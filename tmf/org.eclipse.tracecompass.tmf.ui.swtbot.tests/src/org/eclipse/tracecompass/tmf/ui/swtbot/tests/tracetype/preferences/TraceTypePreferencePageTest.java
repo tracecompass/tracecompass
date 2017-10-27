@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.ConsoleAppender;
@@ -202,25 +203,24 @@ public class TraceTypePreferencePageTest {
     @Test
     public void testSelectTraceType() {
         List<String> menuItems = getSelectTraceTypeMenuItems();
-        String categories[] = new String[] {
+        List<String> categories = Arrays.asList(
+                "Common Trace Format",
                 "Custom Text",
                 "Custom XML",
                 "Test trace",
                 "",
-                "Manage Custom Parsers..."
-        };
-        assertArrayEquals("Test all categories enabled", categories, menuItems.toArray());
+                "Manage Custom Parsers...");
+        assertEquals("Test all categories enabled", categories, menuItems);
 
         //Change the preference values and test the 'Select Trace Type...' options
         setTraceTypePreferences(UNCHECK_ALL, "Custom Text");
         menuItems = getSelectTraceTypeMenuItems();
-        categories = new String[] {
+        categories = Arrays.asList(
                 "Custom Text",
                 "Test trace",
                 "",
-                "Manage Custom Parsers..."
-        };
-        assertArrayEquals("Test 1 category enabled", categories, menuItems.toArray());
+                "Manage Custom Parsers...");
+        assertEquals("Test 1 category enabled", categories, menuItems);
 
         setTraceTypePreferences(CHECK_ALL);
     }
