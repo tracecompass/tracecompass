@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.osgi.util.NLS;
@@ -99,9 +100,15 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 return Status.OK_STATUS;
             }
         }
-        if (target instanceof IProject) {
+
+        if (target instanceof TmfProjectElement) {
             return Status.OK_STATUS;
         }
+
+        if (target instanceof IProject) {
+            return Status.CANCEL_STATUS;
+        }
+
         return Status.CANCEL_STATUS;
     }
 
@@ -110,7 +117,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
         boolean ok = false;
 
         // Use local variable to avoid parameter assignment
-        Object targetToUse = aTarget;
+        @Nullable Object targetToUse = aTarget;
 
         int operation = aDropTargetEvent.detail;
         if (operation != DND.DROP_LINK) {
@@ -120,6 +127,11 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
         // If target is a trace, use its parent (either trace folder or experiment)
         if (targetToUse instanceof TmfTraceElement) {
             targetToUse = ((TmfTraceElement) targetToUse).getParent();
+        }
+
+        // if target is project element
+        if (targetToUse instanceof TmfProjectElement) {
+            targetToUse = ((TmfProjectElement) targetToUse).getTracesFolder();
         }
 
         // If target is a project, use its trace folder
