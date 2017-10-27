@@ -93,12 +93,16 @@ public class TidAnalysisModule extends TmfStateSystemAnalysisModule {
         }
 
         Integer tid = null;
+        // Query at time - 1, because at the boundary (sched_switches), the "thread on
+        // CPU" should be the previous thread, not the next one (as LTTng contexts and
+        // perf traces show).
+        long queryTime = Math.max(time - 1, stateSystem.getStartTime());
         try {
             int cpuQuark = stateSystem.optQuarkAbsolute(Integer.toString(cpu));
             if (cpuQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
                 return null;
             }
-            ITmfStateValue value = stateSystem.querySingleState(time, cpuQuark).getStateValue();
+            ITmfStateValue value = stateSystem.querySingleState(queryTime, cpuQuark).getStateValue();
             if (value.getType().equals(Type.INTEGER)) {
                 tid = value.unboxInt();
             }
