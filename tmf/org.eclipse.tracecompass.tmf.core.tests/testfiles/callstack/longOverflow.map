@@ -1,0 +1,3 @@
+0fffffffffffff00 T Positive long symbol
+ffeeddccbbaa0100 T Overflowing symbol
+ffeeddccbbaa0110 t _end

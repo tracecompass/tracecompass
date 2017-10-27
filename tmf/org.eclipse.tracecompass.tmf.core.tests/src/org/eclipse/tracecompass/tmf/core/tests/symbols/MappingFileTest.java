@@ -143,6 +143,43 @@ public class MappingFileTest {
     }
 
     /**
+     * Test the symbol returned by a mapping file obtained by nm
+     */
+    @Test
+    public void testExtremeValues() {
+        Path nmOutput = Paths.get("..", "..", "tmf", "org.eclipse.tracecompass.tmf.core.tests",
+                "testfiles", "callstack" , "longOverflow.map");
+        assertTrue(Files.exists(nmOutput));
+        String filePath = nmOutput.toFile().getAbsolutePath();
+        assertNotNull(filePath);
+        IMappingFile mf = IMappingFile.create(filePath, false);
+        assertNotNull(mf);
+
+        // Test a smaller value
+        TmfResolvedSymbol symbol = mf.getSymbolEntry(Long.parseUnsignedLong("0ffffffffffffe00", 16));
+        assertNull(symbol);
+
+        // Test a positive long between the symbols
+        symbol = mf.getSymbolEntry(Long.parseUnsignedLong("0ffffffffffffff0", 16));
+        assertNotNull(symbol);
+        assertEquals("Positive long symbol", symbol.getSymbolName());
+
+        // Test an unsigned long between the symbols
+        symbol = mf.getSymbolEntry(Long.parseUnsignedLong("affffffffffffff0", 16));
+        assertNotNull(symbol);
+        assertEquals("Positive long symbol", symbol.getSymbolName());
+
+        // Test an unsigned long between the two overflowing symbols
+        symbol = mf.getSymbolEntry(Long.parseUnsignedLong("ffeeddccbbaa0101", 16));
+        assertNotNull(symbol);
+        assertEquals("Overflowing symbol", symbol.getSymbolName());
+
+        // Test a symbol after the last, it should return null
+        symbol = mf.getSymbolEntry(Long.parseUnsignedLong("ffeeddccbbaa0115", 16));
+        assertNull(symbol);
+    }
+
+    /**
      * Test invalid files
      */
     @Test
