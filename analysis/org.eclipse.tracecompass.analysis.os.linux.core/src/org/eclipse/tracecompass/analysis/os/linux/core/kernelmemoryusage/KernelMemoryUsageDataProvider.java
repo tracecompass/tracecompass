@@ -11,34 +11,25 @@ package org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelThreadInformationProvider;
 import org.eclipse.tracecompass.analysis.os.linux.core.memory.MemoryUsageTreeModel;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelmemoryusage.Messages;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractStateSystemAnalysisDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.FilterTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.AbstractTreeXyDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -46,9 +37,8 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 /**
  * This data provider will return a XY model based on a query filter. The model
@@ -60,8 +50,7 @@ import com.google.common.collect.ImmutableMap;
  */
 @NonNullByDefault
 @SuppressWarnings("restriction")
-public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataProvider
-    implements ITmfTreeXYDataProvider<MemoryUsageTreeModel> {
+public class KernelMemoryUsageDataProvider extends AbstractTreeXyDataProvider<KernelMemoryAnalysisModule, MemoryUsageTreeModel> {
 
     /**
      * This data provider's extension point ID
@@ -73,20 +62,8 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
      * @since 2.4
      */
     private static final int TOTAL_TID = -2;
-    /**
-     * Suffix to add to the trace name for the total entry.
-     * @since 2.4
-     */
-    private static final AtomicLong KERNEL_MEMORY_ENTRY_ID = new AtomicLong();
 
-    private final KernelMemoryAnalysisModule fModule;
     private @Nullable KernelAnalysisModule fKernelModule;
-
-    private final BiMap<Long, Integer> fIdToQuark = HashBiMap.create();
-    /**
-     * This trace's total entry id
-     */
-    private final long fTotalId = KERNEL_MEMORY_ENTRY_ID.getAndIncrement();
 
     /* A map that saves the mapping of a thread ID to its executable name */
     private final Map<String, String> fProcessNameMap = new HashMap<>();
@@ -113,23 +90,17 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
      * Constructor
      */
     private KernelMemoryUsageDataProvider(ITmfTrace trace, KernelMemoryAnalysisModule module) {
-        super(trace);
-        fModule = module;
+        super(trace, module);
     }
 
+    /**
+     * @since 2.5
+     */
     @Override
-    public @NonNull TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        TmfModelResponse<ITmfCommonXAxisModel> res = verifyParameters(fModule, filter, monitor);
-        if (res != null) {
-            return res;
-        }
-
-        ITmfStateSystem ss = Objects.requireNonNull(fModule.getStateSystem(), "Statesystem should have been verified by verifyParameters"); //$NON-NLS-1$
-
+    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
         long[] xValues = filter.getTimesRequested();
 
         long currentEnd = ss.getCurrentEndTime();
-        boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
 
         /**
          * For a given time range, we plot lines representing the memory allocation for
@@ -138,50 +109,46 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
         double[] totalKernelMemoryValues = new double[xValues.length];
         Map<Integer, double[]> selectedSeries = initSeries(filter);
 
-        try {
-            for (int i = 0; i < xValues.length; i++) {
-                if (monitor != null && monitor.isCanceled()) {
-                    return TmfCommonXAxisResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
-                }
+        for (int i = 0; i < xValues.length; i++) {
+            if (monitor != null && monitor.isCanceled()) {
+                return null;
+            }
 
-                long time = xValues[i];
-                if (time >= ss.getStartTime() && time <= currentEnd) {
-                    /* The subattributes of the root are the different threads */
-                    List<Integer> threadQuarkList = ss.getSubAttributes(-1, false);
-                    List<ITmfStateInterval> kernelState = ss.queryFullState(time);
+            long time = xValues[i];
+            if (time >= ss.getStartTime() && time <= currentEnd) {
+                /* The subattributes of the root are the different threads */
+                List<Integer> threadQuarkList = ss.getSubAttributes(-1, false);
+                List<ITmfStateInterval> kernelState = ss.queryFullState(time);
 
-                    for (Integer threadQuark : threadQuarkList) {
-                        long value = extractValue(kernelState.get(threadQuark).getValue());
+                for (Integer threadQuark : threadQuarkList) {
+                    long value = extractValue(kernelState.get(threadQuark).getValue());
 
-                        /* We add the value of each thread to the total quantity */
-                        totalKernelMemoryValues[i] += value;
+                    /* We add the value of each thread to the total quantity */
+                    totalKernelMemoryValues[i] += value;
 
-                        double[] selectedThreadValues = selectedSeries.get(threadQuark);
-                        if (selectedThreadValues != null) {
-                            selectedThreadValues[i] = value;
-                        }
+                    double[] selectedThreadValues = selectedSeries.get(threadQuark);
+                    if (selectedThreadValues != null) {
+                        selectedThreadValues[i] = value;
                     }
                 }
             }
+        }
 
-            /**
-             * We shift the series up.
-             */
-            List<ITmfStateInterval> endState = ss.queryFullState(Long.min(filter.getEnd(), currentEnd));
+        /**
+         * We shift the series up.
+         */
+        List<ITmfStateInterval> endState = ss.queryFullState(Long.min(filter.getEnd(), currentEnd));
 
-            double d = extractTotalValueShift(ss, endState);
-            Arrays.setAll(totalKernelMemoryValues, i -> totalKernelMemoryValues[i] + d);
+        double d = extractTotalValueShift(ss, endState);
+        Arrays.setAll(totalKernelMemoryValues, i -> totalKernelMemoryValues[i] + d);
 
-            for (Entry<Integer, double[]> entry : selectedSeries.entrySet()) {
-                int lowestMemoryQuark = ss.optQuarkRelative(entry.getKey(), KernelMemoryAnalysisModule.THREAD_LOWEST_MEMORY_VALUE);
-                if (lowestMemoryQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
-                    double[] threadValues = entry.getValue();
-                    long shift = extractValue(endState.get(lowestMemoryQuark).getValue());
-                    Arrays.setAll(threadValues, i -> threadValues[i] - shift);
-                }
+        for (Entry<Integer, double[]> entry : selectedSeries.entrySet()) {
+            int lowestMemoryQuark = ss.optQuarkRelative(entry.getKey(), KernelMemoryAnalysisModule.THREAD_LOWEST_MEMORY_VALUE);
+            if (lowestMemoryQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
+                double[] threadValues = entry.getValue();
+                long shift = extractValue(endState.get(lowestMemoryQuark).getValue());
+                Arrays.setAll(threadValues, i -> threadValues[i] - shift);
             }
-        } catch (StateSystemDisposedException e) {
-            return TmfCommonXAxisResponseFactory.createFailedResponse(e.getMessage());
         }
 
         ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
@@ -194,7 +161,7 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
             ySeries.put(selectedThreadName, new YModel(selectedThreadName, entry.getValue()));
         }
 
-        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.KernelMemoryUsageDataProvider_title), xValues, ySeries.build(), complete);
+        return ySeries.build();
     }
 
     /**
@@ -206,20 +173,9 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
      *         newly initialized primitive double arrays of the same length as the
      *         number of requested timestamps.
      */
-    private Map<Integer, double[]> initSeries(TimeQueryFilter filter) {
-        if (filter instanceof SelectionTimeQueryFilter) {
-            Collection<Long> selectedEntries = ((SelectionTimeQueryFilter) filter).getSelectedItems();
-            Map<Integer, double[]> selectedSeries = new HashMap<>();
-            int length = filter.getTimesRequested().length;
-            for (Long id : selectedEntries) {
-                Integer quark = fIdToQuark.get(id);
-                if (quark != null) {
-                    selectedSeries.put(quark, new double[length]);
-                }
-            }
-            return selectedSeries;
-        }
-        return Collections.emptyMap();
+    private Map<Integer, double[]> initSeries(SelectionTimeQueryFilter filter) {
+        int length = filter.getTimesRequested().length;
+        return Maps.toMap(getSelectedQuarks(filter), k -> new double[length]);
     }
 
     /**
@@ -254,58 +210,43 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
     }
 
     /**
-     * @since 2.4
+     * @since 2.5
      */
     @Override
-    public TmfModelResponse<List<MemoryUsageTreeModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    protected List<MemoryUsageTreeModel> getTree(ITmfStateSystem ss, TimeQueryFilter filter, @Nullable IProgressMonitor monitor)
+            throws StateSystemDisposedException {
 
         long start = filter.getStart();
         long end = filter.getEnd();
 
         if (start == end) {
-            return new TmfModelResponse<>(Collections.emptyList(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+            return Collections.emptyList();
         }
 
-        fModule.waitForInitialization();
-        ITmfStateSystem ss = fModule.getStateSystem();
-        if (ss == null) {
-            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
-        }
-        boolean complete = ss.waitUntilBuilt(0);
         // to filter the active threads or not
         boolean filtered = false;
         if (filter instanceof FilterTimeQueryFilter) {
             filtered = ((FilterTimeQueryFilter) filter).isFiltered();
         }
 
-        try {
-            List<MemoryUsageTreeModel> nodes = new ArrayList<>();
-            List<ITmfStateInterval> memoryStates = ss.queryFullState(Long.max(start, ss.getStartTime()));
-            List<Integer> threadQuarkList = ss.getSubAttributes(ITmfStateSystem.ROOT_ATTRIBUTE, false);
+        List<MemoryUsageTreeModel> nodes = new ArrayList<>();
+        List<ITmfStateInterval> memoryStates = ss.queryFullState(Long.max(start, ss.getStartTime()));
+        List<Integer> threadQuarkList = ss.getSubAttributes(ITmfStateSystem.ROOT_ATTRIBUTE, false);
 
-            nodes.add(new MemoryUsageTreeModel(fTotalId, -1, TOTAL_TID, getTrace().getName()));
-            for (Integer threadQuark : threadQuarkList) {
-                ITmfStateInterval threadMemoryInterval = memoryStates.get(threadQuark);
-                if (!filtered || threadMemoryInterval.getEndTime() < end) {
-                    String tidString = ss.getAttributeName(threadQuark);
-                    String procname = getProcessName(tidString);
+        long totalId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
+        nodes.add(new MemoryUsageTreeModel(totalId, -1, TOTAL_TID, getTrace().getName()));
+        for (Integer threadQuark : threadQuarkList) {
+            ITmfStateInterval threadMemoryInterval = memoryStates.get(threadQuark);
+            if (!filtered || threadMemoryInterval.getEndTime() < end) {
+                String tidString = ss.getAttributeName(threadQuark);
+                String procname = getProcessName(tidString);
 
-                    // Ensure that we reuse the same id for a given quark.
-                    Long id = fIdToQuark.inverse().get(threadQuark);
-                    if (id == null) {
-                        id = KERNEL_MEMORY_ENTRY_ID.getAndIncrement();
-                        fIdToQuark.put(id, threadQuark);
-                    }
-                    nodes.add(new MemoryUsageTreeModel(id, fTotalId, parseTid(tidString), procname));
-                }
+                // Ensure that we reuse the same id for a given quark.
+                long id = getId(threadQuark);
+                nodes.add(new MemoryUsageTreeModel(id, totalId, parseTid(tidString), procname));
             }
-            if (complete) {
-                return new TmfModelResponse<>(nodes, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
-            }
-            return  new TmfModelResponse<>(nodes, ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
-        } catch (StateSystemDisposedException e) {
-            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
         }
+        return nodes;
     }
 
     private static int parseTid(String tidString) {
@@ -350,5 +291,21 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
     @Override
     public String getId() {
         return ID;
+    }
+
+    /**
+     * @since 2.5
+     */
+    @Override
+    protected boolean isCacheable() {
+        return false;
+    }
+
+    /**
+     * @since 2.5
+     */
+    @Override
+    protected String getTitle() {
+        return Objects.requireNonNull(Messages.KernelMemoryUsageDataProvider_title);
     }
 }

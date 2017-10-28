@@ -10,7 +10,6 @@
 package org.eclipse.tracecompass.analysis.os.linux.core.cpuusage;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,35 +18,28 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.Messages;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractStateSystemAnalysisDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCpuQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.AbstractTreeXyDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
+import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 
 /**
@@ -59,16 +51,13 @@ import com.google.common.collect.Maps;
  * @since 2.3
  */
 @SuppressWarnings("restriction")
-public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvider
-    implements ITmfTreeXYDataProvider<CpuUsageEntryModel> {
+public class CpuUsageDataProvider extends AbstractTreeXyDataProvider<KernelCpuUsageAnalysis, CpuUsageEntryModel> {
 
     /**
      * Prefix for the total series.
      * @since 2.4
      */
     public static final String TOTAL = "total:"; //$NON-NLS-1$
-
-    private static final TmfModelResponse<List<CpuUsageEntryModel>> FAILED_TREE_RESPONSE = new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
 
     /**
      * This provider's extension point ID.
@@ -81,14 +70,9 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
      * @since 2.4
      */
     public static final int TOTAL_SERIES_TID = -2;
-    private static final AtomicLong CPU_USAGE_ID = new AtomicLong();
 
     /* A map that caches the mapping of a thread ID to its executable name */
     private final Map<String, String> fProcessNameMap = new HashMap<>();
-    private final BiMap<Long, String> fTidToName = HashBiMap.create();
-    private final long fTotalId = CPU_USAGE_ID.getAndIncrement();
-
-    private final KernelCpuUsageAnalysis fModule;
 
     /**
      * {@link KernelAnalysisModule}'s {@link ITmfStateSystem} used to retrieve
@@ -118,24 +102,17 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
      * Constructor
      */
     private CpuUsageDataProvider(ITmfTrace trace, KernelCpuUsageAnalysis module) {
-        super(trace);
-        fModule = module;
+        super(trace, module);
     }
 
+    /**
+     * @since 2.5
+     */
     @Override
-    public TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        TmfModelResponse<ITmfCommonXAxisModel> res = verifyParameters(fModule, filter, monitor);
-        if (res != null) {
-            return res;
-        }
-
-        ITmfStateSystem ss = Objects.requireNonNull(fModule.getStateSystem(), "Statesystem should have been verified by verifyParameters"); //$NON-NLS-1$
-
-        Collection<Long> selectedThreads = Collections.emptySet();
+    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         Set<Integer> cpus = Collections.emptySet();
 
         if (filter instanceof SelectedCpuQueryFilter) {
-            selectedThreads = ((SelectionTimeQueryFilter) filter).getSelectedItems();
             cpus = ((SelectedCpuQueryFilter) filter).getSelectedCpus();
         }
 
@@ -144,11 +121,8 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
         /* CPU usage values for total and selected thread */
         double[] totalValues = new double[xValues.length];
         Map<String, double[]> selectedThreadValues = new HashMap<>();
-        for (Long selectThread : selectedThreads) {
-            String tid = fTidToName.get(selectThread);
-            if (tid != null) {
-                selectedThreadValues.put(tid, new double[xValues.length]);
-            }
+        for (Integer tidInt : getSelectedQuarks(filter)) {
+            selectedThreadValues.put(Integer.toString(tidInt), new double[xValues.length]);
         }
 
         long prevTime = Math.max(filter.getStart(), ss.getStartTime());
@@ -157,7 +131,7 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
         for (int i = 1; i < xValues.length; i++) {
             long time = xValues[i];
             if (time >= ss.getStartTime() && time <= currentEnd && prevTime < time) {
-                Map<String, Long> cpuUsageMap = Maps.filterKeys(fModule.getCpuUsageInRange(cpus, prevTime, time),
+                Map<String, Long> cpuUsageMap = Maps.filterKeys(getAnalysisModule().getCpuUsageInRange(cpus, prevTime, time),
                     key -> key.startsWith(KernelCpuUsageAnalysis.TOTAL)
                 );
 
@@ -171,7 +145,7 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
                     if (threadName != null) {
                         long cpuTime = entry.getValue();
                         totalCpu += cpuTime;
-                        double[] values = selectedThreadValues.get(entry.getKey());
+                        double[] values = selectedThreadValues.get(threadName);
                         if (values != null) {
                             values[i] = normalize(prevTime, time, cpuTime);
                         }
@@ -181,7 +155,7 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
                 prevTime = time;
             }
             if (monitor != null && monitor.isCanceled()) {
-                return TmfCommonXAxisResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
+                return null;
             }
         }
 
@@ -189,12 +163,11 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
         String key = TOTAL + getTrace().getName();
         ySeries.put(key, new YModel(key, totalValues));
         for (Entry<String, double[]> entry : selectedThreadValues.entrySet()) {
-            String selectedThread = getTrace().getName() + ':' + extractThreadName(entry.getKey());
+            String selectedThread = getTrace().getName() + ':' + entry.getKey();
             ySeries.put(selectedThread, new YModel(selectedThread, entry.getValue()));
         }
 
-        boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
-        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.CpuUsageDataProvider_title), xValues, ySeries.build(), complete);
+        return ySeries.build();
     }
 
     private static double normalize(long prevTime, long time, long value) {
@@ -210,37 +183,31 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
     }
 
     /**
-     * @since 2.4
+     * @since 2.5
      */
     @Override
-    public TmfModelResponse<List<CpuUsageEntryModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-
+    protected List<CpuUsageEntryModel> getTree(ITmfStateSystem ss, TimeQueryFilter filter, @Nullable IProgressMonitor monitor)
+            throws StateSystemDisposedException {
         if (!(filter instanceof SelectedCpuQueryFilter)) {
-            return new TmfModelResponse<>(Collections.emptyList(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+            return Collections.emptyList();
         }
 
         SelectedCpuQueryFilter cpuQueryFilter = (SelectedCpuQueryFilter) filter;
         long end = filter.getEnd();
 
-        /* Initialize the data */
-        fModule.waitForInitialization();
-        ITmfStateSystem ss = fModule.getStateSystem();
-        if (ss == null) {
-            return FAILED_TREE_RESPONSE;
-        }
-
         ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystem(getTrace(), KernelAnalysisModule.ID);
         if (kernelSs == null) {
-            return FAILED_TREE_RESPONSE;
+            // let the abstract class handle the error.
+            throw new StateSystemDisposedException();
         }
-        boolean complete = ss.waitUntilBuilt(0) && kernelSs.waitUntilBuilt(0);
-
-        Map<String, Long> cpuUsageMap = fModule.getCpuUsageInRange(cpuQueryFilter.getSelectedCpus(), filter.getStart(), end);
-
         List<CpuUsageEntryModel> entryList = new ArrayList<>();
-        Map<String, Long> totalMap = Maps.filterKeys(cpuUsageMap, key -> key.equals(KernelCpuUsageAnalysis.TOTAL));
-        long totalTime = totalMap.values().stream().mapToLong(Long::longValue).sum();
-        entryList.add(new CpuUsageEntryModel(fTotalId, -1, getTrace().getName(), TOTAL_SERIES_TID, totalTime));
+
+        Map<String, Long> cpuUsageMap = getAnalysisModule().getCpuUsageInRange(cpuQueryFilter.getSelectedCpus(), filter.getStart(), end);
+
+        long totalTime = cpuUsageMap.getOrDefault(KernelCpuUsageAnalysis.TOTAL, 0l);
+        long totalId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
+        entryList.add(new CpuUsageEntryModel(totalId, -1, getTrace().getName(), TOTAL_SERIES_TID, totalTime));
+
         for (Entry<String, Long> entry : cpuUsageMap.entrySet()) {
             /*
              * Process only entries representing the total of all CPUs and that
@@ -253,22 +220,13 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
             String[] strings = key.split(KernelCpuUsageAnalysis.SPLIT_STRING, 2);
 
             if (strings.length > 1) {
-                String tid = strings[1];
-                if (!tid.equals(KernelCpuUsageAnalysis.TID_ZERO)) {
-                    Long id = fTidToName.inverse().get(key);
-                    if (id == null) {
-                        id = CPU_USAGE_ID.getAndIncrement();
-                        fTidToName.put(id, key);
-                    }
-                    entryList.add(new CpuUsageEntryModel(id, fTotalId, getProcessName(tid, filter.getStart()), Integer.parseInt(tid), entry.getValue()));
+                int tid = Integer.parseInt(strings[1]);
+                if (tid != 0) {
+                    entryList.add(new CpuUsageEntryModel(getId(tid), totalId, getProcessName(strings[1], filter.getStart()), tid, entry.getValue()));
                 }
             }
         }
-
-        if (complete) {
-            return new TmfModelResponse<>(entryList, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
-        }
-        return new TmfModelResponse<>(entryList, ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
+        return entryList;
     }
 
     /*
@@ -301,13 +259,11 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
 
         /* Find a name in this attribute's intervals */
         Iterator<ITmfStateInterval> iterator = new StateSystemUtils.QuarkIterator(kernelSs, execNameQuark, start);
-        while (iterator.hasNext()) {
-            Object execNameObject = iterator.next().getValue();
-            if (execNameObject instanceof String) {
-                execName = (String) execNameObject;
-                fProcessNameMap.put(tid, execName);
-                return execName;
-            }
+        Iterator<String> names = Iterators.filter(Iterators.transform(iterator, ITmfStateInterval::getValue), String.class);
+        if (iterator.hasNext()) {
+            execName = names.next();
+            fProcessNameMap.put(tid, execName);
+            return execName;
         }
         return tid;
     }
@@ -318,5 +274,21 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
     @Override
     public String getId() {
         return ID;
+    }
+
+    /**
+     * @since 2.5
+     */
+    @Override
+    protected boolean isCacheable() {
+        return false;
+    }
+
+    /**
+     * @since 2.5
+     */
+    @Override
+    protected String getTitle() {
+        return Objects.requireNonNull(Messages.CpuUsageDataProvider_title);
     }
 }

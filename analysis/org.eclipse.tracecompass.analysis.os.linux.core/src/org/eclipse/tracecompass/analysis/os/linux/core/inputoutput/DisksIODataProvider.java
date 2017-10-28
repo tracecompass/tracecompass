@@ -12,24 +12,17 @@ package org.eclipse.tracecompass.analysis.os.linux.core.inputoutput;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.Messages;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractStateSystemAnalysisDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.AbstractTreeXyDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
@@ -38,9 +31,8 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 
 /**
  * This data provider will return a XY model (model is wrapped in a response)
@@ -50,7 +42,7 @@ import com.google.common.collect.ImmutableMap;
  * @author Yonni Chen
  */
 @SuppressWarnings("restriction")
-public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider implements ITmfTreeXYDataProvider<TmfTreeDataModel> {
+public class DisksIODataProvider extends AbstractTreeXyDataProvider<InputOutputAnalysisModule, TmfTreeDataModel> {
 
     /**
      * Title used to create XY models for the {@link DisksIODataProvider}.
@@ -123,12 +115,6 @@ public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider
         }
     }
 
-    private static final AtomicLong ENTRY_ID = new AtomicLong();
-
-    private final InputOutputAnalysisModule fModule;
-    private final BiMap<Long, Integer> fIdToSectorQuark = HashBiMap.create();
-    private @Nullable TmfModelResponse<List<TmfTreeDataModel>> fCached = null;
-    private final long fTraceId = ENTRY_ID.getAndIncrement();
 
     /**
      * Create an instance of {@link DisksIODataProvider}. Returns a null instance if
@@ -152,8 +138,7 @@ public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider
      * Constructor
      */
     private DisksIODataProvider(ITmfTrace trace, InputOutputAnalysisModule module) {
-        super(trace);
-        fModule = module;
+        super(trace, module);
     }
 
     @Override
@@ -162,19 +147,10 @@ public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider
     }
 
     @Override
-    public TmfModelResponse<List<TmfTreeDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        if (fCached != null) {
-            return fCached;
-        }
-        fModule.waitForInitialization();
-        ITmfStateSystem ss = fModule.getStateSystem();
-        if (ss == null) {
-            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
-        }
-        boolean complete = ss.waitUntilBuilt(0);
-
+    protected List<TmfTreeDataModel> getTree(ITmfStateSystem ss, TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         List<TmfTreeDataModel> nodes = new ArrayList<>();
-        nodes.add(new TmfTreeDataModel(fTraceId, -1, getTrace().getName()));
+        long rootId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
+        nodes.add(new TmfTreeDataModel(rootId, -1, getTrace().getName()));
 
         String readName = Objects.requireNonNull(Messages.DisksIODataProvider_read);
         String writeName = Objects.requireNonNull(Messages.DisksIODataProvider_write);
@@ -182,7 +158,7 @@ public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider
         for (Integer diskQuark : ss.getQuarks(Attributes.DISKS, "*")) { //$NON-NLS-1$
             String diskName = getDiskName(ss, diskQuark);
             long diskId = getId(diskQuark);
-            nodes.add(new TmfTreeDataModel(diskId, fTraceId, diskName));
+            nodes.add(new TmfTreeDataModel(diskId, rootId, diskName));
 
             int readQuark = ss.optQuarkRelative(diskQuark, Attributes.SECTORS_READ);
             if (readQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
@@ -194,22 +170,7 @@ public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider
                 nodes.add(new TmfTreeDataModel(getId(writeQuark), diskId, writeName));
             }
         }
-
-        if (complete) {
-            TmfModelResponse<List<TmfTreeDataModel>> response = new TmfModelResponse<>(nodes, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
-            fCached = response;
-            return response;
-        }
-        return new TmfModelResponse<>(nodes, ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
-    }
-
-    private long getId(int quark) {
-        Long id = fIdToSectorQuark.inverse().get(quark);
-        if (id == null) {
-            id = ENTRY_ID.getAndIncrement();
-            fIdToSectorQuark.put(id, quark);
-        }
-        return id;
+        return nodes;
     }
 
     private static String getDiskName(ITmfStateSystem ss, Integer diskQuark) {
@@ -222,81 +183,68 @@ public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider
     }
 
     @Override
-    public TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        TmfModelResponse<ITmfCommonXAxisModel> res = verifyParameters(fModule, filter, monitor);
-        if (res != null) {
-            return res;
-        }
-
-        @NonNull ITmfStateSystem ss = Objects.requireNonNull(fModule.getStateSystem(), "Statesystem should have been verified by verifyParameters"); //$NON-NLS-1$
+    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
         long[] xValues = filter.getTimesRequested();
         List<DiskBuilder> builders = initBuilders(ss, filter);
         if (builders.isEmpty()) {
             // this would return an empty map even if we did the queries.
-            return TmfCommonXAxisResponseFactory.create(PROVIDER_TITLE, xValues, Collections.emptyMap(), true);
+            return Collections.emptyMap();
         }
 
         long currentEnd = ss.getCurrentEndTime();
-        try {
-            long prevTime = filter.getStart();
-            if (prevTime >= ss.getStartTime() && prevTime <= currentEnd) {
+        long prevTime = filter.getStart();
+        if (prevTime >= ss.getStartTime() && prevTime <= currentEnd) {
+            // reuse the results from the full query
+            List<ITmfStateInterval> states = ss.queryFullState(prevTime);
+
+            for (DiskBuilder entry : builders) {
+                entry.setPrevCount(Disk.extractCount(entry.fSectorQuark, ss, states, prevTime));
+            }
+        }
+
+        for (int i = 1; i < xValues.length; i++) {
+            if (monitor != null && monitor.isCanceled()) {
+                return null;
+            }
+            long time = xValues[i];
+            if (time > currentEnd) {
+                break;
+            } else if (time >= ss.getStartTime()) {
                 // reuse the results from the full query
-                List<ITmfStateInterval> states = ss.queryFullState(prevTime);
+                List<ITmfStateInterval> states = ss.queryFullState(time);
 
                 for (DiskBuilder entry : builders) {
-                    entry.setPrevCount(Disk.extractCount(entry.fSectorQuark, ss, states, prevTime));
+                    double count = Disk.extractCount(entry.fSectorQuark, ss, states, time);
+                    entry.updateValue(i, count, time - prevTime);
                 }
             }
-
-            for (int i = 1; i < xValues.length; i++) {
-                if (monitor != null && monitor.isCanceled()) {
-                    return TmfCommonXAxisResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
-                }
-                long time = xValues[i];
-                if (time > currentEnd) {
-                    break;
-                } else if (time >= ss.getStartTime()) {
-                    // reuse the results from the full query
-                    List<ITmfStateInterval> states = ss.queryFullState(time);
-
-                    for (DiskBuilder entry : builders) {
-                        double count = Disk.extractCount(entry.fSectorQuark, ss, states, time);
-                        entry.updateValue(i, count, time - prevTime);
-                    }
-                }
-                prevTime = time;
-            }
-            ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
-            for (DiskBuilder entry : builders) {
-                IYModel model = entry.build();
-                ySeries.put(model.getName(), model);
-            }
-            boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
-            return TmfCommonXAxisResponseFactory.create(PROVIDER_TITLE, xValues, ySeries.build(), complete);
-        } catch (StateSystemDisposedException e) {
-            return TmfCommonXAxisResponseFactory.createFailedResponse(e.getMessage());
+            prevTime = time;
         }
+        return Maps.uniqueIndex(Iterables.transform(builders, DiskBuilder::build), IYModel::getName);
     }
 
-    private List<DiskBuilder> initBuilders(ITmfStateSystem ss, TimeQueryFilter filter) {
-        if (!(filter instanceof SelectionTimeQueryFilter)) {
-            return Collections.emptyList();
-        }
-
+    private List<DiskBuilder> initBuilders(ITmfStateSystem ss, SelectionTimeQueryFilter filter) {
         int length = filter.getTimesRequested().length;
         List<DiskBuilder> builders = new ArrayList<>();
-        for (Long id : ((SelectionTimeQueryFilter) filter).getSelectedItems()) {
-            Integer quark = fIdToSectorQuark.get(id);
-            if (quark != null) {
-                if (ss.getAttributeName(quark).equals(Attributes.SECTORS_READ)) {
-                    String name = getTrace().getName() + '/' + getDiskName(ss, ss.getParentAttributeQuark(quark)) + "/read"; //$NON-NLS-1$
-                    builders.add(new DiskBuilder(quark, name, length));
-                } else if (ss.getAttributeName(quark).equals(Attributes.SECTORS_WRITTEN)) {
-                    String name = getTrace().getName() + '/' + getDiskName(ss, ss.getParentAttributeQuark(quark)) + "/write"; //$NON-NLS-1$
-                    builders.add(new DiskBuilder(quark, name, length));
-                }
+        for (Integer quark : getSelectedQuarks(filter)) {
+            if (ss.getAttributeName(quark).equals(Attributes.SECTORS_READ)) {
+                String name = getTrace().getName() + '/' + getDiskName(ss, ss.getParentAttributeQuark(quark)) + "/read"; //$NON-NLS-1$
+                builders.add(new DiskBuilder(quark, name, length));
+            } else if (ss.getAttributeName(quark).equals(Attributes.SECTORS_WRITTEN)) {
+                String name = getTrace().getName() + '/' + getDiskName(ss, ss.getParentAttributeQuark(quark)) + "/write"; //$NON-NLS-1$
+                builders.add(new DiskBuilder(quark, name, length));
             }
         }
         return builders;
+    }
+
+    @Override
+    protected boolean isCacheable() {
+        return true;
+    }
+
+    @Override
+    protected String getTitle() {
+        return PROVIDER_TITLE;
     }
 }

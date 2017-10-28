@@ -56,7 +56,7 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
 
     private final TmfStatisticsModule fModule;
     private final TmfModelResponse<List<TmfTreeDataModel>> fResponse;
-    private final long fId;
+    private final long fId = TRACE_IDS.incrementAndGet();
 
     /**
      * Constructor
@@ -69,7 +69,6 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
     public HistogramDataProvider(ITmfTrace trace, TmfStatisticsModule module) {
         super(trace);
         fModule = module;
-        fId = TRACE_IDS.incrementAndGet();
         TmfTreeDataModel model = new TmfTreeDataModel(fId, -1, trace.getName());
         fResponse = new TmfModelResponse<>(Collections.singletonList(model), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
