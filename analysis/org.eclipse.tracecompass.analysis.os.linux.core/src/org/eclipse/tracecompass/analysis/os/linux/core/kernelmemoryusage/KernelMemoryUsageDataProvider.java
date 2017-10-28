@@ -11,12 +11,13 @@ package org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -58,14 +59,13 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
      */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage"; //$NON-NLS-1$
     /**
-     * Fake Tid used for the total entry
-     * @since 2.4
+     * Fake TID used for the total entry
      */
     private static final int TOTAL_TID = -2;
 
-    private @Nullable KernelAnalysisModule fKernelModule;
+    private final KernelAnalysisModule fKernelModule;
 
-    /* A map that saves the mapping of a thread ID to its executable name */
+    /** A map that saves the mapping of a thread ID to its executable name */
     private final Map<String, String> fProcessNameMap = new HashMap<>();
 
     /**
@@ -78,10 +78,15 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
      *         returns null
      */
     public static @Nullable KernelMemoryUsageDataProvider create(ITmfTrace trace) {
-        KernelMemoryAnalysisModule module = TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelMemoryAnalysisModule.class, KernelMemoryAnalysisModule.ID);
-        if (module != null) {
+        KernelMemoryAnalysisModule module = TmfTraceUtils.getAnalysisModuleOfClass(trace,
+                KernelMemoryAnalysisModule.class, KernelMemoryAnalysisModule.ID);
+
+        KernelAnalysisModule kernelModule = TmfTraceUtils.getAnalysisModuleOfClass(trace,
+                KernelAnalysisModule.class, KernelAnalysisModule.ID);
+
+        if (module != null && kernelModule != null) {
             module.schedule();
-            return new KernelMemoryUsageDataProvider(trace, module);
+            return new KernelMemoryUsageDataProvider(trace, module, kernelModule);
         }
         return null;
     }
@@ -89,17 +94,21 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
     /**
      * Constructor
      */
-    private KernelMemoryUsageDataProvider(ITmfTrace trace, KernelMemoryAnalysisModule module) {
+    private KernelMemoryUsageDataProvider(ITmfTrace trace,
+            KernelMemoryAnalysisModule module, KernelAnalysisModule kernelModule) {
         super(trace, module);
+        fKernelModule = kernelModule;
     }
 
     /**
      * @since 2.5
      */
     @Override
-    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
-        long[] xValues = filter.getTimesRequested();
+    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss,
+            SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor)
+            throws StateSystemDisposedException {
 
+        long[] xValues = filter.getTimesRequested();
         long currentEnd = ss.getCurrentEndTime();
 
         /**
@@ -107,29 +116,33 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
          * the total and the selected entries.
          */
         double[] totalKernelMemoryValues = new double[xValues.length];
-        Map<Integer, double[]> selectedSeries = initSeries(filter);
+        Map<Integer, double[]> selectedSeries = Maps.toMap(getSelectedQuarks(filter),
+                k -> new double[xValues.length]);
 
-        for (int i = 0; i < xValues.length; i++) {
+        List<Integer> threadQuarkList = ss.getSubAttributes(-1, false);
+        Collection<Long> times = getTimes(filter, ss.getStartTime(), currentEnd);
+        for (ITmfStateInterval interval : ss.query2D(threadQuarkList, times)) {
             if (monitor != null && monitor.isCanceled()) {
                 return null;
             }
 
-            long time = xValues[i];
-            if (time >= ss.getStartTime() && time <= currentEnd) {
-                /* The subattributes of the root are the different threads */
-                List<Integer> threadQuarkList = ss.getSubAttributes(-1, false);
-                List<ITmfStateInterval> kernelState = ss.queryFullState(time);
+            Object object = interval.getValue();
+            if (object instanceof Number) {
+                double value = ((Number) object).doubleValue();
+                int from = Arrays.binarySearch(xValues, interval.getStartTime());
+                from = (from >= 0) ? from : -1 - from;
 
-                for (Integer threadQuark : threadQuarkList) {
-                    long value = extractValue(kernelState.get(threadQuark).getValue());
+                int to = Arrays.binarySearch(xValues, from, xValues.length, interval.getEndTime());
+                to = (to >= 0) ? to + 1 : -1 - to;
 
-                    /* We add the value of each thread to the total quantity */
+                /* We add the value of each thread to the total quantity */
+                for (int i = from; i < to; i++) {
                     totalKernelMemoryValues[i] += value;
+                }
 
-                    double[] selectedThreadValues = selectedSeries.get(threadQuark);
-                    if (selectedThreadValues != null) {
-                        selectedThreadValues[i] = value;
-                    }
+                double[] selectedThreadValues = selectedSeries.get(interval.getAttribute());
+                if (selectedThreadValues != null) {
+                    Arrays.fill(selectedThreadValues, from, to, value);
                 }
             }
         }
@@ -143,11 +156,16 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
         Arrays.setAll(totalKernelMemoryValues, i -> totalKernelMemoryValues[i] + d);
 
         for (Entry<Integer, double[]> entry : selectedSeries.entrySet()) {
-            int lowestMemoryQuark = ss.optQuarkRelative(entry.getKey(), KernelMemoryAnalysisModule.THREAD_LOWEST_MEMORY_VALUE);
+            int lowestMemoryQuark = ss.optQuarkRelative(entry.getKey(),
+                    KernelMemoryAnalysisModule.THREAD_LOWEST_MEMORY_VALUE);
+
             if (lowestMemoryQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
-                double[] threadValues = entry.getValue();
-                long shift = extractValue(endState.get(lowestMemoryQuark).getValue());
-                Arrays.setAll(threadValues, i -> threadValues[i] - shift);
+                Object value = endState.get(lowestMemoryQuark).getValue();
+                if (value instanceof Number) {
+                    double[] threadValues = entry.getValue();
+                    double shift = ((Number) value).doubleValue();
+                    Arrays.setAll(threadValues, i -> threadValues[i] - shift);
+                }
             }
         }
 
@@ -165,20 +183,6 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
     }
 
     /**
-     * Initialize a map of quark to primitive double array
-     *
-     * @param filter
-     *            the query object
-     * @return a Map of quarks for the entries which exist for this provider to
-     *         newly initialized primitive double arrays of the same length as the
-     *         number of requested timestamps.
-     */
-    private Map<Integer, double[]> initSeries(SelectionTimeQueryFilter filter) {
-        int length = filter.getTimesRequested().length;
-        return Maps.toMap(getSelectedQuarks(filter), k -> new double[length]);
-    }
-
-    /**
      * For each thread, we look for its lowest value since the beginning of the
      * trace. This way, we can avoid negative values in the plot.
      *
@@ -192,28 +196,25 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
         double totalKernelMemoryValuesShift = 0;
 
         /* We add the lowest value of each thread */
-        List<Integer> threadQuarkList = ss.getQuarks("*", KernelMemoryAnalysisModule.THREAD_LOWEST_MEMORY_VALUE); //$NON-NLS-1$
+        List<Integer> threadQuarkList = ss.getQuarks("*", //$NON-NLS-1$
+                KernelMemoryAnalysisModule.THREAD_LOWEST_MEMORY_VALUE);
         for (Integer threadQuark : threadQuarkList) {
             ITmfStateInterval lowestMemoryInterval = endState.get(threadQuark);
             Object val = lowestMemoryInterval.getValue();
-            // We want to add up a positive quantity.
-            totalKernelMemoryValuesShift -= extractValue(val);
+            if (val instanceof Number) {
+                // We want to add up a positive quantity.
+                totalKernelMemoryValuesShift -= ((Number) val).doubleValue();
+            }
         }
         return totalKernelMemoryValuesShift;
-    }
-
-    private static long extractValue(@Nullable Object val) {
-        if (val instanceof Number) {
-            return ((Number) val).longValue();
-        }
-        return 0;
     }
 
     /**
      * @since 2.5
      */
     @Override
-    protected List<MemoryUsageTreeModel> getTree(ITmfStateSystem ss, TimeQueryFilter filter, @Nullable IProgressMonitor monitor)
+    protected List<MemoryUsageTreeModel> getTree(ITmfStateSystem ss,
+            TimeQueryFilter filter, @Nullable IProgressMonitor monitor)
             throws StateSystemDisposedException {
 
         long start = filter.getStart();
@@ -240,7 +241,7 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
         for (Integer threadQuark : threadQuarkList) {
             if (active == null || active.get(threadQuark).getEndTime() < end) {
                 String tidString = ss.getAttributeName(threadQuark);
-                String procname = getProcessName(tidString);
+                String procname = fProcessNameMap.computeIfAbsent(tidString, this::getProcessName);
 
                 // Ensure that we reuse the same id for a given quark.
                 long id = getId(threadQuark);
@@ -262,28 +263,11 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
      * Get the process name from its TID by using the LTTng kernel analysis module
      */
     private String getProcessName(String tid) {
-        String execName = fProcessNameMap.get(tid);
-        if (execName != null) {
-            return execName;
-        }
         if (tid.equals(KernelMemoryStateProvider.OTHER_TID)) {
-            fProcessNameMap.put(tid, tid);
             return tid;
         }
-        KernelAnalysisModule kernelModule = fKernelModule;
-        if (kernelModule == null) {
-            kernelModule = TmfTraceUtils.getAnalysisModuleOfClass(getTrace(), KernelAnalysisModule.class, KernelAnalysisModule.ID);
-        }
-        if (kernelModule == null) {
-            return tid;
-        }
-        fKernelModule = kernelModule;
-        execName = KernelThreadInformationProvider.getExecutableName(kernelModule, Integer.parseInt(tid));
-        if (execName == null) {
-            return tid;
-        }
-        fProcessNameMap.put(tid, execName);
-        return execName;
+        String execName = KernelThreadInformationProvider.getExecutableName(fKernelModule, Integer.parseInt(tid));
+        return execName != null ? execName : tid;
     }
 
     /**
