@@ -52,7 +52,7 @@ public class DataProviderManager {
      *
      * @return the singleton instance
      */
-    public static DataProviderManager getInstance() {
+    public synchronized static DataProviderManager getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new DataProviderManager();
         }
