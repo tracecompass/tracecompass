@@ -303,8 +303,13 @@ public class TmfProjectRegistry implements IResourceChangeListener {
             for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
                 if (delta.getResource() instanceof IProject) {
                     IProject project = (IProject) delta.getResource();
-                    try {
+                    // Handle project moved - it covers only if it's not shadow project
+                    if ((delta.getKind() == IResourceDelta.ADDED) && (delta.getFlags() & IResourceDelta.MOVED_FROM) != 0 ) {
+                        handeProjectMoved(project);
+                        return;
+                    }
 
+                    try {
                         if (delta.getKind() == IResourceDelta.CHANGED &&
                                 project.isOpen() && project.hasNature(TmfProjectNature.ID)) {
                             // If shadow project exists, handle resource change in the shadow project
@@ -548,6 +553,23 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                 } catch (CoreException e) {
                     Activator.getDefault().logError("Error refeshing shadow project " + shadowProject.getName(), e); //$NON-NLS-1$
                 }
+            }
+        });
+    }
+
+    private static void handeProjectMoved(IProject newProject) {
+        Display.getDefault().asyncExec(() -> {
+            addTracingNature(newProject, new NullProgressMonitor());
+            IProject shadowProject = TmfProjectModelHelper.getShadowProject(newProject);
+            String newShadowProjectName = TmfProjectModelHelper.getShadowProjectName(newProject.getName());
+            try {
+                if (shadowProject.exists()) {
+                    IProjectDescription desc = shadowProject.getDescription();
+                    desc.setName(newShadowProjectName);
+                    shadowProject.move(desc, true, new NullProgressMonitor());
+                }
+            } catch (CoreException e) {
+                Activator.getDefault().logError("Error renaming shadow project " + shadowProject.getName() + " to " + newShadowProjectName, e); //$NON-NLS-1$ //$NON-NLS-2$
             }
         });
     }
