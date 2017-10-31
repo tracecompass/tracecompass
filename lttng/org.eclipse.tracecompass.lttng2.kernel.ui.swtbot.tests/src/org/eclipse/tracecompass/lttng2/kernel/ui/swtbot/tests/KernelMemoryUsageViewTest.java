@@ -45,7 +45,7 @@ public class KernelMemoryUsageViewTest extends XYDataProviderBaseTest {
     private static final @NonNull String SESSIOND_PID = "bug446190:482";
     private static final @NonNull String CONSUMERD_PID = "bug446190:496";
 
-    private static final RGB RED = new RGB(255, 0, 0);
+    private static final RGB GREEN = new RGB(0, 255, 0);
     private static final RGB BLUE = new RGB(0, 0, 255);
     private static final RGB PURPLE = new RGB(255, 0, 255);
 
@@ -104,7 +104,7 @@ public class KernelMemoryUsageViewTest extends XYDataProviderBaseTest {
         SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 2, chart, "Only total available");
 
         /* Test type, style and color of series */
-        verifySeriesStyle(SESSIOND_PID, ISeries.SeriesType.LINE, RED, LineStyle.SOLID, false);
+        verifySeriesStyle(SESSIOND_PID, ISeries.SeriesType.LINE, GREEN, LineStyle.SOLID, false);
 
         SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, SESSIOND_PID), "resources/kernelmemory/kernel-memory-res50Selected.json", "Chart data is not valid");
 

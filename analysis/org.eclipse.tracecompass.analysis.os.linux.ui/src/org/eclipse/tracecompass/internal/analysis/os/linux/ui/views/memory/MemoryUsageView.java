@@ -9,8 +9,6 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.memory.MemoryUsageTreeModel;
 import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
@@ -26,8 +24,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxi
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TreePatternFilter;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TriStateFilteredCheckboxTree;
 
 /**
  * Memory usage view
@@ -72,10 +68,7 @@ public class MemoryUsageView extends TmfChartView {
 
     @Override
     protected @NonNull TmfViewer createLeftChildViewer(Composite parent) {
-        // Create the tree viewer with a filtered checkbox
-        int treeStyle = SWT.MULTI | SWT.H_SCROLL | SWT.FULL_SELECTION;
-        TriStateFilteredCheckboxTree triStateFilteredCheckboxTree = new TriStateFilteredCheckboxTree(parent, treeStyle, new TreePatternFilter(), true);
-        MemoryUsageTreeViewer fTreeViewer = new MemoryUsageTreeViewer(parent, triStateFilteredCheckboxTree, fProviderId);
+        MemoryUsageTreeViewer fTreeViewer = new MemoryUsageTreeViewer(parent, fProviderId);
 
         /* Initialize the viewers with the currently selected trace */
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
@@ -84,7 +77,6 @@ public class MemoryUsageView extends TmfChartView {
             fTreeViewer.traceSelected(signal);
         }
 
-        fTreeViewer.getControl().addControlListener(new ControlAdapter() {});
         return fTreeViewer;
     }
 

@@ -202,10 +202,6 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
         if (ss == null) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
         }
-        while (ss.getCurrentEndTime() < filter.getEnd() && !ss.waitUntilBuilt(200)) {
-            // Wait until the ss is build past the query end time
-            // TODO remove once tree viewers support incomplete queries.
-        }
 
         // Get the quarks before the full states to ensure that the attributes will be present in the full state
         boolean isComplete = ss.waitUntilBuilt(0);

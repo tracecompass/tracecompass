@@ -222,13 +222,12 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
         if (ss == null) {
             return FAILED_TREE_RESPONSE;
         }
-        ssWait(ss, end);
 
         ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystem(getTrace(), KernelAnalysisModule.ID);
         if (kernelSs == null) {
             return FAILED_TREE_RESPONSE;
         }
-        ssWait(kernelSs, end);
+        boolean complete = ss.waitUntilBuilt(0) && kernelSs.waitUntilBuilt(0);
 
         Map<String, Long> cpuUsageMap = fModule.getCpuUsageInRange(cpuQueryFilter.getSelectedCpus(), filter.getStart(), end);
 
@@ -259,13 +258,11 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
                 }
             }
         }
-        return new TmfModelResponse<>(entryList, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
-    }
 
-    private static void ssWait(ITmfStateSystem ss, long desiredEnd) {
-        while (ss.getCurrentEndTime() < desiredEnd && !ss.waitUntilBuilt(100)) {
-            // wait.
+        if (complete) {
+            return new TmfModelResponse<>(entryList, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
+        return new TmfModelResponse<>(entryList, ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
     }
 
     /*

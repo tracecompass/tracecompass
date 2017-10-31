@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.analysis.counters.ui;
+package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +22,6 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TreePatternFilter;
 
 import com.google.common.base.Splitter;
 
@@ -34,8 +33,9 @@ import com.google.common.base.Splitter;
  * detects a match if a subsequence of a tree element matches the pattern.
  *
  * @author Mikael Ferland
+ * @since 3.2
  */
-public class CounterTreePatternFilter extends TreePatternFilter {
+public class MultiTreePatternFilter extends TreePatternFilter {
 
     /**
      * List of compiled regular expressions for filtering the tree elements

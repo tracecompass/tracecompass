@@ -12,9 +12,7 @@ package org.eclipse.tracecompass.analysis.counters.ui;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.internal.analysis.counters.ui.CounterTreePatternFilter;
 import org.eclipse.tracecompass.internal.analysis.counters.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -26,7 +24,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.XYChartLegendImageProvid
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TriStateFilteredCheckboxTree;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
@@ -86,11 +83,7 @@ public class CounterView extends TmfChartView {
 
     @Override
     protected @NonNull TmfViewer createLeftChildViewer(Composite parent) {
-        // Create the tree viewer with a filtered checkbox
-        int treeStyle = SWT.MULTI | SWT.H_SCROLL | SWT.FULL_SELECTION;
-        CounterTreePatternFilter filter = new CounterTreePatternFilter();
-        TriStateFilteredCheckboxTree triStateFilteredCheckboxTree = new TriStateFilteredCheckboxTree(parent, treeStyle, filter, true);
-        CounterTreeViewer treeViewer = new CounterTreeViewer(parent, triStateFilteredCheckboxTree);
+        CounterTreeViewer treeViewer = new CounterTreeViewer(parent);
 
         // Initialize the tree viewer with the currently selected trace
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();

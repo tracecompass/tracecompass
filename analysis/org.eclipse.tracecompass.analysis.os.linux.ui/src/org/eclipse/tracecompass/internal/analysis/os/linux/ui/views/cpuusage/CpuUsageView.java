@@ -17,10 +17,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.signals.TmfCpuSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -35,8 +31,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.XYChartLegendImageProvid
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TriStateFilteredCheckboxTree;
-import org.eclipse.ui.dialogs.PatternFilter;
 
 /**
  * CPU usage view. It contains 2 viewers: one tree viewer showing all the
@@ -53,9 +47,6 @@ public class CpuUsageView extends TmfChartView {
 
     /** ID of the followed CPU in the map data in {@link TmfTraceContext} */
     public static final @NonNull String CPU_USAGE_FOLLOW_CPU = ID + ".FOLLOW_CPU"; //$NON-NLS-1$
-
-    private @Nullable CpuUsageTreeViewer fTreeViewer = null;
-    private @Nullable CpuUsageXYViewer fXYViewer = null;
 
     /*
      * To avoid up and downs CPU usage when process is in and out of CPU frequently,
@@ -87,11 +78,13 @@ public class CpuUsageView extends TmfChartView {
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         if (trace != null) {
             TmfTraceSelectedSignal signal = new TmfTraceSelectedSignal(this, trace);
-            if (fTreeViewer != null) {
-                fTreeViewer.traceSelected(signal);
+            TmfViewer treeViewer = getLeftChildViewer();
+            if (treeViewer instanceof CpuUsageTreeViewer) {
+                ((CpuUsageTreeViewer) treeViewer).traceSelected(signal);
             }
-            if (fXYViewer != null) {
-                fXYViewer.traceSelected(signal);
+            TmfXYChartViewer xyViewer = getChartViewer();
+            if (xyViewer != null) {
+                xyViewer.traceSelected(signal);
             }
         }
     }
@@ -101,26 +94,12 @@ public class CpuUsageView extends TmfChartView {
         TmfXYChartSettings settings = new TmfXYChartSettings(Messages.CpuUsageXYViewer_Title, Messages.CpuUsageXYViewer_TimeXAxis, Messages.CpuUsageXYViewer_CpuYAxis, RESOLUTION);
         CpuUsageXYViewer viewer = new CpuUsageXYViewer(parent, settings);
         viewer.setSendTimeAlignSignals(true);
-        fXYViewer = viewer;
         return viewer;
     }
 
     @Override
     public TmfViewer createLeftChildViewer(Composite parent) {
-        // Create the tree viewer with a filtered checkbox
-        int treeStyle = SWT.MULTI | SWT.H_SCROLL | SWT.FULL_SELECTION;
-        TriStateFilteredCheckboxTree checkboxTree = new TriStateFilteredCheckboxTree(parent, treeStyle, new PatternFilter(), true);
-        final CpuUsageTreeViewer viewer = new CpuUsageTreeViewer(parent, checkboxTree);
-
-        viewer.getControl().addControlListener(new ControlAdapter() {
-            @Override
-            public void controlResized(ControlEvent e) {
-                super.controlResized(e);
-            }
-        });
-
-        fTreeViewer = viewer;
-        return fTreeViewer;
+        return new CpuUsageTreeViewer(parent);
     }
 
     /**
@@ -143,8 +122,9 @@ public class CpuUsageView extends TmfChartView {
 
     @Override
     public void setFocus() {
-        if (fXYViewer != null) {
-            fXYViewer.getControl().setFocus();
+        TmfXYChartViewer xyViewer = getChartViewer();
+        if (xyViewer != null) {
+            xyViewer.getControl().setFocus();
         }
     }
 
@@ -157,10 +137,10 @@ public class CpuUsageView extends TmfChartView {
      */
     @TmfSignalHandler
     public void cpuSelect(TmfCpuSelectedSignal signal) {
-        final @Nullable CpuUsageXYViewer xyViewer = fXYViewer;
-        final @Nullable CpuUsageTreeViewer treeViewer = fTreeViewer;
         ITmfTrace trace = signal.getTrace();
-        if (xyViewer != null && treeViewer != null) {
+        TmfXYChartViewer xyViewer = getChartViewer();
+        TmfViewer viewer = getLeftChildViewer();
+        if (xyViewer instanceof CpuUsageXYViewer && viewer instanceof CpuUsageTreeViewer) {
             Set<Integer> data = (Set<Integer>) getData(trace, CPU_USAGE_FOLLOW_CPU);
             if (data == null) {
                 data = new TreeSet<>();
@@ -173,7 +153,9 @@ public class CpuUsageView extends TmfChartView {
                 data.clear();
             }
             xyViewer.refresh();
-            xyViewer.setTitle();
+            ((CpuUsageXYViewer) xyViewer).setTitle();
+
+            CpuUsageTreeViewer treeViewer = (CpuUsageTreeViewer) viewer;
             treeViewer.updateContent(treeViewer.getWindowStartTime(), treeViewer.getWindowEndTime(), false);
         }
     }

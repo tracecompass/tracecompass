@@ -270,12 +270,7 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
         if (ss == null) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
         }
-        while (ss.getCurrentEndTime() < end && !ss.waitUntilBuilt(100)) {
-            /*
-             * wait until the state system end time is later than end or for the state
-             * system to finish building.
-             */
-        }
+        boolean complete = ss.waitUntilBuilt(0);
 
         try {
             List<MemoryUsageTreeModel> nodes = new ArrayList<>();
@@ -298,7 +293,10 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
                     nodes.add(new MemoryUsageTreeModel(id, fTotalId, parseTid(tidString), procname));
                 }
             }
-            return new TmfModelResponse<>(nodes, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+            if (complete) {
+                return new TmfModelResponse<>(nodes, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+            }
+            return  new TmfModelResponse<>(nodes, ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
         } catch (StateSystemDisposedException e) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
         }

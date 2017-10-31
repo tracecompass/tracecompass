@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.analysis.counters.ui;
 
+import java.util.Comparator;
+
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.counters.core.CounterDataProvider;
@@ -17,7 +19,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TriStateFilteredCheckboxTree;
 
 import com.google.common.collect.Lists;
 
@@ -63,18 +64,15 @@ public class CounterTreeViewer extends AbstractSelectTreeViewer {
      *
      * @param parent
      *            Parent composite
-     * @param checkboxTree
-     *            <code>TriStateFilteredTree</code> wrapping a
-     *            <code>CheckboxTreeViewer</code>
      */
-    public CounterTreeViewer(Composite parent, TriStateFilteredCheckboxTree checkboxTree) {
-        super(parent, checkboxTree, 1, CounterDataProvider.ID);
+    public CounterTreeViewer(Composite parent) {
+        super(parent, 1, CounterDataProvider.ID);
         setLabelProvider(new CounterTreeLabelProvider());
     }
 
     @Override
     protected ITmfTreeColumnDataProvider getColumnDataProvider() {
-        return () -> Lists.newArrayList(new TmfTreeColumnData("Counters"), new TmfTreeColumnData("Legend")); //$NON-NLS-1$ //$NON-NLS-2$
+        return () -> Lists.newArrayList(createColumn("Counters", Comparator.comparing(TmfGenericTreeEntry::getName)), new TmfTreeColumnData("Legend")); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
 }

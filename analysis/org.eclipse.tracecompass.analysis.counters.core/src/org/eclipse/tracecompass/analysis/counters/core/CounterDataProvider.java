@@ -118,15 +118,13 @@ public class CounterDataProvider extends AbstractStateSystemAnalysisDataProvider
         if (fCached != null) {
             return fCached;
         }
-        // FIXME remove this when the tree viewer supports updates.
+
         fModule.waitForInitialization();
         ITmfStateSystem ss = fModule.getStateSystem();
         if (ss == null) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
         }
-        while (ss.getCurrentEndTime() < filter.getEnd() && !ss.waitUntilBuilt(500)) {
-            // wait for ss to be built past the queried end time.
-        }
+        boolean complete = ss.waitUntilBuilt(0);
 
         TmfTreeDataModel trace = fQuarkToEntry.get(-1);
         if (trace == null) {
@@ -137,11 +135,12 @@ public class CounterDataProvider extends AbstractStateSystemAnalysisDataProvider
         addTreeViewerBranch(ss, trace, CounterAnalysis.GROUPED_COUNTER_ASPECTS_ATTRIB);
         addTreeViewerBranch(ss, trace, CounterAnalysis.UNGROUPED_COUNTER_ASPECTS_ATTRIB);
 
-        TmfModelResponse<List<TmfTreeDataModel>> response = new TmfModelResponse<>(new ArrayList<>(fQuarkToEntry.values()), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
-        if (ss.waitUntilBuilt(0)) {
+        ArrayList<TmfTreeDataModel> model = new ArrayList<>(fQuarkToEntry.values());
+        if (complete) {
+            TmfModelResponse<List<TmfTreeDataModel>> response = new TmfModelResponse<>(model, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
             fCached = response;
         }
-        return response;
+        return new TmfModelResponse<>(model, ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
     }
 
     private void addTreeViewerBranch(ITmfStateSystem stateSystem, TmfTreeDataModel rootBranch, String branchName) {

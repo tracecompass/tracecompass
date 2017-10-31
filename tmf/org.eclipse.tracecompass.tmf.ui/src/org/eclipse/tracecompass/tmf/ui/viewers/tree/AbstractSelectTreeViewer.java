@@ -12,13 +12,20 @@ package org.eclipse.tracecompass.tmf.ui.viewers.tree;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -27,13 +34,21 @@ import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -42,6 +57,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.ILegendImageProvider;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.MultiTreePatternFilter;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TriStateFilteredCheckboxTree;
 
 import com.google.common.collect.Iterables;
@@ -56,8 +72,16 @@ import com.google.common.primitives.Longs;
  */
 public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
 
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(AbstractSelectTreeViewer.class);
+
+    /** Timeout between updates in the updateData thread **/
+    private static final long BUILD_UPDATE_TIMEOUT = 500;
+
     /** ID of the checked tree items in the map of data in {@link TmfTraceContext} */
     private static final @NonNull String CHECKED_ELEMENTS = ".CHECKED_ELEMENTS"; //$NON-NLS-1$
+    private static final @NonNull String UPDATE_CONTENT_JOB_NAME = "AbstractSelectTreeViewer#updateContent Job"; //$NON-NLS-1$
+    private static final String FAILED_TO_SLEEP_PREFIX = "Failed to sleep the "; //$NON-NLS-1$
+
     private final String fId;
 
     private static final ViewerComparator COMPARATOR = new ViewerComparator() {
@@ -89,7 +113,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     private ILegendImageProvider fLegendImageProvider;
     private ICheckboxTreeViewerListener fChartViewer;
     private TriStateFilteredCheckboxTree fCheckboxTree;
-    private int fLegendColumnIndex;
+    private final int fLegendIndex;
 
     /**
      * Constructor
@@ -102,7 +126,8 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
      * @param legendColumnIndex
      *            index of the legend column (-1 if none)
      */
-    public AbstractSelectTreeViewer(Composite parent, TriStateFilteredCheckboxTree checkboxTree, int legendColumnIndex, String id) {
+    private AbstractSelectTreeViewer(Composite parent, TriStateFilteredCheckboxTree checkboxTree,
+            int legendIndex, String id) {
         super(parent, checkboxTree.getViewer());
 
         TreeViewer treeViewer = checkboxTree.getViewer();
@@ -111,8 +136,25 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
             ((CheckboxTreeViewer) treeViewer).addCheckStateListener(new CheckStateChangedListener());
         }
         fCheckboxTree = checkboxTree;
-        fLegendColumnIndex = legendColumnIndex;
+        fLegendIndex = legendIndex;
         fId = id;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param parent
+     *            Parent composite
+     * @param legendIndex
+     *            index of the legend column (-1 if none)
+     * @param id
+     *            {@link ITmfTreeDataProvider} ID
+     */
+    public AbstractSelectTreeViewer(Composite parent, int legendIndex, String id) {
+        // Create the tree viewer with a filtered checkbox
+        this(parent, new TriStateFilteredCheckboxTree(parent,
+                SWT.MULTI | SWT.H_SCROLL | SWT.FULL_SELECTION,
+                new MultiTreePatternFilter(), true), legendIndex, id);
     }
 
     /**
@@ -229,17 +271,102 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
 
     @Override
     protected void updateContent(long start, long end, boolean isSelection) {
-        /*
-         * save the view context before updating the content (windows and selection
-         * range update) to save the checked entries' IDs and check them again in the
-         * new tree.
-         */
+        try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, UPDATE_CONTENT_JOB_NAME)
+                .setCategory("TreeViewer").build()) { //$NON-NLS-1$
+
+            Job thread = new Job(UPDATE_CONTENT_JOB_NAME) {
+                @Override
+                public IStatus run(IProgressMonitor monitor) {
+                    try (FlowScopeLog runScope = new FlowScopeLogBuilder(LOGGER, Level.FINE, UPDATE_CONTENT_JOB_NAME + " run") //$NON-NLS-1$
+                            .setParentScope(scope).build()) {
+
+                        ITmfTreeDataProvider<@NonNull TmfTreeDataModel> provider = getProvider();
+                        if (provider == null) {
+                            Activator.getDefault().logInfo("Trace: " + getTrace().getName() + " does not have a data provider for ID: " + fId); //$NON-NLS-1$ //$NON-NLS-2$
+                            return Status.OK_STATUS;
+                        }
+
+                        TimeQueryFilter filter = getFilter(start, end, isSelection);
+                        if (filter == null) {
+                            return Status.OK_STATUS;
+                        }
+
+                        boolean isComplete = false;
+                        do {
+                            TmfModelResponse<@NonNull List<@NonNull TmfTreeDataModel>> response;
+                            try (FlowScopeLog iterScope = new FlowScopeLogBuilder(LOGGER, Level.FINE, UPDATE_CONTENT_JOB_NAME + " query") //$NON-NLS-1$
+                                    .setParentScope(scope).build()) {
+
+                                response = provider.fetchTree(filter, monitor);
+                                List<@NonNull TmfTreeDataModel> model = response.getModel();
+                                if (model != null) {
+                                    updateTree(start, end, model);
+                                }
+                            }
+
+                            ITmfResponse.Status status = response.getStatus();
+                            if (status == ITmfResponse.Status.COMPLETED) {
+                                /* Model is complete, no need to request again the data provider */
+                                isComplete = true;
+                            } else if (status == ITmfResponse.Status.FAILED || status == ITmfResponse.Status.CANCELLED) {
+                                /* Error occurred, return */
+                                isComplete = true;
+                            } else {
+                                /**
+                                 * Status is RUNNING. Sleeping current thread to wait before request data
+                                 * provider again
+                                 **/
+                                try {
+                                    Thread.sleep(BUILD_UPDATE_TIMEOUT);
+                                } catch (InterruptedException e) {
+                                    /**
+                                     * InterruptedException is throw by Thread.Sleep and we should retry querying
+                                     * the data provider
+                                     **/
+                                    runScope.addData(FAILED_TO_SLEEP_PREFIX + getName(), e);
+                                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, FAILED_TO_SLEEP_PREFIX + getName());
+                                }
+                            }
+                        } while (!isComplete);
+
+                        return Status.OK_STATUS;
+                    }
+                }
+            };
+            thread.setSystem(true);
+            thread.schedule();
+        }
+    }
+
+    private void updateTree(long start, long end, List<@NonNull TmfTreeDataModel> model) {
         saveViewContext();
-        super.updateContent(start, end, isSelection);
+        final ITmfTreeViewerEntry rootEntry = modelToTree(start, end, model);
+        /* Set the input in main thread only if it didn't change */
+        if (rootEntry != null) {
+            Display.getDefault().asyncExec(() -> {
+                TreeViewer treeViewer = getTreeViewer();
+                if (treeViewer.getControl().isDisposed()) {
+                    return;
+                }
+
+                if (rootEntry != treeViewer.getInput()) {
+                    treeViewer.setInput(rootEntry);
+                    contentChanged(rootEntry);
+                } else {
+                    treeViewer.refresh();
+                    treeViewer.expandToLevel(treeViewer.getAutoExpandLevel());
+                }
+                // FIXME should add a bit of padding
+                for (TreeColumn column : treeViewer.getTree().getColumns()) {
+                    column.pack();
+                }
+            });
+        }
     }
 
     /**
-     * Save the checked entries in the view context before changing trace.
+     * Save the checked entries' ID in the view context before changing trace and
+     * check them again in the new tree.
      */
     private void saveViewContext() {
         ITmfTrace previousTrace = getTrace();
@@ -266,9 +393,10 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     protected Image getLegendImage(@NonNull String name) {
         /* If the image height match the row height, row height will increment */
         ILegendImageProvider legendImageProvider = fLegendImageProvider;
-        if (legendImageProvider != null && fLegendColumnIndex >= 0) {
+        int legendColumnIndex = fLegendIndex;
+        if (legendImageProvider != null && legendColumnIndex >= 0) {
             Tree tree = getTreeViewer().getTree();
-            int imageWidth = tree.getColumn(fLegendColumnIndex).getWidth();
+            int imageWidth = tree.getColumn(legendColumnIndex).getWidth();
             int imageHeight = tree.getItemHeight() - 1;
             if (imageHeight > 0 && imageWidth > 0) {
                 return legendImageProvider.getLegendImage(imageHeight, imageWidth, name);
@@ -278,38 +406,57 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     }
 
     @Override
-    protected void initializeDataSource() {
-        ITmfTrace trace = getTrace();
-        if (trace == null) {
-            return;
-        }
-        DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeDataProvider.class);
+    protected ITmfTreeViewerEntry updateElements(long start, long end, boolean isSelection) {
+        throw new UnsupportedOperationException("This method should not be called for AbstractSelectTreeViewers"); //$NON-NLS-1$
     }
 
-    @Override
-    protected ITmfTreeViewerEntry updateElements(long start, long end, boolean isSelection) {
+    /**
+     * Getter for the {@link ITmfTreeDataProvider} to query for this TreeViewer
+     *
+     * @return the relevant provider, if any
+     */
+    protected ITmfTreeDataProvider<@NonNull TmfTreeDataModel> getProvider() {
         ITmfTrace trace = getTrace();
         if (trace == null) {
             return null;
         }
 
-        ITmfTreeDataProvider<@NonNull TmfTreeDataModel> provider = DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeDataProvider.class);
-        if (provider == null) {
-            return null;
-        }
+        return DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeDataProvider.class);
+    }
 
-        TmfModelResponse<List<@NonNull TmfTreeDataModel>> tree = provider.fetchTree(new TimeQueryFilter(0l, Long.MAX_VALUE, 2), null);
+    /**
+     * Get the filter to query the {@link ITmfTreeDataProvider} for the queried parameters
+     *
+     * @param start
+     *            query start time
+     * @param end
+     *            query end time
+     * @param isSelection
+     *            if the query is a selection
+     * @return the resulting query filter
+     */
+    protected @Nullable TimeQueryFilter getFilter(long start, long end, boolean isSelection) {
+        return new TimeQueryFilter(Long.min(start, end), Long.max(start, end), 2);
+    }
 
-        List<@NonNull TmfTreeDataModel> model = tree.getModel();
-        if (model == null) {
-            return null;
-        }
+    /**
+     * Algorithm to convert a model (List of {@link TmfTreeDataModel}) to the tree.
+     *
+     * @param start
+     *            queried start time
+     * @param end
+     *            queried end time
+     * @param model
+     *            model to convert
+     * @return the resulting {@link TmfTreeViewerEntry}.
+     */
+    protected ITmfTreeViewerEntry modelToTree(long start, long end, List<TmfTreeDataModel> model) {
         TmfTreeViewerEntry root = new TmfTreeViewerEntry(StringUtils.EMPTY);
 
         Map<Long, TmfTreeViewerEntry> map = new HashMap<>();
         map.put(-1L, root);
-        for (@NonNull TmfTreeDataModel entry : model) {
-            TmfGenericTreeEntry<@NonNull TmfTreeDataModel> viewerEntry = new TmfGenericTreeEntry<>(entry);
+        for (TmfTreeDataModel entry : model) {
+            TmfGenericTreeEntry<TmfTreeDataModel> viewerEntry = new TmfGenericTreeEntry<>(entry);
             map.put(entry.getId(), viewerEntry);
 
             TmfTreeViewerEntry parent = map.get(entry.getParentId());
@@ -318,6 +465,27 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
             }
         }
         return root;
+    }
+
+    /**
+     * Create a sortable column
+     *
+     * @param text
+     *            column label
+     * @param comparator
+     *            comparator to sort {@link TmfGenericTreeEntry}s
+     * @return the comparator
+     */
+    protected static <T extends TmfGenericTreeEntry<? extends TmfTreeDataModel>>
+    @NonNull TmfTreeColumnData createColumn(String text, Comparator<T> comparator) {
+        TmfTreeColumnData column = new TmfTreeColumnData(text);
+        column.setComparator(new ViewerComparator() {
+            @Override
+            public int compare(Viewer viewer, Object e1, Object e2) {
+                return comparator.compare((T) e1, (T) e2);
+            }
+        });
+        return column;
     }
 
 }
