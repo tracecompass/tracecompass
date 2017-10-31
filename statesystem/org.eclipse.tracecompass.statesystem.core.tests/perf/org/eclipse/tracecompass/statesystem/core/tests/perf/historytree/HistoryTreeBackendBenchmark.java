@@ -13,7 +13,9 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -34,6 +36,7 @@ import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFact
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
+import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -55,6 +58,7 @@ public class HistoryTreeBackendBenchmark {
     private static final @NonNull String TEST_SINGLE_QUERY_ID = "Single Queries: ";
     private static final @NonNull String TEST_FULL_QUERY_ID = "Full Queries: ";
     private static final @NonNull String TEST_QUERY_RANGE_ID = "Query History Range: ";
+    private static final @NonNull String TEST_2D_QUERY_ID = "2D Queries: ";
     private static final @NonNull String ROOT_NODE = "root";
     private static final int QUEUE_SIZE = 10000;
     private static final long SEED = 5575784704147L;
@@ -266,6 +270,9 @@ public class HistoryTreeBackendBenchmark {
         PerformanceMeter pmRangeQuery = perf.createPerformanceMeter(TEST_PREFIX + TEST_QUERY_RANGE_ID + fName);
         perf.tagAsSummary(pmRangeQuery, TEST_QUERY_RANGE_ID + fShortName, Dimension.CPU_TIME);
 
+        PerformanceMeter pm2DQuery = perf.createPerformanceMeter(TEST_PREFIX + TEST_2D_QUERY_ID + fName);
+        perf.tagAsSummary(pm2DQuery, TEST_2D_QUERY_ID + fShortName, Dimension.CPU_TIME);
+
         for (int i = 0; i < fNbLoops; i++) {
             try {
                 /* Create the state system */
@@ -318,11 +325,24 @@ public class HistoryTreeBackendBenchmark {
 
                 /* Benchmark the history range query of 10 attributes */
                 pmRangeQuery.start();
+                List<Integer> queryAttributes = new ArrayList<>();
                 for (int j = 0; j < 10; j++) {
                     int attrib = (int) getNextRandomValue(randomGenerator, subAttributes.size());
+                    queryAttributes.add(attrib);
                     StateSystemUtils.queryHistoryRange(ss, attrib, ss.getStartTime(), ss.getCurrentEndTime());
                 }
                 pmRangeQuery.stop();
+
+                /* Benchmark 2D query of the same 10 attributes */
+                pm2DQuery.start();
+                for (int j = 0; j < 10; j++) {
+                    Iterable<@NonNull ITmfStateInterval> query2d = ss.query2D(queryAttributes, ss.getStartTime(), ss.getCurrentEndTime());
+                    Iterator<@NonNull ITmfStateInterval> iterator = query2d.iterator();
+                    while (iterator.hasNext()) {
+                        iterator.next();
+                    }
+                }
+                pm2DQuery.stop();
 
                 /* Benchmark the full queries */
                 pmFullQuery.start();
@@ -351,6 +371,7 @@ public class HistoryTreeBackendBenchmark {
         pmSingleQuery.commit();
         pmFullQuery.commit();
         pmRangeQuery.commit();
+        pm2DQuery.commit();
     }
 
     /**
