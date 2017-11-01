@@ -43,7 +43,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -484,22 +483,6 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
     // ------------------------------------------------------------------------
     // Signal Handler
     // ------------------------------------------------------------------------
-
-    /**
-     * Signal handler for handling of the time synch signal. The times
-     * correspond to the selection by the user, not the visible time range.
-     *
-     * @param signal
-     *            The time synch signal {@link TmfSelectionRangeUpdatedSignal}
-     */
-    @Override
-    @TmfSignalHandler
-    public void selectionRangeUpdated(TmfSelectionRangeUpdatedSignal signal) {
-        super.selectionRangeUpdated(signal);
-        if (signal != null && (signal.getSource() != this) && (getTrace() != null)) {
-            updateContent(this.getSelectionBeginTime(), this.getSelectionEndTime(), true);
-        }
-    }
 
     /**
      * Signal handler for handling of the window range signal. This time range
