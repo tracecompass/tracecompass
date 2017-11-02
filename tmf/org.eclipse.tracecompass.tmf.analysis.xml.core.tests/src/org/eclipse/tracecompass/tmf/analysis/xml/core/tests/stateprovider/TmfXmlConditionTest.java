@@ -18,7 +18,7 @@ import static org.junit.Assert.fail;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenAnalysisModule;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -44,7 +44,7 @@ public class TmfXmlConditionTest {
     @Test
     public void testConditionsValidation() {
         ITmfTrace trace = XmlUtilsTest.initializeTrace(testTrace2);
-        XmlStateSystemModule module = XmlUtilsTest.initializeModule(TmfXmlTestFiles.CONDITION_FILE);
+        DataDrivenAnalysisModule module = XmlUtilsTest.initializeModule(TmfXmlTestFiles.CONDITION_FILE);
         try {
             module.setTrace(trace);
 

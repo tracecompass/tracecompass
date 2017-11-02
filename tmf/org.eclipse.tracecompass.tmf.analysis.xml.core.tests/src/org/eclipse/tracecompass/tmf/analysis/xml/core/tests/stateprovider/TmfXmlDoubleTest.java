@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenAnalysisModule;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -47,7 +47,7 @@ public class TmfXmlDoubleTest {
     @Test
     public void testConditionsValidation() throws TmfAnalysisException, StateSystemDisposedException {
         ITmfTrace trace = XmlUtilsTest.initializeTrace(testTrace3);
-        XmlStateSystemModule module = XmlUtilsTest.initializeModule(TmfXmlTestFiles.DOUBLES_FILE);
+        DataDrivenAnalysisModule module = XmlUtilsTest.initializeModule(TmfXmlTestFiles.DOUBLES_FILE);
         module.setTrace(trace);
 
         module.schedule();

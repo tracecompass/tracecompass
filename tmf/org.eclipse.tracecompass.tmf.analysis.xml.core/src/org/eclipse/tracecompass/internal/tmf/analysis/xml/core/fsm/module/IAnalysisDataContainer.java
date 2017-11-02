@@ -10,34 +10,33 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module;
+package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenMappingGroup;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
+import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
 
 /**
- * Interface that all XML defined objects who provide, use or contain state
- * system must implement in order to use the state provider model elements in
- * {@link org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model} package
+ * Interface that all XML defined objects who provide, use or contain data
+ * containers such as state systems or segment store must implement in order to
+ * use the state model elements in the
+ * {@link org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model}
+ * package
+ *
+ * TODO: This class is now really linked with a state system and have
+ * state-systemy methods. Try to make it more generic, so that other DBs can
+ * implement this as well.
  *
  * @author Geneviève Bastien
  */
-public interface IXmlStateSystemContainer extends ITmfXmlTopLevelElement {
+public interface IAnalysisDataContainer {
 
-    /** Root quark, to get values at the root of the state system */
-    int ROOT_QUARK = -1;
     /**
      * Error quark, value taken when a state system quark query is in error.
-     *
-     * FIXME: Originally in the code, the -1 was used for both root quark and
-     * return errors, so it has the same value as root quark, but maybe it can
-     * be changed to something else -2? A quark can never be negative
      */
-    int ERROR_QUARK = -1;
+    int ERROR_QUARK = -2;
 
     /**
      * Get the state system managed by this XML object
@@ -47,11 +46,14 @@ public interface IXmlStateSystemContainer extends ITmfXmlTopLevelElement {
     ITmfStateSystem getStateSystem();
 
     /**
-     * Get the list of locations defined in this top level XML element
+     * Get a mapping group with requested ID. The mapping group should never be null
+     * as it was validated at compile-time
      *
-     * @return The list of {@link TmfXmlLocation}
+     * @param id
+     *            The ID of the mapping group
+     * @return The mapping group
      */
-    @NonNull Iterable<@NonNull TmfXmlLocation> getLocations();
+    DataDrivenMappingGroup getMappingGroup(String id);
 
     /**
      * Get an attribute pool starting at the requested quark

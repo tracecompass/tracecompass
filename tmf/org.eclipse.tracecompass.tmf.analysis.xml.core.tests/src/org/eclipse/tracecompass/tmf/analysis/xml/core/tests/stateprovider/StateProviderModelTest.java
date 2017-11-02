@@ -19,7 +19,7 @@ import static org.junit.Assert.fail;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenAnalysisModule;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -46,7 +46,7 @@ public class StateProviderModelTest {
     @Test
     public void testEventName() {
         ITmfTrace trace = XmlUtilsTest.initializeTrace(testTrace1);
-        XmlStateSystemModule module = XmlUtilsTest.initializeModule(TmfXmlTestFiles.ATTRIBUTE_FILE);
+        DataDrivenAnalysisModule module = XmlUtilsTest.initializeModule(TmfXmlTestFiles.ATTRIBUTE_FILE);
         try {
 
             module.setTrace(trace);

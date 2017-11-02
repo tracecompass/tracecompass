@@ -91,7 +91,7 @@
 				</if>
 				<then>
 					<stateAttribute type="constant" value="stack"/>
-					<stateValue stack="pop" type="long"/>
+					<stateValue stack="pop" type="null"/>
 				</then>
 			</stateChange>
 			<stateChange>

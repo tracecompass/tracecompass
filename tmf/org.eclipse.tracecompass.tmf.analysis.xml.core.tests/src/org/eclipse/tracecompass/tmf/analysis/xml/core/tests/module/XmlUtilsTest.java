@@ -30,10 +30,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateProviderCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenAnalysisModule;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -217,23 +218,20 @@ public class XmlUtilsTest {
      *            The xml file used to initialize the module
      * @return The module
      */
-    public static @NonNull XmlStateSystemModule initializeModule(TmfXmlTestFiles xmlAnalysisFile) {
+    public static @NonNull DataDrivenAnalysisModule initializeModule(TmfXmlTestFiles xmlAnalysisFile) {
 
         /* Initialize the state provider module */
         Document doc = xmlAnalysisFile.getXmlDocument();
         assertNotNull(doc);
+        List<@NonNull Element> childElements = TmfXmlUtils.getChildElements(doc.getDocumentElement(), TmfXmlStrings.STATE_PROVIDER);
+        assertFalse(childElements.isEmpty());
 
-        /* get State Providers modules */
-        NodeList stateproviderNodes = doc.getElementsByTagName(TmfXmlStrings.STATE_PROVIDER);
-        assertFalse(stateproviderNodes.getLength() == 0);
+        Element element = childElements.get(0);
+        String moduleId = element.getAttribute(TmfXmlStrings.ID);
 
-        Element node = (Element) stateproviderNodes.item(0);
-        XmlStateSystemModule module = new XmlStateSystemModule();
-        String moduleId = node.getAttribute(TmfXmlStrings.ID);
-        assertNotNull(moduleId);
-        module.setId(moduleId);
-
-        module.setXmlFile(xmlAnalysisFile.getFile().toPath());
+        TmfXmlStateProviderCu compile = TmfXmlStateProviderCu.compile(xmlAnalysisFile.getFile().toPath(), moduleId);
+        assertNotNull(compile);
+        DataDrivenAnalysisModule module = new DataDrivenAnalysisModule(moduleId, compile);
 
         return module;
     }

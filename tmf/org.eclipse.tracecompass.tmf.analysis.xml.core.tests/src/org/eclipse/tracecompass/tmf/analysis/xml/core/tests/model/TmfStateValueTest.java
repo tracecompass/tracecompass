@@ -12,7 +12,7 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.tests.model;
 import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenAnalysisModule;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -37,8 +37,8 @@ public class TmfStateValueTest {
 
     private static final @NonNull String TEST_TRACE = "test_traces/testTrace4.xml";
 
-    ITmfTrace fTrace;
-    XmlStateSystemModule fModule;
+    private ITmfTrace fTrace;
+    private DataDrivenAnalysisModule fModule;
 
     /**
      * Initializes the trace and the module for the tests
@@ -49,15 +49,14 @@ public class TmfStateValueTest {
     @Before
     public void setUp() throws TmfAnalysisException {
         ITmfTrace trace = XmlUtilsTest.initializeTrace(TEST_TRACE);
-        XmlStateSystemModule module = XmlUtilsTest.initializeModule(TmfXmlTestFiles.STATE_VALUE_FILE);
+        fTrace = trace;
+
+        DataDrivenAnalysisModule module = XmlUtilsTest.initializeModule(TmfXmlTestFiles.STATE_VALUE_FILE);
+        fModule = module;
 
         module.setTrace(trace);
-
         module.schedule();
         module.waitForCompletion();
-
-        fTrace = trace;
-        fModule = module;
     }
 
     /**
@@ -65,8 +64,14 @@ public class TmfStateValueTest {
      */
     @After
     public void cleanUp() {
-        fTrace.dispose();
-        fModule.dispose();
+        ITmfTrace trace = fTrace;
+        if (trace != null) {
+            trace.dispose();
+        }
+        DataDrivenAnalysisModule module = fModule;
+        if (module != null) {
+            module.dispose();
+        }
     }
 
     /**
@@ -79,7 +84,7 @@ public class TmfStateValueTest {
      */
     @Test
     public void testStateValueUpdate() throws AttributeNotFoundException, StateSystemDisposedException {
-        XmlStateSystemModule module = fModule;
+        DataDrivenAnalysisModule module = fModule;
         assertNotNull(module);
 
         ITmfStateSystem ss = module.getStateSystem();
@@ -104,7 +109,7 @@ public class TmfStateValueTest {
      */
     @Test
     public void testStateValueModify() throws AttributeNotFoundException, StateSystemDisposedException {
-        XmlStateSystemModule module = fModule;
+        DataDrivenAnalysisModule module = fModule;
         assertNotNull(module);
 
         ITmfStateSystem ss = module.getStateSystem();
@@ -131,7 +136,7 @@ public class TmfStateValueTest {
      */
     @Test
     public void testStateValuePeek() throws AttributeNotFoundException, StateSystemDisposedException {
-        XmlStateSystemModule module = fModule;
+        DataDrivenAnalysisModule module = fModule;
         assertNotNull(module);
 
         ITmfStateSystem ss = module.getStateSystem();
@@ -156,7 +161,7 @@ public class TmfStateValueTest {
      */
     @Test
     public void testStateValueMapping() throws AttributeNotFoundException, StateSystemDisposedException {
-        XmlStateSystemModule module = fModule;
+        DataDrivenAnalysisModule module = fModule;
         assertNotNull(module);
 
         ITmfStateSystem ss = module.getStateSystem();
@@ -180,7 +185,7 @@ public class TmfStateValueTest {
      */
     @Test
     public void testStateValueHostId() throws AttributeNotFoundException, StateSystemDisposedException {
-        XmlStateSystemModule module = fModule;
+        DataDrivenAnalysisModule module = fModule;
         assertNotNull(module);
 
         ITmfStateSystem ss = module.getStateSystem();
@@ -204,7 +209,7 @@ public class TmfStateValueTest {
      */
     @Test
     public void testStateValueScript() throws AttributeNotFoundException, StateSystemDisposedException {
-        XmlStateSystemModule module = fModule;
+        DataDrivenAnalysisModule module = fModule;
         assertNotNull(module);
 
         ITmfStateSystem ss = module.getStateSystem();

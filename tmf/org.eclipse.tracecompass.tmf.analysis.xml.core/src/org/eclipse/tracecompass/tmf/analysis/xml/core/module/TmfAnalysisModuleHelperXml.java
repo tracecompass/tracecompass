@@ -20,9 +20,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateProviderCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenAnalysisModule;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.Messages;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
@@ -202,11 +203,12 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
         IAnalysisModule module = null;
         switch (fType) {
         case STATE_SYSTEM:
-            module = new XmlStateSystemModule();
-            XmlStateSystemModule ssModule = (XmlStateSystemModule) module;
-            module.setId(analysisid);
-            ssModule.setXmlFile(fSourceFile.toPath());
-
+            TmfXmlStateProviderCu compile = TmfXmlStateProviderCu.compile(fSourceFile.toPath(), analysisid);
+            if (compile == null) {
+                return null;
+            }
+            module = new DataDrivenAnalysisModule(analysisid, compile);
+            module.setName(getName());
             break;
         case PATTERN:
             module = new XmlPatternAnalysis();
