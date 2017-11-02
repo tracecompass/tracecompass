@@ -10,20 +10,15 @@
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.regex.Matcher;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
-
-import com.google.common.base.Splitter;
 
 /**
  * A filter extending the
@@ -38,27 +33,34 @@ import com.google.common.base.Splitter;
 public class MultiTreePatternFilter extends TreePatternFilter {
 
     /**
-     * List of compiled regular expressions for filtering the tree elements
+     * List of Predicates to test the column texts, ordered from leaf to root.
      */
-    private final List<Pattern> fPatterns = new ArrayList<>();
-
-    /**
-     * Cached matchers used for comparing regexes to Strings
-     */
-    private final Map<String, Matcher> fMatchers = new HashMap<>();
+    private final List<Predicate<String>> fPredicates = new ArrayList<>();
 
     @Override
     public void setPattern(String patternString) {
-        fPatterns.clear();
-        fMatchers.clear();
+        fPredicates.clear();
         super.setPattern(patternString);
+        if (patternString == null || patternString.isEmpty()) {
+            return;
+        }
 
         /*
          * The asterisk (*) wildcard needs to be converted to a period (.) for it to be
          * recognized by the Pattern class during regex compilation
          */
-        Iterable<String> filters = Splitter.on('/').split(patternString.replace('*', '.'));
-        filters.forEach(filter -> fPatterns.add(Pattern.compile(filter, Pattern.CASE_INSENSITIVE)));
+        String[] split = patternString.replace('*', '.').split("/"); //$NON-NLS-1$
+        for (int i = split.length - 1; i >= 0; i--) {
+            String filter = split[i];
+            Predicate<String> predicate;
+            try {
+                Pattern pattern = Pattern.compile(filter, Pattern.CASE_INSENSITIVE);
+                predicate = s -> pattern.matcher(s).find();
+            } catch (PatternSyntaxException e) {
+                predicate = s -> s.contains(filter);
+            }
+            fPredicates.add(predicate);
+        }
     }
 
     @Override
@@ -66,25 +68,19 @@ public class MultiTreePatternFilter extends TreePatternFilter {
         Object node = element;
         StructuredViewer structuredViewer = (StructuredViewer) viewer;
         ITableLabelProvider labelProvider = (ITableLabelProvider) structuredViewer.getLabelProvider();
+        ITreeContentProvider treeContentProvider = (ITreeContentProvider) structuredViewer.getContentProvider();
 
         // Ensure the tree element and its parent(s) match the filter text
-        ListIterator<Pattern> iter = fPatterns.listIterator(fPatterns.size());
-        while (iter.hasPrevious()) {
+        for (Predicate<String> p : fPredicates) {
             // Retrieve tree element text and make verification. Text is at column 0
             String labelText = labelProvider.getColumnText(node, 0);
-            if (!wordMatches(labelText, iter.previous())) {
+            if (labelText == null || !p.test(labelText)) {
                 return false;
             }
 
             // Retrieve parent element
-            IContentProvider contentProvider = ((StructuredViewer) viewer).getContentProvider();
-            node = ((ITreeContentProvider) contentProvider).getParent(node);
+            node = treeContentProvider.getParent(node);
         }
         return true;
-    }
-
-    private boolean wordMatches(String text, Pattern pattern) {
-        Matcher matcher = fMatchers.containsKey(text) ? fMatchers.get(text) : pattern.matcher(text);
-        return (text != null) && (matcher != null) && (matcher.find());
     }
 }
