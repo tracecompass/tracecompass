@@ -43,6 +43,8 @@ public class Messages extends NLS {
     public static String MarkerEvent_Bookmarks;
     public static String MarkerEvent_LostEvents;
 
+    public static String TmfCommonXLineChartTooltipProvider_time;
+
     public static String TmfEventsTable_AddAsFilterText;
     public static String TmfEventsTable_AddBookmarkActionText;
     public static String TmfEventsTable_ApplyPresetFilterMenuName;

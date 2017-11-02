@@ -12,12 +12,12 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
 
-import java.text.FieldPosition;
-import java.text.Format;
-import java.text.ParsePosition;
+import java.util.Arrays;
+import java.util.Formatter;
 
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.ITmfChartTimeProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfBaseProvider;
@@ -33,25 +33,6 @@ import org.swtchart.ISeries;
  * @author Geneviève Bastien
  */
 public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implements MouseTrackListener {
-
-    private static final Format DEFAULT_FORMAT = new Format() {
-
-        /**
-         * Default serial ID
-         */
-        private static final long serialVersionUID = -6130622953193109057L;
-
-        @Override
-        public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
-            return toAppendTo.append(obj);
-        }
-
-        @Override
-        public Object parseObject(String source, ParsePosition pos) {
-            return source;
-        }
-
-    };
 
     /**
      * Constructor for the tooltip provider
@@ -115,40 +96,41 @@ public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implemen
             if (xS == null) {
                 return;
             }
-            int index = 0;
-            for (int i = 0; i < xS.length; i++) {
-                if (xS[i] > xCoordinate) {
-                    break;
+            int index = Arrays.binarySearch(xS, xCoordinate);
+            index = index >= 0 ? index : -index - 1;
+            int maxLen = 0;
+            for (ISeries serie : series) {
+                /* Make sure the series values and the value at index exist */
+                if (isValid(index, serie)) {
+                    maxLen = Math.max(maxLen, serie.getId().length());
                 }
-                index = i;
             }
 
             /* set tooltip of closest data point */
-            Format format = getChart().getAxisSet().getYAxis(0).getTick().getFormat();
-            if (format == null) {
-                format = DEFAULT_FORMAT;
-            }
-            StringBuffer buffer = new StringBuffer();
-            buffer.append("time="); //$NON-NLS-1$
-            buffer.append(TmfTimestamp.fromNanos((long) xCoordinate + getChartViewer().getTimeOffset()).toString());
-            buffer.append('\n');
+            StringBuilder buffer = new StringBuilder(Messages.TmfCommonXLineChartTooltipProvider_time + "\t" //$NON-NLS-1$
+                    + TmfTimestamp.fromNanos((long) xCoordinate + getChartViewer().getTimeOffset()).toString() + "\n"); //$NON-NLS-1$
 
-            /* For each series, get the value at the index */
-            for (ISeries serie : series) {
-                double[] yS = serie.getYSeries();
-                /* Make sure the series values and the value at index exist */
-                if (yS == null || yS.length <= index) {
-                    continue;
+            // FIXME this is overridden by the shell font.
+            String formatString = "%-" + (maxLen) + "s%12.2f%n"; //$NON-NLS-1$ //$NON-NLS-2$
+            try (Formatter formatter = new Formatter(buffer)) {
+                /* For each series, get the value at the index */
+                for (ISeries serie : series) {
+                    double[] yS = serie.getYSeries();
+                    /* Make sure the series values and the value at index exist */
+                    if (isValid(index, serie)) {
+                        formatter.format(formatString, serie.getId(), yS[index]);
+                    }
                 }
-                buffer.append(serie.getId());
-                buffer.append('=');
-                buffer.append(format.format(yS[index]));
-                buffer.append('\n');
             }
 
             getChart().getPlotArea().setToolTipText(buffer.toString());
             getChart().redraw();
         }
+    }
+
+    private static boolean isValid(int index, ISeries serie) {
+        double[] ySeries = serie.getYSeries();
+        return serie.isVisible() && ySeries != null && ySeries.length > index;
     }
 
 }
