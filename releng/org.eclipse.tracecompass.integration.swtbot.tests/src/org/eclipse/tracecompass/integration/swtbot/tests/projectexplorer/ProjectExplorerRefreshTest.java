@@ -31,7 +31,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -198,7 +197,7 @@ public class ProjectExplorerRefreshTest {
         assertTrue(kernelTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         assertTrue(ustTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         assertTrue(experiment.contextMenu().menuItems().contains("Delete Supplementary Files..."));
-        refresh(() -> tracesFolder.select().pressShortcut(Keystrokes.F5));
+        refresh(() -> tracesFolder.contextMenu().menu("Refresh").click());
         assertFalse(kernelTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         assertFalse(ustTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         assertFalse(experiment.contextMenu().menuItems().contains("Delete Supplementary Files..."));
