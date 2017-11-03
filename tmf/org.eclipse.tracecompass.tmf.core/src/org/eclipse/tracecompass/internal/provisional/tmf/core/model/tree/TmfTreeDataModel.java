@@ -9,6 +9,10 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree;
 
+import java.util.Objects;
+
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * Basic implementation of {@link ITmfTreeDataModel}.
  *
@@ -49,6 +53,28 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
     @Override
     public String getName() {
         return fName;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        TmfTreeDataModel other = (TmfTreeDataModel) obj;
+        return fId == other.fId
+                && fParentId == other.fParentId
+                && fName.equals(other.fName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fId, fParentId, fName);
     }
 
     @Override

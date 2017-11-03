@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.cpuusage;
 
+import java.util.Objects;
+
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageEntryModel;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
 
@@ -46,5 +48,23 @@ public class CpuUsageEntry extends TmfGenericTreeEntry<CpuUsageEntryModel> {
      */
     public double getPercent() {
         return fPercent;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            // reference equality, nullness, getName, children and model
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        CpuUsageEntry other = (CpuUsageEntry) obj;
+        return Objects.equals(fPercent, other.fPercent);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), fPercent);
     }
 }

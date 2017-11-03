@@ -9,7 +9,10 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.core.memory;
 
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
 
 /**
@@ -53,5 +56,23 @@ public class MemoryUsageTreeModel extends TmfTreeDataModel {
      */
     public int getTid() {
         return fTid;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!super.equals(obj)) {
+            // reference equality, nullness, getName, ID and parent ID
+            return false;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        MemoryUsageTreeModel other = (MemoryUsageTreeModel) obj;
+        return fTid == other.fTid;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), fTid);
     }
 }

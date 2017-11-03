@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.tmf.ui.viewers.tree;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -100,6 +101,27 @@ public class TmfTreeViewerEntry implements ITmfTreeViewerEntry {
     @Override
     public String toString() {
         return getClass().getSimpleName() + '[' + fName + ']';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        TmfTreeViewerEntry other = (TmfTreeViewerEntry) obj;
+        return Objects.equals(getName(), other.getName())
+                && getChildren().equals(other.getChildren());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fName, fChildren);
     }
 
 }
