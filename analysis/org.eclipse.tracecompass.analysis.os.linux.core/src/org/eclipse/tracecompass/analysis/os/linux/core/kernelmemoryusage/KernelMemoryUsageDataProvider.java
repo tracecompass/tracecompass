@@ -322,23 +322,20 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
             fProcessNameMap.put(tid, tid);
             return tid;
         }
-        KernelAnalysisModule kernelModule = getKernelAnalysisModule();
+        KernelAnalysisModule kernelModule = fKernelModule;
+        if (kernelModule == null) {
+            kernelModule = TmfTraceUtils.getAnalysisModuleOfClass(getTrace(), KernelAnalysisModule.class, KernelAnalysisModule.ID);
+        }
         if (kernelModule == null) {
             return tid;
         }
+        fKernelModule = kernelModule;
         execName = KernelThreadInformationProvider.getExecutableName(kernelModule, Integer.parseInt(tid));
         if (execName == null) {
             return tid;
         }
         fProcessNameMap.put(tid, execName);
         return execName;
-    }
-
-    private @Nullable KernelAnalysisModule getKernelAnalysisModule() {
-        if (fKernelModule == null) {
-            fKernelModule = TmfTraceUtils.getAnalysisModuleOfClass(getTrace(), KernelAnalysisModule.class, KernelAnalysisModule.ID);
-        }
-        return fKernelModule;
     }
 
     /**

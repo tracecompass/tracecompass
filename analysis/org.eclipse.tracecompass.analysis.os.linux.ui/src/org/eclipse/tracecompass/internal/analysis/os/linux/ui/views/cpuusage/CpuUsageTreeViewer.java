@@ -52,18 +52,13 @@ public class CpuUsageTreeViewer extends AbstractSelectTreeViewer {
         public String getColumnText(Object element, int columnIndex) {
             CpuUsageEntry obj = (CpuUsageEntry) element;
             if (columnIndex == 0) {
-                int tid = obj.getModel().getTid();
-                if (tid == CpuUsageDataProvider.TOTAL_SERIES_TID) {
-                    // Get the trace name
-                    return obj.getName();
-                }
-                return Integer.toString(tid);
+                return obj.getName();
             } else if (columnIndex == 1) {
                 int tid = obj.getModel().getTid();
                 if (tid == CpuUsageDataProvider.TOTAL_SERIES_TID) {
                     return Messages.CpuUsageXYViewer_Total;
                 }
-                return obj.getModel().getName();
+                return Integer.toString(tid);
             } else if (columnIndex == 2) {
                 return String.format(Messages.CpuUsageComposite_TextPercent, 100 * obj.getPercent());
             } else if (columnIndex == 3) {

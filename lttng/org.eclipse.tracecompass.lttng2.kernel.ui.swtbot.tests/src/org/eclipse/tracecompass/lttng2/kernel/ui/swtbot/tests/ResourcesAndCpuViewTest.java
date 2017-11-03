@@ -63,7 +63,7 @@ public class ResourcesAndCpuViewTest extends XYDataProviderBaseTest {
     private static final @NonNull String TOTAL_SERIES_NAME = "total:bug446190";
     private static final @NonNull String TRACE_NAME = "bug446190";
     private static final @NonNull String TITLE = "CPU Usage";
-    private static final @NonNull String SELECTED_THREAD_TID = "482";
+    private static final @NonNull String SELECTED_THREAD = "lttng-sessiond";
     private static final @NonNull String SELECTED_THREAD_SERIES = "bug446190:482";
     private static final String OTHERTHREAD_SERIES = "bug446190:496";
 
@@ -160,7 +160,7 @@ public class ResourcesAndCpuViewTest extends XYDataProviderBaseTest {
         /* Select a thread */
         SWTBotTreeItem rootEntry = getSWTBotView().bot().tree().getTreeItem(TRACE_NAME);
         SWTBotUtils.waitUntil(tree -> getTableCount() >= 8, rootEntry, "Did not finish loading");
-        SWTBotTreeItem selectedTheadNode = rootEntry.getNode(SELECTED_THREAD_TID);
+        SWTBotTreeItem selectedTheadNode = rootEntry.getNode(SELECTED_THREAD);
         selectedTheadNode.check();
         SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 2, chart, "Only total available");
 
@@ -172,7 +172,7 @@ public class ResourcesAndCpuViewTest extends XYDataProviderBaseTest {
         selectedTheadNode.uncheck();
 
         /* Selected an another thread and test in HD */
-        String otherSelectedThread = "496";
+        String otherSelectedThread = "lttng-consumerd";
         SWTBotTreeItem otherSelectedThreadNode = rootEntry.getNode(otherSelectedThread);
         otherSelectedThreadNode.check();
         chartViewer.setNbPoints(100);

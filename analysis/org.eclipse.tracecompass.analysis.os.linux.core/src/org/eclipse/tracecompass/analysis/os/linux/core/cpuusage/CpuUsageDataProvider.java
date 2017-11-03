@@ -91,6 +91,12 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
     private final KernelCpuUsageAnalysis fModule;
 
     /**
+     * {@link KernelAnalysisModule}'s {@link ITmfStateSystem} used to retrieve
+     * Process names from their PIDs.
+     */
+    private @Nullable ITmfStateSystem fKernelSs;
+
+    /**
      * Create an instance of {@link CpuUsageDataProvider}. Returns a null instance
      * if the analysis module is not found.
      *
@@ -275,10 +281,14 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
             return execName;
         }
 
-        ITmfStateSystem kernelSs = fModule.getStateSystem();
+        ITmfStateSystem kernelSs = fKernelSs;
+        if (kernelSs == null) {
+            kernelSs = TmfStateSystemAnalysisModule.getStateSystem(getTrace(), KernelAnalysisModule.ID);
+        }
         if (kernelSs == null) {
             return tid;
         }
+        fKernelSs = kernelSs;
 
         /* Retrieve the quark for process tid's execName */
         int execNameQuark = kernelSs.optQuarkAbsolute(Attributes.THREADS, tid, Attributes.EXEC_NAME);
