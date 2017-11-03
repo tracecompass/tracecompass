@@ -424,6 +424,12 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         return DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeDataProvider.class);
     }
 
+    @Override
+    protected void initializeDataSource() {
+        super.initializeDataSource();
+        getProvider();
+    }
+
     /**
      * Get the filter to query the {@link ITmfTreeDataProvider} for the queried parameters
      *

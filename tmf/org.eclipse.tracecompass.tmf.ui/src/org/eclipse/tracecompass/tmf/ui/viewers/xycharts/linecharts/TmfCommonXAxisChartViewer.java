@@ -83,11 +83,12 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
     private final double fResolution;
     private final AtomicInteger fDirty = new AtomicInteger();
     private final Map<ITmfTrace, IXYPresentationProvider> fXYPresentationProvider;
-    private ITmfXYDataProvider fXYDataProvider;
     private UpdateThread fUpdateThread;
 
     /** Used for testing **/
     private int fOverrideNbPoints = 0;
+
+    private final ITmfXYDataProvider[] fXYDataProvider = new ITmfXYDataProvider[1];
 
     /**
      * Constructor
@@ -111,7 +112,6 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
     public void loadTrace(ITmfTrace trace) {
         super.loadTrace(trace);
         fXYPresentationProvider.putIfAbsent(trace, new XYPresentationProvider());
-        initializeDataProvider();
     }
 
     @Override
@@ -157,7 +157,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      *            A data provider used for fetching a XY Model
      */
     protected void setDataProvider(ITmfXYDataProvider dataProvider) {
-        fXYDataProvider = dataProvider;
+        fXYDataProvider[0]  = dataProvider;
     }
 
     /**
@@ -235,19 +235,20 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
         private final IProgressMonitor fMonitor;
         private final int fNumRequests;
         private final @NonNull FlowScopeLog fScope;
-        private final ITmfXYDataProvider fDataProvider;
 
-        public UpdateThread(int numRequests, @NonNull FlowScopeLog log, ITmfXYDataProvider dataProvider) {
+        public UpdateThread(int numRequests, @NonNull FlowScopeLog log) {
             super("Line chart update"); //$NON-NLS-1$
             fNumRequests = numRequests;
             fMonitor = new NullProgressMonitor();
             fScope = log;
-            fDataProvider = dataProvider;
         }
 
         @Override
         public void run() {
             try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:UpdateThread", "numRequests=", fNumRequests).setParentScope(fScope).build()) { //$NON-NLS-1$ //$NON-NLS-2$
+                try (FlowScopeLog scopeDp = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:InitializeDataProvider").setParentScope(fScope).build()) { //$NON-NLS-1$
+                    initializeDataProvider();
+                }
                 try {
                     TimeQueryFilter filter = createQueryFilter(getWindowStartTime(), getWindowEndTime(), fNumRequests);
                     updateData(filter, fMonitor);
@@ -280,14 +281,15 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
          *            A monitor for canceling task
          */
         private void updateData(@NonNull TimeQueryFilter filters, IProgressMonitor monitor) {
-            if (fDataProvider == null) {
+            ITmfXYDataProvider dataProvider = fXYDataProvider[0];
+            if (dataProvider == null) {
                 TraceCompassLogUtils.traceInstant(LOGGER, Level.WARNING, "Data provider for this viewer is not available"); //$NON-NLS-1$
                 return;
             }
 
             boolean isComplete = false;
             do {
-                TmfModelResponse<ITmfCommonXAxisModel> response = fDataProvider.fetchXY(filters, monitor);
+                TmfModelResponse<ITmfCommonXAxisModel> response = dataProvider.fetchXY(filters, monitor);
                 ITmfCommonXAxisModel model = response.getModel();
                 if (model != null) {
                     updateDisplay(model, monitor);
@@ -452,7 +454,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             return;
         }
         int numRequests = fOverrideNbPoints != 0 ? fOverrideNbPoints : (int) Math.min(getWindowEndTime() - getWindowStartTime() + 1, (long) (getSwtChart().getPlotArea().getBounds().width * fResolution));
-        fUpdateThread = new UpdateThread(numRequests, fScope, fXYDataProvider);
+        fUpdateThread = new UpdateThread(numRequests, fScope);
         fUpdateThread.start();
     }
 
