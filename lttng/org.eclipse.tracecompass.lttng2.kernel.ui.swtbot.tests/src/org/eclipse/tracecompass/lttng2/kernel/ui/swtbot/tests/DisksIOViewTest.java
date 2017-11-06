@@ -32,6 +32,7 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.ui.IViewPart;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.swtchart.Chart;
 import org.swtchart.ISeries;
@@ -73,6 +74,7 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
      * @throws InvocationTargetException
      *             Reflection exception should not happen
      */
+    @Ignore
     @Test
     public void testDiskView() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         // Wait for analysis to finish.
