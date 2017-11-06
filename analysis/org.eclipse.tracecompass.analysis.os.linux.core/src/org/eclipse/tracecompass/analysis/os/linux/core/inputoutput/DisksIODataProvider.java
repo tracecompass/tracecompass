@@ -74,23 +74,23 @@ public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider
 
         /** This series' sector quark. public because final */
         public final int fSectorQuark;
-        private final long fId;
+        private final String fName;
         private final double[] fValues;
         private double fPrevCount;
 
         /**
          * Constructor
          *
-         * @param id
-         *            the unique ID for a disks read or write series.
+         * @param name
+         *            the series name
          * @param sectorQuark
          *            sector quark
          * @param length
          *            desired length of the series
          */
-        private DiskBuilder(long id, int sectorQuark, int length) {
-            fId = id;
+        private DiskBuilder(int sectorQuark, String name, int length) {
             fSectorQuark = sectorQuark;
+            fName = name;
             fValues = new double[length];
         }
 
@@ -119,7 +119,7 @@ public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider
         }
 
         private IYModel build() {
-            return new YModel(String.valueOf(fId), fValues);
+            return new YModel(fName, fValues);
         }
     }
 
@@ -287,9 +287,14 @@ public class DisksIODataProvider extends AbstractStateSystemAnalysisDataProvider
         List<DiskBuilder> builders = new ArrayList<>();
         for (Long id : ((SelectionTimeQueryFilter) filter).getSelectedItems()) {
             Integer quark = fIdToSectorQuark.get(id);
-            if (quark != null && (ss.getAttributeName(quark).equals(Attributes.SECTORS_READ) ||
-                    ss.getAttributeName(quark).equals(Attributes.SECTORS_WRITTEN))) {
-                builders.add(new DiskBuilder(id, quark, length));
+            if (quark != null) {
+                if (ss.getAttributeName(quark).equals(Attributes.SECTORS_READ)) {
+                    String name = getTrace().getName() + '/' + getDiskName(ss, ss.getParentAttributeQuark(quark)) + "/read"; //$NON-NLS-1$
+                    builders.add(new DiskBuilder(quark, name, length));
+                } else if (ss.getAttributeName(quark).equals(Attributes.SECTORS_WRITTEN)) {
+                    String name = getTrace().getName() + '/' + getDiskName(ss, ss.getParentAttributeQuark(quark)) + "/write"; //$NON-NLS-1$
+                    builders.add(new DiskBuilder(quark, name, length));
+                }
             }
         }
         return builders;

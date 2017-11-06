@@ -12,8 +12,16 @@ package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -32,8 +40,8 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.ui.IViewPart;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.osgi.framework.Bundle;
 import org.swtchart.Chart;
 import org.swtchart.ISeries;
 import org.swtchart.LineStyle;
@@ -52,11 +60,12 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
     private static final int MORE_POINTS = 100;
 
     private static final @NonNull String TITLE = "Disk I/O View";
-    private static final @NonNull String READ_SERIES_NAME = "2";
-    private static final @NonNull String WRITE_SERIES_NAME = "3";
+    private static final @NonNull String READ_SERIES_NAME = "scp_dest/8,0/read";
+    private static final @NonNull String WRITE_SERIES_NAME = "scp_dest/8,0/write";
 
     private static final @NonNull ITmfTimestamp ZOOM_START_TIME = TmfTimestamp.fromNanos(1361214078967381303L);
     private static final @NonNull ITmfTimestamp ZOOM_END_TIME = TmfTimestamp.fromNanos(1361214078967971599L);
+    private static final Bundle BUNDLE = Platform.getBundle("org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests");
 
     /**
      * Test to check the Disks IO Activity view. First, when trace opened, there
@@ -73,10 +82,14 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
      *             Reflection exception should not happen
      * @throws InvocationTargetException
      *             Reflection exception should not happen
+     * @throws URISyntaxException
+     *             if this URL is not formatted strictly according to to RFC2396 and
+     *             cannot be converted to a URI.
+     * @throws IOException
+     *             if an error occurs during the conversion
      */
-    @Ignore
     @Test
-    public void testDiskView() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    public void testDiskView() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, URISyntaxException, IOException {
         // Wait for analysis to finish.
         WaitUtils.waitForJobs();
         IViewPart viewSite = getSWTBotView().getViewReference().getView(true);
@@ -96,7 +109,7 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
         chartViewer.setNbPoints(NUMBER_OF_POINT);
 
         /* Initially, no disk activity */
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk/disk0-res50.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), getFullPath("resources/disk/disk0-res50.json"), "Chart data is not valid");
 
         /* Change time range where there is disks activity */
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, new TmfTimeRange(ZOOM_START_TIME, ZOOM_END_TIME)));
@@ -107,7 +120,7 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
         verifyChartStyle();
 
         /* Test data model */
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk/disk1-res50.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), getFullPath("resources/disk/disk1-res50.json"), "Chart data is not valid");
 
         /* Change Zoom and number of points */
         chartViewer.setNbPoints(MORE_POINTS);
@@ -116,7 +129,25 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
         verifyChartStyle();
 
         /* Test data model */
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk/disk2-res100.json", "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), getFullPath("resources/disk/disk2-res100.json"), "Chart data is not valid");
+    }
+
+    /**
+     * Get the full path to the test file from the bundle.
+     *
+     * @param bundlePath
+     *            path from the bundle
+     * @return the absolute path
+     * @throws URISyntaxException
+     *             if this URL is not formatted strictly according to to RFC2396 and
+     *             cannot be converted to a URI.
+     * @throws IOException
+     *             if an error occurs during the conversion
+     */
+    private static String getFullPath(String bundlePath) throws URISyntaxException, IOException {
+        URL location = FileLocator.find(BUNDLE, new Path(bundlePath), null);
+        URI uri = FileLocator.toFileURL(location).toURI();
+        return new File(uri).getAbsolutePath();
     }
 
     private void verifyChartStyle() {

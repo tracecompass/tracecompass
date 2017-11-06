@@ -494,4 +494,22 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         return column;
     }
 
+    /**
+     * Get the full path of the entry, from the trace to itself, to query the
+     * presentation provider.
+     *
+     * @param entry
+     *            entry whose legend needs to be resolved.
+     * @return the relevant series name.
+     */
+    protected static @NonNull String getFullPath(TmfGenericTreeEntry<TmfTreeDataModel> entry) {
+        String path = entry.getName();
+        ITmfTreeViewerEntry parent = entry.getParent();
+        while (parent instanceof TmfGenericTreeEntry) {
+            path = parent.getName() + '/' + path;
+            parent = parent.getParent();
+        }
+        return path;
+    }
+
 }

@@ -38,7 +38,7 @@ public class DiskIOActivityTreeViewer extends AbstractSelectTreeViewer {
                 TmfGenericTreeEntry<TmfTreeDataModel> entry = (TmfGenericTreeEntry<TmfTreeDataModel>) element;
                 if (!entry.hasChildren()) {
                     // ensures that only leaf nodes return images
-                    return getLegendImage(String.valueOf(entry.getModel().getId()));
+                    return getLegendImage(getFullPath(entry));
                 }
             }
             return null;

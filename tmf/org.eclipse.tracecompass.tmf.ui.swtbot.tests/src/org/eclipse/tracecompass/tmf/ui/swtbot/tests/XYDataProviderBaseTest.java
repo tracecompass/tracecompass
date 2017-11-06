@@ -176,7 +176,9 @@ public abstract class XYDataProviderBaseTest {
     protected TmfCommonXAxisModel extractModelFromChart(final Chart chart, String... otherSeries) {
         String mainSeriesName = getMainSeriesName();
         ISeries mainSeries = chart.getSeriesSet().getSeries(mainSeriesName);
-        assertNotNull(mainSeries);
+        if (mainSeries == null) {
+            return null;
+        }
 
         /* X and Y Values shown in chart */
         double[] xMain = mainSeries.getXSeries();

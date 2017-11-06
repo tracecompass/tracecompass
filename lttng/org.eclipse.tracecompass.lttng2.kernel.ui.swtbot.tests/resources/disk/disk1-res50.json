@@ -53,8 +53,8 @@
     590297
   ],
   "series": {
-    "2": {
-      "label": "2",
+    "scp_dest/8,0/read": {
+      "label": "scp_dest/8,0/read",
       "yValues": [
         0.0,
         0.0,
@@ -108,8 +108,8 @@
         0.0
       ]
     },
-    "3": {
-      "label": "3",
+    "scp_dest/8,0/write": {
+      "label": "scp_dest/8,0/write",
       "yValues": [
         0.0,
         1072748.2795859012,
