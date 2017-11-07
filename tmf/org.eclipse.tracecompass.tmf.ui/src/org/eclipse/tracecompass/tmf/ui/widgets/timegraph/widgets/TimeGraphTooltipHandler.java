@@ -91,9 +91,6 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
             ITimeGraphEntry entry = timeGraphControl.getEntry(pt);
             fillValues(pt, timeGraphControl, entry);
         }
-        if (getTipComposite().getChildren().length == 0) {
-            return;
-        }
     }
 
     private void fillValues(Point pt, TimeGraphControl timeGraphControl, ITimeGraphEntry entry) {

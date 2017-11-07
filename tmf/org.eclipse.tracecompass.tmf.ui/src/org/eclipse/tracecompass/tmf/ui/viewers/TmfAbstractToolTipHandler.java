@@ -79,9 +79,12 @@ public abstract class TmfAbstractToolTipHandler {
                     child.dispose();
                 }
                 fill(control, event, pt);
+                if (fTipComposite.getChildren().length == 0) {
+                    // avoid displaying empty tool tips.
+                    return;
+                }
                 fTipShell.pack();
                 Point tipPosition = control.toDisplay(pt);
-                fTipShell.pack();
                 setHoverLocation(fTipShell, tipPosition);
                 fTipShell.setVisible(true);
             }
