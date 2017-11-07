@@ -12,8 +12,11 @@
 package org.eclipse.tracecompass.tmf.ui.views;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.layout.GridData;
@@ -24,6 +27,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
@@ -39,7 +44,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
  * @author Bernd Hufmann
  * @author Mikael Ferland
  */
-public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
+public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, ITimeReset {
 
     private static final int[] DEFAULT_WEIGHTS = {1, 3};
 
@@ -55,6 +60,8 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
     private TmfViewer fTmfViewer;
     private SashForm fSashForm;
     private Listener fSashDragListener;
+
+    private final Action fResetScaleAction = ResetUtil.createResetAction(this);
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -153,6 +160,14 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
         fChartViewer.setSendTimeAlignSignals(true);
         fChartViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+        fChartViewer.getSwtChart().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+                super.mouseDoubleClick(e);
+                resetStartFinishTime();
+            }
+        });
+
         fChartViewer.getControl().addPaintListener(new PaintListener() {
             @Override
             public void paintControl(PaintEvent e) {
@@ -178,6 +193,7 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
             }
         });
         fSashForm.setWeights(DEFAULT_WEIGHTS);
+        getViewSite().getActionBars().getToolBarManager().add(fResetScaleAction);
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         if (trace != null) {
             setTrace(trace);
@@ -269,6 +285,16 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned {
         int marginSize = timeAxisWidth - width;
         layout.marginRight = Math.max(0, marginSize);
         composite.layout();
+    }
+
+    @Override
+    public void resetStartFinishTime(boolean notify) {
+        TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, TmfTimeRange.ETERNITY);
+        if (notify) {
+            broadcast(signal);
+        } else {
+            getChartViewer().windowRangeUpdated(signal);
+        }
     }
 
     // ------------------------------------------------------------------------

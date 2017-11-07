@@ -16,6 +16,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets;
 
+import org.eclipse.tracecompass.tmf.ui.views.ITimeReset;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 
 /**
@@ -25,7 +26,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeForma
  * @author Patrick Tasse
  * @author Xavier Raynaud
  */
-public interface ITimeDataProvider {
+public interface ITimeDataProvider extends ITimeReset {
 
     /**
      * Updates the selection begin and end time and notifies the selection
@@ -172,17 +173,13 @@ public interface ITimeDataProvider {
     void setSelectedTime(long time, boolean ensureVisible);
 
     /**
-     * Reset the start and end times and notify the registered listeners
-     */
-    void resetStartFinishTime();
-
-    /**
      * Reset the start and end times.
      *
      * @param notify
      *            if true, notify the registered listeners
      * @since 2.0
      */
+    @Override
     default void resetStartFinishTime(boolean notify) {
         if (notify) {
             setStartFinishTimeNotify(getMinTime(), getMaxTime());

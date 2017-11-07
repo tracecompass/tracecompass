@@ -79,6 +79,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.internal.tmf.ui.dialogs.AddBookmarkDialog;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
+import org.eclipse.tracecompass.tmf.ui.views.ResetUtil;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ShowFilterDialogAction;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TimeGraphLegend;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
@@ -2057,15 +2058,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
     public Action getResetScaleAction() {
         if (fResetScaleAction == null) {
             // resetScale
-            fResetScaleAction = new Action() {
-                @Override
-                public void run() {
-                    resetStartFinishTime();
-                }
-            };
-            fResetScaleAction.setText(Messages.TmfTimeGraphViewer_ResetScaleActionNameText);
-            fResetScaleAction.setToolTipText(Messages.TmfTimeGraphViewer_ResetScaleActionToolTipText);
-            fResetScaleAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_HOME_MENU));
+            fResetScaleAction = ResetUtil.createResetAction(this);
         }
         return fResetScaleAction;
     }

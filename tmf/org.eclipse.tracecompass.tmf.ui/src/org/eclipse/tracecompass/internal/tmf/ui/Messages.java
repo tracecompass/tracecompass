@@ -115,7 +115,6 @@ public class Messages extends NLS {
     public static String ShowFindDialogAction_Search;
     public static String ShowFindDialogAction_ShowSearchDialog;
 
-    public static String TmfTimeGraphViewer_ResetScaleActionNameText;
     public static String TmfTimeGraphViewer_ResetScaleActionToolTipText;
     public static String TmfTimeGraphViewer_LegendActionNameText;
     public static String TmfTimeGraphViewer_LegendActionToolTipText;
@@ -331,6 +330,7 @@ public class Messages extends NLS {
     public static String TmfView_PinActionToolTipText;
     public static String TmfView_PinToActionText;
     public static String TmfView_UnpinActionText;
+    public static String TmfView_ResetScaleActionNameText;
 
     public static String CallStackPresentationProvider_Thread;
     public static String CallStackView_FunctionColumn;
