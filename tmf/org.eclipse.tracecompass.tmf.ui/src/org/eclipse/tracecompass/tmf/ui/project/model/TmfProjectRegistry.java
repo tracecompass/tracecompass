@@ -366,7 +366,9 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                             Display.getDefault().asyncExec(() -> {
                                 for (TmfTraceElement trace : changedTraces) {
                                     IResource resource = trace.getResource();
-                                    if (resource.getWorkspace().getRoot().getLocation().isPrefixOf(resource.getLocation()) &&
+                                    IProject parentProject = TmfProjectModelHelper.getProjectFromShadowProject(project);
+                                    if (((parentProject != null && parentProject.getLocation().isPrefixOf(resource.getLocation())) // link from shadow project to parent project
+                                          ||  resource.getWorkspace().getRoot().getLocation().isPrefixOf(resource.getLocation())) && // link within the workspace
                                             !new File(resource.getLocation().toOSString()).exists()) {
                                         handleTraceDeleted(trace);
                                     } else {
