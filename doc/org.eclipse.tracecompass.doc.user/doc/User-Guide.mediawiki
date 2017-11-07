@@ -218,6 +218,15 @@ A new project will appear in the '''Project Explorer''' view.
 
 Tracing projects have two sub-folders: '''Traces''' which holds the individual traces, and '''Experiments''' which holds sets of traces that we want to correlate.
 
+=== Configuring a Project as Tracing Project ===
+It is possible to configure an existing project, for example C/C++ or Java project, as a Tracing project. All Trace Compass related features will be available within the same project. To configure a project as Tracing project, right-click on the project in the Project Explorer and select menu item '''Configure > Configure or convert to Tracing Project'''.
+
+[[Image:images/ProjectExplorerConfigureTracingNature.png]]
+
+Upon successful configuration, the project tree will be updated and the '''Trace Compass''' top-level node will be added. Expanding the '''Trace Compass''' node will show the '''Traces''' and '''Experiments''' nodes from the Tracing project.
+
+[[Image:images/ProjectExplorerCProjectWithTracingNature.png]]
+
 === Importing Traces to the Project ===
 
 The '''Traces''' folder holds the set of traces available for a tracing project. It can optionally contain a tree of trace folders to organize traces into sub-folders. The following chapters will explain different ways to import traces to the '''Traces''' folder of a tracing project.
