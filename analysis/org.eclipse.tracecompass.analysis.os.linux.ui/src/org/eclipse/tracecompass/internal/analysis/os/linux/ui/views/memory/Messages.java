@@ -25,6 +25,10 @@ public class Messages {
     public static String MemoryUsageTree_Legend;
     public static String MemoryUsageTree_Total;
 
+    public static String MemoryView_FilterAction_Text;
+    public static String MemoryView_FilterAction_FilteredTooltipText;
+    public static String MemoryView_FilterAction_UnfilteredTooltipText;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

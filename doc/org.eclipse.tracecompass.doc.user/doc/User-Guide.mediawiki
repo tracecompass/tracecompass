@@ -2445,6 +2445,8 @@ Where:
 
 The view is divided into the following important sections: '''Process Information''' and the '''Relative Kernel Memory Usage'''. The time axis is aligned with other views that support automatic time axis alignment (see [[#Automatic Time Axis Alignment | Automatic Time Axis Alignment]]).
 
+The filter button: [[Image:images/filter_items.gif]] can be used to show only the active threads in the tree viewer. By default only the threads which have had memory usage variations in the visible time range will be shown, clicking the button will reveal all the threads.
+
 
 === Process Information ===
 
@@ -2817,6 +2819,8 @@ The Memory Usage view allows the user to visualize the active memory usage per t
 The view shows the memory consumption for the currently selected trace.
 
 The time chart plots heap memory usage graphically over time. There is one line per process, unassigned memory usage is mapped to "Other".
+
+The filter button: [[Image:images/filter_items.gif]] can be used to show only the active threads in the tree viewer. By default only the threads which have had memory usage variations in the visible time range will be shown, clicking the button will reveal all the threads.
 
 In this implementation, the user needs to trace while hooking the ''liblttng-ust-libc-wrapper'' by running  ''LD_PRELOAD=liblttng-ust-libc-wrapper.so'' '''<exename>'''. This will add tracepoints to memory allocation and freeing to the heap, NOT shared memory or stack usage. If the contexts '''vtid''' and '''procname''' are enabled, then the view will associate the heap usage to processes. As detailed earlier, to enable the contexts, see the [[#Adding Contexts to Channels and Events of a Domain]] section. Or if using the command-line:
 * <pre>lttng add-context -u -t vtid -t procname</pre>

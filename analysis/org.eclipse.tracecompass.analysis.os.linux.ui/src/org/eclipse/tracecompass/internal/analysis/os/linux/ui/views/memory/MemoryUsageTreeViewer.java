@@ -10,9 +10,12 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory;
 
 import java.util.Comparator;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.memory.MemoryUsageTreeModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.FilterTimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
@@ -67,6 +70,9 @@ public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
         }
     }
 
+    // view is filtered by default
+    private boolean fFiltered = true;
+
     /**
      * Constructor
      *
@@ -81,6 +87,11 @@ public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
     }
 
     @Override
+    protected @Nullable TimeQueryFilter getFilter(long start, long end, boolean isSelection) {
+        return new FilterTimeQueryFilter(start, end, 2, fFiltered);
+    }
+
+    @Override
     protected ITmfTreeColumnDataProvider getColumnDataProvider() {
         return () -> {
             Comparator<TmfGenericTreeEntry<MemoryUsageTreeModel>> compareTid = Comparator.comparingInt(c -> c.getModel().getTid());
@@ -89,5 +100,16 @@ public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
                     createColumn(Messages.MemoryUsageTree_ColumnTID, compareTid),
                     new TmfTreeColumnData(Messages.MemoryUsageTree_Legend));
         };
+    }
+
+    /**
+     * Set the view to filter active threads or not.
+     *
+     * @param isFiltered
+     *            if we filter the active threads or not.
+     */
+    public void setFiltered(boolean isFiltered) {
+        fFiltered = isFiltered;
+        updateContent(getWindowStartTime(), getWindowEndTime(), false);
     }
 }

@@ -31,6 +31,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelmemoryusag
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractStateSystemAnalysisDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.FilterTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
@@ -271,6 +272,11 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
         }
         boolean complete = ss.waitUntilBuilt(0);
+        // to filter the active threads or not
+        boolean filtered = false;
+        if (filter instanceof FilterTimeQueryFilter) {
+            filtered = ((FilterTimeQueryFilter) filter).isFiltered();
+        }
 
         try {
             List<MemoryUsageTreeModel> nodes = new ArrayList<>();
@@ -280,7 +286,7 @@ public class KernelMemoryUsageDataProvider extends AbstractStateSystemAnalysisDa
             nodes.add(new MemoryUsageTreeModel(fTotalId, -1, TOTAL_TID, getTrace().getName()));
             for (Integer threadQuark : threadQuarkList) {
                 ITmfStateInterval threadMemoryInterval = memoryStates.get(threadQuark);
-                if (threadMemoryInterval.getEndTime() < end) {
+                if (!filtered || threadMemoryInterval.getEndTime() < end) {
                     String tidString = ss.getAttributeName(threadQuark);
                     String procname = getProcessName(tidString);
 

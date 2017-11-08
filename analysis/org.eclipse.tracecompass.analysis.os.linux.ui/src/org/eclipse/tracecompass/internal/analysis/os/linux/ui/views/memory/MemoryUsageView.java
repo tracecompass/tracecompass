@@ -9,6 +9,8 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.memory.MemoryUsageTreeModel;
 import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
@@ -24,6 +26,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxi
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * Memory usage view
@@ -92,5 +95,31 @@ public class MemoryUsageView extends TmfChartView {
             memoryTree.setTreeListener((TmfFilteredXYChartViewer) chart);
             memoryTree.setLegendImageProvider(legendImageProvider);
         }
+
+        // Add a tool bar button to filter active threads.
+        getViewSite().getActionBars().getToolBarManager().add(getFilterAction());
+    }
+
+    private Action getFilterAction() {
+        Action action = new Action(Messages.MemoryView_FilterAction_Text, IAction.AS_CHECK_BOX) {
+            // memory view is filtered by default.
+            private boolean isFiltered = true;
+
+            @Override
+            public void run() {
+                isFiltered ^= true;
+                setToolTipText(isFiltered ? Messages.MemoryView_FilterAction_FilteredTooltipText : Messages.MemoryView_FilterAction_UnfilteredTooltipText);
+                TmfViewer tree = getLeftChildViewer();
+                if (tree instanceof MemoryUsageTreeViewer) {
+                    MemoryUsageTreeViewer memoryUsageTreeViewer = (MemoryUsageTreeViewer) tree;
+                    memoryUsageTreeViewer.setFiltered(isFiltered);
+                }
+            }
+        };
+        action.setToolTipText(Messages.MemoryView_FilterAction_FilteredTooltipText);
+        action.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.tracecompass.tmf.ui", "icons/elcl16/filter_items.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+        // filtered by default, to not change the default behavior
+        action.setChecked(true);
+        return action;
     }
 }

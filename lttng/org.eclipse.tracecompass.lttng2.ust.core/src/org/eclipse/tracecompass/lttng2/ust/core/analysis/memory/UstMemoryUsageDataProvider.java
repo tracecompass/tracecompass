@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemo
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractStateSystemAnalysisDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.FilterTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
@@ -70,7 +71,6 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
      * reused per every quark, and finds the quarks to query for the XY models.
      */
     private final BiMap<Long, Integer> fIdToQuark = HashBiMap.create();
-    private @Nullable TmfModelResponse<List<MemoryUsageTreeModel>> fCached;
     private final long fTraceId = ENTRY_IDS.getAndIncrement();
 
     private final UstMemoryAnalysisModule fModule;
@@ -192,9 +192,6 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
      */
     @Override
     public TmfModelResponse<List<MemoryUsageTreeModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        if (fCached != null) {
-            return fCached;
-        }
 
         // Waiting for initialization should ensure that the state system is not null.
         fModule.waitForInitialization();
@@ -205,10 +202,17 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
 
         // Get the quarks before the full states to ensure that the attributes will be present in the full state
         boolean isComplete = ss.waitUntilBuilt(0);
+        // to filter the active threads or not
+        boolean filtered = false;
+        if (filter instanceof FilterTimeQueryFilter) {
+            filtered = ((FilterTimeQueryFilter) filter).isFiltered();
+        }
         List<Integer> tidQuarks = ss.getSubAttributes(-1, false);
-        List<ITmfStateInterval> fullState;
+        List<ITmfStateInterval> nameFullState;
+        List<ITmfStateInterval> activeFullState;
         try {
-            fullState = ss.queryFullState(ss.getCurrentEndTime());
+            nameFullState = ss.queryFullState(ss.getCurrentEndTime());
+            activeFullState = ss.queryFullState(Long.max(filter.getStart(), ss.getStartTime()));
         } catch (StateSystemDisposedException e) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
         }
@@ -220,23 +224,25 @@ public class UstMemoryUsageDataProvider extends AbstractStateSystemAnalysisDataP
             int procNameQuark = ss.optQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_PROCNAME_ATTRIBUTE);
 
             if (memoryAttribute != ITmfStateSystem.INVALID_ATTRIBUTE && procNameQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
-                String name = String.valueOf(fullState.get(procNameQuark).getValue());
-                int tid = Integer.parseInt(ss.getAttributeName(quark));
+                ITmfStateInterval threadMemoryInterval = activeFullState.get(memoryAttribute);
+                if (!filtered || threadMemoryInterval.getEndTime() < filter.getEnd()) {
+                    String name = String.valueOf(nameFullState.get(procNameQuark).getValue());
+                    int tid = Integer.parseInt(ss.getAttributeName(quark));
 
-                // Check if an ID has already been created for this quark.
-                Long id = fIdToQuark.inverse().get(quark);
-                if (id == null) {
-                    id = ENTRY_IDS.getAndIncrement();
-                    fIdToQuark.put(id, quark);
+                    // Check if an ID has already been created for this quark.
+                    Long id = fIdToQuark.inverse().get(quark);
+                    if (id == null) {
+                        id = ENTRY_IDS.getAndIncrement();
+                        fIdToQuark.put(id, quark);
+                    }
+                    builder.add(new MemoryUsageTreeModel(id, fTraceId, tid, name));
                 }
-                builder.add(new MemoryUsageTreeModel(id, fTraceId, tid, name));
             }
         }
 
         ImmutableList<MemoryUsageTreeModel> list = builder.build();
         if (isComplete) {
             TmfModelResponse<List<MemoryUsageTreeModel>> tmfModelResponse = new TmfModelResponse<>(list, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
-            fCached = tmfModelResponse;
             return tmfModelResponse;
         }
         return new TmfModelResponse<>(list, ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);

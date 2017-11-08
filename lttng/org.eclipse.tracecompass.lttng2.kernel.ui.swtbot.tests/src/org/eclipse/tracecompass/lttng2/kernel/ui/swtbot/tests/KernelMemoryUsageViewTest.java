@@ -122,6 +122,42 @@ public class KernelMemoryUsageViewTest extends XYDataProviderBaseTest {
         SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, CONSUMERD_PID), "resources/kernelmemory/kernel-memory-res100Selected.json", "Chart data is not valid");
     }
 
+    /**
+     * Test that the filter button works
+     *
+     * @throws NoSuchMethodException
+     *             Reflection exception should not happen
+     * @throws SecurityException
+     *             Reflection exception should not happen
+     * @throws IllegalAccessException
+     *             Reflection exception should not happen
+     * @throws IllegalArgumentException
+     *             Reflection exception should not happen
+     * @throws InvocationTargetException
+     *             Reflection exception should not happen
+     */
+    @Test
+    public void testFilter() throws NoSuchMethodException, SecurityException,
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        IViewPart viewSite = getSWTBotView().getViewReference().getView(true);
+        assertTrue(viewSite instanceof KernelMemoryUsageView);
+        final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewSite);
+        assertNotNull(chartViewer);
+        fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
+
+        SWTBotTree treeBot = getSWTBotView().bot().tree();
+        SWTBotTreeItem totalNode = treeBot.getTreeItem(fTraceName);
+        SWTBotUtils.waitUntil(root -> root.getItems().length == 5, totalNode, "Failed to load the filtered threads");
+
+        getSWTBotView().toolbarButton("Showing active threads").click();
+        totalNode = treeBot.getTreeItem(fTraceName);
+        SWTBotUtils.waitUntil(root -> root.getItems().length == 16, totalNode, "Failed to load all the threads");
+
+        getSWTBotView().toolbarButton("Showing all threads").click();
+        totalNode = treeBot.getTreeItem(fTraceName);
+        SWTBotUtils.waitUntil(root -> root.getItems().length == 5, totalNode, "Failed to filter the threads");
+    }
+
     @Override
     protected @NonNull String getMainSeriesName() {
         return TOTAL_PID;
