@@ -25,17 +25,24 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.wizards.SWTBotImportWizardUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -52,9 +59,12 @@ import org.junit.runners.MethodSorters;
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class ProjectExplorerRefreshTest {
     private static final String TRACE_PROJECT_NAME = "test";
+    private static final String C_PROJECT_NAME = "c-project";
 
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
+
+    private static final long DISK_ACCESS_TIMEOUT = 120000L;
 
     private static final File TEST_TRACES_PATH = new File(new Path(TmfTraceManager.getTemporaryDirPath()).append("testtraces").toOSString());
 
@@ -65,6 +75,7 @@ public class ProjectExplorerRefreshTest {
     private static SWTWorkbenchBot fBot;
 
     private static File fTracesFolder = null;
+    private static File fCProjectFolder = null;
 
     private static String getPath(String relativePath) {
         return new Path(TEST_TRACES_PATH.getAbsolutePath()).append(relativePath).toOSString();
@@ -73,11 +84,11 @@ public class ProjectExplorerRefreshTest {
     /**
      * Test Class setup
      *
-     * @throws IOException
+     * @throws Exception
      *             on error
      */
     @BeforeClass
-    public static void init() throws IOException {
+    public static void init() throws Exception {
         TestDirectoryStructureUtil.generateTraceStructure(TEST_TRACES_PATH);
 
         SWTBotUtils.initialize();
@@ -95,6 +106,11 @@ public class ProjectExplorerRefreshTest {
         SWTBotUtils.createProject(TRACE_PROJECT_NAME);
         IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(TRACE_PROJECT_NAME);
         fTracesFolder = new File(Objects.requireNonNull(TmfProjectRegistry.getProject(project, true).getTracesFolder()).getResource().getLocation().toOSString());
+
+        createCProject(C_PROJECT_NAME);
+        setTracingNature(C_PROJECT_NAME);
+        IProject cProject = ResourcesPlugin.getWorkspace().getRoot().getProject(C_PROJECT_NAME);
+        fCProjectFolder = cProject.getLocation().toFile();
     }
 
     /**
@@ -103,6 +119,7 @@ public class ProjectExplorerRefreshTest {
     @AfterClass
     public static void tearDown() {
         SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
+        SWTBotUtils.deleteProject(C_PROJECT_NAME, fBot);
         fLogger.removeAllAppenders();
     }
 
@@ -215,6 +232,77 @@ public class ProjectExplorerRefreshTest {
         refresh(() -> fBot.menu().menu("File", "Refresh").click());
         assertEquals(1, tracesFolder.getItems().length);
         SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, TEST_FILE_KERNEL.getName());
+    }
+
+    /**
+     * Test refresh after deleting a trace in a c-project
+     *
+     * @throws IOException
+     *             if an exception occurs
+     */
+    @Test
+    public void test16_05CProjectRefreshTraceDeleted() throws IOException {
+        // Copy traces inside the c-project
+        FileUtils.copyDirectory(TEST_FILE_KERNEL, FileUtils.getFile(fCProjectFolder, TEST_FILE_KERNEL.getName()));
+        FileUtils.copyDirectory(TEST_FILE_UST, FileUtils.getFile(fCProjectFolder, TEST_FILE_UST.getName()));
+        SWTBotTreeItem project = SWTBotUtils.selectProject(fBot, C_PROJECT_NAME);
+        refresh(() -> project.contextMenu().menu("Refresh").click());
+
+        // Import traces in Trace Compass sub project as links
+        SWTBotTreeItem tracesFolder = SWTBotUtils.getTraceProjectItem(fBot, project, "Trace Compass", "Traces");
+        tracesFolder.contextMenu().menu("Import...").click();
+        SWTBotImportWizardUtils.selectImportFromDirectory(fBot, fCProjectFolder.getAbsolutePath());
+        SWTBotImportWizardUtils.selectFolder(fBot, true, C_PROJECT_NAME, TEST_FILE_KERNEL.getName());
+        SWTBotImportWizardUtils.selectFolder(fBot, true, C_PROJECT_NAME, TEST_FILE_UST.getName());
+        fBot.button("Finish").click();
+        fBot.waitUntil(Conditions.shellCloses(fBot.activeShell()), DISK_ACCESS_TIMEOUT);
+        WaitUtils.waitForJobs();
+
+        // Be sure that the two traces are imported
+        tracesFolder.expand();
+        fBot.waitUntil(ConditionHelpers.treeItemCount(tracesFolder, 2));
+
+        // Create an experiment
+        tracesFolder.contextMenu().menu("Open As Experiment...", "Generic Experiment").click();
+        SWTBotUtils.activateEditor(fBot, "Experiment").close();
+        SWTBotTreeItem experiment = SWTBotUtils.getTraceProjectItem(fBot, project, "Trace Compass", "Experiments", "Experiment");
+        experiment.expand();
+        fBot.waitUntil(ConditionHelpers.treeItemCount(experiment, 5));
+
+        // Delete one trace from the c-project and verify that the trace is not in Trace Compass anymore
+        FileUtils.deleteDirectory(FileUtils.getFile(fCProjectFolder, TEST_FILE_UST.getName()));
+        refresh(() -> project.contextMenu().menu("Refresh").click());
+        fBot.waitUntil(ConditionHelpers.treeItemCount(tracesFolder, 1));
+
+        // Make sure that the experiment is still there and the trace is not there
+        fBot.waitUntil(ConditionHelpers.treeItemCount(experiment, 4));
+
+        // Delete the remaining trace from the c-project and verify that the trace is not in Trace Compass anymore
+        FileUtils.deleteDirectory(FileUtils.getFile(fCProjectFolder, TEST_FILE_KERNEL.getName()));
+        refresh(() -> project.contextMenu().menu("Refresh").click());
+        fBot.waitUntil(ConditionHelpers.treeItemCount(tracesFolder, 0));
+
+        // Experiments folder should be empty at this point
+        SWTBotTreeItem experimentsFolder = SWTBotUtils.getTraceProjectItem(fBot, project, "Trace Compass", "Experiments");
+        experimentsFolder.expand();
+        fBot.waitUntil(ConditionHelpers.treeItemCount(experimentsFolder, 0));
+    }
+
+    private static void createCProject(String projectName) throws CoreException {
+        IProgressMonitor monitor = new NullProgressMonitor();
+        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+        project.create(monitor);
+        project.open(monitor);
+        IProjectDescription description = project.getDescription();
+        description.setNatureIds(new String[] { "org.eclipse.cdt.core.cnature" });
+        project.setDescription(description, monitor);
+        project.open(monitor);
+    }
+
+    private static void setTracingNature(String projectName) {
+        SWTBotTreeItem projectItem = SWTBotUtils.selectProject(fBot, projectName);
+        projectItem.contextMenu().menu("Configure", "Configure or convert to Tracing Project").click();
+        WaitUtils.waitForJobs();
     }
 
     private static void refresh(Runnable runnable) {
