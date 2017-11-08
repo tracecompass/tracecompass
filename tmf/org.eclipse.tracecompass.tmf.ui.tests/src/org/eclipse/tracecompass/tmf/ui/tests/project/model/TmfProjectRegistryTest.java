@@ -51,6 +51,7 @@ import org.junit.Test;
 public class TmfProjectRegistryTest {
 
     private static final String SOME_PROJECT_NAME = "SomeProject";
+    private static final String NEW_PROJECT_NAME = "SomeProject2";
     private static final String TRACING_PROJECT_NAME = "SomeTracingProject";
     private static final String SOME_OTHER_PROJECT_NAME = "SomeOtherProject";
     private static final String TRACES_LABEL_TEXT = "Traces [0]";
@@ -62,6 +63,7 @@ public class TmfProjectRegistryTest {
     private static final String HIDDEN_TRACECOMPASS_DIRECTORY = ".tracecompass";
 
     private static final String SHADOW_PROJECT_NAME = ".tracecompass-SomeProject";
+    private static final String NEW_SHADOW_PROJECT_NAME = ".tracecompass-SomeProject2";
 
     private static IWorkspaceRoot fWorkspaceRoot;
     private static IProject fSomeProject;
@@ -246,10 +248,16 @@ public class TmfProjectRegistryTest {
         assertEquals(1, children.length);
         assertEquals(projectElement, children[0]);
 
+        // Rename project
+        fSomeProject.move(new Path(NEW_PROJECT_NAME), true, progressMonitor);
+        waitForShadowProjectUpdated(NEW_PROJECT_NAME);
+        IProject shadowProject = fWorkspaceRoot.getProject(NEW_SHADOW_PROJECT_NAME);
+        assertFalse(shadowProject.exists());
+
         // Verify that after deletion of the parent project the shadow project is removed from the workspace
         fSomeProject.delete(false, true, progressMonitor);
-        waitShadowForProjectDeleted(SOME_PROJECT_NAME);
-        IProject shadowProject = fWorkspaceRoot.getProject(SHADOW_PROJECT_NAME);
+        waitForShadowProjectUpdated(NEW_PROJECT_NAME);
+        shadowProject = fWorkspaceRoot.getProject(NEW_SHADOW_PROJECT_NAME);
         assertFalse(shadowProject.exists());
     }
 
@@ -348,13 +356,14 @@ public class TmfProjectRegistryTest {
     }
 
     /**
-     * Waits shadow project to be deleted.
+     * Waits shadow project to be updated.
      */
-    private static void waitShadowForProjectDeleted(String parentProjectName) {
+    private static void waitForShadowProjectUpdated(String parentProjectName) {
         for (int i = 1; i < 5000 && (TmfProjectModelHelper.getShadowProject(parentProjectName).exists()); i *= 2) {
             delay(i);
         }
     }
+
     /**
      * Sleeps current thread or GUI thread for a given time.
      * @param waitTimeMillis time in milliseconds to wait
