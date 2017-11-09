@@ -34,6 +34,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
@@ -106,10 +107,8 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
 
         @Override
         public Color getBackground(Object element, int columnIndex) {
-            if (element instanceof StateEntry) {
-                if (((StateEntry) element).isModified()) {
-                    return Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
-                }
+            if (element instanceof StateEntry && ((StateEntry) element).isModified()) {
+                return Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
             }
             return super.getBackground(element, columnIndex);
         }
@@ -129,31 +128,26 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
 
     @Override
     protected ITmfTreeColumnDataProvider getColumnDataProvider() {
-        return new ITmfTreeColumnDataProvider() {
+        return () -> {
+            List<TmfTreeColumnData> columns = new ArrayList<>();
+            TmfTreeColumnData column = new TmfTreeColumnData(Messages.TreeNodeColumnLabel);
+            columns.add(column);
+            column.setComparator(new ViewerComparator() {
+                @Override
+                public int compare(Viewer viewer, Object e1, Object e2) {
+                    TmfTreeViewerEntry n1 = (TmfTreeViewerEntry) e1;
+                    TmfTreeViewerEntry n2 = (TmfTreeViewerEntry) e2;
 
-            @Override
-            public List<TmfTreeColumnData> getColumnData() {
-                List<TmfTreeColumnData> columns = new ArrayList<>();
-                TmfTreeColumnData column = new TmfTreeColumnData(Messages.TreeNodeColumnLabel);
-                columns.add(column);
-                column.setComparator(new ViewerComparator() {
-                    @Override
-                    public int compare(Viewer viewer, Object e1, Object e2) {
-                        TmfTreeViewerEntry n1 = (TmfTreeViewerEntry) e1;
-                        TmfTreeViewerEntry n2 = (TmfTreeViewerEntry) e2;
-
-                        return n1.getName().compareTo(n2.getName());
-                    }
-                });
-                columns.add(new TmfTreeColumnData(Messages.QuarkColumnLabel));
-                columns.add(new TmfTreeColumnData(Messages.ValueColumnLabel));
-                columns.add(new TmfTreeColumnData(Messages.TypeColumnLabel));
-                columns.add(new TmfTreeColumnData(Messages.StartTimeColumLabel));
-                columns.add(new TmfTreeColumnData(Messages.EndTimeColumLabel));
-                columns.add(new TmfTreeColumnData(Messages.AttributePathColumnLabel));
-                return columns;
-            }
-
+                    return n1.getName().compareTo(n2.getName());
+                }
+            });
+            columns.add(new TmfTreeColumnData(Messages.QuarkColumnLabel));
+            columns.add(new TmfTreeColumnData(Messages.ValueColumnLabel));
+            columns.add(new TmfTreeColumnData(Messages.TypeColumnLabel));
+            columns.add(new TmfTreeColumnData(Messages.StartTimeColumLabel));
+            columns.add(new TmfTreeColumnData(Messages.EndTimeColumLabel));
+            columns.add(new TmfTreeColumnData(Messages.AttributePathColumnLabel));
+            return columns;
         };
     }
 
@@ -477,6 +471,22 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
         public void setOutOfRange() {
             fModified = false;
             fOutOfRange = true;
+        }
+    }
+
+    /**
+     * Signal handler for handling of the time synch signal. The times
+     * correspond to the selection by the user, not the visible time range.
+     *
+     * @param signal
+     *            The time synch signal {@link TmfSelectionRangeUpdatedSignal}
+     */
+    @Override
+    @TmfSignalHandler
+    public void selectionRangeUpdated(TmfSelectionRangeUpdatedSignal signal) {
+        super.selectionRangeUpdated(signal);
+        if (signal != null && (signal.getSource() != this) && (getTrace() != null)) {
+            updateContent(this.getSelectionBeginTime(), this.getSelectionEndTime(), true);
         }
     }
 }
