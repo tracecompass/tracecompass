@@ -187,7 +187,6 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                 if (!project.isOpen()) {
                     project.open(progressMonitor);
                 }
-
                 IProjectDescription description = project.getDescription();
                 boolean hasNature = description.hasNature(TmfProjectNature.ID);
                 String[] natures = description.getNatureIds();
@@ -195,7 +194,6 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                 if (workspace == null) {
                     return;
                 }
-
                 if (!hasNature && natures.length > 0) {
                     // Only add nature if project doesn't have the tracing nature
                     String[] newNatures = new String[natures.length + 1];
@@ -223,6 +221,17 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                 if (hasNature && natures.length > 1) {
                     String shadowProjectName = TmfProjectModelHelper.getShadowProjectName(project.getName());
                     IProject shadowProject = workspace.getRoot().getProject(shadowProjectName);
+
+                    if (shadowProject.exists() && !shadowProject.isAccessible()) {
+                        /*
+                         * If a shadow project is not accessible, i.e. closed or deleted from file
+                         * system while not being removed from the workspace, then remove the project
+                         * from workspace in order to be able to successfully re-create the shadow
+                         * project afterwards.
+                         */
+                        shadowProject.delete(false, true, progressMonitor);
+                    }
+
                     if (!shadowProject.exists()) {
                         // Get or create shadow project
                         IFolder shadowProjectFolder = TmfProjectElement.createFolderStructure(project, null);
@@ -241,7 +250,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
         try {
             action.run(monitor);
         } catch (InvocationTargetException e) {
-            Activator.getDefault().logError("Error adding tracing natue to project " + project.getName(), e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error adding tracing nature to project " + project.getName(), e); //$NON-NLS-1$
         } catch (InterruptedException e) {
         }
     }
