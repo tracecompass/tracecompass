@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -50,11 +51,15 @@ public class SoftIrqExitHandler extends KernelEventHandler {
         /* Put this SoftIRQ back to inactive (= -1) in the resource tree */
         int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeSoftIRQs(cpu, ss), softIrqId.toString());
         long timestamp = KernelEventHandlerUtils.getTimestamp(event);
-        if (isSoftIrqRaised(ss.queryOngoingState(quark))) {
-            ss.modifyAttribute(timestamp, StateValues.SOFT_IRQ_RAISED_VALUE, quark);
-        } else {
-            ss.modifyAttribute(timestamp, TmfStateValue.nullValue(), quark);
-        }
+
+        /* Update the aggregate IRQ entry to set it to this CPU */
+        boolean softIrqRaised = isSoftIrqRaised(ss.queryOngoingState(quark));
+        ss.modifyAttribute(timestamp, softIrqRaised ? StateValues.SOFT_IRQ_RAISED_VALUE : TmfStateValue.nullValue(), quark);
+
+        int aggregateQuark = ss.getQuarkAbsoluteAndAdd(Attributes.SOFT_IRQS, softIrqId.toString());
+        ITmfStateValue aggregateValue = KernelEventHandlerUtils.getAggregate(ss, Attributes.SOFT_IRQS, softIrqId);
+        ss.modifyAttribute(timestamp, aggregateValue, aggregateQuark);
+
         List<Integer> softIrqs = ss.getSubAttributes(ss.getParentAttributeQuark(quark), false);
         /* Only set status to running and no exit if ALL softirqs are exited. */
         for (Integer softIrq : softIrqs) {

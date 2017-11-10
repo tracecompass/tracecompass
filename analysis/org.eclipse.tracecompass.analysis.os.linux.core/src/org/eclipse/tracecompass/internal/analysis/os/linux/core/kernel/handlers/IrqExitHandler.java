@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
@@ -52,5 +53,11 @@ public class IrqExitHandler extends KernelEventHandler {
 
         /* Set the CPU status back to running or "idle" */
         KernelEventHandlerUtils.cpuExitInterrupt(timestamp, cpu, ss);
+
+        /* Update the aggregate IRQ entry to set it to this CPU */
+        int aggregateQuark = ss.getQuarkAbsoluteAndAdd(Attributes.IRQS, irqId.toString());
+        /* Update the aggregate IRQ entry to set it to a running CPU */
+        Integer prevCpu = KernelEventHandlerUtils.getCpuForIrq(ss, irqId);
+        ss.modifyAttribute(timestamp, prevCpu, aggregateQuark);
     }
 }

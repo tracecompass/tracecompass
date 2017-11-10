@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -47,11 +48,15 @@ public class SoftIrqRaiseHandler extends KernelEventHandler {
          */
         int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeSoftIRQs(cpu, ss), softIrqId.toString());
 
-        ITmfStateValue value = (isInSoftirq(ss.queryOngoingState(quark)) ?
+        ITmfStateValue value = isInSoftirq(ss.queryOngoingState(quark)) ?
                 StateValues.SOFT_IRQ_RAISED_RUNNING_VALUE :
-                StateValues.SOFT_IRQ_RAISED_VALUE);
+                StateValues.SOFT_IRQ_RAISED_VALUE;
         ss.modifyAttribute(KernelEventHandlerUtils.getTimestamp(event), value, quark);
 
+        /* Update the aggregate IRQ entry to set it to this CPU */
+        int aggregateQuark = ss.getQuarkAbsoluteAndAdd(Attributes.SOFT_IRQS, softIrqId.toString());
+        ITmfStateValue aggregateValue = KernelEventHandlerUtils.getAggregate(ss, Attributes.SOFT_IRQS, softIrqId);
+        ss.modifyAttribute(KernelEventHandlerUtils.getTimestamp(event), aggregateValue, aggregateQuark);
     }
 
     private static boolean isInSoftirq(@Nullable ITmfStateValue state) {

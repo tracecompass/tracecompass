@@ -59,6 +59,8 @@ import com.google.common.collect.ImmutableMap;
  * |  |  |  |- <Soft IRQ number> -> Soft IRQ Status
  * |  |  |- IRQS
  * |  |  |  |- <IRQ number> -> IRQ Status
+ * |- IRQs / SOFT_IRQs
+ * |  |- <IRQ number> -> Aggregate Status
  * |- THREADS
  * |  |- <Thread number> -> Thread Status
  * |  |  |- PPID
@@ -79,7 +81,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
      * Version number of this state provider. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
-    private static final int VERSION = 23;
+    private static final int VERSION = 24;
 
     // ------------------------------------------------------------------------
     // Fields

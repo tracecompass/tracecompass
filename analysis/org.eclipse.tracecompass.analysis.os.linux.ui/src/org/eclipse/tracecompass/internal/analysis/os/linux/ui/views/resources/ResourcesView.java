@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -53,9 +52,9 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
-import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Table;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 
 /**
@@ -198,7 +197,7 @@ public class ResourcesView extends AbstractTimeGraphView {
 
             final long resolution = Long.max(1, (end - ssq.getStartTime()) / getDisplayWidth());
             /* Transform is just to change the type. */
-            Iterable<TimeGraphEntry> entries = Iterables.transform(entryMap.values(), e -> (TimeGraphEntry) e);
+            Iterable<TimeGraphEntry> entries = Iterables.filter(entryMap.values(), TimeGraphEntry.class);
             zoomEntries(entries, ssq.getStartTime(), end, resolution, monitor);
 
             if (parentTrace.equals(getTrace())) {
@@ -208,7 +207,8 @@ public class ResourcesView extends AbstractTimeGraphView {
         }
     }
 
-    private static void createCpuEntriesWithQuark(@NonNull ITmfTrace trace, final ITmfStateSystem ssq, Map<Integer, ResourcesEntry> entryMap, TimeGraphEntry traceEntry, long startTime, long endTime, List<Integer> cpuQuarks) {
+    private static void createCpuEntriesWithQuark(@NonNull ITmfTrace trace, final ITmfStateSystem ssq, Map<Integer, ResourcesEntry> entryMap,
+            TimeGraphEntry traceEntry, long startTime, long endTime, List<Integer> cpuQuarks) {
         for (Integer cpuQuark : cpuQuarks) {
             final @NonNull String cpuName = ssq.getAttributeName(cpuQuark);
             int cpu = Integer.parseInt(cpuName);
@@ -228,11 +228,10 @@ public class ResourcesView extends AbstractTimeGraphView {
     }
 
     /**
-     * Create and add execution contexts to a cpu entry. Also creates an
-     * aggregate entry in the root trace entry. The execution context is
-     * basically what the cpu is doing in its execution stack. It can be in an
-     * IRQ, Soft IRQ. MCEs, NMIs, Userland and Kernel execution is not yet
-     * supported.
+     * Create and add execution contexts to a cpu entry. Also creates an aggregate
+     * entry in the root trace entry. The execution context is basically what the
+     * cpu is doing in its execution stack. It can be in an IRQ, Soft IRQ. MCEs,
+     * NMIs, Userland and Kernel execution is not yet supported.
      *
      * @param trace
      *            the trace
@@ -265,28 +264,24 @@ public class ResourcesView extends AbstractTimeGraphView {
                 interruptEntry = new ResourcesEntry(quark, trace, startTime, endTime, type, resourceId);
                 entryMap.put(quark, interruptEntry);
                 cpuEntry.addChild(interruptEntry);
-                boolean found = false;
-                for (ITimeGraphEntry rootElem : traceEntry.getChildren()) {
-                    if (rootElem instanceof AggregateResourcesEntry) {
-                        AggregateResourcesEntry aggregateInterruptEntry = (AggregateResourcesEntry) rootElem;
-                        if (aggregateInterruptEntry.getId() == resourceId && aggregateInterruptEntry.getType().equals(type)) {
-                            found = true;
-                            aggregateInterruptEntry.addContributor(interruptEntry);
-                            final AggregateResourcesEntry irqCpuEntry = new AggregateResourcesEntry(trace, cpuEntry.getName(), startTime, endTime, type, cpuEntry.getId());
-                            irqCpuEntry.addContributor(interruptEntry);
-                            aggregateInterruptEntry.addChild(irqCpuEntry);
-                            break;
-                        }
+
+                ResourcesEntry aggregateInterruptEntry = null;
+                // search for the aggregate interrupt entry in the trace entry.
+                for (ResourcesEntry rootEntry : Iterables.filter(traceEntry.getChildren(), ResourcesEntry.class)) {
+                    if (rootEntry.getId() == resourceId && rootEntry.getType().equals(type)) {
+                        aggregateInterruptEntry = rootEntry;
+                        break;
                     }
                 }
-                if (!found) {
-                    AggregateResourcesEntry aggregateInterruptEntry = new AggregateResourcesEntry(trace, startTime, endTime, type, resourceId);
-                    aggregateInterruptEntry.addContributor(interruptEntry);
-                    final AggregateResourcesEntry irqCpuEntry = new AggregateResourcesEntry(trace, cpuEntry.getName(), startTime, endTime, type, cpuEntry.getId());
-                    irqCpuEntry.addContributor(interruptEntry);
-                    aggregateInterruptEntry.addChild(irqCpuEntry);
+                // it does not exist yet, create it
+                if (aggregateInterruptEntry == null) {
+                    String aggregateIrqtype = type == Type.IRQ ? Attributes.IRQS : Attributes.SOFT_IRQS;
+                    int aggregateQuark = ssq.optQuarkAbsolute(aggregateIrqtype, resourceName);
+                    aggregateInterruptEntry = new ResourcesEntry(aggregateQuark, trace, startTime, endTime, type, resourceId);
                     traceEntry.addChild(aggregateInterruptEntry);
                 }
+                ResourcesEntry irqCpuEntry = new ResourcesEntry(quark, trace, cpuEntry.getName(), startTime, endTime, type, cpuEntry.getId());
+                aggregateInterruptEntry.addChild(irqCpuEntry);
             } else {
                 interruptEntry.updateEndTime(endTime);
             }
@@ -299,14 +294,14 @@ public class ResourcesView extends AbstractTimeGraphView {
         boolean isZoomThread = Thread.currentThread() instanceof ZoomThread;
 
         /* Filter the relevant entries and group them by ss */
-        Table<ITmfStateSystem, Integer, ResourcesEntry> table = filterGroupEntries(visible, zoomStartTime, zoomEndTime);
+        Map<ITmfStateSystem, Multimap<Integer, ResourcesEntry>> groupedEntries = filterGroupEntries(visible, zoomStartTime, zoomEndTime);
         TreeMultimap<Integer, ITmfStateInterval> intervals = TreeMultimap.create(Comparator.naturalOrder(),
                 Comparator.comparingLong(ITmfStateInterval::getStartTime));
 
         /* For each ss and its entries */
-        for (Entry<ITmfStateSystem, Map<Integer, ResourcesEntry>> entry : table.rowMap().entrySet()) {
+        for (Entry<ITmfStateSystem, Multimap<Integer, ResourcesEntry>> entry : groupedEntries.entrySet()) {
             ITmfStateSystem ss = entry.getKey();
-            Map<Integer, ResourcesEntry> quarksToEntries = entry.getValue();
+            Multimap<Integer, ResourcesEntry> quarksToEntries = entry.getValue();
 
             long start = Long.max(zoomStartTime, ss.getStartTime());
             long end = Long.min(zoomEndTime, ss.getCurrentEndTime());
@@ -324,10 +319,17 @@ public class ResourcesView extends AbstractTimeGraphView {
                     intervals.put(interval.getAttribute(), interval);
                 }
                 for (Entry<Integer, Collection<ITmfStateInterval>> e : intervals.asMap().entrySet()) {
-                    if (monitor.isCanceled()) {
-                        return;
+                    /*
+                     * Use a collection of entries per quark, as entries with the same quark may
+                     * appear twice because of aggregate IRQs.
+                     */
+                    Collection<ResourcesEntry> entries = quarksToEntries.get(e.getKey());
+                    for (ResourcesEntry resourcesEntry : entries) {
+                        if (monitor.isCanceled()) {
+                            return;
+                        }
+                        addTimeEvents(resourcesEntry, e.getValue(), isZoomThread);
                     }
-                    addTimeEvents(quarksToEntries.get(e.getKey()), e.getValue(), isZoomThread);
                 }
             } catch (TimeRangeException e) {
                 Activator.getDefault().logError("Resources zoom", e); //$NON-NLS-1$
@@ -349,27 +351,29 @@ public class ResourcesView extends AbstractTimeGraphView {
      *            the leftmost time bound of the view
      * @param zoomEndTime
      *            the rightmost time bound of the view
-     * @return A Table of the visible entries keyed by their state system and status
-     *         interval quark.
+     * @return A Map of the visible entries keyed by their state system and grouped
+     *         by their interval quark.
      */
-    private static Table<ITmfStateSystem, Integer, ResourcesEntry> filterGroupEntries(Iterable<TimeGraphEntry> visible,
+    private static Map<ITmfStateSystem, Multimap<Integer, ResourcesEntry>> filterGroupEntries(Iterable<TimeGraphEntry> visible,
             long zoomStartTime, long zoomEndTime) {
-        Table<ITmfStateSystem, Integer, ResourcesEntry> quarksToEntries = HashBasedTable.create();
+        Map<ITmfStateSystem, Multimap<Integer, ResourcesEntry>> quarksToEntries = new HashMap<>();
         for (ResourcesEntry tge : Iterables.filter(visible, ResourcesEntry.class)) {
             if (zoomStartTime <= tge.getEndTime() && zoomEndTime >= tge.getStartTime() && tge.getQuark() >= 0) {
                 ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(tge.getTrace(), KernelAnalysisModule.ID);
                 if (ss != null) {
-                    quarksToEntries.put(ss, tge.getQuark(), tge);
+                    Multimap<Integer, ResourcesEntry> multimap = quarksToEntries.get(ss);
+                    if (multimap == null) {
+                        multimap = HashMultimap.create();
+                        quarksToEntries.put(ss, multimap);
+                    }
+                    multimap.put(tge.getQuark(), tge);
                 }
             }
         }
         return quarksToEntries;
     }
 
-    private void addTimeEvents(@Nullable ResourcesEntry resourceEntry, Collection<ITmfStateInterval> value, boolean isZoomThread) {
-        if (resourceEntry == null) {
-            return;
-        }
+    private void addTimeEvents(ResourcesEntry resourceEntry, Collection<ITmfStateInterval> value, boolean isZoomThread) {
         List<ITimeEvent> events = new ArrayList<>(value.size());
         ITimeEvent prev = null;
         for (ITmfStateInterval interval : value) {
@@ -378,7 +382,7 @@ public class ResourcesView extends AbstractTimeGraphView {
                 long prevEnd = prev.getTime() + prev.getDuration();
                 if (prevEnd < event.getTime()) {
                     // fill in the gap.
-                    events.add(new TimeEvent(resourceEntry, prevEnd, event.getTime() - prevEnd));
+                    events.add(new TimeEvent(resourceEntry, prevEnd, event.getTime() - prevEnd, -1));
                 }
             }
             prev = event;

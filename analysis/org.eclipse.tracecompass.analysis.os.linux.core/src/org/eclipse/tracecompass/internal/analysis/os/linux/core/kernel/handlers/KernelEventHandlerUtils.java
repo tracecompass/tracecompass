@@ -26,7 +26,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 /**
  * Kernel Event Handler Utils is a collection of static methods to be used in
- * subclasses of IKernelEventHandler.
+ * subclasses of {@link KernelEventHandler}.
  *
  * @author Matthew Khouzam
  * @author Francis Giraldeau
@@ -45,12 +45,7 @@ public final class KernelEventHandlerUtils {
      * @return the CPU number (null for not set)
      */
     public static @Nullable Integer getCpu(ITmfEvent event) {
-        Integer cpuObj = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
-        if (cpuObj == null) {
-            /* We couldn't find any CPU information, ignore this event */
-            return null;
-        }
-        return cpuObj;
+        return TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
     }
 
     /**
@@ -118,12 +113,10 @@ public final class KernelEventHandlerUtils {
      *             the attribute was not set with int values
      */
     public static void setProcessToRunning(long timestamp, int currentThreadNode, ITmfStateSystemBuilder ssb)
-            throws TimeRangeException,
-            StateValueTypeException {
-        int quark;
-        ITmfStateValue value;
+            throws TimeRangeException, StateValueTypeException {
+        int quark = ssb.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
 
-        quark = ssb.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
+        ITmfStateValue value;
         if (ssb.queryOngoingState(quark).isNull()) {
             /* We were in user mode before the interruption */
             value = ProcessStatus.RUN.getStateValue();
@@ -263,5 +256,46 @@ public final class KernelEventHandlerUtils {
         }
         int threadSystemCallQuark = ssb.getQuarkAbsoluteAndAdd(Attributes.THREADS, Integer.toString(tid), Attributes.SYSTEM_CALL);
         return (ssb.queryOngoingState(threadSystemCallQuark).isNull() ? StateValues.CPU_STATUS_RUN_USERMODE_VALUE : StateValues.CPU_STATUS_RUN_SYSCALL_VALUE);
+    }
+
+    /**
+     * Get the highest active IRQ for all CPUs for the IRQ type (SOFT or not) and ID
+     *
+     * @param ss
+     *            state system
+     * @param irqType
+     *            IRQ type : {@link Attributes#IRQS} or
+     *            {@link Attributes#SOFT_IRQS}.
+     * @param irqId
+     *            the id of the IRQ for which we want aggregate status
+     * @return the highest IRQ (IRQ, SOFT_IRQ or raised SOFT_IRQ.
+     */
+    public static ITmfStateValue getAggregate(ITmfStateSystemBuilder ss, String irqType, Integer irqId) {
+        ITmfStateValue value = TmfStateValue.nullValue();
+        for (Integer irqQuark : ss.getQuarks(Attributes.CPUS, "*", irqType, irqId.toString())) { //$NON-NLS-1$
+            ITmfStateValue ongoing = ss.queryOngoingState(irqQuark);
+            if (ongoing.unboxInt() > value.unboxInt()) {
+                value = ongoing;
+            }
+        }
+        return value;
+    }
+
+    /**
+     * Find a CPU which has this IRQ raised.
+     *
+     * @param ss
+     *            state system
+     * @param irqId
+     *            IRQ id
+     * @return the CPU number if a CPU has this IRQ raised else null
+     */
+    public static @Nullable Integer getCpuForIrq(ITmfStateSystemBuilder ss, Integer irqId) {
+        for (Integer irqs : ss.getQuarks(Attributes.CPUS, "*", Attributes.IRQS, irqId.toString())) { //$NON-NLS-1$
+            if (!ss.queryOngoingState(irqs).isNull()) {
+                return Integer.parseInt(ss.getAttributeName(ss.getParentAttributeQuark(ss.getParentAttributeQuark(irqs))));
+            }
+        }
+        return null;
     }
 }
