@@ -2147,7 +2147,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             tree.setSortDirection(fSortDirection);
             tree.setSortColumn(column);
         }
-        fTimeGraphViewer.getControl().setFocus();
         // restore and reveal selection
         if ((viewContext != null) && (viewContext.getSelection() != null)) {
             fTimeGraphViewer.setSelection(viewContext.getSelection(), true);
