@@ -50,21 +50,22 @@ public class CpuUsageTreeViewer extends AbstractSelectTreeViewer {
 
         @Override
         public String getColumnText(Object element, int columnIndex) {
-            CpuUsageEntry obj = (CpuUsageEntry) element;
-            if (columnIndex == 0) {
-                return obj.getName();
-            } else if (columnIndex == 1) {
-                int tid = obj.getModel().getTid();
-                if (tid == CpuUsageDataProvider.TOTAL_SERIES_TID) {
-                    return Messages.CpuUsageXYViewer_Total;
+            if (element instanceof CpuUsageEntry) {
+                CpuUsageEntry obj = (CpuUsageEntry) element;
+                if (columnIndex == 0) {
+                    return obj.getName();
+                } else if (columnIndex == 1) {
+                    int tid = obj.getModel().getTid();
+                    if (tid == CpuUsageDataProvider.TOTAL_SERIES_TID) {
+                        return Messages.CpuUsageXYViewer_Total;
+                    }
+                    return Integer.toString(tid);
+                } else if (columnIndex == 2) {
+                    return String.format(Messages.CpuUsageComposite_TextPercent, 100 * obj.getPercent());
+                } else if (columnIndex == 3) {
+                    return NLS.bind(Messages.CpuUsageComposite_TextTime, obj.getModel().getTime());
                 }
-                return Integer.toString(tid);
-            } else if (columnIndex == 2) {
-                return String.format(Messages.CpuUsageComposite_TextPercent, 100 * obj.getPercent());
-            } else if (columnIndex == 3) {
-                return NLS.bind(Messages.CpuUsageComposite_TextTime, obj.getModel().getTime());
             }
-
             return null;
         }
 
