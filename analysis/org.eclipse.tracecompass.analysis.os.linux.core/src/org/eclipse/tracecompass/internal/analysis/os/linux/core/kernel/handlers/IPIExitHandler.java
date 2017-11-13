@@ -51,7 +51,7 @@ public class IPIExitHandler extends KernelEventHandler {
         KernelEventHandlerUtils.setProcessToRunning(timestamp, currentThreadNode, ss);
 
         /* Set the CPU status back to running or "idle" */
-        KernelEventHandlerUtils.cpuExitInterrupt(timestamp, cpu, ss);
+        KernelEventHandlerUtils.updateCpuStatus(timestamp, cpu, ss);
 
         /* Update the aggregate IRQ entry to set it to a CPU which has this IPI active */
         int aggregateQuark = ss.getQuarkAbsoluteAndAdd(Attributes.IRQS, irqId.toString());

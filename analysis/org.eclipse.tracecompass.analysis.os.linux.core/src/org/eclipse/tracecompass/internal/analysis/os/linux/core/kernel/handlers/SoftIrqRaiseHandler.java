@@ -57,6 +57,8 @@ public class SoftIrqRaiseHandler extends KernelEventHandler {
         int aggregateQuark = ss.getQuarkAbsoluteAndAdd(Attributes.SOFT_IRQS, softIrqId.toString());
         ITmfStateValue aggregateValue = KernelEventHandlerUtils.getAggregate(ss, Attributes.SOFT_IRQS, softIrqId);
         ss.modifyAttribute(KernelEventHandlerUtils.getTimestamp(event), aggregateValue, aggregateQuark);
+
+        KernelEventHandlerUtils.updateCpuStatus(KernelEventHandlerUtils.getTimestamp(event), cpu, ss);
     }
 
     private static boolean isInSoftirq(@Nullable ITmfStateValue state) {

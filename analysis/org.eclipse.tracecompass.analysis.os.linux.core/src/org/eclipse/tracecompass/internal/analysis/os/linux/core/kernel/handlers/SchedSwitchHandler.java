@@ -100,7 +100,7 @@ public class SchedSwitchHandler extends KernelEventHandler {
         setCpuProcess(ss, nextTid, timestamp, currentCPUNode);
 
         /* Set the status of the CPU itself */
-        setCpuStatus(ss, nextTid, newCurrentThreadNode, timestamp, currentCPUNode);
+        setCpuStatus(ss, nextTid, newCurrentThreadNode, timestamp, currentCPUNode, cpu);
     }
 
     private static void setOldProcessStatus(ITmfStateSystemBuilder ss, Long prevState, Integer formerThreadNode, int cpu, long timestamp) {
@@ -123,22 +123,21 @@ public class SchedSwitchHandler extends KernelEventHandler {
         ss.modifyAttribute(timestamp, value, quark);
     }
 
-    private static void setCpuStatus(ITmfStateSystemBuilder ss, Integer nextTid, Integer newCurrentThreadNode, long timestamp, int currentCPUNode) {
-        int quark;
-        ITmfStateValue value;
+    private static void setCpuStatus(ITmfStateSystemBuilder ss, Integer nextTid, Integer newCurrentThreadNode, long timestamp, int currentCPUNode, int cpu) {
         if (nextTid > 0) {
             /* Check if the entering process is in kernel or user mode */
-            quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.SYSTEM_CALL);
+            int quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.SYSTEM_CALL);
+            ITmfStateValue value;
             ITmfStateValue queryOngoingState = ss.queryOngoingState(quark);
             if (queryOngoingState.isNull()) {
                 value = StateValues.CPU_STATUS_RUN_USERMODE_VALUE;
             } else {
                 value = StateValues.CPU_STATUS_RUN_SYSCALL_VALUE;
             }
+            ss.modifyAttribute(timestamp, value, currentCPUNode);
         } else {
-            value = StateValues.CPU_STATUS_IDLE_VALUE;
+            KernelEventHandlerUtils.updateCpuStatus(timestamp, cpu, ss);
         }
-        ss.modifyAttribute(timestamp, value, currentCPUNode);
     }
 
     private static void setCpuProcess(ITmfStateSystemBuilder ss, Integer nextTid, long timestamp, int currentCPUNode) {

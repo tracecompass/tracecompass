@@ -176,7 +176,7 @@ public final class KernelEventHandlerUtils {
     }
 
     /**
-     * Reset the CPU's status when it's coming out of an interruption.
+     * Update the CPU's status when it has been modified by an interruption.
      *
      * @param timestamp
      *            the time when the status of the cpu is "leaving irq"
@@ -190,7 +190,7 @@ public final class KernelEventHandlerUtils {
      * @throws TimeRangeException
      *             the time is out of range
      */
-    public static void cpuExitInterrupt(long timestamp, Integer cpuNumber, ITmfStateSystemBuilder ssb)
+    public static void updateCpuStatus(long timestamp, Integer cpuNumber, ITmfStateSystemBuilder ssb)
             throws StateValueTypeException, TimeRangeException {
         int currentCPUNode = getCurrentCPUNode(cpuNumber, ssb);
 
@@ -225,20 +225,28 @@ public final class KernelEventHandlerUtils {
         int irqQuarks = ssb.getQuarkRelativeAndAdd(cpuQuark, Attributes.IRQS);
         List<Integer> irqs = ssb.getSubAttributes(irqQuarks, false);
         for (Integer quark : irqs) {
-            final ITmfStateValue irqState = ssb.queryOngoingState(quark.intValue());
+            ITmfStateValue irqState = ssb.queryOngoingState(quark);
             if (!irqState.isNull()) {
-                return irqState;
+                return StateValues.CPU_STATUS_IRQ_VALUE;
             }
         }
 
         /* Check if there is a soft IRQ running */
         int softIrqQuarks = ssb.getQuarkRelativeAndAdd(cpuQuark, Attributes.SOFT_IRQS);
         List<Integer> softIrqs = ssb.getSubAttributes(softIrqQuarks, false);
+        /*
+         * Get soft IRQ if there is one, else a raised soft IRQ if there is one, if not
+         * leave the value as null.
+         */
+        ITmfStateValue softIrq = TmfStateValue.nullValue();
         for (Integer quark : softIrqs) {
-            final ITmfStateValue softIrqState = ssb.queryOngoingState(quark.intValue());
-            if (!softIrqState.isNull()) {
-                return softIrqState;
+            ITmfStateValue softIrqState = ssb.queryOngoingState(quark.intValue());
+            if (softIrqState.unboxInt() > softIrq.unboxInt()) {
+                softIrq = softIrqState;
             }
+        }
+        if (!softIrq.isNull()) {
+            return softIrq;
         }
 
         /*

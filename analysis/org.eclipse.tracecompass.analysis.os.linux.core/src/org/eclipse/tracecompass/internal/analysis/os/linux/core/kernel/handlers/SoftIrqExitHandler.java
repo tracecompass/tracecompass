@@ -60,6 +60,9 @@ public class SoftIrqExitHandler extends KernelEventHandler {
         ITmfStateValue aggregateValue = KernelEventHandlerUtils.getAggregate(ss, Attributes.SOFT_IRQS, softIrqId);
         ss.modifyAttribute(timestamp, aggregateValue, aggregateQuark);
 
+        /* Set the CPU status back to "busy" or "idle" */
+        KernelEventHandlerUtils.updateCpuStatus(timestamp, cpu, ss);
+
         List<Integer> softIrqs = ss.getSubAttributes(ss.getParentAttributeQuark(quark), false);
         /* Only set status to running and no exit if ALL softirqs are exited. */
         for (Integer softIrq : softIrqs) {
@@ -69,9 +72,6 @@ public class SoftIrqExitHandler extends KernelEventHandler {
         }
         /* Set the previous process back to running */
         KernelEventHandlerUtils.setProcessToRunning(timestamp, currentThreadNode, ss);
-
-        /* Set the CPU status back to "busy" or "idle" */
-        KernelEventHandlerUtils.cpuExitInterrupt(timestamp, cpu, ss);
     }
 
     /**

@@ -45,7 +45,6 @@ public class SoftIrqEntryHandler extends KernelEventHandler {
 
         long timestamp = KernelEventHandlerUtils.getTimestamp(event);
         Integer softIrqId = ((Long) event.getContent().getField(getLayout().fieldVec()).getValue()).intValue();
-        int currentCPUNode = KernelEventHandlerUtils.getCurrentCPUNode(cpu, ss);
         int currentThreadNode = KernelEventHandlerUtils.getCurrentThreadNode(cpu, ss);
 
         /*
@@ -65,7 +64,6 @@ public class SoftIrqEntryHandler extends KernelEventHandler {
         ss.modifyAttribute(timestamp, value, currentThreadNode);
 
         /* Change the status of the CPU to interrupted */
-        value = StateValues.CPU_STATUS_SOFTIRQ_VALUE;
-        ss.modifyAttribute(timestamp, value, currentCPUNode);
+        KernelEventHandlerUtils.updateCpuStatus(timestamp, cpu, ss);
     }
 }
