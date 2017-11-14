@@ -2021,6 +2021,8 @@ The colored bars you see represent '''states''' for the associated process node.
 
 [[Image:images/Cfv_legend.png]]
 
+The style can be updated in the legend.
+
 This dark yellow is what you'll see most of the time since scheduling puts processes on hold while others run.
 
 The vertical blue line with T1 above it is the '''current selection indicator'''. When a time range is selected, the region between the begin and end time of the selection will be shaded and two lines with T1 and T2 above will be displayed. The time stamps corresponding to T1, T2 and their delta are shown in the status line when the mouse is hovering over the control flow.
@@ -2259,6 +2261,8 @@ The time axis is aligned with other views that support automatic time axis align
 Each state are represented by one color so it is faster to say what is happening.
 
 [[Image:images/Rv_legend.png|Color for each state]]
+
+The style can be updated in the legend.
 
 To go through the state of a resource, you first have to select the resource and the timestamp that interest you. For the latter, you can pick some time before the interesting part of the trace.
 
@@ -4020,6 +4024,10 @@ She walks up to the server and hears the hard drive thrashing, This prompts her 
 She sees the tracer writing but there is another process that is writing to the server disk non stop. She looks in the control flow view and sees that there's a program from another fellow engineer, "Wally" that is writing in his home in a loop "All work and no play makes Jack a dull boy.".
 
 Alice kills the program, and immediately the server speeds up. She then goes to discuss this with Wally and implements strict hard disk quotas on the server.
+
+= Trace Compass Incubator =
+
+To install features from the Trace Compass incubator, use the following update site URL: http://download.eclipse.org/tracecompass.incubator/master/repository/.
 
 = References =
 
