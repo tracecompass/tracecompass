@@ -4628,25 +4628,9 @@ View-specific markers can by added in sub-classes of ''AbstractTimeGraphView'' b
 
 = Virtual Machine Analysis =
 
-Virtualized environment are becoming more popular and understanding them can be challenging as machines share resources (CPU, disks, memory, etc), but from their point of view, they are running on bare metal. Tracing all the machines (guests and hosts) in a virtualized environment allows information to be correlated between all the nodes to better understand the system. See the User documentation for more info on this analysis.
+''Note'': The Virtual Machine Analysis that was previously part of Trace Compass has moved to the Trace Compass Incubator where it is undergoing active development. The analyses that were previously in Trace Compass are now available as part of the "Virtual Machine And Container Analysis" feature of the Incubator.
 
-The virtual machine analysis has been implemented in the following plugins:
-
-* '''org.eclipse.tracecompass.lttng2.kernel.core''' contains the virtual machine analysis itself, the model of the virtualized environment, as well as its implementation for different hypervisors.
-* '''org.eclipse.tracecompass.lttng2.kernel.ui''' contains the views for the analysis.
-
-== Adding support for an hypervisor ==
-
-Supporting a new hypervisor in Trace Compass requires implementing the model for this new hypervisor. The following sections will describe for each part of the model what has to be considered, what information we need to have, etc. Note that each hypervisor will require some work and investigation. The information might already be available as a single tracepoint for some, while other may require many tracepoints. It is also possible that some will require to add tracepoints, either to the kernel, or the hypervisor code itself, in which case a userspace trace (LTTng UST) might be necessary to get all the information.
-
-=== Virtual CPU analysis ===
-
-This analysis tracks the state of the virtual CPUs in conjunction with the physical CPU it is running on. For this, we need the following information:
-
-* A way to link a virtual CPU on a guest with a process on the host, such that it is possible to determine when the virtual CPU is preempted on the host. If trace data does not provide this information, some hypervisors have a command line option to dump that information. Manually feeding that information to the analysis is not supported now though.
-* A way to differentiate between hypervisor mode and normal mode for the virtual CPU. A virtual CPU usually runs within a process on the host, but sometimes that process may need to run hypervisor-specific code. That is called '''hypervisor mode'''. During that time, no code from the guest itself is run. Typically, the process is running on the host (not preempted), but from the guest's point of view, the virtual CPU should be preempted.
-
-A model implementation for a new hypervisor will need to implement class '''IVirtualMachineModel''', that can be found in package '''org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model'''. See the javadoc in the class itself for more information on what each method does.
+Please refer to [https://wiki.eclipse.org/Trace_Compass/Incubator_Guidelines the incubator development documentation] for how to contribute to the Incubator.
 
 = JUL Logging =
 

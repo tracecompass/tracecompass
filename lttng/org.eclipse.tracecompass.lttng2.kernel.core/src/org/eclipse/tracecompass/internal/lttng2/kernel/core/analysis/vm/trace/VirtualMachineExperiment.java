@@ -25,6 +25,10 @@ import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
  * guests running on them.
  *
  * @author Mohamad Gebai
+ *
+ *         TODO The virtual machine analysis and experiment have moved to the
+ *         Trace Compass incubator. Remove this class and all other related
+ *         classes and packages that only this uses.
  */
 public class VirtualMachineExperiment extends TmfExperiment {
 

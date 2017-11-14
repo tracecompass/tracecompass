@@ -3784,6 +3784,10 @@ Using the right mouse button to drag horizontally it will update the table and g
 
 = Virtual Machine Analysis =
 
+''Note'': The Virtual Machine Analysis is now deprecated and has moved to the Trace Compass Incubator where it is undergoing active development. The analyses that were previously in Trace Compass are now available as part of the "Virtual Machine And Container Analysis" feature of the Incubator.
+
+Please refer to [[#Trace Compass Incubator | Trace Compass Incubator documentation]] to install incubator features.
+
 Virtual environments are usually composed of host machines, who each run an hypervisor program on which one or many guests can be run. Tracing a guest machine alone can often yield some strange results as from its point of view, it has full use of the resources, but in reality, most resources are shared with the host and other guests.
 
 To better understand what is happening in such an environment, it is necessary to trace all the machines involved, guests and hosts, and correlate this information in an experiment that will display a complete view of the virtualized environment.
@@ -4019,7 +4023,7 @@ Alice kills the program, and immediately the server speeds up. She then goes to 
 
 = References =
 
-* [http://www.eclipse.org/tracecompass Trace Compass project] 
+* [http://www.eclipse.org/tracecompass Trace Compass project]
 * [https://wiki.eclipse.org/index.php/Trace_Compass#User_Guides Trace Compass User Guides]
 * [http://www.lttng.org/ LTTng project]
 * [http://lttng.org/files/doc/man-pages/man1/lttng.1.html LTTng Tracer Control Command Line Tool User Manual]

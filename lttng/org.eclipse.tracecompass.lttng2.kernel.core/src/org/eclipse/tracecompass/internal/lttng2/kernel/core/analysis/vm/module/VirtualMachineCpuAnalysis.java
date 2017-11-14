@@ -51,6 +51,10 @@ import com.google.common.collect.TreeMultimap;
  *
  * @author Mohamad Gebai
  * @author Geneviève Bastien
+ *
+ *         TODO The virtual machine analysis and experiment have moved to the
+ *         Trace Compass incubator. Remove this class and all other related
+ *         classes and packages that only this uses.
  */
 public class VirtualMachineCpuAnalysis extends TmfStateSystemAnalysisModule {
 

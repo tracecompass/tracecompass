@@ -52,6 +52,10 @@ import com.google.common.collect.Multimap;
  * Main implementation for the Virtual Machine view
  *
  * @author Mohamad Gebai
+ *
+ *         TODO The virtual machine analysis and experiment have moved to the
+ *         Trace Compass incubator. Remove this class and all other related
+ *         classes and packages that only this uses.
  */
 public class VirtualMachineView extends AbstractTimeGraphView {
 
