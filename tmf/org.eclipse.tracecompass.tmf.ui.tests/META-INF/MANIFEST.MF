@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 1.0.3.qualifier
+Bundle-Version: 1.0.4.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.tmf.ui.tests;singleton:=true
 Bundle-ActivationPolicy: lazy
@@ -29,12 +29,16 @@ Export-Package: org.eclipse.tracecompass.tmf.ui.tests,
  org.eclipse.tracecompass.tmf.ui.tests.shared,
  org.eclipse.tracecompass.tmf.ui.tests.statistics,
  org.eclipse.tracecompass.tmf.ui.tests.stubs.analysis,
+ org.eclipse.tracecompass.tmf.ui.tests.symbols,
  org.eclipse.tracecompass.tmf.ui.tests.uml2sd.load,
  org.eclipse.tracecompass.tmf.ui.tests.uml2sd.trace,
+ org.eclipse.tracecompass.tmf.ui.tests.views,
  org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.dialogs,
  org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.load,
  org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.loader,
  org.eclipse.tracecompass.tmf.ui.tests.widgets.timegraph.model,
+ org.eclipse.tracecompass.tmf.ui.tests.widgets.timegraph.widgets,
+ org.eclipse.tracecompass.tmf.ui.tests.stubs.views,
  org.eclipse.tracecompass.tmf.ui.widgets.timegraph.test.stub.adaption,
  org.eclipse.tracecompass.tmf.ui.widgets.timegraph.test.stub.model,
  org.eclipse.tracecompass.tmf.ui.widgets.timegraph.test.stub.views

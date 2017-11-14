@@ -19,7 +19,7 @@
 
   <name>Trace Compass CTF Parser Plug-in</name>
   <artifactId>org.eclipse.tracecompass.ctf.parser</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.2-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 
   <build>
