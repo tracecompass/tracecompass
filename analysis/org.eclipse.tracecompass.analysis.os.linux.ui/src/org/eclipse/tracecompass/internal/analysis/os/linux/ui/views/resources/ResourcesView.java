@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -196,8 +197,18 @@ public class ResourcesView extends AbstractTimeGraphView {
             createCpuEntriesWithQuark(trace, ssq, entryMap, traceEntry, startTime, endTime, cpuQuarks);
 
             final long resolution = Long.max(1, (end - ssq.getStartTime()) / getDisplayWidth());
-            /* Transform is just to change the type. */
-            Iterable<TimeGraphEntry> entries = Iterables.filter(entryMap.values(), TimeGraphEntry.class);
+
+            List<TimeGraphEntry> entries = new ArrayList<>();
+            // gather all children entries recursively
+            Consumer<TimeGraphEntry> consumer = new Consumer<TimeGraphEntry>() {
+                @Override
+                public void accept(TimeGraphEntry entry) {
+                    entries.add(entry);
+                    entry.getChildren().forEach(this);
+                }
+            };
+            consumer.accept(traceEntry);
+
             zoomEntries(entries, ssq.getStartTime(), end, resolution, monitor);
 
             if (parentTrace.equals(getTrace())) {
