@@ -19,7 +19,7 @@ import org.eclipse.swt.program.Program;
  */
 public class GiveFeedbackHandler extends AbstractHandler {
 
-    private static final String URL = "https://bugs.eclipse.org/bugs/enter_bug.cgi?product=Tracecompass.Incubator"; //$NON-NLS-1$
+    private static final String URL = "https://bugs.eclipse.org/bugs/enter_bug.cgi?product=Tracecompass"; //$NON-NLS-1$
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
