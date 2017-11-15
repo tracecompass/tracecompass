@@ -43,6 +43,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -177,6 +178,7 @@ public class PinAndCloneTest {
      * Test the behavior with two traces.
      */
     @Test
+    @Ignore
     public void testPinTwoTraces() {
         ITmfTrace ust = TmfTraceManager.getInstance().getActiveTrace();
         assertNotNull(ust);
