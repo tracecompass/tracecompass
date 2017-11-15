@@ -9,11 +9,13 @@
 
 package org.eclipse.tracecompass.analysis.timing.ui.swtbot.tests.callgraph;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -21,7 +23,6 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
@@ -30,14 +31,11 @@ import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
-import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
-import org.eclipse.tracecompass.analysis.timing.core.statistics.Statistics;
 import org.eclipse.tracecompass.analysis.timing.core.tests.flamegraph.AggregationTreeTest;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityViewer;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.ISegmentStoreDensityViewerDataListener;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.CallGraphDensityView;
-import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
@@ -65,17 +63,10 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
     private static final String CALLGRAPHDENSITY_ID = CallGraphDensityView.ID;
 
     private final @NonNull ISegmentStoreDensityViewerDataListener fSyncListener = new ISegmentStoreDensityViewerDataListener() {
-
         @Override
-        public void viewDataChanged(@NonNull Iterable<? extends @NonNull ISegment> newData) {
+        public void chartUpdated() {
             fLatch.countDown();
         }
-
-        @Override
-        public void selectedDataChanged(@Nullable Iterable<? extends @NonNull ISegment> newSelectionData) {
-            // do nothing
-        }
-
     };
     private SWTWorkbenchBot fBot;
     private SWTBotView fView;
@@ -143,6 +134,7 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
         assertNotNull(fTableViewer);
         SWTBotUtils.maximize(funcDensityView);
         fFuncDensityView = funcDensityView;
+        fDensityViewer.setNbPoints(100);
     }
 
     /**
@@ -153,6 +145,7 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
         CallGraphDensityView funcDensityView = fFuncDensityView;
         assertNotNull(funcDensityView);
         SWTBotUtils.maximize(funcDensityView);
+        setCga(null);
 
     }
 
@@ -169,85 +162,140 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
     public void cascadeTest() {
         super.cascadeTest();
         loadData();
+        waitForTable(3);
         assertEquals(3, fTableBot.rowCount());
-        ISeries series = getSeries();
-        IStatistics<@NonNull Long> sss = getDescriptiveStatistics(series);
-        assertEquals(3.0, sss.getTotal(), 0.0);
-        assertEquals(0.02, sss.getMean(), 0.02); // low mean
+        double[] expected = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 4.0 };
+        waitForSeries(expected);
+        assertArrayEquals(expected, getSeries().getYSeries(), 0.1);
     }
 
     @Override
     public void mergeFirstLevelCalleesTest() {
         super.mergeFirstLevelCalleesTest();
         loadData();
+        waitForTable(5);
         assertEquals(5, fTableBot.rowCount());
-        ISeries series = getSeries();
-        IStatistics<@NonNull Long> sss = getDescriptiveStatistics(series);
-        assertEquals(5.0, sss.getTotal(), 0.0);
-        assertEquals(0.02, sss.getMean(), 0.03); // low mean
+        double[] expected = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0 };
+        waitForSeries(expected);
+        assertArrayEquals(expected, getSeries().getYSeries(), 0.1);
     }
 
     @Override
     public void multiFunctionRootsSecondTest() {
         super.multiFunctionRootsSecondTest();
         loadData();
+        waitForTable(4);
         assertEquals(4, fTableBot.rowCount());
-        ISeries series = getSeries();
-        IStatistics<@NonNull Long> sss = getDescriptiveStatistics(series);
-        assertEquals(4.0, sss.getTotal(), 0.0);
-        assertEquals(0.02, sss.getMean(), 0.02); // low mean
+        double[] expected = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 3.0, 1.0, 1.0, 1.0, 1.0 };
+        waitForSeries(expected);
+        assertArrayEquals(expected, getSeries().getYSeries(), 0.1);
     }
 
     @Override
     public void mergeSecondLevelCalleesTest() {
         super.mergeSecondLevelCalleesTest();
         loadData();
+        waitForTable(8);
         assertEquals(8, fTableBot.rowCount());
-        ISeries series = getSeries();
-        double[] ySeries = series.getYSeries();
-        assertNotNull(ySeries);
-        IStatistics<@NonNull Long> sss = getDescriptiveStatistics(series);
-        assertEquals(8.0, sss.getTotal(), 0.0);
-        assertEquals(0.06, sss.getMean(), 0.02); // average mean
+        double[] expected = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 4.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0 };
+        waitForSeries(expected);
+        assertArrayEquals(expected, getSeries().getYSeries(), 0.1);
     }
 
     @Override
     public void multiFunctionRootsTest() {
         super.multiFunctionRootsTest();
         loadData();
+        waitForTable(4);
         assertEquals(4, fTableBot.rowCount());
-        ISeries series = getSeries();
-        double[] ySeries = series.getYSeries();
-        assertNotNull(ySeries);
-        IStatistics<@NonNull Long> sss = getDescriptiveStatistics(series);
-        assertEquals(4.0, sss.getTotal(), 0.0);
-        assertEquals(0.02, sss.getMean(), 0.02); // low mean
+        double[] expected = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 3.0, 1.0, 1.0, 1.0, 1.0 };
+        waitForSeries(expected);
+        assertArrayEquals(expected, getSeries().getYSeries(), 0.1);
     }
 
     @Override
     public void treeTest() {
         super.treeTest();
         loadData();
+        waitForTable(4);
         assertEquals(4, fTableBot.rowCount());
-        ISeries series = getSeries();
-        double[] ySeries = series.getYSeries();
-        assertNotNull(ySeries);
-        IStatistics<@NonNull Long> sss = getDescriptiveStatistics(series);
-        assertEquals(4.0, sss.getTotal(), 0.0);
-        assertEquals(0.02, sss.getMean(), 0.02); // low mean
+        double[] expected = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 3.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0 };
+        waitForSeries(expected);
+        assertArrayEquals(expected, getSeries().getYSeries(), 0.1);
     }
 
     @Override
     public void largeTest() {
         super.largeTest();
         loadData();
+        waitForTable(1000);
         assertEquals(1000, fTableBot.rowCount());
-        ISeries series = getSeries();
-        double[] ySeries = series.getYSeries();
-        assertNotNull(ySeries);
-        IStatistics<@NonNull Long> sss = getDescriptiveStatistics(series);
-        assertEquals(1000.0, sss.getTotal(), 0.0);
-        assertEquals(8, sss.getMean(), 1); // high mean
+        double[] expected = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1001.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
+        waitForSeries(expected);
+        assertArrayEquals(expected, getSeries().getYSeries(), 0.1);
     }
 
     private ISeries getSeries() {
@@ -263,11 +311,13 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
 
     private void loadData() {
         final ISegmentStoreProvider cga = getCga();
+
         UIThreadRunnable.syncExec(() -> {
             fTableViewer.setData(cga);
             fDensityViewer.setSegmentProvider(cga);
             fDensityViewer.updateWithRange(TmfTimeRange.ETERNITY);
             fDensityViewer.refresh();
+            fTableViewer.refresh();
         });
         if (cga != null) {
             try {
@@ -282,14 +332,24 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
 
     }
 
-    private static IStatistics<@NonNull Long> getDescriptiveStatistics(ISeries series) {
-        double[] ySeries = series.getYSeries();
-        assertNotNull(ySeries);
-        IStatistics<@NonNull Long> stats = new Statistics<>();
-        for (double item : ySeries) {
-            stats.update((long) (item - 1.0));
-        }
-        return stats;
+    private void waitForSeries(double[] expected) {
+        SWTBotUtils.waitUntil(arg -> {
+            UIThreadRunnable.syncExec(() -> {
+                fDensityViewer.refresh();
+                fTableViewer.refresh();
+            });
+            double[] ySeries = getSeries().getYSeries();
+            return Arrays.equals(expected, ySeries);
+        }, null, "Unable to refresh viewer series");
+    }
+
+    private void waitForTable(int nbOfRows) {
+        SWTBotUtils.waitUntil(tableBot -> {
+            UIThreadRunnable.syncExec(() -> {
+                fTableViewer.refresh();
+            });
+            return tableBot.rowCount() == nbOfRows;
+        }, fTableBot, "Unable to refresh the table");
     }
 
 }

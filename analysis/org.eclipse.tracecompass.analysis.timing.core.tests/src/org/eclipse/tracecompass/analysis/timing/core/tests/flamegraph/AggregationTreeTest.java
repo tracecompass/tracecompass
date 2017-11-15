@@ -688,13 +688,19 @@ public class AggregationTreeTest {
 
     /**
      * Gets the call graph analysis
+     *
      * @return the call graph analysis
      */
     protected CGAnalysis getCga() {
         return fCga;
     }
 
-    private void setCga(CGAnalysis cga) {
+    /**
+     * Set the callgraphanalysis
+     *
+     * @param cga
+     */
+    protected void setCga(CGAnalysis cga) {
         fCga = cga;
     }
 }

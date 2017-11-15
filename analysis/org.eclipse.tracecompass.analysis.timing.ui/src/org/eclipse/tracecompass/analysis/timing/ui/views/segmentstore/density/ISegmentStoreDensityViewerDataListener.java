@@ -64,4 +64,13 @@ public interface ISegmentStoreDensityViewerDataListener {
     default void selectedDataChanged(@Nullable Iterable<? extends ISegment> newSelectionData) {
         // To be implemented in children
     }
+
+    /**
+     * Notification that chart updated
+     * @since 2.1
+     */
+    default void chartUpdated() {
+        // To be implemented in children
+    }
+
 }

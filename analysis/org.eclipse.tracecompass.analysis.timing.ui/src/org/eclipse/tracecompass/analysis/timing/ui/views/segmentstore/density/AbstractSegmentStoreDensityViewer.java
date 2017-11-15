@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2015, 2016 Ericsson
+ * Copyright (c) 2015, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -79,8 +78,10 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
     private @Nullable ITmfTrace fTrace;
     private @Nullable IAnalysisProgressListener fListener;
     private @Nullable ISegmentStoreProvider fSegmentStoreProvider;
+    private Range fCurrentDurationRange = new Range(Double.MIN_VALUE, Double.MAX_VALUE);
     private TmfTimeRange fCurrentTimeRange = TmfTimeRange.NULL_RANGE;
-    private List<ISegmentStoreDensityViewerDataListener> fListeners;
+    private final List<ISegmentStoreDensityViewerDataListener> fListeners;
+    private int fOverrideNbPoints;
 
     /**
      * Constructs a new density viewer.
@@ -106,9 +107,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         fTooltipProvider = new SimpleTooltipProvider(this);
         fTooltipProvider.register();
 
-        fChart.addDisposeListener((e) -> {
-            internalDispose();
-        });
+        fChart.addDisposeListener(e -> internalDispose());
     }
 
     /**
@@ -118,7 +117,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
      *            The trace to consider
      * @return the
      */
-    protected @Nullable abstract ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace);
+    protected abstract @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace);
 
     @Nullable
     private static ITmfTrace getTrace() {
@@ -132,7 +131,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
 
         series.setBarColor(new Color(Display.getDefault(), BAR_COLOR));
         int barWidth = 4;
-        final int width = fChart.getPlotArea().getBounds().width / barWidth;
+        final int width = fOverrideNbPoints == 0 ? fChart.getPlotArea().getBounds().width / barWidth : fOverrideNbPoints;
         double[] xOrigSeries = new double[width];
         double[] yOrigSeries = new double[width];
         Arrays.fill(yOrigSeries, 1.0);
@@ -181,6 +180,12 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         fChart.getAxisSet().getYAxis(0).setRange(new Range(0.9, maxY));
         fChart.getAxisSet().getYAxis(0).enableLogScale(true);
         fChart.redraw();
+        new Thread(() -> {
+            for (ISegmentStoreDensityViewerDataListener l : fListeners) {
+                l.chartUpdated();
+            }
+        }).start();
+
     }
 
     @Override
@@ -194,10 +199,16 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
      * @param durationRange
      *            a range of latency durations
      */
-    public void select(Range durationRange) {
-        computeDataAsync(fCurrentTimeRange, durationRange).thenAccept((data) -> {
-            for (ISegmentStoreDensityViewerDataListener listener : fListeners) {
-                listener.selectedDataChanged(data);
+    public void select(final Range durationRange) {
+        fCurrentDurationRange = durationRange;
+        final TmfTimeRange timeRange = fCurrentTimeRange;
+        computeDataAsync(timeRange, durationRange).thenAccept(data -> {
+            synchronized (fListeners) {
+                if (fCurrentTimeRange.equals(timeRange) && fCurrentDurationRange.equals(durationRange)) {
+                    for (ISegmentStoreDensityViewerDataListener listener : fListeners) {
+                        listener.selectedDataChanged(data);
+                    }
+                }
             }
         });
     }
@@ -208,8 +219,16 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
      * @param durationRange
      *            a range of latency durations
      */
-    public void zoom(Range durationRange) {
-        computeDataAsync(fCurrentTimeRange, durationRange).thenAccept((data) -> applyData(data));
+    public void zoom(final Range durationRange) {
+        fCurrentDurationRange = durationRange;
+        final TmfTimeRange timeRange = fCurrentTimeRange;
+        computeDataAsync(timeRange, durationRange).thenAccept(data -> {
+            synchronized (fListeners) {
+                if (fCurrentTimeRange.equals(timeRange) && fCurrentDurationRange.equals(durationRange)) {
+                    applyData(data);
+                }
+            }
+        });
     }
 
     private CompletableFuture<@Nullable SegmentStoreWithRange<ISegment>> computeDataAsync(final TmfTimeRange timeRange, final Range durationRange) {
@@ -228,12 +247,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
 
         // Filter on the segment duration if necessary
         if (durationRange.lower > Double.MIN_VALUE || durationRange.upper < Double.MAX_VALUE) {
-            Predicate<ISegment> predicate = new Predicate<ISegment>() {
-                @Override
-                public boolean test(@NonNull ISegment segment) {
-                    return segment.getLength() >= durationRange.lower && segment.getLength() <= durationRange.upper;
-                }
-            };
+            Predicate<ISegment> predicate = segment -> segment.getLength() >= durationRange.lower && segment.getLength() <= durationRange.upper;
             return new SegmentStoreWithRange<>(segStore, timeRange, predicate);
         }
 
@@ -287,13 +301,22 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
     /**
      * Update the display range
      *
-     * @param range
+     * @param timeRange
      *            the range
      * @since 1.2
      */
     @VisibleForTesting
-    public void updateWithRange(final TmfTimeRange range) {
-        computeDataAsync(range, new Range(Double.MIN_VALUE, Double.MAX_VALUE)).thenAccept((data) -> applyData(data));
+    public void updateWithRange(final TmfTimeRange timeRange) {
+        fCurrentTimeRange = timeRange;
+        fCurrentDurationRange = new Range(Double.MIN_VALUE, Double.MAX_VALUE);
+        final Range durationRange = fCurrentDurationRange;
+        computeDataAsync(timeRange, durationRange).thenAccept(data -> {
+            synchronized (fListeners) {
+                if (fCurrentTimeRange.equals(timeRange) && fCurrentDurationRange.equals(durationRange)) {
+                    applyData(data);
+                }
+            }
+        });
     }
 
     @Override
@@ -405,6 +428,23 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
             }
             chart.redraw();
         }
+    }
+
+    /**
+     * Force the number of points to a fixed value
+     *
+     * @param nbPoints
+     *            The number of points to display, cannot be negative. 0 means use
+     *            native resolution. any positive integer means that number of
+     *            points
+     * @since 2.1
+     */
+    public synchronized void setNbPoints(int nbPoints) {
+        if (nbPoints < 0) {
+            throw new IllegalArgumentException("Number of points cannot be negative"); //$NON-NLS-1$
+        }
+        fOverrideNbPoints = nbPoints;
+        updateWithRange(fCurrentTimeRange);
     }
 
     /**
