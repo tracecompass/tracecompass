@@ -2,30 +2,34 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-   <!-- extension
+   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
             locationURI="menu:org.eclipse.ui.main.menu?before=org.eclipse.tracecompass.rcp.ui.menu.window">
          <menu
                id="org.eclipse.tracecompass.rcp.ui.menu.experimental"
-               label="%menu.experimental">
+               label="%menu.tools">
             <command
                   commandId="org.eclipse.equinox.p2.ui.discovery.commands.ShowRepositoryCatalog"
-                  label="%menu.experimental.install"
+                  label="%menu.tools.install"
                   style="push">
 	           <parameter
 	               name="org.eclipse.equinox.p2.ui.discovery.commands.RepositoryParameter"
 	               value="http://download.eclipse.org/tracecompass.incubator/master/repository/">
 	           </parameter>
             </command>
-            <command
-                  commandId="org.eclipse.tracecompass.rcp.incubator.ui.feedback"
-                  label="%menu.experimental.feedback"
-                  style="push" />
          </menu>
       </menuContribution>
-   </extension -->
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.tracecompass.rcp.ui.menu.help?after=org.eclipse.equinox.p2.ui.sdk.install">
+            <command
+                  commandId="org.eclipse.tracecompass.rcp.incubator.ui.feedback"
+                  label="%menu.help.feedback"
+                  style="push" />
+      </menuContribution>
+   </extension>
    <extension
          point="org.eclipse.ui.commands">
       <command
