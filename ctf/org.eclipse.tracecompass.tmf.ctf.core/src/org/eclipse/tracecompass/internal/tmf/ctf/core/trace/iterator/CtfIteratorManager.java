@@ -22,6 +22,7 @@ import java.util.Random;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.ctf.core.Activator;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocationInfo;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfTmfContext;
@@ -72,21 +73,20 @@ public class CtfIteratorManager {
     }
 
     /**
-     * This needs explaining: the iterator table is effectively a cache.
-     * Originally the contexts had a 1 to 1 structure with the file handles of a
-     * trace. This failed since there is a limit to how many file handles we can
-     * have opened simultaneously. Then a round-robin scheme was implemented,
-     * this lead up to a two competing contexts syncing up and using the same
-     * file handler, causing horrible slowdowns. Now a random replacement
-     * algorithm is selected. This is the same as used by arm processors, and it
-     * works quite well when many cores so this looks promising for very
-     * multi-threaded systems.
+     * This needs explaining: the iterator table is effectively a cache. Originally
+     * the contexts had a 1 to 1 structure with the file handles of a trace. This
+     * failed since there is a limit to how many file handles we can have opened
+     * simultaneously. Then a round-robin scheme was implemented, this lead up to a
+     * two competing contexts syncing up and using the same file handler, causing
+     * horrible slowdowns. Now a random replacement algorithm is selected. This is
+     * the same as used by arm processors, and it works quite well when many cores
+     * so this looks promising for very multi-threaded systems.
      *
      * @param context
      *            the context to look up
-     * @return the iterator referring to the context
+     * @return the iterator referring to the context or null in the case of an error
      */
-    public CtfIterator getIterator(final CtfTmfContext context) {
+    public @Nullable CtfIterator getIterator(final CtfTmfContext context) {
         /*
          * if the element is in the map, we don't need to do anything else.
          */
@@ -103,6 +103,9 @@ public class CtfIteratorManager {
                      * if we're not full yet, just add an element.
                      */
                     iter = (CtfIterator) fTrace.createIterator();
+                    if (iter == null) {
+                        return null;
+                    }
                     addElement(context, iter);
 
                 } else {

@@ -13,6 +13,7 @@
 
 package org.eclipse.tracecompass.tmf.ctf.core.context;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.ctf.core.trace.iterator.CtfIterator;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
@@ -78,6 +79,9 @@ public class CtfTmfContext implements ITmfContext {
                 fCurLocation = ctfLocation;
             } else {
                 CtfIterator iterator = getIterator();
+                if(iterator == null) {
+                    return;
+                }
                 iterator.seek(ctfLocation.getLocationInfo());
                 fCurLocation = iterator.getLocation();
             }
@@ -118,7 +122,8 @@ public class CtfTmfContext implements ITmfContext {
      * @return The event or null
      */
     public synchronized CtfTmfEvent getCurrentEvent() {
-        return getIterator().getCurrentEvent();
+        CtfIterator iterator = getIterator();
+        return iterator == null ? null : iterator.getCurrentEvent();
     }
 
     /**
@@ -129,6 +134,9 @@ public class CtfTmfContext implements ITmfContext {
     public synchronized boolean advance() {
         final CtfLocationInfo curLocationData = fCurLocation.getLocationInfo();
         CtfIterator iterator = getIterator();
+        if( iterator == null) {
+            return false;
+        }
         boolean retVal = iterator.advance();
         CtfTmfEvent currentEvent = iterator.getCurrentEvent();
 
@@ -160,6 +168,9 @@ public class CtfTmfContext implements ITmfContext {
      */
     public synchronized boolean seek(final long timestamp) {
         CtfIterator iterator = getIterator();
+        if( iterator == null) {
+            return false;
+        }
         boolean ret = iterator.seek(timestamp);
         fCurLocation = iterator.getLocation();
         return ret;
@@ -174,7 +185,8 @@ public class CtfTmfContext implements ITmfContext {
      */
     public synchronized boolean seek(final CtfLocationInfo location) {
         fCurLocation = new CtfLocation(location);
-        return getIterator().seek(location);
+        CtfIterator iterator = getIterator();
+        return iterator == null ? false : iterator.seek(location);
     }
 
     // -------------------------------------------
@@ -187,7 +199,7 @@ public class CtfTmfContext implements ITmfContext {
      *
      * @return an iterator
      */
-    private CtfIterator getIterator() {
+    private @Nullable CtfIterator getIterator() {
         return (CtfIterator) fTrace.createIteratorFromContext(this);
     }
 }
