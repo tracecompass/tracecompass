@@ -1165,9 +1165,49 @@ To do so:
 
 The trace will be opened in an editor showing the events table, and an entry will be added for it in the Time Chart view.
 
+== Pin and Clone ==
+
+Some views, such as time graph views, can be opened multiple times in order to show content from different traces and/or window ranges simultaneously. This can be done by using the '''New <view name> view''' sub-menu in the view's '''View Menu''' at the far right of the tool bar.
+
+By default, a view shows content from the active trace, which is the last trace whose events editor tab has been selected.
+
+When a view is pinned, it no longer follows the active trace and is locked to the trace to which it is pinned. The view's tab will show the pinned trace's name within brackets, e.g. View Name < ''trace name'' >.
+
+A view can be pinned to the current active trace by clicking the '''Pin View''' button [[Image:images/unpinned_view.gif]] on the tool bar, or pinned to any specific opened trace by using the '''Pin View''' button's drop-down menu. This drop-down menu can also be used to switch the pinned trace of a pinned view. Once a view is pinned, it can be unpinned by clicking the '''Unpin View''' button [[Image:images/pin_view.gif]] on the tool bar.
+
+=== Cloning a view to show two different traces ===
+
+# Open two different traces
+# Open or select the view to be cloned
+# Pin the view to the first trace: from its tool bar, click the '''Pin View''' button [[Image:images/unpinned_view.gif]] or select '''Pin to <first trace>''' from its button drop-down menu
+# In the '''View Menu''', select '''New <view name> view''', '''pinned to <second trace>'''
+
+[[Image:images/PinAndCloneTwoTraces.png]]
+
+=== Cloning a view to show different window ranges of same trace ===
+
+# Open a trace
+# Open or select the view to be cloned
+# Pin the view to the trace: from its tool bar, click the '''Pin View''' button [[Image:images/unpinned_view.gif]] or select '''Pin to <trace>''' from its button drop-down menu
+# In the '''View Menu''', select '''New <view name> view''', '''pinned to <trace> | new instance'''
+
+[[Image:images/PinAndCloneTwoInstances.png]]
+
+== Time Synchronization of Views ==
+
+All time-based views that show the same trace are synchronized in time to show the same window range and time selection. This also applies to the selected event(s) in the [[Events Editor]].
+
+By default, changing the window range or time selection for one trace does not affect the window range or time selection of other opened traces.
+
+To allow a specific trace to be synchronized with (and react to) the window range or time selection from other traces, check the '''Follow time updates from other traces''' toggle option in that trace's [[Event Editor]] context menu. This does not affect whether this trace's time updates will be propagated to other traces.
+
+Time synchronization will only occur if the updated window range or time selection from the other trace overlaps with the full time range of the following trace. It will occur even if the following trace is not the active trace.
+
+Note that two opened instances of the same trace are never time synchronized with each other, regardless of the toggle option.
+
 == Automatic Time Axis Alignment ==
 
-Trace Compass supports automatic alignment of the time axis for time base views. The user now can resize the time window of one view and all other open views will align to the new window size and position. The automatic alignment is optional and can be disabled and enabled using the '''Align Views''' button of the view menu. Disabling or enabling it in one view it will disable and enable it for all view since it's a workspace wide setting.
+Trace Compass supports automatic alignment of the time axis for time-based views. The user now can resize the time window of one view and all other open views will align to the new window size and position. The automatic alignment is optional and can be disabled and enabled using the '''Align Views''' button of the view menu. Disabling or enabling it in one view it will disable and enable it for all view since it's a workspace wide setting.
 
 [[Image:images/TimeAlignment_sash.png]]
 
