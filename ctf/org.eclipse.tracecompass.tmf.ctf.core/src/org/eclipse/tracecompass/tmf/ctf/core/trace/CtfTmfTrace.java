@@ -230,6 +230,9 @@ public class CtfTmfTrace extends TmfTrace
              * that type in the TmfEventTypeManager
              */
             try (CtfIterator iter = fIteratorManager.getIterator(ctx)) {
+                if(iter == null) {
+                    throw new TmfTraceException("Failed to get CTF Iterator for path " + path); //$NON-NLS-1$
+                }
                 Set<@NonNull ITmfEventField> streamContextNames = new HashSet<>();
                 for (IEventDeclaration ied : iter.getEventDeclarations()) {
                     CtfTmfEventType ctfTmfEventType = fContainedEventTypes.get(ied.getName());
