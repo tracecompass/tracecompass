@@ -641,6 +641,62 @@ public final class ConditionHelpers {
     }
 
     /**
+     * Wait until the Time Graph view is ready. The Time Graph view is considered
+     * ready when it displays the desired trace at the desired window range.
+     *
+     * @param view
+     *            the time graph view
+     * @param trace
+     *            the trace that we want the Time Graph View to show
+     * @param windowRange
+     *            the desired window range
+     * @return ICondition for verification
+     */
+    public static ICondition timeGraphRangeCondition(AbstractTimeGraphView view, @NonNull ITmfTrace trace, @NonNull TmfTimeRange windowRange) {
+        return new TimeGraphRangeCondition(view, trace, windowRange);
+    }
+
+    private static class TimeGraphRangeCondition extends DefaultCondition {
+
+        private AbstractTimeGraphView fView;
+        private @NonNull ITmfTrace fTrace;
+        private @NonNull TmfTimeRange fWindowRange;
+        private String fFailureMessage;
+
+        private TimeGraphRangeCondition(AbstractTimeGraphView view, @NonNull ITmfTrace trace, @NonNull TmfTimeRange windowRange) {
+            fView = view;
+            fTrace = trace;
+            fWindowRange = windowRange;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            ITmfTrace trace = fView.getTrace();
+            if (!fTrace.equals(trace)) {
+                String traceName = trace != null ? trace.getName() : "none";
+                fFailureMessage = "Expected view to display trace:" + fTrace.getName() + " but was displaying trace: " + traceName;
+            }
+            @NonNull TmfTimeRange curWindowRange = TmfTraceManager.getInstance().getTraceContext(fTrace).getWindowRange();
+            if (!curWindowRange.equals(fWindowRange)) {
+                fFailureMessage = "Current window range " + curWindowRange + " is not expected " + fWindowRange;
+                return false;
+            }
+
+            if (fView.isDirty()) {
+                fFailureMessage = "Time graph is dirty";
+                return false;
+
+            }
+            return true;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return fFailureMessage;
+        }
+    }
+
+    /**
      *
      * Wait until the XY chart viewer is ready. The XY chart viewer is
      * considered ready when it is not updating.

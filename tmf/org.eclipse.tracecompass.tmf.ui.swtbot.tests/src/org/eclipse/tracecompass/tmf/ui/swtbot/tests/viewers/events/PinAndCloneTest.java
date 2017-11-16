@@ -20,7 +20,6 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
@@ -34,6 +33,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackView;
@@ -221,7 +221,7 @@ public class PinAndCloneTest {
 
         // assert that the ust trace's window range did not change
         SWTBotUtils.activateEditor(fBot, fUstTestTrace.getName());
-        fBot.waitUntil(new PinAndCloneCondition(abstractTimeGraphView, ust, INITIAL_UST_RANGE));
+        fBot.waitUntil(ConditionHelpers.timeGraphRangeCondition(abstractTimeGraphView, ust, INITIAL_UST_RANGE));
 
         // unpin from another active trace
         SWTBotUtils.activateEditor(fBot, kernelTrace.getName());
@@ -237,7 +237,7 @@ public class PinAndCloneTest {
 
         TmfTimeRange expectedUstWindowRange = new TmfTimeRange(TmfTimestamp.fromNanos(UST_START + SECOND), TmfTimestamp.fromNanos(UST_END - SECOND));
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, expectedUstWindowRange, ust));
-        fBot.waitUntil(new PinAndCloneCondition(abstractTimeGraphView, kernelTrace, expectedUstWindowRange));
+        fBot.waitUntil(ConditionHelpers.timeGraphRangeCondition(abstractTimeGraphView, kernelTrace, expectedUstWindowRange));
 
         // close the pinned trace
         SWTBotEditor kernelTable = fBot.editorByTitle(kernelTestTrace.getName());
@@ -290,7 +290,7 @@ public class PinAndCloneTest {
         IWorkbenchPart part = clonedView.getViewReference().getPart(false);
         assertTrue(part instanceof AbstractTimeGraphView);
         AbstractTimeGraphView abstractTimeGraphView = (AbstractTimeGraphView) part;
-        fBot.waitUntil(new PinAndCloneCondition(abstractTimeGraphView, cloneTrace, INITIAL_UST_RANGE));
+        fBot.waitUntil(ConditionHelpers.timeGraphRangeCondition(abstractTimeGraphView, cloneTrace, INITIAL_UST_RANGE));
         cloneEditor.close();
     }
 
@@ -320,57 +320,17 @@ public class PinAndCloneTest {
         IWorkbenchPart part = fOriginalViewBot.getViewReference().getPart(false);
         assertTrue(part instanceof AbstractTimeGraphView);
         AbstractTimeGraphView abstractTimeGraphView = (AbstractTimeGraphView) part;
-        fBot.waitUntil(new PinAndCloneCondition(abstractTimeGraphView, ust, RANGE));
+        fBot.waitUntil(ConditionHelpers.timeGraphRangeCondition(abstractTimeGraphView, ust, RANGE));
 
         SWTBotUtils.activateEditor(fBot, kernel.getName());
-        fBot.waitUntil(new PinAndCloneCondition(abstractTimeGraphView, kernel, RANGE));
+        fBot.waitUntil(ConditionHelpers.timeGraphRangeCondition(abstractTimeGraphView, kernel, RANGE));
 
         // unfollow
         kernelEvent.contextMenu(FOLLOW_TIME_UPDATES_FROM_OTHER_TRACES).click();
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, ust.getInitialTimeRange(), ust));
-        fBot.waitUntil(new PinAndCloneCondition(abstractTimeGraphView, kernel, RANGE));
+        fBot.waitUntil(ConditionHelpers.timeGraphRangeCondition(abstractTimeGraphView, kernel, RANGE));
 
         kernelTest.dispose();
-    }
-
-    private static class PinAndCloneCondition extends DefaultCondition {
-
-        private AbstractTimeGraphView fView;
-        private @NonNull ITmfTrace fTrace;
-        private @NonNull TmfTimeRange fWindowRange;
-        private String fFailureMessage;
-
-        private PinAndCloneCondition(AbstractTimeGraphView view, @NonNull ITmfTrace trace, @NonNull TmfTimeRange windowRange) {
-            fView = view;
-            fTrace = trace;
-            fWindowRange = windowRange;
-        }
-
-        @Override
-        public boolean test() throws Exception {
-            ITmfTrace trace = fView.getTrace();
-            if (!fTrace.equals(trace)) {
-                String traceName = trace != null ? trace.getName() : "none";
-                fFailureMessage = "Expected view to display trace:" + fTrace.getName() + " but was displaying trace: " + traceName;
-            }
-            @NonNull TmfTimeRange curWindowRange = TmfTraceManager.getInstance().getTraceContext(fTrace).getWindowRange();
-            if (!curWindowRange.equals(fWindowRange)) {
-                fFailureMessage = "Current window range " + curWindowRange + " is not expected " + fWindowRange;
-                return false;
-            }
-
-            if (fView.isDirty()) {
-                fFailureMessage = "Time graph is dirty";
-                return false;
-
-            }
-            return true;
-        }
-
-        @Override
-        public String getFailureMessage() {
-            return fFailureMessage;
-        }
     }
 
 }
