@@ -57,7 +57,8 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         MouseListener, MouseMoveListener {
 
     private static final int BASE_10 = 10;
-    private static final int Y_OFFSET = 4;
+    private static final int TICK_HEIGHT = 4;
+    private static final int DECORATOR_HEIGHT = 4;
 
     private static final int MIN_SECOND_FACTOR = 20;
     private static final int SECOND_FACTOR = 30;
@@ -121,6 +122,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     private long fTime1bak;
     private int fHeight;
     private int fDigitWidth;
+    private final int fAlign;
 
     /**
      * Standard constructor
@@ -131,6 +133,22 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
      *            The color scheme to use
      */
     public TimeGraphScale(Composite parent, TimeGraphColorScheme colors) {
+        this(parent, colors, SWT.TOP);
+    }
+
+    /**
+     * Standard constructor
+     *
+     * @param parent
+     *            The parent composite object
+     * @param colors
+     *            The color scheme to use
+     * @param style
+     *            The style to add to the view, can be {@link SWT#TOP} or
+     *            {@link SWT#BOTTOM}
+     * @since 3.2
+     */
+    public TimeGraphScale(Composite parent, TimeGraphColorScheme colors, int style) {
         super(parent, colors, SWT.NO_BACKGROUND | SWT.NO_FOCUS | SWT.DOUBLE_BUFFERED);
         TmfSignalManager.register(this);
         addMouseListener(this);
@@ -142,6 +160,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         GC gc = new GC(parent.getDisplay());
         fDigitWidth = gc.getCharWidth('0');
         gc.dispose();
+        fAlign = (style & SWT.BOTTOM) == 0 ? SWT.TOP : style & SWT.BOTTOM;
     }
 
     /**
@@ -221,8 +240,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         int numDigits = calculateDigits(time0, time1);
 
         int labelWidth = fDigitWidth * numDigits;
-        double pixelsPerNanoSec = (timeSpace <= RIGHT_MARGIN) ? 0 :
-                (double) (timeSpace - RIGHT_MARGIN) / (time1 - time0);
+        double pixelsPerNanoSec = (timeSpace <= RIGHT_MARGIN) ? 0 : (double) (timeSpace - RIGHT_MARGIN) / (time1 - time0);
         long timeDelta = calcTimeDelta(labelWidth, pixelsPerNanoSec);
         long time;
         if (fTimeProvider != null && fTimeProvider.getTimeFormat() == TimeFormat.CALENDAR) {
@@ -289,8 +307,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         long time0 = fTimeProvider.getTime0();
         long time1 = fTimeProvider.getTime1();
         int timeSpace = fTimeProvider.getTimeSpace();
-        return (timeSpace <= RIGHT_MARGIN) ? 0 :
-            (double) (timeSpace - RIGHT_MARGIN) / (time1 - time0);
+        return (timeSpace <= RIGHT_MARGIN) ? 0 : (double) (timeSpace - RIGHT_MARGIN) / (time1 - time0);
     }
 
     private long calcTimeDelta(int width, double pixelsPerNanoSec) {
@@ -402,14 +419,19 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
 
         gc.setBackground(getColorScheme().getColor(TimeGraphColorScheme.TOOL_BACKGROUND));
         gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
-        Rectangle rect0 = new Rectangle(0, 0, 0, 0);
-        Utils.init(rect0, rect);
+        Rectangle timeDrawArea = new Rectangle(0, 0, 0, 0);
+        Utils.init(timeDrawArea, rect);
 
         // draw bottom border and erase all other area
-        gc.drawLine(rect.x, rect.y + rect.height - 1, rect.x + rect.width - 1,
-                rect.y + rect.height - 1);
-        rect0.height--;
-        gc.fillRectangle(rect0);
+        if (fAlign == SWT.TOP) {
+            gc.drawLine(rect.x, rect.y + rect.height - 1, rect.x + rect.width - 1,
+                    rect.y + rect.height - 1);
+        } else {
+            gc.drawLine(rect.x, 0, rect.x + rect.width - 1, 0);
+            timeDrawArea.y = 1;
+        }
+        timeDrawArea.height--;
+        gc.fillRectangle(timeDrawArea);
 
         if (time1 <= time0) {
             return;
@@ -427,36 +449,36 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         if (DRAG_EXTERNAL == fDragState) {
             int x1 = fDragX0;
             int x2 = fDragX;
-            drawRangeDecorators(rect0, gc, x1, x2);
+            drawRangeDecorators(timeDrawArea, gc, x1, x2, fAlign);
         } else {
             long selectionBegin = fTimeProvider.getSelectionBegin();
             long selectionEnd = fTimeProvider.getSelectionEnd();
             int x1 = (int) ((selectionBegin - time0) * pixelsPerNanoSec);
             int x2 = (int) ((selectionEnd - time0) * pixelsPerNanoSec);
-            drawRangeDecorators(rect0, gc, x1, x2);
+            drawRangeDecorators(timeDrawArea, gc, x1, x2, fAlign);
         }
 
         // draw time scale ticks
-        rect0.y = rect.y;
-        rect0.height = rect.height - Y_OFFSET;
-        rect0.width = labelWidth;
+        timeDrawArea.y = fAlign == SWT.TOP ? rect.y : rect.y + TICK_HEIGHT + DECORATOR_HEIGHT;
+        timeDrawArea.height = rect.height - TICK_HEIGHT - DECORATOR_HEIGHT;
+        timeDrawArea.width = labelWidth;
 
-        int y = rect0.y + rect0.height;
+        int tickTop = fAlign == SWT.TOP ? rect.y + rect.height - TICK_HEIGHT : rect.y;
 
         for (final long time : getTickTimeList()) {
             int x = SaturatedArithmetic.add(rect.x, (int) (Math.floor((time - time0) * pixelsPerNanoSec)));
-            gc.drawLine(x, y, x, y + Y_OFFSET);
-            rect0.x = x;
-            if (x + rect0.width <= rect.x + rect.width) {
-                timeDraw.draw(gc, time, rect0);
+            gc.drawLine(x, tickTop, x, tickTop + TICK_HEIGHT);
+            timeDrawArea.x = x;
+            if (x + timeDrawArea.width <= rect.x + rect.width) {
+                timeDraw.draw(gc, time, timeDrawArea);
             }
         }
     }
 
-    private static void drawRangeDecorators(Rectangle rect, GC gc, int x1, int x2) {
-        int y1 = rect.y + rect.height - 9;
-        int y2 = rect.y + rect.height - 5;
-        int ym = (y1 + y2) / 2;
+    private static void drawRangeDecorators(Rectangle rect, GC gc, int x1, int x2, int align) {
+        int y1 = align == SWT.TOP ? rect.y + rect.height - TICK_HEIGHT - DECORATOR_HEIGHT : TICK_HEIGHT;
+        int y2 = y1 + DECORATOR_HEIGHT;
+        int ym = y1 + DECORATOR_HEIGHT / 2;
         if (x1 >= rect.x) {
             // T1
             gc.drawLine(x1 - 2, y1, x1 - 2, y2);
@@ -634,30 +656,19 @@ abstract class TimeDraw {
     private static final String S0 = "0"; //$NON-NLS-1$
     private static final String S00 = "00"; //$NON-NLS-1$
     protected static final long PAD_1000 = 1000;
-    protected static final SimpleDateFormat SEC_FORMAT_HEADER =
-            new SimpleDateFormat("yyyy MMM dd");//$NON-NLS-1$
-    protected static final SimpleDateFormat SEC_FORMAT =
-            new SimpleDateFormat("HH:mm:ss"); //$NON-NLS-1$
-    protected static final SimpleDateFormat MIN_FORMAT_HEADER =
-            new SimpleDateFormat("yyyy MMM dd"); //$NON-NLS-1$
-    protected static final SimpleDateFormat MIN_FORMAT =
-            new SimpleDateFormat("HH:mm"); //$NON-NLS-1$
-    protected static final SimpleDateFormat HOURS_FORMAT_HEADER =
-            new SimpleDateFormat("yyyy"); //$NON-NLS-1$
-    protected static final SimpleDateFormat HOURS_FORMAT =
-            new SimpleDateFormat("MMM dd HH:mm"); //$NON-NLS-1$
-    protected static final SimpleDateFormat DAY_FORMAT_HEADER =
-            new SimpleDateFormat("yyyy"); //$NON-NLS-1$
-    protected static final SimpleDateFormat DAY_FORMAT =
-            new SimpleDateFormat("MMM dd"); //$NON-NLS-1$
-    protected static final SimpleDateFormat MONTH_FORMAT =
-            new SimpleDateFormat("yyyy MMM"); //$NON-NLS-1$
-    protected static final SimpleDateFormat YEAR_FORMAT =
-            new SimpleDateFormat("yyyy"); //$NON-NLS-1$
+    protected static final SimpleDateFormat SEC_FORMAT_HEADER = new SimpleDateFormat("yyyy MMM dd");//$NON-NLS-1$
+    protected static final SimpleDateFormat SEC_FORMAT = new SimpleDateFormat("HH:mm:ss"); //$NON-NLS-1$
+    protected static final SimpleDateFormat MIN_FORMAT_HEADER = new SimpleDateFormat("yyyy MMM dd"); //$NON-NLS-1$
+    protected static final SimpleDateFormat MIN_FORMAT = new SimpleDateFormat("HH:mm"); //$NON-NLS-1$
+    protected static final SimpleDateFormat HOURS_FORMAT_HEADER = new SimpleDateFormat("yyyy"); //$NON-NLS-1$
+    protected static final SimpleDateFormat HOURS_FORMAT = new SimpleDateFormat("MMM dd HH:mm"); //$NON-NLS-1$
+    protected static final SimpleDateFormat DAY_FORMAT_HEADER = new SimpleDateFormat("yyyy"); //$NON-NLS-1$
+    protected static final SimpleDateFormat DAY_FORMAT = new SimpleDateFormat("MMM dd"); //$NON-NLS-1$
+    protected static final SimpleDateFormat MONTH_FORMAT = new SimpleDateFormat("yyyy MMM"); //$NON-NLS-1$
+    protected static final SimpleDateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy"); //$NON-NLS-1$
 
     protected static final List<SimpleDateFormat> formats;
-    static
-    {
+    static {
         ImmutableList.Builder<SimpleDateFormat> formatArrayBuilder = ImmutableList.<SimpleDateFormat> builder();
         formatArrayBuilder.add(SEC_FORMAT);
         formatArrayBuilder.add(SEC_FORMAT_HEADER);
@@ -712,8 +723,8 @@ abstract class TimeDraw {
     public abstract int draw(GC gc, long time, Rectangle rect);
 
     /**
-     * Override to draw absolute time header. This is for the time information
-     * not shown in the draw of each tick
+     * Override to draw absolute time header. This is for the time information not
+     * shown in the draw of each tick
      *
      * @param gc
      *            Graphics context
