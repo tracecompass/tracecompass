@@ -458,6 +458,17 @@ public interface IKernelAnalysisEventLayout {
     String fieldChildTid();
 
     /**
+     * The field with the child process ID. This field is used in clone and spawn
+     * activities, to know what is the process of the thread being cloned.
+     *
+     * @return the name of the field with the child process ID
+     * @since 2.5
+     */
+    default String fieldChildPid() {
+        return "child_pid"; //$NON-NLS-1$
+    }
+
+    /**
      * The field with the command. This is used in scheduling tracepoints that
      * are not switches, and show the current process name. It is often a string
      * like "zsh" or "cmd.exe".

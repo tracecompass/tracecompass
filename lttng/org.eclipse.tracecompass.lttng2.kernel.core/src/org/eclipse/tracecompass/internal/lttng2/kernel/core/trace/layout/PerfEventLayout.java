@@ -233,6 +233,11 @@ public final class PerfEventLayout implements IKernelAnalysisEventLayout {
     }
 
     @Override
+    public String fieldChildPid() {
+        return "child_pid"; //$NON-NLS-1$
+    }
+
+    @Override
     public String fieldPrio() {
         return "prio"; //$NON-NLS-1$
     }

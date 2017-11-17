@@ -91,6 +91,7 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout {
     private static final String PARENT_TID = "parent_tid"; //$NON-NLS-1$
     private static final String CHILD_COMM = "child_comm"; //$NON-NLS-1$
     private static final String CHILD_TID = "child_tid"; //$NON-NLS-1$
+    private static final String CHILD_PID = "child_pid"; //$NON-NLS-1$
     private static final String PRIO = "prio"; //$NON-NLS-1$
     private static final String NEW_PRIO = "newprio"; //$NON-NLS-1$
     private static final String PREV_PRIO = "prev_prio"; //$NON-NLS-1$
@@ -275,6 +276,11 @@ public class DefaultEventLayout implements IKernelAnalysisEventLayout {
     @Override
     public String fieldChildTid() {
         return CHILD_TID;
+    }
+
+    @Override
+    public String fieldChildPid() {
+        return CHILD_PID;
     }
 
     /** @since 1.0 */
