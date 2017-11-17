@@ -24,7 +24,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 /**
  * This aspect finds the ID of the thread running from this event using the
- * {@link KernelAnalysisModule}.
+ * {@link TidAnalysisModule}.
  *
  * @author Geneviève Bastien
  * @since 2.0
