@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.analysis.os.linux.core.kernel;
 import java.util.Collection;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.ThreadPriorityAspect;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.KernelPidAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 
 import com.google.common.collect.ImmutableSet;
@@ -33,6 +34,7 @@ public final class KernelUtils {
         ImmutableSet.Builder<ITmfEventAspect<?>> builder = ImmutableSet.builder();
         builder.add(KernelTidAspect.INSTANCE);
         builder.add(ThreadPriorityAspect.INSTANCE);
+        builder.add(KernelPidAspect.INSTANCE);
         KERNEL_ASPECTS = builder.build();
     }
 

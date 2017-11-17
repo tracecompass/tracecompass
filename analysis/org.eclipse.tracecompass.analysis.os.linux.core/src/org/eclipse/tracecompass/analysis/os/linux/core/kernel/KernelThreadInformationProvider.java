@@ -291,6 +291,45 @@ public final class KernelThreadInformationProvider {
     }
 
     /**
+     * Get the process ID of a thread
+     *
+     * @param module
+     *            The kernel analysis instance to run this method on
+     * @param threadId
+     *            The ID of the thread for which to get the process ID
+     * @param ts
+     *            The timestamp at which to get the parent
+     * @return The process ID or {@code null} if the pid is not found.
+     * @since 2.5
+     */
+    public static @Nullable Integer getProcessId(KernelAnalysisModule module, Integer threadId, long ts) {
+        ITmfStateSystem ss = module.getStateSystem();
+        if (ss == null) {
+            return null;
+        }
+        try {
+            int pidNode = ss.optQuarkAbsolute(Attributes.THREADS, threadId.toString());
+            if (pidNode == ITmfStateSystem.INVALID_ATTRIBUTE) {
+                /* The thread is invalid, return null */
+                return null;
+            }
+            pidNode = ss.optQuarkRelative(pidNode, Attributes.PID);
+            if (pidNode == ITmfStateSystem.INVALID_ATTRIBUTE) {
+                /* The attribute is not there, thread is the process */
+                return threadId;
+            }
+            ITmfStateInterval pidInterval = ss.querySingleState(ts, pidNode);
+            Object pid = pidInterval.getValue();
+
+            if (pid instanceof Integer) {
+                return (Integer) pid;
+            }
+        } catch (StateSystemDisposedException | TimeRangeException e) {
+        }
+        return null;
+    }
+
+    /**
      * Get the executable name of the thread ID. If the thread ID was used
      * multiple time or the name changed in between, it will return the last
      * name the thread has taken, or {@code null} if no name is found

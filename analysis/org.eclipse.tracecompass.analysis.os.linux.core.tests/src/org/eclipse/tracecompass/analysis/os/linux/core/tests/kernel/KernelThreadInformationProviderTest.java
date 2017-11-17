@@ -256,6 +256,55 @@ public class KernelThreadInformationProviderTest {
     }
 
     /**
+     * Test the
+     * {@link KernelThreadInformationProvider#getProcessId(KernelAnalysisModule, Integer, long)}
+     * method
+     */
+    @Test
+    public void testGetPid() {
+        KernelAnalysisModule module = checkNotNull(fModule);
+
+        /* Check with invalid timestamps */
+        Integer pid = KernelThreadInformationProvider.getProcessId(module, 11, -1);
+        assertNull(pid);
+
+        pid = KernelThreadInformationProvider.getProcessId(module, 11, 90);
+        assertNull(pid);
+
+        /* Check with invalid tids */
+        pid = KernelThreadInformationProvider.getProcessId(module, -4, 20);
+        assertNull(pid);
+
+        pid = KernelThreadInformationProvider.getProcessId(module, 13, 20);
+        assertNull(pid);
+
+        /* Check values of processes */
+        pid = KernelThreadInformationProvider.getProcessId(module, 10, 20);
+        assertEquals(Integer.valueOf(10), pid);
+
+        pid = KernelThreadInformationProvider.getProcessId(module, 30, 60);
+        assertEquals(Integer.valueOf(30), pid);
+
+        /* Check pid determined at statedump */
+        pid = KernelThreadInformationProvider.getProcessId(module, 11, 4);
+        assertNull(pid);
+
+        pid = KernelThreadInformationProvider.getProcessId(module, 11, 5);
+        assertEquals(Integer.valueOf(10), pid);
+
+        pid = KernelThreadInformationProvider.getProcessId(module, 12, 10);
+        assertEquals(Integer.valueOf(10), pid);
+
+        /* Check parent after process fork */
+        pid = KernelThreadInformationProvider.getProcessId(module, 21, 25);
+        assertEquals(Integer.valueOf(20), pid);
+
+        pid = KernelThreadInformationProvider.getProcessId(module, 21, 70);
+        assertEquals(Integer.valueOf(20), pid);
+
+    }
+
+    /**
      * Test the {@link KernelThreadInformationProvider#getExecutableName(KernelAnalysisModule, Integer)} method
      */
     @Test
