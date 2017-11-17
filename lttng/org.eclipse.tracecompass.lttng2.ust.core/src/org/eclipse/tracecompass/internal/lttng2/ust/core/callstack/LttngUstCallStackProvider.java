@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.LinuxPidAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.LinuxTidAspect;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst20EventLayout;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
@@ -160,13 +161,12 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
 
     @Override
     protected int getProcessId(@NonNull ITmfEvent event) {
-        /* The "vpid" context may not be present! We need to check */
-        ITmfEventField content = event.getContent();
-        ITmfEventField vpidContextField = content.getField(fLayout.contextVpid());
-        if (vpidContextField == null) {
+        /* We checked earlier that the "vtid" context is present */
+        Integer pid = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), LinuxPidAspect.class, event);
+        if (pid == null) {
             return UNKNOWN_PID;
         }
-        return ((Long) vpidContextField.getValue()).intValue();
+        return pid;
     }
 
     @Override

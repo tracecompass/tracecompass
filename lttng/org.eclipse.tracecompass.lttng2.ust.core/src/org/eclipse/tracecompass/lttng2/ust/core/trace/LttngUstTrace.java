@@ -25,6 +25,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.lttng2.common.core.trace.ILttngTrace;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.Activator;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.ContextVpidAspect;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.ContextVtidAspect;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.DefaultUstEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst20EventLayout;
@@ -38,6 +39,7 @@ import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayou
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.trace.TmfEventTypeCollectionHelper;
 import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventFactory;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
@@ -45,6 +47,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTraceValidationStatus;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfUtils;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
 
 /**
  * Class to contain LTTng-UST traces
@@ -120,13 +123,25 @@ public class LttngUstTrace extends CtfTmfTrace implements ILttngTrace{
         super.initTrace(resource, path, eventType);
 
         /* Determine the event layout to use from the tracer's version */
-        fLayout = getLayoutFromEnv();
+        ILttngUstEventLayout layout = getLayoutFromEnv();
+        fLayout = layout;
 
         ImmutableSet.Builder<ITmfEventAspect<?>> builder = ImmutableSet.builder();
         builder.addAll(LTTNG_UST_ASPECTS);
-        builder.add(new ContextVtidAspect(fLayout));
+        if (checkFieldPresent(layout.contextVtid())) {
+            builder.add(new ContextVtidAspect(layout));
+        }
+        if (checkFieldPresent(layout.contextVpid())) {
+            builder.add(new ContextVpidAspect(layout));
+        }
         builder.addAll(createCounterAspects(this));
         fUstTraceAspects = builder.build();
+    }
+
+    private boolean checkFieldPresent(@NonNull String field) {
+        final Multimap<@NonNull String, @NonNull String> traceEvents = TmfEventTypeCollectionHelper.getEventFieldNames((getContainedEventTypes()));
+
+        return traceEvents.containsValue(field);
     }
 
     private @NonNull ILttngUstEventLayout getLayoutFromEnv() {
