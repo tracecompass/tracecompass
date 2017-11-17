@@ -68,10 +68,24 @@ public class StateDumpHandler extends KernelEventHandler {
         setProcessName(ss, name, curThreadNode, timestamp);
 
         /* Set the process' PPID */
-        setPpid(ss, tid, pid, ppid, curThreadNode, timestamp);
+        setPpid(ss, ppid, curThreadNode, timestamp);
+
+        /* Set the process' PID */
+        setPid(ss, tid, pid, curThreadNode, timestamp);
 
         /* Set the process' status */
         setStatus(ss, status, curThreadNode, cpuField, timestamp);
+    }
+
+    private static void setPid(ITmfStateSystemBuilder ss, int tid, int pid, int curThreadNode, long timestamp) {
+        if (tid == pid) {
+            /* It's a process, no need to set a PID */
+            return;
+        }
+        int quark = ss.getQuarkRelativeAndAdd(curThreadNode, Attributes.PID);
+        if (ss.queryOngoingState(quark).isNull()) {
+            ss.modifyAttribute(timestamp, pid, quark);
+        }
     }
 
     private static void setStatus(ITmfStateSystemBuilder ss, long status, int curThreadNode, @Nullable Long cpu, long timestamp) {
@@ -93,19 +107,10 @@ public class StateDumpHandler extends KernelEventHandler {
         }
     }
 
-    private static void setPpid(ITmfStateSystemBuilder ss, int tid, int pid, int ppid, int curThreadNode, long timestamp) {
-        ITmfStateValue value;
-        int quark;
-        quark = ss.getQuarkRelativeAndAdd(curThreadNode, Attributes.PPID);
+    private static void setPpid(ITmfStateSystemBuilder ss, int ppid, int curThreadNode, long timestamp) {
+        int quark = ss.getQuarkRelativeAndAdd(curThreadNode, Attributes.PPID);
         if (ss.queryOngoingState(quark).isNull()) {
-            if (pid == tid) {
-                /* We have a process. Use the 'PPID' field. */
-                value = TmfStateValue.newValueInt(ppid);
-            } else {
-                /* We have a thread, use the 'PID' field for the parent. */
-                value = TmfStateValue.newValueInt(pid);
-            }
-            ss.modifyAttribute(timestamp, value, quark);
+            ss.modifyAttribute(timestamp, ppid, quark);
         }
     }
 

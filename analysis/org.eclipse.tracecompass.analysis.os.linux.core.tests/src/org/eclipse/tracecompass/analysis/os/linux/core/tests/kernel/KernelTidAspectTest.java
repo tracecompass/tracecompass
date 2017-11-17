@@ -48,7 +48,7 @@ public class KernelTidAspectTest {
 
     private ITmfTrace fTrace;
 
-    private static void deleteSuppFiles(ITmfTrace trace) {
+    private static void deleteSuppFiles(@NonNull ITmfTrace trace) {
         /* Remove supplementary files */
         File suppDir = new File(TmfTraceManager.getSupplementaryFileDir(trace));
         for (File file : suppDir.listFiles()) {
@@ -80,7 +80,10 @@ public class KernelTidAspectTest {
      */
     @After
     public void tearDown() {
-        fTrace.dispose();
+        ITmfTrace trace = fTrace;
+        if (trace != null) {
+            trace.dispose();
+        }
     }
 
     private Integer resolveNextEvent(ITmfContext context) {
@@ -98,6 +101,7 @@ public class KernelTidAspectTest {
 
         ITmfContext context = fTrace.seekEvent(0L);
         List<Integer> expected = new ArrayList<>();
+        expected.add(null);
         expected.add(null);
         expected.add(null);
         expected.add(null);

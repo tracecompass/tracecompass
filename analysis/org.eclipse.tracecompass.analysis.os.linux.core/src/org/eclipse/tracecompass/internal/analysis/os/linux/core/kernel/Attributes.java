@@ -38,6 +38,7 @@ public interface Attributes {
     /* Sub-attributes of the Thread nodes */
     String CURRENT_CPU_RQ = "Current_cpu_rq";
     String PPID = "PPID";
+    String PID = "PID";
     String EXEC_NAME = "Exec_name";
 
     String PRIO = "Prio";

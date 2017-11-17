@@ -61,7 +61,7 @@ public class KernelThreadInformationProviderTest {
     private ITmfTrace fTrace;
     private KernelAnalysisModule fModule;
 
-    private static void deleteSuppFiles(ITmfTrace trace) {
+    private static void deleteSuppFiles(@NonNull ITmfTrace trace) {
         /* Remove supplementary files */
         File suppDir = new File(TmfTraceManager.getSupplementaryFileDir(trace));
         for (File file : suppDir.listFiles()) {
@@ -93,8 +93,11 @@ public class KernelThreadInformationProviderTest {
      */
     @After
     public void tearDown() {
-        deleteSuppFiles(fTrace);
-        fTrace.dispose();
+        ITmfTrace trace = fTrace;
+        if (trace != null) {
+            deleteSuppFiles(trace);
+            trace.dispose();
+        }
     }
 
     /**
@@ -106,7 +109,7 @@ public class KernelThreadInformationProviderTest {
     public void testGetThreadQuarks() {
         KernelAnalysisModule module = checkNotNull(fModule);
         Collection<Integer> threadIds = KernelThreadInformationProvider.getThreadIds(module);
-        assertEquals(ImmutableSet.<Integer>of(10,11,20,21,30,100), threadIds);
+        assertEquals(ImmutableSet.<Integer>of(10,11,12,20,21,30,100), threadIds);
     }
 
     /**
@@ -219,11 +222,11 @@ public class KernelThreadInformationProviderTest {
         ppid = KernelThreadInformationProvider.getParentPid(module, 11, 90);
         assertNull(ppid);
 
-        /* Check with invalid cpus */
+        /* Check with invalid tids */
         ppid = KernelThreadInformationProvider.getParentPid(module, -4, 20);
         assertNull(ppid);
 
-        ppid = KernelThreadInformationProvider.getParentPid(module, 12, 20);
+        ppid = KernelThreadInformationProvider.getParentPid(module, 13, 20);
         assertNull(ppid);
 
         /* Check values with no parent */
@@ -239,6 +242,9 @@ public class KernelThreadInformationProviderTest {
 
         ppid = KernelThreadInformationProvider.getParentPid(module, 11, 5);
         assertEquals(Integer.valueOf(10), ppid);
+
+        ppid = KernelThreadInformationProvider.getParentPid(module, 12, 10);
+        assertEquals(Integer.valueOf(11), ppid);
 
         /* Check parent after process fork */
         ppid = KernelThreadInformationProvider.getParentPid(module, 21, 25);
@@ -269,7 +275,7 @@ public class KernelThreadInformationProviderTest {
 
         /* Check valid value with process name change in history */
         execName = KernelThreadInformationProvider.getExecutableName(module, 21);
-        assertEquals("proc21", execName);
+        assertEquals("tid21", execName);
 
     }
 

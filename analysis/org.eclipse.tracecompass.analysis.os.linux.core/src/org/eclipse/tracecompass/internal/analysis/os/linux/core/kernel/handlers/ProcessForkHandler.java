@@ -46,6 +46,7 @@ public class ProcessForkHandler extends KernelEventHandler {
 
         Integer parentTid = ((Long) content.getField(getLayout().fieldParentTid()).getValue()).intValue();
         Integer childTid = ((Long) content.getField(getLayout().fieldChildTid()).getValue()).intValue();
+        Long childPid = content.getFieldValue(Long.class, getLayout().fieldChildPid());
 
         String parentThreadAttributeName = Attributes.buildThreadAttributeName(parentTid, cpu);
         if (parentThreadAttributeName == null) {
@@ -61,12 +62,17 @@ public class ProcessForkHandler extends KernelEventHandler {
         Integer parentTidNode = ss.getQuarkRelativeAndAdd(threadsNode, parentThreadAttributeName);
         Integer childTidNode = ss.getQuarkRelativeAndAdd(threadsNode, childThreadAttributeName);
 
-
         /* Assign the PPID to the new process */
         int quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.PPID);
         ITmfStateValue value = TmfStateValue.newValueInt(parentTid);
         long timestamp = KernelEventHandlerUtils.getTimestamp(event);
         ss.modifyAttribute(timestamp, value, quark);
+
+        if (childPid != null && childPid.intValue() != childTid) {
+            /* Assign the process ID of the new thread */
+            quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.PID);
+            ss.modifyAttribute(timestamp, childPid.intValue(), quark);
+        }
 
         /* Set the new process' exec_name */
         quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.EXEC_NAME);

@@ -64,11 +64,12 @@ import com.google.common.collect.ImmutableMap;
  * |  |- <IRQ number> -> Aggregate Status
  * |- THREADS
  * |  |- <Thread number> -> Thread Status
- * |  |  |- PPID
+ * |  |  |- PPID -> The thread ID of the parent, can be a process or a thread
  * |  |  |- EXEC_NAME
  * |  |  |- PRIO
  * |  |  |- SYSTEM_CALL
  * |  |  |- CURRENT_CPU_RQ
+ * |  |  |- PID -> The process ID. If absent, the thread is a process
  * </pre>
  *
  * @author Alexandre Montplaisir
@@ -83,7 +84,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
      * Version number of this state provider. Please bump this if you modify the
      * contents of the generated state history in some way.
      */
-    private static final int VERSION = 26;
+    private static final int VERSION = 27;
 
     // ------------------------------------------------------------------------
     // Fields
