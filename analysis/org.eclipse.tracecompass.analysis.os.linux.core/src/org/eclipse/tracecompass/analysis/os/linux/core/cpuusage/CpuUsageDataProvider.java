@@ -238,7 +238,7 @@ public class CpuUsageDataProvider extends AbstractStateSystemAnalysisDataProvide
         Map<String, Long> cpuUsageMap = fModule.getCpuUsageInRange(cpuQueryFilter.getSelectedCpus(), filter.getStart(), end);
 
         List<CpuUsageEntryModel> entryList = new ArrayList<>();
-        Map<String, Long> totalMap = Maps.filterKeys(cpuUsageMap, key -> key.startsWith(KernelCpuUsageAnalysis.TOTAL));
+        Map<String, Long> totalMap = Maps.filterKeys(cpuUsageMap, key -> key.equals(KernelCpuUsageAnalysis.TOTAL));
         long totalTime = totalMap.values().stream().mapToLong(Long::longValue).sum();
         entryList.add(new CpuUsageEntryModel(fTotalId, -1, getTrace().getName(), TOTAL_SERIES_TID, totalTime));
         for (Entry<String, Long> entry : cpuUsageMap.entrySet()) {
