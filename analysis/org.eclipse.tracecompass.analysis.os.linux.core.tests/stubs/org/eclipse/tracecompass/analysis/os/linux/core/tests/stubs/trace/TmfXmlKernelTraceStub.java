@@ -10,8 +10,7 @@
 package org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.ThreadPriorityAspect;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelTidAspect;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelUtils;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
@@ -56,8 +55,7 @@ public class TmfXmlKernelTraceStub extends TmfXmlTraceStubNs implements IKernelT
          */
         ImmutableSet.Builder<ITmfEventAspect<?>> builder = ImmutableSet.builder();
         builder.addAll(super.getEventAspects());
-        builder.add(KernelTidAspect.INSTANCE);
-        builder.add(ThreadPriorityAspect.INSTANCE);
+        builder.addAll(KernelUtils.getKernelAspects());
         return builder.build();
     }
 
