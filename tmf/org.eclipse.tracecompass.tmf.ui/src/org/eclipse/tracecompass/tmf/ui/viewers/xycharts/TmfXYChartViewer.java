@@ -13,12 +13,21 @@
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.xycharts.TmfXYChartTimeAdapter;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
@@ -27,10 +36,17 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphScale;
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
+import org.swtchart.ICustomPaintListener;
+import org.swtchart.IPlotArea;
 import org.swtchart.ISeries;
 import org.swtchart.ISeriesSet;
+import org.swtchart.ITitle;
+import org.swtchart.LineStyle;
 import org.swtchart.Range;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -47,8 +63,14 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+    private static final int DEFAULT_SCALE_HEIGHT = 22;
+
+    /** The color scheme for the chart */
+    private @NonNull TimeGraphColorScheme fColorScheme = new TimeGraphColorScheme();
     /** The SWT Chart reference */
     private Chart fSwtChart;
+    /** The X axis for the chart */
+    private TimeGraphScale fTimeScaleCtrl;
     /** The mouse selection provider */
     private TmfBaseProvider fMouseSelectionProvider;
     /** The mouse drag zoom provider */
@@ -60,12 +82,12 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     /** The middle mouse drag provider */
     private TmfBaseProvider fMouseDragProvider;
     /**
-     * Whether or not to send time alignment signals. This should be set to true
-     * for viewers that are part of an aligned view.
+     * Whether or not to send time alignment signals. This should be set to true for
+     * viewers that are part of an aligned view.
      */
     private boolean fSendTimeAlignSignals = false;
 
-
+    private final ITimeDataProvider fDataProvider;
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -83,13 +105,52 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      *            The label of the yAXIS
      */
     public TmfXYChartViewer(Composite parent, String title, String xLabel, String yLabel) {
-        super(parent, title);
-        fSwtChart = new Chart(parent, SWT.NONE) {
+        Composite commonComposite = new Composite(parent, parent.getStyle()) {
+            @Override
+            public void redraw() {
+                fSwtChart.redraw();
+                fTimeScaleCtrl.redraw();
+            }
+        };
+        commonComposite.addDisposeListener(e -> {
+            fColorScheme.dispose();
+        });
+        commonComposite.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0).margins(0, 0).create());
+        commonComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+        fSwtChart = new Chart(commonComposite, SWT.NONE) {
             @Override
             public boolean setFocus() {
                 return fSwtChart.getPlotArea().setFocus();
             }
         };
+        fSwtChart.getAxisSet().getXAxis(0).getGrid().setStyle(LineStyle.NONE);
+        ((IPlotArea) fSwtChart.getPlotArea()).addCustomPaintListener(new ICustomPaintListener() {
+
+            @Override
+            public void paintControl(PaintEvent e) {
+                drawGridLines(e.gc);
+            }
+
+            @Override
+            public boolean drawBehindSeries() {
+                return true;
+            }
+        });
+
+        fSwtChart.addPaintListener(e -> {
+            Rectangle bounds = fSwtChart.getPlotArea().getBounds();
+            int y = fTimeScaleCtrl.getLocation().y;
+            fTimeScaleCtrl.setBounds(bounds.x, y, bounds.width, DEFAULT_SCALE_HEIGHT);
+            fTimeScaleCtrl.redraw();
+        });
+
+        fTimeScaleCtrl = new TimeGraphScale(commonComposite, fColorScheme, SWT.BOTTOM);
+        Color backgroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_BACKGROUND);
+        fSwtChart.setBackground(backgroundColor);
+        commonComposite.setBackground(backgroundColor);
+        fSwtChart.setForeground(fColorScheme.getColor(TimeGraphColorScheme.FOREGROUND));
+        fTimeScaleCtrl.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
+        fTimeScaleCtrl.setHeight(DEFAULT_SCALE_HEIGHT);
         fSwtChart.getPlotArea().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDown(MouseEvent e) {
@@ -101,21 +162,13 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
         IAxis yAxis = fSwtChart.getAxisSet().getYAxis(0);
 
         /* Set the title/labels, or hide them if they are not provided */
-        if (title == null) {
-            fSwtChart.getTitle().setVisible(false);
-        } else {
-            fSwtChart.getTitle().setText(title);
-        }
-        if (xLabel == null) {
-            xAxis.getTitle().setVisible(false);
-        } else {
-            xAxis.getTitle().setText(xLabel);
-        }
-        if (yLabel == null) {
-            yAxis.getTitle().setVisible(false);
-        } else {
-            yAxis.getTitle().setText(yLabel);
-        }
+        initTitle(title, fSwtChart.getTitle());
+
+        initTitle(null, fSwtChart.getTitle());
+
+        xAxis.getTick().setVisible(false);
+        yAxis.getTick().setForeground(fColorScheme.getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
+        initTitle(yLabel, yAxis.getTitle());
 
         fMouseSelectionProvider = new TmfMouseSelectionProvider(this);
         fMouseDragZoomProvider = new TmfMouseDragZoomProvider(this);
@@ -126,6 +179,18 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
         fSwtChart.addDisposeListener((e) -> {
             internalDispose();
         });
+
+        fDataProvider = new TmfXYChartTimeAdapter(this);
+        fTimeScaleCtrl.setTimeProvider(fDataProvider);
+    }
+
+    private void initTitle(String label, ITitle titleCtrl) {
+        titleCtrl.setForeground(fColorScheme.getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
+        if (label == null) {
+            titleCtrl.setVisible(false);
+        } else {
+            titleCtrl.setText(label);
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -153,8 +218,8 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     }
 
     /**
-     * Sets a mouse selection provider. An existing provider will be
-     * disposed. Use <code>null</code> to disable the mouse selection provider.
+     * Sets a mouse selection provider. An existing provider will be disposed. Use
+     * <code>null</code> to disable the mouse selection provider.
      *
      * @param provider
      *            The selection provider to set
@@ -167,8 +232,8 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     }
 
     /**
-     * Sets a mouse drag zoom provider. An existing provider will be
-     * disposed. Use <code>null</code> to disable the mouse drag zoom provider.
+     * Sets a mouse drag zoom provider. An existing provider will be disposed. Use
+     * <code>null</code> to disable the mouse drag zoom provider.
      *
      * @param provider
      *            The mouse drag zoom provider to set
@@ -181,9 +246,8 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     }
 
     /**
-     * Sets a mouse wheel zoom provider. An existing provider will be
-     * disposed. Use <code>null</code> to disable the mouse wheel zoom
-     * provider.
+     * Sets a mouse wheel zoom provider. An existing provider will be disposed. Use
+     * <code>null</code> to disable the mouse wheel zoom provider.
      *
      * @param provider
      *            The mouse wheel zoom provider to set
@@ -196,8 +260,8 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     }
 
     /**
-     * Sets a tooltip provider. An existing provider will be
-     * disposed. Use <code>null</code> to disable the tooltip provider.
+     * Sets a tooltip provider. An existing provider will be disposed. Use
+     * <code>null</code> to disable the tooltip provider.
      *
      * @param provider
      *            The tooltip provider to set
@@ -210,8 +274,8 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     }
 
     /**
-     * Sets a mouse drag provider. An existing provider will be
-     * disposed. Use <code>null</code> to disable the mouse drag provider.
+     * Sets a mouse drag provider. An existing provider will be disposed. Use
+     * <code>null</code> to disable the mouse drag provider.
      *
      * @param provider
      *            The mouse drag provider to set
@@ -313,14 +377,14 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     protected abstract void updateContent();
 
     /**
-     * Returns whether or not this chart viewer is dirty. The viewer is
-     * considered dirty if it has yet to completely update its model.
+     * Returns whether or not this chart viewer is dirty. The viewer is considered
+     * dirty if it has yet to completely update its model.
      *
-     * This method is meant to be used by tests in order to know when it is safe
-     * to proceed.
+     * This method is meant to be used by tests in order to know when it is safe to
+     * proceed.
      *
-     * @return true if the time graph view has yet to completely update its
-     *         model, false otherwise
+     * @return true if the time graph view has yet to completely update its model,
+     *         false otherwise
      * @since 2.2
      */
     @VisibleForTesting
@@ -336,6 +400,27 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
         // If the chart viewer hasn't updated all the way to the end of
         // the window range then it's dirty. A refresh should happen later.
         return (getWindowStartTime() != startTime || getWindowEndTime() != endTime);
+    }
+
+    /**
+     * Draw the grid lines
+     *
+     * @param bounds
+     *            The bounds of the control
+     * @param gc
+     *            Graphics context
+     * @since 2.0
+     */
+    private void drawGridLines(GC gc) {
+        Rectangle bounds = fSwtChart.getPlotArea().getBounds();
+        Color foreground = fSwtChart.getAxisSet().getXAxis(0).getGrid().getForeground();
+        gc.setForeground(foreground);
+        gc.setAlpha(foreground.getAlpha());
+        gc.setLineStyle(SWT.LINE_DOT);
+        for (int x : fTimeScaleCtrl.getTickList()) {
+            gc.drawLine(x, 0, x,  bounds.height);
+        }
+        gc.setAlpha(255);
     }
 
     // ------------------------------------------------------------------------
@@ -377,8 +462,7 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      * timestamp format.
      *
      * @param signal
-     *            The trace updated signal
-     *            {@link TmfTimestampFormatUpdateSignal}
+     *            The trace updated signal {@link TmfTimestampFormatUpdateSignal}
      */
     @TmfSignalHandler
     public void timestampFormatUpdated(TmfTimestampFormatUpdateSignal signal) {
@@ -400,8 +484,8 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
             for (int i = 0; i < series.length; i++) {
                 set.deleteSeries(series[i].getId());
             }
-            for (IAxis axis: fSwtChart.getAxisSet().getAxes()){
-                axis.setRange(new Range(0,1));
+            for (IAxis axis : fSwtChart.getAxisSet().getAxes()) {
+                axis.setRange(new Range(0, 1));
             }
             fSwtChart.redraw();
         }
@@ -422,9 +506,9 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     }
 
     /**
-     * Get the offset of the point area, relative to the XY chart viewer
-     * control. We consider the point area to be from where the first point
-     * could be drawn to where the last point could be drawn.
+     * Get the offset of the point area, relative to the XY chart viewer control. We
+     * consider the point area to be from where the first point could be drawn to
+     * where the last point could be drawn.
      *
      * @return the offset in pixels
      *
@@ -442,11 +526,11 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     }
 
     /**
-     * Get the width of the point area. We consider the point area to be from
-     * where the first point could be drawn to where the last point could be
-     * drawn. The point area differs from the plot area because there might be a
-     * gap between where the plot area start and where the fist point is drawn.
-     * This also matches the width that the use can select.
+     * Get the width of the point area. We consider the point area to be from where
+     * the first point could be drawn to where the last point could be drawn. The
+     * point area differs from the plot area because there might be a gap between
+     * where the plot area start and where the fist point is drawn. This also
+     * matches the width that the use can select.
      *
      * @return the width in pixels
      *

@@ -14,9 +14,7 @@ import java.util.Collections;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
@@ -63,7 +61,6 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
         Chart chart = getSwtChart();
         // Avoid displaying chart title and axis titles (to reduce wasted space)
         chart.getLegend().setVisible(false);
-        chart.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
         fId = id;
     }
 

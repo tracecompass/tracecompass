@@ -377,7 +377,11 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                              * The width of the chart might have changed and its time axis might be
                              * misaligned with the other views
                              */
-                            Point viewPos = TmfCommonXAxisChartViewer.this.getParent().getParent().toDisplay(0, 0);
+                            Composite parent = TmfCommonXAxisChartViewer.this.getParent();
+                            if (parent == null || parent.getParent() == null) {
+                                return;
+                            }
+                            Point viewPos = parent.getParent().toDisplay(0, 0);
                             int axisPos = getSwtChart().toDisplay(0, 0).x + getPointAreaOffset();
                             int timeAxisOffset = axisPos - viewPos.x;
                             TmfTimeViewAlignmentInfo timeAlignmentInfo = new TmfTimeViewAlignmentInfo(getControl().getShell(), viewPos, timeAxisOffset);
