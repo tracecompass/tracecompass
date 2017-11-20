@@ -12,28 +12,18 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.callstack;
 
-import java.util.Optional;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
-import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NamedTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 /**
  * Presentation provider for the Call Stack view, based on the generic TMF
@@ -58,36 +48,12 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
         }
     }
 
-    private CallStackView fView;
-
     /**
      * Minimum width of a displayed state below which we will not print any text
      * into it. It corresponds to the average width of 1 char, plus the width of
      * the ellipsis characters.
      */
     private Integer fMinimumBarWidth;
-
-    private final LoadingCache<CallStackEvent, Optional<String>> fTimeEventNames = CacheBuilder.newBuilder()
-            .maximumSize(1000)
-            .build(new CacheLoader<CallStackEvent, Optional<String>>() {
-                @Override
-                public Optional<String> load(CallStackEvent event) {
-                    CallStackEntry entry = event.getEntry();
-                    ITmfStateSystem ss = entry.getStateSystem();
-                    try {
-                        ITmfStateValue value = ss.querySingleState(event.getTime(), entry.getQuark()).getStateValue();
-                        if (!value.isNull()) {
-                            String name = fView.getFunctionName(entry.getTrace(), entry.getProcessId(), event.getTime(), value);
-                            return Optional.ofNullable(name);
-                        }
-                    } catch (TimeRangeException e) {
-                        Activator.getDefault().logError("Error querying state system", e); //$NON-NLS-1$
-                    } catch (StateSystemDisposedException e) {
-                        /* Ignored */
-                    }
-                    return Optional.empty();
-                }
-            });
 
     private enum State {
         MULTIPLE (new RGB(100, 100, 100)),
@@ -114,9 +80,11 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
      * @param view
      *            The call stack view that will contain the time events
      * @since 1.2
+     * @deprecated {@link CallStackPresentationProvider} no longer needs the
+     *             reference to the {@link CallStackView}
      */
+    @Deprecated
     public void setCallStackView(CallStackView view) {
-        fView = view;
     }
 
     @Override
@@ -131,8 +99,8 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
 
     @Override
     public int getStateTableIndex(ITimeEvent event) {
-        if (event instanceof CallStackEvent) {
-            CallStackEvent callStackEvent = (CallStackEvent) event;
+        if (event instanceof NamedTimeEvent) {
+            NamedTimeEvent callStackEvent = (NamedTimeEvent) event;
             return callStackEvent.getValue() + 1;
         } else if (event instanceof NullTimeEvent) {
             return INVISIBLE;
@@ -142,15 +110,15 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
 
     @Override
     public String getEventName(ITimeEvent event) {
-        if (event instanceof CallStackEvent) {
-            return fTimeEventNames.getUnchecked((CallStackEvent) event).orElse(null);
+        if (event instanceof NamedTimeEvent) {
+            return ((NamedTimeEvent) event).getLabel();
         }
         return State.MULTIPLE.toString();
     }
 
     @Override
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
-        if (!(event instanceof CallStackEvent)) {
+        if (!(event instanceof NamedTimeEvent)) {
             return;
         }
 
@@ -165,22 +133,9 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
             return;
         }
 
-        String name = fTimeEventNames.getUnchecked((CallStackEvent) event).orElse(""); //$NON-NLS-1$
-        if (name.isEmpty()) {
-            /* No text to print */
-            return;
-        }
-
+        String label = ((NamedTimeEvent) event).getLabel();
         gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
-        Utils.drawText(gc, name, bounds.x, bounds.y, bounds.width, bounds.height, true, true);
-    }
-
-    /**
-     * Indicate that the provider of function names has changed, so any cached
-     * values must be reset.
-     */
-    void resetFunctionNames() {
-        fTimeEventNames.invalidateAll();
+        Utils.drawText(gc, label, bounds.x, bounds.y, bounds.width, bounds.height, true, true);
     }
 
 }

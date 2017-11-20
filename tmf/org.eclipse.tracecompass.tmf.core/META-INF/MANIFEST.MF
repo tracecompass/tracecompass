@@ -25,6 +25,7 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.core.model;x-f
  org.eclipse.tracecompass.internal.tmf.core;x-friends:="org.eclipse.tracecompass.tmf.core.tests,org.eclipse.tracecompass.tmf.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.tmf.core.analysis;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.tmf.core.callstack;x-friends:="org.eclipse.tracecompass.tmf.ui,org.eclipse.tracecompass.tmf.core.tests",
+ org.eclipse.tracecompass.internal.tmf.core.callstack.provider;x-friends:="org.eclipse.tracecompass.tmf.ui",
  org.eclipse.tracecompass.internal.tmf.core.component;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.tmf.core.filter;x-friends:="org.eclipse.tracecompass.tmf.core.tests,org.eclipse.tracecompass.tmf.ui",
  org.eclipse.tracecompass.internal.tmf.core.markers;x-friends:="org.eclipse.tracecompass.tmf.ui,org.eclipse.tracecompass.tmf.core.tests,org.eclipse.tracecompass.tmf.ui.tests",

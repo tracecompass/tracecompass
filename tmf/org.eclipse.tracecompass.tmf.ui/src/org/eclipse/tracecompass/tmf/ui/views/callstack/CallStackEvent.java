@@ -12,13 +12,16 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.callstack;
 
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NamedTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 
 /**
+ * @deprecated Use a {@link TimeEvent} or {@link NamedTimeEvent} instead
  * Time Event implementation specific to the Call Stack View
  *
  * @author Patrick Tasse
  */
+@Deprecated
 public class CallStackEvent extends TimeEvent {
 
     /**

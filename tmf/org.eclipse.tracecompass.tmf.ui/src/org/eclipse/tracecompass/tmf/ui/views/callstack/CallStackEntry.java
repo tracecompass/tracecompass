@@ -24,6 +24,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
  *
  * @author Patrick Tasse
  */
+@Deprecated
 public class CallStackEntry extends TimeGraphEntry {
 
     private final int fQuark;

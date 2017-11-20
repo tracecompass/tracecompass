@@ -47,4 +47,11 @@
             experiment_type="org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment">
       </experiment>
    </extension>
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.dataprovider">
+      <dataProviderFactory
+            class="org.eclipse.tracecompass.internal.tmf.core.callstack.provider.CallStackDataProviderFactory"
+            id="org.eclipse.tracecompass.internal.tmf.core.callstack.provider.CallStackDataProvider">
+      </dataProviderFactory>
+   </extension>
 </plugin>

@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.core.callstack;
+package org.eclipse.tracecompass.internal.tmf.core.callstack.provider;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
