@@ -163,7 +163,7 @@ public final class WaitUtils {
                 }
             }
         } catch (Exception e) {
-            throw new WaitTimeoutException(condition.getFailureMessage()); //$NON-NLS-1$
+            throw new WaitTimeoutException(condition.getFailureMessage() + "\n" + e);
         }
     }
 
