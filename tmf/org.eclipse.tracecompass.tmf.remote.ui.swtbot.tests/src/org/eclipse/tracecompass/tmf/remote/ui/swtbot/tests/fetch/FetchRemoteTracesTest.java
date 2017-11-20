@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -51,6 +51,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,6 +77,9 @@ public class FetchRemoteTracesTest {
     private static final String WELCOME_NAME = "welcome";
 
     private static SWTWorkbenchBot fBot;
+
+    /** The Log4j logger instance. */
+    private static final Logger fLogger = Logger.getRootLogger();
 
     static {
         String traceLocation = "";
@@ -110,7 +114,8 @@ public class FetchRemoteTracesTest {
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         SWTBotUtils.initialize();
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
-        Logger.getRootLogger().addAppender(new NullAppender());
+        fLogger.removeAllAppenders();
+        fLogger.addAppender(new NullAppender());
         fBot = new SWTWorkbenchBot();
 
         SWTBotUtils.closeView(WELCOME_NAME, fBot);
@@ -118,6 +123,14 @@ public class FetchRemoteTracesTest {
         SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
+    }
+
+    /**
+     * Clean up
+     */
+    @AfterClass
+    public static void afterClass() {
+        fLogger.removeAllAppenders();
     }
 
     private static class TraceCountCondition extends DefaultCondition {

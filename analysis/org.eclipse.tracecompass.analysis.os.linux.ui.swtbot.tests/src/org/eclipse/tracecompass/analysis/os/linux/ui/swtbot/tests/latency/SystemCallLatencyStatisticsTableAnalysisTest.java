@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -46,6 +46,7 @@ import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -93,6 +94,14 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
         /* Finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
 
+    }
+
+    /**
+     * Clean up
+     */
+    @AfterClass
+    public static void afterClass() {
+        fLogger.removeAllAppenders();
     }
 
     /**

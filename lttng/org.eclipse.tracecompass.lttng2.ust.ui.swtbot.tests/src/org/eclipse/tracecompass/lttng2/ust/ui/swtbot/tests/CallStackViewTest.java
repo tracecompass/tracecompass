@@ -53,6 +53,7 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackView;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -166,6 +167,7 @@ public class CallStackViewTest {
         Thread.currentThread().setName("SWTBot Thread"); // for the debugger
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
+        fLogger.removeAllAppenders();
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout()));
         fBot = new SWTWorkbenchBot();
 
@@ -175,6 +177,14 @@ public class CallStackViewTest {
         SWTBotUtils.closeView("Statistics", fBot);
         /* finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
+    }
+
+    /**
+     * Clean up
+     */
+    @AfterClass
+    public static void afterClass() {
+        fLogger.removeAllAppenders();
     }
 
     /**

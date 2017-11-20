@@ -164,6 +164,7 @@ public class AddProjectNatureTest {
     @AfterClass
     public static void tearDown() {
         SWTBotUtils.deleteProject(SOME_PROJECT_NAME, fBot);
+        fLogger.removeAllAppenders();
 
         /* Set timestamp defaults */
         IEclipsePreferences defaultPreferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);

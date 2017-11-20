@@ -130,6 +130,7 @@ public class LamiChartViewerTest {
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
         bot.closeAllEditors();
         SWTBotUtils.deleteProject(PROJECT_NAME, bot);
+        fLogger.removeAllAppenders();
         OnDemandAnalysisManager.getInstance().unregisterAnalysis(LamiAnalyses.MULTIPLE_ROW.getAnalysis());
         OnDemandAnalysisManager.getInstance().unregisterAnalysis(LamiAnalyses.MULTIPLE_SIMILAR_ROW.getAnalysis());
     }

@@ -52,6 +52,7 @@ import org.eclipse.tracecompass.tmf.chart.ui.swtbot.tests.shared.SWTBotCustomCha
 import org.eclipse.tracecompass.tmf.chart.ui.swtbot.tests.shared.SWTBotCustomChartUtils.AxisType;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -93,6 +94,14 @@ public class ChartMakerDialogTest {
         WaitUtils.waitForJobs();
         SWTBotUtils.openView(CustomChartStubView.ID);
         CustomChartStubView.setChartProvider(CHART_PROVIDER);
+    }
+
+    /**
+     * Clean up
+     */
+    @AfterClass
+    public static void afterClass() {
+        fLogger.removeAllAppenders();
     }
 
     private void openDialog() {
