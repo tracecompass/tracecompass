@@ -163,6 +163,7 @@ public final class WaitUtils {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new WaitTimeoutException(condition.getFailureMessage() + "\n" + e);
         }
     }
