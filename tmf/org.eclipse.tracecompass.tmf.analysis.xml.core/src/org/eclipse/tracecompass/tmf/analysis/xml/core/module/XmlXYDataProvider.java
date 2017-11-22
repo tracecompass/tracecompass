@@ -85,6 +85,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
      * reused per every quark, and finds the quarks to query for the XY models.
      */
     private final BiMap<Long, Integer> fIdToQuark = HashBiMap.create();
+    private final BiMap<Integer, String> fQuarkToString = HashBiMap.create();
     private final long fTraceId = ENTRY_IDS.getAndIncrement();
     private @Nullable TmfModelResponse<List<TmfTreeDataModel>> fCached;
 
@@ -257,7 +258,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
 
         ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
         for (Entry<Integer, double[]> tempEntry : map.entrySet()) {
-            String name = String.valueOf(fIdToQuark.inverse().get(tempEntry.getKey()));
+            String name = String.valueOf(fQuarkToString.get(tempEntry.getKey()));
             ySeries.put(name, new YModel(name, tempEntry.getValue()));
         }
 
@@ -361,13 +362,11 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
                 }
             }
             if (!seriesName.isEmpty()) {
+                String tempSeriesName = seriesName;
+                String uniqueName = fQuarkToString.computeIfAbsent(quark, q -> getUniqueNameFor(tempSeriesName));
                 // Check if an ID has already been created for this quark.
-                Long id = fIdToQuark.inverse().get(quark);
-                if (id == null) {
-                    id = ENTRY_IDS.getAndIncrement();
-                    fIdToQuark.put(id, quark);
-                }
-                builder.add(new TmfTreeDataModel(id, fTraceId, seriesName));
+                Long id = fIdToQuark.inverse().computeIfAbsent(quark, q -> ENTRY_IDS.getAndIncrement());
+                builder.add(new TmfTreeDataModel(id, fTraceId, uniqueName));
             }
         }
 
@@ -378,6 +377,18 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
             return tmfModelResponse;
         }
         return new TmfModelResponse<>(list, ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
+    }
+
+    private String getUniqueNameFor(String seriesName) {
+        Integer quark = fQuarkToString.inverse().get(seriesName);
+        int index = 1;
+        String newName = seriesName;
+        while (quark != null) {
+            newName = seriesName + '(' + index + ')';
+            quark = fQuarkToString.inverse().get(newName);
+            index++;
+        }
+        return newName;
     }
 
     /**
