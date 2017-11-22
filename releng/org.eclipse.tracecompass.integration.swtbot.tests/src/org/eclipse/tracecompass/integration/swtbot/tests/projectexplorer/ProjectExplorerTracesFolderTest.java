@@ -1071,8 +1071,8 @@ public class ProjectExplorerTracesFolderTest {
         fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, "FolderB/" + CUSTOM_TEXT_LOG.getTraceName()));
         fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, "FolderB/" + LTTNG_KERNEL_TRACE.getTraceName()));
         fBot.waitUntil(ConditionHelpers.isEditorOpened(fBot, "FolderA/" + LTTNG_KERNEL_TRACE.getTraceName()));
-        assertEquals(1, tracesFolder.getNodes().size());
-        assertEquals(1, folderAItem.getNodes().size());
+        SWTBotUtils.waitUntil(folder -> folder.getNodes().size() == 1, tracesFolder, "Traces folder not empty");
+        SWTBotUtils.waitUntil(folder -> folder.getNodes().size() == 1, folderAItem, "Traces folder (folderAItem) not empty");
     }
 
     /**
@@ -1128,7 +1128,7 @@ public class ProjectExplorerTracesFolderTest {
         deleteConfirmationShellBot.button("Yes").click();
         fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, "FolderA/" + CUSTOM_TEXT_LOG.getTraceName()));
         fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, "FolderB/" + LTTNG_KERNEL_TRACE.getTraceName()));
-        assertEquals(0, tracesFolder.getNodes().size());
+        SWTBotUtils.waitUntil(folder -> folder.getNodes().isEmpty(), tracesFolder, "Traces folder not empty");
     }
 
     /**
@@ -1161,7 +1161,7 @@ public class ProjectExplorerTracesFolderTest {
         deleteConfirmationShellBot.button("Yes").click();
         fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, CUSTOM_TEXT_LOG.getTraceName()));
         fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, CLASHES_CUSTOM_TEXT_LOG.getTracePath()));
-        assertEquals(0, tracesFolder.getNodes().size());
+        SWTBotUtils.waitUntil(folder -> folder.getNodes().size() == 0, tracesFolder, "Traces folder not empty");
     }
 
     /**
@@ -1201,8 +1201,8 @@ public class ProjectExplorerTracesFolderTest {
         deleteConfirmationShellBot.button("Yes").click();
         fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, CUSTOM_TEXT_LOG.getTraceName()));
         fBot.waitWhile(ConditionHelpers.isEditorOpened(fBot, LTTNG_KERNEL_TRACE.getTraceName()));
-        assertEquals(0, tracesFolder1.getNodes().size());
-        assertEquals(0, tracesFolder2.getNodes().size());
+        SWTBotUtils.waitUntil(folder -> folder.getNodes().isEmpty(), tracesFolder1, "Traces folder (tracesFolder1) not empty");
+        SWTBotUtils.waitUntil(folder -> folder.getNodes().isEmpty(), tracesFolder2, "Traces folder (tracesFolder2) not empty");
 
         SWTBotUtils.deleteProject(DEFAULT_PROJECT_NAME, fBot);
     }
