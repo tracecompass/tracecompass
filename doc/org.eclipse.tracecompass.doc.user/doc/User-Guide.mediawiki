@@ -2485,8 +2485,9 @@ Where:
 
 The view is divided into the following important sections: '''Process Information''' and the '''Relative Kernel Memory Usage'''. The time axis is aligned with other views that support automatic time axis alignment (see [[#Automatic Time Axis Alignment | Automatic Time Axis Alignment]]).
 
-The filter button: [[Image:images/filter_items.gif]] can be used to show only the active threads in the tree viewer. By default only the threads which have had memory usage variations in the visible time range will be shown, clicking the button will reveal all the threads.
+The filter button: [[Image:images/filter_items.gif]] can be used to show only the active threads in the tree viewer. By default only the threads which have had memory usage variations in the visible time range will be shown, clicking the button will reveal all the threads. Threads can be filtered by checking and unchecking them in the left hand side tree.
 
+The time range can be set to fully zoomed out by double-clicking the time axis or the home button.
 
 === Process Information ===
 
@@ -2604,6 +2605,10 @@ The following views are available for input/output analyses:
 
 ==== Disk I/O Activity View ====
 A time aligned XY chart of the read and write speed for the different disks on the system. This view is useful to see where there was more activity on the disks and whether it was mostly reads or writes.
+
+Disk reads and writes can be selected in the tree on the left hand side.
+
+The time range can be reset by double-clicking the time axis or by clicking the reset button.
 
  [[Image:images/io/diskIoActivity.png| Disk I/O Activity Example]]
 
@@ -2858,7 +2863,7 @@ The Memory Usage view allows the user to visualize the active memory usage per t
 
 The view shows the memory consumption for the currently selected trace.
 
-The time chart plots heap memory usage graphically over time. There is one line per process, unassigned memory usage is mapped to "Other".
+The time chart plots heap memory usage graphically over time. There is one line per process, unassigned memory usage is mapped to "Other". Processes can be checked and unchecked in the tree on the left hand side.
 
 The filter button: [[Image:images/filter_items.gif]] can be used to show only the active threads in the tree viewer. By default only the threads which have had memory usage variations in the visible time range will be shown, clicking the button will reveal all the threads.
 
@@ -2874,6 +2879,8 @@ If thread information is not available it will look like this:
 [[Image:images/memoryUsage/memory-usage-no-thread-info.png]]
 
 The time axis is aligned with other views that support automatic time axis alignment (see [[#Automatic Time Axis Alignment | Automatic Time Axis Alignment]]).
+
+The time range can be fully zoomed out by double-clicking the time axis or the home button.
 
 Please note this view will not show shared memory or stack memory usage.
 
