@@ -63,7 +63,6 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
         implements IAnalysisModule, ITmfPropertiesProvider {
 
     private static final Logger LOGGER = TraceCompassLog.getLogger(TmfAbstractAnalysisModule.class);
-    private static final String LOG_CATEGORY = "AbstractAnalysisModule"; //$NON-NLS-1$
     private @Nullable String fId;
     private boolean fAutomatic = false, fStarted = false;
     private volatile @Nullable ITmfTrace fTrace;
@@ -336,7 +335,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
     }
 
     private void execute(final ITmfTrace trace) {
-        try (FlowScopeLog analysisLog = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TmfAbstractAnalysis:scheduling", "id", getId(), "name", getName()).setCategory(LOG_CATEGORY).build()) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        try (FlowScopeLog analysisLog = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TmfAbstractAnalysis:scheduling", "name", getName()).setCategory(getId()).build()) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             /*
              * TODO: The analysis in a job should be done at the analysis
              * manager level instead of depending on this abstract class
