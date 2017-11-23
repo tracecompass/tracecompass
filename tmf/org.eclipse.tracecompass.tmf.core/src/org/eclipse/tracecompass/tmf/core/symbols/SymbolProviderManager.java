@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016-2017 Movidius Inc. and others
+ * Copyright (c) 2016, 2017 Movidius Inc. and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -26,6 +26,9 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 
@@ -86,6 +89,21 @@ public final class SymbolProviderManager {
     }
 
     /**
+     * Dispose the singleton instance if it exists
+     *
+     * @since 3.2
+     */
+    public static synchronized void dispose() {
+        SymbolProviderManager manager = INSTANCE;
+        if (manager != null) {
+            TmfSignalManager.deregister(manager);
+            manager.fProviders.clear();
+            manager.fInstances.clear();
+        }
+        INSTANCE = null;
+    }
+
+    /**
      * The private constructor of this manager
      */
     private SymbolProviderManager() {
@@ -94,6 +112,7 @@ public final class SymbolProviderManager {
         load(EXTENSION_POINT_ID);
         // Those with a higher priority need to be on top
         fProviders.sort(Comparator.comparingLong(o -> -o.priority));
+        TmfSignalManager.register(this);
     }
 
     private void load(String configElemPath) {
@@ -188,4 +207,17 @@ public final class SymbolProviderManager {
         return getSymbolProviders(trace).iterator().next();
     }
 
+    /**
+     * Signal handler for the traceClosed signal.
+     *
+     * @param signal
+     *            The incoming signal
+     * @since 3.2
+     */
+    @TmfSignalHandler
+    public synchronized void traceClosed(final TmfTraceClosedSignal signal) {
+        for (ITmfTrace trace : TmfTraceManager.getTraceSet(signal.getTrace())) {
+            fInstances.removeAll(trace);
+        }
+    }
 }
