@@ -21,7 +21,11 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -60,10 +64,26 @@ public class DataProviderManager {
     }
 
     /**
+     * Dispose the singleton instance if it exists
+     *
+     * @since 3.2
+     */
+    public static synchronized void dispose() {
+        DataProviderManager manager = INSTANCE;
+        if (manager != null) {
+            TmfSignalManager.deregister(manager);
+            manager.fDataProviderFactories.clear();
+            manager.fInstances.clear();
+        }
+        INSTANCE = null;
+    }
+
+    /**
      * Private constructor.
      */
     private DataProviderManager() {
         loadDataProviders();
+        TmfSignalManager.register(this);
     }
 
     /**
@@ -134,5 +154,19 @@ public class DataProviderManager {
         }
 
         return dataProviders;
+    }
+
+    /**
+     * Signal handler for the traceClosed signal.
+     *
+     * @param signal
+     *            The incoming signal
+     * @since 3.2
+     */
+    @TmfSignalHandler
+    public synchronized void traceClosed(final TmfTraceClosedSignal signal) {
+        for (ITmfTrace trace : TmfTraceManager.getTraceSetWithExperiment(signal.getTrace())) {
+            fInstances.removeAll(trace);
+        }
     }
 }
