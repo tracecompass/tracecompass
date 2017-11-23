@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2009, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.osgi.framework.BundleContext;
 
@@ -93,6 +94,7 @@ public class Activator extends Plugin {
         TmfCoreTracer.stop();
         TmfTraceManager.getInstance().dispose();
         TmfAnalysisManager.dispose();
+        SymbolProviderManager.dispose();
         TmfSignalManager.dispose();
         setDefault(null);
         super.stop(context);

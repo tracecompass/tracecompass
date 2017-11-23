@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Ericsson
+ * Copyright (c) 2009, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -160,7 +160,6 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
             for (TmfEventProvider child : fChildren) {
                 child.dispose();
             }
-            fChildren.clear();
         }
         clearPendingRequests();
         super.dispose();
