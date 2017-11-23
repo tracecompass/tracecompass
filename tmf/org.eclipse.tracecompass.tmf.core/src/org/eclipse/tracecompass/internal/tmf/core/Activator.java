@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -95,6 +96,7 @@ public class Activator extends Plugin {
         TmfTraceManager.getInstance().dispose();
         TmfAnalysisManager.dispose();
         SymbolProviderManager.dispose();
+        DataProviderManager.dispose();
         TmfSignalManager.dispose();
         setDefault(null);
         super.stop(context);
