@@ -177,6 +177,7 @@ public abstract class XYDataProviderBaseTest {
         String mainSeriesName = getMainSeriesName();
         ISeries mainSeries = chart.getSeriesSet().getSeries(mainSeriesName);
         if (mainSeries == null) {
+            System.out.println("Main Series is currently null");
             return null;
         }
 
@@ -195,7 +196,11 @@ public abstract class XYDataProviderBaseTest {
                 double[] xSeries = series.getXSeries();
                 double[] ySeries = series.getYSeries();
 
-                assertTrue("Series should have the same x axis values", Arrays.equals(xMain, xSeries));
+                /* Series should have the same x axis values, not finished updating all series*/
+                if (!Arrays.equals(xMain, xSeries)) {
+                    System.out.println("Series don't currently have the same x axis values");
+                    return null;
+                }
                 yModels.put(other, new YModel(other, Objects.requireNonNull(ySeries)));
             }
         }
