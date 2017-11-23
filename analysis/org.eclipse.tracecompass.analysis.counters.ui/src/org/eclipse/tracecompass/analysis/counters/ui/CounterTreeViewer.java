@@ -52,8 +52,7 @@ public class CounterTreeViewer extends AbstractSelectTreeViewer {
                 if (genericEntry.hasChildren()) {
                     return null;
                 }
-                TmfTreeDataModel model = genericEntry.getModel();
-                return getLegendImage(String.valueOf(model.getId()));
+                return getLegendImage(getFullPath(genericEntry));
             }
             return null;
         }

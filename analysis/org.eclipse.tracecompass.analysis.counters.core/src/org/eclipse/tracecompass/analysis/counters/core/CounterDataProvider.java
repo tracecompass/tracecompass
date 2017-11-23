@@ -216,7 +216,7 @@ public class CounterDataProvider extends AbstractStateSystemAnalysisDataProvider
                     return TmfCommonXAxisResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
                 }
                 double[] yValues = buildYValues(countersIntervals.get(quark), filter);
-                String seriesName = String.valueOf(fIdToQuark.inverse().get(quark));
+                String seriesName = getTrace().getName() + '/' + ss.getFullAttributePath(quark);
                 ySeries.put(seriesName, new YModel(seriesName, yValues));
             }
 
