@@ -53,8 +53,8 @@
     100000001
   ],
   "series": {
-    "2": {
-      "label": "2",
+    "kernel_vm/Ungrouped/minor_faults": {
+      "label": "kernel_vm/Ungrouped/minor_faults",
       "yValues": [
         0.0,
         57.0,

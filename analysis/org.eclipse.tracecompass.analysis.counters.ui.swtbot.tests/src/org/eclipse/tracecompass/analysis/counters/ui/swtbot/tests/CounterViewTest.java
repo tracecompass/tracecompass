@@ -47,7 +47,7 @@ public class CounterViewTest extends XYDataProviderBaseTest {
     private static final @NonNull String TRACE_NAME = "kernel_vm";
     private static final @NonNull String COUNTER_NAME = "minor_faults";
     private static final @NonNull String COUNTERS_VIEW_TITLE = "Counters View";
-    private static final @NonNull String MAIN_SERIES_NAME = "2";
+    private static final @NonNull String MAIN_SERIES_NAME = "kernel_vm/Ungrouped/minor_faults";
     private static final @NonNull String COUNTERS_VIEW_ID = "org.eclipse.tracecompass.analysis.counters.ui.view.counters";
 
     /**
