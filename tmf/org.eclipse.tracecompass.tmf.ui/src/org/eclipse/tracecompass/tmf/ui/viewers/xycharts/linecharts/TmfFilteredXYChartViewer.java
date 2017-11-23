@@ -31,7 +31,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
 import org.swtchart.Chart;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * XY chart viewer which queries and displays selected entries.
@@ -74,11 +74,13 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
     @Override
     public void handleCheckStateChangedEvent(Collection<ITmfTreeViewerEntry> entries) {
         cancelUpdate();
-        clearContent();
 
         Iterable<TmfGenericTreeEntry> counterEntries = Iterables.filter(entries, TmfGenericTreeEntry.class);
-        fSelectedIds = Lists.newArrayList(Iterables.transform(counterEntries, e -> e.getModel().getId()));
-
+        Collection<@NonNull Long> selectedIds = Sets.newHashSet(Iterables.transform(counterEntries, e -> e.getModel().getId()));
+        if (!selectedIds.containsAll(fSelectedIds)) {
+            clearContent();
+        }
+        fSelectedIds = selectedIds;
         updateContent();
     }
 
