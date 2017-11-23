@@ -17,11 +17,10 @@ package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.treeHasRows;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,8 +35,6 @@ import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.ControlFlowView;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources.ResourcesView;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -47,6 +44,8 @@ import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.histogram.HistogramView;
@@ -78,9 +77,11 @@ public class ImportAndReadKernelSmokeTest extends KernelTestBase {
         EXPECTED_ANALYSES.put("Tmf Statistics", ImmutableSet.of("org.eclipse.linuxtools.tmf.statistics.totals", "org.eclipse.linuxtools.tmf.statistics.types"));
         EXPECTED_ANALYSES.put("Active Thread", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.kernel.tid"));
         EXPECTED_ANALYSES.put("Linux Kernel", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.kernel"));
-        EXPECTED_ANALYSES.put("Context switch", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.contextswitch"));
+        EXPECTED_ANALYSES.put("Context switch", Collections.emptySet());
         EXPECTED_ANALYSES.put("Kernel memory usage", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.core.kernelmemory"));
         EXPECTED_ANALYSES.put("CPU usage", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.cpuusage"));
+        EXPECTED_ANALYSES.put("XML Futex Contention Analysis", Collections.emptySet());
+        EXPECTED_ANALYSES.put("XML IRQ Analysis", Collections.emptySet());
     }
 
     private ITmfEvent fDesired1;
@@ -196,35 +197,35 @@ public class ImportAndReadKernelSmokeTest extends KernelTestBase {
         SWTBotUtils.openView(TmfStateSystemExplorer.ID);
         SWTBotView sseBot = bot.viewByTitle("State System Explorer");
         sseBot.show();
-        // get the list and compare it.
-        List<String> actual = getSSNames(sseBot);
-        assertTrue("State systems are not what expected : " + EXPECTED_ANALYSES.keySet() + " instead " + actual, actual.containsAll(EXPECTED_ANALYSES.keySet()));
+        assertEquals("Wrong state systems", EXPECTED_ANALYSES, getSsNames(sseBot));
         // Re-open the view and make sure it has the same results
         sseBot.close();
         SWTBotUtils.openView(TmfStateSystemExplorer.ID);
         sseBot = bot.viewByTitle("State System Explorer");
         sseBot.show();
-        List<String> secondOpen = getSSNames(sseBot);
-        assertEquals("Test reopen view", actual, secondOpen);
+        assertEquals("Wrong state systems", EXPECTED_ANALYSES, getSsNames(sseBot));
         // Close the trace, and re-open it, let's compare one last time
         bot.closeAllEditors();
         bot.waitUntil(treeHasRows(sseBot.bot().tree(), 0));
         // re-open the trace
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, tracePath, KERNEL_TRACE_TYPE);
-        secondOpen = getSSNames(sseBot);
-        assertEquals("Test reopen trace", actual, secondOpen);
+        assertEquals("Wrong state systems", EXPECTED_ANALYSES, getSsNames(sseBot));
         sseBot.close();
     }
 
-    private static List<String> getSSNames(SWTBotView bot) {
-        SWTBotTree tree = bot.bot().tree();
-        bot.bot().waitWhile(treeHasRows(tree, 0));
-        SWTBotTreeItem item = tree.getTreeItem("synthetic-trace").expand();
-        List<String> strings = new ArrayList<>();
-        strings.addAll(item.getNodes());
-        // The items may be out of order, is this a bug?
-        strings.sort(null);
-        return strings;
+    private static Map<String, Set<String>> getSsNames(SWTBotView bot) {
+        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(bot.bot());
+        SWTBotTimeGraphEntry trace = timeGraph.getEntry("synthetic-trace");
+        SWTBotTimeGraphEntry[] modules = trace.getEntries();
+        Map<String, Set<String>> modulesToStateSystems = new HashMap<>();
+        for (SWTBotTimeGraphEntry module : modules) {
+            Set<String> stateSystems = new HashSet<>();
+            for (SWTBotTimeGraphEntry stateSystem : module.getEntries()) {
+                stateSystems.add(stateSystem.getText());
+            }
+            modulesToStateSystems.put(module.getText(), stateSystems);
+        }
+        return modulesToStateSystems;
     }
 
 }

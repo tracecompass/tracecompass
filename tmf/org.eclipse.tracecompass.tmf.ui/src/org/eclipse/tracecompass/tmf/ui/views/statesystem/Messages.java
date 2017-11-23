@@ -65,7 +65,7 @@ public class Messages extends NLS {
     /** Label for the Filter button */
     public static String FilterButton;
 
-    /** Label for the type Interger */
+    /** Label for the type Integer */
     public static String TypeInteger;
 
     /** Label for the type Long */
@@ -80,4 +80,49 @@ public class Messages extends NLS {
     /** Label for the type Custom
      * @since 2.0 */
     public static String TypeCustom;
+
+    /**
+     * Label for null types
+     *
+     * @since 3.3
+     */
+    public static String TypeNull;
+
+    /**
+     * Trace Entry state type name.
+     *
+     * @since 3.3
+     */
+    public static String TraceEntry_StateTypeName;
+    /**
+     * Module Entry state type name
+     *
+     * @since 3.3
+     */
+    public static String ModuleEntry_StateTypeName;
+    /**
+     * State System Entry state type name
+     *
+     * @since 3.3
+     */
+    public static String StateSystemEntry_StateTypeName;
+    /**
+     * Attribute Entry state type name
+     *
+     * @since 3.3
+     */
+    public static String AttributeEntry_StateTypeName;
+
+    /**
+     * Module help text tool tip entry name
+     *
+     * @since 3.3
+     */
+    public static String ModuleHelpText;
+    /**
+     * Module is automatic tool tip entry name
+     *
+     * @since 3.3
+     */
+    public static String ModuleIsAutomatic;
 }

@@ -55,7 +55,9 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
  * @author Florian Wininger
  * @author Alexandre Montplaisir
  * @author Geneviève Bastien
+ * @deprecated the {@link TmfStateSystemExplorer} is now a Time Graph View.
  */
+@Deprecated
 public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$

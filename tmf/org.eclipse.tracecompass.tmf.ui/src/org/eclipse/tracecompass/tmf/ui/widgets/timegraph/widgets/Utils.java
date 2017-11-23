@@ -17,6 +17,7 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.TimeZone;
@@ -36,6 +37,9 @@ import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
+
+import com.google.common.collect.Iterables;
 
 /**
  * General utilities and definitions used by the time graph widget
@@ -992,5 +996,18 @@ public class Utils {
         int x = (int) (x1 + r * (x2 - x1));
         int y = (int) (y1 + r * (y2 - y1));
         return Math.sqrt(distance2(px, py, x, y));
+    }
+
+    /**
+     * Flatten a {@link TimeGraphEntry} tree for easier iteration.
+     *
+     * @param root
+     *            root entry from which to flatten the tree.
+     * @return an {@link Iterable} over the entries.
+     * @since 3.2
+     */
+    public static Iterable<TimeGraphEntry> flatten(TimeGraphEntry root) {
+        Iterable<Iterable<TimeGraphEntry>> transform = Iterables.transform(root.getChildren(), Utils::flatten);
+        return Iterables.concat(Collections.singleton(root), Iterables.concat(transform));
     }
 }
