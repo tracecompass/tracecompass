@@ -19,5 +19,15 @@
             name="Align1">
       </perspective>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="org.eclipse.linuxtools.tmf.ui.stubs"
+            class="org.eclipse.tracecompass.tmf.ui.swtbot.tests.views.TimeGraphViewStub"
+            id="org.eclipse.tracecompass.tmf.ui.swtbot.tests.views.timegraph.stub"
+            name="Time Graph Stub"
+            restorable="true">
+      </view>
+   </extension>
 
 </plugin>

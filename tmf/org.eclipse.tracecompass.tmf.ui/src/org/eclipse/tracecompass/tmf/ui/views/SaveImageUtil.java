@@ -56,6 +56,8 @@ public final class SaveImageUtil {
                 String[] filters = { "*.png", "*.gif", "*.jpg", "*.bmp" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                 int[] filterTypes = { SWT.IMAGE_PNG, SWT.IMAGE_GIF, SWT.IMAGE_JPEG, SWT.IMAGE_BMP };
                 dialog.setFilterExtensions(filters);
+                // In case the user doesn't click anything.
+                dialog.setFilterIndex(0);
                 dialog.setFileName((name == null ? "Untitled" : name) + ".png"); //$NON-NLS-1$ //$NON-NLS-2$
                 String ret = dialog.open();
                 if ((ret != null) && !ret.isEmpty()) {

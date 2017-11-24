@@ -12,6 +12,7 @@
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
 
 import java.awt.AWTException;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,8 +68,8 @@ public final class ImageHelper {
      * <code>pixel = rect.width * y + x;</code>
      *
      * @param rect
-     *            the area to grab in display relative coordinates (top left is
-     *            the origin)
+     *            the area to grab in display relative coordinates (top left is the
+     *            origin)
      * @return an ImageHelper, cannot be null
      */
     public static ImageHelper grabImage(final Rectangle rect) {
@@ -89,8 +90,27 @@ public final class ImageHelper {
     }
 
     /**
-     * Wait for the image at the specified bounds to change from the current
-     * image. The method returns when the new image is stable.
+     * Create an image helper from a file
+     *
+     * @param file
+     *            the file (only tested with PNG)
+     * @return an image helper or null if failed
+     * @throws IOException
+     *             the file is not valid
+     */
+    public static ImageHelper fromFile(File file) throws IOException {
+        BufferedImage bufferedImage = ImageIO.read(file);
+        if (bufferedImage == null) {
+            return null;
+        }
+        Rectangle bounds = new Rectangle(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
+        int[] rgb = bufferedImage.getRGB(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight(), null, 0, bufferedImage.getWidth());
+        return new ImageHelper(rgb, bounds);
+    }
+
+    /**
+     * Wait for the image at the specified bounds to change from the current image.
+     * The method returns when the new image is stable.
      *
      * @param bounds
      *            the bounds in display coordinates
@@ -104,7 +124,7 @@ public final class ImageHelper {
         bot.waitUntil(new DefaultCondition() {
             @Override
             public boolean test() throws Exception {
-                return UIThreadRunnable.syncExec(new Result<Boolean> () {
+                return UIThreadRunnable.syncExec(new Result<Boolean>() {
                     @Override
                     public Boolean run() {
                         newImage[0] = ImageHelper.grabImage(bounds);
@@ -121,7 +141,7 @@ public final class ImageHelper {
         bot.waitUntil(new DefaultCondition() {
             @Override
             public boolean test() throws Exception {
-                return UIThreadRunnable.syncExec(new Result<Boolean> () {
+                return UIThreadRunnable.syncExec(new Result<Boolean>() {
                     @Override
                     public Boolean run() {
                         ImageHelper image = ImageHelper.grabImage(bounds);
@@ -167,9 +187,9 @@ public final class ImageHelper {
      *
      * @param samplePoints
      *            a list of points to sample at
-     * @return a list of RGBs corresponding to the pixel coordinates. Can throw
-     *         an {@link IllegalArgumentException} if the point is outside of
-     *         the image bounds
+     * @return a list of RGBs corresponding to the pixel coordinates. Can throw an
+     *         {@link IllegalArgumentException} if the point is outside of the image
+     *         bounds
      */
     public List<RGB> sample(List<Point> samplePoints) {
         for (Point p : samplePoints) {
@@ -236,8 +256,8 @@ public final class ImageHelper {
      *
      * @param other
      *            the other image to compare
-     * @return an {@link ImageHelper} that is the per pixel difference between
-     *         the two images
+     * @return an {@link ImageHelper} that is the per pixel difference between the
+     *         two images
      *
      */
     public ImageHelper diff(ImageHelper other) {
@@ -251,7 +271,7 @@ public final class ImageHelper {
             byte r = (byte) (local.red - otherPixel.red);
             byte g = (byte) (local.green - otherPixel.green);
             byte b = (byte) (local.blue - otherPixel.blue);
-            fBuffer[i] = r << 16 + g << 8 + b;
+            fBuffer[i] = 0xff << 24 | (r << 16) | (g << 8) | b;
         }
         return new ImageHelper(fBuffer, getBounds());
     }
@@ -265,11 +285,18 @@ public final class ImageHelper {
      *             file not found and such
      */
     public void writePng(File outputFile) throws IOException {
-        java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(fBounds.width, fBounds.height, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        BufferedImage image = new BufferedImage(fBounds.width, fBounds.height, BufferedImage.TYPE_INT_RGB);
         image.setRGB(0, 0, fBounds.width, fBounds.height, fPixels, 0, fBounds.width);
         ImageIO.write(image, "png", outputFile);
     }
 
+    /**
+     * Converter from ARGB to {@link RGB}
+     *
+     * @param pixel
+     *            an ARGB encoded pixel
+     * @return the {@link RGB}
+     */
     private static RGB getRgbFromRGBPixel(int pixel) {
         return new RGB(((pixel >> 16) & 0xff), ((pixel >> 8) & 0xff), ((pixel) & 0xff));
     }
@@ -309,9 +336,9 @@ public final class ImageHelper {
     }
 
     /**
-     * On Mac, RGB values that are captured with ImageHelper are affected by
-     * monitor color profiles. To account for this, we can draw the expected
-     * color in a simple shell and use that color as expected value instead.
+     * On Mac, RGB values that are captured with ImageHelper are affected by monitor
+     * color profiles. To account for this, we can draw the expected color in a
+     * simple shell and use that color as expected value instead.
      *
      * @param original
      *            original color to adjust
@@ -356,7 +383,7 @@ public final class ImageHelper {
             }
         });
 
-        /* Get the color  */
+        /* Get the color */
         return UIThreadRunnable.syncExec(new Result<RGB>() {
             @Override
             public RGB run() {
