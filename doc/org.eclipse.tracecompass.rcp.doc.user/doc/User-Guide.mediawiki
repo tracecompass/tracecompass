@@ -46,6 +46,68 @@ using the same algorithm than described above.
 
 In both of the above cases, the trace will be linked to the default project.
 
+= Trace Compass Incubator =
+
+The Trace Compass Incubator contains additional features, for example, additional trace types, extra analyses for specific use cases or experimental features under development.
+
+Since the Incubator is in Incubation mode, there are no official releases of the plugins. They are built daily and may be updated between Trace Compass releases.
+
+''Disclaimer'': The Trace Compass Incubator features will always work with latest master of Trace Compass but it may not be possible to install some of them with the stable version.
+
+== Install Incubator features ==
+
+=== From the menu ===
+
+To install features from the Incubator, click the '''Tools''' menu and select '''Add-ons'''
+
+[[Image:images/incubator/Menu.png]]
+
+It will open a window that will fetch the available features. You may select all the desired features.
+
+[[Image:images/incubator/DiscoveryUi.png]]
+
+Then click '''Finish'''. It will open Eclipse's main installation wizard. Follow the wizard step, as shown in the following screenshots, then restart Eclipse. The new features will be available!
+
+[[Image:images/incubator/InstallWizardPage1.png]]
+[[Image:images/incubator/InstallWizardPage2.png]]
+[[Image:images/incubator/InstallWizardPage3.png]]
+
+=== From an update site ===
+
+Optionally, one can also install the incubator features using the following update site URL: http://download.eclipse.org/tracecompass.incubator/master/repository/.
+
+== Update incubator features ==
+
+The features in the Trace Compass Incubator are under constant development and new features and bug fixes may be released.
+
+To see if there is any update available, click the '''Help''' menu, then '''Check for updates'''. 
+
+[[Image:images/incubator/Update.png]]
+
+If updates are available, follow the Update wizard.
+
+[[Image:images/incubator/UpdateWizard.png]]
+
+== Uninstall incubator features ==
+
+Uninstalling incubator features is like uninstalling any other feature in Eclipse. And it's hard to find.
+
+Click on the '''Help''' menu, then '''About'''.
+
+[[Image:images/incubator/AboutUninstall.png]]
+
+Then click on the '''Installation Details''' button in the lower left corner.
+
+[[Image:images/incubator/InstallationDetails.png]]
+
+The '''Installed software''' tab lists the installed features, some of which are from the incubator. Select the features to uninstall, then click on the '''Uninstall...''' button at the bottom of the window
+
+[[Image:images/incubator/ListUninstall.png]]
+
+Then complete the uninstall wizard, restart Eclipse and the features won't be there anymore.
+
+[[Image:images/incubator/UninstallWizard.png]]
+
 == References ==
 
 * [http://www.eclipse.org/tracecompass Trace Compass project]
