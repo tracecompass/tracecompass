@@ -180,7 +180,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
      * Cache trace and threadID to a {@link ControlFlowEntry} for faster lookups
      * when building link list
      */
-    private Map<ITmfTrace, TreeMultimap<Integer, ControlFlowEntry>> fEntryCache = new HashMap<>();
+    private final Map<ITmfTrace, TreeMultimap<Integer, ControlFlowEntry>> fEntryCache = new HashMap<>();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -592,6 +592,8 @@ public class ControlFlowView extends AbstractTimeGraphView {
         super.traceClosed(signal);
         synchronized (fFlatTraces) {
             fFlatTraces.remove(signal.getTrace());
+        }
+        synchronized (fEntryCache) {
             fEntryCache.remove(signal.getTrace());
         }
     }
@@ -631,7 +633,10 @@ public class ControlFlowView extends AbstractTimeGraphView {
         final TreeMultimap<Integer, ControlFlowEntry> pidMap = TreeMultimap.create(
                 Comparator.naturalOrder(),
                 Comparator.comparing(ControlFlowEntry::getStartTime));
-        fEntryCache.put(trace, pidMap);
+
+        synchronized (fEntryCache) {
+            fEntryCache.put(trace, pidMap);
+        }
 
         long start = ssq.getStartTime();
         setStartTime(Long.min(getStartTime(), start));
@@ -709,7 +714,9 @@ public class ControlFlowView extends AbstractTimeGraphView {
                         entry.setParentThreadId(ppid);
                         entry.updateEndTime(endTime);
                     }
-                    pidMap.put(threadId, entry);
+                    synchronized (fEntryCache) {
+                        pidMap.put(threadId, entry);
+                    }
                 }
             }
 
@@ -1084,16 +1091,18 @@ public class ControlFlowView extends AbstractTimeGraphView {
     }
 
     private ControlFlowEntry findEntry(@NonNull ITmfTrace trace, int tid, long time) {
-        TreeMultimap<Integer, ControlFlowEntry> pidMap = fEntryCache.get(trace);
-        if (pidMap == null) {
-            return null;
+        synchronized (fEntryCache) {
+            TreeMultimap<Integer, ControlFlowEntry> pidMap = fEntryCache.get(trace);
+            if (pidMap == null) {
+                return null;
+            }
+            /*
+             * FIXME TreeMultimap values are Navigable Sets sorted by start time, find the
+             * values using floor and the relevant anonymous class if ever the iteration
+             * below slows down.
+             */
+            return Iterables.find(pidMap.get(tid), cfe -> cfe.getStartTime() <= time && time <= cfe.getEndTime(), null);
         }
-        /*
-         * FIXME TreeMultimap values are Navigable Sets sorted by start time, find the
-         * values using floor and the relevant anonymous class if ever the iteration
-         * below slows down.
-         */
-        return Iterables.find(pidMap.get(tid), cfe -> cfe.getStartTime() <= time && time <= cfe.getEndTime(), null);
     }
 
     /**
