@@ -9,9 +9,8 @@
 
 package org.eclipse.tracecompass.tmf.core.dataprovider;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -46,8 +45,9 @@ public class DataProviderManager {
     private static final String EXTENSION_POINT_ID = "org.eclipse.tracecompass.tmf.core.dataprovider"; //$NON-NLS-1$
     private static final String ELEMENT_NAME_PROVIDER = "dataProviderFactory"; //$NON-NLS-1$
     private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
+    private static final String ATTR_ID = "id"; //$NON-NLS-1$
 
-    private List<IDataProviderFactory> fDataProviderFactories = new ArrayList<>();
+    private Map<String, IDataProviderFactory> fDataProviderFactories = new HashMap<>();
 
     private final Multimap<ITmfTrace, ITmfTreeDataProvider<? extends ITmfTreeDataModel>> fInstances = LinkedHashMultimap.create();
 
@@ -95,7 +95,7 @@ public class DataProviderManager {
             if (cElement != null && cElement.getName().equals(ELEMENT_NAME_PROVIDER)) {
                 try {
                     Object extension = cElement.createExecutableExtension(ATTR_CLASS);
-                    fDataProviderFactories.add((IDataProviderFactory) extension);
+                    fDataProviderFactories.put(cElement.getAttribute(ATTR_ID), (IDataProviderFactory) extension);
                 } catch (CoreException e) {
                     Activator.logError("Unable to load extensions", e); //$NON-NLS-1$
                 }
@@ -114,46 +114,21 @@ public class DataProviderManager {
      *            Returned data provider must extend this class
      * @return Data provider
      */
-    public @Nullable <T extends ITmfTreeDataProvider<? extends ITmfTreeDataModel>> T getDataProvider(@NonNull ITmfTrace trace, String id, Class<T> dataProviderClass) {
-        Collection<T> dataProvider = getDataProvider(trace, dataProviderClass);
-        for (T provider : dataProvider) {
-            if (provider != null && id.equals(provider.getId())) {
-                return provider;
+    public synchronized @Nullable <T extends ITmfTreeDataProvider<? extends ITmfTreeDataModel>> T getDataProvider(@NonNull ITmfTrace trace, String id, Class<T> dataProviderClass) {
+        for (ITmfTreeDataProvider<? extends ITmfTreeDataModel> dataProvider : fInstances.get(trace)) {
+            if (id.equals(dataProvider.getId()) && dataProviderClass.isAssignableFrom(dataProvider.getClass())) {
+                return dataProviderClass.cast(dataProvider);
+            }
+        }
+        IDataProviderFactory providerFactory = fDataProviderFactories.get(id);
+        if (providerFactory != null) {
+            ITmfTreeDataProvider<? extends ITmfTreeDataModel> dataProvider = providerFactory.createProvider(trace);
+            if (dataProvider != null && id.equals(dataProvider.getId()) && dataProviderClass.isAssignableFrom(dataProvider.getClass())) {
+                fInstances.put(trace, dataProvider);
+                return dataProviderClass.cast(dataProvider);
             }
         }
         return null;
-    }
-
-    /**
-     * Get a collection of data providers for the given trace
-     *
-     * @param trace
-     *            The trace
-     * @param dataProviderClass
-     *            Returned data provider must extend this class
-     * @return Collection of data provider
-     */
-    public synchronized <T> Collection<T> getDataProvider(@NonNull ITmfTrace trace, Class<T> dataProviderClass) {
-        Collection<T> dataProviders = new ArrayList<>();
-        for (ITmfTreeDataProvider<? extends ITmfTreeDataModel> dataProvider : fInstances.get(trace)) {
-            if (dataProvider != null && dataProviderClass.isAssignableFrom(dataProvider.getClass())) {
-                dataProviders.add(dataProviderClass.cast(dataProvider));
-            }
-        }
-
-        if (dataProviders.isEmpty()) {
-            for (IDataProviderFactory providerFactory : fDataProviderFactories) {
-                ITmfTreeDataProvider<? extends ITmfTreeDataModel> provider = providerFactory.createProvider(trace);
-                if (provider != null) {
-                    fInstances.put(trace, provider);
-                    if (dataProviderClass.isAssignableFrom(provider.getClass())) {
-                        dataProviders.add(dataProviderClass.cast(provider));
-                    }
-                }
-            }
-        }
-
-        return dataProviders;
     }
 
     /**
