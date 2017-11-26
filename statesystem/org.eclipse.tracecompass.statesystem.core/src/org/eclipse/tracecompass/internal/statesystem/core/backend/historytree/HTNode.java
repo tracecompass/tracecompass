@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.channels.FileChannel;
+import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -169,31 +169,26 @@ public abstract class HTNode {
     }
 
     /**
-     * Reader factory method. Build a Node object (of the right type) by reading
-     * a block in the file.
+     * Reader factory method. Build a Node object (of the right type) by reading a
+     * block in the file.
      *
      * @param config
      *            Configuration of the History Tree
-     * @param fc
-     *            FileChannel to the history file, ALREADY SEEKED at the start
-     *            of the node.
+     * @param buffer
+     *            Buffer that this node maps to.
      * @param nodeFactory
      *            The factory to create the nodes for this tree
      * @return The node object
      * @throws IOException
      *             If there was an error reading from the file channel
      */
-    public static final @NonNull HTNode readNode(HTConfig config, FileChannel fc, IHistoryTree.IHTNodeFactory nodeFactory)
+    public static final @NonNull HTNode readNode(HTConfig config, ByteBuffer buffer, IHistoryTree.IHTNodeFactory nodeFactory)
             throws IOException {
         HTNode newNode = null;
-        int res, i;
 
-        ByteBuffer buffer = ByteBuffer.allocate(config.getBlockSize());
         buffer.order(ByteOrder.LITTLE_ENDIAN);
         buffer.clear();
-        res = fc.read(buffer);
-        assert (res == config.getBlockSize());
-        buffer.flip();
+        assert (buffer.limit() == config.getBlockSize());
 
         /* Read the common header part */
         byte typeByte = buffer.get();
@@ -230,7 +225,7 @@ public abstract class HTNode {
          * At this point, we should be done reading the header and 'buffer'
          * should only have the intervals left
          */
-        for (i = 0; i < intervalCount; i++) {
+        for (int i = 0; i < intervalCount; i++) {
             HTInterval interval = HTInterval.readFrom(buffer);
             newNode.fIntervals.add(interval);
             newNode.fSizeOfIntervalSection += interval.getSizeOnDisk();
@@ -248,13 +243,10 @@ public abstract class HTNode {
     /**
      * Write this node to the given file channel.
      *
-     * @param fc
-     *            The file channel to write to (should be sought to be correct
-     *            position)
-     * @throws IOException
-     *             If there was an error writing
+     * @param buffer
+     *            The buffer for the node.
      */
-    public final void writeSelf(FileChannel fc) throws IOException {
+    public final void writeSelf(MappedByteBuffer buffer) {
         /*
          * Yes, we are taking the *read* lock here, because we are reading the
          * information in the node to write it to disk.
@@ -263,7 +255,6 @@ public abstract class HTNode {
         try {
             final int blockSize = fConfig.getBlockSize();
 
-            ByteBuffer buffer = ByteBuffer.allocate(blockSize);
             buffer.order(ByteOrder.LITTLE_ENDIAN);
             buffer.clear();
 
@@ -293,9 +284,7 @@ public abstract class HTNode {
                 buffer.put((byte) 0);
             }
 
-            /* Finally, write everything in the Buffer to disk */
-            buffer.flip();
-            int res = fc.write(buffer);
+            int res = buffer.position();
             if (res != blockSize) {
                 throw new IllegalStateException("Wrong size of block written: Actual: " + res + ", Expected: " + blockSize); //$NON-NLS-1$ //$NON-NLS-2$
             }
