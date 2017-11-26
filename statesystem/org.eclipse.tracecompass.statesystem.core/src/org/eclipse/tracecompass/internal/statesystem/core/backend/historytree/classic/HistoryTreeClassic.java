@@ -23,6 +23,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -410,6 +411,21 @@ public class HistoryTreeClassic implements IHistoryTree {
 
         /* Read the node from disk */
         return fTreeIO.readNode(seqNumber);
+    }
+
+    @Override
+    public HTNode readNode(Deque<Integer> queue) throws ClosedChannelException {
+        /* Try to read the node from memory */
+        synchronized (fLatestBranch) {
+            for (HTNode node : fLatestBranch) {
+                if (queue.remove(node.getSequenceNumber())) {
+                    return node;
+                }
+            }
+        }
+
+        /* Read the node from disk */
+        return fTreeIO.readNode(queue);
     }
 
     @Override

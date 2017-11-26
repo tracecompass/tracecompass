@@ -20,6 +20,8 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import java.util.Deque;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -195,6 +197,36 @@ public class HT_IO {
             Activator.getDefault().logError(e.getMessage(), e);
             throw new IllegalStateException();
         }
+    }
+
+    /**
+     * Read a node from a file on disk
+     *
+     * @param queue
+     *            NON-EMPTY queue of node sequence numbers to read from
+     * @return any node from the queue, returning cached nodes first, else resorting
+     *         to reading on disk.
+     * @throws ClosedChannelException
+     *             Usually happens because the file was closed while we were
+     *             reading. Instead of using a big reader-writer lock, we'll just
+     *             catch this exception.
+     */
+    public @NonNull HTNode readNode(Deque<Integer> queue) throws ClosedChannelException {
+        /*
+         * Use an iterator in order to remove efficiently from the queue position
+         */
+        Iterator<Integer> iterator = queue.iterator();
+        while (iterator.hasNext()) {
+            Integer seqNumber = iterator.next();
+            CacheKey key = new CacheKey(this, seqNumber);
+            HTNode node = NODE_CACHE.getIfPresent(key);
+            if (node != null) {
+                iterator.remove();
+                return node;
+            }
+        }
+        // need to go to disk
+        return readNode(queue.pop());
     }
 
     /**

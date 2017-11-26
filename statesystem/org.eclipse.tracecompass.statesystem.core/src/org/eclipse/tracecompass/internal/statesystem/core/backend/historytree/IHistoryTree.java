@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
+import java.util.Deque;
+
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 
 /**
@@ -156,6 +158,17 @@ public interface IHistoryTree {
      *             If the tree IO is unavailable
      */
     HTNode readNode(int seqNumber) throws ClosedChannelException;
+
+    /**
+     * Read a node from the tree, prioritizing cached nodes.
+     *
+     * @param queue
+     *            queue of queried nodes, the returned node's sequence number will
+     *            be removed from the queue.
+     * @return The node
+     * @throws ClosedChannelException
+     */
+    HTNode readNode(Deque<Integer> queue) throws ClosedChannelException;
 
     /**
      * Write a node object to the history file.

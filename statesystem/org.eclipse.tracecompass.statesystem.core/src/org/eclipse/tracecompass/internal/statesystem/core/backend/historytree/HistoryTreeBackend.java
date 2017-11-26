@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -39,7 +40,6 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Iterables;
 
 /**
  * History Tree backend for storing a state history. This is the basic version
@@ -356,38 +356,36 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
     }
 
     @Override
-    public Iterable<@NonNull ITmfStateInterval> query2D(IntegerRangeCondition quarks, TimeRangeCondition times)
-            throws TimeRangeException {
-        /* Get a flattened Iterable of nodes that match the conditions */
-        Iterable<HTNode> nodes = flatten(getSHT().getRootNode(), quarks, times);
-        /*
-         * Transform them into the iterables over their intervals that match the
-         * conditions.
-         */
-        Iterable<Iterable<HTInterval>> iterables = Iterables.transform(nodes,
-                n -> n.iterable2D(quarks, times));
-        return Iterables.concat(iterables);
-    }
+    public Iterable<@NonNull ITmfStateInterval> query2D(IntegerRangeCondition quarks, TimeRangeCondition times) {
+        return () -> new Iterator<@NonNull ITmfStateInterval>() {
+            private final Deque<Integer> seqNumberQueue = new LinkedList<>(Collections.singleton(getSHT().getRootNode().getSequenceNumber()));
+            private Iterator<@NonNull HTInterval> intervalQueue = Collections.emptyIterator();
 
-    private Iterable<HTNode> flatten(HTNode node, IntegerRangeCondition quarks, TimeRangeCondition times) {
-        if (node.getNodeType() == HTNode.NodeType.LEAF) {
-            return Collections.singleton(node);
-        }
-        ParentNode parent = (ParentNode) node;
-        /*
-         * Transform the children's sequence numbers into the children's
-         * flattened subtrees.
-         */
-        Iterable<Iterable<HTNode>> children = Iterables.transform(parent.selectNextChildren2D(quarks, times), seqNum -> {
-            try {
-                /* Recursive call to flatten children */
-                return flatten(getSHT().readNode(seqNum), quarks, times);
-            } catch (ClosedChannelException e) {
-                return Collections.emptyList();
+            @Override
+            public boolean hasNext() {
+                while (!intervalQueue.hasNext() && !seqNumberQueue.isEmpty()) {
+                    try {
+                        HTNode currentNode = getSHT().readNode(seqNumberQueue);
+                        /* Compute reduced conditions here to reduce complexity in queuing operations. */
+                        IntegerRangeCondition subQuarks = quarks.subCondition(currentNode.getMinQuark(), currentNode.getMaxQuark());
+                        TimeRangeCondition subTimes = times.subCondition(currentNode.getNodeStart(), currentNode.getNodeEnd());
+                        if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
+                            // Queue the relevant children nodes for BFS.
+                            seqNumberQueue.addAll(((ParentNode) currentNode).selectNextChildren2D(subQuarks, subTimes));
+                        }
+                        intervalQueue = currentNode.iterable2D(subQuarks, subTimes).iterator();
+                    } catch (ClosedChannelException e) {
+                        return false;
+                    }
+                }
+                return intervalQueue.hasNext();
             }
-        });
-        /* BFS */
-        return Iterables.concat(Collections.singleton(node), Iterables.concat(children));
+
+            @Override
+            public ITmfStateInterval next() {
+                return intervalQueue.next();
+            }
+        };
     }
 
     /**
