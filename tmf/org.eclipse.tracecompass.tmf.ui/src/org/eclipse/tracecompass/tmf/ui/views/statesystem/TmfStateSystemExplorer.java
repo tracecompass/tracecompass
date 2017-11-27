@@ -21,12 +21,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -40,7 +39,6 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
@@ -62,11 +60,13 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sampling;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
+import org.eclipse.ui.IWorkbenchActionConstants;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Table;
+import com.google.common.collect.TreeMultimap;
 
 /**
  * Displays the State System at a current time.
@@ -77,7 +77,7 @@ import com.google.common.collect.Table;
  */
 public class TmfStateSystemExplorer extends AbstractTimeGraphView {
 
-    private static final String HT_EXTENSION = ".ht";
+    private static final String HT_EXTENSION = ".ht"; //$NON-NLS-1$
 
     /** The Environment View's ID */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.ssvisualizer"; //$NON-NLS-1$
@@ -87,8 +87,36 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
 
     private static final String[] COLUMN_NAMES = new String[] {
             Messages.TreeNodeColumnLabel,
-            Messages.QuarkColumnLabel
+            Messages.QuarkColumnLabel,
+            Messages.ValueColumnLabel
     };
+
+    private static final Comparator<ITimeGraphEntry> NAME_COMPARATOR = (a, b) -> {
+        if (a instanceof AttributeEntry && b instanceof AttributeEntry) {
+            return a.getName().compareTo(b.getName());
+
+        }
+        return 0;
+    };
+
+    private static final Comparator<ITimeGraphEntry> QUARK_COMPARATOR = (a, b) -> {
+        if (a instanceof AttributeEntry && b instanceof AttributeEntry) {
+            return Integer.compare(((AttributeEntry) a).getQuark(), ((AttributeEntry) b).getQuark());
+
+        }
+        return 0;
+    };
+
+    private static final Comparator<ITimeGraphEntry>[] COLUMN_COMPARATORS;
+    static {
+        ImmutableList.Builder<Comparator<ITimeGraphEntry>> builder = ImmutableList.builder();
+        builder.add(NAME_COMPARATOR)
+                .add(QUARK_COMPARATOR);
+        List<Comparator<ITimeGraphEntry>> l = builder.build();
+        COLUMN_COMPARATORS = l.toArray(new Comparator[l.size()]);
+    }
+
+    private static final int QUARK_COLUMN_INDEX = 1;
 
     private static final int ITERATION_WAIT = 500;
     /**
@@ -137,9 +165,14 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
                 TimeGraphEntry entry = (TimeGraphEntry) element;
                 if (columnIndex == 0) {
                     return entry.getName();
-                } else if (columnIndex == 1 && !(entry instanceof TraceEntry)
-                        && !(entry instanceof StateSystemEntry) && !(entry instanceof ModuleEntry)) {
-                    return Integer.toString(getQuark(getStateSystemAndPath(entry)));
+                } else if (columnIndex == 1 && entry instanceof AttributeEntry) {
+                    return Integer.toString(((AttributeEntry) entry).getQuark());
+                } else if (columnIndex == 2 && entry instanceof AttributeEntry) {
+                    List<ITmfStateInterval> fullState = StateSystemEntry.getFullStates(entry);
+                    if (fullState != null) {
+                        ITmfStateInterval interval = fullState.get(((AttributeEntry) entry).getQuark());
+                        return String.valueOf(interval.getValue());
+                    }
                 }
             }
             return ""; //$NON-NLS-1$
@@ -164,13 +197,13 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
         public ModuleEntry(ITmfAnalysisModuleWithStateSystems module, long startTime) {
             super(module.getName(), startTime, startTime);
             fModule = module;
-            addEvent(new TimeEvent(this, startTime, startTime));
+            addEvent(new TimeEvent(this, startTime, 0));
         }
 
         @Override
         public void updateEndTime(long endTime) {
             super.updateEndTime(endTime);
-            addEvent(new TimeEvent(this, getStartTime(), endTime));
+            addEvent(new TimeEvent(this, getStartTime(), endTime - getStartTime()));
         }
 
         public ITmfAnalysisModuleWithStateSystems getModule() {
@@ -180,28 +213,57 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
 
     static class StateSystemEntry extends TimeGraphEntry {
         private final ITmfStateSystem fSs;
+        private List<ITmfStateInterval> fFullStates = null;
 
         public StateSystemEntry(ITmfStateSystem ss) {
             super(ss.getSSID(), ss.getStartTime(), ss.getCurrentEndTime());
             fSs = ss;
-            addEvent(new TimeEvent(this, ss.getStartTime(), ss.getCurrentEndTime()));
+            addEvent(new TimeEvent(this, ss.getStartTime(), ss.getCurrentEndTime() - ss.getStartTime()));
         }
 
         @Override
         public void updateEndTime(long endTime) {
             super.updateEndTime(endTime);
-            addEvent(new TimeEvent(this, getStartTime(), endTime));
+            addEvent(new TimeEvent(this, getStartTime(), endTime - getStartTime()));
         }
 
         public ITmfStateSystem getStateSystem() {
             return fSs;
+        }
+
+        public void setFullStates(List<ITmfStateInterval> fullStates) {
+            fFullStates = fullStates;
+        }
+
+        static List<ITmfStateInterval> getFullStates(TimeGraphEntry entry) {
+            TimeGraphEntry parent = entry;
+            while (parent != null) {
+                if (parent instanceof StateSystemEntry) {
+                    return ((StateSystemEntry) parent).fFullStates;
+                }
+                parent = parent.getParent();
+            }
+            return null;
+        }
+    }
+
+    static class AttributeEntry extends TimeGraphEntry {
+        private final int fQuark;
+
+        public AttributeEntry(String name, long start, long end, int quark) {
+            super(name, start, end);
+            fQuark = quark;
+        }
+
+        public int getQuark() {
+            return fQuark;
         }
     }
 
     /**
      * Set of {@link ITmfAnalysisModuleWithStateSystems} that were received by
      * {@link TmfStateSystemExplorer#handleAnalysisStarted(TmfStartAnalysisSignal)}.
-     * These are non automatic analysis that the
+     * These are non automatic analysis that the build entry must join on.
      */
     private final Set<ITmfAnalysisModuleWithStateSystems> fStartedAnalysis = ConcurrentHashMap.newKeySet();
 
@@ -210,7 +272,7 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
      */
     public TmfStateSystemExplorer() {
         super(ID, new StateSystemPresentationProvider());
-        setTreeColumns(COLUMN_NAMES);
+        setTreeColumns(COLUMN_NAMES, COLUMN_COMPARATORS, QUARK_COLUMN_INDEX);
         setTreeLabelProvider(new StateSystemTreeLabelProvider());
         setEntryComparator(Comparator.comparing(ITimeGraphEntry::getName));
         setAutoExpandLevel(DEFAULT_AUTOEXPAND);
@@ -224,6 +286,11 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
         collapseExpand.setToolTipText(Messages.FilterButton);
 
         manager.add(collapseExpand);
+
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getTimeGraphViewer().getResetScaleAction());
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getTimeGraphViewer().getPreviousEventAction());
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getTimeGraphViewer().getNextEventAction());
+
     }
 
     @Override
@@ -260,12 +327,20 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
         Iterable<@NonNull ITmfAnalysisModuleWithStateSystems> modules = Iterables.
                 filter(trace.getAnalysisModules(), ITmfAnalysisModuleWithStateSystems.class);
 
-        modules.forEach(m -> waitForInitialization(trace, m));
+        for (ITmfAnalysisModuleWithStateSystems m : modules) {
+            if (monitor.isCanceled()) {
+                return;
+            }
+            waitForInitialization(trace, m);
+        }
 
         boolean complete = false;
-        while (!complete) {
+        while (!complete && !monitor.isCanceled()) {
             complete = true;
             for (ITmfAnalysisModuleWithStateSystems module : modules) {
+                if (monitor.isCanceled()) {
+                    return;
+                }
                 // Add the module as an entry to the trace
                 ModuleEntry moduleEntry = getOrCreateModuleEntry(traceEntry, module);
                 /*
@@ -284,12 +359,20 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
             long resolution = Long.max(1, (end - start) / getDisplayWidth());
             zoomEntries(Utils.flatten(traceEntry), start, end, resolution, monitor);
 
+            if (monitor.isCanceled()) {
+                return;
+            }
+
             if (parentTrace == getTrace()) {
                 synchronized (this) {
                     setStartTime(Long.min(getStartTime(), start));
                     setEndTime(Long.max(getEndTime(), end));
                 }
                 refresh();
+            }
+
+            if (monitor.isCanceled()) {
+                return;
             }
 
             if (!complete) {
@@ -338,11 +421,7 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
             }
         }
         if (moduleEntry == null) {
-            long start = Long.MAX_VALUE;
-            for (ITmfStateSystem ss : module.getStateSystems()) {
-                start = Long.min(start, ss.getStartTime());
-            }
-            moduleEntry = new ModuleEntry(module, start);
+            moduleEntry = new ModuleEntry(module, traceEntry.getStartTime());
             traceEntry.addChild(moduleEntry);
         }
         return moduleEntry;
@@ -352,7 +431,7 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
         StateSystemEntry ssEntry = null;
         long currentEndTime = ss.getCurrentEndTime();
         for (StateSystemEntry entry : Iterables.filter(moduleEntry.getChildren(), StateSystemEntry.class)) {
-            if (entry.fSs == ss) {
+            if (entry.getStateSystem() == ss) {
                 ssEntry = entry;
                 ssEntry.updateEndTime(currentEndTime);
                 break;
@@ -381,7 +460,7 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
             }
         }
         if (entry == null) {
-            entry = new TimeGraphEntry(name, start, end);
+            entry = new AttributeEntry(name, start, end, quark);
             parent.addChild(entry);
         }
         for (Integer child : ss.getSubAttributes(quark, false)) {
@@ -396,7 +475,8 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
 
         boolean isZoomThread = Thread.currentThread() instanceof ZoomThread;
         Table<ITmfStateSystem, Integer, TimeGraphEntry> table = filterGroupEntries(entries);
-        ArrayListMultimap<Integer, ITmfStateInterval> intervals = ArrayListMultimap.create();
+        TreeMultimap<Integer, ITmfStateInterval> intervals = TreeMultimap.create(Comparator.naturalOrder(),
+                Comparator.comparingLong(ITmfStateInterval::getStartTime));
 
         for (Entry<ITmfStateSystem, Map<Integer, TimeGraphEntry>> ssEntries : table.rowMap().entrySet()) {
             ITmfStateSystem ss = ssEntries.getKey();
@@ -422,7 +502,7 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
                         return;
                     }
                     TimeGraphEntry tge = entry.getValue();
-                    List<ITmfStateInterval> states = intervals.removeAll(entry.getKey());
+                    SortedSet<ITmfStateInterval> states = intervals.removeAll(entry.getKey());
                     List<ITimeEvent> events = createTimeEvents(tge, states);
                     if (isZoomThread) {
                         applyResults(() -> {
@@ -437,25 +517,38 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
                 Activator.getDefault().logError("State System Explorer: incorrect query times for zoomEvent", e); //$NON-NLS-1$
             } catch (StateSystemDisposedException e) {
                 // If the state system was disposed, the trace was closed, nothing to do here.
+            } finally {
+                intervals.clear();
             }
         }
     }
 
     private static Table<ITmfStateSystem, Integer, TimeGraphEntry> filterGroupEntries(Iterable<TimeGraphEntry> visible) {
         Table<ITmfStateSystem, Integer, TimeGraphEntry> quarksToEntries = HashBasedTable.create();
-        for (TimeGraphEntry entry : visible) {
-            Pair<ITmfStateSystem, List<String>> ssPath = getStateSystemAndPath(entry);
-            if (ssPath != null) {
-                quarksToEntries.put(ssPath.getFirst(), getQuark(ssPath), entry);
+        for (AttributeEntry entry : Iterables.filter(visible, AttributeEntry.class)) {
+            ITmfStateSystem ss = getStateSystem(entry);
+            if (ss != null) {
+                quarksToEntries.put(ss, entry.getQuark(), entry);
             }
         }
         return quarksToEntries;
     }
 
-    private static List<ITimeEvent> createTimeEvents(TimeGraphEntry tge, List<ITmfStateInterval> intervals) {
+    private static List<ITimeEvent> createTimeEvents(TimeGraphEntry tge, SortedSet<ITmfStateInterval> intervals) {
         List<ITimeEvent> events = new ArrayList<>(intervals.size());
-        intervals.forEach(interval -> events.add(new StateSystemEvent(tge, interval)));
-        events.sort(Comparator.comparingLong(ITimeEvent::getTime));
+        ITimeEvent prev = null;
+        for (ITmfStateInterval interval : intervals) {
+            ITimeEvent event = new StateSystemEvent(tge, interval);
+            if (prev != null) {
+                long prevEnd = prev.getTime() + prev.getDuration();
+                if (prevEnd < event.getTime()) {
+                    // fill in the gap.
+                    events.add(new TimeEvent(tge, prevEnd, event.getTime() - prevEnd));
+                }
+            }
+            prev = event;
+            events.add(event);
+        }
         return events;
     }
 
@@ -468,79 +561,23 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
         Iterable<TimeGraphEntry> moduleEntries = Iterables.concat(Iterables.transform(traceEntries, TimeGraphEntry::getChildren));
         Iterable<TimeGraphEntry> stateSystemEntries = Iterables.concat(Iterables.transform(moduleEntries, TimeGraphEntry::getChildren));
         for (StateSystemEntry stateSystemEntry : Iterables.filter(stateSystemEntries, StateSystemEntry.class)) {
-            if (syncStateSystem(time, stateSystemEntry)) {
-                return;
-            }
-        }
-    }
-
-    /**
-     * Try to sync the view to a state system at the desired time
-     *
-     * @param time
-     *            the currently selected time.
-     * @param stateSystemEntry
-     *            root entry whose children to try and sync to.
-     * @return if the time was synced to an entry in this {@link StateSystemEntry}.
-     */
-    private boolean syncStateSystem(long time, StateSystemEntry stateSystemEntry) {
-        try {
-            List<@NonNull ITmfStateInterval> full = stateSystemEntry.fSs.queryFullState(time);
-            for (ITmfStateInterval interval : full) {
-                if (interval.getStartTime() == time) {
-                    TimeGraphEntry entry = getEntry(stateSystemEntry, interval.getAttribute());
-                    Display.getDefault().asyncExec(() -> {
-                        getTimeGraphViewer().setSelection(entry, true);
-                        getTimeGraphViewer().getTimeGraphControl().fireSelectionChanged();
-                    });
-                    return true;
+            /**
+             * Cache the full state for this state system at time, if it exists, for reuse
+             * by the tree label provider.
+             */
+            ITmfStateSystem ss = stateSystemEntry.getStateSystem();
+            if (ss.getStartTime() <= time && time <= ss.getCurrentEndTime()) {
+                try {
+                    List<@NonNull ITmfStateInterval> full = ss.queryFullState(time);
+                    stateSystemEntry.setFullStates(full);
+                } catch (StateSystemDisposedException e) {
+                    stateSystemEntry.setFullStates(null);
                 }
+            } else {
+                stateSystemEntry.setFullStates(null);
             }
-        } catch (StateSystemDisposedException e) {
-            // State system was disposed, nothing to do,
         }
-        return false;
-    }
-
-    /**
-     * Get the child entry for a queried quark in a {@link StateSystemEntry}'s
-     * children.
-     *
-     * @param stateSystemEntry
-     *            root entry.
-     * @param quark
-     *            queried quark.
-     * @return the queried {@link TimeGraphEntry}, else null if it's full path
-     *         didn't match.
-     * @throws IndexOutOfBoundsException
-     *             if the quark was out of the state system's range
-     * @throws NoSuchElementException
-     *             if the tree was not built correctly
-     */
-    private static TimeGraphEntry getEntry(StateSystemEntry stateSystemEntry, int quark) {
-        ITmfStateSystem ss = stateSystemEntry.fSs;
-        TimeGraphEntry entry = stateSystemEntry;
-        for (String path : ss.getFullAttributePathArray(quark)) {
-            entry = Iterables.find(entry.getChildren(), child -> child.getName().equals(path));
-        }
-        return entry;
-    }
-
-    /**
-     * Get the quark for an entry.
-     *
-     * @param entry
-     *            any {@link TimeGraphEntry} from the tree
-     * @return the quark for an attribute entry, else
-     *         {@link ITmfStateSystem#INVALID_ATTRIBUTE}.
-     */
-    private static int getQuark(Pair<ITmfStateSystem, List<String>> ssPath) {
-        if (ssPath == null) {
-            return ITmfStateSystem.INVALID_ATTRIBUTE;
-        }
-        ITmfStateSystem ss = ssPath.getFirst();
-        List<String> pathL = ssPath.getSecond();
-        return ss.optQuarkAbsolute(pathL.toArray(new String[pathL.size()]));
+        refresh();
     }
 
     /**
@@ -551,14 +588,12 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
      * @return a {@link Pair} encapsulating both, else null if the entry was for a
      *         trace / module / state system.
      */
-    static Pair<ITmfStateSystem, List<String>> getStateSystemAndPath(TimeGraphEntry entry) {
-        LinkedList<String> list = new LinkedList<>();
+    static ITmfStateSystem getStateSystem(TimeGraphEntry entry) {
         TimeGraphEntry parent = entry;
         while (parent != null) {
-            list.addFirst(parent.getName());
             parent = parent.getParent();
             if (parent instanceof StateSystemEntry) {
-                return new Pair<>(((StateSystemEntry) parent).fSs, list);
+                return ((StateSystemEntry) parent).getStateSystem();
             }
         }
         return null;
