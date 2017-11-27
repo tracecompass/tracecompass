@@ -235,38 +235,20 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         }
     }
 
-    /**
-     * Method called when the trace is opened
-     * <p>
-     * renamed so that it does not override
-     * {@link AbstractTmfTreeViewer#traceOpened(TmfTraceOpenedSignal)}
-     * <p>
-     * final - do not call
-     *
-     * @param signal
-     *            unused
-     */
+    @Override
     @TmfSignalHandler
-    public final void traceOpenedIntern(@Nullable TmfTraceOpenedSignal signal) {
+    public void traceOpened(TmfTraceOpenedSignal signal) {
         saveViewContext();
+        super.traceOpened(signal);
     }
 
-    /**
-     * Method called when the trace is selected
-     * <p>
-     * renamed so that it does not override
-     * {@link AbstractTmfTreeViewer#traceSelected(TmfTraceSelectedSignal)}
-     * <p>
-     * final - do not call
-     *
-     * @param signal
-     *            unused
-     */
+    @Override
     @TmfSignalHandler
-    public final void traceSelectedIntern(@Nullable TmfTraceSelectedSignal signal) {
+    public void traceSelected(TmfTraceSelectedSignal signal) {
         if (signal != null && getTrace() != signal.getTrace()) {
             saveViewContext();
         }
+        super.traceSelected(signal);
     }
 
     @Override
@@ -339,7 +321,6 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     }
 
     private void updateTree(long start, long end, List<@NonNull TmfTreeDataModel> model) {
-        saveViewContext();
         final ITmfTreeViewerEntry rootEntry = modelToTree(start, end, model);
         /* Set the input in main thread only if it didn't change */
         if (rootEntry != null) {
