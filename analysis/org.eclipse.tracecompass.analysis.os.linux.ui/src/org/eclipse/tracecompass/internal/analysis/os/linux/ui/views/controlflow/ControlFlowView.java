@@ -73,6 +73,7 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModul
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
@@ -590,11 +591,14 @@ public class ControlFlowView extends AbstractTimeGraphView {
     @Override
     public void traceClosed(TmfTraceClosedSignal signal) {
         super.traceClosed(signal);
+        ITmfTrace parentTrace = signal.getTrace();
         synchronized (fFlatTraces) {
-            fFlatTraces.remove(signal.getTrace());
+            fFlatTraces.remove(parentTrace);
         }
         synchronized (fEntryCache) {
-            fEntryCache.remove(signal.getTrace());
+            for (ITmfTrace trace : TmfTraceManager.getTraceSet(parentTrace)) {
+                fEntryCache.remove(trace);
+            }
         }
     }
 
