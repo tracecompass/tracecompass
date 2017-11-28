@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlDataProviderManager;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -46,6 +47,7 @@ public class Activator extends Plugin {
     @Override
     public void stop(BundleContext context) throws Exception {
         setDefault(null);
+        XmlDataProviderManager.dispose();
         super.stop(context);
     }
 

@@ -19,6 +19,9 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.w3c.dom.Element;
@@ -51,6 +54,27 @@ public class XmlDataProviderManager {
             INSTANCE = new XmlDataProviderManager();
         }
         return INSTANCE;
+    }
+
+    /**
+     * Dispose the singleton instance if it exists
+     *
+     * @since 3.2
+     */
+    public static synchronized void dispose() {
+        XmlDataProviderManager manager = INSTANCE;
+        if (manager != null) {
+            TmfSignalManager.deregister(manager);
+            manager.fXyProviders.clear();
+        }
+        INSTANCE = null;
+    }
+
+    /**
+     * Private constructor.
+     */
+    private XmlDataProviderManager() {
+        TmfSignalManager.register(this);
     }
 
     /**
@@ -102,5 +126,16 @@ public class XmlDataProviderManager {
             return providers.get(0);
         }
         return new TmfTreeXYCompositeDataProvider<>(providers, XmlXYDataProvider.ID, XmlXYDataProvider.ID);
+    }
+
+    /**
+     * Signal handler for the traceClosed signal.
+     *
+     * @param signal
+     *            The incoming signal
+     */
+    @TmfSignalHandler
+    public synchronized void traceClosed(final TmfTraceClosedSignal signal) {
+        fXyProviders.row(signal.getTrace()).clear();
     }
 }
