@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2016 École Polytechnique de Montréal and others.
+ * Copyright (c) 2014, 2017 École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -156,12 +156,12 @@ public class TmfStateSystemViewer extends AbstractTmfTreeViewer {
     // ------------------------------------------------------------------------
 
     @Override
-    protected ITmfTreeViewerEntry updateElements(long start, long end, boolean selection) {
+    protected ITmfTreeViewerEntry updateElements(ITmfTrace trace, long start, long end, boolean selection) {
 
         if (selection) {
             fSelection = start;
         } else {
-            TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+            TmfTraceContext ctx = TmfTraceManager.getInstance().getTraceContext(trace);
             fSelection = ctx.getSelectionRange().getStartTime().toNanos();
         }
 

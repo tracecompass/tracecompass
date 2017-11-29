@@ -120,12 +120,18 @@ public class DataProviderManager {
                 return dataProviderClass.cast(dataProvider);
             }
         }
-        IDataProviderFactory providerFactory = fDataProviderFactories.get(id);
-        if (providerFactory != null) {
-            ITmfTreeDataProvider<? extends ITmfTreeDataModel> dataProvider = providerFactory.createProvider(trace);
-            if (dataProvider != null && id.equals(dataProvider.getId()) && dataProviderClass.isAssignableFrom(dataProvider.getClass())) {
-                fInstances.put(trace, dataProvider);
-                return dataProviderClass.cast(dataProvider);
+        for (ITmfTrace opened : TmfTraceManager.getInstance().getOpenedTraces()) {
+            if (TmfTraceManager.getTraceSetWithExperiment(opened).contains(trace)) {
+                /* if this trace or an experiment containing this trace is opened */
+                IDataProviderFactory providerFactory = fDataProviderFactories.get(id);
+                if (providerFactory != null) {
+                    ITmfTreeDataProvider<? extends ITmfTreeDataModel> dataProvider = providerFactory.createProvider(trace);
+                    if (dataProvider != null && id.equals(dataProvider.getId()) && dataProviderClass.isAssignableFrom(dataProvider.getClass())) {
+                        fInstances.put(trace, dataProvider);
+                        return dataProviderClass.cast(dataProvider);
+                    }
+                }
+                return null;
             }
         }
         return null;

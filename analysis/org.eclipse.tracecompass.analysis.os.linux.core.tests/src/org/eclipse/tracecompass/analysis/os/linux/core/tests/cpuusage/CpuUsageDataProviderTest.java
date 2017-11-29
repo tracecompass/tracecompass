@@ -37,7 +37,6 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.Time
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse.Status;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
-import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -107,7 +106,7 @@ public class CpuUsageDataProviderTest {
         assertNotNull(module);
         module.schedule();
         module.waitForCompletion();
-        fDataProvider = DataProviderManager.getInstance().getDataProvider(trace, CpuUsageDataProvider.ID, CpuUsageDataProvider.class);
+        fDataProvider = CpuUsageDataProvider.create(trace);
         assertNotNull(fDataProvider);
         fTrace = trace;
     }

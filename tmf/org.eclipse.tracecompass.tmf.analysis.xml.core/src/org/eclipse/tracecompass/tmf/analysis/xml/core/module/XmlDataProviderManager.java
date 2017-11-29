@@ -96,20 +96,25 @@ public class XmlDataProviderManager {
         if (provider != null) {
             return provider;
         }
-        Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
-        if (traces.size() == 1) {
-            Set<@NonNull String> analysisIds = TmfXmlUtils.getViewAnalysisIds(viewElement);
-            Element entry = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.ENTRY_ELEMENT).get(0);
+        for (ITmfTrace opened : TmfTraceManager.getInstance().getOpenedTraces()) {
+            if (TmfTraceManager.getTraceSetWithExperiment(opened).contains(trace)) {
+                /* if this trace or an experiment containing this trace is opened */
+                Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
+                if (traces.size() == 1) {
+                    Set<@NonNull String> analysisIds = TmfXmlUtils.getViewAnalysisIds(viewElement);
+                    Element entry = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.ENTRY_ELEMENT).get(0);
 
-            provider = XmlXYDataProvider.create(trace, analysisIds, entry);
-        } else {
-            provider = generateExperimentProvider(traces, viewElement);
+                    provider = XmlXYDataProvider.create(trace, analysisIds, entry);
+                } else {
+                    provider = generateExperimentProvider(traces, viewElement);
+                }
+                if (provider != null) {
+                    fXyProviders.put(trace, viewId, provider);
+                }
+                return provider;
+            }
         }
-
-        if (provider != null) {
-            fXyProviders.put(trace, viewId, provider);
-        }
-        return provider;
+        return null;
     }
 
     private static ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel> generateExperimentProvider(Collection<ITmfTrace> traces, Element viewElement) {
@@ -136,6 +141,8 @@ public class XmlDataProviderManager {
      */
     @TmfSignalHandler
     public synchronized void traceClosed(final TmfTraceClosedSignal signal) {
-        fXyProviders.row(signal.getTrace()).clear();
+        for (ITmfTrace trace : TmfTraceManager.getTraceSetWithExperiment(signal.getTrace())) {
+            fXyProviders.row(trace).clear();
+        }
     }
 }

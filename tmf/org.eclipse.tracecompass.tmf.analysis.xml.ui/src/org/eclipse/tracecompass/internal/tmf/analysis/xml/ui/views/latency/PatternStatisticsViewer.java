@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentsStatisticsViewer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternLatencyStatisticsAnalysis;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
  * A tree viewer implementation for displaying pattern latency statistics
@@ -54,12 +55,19 @@ public class PatternStatisticsViewer extends AbstractSegmentsStatisticsViewer {
      *            The analysis ID
      */
     public void updateViewer(String analysisId) {
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            return;
+        }
         if (analysisId != null) {
             fAnalysisId = analysisId;
-            initializeDataSource();
+            initializeDataSource(trace);
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
+                    if (!trace.equals(getTrace())) {
+                        return;
+                    }
                     clearContent();
                     updateContent(getWindowStartTime(), getWindowEndTime(), false);
                 }

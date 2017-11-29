@@ -298,23 +298,20 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
     }
 
     @Override
-    public void initializeDataSource() {
-        ITmfTrace trace = getTrace();
-        if (trace != null) {
-            TmfAbstractAnalysisModule module = createStatisticsAnalysiModule();
-            if (module == null) {
-                return;
+    public void initializeDataSource(ITmfTrace trace) {
+        TmfAbstractAnalysisModule module = createStatisticsAnalysiModule();
+        if (module == null) {
+            return;
+        }
+        try {
+            module.setTrace(trace);
+            module.schedule();
+            if (fModule != null) {
+                fModule.dispose();
             }
-            try {
-                module.setTrace(trace);
-                module.schedule();
-                if (fModule != null) {
-                    fModule.dispose();
-                }
-                fModule = module;
-            } catch (TmfAnalysisException e) {
-                Activator.getDefault().logError("Error initializing statistics analysis module", e); //$NON-NLS-1$
-            }
+            fModule = module;
+        } catch (TmfAnalysisException e) {
+            Activator.getDefault().logError("Error initializing statistics analysis module", e); //$NON-NLS-1$
         }
     }
 
@@ -404,11 +401,11 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
     }
 
     @Override
-    protected @Nullable ITmfTreeViewerEntry updateElements(long start, long end, boolean isSelection) {
+    protected @Nullable ITmfTreeViewerEntry updateElements(ITmfTrace trace, long start, long end, boolean isSelection) {
 
         TmfAbstractAnalysisModule analysisModule = getStatisticsAnalysisModule();
 
-        if (getTrace() == null || !(analysisModule instanceof AbstractSegmentStatisticsAnalysis)) {
+        if (!(analysisModule instanceof AbstractSegmentStatisticsAnalysis) || !trace.equals(analysisModule.getTrace())) {
             return null;
         }
 

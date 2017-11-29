@@ -64,7 +64,7 @@ public class TmfTreeXYCompositeDataProvider<M extends ITmfTreeDataModel, P exten
     }
 
     /**
-     * Return an {@link ITmfTreeXYDataProvider} from a list of trace.
+     * Return a composite {@link ITmfTreeXYDataProvider} from a list of traces.
      *
      * @param traces
      *            A list of traces from which to generate a provider.
