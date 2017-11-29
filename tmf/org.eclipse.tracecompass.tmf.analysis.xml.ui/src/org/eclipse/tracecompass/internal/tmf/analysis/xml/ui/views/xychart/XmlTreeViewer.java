@@ -70,10 +70,9 @@ public class XmlTreeViewer extends AbstractSelectTreeViewer {
     }
 
     @Override
-    protected @Nullable ITmfTreeDataProvider<TmfTreeDataModel> getProvider() {
-        ITmfTrace trace = getTrace();
+    protected @Nullable ITmfTreeDataProvider<TmfTreeDataModel> getProvider(ITmfTrace trace) {
         Element viewElement = fViewInfo.getViewElement(TmfXmlStrings.XY_VIEW);
-        if (trace == null || viewElement == null) {
+        if (viewElement == null) {
             return null;
         }
         return XmlDataProviderManager.getInstance().getXyProvider(trace, viewElement);

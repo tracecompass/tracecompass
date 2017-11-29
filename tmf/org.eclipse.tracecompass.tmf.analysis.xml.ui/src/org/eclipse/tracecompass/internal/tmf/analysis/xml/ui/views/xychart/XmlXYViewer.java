@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2016 École Polytechnique de Montréal and others.
+ * Copyright (c) 2014, 2017 École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,8 +14,7 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.xychart;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlDataProviderManager;
@@ -53,14 +52,12 @@ public class XmlXYViewer extends TmfFilteredXYChartViewer {
     }
 
     @Override
-    protected void initializeDataProvider() {
-        ITmfTrace trace = getTrace();
+    protected @Nullable ITmfXYDataProvider initializeDataProvider(ITmfTrace trace) {
         Element viewElement = fViewInfo.getViewElement(TmfXmlStrings.XY_VIEW);
-        if (trace == null || viewElement == null) {
-            return;
+        if (viewElement == null) {
+            return null;
         }
-        ITmfTreeXYDataProvider<TmfTreeDataModel> provider = XmlDataProviderManager.getInstance().getXyProvider(trace, viewElement);
-        setDataProvider(provider);
+        return XmlDataProviderManager.getInstance().getXyProvider(trace, viewElement);
     }
 
     /**
@@ -68,6 +65,10 @@ public class XmlXYViewer extends TmfFilteredXYChartViewer {
      * be reinitialized
      */
     public void viewInfoUpdated() {
-        initializeDataProvider();
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            return;
+        }
+        initializeDataProvider(trace);
     }
 }

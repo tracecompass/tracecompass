@@ -88,8 +88,6 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
     /** Used for testing **/
     private int fOverrideNbPoints = 0;
 
-    private final ITmfXYDataProvider[] fXYDataProvider = new ITmfXYDataProvider[1];
-
     /**
      * Constructor
      *
@@ -138,8 +136,12 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
 
     /**
      * Initialize the data provider of this viewer
+     *
+     * @param trace
+     *            The trace
+     * @return the data provider
      */
-    protected abstract void initializeDataProvider();
+    protected abstract ITmfXYDataProvider initializeDataProvider(@NonNull ITmfTrace trace);
 
     /**
      * Gets the presentation provider
@@ -148,16 +150,6 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      */
     protected IXYPresentationProvider getPresentationProvider() {
         return Objects.requireNonNull(fXYPresentationProvider.get(getTrace()));
-    }
-
-    /**
-     * Set the data provider
-     *
-     * @param dataProvider
-     *            A data provider used for fetching a XY Model
-     */
-    protected void setDataProvider(ITmfXYDataProvider dataProvider) {
-        fXYDataProvider[0]  = dataProvider;
     }
 
     /**
@@ -205,6 +197,10 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
 
     @Override
     protected void updateContent() {
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            return;
+        }
         cancelUpdate();
         try (FlowScopeLog parentScope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:ContentUpdateRequested").setCategory(getViewerId()).build()) { //$NON-NLS-1$
             /*
@@ -213,8 +209,11 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
              */
             fDirty.incrementAndGet();
             getDisplay().asyncExec(() -> {
+                if (!trace.equals(getTrace())) {
+                    return;
+                }
                 try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:CreatingUpdateThread").setParentScope(parentScope).build()) { //$NON-NLS-1$
-                    newUpdateThread(scope);
+                    newUpdateThread(trace, scope);
                 }
             });
         }
@@ -232,12 +231,14 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
 
     private class UpdateThread extends Thread {
 
+        private final ITmfTrace fTrace;
         private final IProgressMonitor fMonitor;
         private final int fNumRequests;
         private final @NonNull FlowScopeLog fScope;
 
-        public UpdateThread(int numRequests, @NonNull FlowScopeLog log) {
+        public UpdateThread(ITmfTrace trace, int numRequests, @NonNull FlowScopeLog log) {
             super("Line chart update"); //$NON-NLS-1$
+            fTrace = trace;
             fNumRequests = numRequests;
             fMonitor = new NullProgressMonitor();
             fScope = log;
@@ -246,12 +247,17 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
         @Override
         public void run() {
             try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:UpdateThread", "numRequests=", fNumRequests).setParentScope(fScope).build()) { //$NON-NLS-1$ //$NON-NLS-2$
+                ITmfXYDataProvider dataProvider = null;
                 try (FlowScopeLog scopeDp = new FlowScopeLogBuilder(LOGGER, Level.FINE, "CommonXLineChart:InitializeDataProvider").setParentScope(fScope).build()) { //$NON-NLS-1$
-                    initializeDataProvider();
+                    dataProvider = initializeDataProvider(fTrace);
+                }
+                if (dataProvider == null) {
+                    TraceCompassLogUtils.traceInstant(LOGGER, Level.WARNING, "Data provider for this viewer is not available"); //$NON-NLS-1$
+                    return;
                 }
                 try {
                     TimeQueryFilter filter = createQueryFilter(getWindowStartTime(), getWindowEndTime(), fNumRequests);
-                    updateData(filter, fMonitor);
+                    updateData(dataProvider, filter, fMonitor);
                 } finally {
                     /*
                      * fDirty should have been incremented before creating the thread, so we
@@ -275,18 +281,14 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
          * {@link UpdateThread#updateDisplay(ITmfCommonXAxisModel)} when needed for the
          * new values to be displayed.
          *
+         * @param dataProvider
+         *            A data provider
          * @param filters
          *            A query filter
          * @param monitor
          *            A monitor for canceling task
          */
-        private void updateData(@NonNull TimeQueryFilter filters, IProgressMonitor monitor) {
-            ITmfXYDataProvider dataProvider = fXYDataProvider[0];
-            if (dataProvider == null) {
-                TraceCompassLogUtils.traceInstant(LOGGER, Level.WARNING, "Data provider for this viewer is not available"); //$NON-NLS-1$
-                return;
-            }
-
+        private void updateData(@NonNull ITmfXYDataProvider dataProvider, @NonNull TimeQueryFilter filters, IProgressMonitor monitor) {
             boolean isComplete = false;
             do {
                 TmfModelResponse<ITmfCommonXAxisModel> response = dataProvider.fetchXY(filters, monitor);
@@ -333,6 +335,9 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                 Display.getDefault().asyncExec(() -> {
                     final TmfChartTimeStampFormat tmfChartTimeStampFormat = new TmfChartTimeStampFormat(getTimeOffset());
                     try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TmfCommonXAxisChart:UpdateDisplay").setParentScope(scope).build()) { //$NON-NLS-1$
+                        if (!fTrace.equals(getTrace())) {
+                            return;
+                        }
                         if (getSwtChart().isDisposed()) {
                             return;
                         }
@@ -453,12 +458,12 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
         }
     }
 
-    private synchronized void newUpdateThread(@NonNull FlowScopeLog fScope) {
+    private synchronized void newUpdateThread(@NonNull ITmfTrace trace, @NonNull FlowScopeLog fScope) {
         if (getSwtChart().isDisposed()) {
             return;
         }
         int numRequests = fOverrideNbPoints != 0 ? fOverrideNbPoints : (int) Math.min(getWindowEndTime() - getWindowStartTime() + 1, (long) (getSwtChart().getPlotArea().getBounds().width * fResolution));
-        fUpdateThread = new UpdateThread(numRequests, fScope);
+        fUpdateThread = new UpdateThread(trace, numRequests, fScope);
         fUpdateThread.start();
     }
 
@@ -467,7 +472,6 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
     public void traceClosed(@Nullable TmfTraceClosedSignal signal) {
         cancelUpdate();
         super.traceClosed(signal);
-        setDataProvider(null);
         if (signal != null) {
             fXYPresentationProvider.remove(signal.getTrace());
         }

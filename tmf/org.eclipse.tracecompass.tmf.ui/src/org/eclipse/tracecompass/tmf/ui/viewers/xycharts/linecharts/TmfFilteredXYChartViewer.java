@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -118,14 +119,8 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
     }
 
     @Override
-    protected void initializeDataProvider() {
-        ITmfTrace trace = getTrace();
-        if (trace == null) {
-            return;
-        }
-        ITmfTreeXYDataProvider provider = DataProviderManager.getInstance().getDataProvider(trace,
-                fId, ITmfTreeXYDataProvider.class);
-        setDataProvider(provider);
+    protected ITmfXYDataProvider initializeDataProvider(ITmfTrace trace) {
+        return DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeXYDataProvider.class);
     }
 
 }

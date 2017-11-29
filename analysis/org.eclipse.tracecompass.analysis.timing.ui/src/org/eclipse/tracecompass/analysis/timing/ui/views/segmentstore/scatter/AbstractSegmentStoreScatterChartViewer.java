@@ -18,6 +18,7 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreP
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreScatterDataProvider;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter.SegmentStoreScatterGraphTooltipProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
@@ -61,14 +62,12 @@ public abstract class AbstractSegmentStoreScatterChartViewer extends TmfCommonXA
     // ------------------------------------------------------------------------
 
     @Override
-    protected void initializeDataProvider() {
-        ITmfTrace trace = getTrace();
-        if (trace != null) {
-            final ISegmentStoreProvider segmentStoreProvider = getSegmentStoreProvider(trace);
-            if (segmentStoreProvider != null) {
-                setDataProvider(SegmentStoreScatterDataProvider.create(trace, segmentStoreProvider));
-            }
+    protected @Nullable ITmfXYDataProvider initializeDataProvider(ITmfTrace trace) {
+        final ISegmentStoreProvider segmentStoreProvider = getSegmentStoreProvider(trace);
+        if (segmentStoreProvider != null) {
+            return SegmentStoreScatterDataProvider.create(trace, segmentStoreProvider);
         }
+        return null;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -55,9 +55,13 @@ public class PatternScatterGraphViewer extends AbstractSegmentStoreScatterChartV
      *            The analysis ID
      */
     public void updateViewer(String analysisId) {
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            return;
+        }
         if (analysisId != null) {
             fAnalysisId = analysisId;
-            initializeDataProvider();
+            initializeDataProvider(trace);
         }
     }
 }

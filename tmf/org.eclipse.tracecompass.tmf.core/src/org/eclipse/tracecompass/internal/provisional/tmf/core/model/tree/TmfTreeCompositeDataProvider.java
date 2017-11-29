@@ -44,8 +44,8 @@ public class TmfTreeCompositeDataProvider<M extends ITmfTreeDataModel, P extends
      * Constructor
      *
      * @param providers
-     *            A factory that creates a list of data provider. Each data provider
-     *            should be associated to a different trace.
+     *            A list of data providers. Each data provider should be associated
+     *            to a different trace.
      * @param id
      *            the provider's ID
      */

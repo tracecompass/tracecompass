@@ -255,16 +255,19 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     protected void updateContent(long start, long end, boolean isSelection) {
         try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, UPDATE_CONTENT_JOB_NAME)
                 .setCategory("TreeViewer").build()) { //$NON-NLS-1$
-
+            ITmfTrace trace = getTrace();
+            if (trace == null) {
+                return;
+            }
             Job thread = new Job(UPDATE_CONTENT_JOB_NAME) {
                 @Override
                 public IStatus run(IProgressMonitor monitor) {
                     try (FlowScopeLog runScope = new FlowScopeLogBuilder(LOGGER, Level.FINE, UPDATE_CONTENT_JOB_NAME + " run") //$NON-NLS-1$
                             .setParentScope(scope).build()) {
 
-                        ITmfTreeDataProvider<@NonNull TmfTreeDataModel> provider = getProvider();
+                        ITmfTreeDataProvider<@NonNull TmfTreeDataModel> provider = getProvider(trace);
                         if (provider == null) {
-                            Activator.getDefault().logInfo("Trace: " + getTrace().getName() + " does not have a data provider for ID: " + fId); //$NON-NLS-1$ //$NON-NLS-2$
+                            Activator.getDefault().logInfo("Trace: " + trace.getName() + " does not have a data provider for ID: " + fId); //$NON-NLS-1$ //$NON-NLS-2$
                             return Status.OK_STATUS;
                         }
 
@@ -282,7 +285,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
                                 response = provider.fetchTree(filter, monitor);
                                 List<@NonNull TmfTreeDataModel> model = response.getModel();
                                 if (model != null) {
-                                    updateTree(start, end, model);
+                                    updateTree(trace, start, end, model);
                                 }
                             }
 
@@ -320,11 +323,14 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         }
     }
 
-    private void updateTree(long start, long end, List<@NonNull TmfTreeDataModel> model) {
+    private void updateTree(ITmfTrace trace, long start, long end, List<@NonNull TmfTreeDataModel> model) {
         final ITmfTreeViewerEntry rootEntry = modelToTree(start, end, model);
         /* Set the input in main thread only if it didn't change */
         if (rootEntry != null) {
             Display.getDefault().asyncExec(() -> {
+                if (!trace.equals(getTrace())) {
+                    return;
+                }
                 TreeViewer treeViewer = getTreeViewer();
                 if (treeViewer.getControl().isDisposed()) {
                     return;
@@ -387,28 +393,23 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     }
 
     @Override
-    protected ITmfTreeViewerEntry updateElements(long start, long end, boolean isSelection) {
+    protected ITmfTreeViewerEntry updateElements(ITmfTrace trace, long start, long end, boolean isSelection) {
         throw new UnsupportedOperationException("This method should not be called for AbstractSelectTreeViewers"); //$NON-NLS-1$
     }
 
     /**
      * Getter for the {@link ITmfTreeDataProvider} to query for this TreeViewer
      *
+     * @trace the trace
      * @return the relevant provider, if any
      */
-    protected ITmfTreeDataProvider<@NonNull TmfTreeDataModel> getProvider() {
-        ITmfTrace trace = getTrace();
-        if (trace == null) {
-            return null;
-        }
-
+    protected ITmfTreeDataProvider<@NonNull TmfTreeDataModel> getProvider(@NonNull ITmfTrace trace) {
         return DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeDataProvider.class);
     }
 
     @Override
-    protected void initializeDataSource() {
-        super.initializeDataSource();
-        getProvider();
+    protected void initializeDataSource(@NonNull ITmfTrace trace) {
+        getProvider(trace);
     }
 
     /**
