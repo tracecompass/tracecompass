@@ -110,4 +110,11 @@
             id="org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.DisksIODataProvider">
       </dataProviderFactory>
    </extension>
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.dataprovider">
+      <dataProviderFactory
+            class="org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadStatusDataProviderFactory"
+            id="org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadStatusDataProvider">
+      </dataProviderFactory>
+   </extension>
 </plugin>

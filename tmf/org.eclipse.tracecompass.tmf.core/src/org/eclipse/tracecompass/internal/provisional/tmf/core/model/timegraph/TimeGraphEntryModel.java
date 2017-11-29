@@ -18,8 +18,8 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTree
  * @author Simon Delisle
  */
 public class TimeGraphEntryModel extends TmfTreeDataModel implements ITimeGraphEntryModel {
-    private long fStartTime;
-    private long fEndTime;
+    private final long fStartTime;
+    private final long fEndTime;
 
     /**
      * Constructor
@@ -51,31 +51,9 @@ public class TimeGraphEntryModel extends TmfTreeDataModel implements ITimeGraphE
         return fEndTime;
     }
 
-    /**
-     * Update entry start time
-     *
-     * @param start
-     *            new start time
-     */
-    public void updateStartTime(long start) {
-        if (fStartTime == -1) {
-            fStartTime = start;
-        } else {
-            fStartTime = Long.min(start, fStartTime);
-        }
-    }
-
-    /**
-     * Update entry end time
-     *
-     * @param endTime
-     *            New end time
-     */
-    public void updateEndTime(long endTime) {
-        if (fEndTime == -1) {
-            fEndTime = endTime;
-        } else {
-            fEndTime = Long.max(endTime, fEndTime);
-        }
+    @Override
+    public String toString() {
+        return "<name=" + getName() + " id=" + getId() + " parentId=" + getParentId() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                + " start=" + fStartTime + " end=" + fEndTime + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 }

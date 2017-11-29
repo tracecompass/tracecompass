@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -32,6 +33,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+
 import com.google.common.collect.Range;
 
 /**
@@ -41,12 +43,14 @@ import com.google.common.collect.Range;
  */
 public class DynamicFilterDialog extends TitleAreaDialog {
 
+    /** Pattern for CPUS ranges e.g.: 1,1-200,2,3 */
+    private static final Pattern CPU_RANGE = Pattern.compile("^((\\d+(\\-\\d+)?, ?)*(\\d+(\\-\\d+)?))+$"); //$NON-NLS-1$
     private static final @NonNull String INTERNAL_RANGE_SEPARATOR = "-"; //$NON-NLS-1$
     private static final @NonNull String RANGES_DELIMITER = ","; //$NON-NLS-1$
 
     /** The internal ActiveThreadsFilter result */
     private @NonNull ActiveThreadsFilter fInternalActiveThreadsFilter;
-    private @Nullable final ITmfTrace fTrace;
+    private final @Nullable ITmfTrace fTrace;
 
     private Button fActiveThreadEnabledButton;
     private Button fAllActiveThreadsRadionButton;
@@ -79,8 +83,7 @@ public class DynamicFilterDialog extends TitleAreaDialog {
     }
 
     private static boolean validateCpuRange(final String newString) {
-        /* Pattern for CPUS ranges e.g.: 1,1-200,2,3 */
-        return Pattern.matches("^((\\d+(\\-\\d+)?, ?)*(\\d+(\\-\\d+)?))+$", newString); //$NON-NLS-1$
+        return CPU_RANGE.matcher(newString).matches();
     }
 
     private void createActiveThreadSection(Composite parent) {

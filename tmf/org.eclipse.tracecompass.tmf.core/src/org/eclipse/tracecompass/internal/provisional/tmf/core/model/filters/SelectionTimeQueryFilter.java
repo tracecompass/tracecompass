@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
@@ -38,6 +39,19 @@ public class SelectionTimeQueryFilter extends TimeQueryFilter
      */
     public SelectionTimeQueryFilter(long start, long end, int n, Collection<Long> items) {
         super(start, end, n);
+        fItems = ImmutableList.copyOf(items);
+    }
+
+    /**
+     * Create a {@link SelectionTimeQueryFilter} from a sorted list of times.
+     *
+     * @param times
+     *            sorted list of times to query.
+     * @param items
+     *            The unique keys of the selected entries.
+     */
+    public SelectionTimeQueryFilter(List<Long> times, Collection<Long> items) {
+        super(times);
         fItems = ImmutableList.copyOf(items);
     }
 

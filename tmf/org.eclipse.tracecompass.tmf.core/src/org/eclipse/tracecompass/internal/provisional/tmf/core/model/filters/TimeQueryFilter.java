@@ -9,6 +9,11 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;
 
+import java.util.List;
+
+import com.google.common.collect.Ordering;
+import com.google.common.primitives.Longs;
+
 /**
  * This represents a time query filter used by data providers. It encapsulates
  * an array of times used for requesting data. It's the responsibility of
@@ -37,6 +42,19 @@ public class TimeQueryFilter {
      **/
     public TimeQueryFilter(long start, long end, int n) {
         fTimesRequested = splitRangeIntoEqualParts(start, end, n);
+    }
+
+    /**
+     * Create a {@link TimeQueryFilter} from a sorted list of times.
+     *
+     * @param times
+     *            sorted list of times to query.
+     */
+    public TimeQueryFilter(List<Long> times) {
+        if (!Ordering.natural().isOrdered(times)) {
+            throw new IllegalArgumentException("List of times is not sorted"); //$NON-NLS-1$
+        }
+        fTimesRequested = Longs.toArray(times);
     }
 
     /**
@@ -70,10 +88,9 @@ public class TimeQueryFilter {
      * Given a start and end value, this method will create an array of n entries
      * uniformly distributed. First entry of resulting array is start and last entry
      * is end. Example : start = 1, end = 15, n = 5, resulting array will be : [1,
-     * 5, 8, 12, 15].
-     * <br/>
-     * If n is equal to 1, this method will return an array of size 1 ONLY if start and
-     * end are equal. Otherwise, an IllegalArgumentException will be thrown.
+     * 5, 8, 12, 15]. <br/>
+     * If n is equal to 1, this method will return an array of size 1 ONLY if start
+     * and end are equal. Otherwise, an IllegalArgumentException will be thrown.
      *
      * @param start
      *            The starting value

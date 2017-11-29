@@ -12,30 +12,38 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow;
 
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
-import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
-import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
-import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadEntryModel;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadStatusDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ITimeGraphEntryActiveProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
+
 /**
  * Provides Functionality for check Active / uncheck inactive
  *
  * @noinstantiate This class is not intended to be instantiated by clients.
- * @noextend This class is not intended to be subclassed by clients.
  * @since 1.0
  */
-public class ControlFlowCheckActiveProvider implements ITimeGraphEntryActiveProvider {
+public final class ControlFlowCheckActiveProvider implements ITimeGraphEntryActiveProvider {
 
     String fLabel;
     String fTooltip;
+    private TmfTimeRange fRange = null;
+    private ThreadStatusDataProvider fProvider = null;
+    private @NonNull Set<Long> fActive = Collections.emptySet();
 
     /**
      * @param label
@@ -65,64 +73,36 @@ public class ControlFlowCheckActiveProvider implements ITimeGraphEntryActiveProv
 
             TmfTraceManager traceManager = TmfTraceManager.getInstance();
             TmfTraceContext traceContext = traceManager.getCurrentTraceContext();
-            TmfTimeRange winRange = traceContext.getWindowRange();
-            TmfTimeRange selRange = traceContext.getSelectionRange();
+            TmfTimeRange range = traceContext.getSelectionRange();
 
             /* Take precedence of selection over window range. */
-            long beginTS = selRange.getStartTime().getValue();
-            long endTS = selRange.getEndTime().getValue();
-
-            /* No selection, take window range */
-            if (beginTS == endTS) {
-                beginTS = winRange.getStartTime().getValue();
-                endTS = winRange.getEndTime().getValue();
+            if (Objects.equals(range.getStartTime(), range.getEndTime())) {
+                range = traceContext.getWindowRange();
             }
 
-            ITmfTrace trace = cfe.getTrace();
-            ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
-            if (ssq != null) {
-                beginTS = Math.max(beginTS, ssq.getStartTime());
-                endTS = Math.min(endTS, ssq.getCurrentEndTime());
-                if (beginTS > endTS) {
-                    return false;
-                }
-                try {
-                    int statusQuark = cfe.getThreadQuark();
-
-                    /* Get the initial state at beginTS */
-                    ITmfStateInterval currentInterval = ssq.querySingleState(beginTS, statusQuark);
-                    if (isIntervalInStateActive(currentInterval)) {
-                        return true;
-                    }
-
-                    /* Get the following state changes */
-                    long ts = currentInterval.getEndTime();
-                    while (ts != -1 && ts < endTS) {
-                        ts++; /* To "jump over" to the next state in the history */
-                        currentInterval = ssq.querySingleState(ts, statusQuark);
-                        if (isIntervalInStateActive(currentInterval)) {
-                            return true;
-                        }
-                        ts = currentInterval.getEndTime();
-                    }
-                } catch (StateSystemDisposedException e) {
-                    /* Ignore ... */
-                }
-            }
+            Set<Long> ids = getActiveIds(cfe, range);
+            return ids.contains(cfe.getModel().getId());
         }
 
         return false;
     }
 
-    private static boolean isIntervalInStateActive (ITmfStateInterval ival) {
-        ProcessStatus value = ProcessStatus.getStatusFromStateValue(ival.getStateValue());
-        /* An entry is only active when running */
-        if (value == ProcessStatus.RUN || value == ProcessStatus.RUN_SYTEMCALL ||
-                value == ProcessStatus.INTERRUPTED) {
-            return true;
+    private Set<Long> getActiveIds(ControlFlowEntry cfe, TmfTimeRange range) {
+        ThreadStatusDataProvider dataProvider = ControlFlowView.getProvider(cfe);
+        if (range.equals(fRange) && dataProvider.equals(fProvider)) {
+            return fActive;
         }
+        TimeQueryFilter filter = new TimeQueryFilter(range.getStartTime().toNanos(), range.getEndTime().toNanos(), 2);
+        TmfModelResponse<List<ThreadEntryModel>> response = dataProvider.fetchTree(filter, null);
+        List<ThreadEntryModel> model = response.getModel();
+        if (model == null) {
+            // query must have failed, return empty and don't invalidate the cache.
+            return Collections.emptySet();
+        }
+        fRange = range;
+        fActive = Sets.newHashSet(Iterables.transform(model, thread -> thread.getId()));
+        return fActive;
 
-        return false;
     }
 
 }

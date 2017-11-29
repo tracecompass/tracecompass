@@ -24,6 +24,8 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphEntryModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.TimeGraphEntryModel;
 
 /**
  * An entry for use in the time graph views
@@ -86,14 +88,12 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     /** List of child entries */
     private final List<@NonNull TimeGraphEntry> fChildren = new CopyOnWriteArrayList<>();
 
-    /** Name of this entry (text to show) */
-    private String fName;
-    private long fStartTime = SWT.DEFAULT;
-    private long fEndTime = SWT.DEFAULT;
     private @NonNull List<ITimeEvent> fEventList = new ArrayList<>();
     private @NonNull List<ITimeEvent> fZoomedEventList = new ArrayList<>();
     private Comparator<ITimeGraphEntry> fComparator;
     private Sampling fSampling;
+
+    private TimeGraphEntryModel fModel;
 
     /**
      * Constructor
@@ -106,9 +106,18 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      *            The end time of this entry
      */
     public TimeGraphEntry(String name, long startTime, long endTime) {
-        fName = name;
-        fStartTime = startTime;
-        fEndTime = endTime;
+        fModel = new TimeGraphEntryModel(-1, -1, name, startTime, endTime);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param model
+     *            Time graph model
+     * @since 3.3
+     */
+    public TimeGraphEntry(TimeGraphEntryModel model) {
+        fModel = model;
     }
 
     // ---------------------------------------------
@@ -154,7 +163,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
 
     @Override
     public String getName() {
-        return fName;
+        return fModel.getName();
     }
 
     /**
@@ -164,17 +173,21 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      *            the updated entry name
      */
     public void setName(String name) {
-        fName = name;
+        /*
+         * Model is immutable, this is the only way to do this, consider not updating
+         * name in the future?
+         */
+        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), name, getStartTime(), getEndTime());
     }
 
     @Override
     public long getStartTime() {
-        return fStartTime;
+        return fModel.getStartTime();
     }
 
     @Override
     public long getEndTime() {
-        return fEndTime;
+        return fModel.getEndTime();
     }
 
     /**
@@ -184,7 +197,11 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      *            the end time
      */
     public void updateEndTime(long endTime) {
-        fEndTime = Math.max(endTime, fEndTime);
+        /*
+         * Model is immutable, this is the only way to do this, consider not updating
+         * end time in the future?
+         */
+        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), fModel.getName(), fModel.getStartTime(), Long.max(getEndTime(), endTime));
     }
 
     @Override
@@ -291,13 +308,16 @@ public class TimeGraphEntry implements ITimeGraphEntry {
             return;
         }
         long start = event.getTime();
-        if (fStartTime == SWT.DEFAULT || start < fStartTime) {
-            fStartTime = start;
-        }
+        long newStart = fModel.getStartTime() == SWT.DEFAULT ? start : Long.min(start, fModel.getStartTime());
+
         long end = start + event.getDuration();
-        if (fEndTime == SWT.DEFAULT || end > fEndTime) {
-            fEndTime = end;
-        }
+        long newEnd = fModel.getEndTime() == SWT.DEFAULT ? end : Long.max(end, fModel.getEndTime());
+
+        /*
+         * Model is immutable, this is the only way to do this, consider not updating
+         * bounds in the future?
+         */
+        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), getName(), newStart, newEnd);
     }
 
     /**
@@ -385,7 +405,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '(' + fName + ')';
+        return getClass().getSimpleName() + '(' + fModel.getName() + ')';
     }
 
     /**
@@ -394,7 +414,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
     @Override
     public boolean matches(@NonNull Pattern pattern) {
         // Default implementation
-        return pattern.matcher(fName).find();
+        return pattern.matcher(fModel.getName()).find();
     }
 
     /**
@@ -417,6 +437,16 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      */
     public void setSampling(Sampling sampling) {
         fSampling = sampling;
+    }
+
+    /**
+     * Getter for the underlying time graph entry model
+     *
+     * @return The underlying time graph entry model
+     * @since 3.3
+     */
+    public ITimeGraphEntryModel getModel() {
+        return fModel;
     }
 
 }

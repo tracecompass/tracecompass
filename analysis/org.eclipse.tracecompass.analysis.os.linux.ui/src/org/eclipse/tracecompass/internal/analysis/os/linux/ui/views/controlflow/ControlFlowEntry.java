@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow
 import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadEntryModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
@@ -28,9 +29,6 @@ import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 public class ControlFlowEntry extends TimeGraphEntry {
 
     private final @NonNull ITmfTrace fTrace;
-    private final int fThreadId;
-    private int fParentThreadId;
-    private final int fThreadQuark;
 
     /**
      * This column is for keeping the order we found with the scheduling algorithm.
@@ -57,11 +55,20 @@ public class ControlFlowEntry extends TimeGraphEntry {
      *            The end time of this process
      */
     public ControlFlowEntry(int quark, @NonNull ITmfTrace trace, String execName, int threadId, int parentThreadId, long startTime, long endTime) {
-        super(execName, startTime, endTime);
+        this(new ThreadEntryModel(quark, -1, execName, startTime, endTime, threadId, parentThreadId), trace);
+    }
+
+    /**
+     * Constructor, build a {@link ControlFlowEntry} from it's model
+     *
+     * @param model
+     *            the {@link ThreadEntryModel} to compose this entry
+     * @param trace
+     *            The trace on which we are working
+     */
+    public ControlFlowEntry(ThreadEntryModel model, @NonNull ITmfTrace trace) {
+        super(model);
         fTrace = trace;
-        fThreadId = threadId;
-        fParentThreadId = parentThreadId;
-        fThreadQuark = quark;
         fSchedulingPosition = Long.MAX_VALUE;
     }
 
@@ -71,7 +78,7 @@ public class ControlFlowEntry extends TimeGraphEntry {
      * @return The TID
      */
     public int getThreadId() {
-        return fThreadId;
+        return ((ThreadEntryModel) getModel()).getThreadId();
     }
 
     /**
@@ -89,27 +96,7 @@ public class ControlFlowEntry extends TimeGraphEntry {
      * @return The "PTID"
      */
     public int getParentThreadId() {
-        return fParentThreadId;
-    }
-
-    /**
-     * Set this thread's parent TID
-     *
-     * @param ptid
-     *            The "PTID"
-     * @since 1.1
-     */
-    public void setParentThreadId(int ptid) {
-        fParentThreadId = ptid;
-    }
-
-    /**
-     * Get the quark of the attribute matching this thread's TID
-     *
-     * @return The quark
-     */
-    public int getThreadQuark() {
-        return fThreadQuark;
+        return ((ThreadEntryModel) getModel()).getParentThreadId();
     }
 
     @Override
@@ -117,13 +104,10 @@ public class ControlFlowEntry extends TimeGraphEntry {
         if (pattern.matcher(getName()).find()) {
             return true;
         }
-        if (pattern.matcher(Integer.toString(fThreadId)).find()) {
+        if (pattern.matcher(Integer.toString(getThreadId())).find()) {
             return true;
         }
-        if (pattern.matcher(Integer.toString(fParentThreadId)).find()) {
-            return true;
-        }
-        if (pattern.matcher(Integer.toString(fThreadQuark)).find()) {
+        if (pattern.matcher(Integer.toString(getParentThreadId())).find()) {
             return true;
         }
         return (pattern.matcher(FormatTimeUtils.formatTime(getStartTime(), TimeFormat.CALENDAR, Resolution.NANOSEC)).find());
@@ -131,7 +115,7 @@ public class ControlFlowEntry extends TimeGraphEntry {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '(' + getName() + '[' + fThreadId + "])"; //$NON-NLS-1$
+        return getClass().getSimpleName() + '(' + getName() + '[' + getThreadId() + "])"; //$NON-NLS-1$
     }
 
     /**
