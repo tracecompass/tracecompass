@@ -371,6 +371,7 @@ public final class SWTBotUtils {
             public void run() {
                 try {
                     PlatformUI.getWorkbench().showPerspective(id, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().resetPerspective();
                 } catch (WorkbenchException e) {
                     fail(e.getMessage());
                 }
