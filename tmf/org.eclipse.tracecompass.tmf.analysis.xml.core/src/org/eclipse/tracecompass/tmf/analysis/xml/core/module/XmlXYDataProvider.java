@@ -244,8 +244,10 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
                     List<@NonNull ITmfStateInterval> full = ss.queryFullState(time);
                     for (Entry<Integer, double[]> series : map.entrySet()) {
                         int attributeQuark = display.getAttributeQuark(series.getKey(), null);
-                        Object value = full.get(attributeQuark).getValue();
-                        setYValue(i, series.getValue(), extractValue(value), entry.getType());
+                        if (attributeQuark >= 0 && attributeQuark < full.size()) {
+                            Object value = full.get(attributeQuark).getValue();
+                            setYValue(i, series.getValue(), extractValue(value), entry.getType());
+                        }
                     }
                 }
             }
