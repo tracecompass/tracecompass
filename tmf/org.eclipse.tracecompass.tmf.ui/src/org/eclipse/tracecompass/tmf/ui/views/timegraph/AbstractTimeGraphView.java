@@ -1683,7 +1683,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     protected void refresh() {
         try (FlowScopeLog parentLogger = new FlowScopeLogBuilder(LOGGER, Level.FINE, "RefreshRequested").setCategory(getViewId()).build()) { //$NON-NLS-1$
-            final boolean zoomThread = Thread.currentThread() instanceof ZoomThread;
+            final boolean isZoomThread = Thread.currentThread() instanceof ZoomThread;
             TmfUiRefreshHandler.getInstance().queueUpdate(this, new Runnable() {
                 @Override
                 public void run() {
@@ -1746,7 +1746,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                                 synchingToTime(selectionBeginTime);
                             }
 
-                            if (!zoomThread) {
+                            ZoomThread zoomThread = fZoomThread;
+                            if (!isZoomThread ||
+                                    (zoomThread != null && (zoomThread.getZoomStartTime() != startTime || zoomThread.getZoomEndTime() != endTime))) {
                                 startZoomThread(startTime, endTime);
                             }
                         } finally {
