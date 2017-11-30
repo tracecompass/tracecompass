@@ -38,7 +38,20 @@ public enum CtfBenchmarkTrace {
      * Trace length: ~31 s
      * </pre>
      */
-    ALL_OS_ANALYSES("/os-events");
+    ALL_OS_ANALYSES("/os-events"),
+
+    /**
+     * A UST trace of the qmlscene program instrumented with -finstrument-functions.
+     * This trace can be used to benchmark UST cyg-profile analyses
+     *
+     * <pre>
+     * Trace Size: 20 MB
+     * Tracer: lttng-ust 2.8
+     * Event count: 465 662
+     * Trace length: ~10 s
+     * </pre>
+     */
+    UST_QMLSCENE("/qmlscene");
 
     private static final @NonNull String TRACE_PATH = "traces";
     private final String fTraceName;
@@ -52,7 +65,7 @@ public enum CtfBenchmarkTrace {
      *
      * @return The path for this trace
      */
-    public IPath getTraceURL() {
+    public IPath getTracePath() {
         IPath url = CtfCoreTestPlugin.getAbsolutePath(new Path(TRACE_PATH + fTraceName));
         if (url == null) {
             /* Project configuration problem? */
