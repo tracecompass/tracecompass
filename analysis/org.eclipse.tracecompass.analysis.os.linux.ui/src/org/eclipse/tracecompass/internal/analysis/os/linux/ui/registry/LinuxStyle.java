@@ -24,9 +24,9 @@ import com.google.common.collect.ImmutableMap;
 public enum LinuxStyle {
 
     /**
-     * Unknown state for thread or CPU
+     * Unknown state for thread or CPU, often used for lines
      */
-    UNKNOWN(Messages.LinuxStyles_unknown, 100, 100, 100, 255, 0.33f),
+    UNKNOWN(Messages.LinuxStyles_unknown, 100, 100, 100, 255, 0.10f),
 
     /**
      * Wait for an unknown reason

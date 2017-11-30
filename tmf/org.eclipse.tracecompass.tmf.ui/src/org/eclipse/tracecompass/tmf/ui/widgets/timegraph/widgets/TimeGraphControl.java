@@ -2333,10 +2333,18 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
             gc.setForeground(stateColor);
             gc.setBackground(stateColor);
-
+            int old = gc.getLineWidth();
+            Map<String, Object> styleMap = fTimeGraphProvider.getEventStyle(event);
+            float heightFactor = (float) styleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), 0.1f);
+            if (heightFactor > 1.0 || heightFactor < 0) {
+                heightFactor = 0.1f;
+            }
+            heightFactor *= 10;
+            gc.setLineWidth((int) (heightFactor));
             /* Draw the arrow */
-            gc.drawLine(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height);
-            drawArrowHead(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, gc);
+            Point newEndpoint = drawArrowHead(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, heightFactor, gc);
+            gc.drawLine(rect.x, rect.y, newEndpoint.x, newEndpoint.y);
+            gc.setLineWidth(old);
 
         }
         fTimeGraphProvider.postDrawEvent(event, rect, gc);
@@ -2351,8 +2359,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *
      * The algorithm was taken from this site, not the code itself
      */
-    private static void drawArrowHead(int x0, int y0, int x1, int y1, GC gc) {
-        int factor = 10;
+    private static Point drawArrowHead(int x0, int y0, int x1, int y1, float scale, GC gc) {
+        double factor = 10 + 2.0 * scale;
         double cos = 0.9510;
         double sin = 0.3090;
         long lenx = x1 - x0;
@@ -2367,6 +2375,11 @@ public class TimeGraphControl extends TimeGraphBaseControl
         int end2Y = (int) Math.round((y1 - (dx * -sin + dy * cos)));
         int[] arrow = new int[] { x1, y1, end1X, end1Y, end2X, end2Y, x1, y1 };
         gc.fillPolygon(arrow);
+        /*
+         * The returned point corresponds to the point at 1/4 from the head basis basis
+         * to the tip. it will be used as end point the arrow line
+         */
+        return new Point((3 * ((end1X + end2X) / 2) + x1) / 4, (3 * ((end1Y + end2Y) / 2) + y1) / 4);
     }
 
     /**
