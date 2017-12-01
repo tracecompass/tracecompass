@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
@@ -51,6 +52,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfStartAnalysisSignal;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -105,6 +107,20 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
 
         }
         return 0;
+    };
+
+    // Puts the experiment entries at the top of the list
+    private static final Comparator<ITimeGraphEntry> TRACE_ENTRY_COMPARATOR = (a, b) -> {
+        if (a instanceof TraceEntry && b instanceof TraceEntry) {
+            TraceEntry ta = (TraceEntry) a;
+            TraceEntry tb = (TraceEntry) b;
+            if (ta.fEntryTrace instanceof TmfExperiment) {
+                return (tb.fEntryTrace instanceof TmfExperiment) ? a.getName().compareTo(b.getName()) : 1;
+            }
+            return (tb.fEntryTrace instanceof TmfExperiment) ? -1 : a.getName().compareTo(b.getName());
+
+        }
+        return a.getName().compareTo(b.getName());
     };
 
     private static final Comparator<ITimeGraphEntry>[] COLUMN_COMPARATORS;
@@ -181,8 +197,11 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
 
     static class TraceEntry extends TimeGraphEntry {
 
+        private final ITmfTrace fEntryTrace;
+
         public TraceEntry(ITmfTrace trace) {
             super(trace.getName(), trace.getStartTime().toNanos(), trace.getStartTime().toNanos());
+            fEntryTrace = trace;
         }
 
         @Override
@@ -274,7 +293,7 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
         super(ID, new StateSystemPresentationProvider());
         setTreeColumns(COLUMN_NAMES, COLUMN_COMPARATORS, QUARK_COLUMN_INDEX);
         setTreeLabelProvider(new StateSystemTreeLabelProvider());
-        setEntryComparator(Comparator.comparing(ITimeGraphEntry::getName));
+        setEntryComparator(TRACE_ENTRY_COMPARATOR);
         setAutoExpandLevel(DEFAULT_AUTOEXPAND);
     }
 
@@ -615,6 +634,11 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
             fStartedAnalysis.add((ITmfAnalysisModuleWithStateSystems) module);
             rebuild();
         }
+    }
+
+    @Override
+    protected @NonNull Iterable<ITmfTrace> getTracesToBuild(@Nullable ITmfTrace trace) {
+        return TmfTraceManager.getTraceSetWithExperiment(trace);
     }
 
 }
