@@ -29,7 +29,6 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.registry.LinuxStyle;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -181,13 +180,15 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         }
 
         try {
-            int currentCpuRqQuark = ssq.getQuarkRelative(entry.getThreadQuark(), Attributes.CURRENT_CPU_RQ);
-            ITmfStateInterval interval = ssq.querySingleState(hoverTime, currentCpuRqQuark);
-            ITmfStateValue value = interval.getStateValue();
-            if (value.getType() == Type.INTEGER) {
-                retMap.put(Messages.ControlFlowView_attributeCpuName, String.valueOf(value.unboxInt()));
+            int currentCpuRqQuark = ssq.optQuarkRelative(entry.getThreadQuark(), Attributes.CURRENT_CPU_RQ);
+            if (currentCpuRqQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
+                ITmfStateInterval interval = ssq.querySingleState(hoverTime, currentCpuRqQuark);
+                ITmfStateValue value = interval.getStateValue();
+                if (value.getType() == Type.INTEGER) {
+                    retMap.put(Messages.ControlFlowView_attributeCpuName, String.valueOf(value.unboxInt()));
+                }
             }
-        } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException e) {
+        } catch (TimeRangeException | StateValueTypeException e) {
             Activator.getDefault().logError("Error in ControlFlowPresentationProvider", e); //$NON-NLS-1$
         } catch (StateSystemDisposedException e) {
             /* Ignored */
