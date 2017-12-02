@@ -38,6 +38,7 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
@@ -121,9 +122,9 @@ public class CallStackViewTest {
 
     private static final @NonNull String CONFIGURE_SYMBOL_PROVIDERS = "Configure how the addresses are mapped to function names";
     // Separator
-    private static final @NonNull String SORT_BY_NAME = "Sort threads by thread name";
-    private static final @NonNull String SORT_BY_ID = "Sort threads by thread id";
-    private static final @NonNull String SORT_BY_START = "Sort threads by start time";
+    private static final @NonNull String SORT_BY_NAME = "Name";
+    private static final @NonNull String SORT_BY_ID = "PID/TID";
+    private static final @NonNull String SORT_BY_START = "Start time";
     // Separator
     private static final @NonNull String SHOW_VIEW_FILTERS = "Show View Filters";
     // Separator
@@ -144,8 +145,6 @@ public class CallStackViewTest {
 
     private static final List<String> TOOLBAR_BUTTONS_TOOLTIPS = ImmutableList.of(
             CONFIGURE_SYMBOL_PROVIDERS,
-            "",
-            SORT_BY_NAME, SORT_BY_ID, SORT_BY_START,
             "",
             SHOW_VIEW_FILTERS,
             "",
@@ -283,9 +282,10 @@ public class CallStackViewTest {
         goToTime(TIMESTAMPS[0]);
         final SWTBotView viewBot = fBot.viewById(CallStackView.ID);
         viewBot.setFocus();
-        viewBot.toolbarToggleButton(SORT_BY_NAME).click();
-        viewBot.toolbarToggleButton(SORT_BY_ID).click();
-        viewBot.toolbarToggleButton(SORT_BY_START).click();
+        SWTBotTree tree = viewBot.bot().tree();
+        tree.header(SORT_BY_NAME).click();
+        tree.header(SORT_BY_ID).click();
+        tree.header(SORT_BY_START).click();
         viewBot.setFocus();
         WaitUtils.waitForJobs();
         waitForSymbolNames(viewBot, STACK_FRAMES[0]);

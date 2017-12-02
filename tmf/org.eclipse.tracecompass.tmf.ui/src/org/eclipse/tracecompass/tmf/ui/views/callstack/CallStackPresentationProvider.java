@@ -16,6 +16,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphEntryModel;
+import org.eclipse.tracecompass.internal.tmf.core.callstack.provider.CallStackEntryModel;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
@@ -23,6 +25,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NamedTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 
 /**
@@ -89,7 +92,18 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
 
     @Override
     public String getStateTypeName(ITimeGraphEntry entry) {
-        return Messages.CallStackPresentationProvider_Thread;
+        if (entry instanceof TimeGraphEntry) {
+            ITimeGraphEntryModel model = ((TimeGraphEntry) entry).getModel();
+            if (model instanceof CallStackEntryModel) {
+                int type = ((CallStackEntryModel) model).getStackLevel();
+                if (type >= 0) {
+                    return Messages.CallStackPresentationProvider_Thread;
+                } else if (type == -1) {
+                    return Messages.CallStackPresentationProvider_Process;
+                }
+            }
+        }
+        return null;
     }
 
     @Override

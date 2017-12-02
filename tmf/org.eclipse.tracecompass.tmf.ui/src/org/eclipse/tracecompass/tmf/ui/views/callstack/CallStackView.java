@@ -29,14 +29,9 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.GroupMarker;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.events.MouseAdapter;
@@ -108,10 +103,52 @@ public class CallStackView extends AbstractTimeGraphView {
 
     private static final String[] COLUMN_NAMES = new String[] {
             Messages.CallStackView_FunctionColumn,
+            Messages.CallStackView_PidTidColumn,
             Messages.CallStackView_DepthColumn,
             Messages.CallStackView_EntryTimeColumn,
             Messages.CallStackView_ExitTimeColumn,
             Messages.CallStackView_DurationColumn
+    };
+
+    private static final Comparator<ITimeGraphEntry> NAME_COMPARATOR = Comparator.comparing(ITimeGraphEntry::getName);
+
+    private static final Comparator<ITimeGraphEntry> THREAD_ID_COMPARATOR = (o1, o2) -> {
+        if (o1 instanceof TimeGraphEntry && o2 instanceof TimeGraphEntry) {
+            TimeGraphEntry t1 = (TimeGraphEntry) o1;
+            TimeGraphEntry t2 = (TimeGraphEntry) o2;
+            ITimeGraphEntryModel model1 = t1.getModel();
+            ITimeGraphEntryModel model2 = t2.getModel();
+            if (model1 instanceof CallStackEntryModel && model2 instanceof CallStackEntryModel) {
+                CallStackEntryModel m1 = (CallStackEntryModel) model1;
+                CallStackEntryModel m2 = (CallStackEntryModel) model2;
+                if (m1.getStackLevel() == 0 && m2.getStackLevel() == 0) {
+                    return Long.compare(m1.getPid(), m2.getPid());
+                }
+            }
+        }
+        return 0;
+    };
+
+    private static final Comparator<ITimeGraphEntry> DEPTH_COMPARATOR = (o1, o2) -> {
+        if (o1 instanceof TimeGraphEntry && o2 instanceof TimeGraphEntry) {
+            TimeGraphEntry t1 = (TimeGraphEntry) o1;
+            TimeGraphEntry t2 = (TimeGraphEntry) o2;
+            ITimeGraphEntryModel model1 = t1.getModel();
+            ITimeGraphEntryModel model2 = t2.getModel();
+            if (model1 instanceof CallStackEntryModel && model2 instanceof CallStackEntryModel) {
+                return Integer.compare(((CallStackEntryModel) model1).getStackLevel(), ((CallStackEntryModel) model2).getStackLevel());
+            }
+        }
+        return 0;
+    };
+
+    @SuppressWarnings("unchecked")
+    private static final Comparator<ITimeGraphEntry>[] COMPARATORS = new Comparator[] {
+            Comparator.comparing(ITimeGraphEntry::getName),
+            THREAD_ID_COMPARATOR,
+            DEPTH_COMPARATOR,
+            Comparator.comparingLong(ITimeGraphEntry::getStartTime),
+            Comparator.comparingLong(ITimeGraphEntry::getEndTime)
     };
 
     private static final String[] FILTER_COLUMN_NAMES = new String[] {
@@ -126,24 +163,6 @@ public class CallStackView extends AbstractTimeGraphView {
     private static final Image STACKFRAME_IMAGE = Activator.getDefault().getImageFromPath("icons/obj16/stckframe_obj.gif"); //$NON-NLS-1$
 
     private static final String IMPORT_BINARY_ICON_PATH = "icons/obj16/binaries_obj.gif"; //$NON-NLS-1$
-
-    private static final ImageDescriptor SORT_BY_NAME_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_alpha.gif"); //$NON-NLS-1$
-    private static final ImageDescriptor SORT_BY_NAME_REV_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_alpha_rev.gif"); //$NON-NLS-1$
-    private static final ImageDescriptor SORT_BY_ID_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_num.gif"); //$NON-NLS-1$
-    private static final ImageDescriptor SORT_BY_ID_REV_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_num_rev.gif"); //$NON-NLS-1$
-    private static final ImageDescriptor SORT_BY_TIME_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_time.gif"); //$NON-NLS-1$
-    private static final ImageDescriptor SORT_BY_TIME_REV_ICON = Activator.getDefault().getImageDescripterFromPath("icons/etool16/sort_time_rev.gif"); //$NON-NLS-1$
-    private static final String SORT_OPTION_KEY = "sort.option"; //$NON-NLS-1$
-
-    private enum SortOption {
-        BY_NAME, BY_NAME_REV, BY_ID, BY_ID_REV, BY_TIME, BY_TIME_REV
-    }
-
-    private @NonNull SortOption fSortOption = SortOption.BY_NAME;
-    private @NonNull Comparator<ITimeGraphEntry> fThreadComparator = new ThreadNameComparator(false);
-    private Action fSortByNameAction;
-    private Action fSortByIdAction;
-    private Action fSortByTimeAction;
 
     // ------------------------------------------------------------------------
     // Fields
@@ -195,66 +214,20 @@ public class CallStackView extends AbstractTimeGraphView {
     private class CallStackComparator implements Comparator<ITimeGraphEntry> {
         @Override
         public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
-            ITimeGraphEntryModel m1 = ((TimeGraphEntry) o1).getModel();
-            ITimeGraphEntryModel m2 = ((TimeGraphEntry) o2).getModel();
-            if (m1 instanceof CallStackEntryModel && m2 instanceof CallStackEntryModel) {
-                CallStackEntryModel t1 = (CallStackEntryModel) m1;
-                CallStackEntryModel t2 = (CallStackEntryModel) m2;
-                if (t1.getStackLevel() == CallStackEntryModel.THREAD && t2.getStackLevel() == CallStackEntryModel.THREAD) {
-                    return fThreadComparator.compare(o1, o2);
-                } else if (t1.getStackLevel() == CallStackEntryModel.PROCESS && t2.getStackLevel() == CallStackEntryModel.PROCESS) {
-                    return Integer.compare(t1.getPid(), t2.getPid());
+            if (o1 instanceof TimeGraphEntry && o2 instanceof TimeGraphEntry) {
+                TimeGraphEntry t1 = (TimeGraphEntry) o1;
+                TimeGraphEntry t2 = (TimeGraphEntry) o2;
+                ITimeGraphEntryModel model1 = t1.getModel();
+                ITimeGraphEntryModel model2 = t2.getModel();
+                CallStackEntryModel m1 = (CallStackEntryModel) model1;
+                CallStackEntryModel m2 = (CallStackEntryModel) model2;
+                if (m1.getStackLevel() == 0 && m2.getStackLevel() == 0) {
+                    return NAME_COMPARATOR.compare(t1, t2);
+                } else if (m1.getStackLevel() == -1 && m2.getStackLevel() == -1) {
+                    return Integer.compare(m1.getPid(), m2.getPid());
                 }
             }
             return 0;
-        }
-    }
-
-    private static class ThreadNameComparator implements Comparator<ITimeGraphEntry> {
-        private boolean reverse;
-
-        public ThreadNameComparator(boolean reverse) {
-            this.reverse = reverse;
-        }
-
-        @Override
-        public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
-            return reverse ? o2.getName().compareTo(o1.getName()) : o1.getName().compareTo(o2.getName());
-        }
-    }
-
-    private static class ThreadIdComparator implements Comparator<ITimeGraphEntry> {
-        private boolean reverse;
-
-        public ThreadIdComparator(boolean reverse) {
-            this.reverse = reverse;
-        }
-
-        @Override
-        public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
-            ITimeGraphEntryModel m1 = ((TimeGraphEntry) o1).getModel();
-            ITimeGraphEntryModel m2 = ((TimeGraphEntry) o2).getModel();
-            if (m1 instanceof CallStackEntryModel && m2 instanceof CallStackEntryModel) {
-                CallStackEntryModel t1 = (CallStackEntryModel) m1;
-                CallStackEntryModel t2 = (CallStackEntryModel) m2;
-                if (t1.getStackLevel() == CallStackEntryModel.THREAD && t2.getStackLevel() == CallStackEntryModel.THREAD) {
-                    return reverse ? Long.compare(t2.getPid(), t1.getPid()) : Long.compare(t1.getPid(), t2.getPid());
-                }
-            }
-            return 0;
-        }
-    }
-
-    private static class ThreadTimeComparator implements Comparator<ITimeGraphEntry> {
-        private boolean reverse;
-
-        public ThreadTimeComparator(boolean reverse) {
-            this.reverse = reverse;
-        }
-
-        @Override
-        public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
-            return reverse ? Long.compare(o2.getStartTime(), o1.getStartTime()) : Long.compare(o1.getStartTime(), o2.getStartTime());
         }
     }
 
@@ -281,7 +254,9 @@ public class CallStackView extends AbstractTimeGraphView {
 
         @Override
         public String getColumnText(Object element, int columnIndex) {
-            if (element instanceof TimeGraphEntry) {
+            if (element instanceof TraceEntry && columnIndex == 0) {
+                return ((TraceEntry) element).getName();
+            } else if (element instanceof TimeGraphEntry) {
                 TimeGraphEntry entry = (TimeGraphEntry) element;
                 ITimeGraphEntryModel model = entry.getModel();
                 ITimeGraphState function = fFunctions.get(model.getId());
@@ -289,21 +264,31 @@ public class CallStackView extends AbstractTimeGraphView {
                         (model instanceof CallStackEntryModel && ((CallStackEntryModel) model).getStackLevel() <= 0))) {
                     // trace, process, threads
                     return entry.getName();
-                } else if (function == null) {
-                    return ""; //$NON-NLS-1$
                 }
 
-                if (columnIndex == 0) {
-                    // functions
-                    return function.getLabel();
-                } else if (columnIndex == 1 && model instanceof CallStackEntryModel) {
-                    return Integer.toString(((CallStackEntryModel) model).getStackLevel());
-                } else if (columnIndex == 2) {
-                    return TmfTimestampFormat.getDefaulTimeFormat().format(function.getStartTime());
-                } else if (columnIndex == 3) {
-                    return TmfTimestampFormat.getDefaulTimeFormat().format(function.getStartTime() + function.getDuration());
-                } else if (columnIndex == 4) {
-                    return TmfTimestampFormat.getDefaulIntervalFormat().format(function.getDuration());
+                if (function != null) {
+                    if (columnIndex == 0) {
+                        // functions
+                        return function.getLabel();
+                    } else if (columnIndex == 2 && model instanceof CallStackEntryModel) {
+                        return Integer.toString(((CallStackEntryModel) model).getStackLevel());
+                    } else if (columnIndex == 3) {
+                        return TmfTimestampFormat.getDefaulTimeFormat().format(function.getStartTime());
+                    } else if (columnIndex == 4) {
+                        return TmfTimestampFormat.getDefaulTimeFormat().format(function.getStartTime() + function.getDuration());
+                    } else if (columnIndex == 5) {
+                        return TmfTimestampFormat.getDefaulIntervalFormat().format(function.getDuration());
+                    }
+                } else if (model instanceof CallStackEntryModel) {
+                    CallStackEntryModel callStackEntryModel = (CallStackEntryModel) model;
+                    if (columnIndex == 1 && callStackEntryModel.getStackLevel() <= 0 && callStackEntryModel.getPid() >= 0) {
+                        return Integer.toString(callStackEntryModel.getPid());
+                    } else if (columnIndex == 3 && callStackEntryModel.getStackLevel() <= 0) {
+                        return TmfTimestampFormat.getDefaulTimeFormat().format(model.getStartTime());
+                    } else if (columnIndex == 4 && callStackEntryModel.getStackLevel() <= 0) {
+                        return TmfTimestampFormat.getDefaulTimeFormat().format(model.getEndTime());
+                    }
+
                 }
             }
             return ""; //$NON-NLS-1$
@@ -337,7 +322,7 @@ public class CallStackView extends AbstractTimeGraphView {
      */
     public CallStackView() {
         super(ID, new CallStackPresentationProvider());
-        setTreeColumns(COLUMN_NAMES);
+        setTreeColumns(COLUMN_NAMES, COMPARATORS, 0);
         setTreeLabelProvider(new CallStackTreeLabelProvider());
         setEntryComparator(new CallStackComparator());
         setFilterColumns(FILTER_COLUMN_NAMES);
@@ -392,8 +377,6 @@ public class CallStackView extends AbstractTimeGraphView {
                 }
             }
         });
-
-        loadSortOption();
 
         IEditorPart editor = getSite().getPage().getActiveEditor();
         if (editor instanceof ITmfTraceEditor) {
@@ -501,6 +484,7 @@ public class CallStackView extends AbstractTimeGraphView {
                             traceEntry.updateModel(entry);
                         } else {
                             traceEntry = new TraceEntry(entry, provider);
+                            traceEntry.sortChildren(NAME_COMPARATOR);
                             addToEntryList(parentTrace, Collections.singletonList(traceEntry));
                         }
                     }
@@ -732,10 +716,6 @@ public class CallStackView extends AbstractTimeGraphView {
         makeActions();
         manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getConfigureSymbolsAction());
         manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, new Separator());
-        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getSortByNameAction());
-        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getSortByIdAction());
-        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getSortByTimeAction());
-        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, new Separator());
         manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getTimeGraphViewer().getShowFilterDialogAction());
         manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, new Separator());
         manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getTimeGraphViewer().getResetScaleAction());
@@ -750,17 +730,6 @@ public class CallStackView extends AbstractTimeGraphView {
         manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fNextItemAction);
         manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getTimeGraphViewer().getZoomInAction());
         manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getTimeGraphViewer().getZoomOutAction());
-    }
-
-    /**
-     * @since 2.0
-     */
-    @Override
-    protected void fillTimeGraphEntryContextMenu(IMenuManager contextMenu) {
-        contextMenu.add(new GroupMarker(IWorkbenchActionConstants.GROUP_REORGANIZE));
-        contextMenu.add(getSortByNameAction());
-        contextMenu.add(getSortByIdAction());
-        contextMenu.add(getSortByTimeAction());
     }
 
     /**
@@ -860,127 +829,6 @@ public class CallStackView extends AbstractTimeGraphView {
     // ------------------------------------------------------------------------
     // Methods related to function name mapping
     // ------------------------------------------------------------------------
-
-    private Action getSortByNameAction() {
-        if (fSortByNameAction == null) {
-            fSortByNameAction = new Action(Messages.CallStackView_SortByThreadName, IAction.AS_CHECK_BOX) {
-                @Override
-                public void run() {
-                    if (fSortOption == SortOption.BY_NAME) {
-                        saveSortOption(SortOption.BY_NAME_REV);
-                    } else {
-                        saveSortOption(SortOption.BY_NAME);
-                    }
-                }
-            };
-            fSortByNameAction.setToolTipText(Messages.CallStackView_SortByThreadName);
-            fSortByNameAction.setImageDescriptor(SORT_BY_NAME_ICON);
-        }
-        return fSortByNameAction;
-    }
-
-    private Action getSortByIdAction() {
-        if (fSortByIdAction == null) {
-            fSortByIdAction = new Action(Messages.CallStackView_SortByThreadId, IAction.AS_CHECK_BOX) {
-                @Override
-                public void run() {
-                    if (fSortOption == SortOption.BY_ID) {
-                        saveSortOption(SortOption.BY_ID_REV);
-                    } else {
-                        saveSortOption(SortOption.BY_ID);
-                    }
-                }
-            };
-            fSortByIdAction.setToolTipText(Messages.CallStackView_SortByThreadId);
-            fSortByIdAction.setImageDescriptor(SORT_BY_ID_ICON);
-        }
-        return fSortByIdAction;
-    }
-
-    private Action getSortByTimeAction() {
-        if (fSortByTimeAction == null) {
-            fSortByTimeAction = new Action(Messages.CallStackView_SortByThreadTime, IAction.AS_CHECK_BOX) {
-                @Override
-                public void run() {
-                    if (fSortOption == SortOption.BY_TIME) {
-                        saveSortOption(SortOption.BY_TIME_REV);
-                    } else {
-                        saveSortOption(SortOption.BY_TIME);
-                    }
-                }
-            };
-            fSortByTimeAction.setToolTipText(Messages.CallStackView_SortByThreadTime);
-            fSortByTimeAction.setImageDescriptor(SORT_BY_TIME_ICON);
-        }
-        return fSortByTimeAction;
-    }
-
-    private void loadSortOption() {
-        IDialogSettings settings = Activator.getDefault().getDialogSettings();
-        IDialogSettings section = settings.getSection(getClass().getName());
-        if (section == null) {
-            return;
-        }
-        String sortOption = section.get(SORT_OPTION_KEY);
-        if (sortOption == null) {
-            return;
-        }
-
-        // reset defaults
-        getSortByNameAction().setChecked(false);
-        getSortByNameAction().setImageDescriptor(SORT_BY_NAME_ICON);
-        getSortByIdAction().setChecked(false);
-        getSortByIdAction().setImageDescriptor(SORT_BY_ID_ICON);
-        getSortByTimeAction().setChecked(false);
-        getSortByTimeAction().setImageDescriptor(SORT_BY_TIME_ICON);
-
-        if (sortOption.equals(SortOption.BY_NAME.name())) {
-            fSortOption = SortOption.BY_NAME;
-            fThreadComparator = new ThreadNameComparator(false);
-            getSortByNameAction().setChecked(true);
-        } else if (sortOption.equals(SortOption.BY_NAME_REV.name())) {
-            fSortOption = SortOption.BY_NAME_REV;
-            fThreadComparator = new ThreadNameComparator(true);
-            getSortByNameAction().setChecked(true);
-            getSortByNameAction().setImageDescriptor(SORT_BY_NAME_REV_ICON);
-        } else if (sortOption.equals(SortOption.BY_ID.name())) {
-            fSortOption = SortOption.BY_ID;
-            fThreadComparator = new ThreadIdComparator(false);
-            getSortByIdAction().setChecked(true);
-        } else if (sortOption.equals(SortOption.BY_ID_REV.name())) {
-            fSortOption = SortOption.BY_ID_REV;
-            fThreadComparator = new ThreadIdComparator(true);
-            getSortByIdAction().setChecked(true);
-            getSortByIdAction().setImageDescriptor(SORT_BY_ID_REV_ICON);
-        } else if (sortOption.equals(SortOption.BY_TIME.name())) {
-            fSortOption = SortOption.BY_TIME;
-            fThreadComparator = new ThreadTimeComparator(false);
-            getSortByTimeAction().setChecked(true);
-        } else if (sortOption.equals(SortOption.BY_TIME_REV.name())) {
-            fSortOption = SortOption.BY_TIME_REV;
-            fThreadComparator = new ThreadTimeComparator(true);
-            getSortByTimeAction().setChecked(true);
-            getSortByTimeAction().setImageDescriptor(SORT_BY_TIME_REV_ICON);
-        }
-    }
-
-    private void saveSortOption(SortOption sortOption) {
-        IDialogSettings settings = Activator.getDefault().getDialogSettings();
-        IDialogSettings section = settings.getSection(getClass().getName());
-        if (section == null) {
-            section = settings.addNewSection(getClass().getName());
-        }
-        section.put(SORT_OPTION_KEY, sortOption.name());
-        loadSortOption();
-        List<TimeGraphEntry> entryList = getEntryList(getTrace());
-        if (entryList == null) {
-            return;
-        }
-        for (TimeGraphEntry traceEntry : entryList) {
-            traceEntry.sortChildren(fThreadComparator);
-        }
-        refresh();
-    }
 
     private Action getConfigureSymbolsAction() {
         if (fConfigureSymbolsAction != null) {

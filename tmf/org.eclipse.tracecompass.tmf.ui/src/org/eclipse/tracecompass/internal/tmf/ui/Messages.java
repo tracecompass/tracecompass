@@ -336,8 +336,10 @@ public class Messages extends NLS {
     public static String TmfView_UnpinActionText;
     public static String TmfView_ResetScaleActionNameText;
 
+    public static String CallStackPresentationProvider_Process;
     public static String CallStackPresentationProvider_Thread;
     public static String CallStackView_FunctionColumn;
+    public static String CallStackView_PidTidColumn;
     public static String CallStackView_DepthColumn;
     public static String CallStackView_EntryTimeColumn;
     public static String CallStackView_ExitTimeColumn;
