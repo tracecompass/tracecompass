@@ -431,6 +431,9 @@ public final class SWTBotUtils {
         /* Do not switch perspectives on trace open */
         IPreferenceStore store = Activator.getDefault().getPreferenceStore();
         store.setValue(ITmfUIPreferences.SWITCH_TO_PERSPECTIVE, MessageDialogWithToggle.NEVER);
+
+        // Switch to and reset Tracing perspective
+        switchToTracingPerspective();
     }
 
     private static void printEnvironment() {
