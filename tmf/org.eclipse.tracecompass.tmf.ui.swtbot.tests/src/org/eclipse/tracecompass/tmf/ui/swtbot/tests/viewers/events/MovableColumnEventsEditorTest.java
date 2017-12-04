@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -124,7 +124,7 @@ public class MovableColumnEventsEditorTest {
         SWTBotTable tableBot = editorBot.bot().table();
 
         // Maximize editor area
-        SWTBotUtils.maximizeTable(tableBot);
+        SWTBotUtils.maximize(editorBot.getReference(), tableBot);
 
         // Verify that source code was actually opened
         assertArrayEquals("Before reorder", BEFORE_COLS, tableBot.columns().toArray());
@@ -144,7 +144,7 @@ public class MovableColumnEventsEditorTest {
         editorBot = SWTBotUtils.activateEditor(fBot, fTestFile.getName());
         tableBot = editorBot.bot().table();
         // Maximize editor area
-        SWTBotUtils.maximizeTable(tableBot);
+        SWTBotUtils.maximize(editorBot.getReference(), tableBot);
         assertArrayEquals("After reorder", AFTER_COLS, tableBot.columns().toArray());
         // close and re-open
         editorBot.close();
@@ -154,7 +154,7 @@ public class MovableColumnEventsEditorTest {
         editorBot = SWTBotUtils.activateEditor(fBot, fTestFile.getName());
         tableBot = editorBot.bot().table();
         // Maximize editor area
-        SWTBotUtils.maximizeTable(tableBot);
+        SWTBotUtils.maximize(editorBot.getReference(), tableBot);
         assertNull("After reset", TmfTraceColumnManager.loadColumnOrder(COLUMN_TRACE_TYPE));
         assertArrayEquals("After reset", BEFORE_COLS, tableBot.columns().toArray());
         fBot.closeAllEditors();

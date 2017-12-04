@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -133,7 +133,7 @@ public class CollapseEventsInTableTest {
         SWTBotTable tableBot = editorBot.bot().table();
 
         /* Maximize editor area */
-        SWTBotUtils.maximizeTable(tableBot);
+        SWTBotUtils.maximize(editorBot.getReference(), tableBot);
         tableBot.click(1, 0);
 
         /* Collapse Events */
@@ -182,7 +182,7 @@ public class CollapseEventsInTableTest {
         fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "Jan 1 01:01:01", 1, 1));
         assertEquals("Timestamp", "Jan 1 01:01:01", tableBot.cell(1, 1));
 
-        SWTBotUtils.maximizeTable(tableBot);
+        SWTBotUtils.maximize(editorBot.getReference(), tableBot);
 
         fBot.closeAllEditors();
         SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);

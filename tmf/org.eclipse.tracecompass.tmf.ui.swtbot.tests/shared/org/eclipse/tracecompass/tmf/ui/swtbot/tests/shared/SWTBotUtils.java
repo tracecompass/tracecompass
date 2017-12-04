@@ -112,9 +112,10 @@ import org.eclipse.tracecompass.tmf.ui.views.TracingPerspectiveFactory;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -833,7 +834,10 @@ public final class SWTBotUtils {
      *
      * @param tableBot
      *            the {@link SWTBotTable} table
+     * @deprecated Use
+     *             {@link #maximize(IWorkbenchPartReference, AbstractSWTBotControl)}.
      */
+    @Deprecated
     public static void maximizeTable(SWTBotTable tableBot) {
         final AtomicBoolean controlResized = new AtomicBoolean();
         UIThreadRunnable.syncExec(new VoidResult() {
@@ -1138,20 +1142,58 @@ public final class SWTBotUtils {
     }
 
     /**
-     * Maximize a view by reference. Calling this a second time will "un-maximize" a view.
-     * <p>
-     * TODO: if this is useful, maybe uplift to SWTViewBot
+     * Maximize a workbench part and wait for one of its controls to be resized.
+     * Calling this a second time will "un-maximize" the part.
      *
-     * @param view
-     *            the view reference
+     * @param partReference
+     *            the {@link IWorkbenchPartReference} which contains the control
+     * @param controlBot
+     *            a control that should be resized
      */
-    public static void maximize(@NonNull IViewPart view) {
-        assertNotNull(view);
-        IWorkbenchPartSite site = view.getSite();
+    public static void maximize(IWorkbenchPartReference partReference, AbstractSWTBotControl<?> controlBot) {
+        final AtomicBoolean controlResized = new AtomicBoolean();
+        Control control = controlBot.widget;
+        assertNotNull(control);
+        UIThreadRunnable.syncExec(new VoidResult() {
+            @Override
+            public void run() {
+                control.addControlListener(new ControlAdapter() {
+                    @Override
+                    public void controlResized(ControlEvent e) {
+                        control.removeControlListener(this);
+                        controlResized.set(true);
+                    }
+                });
+            }
+        });
+        IWorkbenchPart part = partReference.getPart(false);
+        assertNotNull(part);
+        maximize(part);
+        new SWTBot().waitUntil(new DefaultCondition() {
+            @Override
+            public boolean test() throws Exception {
+                return controlResized.get();
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return "Control was not resized";
+            }
+        });
+    }
+
+    /**
+     * Maximize a part. Calling this a second time will "un-maximize" a part.
+     *
+     * @param part
+     *            the workbench part
+     */
+    public static void maximize(@NonNull IWorkbenchPart part) {
+        assertNotNull(part);
+        IWorkbenchPartSite site = part.getSite();
         assertNotNull(site);
         // The annotation is to make the compiler not complain.
-        @Nullable
-        Object handlerServiceObject = site.getService(IHandlerService.class);
+        @Nullable Object handlerServiceObject = site.getService(IHandlerService.class);
         assertTrue(handlerServiceObject instanceof IHandlerService);
         IHandlerService handlerService = (IHandlerService) handlerServiceObject;
         try {

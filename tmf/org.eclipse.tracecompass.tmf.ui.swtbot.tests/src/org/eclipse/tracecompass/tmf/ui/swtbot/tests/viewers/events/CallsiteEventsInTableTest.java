@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 Ericsson
+ * Copyright (c) 2014, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -158,7 +158,7 @@ public class CallsiteEventsInTableTest {
         SWTBotTable tableBot = editorBot.bot().table();
 
         // Maximize editor area
-        SWTBotUtils.maximizeTable(tableBot);
+        SWTBotUtils.maximize(editorBot.getReference(), tableBot);
         SWTBotTableItem tableItem = tableBot.getTableItem(1);
 
         // Open source code location
@@ -171,7 +171,7 @@ public class CallsiteEventsInTableTest {
         assertTrue(sourceEditorBot.isActive());
 
         editorBot.show();
-        SWTBotUtils.maximizeTable(tableBot);
+        SWTBotUtils.maximize(editorBot.getReference(), tableBot);
 
         fBot.closeAllEditors();
         SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);

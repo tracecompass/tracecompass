@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -124,7 +124,7 @@ public class FontEventEditorTest {
         SWTBotTable tableBot = editorBot.bot().table();
 
         // Maximize editor area
-        SWTBotUtils.maximizeTable(tableBot);
+        SWTBotUtils.maximize(editorBot.getReference(), tableBot);
         tableBot.contextMenu("Show Raw").click();
         tableBot.setFocus();
         tableBot.click(4, 1);
