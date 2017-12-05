@@ -215,18 +215,43 @@ public final class SWTBotUtils {
         SWTBotMenu contextMenu = treeItem.contextMenu("Delete");
         contextMenu.click();
 
+        handleDeleteDialog(deleteResources, bot);
+        WaitUtils.waitForJobs();
+    }
+
+    private static void handleDeleteDialog(boolean deleteResources, SWTWorkbenchBot bot) {
+        SWTBotShell parentShell = bot.shell("Delete Resources");
         if (deleteResources) {
-            bot.shell("Delete Resources").setFocus();
-            final SWTBotCheckBox checkBox = bot.checkBox();
-            bot.waitUntil(Conditions.widgetIsEnabled(checkBox));
+            parentShell.setFocus();
+            final SWTBotCheckBox checkBox = parentShell.bot().checkBox();
             checkBox.click();
         }
 
-        final SWTBotButton okButton = bot.button("OK");
-        bot.waitUntil(Conditions.widgetIsEnabled(okButton));
+        final SWTBotButton okButton = parentShell.bot().button("OK");
         okButton.click();
 
-        WaitUtils.waitForJobs();
+        // If the out of sync shell appears, press continue to delete the project
+        bot.waitWhile(new DefaultCondition() {
+            @Override
+            public boolean test() throws Exception {
+                // If no delete resources shells are found, we can assume that the project has been deleted
+                boolean deleteShellFound = false;
+                for (SWTBotShell shell : bot.shells()) {
+                    if (shell.getText().equals("Delete Resources")) {
+                        deleteShellFound = true;
+                        if (shell.widget != parentShell.widget) {
+                            shell.bot().button("Continue").click();
+                        }
+                    }
+                }
+                return deleteShellFound;
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return "Delete Resources shell did not close";
+            }
+        });
     }
 
     /**
