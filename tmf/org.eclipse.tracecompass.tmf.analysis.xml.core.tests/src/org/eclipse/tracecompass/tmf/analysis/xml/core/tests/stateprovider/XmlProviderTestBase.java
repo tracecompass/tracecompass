@@ -127,14 +127,6 @@ public abstract class XmlProviderTestBase {
     }
 
     /**
-     * Cleanup after the test
-     */
-    @After
-    public void cleanupTest() {
-        fTrace.dispose();
-    }
-
-    /**
      * Test the building of the state system
      */
     @Test

@@ -322,4 +322,18 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
             return EMPTY_STRING;
         }
     }
+
+    @Override
+    public boolean waitForCompletion() {
+        return super.waitForCompletion()
+                && fStateSystemModule.waitForCompletion()
+                && fSegmentStoreModule.waitForCompletion();
+    }
+
+    @Override
+    public boolean waitForCompletion(@NonNull IProgressMonitor monitor) {
+        return super.waitForCompletion(monitor)
+                && fStateSystemModule.waitForCompletion(monitor)
+                && fSegmentStoreModule.waitForCompletion(monitor);
+    }
 }

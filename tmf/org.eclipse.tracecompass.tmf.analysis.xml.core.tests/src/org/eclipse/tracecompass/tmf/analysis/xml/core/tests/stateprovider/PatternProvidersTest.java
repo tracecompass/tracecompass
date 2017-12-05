@@ -14,7 +14,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.nio.file.Paths;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
@@ -23,6 +22,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
+import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.junit.Test;
 
@@ -64,8 +64,9 @@ public class PatternProvidersTest extends XmlProviderTestBase {
      */
     @Test
     public void testSegmentStore() {
-        assertTrue(getModule().waitForCompletion(new NullProgressMonitor()));
-        ISegmentStore<@NonNull ISegment> ss = ((ISegmentStoreProvider) getModule()).getSegmentStore();
+        TmfAbstractAnalysisModule module = getModule();
+        assertTrue(module.waitForCompletion());
+        ISegmentStore<@NonNull ISegment> ss = ((ISegmentStoreProvider) module).getSegmentStore();
         assertNotNull(ss);
         assertFalse(ss.isEmpty());
     }
