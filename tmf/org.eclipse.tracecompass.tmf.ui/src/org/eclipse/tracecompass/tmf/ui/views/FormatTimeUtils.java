@@ -15,6 +15,7 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
+import org.eclipse.tracecompass.common.core.format.LongToPercentFormat;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
 
@@ -47,7 +48,13 @@ public final class FormatTimeUtils {
         /**
          * Timestamp displayed as cycles
          */
-        CYCLES
+        CYCLES,
+
+        /**
+         * Value displayed as percentage
+         * @since 4.0
+         */
+        PERCENTAGE
     }
 
     /**
@@ -105,6 +112,8 @@ public final class FormatTimeUtils {
             return NumberFormat.getInstance().format(time) + Messages.Utils_ClockCyclesUnit;
         case RELATIVE:
             return formatTimeRelative(time, resolution);
+        case PERCENTAGE:
+            return LongToPercentFormat.getInstance().format(time);
         default:
         }
 

@@ -33,6 +33,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.tracecompass.common.core.format.LongToPercentFormat;
 import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -109,6 +110,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     private static final TimeDraw TIMEDRAW_ABS_YEAR = new TimeDrawAbsYear();
     private static final TimeDraw TIMEDRAW_NUMBER = new TimeDrawNumber();
     private static final TimeDraw TIMEDRAW_CYCLES = new TimeDrawCycles();
+    private static final TimeDraw TIMEDRAW_PERCENT = new TimeDrawPercent();
 
     private static final int DRAG_EXTERNAL = -1;
     private static final int NO_BUTTON = 0;
@@ -383,10 +385,13 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
                     timeDraw = TIMEDRAW_ABS_NANOSEC;
                 }
                 return timeDraw;
+
             case NUMBER:
                 return TIMEDRAW_NUMBER;
             case CYCLES:
                 return TIMEDRAW_CYCLES;
+            case PERCENTAGE:
+                return TIMEDRAW_PERCENT;
             case RELATIVE:
             default:
             }
@@ -941,6 +946,14 @@ class TimeDrawCycles extends TimeDraw {
     @Override
     public int draw(GC gc, long time, Rectangle rect) {
         String stime = FormatTimeUtils.formatTime(time, FormatTimeUtils.TimeFormat.CYCLES, FormatTimeUtils.Resolution.SECONDS);
+        return Utils.drawText(gc, stime, rect, true);
+    }
+}
+
+class TimeDrawPercent extends TimeDraw {
+    @Override
+    public int draw(GC gc, long time, Rectangle rect) {
+        String stime = LongToPercentFormat.getInstance().format(time);
         return Utils.drawText(gc, stime, rect, true);
     }
 }

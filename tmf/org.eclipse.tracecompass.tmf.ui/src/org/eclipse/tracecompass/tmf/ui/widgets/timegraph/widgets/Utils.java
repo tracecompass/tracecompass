@@ -27,6 +27,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.common.core.format.LongToPercentFormat;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
@@ -65,7 +66,14 @@ public class Utils {
         /**
          * Timestamp displayed as cycles
          */
-        CYCLES((FormatTimeUtils.TimeFormat.CYCLES));
+        CYCLES((FormatTimeUtils.TimeFormat.CYCLES)),
+
+        /**
+         * Timestamp displayed as percentages, where 100% maps to the long value
+         * {@link LongToPercentFormat#MAX_PERCENT_VALUE}
+         * @since 4.0
+         */
+        PERCENTAGE((FormatTimeUtils.TimeFormat.PERCENTAGE));
 
         private final FormatTimeUtils.TimeFormat tf;
         private TimeFormat(FormatTimeUtils.TimeFormat tf) {
