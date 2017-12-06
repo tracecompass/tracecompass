@@ -15,14 +15,15 @@
 package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.treeHasRows;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -71,18 +72,20 @@ import com.google.common.collect.ImmutableSet;
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class ImportAndReadKernelSmokeTest extends KernelTestBase {
 
-    private static final @NonNull Map<String, Set<String>> EXPECTED_ANALYSES = new HashMap<>();
+    private static final @NonNull Set<Entry<String, Set<String>>> EXPECTED_ANALYSES;
 
     static {
-        EXPECTED_ANALYSES.put("Input/Output", Collections.emptySet());
-        EXPECTED_ANALYSES.put("Tmf Statistics", ImmutableSet.of("org.eclipse.linuxtools.tmf.statistics.totals", "org.eclipse.linuxtools.tmf.statistics.types"));
-        EXPECTED_ANALYSES.put("Active Thread", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.kernel.tid"));
-        EXPECTED_ANALYSES.put("Linux Kernel", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.kernel"));
-        EXPECTED_ANALYSES.put("Context switch", Collections.emptySet());
-        EXPECTED_ANALYSES.put("Kernel memory usage", Collections.emptySet());
-        EXPECTED_ANALYSES.put("CPU usage", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.cpuusage"));
-        EXPECTED_ANALYSES.put("XML Futex Contention Analysis", Collections.emptySet());
-        EXPECTED_ANALYSES.put("XML IRQ Analysis", Collections.emptySet());
+        Map<String, Set<String>> map  = new HashMap<>();
+        map.put("Input/Output", Collections.emptySet());
+        map.put("Tmf Statistics", ImmutableSet.of("org.eclipse.linuxtools.tmf.statistics.totals", "org.eclipse.linuxtools.tmf.statistics.types"));
+        map.put("Active Thread", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.kernel.tid"));
+        map.put("Linux Kernel", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.kernel"));
+        map.put("Context switch", Collections.emptySet());
+        map.put("Kernel memory usage", Collections.emptySet());
+        map.put("CPU usage", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.cpuusage"));
+        map.put("XML Futex Contention Analysis", Collections.emptySet());
+        map.put("XML IRQ Analysis", Collections.emptySet());
+        EXPECTED_ANALYSES = map.entrySet();
     }
 
     private ITmfEvent fDesired1;
@@ -202,24 +205,24 @@ public class ImportAndReadKernelSmokeTest extends KernelTestBase {
         SWTBotUtils.openView(TmfStateSystemExplorer.ID);
         SWTBotView sseBot = bot.viewByTitle("State System Explorer");
         sseBot.show();
-        assertEquals("Wrong state systems", EXPECTED_ANALYSES, getSsNames(sseBot));
+        assertTrue("Wrong state systems", getSsNames(sseBot).containsAll(EXPECTED_ANALYSES));
         // Re-open the view and make sure it has the same results
         sseBot.close();
         SWTBotUtils.openView(TmfStateSystemExplorer.ID);
         sseBot = bot.viewByTitle("State System Explorer");
         sseBot.show();
-        assertEquals("Wrong state systems", EXPECTED_ANALYSES, getSsNames(sseBot));
+        assertTrue("Wrong state systems", getSsNames(sseBot).containsAll(EXPECTED_ANALYSES));
         // Close the trace, and re-open it, let's compare one last time
         bot.closeAllEditors();
         bot.waitUntil(treeHasRows(sseBot.bot().tree(), 0));
         // re-open the trace
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, tracePath, KERNEL_TRACE_TYPE);
-        assertEquals("Wrong state systems", EXPECTED_ANALYSES, getSsNames(sseBot));
+        assertTrue("Wrong state systems", getSsNames(sseBot).containsAll(EXPECTED_ANALYSES));
         sseBot.close();
         cpuUsageBot.close();
     }
 
-    private static Map<String, Set<String>> getSsNames(SWTBotView bot) {
+    private static @NonNull Set<@NonNull Entry<String, Set<String>>> getSsNames(SWTBotView bot) {
         SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(bot.bot());
         SWTBotTimeGraphEntry trace = timeGraph.getEntry("synthetic-trace");
         SWTBotTimeGraphEntry[] modules = trace.getEntries();
@@ -231,7 +234,7 @@ public class ImportAndReadKernelSmokeTest extends KernelTestBase {
             }
             modulesToStateSystems.put(module.getText(), stateSystems);
         }
-        return modulesToStateSystems;
+        return modulesToStateSystems.entrySet();
     }
 
 }
