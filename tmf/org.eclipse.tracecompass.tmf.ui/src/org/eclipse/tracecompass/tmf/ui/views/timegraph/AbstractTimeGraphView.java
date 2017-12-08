@@ -178,7 +178,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(AbstractTimeGraphView.class);
 
-    private static final int DEFAULT_BUFFER_SIZE = 10;
+    private static final int DEFAULT_BUFFER_SIZE = 3;
 
     /**
      * Redraw state enum
@@ -295,6 +295,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * Set of visible entries to zoom on.
      */
     private @NonNull Set<@NonNull TimeGraphEntry> fVisibleEntries = Collections.emptySet();
+
+    /**
+     * The width of the last time space that was zoomed on.
+     */
+    private int fPrevTimeSpace = -1;
 
     /**
      * Menu Manager for context-sensitive menu for time graph entries. This will be
@@ -1098,14 +1103,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             @Override
             public void paintControl(PaintEvent e) {
                 TmfUiRefreshHandler.getInstance().queueUpdate(this, () -> {
+                    int timeSpace = getTimeGraphViewer().getTimeSpace();
                     Set<@NonNull TimeGraphEntry> newSet = getVisibleItems(DEFAULT_BUFFER_SIZE);
-                    if (!fVisibleEntries.equals(newSet)) {
+                    if (fPrevTimeSpace != timeSpace || !fVisibleEntries.equals(newSet)) {
                         /*
                          * Start a zoom thread if the set of visible entries has changed. We do not use
                          * lists as the order is not important. We cannot use the start index / size of
                          * the visible entries as we can collapse / reorder events.
                          */
                         fVisibleEntries = newSet;
+                        fPrevTimeSpace = timeSpace;
                         startZoomThread(getTimeGraphViewer().getTime0(), getTimeGraphViewer().getTime1());
                     }
                 });
@@ -1829,8 +1836,13 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     restart = true;
                 }
             }
-            long resolution = Math.max(1, (clampedEndTime - clampedStartTime) / fDisplayWidth);
-            zoomThread = createZoomThread(clampedStartTime, clampedEndTime, resolution, restart);
+            int timeSpace = getTimeGraphViewer().getTimeSpace();
+            if (timeSpace > 0) {
+                long resolution = Long.max(1, (clampedEndTime - clampedStartTime) / timeSpace);
+                zoomThread = createZoomThread(clampedStartTime, clampedEndTime, resolution, restart);
+            } else {
+                zoomThread = null;
+            }
             fZoomThread = zoomThread;
             if (zoomThread != null) {
                 zoomThread.setScopeId(log.getId());
