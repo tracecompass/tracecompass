@@ -861,7 +861,8 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
         // Unrecognized checkbox
         fImportUnrecognizedButton = new Button(composite, SWT.CHECK);
-        fImportUnrecognizedButton.setSelection(true);
+        // Do not import unrecognized traces by default
+        fImportUnrecognizedButton.setSelection(false);
         fImportUnrecognizedButton.setText(Messages.ImportTraceWizard_ImportUnrecognized);
     }
 
@@ -1114,7 +1115,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         boolean value;
         if (fImportUnrecognizedButton != null) {
             if (settings.get(getPageStoreKey(IMPORT_WIZARD_IMPORT_UNRECOGNIZED_ID)) == null) {
-                value = true;
+                value = false;
             } else {
                 value = settings.getBoolean(getPageStoreKey(IMPORT_WIZARD_IMPORT_UNRECOGNIZED_ID));
             }
