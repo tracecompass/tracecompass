@@ -341,7 +341,6 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
                     contentChanged(rootEntry);
                 } else {
                     treeViewer.refresh();
-                    treeViewer.expandToLevel(treeViewer.getAutoExpandLevel());
                 }
                 // FIXME should add a bit of padding
                 for (TreeColumn column : treeViewer.getTree().getColumns()) {
