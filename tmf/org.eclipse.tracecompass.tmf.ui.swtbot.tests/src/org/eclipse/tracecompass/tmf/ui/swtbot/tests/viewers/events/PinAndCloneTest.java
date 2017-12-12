@@ -18,8 +18,10 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
@@ -43,7 +45,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -178,7 +179,6 @@ public class PinAndCloneTest {
      * Test the behavior with two traces.
      */
     @Test
-    @Ignore
     public void testPinTwoTraces() {
         ITmfTrace ust = TmfTraceManager.getInstance().getActiveTrace();
         assertNotNull(ust);
@@ -189,9 +189,27 @@ public class PinAndCloneTest {
         fBot.editorByTitle(kernelTestTrace.getName());
 
         // assert that the pin to drop down menuItems are present for both traces.
-        SWTBotToolbarDropDownButton toolbarDropDownButton = fOriginalViewBot.toolbarDropDownButton(PIN_VIEW_BUTTON_NAME);
-        toolbarDropDownButton.menuItem(PIN_TO_PREFIX + kernelTestTrace.getName());
-        toolbarDropDownButton.menuItem(PIN_TO_PREFIX + fUstTestTrace.getName()).click();
+        fBot.waitUntil(new DefaultCondition() {
+            WidgetNotFoundException fException;
+
+            @Override
+            public boolean test() throws Exception {
+                try {
+                    SWTBotToolbarDropDownButton toolbarDropDownButton = fOriginalViewBot.toolbarDropDownButton(PIN_VIEW_BUTTON_NAME);
+                    toolbarDropDownButton.menuItem(PIN_TO_PREFIX + kernelTestTrace.getName());
+                    toolbarDropDownButton.menuItem(PIN_TO_PREFIX + fUstTestTrace.getName()).click();
+                    return true;
+                } catch (WidgetNotFoundException e) {
+                    fException = e;
+                    return false;
+                }
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return "Traces not available in toolbar drop down menu: " + fException;
+            }
+        });
 
         /*
          * assert that the pinned view is the UST trace despite the active trace being
