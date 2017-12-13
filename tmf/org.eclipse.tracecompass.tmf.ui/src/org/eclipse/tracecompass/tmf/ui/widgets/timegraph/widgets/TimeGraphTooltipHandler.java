@@ -28,8 +28,9 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 
 /**
  * Handler for the tool tips in the generic time graph view.
@@ -190,7 +191,7 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
                 }
 
                 Resolution res = Resolution.NANOSEC;
-                TimeFormat tf = fTimeDataProvider.getTimeFormat();
+                TimeFormat tf = fTimeDataProvider.getTimeFormat2();
                 String startTime = "?"; //$NON-NLS-1$
                 String duration = "?"; //$NON-NLS-1$
                 String endTime = "?"; //$NON-NLS-1$
@@ -198,29 +199,29 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
                     ITimeDataProviderConverter tdp = (ITimeDataProviderConverter) fTimeDataProvider;
                     if (eventStartTime > -1) {
                         eventStartTime = tdp.convertTime(eventStartTime);
-                        startTime = Utils.formatTime(eventStartTime, tf, res);
+                        startTime = FormatTimeUtils.formatTime(eventStartTime, tf, res);
                     }
                     if (eventEndTime > -1) {
                         eventEndTime = tdp.convertTime(eventEndTime);
-                        endTime = Utils.formatTime(eventEndTime, tf, res);
+                        endTime = FormatTimeUtils.formatTime(eventEndTime, tf, res);
                     }
                     if (eventDuration > -1) {
-                        duration = Utils.formatDelta(eventEndTime - eventStartTime, tf, res);
+                        duration = FormatTimeUtils.formatDelta(eventEndTime - eventStartTime, tf, res);
                     }
                 } else {
                     if (eventStartTime > -1) {
-                        startTime = Utils.formatTime(eventStartTime, tf, res);
+                        startTime = FormatTimeUtils.formatTime(eventStartTime, tf, res);
                     }
                     if (eventEndTime > -1) {
-                        endTime = Utils.formatTime(eventEndTime, tf, res);
+                        endTime = FormatTimeUtils.formatTime(eventEndTime, tf, res);
                     }
                     if (eventDuration > -1) {
-                        duration = Utils.formatDelta(eventDuration, tf, res);
+                        duration = FormatTimeUtils.formatDelta(eventDuration, tf, res);
                     }
                 }
                 if (tf == TimeFormat.CALENDAR) {
                     addItem(Messages.TmfTimeTipHandler_TRACE_DATE,
-                            eventStartTime > -1 ? Utils.formatDate(eventStartTime) : "?"); //$NON-NLS-1$
+                            eventStartTime > -1 ? FormatTimeUtils.formatDate(eventStartTime) : "?"); //$NON-NLS-1$
                 }
                 if (eventDuration > 0) {
                     addItem(Messages.TmfTimeTipHandler_TRACE_START_TIME, startTime);
@@ -275,16 +276,16 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
                 duration = targetTime - sourceTime;
             }
             Resolution res = Resolution.NANOSEC;
-            TimeFormat tf = fTimeDataProvider.getTimeFormat();
+            TimeFormat tf = fTimeDataProvider.getTimeFormat2();
             if (tf == TimeFormat.CALENDAR) {
-                addItem(Messages.TmfTimeTipHandler_TRACE_DATE, Utils.formatDate(sourceTime));
+                addItem(Messages.TmfTimeTipHandler_TRACE_DATE, FormatTimeUtils.formatDate(sourceTime));
             }
             if (duration > 0) {
-                addItem(Messages.TmfTimeTipHandler_LINK_SOURCE_TIME, Utils.formatTime(sourceTime, tf, res));
-                addItem(Messages.TmfTimeTipHandler_LINK_TARGET_TIME, Utils.formatTime(targetTime, tf, res));
-                addItem(Messages.TmfTimeTipHandler_DURATION, Utils.formatDelta(duration, tf, res));
+                addItem(Messages.TmfTimeTipHandler_LINK_SOURCE_TIME, FormatTimeUtils.formatTime(sourceTime, tf, res));
+                addItem(Messages.TmfTimeTipHandler_LINK_TARGET_TIME, FormatTimeUtils.formatTime(targetTime, tf, res));
+                addItem(Messages.TmfTimeTipHandler_DURATION, FormatTimeUtils.formatDelta(duration, tf, res));
             } else {
-                addItem(Messages.TmfTimeTipHandler_LINK_TIME, Utils.formatTime(sourceTime, tf, res));
+                addItem(Messages.TmfTimeTipHandler_LINK_TIME, FormatTimeUtils.formatTime(sourceTime, tf, res));
             }
         }
     }

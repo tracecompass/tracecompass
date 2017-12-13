@@ -95,8 +95,9 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sa
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
 
@@ -628,7 +629,7 @@ public class ControlFlowView extends AbstractTimeGraphView {
                     return Integer.toString(entry.getParentThreadId());
                 }
             } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_birthTimeColumn)) {
-                return Utils.formatTime(entry.getStartTime(), TimeFormat.CALENDAR, Resolution.NANOSEC);
+                return FormatTimeUtils.formatTime(entry.getStartTime(), TimeFormat.CALENDAR, Resolution.NANOSEC);
             } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_traceColumn)) {
                 return entry.getTrace().getName();
             } else if (COLUMN_NAMES[columnIndex].equals(INVISIBLE_COLUMN)) {

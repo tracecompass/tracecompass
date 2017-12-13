@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2014, 2017 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -35,6 +35,8 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
     private long fBeginTime;
     /** Cached end time */
     private long fEndTime;
+    /** Cached cursor time*/
+    private long fCursorTime;
     /** Flag indicating that an update is ongoing */
     private boolean fIsInternalUpdate;
     /** Flag indicating that the begin marker is dragged */
@@ -78,6 +80,7 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
     // ------------------------------------------------------------------------
     @Override
     public void mouseDoubleClick(MouseEvent e) {
+        // Do nothing
     }
 
     @Override
@@ -120,6 +123,12 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
             }
             ITmfChartTimeProvider viewer = getChartViewer();
             viewer.updateSelectionRange(fBeginTime + viewer.getTimeOffset(), fEndTime + viewer.getTimeOffset());
+
+            if (viewer instanceof TmfXYChartViewer) {
+                TmfXYChartViewer xyChartViewer = (TmfXYChartViewer) viewer;
+                xyChartViewer.updateStatusLine(fBeginTime, fEndTime, fCursorTime);
+            }
+
             fIsInternalUpdate = false;
             getChart().redraw();
         }
@@ -130,14 +139,22 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
     // ------------------------------------------------------------------------
     @Override
     public void mouseMove(MouseEvent e) {
+        IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+        fCursorTime = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
+
         if (fIsInternalUpdate) {
-            IAxis xAxis = getChart().getAxisSet().getXAxis(0);
             if (fDragBeginMarker) {
                 fBeginTime = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
             } else {
                 fEndTime = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
             }
             getChart().redraw();
+        }
+
+        ITmfChartTimeProvider viewer = getChartViewer();
+        if (viewer instanceof TmfXYChartViewer) {
+            TmfXYChartViewer xyChartViewer = (TmfXYChartViewer) viewer;
+            xyChartViewer.updateStatusLine(fBeginTime, fEndTime, fCursorTime);
         }
     }
 

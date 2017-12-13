@@ -119,6 +119,13 @@ public class TmfMouseDragZoomProvider extends TmfBaseProvider implements MouseLi
         if (fIsUpdate) {
             IAxis xAxis = getChart().getAxisSet().getXAxis(0);
             fEndTime = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
+
+            ITmfChartTimeProvider viewer = getChartViewer();
+            if (viewer instanceof TmfXYChartViewer) {
+                TmfXYChartViewer xyChartViewer = (TmfXYChartViewer) viewer;
+                xyChartViewer.updateStatusLine(fStartTime, fEndTime, limitXDataCoordinate(xAxis.getDataCoordinate(e.x)));
+            }
+
             getChart().redraw();
         }
     }

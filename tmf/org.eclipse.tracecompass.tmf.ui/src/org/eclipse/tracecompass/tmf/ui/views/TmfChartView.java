@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.tmf.ui.views;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.MouseAdapter;
@@ -200,6 +201,9 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
             setTrace(trace);
             loadTrace();
         }
+
+        IStatusLineManager statusLineManager = getViewSite().getActionBars().getStatusLineManager();
+        fChartViewer.setStatusLineManager(statusLineManager);
     }
 
     @Override

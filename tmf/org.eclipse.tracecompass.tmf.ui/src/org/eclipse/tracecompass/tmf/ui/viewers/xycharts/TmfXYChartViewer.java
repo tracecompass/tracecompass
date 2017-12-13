@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2016 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2013, 2016, 2017 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -40,6 +41,9 @@ import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphScale;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
 import org.swtchart.ICustomPaintListener;
@@ -89,6 +93,8 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     private boolean fSendTimeAlignSignals = false;
 
     private final ITimeDataProvider fDataProvider;
+
+    private IStatusLineManager fStatusLineManager;
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -576,5 +582,70 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     @Override
     public void saveImage(String filename, int format) {
         getSwtChart().save(filename, format);
+    }
+
+    /**
+     * Set the status bar manager
+     *
+     * @param statusLineManager
+     *            Status bar manager
+     * @since 3.3
+     */
+    public void setStatusLineManager(IStatusLineManager statusLineManager) {
+        if (fStatusLineManager != null && statusLineManager == null) {
+            fStatusLineManager.setMessage(null);
+        }
+        fStatusLineManager = statusLineManager;
+    }
+
+    /**
+     * Update the status line to include time selection
+     *
+     * @param startTime
+     *            Selection start time
+     * @param endTime
+     *            Selection end time
+     * @param cursorTime
+     *            Cursor time
+     * @since 3.3
+     */
+    public void updateStatusLine(long startTime, long endTime, long cursorTime) {
+        TimeFormat timeFormat = fTimeScaleCtrl.getTimeProvider().getTimeFormat2();
+        boolean isCalendar = timeFormat == TimeFormat.CALENDAR;
+
+        StringBuilder message = new StringBuilder();
+        String spaces = "     "; //$NON-NLS-1$
+        if (cursorTime >= 0) {
+            message.append("T: "); //$NON-NLS-1$
+            if (isCalendar) {
+                message.append(FormatTimeUtils.formatDate(cursorTime + getTimeOffset()) + ' ');
+            }
+            message.append(FormatTimeUtils.formatTime(cursorTime + getTimeOffset(), timeFormat, Resolution.NANOSEC));
+            message.append(spaces);
+        }
+
+        if (startTime == endTime) {
+            message.append("T1: "); //$NON-NLS-1$
+            if (isCalendar) {
+                message.append(FormatTimeUtils.formatDate(startTime + getTimeOffset()) + ' ');
+            }
+            message.append(FormatTimeUtils.formatTime(startTime + getTimeOffset(), timeFormat, Resolution.NANOSEC));
+        } else {
+            message.append("T1: "); //$NON-NLS-1$
+            if (isCalendar) {
+                message.append(FormatTimeUtils.formatDate(startTime + getTimeOffset()) + ' ');
+            }
+            message.append(FormatTimeUtils.formatTime(startTime + getTimeOffset(), timeFormat, Resolution.NANOSEC));
+            message.append(spaces);
+            message.append("T2: "); //$NON-NLS-1$
+            if (isCalendar) {
+                message.append(FormatTimeUtils.formatDate(endTime + getTimeOffset()) + ' ');
+            }
+            message.append(FormatTimeUtils.formatTime(endTime + getTimeOffset(), timeFormat, Resolution.NANOSEC));
+            message.append(spaces);
+            message.append("\u0394: " + FormatTimeUtils.formatDelta(endTime - startTime, timeFormat, Resolution.NANOSEC)); //$NON-NLS-1$
+        }
+
+        fStatusLineManager.setMessage(message.toString());
     }
 }

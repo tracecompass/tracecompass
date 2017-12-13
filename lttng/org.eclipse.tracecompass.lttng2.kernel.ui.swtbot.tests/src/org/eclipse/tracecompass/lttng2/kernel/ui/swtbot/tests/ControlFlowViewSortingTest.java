@@ -43,9 +43,9 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -232,9 +232,9 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
     private static void testBirthtimeSorting(final SWTBotTree tree, final SWTBotTimeGraph timeGraph) {
         SWTBotTreeColumn column = tree.header(BIRTH_COLUMN);
         String[] expected = {
-                Utils.formatTime(LTTNG_CONSUMER_BIRTHTIME, TimeFormat.CALENDAR, Resolution.NANOSEC),
-                Utils.formatTime(SYSTEMD_BIRTHTIME, TimeFormat.CALENDAR, Resolution.NANOSEC),
-                Utils.formatTime(KTHREAD_BIRTHTIME, TimeFormat.CALENDAR, Resolution.NANOSEC) };
+                FormatTimeUtils.formatTime(LTTNG_CONSUMER_BIRTHTIME, TimeFormat.CALENDAR, Resolution.NANOSEC),
+                FormatTimeUtils.formatTime(SYSTEMD_BIRTHTIME, TimeFormat.CALENDAR, Resolution.NANOSEC),
+                FormatTimeUtils.formatTime(KTHREAD_BIRTHTIME, TimeFormat.CALENDAR, Resolution.NANOSEC) };
 
         /* Sort direction Up */
         SWTBotTestCondition condition = getSortCondition(BIRTH_COLUMN, BIRTH_COLUMN_ID, expected, timeGraph, false);

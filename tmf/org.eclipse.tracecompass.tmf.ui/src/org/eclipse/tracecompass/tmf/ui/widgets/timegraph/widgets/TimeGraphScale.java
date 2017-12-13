@@ -39,8 +39,9 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 
 import com.google.common.collect.ImmutableList;
 
@@ -243,7 +244,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         double pixelsPerNanoSec = (timeSpace <= RIGHT_MARGIN) ? 0 : (double) (timeSpace - RIGHT_MARGIN) / (time1 - time0);
         long timeDelta = calcTimeDelta(labelWidth, pixelsPerNanoSec);
         long time;
-        if (fTimeProvider != null && fTimeProvider.getTimeFormat() == TimeFormat.CALENDAR) {
+        if (fTimeProvider != null && fTimeProvider.getTimeFormat2() == TimeFormat.CALENDAR) {
             time = floorToCalendar(time0, timeDelta);
         } else {
             time = (time0 / timeDelta) * timeDelta;
@@ -255,7 +256,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
             if (pixelsPerNanoSec == 0 || time > Long.MAX_VALUE - timeDelta || timeDelta == 0) {
                 break;
             }
-            if (fTimeProvider != null && fTimeProvider.getTimeFormat() == TimeFormat.CALENDAR) {
+            if (fTimeProvider != null && fTimeProvider.getTimeFormat2() == TimeFormat.CALENDAR) {
                 if (timeDelta >= YEAR_IN_NS) {
                     long millis = time / MILLISEC_IN_NS;
                     GREGORIAN_CALENDAR.setTime(new Date(millis));
@@ -314,7 +315,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         long timeDelta;
         double minDelta = (pixelsPerNanoSec == 0) ? YEAR_IN_NS : width / pixelsPerNanoSec;
         long unit = 1;
-        if (fTimeProvider != null && fTimeProvider.getTimeFormat() == TimeFormat.CALENDAR) {
+        if (fTimeProvider != null && fTimeProvider.getTimeFormat2() == TimeFormat.CALENDAR) {
             if (minDelta > MAX_MONTH_FACTOR * MONTH_IN_NS) {
                 unit = YEAR_IN_NS;
             } else if (minDelta > MIN_MONTH_FACTOR * MONTH_IN_NS) {
@@ -540,7 +541,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     private int calculateDigits(long time0, long time1) {
         int numDigits;
         long timeRange = time1 - time0;
-        TimeFormat timeFormat = fTimeProvider.getTimeFormat();
+        TimeFormat timeFormat = fTimeProvider.getTimeFormat2();
 
         if (timeFormat == TimeFormat.CALENDAR) {
             // Calculate the number of digits to represent the time provided
@@ -565,7 +566,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
             numDigits += 12; // .000 000 000
             if (timeFormat == TimeFormat.CYCLES) {
                 numDigits += Messages.Utils_ClockCyclesUnit.length();
-            } else if (fTimeProvider.getTimeFormat() == TimeFormat.RELATIVE) {
+            } else if (fTimeProvider.getTimeFormat2() == TimeFormat.RELATIVE) {
                 numDigits += 2; // " s"
             }
         }
@@ -641,7 +642,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
     @TmfSignalHandler
     public void timestampFormatUpdated(TmfTimestampFormatUpdateSignal signal) {
         TimeDraw.updateTimeZone();
-        Utils.updateTimeZone();
+        FormatTimeUtils.updateTimeZone();
         redraw();
     }
 }
@@ -885,7 +886,7 @@ class TimeDrawAbsMillisec extends TimeDraw {
         synchronized (SEC_FORMAT) {
             stime = SEC_FORMAT.format(new Date(nanosec / MILLISEC_IN_NS));
         }
-        String ns = Utils.formatNs(nanosec, Resolution.MILLISEC);
+        String ns = FormatTimeUtils.formatNs(nanosec, Resolution.MILLISEC);
         return Utils.drawText(gc, stime + "." + ns, rect, true); //$NON-NLS-1$
     }
 
@@ -902,7 +903,7 @@ class TimeDrawAbsMicroSec extends TimeDraw {
         synchronized (SEC_FORMAT) {
             stime = SEC_FORMAT.format(new Date(nanosec / MILLISEC_IN_NS));
         }
-        String micr = Utils.formatNs(nanosec, Resolution.MICROSEC);
+        String micr = FormatTimeUtils.formatNs(nanosec, Resolution.MICROSEC);
         return Utils.drawText(gc, stime + "." + micr, rect, true); //$NON-NLS-1$
     }
 
@@ -919,7 +920,7 @@ class TimeDrawAbsNanoSec extends TimeDraw {
         synchronized (SEC_FORMAT) {
             stime = SEC_FORMAT.format(new Date(nanosec / MILLISEC_IN_NS));
         }
-        String ns = Utils.formatNs(nanosec, Resolution.NANOSEC);
+        String ns = FormatTimeUtils.formatNs(nanosec, Resolution.NANOSEC);
         return Utils.drawText(gc, stime + "." + ns, rect, true); //$NON-NLS-1$
     }
 
@@ -940,7 +941,7 @@ class TimeDrawNumber extends TimeDraw {
 class TimeDrawCycles extends TimeDraw {
     @Override
     public int draw(GC gc, long time, Rectangle rect) {
-        String stime = Utils.formatTime(time, TimeFormat.CYCLES, Resolution.SECONDS);
+        String stime = FormatTimeUtils.formatTime(time, TimeFormat.CYCLES, Resolution.SECONDS);
         return Utils.drawText(gc, stime, rect, true);
     }
 }

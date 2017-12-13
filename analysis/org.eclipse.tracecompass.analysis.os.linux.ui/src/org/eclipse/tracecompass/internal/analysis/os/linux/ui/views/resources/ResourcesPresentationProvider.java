@@ -49,8 +49,9 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITmfTimeGraphDrawingHelper;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -223,7 +224,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                         // In running state get the current tid
 
                         try {
-                            retMap.put(Messages.ResourcesView_attributeHoverTime, Utils.formatTime(hoverTime, TimeFormat.CALENDAR, Resolution.NANOSEC));
+                            retMap.put(Messages.ResourcesView_attributeHoverTime, FormatTimeUtils.formatTime(hoverTime, TimeFormat.CALENDAR, Resolution.NANOSEC));
                             int cpuQuark = entry.getQuark();
                             int currentThreadQuark = ss.getQuarkRelative(cpuQuark, Attributes.CURRENT_THREAD);
                             ITmfStateInterval interval = ss.querySingleState(hoverTime, currentThreadQuark);

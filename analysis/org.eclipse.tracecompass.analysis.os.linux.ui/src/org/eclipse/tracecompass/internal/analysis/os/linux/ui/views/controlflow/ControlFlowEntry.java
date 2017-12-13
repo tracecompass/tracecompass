@@ -18,9 +18,9 @@ import java.util.regex.Pattern;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.Resolution;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 
 /**
  * An entry in the Control Flow view
@@ -126,7 +126,7 @@ public class ControlFlowEntry extends TimeGraphEntry {
         if (pattern.matcher(Integer.toString(fThreadQuark)).find()) {
             return true;
         }
-        return (pattern.matcher(Utils.formatTime(getStartTime(), TimeFormat.CALENDAR, Resolution.NANOSEC)).find());
+        return (pattern.matcher(FormatTimeUtils.formatTime(getStartTime(), TimeFormat.CALENDAR, Resolution.NANOSEC)).find());
     }
 
     @Override

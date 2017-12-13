@@ -15,14 +15,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets;
 
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -32,9 +26,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
-import org.eclipse.tracecompass.internal.tmf.ui.Messages;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
@@ -52,7 +44,12 @@ public class Utils {
     private Utils() {
     }
 
-    /** Time format for dates and timestamp */
+    /**
+     * Time format for dates and timestamp
+     *
+     * @deprecated As of 3.3, use {@link FormatTimeUtils}
+     */
+    @Deprecated
     public enum TimeFormat {
         /** Relative to the start of the trace */
         RELATIVE,
@@ -75,8 +72,11 @@ public class Utils {
 
     /**
      * Timestamp resolution
+     *
+     * @deprecated As of 3.3, use {@link FormatTimeUtils}
      */
-    public static enum Resolution {
+    @Deprecated
+    public enum Resolution {
         /** seconds */
         SECONDS,
 
@@ -98,21 +98,14 @@ public class Utils {
      */
     public static final String ELLIPSIS = "…"; //$NON-NLS-1$
 
-    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss"); //$NON-NLS-1$
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd"); //$NON-NLS-1$
-    private static final long HOURS_PER_DAY = 24;
-    private static final long MIN_PER_HOUR = 60;
-    private static final long SEC_PER_MIN = 60;
-    private static final long SEC_IN_NS = 1000000000;
-    private static final long MILLISEC_IN_NS = 1000000;
-
     /**
      * Update the time and date formats to use the current time zone
+     *
+     * @deprecated As of 3.3, use {@link FormatTimeUtils}
      */
+    @Deprecated
     public static void updateTimeZone() {
-        TimeZone timeZone = TmfTimePreferences.getTimeZone();
-        TIME_FORMAT.setTimeZone(timeZone);
-        DATE_FORMAT.setTimeZone(timeZone);
+        FormatTimeUtils.updateTimeZone();
     }
 
     static Rectangle clone(Rectangle source) {
@@ -411,41 +404,21 @@ public class Utils {
     /**
      * Formats time in format: MM:SS:NNN
      *
-     * @param time time
-     * @param format  0: MMMM:ss:nnnnnnnnn, 1: HH:MM:ss MMM.mmmm.nnn
-     * @param resolution the resolution
+     * @param time
+     *            time
+     * @param format
+     *            0: MMMM:ss:nnnnnnnnn, 1: HH:MM:ss MMM.mmmm.nnn
+     * @param resolution
+     *            the resolution
      * @return the formatted time
+     *
+     * @deprecated As of 3.3, use {@link FormatTimeUtils}
      */
+    @Deprecated
     public static String formatTime(long time, TimeFormat format, Resolution resolution) {
-        switch (format) {
-        case CALENDAR:
-            return formatTimeAbs(time, resolution);
-        case NUMBER:
-            return NumberFormat.getInstance().format(time);
-        case CYCLES:
-            return NumberFormat.getInstance().format(time) + Messages.Utils_ClockCyclesUnit;
-        case RELATIVE:
-            return formatTimeRelative(time, resolution);
-        default:
-        }
-
-        StringBuffer str = new StringBuffer();
-        long t = time;
-        boolean neg = t < 0;
-        if (neg) {
-            t = -t;
-            str.append('-');
-        }
-
-        long sec = t / SEC_IN_NS;
-        str.append(sec);
-        String ns = formatNs(t, resolution);
-        if (!ns.equals("")) { //$NON-NLS-1$
-            str.append('.');
-            str.append(ns);
-        }
-
-        return str.toString();
+        FormatTimeUtils.TimeFormat timeFormat = FormatTimeUtils.TimeFormat.values()[format.ordinal()];
+        FormatTimeUtils.Resolution res = FormatTimeUtils.Resolution.values()[resolution.ordinal()];
+        return FormatTimeUtils.formatTime(time, timeFormat, res);
     }
 
     /**
@@ -454,10 +427,11 @@ public class Utils {
      * @param absTime
      *            The source time, in ns
      * @return the formatted date
+     * @deprecated As of 3.3, use {@link FormatTimeUtils}
      */
+    @Deprecated
     public static String formatDate(long absTime) {
-        String sdate = DATE_FORMAT.format(new Date(absTime / MILLISEC_IN_NS));
-        return sdate;
+        return FormatTimeUtils.formatDate(absTime);
     }
 
     /**
@@ -468,23 +442,12 @@ public class Utils {
      * @param res
      *            The resolution to use
      * @return the formatted time
+     * @deprecated As of 3.3, use {@link FormatTimeUtils}
      */
+    @Deprecated
     public static String formatTimeAbs(long time, Resolution res) {
-        StringBuffer str = new StringBuffer();
-
-        // format time from nanoseconds to calendar time HH:MM:SS
-        String stime = TIME_FORMAT.format(new Date(time / MILLISEC_IN_NS));
-        str.append(stime);
-        String ns = formatNs(time, res);
-        if (!ns.isEmpty()) {
-            str.append('.');
-            /*
-             * append the Milliseconds, MicroSeconds and NanoSeconds as
-             * specified in the Resolution
-             */
-            str.append(ns);
-        }
-        return str.toString();
+        FormatTimeUtils.Resolution resolution = FormatTimeUtils.Resolution.values()[res.ordinal()];
+        return FormatTimeUtils.formatTimeAbs(time, resolution);
     }
 
     /**
@@ -497,42 +460,13 @@ public class Utils {
      * @param resolution
      *            The resolution to use
      * @return the formatted time delta
+     * @deprecated As of 3.3, use {@link FormatTimeUtils}
      */
+    @Deprecated
     public static String formatDelta(long delta, TimeFormat format, Resolution resolution) {
-        if (format == TimeFormat.CALENDAR) {
-            return formatDeltaAbs(delta, resolution);
-        }
-        return formatTime(delta, format, resolution);
-    }
-
-    /**
-     * Formats relative time to second
-     *
-     * @param time
-     *            The relative time in ns
-     * @param resolution
-     *            The resolution to use
-     * @return The formatted time in second
-     */
-    private static String formatTimeRelative(long time, Resolution resolution) {
-        StringBuffer str = new StringBuffer();
-        if (time < 0) {
-            str.append('-');
-        }
-
-        long ns = Math.abs(time);
-        long seconds = TimeUnit.NANOSECONDS.toSeconds(ns);
-        str.append(seconds);
-        str.append('.');
-        // append the ms, us and ns as specified in the resolution
-        str.append(formatNs(time, resolution));
-        str.append('s');
-        if (seconds == 0) {
-            str.append(" ("); //$NON-NLS-1$
-            str.append(new DecimalUnitFormat(1.0 / SEC_IN_NS).format(time));
-            str.append("s)"); //$NON-NLS-1$
-        }
-        return str.toString();
+        FormatTimeUtils.TimeFormat timeFormat = FormatTimeUtils.TimeFormat.values()[format.ordinal()];
+        FormatTimeUtils.Resolution res = FormatTimeUtils.Resolution.values()[resolution.ordinal()];
+        return FormatTimeUtils.formatDelta(delta, timeFormat, res);
     }
 
     /**
@@ -544,40 +478,12 @@ public class Utils {
      * @param resolution
      *            The resolution to use
      * @return the formatted time delta
+     * @deprecated As of 3.3, use {@link FormatTimeUtils}
      */
+    @Deprecated
     public static String formatDeltaAbs(long delta, Resolution resolution) {
-        StringBuffer str = new StringBuffer();
-        if (delta < 0) {
-            str.append('-');
-        }
-        long ns = Math.abs(delta);
-        long seconds = TimeUnit.NANOSECONDS.toSeconds(ns);
-        long minutes = TimeUnit.NANOSECONDS.toMinutes(ns);
-        long hours = TimeUnit.NANOSECONDS.toHours(ns);
-        long days = TimeUnit.NANOSECONDS.toDays(ns);
-        if (days > 0) {
-            str.append(days);
-            str.append("d "); //$NON-NLS-1$
-        }
-        if (hours > 0) {
-            str.append(hours % HOURS_PER_DAY);
-            str.append("h "); //$NON-NLS-1$
-        }
-        if (minutes > 0) {
-            str.append(minutes % MIN_PER_HOUR);
-            str.append("m "); //$NON-NLS-1$
-        }
-        str.append(seconds % SEC_PER_MIN);
-        str.append('.');
-        // append the ms, us and ns as specified in the resolution
-        str.append(formatNs(delta, resolution));
-        str.append("s"); //$NON-NLS-1$
-        if (seconds == 0) {
-            str.append(" ("); //$NON-NLS-1$
-            str.append(new DecimalUnitFormat(1.0 / SEC_IN_NS).format(delta));
-            str.append("s)"); //$NON-NLS-1$
-        }
-        return str.toString();
+        FormatTimeUtils.Resolution res = FormatTimeUtils.Resolution.values()[resolution.ordinal()];
+        return FormatTimeUtils.formatDeltaAbs(delta, res);
     }
 
     /**
@@ -591,22 +497,12 @@ public class Utils {
      * @param res
      *            The Resolution to use
      * @return the formatted nanosec
+     * @deprecated As of 3.3, use {@link FormatTimeUtils}
      */
+    @Deprecated
     public static String formatNs(long srcTime, Resolution res) {
-        StringBuffer str = new StringBuffer();
-        long ns = Math.abs(srcTime % SEC_IN_NS);
-        String nanos = Long.toString(ns);
-        str.append("000000000".substring(nanos.length())); //$NON-NLS-1$
-        str.append(nanos);
-
-        if (res == Resolution.MILLISEC) {
-            return str.substring(0, 3);
-        } else if (res == Resolution.MICROSEC) {
-            return str.substring(0, 6);
-        } else if (res == Resolution.NANOSEC) {
-            return str.substring(0, 9);
-        }
-        return ""; //$NON-NLS-1$
+        FormatTimeUtils.Resolution resolution = FormatTimeUtils.Resolution.values()[res.ordinal()];
+        return FormatTimeUtils.formatNs(srcTime, resolution);
     }
 
     /**

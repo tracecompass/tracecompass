@@ -13,7 +13,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.ITmfChartTimeProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 
 /**
  * Tmf Chart data provider wrapper to comply with Time data provider API
@@ -95,8 +96,17 @@ public final class TmfXYChartTimeAdapter implements ITimeDataProvider {
         return fTimeProvider.getEndTime();
     }
 
+    /**
+     * @deprecated As of 3.3 use {@link #getTimeFormat2()}
+     */
     @Override
-    public TimeFormat getTimeFormat() {
+    @Deprecated
+    public Utils.TimeFormat getTimeFormat() {
+        return Utils.TimeFormat.values()[TimeFormat.CALENDAR.ordinal()];
+    }
+
+    @Override
+    public TimeFormat getTimeFormat2() {
         return TimeFormat.CALENDAR;
     }
 
