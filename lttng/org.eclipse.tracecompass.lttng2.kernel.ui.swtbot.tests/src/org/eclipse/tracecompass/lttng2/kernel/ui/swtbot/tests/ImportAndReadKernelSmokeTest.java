@@ -217,7 +217,7 @@ public class ImportAndReadKernelSmokeTest extends KernelTestBase {
         bot.waitUntil(treeHasRows(sseBot.bot().tree(), 0));
         // re-open the trace
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, tracePath, KERNEL_TRACE_TYPE);
-        assertTrue("Wrong state systems", getSsNames(sseBot).containsAll(EXPECTED_ANALYSES));
+        assertTrue("Wrong state systems: expected: " + EXPECTED_ANALYSES + ", actual: " + getSsNames(sseBot), getSsNames(sseBot).containsAll(EXPECTED_ANALYSES));
         sseBot.close();
         cpuUsageBot.close();
     }
