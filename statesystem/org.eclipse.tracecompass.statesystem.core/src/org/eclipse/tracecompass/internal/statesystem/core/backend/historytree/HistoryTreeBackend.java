@@ -369,11 +369,17 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
                         /* Compute reduced conditions here to reduce complexity in queuing operations. */
                         IntegerRangeCondition subQuarks = quarks.subCondition(currentNode.getMinQuark(), currentNode.getMaxQuark());
                         TimeRangeCondition subTimes = times.subCondition(currentNode.getNodeStart(), currentNode.getNodeEnd());
-                        if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
-                            // Queue the relevant children nodes for BFS.
-                            seqNumberQueue.addAll(((ParentNode) currentNode).selectNextChildren2D(subQuarks, subTimes));
+                        /*
+                         * During the SHT construction, the bounds of the children are not final, so we
+                         * may have queued some nodes which don't overlap the query.
+                         */
+                        if (subQuarks != null && subTimes != null) {
+                            if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
+                                // Queue the relevant children nodes for BFS.
+                                seqNumberQueue.addAll(((ParentNode) currentNode).selectNextChildren2D(subQuarks, subTimes));
+                            }
+                            intervalQueue = currentNode.iterable2D(subQuarks, subTimes).iterator();
                         }
-                        intervalQueue = currentNode.iterable2D(subQuarks, subTimes).iterator();
                     } catch (ClosedChannelException e) {
                         return false;
                     }
