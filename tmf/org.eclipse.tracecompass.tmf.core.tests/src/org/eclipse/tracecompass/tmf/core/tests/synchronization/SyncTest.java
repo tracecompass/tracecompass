@@ -31,6 +31,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.synchronization.SyncAlgorithmFullyIncremental;
 import org.eclipse.tracecompass.internal.tmf.core.synchronization.TmfTimestampTransformLinearFast;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventDependency;
+import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventDependency.DependencyEvent;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationAlgorithm;
 import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationAlgorithm.SyncQuality;
@@ -226,8 +227,8 @@ public class SyncTest {
     private static void addSyncMatch(SynchronizationAlgorithm algo, ITmfTrace sender, long sendTs, ITmfTrace receiver, long receiveTs) {
         algo.addMatch(
                 new TmfEventDependency(
-                        new TmfSyncEventStub(sender, TmfTimestamp.fromSeconds(sendTs)),
-                        new TmfSyncEventStub(receiver, TmfTimestamp.fromSeconds(receiveTs))
+                        new DependencyEvent(new TmfSyncEventStub(sender, TmfTimestamp.fromSeconds(sendTs))),
+                        new DependencyEvent(new TmfSyncEventStub(receiver, TmfTimestamp.fromSeconds(receiveTs)))
                 ));
     }
 

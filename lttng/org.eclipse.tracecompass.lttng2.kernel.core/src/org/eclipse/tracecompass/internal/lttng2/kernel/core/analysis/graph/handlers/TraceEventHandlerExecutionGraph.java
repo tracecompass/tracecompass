@@ -36,6 +36,7 @@ import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.event.matching.IMatchProcessingUnit;
+import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventDependency.DependencyEvent;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventDependency;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -63,7 +64,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
 
     private final Table<String, Integer, OsWorker> fKernel;
     private final IMatchProcessingUnit fMatchProcessing;
-    private Map<ITmfEvent, TmfVertex> fTcpNodes;
+    private Map<DependencyEvent, TmfVertex> fTcpNodes;
     private TmfEventMatching fTcpMatching;
 
     /**
@@ -96,8 +97,8 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
                 if (match == null) {
                     return;
                 }
-                TmfVertex output = fTcpNodes.remove(match.getSourceEvent());
-                TmfVertex input = fTcpNodes.remove(match.getDestinationEvent());
+                TmfVertex output = fTcpNodes.remove(match.getSource());
+                TmfVertex input = fTcpNodes.remove(match.getDestination());
                 if (output != null && input != null) {
                     output.linkVertical(input).setType(EdgeType.NETWORK);
                 }
@@ -373,7 +374,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         if (context == Context.SOFTIRQ) {
             OsWorker k = getOrCreateKernelWorker(event, cpu);
             TmfVertex endpoint = stateExtend(k, event.getTimestamp().getValue());
-            fTcpNodes.put(event, endpoint);
+            fTcpNodes.put(new DependencyEvent(event), endpoint);
             // TODO add actual progress monitor
             fTcpMatching.matchEvent(event, event.getTrace(), DEFAULT_PROGRESS_MONITOR);
         }
@@ -397,7 +398,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
             return;
         }
         TmfVertex endpoint = stateExtend(sender, event.getTimestamp().getValue());
-        fTcpNodes.put(event, endpoint);
+        fTcpNodes.put(new DependencyEvent(event), endpoint);
         // TODO, add actual progress monitor
         fTcpMatching.matchEvent(event, event.getTrace(), new NullProgressMonitor());
     }

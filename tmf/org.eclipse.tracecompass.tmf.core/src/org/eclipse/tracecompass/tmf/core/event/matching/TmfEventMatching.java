@@ -12,8 +12,6 @@
 
 package org.eclipse.tracecompass.tmf.core.event.matching;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,6 +25,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventDependency.DependencyEvent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -64,12 +63,12 @@ public class TmfEventMatching implements ITmfEventMatching {
     /**
      * Hashtables for unmatches incoming events
      */
-    private final Table<ITmfTrace, IEventMatchingKey, ITmfEvent> fUnmatchedIn = HashBasedTable.create();
+    private final Table<ITmfTrace, IEventMatchingKey, DependencyEvent> fUnmatchedIn = HashBasedTable.create();
 
     /**
      * Hashtables for unmatches outgoing events
      */
-    private final Table<ITmfTrace, IEventMatchingKey, ITmfEvent> fUnmatchedOut = HashBasedTable.create();
+    private final Table<ITmfTrace, IEventMatchingKey, DependencyEvent> fUnmatchedOut = HashBasedTable.create();
 
     /**
      * Enum for cause and effect types of event
@@ -242,7 +241,7 @@ public class TmfEventMatching implements ITmfEventMatching {
         if (eventKey == null) {
             return;
         }
-        Table<ITmfTrace, IEventMatchingKey, ITmfEvent> unmatchedTbl, companionTbl;
+        Table<ITmfTrace, IEventMatchingKey, DependencyEvent> unmatchedTbl, companionTbl;
 
         /* Point to the appropriate table */
         switch (evType) {
@@ -258,24 +257,20 @@ public class TmfEventMatching implements ITmfEventMatching {
             return;
         }
 
-        boolean found = false;
         TmfEventDependency dep = null;
+        DependencyEvent depEvent = new DependencyEvent(event);
         /* Search for the event in the companion table */
         for (ITmfTrace mTrace : getIndividualTraces()) {
             if (companionTbl.contains(mTrace, eventKey)) {
-                found = true;
-                ITmfEvent companionEvent = companionTbl.get(mTrace, eventKey);
-
-                /* Remove the element from the companion table */
-                companionTbl.remove(mTrace, eventKey);
+                DependencyEvent companionEvent = companionTbl.remove(mTrace, eventKey);
 
                 /* Create the dependency object */
                 switch (evType) {
                 case EFFECT:
-                    dep = new TmfEventDependency(companionEvent, event);
+                    dep = new TmfEventDependency(companionEvent, depEvent);
                     break;
                 case CAUSE:
-                    dep = new TmfEventDependency(event, companionEvent);
+                    dep = new TmfEventDependency(depEvent, companionEvent);
                     break;
                 default:
                     break;
@@ -288,8 +283,8 @@ public class TmfEventMatching implements ITmfEventMatching {
          * If no companion was found, add the event to the appropriate unMatched
          * lists
          */
-        if (found) {
-            getProcessingUnit().addMatch(checkNotNull(dep));
+        if (dep != null) {
+            getProcessingUnit().addMatch(dep);
             monitor.subTask(NLS.bind(Messages.TmfEventMatching_MatchesFound, getProcessingUnit().countMatches()));
         } else {
             /*
@@ -304,7 +299,7 @@ public class TmfEventMatching implements ITmfEventMatching {
              * though
              */
             if (!unmatchedTbl.contains(event.getTrace(), eventKey)) {
-                unmatchedTbl.put(event.getTrace(), eventKey, event);
+                unmatchedTbl.put(event.getTrace(), eventKey, depEvent);
             }
         }
     }

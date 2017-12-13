@@ -27,13 +27,12 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.synchronization.graph.SyncSpanningTree;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventDependency;
+import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventDependency.DependencyEvent;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.synchronization.Messages;
 import org.eclipse.tracecompass.tmf.core.synchronization.SynchronizationAlgorithm;
 import org.eclipse.tracecompass.tmf.core.synchronization.TimestampTransformFactory;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -99,8 +98,8 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
 
     @Override
     protected void processMatch(TmfEventDependency match) {
-        ITmfTrace trace1 = match.getSourceEvent().getTrace();
-        ITmfTrace trace2 = match.getDestinationEvent().getTrace();
+        ITmfTrace trace1 = match.getSource().getTrace();
+        ITmfTrace trace2 = match.getDestination().getTrace();
         String host1 = trace1.getHostId();
         String host2 = trace2.getHostId();
 
@@ -287,19 +286,19 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
             fNbMatches++;
 
             /* Initialize data depending on the which hull the match is part of */
-            if (match.getSourceEvent().getTrace().getHostId().compareTo(match.getDestinationEvent().getTrace().getHostId()) > 0) {
+            if (match.getSource().getTrace().getHostId().compareTo(match.getDestination().getTrace().getHostId()) > 0) {
                 boundList = fUpperBoundList;
                 otherBoundList = fLowerBoundList;
                 line = fLmin;
                 otherLine = fLmax;
-                p = new SyncPoint(match.getDestinationEvent(), match.getSourceEvent());
+                p = new SyncPoint(match.getDestination(), match.getSource());
                 inversionFactor = 1;
             } else {
                 boundList = fLowerBoundList;
                 otherBoundList = fUpperBoundList;
                 line = fLmax;
                 otherLine = fLmin;
-                p = new SyncPoint(match.getSourceEvent(), match.getDestinationEvent());
+                p = new SyncPoint(match.getSource(), match.getDestination());
                 inversionFactor = -1;
             }
 
@@ -553,16 +552,22 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
      * is the timestamp of the event from the reference trace while the y axis
      * is the timestamp of the event on the other trace
      */
-    private class SyncPoint {
-        private final ITmfTimestamp x, y;
+    private static class SyncPoint {
+        private final long x;
+        private final long y;
 
-        public SyncPoint(ITmfEvent ex, ITmfEvent ey) {
-            x = ex.getTimestamp();
-            y = ey.getTimestamp();
+        public SyncPoint(DependencyEvent dependencyEvent, DependencyEvent dependencyEvent2) {
+            /*
+             * The algorithm will give more readable results by using the value and not
+             * toNanos(), as the computed values of the formula will resemble the timestamps
+             * of the trace
+             */
+            x = dependencyEvent.getTimestamp().getValue();
+            y = dependencyEvent2.getTimestamp().getValue();
         }
 
         public long getTimeX() {
-            return x.getValue();
+            return x;
         }
 
         /**
@@ -581,7 +586,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
          * @return The cross product
          */
         public long crossProduct(SyncPoint pa, SyncPoint pb) {
-            long cp = ((pa.x.getValue() - x.getValue()) * (pb.y.getValue() - y.getValue()) - (pa.y.getValue() - y.getValue()) * (pb.x.getValue() - x.getValue()));
+            long cp = ((pa.x - x) * (pb.y - y) - (pa.y - y) * (pb.x - x));
             return cp;
         }
 
@@ -592,8 +597,8 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
             if (p1 == null) {
                 return BigDecimal.ONE;
             }
-            BigDecimal deltay = BigDecimal.valueOf(y.getValue() - p1.y.getValue());
-            BigDecimal deltax = BigDecimal.valueOf(x.getValue() - p1.x.getValue());
+            BigDecimal deltay = BigDecimal.valueOf(y - p1.y);
+            BigDecimal deltax = BigDecimal.valueOf(x - p1.x);
             if (deltax.equals(BigDecimal.ZERO)) {
                 return BigDecimal.ONE;
             }
@@ -604,7 +609,7 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
          * Get the beta value (when x = 0) of the line given alpha
          */
         public @NonNull BigDecimal getBeta(BigDecimal alpha) {
-            return BigDecimal.valueOf(y.getValue()).subtract(alpha.multiply(BigDecimal.valueOf(x.getValue()), fMc));
+            return BigDecimal.valueOf(y).subtract(alpha.multiply(BigDecimal.valueOf(x), fMc));
         }
 
         @Override
