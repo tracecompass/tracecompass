@@ -33,7 +33,7 @@ public class TmfEventDependency {
      * timestamp. This contains only the required information for event matching
      * between traces, without the extra fields that take up a lot of memory.
      *
-     * @since 3.2
+     * @since 3.3
      */
     public static class DependencyEvent {
         private final @NonNull ITmfTrace fTrace;
@@ -91,7 +91,7 @@ public class TmfEventDependency {
      *            The source event of this dependency
      * @param destination
      *            The destination event of this dependency
-     * @since 3.2
+     * @since 3.3
      */
     public TmfEventDependency(final DependencyEvent source, final DependencyEvent destination) {
         fSource = source;
@@ -102,7 +102,7 @@ public class TmfEventDependency {
      * Get the source of this dependency
      *
      * @return The source event
-     * @since 3.2
+     * @since 3.3
      */
     public DependencyEvent getSource() {
         return fSource;
@@ -112,7 +112,7 @@ public class TmfEventDependency {
      * Get the destination of this dependency
      *
      * @return The source event
-     * @since 3.2
+     * @since 3.3
      */
     public DependencyEvent getDestination() {
         return fDestination;

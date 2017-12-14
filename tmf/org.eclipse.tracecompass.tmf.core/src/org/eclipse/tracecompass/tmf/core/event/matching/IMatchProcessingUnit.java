@@ -44,6 +44,19 @@ public interface IMatchProcessingUnit {
     void addMatch(TmfEventDependency match);
 
     /**
+     * Function called when a match is found
+     *
+     * @param eventKey
+     *            The key that matched the events to get this match
+     * @param match
+     *            The event match
+     * @since 3.3
+     */
+    default void addMatch(IEventMatchingKey eventKey, TmfEventDependency match) {
+        addMatch(match);
+    }
+
+    /**
      * Function called after all matching has been done, to do any post-match
      * treatment
      */

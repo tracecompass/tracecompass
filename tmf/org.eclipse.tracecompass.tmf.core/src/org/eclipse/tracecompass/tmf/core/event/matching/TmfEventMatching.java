@@ -12,9 +12,16 @@
 
 package org.eclipse.tracecompass.tmf.core.event.matching;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -33,6 +40,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
@@ -53,6 +61,9 @@ public class TmfEventMatching implements ITmfEventMatching {
      */
     private final @NonNull Collection<@NonNull ITmfTrace> fTraces;
 
+    private final @NonNull Collection<@NonNull ITmfTrace> fIndividualTraces;
+    private final @NonNull Collection<@NonNull String> fDistinctHosts;
+
     /**
      * The class to call once a match is found
      */
@@ -69,6 +80,12 @@ public class TmfEventMatching implements ITmfEventMatching {
      * Hashtables for unmatches outgoing events
      */
     private final Table<ITmfTrace, IEventMatchingKey, DependencyEvent> fUnmatchedOut = HashBasedTable.create();
+
+    /**
+     * Hash tables matching the latest match between 2 hosts (sender, receiver) by
+     * key class
+     */
+    private final Map<Class<? extends IEventMatchingKey>, Table<String, String, TmfEventDependency>> fLastMatches = new HashMap<>();
 
     /**
      * Enum for cause and effect types of event
@@ -110,6 +127,15 @@ public class TmfEventMatching implements ITmfEventMatching {
         }
         fTraces = new HashSet<>(traces);
         fMatches = tmfEventMatches;
+        Set<@NonNull ITmfTrace> individualTraces = new HashSet<>();
+        for (ITmfTrace trace : traces) {
+            individualTraces.addAll(TmfTraceManager.getTraceSet(trace));
+        }
+        fIndividualTraces = individualTraces;
+        fDistinctHosts = individualTraces.stream()
+                .map(ITmfTrace::getHostId)
+                .distinct()
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -132,11 +158,7 @@ public class TmfEventMatching implements ITmfEventMatching {
      * @return The individual traces to synchronize, no experiments
      */
     protected Collection<ITmfTrace> getIndividualTraces() {
-        Set<ITmfTrace> traces = new HashSet<>();
-        for (ITmfTrace trace : fTraces) {
-            traces.addAll(TmfTraceManager.getTraceSet(trace));
-        }
-        return traces;
+        return fIndividualTraces;
     }
 
     /**
@@ -284,7 +306,7 @@ public class TmfEventMatching implements ITmfEventMatching {
          * lists
          */
         if (dep != null) {
-            getProcessingUnit().addMatch(dep);
+            processDependency(eventKey, dep);
             monitor.subTask(NLS.bind(Messages.TmfEventMatching_MatchesFound, getProcessingUnit().countMatches()));
         } else {
             /*
@@ -300,6 +322,48 @@ public class TmfEventMatching implements ITmfEventMatching {
              */
             if (!unmatchedTbl.contains(event.getTrace(), eventKey)) {
                 unmatchedTbl.put(event.getTrace(), eventKey, depEvent);
+            }
+        }
+    }
+
+    private void processDependency(@NonNull IEventMatchingKey eventKey, @NonNull TmfEventDependency dep) {
+        getProcessingUnit().addMatch(eventKey, dep);
+        String sourceHost = dep.getSource().getTrace().getHostId();
+        String destHost = dep.getDestination().getTrace().getHostId();
+        Table<String, String, TmfEventDependency> lastMatches = getLastMatchTable(eventKey);
+        lastMatches.put(sourceHost, destHost, dep);
+
+        // Do some cleanup of events waiting to be matched
+        cleanupList(eventKey, lastMatches.row(sourceHost), dep.getSource(), evDep -> evDep.getSource().getTimestamp().toNanos(), fUnmatchedOut);
+        cleanupList(eventKey, lastMatches.column(destHost), dep.getDestination(), evDep -> evDep.getDestination().getTimestamp().toNanos(), fUnmatchedIn);
+    }
+
+    private Table<String, String, TmfEventDependency> getLastMatchTable(@NonNull IEventMatchingKey eventKey) {
+        Table<String, String, TmfEventDependency> table = fLastMatches.get(eventKey.getClass());
+        if (table == null) {
+            table = HashBasedTable.create();
+            fLastMatches.put(eventKey.getClass(), table);
+        }
+        return table;
+    }
+
+    private void cleanupList(@NonNull IEventMatchingKey eventKey, Map<String, TmfEventDependency> lastMatches, DependencyEvent lastDep, Function<TmfEventDependency, Long> mapToTime, Table<ITmfTrace, IEventMatchingKey, DependencyEvent> toClean) {
+     // Is there a match with all other hosts
+        long otherHosts = lastMatches.keySet().stream().filter(s -> !s.equals(lastDep.getTrace().getHostId())).count();
+        if (otherHosts == fDistinctHosts.size() - 1) {
+            // A match has been found with all hosts, cleanup the previously sent packets for this trace
+            Long earliest = lastMatches.values().stream()
+                    .map(mapToTime)
+                    .min(Long::compareTo)
+                    .orElse(0L);
+            if (earliest > 0) {
+                List<IEventMatchingKey> toRemove = new ArrayList<>();
+                for (Entry<IEventMatchingKey, DependencyEvent> entry : toClean.row(lastDep.getTrace()).entrySet()) {
+                    if (entry.getValue().getTimestamp().toNanos() < earliest && entry.getKey().getClass().isAssignableFrom(eventKey.getClass())) {
+                        toRemove.add(entry.getKey());
+                    }
+                }
+                toRemove.forEach(m -> toClean.remove(lastDep.getTrace(), m));
             }
         }
     }
@@ -381,6 +445,28 @@ public class TmfEventMatching implements ITmfEventMatching {
      */
     public static void registerMatchObject(ITmfMatchEventDefinition match) {
         MATCH_DEFINITIONS.add(match);
+    }
+
+    /**
+     * Get the table of unmatched effect events (incoming)
+     *
+     * @return The table of unmatched incoming events
+     * @since 3.3
+     */
+    @VisibleForTesting
+    protected Table<ITmfTrace, IEventMatchingKey, DependencyEvent> getUnmatchedIn() {
+        return fUnmatchedIn;
+    }
+
+    /**
+     * Get the table of unmatched cause events (outgoing)
+     *
+     * @return The table of unmatched outgoing events
+     * @since 3.3
+     */
+    @VisibleForTesting
+    protected Table<ITmfTrace, IEventMatchingKey, DependencyEvent> getUnmatchedOut() {
+        return fUnmatchedOut;
     }
 
 }
