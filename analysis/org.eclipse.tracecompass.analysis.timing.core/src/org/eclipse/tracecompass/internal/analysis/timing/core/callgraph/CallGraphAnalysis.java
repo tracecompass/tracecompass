@@ -154,7 +154,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
             module.schedule();
         }
         // TODO:Look at updates while the state system's being built
-        dependentAnalyses.forEach((t) -> t.waitForCompletion(monitor));
+        dependentAnalyses.forEach(t -> t.waitForCompletion(monitor));
         for (IAnalysisModule module : dependentAnalyses) {
             CallStackAnalysis callstackModule = (CallStackAnalysis) module;
             String[] threadsPattern = callstackModule.getThreadsPattern();
@@ -403,7 +403,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
         ThreadNode init = new ThreadNode(initSegment, 0, 0);
         fThreadNodes.forEach(
                 tn -> tn.getChildren().forEach(
-                        child -> init.addChild(initSegment, child)));
+                        child -> init.addChild(initSegment, child.clone())));
         return Collections.singleton(init);
 
     }
