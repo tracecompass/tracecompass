@@ -89,7 +89,9 @@ public class HistoryTreeSegmentStore<E extends ISegment> implements ISegmentStor
     private SegmentHistoryTree<E> createHistoryTree(Path treeFile, IHTIntervalReader<@NonNull E> intervalReader) throws IOException {
         try {
             if (Files.exists(treeFile)) {
-                return new SegmentHistoryTree<>(NonNullUtils.checkNotNull(treeFile.toFile()), PROVIDER_VERSION, intervalReader);
+                SegmentHistoryTree<E> sht = new SegmentHistoryTree<>(NonNullUtils.checkNotNull(treeFile.toFile()), PROVIDER_VERSION, intervalReader);
+                fFinishedBuilding = true;
+                return sht;
             }
         } catch (IOException e) {
             /**

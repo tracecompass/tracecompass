@@ -15,11 +15,13 @@ import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.segmentstore.core.segmentHistoryTree.HistoryTreeSegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.tests.AbstractTestSegmentStore;
@@ -83,8 +85,8 @@ public class HTStoreTest extends AbstractTestSegmentStore {
     }
 
     /**
-     * Overrides the assert equals to compare 2 segments. The HT segments are
-     * not identical to the original segments.
+     * Overrides the assert equals to compare 2 segments. The HT segments are not
+     * identical to the original segments.
      *
      * @param expected
      *            The expected segment
@@ -128,6 +130,40 @@ public class HTStoreTest extends AbstractTestSegmentStore {
     @Test(expected = UnsupportedOperationException.class)
     public void testAddAllConstructor() {
         super.testAddAllConstructor();
+    }
+
+    /**
+     * Test reading and re-reading a {@link HistoryTreeSegmentStore}
+     *
+     * @throws IOException
+     *             Exception thrown by application
+     */
+    @Test
+    public void testReadingSegmentStore() throws IOException {
+        Path dirPath = Files.createTempDirectory("tmpSegStoreDir");
+        Path filePath = Paths.get(dirPath.toString(), "tmpSegStore");
+        assertNotNull(filePath);
+
+        try {
+            // Get the segment store, it should be in build mode and fill it with some data
+            HistoryTreeSegmentStoreStub<TestSegment> segmentStore = new HistoryTreeSegmentStoreStub<>(filePath, 1, TestSegment.DESERIALISER);
+            segmentStore.add(new TestSegment(1, 3, "abc"));
+            segmentStore.finishedBuilding(4);
+            segmentStore.dispose();
+
+            // Open the segment store, it should be filled with the segment
+            segmentStore = new HistoryTreeSegmentStoreStub<>(filePath, 1, TestSegment.DESERIALISER);
+            assertEquals(1, segmentStore.size());
+            segmentStore.dispose();
+
+            // Re-open the segment store, it should be filled with the segment
+            segmentStore = new HistoryTreeSegmentStoreStub<>(filePath, 1, TestSegment.DESERIALISER);
+            assertEquals(1, segmentStore.size());
+            segmentStore.dispose();
+        } finally {
+            Files.delete(filePath);
+            Files.delete(dirPath);
+        }
     }
 
 }
