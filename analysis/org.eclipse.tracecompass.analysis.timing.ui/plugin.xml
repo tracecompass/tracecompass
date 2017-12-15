@@ -24,6 +24,27 @@
                class="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphAnalysis">
          </analysisModuleClass>
       </output>
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.analysis.timing.ui.segstore.statistics:org.eclipse.tracecompass.internal.analysis.timing.core.event.matching">
+         <analysisId
+               id="org.eclipse.tracecompass.internal.analysis.timing.core.event.matching">
+         </analysisId>
+      </output>
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.analysis.timing.ui.segstore.table:org.eclipse.tracecompass.internal.analysis.timing.core.event.matching">
+         <analysisId
+               id="org.eclipse.tracecompass.internal.analysis.timing.core.event.matching">
+         </analysisId>
+      </output>
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.internal.analysis.timing.ui.views.event.matching.scatter">
+         <analysisId
+               id="org.eclipse.tracecompass.internal.analysis.timing.core.event.matching">
+         </analysisId>
+      </output>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -67,6 +88,32 @@
             icon="icons/eview16/statistics_view.gif"
             id="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.statistics.callgraphstatistics"
             name="%view.callgraph.statistics"
+            restorable="true">
+      </view>
+      <view
+            category="org.eclipse.linuxtools.lttng2.ui.views.category"
+            class="org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.SegmentStoreTableView"
+            icon="icons/eview16/latency.png"
+            id="org.eclipse.tracecompass.analysis.timing.ui.segstore.table:org.eclipse.tracecompass.internal.analysis.timing.core.event.matching"
+            name="%view.matching.table"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.lttng2.ui.views.category"
+            class="org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.SegmentStoreStatisticsView"
+            icon="icons/eview16/statistics_view.gif"
+            id="org.eclipse.tracecompass.analysis.timing.ui.segstore.statistics:org.eclipse.tracecompass.internal.analysis.timing.core.event.matching"
+            name="%view.matching.stats"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.lttng2.ui.views.category"
+            class="org.eclipse.tracecompass.internal.analysis.timing.ui.views.event.matching.EventMatchingScatterView"
+            icon="icons/eview16/statistics_view.gif"
+            id="org.eclipse.tracecompass.internal.analysis.timing.ui.views.event.matching.scatter"
+            name="%view.matching.scatter"
             restorable="true">
       </view>
    </extension>

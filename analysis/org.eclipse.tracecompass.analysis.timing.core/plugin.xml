@@ -15,6 +15,17 @@
                class="org.eclipse.tracecompass.tmf.core.trace.TmfTrace">
          </tracetype>
       </module>
+      <module
+            analysis_module="org.eclipse.tracecompass.internal.analysis.timing.core.event.matching.EventMatchingLatencyAnalysis"
+            applies_experiment="true"
+            automatic="false"
+            id="org.eclipse.tracecompass.internal.analysis.timing.core.event.matching"
+            name="%event.matching.analysis">
+         <tracetype
+               applies="true"
+               class="org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment">
+         </tracetype>
+      </module>
    </extension>
 
 </plugin>

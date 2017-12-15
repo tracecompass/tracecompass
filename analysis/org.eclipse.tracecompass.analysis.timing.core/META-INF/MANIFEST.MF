@@ -19,6 +19,7 @@ Export-Package: org.eclipse.tracecompass.analysis.timing.core.segmentstore,
  org.eclipse.tracecompass.analysis.timing.core.statistics,
  org.eclipse.tracecompass.internal.analysis.timing.core,
  org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;x-friends:="org.eclipse.tracecompass.analysis.timing.ui,org.eclipse.tracecompass.analysis.timing.core.tests",
+ org.eclipse.tracecompass.internal.analysis.timing.core.event.matching;x-friends:="org.eclipse.tracecompass.analysis.timing.ui,org.eclipse.tracecompass.analysis.timing.core.tests",
  org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore;x-internal:=true
 Import-Package: com.google.common.annotations,
  com.google.common.collect,
