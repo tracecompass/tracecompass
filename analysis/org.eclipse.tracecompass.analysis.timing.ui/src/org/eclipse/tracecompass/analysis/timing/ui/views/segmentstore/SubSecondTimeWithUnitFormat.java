@@ -58,13 +58,14 @@ public final class SubSecondTimeWithUnitFormat extends Format {
                 return appender == null ? new StringBuffer() : NonNullUtils.checkNotNull(appender.append("---")); //$NON-NLS-1$
             }
             String unit = NANOSECONDS;
-            if (formattedTime >= NANOS_PER_SEC) {
+            double absFormattedTime = Math.abs(formattedTime);
+            if (absFormattedTime >= NANOS_PER_SEC) {
                 unit = SECONDS;
                 formattedTime /= NANOS_PER_SEC;
-            } else if (formattedTime >= NANOS_PER_MILLI) {
+            } else if (absFormattedTime >= NANOS_PER_MILLI) {
                 unit = MILLISECONDS;
                 formattedTime /= NANOS_PER_MILLI;
-            } else if (formattedTime >= NANOS_PER_MICRO) {
+            } else if (absFormattedTime >= NANOS_PER_MICRO) {
                 unit = MICROSECONDS;
                 formattedTime /= NANOS_PER_MICRO;
             }
