@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.internal.util.ByteBufferTracker;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
@@ -347,6 +348,7 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
         fAnalysisModules.clear();
 
         super.dispose();
+        ByteBufferTracker.setMarked();
     }
 
     // ------------------------------------------------------------------------

@@ -39,6 +39,7 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.core.model;x-f
  org.eclipse.tracecompass.internal.tmf.core.timestamp;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.tmf.core.trace.experiment;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.tmf.core.trace.indexer;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
+ org.eclipse.tracecompass.internal.util;x-friends:="org.eclipse.tracecompass.tmf.ui",
  org.eclipse.tracecompass.tmf.core,
  org.eclipse.tracecompass.tmf.core.analysis,
  org.eclipse.tracecompass.tmf.core.analysis.ondemand,

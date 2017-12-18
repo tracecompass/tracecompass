@@ -45,6 +45,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
+import org.eclipse.tracecompass.internal.util.ByteBufferTracker;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtEvent;
@@ -689,11 +690,13 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         }
 
         /*
-         * We will be closing a trace shortly. Invoke GC to release
+         * We will be deleting a trace shortly. Invoke GC to release
          * MappedByteBuffer objects, which some trace types, like CTF, use.
          * (see Java bug JDK-4724038)
          */
-        System.gc();
+        if (ByteBufferTracker.getAndReset()) {
+            System.gc();
+        }
     }
 
     /**
