@@ -202,7 +202,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
          * closeTree()
          */
         try {
-            HTInterval pill = new HTInterval(-1, endTime, -1, TmfStateValue.nullValue());
+            HTInterval pill = new HTInterval(Long.MIN_VALUE, endTime, -1, TmfStateValue.nullValue());
             intervalQueue.put(pill);
             intervalQueue.flushInputBuffer();
             shtThread.join();
@@ -217,7 +217,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
     public void run() {
         try {
             HTInterval currentInterval = intervalQueue.blockingPeek();
-            while (currentInterval.getStartTime() != -1) {
+            while (currentInterval.getStartTime() != Long.MIN_VALUE) {
                 /* Send the interval to the History Tree */
                 getSHT().insertInterval(currentInterval);
                 /* Actually remove the interval from the queue */
@@ -234,7 +234,6 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
              * The end time of this "signal interval" is actually correct.
              */
             getSHT().closeTree(currentInterval.getEndTime());
-            return;
         } catch (TimeRangeException e) {
             /* This should not happen */
             Activator.getDefault().logError("Error starting the state system", e); //$NON-NLS-1$

@@ -160,6 +160,7 @@ public abstract class HTNode {
     protected HTNode(HTConfig config, int seqNumber, int parentSeqNumber, long start) {
         fConfig = config;
         fNodeStart = start;
+        fNodeEnd = start;
         fSequenceNumber = seqNumber;
         fParentSequenceNumber = parentSeqNumber;
 

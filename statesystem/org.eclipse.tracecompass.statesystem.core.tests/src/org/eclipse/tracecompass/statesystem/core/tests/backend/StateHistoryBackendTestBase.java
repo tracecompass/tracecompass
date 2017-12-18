@@ -452,4 +452,29 @@ public abstract class StateHistoryBackendTestBase {
         }
     }
 
+    /**
+     * Test that negative times are also properly handled.
+     *
+     * @throws IOException
+     *             if an IO exception occurred creating the backend.
+     * @throws StateSystemDisposedException
+     *             if the state system was disposed
+     * @throws TimeRangeException
+     *             if the time was incorrect.
+     */
+    @Test
+    public void testNegativeTimes() throws IOException, TimeRangeException, StateSystemDisposedException {
+        long startTime = -1001;
+        IStateHistoryBackend backend = getBackendForBuilding(startTime);
+        for (long t = startTime; t <= 200; t += 10) {
+            backend.insertPastState(t, t + 10, 0, t);
+        }
+        backend.finishedBuilding(210);
+
+        IStateHistoryBackend backendQuery = getBackendForQuerying(backend);
+        ITmfStateInterval poisonInterval = backendQuery.doSingularQuery(-1, 0);
+        assertNotNull(poisonInterval);
+        assertEquals(-11L, poisonInterval.getValue());
+    }
+
 }

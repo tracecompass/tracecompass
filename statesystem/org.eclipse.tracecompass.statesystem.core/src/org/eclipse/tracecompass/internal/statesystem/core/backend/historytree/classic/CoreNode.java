@@ -83,6 +83,7 @@ public final class CoreNode extends ParentNode {
          */
         fChildren = new int[size];
         fChildStart = new long[size];
+        Arrays.fill(fChildStart, Long.MIN_VALUE);
         fChildEnd = new long[size];
         Arrays.fill(fChildEnd, Long.MAX_VALUE);
         fChildMin = new int[size];
