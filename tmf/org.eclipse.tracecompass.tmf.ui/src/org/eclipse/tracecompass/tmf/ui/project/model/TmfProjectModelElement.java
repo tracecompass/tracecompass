@@ -21,7 +21,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -266,13 +269,16 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
     public IFolder prepareTraceSupplementaryFolder(String supplFolderPath, boolean createFolder) {
         IFolder folder = getTraceSupplementaryFolder(supplFolderPath);
         try {
-            if (createFolder) {
-                IFolder propertiesFolder = folder.getFolder(TmfCommonConstants.TRACE_PROPERTIES_FOLDER);
-                TraceUtils.createFolder(propertiesFolder, new NullProgressMonitor());
-                propertiesFolder.setHidden(true);
-            } else {
-                TraceUtils.createFolder((IFolder) folder.getParent(), new NullProgressMonitor());
-            }
+            ICoreRunnable runnable = monitor -> {
+                if (createFolder) {
+                    IFolder propertiesFolder = folder.getFolder(TmfCommonConstants.TRACE_PROPERTIES_FOLDER);
+                    TraceUtils.createFolder(propertiesFolder, monitor);
+                    propertiesFolder.setHidden(true);
+                } else {
+                    TraceUtils.createFolder((IFolder) folder.getParent(), monitor);
+                }
+            };
+            ResourcesPlugin.getWorkspace().run(runnable, folder.getProject(), IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
         } catch (CoreException e) {
             Activator.getDefault().logError("Error creating supplementary folder " + folder.getFullPath(), e); //$NON-NLS-1$
         }
