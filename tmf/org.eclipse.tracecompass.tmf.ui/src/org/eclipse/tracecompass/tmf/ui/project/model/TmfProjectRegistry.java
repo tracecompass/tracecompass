@@ -41,6 +41,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
@@ -314,7 +315,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                     IProject project = (IProject) delta.getResource();
                     // Handle project moved - it covers only if it's not shadow project
                     if ((delta.getKind() == IResourceDelta.ADDED) && (delta.getFlags() & IResourceDelta.MOVED_FROM) != 0 ) {
-                        handeProjectMoved(project);
+                        handleProjectMoved(project);
                         return;
                     }
 
@@ -323,7 +324,10 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                                 project.isOpen() && project.hasNature(TmfProjectNature.ID)) {
                             // If shadow project exists, handle resource change in the shadow project
                             if (TmfProjectModelHelper.shadowProjectAccessible(project)) {
-                                handeParentProjectRefresh(project);
+                                handleParentProjectRefresh(project);
+                                return;
+                            } else if ((delta.getFlags() & IResourceDelta.OPEN) != 0) {
+                                handleParentProjectOpen(project);
                                 return;
                             }
 
@@ -554,34 +558,43 @@ public class TmfProjectRegistry implements IResourceChangeListener {
         }
     }
 
-    private static void handeParentProjectRefresh(IProject project) {
-        Display.getDefault().asyncExec(() -> {
+    private static void handleParentProjectOpen(IProject project) {
+        Job job = Job.createSystem(monitor -> {
+            addTracingNature(project, monitor);
+        });
+        job.schedule();
+    }
+
+    private static void handleParentProjectRefresh(IProject project) {
+        Job job = Job.createSystem(monitor -> {
             IWorkspace workspace = ResourcesPlugin.getWorkspace();
             IProject shadowProject = workspace.getRoot().getProject(TmfProjectModelHelper.getShadowProjectName(project.getName()));
             if (shadowProject.exists()) {
                 try {
-                    shadowProject.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+                    shadowProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);
                 } catch (CoreException e) {
                     Activator.getDefault().logError("Error refeshing shadow project " + shadowProject.getName(), e); //$NON-NLS-1$
                 }
             }
         });
+        job.schedule();
     }
 
-    private static void handeProjectMoved(IProject newProject) {
-        Display.getDefault().asyncExec(() -> {
-            addTracingNature(newProject, new NullProgressMonitor());
+    private static void handleProjectMoved(IProject newProject) {
+        Job job = Job.createSystem(monitor -> {
+            addTracingNature(newProject, monitor);
             IProject shadowProject = TmfProjectModelHelper.getShadowProject(newProject);
             String newShadowProjectName = TmfProjectModelHelper.getShadowProjectName(newProject.getName());
             try {
                 if (shadowProject.exists()) {
                     IProjectDescription desc = shadowProject.getDescription();
                     desc.setName(newShadowProjectName);
-                    shadowProject.move(desc, true, new NullProgressMonitor());
+                    shadowProject.move(desc, true, monitor);
                 }
             } catch (CoreException e) {
                 Activator.getDefault().logError("Error renaming shadow project " + shadowProject.getName() + " to " + newShadowProjectName, e); //$NON-NLS-1$ //$NON-NLS-2$
             }
         });
+        job.schedule();
     }
 }

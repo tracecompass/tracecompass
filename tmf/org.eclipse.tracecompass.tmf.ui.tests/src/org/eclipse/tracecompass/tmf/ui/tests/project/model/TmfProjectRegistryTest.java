@@ -32,8 +32,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.internal.tmf.ui.project.model.TmfProjectModelHelper;
 import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfNavigatorContentProvider;
@@ -41,6 +39,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectModelPreferences;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -128,6 +127,7 @@ public class TmfProjectRegistryTest {
         TmfProjectRegistry.addTracingNature(fSomeProject, progressMonitor);
         desc = fSomeProject.getDescription();
         assertTrue(desc.hasNature(TmfProjectNature.ID));
+        WaitUtils.waitUntil(project -> project.exists(), fShadowSomeProject, "Shadow project did not get created");
 
         IFolder hiddenTcFile = fSomeProject.getFolder(HIDDEN_TRACECOMPASS_DIRECTORY);
         assertTrue(hiddenTcFile.exists());
@@ -154,11 +154,10 @@ public class TmfProjectRegistryTest {
 
         // Verify content provider for shadow project if project is closed
         fSomeProject.close(progressMonitor);
-        assertEquals(fShadowSomeProject, contentProvider.getParent(projectElement));
-        children = contentProvider.getChildren(fShadowSomeProject);
-        assertEquals(2, children.length);
+        WaitUtils.waitUntil(project -> !project.exists(), fShadowSomeProject, "Shadow project did not get deleted");
 
         fSomeProject.open(progressMonitor);
+        WaitUtils.waitUntil(project -> project.isOpen(), fShadowSomeProject, "Shadow project did not get opened");
         // Traces folder
         TmfTraceFolder traceFolder = projectElement.getTracesFolder();
         assertNotNull(traceFolder);
@@ -250,15 +249,14 @@ public class TmfProjectRegistryTest {
 
         // Rename project
         fSomeProject.move(new Path(NEW_PROJECT_NAME), true, progressMonitor);
-        waitForShadowProjectUpdated(NEW_PROJECT_NAME);
         IProject shadowProject = fWorkspaceRoot.getProject(NEW_SHADOW_PROJECT_NAME);
-        assertFalse(shadowProject.exists());
+        WaitUtils.waitUntil(project -> project.exists(), shadowProject, "Shadow project did get moved");
 
         // Verify that after deletion of the parent project the shadow project is removed from the workspace
-        fSomeProject.delete(false, true, progressMonitor);
-        waitForShadowProjectUpdated(NEW_PROJECT_NAME);
+        IProject newProject = fWorkspaceRoot.getProject(NEW_PROJECT_NAME);
+        newProject.delete(false, true, progressMonitor);
         shadowProject = fWorkspaceRoot.getProject(NEW_SHADOW_PROJECT_NAME);
-        assertFalse(shadowProject.exists());
+        WaitUtils.waitUntil(project -> !project.exists(), shadowProject, "Shadow project did not get deleted");
     }
 
     /**
@@ -353,43 +351,5 @@ public class TmfProjectRegistryTest {
         assertNotNull(expFolder);
         assertFalse(expFolder.getResource().exists());
 
-    }
-
-    /**
-     * Waits shadow project to be updated.
-     */
-    private static void waitForShadowProjectUpdated(String parentProjectName) {
-        for (int i = 1; i < 5000 && (TmfProjectModelHelper.getShadowProject(parentProjectName).exists()); i *= 2) {
-            delay(i);
-        }
-    }
-
-    /**
-     * Sleeps current thread or GUI thread for a given time.
-     * @param waitTimeMillis time in milliseconds to wait
-     */
-    private static void delay(final long waitTimeMillis) {
-        final Display display = Display.getCurrent();
-        if (display != null) {
-            final long endTimeMillis = System.currentTimeMillis() + waitTimeMillis;
-            while(System.currentTimeMillis() < endTimeMillis) {
-                if (!display.readAndDispatch()) {
-                    // We do not use Display.sleep because it might never wake up
-                    // if there is no user interaction
-                    try {
-                        Thread.sleep(Math.min(waitTimeMillis, 10));
-                    } catch (final InterruptedException e) {
-                        // Ignored
-                    }
-                }
-                display.update();
-            }
-        } else {
-            try {
-                Thread.sleep(waitTimeMillis);
-            } catch (final InterruptedException e) {
-                // Ignored
-            }
-        }
     }
 }
