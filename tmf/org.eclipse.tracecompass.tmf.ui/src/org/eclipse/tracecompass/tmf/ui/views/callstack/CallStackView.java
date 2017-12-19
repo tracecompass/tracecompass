@@ -492,15 +492,17 @@ public class CallStackView extends AbstractTimeGraphView {
         }
 
         /*
-         * Load the symbol provider for the current trace, even if it does not
-         * provide a call stack analysis module. See
+         * Load the symbol provider for the current trace, even if it does not provide a
+         * call stack analysis module. See
          * https://bugs.eclipse.org/bugs/show_bug.cgi?id=494212
          */
-        Collection<ISymbolProvider> providers = fSymbolProviders.get(trace);
-        if (providers.isEmpty()) {
-            providers = SymbolProviderManager.getInstance().getSymbolProviders(trace);
-            providers.forEach( (provider) -> provider.loadConfiguration(new NullProgressMonitor()));
-            fSymbolProviders.putAll(trace, providers);
+        synchronized (fSymbolProviders) {
+            Collection<ISymbolProvider> providers = fSymbolProviders.get(trace);
+            if (providers.isEmpty()) {
+                providers = SymbolProviderManager.getInstance().getSymbolProviders(trace);
+                providers.forEach(provider -> provider.loadConfiguration(new NullProgressMonitor()));
+                fSymbolProviders.putAll(trace, providers);
+            }
         }
 
         /* Continue with the call stack view specific operations */
