@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2014 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2013, 2018 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -17,7 +17,10 @@ package org.eclipse.tracecompass.tmf.ui.project.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,7 +34,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.util.OpenStrategy;
@@ -80,6 +85,7 @@ public class TmfOpenTraceHelper {
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(TmfOpenTraceHelper.class);
     private static final @NonNull String LOCAL_CATEGORY = "TmfOpenTraceHelper"; //$NON-NLS-1$
     private static final String ENDL = System.getProperty("line.separator"); //$NON-NLS-1$
+    private static final Set<TmfCommonProjectElement> fOpening = Collections.synchronizedSet(new HashSet<>());
 
     private TmfOpenTraceHelper() {
     }
@@ -369,9 +375,18 @@ public class TmfOpenTraceHelper {
                 }
                 return;
             }
-
+            if (!fOpening.add(traceElement)) {
+                /* element is already opening */
+                return;
+            }
             OpenProjectElementJob job = new OpenProjectElementJob(traceElement, file);
             job.fParentScope = flow;
+            job.addJobChangeListener(new JobChangeAdapter() {
+                @Override
+                public void done(IJobChangeEvent event) {
+                    fOpening.remove(traceElement);
+                }
+            });
             job.schedule();
         }
     }
@@ -421,7 +436,7 @@ public class TmfOpenTraceHelper {
                 final String editorId = (traceEditorId != null) ? traceEditorId : TmfEventsEditor.ID;
                 final IEditorInput editorInput = new TmfEditorInput(fFile, fTrace);
 
-                Display.getDefault().asyncExec(() -> {
+                Display.getDefault().syncExec(() -> {
                     try (FlowScopeLog displayLog = new FlowScopeLogBuilder(LOGGER, Level.FINE, "OpenEditor").setParentScope(log).build();) { //$NON-NLS-1$
 
                         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
