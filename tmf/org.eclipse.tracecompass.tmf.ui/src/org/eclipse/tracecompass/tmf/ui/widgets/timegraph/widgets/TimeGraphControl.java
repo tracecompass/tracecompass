@@ -2818,9 +2818,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 tdp.getTime0() == tdp.getTime1()) {
             return;
         }
-        TimeFormat tf = tdp.getTimeFormat().convert();
-        Resolution res = Resolution.NANOSEC;
-        StringBuilder message = new StringBuilder();
+
+        long cursorTime = -1;
+        long selectionBeginTime = 0;
+        long selectionEndTime = 0;
         if ((x >= 0 || x == STATUS_WITHOUT_CURSOR_TIME) && fDragState == DRAG_NONE) {
             if (x != STATUS_WITHOUT_CURSOR_TIME) {
                 long time = getTimeAtX(x);
@@ -2828,28 +2829,11 @@ public class TimeGraphControl extends TimeGraphBaseControl
                     if (tdp instanceof ITimeDataProviderConverter) {
                         time = ((ITimeDataProviderConverter) tdp).convertTime(time);
                     }
-                    message.append(NLS.bind("T: {0}{1}     ", //$NON-NLS-1$
-                            new Object[] {
-                                    tf == TimeFormat.CALENDAR ? FormatTimeUtils.formatDate(time) + ' ' : "", //$NON-NLS-1$
-                                    FormatTimeUtils.formatTime(time, tf, res)
-                            }));
+                    cursorTime = time;
                 }
             }
-            long selectionBegin = tdp.getSelectionBegin();
-            long selectionEnd = tdp.getSelectionEnd();
-            message.append(NLS.bind("T1: {0}{1}", //$NON-NLS-1$
-                    new Object[] {
-                            tf == TimeFormat.CALENDAR ? FormatTimeUtils.formatDate(selectionBegin) + ' ' : "", //$NON-NLS-1$
-                            FormatTimeUtils.formatTime(selectionBegin, tf, res)
-                    }));
-            if (selectionBegin != selectionEnd) {
-                message.append(NLS.bind("     T2: {0}{1}     \u0394: {2}", //$NON-NLS-1$
-                        new Object[] {
-                                tf == TimeFormat.CALENDAR ? FormatTimeUtils.formatDate(selectionEnd) + ' ' : "", //$NON-NLS-1$
-                                FormatTimeUtils.formatTime(selectionEnd, tf, res),
-                                FormatTimeUtils.formatDelta(selectionEnd - selectionBegin, tf, res)
-                        }));
-            }
+            selectionBeginTime = tdp.getSelectionBegin();
+            selectionEndTime = tdp.getSelectionEnd();
         } else if (fDragState == DRAG_SELECTION || fDragState == DRAG_ZOOM) {
             long time0 = fDragBeginMarker ? getTimeAtX(fDragX0) : fDragTime0;
             long time = fDragBeginMarker ? fDragTime0 : getTimeAtX(fDragX);
@@ -2857,16 +2841,41 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 time0 = ((ITimeDataProviderConverter) tdp).convertTime(time0);
                 time = ((ITimeDataProviderConverter) tdp).convertTime(time);
             }
-            message.append(NLS.bind("T1: {0}{1}     T2: {2}{3}     \u0394: {4}", //$NON-NLS-1$
+            // Use the time of T2 to update the cursor time
+            cursorTime = time;
+            selectionBeginTime = time0;
+            selectionEndTime = time;
+        }
+        String message = buildStatusMessage(cursorTime, selectionBeginTime, selectionEndTime, tdp.getTimeFormat().convert(), Resolution.NANOSEC);
+        fStatusLineManager.setMessage(message);
+    }
+
+    private static String buildStatusMessage(long cursorTime, long selectionBeginTime, long selectionEndTime, TimeFormat tf, Resolution res) {
+        StringBuilder message = new StringBuilder();
+
+        if (cursorTime >= 0) {
+            message.append(NLS.bind("T: {0}{1}     ", //$NON-NLS-1$
                     new Object[] {
-                            tf == TimeFormat.CALENDAR ? FormatTimeUtils.formatDate(time0) + ' ' : "", //$NON-NLS-1$
-                            FormatTimeUtils.formatTime(time0, tf, res),
-                            tf == TimeFormat.CALENDAR ? FormatTimeUtils.formatDate(time) + ' ' : "", //$NON-NLS-1$
-                            FormatTimeUtils.formatTime(time, tf, res),
-                            FormatTimeUtils.formatDelta(time - time0, tf, res)
+                            tf == TimeFormat.CALENDAR ? FormatTimeUtils.formatDate(cursorTime) + ' ' : "", //$NON-NLS-1$
+                            FormatTimeUtils.formatTime(cursorTime, tf, res)
                     }));
         }
-        fStatusLineManager.setMessage(message.toString());
+
+        message.append(NLS.bind("T1: {0}{1}", //$NON-NLS-1$
+                new Object[] {
+                        tf == TimeFormat.CALENDAR ? FormatTimeUtils.formatDate(selectionBeginTime) + ' ' : "", //$NON-NLS-1$
+                        FormatTimeUtils.formatTime(selectionBeginTime, tf, res)
+                }));
+
+        if (selectionBeginTime != selectionEndTime) {
+            message.append(NLS.bind("     T2: {0}{1}     \u0394: {2}", //$NON-NLS-1$
+                    new Object[] {
+                            tf == TimeFormat.CALENDAR ? FormatTimeUtils.formatDate(selectionEndTime) + ' ' : "", //$NON-NLS-1$
+                            FormatTimeUtils.formatTime(selectionEndTime, tf, res),
+                            FormatTimeUtils.formatDelta(selectionEndTime - selectionBeginTime, tf, res)
+                    }));
+        }
+        return message.toString();
     }
 
     @Override
