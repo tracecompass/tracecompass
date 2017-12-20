@@ -17,6 +17,7 @@ import java.util.Iterator;
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfCommonProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectModelElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
@@ -102,8 +103,8 @@ public class TracePropertyTester extends PropertyTester {
 
         // Check if the trace element is of a specific trace type
         if (TRACE_TYPE.equals(property)) {
-            if (receiver instanceof TmfTraceElement) {
-                TmfTraceElement trace = (TmfTraceElement) receiver;
+            if (receiver instanceof TmfCommonProjectElement) {
+                TmfCommonProjectElement trace = (TmfCommonProjectElement) receiver;
                 if (expectedValue instanceof String && expectedValue.equals(trace.getTraceType())) {
                     return true;
                 }
