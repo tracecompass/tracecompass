@@ -759,7 +759,6 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
                         if (!toRemove.isEmpty() && experiment.getTraces().isEmpty()) {
                             // If experiment becomes empty, delete it
                             experiment.getResource().delete(true, progressMonitor);
-                            experiment.getParent().refresh();
                         }
                     }
                 }
