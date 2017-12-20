@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +41,8 @@ import com.google.common.collect.HashBiMap;
  * Class to abstract {@link ITmfTreeDataProvider} methods and fields. Handles
  * the quark to entry id associations, providing the concrete class with the
  * state system when required. Handles logging the time taken to return tree
- * models, encapsulating the model in a response and the exceptions.
+ * models, encapsulating the model in a response, concurrency and the
+ * exceptions.
  *
  * @param <A>
  *            Generic type for the encapsulated
@@ -59,6 +61,7 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
 
     private static final AtomicLong ENTRY_ID = new AtomicLong();
     private final A fAnalysisModule;
+    private final ReentrantReadWriteLock fLock = new ReentrantReadWriteLock(false);
     private final BiMap<Long, Integer> fIdToQuark = HashBiMap.create();
     private @Nullable TmfModelResponse<List<M>> fCached;
 
@@ -85,7 +88,9 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
     }
 
     /**
-     * Get (and generate if necessary) a unique id for this quark
+     * Get (and generate if necessary) a unique id for this quark. Should be called
+     * inside {@link #getTree(ITmfStateSystem, TimeQueryFilter, IProgressMonitor)},
+     * where the write lock is held.
      *
      * @param quark
      *            quark to map to
@@ -103,14 +108,20 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      * @return Set of quarks associated to the filter
      */
     protected Set<Integer> getSelectedQuarks(SelectionTimeQueryFilter filter) {
-        Set<Integer> quarks = new HashSet<>();
-        for (Long selectedItem : filter.getSelectedItems()) {
-            Integer quark = fIdToQuark.get(selectedItem);
-            if (quark != null && quark >= 0) {
-                quarks.add(quark);
+        fLock.readLock().lock();
+        try {
+            Set<Integer> quarks = new HashSet<>();
+
+            for (Long selectedItem : filter.getSelectedItems()) {
+                Integer quark = fIdToQuark.get(selectedItem);
+                if (quark != null && quark >= 0) {
+                    quarks.add(quark);
+                }
             }
+            return quarks;
+        } finally {
+            fLock.readLock().unlock();
         }
-        return quarks;
     }
 
     /**
@@ -136,14 +147,21 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
 
     @Override
     public final TmfModelResponse<List<M>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        if (fCached != null) {
-            /*
-             * If the tree depends on the filter, isCacheable should return false (by
-             * contract). If the tree is not cacheable, fCached will always be null, and we
-             * will never enter this block.
-             */
-            return fCached;
+        fLock.readLock().lock();
+        try {
+            if (fCached != null) {
+                /*
+                 * If the tree depends on the filter, isCacheable should return false (by
+                 * contract). If the tree is not cacheable, fCached will always be null, and we
+                 * will never enter this block.
+                 */
+                return fCached;
+            }
+        } finally {
+            fLock.readLock().unlock();
         }
+
+        fLock.writeLock().lock();
         fAnalysisModule.waitForInitialization();
         ITmfStateSystem ss = fAnalysisModule.getStateSystem();
         if (ss == null) {
@@ -155,7 +173,8 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
                 .setCategory(getClass().getSimpleName()).build()) {
             List<M> tree = getTree(ss, filter, monitor);
             if (complete) {
-                TmfModelResponse<List<M>> response = new TmfModelResponse<>(tree, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+                TmfModelResponse<List<M>> response = new TmfModelResponse<>(tree,
+                        ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
                 if (isCacheable()) {
                     fCached = response;
                 }
@@ -164,6 +183,8 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
             return new TmfModelResponse<>(tree, ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
         } catch (StateSystemDisposedException e) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
+        } finally {
+            fLock.writeLock().unlock();
         }
     }
 
@@ -179,7 +200,8 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
     /**
      * Abstract method to be implemented by the providers to return trees. Lets the
      * abstract class handle waiting for {@link ITmfStateSystem} initialization and
-     * progress, as well as error handling
+     * progress, as well as error handling. The write lock to the quark <-> unique
+     * id map for this provider is held at this point.
      *
      * @param ss
      *            the {@link TmfStateSystemAnalysisModule}'s {@link ITmfStateSystem}
@@ -192,5 +214,6 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      *             if the state system was closed during the query or could not be
      *             queried.
      */
-    protected abstract List<M> getTree(ITmfStateSystem ss, TimeQueryFilter filter, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException;
+    protected abstract List<M> getTree(ITmfStateSystem ss, TimeQueryFilter filter,
+            @Nullable IProgressMonitor monitor) throws StateSystemDisposedException;
 }

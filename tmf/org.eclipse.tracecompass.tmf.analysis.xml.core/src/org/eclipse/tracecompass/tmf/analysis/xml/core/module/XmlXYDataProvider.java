@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -80,6 +81,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
     private static final Pattern WILDCARD_PATTERN = Pattern.compile("\\*"); //$NON-NLS-1$
     private static final AtomicLong ENTRY_IDS = new AtomicLong();
 
+    private final ReentrantReadWriteLock fLock = new ReentrantReadWriteLock(false);
     /**
      * Two way association between quarks and entry IDs, ensures that a single ID is
      * reused per every quark, and finds the quarks to query for the XY models.
@@ -257,9 +259,14 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         }
 
         ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
-        for (Entry<Integer, double[]> tempEntry : map.entrySet()) {
-            String name = String.valueOf(fQuarkToString.get(tempEntry.getKey()));
-            ySeries.put(name, new YModel(name, tempEntry.getValue()));
+        fLock.readLock().lock();
+        try {
+            for (Entry<Integer, double[]> tempEntry : map.entrySet()) {
+                String name = String.valueOf(fQuarkToString.get(tempEntry.getKey()));
+                ySeries.put(name, new YModel(name, tempEntry.getValue()));
+            }
+        } finally {
+            fLock.readLock().unlock();
         }
 
         boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
@@ -270,15 +277,20 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         if (!(filter instanceof SelectionTimeQueryFilter)) {
             return Collections.emptyMap();
         }
-        Map<Integer, double[]> map = new HashMap<>();
-        int length = filter.getTimesRequested().length;
-        for (Long id : ((SelectionTimeQueryFilter) filter).getSelectedItems()) {
-            Integer quark = fIdToQuark.get(id);
-            if (quark != null) {
-                map.put(quark, new double[length]);
+        fLock.readLock().lock();
+        try {
+            Map<Integer, double[]> map = new HashMap<>();
+            int length = filter.getTimesRequested().length;
+            for (Long id : ((SelectionTimeQueryFilter) filter).getSelectedItems()) {
+                Integer quark = fIdToQuark.get(id);
+                if (quark != null) {
+                    map.put(quark, new double[length]);
+                }
             }
+            return map;
+        } finally {
+            fLock.readLock().unlock();
         }
-        return map;
     }
 
     private static void setYValue(int index, double[] y, double value, DisplayType type) {
@@ -331,8 +343,13 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
      */
     @Override
     public TmfModelResponse<List<TmfTreeDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        if (fCached != null) {
-            return fCached;
+        fLock.readLock().lock();
+        try {
+            if (fCached != null) {
+                return fCached;
+            }
+        } finally {
+            fLock.readLock().unlock();
         }
 
         ITmfStateSystem ss = fXmlEntry.getStateSystem();
@@ -341,42 +358,43 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         boolean isComplete = ss.waitUntilBuilt(0);
         // Get the quarks before the full states to ensure that the attributes will be present in the full state
         List<Integer> quarks = fXmlEntry.getQuarks();
-        List<ITmfStateInterval> fullState;
+        fLock.writeLock().lock();
         try {
-            fullState = ss.queryFullState(ss.getCurrentEndTime());
-        } catch (StateSystemDisposedException e) {
-            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
-        }
+            List<ITmfStateInterval> fullState = ss.queryFullState(ss.getCurrentEndTime());
+            ImmutableList.Builder<TmfTreeDataModel> builder = ImmutableList.builder();
+            builder.add(new TmfTreeDataModel(fTraceId, -1, getTrace().getName()));
 
-        ImmutableList.Builder<TmfTreeDataModel> builder = ImmutableList.builder();
-        builder.add(new TmfTreeDataModel(fTraceId, -1, getTrace().getName()));
-
-        for (int quark : quarks) {
-            String seriesName = ss.getAttributeName(quark);
-            if (seriesNameAttrib != null) {
-                // Use the value of the series name attribute
-                int seriesNameQuark = seriesNameAttrib.getAttributeQuark(quark, null);
-                Object value = fullState.get(seriesNameQuark).getValue();
-                if (value != null) {
-                    seriesName = String.valueOf(value);
+            for (int quark : quarks) {
+                String seriesName = ss.getAttributeName(quark);
+                if (seriesNameAttrib != null) {
+                    // Use the value of the series name attribute
+                    int seriesNameQuark = seriesNameAttrib.getAttributeQuark(quark, null);
+                    Object value = fullState.get(seriesNameQuark).getValue();
+                    if (value != null) {
+                        seriesName = String.valueOf(value);
+                    }
+                }
+                if (!seriesName.isEmpty()) {
+                    String tempSeriesName = seriesName;
+                    String uniqueName = fQuarkToString.computeIfAbsent(quark, q -> getUniqueNameFor(tempSeriesName));
+                    // Check if an ID has already been created for this quark.
+                    Long id = fIdToQuark.inverse().computeIfAbsent(quark, q -> ENTRY_IDS.getAndIncrement());
+                    builder.add(new TmfTreeDataModel(id, fTraceId, uniqueName));
                 }
             }
-            if (!seriesName.isEmpty()) {
-                String tempSeriesName = seriesName;
-                String uniqueName = fQuarkToString.computeIfAbsent(quark, q -> getUniqueNameFor(tempSeriesName));
-                // Check if an ID has already been created for this quark.
-                Long id = fIdToQuark.inverse().computeIfAbsent(quark, q -> ENTRY_IDS.getAndIncrement());
-                builder.add(new TmfTreeDataModel(id, fTraceId, uniqueName));
-            }
-        }
 
-        ImmutableList<TmfTreeDataModel> list = builder.build();
-        if (isComplete) {
-            TmfModelResponse<List<TmfTreeDataModel>> tmfModelResponse = new TmfModelResponse<>(list, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
-            fCached = tmfModelResponse;
-            return tmfModelResponse;
+            ImmutableList<TmfTreeDataModel> list = builder.build();
+            if (isComplete) {
+                TmfModelResponse<List<TmfTreeDataModel>> tmfModelResponse = new TmfModelResponse<>(list, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+                fCached = tmfModelResponse;
+                return tmfModelResponse;
+            }
+            return new TmfModelResponse<>(list, ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
+        } catch (StateSystemDisposedException e) {
+            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
+        } finally {
+            fLock.writeLock().unlock();
         }
-        return new TmfModelResponse<>(list, ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
     }
 
     private String getUniqueNameFor(String seriesName) {
