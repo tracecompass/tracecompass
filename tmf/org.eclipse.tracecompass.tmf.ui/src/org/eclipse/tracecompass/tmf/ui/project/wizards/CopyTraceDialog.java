@@ -31,6 +31,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -61,6 +62,7 @@ public class CopyTraceDialog extends SelectionStatusDialog {
     private final TmfTraceElement fTrace;
     private Text fNewTraceName;
     private final IFolder fTraceFolder;
+    private Button fCopyLinkButton;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -90,7 +92,25 @@ public class CopyTraceDialog extends SelectionStatusDialog {
         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         createNewTraceNameGroup(composite);
+        if (fTrace.getResource().isLinked()) {
+            createOptionsGroup(composite);
+        }
         return composite;
+    }
+
+    private void createOptionsGroup(Composite parent) {
+        Composite optionsGroup = new Composite(parent, SWT.NONE);
+        optionsGroup.setLayout(new GridLayout());
+        optionsGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
+        Label descriptionLabel = new Label(optionsGroup, SWT.NONE);
+        descriptionLabel.setText(Messages.CopyTraceDialog_Description);
+
+        fCopyLinkButton = new Button(optionsGroup, SWT.RADIO);
+        fCopyLinkButton.setText(Messages.CopyTraceDialog_CopyLinkButton);
+        fCopyLinkButton.setSelection(true);
+
+        Button copyResourceButton = new Button(optionsGroup, SWT.RADIO);
+        copyResourceButton.setText(Messages.CopyTraceDialog_CopyTraceButton);
     }
 
     private void createNewTraceNameGroup(Composite parent) {
@@ -168,7 +188,8 @@ public class CopyTraceDialog extends SelectionStatusDialog {
 
     @Override
     protected void okPressed() {
-        IResource trace = copyTrace(fNewTraceName.getText());
+        boolean copyAsLink = fCopyLinkButton.getSelection();
+        IResource trace = copyTrace(fNewTraceName.getText(), copyAsLink);
         if (trace == null) {
             return;
         }
@@ -176,7 +197,7 @@ public class CopyTraceDialog extends SelectionStatusDialog {
         super.okPressed();
     }
 
-    private IResource copyTrace(final String newName) {
+    private IResource copyTrace(final String newName, boolean copyAsLink) {
 
         WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
             @Override
@@ -186,7 +207,7 @@ public class CopyTraceDialog extends SelectionStatusDialog {
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();
                     }
-                    fTrace.copy(newName, true);
+                    fTrace.copy(newName, true, copyAsLink);
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();
                     }

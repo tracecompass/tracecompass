@@ -408,6 +408,21 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      * @return the new Resource object
      */
     public IResource copy(final String newName, final boolean copySuppFiles) {
+        return copy(newName, copySuppFiles, true);
+    }
+
+    /**
+     * Copy this model element
+     *
+     * @param newName
+     *            The name of the new element
+     * @param copySuppFiles
+     *            Whether to copy supplementary files or not
+     * @param copyAsLink
+     *            Whether to copy as a link or not
+     * @return the new Resource object
+     */
+    public IResource copy(final String newName, final boolean copySuppFiles, final boolean copyAsLink) {
 
         final IPath newPath = getParent().getResource().getFullPath().addTrailingSeparator().append(newName);
 
@@ -418,7 +433,11 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
         }
         /* Copy the trace */
         try {
-            getResource().copy(newPath, IResource.FORCE | IResource.SHALLOW, null);
+            int flags = IResource.FORCE;
+            if (copyAsLink) {
+                flags |= IResource.SHALLOW;
+            }
+            getResource().copy(newPath, flags, null);
             IResource trace = ((IFolder) getParent().getResource()).findMember(newName);
 
             /* Delete any bookmarks file found in copied trace folder */
@@ -426,9 +445,8 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
                 IFolder folderTrace = (IFolder) trace;
                 for (IResource member : folderTrace.members()) {
                     String traceTypeId = TmfTraceType.getTraceTypeId(member);
-                    if (ITmfEventsEditorConstants.TRACE_INPUT_TYPE_CONSTANTS.contains(traceTypeId)) {
-                        member.delete(true, null);
-                    } else if (ITmfEventsEditorConstants.EXPERIMENT_INPUT_TYPE_CONSTANTS.contains(traceTypeId)) {
+                    if (ITmfEventsEditorConstants.TRACE_INPUT_TYPE_CONSTANTS.contains(traceTypeId)
+                            || ITmfEventsEditorConstants.EXPERIMENT_INPUT_TYPE_CONSTANTS.contains(traceTypeId)) {
                         member.delete(true, null);
                     }
                 }

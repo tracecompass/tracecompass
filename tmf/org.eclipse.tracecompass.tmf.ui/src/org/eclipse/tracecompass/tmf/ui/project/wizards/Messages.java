@@ -149,6 +149,21 @@ public class Messages extends NLS {
      */
     public static String CopyTraceDialog_TraceNewName;
     /**
+     * The description for how to copy a trace.
+     * @since 3.3
+     */
+    public static String CopyTraceDialog_Description;
+    /**
+     * Text for copy as link button
+     * @since 3.3
+     */
+    public static String CopyTraceDialog_CopyLinkButton;
+    /**
+     * Text for copy the trace button
+     * @since 3.3
+     */
+    public static String CopyTraceDialog_CopyTraceButton;
+    /**
      * The title of the new folder dialog.
      */
     public static String NewFolderDialog_DialogTitle;
