@@ -146,7 +146,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      *            you are wasting space.
      * @param enumTree
      *            Existing enum declaration table
-     * @since 2.1
+     * @since 2.3
      */
     public EnumDeclaration(IntegerDeclaration containerType, Map<Pair, String> enumTree){
         fContainerType = containerType;
@@ -271,7 +271,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      *
      * @return a copy of the Enum declaration entry map.
      *
-     * @since 3.0
+     * @since 2.3
      */
     public Map<Pair, String> getLookupTable() {
         return ImmutableMap.copyOf(fEnumTree);

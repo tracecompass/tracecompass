@@ -55,7 +55,7 @@ public interface TmfXmlStrings {
      */
     static final String ANALYSIS_ID = "analysisId";
     /**
-     * @since 2.4
+     * @since 2.5
      */
     static final String DISPLAY_TEXT = "displayText";
     /**
@@ -176,6 +176,9 @@ public interface TmfXmlStrings {
     String FORCED_TYPE = "forcedType";
     String ATTRIBUTE_STACK = "stack";
     String STACK_POP = "pop";
+    /**
+     * @since 2.5
+     */
     String STACK_POPALL = "popAll";
     String STACK_PUSH = "push";
     String STACK_PEEK = "peek";

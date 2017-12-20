@@ -100,7 +100,7 @@ public final class KernelThreadInformationProvider {
      * @return A set of all the thread IDs that are run on said CPUs on the time
      *         range. Empty set if there is no thread on the CPUs in this time
      *         range. Null if the information is not available.
-     * @since 2.4
+     * @since 2.5
      */
     public static @Nullable Set<Integer> getThreadsOfCpus(KernelAnalysisModule module, Collection<Long> cpus, long rangeStart, long rangeEnd) {
         ITmfStateSystem ss = module.getStateSystem();
@@ -167,7 +167,7 @@ public final class KernelThreadInformationProvider {
      * @return A set of all the thread IDs that are considered active in the
      *         time range. Empty set if there are none. Null if the information
      *         is not available.
-     * @since 2.4
+     * @since 2.5
      */
     public static @Nullable Set<Integer> getActiveThreadsForRange(KernelAnalysisModule module, long rangeStart, long rangeEnd) {
         ITmfStateSystem ss = module.getStateSystem();

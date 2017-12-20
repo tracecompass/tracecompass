@@ -59,7 +59,7 @@ public class XmlDataProviderManager {
     /**
      * Dispose the singleton instance if it exists
      *
-     * @since 3.2
+     * @since 2.4
      */
     public static synchronized void dispose() {
         XmlDataProviderManager manager = INSTANCE;

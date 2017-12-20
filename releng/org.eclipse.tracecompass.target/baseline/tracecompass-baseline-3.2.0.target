@@ -39,7 +39,7 @@
 <unit id="org.eclipse.tracecompass.tmf.remote.core" version="0.0.0"/>
 <unit id="org.eclipse.tracecompass.tmf.remote.ui" version="0.0.0"/>
 <unit id="org.eclipse.tracecompass.tmf.ui" version="0.0.0"/>
-<repository location="http://download.eclipse.org/tracecompass/oxygen/milestones/ur2_rc1/"/>
+<repository location="http://download.eclipse.org/tracecompass/releases/3.2.0/repository/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.core.runtime" version="0.0.0"/>

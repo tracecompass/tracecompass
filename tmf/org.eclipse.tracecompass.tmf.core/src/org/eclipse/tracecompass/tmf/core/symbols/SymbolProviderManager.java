@@ -91,7 +91,7 @@ public final class SymbolProviderManager {
     /**
      * Dispose the singleton instance if it exists
      *
-     * @since 3.2
+     * @since 3.3
      */
     public static synchronized void dispose() {
         SymbolProviderManager manager = INSTANCE;

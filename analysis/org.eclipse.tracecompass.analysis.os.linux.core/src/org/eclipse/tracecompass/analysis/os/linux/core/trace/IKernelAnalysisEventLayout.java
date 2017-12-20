@@ -236,7 +236,7 @@ public interface IKernelAnalysisEventLayout {
      * another.
      *
      * @return The event name
-     * @since 2.4
+     * @since 2.5
      */
     default String eventSchedMigrateTask() {
         return "sched_migrate_task"; //$NON-NLS-1$
@@ -638,7 +638,7 @@ public interface IKernelAnalysisEventLayout {
      * events.
      *
      * @return The field name
-     * @since 2.4
+     * @since 2.5
      */
     default String fieldTargetCpu() {
         return "target_cpu"; //$NON-NLS-1$
@@ -649,7 +649,7 @@ public interface IKernelAnalysisEventLayout {
      * thread being migrated.
      *
      * @return The field name
-     * @since 2.4
+     * @since 2.5
      */
     default String fieldDestCpu() {
         return "dest_cpu"; //$NON-NLS-1$

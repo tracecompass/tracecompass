@@ -1004,7 +1004,7 @@ public class Utils {
      * @param root
      *            root entry from which to flatten the tree.
      * @return an {@link Iterable} over the entries.
-     * @since 3.2
+     * @since 3.3
      */
     public static Iterable<TimeGraphEntry> flatten(TimeGraphEntry root) {
         Iterable<Iterable<TimeGraphEntry>> transform = Iterables.transform(root.getChildren(), Utils::flatten);

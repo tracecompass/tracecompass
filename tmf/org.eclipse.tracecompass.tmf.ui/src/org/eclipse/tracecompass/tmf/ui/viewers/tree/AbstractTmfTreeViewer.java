@@ -391,7 +391,7 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
      *
      * @param trace
      *            the trace being loaded
-     * @since 3.2
+     * @since 3.3
      */
     protected void initializeDataSource(@NonNull ITmfTrace trace) {
         /* Override to initialize the data source */
