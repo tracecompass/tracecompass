@@ -21,12 +21,12 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfXyResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
@@ -74,11 +74,11 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
     }
 
     @Override
-    public @NonNull TmfModelResponse<ITmfCommonXAxisModel> fetchXY(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<ITmfXyModel> fetchXY(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         long[] xValues = filter.getTimesRequested();
 
         if (!(filter instanceof SelectionTimeQueryFilter) || !((SelectionTimeQueryFilter) filter).getSelectedItems().contains(fId)) {
-            return TmfCommonXAxisResponseFactory.create(TITLE, xValues, Collections.emptyMap(), true);
+            return TmfXyResponseFactory.create(TITLE, xValues, Collections.emptyMap(), true);
         }
 
         int n = xValues.length;
@@ -91,7 +91,7 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
 
         String seriesName = getTrace().getName();
         Map<String, IYModel> ySeries = ImmutableMap.of(seriesName, new YModel(seriesName, y));
-        return TmfCommonXAxisResponseFactory.create(TITLE, xValues, ySeries, true);
+        return TmfXyResponseFactory.create(TITLE, xValues, ySeries, true);
     }
 
     @Override

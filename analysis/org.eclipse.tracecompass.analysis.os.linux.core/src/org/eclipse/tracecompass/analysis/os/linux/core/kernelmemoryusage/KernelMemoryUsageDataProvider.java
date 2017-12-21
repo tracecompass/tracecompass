@@ -28,7 +28,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelmemoryusag
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.FilterTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.AbstractTreeXyDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.AbstractTreeCommonXDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -50,7 +50,7 @@ import com.google.common.collect.Maps;
  */
 @NonNullByDefault
 @SuppressWarnings("restriction")
-public class KernelMemoryUsageDataProvider extends AbstractTreeXyDataProvider<KernelMemoryAnalysisModule, MemoryUsageTreeModel> {
+public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvider<KernelMemoryAnalysisModule, MemoryUsageTreeModel> {
 
     /**
      * This data provider's extension point ID

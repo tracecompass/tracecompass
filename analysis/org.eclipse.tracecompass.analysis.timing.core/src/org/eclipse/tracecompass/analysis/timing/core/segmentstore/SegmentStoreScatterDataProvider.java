@@ -22,10 +22,10 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.Messages;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfXyResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
@@ -158,20 +158,20 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
     }
 
     @Override
-    public TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         ISegmentStoreProvider provider = fProvider;
 
         if (!(provider instanceof IAnalysisModule)) {
-            return TmfCommonXAxisResponseFactory.createFailedResponse(Messages.SegmentStoreDataProvider_SegmentMustBeAnIAnalysisModule);
+            return TmfXyResponseFactory.createFailedResponse(Messages.SegmentStoreDataProvider_SegmentMustBeAnIAnalysisModule);
         }
 
         if (!(((IAnalysisModule) provider).waitForCompletion())) {
-            return TmfCommonXAxisResponseFactory.createFailedResponse(CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
+            return TmfXyResponseFactory.createFailedResponse(CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
         }
 
         final ISegmentStore<ISegment> segStore = provider.getSegmentStore();
         if (segStore == null) {
-            return TmfCommonXAxisResponseFactory.createFailedResponse(Messages.SegmentStoreDataProvider_SegmentNotAvailable);
+            return TmfXyResponseFactory.createFailedResponse(Messages.SegmentStoreDataProvider_SegmentNotAvailable);
         }
 
         long start = filter.getStart();
@@ -186,7 +186,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         // For each visible segments, add start time to x value and duration for y value
         for (ISegment segment : displayData) {
             if (monitor != null && monitor.isCanceled()) {
-                return TmfCommonXAxisResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
+                return TmfXyResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
             }
             xSeries.add(segment.getStart());
             yValues.add((double) segment.getLength());
@@ -194,7 +194,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
 
         IYModel yModel = new YModel(Objects.requireNonNull(Messages.SegmentStoreDataProvider_Duration), Objects.requireNonNull(Doubles.toArray(yValues)));
         Map<String, IYModel> ySeries = ImmutableMap.of(Objects.requireNonNull(Messages.SegmentStoreDataProvider_Duration), yModel);
-        return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.SegmentStoreScatterGraphViewer_title), Objects.requireNonNull(Longs.toArray(xSeries)), ySeries, true);
+        return TmfXyResponseFactory.create(Objects.requireNonNull(Messages.SegmentStoreScatterGraphViewer_title), Objects.requireNonNull(Longs.toArray(xSeries)), ySeries, true);
     }
 
     private Iterable<ISegment> compactList(final long startTime, final Iterable<@NonNull ISegment> iterableToCompact, long pixelSize) {

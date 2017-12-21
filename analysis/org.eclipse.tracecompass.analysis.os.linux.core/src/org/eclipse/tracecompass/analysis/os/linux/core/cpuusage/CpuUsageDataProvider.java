@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attribute
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCpuQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.AbstractTreeXyDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.AbstractTreeCommonXDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -51,7 +51,7 @@ import com.google.common.collect.Maps;
  * @since 2.3
  */
 @SuppressWarnings("restriction")
-public class CpuUsageDataProvider extends AbstractTreeXyDataProvider<KernelCpuUsageAnalysis, CpuUsageEntryModel> {
+public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<KernelCpuUsageAnalysis, CpuUsageEntryModel> {
 
     /**
      * Prefix for the total series.

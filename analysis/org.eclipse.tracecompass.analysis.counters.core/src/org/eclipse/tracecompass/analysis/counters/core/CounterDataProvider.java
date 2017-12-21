@@ -28,7 +28,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.Sele
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.AbstractTreeXyDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.AbstractTreeCommonXDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -51,7 +51,7 @@ import com.google.common.collect.TreeMultimap;
  * @since 1.1
  */
 @SuppressWarnings("restriction")
-public class CounterDataProvider extends AbstractTreeXyDataProvider<CounterAnalysis, TmfTreeDataModel> {
+public class CounterDataProvider extends AbstractTreeCommonXDataProvider<CounterAnalysis, TmfTreeDataModel> {
 
     /**
      * This data provider's extension point ID

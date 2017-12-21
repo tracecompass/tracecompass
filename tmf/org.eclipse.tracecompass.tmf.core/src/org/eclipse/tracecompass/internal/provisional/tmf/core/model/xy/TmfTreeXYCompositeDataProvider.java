@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfXyResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeCompositeDataProvider;
@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 
 /**
  * Represents a base implementation of {@link ITmfTreeXYDataProvider} that
@@ -93,22 +94,50 @@ public class TmfTreeXYCompositeDataProvider<M extends ITmfTreeDataModel, P exten
     }
 
     @Override
-    public TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        List<P> providers = getProviders();
+        boolean allCommon = Iterables.all(providers, ITmfCommonXAxisModel.class::isInstance);
+
+        if (allCommon) {
+            return getCommonXResponse(filter, monitor, providers);
+        }
+        return getXyResponse(filter, monitor, providers);
+    }
+
+    private TmfModelResponse<ITmfXyModel> getXyResponse(TimeQueryFilter filter, @Nullable IProgressMonitor monitor, List<P> providers) {
+        boolean isComplete = true;
+        ImmutableMap.Builder<String, ISeriesModel> series = ImmutableMap.builder();
+        for (P dataProvider : providers) {
+            TmfModelResponse<ITmfXyModel> response = dataProvider.fetchXY(filter, monitor);
+            isComplete &= response.getStatus() == ITmfResponse.Status.COMPLETED;
+            ITmfXyModel model = response.getModel();
+            if (model != null) {
+                series.putAll(model.getData());
+            }
+
+            if (monitor != null && monitor.isCanceled()) {
+                return TmfXyResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
+            }
+        }
+        return TmfXyResponseFactory.create(fTitle, series.build(), isComplete); // $NON-NLS-1$
+    }
+
+    private TmfModelResponse<ITmfXyModel> getCommonXResponse(TimeQueryFilter filter, @Nullable IProgressMonitor monitor, List<P> providers) {
         boolean isComplete = true;
         ImmutableMap.Builder<String, IYModel> series = ImmutableMap.builder();
-
-        for (P dataProvider : getProviders()) {
-            TmfModelResponse<ITmfCommonXAxisModel> response = dataProvider.fetchXY(filter, monitor);
+        for (P dataProvider : providers) {
+            TmfModelResponse<ITmfXyModel> response = dataProvider.fetchXY(filter, monitor);
             isComplete &= response.getStatus() == ITmfResponse.Status.COMPLETED;
-            ITmfCommonXAxisModel model = response.getModel();
+            ITmfCommonXAxisModel model = (ITmfCommonXAxisModel) response.getModel();
             if (model != null) {
                 series.putAll(model.getYData());
             }
 
             if (monitor != null && monitor.isCanceled()) {
-                return TmfCommonXAxisResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
+                return TmfXyResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
             }
         }
-        return TmfCommonXAxisResponseFactory.create(fTitle, filter.getTimesRequested(), series.build(), isComplete); // $NON-NLS-1$
+        return TmfXyResponseFactory.create(fTitle, filter.getTimesRequested(), series.build(), isComplete); // $NON-NLS-1$
+
     }
 }

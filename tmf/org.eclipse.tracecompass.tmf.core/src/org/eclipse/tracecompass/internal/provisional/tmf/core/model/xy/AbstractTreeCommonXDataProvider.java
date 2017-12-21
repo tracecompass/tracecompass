@@ -19,7 +19,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfCommonXAxisResponseFactory;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfXyResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.AbstractTreeDataProvider;
@@ -32,9 +32,10 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModul
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
- * Class to abstract {@link ITmfTreeXYDataProvider} methods and fields. Handles
- * the exceptions that can be thrown by the concrete classes, and logs the time
- * taken to build the XY models.
+ * Class to abstract {@link ITmfTreeXYDataProvider} methods and fields for data
+ * provider that share the values of X axis for all series (for instance line
+ * charts). Handles the exceptions that can be thrown by the concrete classes,
+ * and logs the time taken to build the XY models.
  *
  * @param <A>
  *            Generic type for the encapsulated
@@ -43,7 +44,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  *            Generic type for the returned {@link ITmfTreeDataModel}.
  * @author Loic Prieur-Drevon
  */
-public abstract class AbstractTreeXyDataProvider<A extends TmfStateSystemAnalysisModule, M extends ITmfTreeDataModel>
+public abstract class AbstractTreeCommonXDataProvider<A extends TmfStateSystemAnalysisModule, M extends ITmfTreeDataModel>
     extends AbstractTreeDataProvider<A, M> implements ITmfTreeXYDataProvider<M> {
 
     /**
@@ -54,14 +55,14 @@ public abstract class AbstractTreeXyDataProvider<A extends TmfStateSystemAnalysi
      * @param analysisModule
      *            the analysis encapsulated by this provider
      */
-    public AbstractTreeXyDataProvider(ITmfTrace trace, A analysisModule) {
+    public AbstractTreeCommonXDataProvider(ITmfTrace trace, A analysisModule) {
         super(trace, analysisModule);
     }
 
     @Override
-    public final TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public final TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         A module = getAnalysisModule();
-        TmfModelResponse<ITmfCommonXAxisModel> res = verifyParameters(module, filter, monitor);
+        TmfModelResponse<ITmfXyModel> res = verifyParameters(module, filter, monitor);
         if (res != null) {
             return res;
         }
@@ -74,17 +75,17 @@ public abstract class AbstractTreeXyDataProvider<A extends TmfStateSystemAnalysi
         try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "AbstractTreeXyDataProvider#fetchXY") //$NON-NLS-1$
                 .setCategory(getClass().getSimpleName()).build()) {
             if (!(filter instanceof SelectionTimeQueryFilter)) {
-                return TmfCommonXAxisResponseFactory.create(getTitle(), filter.getTimesRequested(), Collections.emptyMap(), complete);
+                return TmfXyResponseFactory.create(getTitle(), filter.getTimesRequested(), Collections.emptyMap(), complete);
             }
 
             Map<String, IYModel> yModels = getYModels(ss, (SelectionTimeQueryFilter) filter, monitor);
             if (yModels == null) {
                 // getModels returns null if the query was cancelled.
-                return TmfCommonXAxisResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
+                return TmfXyResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
             }
-            return TmfCommonXAxisResponseFactory.create(getTitle(), filter.getTimesRequested(), yModels, complete);
+            return TmfXyResponseFactory.create(getTitle(), filter.getTimesRequested(), yModels, complete);
         } catch (StateSystemDisposedException | TimeRangeException | IndexOutOfBoundsException e) {
-            return TmfCommonXAxisResponseFactory.createFailedResponse(String.valueOf(e.getMessage()));
+            return TmfXyResponseFactory.createFailedResponse(String.valueOf(e.getMessage()));
         }
     }
 

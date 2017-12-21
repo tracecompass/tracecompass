@@ -24,7 +24,7 @@ import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemo
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.FilterTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.AbstractTreeXyDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.AbstractTreeCommonXDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -46,7 +46,7 @@ import com.google.common.collect.Maps;
  */
 @NonNullByDefault
 @SuppressWarnings("restriction")
-public class UstMemoryUsageDataProvider extends AbstractTreeXyDataProvider<UstMemoryAnalysisModule, MemoryUsageTreeModel> {
+public class UstMemoryUsageDataProvider extends AbstractTreeCommonXDataProvider<UstMemoryAnalysisModule, MemoryUsageTreeModel> {
 
     /**
      * Entry point ID.

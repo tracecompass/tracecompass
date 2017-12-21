@@ -21,7 +21,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.Mess
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.AbstractTreeXyDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.AbstractTreeCommonXDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -42,7 +42,7 @@ import com.google.common.collect.Maps;
  * @author Yonni Chen
  */
 @SuppressWarnings("restriction")
-public class DisksIODataProvider extends AbstractTreeXyDataProvider<InputOutputAnalysisModule, TmfTreeDataModel> {
+public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOutputAnalysisModule, TmfTreeDataModel> {
 
     /**
      * Title used to create XY models for the {@link DisksIODataProvider}.

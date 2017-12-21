@@ -12,7 +12,7 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -58,21 +58,21 @@ public abstract class AbstractStateSystemAnalysisDataProvider extends AbstractTm
      * @return A {@link TmfModelResponse} if something went wrong. Null if
      *         everything is fine
      */
-    protected @Nullable TmfModelResponse<ITmfCommonXAxisModel> verifyParameters(TmfStateSystemAnalysisModule module, TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    protected @Nullable TmfModelResponse<ITmfXyModel> verifyParameters(TmfStateSystemAnalysisModule module, TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         if (!module.waitForInitialization()) {
-            return TmfCommonXAxisResponseFactory.createFailedResponse(CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
+            return TmfXyResponseFactory.createFailedResponse(CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
         }
         if (monitor != null && monitor.isCanceled()) {
-            return TmfCommonXAxisResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
+            return TmfXyResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
         }
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
-            return TmfCommonXAxisResponseFactory.createFailedResponse(CommonStatusMessage.STATE_SYSTEM_FAILED);
+            return TmfXyResponseFactory.createFailedResponse(CommonStatusMessage.STATE_SYSTEM_FAILED);
         }
 
         long realStart = Math.max(ss.getStartTime(), filter.getStart());
         if (realStart >= filter.getEnd()) {
-            return TmfCommonXAxisResponseFactory.createFailedResponse(CommonStatusMessage.INCORRECT_QUERY_INTERVAL);
+            return TmfXyResponseFactory.createFailedResponse(CommonStatusMessage.INCORRECT_QUERY_INTERVAL);
         }
         return null;
     }

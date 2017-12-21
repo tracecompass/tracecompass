@@ -30,9 +30,10 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ISeriesModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IXYPresentationProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RGBColor;
@@ -296,8 +297,8 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
         private void updateData(@NonNull ITmfXYDataProvider dataProvider, @NonNull TimeQueryFilter filters, IProgressMonitor monitor) {
             boolean isComplete = false;
             do {
-                TmfModelResponse<ITmfCommonXAxisModel> response = dataProvider.fetchXY(filters, monitor);
-                ITmfCommonXAxisModel model = response.getModel();
+                TmfModelResponse<ITmfXyModel> response = dataProvider.fetchXY(filters, monitor);
+                ITmfXyModel model = response.getModel();
                 if (model != null) {
                     updateDisplay(model, monitor);
                 }
@@ -331,10 +332,10 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
         /**
          * Update the chart's values before refreshing the viewer
          */
-        private void updateDisplay(ITmfCommonXAxisModel model, IProgressMonitor monitor) {
+        private void updateDisplay(ITmfXyModel model, IProgressMonitor monitor) {
             try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TmfCommonXAxisChart:UpdateDisplayRequested").setCategory(getViewerId()).build()) { //$NON-NLS-1$
                 /* Content is not up to date, increment dirtiness */
-                final ITmfCommonXAxisModel seriesValues = model;
+                final ITmfXyModel seriesValues = model;
                 fDirty.incrementAndGet();
 
                 Display.getDefault().asyncExec(() -> {
@@ -353,12 +354,12 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                         double miny = DEFAULT_MINY;
                         long delta = getWindowEndTime() - getWindowStartTime();
                         if (delta > 0) {
-                            for (IYModel entry : seriesValues.getYData().values()) {
+                            for (ISeriesModel entry : seriesValues.getData().values()) {
                                 ISeries series = getSwtChart().getSeriesSet().getSeries(entry.getName());
                                 if (series == null) {
                                     series = createSWTSeriesFromModel(entry);
                                 }
-                                series.setXSeries(extractXValuesToDisplay(seriesValues));
+                                series.setXSeries(extractXValuesToDisplay(entry.getXAxis()));
                                 /*
                                  * Find the minimal and maximum values in this series
                                  */
@@ -412,8 +413,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
          * Since the XY Model returned by data provider contains directly the requested
          * time as long array, we need to convert it to double array for the SWT Chart.
          */
-        private double[] extractXValuesToDisplay(ITmfCommonXAxisModel model) {
-            long[] xValuesRequested = model.getXAxis();
+        private double[] extractXValuesToDisplay(long[] xValuesRequested) {
             double[] xValuesToDisplay = new double[xValuesRequested.length];
             long offset = getTimeOffset();
 
@@ -423,7 +423,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             return xValuesToDisplay;
         }
 
-        private @NonNull ISeries createSWTSeriesFromModel(IYModel yModel) {
+        private @NonNull ISeries createSWTSeriesFromModel(ISeriesModel yModel) {
             ISeriesSet seriesSet = getSwtChart().getSeriesSet();
 
             String seriesName = yModel.getName();
@@ -451,6 +451,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             lineSeries.setLineStyle(LineStyle.valueOf(appearance.getStyle()));
             lineSeries.setSymbolType(isScatter ? PlotSymbolType.DIAMOND : PlotSymbolType.NONE);
             lineSeries.setLineColor(color);
+            lineSeries.setSymbolColor(color);
             lineSeries.setVisible(true);
             lineSeries.setLineWidth(appearance.getWidth());
             return lineSeries;

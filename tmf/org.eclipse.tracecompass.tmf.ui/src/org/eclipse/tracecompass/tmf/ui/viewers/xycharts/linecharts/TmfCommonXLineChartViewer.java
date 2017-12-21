@@ -40,6 +40,7 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLo
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
@@ -503,12 +504,14 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
         boolean isComplete = false;
         do {
-            TmfModelResponse<ITmfCommonXAxisModel> response = fXYDataProvider.fetchXY(filters, monitor);
-            ITmfCommonXAxisModel model = response.getModel();
-            if (model != null) {
-                extractXYModelAndUpdateViewModel(model);
-                updateDisplay();
+            TmfModelResponse<ITmfXyModel> response = fXYDataProvider.fetchXY(filters, monitor);
+            ITmfXyModel model = response.getModel();
+            if (!(model instanceof ITmfCommonXAxisModel)) {
+                Activator.getDefault().logError("The model is of the wrong type: " + model); //$NON-NLS-1$
+                return;
             }
+            extractXYModelAndUpdateViewModel((ITmfCommonXAxisModel) model);
+            updateDisplay();
 
             ITmfResponse.Status status = response.getStatus();
             if (status == ITmfResponse.Status.COMPLETED) {
