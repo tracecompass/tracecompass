@@ -32,6 +32,8 @@ import org.swtchart.LineStyle;
  */
 public class XYChartLegendImageProvider implements ILegendImageProvider {
 
+    private static final int OVAL_LEGEND_SIZE = 3;
+    private static final @NonNull String DOT_SHAPE_OVAL = "oval"; //$NON-NLS-1$
     private final TmfCommonXAxisChartViewer fChartViewer;
 
     /**
@@ -66,11 +68,30 @@ public class XYChartLegendImageProvider implements ILegendImageProvider {
         gc.fillRectangle(0, 0, imageWidth, imageHeight);
         gc.setForeground(lineColor);
         gc.setLineWidth(appearance.getWidth());
-        gc.setLineStyle(LineStyle.valueOf(appearance.getStyle()).ordinal());
-        gc.drawLine(0, imageHeight / 2, imageWidth, imageHeight / 2);
+        LineStyle lineStyle = LineStyle.valueOf(appearance.getStyle());
+        if (lineStyle != LineStyle.NONE) {
+            gc.setLineStyle(LineStyle.valueOf(appearance.getStyle()).ordinal());
+            gc.drawLine(0, imageHeight / 2, imageWidth, imageHeight / 2);
+        } else {
+            // Not a line, draw a dot
+            // FIXME: support more shapes and add a getter to the IYAppearance class
+            drawStyledDot(gc, lineColor, imageWidth, imageHeight, DOT_SHAPE_OVAL);
+        }
 
         gc.dispose();
         lineColor.dispose();
         return image;
+    }
+
+    private static void drawStyledDot(GC gc, Color lineColor, int imageWidth, int imageHeight, String shape) {
+        gc.setBackground(lineColor);
+        switch(shape) {
+        case DOT_SHAPE_OVAL:
+        default:
+            // Default is an oval
+            gc.fillOval(imageWidth / 2 - OVAL_LEGEND_SIZE, imageHeight / 2 - OVAL_LEGEND_SIZE, OVAL_LEGEND_SIZE * 2, OVAL_LEGEND_SIZE * 2);
+            break;
+        }
+
     }
 }
