@@ -14,12 +14,10 @@ package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.Objects;
@@ -51,7 +49,7 @@ import com.google.common.cache.LoadingCache;
  */
 public class HT_IO {
 
-    private static final Logger LOGGER = TraceCompassLog.getLogger(HT_IO.class);
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(HT_IO.class);
 
     // ------------------------------------------------------------------------
     // Global cache of nodes
@@ -100,8 +98,8 @@ public class HT_IO {
             TraceCompassLogUtils.traceInstant(LOGGER, Level.FINEST, "Ht_Io:CacheMiss", "seqNum", seqNb); //$NON-NLS-1$ //$NON-NLS-2$
 
             synchronized (io) {
-                MappedByteBuffer buffer = io.mapNodeToBuffer(seqNb, MapMode.READ_ONLY);
-                return HTNode.readNode(io.fConfig, buffer, key.fStateHistory.fNodeFactory);
+                io.seekFCToNodePos(io.fFileChannelIn, seqNb);
+                return HTNode.readNode(io.fConfig, io.fFileChannelIn, key.fStateHistory.fNodeFactory);
             }
         }
     };
@@ -109,7 +107,6 @@ public class HT_IO {
     private static final LoadingCache<CacheKey, HTNode> NODE_CACHE = CacheBuilder.newBuilder()
             .maximumSize(CACHE_SIZE).build(NODE_LOADER);
 
-    private static final String READ_WRITE_MODE = "rw"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Instance fields
@@ -119,8 +116,10 @@ public class HT_IO {
     private final HTConfig fConfig;
 
     /* Fields related to the file I/O */
-    private final RandomAccessFile fRandomAccessFile;
-    private final FileChannel fFileChannel;
+    private final FileInputStream fFileInputStream;
+    private final FileOutputStream fFileOutputStream;
+    private final FileChannel fFileChannelIn;
+    private final FileChannel fFileChannelOut;
 
     private final IHTNodeFactory fNodeFactory;
 
@@ -159,11 +158,18 @@ public class HT_IO {
                 throw new IOException("Cannot create new file at " + //$NON-NLS-1$
                         historyTreeFile.getName());
             }
+            fFileInputStream = new FileInputStream(historyTreeFile);
+            fFileOutputStream = new FileOutputStream(historyTreeFile, false);
+        } else {
+            /*
+             * We want to open an existing file, make sure we don't squash the
+             * existing content when opening the fos!
+             */
+            fFileInputStream = new FileInputStream(historyTreeFile);
+            fFileOutputStream = new FileOutputStream(historyTreeFile, true);
         }
-        RandomAccessFile randomAccessFile = new RandomAccessFile(historyTreeFile, READ_WRITE_MODE);
-        fRandomAccessFile = randomAccessFile;
-        fFileChannel = randomAccessFile.getChannel();
-
+        fFileChannelIn = fFileInputStream.getChannel();
+        fFileChannelOut = fFileOutputStream.getChannel();
         fNodeFactory = nodeFactory;
     }
 
@@ -245,7 +251,8 @@ public class HT_IO {
 
             /* Position ourselves at the start of the node and write it */
             synchronized (this) {
-                node.writeSelf(mapNodeToBuffer(seqNumber, MapMode.READ_WRITE));
+                seekFCToNodePos(fFileChannelOut, seqNumber);
+                node.writeSelf(fFileChannelOut);
             }
         } catch (IOException e) {
             /* If we were able to open the file, we should be fine now... */
@@ -259,7 +266,7 @@ public class HT_IO {
      * @return The output file channel
      */
     public FileChannel getFcOut() {
-        return fFileChannel;
+        return fFileChannelOut;
     }
 
     /**
@@ -270,20 +277,17 @@ public class HT_IO {
      *            after all the nodes.
      * @return The correctly-seeked input stream
      */
-    public FileInputStream supplyATReader(long nodeOffset) {
-        FileInputStream fileInputStream = null;
+    public FileInputStream supplyATReader(int nodeOffset) {
         try {
             /*
              * Position ourselves at the start of the Mapping section in the
              * file (which is right after the Blocks)
              */
-            fileInputStream = new FileInputStream(fConfig.getStateFile());
-            long offset = IHistoryTree.TREE_HEADER_SIZE + nodeOffset * fConfig.getBlockSize();
-            fileInputStream.getChannel().position(offset);
+            seekFCToNodePos(fFileChannelIn, nodeOffset);
         } catch (IOException e) {
             Activator.getDefault().logError(e.getMessage(), e);
         }
-        return fileInputStream;
+        return fFileInputStream;
     }
 
     /**
@@ -291,8 +295,8 @@ public class HT_IO {
      */
     public synchronized void closeFile() {
         try {
-            fFileChannel.close();
-            fRandomAccessFile.close();
+            fFileInputStream.close();
+            fFileOutputStream.close();
         } catch (IOException e) {
             Activator.getDefault().logError(e.getMessage(), e);
         }
@@ -312,16 +316,20 @@ public class HT_IO {
     }
 
     /**
-     * Return the {@link MappedByteBuffer} for the queried node.
+     * Seek the given FileChannel to the position corresponding to the node that has
+     * seqNumber
      *
+     * @param fc
+     *            the channel to seek
      * @param seqNumber
-     *            the node sequence number to seek the channel to, cast as long
+     *            the node sequence number to seek the channel to
      * @throws IOException
      *             If some other I/O error occurs
      */
-    private MappedByteBuffer mapNodeToBuffer(long seqNumber, MapMode readWrite) throws IOException {
-        long position = IHistoryTree.TREE_HEADER_SIZE + seqNumber * fConfig.getBlockSize();
-        return fFileChannel.map(readWrite, position, fConfig.getBlockSize());
+    private void seekFCToNodePos(FileChannel fc, long seqNumber)
+            throws IOException {
+        fc.position(IHistoryTree.TREE_HEADER_SIZE
+                + seqNumber * fConfig.getBlockSize());
     }
 
 }

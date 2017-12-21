@@ -267,14 +267,8 @@ public class HistoryTreeClassic implements IHistoryTree {
             fTreeEnd = requestedEndTime;
 
             closeBranch(0, requestedEndTime);
-            /**
-             * The FileChannel is handled with the state history tree lifecycle, do not put
-             * it in a try-with-resources else the channel (for reading and writing) will be
-             * closed when the tree is finished building, whereas we still need it for
-             * querying after.
-             */
-            FileChannel fc = fTreeIO.getFcOut();
-            try {
+
+            try (FileChannel fc = fTreeIO.getFcOut();) {
                 ByteBuffer buffer = ByteBuffer.allocate(TREE_HEADER_SIZE);
                 buffer.order(ByteOrder.LITTLE_ENDIAN);
                 buffer.clear();
