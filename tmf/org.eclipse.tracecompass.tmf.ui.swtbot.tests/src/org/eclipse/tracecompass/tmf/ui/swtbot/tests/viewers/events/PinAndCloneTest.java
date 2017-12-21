@@ -144,9 +144,26 @@ public class PinAndCloneTest {
         assertEquals(CALL_STACK_VIEW_TITLE, fOriginalViewBot.getTitle());
 
         // ensure that the pin drop down is present, pin the view.
-        SWTBotToolbarDropDownButton toolbarDropDownButton = fOriginalViewBot.toolbarDropDownButton(PIN_VIEW_BUTTON_NAME);
-        // FIXME intermittent failures
-        toolbarDropDownButton.menuItem(PIN_TO_PREFIX + fUstTestTrace.getName()).click();
+        fBot.waitUntil(new DefaultCondition() {
+            WidgetNotFoundException fException;
+
+            @Override
+            public boolean test() throws Exception {
+                try {
+                    SWTBotToolbarDropDownButton toolbarDropDownButton = fOriginalViewBot.toolbarDropDownButton(PIN_VIEW_BUTTON_NAME);
+                    toolbarDropDownButton.menuItem(PIN_TO_PREFIX + fUstTestTrace.getName()).click();
+                    return true;
+                } catch (WidgetNotFoundException e) {
+                    fException = e;
+                    return false;
+                }
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return "Traces not available in toolbar drop down menu: " + fException;
+            }
+        });
 
         // ensure that the view has been renamed. Get the view by title and ensure it
         // has the same widget as there is a renaming bug.
@@ -184,6 +201,8 @@ public class PinAndCloneTest {
         assertNotNull(ust);
         ITmfTrace kernelTestTrace = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.CONTEXT_SWITCHES_KERNEL);
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, kernelTestTrace.getPath(), TRACETYPE_ID);
+        /* Finish waiting for the trace to index */
+        WaitUtils.waitForJobs();
         SWTBotEditor kernelEditor = SWTBotUtils.activateEditor(fBot, kernelTestTrace.getName());
         // wait for the editor to be ready.
         fBot.editorByTitle(kernelTestTrace.getName());
@@ -322,6 +341,8 @@ public class PinAndCloneTest {
         assertNotNull(ust);
         ITmfTrace kernelTest = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.CONTEXT_SWITCHES_KERNEL);
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, kernelTest.getPath(), TRACETYPE_ID);
+        /* Finish waiting for the trace to index */
+        WaitUtils.waitForJobs();
         SWTBotEditor kernelEditor = SWTBotUtils.activateEditor(fBot, kernelTest.getName());
         // wait for the editor to be ready.
         fBot.editorByTitle(kernelTest.getName());
