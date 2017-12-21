@@ -29,7 +29,7 @@ public class YModel implements IYModel {
 
     /**
      * Constructor
-     *s
+     *
      * @param name
      *            The name of the series
      * @param yValues

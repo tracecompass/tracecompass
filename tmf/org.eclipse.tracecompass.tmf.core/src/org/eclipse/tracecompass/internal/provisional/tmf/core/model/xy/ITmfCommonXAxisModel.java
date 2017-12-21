@@ -11,7 +11,6 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy;
 
 import java.util.Map;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.viewmodel.ICommonXAxisModel;
 
 /**
@@ -37,7 +36,7 @@ import org.eclipse.tracecompass.tmf.core.viewmodel.ICommonXAxisModel;
  *
  * @author Yonni Chen
  */
-public interface ITmfCommonXAxisModel {
+public interface ITmfCommonXAxisModel extends ITmfXyModel {
 
     /**
      * Get the X values
@@ -45,13 +44,6 @@ public interface ITmfCommonXAxisModel {
      * @return The x values
      */
     long[] getXAxis();
-
-    /**
-     * Get chart title
-     *
-     * @return The title
-     */
-    @Nullable String getTitle();
 
     /**
      * Get the collection of {@link IYModel}
