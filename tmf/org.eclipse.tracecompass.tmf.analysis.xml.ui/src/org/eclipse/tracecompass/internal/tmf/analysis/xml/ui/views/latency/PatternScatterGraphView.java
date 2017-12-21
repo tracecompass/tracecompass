@@ -10,14 +10,20 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterChartTreeViewer;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlLatencyViewInfo;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
@@ -40,17 +46,14 @@ public class PatternScatterGraphView extends TmfChartView {
      */
     public PatternScatterGraphView() {
         super(ID);
-        this.addPartPropertyListener(new IPropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent event) {
-                if (event.getProperty().equals(TmfXmlStrings.XML_LATENCY_OUTPUT_DATA)) {
-                    Object newValue = event.getNewValue();
-                    if (newValue instanceof String) {
-                        String data = (String) newValue;
-                        fViewInfo.setViewData(data);
-                        setPartName(fViewInfo.getLabel());
-                        loadLatencyView();
-                    }
+        this.addPartPropertyListener(event -> {
+            if (event.getProperty().equals(TmfXmlStrings.XML_LATENCY_OUTPUT_DATA)) {
+                Object newValue = event.getNewValue();
+                if (newValue instanceof String) {
+                    String data = (String) newValue;
+                    fViewInfo.setViewData(data);
+                    setPartName(fViewInfo.getLabel());
+                    loadLatencyView();
                 }
             }
         });
@@ -64,12 +67,7 @@ public class PatternScatterGraphView extends TmfChartView {
             fViewInfo.setName(name);
         }
         super.createPartControl(parent);
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                setPartName(fViewInfo.getLabel());
-            }
-        });
+        Display.getDefault().asyncExec(() -> setPartName(fViewInfo.getLabel()));
     }
 
     private void loadLatencyView() {
@@ -85,4 +83,18 @@ public class PatternScatterGraphView extends TmfChartView {
         loadLatencyView();
         return viewer;
     }
+
+    @Override
+    protected @NonNull TmfViewer createLeftChildViewer(@Nullable Composite parent) {
+        return new AbstractSegmentStoreScatterChartTreeViewer(Objects.requireNonNull(parent)) {
+
+            @Override
+            protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace) {
+                String analysisId = fViewInfo.getViewAnalysisId();
+                return analysisId != null ? TmfTraceUtils.getAnalysisModuleOfClass(trace, XmlPatternAnalysis.class, analysisId) : null;
+            }
+
+        };
+    }
+
 }

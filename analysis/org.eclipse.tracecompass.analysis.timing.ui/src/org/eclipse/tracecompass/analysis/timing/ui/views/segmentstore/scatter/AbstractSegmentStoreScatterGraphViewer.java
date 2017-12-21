@@ -99,7 +99,7 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
         if (trace != null) {
             final ISegmentStoreProvider segmentStoreProvider = getSegmentStoreProvider(trace);
             if (segmentStoreProvider != null) {
-                setDataProvider(SegmentStoreScatterDataProvider.create(trace, segmentStoreProvider));
+                setDataProvider(SegmentStoreScatterDataProvider.getOrCreate(trace, segmentStoreProvider));
             }
         }
     }

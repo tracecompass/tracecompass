@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 
 /**
@@ -37,7 +37,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSet
  * @since 2.1
  */
 @SuppressWarnings("restriction")
-public abstract class AbstractSegmentStoreScatterChartViewer extends TmfCommonXAxisChartViewer {
+public abstract class AbstractSegmentStoreScatterChartViewer extends TmfFilteredXYChartViewer {
 
     private static final Format FORMAT = new SubSecondTimeWithUnitFormat();
     private static final int DEFAULT_SERIES_WIDTH = 1;
@@ -51,7 +51,7 @@ public abstract class AbstractSegmentStoreScatterChartViewer extends TmfCommonXA
      *            See {@link TmfXYChartSettings} to know what it contains
      */
     public AbstractSegmentStoreScatterChartViewer(Composite parent, TmfXYChartSettings settings) {
-        super(parent, settings);
+        super(parent, settings, SegmentStoreScatterDataProvider.ID);
         setTooltipProvider(new SegmentStoreScatterGraphTooltipProvider(this));
         getSwtChart().getLegend().setVisible(false);
         getSwtChart().getAxisSet().getYAxis(0).getTick().setFormat(FORMAT);
@@ -65,7 +65,7 @@ public abstract class AbstractSegmentStoreScatterChartViewer extends TmfCommonXA
     protected @Nullable ITmfXYDataProvider initializeDataProvider(ITmfTrace trace) {
         final ISegmentStoreProvider segmentStoreProvider = getSegmentStoreProvider(trace);
         if (segmentStoreProvider != null) {
-            return SegmentStoreScatterDataProvider.create(trace, segmentStoreProvider);
+            return SegmentStoreScatterDataProvider.getOrCreate(trace, segmentStoreProvider);
         }
         return null;
     }

@@ -25,6 +25,7 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -247,14 +248,15 @@ public abstract class XYDataProviderBaseTest {
      * @param expectedType
      *            Expected type of the series
      * @param expectedColor
-     *            Expected color of the series
+     *            Expected color of the series. If the color is arbitrary, a value
+     *            of <code>null</code> will skip color check
      * @param expectedLineStyle
      *            Expected line style of the series
      * @param isArea
      *            Parameter should be true if expected series show area, false
      *            either
      */
-    protected void verifySeriesStyle(String seriesName, ISeries.SeriesType expectedType, RGB expectedColor, LineStyle expectedLineStyle, boolean isArea) {
+    protected void verifySeriesStyle(String seriesName, ISeries.SeriesType expectedType, @Nullable RGB expectedColor, LineStyle expectedLineStyle, boolean isArea) {
         ISeries series = fChart.getSeriesSet().getSeries(seriesName);
         assertNotNull(series);
         assertTrue(series.isVisible());
@@ -264,12 +266,16 @@ public abstract class XYDataProviderBaseTest {
 
         if (expectedType == ISeries.SeriesType.LINE) {
             ILineSeries line = (ILineSeries) series;
-            assertEquals(expectedColor, line.getLineColor().getRGB());
+            if (expectedColor != null) {
+                assertEquals(expectedColor, line.getLineColor().getRGB());
+            }
             assertEquals(expectedLineStyle, line.getLineStyle());
             assertEquals(isArea, line.isAreaEnabled());
         } else if (expectedType == ISeries.SeriesType.BAR) {
             IBarSeries bar = (IBarSeries) series;
-            assertEquals(expectedColor, bar.getBarColor().getRGB());
+            if (expectedColor != null) {
+                assertEquals(expectedColor, bar.getBarColor().getRGB());
+            }
             assertTrue(bar.isStackEnabled());
         }
     }

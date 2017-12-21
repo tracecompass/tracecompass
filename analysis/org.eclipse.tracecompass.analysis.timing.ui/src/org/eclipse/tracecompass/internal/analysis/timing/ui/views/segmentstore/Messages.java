@@ -27,6 +27,14 @@ public class Messages extends NLS {
      * Export to TSV tooltip
      */
     public static @Nullable String ExportToTsvAction_exportToTsvToolTip;
+    /**
+     * Export to TSV tooltip
+     */
+    public static @Nullable String AbstractSegmentStoreScatterView_Type;
+    /**
+     * Export to TSV tooltip
+     */
+    public static @Nullable String AbstractSegmentStoreScatterView_Legend;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -11,17 +11,23 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
+import java.util.Objects;
+
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterChartViewer;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterChartTreeViewer;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
-import com.google.common.annotations.VisibleForTesting;
-
 /**
- * Some stuff
+ * Shows the system call latencies in time
  *
  * @author Matthew Khouzam
  */
@@ -31,8 +37,6 @@ public class SystemCallLatencyScatterView extends TmfChartView {
 
     /** The view's ID */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.views.latency.scatter"; //$NON-NLS-1$
-
-    private @Nullable AbstractSegmentStoreScatterChartViewer fScatterViewer;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -51,15 +55,20 @@ public class SystemCallLatencyScatterView extends TmfChartView {
 
     @Override
     protected TmfXYChartViewer createChartViewer(@Nullable Composite parent) {
-        fScatterViewer = new SystemCallLatencyScatterGraphViewer(NonNullUtils.checkNotNull(parent), nullToEmptyString(Messages.SystemCallLatencyScatterView_title), nullToEmptyString(Messages.SystemCallLatencyScatterView_xAxis),
+        return new SystemCallLatencyScatterGraphViewer(NonNullUtils.checkNotNull(parent), nullToEmptyString(Messages.SystemCallLatencyScatterView_title), nullToEmptyString(Messages.SystemCallLatencyScatterView_xAxis),
                 nullToEmptyString(Messages.SystemCallLatencyScatterView_yAxis));
-        return fScatterViewer;
     }
 
-    @VisibleForTesting
     @Override
-    public TmfXYChartViewer getChartViewer() {
-        return super.getChartViewer();
+    protected @NonNull TmfViewer createLeftChildViewer(@Nullable Composite parent) {
+        return new AbstractSegmentStoreScatterChartTreeViewer(Objects.requireNonNull(parent)) {
+
+            @Override
+            protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace) {
+                return TmfTraceUtils.getAnalysisModuleOfClass(trace, SystemCallLatencyAnalysis.class, SystemCallLatencyAnalysis.ID);
+            }
+
+        };
     }
 
 }
