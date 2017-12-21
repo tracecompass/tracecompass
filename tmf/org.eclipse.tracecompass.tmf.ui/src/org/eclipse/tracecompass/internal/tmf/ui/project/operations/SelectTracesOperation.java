@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Ericsson
+ * Copyright (c) 2016, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -196,13 +196,13 @@ public class SelectTracesOperation implements IRunnableWithProgress {
                 subMonitor.worked(1);
             }
             if (changed) {
-                Display.getDefault().syncExec(new Runnable() {
+                Display.getDefault().asyncExec(new Runnable() {
                     @Override
                     public void run() {
                         experimentElement.closeEditors();
+                        experimentElement.deleteSupplementaryResources();
                     }
                 });
-                experimentElement.deleteSupplementaryResources();
             }
             setStatus(Status.OK_STATUS);
         } catch (InterruptedException e) {
