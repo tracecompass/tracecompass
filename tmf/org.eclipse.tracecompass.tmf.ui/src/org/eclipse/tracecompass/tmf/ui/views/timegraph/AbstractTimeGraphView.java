@@ -1103,6 +1103,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             @Override
             public void paintControl(PaintEvent e) {
                 TmfUiRefreshHandler.getInstance().queueUpdate(this, () -> {
+                    if (fTimeGraphViewer.getTimeGraphControl().isDisposed()) {
+                        return;
+                    }
                     int timeSpace = getTimeGraphViewer().getTimeSpace();
                     Set<@NonNull TimeGraphEntry> newSet = getVisibleItems(DEFAULT_BUFFER_SIZE);
                     if (fPrevTimeSpace != timeSpace || !fVisibleEntries.equals(newSet)) {
