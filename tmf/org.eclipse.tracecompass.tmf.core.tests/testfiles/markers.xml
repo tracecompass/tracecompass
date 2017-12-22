@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<marker-sets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="markers.xsd">
+	<marker-set name="Example" id="example.id">
+		<marker name="Frame" color="#ff0000" period="10" unit="ms" range="0..4095">
+			<submarker name="Subframe" color="#00ff00" label="#%d Normal" range="0..9" index="0,2..9">
+				<submarker name="Slot" color="#008800" range="0..1"/>
+			</submarker>
+			<submarker name="Subframe" color="#ff8800" label="#%d Special" range="0..9" index="1">
+				<segments name="Slot">
+					<segment label="A" color="#884400" length="1"/>
+					<segment label="B" color="#884400" length="3"/>
+					<segment label="C" color="#884400" length="2"/>
+				</segments>
+			</submarker>
+		</marker>
+	</marker-set>
+</marker-sets>

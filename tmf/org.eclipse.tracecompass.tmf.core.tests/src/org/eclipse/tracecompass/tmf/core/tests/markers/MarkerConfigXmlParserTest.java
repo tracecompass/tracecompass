@@ -309,4 +309,17 @@ public class MarkerConfigXmlParserTest {
             file.delete();
         }
     }
+
+    /**
+     * Test that the definitions from the extension point are loaded.
+     */
+    @Test
+    public void testExtensionPoint() {
+        List<MarkerSet> markerSet = MarkerConfigXmlParser.getMarkerSets();
+        assertEquals("Extension point markers should be loaded", 1, markerSet.size());
+
+        MarkerSet set = markerSet.get(0);
+        assertEquals("Wrong MarkerSet name", "Example", set.getName());
+        assertEquals("Wrong MarkerSet Id", "example.id", set.getId());
+    }
 }

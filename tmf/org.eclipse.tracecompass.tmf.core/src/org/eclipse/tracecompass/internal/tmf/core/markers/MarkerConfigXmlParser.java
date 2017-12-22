@@ -20,7 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 
 import javax.xml.XMLConstants;
@@ -30,12 +30,17 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.SchemaFactory;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.markers.Marker.PeriodicMarker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker.SplitMarker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker.WeightedMarker;
+import org.osgi.framework.Bundle;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -70,6 +75,9 @@ public class MarkerConfigXmlParser {
     private static final String DEFAULT_LABEL = "%d"; //$NON-NLS-1$
 
     private static final @NonNull String ELLIPSIS = ".."; //$NON-NLS-1$
+    private static final @NonNull String TMF_CUSTOM_MARKERS_BUILTIN_EXTENSION_ID = "org.eclipse.tracecompass.tmf.core.custom.marker"; //$NON-NLS-1$
+    private static final @NonNull String ELEMENT_NAME_CUSTOM_MARKERS = "customMarker"; //$NON-NLS-1$
+    private static final @NonNull String ATTRIBUTE_NAME_FILE = "file"; //$NON-NLS-1$
 
     /**
      * Get the marker sets from the marker configuration file.
@@ -77,10 +85,19 @@ public class MarkerConfigXmlParser {
      * @return the list of marker sets
      */
     public static @NonNull List<MarkerSet> getMarkerSets() {
-        if (!MARKER_CONFIG_FILE.exists()) {
-            return Collections.EMPTY_LIST;
+        List<MarkerSet> markers = new ArrayList<>();
+
+        // add the MarkerSets from the editable marker config file
+        if (MARKER_CONFIG_FILE.exists()) {
+            markers.addAll(parse(MARKER_CONFIG_FILE.getAbsolutePath()));
         }
-        return parse(MARKER_CONFIG_FILE.getAbsolutePath());
+
+        // add the MarkerSets from the extension point
+        for (String extensionBookmark : getExtensionDefinitionsPaths()) {
+            markers.addAll(parse(extensionBookmark));
+        }
+
+        return markers;
     }
 
     /**
@@ -323,5 +340,43 @@ public class MarkerConfigXmlParser {
             return 0L;
         }
         return Long.parseLong(offset);
+    }
+
+    /**
+     * Get all the custom marker definition paths contributed by extensions.
+     *
+     * @return the paths to the marker definition paths.
+     */
+    private static final Collection<String> getExtensionDefinitionsPaths() {
+        List<String> extensionDefinitionsPaths = new ArrayList<>();
+        IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(TMF_CUSTOM_MARKERS_BUILTIN_EXTENSION_ID);
+        for (IConfigurationElement element : elements) {
+            if (!element.getName().equals(ELEMENT_NAME_CUSTOM_MARKERS)) {
+                continue;
+            }
+
+            final String filename = element.getAttribute(ATTRIBUTE_NAME_FILE);
+            final String name = element.getContributor().getName();
+            SafeRunner.run(new ISafeRunnable() {
+                @Override
+                public void run() throws IOException {
+                    if (name != null) {
+                        Bundle bundle = Platform.getBundle(name);
+                        if (bundle != null) {
+                            URL xmlUrl = bundle.getResource(filename);
+                            URL locatedURL = FileLocator.toFileURL(xmlUrl);
+                            extensionDefinitionsPaths.add(locatedURL.getPath());
+                        }
+                    }
+                }
+
+                @Override
+                public void handleException(Throwable exception) {
+                    // Handled sufficiently in SafeRunner
+                }
+            });
+
+        }
+        return extensionDefinitionsPaths;
     }
 }

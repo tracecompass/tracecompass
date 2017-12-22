@@ -67,8 +67,8 @@ public class MarkerSetSwtBotTest {
     private static final String UST_ID = "org.eclipse.linuxtools.lttng2.ust.tracetype";
     private static SWTWorkbenchBot fBot;
     private static SWTBotView fViewBot;
-    private static String[] MENU_ITEMS_NO_MARKERS_SET = new String[] { "None", "", "Edit..." };
-    private static String[] MENU_ITEMS_2_MARKERS_SET = new String[] { "None", "Set A", "Set B", "", "Edit..." };
+    private static String[] MENU_ITEMS_NO_MARKERS_SET = new String[] { "None", "Example", "", "Edit..." };
+    private static String[] MENU_ITEMS_2_MARKERS_SET = new String[] { "None", "Set A", "Set B","Example", "", "Edit..." };
     private static long fStart;
     private static TmfTimeRange fFullRange;
 

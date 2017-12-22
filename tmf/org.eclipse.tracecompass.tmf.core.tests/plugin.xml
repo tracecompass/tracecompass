@@ -193,5 +193,13 @@
             traceContentType="xml">
       </customTrace>
    </extension>
+   <extension
+         id="org.eclipse.tracecompass.tmf.core.tests.markers"
+         name="Test Marker file"
+         point="org.eclipse.tracecompass.tmf.core.custom.marker">
+      <customMarker
+            file="testfiles/markers.xml">
+      </customMarker>
+   </extension>
 
 </plugin>

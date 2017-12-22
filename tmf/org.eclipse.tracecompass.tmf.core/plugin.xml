@@ -7,6 +7,7 @@
    <extension-point id="org.eclipse.tracecompass.tmf.core.custom.trace" name="%extensionpoint.custom_trace.name" schema="schema/org.eclipse.tracecompass.tmf.core.custom.trace.exsd"/>
    <extension-point id="org.eclipse.tracecompass.tmf.core.symbolProvider" name="%extensionpoint.symbol_provider.name" schema="schema/org.eclipse.tracecompass.tmf.core.symbolProvider.exsd"/>
    <extension-point id="org.eclipse.tracecompass.tmf.core.dataprovider" name="%extensionpoint.data_provider.name" schema="schema/org.eclipse.tracecompass.tmf.core.dataprovider.exsd"/>
+   <extension-point id="org.eclipse.tracecompass.tmf.core.custom.marker" name="%extensionpoint.custom_marker.name" schema="schema/org.eclipse.tracecompass.tmf.core.custom.marker.exsd"/>
 
    <extension
          point="org.eclipse.core.runtime.preferences">
