@@ -23,6 +23,7 @@
             <element ref="output"/>
             <element ref="parameterProvider"/>
             <element ref="listener"/>
+            <element ref="tracetype"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -154,6 +155,16 @@
                <documentation>
                   Does this tracetype element mean the class applies or not (default true)
                </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  The analysis ID this tracetype applies to. Must be present if the tracetype is a top-level element, otherwise, the &apos;module&apos; element this is part of has precedence.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.linuxtools.tmf.core.analysis/module/@id"/>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>

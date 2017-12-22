@@ -28,5 +28,10 @@
                class="org.eclipse.tracecompass.btf.core.trace.BtfTrace">
          </tracetype>
       </module>
+      <tracetype
+            applies="false"
+            class="org.eclipse.tracecompass.btf.core.trace.BtfTrace"
+            id="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.callgraphanalysis">
+      </tracetype>
    </extension>
 </plugin>

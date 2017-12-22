@@ -13,15 +13,23 @@
 
 package org.eclipse.tracecompass.tmf.core.analysis;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.ContributorFactoryOSGi;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.analysis.TmfAnalysisModuleSourceConfigElement;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
@@ -41,7 +49,39 @@ import org.osgi.framework.Bundle;
  */
 public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelper {
 
+    private static final @NonNull Comparator<@NonNull ApplicableClass> APPLICABLE_CLASS_COMPARATOR = new Comparator<@NonNull ApplicableClass>() {
+
+        @Override
+        public int compare(@NonNull ApplicableClass o1, @NonNull ApplicableClass o2) {
+            if (o1.fClass.equals(o2.fClass)) {
+                // Classes are the same
+                return 0;
+            }
+            // Otherwise, if one class is assignable from the other, the most generic one is smaller
+            if (o1.fClass.isAssignableFrom(o2.fClass)) {
+                return -1;
+            }
+            if (o2.fClass.isAssignableFrom(o1.fClass)) {
+                return 1;
+            }
+            return 0;
+        }
+
+    };
+
+    /** Class that stores whether the analysis applies to a certain trace type */
+    private static class ApplicableClass {
+        private final Class<?> fClass;
+        private final boolean fApplies;
+
+        public ApplicableClass(Class<?> clazz, boolean applies) {
+            fClass = clazz;
+            fApplies = applies;
+        }
+    }
+
     private final IConfigurationElement fCe;
+    private @Nullable List<ApplicableClass> fApplicableClasses = null;
 
     /**
      * Constructor
@@ -104,36 +144,88 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
 
     @Override
     public Bundle getBundle() {
-        return ContributorFactoryOSGi.resolve(fCe.getContributor());
+        return getBundle(fCe);
+    }
+
+    private static Bundle getBundle(IConfigurationElement element) {
+        return ContributorFactoryOSGi.resolve(element.getContributor());
+    }
+
+    private List<ApplicableClass> fillApplicableClasses() {
+        List<IConfigurationElement> ces = new ArrayList<>();
+        /*
+         * Get the module's applying tracetypes, first from the extension point itself
+         */
+        IConfigurationElement[] tracetypeCE = fCe.getChildren(TmfAnalysisModuleSourceConfigElement.TRACETYPE_ELEM);
+        ces.addAll(Arrays.asList(tracetypeCE));
+        /* Then those in their separate extension */
+        tracetypeCE = Platform.getExtensionRegistry().getConfigurationElementsFor(TmfAnalysisModuleSourceConfigElement.TMF_ANALYSIS_TYPE_ID);
+        String id = getId();
+        for (IConfigurationElement element : tracetypeCE) {
+            String elementName = element.getName();
+            if (elementName.equals(TmfAnalysisModuleSourceConfigElement.TRACETYPE_ELEM)) {
+                String analysisId = element.getAttribute(TmfAnalysisModuleSourceConfigElement.ID_ATTR);
+                if (id.equals(analysisId)) {
+                    ces.add(element);
+                }
+            }
+        }
+        Map<Class<?>, ApplicableClass> classMap = new HashMap<>();
+        /*
+         * Convert the configuration element to applicable classes and keep only the
+         * latest one for a class
+         */
+        ces.forEach(ce -> {
+            ApplicableClass traceTypeApplies = parseTraceTypeElement(ce);
+            if (traceTypeApplies != null) {
+                classMap.put(traceTypeApplies.fClass, traceTypeApplies);
+            }
+        });
+        List<ApplicableClass> applicableClasses = new ArrayList<>(classMap.values());
+        applicableClasses.sort(APPLICABLE_CLASS_COMPARATOR);
+        return applicableClasses;
+    }
+
+    private static ApplicableClass parseTraceTypeElement(IConfigurationElement element) {
+        try {
+            Class<?> applyclass = getBundle(element).loadClass(element.getAttribute(TmfAnalysisModuleSourceConfigElement.CLASS_ATTR));
+            String classAppliesVal = element.getAttribute(TmfAnalysisModuleSourceConfigElement.APPLIES_ATTR);
+            boolean classApplies = true;
+            if (classAppliesVal != null) {
+                classApplies = Boolean.parseBoolean(classAppliesVal);
+            }
+            if (classApplies) {
+                return new ApplicableClass(applyclass, true);
+            }
+            return new ApplicableClass(applyclass, false);
+        } catch (ClassNotFoundException | InvalidRegistryObjectException e) {
+            Activator.logError("Error in applies to trace", e); //$NON-NLS-1$
+        }
+        return null;
+    }
+
+
+    private List<ApplicableClass> getApplicableClasses() {
+        List<ApplicableClass> applicableClasses = fApplicableClasses;
+        if (applicableClasses == null) {
+            applicableClasses = fillApplicableClasses();
+            fApplicableClasses = applicableClasses;
+        }
+        return applicableClasses;
     }
 
     private boolean appliesToTraceClass(Class<? extends ITmfTrace> traceclass) {
         boolean applies = false;
-
-        /* Get the module's applying tracetypes */
-        final IConfigurationElement[] tracetypeCE = fCe.getChildren(TmfAnalysisModuleSourceConfigElement.TRACETYPE_ELEM);
-        for (IConfigurationElement element : tracetypeCE) {
-            Class<?> applyclass;
-            try {
-                applyclass = getBundle().loadClass(element.getAttribute(TmfAnalysisModuleSourceConfigElement.CLASS_ATTR));
-                String classAppliesVal = element.getAttribute(TmfAnalysisModuleSourceConfigElement.APPLIES_ATTR);
-                boolean classApplies = true;
-                if (classAppliesVal != null) {
-                    classApplies = Boolean.parseBoolean(classAppliesVal);
+        for (ApplicableClass clazz : getApplicableClasses()) {
+            if (clazz.fApplies) {
+                applies |= clazz.fClass.isAssignableFrom(traceclass);
+            } else {
+                /*
+                 * If the trace type does not apply, reset the applies variable to false
+                 */
+                if (clazz.fClass.isAssignableFrom(traceclass)) {
+                    applies = false;
                 }
-                if (classApplies) {
-                    applies |= applyclass.isAssignableFrom(traceclass);
-                } else {
-                    /*
-                     * If the trace type does not apply, reset the applies
-                     * variable to false
-                     */
-                    if (applyclass.isAssignableFrom(traceclass)) {
-                        applies = false;
-                    }
-                }
-            } catch (ClassNotFoundException | InvalidRegistryObjectException e) {
-                Activator.logError("Error in applies to trace", e); //$NON-NLS-1$
             }
         }
         return applies;

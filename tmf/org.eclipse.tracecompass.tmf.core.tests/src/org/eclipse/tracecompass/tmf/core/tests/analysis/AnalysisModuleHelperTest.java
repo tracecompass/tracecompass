@@ -55,9 +55,11 @@ import com.google.common.collect.Multimap;
  */
 public class AnalysisModuleHelperTest {
 
+    private static final @NonNull String ANALYSIS_TRACETYPE_ID = "org.eclipse.linuxtools.tmf.core.tests.analysis.testtracetype";
     private IAnalysisModuleHelper fModule;
     private IAnalysisModuleHelper fModuleOther;
     private IAnalysisModuleHelper fReqModule;
+    private IAnalysisModuleHelper fTraceTypeModule;
     private ITmfTrace fTrace;
 
     private static IAnalysisModuleHelper getModuleHelper(@NonNull String moduleId) {
@@ -80,6 +82,9 @@ public class AnalysisModuleHelperTest {
         fReqModule = getModuleHelper(AnalysisManagerTest.MODULE_REQ);
         assertNotNull(fReqModule);
         assertTrue(fReqModule instanceof TmfAnalysisModuleHelperConfigElement);
+        fTraceTypeModule = getModuleHelper(ANALYSIS_TRACETYPE_ID);
+        assertNotNull(fTraceTypeModule);
+        assertTrue(fTraceTypeModule instanceof TmfAnalysisModuleHelperConfigElement);
         fTrace = TmfTestTrace.A_TEST_10K2.getTraceAsStub2();
     }
 
@@ -133,6 +138,16 @@ public class AnalysisModuleHelperTest {
         assertTrue(fModuleOther.appliesToTraceType(TmfTraceStub2.class));
         assertTrue(fModuleOther.appliesToTraceType(TmfTraceStub3.class));
         assertTrue(fModuleOther.appliesToTraceType(TmfExperiment.class));
+
+        /*
+         * tracetype module: It's been defined applying to TmfTraceStub, then external
+         * tracetypes definitions made it not apply, but apply to TmfTraceStub2
+         */
+        assertFalse(fTraceTypeModule.appliesToTraceType(TmfTrace.class));
+        assertFalse(fTraceTypeModule.appliesToTraceType(TmfTraceStub.class));
+        assertTrue(fTraceTypeModule.appliesToTraceType(TmfTraceStub2.class));
+        assertFalse(fTraceTypeModule.appliesToTraceType(TmfTraceStub3.class));
+        assertFalse(fTraceTypeModule.appliesToTraceType(TmfExperiment.class));
     }
 
     /**
