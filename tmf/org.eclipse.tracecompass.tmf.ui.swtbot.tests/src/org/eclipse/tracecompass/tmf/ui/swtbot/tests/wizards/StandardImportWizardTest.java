@@ -9,7 +9,10 @@
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.wizards;
 
 import static org.junit.Assert.assertEquals;
+
 import java.net.URL;
+import java.util.Calendar;
+
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
@@ -32,9 +35,10 @@ import org.junit.runner.RunWith;
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class StandardImportWizardTest extends AbstractStandardImportWizardTest {
 
-    private static String TEST_FOLDER_NAME = "testfiles";
-    private static String START_TIME = "2017-01-01 02:00:00";
-    private static String END_TIME = "2017-01-01 05:05:00";
+    private static final String TEST_FOLDER_NAME = "testfiles";
+    private static final int YEAR = Calendar.getInstance().get(Calendar.YEAR);
+    private static final String START_TIME = YEAR + "-01-01 02:00:00";
+    private static final String END_TIME = YEAR + "-01-01 05:05:00";
 
     /**
      * create the project

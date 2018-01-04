@@ -17,7 +17,11 @@ import static org.junit.Assert.assertNotNull;
 
 import java.net.URI;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +40,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.project.operations.SelectTracesO
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
@@ -110,11 +115,33 @@ public class SelectTracesOperationTest {
             fExpectedTimeRangeTraces[i] = fTraces[i];
         }
 
-        TmfTimestampFormat tmfTimestampFormat = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss");
-        fStartTimeRange = TmfTimestamp.fromNanos(tmfTimestampFormat.parseValue("2017-01-01 02:00:00"));
-        fEndTimeRange = TmfTimestamp.fromNanos(tmfTimestampFormat.parseValue("2017-01-01 05:05:00"));
+        fStartTimeRange = parse("Jan 1 02:00:00");
+        fEndTimeRange = parse("Jan 1 05:05:00");
 
         fExperiment = ProjectModelTestData.addExperiment(fProjectElement, EXPERIMENT_NAME);
+    }
+
+    /**
+     * Parse the time stamps with the same approach as the syslog trace stub
+     *
+     * @param time
+     *            timestamp string
+     * @return the parsed {@link ITmfTimestamp}
+     * @throws ParseException
+     *             if the timestamp string does not match the expected format.
+     */
+    private static ITmfTimestamp parse(String time) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "MMM dd HH:mm:ss", TmfTimePreferences.getLocale());
+        dateFormat.setTimeZone(TmfTimestampFormat.getDefaulTimeFormat().getTimeZone());
+        Date date = dateFormat.parse(time);
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        calendar.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+        if (calendar.after(Calendar.getInstance())) {
+            calendar.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR) - 1);
+        }
+        return TmfTimestamp.fromMillis(calendar.getTimeInMillis());
     }
 
     /**
