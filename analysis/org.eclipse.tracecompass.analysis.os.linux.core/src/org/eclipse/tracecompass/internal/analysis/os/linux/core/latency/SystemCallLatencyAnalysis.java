@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelTidAspect;
@@ -83,8 +82,8 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
     }
 
     @Override
-    protected  AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> syscalls) {
-        return new SyscallLatencyAnalysisRequest(syscalls);
+    protected AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> syscalls, IProgressMonitor monitor) {
+        return new SyscallLatencyAnalysisRequest(syscalls, monitor);
     }
 
     @Override
@@ -102,10 +101,11 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
 
         private final Map<Integer, SystemCall.InitialInfo> fOngoingSystemCalls = new HashMap<>();
         private @Nullable IKernelAnalysisEventLayout fLayout;
-        private final IProgressMonitor fMonitor = new NullProgressMonitor();
+        private final IProgressMonitor fMonitor;
 
-        public SyscallLatencyAnalysisRequest(ISegmentStore<ISegment> syscalls) {
+        public SyscallLatencyAnalysisRequest(ISegmentStore<ISegment> syscalls, IProgressMonitor monitor) {
             super(syscalls);
+            fMonitor = monitor;
         }
 
         @Override

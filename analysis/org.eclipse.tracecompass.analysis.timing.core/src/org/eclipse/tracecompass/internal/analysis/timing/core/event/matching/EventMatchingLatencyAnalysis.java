@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisEventBasedModule;
@@ -47,7 +46,6 @@ public class EventMatchingLatencyAnalysis extends AbstractSegmentStoreAnalysisEv
      * ID of this analysis
      */
     public static final String ID = "org.eclipse.tracecompass.internal.analysis.timing.core.event.matching"; //$NON-NLS-1$
-    private static final IProgressMonitor NULL_MONITOR = new NullProgressMonitor();
 
     private static final Collection<ISegmentAspect> BASE_ASPECTS =
             ImmutableList.of(EventMatchingTypeAspect.INSTANCE);
@@ -98,14 +96,14 @@ public class EventMatchingLatencyAnalysis extends AbstractSegmentStoreAnalysisEv
     }
 
     @Override
-    protected AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> segmentStore) {
+    protected AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> segmentStore, IProgressMonitor monitor) {
         ITmfTrace trace = getTrace();
         if (trace == null) {
             throw new NullPointerException("The trace should not be null"); //$NON-NLS-1$
         }
         TmfEventMatching matching = new TmfEventMatching(Collections.singleton(trace), new EventMatchingLatencyProcessing(segmentStore));
         matching.initMatching();
-        return new LatencyMatchingEventRequest(segmentStore, matching);
+        return new LatencyMatchingEventRequest(segmentStore, matching, monitor);
     }
 
     @Override
@@ -121,16 +119,18 @@ public class EventMatchingLatencyAnalysis extends AbstractSegmentStoreAnalysisEv
     private class LatencyMatchingEventRequest extends AbstractSegmentStoreAnalysisRequest {
 
         private final TmfEventMatching fMatching;
+        private final IProgressMonitor fMonitor;
 
-        public LatencyMatchingEventRequest(ISegmentStore<ISegment> segmentStore, TmfEventMatching matching) {
+        public LatencyMatchingEventRequest(ISegmentStore<ISegment> segmentStore, TmfEventMatching matching, IProgressMonitor monitor) {
             super(segmentStore);
             fMatching = matching;
+            fMonitor = monitor;
         }
 
         @Override
         public void handleData(final ITmfEvent event) {
             super.handleData(event);
-            fMatching.matchEvent(event, event.getTrace(), NULL_MONITOR);
+            fMatching.matchEvent(event, event.getTrace(), fMonitor);
         }
     }
 

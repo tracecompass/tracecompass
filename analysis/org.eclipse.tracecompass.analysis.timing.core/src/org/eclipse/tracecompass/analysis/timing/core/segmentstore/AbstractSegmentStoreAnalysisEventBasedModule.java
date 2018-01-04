@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.analysis.timing.core.segmentstore;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -38,8 +39,30 @@ public abstract class AbstractSegmentStoreAnalysisEventBasedModule extends Abstr
      * @param segmentStore
      *            a segment store to fill
      * @return the segment store analysis request implementation
+     * @deprecated Use the
+     *             {@link #createAnalysisRequest(ISegmentStore, IProgressMonitor)}
+     *             method instead
      */
-    protected abstract AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> segmentStore);
+    @Deprecated
+    protected AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> segmentStore) {
+        return createAnalysisRequest(segmentStore, new NullProgressMonitor());
+    }
+
+    /**
+     * Returns the analysis request for creating the segment store
+     *
+     * TODO: Make this abstract when incrementing the major version
+     *
+     * @param segmentStore
+     *            a segment store to fill
+     * @param monitor
+     *            The progress monitor to use for the request
+     * @return the segment store analysis request implementation
+     * @since 3.2
+     */
+    protected AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> segmentStore, IProgressMonitor monitor) {
+        throw new UnsupportedOperationException("This method should be overridden by implementations"); //$NON-NLS-1$
+    }
 
     @Override
     protected void canceling() {
@@ -59,7 +82,7 @@ public abstract class AbstractSegmentStoreAnalysisEventBasedModule extends Abstr
         }
 
         /* Create a new request */
-        req = createAnalysisRequest(segmentStore);
+        req = createAnalysisRequest(segmentStore, monitor);
         fOngoingRequest = req;
         trace.sendRequest(req);
 
