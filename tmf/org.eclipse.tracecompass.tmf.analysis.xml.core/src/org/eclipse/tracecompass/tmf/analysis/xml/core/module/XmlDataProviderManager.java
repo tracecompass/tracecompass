@@ -59,7 +59,7 @@ public class XmlDataProviderManager {
     /**
      * Dispose the singleton instance if it exists
      *
-     * @since 2.4
+     * @since 2.5
      */
     public static synchronized void dispose() {
         XmlDataProviderManager manager = INSTANCE;
@@ -138,6 +138,7 @@ public class XmlDataProviderManager {
      *
      * @param signal
      *            The incoming signal
+     * @since 2.5
      */
     @TmfSignalHandler
     public synchronized void traceClosed(final TmfTraceClosedSignal signal) {

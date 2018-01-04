@@ -518,7 +518,7 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
      *            <code>false</code> for the visible time range
      * @return The root entry of the list of entries to display or <code>null</code>
      *         if no update necessary
-     * @since 3.2
+     * @since 3.3
      */
     protected ITmfTreeViewerEntry updateElements(@NonNull ITmfTrace trace, long start, long end, boolean isSelection) {
         return updateElements(start, end, isSelection);

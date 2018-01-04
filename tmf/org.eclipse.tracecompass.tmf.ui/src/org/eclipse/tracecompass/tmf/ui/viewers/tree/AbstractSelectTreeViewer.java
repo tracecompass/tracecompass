@@ -399,8 +399,9 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     /**
      * Getter for the {@link ITmfTreeDataProvider} to query for this TreeViewer
      *
-     * @trace the trace
+     * @param trace the trace
      * @return the relevant provider, if any
+     * @since 3.3
      */
     protected ITmfTreeDataProvider<@NonNull TmfTreeDataModel> getProvider(@NonNull ITmfTrace trace) {
         return DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeDataProvider.class);

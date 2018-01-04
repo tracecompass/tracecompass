@@ -212,7 +212,7 @@ public final class SymbolProviderManager {
      *
      * @param signal
      *            The incoming signal
-     * @since 3.2
+     * @since 3.3
      */
     @TmfSignalHandler
     public synchronized void traceClosed(final TmfTraceClosedSignal signal) {

@@ -137,11 +137,16 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
     /**
      * Initialize the data provider of this viewer
      *
+     * FIXME Make this abstract when incrementing the major version
+     *
      * @param trace
      *            The trace
      * @return the data provider
+     * @since 3.3
      */
-    protected abstract ITmfXYDataProvider initializeDataProvider(@NonNull ITmfTrace trace);
+    protected ITmfXYDataProvider initializeDataProvider(@NonNull ITmfTrace trace) {
+        throw new UnsupportedOperationException("This needs to be implemented concrete classes"); //$NON-NLS-1$
+    }
 
     /**
      * Gets the presentation provider
