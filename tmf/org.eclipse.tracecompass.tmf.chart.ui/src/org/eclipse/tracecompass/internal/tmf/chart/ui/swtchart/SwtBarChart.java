@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -209,9 +210,10 @@ public final class SwtBarChart extends SwtXYChartViewer {
             fCategories = categories;
 
             /* Generate numerical data for the Y axis */
-            double[] yData = new double[yConsumer.getData().size()];
+            List<Number> data = yConsumer.getData();
+            double[] yData = new double[data.size()];
             for (int i = 0; i < yData.length; i++) {
-                Number number = checkNotNull(yConsumer.getData().get(i));
+                Number number = checkNotNull(data.get(i));
                 yData[i] = fYRanges.getInternalValue(number).doubleValue();
             }
 

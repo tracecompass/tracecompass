@@ -294,11 +294,12 @@ public final class SwtScatterChart extends SwtXYChartViewer {
             /* Generate data for the X axis */
             if (getXDescriptorsInfo().areNumerical()) {
                 NumericalConsumer consumer = (NumericalConsumer) seriesConsumer.getXConsumer();
-                int size = consumer.getData().size();
+                List<Number> data = consumer.getData();
+                int size = data.size();
 
                 xData = new double[size];
                 for (int i = 0; i < size; i++) {
-                    Number number = checkNotNull(consumer.getData().get(i));
+                    Number number = checkNotNull(data.get(i));
                     xData[i] = fXRanges.getInternalValue(number).doubleValue();
                 }
             } else {
@@ -315,10 +316,11 @@ public final class SwtScatterChart extends SwtXYChartViewer {
             /* Generate data for the Y axis */
             if (getYDescriptorsInfo().areNumerical()) {
                 NumericalConsumer consumer = (NumericalConsumer) seriesConsumer.getYConsumer();
+                List<Number> data = consumer.getData();
 
-                yData = new double[consumer.getData().size()];
+                yData = new double[data.size()];
                 for (int i = 0; i < yData.length; i++) {
-                    Number number = checkNotNull(consumer.getData().get(i));
+                    Number number = checkNotNull(data.get(i));
                     yData[i] = fYRanges.getInternalValue(number).doubleValue();
                 }
             } else {
@@ -509,8 +511,9 @@ public final class SwtScatterChart extends SwtXYChartViewer {
             boolean found = false;
             for (ISeries swtSeries : getChart().getSeriesSet().getSeries()) {
                 ILineSeries series = (ILineSeries) swtSeries;
+                double[] xSeries = series.getXSeries();
 
-                for (int i = 0; i < series.getXSeries().length; i++) {
+                for (int i = 0; i < xSeries.length; i++) {
                     Point dataPoint = series.getPixelCoordinates(i);
 
                     /*
