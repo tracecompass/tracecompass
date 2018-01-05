@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.filters;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -186,14 +187,10 @@ public class ActiveThreadsFilter extends ViewerFilter {
         long endTS = winRange.getEndTime().getValue();
 
         if (kernelModule == null) {
-            return new HashSet<>();
+            return Collections.emptySet();
         }
 
-        Set<Integer> set = KernelThreadInformationProvider.getActiveThreadsForRange(kernelModule, beginTS, endTS);
-        if (set == null) {
-            set = new HashSet<>();
-        }
-        return set;
+        return KernelThreadInformationProvider.getActiveThreadsForRange(kernelModule, beginTS, endTS);
     }
 
     /**

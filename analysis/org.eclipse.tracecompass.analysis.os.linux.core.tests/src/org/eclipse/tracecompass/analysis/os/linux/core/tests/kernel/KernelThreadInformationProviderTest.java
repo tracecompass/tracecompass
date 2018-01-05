@@ -202,8 +202,21 @@ public class KernelThreadInformationProviderTest {
          * CPU 1) should be active in the range.
          */
         Set<Integer> tids = KernelThreadInformationProvider.getActiveThreadsForRange(module, start, end);
-        assertNotNull(tids);
         assertEquals(ImmutableSet.of(11, 21, 30), tids);
+
+        // Check with invalid time ranges
+        tids = KernelThreadInformationProvider.getActiveThreadsForRange(module, 0, 0);
+        assertTrue(tids.isEmpty());
+
+        tids = KernelThreadInformationProvider.getActiveThreadsForRange(module, 123456789L, 1234567890L);
+        assertTrue(tids.isEmpty());
+
+        // Check with overlapping time ranges
+        tids = KernelThreadInformationProvider.getActiveThreadsForRange(module, 0, 10L);
+        assertTrue(tids.isEmpty());
+
+        tids = KernelThreadInformationProvider.getActiveThreadsForRange(module, 70, 123456L);
+        assertEquals(ImmutableSet.of(11, 20, 21), tids);
     }
 
     /**

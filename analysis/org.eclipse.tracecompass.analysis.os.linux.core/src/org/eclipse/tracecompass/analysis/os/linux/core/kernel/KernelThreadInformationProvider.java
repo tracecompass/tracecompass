@@ -155,8 +155,8 @@ public final class KernelThreadInformationProvider {
     };
 
     /**
-     * Return all the threads that are considered active in the given time
-     * range. Threads with TID 0 (swapper threads) will never be included.
+     * Return all the threads that are considered active in the given time range.
+     * Threads with TID 0 (swapper threads) will never be included.
      *
      * @param module
      *            The kernel analysis module to query
@@ -164,24 +164,34 @@ public final class KernelThreadInformationProvider {
      *            The start of the time range
      * @param rangeEnd
      *            The end of the time range
-     * @return A set of all the thread IDs that are considered active in the
-     *         time range. Empty set if there are none. Null if the information
-     *         is not available.
+     * @return A set of all the thread IDs that are considered active in the time
+     *         range. Empty set if there are none or if unavailable for the time
+     *         range.
      * @since 2.5
      */
-    public static @Nullable Set<Integer> getActiveThreadsForRange(KernelAnalysisModule module, long rangeStart, long rangeEnd) {
+    public static Set<Integer> getActiveThreadsForRange(KernelAnalysisModule module, long rangeStart, long rangeEnd) {
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
-            return null;
+            return Collections.emptySet();
+        }
+
+        // Check the time range to avoid throwing an exception
+        long start = Math.max(rangeStart, ss.getStartTime());
+        long end = Math.min(rangeEnd, ss.getCurrentEndTime());
+        if (start > end) {
+            return Collections.emptySet();
         }
 
         List<ITmfStateInterval> fullQueryAtStart;
         int threadsQuark;
         try {
-            fullQueryAtStart = ss.queryFullState(rangeStart);
-            threadsQuark = ss.getQuarkAbsolute(Attributes.THREADS);
-        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
-            return null;
+            fullQueryAtStart = ss.queryFullState(start);
+            threadsQuark = ss.optQuarkAbsolute(Attributes.THREADS);
+            if (threadsQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+                return Collections.emptySet();
+            }
+        } catch (StateSystemDisposedException e) {
+            return Collections.emptySet();
         }
 
 
@@ -210,11 +220,11 @@ public final class KernelThreadInformationProvider {
                      * from one inactive state to another, this will be found
                      * with the range query below.
                      */
-                    if (intervalAtStart.getEndTime() >= rangeEnd) {
+                    if (intervalAtStart.getEndTime() >= end) {
                         return false;
                     }
 
-                    QuarkIterator it = new QuarkIterator(ss, threadQuark, rangeStart, rangeEnd);
+                    QuarkIterator it = new QuarkIterator(ss, threadQuark, start, end);
                     while (it.hasNext()) {
                         ITmfStateInterval interval = it.next();
                         if (IS_STATE_VALUE_ACTIVE.test(interval.getStateValue())) {
@@ -438,7 +448,7 @@ public final class KernelThreadInformationProvider {
      * @return The list of status intervals for this thread, an empty list is
      *         returned if either the state system is {@code null} or the quark
      *         is not found
-     * @since 2.4
+     * @since 2.5
      */
     public static Iterator<ITmfStateInterval> getStatusIntervalsForThread(KernelAnalysisModule module, Integer threadId, long start, long end) {
         ITmfStateSystem ss = module.getStateSystem();
