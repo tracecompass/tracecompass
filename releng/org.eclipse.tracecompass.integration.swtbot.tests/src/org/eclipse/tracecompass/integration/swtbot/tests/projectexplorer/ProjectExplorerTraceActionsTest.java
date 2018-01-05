@@ -59,6 +59,8 @@ public class ProjectExplorerTraceActionsTest {
     private static final String TRACE_PROJECT_NAME = "test";
     private static final String TRACE_NAME = CUSTOM_TEXT_LOG.getTraceName();
     private static final String RENAMED_TRACE_NAME = TRACE_NAME + 2;
+    private static final String RENAMED_AS_NEW_TRACE_NAME = TRACE_NAME + 3;
+    private static final String COPY_AS_NEW_TRACE_OPTION = "Copy as a new trace";
 
     private static File fTestFile = null;
 
@@ -186,12 +188,23 @@ public class ProjectExplorerTraceActionsTest {
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
 
-        createCopy(traceItem);
+        // Copy the trace as link (default)
+        createCopy(traceItem, true);
+        // Copy the trace as a new trace
+        createCopy(traceItem, false);
 
         fBot.closeAllEditors();
         SWTBotTreeItem copiedItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), RENAMED_TRACE_NAME);
         copiedItem.contextMenu().menu("Open").click();
         SWTBotImportWizardUtils.testEventsTable(fBot, RENAMED_TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
+        SWTBotTreeItem copiedAsNewItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), RENAMED_AS_NEW_TRACE_NAME);
+        copiedAsNewItem.contextMenu().menu("Open").click();
+        SWTBotImportWizardUtils.testEventsTable(fBot, RENAMED_AS_NEW_TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
+
+        // Make sure that the traces have the correct link status (linked or not)
+        testLinkStatus(copiedItem, true);
+        testLinkStatus(copiedAsNewItem, false);
+
         fBot.closeAllEditors();
         SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
     }
@@ -341,7 +354,7 @@ public class ProjectExplorerTraceActionsTest {
         fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, TRACE_NAME));
         IEditorReference originalEditor = fBot.activeEditor().getReference();
 
-        createCopy(traceItem);
+        createCopy(traceItem, true);
 
         SWTBotTreeItem copiedItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), RENAMED_TRACE_NAME);
         copiedItem.doubleClick();
@@ -355,13 +368,17 @@ public class ProjectExplorerTraceActionsTest {
         SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
     }
 
-    private static void createCopy(SWTBotTreeItem traceItem) {
+    private static void createCopy(SWTBotTreeItem traceItem, boolean copyAsLink) {
         traceItem.contextMenu().menu("Copy...").click();
         final String COPY_TRACE_DIALOG_TITLE = "Copy Trace";
         fBot.waitUntil(Conditions.shellIsActive(COPY_TRACE_DIALOG_TITLE));
         SWTBotShell shell = fBot.shell(COPY_TRACE_DIALOG_TITLE);
         SWTBotText text = shell.bot().textWithLabel("New Trace name:");
         text.setText(RENAMED_TRACE_NAME);
+        if (!copyAsLink) {
+            shell.bot().radio(COPY_AS_NEW_TRACE_OPTION).click();
+            text.setText(RENAMED_AS_NEW_TRACE_NAME);
+        }
         shell.bot().button("OK").click();
         fBot.waitUntil(Conditions.shellCloses(shell));
     }
@@ -371,6 +388,15 @@ public class ProjectExplorerTraceActionsTest {
         SWTBotView view = fBot.viewById(TmfStatisticsView.ID);
         assertTrue(view.bot().tree().hasItems());
         view.bot().tree().cell(0, 1).equals(Long.toString(CUSTOM_TEXT_LOG.getNbEvents()));
+    }
+
+    private static void testLinkStatus(SWTBotTreeItem traceItem, boolean isLinked) {
+        SWTBotView viewBot = fBot.viewByTitle("Properties");
+        traceItem.select();
+        viewBot.setFocus();
+        SWTBotTreeItem linkedNode = viewBot.bot().tree().getTreeItem("Resource properties").getNode("linked");
+        String linkedValue = linkedNode.cell(1);
+        assertEquals(Boolean.toString(isLinked), linkedValue);
     }
 
     private final class TraceDeletedCondition extends DefaultCondition {

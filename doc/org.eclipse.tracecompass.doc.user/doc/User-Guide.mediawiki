@@ -559,13 +559,13 @@ To copy a trace or experiment select the relevant trace or experiment in the '''
 
 [[Image:images/CopyTraceAction.png]]
 
-A new dialog box will show for entering a new name. Enter a new trace or experiment name respectively in the relevant text field and click on '''OK'''. If the new name already exists the dialog box will show an error and a different name has to be entered.
+A new dialog box will show for entering a new name. Enter a new trace or experiment name respectively in the relevant text field and click on '''OK'''. In case of a linked trace two options are available, '''Copy as a link''' or '''Copy as a new trace'''. The first option, default one, the copied trace will be a link to the original trace. The second option, will make a copy of the original trace in your workspace. If the new name already exists the dialog box will show an error and a different name has to be entered.
 
 [[Image:images/CopyTraceDialog.png]]
 
 [[Image:images/CopyExperimentDialog.png]]
 
-After successful copy operation the new trace or experiment respectively will show in the '''Project Explorer'''. In case of a linked trace, the copied trace will be a link to the original trace too.
+After successful copy operation the new trace or experiment respectively will show in the '''Project Explorer'''.
 
 Note that the directory for all supplementary files will be copied, too. (see also [[#Deleting Supplementary Files | Deleting Supplementary Files]]).
 
