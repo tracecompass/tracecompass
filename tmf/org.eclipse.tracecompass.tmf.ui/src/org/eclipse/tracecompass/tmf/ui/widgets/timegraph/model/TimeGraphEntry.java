@@ -313,8 +313,19 @@ public class TimeGraphEntry implements ITimeGraphEntry {
             addChild(fChildren.size(), child);
         } else {
             int i = Collections.binarySearch(fChildren, child, fComparator);
-            /* Deal with negative insertion points from binarySearch */
-            i = i >= 0 ? i : -i - 1;
+            if (i >= 0) {
+                i ++;
+                /*
+                 * There might be several children which are equal in regards to the comparator,
+                 * increment past the index of the last one.
+                 */
+                while (i < fChildren.size() && fComparator.compare(child, fChildren.get(i)) == 0) {
+                    i++;
+                }
+            } else {
+                /* Deal with negative insertion points from binarySearch */
+                i = -i - 1;
+            }
             addChild(i, child);
         }
     }
