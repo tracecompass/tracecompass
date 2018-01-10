@@ -28,9 +28,12 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -41,6 +44,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
@@ -62,6 +66,7 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
     private final TmfExperimentElement fExperiment;
     private Text fNewExperimentName;
     private IFolder fExperimentFolder;
+    private Button fDeepCopyButton;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -95,6 +100,14 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         createNewExperimentNameGroup(composite);
+        fDeepCopyButton = new Button(composite, SWT.CHECK);
+        fDeepCopyButton.setText(Messages.CopyExperimentDialog_DeepCopyButton);
+        fDeepCopyButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                validateNewExperimentName();
+            }
+        });
         return composite;
     }
 
@@ -152,7 +165,28 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
             return;
         }
 
+        Status deepCopyStatus = validateDeepCopyDestination();
+        if (deepCopyStatus.getSeverity() != IStatus.OK) {
+            updateStatus(deepCopyStatus);
+            return;
+        }
+
         updateStatus(new Status(IStatus.OK, Activator.PLUGIN_ID, "")); //$NON-NLS-1$
+    }
+
+    private Status validateDeepCopyDestination() {
+        Status status = new Status(IStatus.OK, Activator.PLUGIN_ID, ""); //$NON-NLS-1$
+        if (fDeepCopyButton.getSelection()) {
+            TmfTraceFolder tracesFolderElement = fExperiment.getProject().getTracesFolder();
+            if (tracesFolderElement != null) {
+                IFolder tracesFolder = tracesFolderElement.getResource();
+                IPath traceDestinationPath = new Path(fNewExperimentName.getText());
+                if (tracesFolder.getFolder(traceDestinationPath).exists()) {
+                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, Messages.CopyExperimentDialog_DeepCopyError, null);
+                }
+            }
+        }
+        return status;
     }
 
     // ------------------------------------------------------------------------
@@ -171,7 +205,8 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
 
     @Override
     protected void okPressed() {
-        IFolder folder = copyExperiment(fNewExperimentName.getText());
+        boolean copyAsLink = !fDeepCopyButton.getSelection();
+        IFolder folder = copyExperiment(fNewExperimentName.getText(), copyAsLink);
         if (folder == null) {
             return;
         }
@@ -179,7 +214,7 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
         super.okPressed();
     }
 
-    private IFolder copyExperiment(final String newName) {
+    private IFolder copyExperiment(final String newName, boolean copyAsLink) {
 
         WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
             @Override
@@ -190,7 +225,7 @@ public class CopyExperimentDialog extends SelectionStatusDialog {
                         throw new OperationCanceledException();
                     }
 
-                    fExperiment.copy(newName, true);
+                    fExperiment.copy(newName, true, copyAsLink);
 
                     if (monitor.isCanceled()) {
                         throw new OperationCanceledException();

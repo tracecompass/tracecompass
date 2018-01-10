@@ -67,6 +67,10 @@ public class ProjectExplorerTraceActionsTest {
     private static final String COPY_TRACE_DIALOG_TITLE = "Copy Trace";
     private static final String PROJECT_EXPLORER_VIEW_NAME = "Project Explorer";
     private static final String PROPERTIES_VIEW_NAME = "Properties";
+    private static final String COPY_EXPERIMENT_DIALOG_TITLE = "Copy Experiment";
+    private static final String DEEP_COPY_OPTION = "Deep copy this experiment (each trace will be copied as a new trace)";
+    private static final String RENAMED_EXP_DEEP_COPY = "expDeepCopy";
+    private static final String RENAMED_EXP_NAME = "exp";
 
     private static File fTestFile = null;
 
@@ -212,6 +216,46 @@ public class ProjectExplorerTraceActionsTest {
         testLinkStatus(copiedAsNewItem, false);
 
         fBot.closeAllEditors();
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+    }
+
+    /**
+     * Test that the experiment can be copied with the context menu
+     * <p>
+     * Action : Copy experiment
+     * <p>
+     * Procedure :Select the Copy menu and provide a new name. Open.
+     * <p>
+     * Expected Results: Experiment is replicated under the new name
+     *
+     */
+    @Test
+    public void test_CopyExperiment() {
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
+        SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
+
+        // Copy the trace as a new trace
+        createCopy(traceItem, false);
+
+        SWTBotTreeItem tracesFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        tracesFolder.contextMenu().menu("Open As Experiment...", "Generic Experiment").click();
+        SWTBotTreeItem experimentsItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME), "Experiments");
+        experimentsItem.expand();
+        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable("Experiment [2]", experimentsItem));
+
+        SWTBotTreeItem expItem = SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, "Experiment");
+
+        // Copy the experiment
+        createExperimentCopy(expItem, false);
+        SWTBotTreeItem copiedExpItem = SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, RENAMED_EXP_NAME);
+        verifyExperimentCopy(copiedExpItem, false);
+
+        // Make a deep copy of the experiment
+        createExperimentCopy(expItem, true);
+        SWTBotTreeItem deepCopiedExpItem = SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, RENAMED_EXP_DEEP_COPY);
+        verifyExperimentCopy(deepCopiedExpItem, true);
+
+        assertEquals(3, experimentsItem.getItems().length);
         SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
     }
 
@@ -393,6 +437,21 @@ public class ProjectExplorerTraceActionsTest {
         fBot.waitUntil(Conditions.shellCloses(shell));
     }
 
+    private static void createExperimentCopy(SWTBotTreeItem expItem, boolean deepCopy) {
+        fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
+        expItem.contextMenu().menu("Copy...").click();
+        fBot.waitUntil(Conditions.shellIsActive(COPY_EXPERIMENT_DIALOG_TITLE));
+        SWTBotShell shell = fBot.shell(COPY_EXPERIMENT_DIALOG_TITLE);
+        SWTBotText text = shell.bot().textWithLabel("New Experiment name:");
+        text.setText(RENAMED_EXP_NAME);
+        if (deepCopy) {
+            text.setText(RENAMED_EXP_DEEP_COPY);
+            shell.bot().checkBox(DEEP_COPY_OPTION).click();
+        }
+        shell.bot().button("OK").click();
+        fBot.waitUntil(Conditions.shellCloses(shell));
+    }
+
     private static void testStatisticsView() {
         SWTBotUtils.openView(TmfStatisticsView.ID);
         SWTBotView view = fBot.viewById(TmfStatisticsView.ID);
@@ -411,6 +470,30 @@ public class ProjectExplorerTraceActionsTest {
         SWTBotTreeItem linkedNode = resourcePropertiesItem.getNode(LINKED_ITEM_NAME);
         String linkedValue = linkedNode.cell(1);
         assertEquals(Boolean.toString(isLinked), linkedValue);
+    }
+
+    private static void verifyExperimentCopy(SWTBotTreeItem copiedExpItem, boolean isDeepCopied) {
+        SWTBotTreeItem tracesFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        tracesFolder.expand();
+        SWTBotTreeItem[] traceItems = tracesFolder.getItems();
+        copiedExpItem.expand();
+        if(isDeepCopied) {
+            // Traces folder should contain the previous two traces and the new folder for the copied traces
+            assertEquals(3, traceItems.length);
+            copiedExpItem.getNode(RENAMED_EXP_DEEP_COPY + '/'+ TRACE_NAME);
+            copiedExpItem.getNode(RENAMED_EXP_DEEP_COPY + '/'+ RENAMED_AS_NEW_TRACE_NAME);
+            SWTBotTreeItem deepCopiedExpTracesFolder = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, RENAMED_EXP_DEEP_COPY);
+            deepCopiedExpTracesFolder.expand();
+            SWTBotTreeItem[] expTracesFolderItems = deepCopiedExpTracesFolder.getItems();
+            assertEquals(2, expTracesFolderItems.length);
+            for (SWTBotTreeItem traceItem : expTracesFolderItems) {
+                testLinkStatus(traceItem, false);
+            }
+        } else {
+            assertEquals(2, traceItems.length);
+            copiedExpItem.getNode(TRACE_NAME);
+            copiedExpItem.getNode(RENAMED_AS_NEW_TRACE_NAME);
+        }
     }
 
     private final class TraceDeletedCondition extends DefaultCondition {

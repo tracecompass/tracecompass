@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IContainer;
@@ -434,6 +435,81 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         if (!parent.equals(getResource()) && parent.exists() && parent.members().length == 0) {
             deleteTraceResource(parent);
         }
+    }
+
+    @Override
+    public IResource copy(String newName, boolean copySuppFiles, boolean copyAsLink) {
+        // Copy the experiment resource to keep all the information attached to this resource
+        IResource copiedExpResource = super.copy(newName, copySuppFiles, true);
+        if (copyAsLink) {
+            return copiedExpResource;
+        }
+
+        TmfExperimentFolder experimentsFolder = getProject().getExperimentsFolder();
+        TmfTraceFolder tracesFolder = getProject().getTracesFolder();
+        if (experimentsFolder == null || copiedExpResource == null || tracesFolder == null) {
+            return null;
+        }
+
+        experimentsFolder.refreshChildren();
+        TmfExperimentElement copiedExperiment = experimentsFolder.getExperiment(copiedExpResource);
+        if (copiedExperiment == null) {
+            return null;
+        }
+
+        // Copy the traces
+        List<TmfTraceElement> experimentTraces = copiedExperiment.getTraces();
+        Map<TmfTraceElement, TmfTraceElement> traces = new HashMap<>();
+        for (TmfTraceElement expTraceElement : experimentTraces) {
+            // Populate a list of trace element to copy them later
+            traces.put(expTraceElement, expTraceElement.getElementUnderTraceFolder());
+        }
+        Map<TmfTraceElement, IResource> copiedTraceResources = new HashMap<>();
+        for (Entry<TmfTraceElement, TmfTraceElement> traceElement : traces.entrySet()) {
+            IFolder newFolder = tracesFolder.getResource().getFolder(newName);
+            IPath traceElementPath = traceElement.getValue().getPath().makeRelativeTo(tracesFolder.getPath());
+            IFolder traceDestinationFolder = newFolder.getFolder(traceElementPath.removeLastSegments(1));
+            try {
+                if (!traceDestinationFolder.exists()) {
+                    TraceUtils.createFolder(traceDestinationFolder, null);
+                }
+            } catch (CoreException e) {
+                return null;
+            }
+            IPath newTracePath = newFolder.getFullPath().append(traceElementPath);
+            copiedTraceResources.put(traceElement.getKey(), traceElement.getValue().copy(copySuppFiles, copyAsLink, newTracePath));
+        }
+
+        // Add traces to the new experiment
+        IFolder experimentNewFolder = copiedExperiment.getResource().getFolder(newName);
+        for (TmfTraceElement traceElement : experimentTraces) {
+            IResource resource = traceElement.getResource();
+            IPath traceResourcePath = resource.getFullPath().makeRelativeTo(copiedExperiment.getPath());
+            IResource resourceToMove = resource;
+            IPath destinationPath = experimentNewFolder.getFullPath().append(traceResourcePath);
+            if(traceResourcePath.segmentCount() > 1) {
+                resourceToMove = copiedExperiment.getResource().getFolder(traceResourcePath.segment(0));
+                destinationPath = experimentNewFolder.getFullPath().append(traceResourcePath.segment(0));
+            }
+            try {
+                TraceUtils.createFolder(experimentNewFolder, null);
+                resourceToMove.move(destinationPath, IResource.FORCE | IResource.SHALLOW, null);
+
+                IResource copiedTraceResource = copiedTraceResources.get(traceElement);
+                if(copiedTraceResource != null && resource instanceof IFolder) {
+                    IFolder linkedFolder = experimentNewFolder.getFolder(traceResourcePath);
+                    linkedFolder.createLink(copiedTraceResource.getLocation(), IResource.REPLACE, null);
+                } else if(copiedTraceResource != null && resource instanceof IFile) {
+                    IFile linkedFile = experimentNewFolder.getFile(traceResourcePath);
+                    linkedFile.createLink(copiedTraceResource.getLocation(), IResource.REPLACE, null);
+                }
+            } catch (CoreException e) {
+                return null;
+            }
+
+        }
+
+        return copiedExpResource;
     }
 
     @Override

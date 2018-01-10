@@ -35,7 +35,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
@@ -279,6 +278,25 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
     }
 
     /**
+     * Return the element destination path relative to its common element (traces
+     * folder, experiments folder or experiment element).
+     *
+     * @param destinationPath
+     *            Full destination path
+     *
+     * @return The element destination path
+     * @since 3.3
+     */
+    public @NonNull String getDestinationPathRelativeToParent(IPath destinationPath) {
+        ITmfProjectModelElement parent = getParent();
+        while (!(parent instanceof TmfTracesFolder || parent instanceof TmfExperimentElement || parent instanceof TmfExperimentFolder)) {
+            parent = parent.getParent();
+        }
+        IPath path = destinationPath.makeRelativeTo(parent.getPath());
+        return checkNotNull(path.toString());
+    }
+
+    /**
      * @return The suffix for the supplementary folder
      */
     protected String getSuffix() {
@@ -412,7 +430,8 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
     }
 
     /**
-     * Copy this model element
+     * Copy this model element at the same place as this element
+     * (ex./Traces/thisElementPath).
      *
      * @param newName
      *            The name of the new element
@@ -424,12 +443,26 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      * @since 3.3
      */
     public IResource copy(final String newName, final boolean copySuppFiles, final boolean copyAsLink) {
-
         final IPath newPath = getParent().getResource().getFullPath().addTrailingSeparator().append(newName);
+        return copy(copySuppFiles, copyAsLink, newPath);
+    }
 
+    /**
+     * Copy this model element to the destinationPath
+     *
+     * @param copySuppFiles
+     *            Whether to copy supplementary files or not
+     * @param copyAsLink
+     *            Whether to copy as a link or not
+     * @param destinationPath
+     *            The path where the element will be copied
+     * @return the new Resource object
+     * @since 3.3
+     */
+    public IResource copy(final boolean copySuppFiles, final boolean copyAsLink, IPath destinationPath) {
         /* Copy supplementary files first, only if needed */
         if (copySuppFiles) {
-            String newElementPath = new Path(getElementPath()).removeLastSegments(1).append(newName).toString();
+            String newElementPath = getDestinationPathRelativeToParent(destinationPath);
             copySupplementaryFolder(newElementPath);
         }
         /* Copy the trace */
@@ -438,8 +471,9 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
             if (copyAsLink) {
                 flags |= IResource.SHALLOW;
             }
-            getResource().copy(newPath, flags, null);
-            IResource trace = ((IFolder) getParent().getResource()).findMember(newName);
+            getResource().copy(destinationPath, flags, null);
+            IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+            IResource trace = workspaceRoot.findMember(destinationPath);
 
             /* Delete any bookmarks file found in copied trace folder */
             if (trace instanceof IFolder) {

@@ -125,6 +125,16 @@ public class Messages extends NLS {
      */
     public static String CopyExperimentDialog_ExperimentNewName;
     /**
+     * Text for deep copy of an experiment button
+     * @since 3.3
+     */
+    public static String CopyExperimentDialog_DeepCopyButton;
+    /**
+     * Error message when the destination folder for traces already exist.
+     * @since 3.3
+     */
+    public static String CopyExperimentDialog_DeepCopyError;
+    /**
      * The title of the rename trace dialog.
      */
     public static String RenameTraceDialog_DialogTitle;
