@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2017 Intel Corporation and others
+ * Copyright (c) 2007, 2018 Intel Corporation and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -88,6 +88,9 @@ import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphColorListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
@@ -103,9 +106,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
-import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
-import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
-import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 
 import com.google.common.collect.Iterables;
 
@@ -2818,7 +2818,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 tdp.getTime0() == tdp.getTime1()) {
             return;
         }
-        TimeFormat tf = tdp.getTimeFormat2();
+        TimeFormat tf = tdp.getTimeFormat().convert();
         Resolution res = Resolution.NANOSEC;
         StringBuilder message = new StringBuilder();
         if ((x >= 0 || x == STATUS_WITHOUT_CURSOR_TIME) && fDragState == DRAG_NONE) {

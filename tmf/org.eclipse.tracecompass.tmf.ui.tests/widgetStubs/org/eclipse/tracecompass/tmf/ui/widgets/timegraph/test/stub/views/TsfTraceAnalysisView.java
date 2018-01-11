@@ -50,7 +50,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.test.stub.adaption.TsfI
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.test.stub.model.EventImpl;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.test.stub.model.TraceImpl;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.test.stub.model.TraceModelImplFactory;
-import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;

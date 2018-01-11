@@ -13,7 +13,7 @@
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 
 /**
  * Time Data Provider wrapper that converts nanoseconds to cycles.
@@ -182,21 +182,9 @@ public class TimeDataProviderCyclesConverter implements ITimeDataProviderConvert
         return fProvider.getTimeSpace();
     }
 
-    /**
-     * @deprecated As of 3.3 use {@link #getTimeFormat2()}
-     */
     @Override
-    @Deprecated
-    public Utils.TimeFormat getTimeFormat() {
+    public TimeFormat getTimeFormat() {
         return fProvider.getTimeFormat();
-    }
-
-    /**
-     * @since 3.3
-     */
-    @Override
-    public TimeFormat getTimeFormat2() {
-        return fProvider.getTimeFormat2();
     }
 
 }

@@ -17,8 +17,7 @@
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets;
 
 import org.eclipse.tracecompass.tmf.ui.views.ITimeReset;
-import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
-import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 
 /**
  * Time data provider interface, for use in the timegraph widget.
@@ -214,22 +213,6 @@ public interface ITimeDataProvider extends ITimeReset {
      *   <li>{@link TimeFormat#NUMBER}   number, displayed as long values.
      *   <li>{@link TimeFormat#CYCLES}   cycles, displayed as long values.
      * </ul>
-     * @since 3.3
      */
-    default TimeFormat getTimeFormat2() {
-        return FormatTimeUtils.TimeFormat.values()[getTimeFormat().ordinal()];
-    }
-
-    /**
-     * @return the time format, one of:
-     * <ul>
-     *   <li>{@link TimeFormat#CALENDAR} absolute time, displayed as year/month/day/hours/minutes/seconds/ms/us/ns
-     *   <li>{@link TimeFormat#RELATIVE} relative time, displayed as seconds/ms/us/ns
-     *   <li>{@link TimeFormat#NUMBER}   number, displayed as long values.
-     *   <li>{@link TimeFormat#CYCLES}   cycles, displayed as long values.
-     * </ul>
-     * @deprecated As of 3.3 use {@link #getTimeFormat2()}
-     */
-    @Deprecated
-    Utils.TimeFormat getTimeFormat();
+    TimeFormat getTimeFormat();
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2016 Intel Corporation, Ericsson
+ * Copyright (c) 2007, 2018 Intel Corporation, Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,14 +23,14 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfAbstractToolTipHandler;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
-import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
-import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
-import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 
 /**
  * Handler for the tool tips in the generic time graph view.
@@ -191,7 +191,7 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
                 }
 
                 Resolution res = Resolution.NANOSEC;
-                TimeFormat tf = fTimeDataProvider.getTimeFormat2();
+                TimeFormat tf = fTimeDataProvider.getTimeFormat().convert();
                 String startTime = "?"; //$NON-NLS-1$
                 String duration = "?"; //$NON-NLS-1$
                 String endTime = "?"; //$NON-NLS-1$
@@ -276,7 +276,7 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
                 duration = targetTime - sourceTime;
             }
             Resolution res = Resolution.NANOSEC;
-            TimeFormat tf = fTimeDataProvider.getTimeFormat2();
+            TimeFormat tf = fTimeDataProvider.getTimeFormat().convert();
             if (tf == TimeFormat.CALENDAR) {
                 addItem(Messages.TmfTimeTipHandler_TRACE_DATE, FormatTimeUtils.formatDate(sourceTime));
             }

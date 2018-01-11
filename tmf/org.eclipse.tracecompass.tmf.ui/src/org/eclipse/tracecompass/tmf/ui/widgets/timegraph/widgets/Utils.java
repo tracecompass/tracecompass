@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2017 Intel Corporation, Ericsson
+ * Copyright (c) 2007, 2018 Intel Corporation, Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets;
 
 import java.util.Collections;
 import java.util.Iterator;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -46,48 +47,69 @@ public class Utils {
 
     /**
      * Time format for dates and timestamp
-     *
-     * @deprecated As of 3.3, use {@link FormatTimeUtils}
      */
-    @Deprecated
     public enum TimeFormat {
         /** Relative to the start of the trace */
-        RELATIVE,
+        RELATIVE(FormatTimeUtils.TimeFormat.RELATIVE),
 
         /**
          * Absolute timestamp (ie, relative to the Unix epoch)
          */
-        CALENDAR,
+        CALENDAR(FormatTimeUtils.TimeFormat.CALENDAR),
 
         /**
          * Timestamp displayed as a simple number
          */
-        NUMBER,
+        NUMBER(FormatTimeUtils.TimeFormat.NUMBER),
 
         /**
          * Timestamp displayed as cycles
          */
-        CYCLES
+        CYCLES((FormatTimeUtils.TimeFormat.CYCLES));
+
+        private final FormatTimeUtils.TimeFormat tf;
+        private TimeFormat(FormatTimeUtils.TimeFormat tf) {
+            this.tf = tf;
+        }
+        /**
+         * Convert the {@link TimeFormat} to a {@link org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat}
+         * @return the converted time format
+         * @since 3.3
+         */
+        public FormatTimeUtils.TimeFormat convert() {
+            return tf;
+        }
     }
 
     /**
      * Timestamp resolution
-     *
-     * @deprecated As of 3.3, use {@link FormatTimeUtils}
      */
-    @Deprecated
     public enum Resolution {
         /** seconds */
-        SECONDS,
+        SECONDS(FormatTimeUtils.Resolution.SECONDS),
 
         /** milliseconds */
-        MILLISEC,
+        MILLISEC(FormatTimeUtils.Resolution.MILLISEC),
 
         /** microseconds */
-        MICROSEC,
+        MICROSEC(FormatTimeUtils.Resolution.MICROSEC),
 
         /** nanoseconds */
-        NANOSEC
+        NANOSEC(FormatTimeUtils.Resolution.NANOSEC);
+
+
+        private final FormatTimeUtils.Resolution res;
+        private Resolution(FormatTimeUtils.Resolution res) {
+            this.res = res;
+        }
+        /**
+         * Convert the {@link Resolution} to a {@link org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution}
+         * @return the converted resolution
+         * @since 3.3
+         */
+        public FormatTimeUtils.Resolution convert() {
+            return res;
+        }
     }
 
     /**
@@ -416,9 +438,7 @@ public class Utils {
      */
     @Deprecated
     public static String formatTime(long time, TimeFormat format, Resolution resolution) {
-        FormatTimeUtils.TimeFormat timeFormat = FormatTimeUtils.TimeFormat.values()[format.ordinal()];
-        FormatTimeUtils.Resolution res = FormatTimeUtils.Resolution.values()[resolution.ordinal()];
-        return FormatTimeUtils.formatTime(time, timeFormat, res);
+        return FormatTimeUtils.formatTime(time, format.convert(), resolution.convert());
     }
 
     /**
@@ -446,8 +466,7 @@ public class Utils {
      */
     @Deprecated
     public static String formatTimeAbs(long time, Resolution res) {
-        FormatTimeUtils.Resolution resolution = FormatTimeUtils.Resolution.values()[res.ordinal()];
-        return FormatTimeUtils.formatTimeAbs(time, resolution);
+        return FormatTimeUtils.formatTimeAbs(time, res.convert());
     }
 
     /**
@@ -464,9 +483,7 @@ public class Utils {
      */
     @Deprecated
     public static String formatDelta(long delta, TimeFormat format, Resolution resolution) {
-        FormatTimeUtils.TimeFormat timeFormat = FormatTimeUtils.TimeFormat.values()[format.ordinal()];
-        FormatTimeUtils.Resolution res = FormatTimeUtils.Resolution.values()[resolution.ordinal()];
-        return FormatTimeUtils.formatDelta(delta, timeFormat, res);
+        return FormatTimeUtils.formatDelta(delta, format.convert(), resolution.convert());
     }
 
     /**
@@ -482,8 +499,7 @@ public class Utils {
      */
     @Deprecated
     public static String formatDeltaAbs(long delta, Resolution resolution) {
-        FormatTimeUtils.Resolution res = FormatTimeUtils.Resolution.values()[resolution.ordinal()];
-        return FormatTimeUtils.formatDeltaAbs(delta, res);
+        return FormatTimeUtils.formatDeltaAbs(delta, resolution.convert());
     }
 
     /**
@@ -501,8 +517,7 @@ public class Utils {
      */
     @Deprecated
     public static String formatNs(long srcTime, Resolution res) {
-        FormatTimeUtils.Resolution resolution = FormatTimeUtils.Resolution.values()[res.ordinal()];
-        return FormatTimeUtils.formatNs(srcTime, resolution);
+        return FormatTimeUtils.formatNs(srcTime, res.convert());
     }
 
     /**

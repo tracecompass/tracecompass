@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2016, 2017 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2013, 2018 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -38,12 +38,12 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.IImageSave;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphScale;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphScale;
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
 import org.swtchart.ICustomPaintListener;
@@ -610,7 +610,7 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      * @since 3.3
      */
     public void updateStatusLine(long startTime, long endTime, long cursorTime) {
-        TimeFormat timeFormat = fTimeScaleCtrl.getTimeProvider().getTimeFormat2();
+        TimeFormat timeFormat = fTimeScaleCtrl.getTimeProvider().getTimeFormat().convert();
         boolean isCalendar = timeFormat == TimeFormat.CALENDAR;
 
         StringBuilder message = new StringBuilder();

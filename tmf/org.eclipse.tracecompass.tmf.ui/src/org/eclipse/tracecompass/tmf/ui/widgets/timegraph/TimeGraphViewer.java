@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2017 Intel Corporation, Ericsson, others
+ * Copyright (c) 2007, 2018 Intel Corporation, Ericsson, others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -79,8 +79,6 @@ import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.internal.tmf.ui.dialogs.AddBookmarkDialog;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.viewers.IImageSave;
-import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
-import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.views.ResetUtil;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ShowFilterDialogAction;
@@ -99,6 +97,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphMarker
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphScale;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphTooltipHandler;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -1575,23 +1574,13 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
     }
 
     @Override
-    public TimeFormat getTimeFormat2() {
+    public TimeFormat getTimeFormat() {
         return fTimeFormat;
-    }
-
-    /**
-     * @deprecated As of 3.3 use {@link #getTimeFormat2()}
-     */
-    @Override
-    @Deprecated
-    public Utils.TimeFormat getTimeFormat() {
-        return Utils.TimeFormat.values()[fTimeFormat.ordinal()];
     }
 
     /**
      * @param tf
      *            the {@link TimeFormat} used to display timestamps
-     * @since 3.3
      */
     public void setTimeFormat(TimeFormat tf) {
         this.fTimeFormat = tf;
@@ -1604,16 +1593,6 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
         if (fToolTipHandler != null) {
             fToolTipHandler.setTimeProvider(fTimeDataProvider);
         }
-    }
-
-    /**
-     * @param tf
-     *            the {@link TimeFormat} used to display timestamps
-     * @deprecated As of 3.3 use {@link #setTimeFormat(TimeFormat)}
-     */
-    @Deprecated
-    public void setTimeFormat(Utils.TimeFormat tf) {
-        setTimeFormat(FormatTimeUtils.TimeFormat.values()[tf.ordinal()]);
     }
 
     /**
