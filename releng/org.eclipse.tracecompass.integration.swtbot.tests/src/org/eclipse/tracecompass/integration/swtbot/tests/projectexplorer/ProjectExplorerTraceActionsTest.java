@@ -32,6 +32,7 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -61,6 +62,11 @@ public class ProjectExplorerTraceActionsTest {
     private static final String RENAMED_TRACE_NAME = TRACE_NAME + 2;
     private static final String RENAMED_AS_NEW_TRACE_NAME = TRACE_NAME + 3;
     private static final String COPY_AS_NEW_TRACE_OPTION = "Copy as a new trace";
+    private static final String RESOURCE_PROPERTIES_ITEM_NAME = "Resource properties";
+    private static final String LINKED_ITEM_NAME = "linked";
+    private static final String COPY_TRACE_DIALOG_TITLE = "Copy Trace";
+    private static final String PROJECT_EXPLORER_VIEW_NAME = "Project Explorer";
+    private static final String PROPERTIES_VIEW_NAME = "Properties";
 
     private static File fTestFile = null;
 
@@ -330,6 +336,7 @@ public class ProjectExplorerTraceActionsTest {
     public void test4_08OpenDoubleClick() throws WidgetNotFoundException {
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
+        fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
         traceItem.doubleClick();
 
         SWTBotImportWizardUtils.testEventsTable(fBot, TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
@@ -350,6 +357,7 @@ public class ProjectExplorerTraceActionsTest {
     public void test4_09BringToTop() {
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
+        fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
         traceItem.doubleClick();
         fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, TRACE_NAME));
         IEditorReference originalEditor = fBot.activeEditor().getReference();
@@ -357,9 +365,11 @@ public class ProjectExplorerTraceActionsTest {
         createCopy(traceItem, true);
 
         SWTBotTreeItem copiedItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), RENAMED_TRACE_NAME);
+        fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
         copiedItem.doubleClick();
         fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, RENAMED_TRACE_NAME));
         SWTBotUtils.delay(1000);
+        fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
         traceItem.doubleClick();
         fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, TRACE_NAME));
         assertTrue(originalEditor == fBot.activeEditor().getReference());
@@ -369,8 +379,8 @@ public class ProjectExplorerTraceActionsTest {
     }
 
     private static void createCopy(SWTBotTreeItem traceItem, boolean copyAsLink) {
+        fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
         traceItem.contextMenu().menu("Copy...").click();
-        final String COPY_TRACE_DIALOG_TITLE = "Copy Trace";
         fBot.waitUntil(Conditions.shellIsActive(COPY_TRACE_DIALOG_TITLE));
         SWTBotShell shell = fBot.shell(COPY_TRACE_DIALOG_TITLE);
         SWTBotText text = shell.bot().textWithLabel("New Trace name:");
@@ -391,10 +401,14 @@ public class ProjectExplorerTraceActionsTest {
     }
 
     private static void testLinkStatus(SWTBotTreeItem traceItem, boolean isLinked) {
-        SWTBotView viewBot = fBot.viewByTitle("Properties");
+        SWTBotView viewBot = fBot.viewByTitle(PROPERTIES_VIEW_NAME);
+        viewBot.show();
+        fBot.waitUntil(ConditionHelpers.viewIsOpened(viewBot));
         traceItem.select();
-        viewBot.setFocus();
-        SWTBotTreeItem linkedNode = viewBot.bot().tree().getTreeItem("Resource properties").getNode("linked");
+        SWTBotTree tree = viewBot.bot().tree();
+        SWTBotTreeItem resourcePropertiesItem = tree.getTreeItem(RESOURCE_PROPERTIES_ITEM_NAME);
+        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(LINKED_ITEM_NAME, resourcePropertiesItem));
+        SWTBotTreeItem linkedNode = resourcePropertiesItem.getNode(LINKED_ITEM_NAME);
         String linkedValue = linkedNode.cell(1);
         assertEquals(Boolean.toString(isLinked), linkedValue);
     }

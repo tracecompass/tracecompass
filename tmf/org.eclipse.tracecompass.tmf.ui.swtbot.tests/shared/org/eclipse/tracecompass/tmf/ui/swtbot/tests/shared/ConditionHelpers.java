@@ -282,6 +282,22 @@ public final class ConditionHelpers {
     }
 
     /**
+     * Wait for a view to open
+     *
+     * @param view
+     *            bot view for the view
+     * @return true if the view is open, false otherwise
+     */
+    public static ICondition viewIsOpened(final SWTBotView view) {
+        return new SWTBotTestCondition() {
+            @Override
+            public boolean test() throws Exception {
+                return (view != null) && (view.isActive());
+            }
+        };
+    }
+
+    /**
      * Wait till table cell has a given content.
      *
      * @param table
