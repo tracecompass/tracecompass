@@ -40,7 +40,7 @@
       </output>
       <output
             class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
-            id="org.eclipse.tracecompass.internal.analysis.timing.ui.views.event.matching.scatter">
+            id="org.eclipse.tracecompass.analysis.timing.ui.segstore.scatter:org.eclipse.tracecompass.internal.analysis.timing.core.event.matching">
          <analysisId
                id="org.eclipse.tracecompass.internal.analysis.timing.core.event.matching">
          </analysisId>
@@ -82,6 +82,14 @@
             restorable="true">
       </view>
       <view
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.SegmentStoreScatterView"
+            icon="icons/eview16/latency.png"
+            id="org.eclipse.tracecompass.analysis.timing.ui.segstore.scatter"
+            name="%view.segstore.scatters"
+            restorable="true">
+      </view>
+      <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.tmf.ui.views.category"
             class="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.statistics.CallGraphStatisticsView"
@@ -110,9 +118,9 @@
       <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.tracecompass.internal.analysis.timing.ui.views.event.matching.EventMatchingScatterView"
+            class="org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.SegmentStoreScatterView"
             icon="icons/eview16/statistics_view.gif"
-            id="org.eclipse.tracecompass.internal.analysis.timing.ui.views.event.matching.scatter"
+            id="org.eclipse.tracecompass.analysis.timing.ui.segstore.scatter:org.eclipse.tracecompass.internal.analysis.timing.core.event.matching"
             name="%view.matching.scatter"
             restorable="true">
       </view>
