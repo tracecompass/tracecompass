@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2017 Ericsson
+ * Copyright (c) 2014, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -159,8 +159,8 @@ public class TestImportExportPackageWizard {
         SWTBotTreeItem treeItem = SWTBotUtils.selectTracesFolder(fBot, PROJECT_NAME);
 
         treeItem.contextMenu(EXPORT_TRACE_PACKAGE).click();
-        fBot.waitUntil(Conditions.shellIsActive(EXPORT_TRACE_PACKAGE_TITLE));
-        SWTBot shellBot = fBot.activeShell().bot();
+        SWTBotShell shell = fBot.shell(EXPORT_TRACE_PACKAGE_TITLE).activate();
+        SWTBot shellBot = shell.bot();
         shellBot.button(DESELECT_ALL).click();
         SWTBotTreeItem[] items = fBot.tree().getAllItems();
         for (SWTBotTreeItem item : items) {
@@ -194,7 +194,6 @@ public class TestImportExportPackageWizard {
         shellBot.checkBox(COMPRESS_THE_CONTENTS_OF_THE_FILE).click();
         shellBot.checkBox(COMPRESS_THE_CONTENTS_OF_THE_FILE).click();
         shellBot.comboBox().setText(EXPORT_LOCATION);
-        SWTBotShell shell = fBot.activeShell();
         shellBot.button(FINISH).click();
         // finished exporting
         WaitUtils.waitForJobs();
@@ -214,13 +213,12 @@ public class TestImportExportPackageWizard {
         // import
         treeItem = SWTBotUtils.selectTracesFolder(fBot, PROJECT_NAME);
         treeItem.contextMenu(IMPORT_TRACE_PACKAGE).click();
-        fBot.waitUntil(Conditions.shellIsActive(IMPORT_TRACE_PACKAGE_TITLE));
-        shellBot = fBot.activeShell().bot();
+        shell = fBot.shell(IMPORT_TRACE_PACKAGE_TITLE).activate();
+        shellBot = shell.bot();
         shellBot.comboBox().setText(EXPORT_LOCATION);
         shellBot.comboBox().typeText("\n");
 
         shellBot.button(SELECT_ALL).click();
-        shell = fBot.activeShell();
         shellBot.button(FINISH).click();
         fBot.button("Yes To All").click();
         fBot.waitUntil(Conditions.shellCloses(shell));
