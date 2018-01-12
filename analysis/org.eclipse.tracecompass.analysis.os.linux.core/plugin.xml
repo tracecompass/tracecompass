@@ -117,4 +117,11 @@
             id="org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadStatusDataProvider">
       </dataProviderFactory>
    </extension>
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.dataprovider">
+      <dataProviderFactory
+            class="org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesStatusDataProviderFactory"
+            id="org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ResourcesStatusDataProvider">
+      </dataProviderFactory>
+   </extension>
 </plugin>

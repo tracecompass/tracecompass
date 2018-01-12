@@ -9,7 +9,7 @@
 package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
 /**
- * SWTBot test for Resources view Find dialod
+ * SWTBot test for Resources view Find dialog
  *
  * @author Jean-Christian Kouame
  */

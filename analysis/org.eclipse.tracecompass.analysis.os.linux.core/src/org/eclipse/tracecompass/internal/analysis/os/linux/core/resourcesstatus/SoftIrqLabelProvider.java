@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources;
+package org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 

@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources;
+package org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -16,8 +16,8 @@ import org.eclipse.osgi.util.NLS;
  *
  * @author Matthew Khouzam
  */
-public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources.messages"; //$NON-NLS-1$
+class Messages extends NLS {
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.messages"; //$NON-NLS-1$
     /** softirq 0 */
     public static String SoftIrqLabelProvider_softIrq0;
     /** softirq 1 */

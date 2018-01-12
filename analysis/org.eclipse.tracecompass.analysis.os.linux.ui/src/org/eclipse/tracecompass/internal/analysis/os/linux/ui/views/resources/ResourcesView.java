@@ -21,42 +21,47 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
+import java.util.Objects;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.signals.TmfCpuSelectedSignal;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel.Type;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesStatusDataProvider;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.FollowCpuAction;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.UnfollowCpuAction;
-import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources.ResourcesEntry.Type;
-import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphRowModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphState;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NamedTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sampling;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
 
 /**
  * Main implementation for the LTTng 2.0 kernel Resource view
@@ -70,7 +75,6 @@ public class ResourcesView extends AbstractTimeGraphView {
 
     /** ID of the followed CPU in the map data in {@link TmfTraceContext} */
     public static final @NonNull String RESOURCES_FOLLOW_CPU = ID + ".FOLLOW_CPU"; //$NON-NLS-1$
-    private static final String WILDCARD = "*"; //$NON-NLS-1$
 
     private static final String[] FILTER_COLUMN_NAMES = new String[] {
             Messages.ResourcesView_stateTypeName
@@ -99,7 +103,7 @@ public class ResourcesView extends AbstractTimeGraphView {
         public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
             ResourcesEntry entry1 = (ResourcesEntry) o1;
             ResourcesEntry entry2 = (ResourcesEntry) o2;
-            if (entry1.getType() == Type.NULL && entry2.getType() == Type.NULL) {
+            if (entry1.getType() == Type.TRACE && entry2.getType() == Type.TRACE) {
                 /* sort trace entries alphabetically */
                 return entry1.getName().compareTo(entry2.getName());
             }
@@ -118,7 +122,7 @@ public class ResourcesView extends AbstractTimeGraphView {
             IStructuredSelection sSel = (IStructuredSelection) selection;
             if (sSel.getFirstElement() instanceof ResourcesEntry) {
                 ResourcesEntry resourcesEntry = (ResourcesEntry) sSel.getFirstElement();
-                if (resourcesEntry.getType().equals(ResourcesEntry.Type.CPU)) {
+                if (resourcesEntry.getType().equals(Type.CPU)) {
                     TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
                     Integer data = (Integer) ctx.getData(RESOURCES_FOLLOW_CPU);
                     int cpu = data != null ? data.intValue() : -1;
@@ -170,184 +174,124 @@ public class ResourcesView extends AbstractTimeGraphView {
 
     @Override
     protected void buildEntryList(ITmfTrace trace, ITmfTrace parentTrace, final IProgressMonitor monitor) {
-        final ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
-        if (ssq == null) {
+        ResourcesStatusDataProvider dataProvider = DataProviderManager.getInstance()
+                .getDataProvider(trace, ResourcesStatusDataProvider.ID, ResourcesStatusDataProvider.class);
+        if (dataProvider == null) {
             return;
         }
-        Map<Integer, ResourcesEntry> entryMap = new HashMap<>();
 
-        long startTime = ssq.getStartTime();
-        long start = startTime;
-        TimeGraphEntry traceEntry = new ResourcesEntry(trace, trace.getName(), startTime, ssq.getCurrentEndTime() + 1, 0);
-        addToEntryList(parentTrace, Collections.singletonList(traceEntry));
-        setStartTime(Long.min(getStartTime(), startTime));
+        SubMonitor subMonitor = SubMonitor.convert(monitor);
         boolean complete = false;
-        while (!complete && !monitor.isCanceled() && !ssq.isCancelled()) {
-            complete = ssq.waitUntilBuilt(BUILD_UPDATE_TIMEOUT);
-            long end = ssq.getCurrentEndTime();
-            if (start == end && !complete) {
-                // when complete execute one last time regardless of end time
-                continue;
+        ResourcesEntry traceEntry = null;
+        Map<Long, TimeGraphEntry> map = new HashMap<>();
+        while (!complete && !subMonitor.isCanceled()) {
+            TmfModelResponse<List<ResourcesEntryModel>> response = dataProvider.fetchTree(new TimeQueryFilter(0, Long.MAX_VALUE, 2), subMonitor);
+            if (response.getStatus() == ITmfResponse.Status.FAILED) {
+                Activator.getDefault().logError("Resources Data Provider failed: " + response.getStatusMessage()); //$NON-NLS-1$
+                return;
+            } else if (response.getStatus() == ITmfResponse.Status.CANCELLED) {
+                return;
             }
-            long endTime = end + 1;
-            setEndTime(Long.max(getEndTime(), end));
+            complete = response.getStatus() == ITmfResponse.Status.COMPLETED;
 
-            traceEntry.updateEndTime(endTime);
-            List<Integer> cpuQuarks = ssq.getQuarks(Attributes.CPUS, WILDCARD);
-            createCpuEntriesWithQuark(trace, ssq, entryMap, traceEntry, startTime, endTime, cpuQuarks);
+            List<ResourcesEntryModel> model = response.getModel();
+            if (model != null) {
+                for (ResourcesEntryModel entry : model) {
+                    if (entry.getType() != ResourcesEntryModel.Type.TRACE) {
+                        TimeGraphEntry uiEntry = map.get(entry.getId());
+                        if (uiEntry == null) {
+                            uiEntry = new ResourcesEntry(entry, trace);
+                            map.put(entry.getId(), uiEntry);
 
-            final long resolution = Long.max(1, (end - ssq.getStartTime()) / getDisplayWidth());
+                            TimeGraphEntry parent = map.getOrDefault(entry.getParentId(), traceEntry);
+                            parent.addChild(uiEntry);
+                        } else {
+                            uiEntry.updateModel(entry);
+                        }
+                    } else {
+                        setStartTime(Long.min(getStartTime(), entry.getStartTime()));
+                        setEndTime(Long.max(getEndTime(), entry.getEndTime() + 1));
 
-            List<TimeGraphEntry> entries = new ArrayList<>();
-            // gather all children entries recursively
-            Consumer<TimeGraphEntry> consumer = new Consumer<TimeGraphEntry>() {
-                @Override
-                public void accept(TimeGraphEntry entry) {
-                    entries.add(entry);
-                    entry.getChildren().forEach(this);
+                        if (traceEntry != null) {
+                            traceEntry.updateModel(entry);
+                        } else {
+                            traceEntry = new ResourcesEntry(entry, trace);
+                            addToEntryList(parentTrace, Collections.singletonList(traceEntry));
+                        }
+                    }
                 }
-            };
-            consumer.accept(traceEntry);
+                Objects.requireNonNull(traceEntry);
+                long start = traceEntry.getStartTime();
+                long end = traceEntry.getEndTime();
+                final long resolution = Long.max(1, (end - start) / getDisplayWidth());
+                zoomEntries(map.values(), start, end, resolution, subMonitor);
+            }
 
-            zoomEntries(entries, ssq.getStartTime(), end, resolution, monitor);
+            if (subMonitor.isCanceled()) {
+                return;
+            }
 
             if (parentTrace.equals(getTrace())) {
                 refresh();
             }
-            start = end;
-        }
-    }
+            subMonitor.worked(1);
 
-    private static void createCpuEntriesWithQuark(@NonNull ITmfTrace trace, final ITmfStateSystem ssq, Map<Integer, ResourcesEntry> entryMap,
-            TimeGraphEntry traceEntry, long startTime, long endTime, List<Integer> cpuQuarks) {
-        for (Integer cpuQuark : cpuQuarks) {
-            final @NonNull String cpuName = ssq.getAttributeName(cpuQuark);
-            int cpu = Integer.parseInt(cpuName);
-            ResourcesEntry cpuEntry = entryMap.get(cpuQuark);
-            if (cpuEntry == null) {
-                cpuEntry = new ResourcesEntry(cpuQuark, trace, startTime, endTime, Type.CPU, cpu);
-                entryMap.put(cpuQuark, cpuEntry);
-                traceEntry.addChild(cpuEntry);
-            } else {
-                cpuEntry.updateEndTime(endTime);
-            }
-            List<Integer> irqQuarks = ssq.getQuarks(Attributes.CPUS, cpuName, Attributes.IRQS, WILDCARD);
-            createCpuInterruptEntryWithQuark(trace, ssq, entryMap, startTime, endTime, traceEntry, cpuEntry, irqQuarks, Type.IRQ);
-            List<Integer> softIrqQuarks = ssq.getQuarks(Attributes.CPUS, cpuName, Attributes.SOFT_IRQS, WILDCARD);
-            createCpuInterruptEntryWithQuark(trace, ssq, entryMap, startTime, endTime, traceEntry, cpuEntry, softIrqQuarks, Type.SOFT_IRQ);
-        }
-    }
-
-    /**
-     * Create and add execution contexts to a cpu entry. Also creates an aggregate
-     * entry in the root trace entry. The execution context is basically what the
-     * cpu is doing in its execution stack. It can be in an IRQ, Soft IRQ. MCEs,
-     * NMIs, Userland and Kernel execution is not yet supported.
-     *
-     * @param trace
-     *            the trace
-     * @param ssq
-     *            the state system
-     * @param entryMap
-     *            the entry map
-     * @param startTime
-     *            the start time in nanoseconds
-     * @param endTime
-     *            the end time in nanoseconds
-     * @param traceEntry
-     *            the trace timegraph entry
-     * @param cpuEntry
-     *            the cpu timegraph entry (the entry under the trace entry
-     * @param childrenQuarks
-     *            the quarks to add to cpu entry
-     * @param type
-     *            the type of entry being added
-     */
-    private static void createCpuInterruptEntryWithQuark(@NonNull ITmfTrace trace,
-            final ITmfStateSystem ssq, Map<Integer, ResourcesEntry> entryMap,
-            long startTime, long endTime, TimeGraphEntry traceEntry, ResourcesEntry cpuEntry,
-            List<Integer> childrenQuarks, Type type) {
-        for (Integer quark : childrenQuarks) {
-            final @NonNull String resourceName = ssq.getAttributeName(quark);
-            int resourceId = Integer.parseInt(resourceName);
-            ResourcesEntry interruptEntry = entryMap.get(quark);
-            if (interruptEntry == null) {
-                interruptEntry = new ResourcesEntry(quark, trace, startTime, endTime, type, resourceId);
-                entryMap.put(quark, interruptEntry);
-                cpuEntry.addChild(interruptEntry);
-
-                ResourcesEntry aggregateInterruptEntry = null;
-                // search for the aggregate interrupt entry in the trace entry.
-                for (ResourcesEntry rootEntry : Iterables.filter(traceEntry.getChildren(), ResourcesEntry.class)) {
-                    if (rootEntry.getId() == resourceId && rootEntry.getType().equals(type)) {
-                        aggregateInterruptEntry = rootEntry;
-                        break;
-                    }
+            if (!complete && !subMonitor.isCanceled()) {
+                try {
+                    Thread.sleep(BUILD_UPDATE_TIMEOUT);
+                } catch (InterruptedException e) {
+                    Activator.getDefault().logError("Failed to wait for data provider", e); //$NON-NLS-1$
                 }
-                // it does not exist yet, create it
-                if (aggregateInterruptEntry == null) {
-                    String aggregateIrqtype = type == Type.IRQ ? Attributes.IRQS : Attributes.SOFT_IRQS;
-                    int aggregateQuark = ssq.optQuarkAbsolute(aggregateIrqtype, resourceName);
-                    aggregateInterruptEntry = new ResourcesEntry(aggregateQuark, trace, startTime, endTime, type, resourceId);
-                    traceEntry.addChild(aggregateInterruptEntry);
-                }
-                ResourcesEntry irqCpuEntry = new ResourcesEntry(quark, trace, cpuEntry.getName(), startTime, endTime, type, cpuEntry.getId());
-                aggregateInterruptEntry.addChild(irqCpuEntry);
-            } else {
-                interruptEntry.updateEndTime(endTime);
             }
         }
     }
 
     @Override
-    protected void zoomEntries(Iterable<TimeGraphEntry> visible, long zoomStartTime, long zoomEndTime,
+    protected void zoomEntries(@NonNull Iterable<@NonNull TimeGraphEntry> entries, long zoomStartTime, long zoomEndTime,
             long resolution, @NonNull IProgressMonitor monitor) {
-        boolean isZoomThread = Thread.currentThread() instanceof ZoomThread;
+        if (resolution < 0) {
+            // StateSystemUtils.getTimes would throw an illegal argument exception.
+            return;
+        }
 
-        /* Filter the relevant entries and group them by ss */
-        Map<ITmfStateSystem, Multimap<Integer, ResourcesEntry>> groupedEntries = filterGroupEntries(visible, zoomStartTime, zoomEndTime);
-        TreeMultimap<Integer, ITmfStateInterval> intervals = TreeMultimap.create(Comparator.naturalOrder(),
-                Comparator.comparingLong(ITmfStateInterval::getStartTime));
+        long start = Long.min(zoomStartTime, zoomEndTime);
+        long end = Long.max(zoomStartTime, zoomEndTime);
+        List<@NonNull Long> times = StateSystemUtils.getTimes(start, end, resolution);
+        Sampling sampling = new Sampling(start, end, resolution);
+        Map<ResourcesStatusDataProvider, Multimap<Long, ResourcesEntry>> resourceEntries = filterGroupEntries(entries, zoomStartTime, zoomEndTime);
+        SubMonitor subMonitor = SubMonitor.convert(monitor, "ResourcesView#zoomEntries", resourceEntries.size()); //$NON-NLS-1$
 
-        /* For each ss and its entries */
-        for (Entry<ITmfStateSystem, Multimap<Integer, ResourcesEntry>> entry : groupedEntries.entrySet()) {
-            ITmfStateSystem ss = entry.getKey();
-            Multimap<Integer, ResourcesEntry> quarksToEntries = entry.getValue();
+        for (Entry<ResourcesStatusDataProvider, Multimap<Long, ResourcesEntry>> entry : resourceEntries.entrySet()) {
+            ResourcesStatusDataProvider dataProvider = entry.getKey();
+            Multimap<Long, ResourcesEntry> map = entry.getValue();
+            SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(times, map.keySet());
+            TmfModelResponse<List<ITimeGraphRowModel>> response = dataProvider.fetchRowModel(filter, monitor);
 
-            long start = Long.max(zoomStartTime, ss.getStartTime());
-            long end = Long.min(zoomEndTime, ss.getCurrentEndTime());
-            if (start > end) {
-                continue;
+            List<ITimeGraphRowModel> model = response.getModel();
+            if (model != null) {
+                zoomEntries(map, model, response.getStatus() == ITmfResponse.Status.COMPLETED, sampling);
             }
-            /* Get the time stamps for the 2D query */
-            List<Long> times = StateSystemUtils.getTimes(start, end, resolution);
-            try {
-                /* Do the actual query */
-                for (ITmfStateInterval interval : ss.query2D(quarksToEntries.keySet(), times)) {
-                    if (monitor.isCanceled()) {
-                        return;
-                    }
-                    intervals.put(interval.getAttribute(), interval);
-                }
-                for (Entry<Integer, Collection<ITmfStateInterval>> e : intervals.asMap().entrySet()) {
-                    /*
-                     * Use a collection of entries per quark, as entries with the same quark may
-                     * appear twice because of aggregate IRQs.
-                     */
-                    Collection<ResourcesEntry> entries = quarksToEntries.get(e.getKey());
-                    for (ResourcesEntry resourcesEntry : entries) {
-                        if (monitor.isCanceled()) {
-                            return;
+            subMonitor.worked(1);
+        }
+    }
+
+    private void zoomEntries(Multimap<Long, ResourcesEntry> map, List<ITimeGraphRowModel> model, boolean completed, Sampling sampling) {
+        boolean isZoomThread = Thread.currentThread() instanceof ZoomThread;
+        for (ITimeGraphRowModel rowModel : model) {
+            Collection<ResourcesEntry> resourceEntries = map.get(rowModel.getEntryID());
+
+            for (ResourcesEntry resourceEntry : resourceEntries) {
+                List<ITimeEvent> events = createTimeEvents(resourceEntry, rowModel.getStates());
+                if (isZoomThread) {
+                    applyResults(() -> {
+                        resourceEntry.setZoomedEventList(events);
+                        if (completed) {
+                            resourceEntry.setSampling(sampling);
                         }
-                        addTimeEvents(resourcesEntry, e.getValue(), isZoomThread);
-                    }
+                    });
+                } else {
+                    resourceEntry.setEventList(events);
                 }
-            } catch (TimeRangeException e) {
-                Activator.getDefault().logError("Resources zoom", e); //$NON-NLS-1$
-            } catch (StateSystemDisposedException e) {
-                /* State System has been disposed, no need to try again. */
-            } finally {
-                intervals.clear();
             }
         }
     }
@@ -363,31 +307,29 @@ public class ResourcesView extends AbstractTimeGraphView {
      * @param zoomEndTime
      *            the rightmost time bound of the view
      * @return A Map of the visible entries keyed by their state system and grouped
-     *         by their interval quark.
+     *         by their data provider.
      */
-    private static Map<ITmfStateSystem, Multimap<Integer, ResourcesEntry>> filterGroupEntries(Iterable<TimeGraphEntry> visible,
+    private static Map<ResourcesStatusDataProvider, Multimap<Long, ResourcesEntry>> filterGroupEntries(Iterable<TimeGraphEntry> visible,
             long zoomStartTime, long zoomEndTime) {
-        Map<ITmfStateSystem, Multimap<Integer, ResourcesEntry>> quarksToEntries = new HashMap<>();
-        for (ResourcesEntry tge : Iterables.filter(visible, ResourcesEntry.class)) {
-            if (zoomStartTime <= tge.getEndTime() && zoomEndTime >= tge.getStartTime() && tge.getQuark() >= 0) {
-                ITmfStateSystem ss = TmfStateSystemAnalysisModule.getStateSystem(tge.getTrace(), KernelAnalysisModule.ID);
-                if (ss != null) {
-                    Multimap<Integer, ResourcesEntry> multimap = quarksToEntries.get(ss);
-                    if (multimap == null) {
-                        multimap = HashMultimap.create();
-                        quarksToEntries.put(ss, multimap);
-                    }
-                    multimap.put(tge.getQuark(), tge);
+        DataProviderManager manager = DataProviderManager.getInstance();
+        Iterable<ResourcesEntry> resourceEntries = Iterables.filter(visible, ResourcesEntry.class);
+        Map<ResourcesStatusDataProvider, Multimap<Long, ResourcesEntry>> quarksToEntries = new HashMap<>();
+        for (ResourcesEntry entry : resourceEntries) {
+            if (zoomStartTime <= entry.getEndTime() && zoomEndTime >= entry.getStartTime()) {
+                ResourcesStatusDataProvider provider = manager.getDataProvider(entry.getTrace(), ResourcesStatusDataProvider.ID, ResourcesStatusDataProvider.class);
+                if (provider != null) {
+                    Multimap<Long, ResourcesEntry> multimap = quarksToEntries.computeIfAbsent(provider, p -> HashMultimap.create());
+                    multimap.put(entry.getModel().getId(), entry);
                 }
             }
         }
         return quarksToEntries;
     }
 
-    private void addTimeEvents(ResourcesEntry resourceEntry, Collection<ITmfStateInterval> value, boolean isZoomThread) {
+    private static List<ITimeEvent> createTimeEvents(ResourcesEntry resourceEntry, List<ITimeGraphState> value) {
         List<ITimeEvent> events = new ArrayList<>(value.size());
         ITimeEvent prev = null;
-        for (ITmfStateInterval interval : value) {
+        for (ITimeGraphState interval : value) {
             ITimeEvent event = createTimeEvent(interval, resourceEntry);
             if (prev != null) {
                 long prevEnd = prev.getTime() + prev.getDuration();
@@ -399,11 +341,7 @@ public class ResourcesView extends AbstractTimeGraphView {
             prev = event;
             events.add(event);
         }
-        if (isZoomThread) {
-            applyResults(() -> resourceEntry.setZoomedEventList(events));
-        } else {
-            resourceEntry.setEventList(events);
-        }
+        return events;
     }
 
     /**
@@ -415,14 +353,15 @@ public class ResourcesView extends AbstractTimeGraphView {
      * @param interval
      *            state interval which will generate the new event
      */
-    private static TimeEvent createTimeEvent(ITmfStateInterval interval, ResourcesEntry resourceEntry) {
-        long startTime = interval.getStartTime();
-        long duration = interval.getEndTime() - startTime + 1;
-        Object status = interval.getValue();
-        if (status instanceof Integer) {
-            return new TimeEvent(resourceEntry, startTime, duration, (int) status);
+    private static TimeEvent createTimeEvent(ITimeGraphState state, ResourcesEntry resourceEntry) {
+        if (state.getValue() == Integer.MIN_VALUE) {
+            return new NullTimeEvent(resourceEntry, state.getStartTime(), state.getDuration());
         }
-        return new NullTimeEvent(resourceEntry, startTime, duration);
+        String label = state.getLabel();
+        if (label != null) {
+            return new NamedTimeEvent(resourceEntry, state.getStartTime(), state.getDuration(), (int) state.getValue(), label);
+        }
+        return new TimeEvent(resourceEntry, state.getStartTime(), state.getDuration(), (int) state.getValue());
     }
 
     /**
