@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2017 Ericsson
+ * Copyright (c) 2011, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -81,6 +81,15 @@ public class TmfProjectRegistry implements IResourceChangeListener {
     }
 
     /**
+     * Initializes the project registry
+     *
+     * @since 3.3
+     */
+    public static void init() {
+        /* static variables are initialized */
+    }
+
+    /**
      * Disposes the project registry
      *
      * @since 2.3
@@ -97,7 +106,14 @@ public class TmfProjectRegistry implements IResourceChangeListener {
      * @return the project model element or null if it does not exist
      */
     public static synchronized TmfProjectElement getProject(IProject project) {
-        return getProject(project, false);
+        try {
+            if (project.hasNature(TmfProjectNature.ID)) {
+                return getProject(project, true);
+            }
+        } catch (CoreException e) {
+            /* ignore */
+        }
+        return null;
     }
 
     /**
