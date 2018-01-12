@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.tracecompass.internal.lttng2.control.core.LttngProfileManager;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
+import org.eclipse.tracecompass.tmf.ui.dialog.DirectoryDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -163,7 +164,7 @@ public class ControlRemoteProfilesPreferencePage extends PreferencePage implemen
         fExportButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                DirectoryDialog dialog = new DirectoryDialog(Display.getCurrent().getActiveShell());
+                DirectoryDialog dialog = DirectoryDialogFactory.create(Display.getCurrent().getActiveShell());
                 dialog.setText(Messages.TraceControl_ExportProfileTitle);
                 String path = dialog.open();
                 if (path != null) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 Ericsson and others.
+ * Copyright (c) 2009, 2018 Ericsson and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -83,6 +84,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
+import org.eclipse.tracecompass.tmf.ui.dialog.DirectoryDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
@@ -617,7 +619,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
      */
     protected void handleSourceDirectoryBrowseButtonPressed() {
         String currentSource = directoryNameField.getText();
-        DirectoryDialog dialog = new DirectoryDialog(directoryNameField.getShell(), SWT.SAVE | SWT.SHEET);
+        DirectoryDialog dialog = DirectoryDialogFactory.create(directoryNameField.getShell(), SWT.SAVE | SWT.SHEET);
         dialog.setText(Messages.ImportTraceWizard_SelectTraceDirectoryTitle);
         dialog.setMessage(Messages.ImportTraceWizard_SelectTraceDirectoryMessage);
         dialog.setFilterPath(getSourceDirectoryName(currentSource));
