@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -399,14 +399,16 @@ public class ImportTracePackageWizardPage extends AbstractTracePackageWizardPage
     }
 
     private int promptForOverwrite(String traceName) {
-        final MessageDialog dialog = new MessageDialog(getContainer()
-                .getShell(), null, null, MessageFormat.format(Messages.ImportTracePackageWizardPage_AlreadyExists, traceName),
+        final MessageDialog dialog = new MessageDialog(getContainer().getShell(),
+                Messages.ImportTracePackageWizardPage_AlreadyExistsTitle,
+                null,
+                MessageFormat.format(Messages.ImportTracePackageWizardPage_AlreadyExists, traceName),
                 MessageDialog.QUESTION, new String[] {
                         IDialogConstants.NO_TO_ALL_LABEL,
                         IDialogConstants.NO_LABEL,
                         IDialogConstants.YES_TO_ALL_LABEL,
-                        IDialogConstants.YES_LABEL,
-                }, 3) {
+                        IDialogConstants.YES_LABEL},
+                3) {
             @Override
             protected int getShellStyle() {
                 return super.getShellStyle() | SWT.SHEET;

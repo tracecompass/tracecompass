@@ -64,6 +64,8 @@ public class TestImportExportPackageWizard {
     private static final String EXPORT_TRACE_PACKAGE_TITLE = "Export trace package";
     private static final String PROJECT_EXPLORER = "Project Explorer";
     private static final String FINISH = "Finish";
+    private static final String CONFIRMATION = "Confirmation";
+    private static final String YES_TO_ALL = "Yes To All";
     private static final String COMPRESS_THE_CONTENTS_OF_THE_FILE = "Compress the contents of the file";
     private static final String SAVE_IN_ZIP_FORMAT = "Save in zip format";
     private static final String SAVE_IN_TAR_FORMAT = "Save in tar format";
@@ -220,7 +222,7 @@ public class TestImportExportPackageWizard {
 
         shellBot.button(SELECT_ALL).click();
         shellBot.button(FINISH).click();
-        fBot.button("Yes To All").click();
+        fBot.shell(CONFIRMATION).activate().bot().button(YES_TO_ALL).click();
         fBot.waitUntil(Conditions.shellCloses(shell));
         fBot = new SWTWorkbenchBot();
         SWTBotUtils.openEditor(fBot, PROJECT_NAME, new Path(traceFile.getName()));

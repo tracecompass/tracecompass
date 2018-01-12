@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -121,6 +121,11 @@ public class Messages extends NLS {
      * Dialog text when a trace with the same name already exists
      */
     public static String ImportTracePackageWizardPage_AlreadyExists;
+
+    /**
+     * Dialog title when a trace with the same name already exists
+     */
+    public static String ImportTracePackageWizardPage_AlreadyExistsTitle;
 
     /**
      * Title for the import page
