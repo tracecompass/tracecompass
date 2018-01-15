@@ -1189,9 +1189,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     public void dispose() {
         super.dispose();
         synchronized (fBuildJobMap) {
-            fBuildJobMap.values().forEach(buildJob -> {
-                buildJob.cancel();
-            });
+            fBuildJobMap.values().forEach(Job::cancel);
         }
         if (fZoomThread != null) {
             fZoomThread.cancel();

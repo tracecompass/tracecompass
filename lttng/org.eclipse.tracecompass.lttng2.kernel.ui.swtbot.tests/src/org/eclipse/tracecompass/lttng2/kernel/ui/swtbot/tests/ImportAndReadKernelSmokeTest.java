@@ -15,9 +15,11 @@
 package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.treeHasRows;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -225,6 +227,8 @@ public class ImportAndReadKernelSmokeTest extends KernelTestBase {
     private static @NonNull Set<@NonNull Entry<String, Set<String>>> getSsNames(SWTBotView bot) {
         SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(bot.bot());
         SWTBotTimeGraphEntry trace = timeGraph.getEntry("synthetic-trace");
+        SWTBotTimeGraphEntry[] traceEntries = timeGraph.getEntries();
+        assertEquals("State system explorer should have a single trace entry: " + Arrays.toString(traceEntries), 1, traceEntries.length);
         SWTBotTimeGraphEntry[] modules = trace.getEntries();
         Map<String, Set<String>> modulesToStateSystems = new HashMap<>();
         for (SWTBotTimeGraphEntry module : modules) {

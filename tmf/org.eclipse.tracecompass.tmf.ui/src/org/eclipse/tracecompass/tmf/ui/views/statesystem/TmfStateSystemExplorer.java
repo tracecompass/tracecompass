@@ -19,6 +19,7 @@ package org.eclipse.tracecompass.tmf.ui.views.statesystem;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -49,6 +50,7 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfStartAnalysisSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -341,7 +343,20 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
         long start = trace.getStartTime().toNanos();
         long end = start;
         TraceEntry traceEntry = new TraceEntry(trace);
-        addToEntryList(parentTrace, Collections.singletonList(traceEntry));
+
+        synchronized (fStartedAnalysis) {
+            /*
+             * Ensure that this is the only job running build entry list.
+             */
+            if (monitor.isCanceled()) {
+                return;
+            }
+            if (getEntryList(parentTrace) == null) {
+                addToEntryList(parentTrace, Collections.singletonList(traceEntry));
+            } else {
+                return;
+            }
+        }
 
         Iterable<@NonNull ITmfAnalysisModuleWithStateSystems> modules = Iterables.
                 filter(trace.getAnalysisModules(), ITmfAnalysisModuleWithStateSystems.class);
@@ -377,6 +392,8 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
 
             long resolution = Long.max(1, (end - start) / getDisplayWidth());
             zoomEntries(Utils.flatten(traceEntry), start, end, resolution, monitor);
+            long selectionStart = TmfTraceManager.getInstance().getTraceContext(trace).getSelectionRange().getStartTime().toNanos();
+            updateFullstates(selectionStart, Collections.singletonList(traceEntry));
 
             if (monitor.isCanceled()) {
                 return;
@@ -577,6 +594,11 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
         if (traceEntries == null) {
             return;
         }
+        updateFullstates(time, traceEntries);
+        refresh();
+    }
+
+    private static void updateFullstates(long time, List<@NonNull TimeGraphEntry> traceEntries) {
         Iterable<TimeGraphEntry> moduleEntries = Iterables.concat(Iterables.transform(traceEntries, TimeGraphEntry::getChildren));
         Iterable<TimeGraphEntry> stateSystemEntries = Iterables.concat(Iterables.transform(moduleEntries, TimeGraphEntry::getChildren));
         for (StateSystemEntry stateSystemEntry : Iterables.filter(stateSystemEntries, StateSystemEntry.class)) {
@@ -596,7 +618,6 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
                 stateSystemEntry.setFullStates(null);
             }
         }
-        refresh();
     }
 
     /**
@@ -631,14 +652,52 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
         IAnalysisModule module = signal.getAnalysisModule();
         if (module instanceof ITmfAnalysisModuleWithStateSystems && !module.isAutomatic()) {
             /* use set to wait for initialization in build entry list to avoid deadlocks. */
-            fStartedAnalysis.add((ITmfAnalysisModuleWithStateSystems) module);
-            rebuild();
+            if (Iterables.contains(allModules(getTrace()), module)) {
+                /*
+                 * Rebuild only if the started analysis module is from the active
+                 * trace/experiment.
+                 */
+                synchronized (fStartedAnalysis) {
+                    fStartedAnalysis.add((ITmfAnalysisModuleWithStateSystems) module);
+                    rebuild();
+                }
+            } else {
+                /*
+                 * Reset the View for the relevant trace, ensuring that the entry list will be
+                 * rebuilt when the view switches back.
+                 */
+                for (ITmfTrace trace : TmfTraceManager.getInstance().getOpenedTraces()) {
+                    if (Iterables.contains(allModules(trace), module)) {
+                        synchronized (fStartedAnalysis) {
+                            fStartedAnalysis.add((ITmfAnalysisModuleWithStateSystems) module);
+                            resetView(trace);
+                        }
+                        break;
+                    }
+                }
+            }
         }
     }
 
     @Override
     protected @NonNull Iterable<ITmfTrace> getTracesToBuild(@Nullable ITmfTrace trace) {
         return TmfTraceManager.getTraceSetWithExperiment(trace);
+    }
+
+    private static Iterable<ITmfAnalysisModuleWithStateSystems> allModules(ITmfTrace trace) {
+        Collection<@NonNull ITmfTrace> traces = TmfTraceManager.getTraceSetWithExperiment(trace);
+        Iterable<IAnalysisModule> allModules = Iterables.concat(Iterables.transform(traces, ITmfTrace::getAnalysisModules));
+        return Iterables.filter(allModules, ITmfAnalysisModuleWithStateSystems.class);
+    }
+
+    @Override
+    @TmfSignalHandler
+    public void traceClosed(TmfTraceClosedSignal signal) {
+        super.traceClosed(signal);
+        // remove modules to avoid leaks.
+        for (ITmfAnalysisModuleWithStateSystems module : allModules(signal.getTrace())) {
+            fStartedAnalysis.remove(module);
+        }
     }
 
 }
