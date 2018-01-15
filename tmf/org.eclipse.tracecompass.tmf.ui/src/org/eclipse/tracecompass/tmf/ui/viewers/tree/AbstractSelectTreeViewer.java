@@ -38,6 +38,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
@@ -79,6 +80,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
 
     /** ID of the checked tree items in the map of data in {@link TmfTraceContext} */
     private static final @NonNull String CHECKED_ELEMENTS = ".CHECKED_ELEMENTS"; //$NON-NLS-1$
+    private static final @NonNull String FILTER_STRING = ".FILTER_STRING";
     private static final @NonNull String UPDATE_CONTENT_JOB_NAME = "AbstractSelectTreeViewer#updateContent Job"; //$NON-NLS-1$
     private static final String FAILED_TO_SLEEP_PREFIX = "Failed to sleep the "; //$NON-NLS-1$
 
@@ -200,6 +202,10 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
             checkEntries(ids, rootEntry, checkedElements);
             fCheckboxTree.setCheckedElements(checkedElements.toArray());
         }
+        Object filterString = ctx.getData(getClass() + FILTER_STRING);
+        if (rootEntry != null && filterString instanceof String) {
+            fCheckboxTree.setFilterText((String) filterString);
+        }
 
         if (fChartViewer != null) {
             fChartViewer.handleCheckStateChangedEvent(getCheckedViewerEntries());
@@ -247,6 +253,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     public void traceSelected(TmfTraceSelectedSignal signal) {
         if (signal != null && getTrace() != signal.getTrace()) {
             saveViewContext();
+            fCheckboxTree.getFilterControl().clearSelection();
         }
         super.traceSelected(signal);
     }
@@ -364,8 +371,11 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
                     ids.add(((TmfGenericTreeEntry) checkedElement).getModel().getId());
                 }
             }
+            Text filterControl = fCheckboxTree.getFilterControl();
+            String filterString = filterControl != null ? filterControl.getText() : null;
             TmfTraceManager.getInstance().updateTraceContext(previousTrace,
-                    builder -> builder.setData(getClass() + CHECKED_ELEMENTS, ids));
+                    builder -> builder.setData(getClass() + CHECKED_ELEMENTS, ids)
+                    .setData(getClass() + FILTER_STRING, filterString));
         }
     }
 

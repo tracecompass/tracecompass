@@ -172,4 +172,10 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
         }
     }
 
+    @Override
+    public void setFilterText(String string) {
+        // make public
+        super.setFilterText(string);
+    }
+
 }
