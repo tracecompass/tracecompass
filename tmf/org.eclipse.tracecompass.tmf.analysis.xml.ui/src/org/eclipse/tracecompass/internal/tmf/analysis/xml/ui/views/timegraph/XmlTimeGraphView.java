@@ -13,63 +13,47 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.timegraph;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Map.Entry;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readonly.TmfXmlReadOnlyModelFactory;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphEntryModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphRowModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphState;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.timegraph.XmlEntry.EntryDisplayType;
-import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
-import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
-import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
-import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlDataProviderManager;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlTimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.views.TmfViewFactory;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sampling;
 import org.w3c.dom.Element;
 
-import com.google.common.collect.Iterables;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 
 /**
  * This view displays state system data in a time graph view. It uses an XML
@@ -101,16 +85,16 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
     private static final int[] fWeight = { 1, 2 };
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
-    private static final @NonNull String SPLIT_STRING = "/"; //$NON-NLS-1$
 
-    private static final Comparator<XmlEntry> XML_ENTRY_COMPARATOR = Comparator.comparing(XmlEntry::getType)
-            .thenComparing(XmlEntry::getElement, Comparator.nullsFirst(Comparator.comparing(element -> element.getAttribute(TmfXmlStrings.PATH))))
-            .thenComparing(XmlEntry::getName).thenComparingLong(XmlEntry::getStartTime);
+    private static final Comparator<XmlTimeGraphEntryModel> XML_ENTRY_COMPARATOR = Comparator
+            .comparing(XmlTimeGraphEntryModel::getPath, Comparator.nullsFirst(Comparator.naturalOrder()))
+            .thenComparing(XmlTimeGraphEntryModel::getName).thenComparingLong(XmlTimeGraphEntryModel::getStartTime);
 
-    private static final Comparator<ITimeGraphEntry> ENTRY_COMPARATOR = Comparator.comparing(x -> (XmlEntry) x, XML_ENTRY_COMPARATOR);
+    private static final Comparator<ITimeGraphEntry> ENTRY_COMPARATOR = Comparator.comparing(x -> (XmlTimeGraphEntryModel) ((TimeGraphEntry) x).getModel(), XML_ENTRY_COMPARATOR);
+    /** Timeout between updates in the build thread in ms */
+    private static final long BUILD_UPDATE_TIMEOUT = 500;
 
     private final @NonNull XmlViewInfo fViewInfo = new XmlViewInfo(ID);
-    private final ITmfXmlModelFactory fFactory;
     private final Map<String, Integer> fStringValueMap = new HashMap<>();
 
     // ------------------------------------------------------------------------
@@ -128,20 +112,14 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         setFilterColumns(DEFAULT_FILTER_COLUMN_NAMES);
         setFilterLabelProvider(new XmlTreeLabelProvider());
         setEntryComparator(ENTRY_COMPARATOR);
-        this.addPartPropertyListener(new IPropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent event) {
-                if (event.getProperty().equals(TmfXmlStrings.XML_OUTPUT_DATA)) {
-                    Object newValue = event.getNewValue();
-                    if (newValue instanceof String) {
-                        String data = (String) newValue;
-                        fViewInfo.setViewData(data);
-                        loadNewXmlView();
-                    }
-                }
+        addPartPropertyListener(event -> {
+            Object newValue = event.getNewValue();
+            if (event.getProperty().equals(TmfXmlStrings.XML_OUTPUT_DATA) && newValue instanceof String) {
+                String data = (String) newValue;
+                fViewInfo.setViewData(data);
+                loadNewXmlView();
             }
         });
-        fFactory = TmfXmlReadOnlyModelFactory.getInstance();
     }
 
     @Override
@@ -162,12 +140,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
     }
 
     private void setViewTitle(final String title) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                setPartName(title);
-            }
-        });
+        Display.getDefault().asyncExec(() -> setPartName(title));
     }
 
     @Override
@@ -209,18 +182,43 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
 
         @Override
         public String getColumnText(Object element, int columnIndex) {
-            XmlEntry entry = (XmlEntry) element;
+            if (element instanceof TimeGraphEntry) {
+                TimeGraphEntry entry = (TimeGraphEntry) element;
 
-            if (DEFAULT_COLUMN_NAMES[columnIndex].equals(Messages.XmlTimeGraphView_ColumnName)) {
-                return entry.getName();
-            } else if (DEFAULT_COLUMN_NAMES[columnIndex].equals(Messages.XmlTimeGraphView_ColumnId)) {
-                return entry.getId();
-            } else if (DEFAULT_COLUMN_NAMES[columnIndex].equals(Messages.XmlTimeGraphView_ColumnParentId)) {
-                return entry.getParentId();
+                if (DEFAULT_COLUMN_NAMES[columnIndex].equals(Messages.XmlTimeGraphView_ColumnName)) {
+                    return entry.getName();
+                }
+
+                ITimeGraphEntryModel model = entry.getModel();
+                if (model instanceof XmlTimeGraphEntryModel) {
+                    XmlTimeGraphEntryModel xmlModel = (XmlTimeGraphEntryModel) model;
+                    if (DEFAULT_COLUMN_NAMES[columnIndex].equals(Messages.XmlTimeGraphView_ColumnId)) {
+                        return xmlModel.getXmlId();
+                    } else if (DEFAULT_COLUMN_NAMES[columnIndex].equals(Messages.XmlTimeGraphView_ColumnParentId)) {
+                        return xmlModel.getXmlParentId();
+                    }
+                }
             }
             return EMPTY_STRING;
         }
+    }
 
+    private static class TraceEntry extends TimeGraphEntry {
+        private final @NonNull ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> fProvider;
+
+        public TraceEntry(XmlTimeGraphEntryModel model, @NonNull ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> provider) {
+            super(model);
+            fProvider = provider;
+        }
+
+        @Override
+        public boolean hasTimeEvents() {
+            return false;
+        }
+
+        public @NonNull ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> getProvider() {
+            return fProvider;
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -230,8 +228,8 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
     @Override
     protected void buildEntryList(ITmfTrace trace, ITmfTrace parentTrace, IProgressMonitor monitor) {
         /*
-         * Get the view element from the XML file. If the element can't be
-         * found, return.
+         * Get the view element from the XML file. If the element can't be found,
+         * return.
          */
         Element viewElement = fViewInfo.getViewElement(TmfXmlStrings.TIME_GRAPH_VIEW);
         if (viewElement == null) {
@@ -240,8 +238,8 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         ITimeGraphPresentationProvider2 pres = this.getPresentationProvider();
         if (pres instanceof XmlPresentationProvider) {
             /*
-             * TODO: Each entry of a line could have their own states/color.
-             * That will require an update to the presentation provider
+             * TODO: Each entry of a line could have their own states/color. That will
+             * require an update to the presentation provider
              */
             ((XmlPresentationProvider) pres).loadNewStates(viewElement);
         }
@@ -255,353 +253,210 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         // Empty the additional state values
         fStringValueMap.clear();
 
-        Set<String> analysisIds = TmfXmlUtils.getViewAnalysisIds(viewElement);
-
-        List<Element> entries = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.ENTRY_ELEMENT);
-        Set<XmlEntry> entryList = new TreeSet<>(getEntryComparator());
-        if (monitor.isCanceled()) {
-            return;
-        }
-
-        Set<@NonNull ITmfAnalysisModuleWithStateSystems> stateSystemModules = new HashSet<>();
-        if (analysisIds.isEmpty()) {
-            /*
-             * No analysis specified, take all state system analysis modules
-             */
-            Iterables.addAll(stateSystemModules, TmfTraceUtils.getAnalysisModulesOfClass(trace, ITmfAnalysisModuleWithStateSystems.class));
-        } else {
-            for (String moduleId : analysisIds) {
-                moduleId = checkNotNull(moduleId);
-                ITmfAnalysisModuleWithStateSystems module = TmfTraceUtils.getAnalysisModuleOfClass(trace, ITmfAnalysisModuleWithStateSystems.class, moduleId);
-                if (module != null) {
-                    stateSystemModules.add(module);
-                }
-            }
-        }
-
-        for (ITmfAnalysisModuleWithStateSystems module : stateSystemModules) {
-            IStatus status = module.schedule();
-            if (!status.isOK()) {
+        SubMonitor subMonitor = SubMonitor.convert(monitor);
+        boolean complete = false;
+        ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> provider = XmlDataProviderManager.getInstance().getTimeGraphProvider(trace, viewElement);
+        Map<Long, TimeGraphEntry> map = new HashMap<>();
+        while (!complete && !subMonitor.isCanceled()) {
+            TmfModelResponse<List<XmlTimeGraphEntryModel>> response = provider.fetchTree(new TimeQueryFilter(0, Long.MAX_VALUE, 2), subMonitor);
+            if (response.getStatus() == ITmfResponse.Status.FAILED) {
+                Activator.logError("Call Stack Data Provider failed: " + response.getStatusMessage()); //$NON-NLS-1$
+                return;
+            } else if (response.getStatus() == ITmfResponse.Status.CANCELLED) {
                 return;
             }
-            if (!module.waitForInitialization()) {
-                return;
-            }
-            for (ITmfStateSystem ssq : module.getStateSystems()) {
-                ssq.waitUntilBuilt();
+            complete = response.getStatus() == ITmfResponse.Status.COMPLETED;
 
-                long startTime = ssq.getStartTime();
-                long endTime = ssq.getCurrentEndTime();
-                XmlEntry groupEntry = new XmlEntry(-1, trace, trace.getName(), ssq);
-                entryList.add(groupEntry);
-                setStartTime(Math.min(getStartTime(), startTime));
-                setEndTime(Math.max(getEndTime(), endTime));
-
-                /* Add children entry of this entry for each line */
-                for (Element entry : entries) {
-                    buildEntry(entry, groupEntry, -1, StringUtils.EMPTY);
-                }
-            }
-        }
-
-        addToEntryList(parentTrace, new ArrayList<TimeGraphEntry>(entryList));
-
-        if (parentTrace.equals(getTrace())) {
-            refresh();
-        }
-        for (XmlEntry traceEntry : entryList) {
-            if (monitor.isCanceled()) {
-                return;
-            }
-            long startTime = traceEntry.getStateSystem().getStartTime();
-            long endTime = traceEntry.getStateSystem().getCurrentEndTime() + 1;
-            buildStatusEvent(traceEntry, monitor, startTime, endTime);
-        }
-    }
-
-    private void buildEntry(Element entryElement, XmlEntry parentEntry, int prevBaseQuark, String prevRegex) {
-        /* Get the attribute string to display */
-        String path = entryElement.getAttribute(TmfXmlStrings.PATH);
-        if (path.isEmpty()) {
-            path = TmfXmlStrings.WILDCARD;
-        }
-
-        /*
-         * Make sure the XML element has either a display attribute or entries,
-         * otherwise issue a warning
-         */
-
-        List<Element> displayElements = TmfXmlUtils.getChildElements(entryElement, TmfXmlStrings.DISPLAY_ELEMENT);
-        List<Element> entryElements = TmfXmlUtils.getChildElements(entryElement, TmfXmlStrings.ENTRY_ELEMENT);
-
-        if (displayElements.isEmpty() && entryElements.isEmpty()) {
-            Activator.logWarning(String.format("XML view: entry for %s should have either a display element or entry elements", path)); //$NON-NLS-1$
-            return;
-        }
-
-        // Get the state system to use to populate those entries, by default, it
-        // is the same as the parent
-        String analysisId = entryElement.getAttribute(TmfXmlStrings.ANALYSIS_ID);
-        ITmfStateSystem parentSs = parentEntry.getStateSystem();
-        ITmfStateSystem ss = parentSs;
-        int baseQuark = prevBaseQuark;
-        if (!analysisId.isEmpty()) {
-            ss = TmfStateSystemAnalysisModule.getStateSystem(parentEntry.getTrace(), analysisId);
-            baseQuark = ITmfStateSystem.ROOT_ATTRIBUTE;
-            if (ss == null) {
-                return;
-            }
-        }
-
-        // Replace any place holders in the path
-        Pattern pattern = Pattern.compile(prevRegex);
-        String attributePath = prevBaseQuark > 0 ? parentSs.getFullAttributePath(prevBaseQuark) : StringUtils.EMPTY;
-        Matcher matcher = pattern.matcher(attributePath);
-        if (matcher.find()) {
-            path = matcher.replaceFirst(path);
-        }
-        String regexName = path.replaceAll("\\*", "(.*)"); //$NON-NLS-1$//$NON-NLS-2$
-
-        /* Get the list of quarks to process with this path */
-        String[] paths = regexName.split(SPLIT_STRING);
-        int i = 0;
-        List<Integer> quarks = Collections.singletonList(baseQuark);
-
-        while (i < paths.length) {
-            List<Integer> subQuarks = new LinkedList<>();
-            /* Replace * by .* to have a regex string */
-            String name = paths[i];
-            for (int relativeQuark : quarks) {
-                for (int quark : ss.getSubAttributes(relativeQuark, false, name)) {
-                    subQuarks.add(quark);
-                }
-            }
-            quarks = subQuarks;
-            i++;
-        }
-
-        /* Process each quark */
-        XmlEntry currentEntry;
-        Element displayElement = null;
-        Map<String, XmlEntry> entryMap = new HashMap<>();
-        if (!displayElements.isEmpty()) {
-            displayElement = displayElements.get(0);
-        }
-        for (int quark : quarks) {
-            currentEntry = parentEntry;
-            /* Process the current entry, if specified */
-            if (displayElement != null) {
-                currentEntry = processEntry(entryElement, displayElement, parentEntry, quark, ss);
-                entryMap.put(currentEntry.getId(), currentEntry);
-            }
-            /* Process the children entry of this entry */
-            for (Element subEntryEl : entryElements) {
-                buildEntry(subEntryEl, currentEntry, quark, prevRegex.isEmpty() ? regexName : prevRegex + '/' + regexName);
-            }
-        }
-        if (!entryMap.isEmpty()) {
-            buildTree(entryMap, parentEntry);
-        }
-    }
-
-    private XmlEntry processEntry(@NonNull Element entryElement, @NonNull Element displayEl,
-            @NonNull XmlEntry parentEntry, int quark, ITmfStateSystem ss) {
-        /*
-         * Get the start time and end time of this entry from the display
-         * attribute
-         */
-        ITmfXmlStateAttribute display = fFactory.createStateAttribute(displayEl, parentEntry);
-        int displayQuark = display.getAttributeQuark(quark, null);
-        if (displayQuark == IXmlStateSystemContainer.ERROR_QUARK) {
-            return new XmlEntry(quark, parentEntry.getTrace(),
-                    String.format("Unknown display quark for %s", ss.getAttributeName(quark)), ss); //$NON-NLS-1$
-        }
-
-        long entryStart = ss.getStartTime();
-        long entryEnd = ss.getCurrentEndTime() + 1;
-
-        try {
-
-            ITmfStateInterval oneInterval = ss.querySingleState(entryStart, displayQuark);
-
-            /* The entry start is the first non-null interval */
-            while (oneInterval.getStateValue().isNull()) {
-                long ts = oneInterval.getEndTime() + 1;
-                if (ts > ss.getCurrentEndTime()) {
-                    break;
-                }
-                oneInterval = ss.querySingleState(ts, displayQuark);
-            }
-            entryStart = oneInterval.getStartTime();
-
-            /* The entry end is the last non-null interval */
-            oneInterval = ss.querySingleState(entryEnd - 1, displayQuark);
-            while (oneInterval.getStateValue().isNull()) {
-                long ts = oneInterval.getStartTime() - 1;
-                if (ts < ss.getStartTime()) {
-                    break;
-                }
-                oneInterval = ss.querySingleState(ts, displayQuark);
-            }
-            entryEnd = oneInterval.getEndTime() + 1;
-
-        } catch (StateSystemDisposedException e) {
-        }
-
-        return new XmlEntry(quark, displayQuark, parentEntry.getTrace(), ss.getAttributeName(quark),
-                entryStart, entryEnd, EntryDisplayType.DISPLAY, ss, entryElement);
-    }
-
-    private void buildStatusEvent(XmlEntry traceEntry, @NonNull IProgressMonitor monitor, long start, long end) {
-        long resolution = Math.max((end - start) / getDisplayWidth(), 1);
-        long startTime = Math.max(start, traceEntry.getStartTime());
-        long endTime = Math.min(end + 1, traceEntry.getEndTime());
-        List<ITimeEvent> eventList = getEventList(traceEntry, startTime, endTime, resolution, monitor);
-        if (monitor.isCanceled()) {
-            return;
-        }
-        traceEntry.setEventList(eventList);
-        redraw();
-
-        for (ITimeGraphEntry entry : traceEntry.getChildren()) {
-            if (monitor.isCanceled()) {
-                return;
-            }
-            XmlEntry xmlEntry = (XmlEntry) entry;
-            buildStatusEvent(xmlEntry, monitor, start, end);
-        }
-    }
-
-    /** Build a tree using getParentId() and getId() */
-    private static void buildTree(Map<String, XmlEntry> entryMap, XmlEntry rootEntry) {
-        for (XmlEntry entry : entryMap.values()) {
-            boolean root = true;
-            if (!entry.getParentId().isEmpty()) {
-                XmlEntry parent = entryMap.get(entry.getParentId());
+            List<XmlTimeGraphEntryModel> model = response.getModel();
+            if (model != null) {
                 /*
-                 * Associate the parent entry only if their time overlap. A
-                 * child entry may start before its parent, for example at the
-                 * beginning of the trace if a parent has not yet appeared in
-                 * the state system. We just want to make sure that the entry
-                 * didn't start after the parent ended or ended before the
-                 * parent started.
+                 * Ensure that all the entries exist
                  */
-                if (parent != null &&
-                        !(entry.getStartTime() > parent.getEndTime() ||
-                                entry.getEndTime() < parent.getStartTime())) {
-                    parent.addChild(entry);
-                    root = false;
+                for (XmlTimeGraphEntryModel entry : model) {
+                    map.computeIfAbsent(entry.getId(), id -> {
+                        if (entry.getParentId() != -1) {
+                            return new TimeGraphEntry(entry);
+                        }
+                        TraceEntry traceEntry = new TraceEntry(entry, provider);
+                        addToEntryList(parentTrace, Collections.singletonList(traceEntry));
+                        setStartTime(Long.min(getStartTime(), entry.getStartTime()));
+                        setEndTime(Long.max(getEndTime(), entry.getEndTime()));
+                        return traceEntry;
+                    });
                 }
+                /*
+                 * set the correct child / parent relation
+                 */
+                for (XmlTimeGraphEntryModel entry : model) {
+                    TimeGraphEntry child = map.get(entry.getId());
+                    TimeGraphEntry parent = map.get(entry.getParentId());
+                    if (child != null && parent != null) {
+                        child.updateModel(entry);
+                        parent.addChild(child);
+                    }
+                }
+                long start = getStartTime();
+                long end = getEndTime();
+                final long resolution = Long.max(1, (end - start) / getDisplayWidth());
+                zoomEntries(map.values(), start, end, resolution, subMonitor);
             }
-            if (root) {
-                rootEntry.addChild(entry);
+            if (parentTrace.equals(getTrace())) {
+                refresh();
+            }
+            subMonitor.worked(1);
+
+            if (!complete) {
+                try {
+                    Thread.sleep(BUILD_UPDATE_TIMEOUT);
+                } catch (InterruptedException e) {
+                    Activator.logError("Failed to wait for data provider", e); //$NON-NLS-1$
+                }
             }
         }
     }
 
     @Override
-    protected List<ITimeEvent> getEventList(TimeGraphEntry entry, long startTime, long endTime, long resolution, IProgressMonitor monitor) {
-        if (!(entry instanceof XmlEntry)) {
-            return Collections.emptyList();
+    protected void zoomEntries(@NonNull Iterable<@NonNull TimeGraphEntry> entries, long zoomStartTime, long zoomEndTime,
+            long resolution, @NonNull IProgressMonitor monitor) {
+        if (resolution < 0) {
+            return;
         }
-        XmlEntry xmlEntry = (XmlEntry) entry;
-        ITmfStateSystem ssq = xmlEntry.getStateSystem();
-        final long realStart = Math.max(startTime, entry.getStartTime());
-        final long realEnd = Math.min(endTime, entry.getEndTime());
-        if (realEnd <= realStart) {
-            return null;
-        }
-        List<ITimeEvent> eventList = null;
-        int quark = xmlEntry.getDisplayQuark();
+        long zoomStart = Long.min(zoomStartTime, zoomEndTime);
+        long zoomEnd = Long.max(zoomStartTime, zoomEndTime);
+        List<@NonNull Long> times = StateSystemUtils.getTimes(zoomStart, zoomEnd, resolution);
+        Sampling sampling = new Sampling(zoomStart, zoomEnd, resolution);
+        Table<ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel>, Long, TimeGraphEntry> groupedEntries = filterGroup(entries, zoomStartTime, zoomEndTime);
+        // One unit of work per data provider
+        IProgressMonitor subMonitor = SubMonitor.convert(monitor, "XmlTimeGraphView#zoomEntries", groupedEntries.rowKeySet().size()); //$NON-NLS-1$
+        for (Entry<ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel>, Map<Long, TimeGraphEntry>> entry : groupedEntries.rowMap().entrySet()) {
+            Map<Long, TimeGraphEntry> map = entry.getValue();
+            SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(times, map.keySet());
+            TmfModelResponse<List<ITimeGraphRowModel>> fetchRowModel = entry.getKey().fetchRowModel(filter, monitor);
 
-        try {
-            if (xmlEntry.getType() == EntryDisplayType.DISPLAY) {
-
-                List<ITmfStateInterval> statusIntervals = StateSystemUtils.queryHistoryRange(ssq, quark, realStart, realEnd - 1, resolution, monitor);
-                eventList = new ArrayList<>(statusIntervals.size());
-                long lastEndTime = -1;
-                for (ITmfStateInterval statusInterval : statusIntervals) {
-                    if (monitor.isCanceled()) {
-                        return null;
+            List<ITimeGraphRowModel> model = fetchRowModel.getModel();
+            if (model != null) {
+                for (ITimeGraphRowModel rowModel : model) {
+                    if (subMonitor.isCanceled()) {
+                        return;
                     }
-                    int status = getStatusFromInterval(statusInterval);
-                    long time = statusInterval.getStartTime();
-                    long duration = statusInterval.getEndTime() - time + 1;
-                    if (!statusInterval.getStateValue().isNull()) {
-                        if (lastEndTime != time && lastEndTime != -1) {
-                            eventList.add(new TimeEvent(entry, lastEndTime, time - lastEndTime));
+                    TimeGraphEntry tgEntry = map.get(rowModel.getEntryID());
+                    if (tgEntry != null) {
+                        List<ITimeEvent> events = createTimeEvents(tgEntry, rowModel.getStates());
+                        if (Thread.currentThread() instanceof ZoomThread) {
+                            applyResults(() -> {
+                                tgEntry.setZoomedEventList(events);
+                                if (fetchRowModel.getStatus() == ITmfResponse.Status.COMPLETED) {
+                                    tgEntry.setSampling(sampling);
+                                }
+                            });
+                        } else {
+                            tgEntry.setEventList(events);
                         }
-                        eventList.add(new TimeEvent(entry, time, duration, status));
-                    } else if (lastEndTime == -1 || time + duration >= endTime) {
-                        // add null event if it intersects the start or end time
-                        eventList.add(new NullTimeEvent(entry, time, duration));
                     }
-                    lastEndTime = time + duration;
                 }
             }
-        } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException | StateSystemDisposedException e) {
-            /* Ignored */
+            subMonitor.worked(1);
         }
-        return eventList;
     }
 
-    private int getStringIndex(String stateStr) {
+    /**
+     * Filter the entries to return only TimeGraphEntry which intersect the time
+     * range and group them by data provider.
+     *
+     * @param visible
+     *            the input list of visible entries
+     * @param zoomStartTime
+     *            the leftmost time bound of the view
+     * @param zoomEndTime
+     *            the rightmost time bound of the view
+     * @return A Table of the visible entries keyed by their data provider and id.
+     */
+    private static Table<ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel>, Long, TimeGraphEntry> filterGroup(Iterable<TimeGraphEntry> visible,
+            long zoomStartTime, long zoomEndTime) {
+        Table<ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel>, Long, TimeGraphEntry> table = HashBasedTable.create();
+        for (TimeGraphEntry entry : visible) {
+            if (zoomStartTime <= entry.getEndTime() && zoomEndTime >= entry.getStartTime()) {
+                table.put(getProvider(entry), entry.getModel().getId(), entry);
+            }
+        }
+        return table;
+    }
+
+    /**
+     * Get the {@link ITimeGraphDataProvider} from a {@link TimeGraphEntry}'s
+     * parent.
+     *
+     * @param entry
+     *            queried Control Flow Entry.
+     * @return the {@link ITimeGraphDataProvider}
+     */
+    public static @NonNull ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> getProvider(TimeGraphEntry entry) {
+        ITimeGraphEntry parent = entry;
+        while (parent != null) {
+            if (parent instanceof TraceEntry) {
+                return ((TraceEntry) parent).getProvider();
+            }
+            parent = parent.getParent();
+        }
+        throw new IllegalStateException(entry + " should have a TraceEntry parent"); //$NON-NLS-1$
+    }
+
+    /**
+     * Create {@link ITimeEvent}s for an entry from the list of
+     * {@link ITimeGraphState}s, filling in the gaps.
+     *
+     * @param entry
+     *            the {@link TimeGraphEntry} on which we are working
+     * @param values
+     *            the list of {@link ITimeGraphState}s from the
+     *            {@link ThreadStatusDataProvider}.
+     * @return a contiguous List of {@link ITimeEvent}s
+     */
+    private List<ITimeEvent> createTimeEvents(TimeGraphEntry entry, List<ITimeGraphState> values) {
+        List<ITimeEvent> events = new ArrayList<>(values.size());
+        ITimeEvent prev = null;
+        for (ITimeGraphState state : values) {
+            ITimeEvent event = createTimeEvent(entry, state);
+            if (prev != null) {
+                long prevEnd = prev.getTime() + prev.getDuration();
+                if (prevEnd < event.getTime()) {
+                    // fill in the gap.
+                    events.add(new TimeEvent(entry, prevEnd, event.getTime() - prevEnd));
+                }
+            }
+            prev = event;
+            events.add(event);
+        }
+        return events;
+    }
+
+    private ITimeEvent createTimeEvent(TimeGraphEntry entry, ITimeGraphState state) {
+        String label = state.getLabel();
+        if (state.getValue() == Integer.MIN_VALUE && label != null) {
+            // String interval
+            int status = getStringIndex(label);
+
+            return new TimeEvent(entry, state.getStartTime(), state.getDuration(), status);
+        }
+        int status = (int) state.getValue();
         XmlPresentationProvider pres = getPresentationProvider();
-        Integer statusInt = fStringValueMap.get(stateStr);
+        if (label != null && !pres.hasIndex(status) && !label.equals(String.valueOf(-1))) {
+            status = getStringIndex(label);
+        }
+        return new TimeEvent(entry, state.getStartTime(), state.getDuration(), status);
+    }
+
+    private int getStringIndex(String state) {
+        XmlPresentationProvider pres = getPresentationProvider();
+        Integer statusInt = fStringValueMap.get(state);
         if (statusInt != null) {
             return statusInt;
         }
 
         // Add this new state to the presentation provider
-        int status = pres.addState(stateStr);
-        fStringValueMap.put(stateStr, status);
+        int status = pres.addState(state);
+        fStringValueMap.put(state, status);
         return status;
-
-    }
-
-    private int getStatusFromInterval(ITmfStateInterval statusInterval) {
-        ITmfStateValue stateValue = statusInterval.getStateValue();
-
-        int status = -1;
-        switch (stateValue.getType()) {
-        case INTEGER:
-        case NULL:
-        {
-            status = stateValue.unboxInt();
-            XmlPresentationProvider pres = getPresentationProvider();
-            if (!pres.hasIndex(status)) {
-                status = getStringIndex(String.valueOf(status));
-            }
-        }
-            break;
-        case LONG:
-        {
-            status = (int) stateValue.unboxLong();
-            XmlPresentationProvider pres = getPresentationProvider();
-            if (!pres.hasIndex(status)) {
-                status = getStringIndex("0x" + Long.toHexString(stateValue.unboxLong())); //$NON-NLS-1$
-            }
-        }
-            break;
-        case STRING:
-            String statusStr = stateValue.unboxStr();
-            status = getStringIndex(statusStr);
-            break;
-        case DOUBLE:
-            status = (int) stateValue.unboxDouble();
-            break;
-        case CUSTOM:
-        default:
-            break;
-        }
-
-        return status;
-    }
-
-    @Override
-    protected List<ILinkEvent> getLinkList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
-        /* TODO: not implemented yet, need XML to go along */
-        return Collections.emptyList();
     }
 
     @Override

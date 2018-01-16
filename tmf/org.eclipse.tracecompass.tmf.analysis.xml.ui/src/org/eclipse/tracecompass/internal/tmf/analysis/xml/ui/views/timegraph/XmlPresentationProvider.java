@@ -25,14 +25,16 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.timegraph.XmlEntry.EntryDisplayType;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlTimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.w3c.dom.Element;
 
@@ -71,10 +73,12 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
         if (event instanceof TimeEvent && ((TimeEvent) event).hasValue()) {
             TimeEvent tcEvent = (TimeEvent) event;
 
-            XmlEntry entry = (XmlEntry) event.getEntry();
+            TimeGraphEntry entry = (TimeGraphEntry) event.getEntry();
             int value = tcEvent.getValue();
 
-            if (entry.getType() == EntryDisplayType.DISPLAY) {
+            ITimeGraphEntryModel model = entry.getModel();
+            if (model instanceof XmlTimeGraphEntryModel
+                    && ((XmlTimeGraphEntryModel) model).getPath() != null) {
                 // Draw state only if state is already known
                 Integer index = stateIndex.get(value);
                 if (index != null) {
@@ -95,14 +99,13 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
         if (event instanceof TimeEvent && ((TimeEvent) event).hasValue()) {
             TimeEvent tcEvent = (TimeEvent) event;
 
-            XmlEntry entry = (XmlEntry) event.getEntry();
+            XmlTimeGraphEntryModel model = (XmlTimeGraphEntryModel) ((TimeGraphEntry) event.getEntry()).getModel();
             int value = tcEvent.getValue();
 
-            if (entry.getType() == EntryDisplayType.DISPLAY) {
+            if (model.getPath() != null) {
                 Integer index = stateIndex.get(value);
                 if (index != null) {
-                    String rgb = stateValues.get(index.intValue()).getStateString();
-                    return rgb;
+                    return stateValues.get(index.intValue()).getStateString();
                 }
             }
             return null;
@@ -116,13 +119,13 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
          * TODO: Add the XML elements to support adding extra information in the
          * tooltips and implement this
          */
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     @Override
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
         // Is there text to show
-        XmlEntry entry = (XmlEntry) event.getEntry();
+        XmlTimeGraphEntryModel entry = (XmlTimeGraphEntryModel) ((TimeGraphEntry) event.getEntry()).getModel();
         if (!entry.showText()) {
             return;
         }
@@ -190,12 +193,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
             value++;
         }
         addOrUpdateState(value, name, ""); //$NON-NLS-1$
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                fireColorSettingsChanged();
-            }
-        });
+        Display.getDefault().asyncExec(this::fireColorSettingsChanged);
         return value;
     }
 

@@ -16,6 +16,8 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.TmfTimeGraphCompositeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
@@ -27,6 +29,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.w3c.dom.Element;
 
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Table;
 
 /**
@@ -44,6 +47,7 @@ public class XmlDataProviderManager {
 
     private static final String ID_ATTRIBUTE = "id"; //$NON-NLS-1$
     private final Table<ITmfTrace, String, ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel>> fXyProviders = HashBasedTable.create();
+    private final Table<ITmfTrace, String, ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel>> fTimeGraphProviders = HashBasedTable.create();
 
     /**
      * Get the instance of the manager
@@ -67,6 +71,7 @@ public class XmlDataProviderManager {
         if (manager != null) {
             TmfSignalManager.deregister(manager);
             manager.fXyProviders.clear();
+            manager.fTimeGraphProviders.clear();
         }
         INSTANCE = null;
     }
@@ -97,31 +102,30 @@ public class XmlDataProviderManager {
         if (provider != null) {
             return provider;
         }
-        for (ITmfTrace opened : TmfTraceManager.getInstance().getOpenedTraces()) {
-            if (TmfTraceManager.getTraceSetWithExperiment(opened).contains(trace)) {
-                /* if this trace or an experiment containing this trace is opened */
-                Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
-                if (traces.size() == 1) {
-                    Set<@NonNull String> analysisIds = TmfXmlUtils.getViewAnalysisIds(viewElement);
-                    Element entry = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.ENTRY_ELEMENT).get(0);
+        if (Iterables.any(TmfTraceManager.getInstance().getOpenedTraces(),
+                opened -> TmfTraceManager.getTraceSetWithExperiment(opened).contains(trace))) {
+            /* if this trace or an experiment containing this trace is opened */
+            Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
+            if (traces.size() == 1) {
+                Set<@NonNull String> analysisIds = TmfXmlUtils.getViewAnalysisIds(viewElement);
+                Element entry = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.ENTRY_ELEMENT).get(0);
 
-                    provider = XmlXYDataProvider.create(trace, analysisIds, entry);
-                } else {
-                    provider = generateExperimentProvider(traces, viewElement);
-                }
-                if (provider != null) {
-                    fXyProviders.put(trace, viewId, provider);
-                }
-                return provider;
+                provider = XmlXYDataProvider.create(trace, analysisIds, entry);
+            } else {
+                provider = generateExperimentProviderXy(traces, viewElement);
             }
+            if (provider != null) {
+                fXyProviders.put(trace, viewId, provider);
+            }
+            return provider;
         }
         return null;
     }
 
-    private static ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel> generateExperimentProvider(Collection<ITmfTrace> traces, Element viewElement) {
-        List<ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel>> providers = new ArrayList<>();
+    private ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel> generateExperimentProviderXy(Collection<@NonNull ITmfTrace> traces, @NonNull Element viewElement) {
+        List<@NonNull ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel>> providers = new ArrayList<>();
         for (ITmfTrace child : traces) {
-            ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel> childProvider = getInstance().getXyProvider(child, viewElement);
+            ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel> childProvider = getXyProvider(child, viewElement);
             if (childProvider != null) {
                 providers.add(childProvider);
             }
@@ -135,6 +139,60 @@ public class XmlDataProviderManager {
     }
 
     /**
+     * Create (if necessary) and get the {@link XmlXYDataProvider} for the specified
+     * trace and viewElement.
+     *
+     * @param trace
+     *            trace for which we are querying a provider
+     * @param viewElement
+     *            the XML XY view for which we are querying a provider
+     * @return the unique instance of an XY provider for the queried parameters
+     * @since 2.5
+     */
+    public synchronized ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> getTimeGraphProvider(@NonNull ITmfTrace trace, @NonNull Element viewElement) {
+        if (!viewElement.hasAttribute(ID_ATTRIBUTE)) {
+            return null;
+        }
+        String viewId = viewElement.getAttribute(ID_ATTRIBUTE);
+        ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> provider = fTimeGraphProviders.get(trace, viewId);
+        if (provider != null) {
+            return provider;
+        }
+
+        if (Iterables.any(TmfTraceManager.getInstance().getOpenedTraces(),
+                opened -> TmfTraceManager.getTraceSetWithExperiment(opened).contains(trace))) {
+            /* if this trace or an experiment containing this trace is opened */
+            Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
+            if (traces.size() == 1) {
+                provider = XmlTimeGraphDataProvider.create(trace, viewElement);
+            } else {
+                provider = generateExperimentProviderTimeGraph(traces, viewElement);
+            }
+            if (provider != null) {
+                fTimeGraphProviders.put(trace, viewId, provider);
+            }
+            return provider;
+        }
+        return null;
+    }
+
+    private ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> generateExperimentProviderTimeGraph(Collection<@NonNull ITmfTrace> traces, @NonNull Element viewElement) {
+        List<@NonNull ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel>> providers = new ArrayList<>();
+        for (ITmfTrace child : traces) {
+            ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> childProvider = getTimeGraphProvider(child, viewElement);
+            if (childProvider != null) {
+                providers.add(childProvider);
+            }
+        }
+        if (providers.isEmpty()) {
+            return null;
+        } else if (providers.size() == 1) {
+            return providers.get(0);
+        }
+        return new TmfTimeGraphCompositeDataProvider<>(providers, XmlTimeGraphDataProvider.ID);
+    }
+
+    /**
      * Signal handler for the traceClosed signal.
      *
      * @param signal
@@ -145,6 +203,7 @@ public class XmlDataProviderManager {
     public synchronized void traceClosed(final TmfTraceClosedSignal signal) {
         for (ITmfTrace trace : TmfTraceManager.getTraceSetWithExperiment(signal.getTrace())) {
             fXyProviders.row(trace).clear();
+            fTimeGraphProviders.row(trace).clear();
         }
     }
 }
