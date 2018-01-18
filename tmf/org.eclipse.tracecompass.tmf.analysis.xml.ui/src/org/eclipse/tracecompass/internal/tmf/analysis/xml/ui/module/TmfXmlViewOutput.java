@@ -12,19 +12,15 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module;
 
-import java.util.List;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module.TmfXmlAnalysisOutputSource.ViewType;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.w3c.dom.Element;
 
 /**
  * Class overriding the default analysis view output for XML views. These views
@@ -39,7 +35,6 @@ import org.w3c.dom.Element;
 public class TmfXmlViewOutput extends TmfAnalysisViewOutput {
 
     private String fLabel = null;
-    private final @NonNull ViewType fViewType;
 
     /**
      * Constructor
@@ -61,7 +56,6 @@ public class TmfXmlViewOutput extends TmfAnalysisViewOutput {
      */
     public TmfXmlViewOutput(String viewid, @NonNull ViewType viewType) {
         super(viewid);
-        fViewType = viewType;
     }
 
     @Override
@@ -86,26 +80,13 @@ public class TmfXmlViewOutput extends TmfAnalysisViewOutput {
         /* Find the label of the view */
         if (key.equals(TmfXmlStrings.XML_OUTPUT_DATA)) {
             String[] idFile = value.split(TmfXmlAnalysisOutputSource.DATA_SEPARATOR);
-            String viewId = (idFile.length > 0) ? idFile[0] : null;
-            String filePath = (idFile.length > 1) ? idFile[1] : null;
-            if ((viewId == null) || (filePath == null)) {
-                return;
-            }
-            Element viewElement = TmfXmlUtils.getElementInFile(filePath, fViewType.getXmlElem(), viewId);
-            if (viewElement == null) {
-                return;
-            }
-            List<Element> heads = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.HEAD);
-            if (heads.size() != 1) {
-                return;
-            }
-            Element headElement = heads.get(0);
-            List<Element> label = TmfXmlUtils.getChildElements(headElement, TmfXmlStrings.LABEL);
+            String label = (idFile.length > 2) ? idFile[2] : ""; //$NON-NLS-1$
+
             if (label.isEmpty()) {
                 return;
             }
-            Element labelElement = label.get(0);
-            fLabel = labelElement.getAttribute(TmfXmlStrings.VALUE);
+
+            fLabel = label;
         }
     }
 }

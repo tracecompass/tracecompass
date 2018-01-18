@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlDataProviderManager;
 import org.osgi.framework.BundleContext;
 
@@ -42,12 +43,14 @@ public class Activator extends Plugin {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         setDefault(this);
+        XmlUtils.initOutputElements();
     }
 
     @Override
     public void stop(BundleContext context) throws Exception {
         setDefault(null);
         XmlDataProviderManager.dispose();
+        XmlUtils.clearOutputElements();
         super.stop(context);
     }
 
@@ -111,8 +114,8 @@ public class Activator extends Plugin {
     // ------------------------------------------------------------------------
 
     /**
-     * Logs a message and exception with severity WARNING in the runtime log of
-     * the plug-in.
+     * Logs a message and exception with severity WARNING in the runtime log of the
+     * plug-in.
      *
      * @param message
      *            A message to log
@@ -122,8 +125,8 @@ public class Activator extends Plugin {
     }
 
     /**
-     * Logs a message and exception with severity WARNING in the runtime log of
-     * the plug-in.
+     * Logs a message and exception with severity WARNING in the runtime log of the
+     * plug-in.
      *
      * @param message
      *            A message to log
@@ -139,8 +142,8 @@ public class Activator extends Plugin {
     // ------------------------------------------------------------------------
 
     /**
-     * Logs a message and exception with severity ERROR in the runtime log of
-     * the plug-in.
+     * Logs a message and exception with severity ERROR in the runtime log of the
+     * plug-in.
      *
      * @param message
      *            A message to log
@@ -150,8 +153,8 @@ public class Activator extends Plugin {
     }
 
     /**
-     * Logs a message and exception with severity ERROR in the runtime log of
-     * the plug-in.
+     * Logs a message and exception with severity ERROR in the runtime log of the
+     * plug-in.
      *
      * @param message
      *            A message to log
@@ -161,5 +164,4 @@ public class Activator extends Plugin {
     public static void logError(String message, Throwable exception) {
         fPlugin.getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, exception));
     }
-
 }

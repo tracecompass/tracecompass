@@ -12,18 +12,12 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.module;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.Collection;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlOutputElement;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternDensityView;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternLatencyTableView;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternScatterGraphView;
@@ -31,15 +25,13 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.Patte
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.timegraph.XmlTimeGraphView;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.xychart.XmlXYView;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisOutput;
 import org.eclipse.tracecompass.tmf.core.analysis.ITmfNewAnalysisModuleListener;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 
 /**
  * This class searches all XML files to find outputs applicable to the newly
@@ -60,17 +52,17 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
         /**
          * Time graph view element
          */
-        TIME_GRAPH_VIEW(TmfXmlStrings.TIME_GRAPH_VIEW, XmlTimeGraphView.ID),
+        TIME_GRAPH_VIEW(XmlUtils.OutputType.TIME_GRAPH, XmlTimeGraphView.ID),
         /**
          * XY chart view element
          */
-        XY_VIEW(TmfXmlStrings.XY_VIEW, XmlXYView.ID);
+        XY_VIEW(XmlUtils.OutputType.XY, XmlXYView.ID);
 
-        private final @NonNull String fXmlElem;
+        private final XmlUtils.OutputType fOutputType;
         private final String fViewId;
 
-        private ViewType(@NonNull String xmlElem, String viewId) {
-            fXmlElem = xmlElem;
+        private ViewType(XmlUtils.OutputType outputType, String viewId) {
+            fOutputType = outputType;
             fViewId = viewId;
         }
 
@@ -80,7 +72,7 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
          * @return The XML element corresponding to this type
          */
         public @NonNull String getXmlElem() {
-            return fXmlElem;
+            return fOutputType.getXmlElem();
         }
 
         private String getViewId() {
@@ -144,63 +136,32 @@ public class TmfXmlAnalysisOutputSource implements ITmfNewAnalysisModuleListener
 
     @Override
     public void moduleCreated(IAnalysisModule module) {
-        // Get all the XML files, builtin and not builtin
-        Set<File> files = XmlUtils.listBuiltinFiles().values().stream()
-                .map(p -> p.toFile())
-                .collect(Collectors.toSet());
-        XmlUtils.listFiles().values().stream()
-                .forEach(f -> files.add(f));
 
-        for (File xmlFile : files) {
-            if (!XmlUtils.xmlValidate(xmlFile).isOK()) {
-                continue;
-            }
+        if (module instanceof ITmfAnalysisModuleWithStateSystems) {
+            Multimap<String, XmlOutputElement> outputs = XmlUtils.getXmlOutputElements();
+            for (Collection<XmlOutputElement> elements : outputs.asMap().values()) {
+                for (ViewType viewType : ViewType.values()) {
+                    Iterable<XmlOutputElement> filteredElements = Iterables.filter(elements, element -> (element.getXmlElem().equals(viewType.getXmlElem()) && element.getAnalyses().contains(module.getId())));
+                    String viewId = viewType.getViewId();
 
-            try {
-                Document doc = XmlUtils.getDocumentFromFile(xmlFile);
-
-                /* get state provider views if the analysis has state systems */
-                if (module instanceof ITmfAnalysisModuleWithStateSystems) {
-                    for (ViewType viewType : ViewType.values()) {
-                        NodeList ssViewNodes = doc.getElementsByTagName(viewType.getXmlElem());
-                        for (int i = 0; i < ssViewNodes.getLength(); i++) {
-                            Element node = (Element) ssViewNodes.item(i);
-
-                            /* Check if analysis is the right one */
-                            List<Element> headNodes = TmfXmlUtils.getChildElements(node, TmfXmlStrings.HEAD);
-                            if (headNodes.size() != 1) {
-                                continue;
-                            }
-
-                            List<Element> analysisNodes = TmfXmlUtils.getChildElements(headNodes.get(0), TmfXmlStrings.ANALYSIS);
-                            for (Element analysis : analysisNodes) {
-                                String analysisId = analysis.getAttribute(TmfXmlStrings.ID);
-                                if (analysisId.equals(module.getId())) {
-                                    String viewId = viewType.getViewId();
-                                    IAnalysisOutput output = new TmfXmlViewOutput(viewId, viewType);
-                                    output.setOutputProperty(TmfXmlStrings.XML_OUTPUT_DATA, node.getAttribute(TmfXmlStrings.ID) + DATA_SEPARATOR + xmlFile.getAbsolutePath(), false);
-                                    module.registerOutput(output);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Add the latency views for pattern analysis
-                if (module instanceof XmlPatternAnalysis) {
-                    for (LatencyViewType viewType : LatencyViewType.values()) {
-                        String viewLabelPrefix = ((XmlPatternAnalysis) module).getViewLabelPrefix();
-                        String label = viewLabelPrefix.isEmpty() ? viewType.getLabel() : viewType.getLabel().replaceFirst(LATENCY_STRING, viewLabelPrefix);
-                        IAnalysisOutput output = new TmfXmlLatencyViewOutput(viewType.getViewId(), label);
-                        output.setOutputProperty(TmfXmlStrings.XML_LATENCY_OUTPUT_DATA, module.getId() + DATA_SEPARATOR + output.getName(), false);
+                    for (XmlOutputElement element : filteredElements) {
+                        IAnalysisOutput output = new TmfXmlViewOutput(viewId, viewType);
+                        output.setOutputProperty(TmfXmlStrings.XML_OUTPUT_DATA, element.getId() + DATA_SEPARATOR + element.getPath() + DATA_SEPARATOR + element.getLabel(), false);
                         module.registerOutput(output);
                     }
                 }
+            }
+        }
 
-            } catch (ParserConfigurationException | SAXException | IOException e) {
-                Activator.logError("Error opening XML file", e); //$NON-NLS-1$
+        // Add the latency views for pattern analysis
+        if (module instanceof XmlPatternAnalysis) {
+            for (LatencyViewType viewType : LatencyViewType.values()) {
+                String viewLabelPrefix = ((XmlPatternAnalysis) module).getViewLabelPrefix();
+                String label = viewLabelPrefix.isEmpty() ? viewType.getLabel() : viewType.getLabel().replaceFirst(LATENCY_STRING, viewLabelPrefix);
+                IAnalysisOutput output = new TmfXmlLatencyViewOutput(viewType.getViewId(), label);
+                output.setOutputProperty(TmfXmlStrings.XML_LATENCY_OUTPUT_DATA, module.getId() + DATA_SEPARATOR + output.getName(), false);
+                module.registerOutput(output);
             }
         }
     }
-
 }

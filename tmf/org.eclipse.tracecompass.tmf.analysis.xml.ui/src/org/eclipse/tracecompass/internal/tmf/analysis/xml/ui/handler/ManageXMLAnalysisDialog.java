@@ -293,6 +293,8 @@ public class ManageXMLAnalysisDialog extends Dialog {
             deleteSupplementaryFile(file.getName());
             if (addFile) {
                 status = XmlUtils.addXmlFile(file);
+            } else {
+                XmlUtils.updateXmlFile(file);
             }
             if (status.isOK()) {
                 XmlAnalysisModuleSource.notifyModuleChange();

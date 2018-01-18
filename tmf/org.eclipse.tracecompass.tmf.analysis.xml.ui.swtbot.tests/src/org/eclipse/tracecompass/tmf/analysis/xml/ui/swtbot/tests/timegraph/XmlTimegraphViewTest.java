@@ -79,6 +79,7 @@ public class XmlTimegraphViewTest {
     private static void loadXmlFile() {
         XmlUtils.addXmlFile(TmfXmlTestFiles.CONDITION_FILE.getFile());
         XmlUtils.addXmlFile(TmfXmlTestFiles.VALID_TIMEGRAPH_VIEW_ELEMENT_FILE.getFile());
+
         XmlAnalysisModuleSource.notifyModuleChange();
     }
 

@@ -25,8 +25,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -64,6 +67,10 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
+
 /**
  * Class containing some utilities for the XML plug-in packages: for example, it
  * manages the XML files and validates them
@@ -71,6 +78,35 @@ import org.xml.sax.SAXParseException;
  * @author Geneviève Bastien
  */
 public class XmlUtils {
+
+    /**
+     * Enum to match the name of an output's XML element to its output ID.
+     */
+    public static enum OutputType {
+        /**
+         * Time graph output element
+         */
+        TIME_GRAPH(TmfXmlStrings.TIME_GRAPH_VIEW),
+        /**
+         * XY chart output element
+         */
+        XY(TmfXmlStrings.XY_VIEW);
+
+        private final @NonNull String fXmlElem;
+
+        private OutputType(@NonNull String xmlElem) {
+            fXmlElem = xmlElem;
+        }
+
+        /**
+         * Get the XML element corresponding to this output type
+         *
+         * @return The XML element corresponding to this type
+         */
+        public @NonNull String getXmlElem() {
+            return fXmlElem;
+        }
+    }
 
     /** Sub-directory of the plug-in where XML files are stored */
     private static final String XML_DIRECTORY = "xml_files"; //$NON-NLS-1$
@@ -89,6 +125,8 @@ public class XmlUtils {
     private static final String XSD_FILE_ATTRIB = "file"; //$NON-NLS-1$
     private static final String XSD_SCHEMA_PARSER_ELEMENT = "schemaParser"; //$NON-NLS-1$
     private static final String XSD_PARSER_CLASS_ATTRIB = "class"; //$NON-NLS-1$
+    private static final @NonNull Multimap<String, XmlOutputElement> XML_OUTPUT_ELEMENTS = HashMultimap.create();
+    private static Multimap<String, XmlOutputElement> fCachedOutputElement;
 
     /**
      * Extension for XML files
@@ -194,7 +232,13 @@ public class XmlUtils {
         /* Copy file to path */
         File toFile = getXmlFilesPath().addTrailingSeparator().append(fromFile.getName()).toFile();
 
-        return copyXmlFile(fromFile, toFile);
+        IStatus status = copyXmlFile(fromFile, toFile);
+
+        if (status.isOK()) {
+            preloadXmlAnalysesOutput(toFile);
+        }
+
+        return status;
     }
 
     /**
@@ -320,6 +364,7 @@ public class XmlUtils {
         if (file == null) {
             return;
         }
+        removeXmlOutput(file.getAbsolutePath());
         file.delete();
     }
 
@@ -441,4 +486,123 @@ public class XmlUtils {
         return childElements;
     }
 
+    /**
+     * preload all the xml analyses output for the existing xml files
+     */
+    public static void initOutputElements() {
+        // Get all the xml files, builtin and not builtin
+        Set<File> files = listBuiltinFiles().values().stream()
+                .map(p -> p.toFile())
+                .collect(Collectors.toSet());
+        listFiles().values().stream()
+                .forEach(f -> files.add(f));
+
+        for (File xmlFile : files) {
+            preloadXmlAnalysesOutput(xmlFile);
+        }
+    }
+
+    /**
+     * Preload the xml analyses file output data
+     *
+     * @param file
+     *            The xml file
+     */
+    public static void updateXmlFile(File file) {
+        preloadXmlAnalysesOutput(file);
+    }
+
+    /**
+     * preload all the xml analyses output in the given file.
+     *
+     * @param xmlFile
+     *            The xml file
+     */
+    private static void preloadXmlAnalysesOutput(File xmlFile) {
+
+        if (!xmlValidate(xmlFile).isOK()) {
+            return;
+        }
+
+        removeXmlOutput(xmlFile.getAbsolutePath());
+        try {
+            Document doc = XmlUtils.getDocumentFromFile(xmlFile);
+
+                for (OutputType outputType : OutputType.values()) {
+                    NodeList outputNodes = doc.getElementsByTagName(outputType.getXmlElem());
+                    for (int i = 0; i < outputNodes.getLength(); i++) {
+                        Set<String> analysesId = new HashSet<>();
+                        Element node = (Element) outputNodes.item(i);
+
+                        /* Check if analysis is the right one */
+                        List<Element> headNodes = TmfXmlUtils.getChildElements(node, TmfXmlStrings.HEAD);
+                        if (headNodes.size() != 1) {
+                            return;
+                        }
+
+                        Element headElement = headNodes.get(0);
+                        List<Element> analysisNodes = TmfXmlUtils.getChildElements(headElement, TmfXmlStrings.ANALYSIS);
+                        for (Element analysis : analysisNodes) {
+                            String analysisId = analysis.getAttribute(TmfXmlStrings.ID);
+                            analysesId.add(analysisId);
+                        }
+                        String outputId = node.getAttribute(TmfXmlStrings.ID);
+
+                        List<Element> label = TmfXmlUtils.getChildElements(headNodes.get(0), TmfXmlStrings.LABEL);
+                        if (label.isEmpty()) {
+                            return;
+                        }
+                        Element labelElement = label.get(0);
+                        String outputLabel = labelElement.getAttribute(TmfXmlStrings.VALUE);
+
+                        XmlOutputElement output = new XmlOutputElement(xmlFile.getAbsolutePath(), outputType.getXmlElem(), outputId, outputLabel, analysesId);
+                        addXmlOutput(output);
+                    }
+                }
+                updateCachedOuputElements();
+
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            Activator.logError("Error opening XML file", e); //$NON-NLS-1$
+        }
+    }
+
+    private static void updateCachedOuputElements() {
+        fCachedOutputElement = ImmutableMultimap.copyOf(XML_OUTPUT_ELEMENTS);
+    }
+
+    /**
+     * Update or add new xml output
+     *
+     * @param output
+     *            the output
+     */
+    private static void addXmlOutput(XmlOutputElement output) {
+        XML_OUTPUT_ELEMENTS.put(output.getPath(), output);
+    }
+
+    /**
+     * Remove all the ouput for the specific xml file
+     *
+     * @param path
+     *            The xml file path
+     */
+    private static void removeXmlOutput(String path) {
+        XML_OUTPUT_ELEMENTS.removeAll(path);
+    }
+
+    /**
+     * Clear all the preloaded xml output elements
+     */
+    public static void clearOutputElements() {
+        XML_OUTPUT_ELEMENTS.clear();
+    }
+
+    /**
+     * Get all the xml output element
+     *
+     * @return A table of xml output elements
+     */
+    public static Multimap<String, XmlOutputElement> getXmlOutputElements() {
+        return fCachedOutputElement;
+    }
 }
