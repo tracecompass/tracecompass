@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.core.runtime.ContributorFactoryOSGi;
@@ -49,6 +50,7 @@ import org.osgi.framework.Bundle;
  */
 public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelper {
 
+    /** Note: This comparator is not symmetric so it cannot be used by regular sorting algorithms */
     private static final @NonNull Comparator<@NonNull ApplicableClass> APPLICABLE_CLASS_COMPARATOR = new Comparator<@NonNull ApplicableClass>() {
 
         @Override
@@ -182,8 +184,29 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
             }
         });
         List<ApplicableClass> applicableClasses = new ArrayList<>(classMap.values());
-        applicableClasses.sort(APPLICABLE_CLASS_COMPARATOR);
-        return applicableClasses;
+        return sortApplicableClasses(applicableClasses);
+    }
+
+    private static List<ApplicableClass> sortApplicableClasses(List<ApplicableClass> applicableClasses) {
+        if (applicableClasses.size() == 0) {
+            return Collections.emptyList();
+        }
+        List<ApplicableClass> sorted = new ArrayList<>(applicableClasses.size());
+        sorted.add(applicableClasses.get(0));
+        for (int i = 1; i < applicableClasses.size(); i++) {
+            int pos = i;
+            ApplicableClass current = applicableClasses.get(i);
+            for (int j = 0; j < sorted.size(); j++) {
+                int cmp = APPLICABLE_CLASS_COMPARATOR.compare(Objects.requireNonNull(current), Objects.requireNonNull(sorted.get(j)));
+                if (cmp < 0) {
+                    pos = j;
+                } else if (cmp > 0) {
+                    pos = j + 1;
+                }
+            }
+            sorted.add(pos, current);
+        }
+        return sorted;
     }
 
     private static ApplicableClass parseTraceTypeElement(IConfigurationElement element) {
@@ -214,11 +237,13 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
         return applicableClasses;
     }
 
-    private boolean appliesToTraceClass(Class<? extends ITmfTrace> traceclass) {
-        boolean applies = false;
+    private @Nullable Boolean appliesToTraceClass(Class<? extends ITmfTrace> traceclass) {
+        Boolean applies = null;
         for (ApplicableClass clazz : getApplicableClasses()) {
             if (clazz.fApplies) {
-                applies |= clazz.fClass.isAssignableFrom(traceclass);
+                if (clazz.fClass.isAssignableFrom(traceclass)) {
+                    applies = true;
+                }
             } else {
                 /*
                  * If the trace type does not apply, reset the applies variable to false
@@ -233,13 +258,13 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
 
     @Override
     public boolean appliesToTraceType(Class<? extends ITmfTrace> traceclass) {
-        boolean applies = appliesToTraceClass(traceclass);
+        Boolean applies = appliesToTraceClass(traceclass);
 
         /* Check if it applies to an experiment */
-        if (!applies && TmfExperiment.class.isAssignableFrom(traceclass)) {
-            applies = appliesToExperiment();
+        if (applies == null && TmfExperiment.class.isAssignableFrom(traceclass)) {
+            return appliesToExperiment();
         }
-        return applies;
+        return applies == null ? false : applies;
     }
 
     @Override
@@ -287,21 +312,21 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
     public IAnalysisModule newModule(ITmfTrace trace) throws TmfAnalysisException {
 
         /* Check if it applies to trace itself */
-        boolean applies = appliesToTraceClass(trace.getClass());
+        Boolean applies = appliesToTraceClass(trace.getClass());
         /*
          * If the trace is an experiment, check if this module would apply to an
          * experiment should it apply to one of its traces.
          */
-        if (!applies && (trace instanceof TmfExperiment) && appliesToExperiment()) {
+        if (applies == null && (trace instanceof TmfExperiment) && appliesToExperiment()) {
             for (ITmfTrace expTrace : TmfTraceManager.getTraceSet(trace)) {
-                if (appliesToTraceClass(expTrace.getClass())) {
+                if (appliesToTraceClass(expTrace.getClass()) == Boolean.TRUE) {
                     applies = true;
                     break;
                 }
             }
         }
 
-        if (!applies) {
+        if (applies != Boolean.TRUE) {
             return null;
         }
 

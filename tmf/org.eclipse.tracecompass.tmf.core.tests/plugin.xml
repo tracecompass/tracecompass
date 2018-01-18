@@ -89,6 +89,7 @@
       <module
             analysis_module="org.eclipse.tracecompass.tmf.tests.stubs.analysis.TestAnalysis"
             automatic="true"
+            applies_experiment="true"
             id="org.eclipse.linuxtools.tmf.core.tests.analysis.testtracetype"
             name="Test Trace Type analysis">
          <tracetype
@@ -113,6 +114,11 @@
       <tracetype
             applies="false"
             class="org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub"
+            id="org.eclipse.linuxtools.tmf.core.tests.analysis.testtracetype">
+      </tracetype>
+      <tracetype
+            applies="false"
+            class="org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment"
             id="org.eclipse.linuxtools.tmf.core.tests.analysis.testtracetype">
       </tracetype>
    </extension>
