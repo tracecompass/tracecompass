@@ -261,6 +261,15 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                     }
                     // Create project directory in shadow project
                     TmfProjectElement.createFolderStructure(project, shadowProject);
+
+                    // If the traces or experiment or supplementary folder is null
+                    // then refresh children to make sure that the created folder(s) are
+                    // available
+                    TmfProjectElement tmfProject = TmfProjectRegistry.getProject(project, false);
+                    if ((tmfProject != null) &&
+                            ((tmfProject.getTracesFolder() == null) || (tmfProject.getExperimentsFolder() == null) || (tmfProject.getSupplementaryFolder() == null))) {
+                        tmfProject.refreshChildren();
+                    }
                 }
             }
         };
