@@ -350,7 +350,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                             // Handle resource change in the relevant project
                             Set<IResource> resourcesToRefresh = new HashSet<>();
                             Map<IResource, Integer> resourceFlags = new HashMap<>();
-                            event.getDelta().accept(visited -> {
+                            delta.accept(visited -> {
                                 resourceFlags.put(visited.getResource(), visited.getFlags());
                                 if ((visited.getFlags() & (IResourceDelta.CONTENT | IResourceDelta.LOCAL_CHANGED)) != 0) {
                                     // visited resource content has changed, refresh it
