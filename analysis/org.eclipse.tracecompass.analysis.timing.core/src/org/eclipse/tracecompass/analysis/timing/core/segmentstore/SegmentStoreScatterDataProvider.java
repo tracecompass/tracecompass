@@ -52,22 +52,18 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
 
     private final ISegmentStoreProvider fProvider;
 
-    /**
-     * We check that this field is different to 0 in {@link #fetchXY} method to
-     * avoid dividing by 0. TODO : should this be a double?
-     */
-    private long fPixelSize = -1;
-
     private class SegmentStoreIterator implements Iterator<@NonNull ISegment> {
 
         private @Nullable ISegment fLast = null;
         private @Nullable ISegment fNext = null;
         private final Iterator<@NonNull ISegment> fIterator;
         private final long fStartTime;
+        private final long fPixelSize;
 
-        public SegmentStoreIterator(long startTime, Iterable<@NonNull ISegment> iterableToCompact) {
+        public SegmentStoreIterator(long startTime, Iterable<@NonNull ISegment> iterableToCompact, long pixelSize) {
             fStartTime = startTime;
             fIterator = Objects.requireNonNull(iterableToCompact.iterator());
+            fPixelSize = Math.max(1, pixelSize);
         }
 
         @Override
@@ -163,25 +159,26 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
 
     @Override
     public TmfModelResponse<ITmfCommonXAxisModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        ISegmentStoreProvider provider = fProvider;
 
-        if (!(fProvider instanceof IAnalysisModule)) {
+        if (!(provider instanceof IAnalysisModule)) {
             return TmfCommonXAxisResponseFactory.createFailedResponse(Messages.SegmentStoreDataProvider_SegmentMustBeAnIAnalysisModule);
         }
 
-        if (!(((IAnalysisModule) fProvider).waitForCompletion())) {
+        if (!(((IAnalysisModule) provider).waitForCompletion())) {
             return TmfCommonXAxisResponseFactory.createFailedResponse(CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
         }
 
-        final ISegmentStore<ISegment> segStore = fProvider.getSegmentStore();
+        final ISegmentStore<ISegment> segStore = provider.getSegmentStore();
         if (segStore == null) {
             return TmfCommonXAxisResponseFactory.createFailedResponse(Messages.SegmentStoreDataProvider_SegmentNotAvailable);
         }
 
         long start = filter.getStart();
         long end = filter.getEnd();
-        fPixelSize = Math.max(1, (end - start) / filter.getTimesRequested().length);
+        long pixelSize = Math.max(1, (end - start) / filter.getTimesRequested().length);
         final Iterable<ISegment> intersectingElements = segStore.getIntersectingElements(start, end, SegmentComparators.INTERVAL_START_COMPARATOR);
-        final Iterable<ISegment> displayData = compactList(start, intersectingElements);
+        final Iterable<ISegment> displayData = compactList(start, intersectingElements, pixelSize);
 
         List<Long> xSeries = new ArrayList<>();
         List<Double> yValues = new ArrayList<>();
@@ -200,7 +197,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         return TmfCommonXAxisResponseFactory.create(Objects.requireNonNull(Messages.SegmentStoreScatterGraphViewer_title), Objects.requireNonNull(Longs.toArray(xSeries)), ySeries, true);
     }
 
-    private Iterable<ISegment> compactList(final long startTime, final Iterable<@NonNull ISegment> iterableToCompact) {
-        return () -> new SegmentStoreIterator(startTime, iterableToCompact);
+    private Iterable<ISegment> compactList(final long startTime, final Iterable<@NonNull ISegment> iterableToCompact, long pixelSize) {
+        return () -> new SegmentStoreIterator(startTime, iterableToCompact, pixelSize);
     }
 }

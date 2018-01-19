@@ -12,6 +12,7 @@
 package org.eclipse.tracecompass.tmf.ui.views;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IStatusLineManager;
@@ -28,15 +29,21 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Sash;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
+import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
+import org.eclipse.ui.IWorkbenchActionConstants;
 
 /**
  * Base class to be used with a chart viewer {@link TmfXYChartViewer}.
@@ -46,7 +53,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
  * @author Bernd Hufmann
  * @author Mikael Ferland
  */
-public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, ITimeReset {
+public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, ITimeReset, ITmfPinnable, ITmfAllowMultiple {
 
     private static final int[] DEFAULT_WEIGHTS = {1, 3};
 
@@ -55,13 +62,13 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
     // ------------------------------------------------------------------------
     /** The TMF XY Chart reference */
     private TmfXYChartViewer fChartViewer;
-    /** The Trace reference */
-    private ITmfTrace fTrace;
     /** A composite that allows us to add margins */
     private Composite fXYViewerContainer;
     private TmfViewer fTmfViewer;
     private SashForm fSashForm;
     private Listener fSashDragListener;
+    /** The original view title */
+    private String fOriginalTabLabel;
 
     private final Action fResetScaleAction = ResetUtil.createResetAction(this);
 
@@ -129,9 +136,15 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
      * Returns the ITmfTrace implementation
      *
      * @return the ITmfTrace implementation {@link ITmfTrace}
+     * @since 3.3
      */
-    protected ITmfTrace getTrace() {
-        return fTrace;
+    @Override
+    public ITmfTrace getTrace() {
+        TmfXYChartViewer chartViewer = getChartViewer();
+        if (chartViewer != null) {
+            return chartViewer.getTrace();
+        }
+        return null;
     }
 
     /**
@@ -139,9 +152,11 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
      *
      * @param trace
      *            The ITmfTrace implementation {@link ITmfTrace}
+     * @deprecated
+     *            This method will be removed
      */
+    @Deprecated
     protected void setTrace(ITmfTrace trace) {
-        fTrace = trace;
     }
 
     // ------------------------------------------------------------------------
@@ -195,15 +210,16 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
             }
         });
         fSashForm.setWeights(DEFAULT_WEIGHTS);
-        getViewSite().getActionBars().getToolBarManager().add(fResetScaleAction);
+        getViewSite().getActionBars().getToolBarManager().appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fResetScaleAction);
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         if (trace != null) {
-            setTrace(trace);
             loadTrace();
         }
 
         IStatusLineManager statusLineManager = getViewSite().getActionBars().getStatusLineManager();
         fChartViewer.setStatusLineManager(statusLineManager);
+
+        fOriginalTabLabel = getPartName();
     }
 
     @Override
@@ -233,8 +249,18 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
      * Load the trace into view.
      */
     protected void loadTrace() {
-        if (fChartViewer != null) {
-            fChartViewer.loadTrace(fTrace);
+        // Initialize the tree viewer with the currently selected trace
+        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
+        if (trace != null) {
+            TmfTraceSelectedSignal signal = new TmfTraceSelectedSignal(this, trace);
+            TmfViewer leftViewer = getLeftChildViewer();
+            if (leftViewer instanceof TmfTimeViewer) {
+                ((TmfTimeViewer) leftViewer).traceSelected(signal);
+            }
+            TmfXYChartViewer chartViewer = getChartViewer();
+            if (chartViewer != null) {
+                chartViewer.traceSelected(signal);
+            }
         }
     }
 
@@ -300,11 +326,40 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
 
     @Override
     public void resetStartFinishTime(boolean notify) {
-        TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, TmfTimeRange.ETERNITY);
+        TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, TmfTimeRange.ETERNITY, getTrace());
         if (notify) {
             broadcast(signal);
         } else {
             getChartViewer().windowRangeUpdated(signal);
+        }
+    }
+
+    @Override
+    public void setPinned(@Nullable ITmfTrace trace) {
+
+        TmfViewer leftViewer = getLeftChildViewer();
+        if (leftViewer instanceof ITmfPinnable) {
+            ((ITmfPinnable) leftViewer).setPinned(trace);
+        }
+
+        ITmfPinnable chartViewer = getChartViewer();
+        if (chartViewer != null) {
+            chartViewer.setPinned(trace);
+        }
+
+        if (trace != null) {
+            /* Ignore relevant inbound signals */
+            TmfSignalManager.addIgnoredInboundSignal(this, TmfTraceOpenedSignal.class);
+            TmfSignalManager.addIgnoredInboundSignal(this, TmfTraceSelectedSignal.class);
+            setPartName(String.format("%s <%s>", fOriginalTabLabel, TmfTraceManager.getInstance().getTraceUniqueName(trace))); //$NON-NLS-1$
+        } else {
+            /* Handle relevant inbound signals */
+            TmfSignalManager.removeIgnoredInboundSignal(this, TmfTraceOpenedSignal.class);
+            TmfSignalManager.removeIgnoredInboundSignal(this, TmfTraceSelectedSignal.class);
+            setPartName(fOriginalTabLabel);
+        }
+        if (fPinAction != null) {
+            fPinAction.setPinnedTrace(trace);
         }
     }
 
@@ -342,4 +397,17 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
         return fChartViewer.isDirty();
     }
 
+    /**
+     * Handles the trace closed signal
+     *
+     * @param signal
+     *            the signal
+     * @since 3.3
+     */
+    @TmfSignalHandler
+    public void traceClosed(final TmfTraceClosedSignal signal) {
+        if (signal.getTrace() == getTrace() && isPinned()) {
+            setPinned(null);
+        }
+    }
 }

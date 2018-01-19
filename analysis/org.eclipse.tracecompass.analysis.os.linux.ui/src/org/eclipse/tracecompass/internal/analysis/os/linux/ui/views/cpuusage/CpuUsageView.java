@@ -159,5 +159,4 @@ public class CpuUsageView extends TmfChartView {
             treeViewer.updateContent(treeViewer.getWindowStartTime(), treeViewer.getWindowEndTime(), false);
         }
     }
-
 }

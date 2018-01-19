@@ -195,7 +195,11 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
      */
     @Override
     protected void contentChanged(ITmfTreeViewerEntry rootEntry) {
-        TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            return;
+        }
+        TmfTraceContext ctx = TmfTraceManager.getInstance().getTraceContext(trace);
         Set<Long> ids = (Set<Long>) ctx.getData(getClass() + CHECKED_ELEMENTS);
         if (ids != null && rootEntry != null) {
             List<ITmfTreeViewerEntry> checkedElements = new ArrayList<>();

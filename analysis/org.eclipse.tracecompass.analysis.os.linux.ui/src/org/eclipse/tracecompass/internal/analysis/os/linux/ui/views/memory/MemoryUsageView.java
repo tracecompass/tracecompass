@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxi
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
@@ -97,7 +98,7 @@ public class MemoryUsageView extends TmfChartView {
         }
 
         // Add a tool bar button to filter active threads.
-        getViewSite().getActionBars().getToolBarManager().add(getFilterAction());
+        getViewSite().getActionBars().getToolBarManager().appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getFilterAction());
     }
 
     private Action getFilterAction() {

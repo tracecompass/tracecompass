@@ -17,6 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalThrottler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -30,6 +31,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.views.ITmfPinnable;
 
 /**
  * Abstract class that extends {@link TmfViewer} that adds methods to
@@ -48,7 +50,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
  * @author Bernd Hufmann
  * @author Geneviève Bastien
  */
-public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvider {
+public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvider, ITmfPinnable {
 
     /** Start time of trace */
     private long fStartTime;
@@ -166,8 +168,10 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
      * Gets the trace that is displayed by this viewer.
      *
      * @return the trace
+     * @since 3.3
      */
-    protected ITmfTrace getTrace() {
+    @Override
+    public ITmfTrace getTrace() {
         return fTrace;
     }
 
@@ -234,7 +238,7 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
                 TmfTimestamp.fromNanos(getWindowEndTime()));
 
         // Send the signal
-        TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, timeRange, fTrace);
+        TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, timeRange, getTrace());
         fTimeRangeSyncThrottle.queue(signal);
     }
 
@@ -249,8 +253,10 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
      */
     public void loadTrace(ITmfTrace trace) {
         fTrace = trace;
-
-        TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
+        if (trace == null) {
+            return;
+        }
+        TmfTraceContext ctx = TmfTraceManager.getInstance().getTraceContext(trace);
         long selectionStart = ctx.getSelectionRange().getStartTime().toNanos();
         long selectionEnd = ctx.getSelectionRange().getEndTime().toNanos();
         TmfTimeRange windowRange = ctx.getWindowRange();
@@ -277,6 +283,30 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
         setWindowRange(0, 0);
         setEndTime(0);
         setTrace(null);
+    }
+
+    @Override
+    public synchronized void setPinned(ITmfTrace trace) {
+        if (trace != null) {
+            /* Ignore relevant inbound signals */
+            TmfSignalManager.addIgnoredInboundSignal(this, TmfTraceOpenedSignal.class);
+            TmfSignalManager.addIgnoredInboundSignal(this, TmfTraceSelectedSignal.class);
+
+            if (!trace.equals(fTrace)) {
+                loadTrace(trace);
+            }
+        } else {
+            /* Handle relevant inbound signals */
+            TmfSignalManager.removeIgnoredInboundSignal(this, TmfTraceOpenedSignal.class);
+            TmfSignalManager.removeIgnoredInboundSignal(this, TmfTraceSelectedSignal.class);
+
+            ITmfTrace activeTrace = TmfTraceManager.getInstance().getActiveTrace();
+            if (activeTrace != null && !activeTrace.equals(fTrace)) {
+                loadTrace(activeTrace);
+            } else {
+                refresh();
+            }
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -339,9 +369,11 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
      */
     @TmfSignalHandler
     public void selectionRangeUpdated(@Nullable TmfSelectionRangeUpdatedSignal signal) {
-        if (signal != null && (signal.getSource() != this) && (fTrace != null)) {
-            long selectedTime = signal.getBeginTime().toNanos();
-            long selectedEndTime = signal.getEndTime().toNanos();
+        final ITmfTrace trace = fTrace;
+        if (signal != null && (signal.getSource() != this) && (trace != null)) {
+            TmfTraceContext ctx = TmfTraceManager.getInstance().getTraceContext(trace);
+            long selectedTime = ctx.getSelectionRange().getStartTime().toNanos();
+            long selectedEndTime = ctx.getSelectionRange().getEndTime().toNanos();
             setSelectionRange(selectedTime, selectedEndTime);
         }
     }
@@ -355,10 +387,12 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
      */
     @TmfSignalHandler
     public void windowRangeUpdated(@Nullable TmfWindowRangeUpdatedSignal signal) {
+        final ITmfTrace trace = fTrace;
+        if (signal != null && trace != null) {
+            TmfTraceContext ctx = TmfTraceManager.getInstance().getTraceContext(trace);
 
-        if (signal != null && fTrace != null) {
             // Validate the time range
-            TmfTimeRange range = signal.getCurrentRange().getIntersection(fTrace.getTimeRange());
+            TmfTimeRange range = ctx.getWindowRange().getIntersection(trace.getTimeRange());
             if (range == null) {
                 return;
             }

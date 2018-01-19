@@ -25,6 +25,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxi
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
@@ -73,7 +74,7 @@ public class CounterView extends TmfChartView {
 
         // Add a tool bar button to display counters data cumulatively
         IActionBars bars = getViewSite().getActionBars();
-        bars.getToolBarManager().add(getCumulativeAction());
+        bars.getToolBarManager().appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getCumulativeAction());
     }
 
     @Override
