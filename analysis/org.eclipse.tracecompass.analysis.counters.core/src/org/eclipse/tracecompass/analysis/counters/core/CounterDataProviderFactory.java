@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -32,6 +32,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  * @author Loic Prieur-Drevon
  * @since 1.1
  */
+@SuppressWarnings("restriction")
 public class CounterDataProviderFactory implements IDataProviderFactory {
 
     private static final String TITLE = Objects.requireNonNull(Messages.CounterDataProvider_ChartTitle);

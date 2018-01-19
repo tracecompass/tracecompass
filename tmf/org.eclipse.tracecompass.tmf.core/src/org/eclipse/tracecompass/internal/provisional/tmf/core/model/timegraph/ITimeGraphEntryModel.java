@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,7 +15,6 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTre
  * Represents a time graph entry model. These objects are typically returned by
  * {@link ITimeGraphDataProvider#fetchTree}
  *
- * @since 3.2
  * @author Simon Delisle
  */
 public interface ITimeGraphEntryModel extends ITmfTreeDataModel {

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2016, 2017 Polytechnique de Montréal
+ * Copyright (c) 2016, 2018 Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableList;
  * @author Wassim Nasrallah
  * @author Najib Arbaoui
  */
+@SuppressWarnings("restriction")
 public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
 
     /** Provides label for the Kernel memory usage tree viewer cells */

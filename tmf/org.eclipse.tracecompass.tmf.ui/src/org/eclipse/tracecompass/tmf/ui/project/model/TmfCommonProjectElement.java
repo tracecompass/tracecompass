@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2017 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2010, 2018 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -421,6 +421,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      * @param copyAsLink
      *            Whether to copy as a link or not
      * @return the new Resource object
+     * @since 3.3
      */
     public IResource copy(final String newName, final boolean copySuppFiles, final boolean copyAsLink) {
 

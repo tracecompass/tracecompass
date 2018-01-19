@@ -43,6 +43,7 @@ import org.junit.runners.Parameterized.Parameters;
  *
  * @author Geneviève Bastien
  */
+@SuppressWarnings("restriction")
 @RunWith(Parameterized.class)
 public class CallStackAndGraphBenchmark {
 

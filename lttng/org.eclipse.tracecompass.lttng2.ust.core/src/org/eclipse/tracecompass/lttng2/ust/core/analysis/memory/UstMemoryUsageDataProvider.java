@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -80,7 +80,7 @@ public class UstMemoryUsageDataProvider extends AbstractTreeXyDataProvider<UstMe
     }
 
     /**
-     * @since 3.2
+     * @since 3.3
      */
     @Override
     protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
@@ -134,7 +134,7 @@ public class UstMemoryUsageDataProvider extends AbstractTreeXyDataProvider<UstMe
     }
 
     /**
-     * @since 3.2
+     * @since 3.3
      */
     @Override
     protected List<MemoryUsageTreeModel> getTree(ITmfStateSystem ss, TimeQueryFilter filter, @Nullable IProgressMonitor monitor)
@@ -188,7 +188,7 @@ public class UstMemoryUsageDataProvider extends AbstractTreeXyDataProvider<UstMe
     }
 
     /**
-     * @since 3.2
+     * @since 3.3
      */
     @Override
     protected boolean isCacheable() {
@@ -196,7 +196,7 @@ public class UstMemoryUsageDataProvider extends AbstractTreeXyDataProvider<UstMe
     }
 
     /**
-     * @since 3.2
+     * @since 3.3
      */
     @Override
     protected String getTitle() {

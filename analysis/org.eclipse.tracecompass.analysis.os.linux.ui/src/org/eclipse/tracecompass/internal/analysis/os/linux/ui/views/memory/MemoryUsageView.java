@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2016, 2017 École Polytechnique de Montréal and others
+ * Copyright (c) 2016, 2018 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -37,6 +37,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  * @author Mahdi Zolnouri
  * @author Wassim Nasrallah
  */
+@SuppressWarnings("restriction")
 public class MemoryUsageView extends TmfChartView {
    private final String fProviderId;
    private final TmfXYChartSettings fSettings;

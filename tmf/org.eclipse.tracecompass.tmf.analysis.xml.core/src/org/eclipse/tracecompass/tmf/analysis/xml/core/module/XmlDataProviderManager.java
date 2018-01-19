@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -37,6 +37,7 @@ import com.google.common.collect.Table;
  * @since 2.4
  * @author Loic Prieur-Drevon
  */
+@SuppressWarnings("restriction")
 public class XmlDataProviderManager {
 
     private static @Nullable XmlDataProviderManager INSTANCE;

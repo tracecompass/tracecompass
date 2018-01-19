@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2015, 2017 Ericsson
+ * Copyright (c) 2015, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -437,7 +437,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
      *            The number of points to display, cannot be negative. 0 means use
      *            native resolution. any positive integer means that number of
      *            points
-     * @since 2.1
+     * @since 2.2
      */
     public synchronized void setNbPoints(int nbPoints) {
         if (nbPoints < 0) {

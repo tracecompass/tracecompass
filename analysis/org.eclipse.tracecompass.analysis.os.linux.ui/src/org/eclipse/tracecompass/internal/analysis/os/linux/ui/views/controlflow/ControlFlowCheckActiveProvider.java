@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Keba AG
+ * Copyright (c) 2015, 2018 Keba AG
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -37,6 +37,7 @@ import com.google.common.collect.Sets;
  * @noinstantiate This class is not intended to be instantiated by clients.
  * @since 1.0
  */
+@SuppressWarnings("restriction")
 public final class ControlFlowCheckActiveProvider implements ITimeGraphEntryActiveProvider {
 
     String fLabel;

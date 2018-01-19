@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -67,7 +67,7 @@ public interface ISegmentStoreDensityViewerDataListener {
 
     /**
      * Notification that chart updated
-     * @since 2.1
+     * @since 2.2
      */
     default void chartUpdated() {
         // To be implemented in children
