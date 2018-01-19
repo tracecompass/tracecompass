@@ -56,6 +56,7 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.ui;x-friends:="org.eclipse
  org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg;x-friends:="org.eclipse.tracecompass.tmf.remote.ui,org.eclipse.tracecompass.tmf.remote.ui.tests,org.eclipse.tracecompass.lttng2.control.ui",
  org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.importexport;x-friends:="org.eclipse.tracecompass.tmf.remote.ui",
  org.eclipse.tracecompass.internal.tmf.ui.symbols;x-friends:="org.eclipse.tracecompass.tmf.ui.tests",
+ org.eclipse.tracecompass.internal.tmf.ui.util;x-friends:="org.eclipse.tracecompass.tmf.ui.tests",
  org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts;x-friends:="org.eclipse.tracecompass.tmf.ui.tests",
  org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.model;x-friends:="org.eclipse.tracecompass.tmf.ui.tests",
  org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics;x-friends:="org.eclipse.tracecompass.tmf.ui.tests",

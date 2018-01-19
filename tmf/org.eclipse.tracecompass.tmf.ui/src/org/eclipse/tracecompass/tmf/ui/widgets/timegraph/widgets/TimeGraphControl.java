@@ -36,6 +36,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -85,6 +86,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
+import org.eclipse.tracecompass.internal.tmf.ui.util.LineClipper;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
@@ -2264,7 +2266,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         drawArrow(getColorScheme(), event, getArrowRectangle(bounds, event), gc);
     }
 
-    private Rectangle getArrowRectangle(Rectangle bounds, ILinkEvent event) {
+    private @Nullable Rectangle getArrowRectangle(Rectangle bounds, ILinkEvent event) {
         int srcIndex = fItemData.findItemIndex(event.getEntry());
         int destIndex = fItemData.findItemIndex(event.getDestinationEntry());
 
@@ -2286,7 +2288,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
         int y0 = src.y + src.height / 2;
         int y1 = dst.y + dst.height / 2;
-        return new Rectangle(x0, y0, x1 - x0, y1 - y0);
+        return LineClipper.clip(bounds, x0, y0, x1, y1);
     }
 
     /**
