@@ -3,7 +3,7 @@
 <schema targetNamespace="org.eclipse.tracecompass.tmf.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.eclipse.tracecompass.tmf.core" id="org.eclipse.tracecompass.tmf.core.custom.marker" name="%extensionpoint.custom_marker.name"/>
+         <meta.schema plugin="org.eclipse.tracecompass.tmf.core" id="org.eclipse.tracecompass.tmf.core.custom.marker" name="Custom Marker"/>
       </appinfo>
       <documentation>
          Extension point to load custom marker set definitions.
@@ -17,6 +17,9 @@
          </appinfo>
       </annotation>
       <complexType>
+         <sequence minOccurs="1" maxOccurs="unbounded">
+            <element ref="customMarker"/>
+         </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
@@ -46,7 +49,7 @@
 
    <element name="customMarker">
       <complexType>
-         <attribute name="file" type="string">
+         <attribute name="file" type="string" use="required">
             <annotation>
                <documentation>
                   The path to the XML file describing custom markers.
