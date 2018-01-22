@@ -145,26 +145,13 @@ public class KernelMemoryUsageViewTest extends XYDataProviderBaseTest {
         assertNotNull(chartViewer);
         fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
 
-        SWTBotTree treeBot = getSWTBotView().bot().tree();
-        SWTBotTreeItem totalNode = treeBot.getTreeItem(fTraceName);
-        SWTBotUtils.waitUntil(root -> root.getItems().length == 5, totalNode, "Failed to load the filtered threads");
+        SWTBotUtils.waitUntil(bot -> bot.tree().getTreeItem(fTraceName).getItems().length == 5, getSWTBotView().bot(), "Failed to load the filtered threads");
 
-        final SWTBotTreeItem[] testNodes = new SWTBotTreeItem[1];
-        testNodes[0] = treeBot.getTreeItem(fTraceName);
         getSWTBotView().toolbarButton("Showing active threads").click();
-        // Wait till new widget is available because treeViewer.setInput(newRoot) clears previous tree items
-        SWTBotUtils.waitUntil(root -> testNodes[0].widget != root.getTreeItem(fTraceName).widget, treeBot, "Failed to get new TreeItem");
+        SWTBotUtils.waitUntil(bot -> bot.tree().getTreeItem(fTraceName).getItems().length == 16, getSWTBotView().bot(), "Failed to load all the threads");
 
-        totalNode = treeBot.getTreeItem(fTraceName);
-        SWTBotUtils.waitUntil(root -> root.getItems().length == 16, totalNode, "Failed to load all the threads");
-
-        testNodes[0] = treeBot.getTreeItem(fTraceName);
         getSWTBotView().toolbarButton("Showing all threads").click();
-        // Wait till new widget is available because treeViewer.setInput(newRoot) clears previous tree items
-        SWTBotUtils.waitUntil(root -> testNodes[0].widget != root.getTreeItem(fTraceName).widget, treeBot, "Failed to get new TreeItem");
-
-        totalNode = treeBot.getTreeItem(fTraceName);
-        SWTBotUtils.waitUntil(root -> root.getItems().length == 5, totalNode, "Failed to filter the threads");
+        SWTBotUtils.waitUntil(bot -> bot.tree().getTreeItem(fTraceName).getItems().length == 5, getSWTBotView().bot(), "Failed to filter the threads");
     }
 
     @Override
