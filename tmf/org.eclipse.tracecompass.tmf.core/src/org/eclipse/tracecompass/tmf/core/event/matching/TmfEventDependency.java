@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.tmf.core.event.matching;
 
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -67,6 +69,24 @@ public class TmfEventDependency {
         public ITmfTimestamp getTimestamp() {
             return fTimestamp;
         }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(fTrace, fTimestamp);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof DependencyEvent)) {
+                return false;
+            }
+            DependencyEvent other = (DependencyEvent) obj;
+            return Objects.equals(fTrace, other.fTrace) && Objects.equals(fTimestamp, other.fTimestamp);
+        }
+
     }
 
     /**
