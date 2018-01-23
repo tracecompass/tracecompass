@@ -14,14 +14,13 @@
 
 package org.eclipse.tracecompass.internal.statesystem.core;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.eclipse.tracecompass.statesystem.core.ITmfStateSystem.INVALID_ATTRIBUTE;
 
 import java.io.PrintWriter;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -40,12 +39,12 @@ import com.google.common.collect.ImmutableList;
  */
 public final class Attribute {
 
-    private final Attribute parent;
-    private final @NonNull String name;
-    private final int quark;
+    private final Attribute fParent;
+    private final @NonNull String fName;
+    private final int fQuark;
 
     /** The sub-attributes (<basename, attribute>) of this attribute */
-    private final Map<String, Attribute> subAttributes;
+    private final Map<String, Attribute> fSubAttributes = new LinkedHashMap<>();
 
     /**
      * Constructor
@@ -59,10 +58,9 @@ public final class Attribute {
      *            The integer representation of this attribute
      */
     public Attribute(Attribute parent, @NonNull String name, int quark) {
-        this.parent = parent;
-        this.quark = quark;
-        this.name = name;
-        this.subAttributes = Collections.synchronizedMap(new LinkedHashMap<String, Attribute>());
+        fParent = parent;
+        fQuark = quark;
+        fName = name;
     }
 
     // ------------------------------------------------------------------------
@@ -75,7 +73,7 @@ public final class Attribute {
      * @return The quark of this attribute
      */
     public int getQuark() {
-        return quark;
+        return fQuark;
     }
 
     /**
@@ -84,7 +82,7 @@ public final class Attribute {
      * @return The name of this attribute
      */
     public @NonNull String getName() {
-        return name;
+        return fName;
     }
 
     /**
@@ -93,7 +91,7 @@ public final class Attribute {
      * @return The child attributes.
      */
     public Iterable<Attribute> getSubAttributes() {
-        return ImmutableList.copyOf(subAttributes.values());
+        return ImmutableList.copyOf(fSubAttributes.values());
     }
 
     /**
@@ -105,7 +103,7 @@ public final class Attribute {
      *         if that attribute does not exist.
      */
     public int getSubAttributeQuark(String... path) {
-        return this.getSubAttributeQuark(path, 0);
+        return getSubAttributeQuark(path, 0);
     }
 
     /**
@@ -120,21 +118,18 @@ public final class Attribute {
      *         if that attribute does not exist.
      */
     public Attribute getSubAttributeNode(String... path) {
-        return this.getSubAttributeNode(path, 0);
+        return getSubAttributeNode(path, 0);
     }
 
     /**
      * "Inner" part of the previous public method, which is used recursively. To
-     * avoid having to copy sub-arrays to pass down, we just track where we are
-     * at with the index parameter. It uses getSubAttributeNode(), whose
-     * implementation is left to the derived classes.
+     * avoid having to copy sub-arrays to pass down, we just track where we are at
+     * with the index parameter. It uses getSubAttributeNode(), whose implementation
+     * is left to the derived classes.
      */
     private int getSubAttributeQuark(String[] path, int index) {
-        Attribute targetNode = this.getSubAttributeNode(path, index);
-        if (targetNode == null) {
-            return INVALID_ATTRIBUTE;
-        }
-        return targetNode.getQuark();
+        Attribute targetNode = getSubAttributeNode(path, index);
+        return targetNode != null ? targetNode.getQuark() : INVALID_ATTRIBUTE;
     }
 
     /**
@@ -143,7 +138,7 @@ public final class Attribute {
      * @return The parent attribute
      */
     public Attribute getParentAttribute() {
-        return this.parent;
+        return fParent;
     }
 
     /**
@@ -152,7 +147,7 @@ public final class Attribute {
      * @return The quark of the parent attribute
      */
     public int getParentAttributeQuark() {
-        return this.parent.getQuark();
+        return fParent.getQuark();
     }
 
     /* The methods how to access children are left to derived classes */
@@ -166,7 +161,7 @@ public final class Attribute {
         if (newSubAttribute == null) {
             throw new IllegalArgumentException();
         }
-        subAttributes.put(newSubAttribute.getName(), newSubAttribute);
+        fSubAttributes.put(newSubAttribute.getName(), newSubAttribute);
     }
 
     /**
@@ -180,7 +175,7 @@ public final class Attribute {
      * @return The requested attribute
      */
     private Attribute getSubAttributeNode(String[] path, int index) {
-        final Attribute nextNode = subAttributes.get(path[index]);
+        final Attribute nextNode = fSubAttributes.get(path[index]);
 
         if (nextNode == null) {
             /* We don't have the expected child => the attribute does not exist */
@@ -206,9 +201,9 @@ public final class Attribute {
         Attribute curNode = this;
 
         /* Add recursive parents to the list, but stop at the root node */
-        while (curNode.parent != null) {
+        while (curNode.fParent != null) {
             list.addFirst(curNode.getName());
-            curNode = curNode.parent;
+            curNode = curNode.fParent;
         }
 
         return list.toArray(new @NonNull String[list.size()]);
@@ -221,26 +216,18 @@ public final class Attribute {
      * @return The full name of this attribute
      */
     public @NonNull String getFullAttributeName() {
-        String[] array = this.getFullAttribute();
-        StringBuffer buf = new StringBuffer();
-
-        for (int i = 0; i < array.length - 1; i++) {
-            buf.append(array[i]);
-            buf.append('/');
-        }
-        buf.append(array[array.length - 1]);
-        return checkNotNull(buf.toString());
+        return Objects.requireNonNull(String.join("/", getFullAttribute())); //$NON-NLS-1$
     }
 
     @Override
     public String toString() {
-        return getFullAttributeName() + " (" + quark + ')'; //$NON-NLS-1$
+        return getFullAttributeName() + " (" + fQuark + ')'; //$NON-NLS-1$
     }
 
     private int curDepth;
 
     private void attributeNodeToString(PrintWriter writer, Attribute currentNode) {
-        writer.println(currentNode.getName() + " (" + currentNode.quark + ')'); //$NON-NLS-1$
+        writer.println(currentNode.getName() + " (" + currentNode.fQuark + ')'); //$NON-NLS-1$
         curDepth++;
 
         for (Attribute nextNode : currentNode.getSubAttributes()) {

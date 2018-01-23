@@ -30,6 +30,7 @@ import java.io.PrintWriter;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -53,9 +54,10 @@ public final class AttributeTree {
      */
     private static final String SERIALIZATION_WILDCARD = "*"; //$NON-NLS-1$
 
-    private final StateSystem ss;
-    private final List<Attribute> attributeList;
-    private final Attribute attributeTreeRoot;
+    private final StateSystem fSs;
+    private final List<Attribute> fAttributeList;
+    private final Attribute fAttributeTreeRoot;
+    private final ReentrantReadWriteLock fLock = new ReentrantReadWriteLock();
 
     /**
      * Standard constructor, create a new empty Attribute Tree
@@ -64,9 +66,9 @@ public final class AttributeTree {
      *            The StateSystem to which this AT is attached
      */
     public AttributeTree(StateSystem ss) {
-        this.ss = ss;
-        this.attributeList = new ArrayList<>();
-        this.attributeTreeRoot = new Attribute(null, "root", ROOT_ATTRIBUTE); //$NON-NLS-1$
+        fSs = ss;
+        fAttributeList = new ArrayList<>();
+        fAttributeTreeRoot = new Attribute(null, "root", ROOT_ATTRIBUTE); //$NON-NLS-1$
     }
 
     /**
@@ -105,10 +107,10 @@ public final class AttributeTree {
          * Now we have 'list', the ArrayList of String arrays representing all
          * the attributes. Simply create attributes the normal way from them.
          */
-        String[] prevFullAttribute = null, curFullAttribute = null;
+        String[] prevFullAttribute = null;
         for (String[] attrib : attribList) {
-            curFullAttribute = decodeFullAttribute(prevFullAttribute, attrib);
-            this.getQuarkAndAdd(ROOT_ATTRIBUTE, curFullAttribute);
+            String[] curFullAttribute = decodeFullAttribute(prevFullAttribute, attrib);
+            getQuarkAndAdd(ROOT_ATTRIBUTE, curFullAttribute);
             prevFullAttribute = curFullAttribute;
         }
     }
@@ -121,7 +123,8 @@ public final class AttributeTree {
      * @param pos
      *            The position (in bytes) in the file where to write
      */
-    public synchronized void writeSelf(File file, long pos) {
+    public void writeSelf(File file, long pos) {
+        fLock.readLock().lock();
         try (FileOutputStream fos = new FileOutputStream(file, true);
                 FileChannel fc = fos.getChannel();) {
             fc.position(pos);
@@ -131,11 +134,11 @@ public final class AttributeTree {
                 oos.writeInt(ATTRIB_TREE_MAGIC_NUMBER);
 
                 /* Compute the serialized list of attributes and write it */
-                List<String[]> list = new ArrayList<>(attributeList.size());
-                String[] prevFullAttribute = null, curFullAttribute = null, curEncodedAttribute = null;
-                for (Attribute entry : this.attributeList) {
-                    curFullAttribute = entry.getFullAttribute();
-                    curEncodedAttribute = encodeFullAttribute(prevFullAttribute, entry.getFullAttribute());
+                List<String[]> list = new ArrayList<>(fAttributeList.size());
+                String[] prevFullAttribute = null;
+                for (Attribute entry : fAttributeList) {
+                    String[] curFullAttribute = entry.getFullAttribute();
+                    String[] curEncodedAttribute = encodeFullAttribute(prevFullAttribute, entry.getFullAttribute());
                     list.add(curEncodedAttribute);
                     prevFullAttribute = curFullAttribute;
                 }
@@ -143,8 +146,9 @@ public final class AttributeTree {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            fLock.readLock().unlock();
         }
-
     }
 
     /**
@@ -208,8 +212,13 @@ public final class AttributeTree {
      *
      * @return The current number of attributes in the tree
      */
-    public synchronized int getNbAttributes() {
-        return attributeList.size();
+    public int getNbAttributes() {
+        fLock.readLock().lock();
+        try {
+            return fAttributeList.size();
+        } finally {
+            fLock.readLock().unlock();
+        }
     }
 
     /**
@@ -229,22 +238,21 @@ public final class AttributeTree {
      * @throws IndexOutOfBoundsException
      *             If the starting node quark is out of range
      */
-    public synchronized int getQuarkDontAdd(int startingNodeQuark, String... subPath) {
-        Attribute prevNode;
-
+    public int getQuarkDontAdd(int startingNodeQuark, String... subPath) {
         /* If subPath is empty, simply return the starting quark */
         if (subPath == null || subPath.length == 0) {
             return startingNodeQuark;
         }
 
-        /* Get the "starting node" */
-        if (startingNodeQuark == ROOT_ATTRIBUTE) {
-            prevNode = attributeTreeRoot;
-        } else {
-            prevNode = attributeList.get(startingNodeQuark);
-        }
+        fLock.readLock().lock();
+        try {
 
-        return prevNode.getSubAttributeQuark(subPath);
+            /* Get the "starting node" */
+            Attribute startingNode = getAttribute(startingNodeQuark);
+            return startingNode.getSubAttributeQuark(subPath);
+        } finally {
+            fLock.readLock().unlock();
+        }
     }
 
     /**
@@ -262,44 +270,37 @@ public final class AttributeTree {
      * @throws IndexOutOfBoundsException
      *             If the starting node quark is out of range
      */
-    public synchronized int getQuarkAndAdd(int startingNodeQuark, String... subPath) {
-        // FIXME synchronized here is probably quite costly... maybe only locking
-        // the "for" would be enough?
+    public int getQuarkAndAdd(int startingNodeQuark, String... subPath) {
+        fLock.writeLock().lock();
+        try {
+            /* Get the "starting node" */
+            Attribute prevNode = getAttribute(startingNodeQuark);
 
-        Attribute nextNode = null;
-        Attribute prevNode;
-
-        /* Get the "starting node" */
-        if (startingNodeQuark == ROOT_ATTRIBUTE) {
-            prevNode = attributeTreeRoot;
-        } else {
-            prevNode = attributeList.get(startingNodeQuark);
-        }
-
-        int knownQuark = prevNode.getSubAttributeQuark(subPath);
-        if (knownQuark == INVALID_ATTRIBUTE) {
-            /*
-             * The attribute was not in the table previously, and we want to add
-             * it
-             */
-            for (String curDirectory : subPath) {
-                nextNode = prevNode.getSubAttributeNode(curDirectory);
-                if (nextNode == null) {
-                    /* This is where we need to start adding */
-                    nextNode = new Attribute(prevNode, checkNotNull(curDirectory), attributeList.size());
-                    prevNode.addSubAttribute(nextNode);
-                    attributeList.add(nextNode);
-                    ss.addEmptyAttribute();
+            int knownQuark = prevNode.getSubAttributeQuark(subPath);
+            if (knownQuark == INVALID_ATTRIBUTE) {
+                /*
+                 * The attribute was not in the table previously, and we want to add it
+                 */
+                for (String curDirectory : subPath) {
+                    Attribute nextNode = prevNode.getSubAttributeNode(curDirectory);
+                    if (nextNode == null) {
+                        /* This is where we need to start adding */
+                        nextNode = new Attribute(prevNode, checkNotNull(curDirectory), fAttributeList.size());
+                        prevNode.addSubAttribute(nextNode);
+                        fAttributeList.add(nextNode);
+                        fSs.addEmptyAttribute();
+                    }
+                    prevNode = nextNode;
                 }
-                prevNode = nextNode;
+                return fAttributeList.size() - 1;
             }
-            return attributeList.size() - 1;
+            /*
+             * The attribute already existed, return the quark of that attribute
+             */
+            return knownQuark;
+        } finally {
+            fLock.writeLock().unlock();
         }
-        /*
-         * The attribute was already existing, return the quark of that
-         * attribute
-         */
-        return knownQuark;
     }
 
     /**
@@ -315,21 +316,27 @@ public final class AttributeTree {
      * @throws IndexOutOfBoundsException
      *             If the attribute quark is out of range
      */
-    public synchronized @NonNull List<@NonNull Integer> getSubAttributes(int attributeQuark, boolean recursive) {
-        List<@NonNull Integer> listOfChildren = new ArrayList<>();
-        Attribute startingAttribute;
+    public @NonNull List<@NonNull Integer> getSubAttributes(int attributeQuark, boolean recursive) {
+        fLock.readLock().lock();
+        try {
+            List<@NonNull Integer> listOfChildren = new ArrayList<>();
+            /* Set up the node from which we'll start the search */
+            Attribute startingAttribute = getAttribute(attributeQuark);
 
-        /* Set up the node from which we'll start the search */
-        if (attributeQuark == ROOT_ATTRIBUTE) {
-            startingAttribute = attributeTreeRoot;
-        } else {
-            startingAttribute = attributeList.get(attributeQuark);
+            /* Iterate through the sub-attributes and add them to the list */
+            addSubAttributes(listOfChildren, startingAttribute, recursive);
+
+            return listOfChildren;
+        } finally {
+            fLock.readLock().unlock();
         }
+    }
 
-        /* Iterate through the sub-attributes and add them to the list */
-        addSubAttributes(listOfChildren, startingAttribute, recursive);
-
-        return listOfChildren;
+    private Attribute getAttribute(int startingNodeQuark) {
+        if (startingNodeQuark == ROOT_ATTRIBUTE) {
+            return fAttributeTreeRoot;
+        }
+        return fAttributeList.get(startingNodeQuark);
     }
 
     /**
@@ -343,11 +350,16 @@ public final class AttributeTree {
      * @throws IndexOutOfBoundsException
      *             If the quark is out of range
      */
-    public synchronized int getParentAttributeQuark(int quark) {
+    public int getParentAttributeQuark(int quark) {
         if (quark == ROOT_ATTRIBUTE) {
             return quark;
         }
-        return attributeList.get(quark).getParentAttributeQuark();
+        fLock.readLock().lock();
+        try {
+            return fAttributeList.get(quark).getParentAttributeQuark();
+        } finally {
+            fLock.readLock().unlock();
+        }
     }
 
     private void addSubAttributes(List<Integer> list, Attribute curAttribute,
@@ -369,8 +381,13 @@ public final class AttributeTree {
      * @throws IndexOutOfBoundsException
      *             If the quark is out of range
      */
-    public synchronized @NonNull String getAttributeName(int quark) {
-        return attributeList.get(quark).getName();
+    public @NonNull String getAttributeName(int quark) {
+        fLock.readLock().lock();
+        try {
+            return fAttributeList.get(quark).getName();
+        } finally {
+            fLock.readLock().unlock();
+        }
     }
 
     /**
@@ -382,8 +399,13 @@ public final class AttributeTree {
      * @throws IndexOutOfBoundsException
      *             If the quark is out of range
      */
-    public synchronized @NonNull String getFullAttributeName(int quark) {
-        return attributeList.get(quark).getFullAttributeName();
+    public @NonNull String getFullAttributeName(int quark) {
+        fLock.readLock().lock();
+        try {
+            return fAttributeList.get(quark).getFullAttributeName();
+        } finally {
+            fLock.readLock().unlock();
+        }
     }
 
     /**
@@ -396,8 +418,13 @@ public final class AttributeTree {
      * @throws IndexOutOfBoundsException
      *             If the quark is out of range
      */
-    public synchronized String @NonNull [] getFullAttributePathArray(int quark) {
-        return attributeList.get(quark).getFullAttribute();
+    public String @NonNull [] getFullAttributePathArray(int quark) {
+        fLock.readLock().lock();
+        try {
+            return fAttributeList.get(quark).getFullAttribute();
+        } finally {
+            fLock.readLock().unlock();
+        }
     }
 
     /**
@@ -406,8 +433,13 @@ public final class AttributeTree {
      * @param writer
      *            The writer where to print the output
      */
-    public synchronized void debugPrint(PrintWriter writer) {
-        attributeTreeRoot.debugPrint(writer);
+    public void debugPrint(PrintWriter writer) {
+        fLock.readLock().lock();
+        try {
+            fAttributeTreeRoot.debugPrint(writer);
+        } finally {
+            fLock.readLock().unlock();
+        }
     }
 
 }
