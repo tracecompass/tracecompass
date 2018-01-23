@@ -470,6 +470,22 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         if (shouldDeleteFiles && (fStateSystem != null)) {
             fStateSystem.removeFiles();
         }
+        completingBuild(shouldDeleteFiles);
+    }
+
+    /**
+     * The state system and analysis construction has completed. The state provider
+     * has been disposed, either at the end of the analysis, when it is cancelled or
+     * has failed. Children classes should override this if they need to close or
+     * dispose of anything at the end of the analysis execution.
+     *
+     * @param deleteFiles
+     *            If <code>true</code>, files that were built during the execution
+     *            should be deleted, otherwise they should be saved.
+     * @since 3.3
+     */
+    protected void completingBuild(boolean deleteFiles) {
+        // Nothing to do, classes may override this
     }
 
     private void build(ITmfStateProvider provider) {
