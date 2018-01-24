@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.ctf.core.tests.shared.CtfBenchmarkTrace;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.callstack.LttngUstCallStackAnalysis;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
@@ -64,7 +65,7 @@ public class LttngUstResponseBenchmark extends ViewsResponseTest {
     }
 
     /**
-     * Test with the many-threads trace
+     * Test with the cyg-profile trace
      *
      * @throws SecurityException
      *             If a security manager is present and any the wrong class is
@@ -79,6 +80,21 @@ public class LttngUstResponseBenchmark extends ViewsResponseTest {
     @Test
     public void testWithCygProfile() throws SecurityException, IllegalArgumentException, IOException {
         runTestWithTrace(FileLocator.toFileURL(CtfTestTrace.CYG_PROFILE.getTraceURL()).getPath(), TRACE_TYPE, Collections.singleton(CALLSTACK_VIEW_ID));
+    }
+
+    /**
+     * Test with the qmlscene benchmark trace
+     *
+     * @throws SecurityException
+     *             If a security manager is present and any the wrong class is
+     *             loaded or the class loader is not the same as its ancestor's
+     *             loader.
+     * @throws IllegalArgumentException
+     *             the object is not the correct class type
+     */
+    @Test
+    public void testWithQmlScene() throws SecurityException, IllegalArgumentException {
+        runTestWithTrace(CtfBenchmarkTrace.UST_QMLSCENE.getTracePath().toOSString(), TRACE_TYPE, Collections.singleton(CALLSTACK_VIEW_ID));
     }
 
 }
