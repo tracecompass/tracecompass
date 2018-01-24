@@ -39,6 +39,15 @@ public class XYPresentationProvider implements IXYPresentationProvider {
             YAppearance.Type.LINE,
             YAppearance.Type.SCATTER);
 
+    private static final List<String> SUPPORTED_TICKS = ImmutableList.of(
+            YAppearance.SymbolStyle.DIAMOND,
+            YAppearance.SymbolStyle.CIRCLE,
+            YAppearance.SymbolStyle.SQUARE,
+            YAppearance.SymbolStyle.TRIANGLE,
+            YAppearance.SymbolStyle.INVERTED_TRIANGLE,
+            YAppearance.SymbolStyle.PLUS,
+            YAppearance.SymbolStyle.CROSS);
+
     /* Gets the default palette for available colors for XY series */
     private static final IPaletteProvider COLOR_PALETTE = DefaultColorPaletteProvider.INSTANCE;
 
@@ -56,10 +65,11 @@ public class XYPresentationProvider implements IXYPresentationProvider {
             throw new UnsupportedOperationException("Series type: " + seriesType + " is not supported."); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        appearance = createAppearance(serieName, seriesType, width);
+        appearance = YAppearance.Type.SCATTER.equals(seriesType) ? createScatter(serieName, seriesType, width) : createAppearance(serieName, seriesType, width);
         fYAppearances.put(serieName, appearance);
         return appearance;
     }
+
 
     @Override
     public void clear() {
@@ -70,6 +80,18 @@ public class XYPresentationProvider implements IXYPresentationProvider {
         RGBAColor color = generateColor();
         String style = generateStyle(seriesType);
         return new YAppearance(seriesName, seriesType, style, color, width);
+    }
+
+    private IYAppearance createScatter(String seriesName, String seriesType, int width) {
+        RGBAColor color = generateColor();
+        String style = generateTickStyle(seriesType);
+
+        return new YAppearance(seriesName, seriesType, IYAppearance.Style.NONE, color, width) {
+            @Override
+            public String getSymbolStyle() {
+                return style;
+            }
+        };
     }
 
     /**
@@ -97,6 +119,13 @@ public class XYPresentationProvider implements IXYPresentationProvider {
         if (!IYAppearance.Type.SCATTER.equals(type)) {
             int nbColor = COLOR_PALETTE.get().size();
             return Iterables.get(SUPPORTED_STYLES, (fYAppearances.keySet().size() / nbColor) % SUPPORTED_STYLES.size());
+        }
+        return IYAppearance.Style.NONE;
+    }
+
+    private String generateTickStyle(String type) {
+        if (IYAppearance.Type.SCATTER.equals(type)) {
+            return Iterables.get(SUPPORTED_TICKS, (fYAppearances.keySet().size() / (COLOR_PALETTE.get().size())) % SUPPORTED_TICKS.size());
         }
         return IYAppearance.Style.NONE;
     }

@@ -52,12 +52,14 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.swtchart.IAxisTick;
 import org.swtchart.IBarSeries;
 import org.swtchart.ILineSeries;
-import org.swtchart.ILineSeries.PlotSymbolType;
 import org.swtchart.ISeries;
 import org.swtchart.ISeries.SeriesType;
 import org.swtchart.ISeriesSet;
 import org.swtchart.LineStyle;
 import org.swtchart.Range;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 
 /**
  * XY Chart viewer class implementation. All series in this viewer use the same
@@ -72,6 +74,20 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
 
     private static final String DIRTY_UNDERFLOW_ERROR = "Dirty underflow error"; //$NON-NLS-1$
 
+    private static final Map<String, ILineSeries.PlotSymbolType> SYMBOL_MAP;
+
+    static{
+        ImmutableMap.Builder<String, ILineSeries.PlotSymbolType> builder = new Builder<>();
+        builder.put(IYAppearance.SymbolStyle.NONE, ILineSeries.PlotSymbolType.NONE);
+        builder.put(IYAppearance.SymbolStyle.CIRCLE, ILineSeries.PlotSymbolType.CIRCLE);
+        builder.put(IYAppearance.SymbolStyle.CROSS, ILineSeries.PlotSymbolType.CROSS);
+        builder.put(IYAppearance.SymbolStyle.DIAMOND, ILineSeries.PlotSymbolType.DIAMOND);
+        builder.put(IYAppearance.SymbolStyle.INVERTED_TRIANGLE, ILineSeries.PlotSymbolType.INVERTED_TRIANGLE);
+        builder.put(IYAppearance.SymbolStyle.TRIANGLE, ILineSeries.PlotSymbolType.TRIANGLE);
+        builder.put(IYAppearance.SymbolStyle.PLUS, ILineSeries.PlotSymbolType.PLUS);
+        builder.put(IYAppearance.SymbolStyle.SQUARE, ILineSeries.PlotSymbolType.SQUARE);
+        SYMBOL_MAP = builder.build();
+    }
     private static final double DEFAULT_MAXY = Double.MIN_VALUE;
     private static final double DEFAULT_MINY = Double.MAX_VALUE;
 
@@ -439,6 +455,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             String type = appearance.getType();
             RGBAColor rgb = appearance.getColor();
             Color color = new Color(Display.getDefault(), rgb.getRed(), rgb.getGreen(), rgb.getBlue());
+            String symbolType = appearance.getSymbolStyle();
 
             if (type.equals(IYAppearance.Type.BAR)) {
                 IBarSeries barSeries = (IBarSeries) seriesSet.createSeries(SeriesType.BAR, seriesName);
@@ -453,10 +470,9 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
              * Default is line chart
              */
             ILineSeries lineSeries = (ILineSeries) seriesSet.createSeries(SeriesType.LINE, seriesName);
-            boolean isScatter = IYAppearance.Type.SCATTER.equals(type);
             lineSeries.enableArea(IYAppearance.Type.AREA.equals(type));
             lineSeries.setLineStyle(LineStyle.valueOf(appearance.getStyle()));
-            lineSeries.setSymbolType(isScatter ? PlotSymbolType.DIAMOND : PlotSymbolType.NONE);
+            lineSeries.setSymbolType(SYMBOL_MAP.getOrDefault(symbolType, ILineSeries.PlotSymbolType.NONE));
             lineSeries.setLineColor(color);
             lineSeries.setSymbolColor(color);
             lineSeries.setVisible(true);

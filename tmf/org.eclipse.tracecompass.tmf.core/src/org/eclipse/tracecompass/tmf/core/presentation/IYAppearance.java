@@ -98,7 +98,46 @@ public interface IYAppearance {
          * Constructor
          */
         private Style() {
+            // do nothing
+        }
+    }
 
+    /**
+     * Symbol styles, contains strings defining potential appearances of a dot in a
+     * chart.
+     *
+     * @author Matthew Khouzam
+     * @since 4.0
+     */
+    public final class SymbolStyle {
+
+        /** No tick */
+        public static final String NONE = "NONE"; //$NON-NLS-1$
+
+        /** Diamond tick */
+        public static final String DIAMOND = "DIAMOND"; //$NON-NLS-1$
+
+        /** Circle tick */
+        public static final String CIRCLE = "CIRCLE"; //$NON-NLS-1$
+
+        /** Square tick */
+        public static final String SQUARE = "SQUARE"; //$NON-NLS-1$
+
+        /** triangle tick */
+        public static final String TRIANGLE = "TRIANGLE"; //$NON-NLS-1$
+
+        /** inverted triangle */
+        public static final String INVERTED_TRIANGLE = "INVERTED_TRIANGLE"; //$NON-NLS-1$
+
+        /** st andrews cross, like an X */
+        public static final String CROSS = "CROSS"; //$NON-NLS-1$
+
+        /** Plus tick */
+        public static final String PLUS = "PLUS"; //$NON-NLS-1$
+
+        /** Constructor */
+        private SymbolStyle() {
+            // do nothing
         }
     }
 
@@ -137,4 +176,36 @@ public interface IYAppearance {
      * @return the width of the Y serie
      */
     int getWidth();
+
+    /**
+     * Symbol Style. Used for ticks. Styles type define the type of ticks for actual
+     * points. Ticks can be:
+     * <ul>
+     * <li>{@link SymbolStyle#CIRCLE}</li>
+     * <li>{@link SymbolStyle#CROSS}</li>
+     * <li>{@link SymbolStyle#DIAMOND}</li>
+     * <li>{@link SymbolStyle#INVERTED_TRIANGLE}</li>
+     * <li>{@link SymbolStyle#TRIANGLE}</li>
+     * <li>{@link SymbolStyle#PLUS}</li>
+     * <li>{@link SymbolStyle#SQUARE}</li>
+     * </ul>
+     *
+     * If the tick is {@link SymbolStyle#NONE}, no tick shall be displayed.
+     *
+     * @return the appearance
+     * @since 4.0
+     */
+    default String getSymbolStyle() {
+        return SymbolStyle.NONE;
+    }
+
+    /**
+     * Get the symbol size
+     *
+     * @return the size of the symbol in pixels
+     * @since 4.0
+     */
+    default int getSymbolSize() {
+        return 3;
+    }
 }

@@ -17,6 +17,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.internal.tmf.ui.util.SymbolHelper;
 import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.ui.viewers.ILegendImageProvider;
@@ -32,8 +33,6 @@ import org.swtchart.LineStyle;
  */
 public class XYChartLegendImageProvider implements ILegendImageProvider {
 
-    private static final int OVAL_LEGEND_SIZE = 3;
-    private static final @NonNull String DOT_SHAPE_OVAL = "oval"; //$NON-NLS-1$
     private final TmfCommonXAxisChartViewer fChartViewer;
 
     /**
@@ -66,32 +65,63 @@ public class XYChartLegendImageProvider implements ILegendImageProvider {
 
         gc.setBackground(background);
         gc.fillRectangle(0, 0, imageWidth, imageHeight);
-        gc.setForeground(lineColor);
-        gc.setLineWidth(appearance.getWidth());
-        LineStyle lineStyle = LineStyle.valueOf(appearance.getStyle());
-        if (lineStyle != LineStyle.NONE) {
-            gc.setLineStyle(LineStyle.valueOf(appearance.getStyle()).ordinal());
-            gc.drawLine(0, imageHeight / 2, imageWidth, imageHeight / 2);
-        } else {
-            // Not a line, draw a dot
-            // FIXME: support more shapes and add a getter to the IYAppearance class
-            drawStyledDot(gc, lineColor, imageWidth, imageHeight, DOT_SHAPE_OVAL);
-        }
+        drawStyleLine(gc, lineColor, imageWidth, imageHeight, appearance);
+
+        drawStyledDot(gc, lineColor, imageWidth, imageHeight, appearance);
 
         gc.dispose();
         lineColor.dispose();
         return image;
     }
 
-    private static void drawStyledDot(GC gc, Color lineColor, int imageWidth, int imageHeight, String shape) {
-        gc.setBackground(lineColor);
-        switch(shape) {
-        case DOT_SHAPE_OVAL:
+    private static void drawStyleLine(GC gc, Color lineColor, int imageWidth, int imageHeight, IYAppearance appearance) {
+        Color prev = gc.getForeground();
+        LineStyle lineStyle = LineStyle.valueOf(appearance.getStyle());
+        if (lineStyle != LineStyle.NONE) {
+            gc.setForeground(lineColor);
+            gc.setLineWidth(appearance.getWidth());
+            gc.setLineStyle(LineStyle.valueOf(appearance.getStyle()).ordinal());
+            gc.drawLine(0, imageHeight / 2, imageWidth, imageHeight / 2);
+            gc.setForeground(prev);
+        }
+    }
+
+    private static void drawStyledDot(GC gc, Color lineColor, int imageWidth, int imageHeight, IYAppearance appearance) {
+        String symbolStyle = appearance.getSymbolStyle();
+        int symbolSize = appearance.getSymbolSize();
+        int centerX = imageWidth / 2;
+        int centerY = imageHeight / 2;
+        Color prevBg = gc.getBackground();
+        Color prevFg = gc.getForeground();
+        switch(symbolStyle) {
+        case IYAppearance.SymbolStyle.CIRCLE:
+            SymbolHelper.drawCircle(gc, lineColor, symbolSize, centerX, centerY);
+            break;
+        case IYAppearance.SymbolStyle.DIAMOND:
+            SymbolHelper.drawDiamond(gc, lineColor, symbolSize, centerX, centerY);
+            break;
+        case IYAppearance.SymbolStyle.SQUARE:
+            SymbolHelper.drawSquare(gc, lineColor, symbolSize, centerX, centerY);
+            break;
+        case IYAppearance.SymbolStyle.CROSS:
+            SymbolHelper.drawCross(gc, lineColor, symbolSize, centerX, centerY);
+            break;
+        case IYAppearance.SymbolStyle.PLUS:
+            SymbolHelper.drawPlus(gc, lineColor, symbolSize, centerX, centerY);
+            break;
+
+        case IYAppearance.SymbolStyle.INVERTED_TRIANGLE:
+            SymbolHelper.drawInvertedTriangle(gc, lineColor, symbolSize, centerX, centerY);
+            break;
+        case IYAppearance.SymbolStyle.TRIANGLE:
+            SymbolHelper.drawTriangle(gc, lineColor, symbolSize, centerX, centerY);
+            break;
+
         default:
-            // Default is an oval
-            gc.fillOval(imageWidth / 2 - OVAL_LEGEND_SIZE, imageHeight / 2 - OVAL_LEGEND_SIZE, OVAL_LEGEND_SIZE * 2, OVAL_LEGEND_SIZE * 2);
+            // Default is nothing
             break;
         }
-
+        gc.setForeground(prevFg);
+        gc.setBackground(prevBg);
     }
 }
