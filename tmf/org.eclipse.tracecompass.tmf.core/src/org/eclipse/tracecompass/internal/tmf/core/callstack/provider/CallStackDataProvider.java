@@ -65,7 +65,7 @@ public class CallStackDataProvider extends AbstractTmfTraceDataProvider implemen
     /**
      * Extension point ID.
      */
-    public static final String ID = "org.eclipse.tracecompass.internal.tmf.core.callstack.provider.CallStackDataProvider"; //$NON-NLS-1$
+    public static final @NonNull String ID = "org.eclipse.tracecompass.internal.tmf.core.callstack.provider.CallStackDataProvider"; //$NON-NLS-1$
     private static final int UNKNOWN_TID = -1;
 
     private static final AtomicLong fAtomicLong = new AtomicLong();
@@ -122,7 +122,7 @@ public class CallStackDataProvider extends AbstractTmfTraceDataProvider implemen
      * @param module
      *            underlying {@link CallStackAnalysis} module
      */
-    public CallStackDataProvider(ITmfTrace trace, CallStackAnalysis module) {
+    public CallStackDataProvider(@NonNull ITmfTrace trace, CallStackAnalysis module) {
         super(trace);
         fModule = module;
     }
@@ -152,6 +152,8 @@ public class CallStackDataProvider extends AbstractTmfTraceDataProvider implemen
         try {
             List<Integer> processQuarks = ss.getQuarks(fModule.getProcessesPattern());
             SubMonitor subMonitor = SubMonitor.convert(monitor, "CallStackDataProvider#fetchTree", processQuarks.size()); //$NON-NLS-1$
+            List<@NonNull ITmfStateInterval> fullStart = ss.queryFullState(start);
+            List<@NonNull ITmfStateInterval> fullEnd = ss.queryFullState(end);
             for (int processQuark : processQuarks) {
 
                 /*
@@ -162,7 +164,7 @@ public class CallStackDataProvider extends AbstractTmfTraceDataProvider implemen
                 if (processQuark != ITmfStateSystem.ROOT_ATTRIBUTE) {
                     threadParentId = getIdForQuark(processQuark);
                     String processName = ss.getAttributeName(processQuark);
-                    Object processValue = ss.querySingleState(end, processQuark).getValue();
+                    Object processValue = fullEnd.get(processQuark).getValue();
                     pid = getThreadProcessId(processName, processValue);
                     builder.add(new CallStackEntryModel(threadParentId, traceId, processName, start, end,
                             CallStackEntryModel.PROCESS, pid));
@@ -185,7 +187,7 @@ public class CallStackDataProvider extends AbstractTmfTraceDataProvider implemen
                      */
                     long callStackParent = threadParentId;
                     if (threadQuark != processQuark) {
-                        CallStackEntryModel thread = createThread(ss, start, end, threadQuark, threadParentId, callStackQuark);
+                        CallStackEntryModel thread = createThread(ss, start, end, threadQuark, threadParentId, callStackQuark, fullStart, fullEnd);
                         callStackParent = thread.getId();
                         builder.add(thread);
                     }
@@ -206,16 +208,17 @@ public class CallStackDataProvider extends AbstractTmfTraceDataProvider implemen
         return new TmfModelResponse<>(builder.build(), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
     }
 
-    private CallStackEntryModel createThread(ITmfStateSystem ss, long start, long end, int threadQuark, long processId, int callStackQuark) throws StateSystemDisposedException {
+    private CallStackEntryModel createThread(ITmfStateSystem ss, long start, long end, int threadQuark, long processId, int callStackQuark,
+            List<ITmfStateInterval> fullStart, List<ITmfStateInterval> fullEnd) {
         String threadName = ss.getAttributeName(threadQuark);
         long threadEnd = end + 1;
-        ITmfStateInterval endInterval = ss.querySingleState(end, callStackQuark);
+        ITmfStateInterval endInterval = fullEnd.get(callStackQuark);
         if (endInterval.getValue() == null && endInterval.getStartTime() != ss.getStartTime()) {
             threadEnd = endInterval.getStartTime();
         }
-        Object threadStateValue = ss.querySingleState(end, threadQuark).getValue();
+        Object threadStateValue = fullEnd.get(threadQuark).getValue();
         int threadId = getThreadProcessId(threadName, threadStateValue);
-        ITmfStateInterval startInterval = ss.querySingleState(start, callStackQuark);
+        ITmfStateInterval startInterval = fullStart.get(callStackQuark);
         long threadStart = startInterval.getValue() == null ? Long.min(startInterval.getEndTime() + 1, end) : start;
         return new CallStackEntryModel(getIdForQuark(threadQuark), processId, threadName, threadStart, threadEnd, CallStackEntryModel.THREAD, threadId);
     }
@@ -315,7 +318,7 @@ public class CallStackDataProvider extends AbstractTmfTraceDataProvider implemen
         return new TimeGraphState(startTime, duration, Integer.MIN_VALUE);
     }
 
-    private static Collection<@NonNull Long> getTimes(long start, TimeQueryFilter filter) {
+    private static @NonNull Collection<@NonNull Long> getTimes(long start, TimeQueryFilter filter) {
         Collection<@NonNull Long> times = new HashSet<>();
         for (long t : filter.getTimesRequested()) {
             if (t >= start) {
@@ -345,7 +348,7 @@ public class CallStackDataProvider extends AbstractTmfTraceDataProvider implemen
     public void resetFunctionNames(@Nullable IProgressMonitor monitor) {
         fTimeEventNames.invalidateAll();
         synchronized (fProviders) {
-            Collection<ISymbolProvider> symbolProviders = SymbolProviderManager.getInstance().getSymbolProviders(getTrace());
+            Collection<@NonNull ISymbolProvider> symbolProviders = SymbolProviderManager.getInstance().getSymbolProviders(getTrace());
             SubMonitor sub = SubMonitor.convert(monitor, "CallStackDataProvider#resetFunctionNames", symbolProviders.size()); //$NON-NLS-1$
             fProviders.clear();
             for (ISymbolProvider symbolProvider : symbolProviders) {
@@ -369,7 +372,7 @@ public class CallStackDataProvider extends AbstractTmfTraceDataProvider implemen
      * @return the next / previous interval if it exists, encapsulated in a
      *         response.
      */
-    private TmfModelResponse<List<ITimeGraphRowModel>> getFollowEvent(ITmfStateSystem ss, long id, long time, boolean forward) {
+    private @NonNull TmfModelResponse<List<ITimeGraphRowModel>> getFollowEvent(ITmfStateSystem ss, long id, long time, boolean forward) {
         Integer quark = fIdToQuark.get(id);
         if (quark == null) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
