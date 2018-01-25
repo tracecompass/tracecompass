@@ -82,6 +82,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sampling;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
@@ -174,9 +175,9 @@ public class CallStackView extends AbstractTimeGraphView {
     // ------------------------------------------------------------------------
 
     private static class TraceEntry extends TimeGraphEntry {
-        private final CallStackDataProvider fProvider;
+        private final @NonNull CallStackDataProvider fProvider;
 
-        public TraceEntry(CallStackEntryModel model, CallStackDataProvider provider) {
+        public TraceEntry(CallStackEntryModel model, @NonNull CallStackDataProvider provider) {
             super(model);
             fProvider = provider;
         }
@@ -186,7 +187,7 @@ public class CallStackView extends AbstractTimeGraphView {
             return false;
         }
 
-        public CallStackDataProvider getProvider() {
+        public @NonNull CallStackDataProvider getProvider() {
             return fProvider;
         }
     }
@@ -194,12 +195,16 @@ public class CallStackView extends AbstractTimeGraphView {
     private class CallStackComparator implements Comparator<ITimeGraphEntry> {
         @Override
         public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
-            CallStackEntryModel t1 = (CallStackEntryModel) ((TimeGraphEntry) o1).getModel();
-            CallStackEntryModel t2 = (CallStackEntryModel) ((TimeGraphEntry) o2).getModel();
-            if (t1.getStackLevel() == CallStackEntryModel.THREAD && t2.getStackLevel() == CallStackEntryModel.THREAD) {
-                return fThreadComparator.compare(o1, o2);
-            } else if (t1.getStackLevel() == CallStackEntryModel.PROCESS && t2.getStackLevel() == CallStackEntryModel.PROCESS) {
-                return Integer.compare(t1.getPid(), t2.getPid());
+            ITimeGraphEntryModel m1 = ((TimeGraphEntry) o1).getModel();
+            ITimeGraphEntryModel m2 = ((TimeGraphEntry) o2).getModel();
+            if (m1 instanceof CallStackEntryModel && m2 instanceof CallStackEntryModel) {
+                CallStackEntryModel t1 = (CallStackEntryModel) m1;
+                CallStackEntryModel t2 = (CallStackEntryModel) m2;
+                if (t1.getStackLevel() == CallStackEntryModel.THREAD && t2.getStackLevel() == CallStackEntryModel.THREAD) {
+                    return fThreadComparator.compare(o1, o2);
+                } else if (t1.getStackLevel() == CallStackEntryModel.PROCESS && t2.getStackLevel() == CallStackEntryModel.PROCESS) {
+                    return Integer.compare(t1.getPid(), t2.getPid());
+                }
             }
             return 0;
         }
@@ -227,10 +232,14 @@ public class CallStackView extends AbstractTimeGraphView {
 
         @Override
         public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
-            CallStackEntryModel t1 = (CallStackEntryModel) ((TimeGraphEntry) o1).getModel();
-            CallStackEntryModel t2 = (CallStackEntryModel) ((TimeGraphEntry) o2).getModel();
-            if (t1.getStackLevel() == CallStackEntryModel.THREAD && t2.getStackLevel() == CallStackEntryModel.THREAD) {
-                return reverse ? Long.compare(t2.getPid(), t1.getPid()) : Long.compare(t1.getPid(), t2.getPid());
+            ITimeGraphEntryModel m1 = ((TimeGraphEntry) o1).getModel();
+            ITimeGraphEntryModel m2 = ((TimeGraphEntry) o2).getModel();
+            if (m1 instanceof CallStackEntryModel && m2 instanceof CallStackEntryModel) {
+                CallStackEntryModel t1 = (CallStackEntryModel) m1;
+                CallStackEntryModel t2 = (CallStackEntryModel) m2;
+                if (t1.getStackLevel() == CallStackEntryModel.THREAD && t2.getStackLevel() == CallStackEntryModel.THREAD) {
+                    return reverse ? Long.compare(t2.getPid(), t1.getPid()) : Long.compare(t1.getPid(), t2.getPid());
+                }
             }
             return 0;
         }
@@ -517,7 +526,12 @@ public class CallStackView extends AbstractTimeGraphView {
 
     private void addUnavailableEntry(ITmfTrace trace, ITmfTrace parentTrace) {
         String name = Messages.CallStackView_StackInfoNotAvailable + ' ' + '(' + trace.getName() + ')';
-        TraceEntry unavailableEntry = new TraceEntry(new CallStackEntryModel(0, 0, name, 0, 0, CallStackEntryModel.TRACE, 0), null);
+        TimeGraphEntry unavailableEntry = new TimeGraphEntry(name, 0, 0) {
+            @Override
+            public boolean hasTimeEvents() {
+                return false;
+            }
+        };
         addToEntryList(parentTrace, Collections.singletonList(unavailableEntry));
         if (parentTrace == getTrace()) {
             refresh();
@@ -646,7 +660,7 @@ public class CallStackView extends AbstractTimeGraphView {
         List<TimeGraphEntry> traceEntries = getEntryList(getTrace());
         if (traceEntries != null) {
             for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
-                Iterable<TimeGraphEntry> unfiltered = Iterables.filter(flatten(traceEntry), TimeGraphEntry.class);
+                Iterable<TimeGraphEntry> unfiltered = Iterables.filter(Utils.flatten(traceEntry), TimeGraphEntry.class);
                 Map<Long, TimeGraphEntry> map = Maps.uniqueIndex(unfiltered, e -> e.getModel().getId());
                 // use time -1 as a lower bound for the end of Time events to be included.
                 SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(time - 1, time, 2, map.keySet());
@@ -696,10 +710,6 @@ public class CallStackView extends AbstractTimeGraphView {
         } else {
             fFunctions.remove(id);
         }
-    }
-
-    private static Iterable<ITimeGraphEntry> flatten(ITimeGraphEntry root) {
-        return Iterables.concat(Collections.singletonList(root), Iterables.concat(Iterables.transform(root.getChildren(), CallStackView::flatten)));
     }
 
     private void makeActions() {
@@ -985,15 +995,14 @@ public class CallStackView extends AbstractTimeGraphView {
                             traceEntry.getProvider().resetFunctionNames(new NullProgressMonitor());
 
                             // reset full and zoomed events here
-                            Iterable<ITimeGraphEntry> flatten = flatten(traceEntry);
-                            Iterable<TimeGraphEntry> filter = Iterables.filter(flatten, TimeGraphEntry.class);
-                            filter.forEach(e -> e.setSampling(null));
+                            Iterable<TimeGraphEntry> flatten = Utils.flatten(traceEntry);
+                            flatten.forEach(e -> e.setSampling(null));
 
                             // recompute full events
                             long start = traceEntry.getStartTime();
                             long end = traceEntry.getEndTime();
                             final long resolution = Long.max(1, (end - start) / getDisplayWidth());
-                            zoomEntries(filter, start, end, resolution, new NullProgressMonitor());
+                            zoomEntries(flatten, start, end, resolution, new NullProgressMonitor());
                         }
                         // zoomed events will be retriggered by refreshing
                         refresh();
