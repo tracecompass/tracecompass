@@ -72,7 +72,7 @@ public abstract class AbstractStateSystemAnalysisDataProvider extends AbstractTm
 
         long realStart = Math.max(ss.getStartTime(), filter.getStart());
         if (realStart >= filter.getEnd()) {
-            return TmfXyResponseFactory.createFailedResponse(CommonStatusMessage.INCORRECT_QUERY_INTERVAL);
+            return TmfXyResponseFactory.createEmptyResponse(CommonStatusMessage.INCORRECT_QUERY_INTERVAL);
         }
         return null;
     }
