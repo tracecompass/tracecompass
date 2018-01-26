@@ -757,13 +757,18 @@ public class ControlFlowView extends AbstractTimeGraphView {
                 synchronized (fControlFlowEntries) {
                     for (ThreadEntryModel entry : model) {
                         if (entry.getThreadId() != Integer.MIN_VALUE) {
-                            fControlFlowEntries.put(trace, entry.getId(), new ControlFlowEntry(entry, trace));
+                            ControlFlowEntry e = fControlFlowEntries.get(trace, entry.getId());
+                            if (e != null) {
+                                e.updateModel(entry);
+                            } else {
+                                fControlFlowEntries.put(trace, entry.getId(), new ControlFlowEntry(entry, trace));
+                            }
                         } else {
                             setStartTime(Long.min(getStartTime(), entry.getStartTime()));
                             setEndTime(Long.max(getEndTime(), entry.getEndTime() + 1));
 
                             if (traceEntry != null) {
-                                traceEntry.updateEndTime(entry.getEndTime());
+                                traceEntry.updateModel(entry);
                             } else {
                                 traceEntry = new TraceEntry(entry, trace, dataProvider);
                                 addToEntryList(parentTrace, Collections.singletonList(traceEntry));
@@ -813,6 +818,11 @@ public class ControlFlowView extends AbstractTimeGraphView {
     private static void addEntriesToHierarchicalTree(Iterable<ControlFlowEntry> entryList, TimeGraphEntry traceEntry) {
         traceEntry.clearChildren();
         Map<Long, ControlFlowEntry> map = Maps.uniqueIndex(entryList, entry -> entry.getModel().getId());
+        for (ControlFlowEntry e : entryList) {
+            // reset children tree prior to rebuild
+            e.clearChildren();
+            e.setParent(null);
+        }
         for (TimeGraphEntry entry : entryList) {
             ControlFlowEntry parent = map.get(entry.getModel().getParentId());
             /*

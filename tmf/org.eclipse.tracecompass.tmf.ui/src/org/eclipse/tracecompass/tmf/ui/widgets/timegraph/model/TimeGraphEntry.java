@@ -449,4 +449,18 @@ public class TimeGraphEntry implements ITimeGraphEntry {
         return fModel;
     }
 
+    /**
+     * Update the underlying model.
+     *
+     * @param model
+     *            new model for this TimeGraphEntry.
+     * @since 3.3
+     */
+    public void updateModel(@NonNull TimeGraphEntryModel model) {
+        if (fModel.getId() != model.getId()) {
+            throw new IllegalArgumentException("TimeGraphEntry should be updated with a TimeGraphEntryModel with the same id."); //$NON-NLS-1$
+        }
+        fModel = model;
+    }
+
 }

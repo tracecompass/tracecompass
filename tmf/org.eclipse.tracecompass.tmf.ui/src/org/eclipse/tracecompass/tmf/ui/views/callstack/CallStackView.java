@@ -484,17 +484,21 @@ public class CallStackView extends AbstractTimeGraphView {
             if (model != null) {
                 for (CallStackEntryModel entry : model) {
                     if (entry.getStackLevel() != CallStackEntryModel.TRACE) {
-                        TimeGraphEntry uiEntry = new TimeGraphEntry(entry);
-                        map.put(entry.getId(), uiEntry);
-                        TimeGraphEntry parent = map.getOrDefault(entry.getParentId(), traceEntry);
-                        parent.addChild(uiEntry);
+                        TimeGraphEntry uiEntry = map.get(entry.getId());
+                        if (uiEntry != null) {
+                            uiEntry.updateModel(entry);
+                        } else {
+                            uiEntry = new TimeGraphEntry(entry);
+                            map.put(entry.getId(), uiEntry);
+                            TimeGraphEntry parent = map.getOrDefault(entry.getParentId(), traceEntry);
+                            parent.addChild(uiEntry);
+                        }
                     } else {
                         setStartTime(Long.min(getStartTime(), entry.getStartTime()));
                         setEndTime(Long.max(getEndTime(), entry.getEndTime() + 1));
 
                         if (traceEntry != null) {
-                            traceEntry.updateEndTime(entry.getEndTime());
-                            traceEntry.clearChildren();
+                            traceEntry.updateModel(entry);
                         } else {
                             traceEntry = new TraceEntry(entry, provider);
                             addToEntryList(parentTrace, Collections.singletonList(traceEntry));
@@ -511,7 +515,6 @@ public class CallStackView extends AbstractTimeGraphView {
                 synchingToTime(getTimeGraphViewer().getSelectionBegin());
                 refresh();
             }
-            map.clear();
             subMonitor.worked(1);
 
             if (!complete) {
