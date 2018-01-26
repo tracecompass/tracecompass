@@ -17,9 +17,9 @@ import java.lang.reflect.InvocationTargetException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage.UstMemoryUsageView;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
@@ -128,9 +128,16 @@ public class MemoryUsageViewTest extends XYDataProviderBaseTest {
         verifySeriesStyle(FOURTH_SERIES_NAME, ISeries.SeriesType.LINE, GREEN_BLUE, LineStyle.SOLID, false);
     }
 
+    /**
+     * Ensure that the tree is loaded and then check all entries
+     */
     private void checkAllEntries() {
-        SWTBotTree treeBot = getSWTBotView().bot().tree();
-        for (SWTBotTreeItem entry : treeBot.getAllItems()) {
+        SWTBot bot = getSWTBotView().bot();
+
+        SWTBotUtils.waitUntil(b -> b.tree().visibleRowCount() == 5, bot,
+                "Incorrect number of tree entries, expected 5, was " + bot.tree().visibleRowCount());
+
+        for (SWTBotTreeItem entry : bot.tree().getAllItems()) {
             entry.check();
         }
     }
