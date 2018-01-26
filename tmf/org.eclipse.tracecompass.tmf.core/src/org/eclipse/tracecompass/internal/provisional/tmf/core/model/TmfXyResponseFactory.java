@@ -9,9 +9,11 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ISeriesModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
@@ -103,5 +105,18 @@ public final class TmfXyResponseFactory {
      */
     public static TmfModelResponse<ITmfXyModel> createCancelledResponse(String message) {
         return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, message);
+    }
+
+    /**
+     * Create a {@link TmfModelResponse} with a COMPLETED status but empty model.
+     *
+     * @param message
+     *            A detailed message of why the response is empty
+     * @return A {@link TmfModelResponse} with a COMPLETED status and empty model
+     */
+    public static TmfModelResponse<ITmfXyModel> createEmptyResponse(String message) {
+        ITmfXyModel model = new TmfXyModel(StringUtils.EMPTY, Collections.emptyMap());
+
+        return new TmfModelResponse<>(model, ITmfResponse.Status.COMPLETED, message);
     }
 }

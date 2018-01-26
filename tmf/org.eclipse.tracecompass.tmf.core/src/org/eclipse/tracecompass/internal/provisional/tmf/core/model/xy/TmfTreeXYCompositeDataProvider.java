@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -95,49 +96,73 @@ public class TmfTreeXYCompositeDataProvider<M extends ITmfTreeDataModel, P exten
 
     @Override
     public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        /**
+         * <pre>
+         * Response status according to the provider's reponse statuses:
+         *
+         * * Cancelled -> The monitor is cancelled
+         * * Failed -> At least one provider has failed
+         * * Running -> At least one of the providers is running
+         * * Completed -> All providers have completed
+         * </pre>
+         */
         List<P> providers = getProviders();
-        boolean allCommon = Iterables.all(providers, ITmfCommonXAxisModel.class::isInstance);
+        // Get all the responses
+        Collection<TmfModelResponse<ITmfXyModel>> responses = getXyResponses(filter, monitor, providers);
 
-        if (allCommon) {
-            return getCommonXResponse(filter, monitor, providers);
+        if (monitor != null && monitor.isCanceled()) {
+            return TmfXyResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
         }
-        return getXyResponse(filter, monitor, providers);
-    }
+        // If one response is failed, return a failed response with a concatenation of the messages
+        String failedMsg = handleFailedStatus(responses);
+        if (failedMsg != null) {
+            return TmfXyResponseFactory.createFailedResponse(failedMsg);
+        }
 
-    private TmfModelResponse<ITmfXyModel> getXyResponse(TimeQueryFilter filter, @Nullable IProgressMonitor monitor, List<P> providers) {
-        boolean isComplete = true;
+        boolean allCommon = Iterables.all(providers, ITmfCommonXAxisModel.class::isInstance);
+        // The query is considered complete if all providers are completed
+        boolean isComplete = Iterables.all(responses, response -> response.getStatus() == ITmfResponse.Status.COMPLETED);
+        if (allCommon) {
+            ImmutableMap.Builder<String, IYModel> series = ImmutableMap.builder();
+            responses.forEach(response -> {
+                ITmfCommonXAxisModel model = (ITmfCommonXAxisModel) response.getModel();
+                if (model != null) {
+                    series.putAll(model.getYData());
+                }
+            });
+            return TmfXyResponseFactory.create(fTitle, filter.getTimesRequested(), series.build(), isComplete);
+        }
         ImmutableMap.Builder<String, ISeriesModel> series = ImmutableMap.builder();
-        for (P dataProvider : providers) {
-            TmfModelResponse<ITmfXyModel> response = dataProvider.fetchXY(filter, monitor);
-            isComplete &= response.getStatus() == ITmfResponse.Status.COMPLETED;
+        responses.forEach(response -> {
             ITmfXyModel model = response.getModel();
             if (model != null) {
                 series.putAll(model.getData());
             }
-
-            if (monitor != null && monitor.isCanceled()) {
-                return TmfXyResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
-            }
-        }
-        return TmfXyResponseFactory.create(fTitle, series.build(), isComplete); // $NON-NLS-1$
+        });
+        return TmfXyResponseFactory.create(fTitle, series.build(), isComplete);
     }
 
-    private TmfModelResponse<ITmfXyModel> getCommonXResponse(TimeQueryFilter filter, @Nullable IProgressMonitor monitor, List<P> providers) {
-        boolean isComplete = true;
-        ImmutableMap.Builder<String, IYModel> series = ImmutableMap.builder();
+    private static @Nullable String handleFailedStatus(Collection<TmfModelResponse<ITmfXyModel>> responses) {
+        if (Iterables.any(responses, response -> response.getStatus() == ITmfResponse.Status.FAILED)) {
+            // All requests have failed, return a concatenation of their errors
+            return responses.stream().map(TmfModelResponse::getStatusMessage)
+                    .collect(Collectors.joining("\n")); //$NON-NLS-1$
+        }
+        // At least one is good, return null
+        return null;
+    }
+
+    private Collection<TmfModelResponse<ITmfXyModel>> getXyResponses(TimeQueryFilter filter, @Nullable IProgressMonitor monitor, List<P> providers) {
+        List<TmfModelResponse<ITmfXyModel>> responses = new ArrayList<>();
         for (P dataProvider : providers) {
             TmfModelResponse<ITmfXyModel> response = dataProvider.fetchXY(filter, monitor);
-            isComplete &= response.getStatus() == ITmfResponse.Status.COMPLETED;
-            ITmfCommonXAxisModel model = (ITmfCommonXAxisModel) response.getModel();
-            if (model != null) {
-                series.putAll(model.getYData());
-            }
+            responses.add(response);
 
             if (monitor != null && monitor.isCanceled()) {
-                return TmfXyResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
+                return responses;
             }
         }
-        return TmfXyResponseFactory.create(fTitle, filter.getTimesRequested(), series.build(), isComplete); // $NON-NLS-1$
-
+        return responses;
     }
+
 }
