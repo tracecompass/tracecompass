@@ -13,20 +13,15 @@ import static org.eclipse.swtbot.swt.finder.SWTBotAssert.assertVisible;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
-import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternScatterGraphView;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IViewReference;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.swtchart.Chart;
@@ -42,26 +37,7 @@ import org.swtchart.Range;
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class PatternScatterChartViewTest extends PatternLatencyViewTestBase {
 
-    private static final String VIEW_ID = PatternScatterGraphView.ID;
     private static final String VIEW_TITLE = "Latency vs Time";
-    private Chart fScatterChart;
-
-    private void setChart() {
-        SWTBotView viewBot = fBot.viewById(VIEW_ID);
-        final IViewReference viewReference = viewBot.getViewReference();
-        IViewPart viewPart = UIThreadRunnable.syncExec(new Result<IViewPart>() {
-            @Override
-            public IViewPart run() {
-                return viewReference.getView(true);
-            }
-        });
-        assertNotNull(viewPart);
-        if (!(viewPart instanceof PatternScatterGraphView)) {
-            fail("Could not instanciate view");
-        }
-        fScatterChart = viewBot.bot().widget(WidgetOfType.widgetOfType(Chart.class));
-        assertNotNull(fScatterChart);
-    }
 
     /**
      * Test the pattern latency scatter graph. This method test if the chart has
@@ -69,17 +45,19 @@ public class PatternScatterChartViewTest extends PatternLatencyViewTestBase {
      */
     @Test
     public void testWithTrace() {
-        setChart();
+        SWTBotView viewBot = fBot.viewById(PatternScatterGraphView.ID);
+        viewBot.setFocus();
         WaitUtils.waitForJobs();
-        final Chart scatterChart = fScatterChart;
-        assertNotNull(scatterChart);
-        fBot.waitUntil(ConditionHelpers.numberOfSeries(scatterChart, 1));
 
-        SWTBotChart chartBot = new SWTBotChart(scatterChart);
+        Chart chart = viewBot.bot().widget(WidgetOfType.widgetOfType(Chart.class));
+        assertNotNull(chart);
+        fBot.waitUntil(ConditionHelpers.numberOfSeries(chart, 1));
+
+        SWTBotChart chartBot = new SWTBotChart(chart);
         assertVisible(chartBot);
-        final Range range = scatterChart.getAxisSet().getXAxes()[0].getRange();
+        final Range range = chart.getAxisSet().getXAxes()[0].getRange();
         assertEquals(100000000, range.upper - range.lower, 0);
-        ISeriesSet seriesSet = fScatterChart.getSeriesSet();
+        ISeriesSet seriesSet = chart.getSeriesSet();
         assertNotNull(seriesSet);
         ISeries[] series = seriesSet.getSeries();
         assertNotNull(series);
@@ -98,7 +76,7 @@ public class PatternScatterChartViewTest extends PatternLatencyViewTestBase {
 
     @Override
     protected String getViewId() {
-        return VIEW_ID;
+        return PatternScatterGraphView.ID;
     }
 
     @Override
