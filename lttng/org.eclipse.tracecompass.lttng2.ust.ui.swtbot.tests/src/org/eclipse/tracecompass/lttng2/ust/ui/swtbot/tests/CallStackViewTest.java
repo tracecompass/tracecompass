@@ -13,7 +13,6 @@
 
 package org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -60,6 +59,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 /**
  * Test for the Call Stack view in trace compass
@@ -232,8 +232,7 @@ public class CallStackViewTest {
         final SWTBotView viewBot = fBot.viewById(CallStackView.ID);
         viewBot.setFocus();
         WaitUtils.waitForJobs();
-        List<String> names = getVisibleStackFrames(viewBot);
-        assertArrayEquals(STACK_FRAMES[0], names.toArray());
+        waitForSymbolNames(viewBot, STACK_FRAMES[0]);
     }
 
     /**
@@ -251,7 +250,7 @@ public class CallStackViewTest {
             currentEventOffset++;
             fBot.waitUntil(ConditionHelpers.selectionInEventsTable(fBot, TIMESTAMPS[currentEventOffset]));
             WaitUtils.waitForJobs();
-            assertArrayEquals(STACK_FRAMES[currentEventOffset], getVisibleStackFrames(viewBot).toArray());
+            waitForSymbolNames(viewBot, STACK_FRAMES[currentEventOffset]);
 
         }
         // back twice
@@ -260,7 +259,7 @@ public class CallStackViewTest {
             currentEventOffset--;
             fBot.waitUntil(ConditionHelpers.selectionInEventsTable(fBot, TIMESTAMPS[currentEventOffset]));
             WaitUtils.waitForJobs();
-            assertArrayEquals(STACK_FRAMES[currentEventOffset], getVisibleStackFrames(viewBot).toArray());
+            waitForSymbolNames(viewBot, STACK_FRAMES[currentEventOffset]);
         }
         // move up and down once to make sure it doesn't explode
         viewBot.toolbarPushButton(SELECT_PREVIOUS_ITEM).click();
@@ -289,8 +288,14 @@ public class CallStackViewTest {
         viewBot.toolbarToggleButton(SORT_BY_START).click();
         viewBot.setFocus();
         WaitUtils.waitForJobs();
-        List<String> names = getVisibleStackFrames(viewBot);
-        assertArrayEquals(STACK_FRAMES[0], names.toArray());
+        waitForSymbolNames(viewBot, STACK_FRAMES[0]);
+    }
+
+    private static void waitForSymbolNames(final SWTBotView viewBot, String[] symbolNames) {
+        List<String> symbolNameList = Lists.newArrayList(symbolNames);
+        WaitUtils.waitUntil(vBot -> symbolNameList.equals(getVisibleStackFrames(vBot)),
+                viewBot, "Wrong symbol names, expected:" + symbolNameList
+                + ", got: " + getVisibleStackFrames(viewBot));
     }
 
     private static List<String> getVisibleStackFrames(final SWTBotView viewBot) {
