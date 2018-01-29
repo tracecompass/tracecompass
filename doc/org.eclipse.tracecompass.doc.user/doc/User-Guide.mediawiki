@@ -1167,7 +1167,7 @@ The trace will be opened in an editor showing the events table, and an entry wil
 
 == Pin and Clone ==
 
-Some views, such as time graph views, can be opened multiple times in order to show content from different traces and/or window ranges simultaneously. This can be done by using the '''New <view name> view''' sub-menu in the view's '''View Menu''' at the far right of the tool bar.
+Some views, such as time graph and XY chart views, can be opened multiple times in order to show content from different traces and/or window ranges simultaneously. This can be done by using the '''New <view name> view''' sub-menu in the view's '''View Menu''' at the far right of the tool bar.
 
 By default, a view shows content from the active trace, which is the last trace whose events editor tab has been selected.
 
