@@ -88,7 +88,7 @@ public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
 
     @Override
     protected @Nullable TimeQueryFilter getFilter(long start, long end, boolean isSelection) {
-        return new FilterTimeQueryFilter(start, end, 2, fFiltered);
+        return new FilterTimeQueryFilter(Long.min(start, end), Long.max(start, end), 2, fFiltered);
     }
 
     @Override

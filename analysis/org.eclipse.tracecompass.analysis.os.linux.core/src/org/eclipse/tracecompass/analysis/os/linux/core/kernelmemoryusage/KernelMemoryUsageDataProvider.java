@@ -219,25 +219,26 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeXyDataProvider<Ke
         long start = filter.getStart();
         long end = filter.getEnd();
 
-        if (start == end) {
-            return Collections.emptyList();
-        }
-
-        // to filter the active threads or not
-        boolean filtered = false;
-        if (filter instanceof FilterTimeQueryFilter) {
-            filtered = ((FilterTimeQueryFilter) filter).isFiltered();
+        // Let the list of active states be null if we aren't filtering
+        List<ITmfStateInterval> active = null;
+        if (filter instanceof FilterTimeQueryFilter && ((FilterTimeQueryFilter) filter).isFiltered()) {
+            if (start == end || start > ss.getCurrentEndTime() || end < ss.getStartTime()) {
+                /*
+                 * return an empty list if the filter is empty or does not intersect the state
+                 * system
+                 */
+                return Collections.emptyList();
+            }
+            active = ss.queryFullState(Long.max(start, ss.getStartTime()));
         }
 
         List<MemoryUsageTreeModel> nodes = new ArrayList<>();
-        List<ITmfStateInterval> memoryStates = ss.queryFullState(Long.max(start, ss.getStartTime()));
         List<Integer> threadQuarkList = ss.getSubAttributes(ITmfStateSystem.ROOT_ATTRIBUTE, false);
 
         long totalId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
         nodes.add(new MemoryUsageTreeModel(totalId, -1, TOTAL_TID, getTrace().getName()));
         for (Integer threadQuark : threadQuarkList) {
-            ITmfStateInterval threadMemoryInterval = memoryStates.get(threadQuark);
-            if (!filtered || threadMemoryInterval.getEndTime() < end) {
+            if (active == null || active.get(threadQuark).getEndTime() < end) {
                 String tidString = ss.getAttributeName(threadQuark);
                 String procname = getProcessName(tidString);
 

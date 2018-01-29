@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.lttng2.ust.core.analysis.memory;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -138,12 +139,24 @@ public class UstMemoryUsageDataProvider extends AbstractTreeXyDataProvider<UstMe
     @Override
     protected List<MemoryUsageTreeModel> getTree(ITmfStateSystem ss, TimeQueryFilter filter, @Nullable IProgressMonitor monitor)
             throws StateSystemDisposedException {
-        boolean filtered = false;
-        if (filter instanceof FilterTimeQueryFilter) {
-            filtered = ((FilterTimeQueryFilter) filter).isFiltered();
+
+        long start = filter.getStart();
+        long end = filter.getEnd();
+
+        // Let the list of active states be null if we aren't filtering
+        List<ITmfStateInterval> active = null;
+        if (filter instanceof FilterTimeQueryFilter && ((FilterTimeQueryFilter) filter).isFiltered()) {
+            if (start == end || start > ss.getCurrentEndTime() || end < ss.getStartTime()) {
+                /*
+                 * return an empty list if the filter is empty or does not intersect the state
+                 * system
+                 */
+                return Collections.emptyList();
+            }
+            active = ss.queryFullState(Long.max(start, ss.getStartTime()));
         }
+
         List<ITmfStateInterval> nameFullState = ss.queryFullState(ss.getCurrentEndTime());
-        List<ITmfStateInterval> activeFullState = ss.queryFullState(Long.max(filter.getStart(), ss.getStartTime()));
         List<Integer> tidQuarks = ss.getSubAttributes(-1, false);
 
         ImmutableList.Builder<MemoryUsageTreeModel> builder = ImmutableList.builder();
@@ -153,16 +166,13 @@ public class UstMemoryUsageDataProvider extends AbstractTreeXyDataProvider<UstMe
             int memoryAttribute = ss.optQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_MEMORY_ATTRIBUTE);
             int procNameQuark = ss.optQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_PROCNAME_ATTRIBUTE);
 
-            if (memoryAttribute != ITmfStateSystem.INVALID_ATTRIBUTE && procNameQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
-                ITmfStateInterval threadMemoryInterval = activeFullState.get(memoryAttribute);
-                if (!filtered || threadMemoryInterval.getEndTime() < filter.getEnd()) {
-                    String name = String.valueOf(nameFullState.get(procNameQuark).getValue());
-                    int tid = Integer.parseInt(ss.getAttributeName(quark));
+            if (memoryAttribute != ITmfStateSystem.INVALID_ATTRIBUTE
+                    && procNameQuark != ITmfStateSystem.INVALID_ATTRIBUTE
+                    && (active == null || active.get(memoryAttribute).getEndTime() < end)) {
+                String name = String.valueOf(nameFullState.get(procNameQuark).getValue());
+                int tid = Integer.parseInt(ss.getAttributeName(quark));
 
-                    // Check if an ID has already been created for this quark.
-                    Long id = getId(quark);
-                    builder.add(new MemoryUsageTreeModel(id, rootId, tid, name));
-                }
+                builder.add(new MemoryUsageTreeModel(getId(quark), rootId, tid, name));
             }
         }
 
@@ -182,7 +192,7 @@ public class UstMemoryUsageDataProvider extends AbstractTreeXyDataProvider<UstMe
      */
     @Override
     protected boolean isCacheable() {
-        return true;
+        return false;
     }
 
     /**
