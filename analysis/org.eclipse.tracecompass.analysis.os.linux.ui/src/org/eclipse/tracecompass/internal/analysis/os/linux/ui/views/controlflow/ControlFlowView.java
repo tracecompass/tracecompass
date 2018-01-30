@@ -496,11 +496,6 @@ public class ControlFlowView extends AbstractTimeGraphView {
             if (entryList != null) {
                 for (TraceEntry traceEntry : Iterables.filter(entryList, TraceEntry.class)) {
                     Collection<ControlFlowEntry> entries = fControlFlowEntries.row(traceEntry.getTrace()).values();
-                    entries.forEach(e -> {
-                        // reset the entries
-                        e.setParent(null);
-                        e.clearChildren();
-                    });
                     addEntriesToFlatTree(entries, traceEntry);
                 }
             }
@@ -809,7 +804,12 @@ public class ControlFlowView extends AbstractTimeGraphView {
      */
     private static void addEntriesToFlatTree(Collection<@NonNull ControlFlowEntry> entries, TimeGraphEntry traceEntry) {
         traceEntry.clearChildren();
-        entries.forEach(traceEntry::addChild);
+        for (ControlFlowEntry e : entries) {
+            // reset the entries
+            e.setParent(null);
+            e.clearChildren();
+            traceEntry.addChild(e);
+        }
     }
 
     /**
