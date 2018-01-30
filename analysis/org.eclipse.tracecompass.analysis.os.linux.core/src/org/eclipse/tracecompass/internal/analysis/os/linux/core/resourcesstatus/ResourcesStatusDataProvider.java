@@ -85,17 +85,17 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                 return null;
             }
 
-            int currentThreadQuark = ss.optQuarkRelative(interval.getAttribute(), Attributes.CURRENT_THREAD);
-            if (currentThreadQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
-                return null;
-            }
-
             long startTime = interval.getStartTime();
             long duration = interval.getEndTime() - startTime + 1;
+            int status = interval.getStateValue().unboxInt();
+
+            int currentThreadQuark = ss.optQuarkRelative(interval.getAttribute(), Attributes.CURRENT_THREAD);
+            if (currentThreadQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+                return new TimeGraphState(startTime, duration, status);
+            }
 
             String attribute;
             Function<String, String> trim = Function.identity();
-            int status = interval.getStateValue().unboxInt();
             if (status == StateValues.CPU_STATUS_RUN_USERMODE) {
                 attribute = Attributes.EXEC_NAME;
             } else if (status == StateValues.CPU_STATUS_RUN_SYSCALL) {
@@ -129,7 +129,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                 // make sure next time is at least at the next pixel
                 time = tidInterval.getEndTime() + 1;
             }
-            return null;
+            return new TimeGraphState(startTime, duration, status);
         }
     };
 
@@ -266,6 +266,12 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             }
             rows.add(new TimeGraphRowModel(getId(entry.getKey()), eventList));
         }
+        if (!ss.waitUntilBuilt(0)) {
+            /*
+             * Avoid caching incomplete results from state system.
+             */
+            fTimeEventNames.invalidateAll();
+        }
         return rows;
     }
 
@@ -276,10 +282,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         if (status instanceof Integer) {
             int s = (int) status;
             if (s == StateValues.CPU_STATUS_RUN_USERMODE || s == StateValues.CPU_STATUS_RUN_SYSCALL) {
-                ITimeGraphState createNamedState = fTimeEventNames.getIfPresent(interval);
-                if (createNamedState != null) {
-                    return createNamedState;
-                }
+                return fTimeEventNames.getUnchecked(interval);
             }
             return new TimeGraphState(startTime, duration, s);
         }
