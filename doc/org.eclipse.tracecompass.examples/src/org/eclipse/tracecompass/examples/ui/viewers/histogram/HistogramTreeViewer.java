@@ -47,7 +47,13 @@ public class HistogramTreeViewer extends AbstractSelectTreeViewer {
         public Image getColumnImage(Object element, int columnIndex) {
             if (columnIndex == 1 && element instanceof TmfGenericTreeEntry && isChecked(element)) {
                 TmfGenericTreeEntry<TmfTreeDataModel> genericEntry = (TmfGenericTreeEntry<TmfTreeDataModel>) element;
-                return getLegendImage(genericEntry.getModel().getName());
+                if (!genericEntry.hasChildren()) {
+                    /*
+                     * the trace level entry should not have a legend, the Total and lost event
+                     * entries should.
+                     */
+                    return getLegendImage(getFullPath(genericEntry));
+                }
             }
             return null;
         }

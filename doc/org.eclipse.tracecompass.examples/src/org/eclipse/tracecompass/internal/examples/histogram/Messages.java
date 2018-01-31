@@ -19,6 +19,14 @@ public class Messages extends NLS {
      */
     public static @Nullable String HistogramDataProvider_Title;
     /**
+     * New Histogram Total events series' table
+     */
+    public static @Nullable String HistogramDataProvider_Total;
+    /**
+     * New Histogram Lost events series' title
+     */
+    public static @Nullable String HistogramDataProvider_Lost;
+    /**
      * New histogram tree name column name.
      */
     public static @Nullable String NewHistogramTree_ColumnName;
