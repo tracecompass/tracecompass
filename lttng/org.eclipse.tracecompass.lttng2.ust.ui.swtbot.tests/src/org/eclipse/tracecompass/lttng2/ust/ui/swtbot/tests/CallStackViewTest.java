@@ -218,7 +218,7 @@ public class CallStackViewTest {
     public void testOpenCallstack() {
         SWTBotView viewBot = fBot.viewById(CallStackView.ID);
         viewBot.setFocus();
-        assertEquals(Arrays.asList("0x40472b"), getVisibleStackFrames(viewBot));
+        waitForSymbolNames(viewBot, new String[]{"0x40472b"});
     }
 
     /**

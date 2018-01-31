@@ -10,7 +10,6 @@
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -60,12 +59,15 @@ public abstract class AbstractTimeGraphDataProvider<A extends TmfStateSystemAnal
     @Override
     public final TmfModelResponse<List<ITimeGraphRowModel>> fetchRowModel(SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         A module = getAnalysisModule();
-        if (verifyParameters(module, filter, monitor) != null) {
-            return new TmfModelResponse<>(null, Status.FAILED, CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
+        if (!module.waitForInitialization()) {
+            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
         }
 
-        ITmfStateSystem ss = Objects.requireNonNull(module.getStateSystem(),
-                "Statesystem should have been verified by verifyParameters"); //$NON-NLS-1$
+        ITmfStateSystem ss = module.getStateSystem();
+        if (ss == null) {
+            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
+        }
+
         long currentEnd = ss.getCurrentEndTime();
         boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
 
@@ -80,7 +82,7 @@ public abstract class AbstractTimeGraphDataProvider<A extends TmfStateSystemAnal
             return new TmfModelResponse<>(models, complete ? Status.COMPLETED : Status.RUNNING,
                     complete ? CommonStatusMessage.COMPLETED : CommonStatusMessage.RUNNING);
         } catch (StateSystemDisposedException | TimeRangeException | IndexOutOfBoundsException e) {
-            return new TmfModelResponse<>(null, Status.FAILED, e.getMessage());
+            return new TmfModelResponse<>(null, Status.FAILED, String.valueOf(e.getMessage()));
         }
     }
 
