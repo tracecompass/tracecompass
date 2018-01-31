@@ -159,11 +159,23 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         return retMap;
     }
 
+    /**
+     * Returns the average character width, measured in pixels, of the font
+     * described by the receiver.
+     *
+     * @param gc
+     *            The graphic context
+     * @return the average character width of the font
+     */
+    @Deprecated
+    private static int getAverageCharWidth(GC gc) {
+        return gc.getFontMetrics().getAverageCharWidth();
+    }
 
     @Override
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
         if (fAverageCharacterWidth == null) {
-            fAverageCharacterWidth = gc.getFontMetrics().getAverageCharWidth();
+            fAverageCharacterWidth = getAverageCharWidth(gc);
         }
         if (bounds.width <= fAverageCharacterWidth || !(event instanceof NamedTimeEvent)) {
             // NamedTimeEvents are used only for the sys calls which we want.

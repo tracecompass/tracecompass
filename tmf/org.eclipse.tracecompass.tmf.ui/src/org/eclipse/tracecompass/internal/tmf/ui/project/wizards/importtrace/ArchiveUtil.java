@@ -16,9 +16,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Objects;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.widgets.Shell;
@@ -46,16 +49,13 @@ public class ArchiveUtil {
     }
 
     private static boolean isZipFile(String fileName) {
-        ZipFile specifiedZipSourceFile = getSpecifiedZipSourceFile(fileName);
-        if (specifiedZipSourceFile != null) {
-            try {
-                specifiedZipSourceFile.close();
+        try (ZipFile specifiedZipSourceFile = getSpecifiedZipSourceFile(fileName)) {
+            if (specifiedZipSourceFile != null) {
                 return true;
-            } catch (IOException e) {
-                // ignore
             }
+        } catch (IOException e) {
+            // ignore
         }
-
         return false;
     }
 
@@ -182,9 +182,8 @@ public class ArchiveUtil {
 
         ZipFile zipFile = getSpecifiedZipSourceFile(archivePath);
         if (zipFile != null) {
-            ArrayList<ZipArchiveEntry> entries = Collections.list(zipFile.getEntries());
-            for (ZipArchiveEntry zipArchiveEntry : entries) {
-                archiveSize += zipArchiveEntry.getSize();
+            for (Enumeration<? extends ZipEntry> e = zipFile.entries(); e.hasMoreElements();) {
+                archiveSize += Objects.requireNonNull(e.nextElement()).getSize();
             }
             closeZipFile(zipFile);
             return archiveSize;

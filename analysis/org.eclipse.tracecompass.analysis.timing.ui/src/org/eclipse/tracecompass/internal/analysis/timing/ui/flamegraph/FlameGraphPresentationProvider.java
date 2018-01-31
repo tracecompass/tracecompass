@@ -146,11 +146,23 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
         }
         return funcSymbol;
     }
+    /**
+     * Returns the average character width, measured in pixels, of the font
+     * described by the receiver.
+     *
+     * @param gc
+     *            The graphic context
+     * @return the average character width of the font
+     */
+    @Deprecated
+    private static int getAverageCharWidth(GC gc) {
+        return gc.getFontMetrics().getAverageCharWidth();
+    }
 
     @Override
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
         if (fAverageCharWidth == null) {
-            fAverageCharWidth = gc.getFontMetrics().getAverageCharWidth();
+            fAverageCharWidth = getAverageCharWidth(gc);
         }
         if (bounds.width <= fAverageCharWidth) {
             return;

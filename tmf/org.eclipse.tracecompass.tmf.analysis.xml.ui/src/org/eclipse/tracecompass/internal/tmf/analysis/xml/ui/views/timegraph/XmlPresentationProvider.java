@@ -122,6 +122,19 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
         return Collections.emptyMap();
     }
 
+    /**
+     * Returns the average character width, measured in pixels, of the font
+     * described by the receiver.
+     *
+     * @param gc
+     *            The graphic context
+     * @return the average character width of the font
+     */
+    @Deprecated
+    private static int getAverageCharWidth(GC gc) {
+        return gc.getFontMetrics().getAverageCharWidth();
+    }
+
     @Override
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
         // Is there text to show
@@ -131,7 +144,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
         }
         // See if the state is too short to show text
         if (fAverageCharacterWidth == null) {
-            fAverageCharacterWidth = gc.getFontMetrics().getAverageCharWidth();
+            fAverageCharacterWidth = getAverageCharWidth(gc);
         }
         if (bounds.width <= fAverageCharacterWidth) {
             return;

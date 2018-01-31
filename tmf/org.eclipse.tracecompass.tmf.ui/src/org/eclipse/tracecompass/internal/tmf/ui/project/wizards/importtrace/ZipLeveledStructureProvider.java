@@ -22,9 +22,11 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.Nullable;
@@ -215,9 +217,9 @@ public class ZipLeveledStructureProvider implements
         children = new HashMap<>(1000);
 
         children.put(root, new ArrayList<>());
-        Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
+        Enumeration<? extends ZipEntry> entries = zipFile.entries();
         while (entries.hasMoreElements()) {
-            ZipArchiveEntry entry = entries.nextElement();
+            ZipEntry entry = Objects.requireNonNull(entries.nextElement());
             IPath path = new Path(entry.getName()).addTrailingSeparator();
 
             if (entry.isDirectory()) {
@@ -230,7 +232,7 @@ public class ZipLeveledStructureProvider implements
                 if (pathSegmentCount > 1) {
                     createContainer(path.uptoSegment(pathSegmentCount - 1));
                 }
-                createFile(entry);
+                createFile(new ZipArchiveEntry(entry.getName()));
             }
         }
     }
