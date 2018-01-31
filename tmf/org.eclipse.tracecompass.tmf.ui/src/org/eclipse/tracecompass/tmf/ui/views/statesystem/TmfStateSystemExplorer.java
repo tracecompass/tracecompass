@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 École Polytechnique de Montréal, Ericsson
+ * Copyright (c) 2013, 2018 École Polytechnique de Montréal, Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -35,8 +35,11 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
@@ -64,7 +67,9 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sampling;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.PlatformUI;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
@@ -86,8 +91,9 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
     /** The Environment View's ID */
     public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.ssvisualizer"; //$NON-NLS-1$
 
-    private static final Image FILTER_IMAGE =
-            Activator.getDefault().getImageFromPath( File.separator + "icons" +  File.separator + "elcl16" +  File.separator + "filter_items.gif"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    private static final Image FILTER_IMAGE = Activator.getDefault().getImageFromPath(File.separator + "icons" + File.separator + "elcl16" + File.separator + "filter_items.gif"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    private static final Image COLLAPSE_IMAGE = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_COLLAPSEALL);
+    private static final Image EXPAND_IMAGE = Activator.getDefault().getImageFromPath(File.separator + "icons" + File.separator + "elcl16" + File.separator + "expandall.gif"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     private static final String[] COLUMN_NAMES = new String[] {
             Messages.TreeNodeColumnLabel,
@@ -143,34 +149,89 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
      */
     private static final int DEFAULT_AUTOEXPAND = 2;
 
-    private class FilterAction extends Action {
-        public FilterAction(String text, int style) {
-            super(text, style);
+    private class ExpandAction extends Action {
+        public ExpandAction(String text) {
+            super(text, IAction.AS_PUSH_BUTTON);
+            setImageDescriptor(ImageDescriptor.createFromImage(EXPAND_IMAGE));
+            setToolTipText(Messages.ExpandButton);
         }
 
         @Override
         public void run() {
-            boolean showAll = isChecked();
-            setAutoExpandLevel(showAll ? AbstractTreeViewer.ALL_LEVELS : DEFAULT_AUTOEXPAND);
+            setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
             List<@NonNull TimeGraphEntry> traceEntries = getEntryList(getTrace());
             if (traceEntries == null) {
                 return;
             }
             TimeGraphControl control = getTimeGraphViewer().getTimeGraphControl();
-            if (showAll) {
-                Iterables.concat(Iterables.transform(traceEntries, Utils::flatten))
-                        .forEach(e -> control.setExpandedState(e, true));
-            } else {
-                traceEntries.forEach(trace -> expandUpToStateSystems(control, trace));
+            Iterables.concat(Iterables.transform(traceEntries, Utils::flatten))
+                    .forEach(e -> control.setExpandedState(e, true));
+            redraw();
+        }
+    }
+
+    private class CollapseAction extends Action {
+        public CollapseAction(String text) {
+            super(text, IAction.AS_PUSH_BUTTON);
+            setImageDescriptor(ImageDescriptor.createFromImage(COLLAPSE_IMAGE));
+            setToolTipText(Messages.CollapseButton);
+        }
+
+        @Override
+        public void run() {
+            setAutoExpandLevel(DEFAULT_AUTOEXPAND);
+            List<@NonNull TimeGraphEntry> traceEntries = getEntryList(getTrace());
+            if (traceEntries == null) {
+                return;
+            }
+            TimeGraphControl control = getTimeGraphViewer().getTimeGraphControl();
+            for (TimeGraphEntry traceEntry : traceEntries) {
+                for (TimeGraphEntry moduleEntry : traceEntry.getChildren()) {
+                    for (TimeGraphEntry stateSystemEntry : moduleEntry.getChildren()) {
+                        Utils.flatten(stateSystemEntry).forEach(attribute -> control.setExpandedState(attribute, false));
+                    }
+                }
             }
             redraw();
         }
+    }
 
-        private void expandUpToStateSystems(TimeGraphControl control, TimeGraphEntry traceEntry) {
-            control.setExpandedState(traceEntry, true);
-            for (TimeGraphEntry moduleEntry : traceEntry.getChildren()) {
-                control.setExpandedState(moduleEntry, true);
-                moduleEntry.getChildren().forEach(ss -> control.setExpandedState(ss, false));
+    private class FilterAction extends Action {
+        public FilterAction(String text) {
+            super(text, IAction.AS_CHECK_BOX);
+            setImageDescriptor(ImageDescriptor.createFromImage(FILTER_IMAGE));
+            setToolTipText(Messages.FilterButton);
+        }
+
+        /**
+         * Filter that returns true if an item or its parent had a state change at the
+         * beginning of the selection.
+         */
+        private final @NonNull ViewerFilter fStateChangeListener = new ViewerFilter() {
+
+            @Override
+            public boolean select(Viewer viewer, Object parentElement, Object element) {
+                if (element instanceof AttributeEntry) {
+                    TimeGraphEntry tge = (AttributeEntry) element;
+                    Iterable<@NonNull AttributeEntry> attributeEntries = Iterables.filter(Utils.flatten(tge), AttributeEntry.class);
+                    return Iterables.any(attributeEntries, this::isStateChange);
+                }
+                return true;
+            }
+
+            private boolean isStateChange(@NonNull AttributeEntry attribute) {
+                List<ITmfStateInterval> fullState = StateSystemEntry.getFullStates(attribute);
+                long selectionBegin = getTimeGraphViewer().getSelectionBegin();
+                return fullState != null && fullState.get(attribute.fQuark).getStartTime() == selectionBegin;
+            }
+        };
+
+        @Override
+        public void run() {
+            if (isChecked()) {
+                getTimeGraphViewer().addFilter(fStateChangeListener);
+            } else {
+                getTimeGraphViewer().removeFilter(fStateChangeListener);
             }
         }
     }
@@ -301,12 +362,11 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
 
     @Override
     protected void fillLocalToolBar(IToolBarManager manager) {
-        Action collapseExpand = new FilterAction(Messages.FilterButton, IAction.AS_CHECK_BOX);
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, new CollapseAction(Messages.CollapseButton));
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, new ExpandAction(Messages.ExpandButton));
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, new FilterAction(Messages.FilterButton));
 
-        collapseExpand.setImageDescriptor(ImageDescriptor.createFromImage(FILTER_IMAGE));
-        collapseExpand.setToolTipText(Messages.FilterButton);
-
-        manager.add(collapseExpand);
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, new Separator());
 
         manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getTimeGraphViewer().getResetScaleAction());
         manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getTimeGraphViewer().getPreviousEventAction());
