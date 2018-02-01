@@ -356,7 +356,11 @@ public class TmfOpenTraceHelper {
             }
 
             final IWorkbench wb = PlatformUI.getWorkbench();
-            final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+            IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
+            if(window == null) {
+                return;
+            }
+            final IWorkbenchPage activePage = window.getActivePage();
             final IEditorPart editor = findEditor(new FileEditorInput(file), true);
             if (editor != null) {
                 activePage.activate(editor);
