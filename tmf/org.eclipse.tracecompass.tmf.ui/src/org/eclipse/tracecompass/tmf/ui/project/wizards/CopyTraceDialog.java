@@ -188,7 +188,7 @@ public class CopyTraceDialog extends SelectionStatusDialog {
 
     @Override
     protected void okPressed() {
-        boolean copyAsLink = fCopyLinkButton.getSelection();
+        boolean copyAsLink = fCopyLinkButton != null ? fCopyLinkButton.getSelection() : false;
         IResource trace = copyTrace(fNewTraceName.getText(), copyAsLink);
         if (trace == null) {
             return;
