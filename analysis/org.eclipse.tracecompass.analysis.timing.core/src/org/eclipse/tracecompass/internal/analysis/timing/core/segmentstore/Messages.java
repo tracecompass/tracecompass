@@ -55,6 +55,16 @@ public class Messages extends NLS {
      */
     public static @Nullable String SegmentStoreStatisticsDataProviderFactory_AnalysisName;
 
+    /**
+     * Title of the data provider
+     */
+    public static @Nullable String SegmentStoreScatterGraphDataProvider_title;
+
+    /**
+     * Description of the data provider
+     */
+    public static @Nullable String SegmentStoreScatterGraphDataProvider_description;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

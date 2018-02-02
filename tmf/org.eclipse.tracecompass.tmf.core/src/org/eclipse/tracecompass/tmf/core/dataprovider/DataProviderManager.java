@@ -9,7 +9,11 @@
 
 package org.eclipse.tracecompass.tmf.core.dataprovider;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -18,6 +22,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.tmf.core.component.DataProviderConstants;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -37,7 +42,6 @@ import com.google.common.collect.Multimap;
  */
 public class DataProviderManager {
 
-    private static final @NonNull String ID_SPLITTER = ":"; //$NON-NLS-1$
     /**
      * The singleton instance of this manager
      */
@@ -129,7 +133,7 @@ public class DataProviderManager {
                 return dataProviderClass.cast(dataProvider);
             }
         }
-        String[] ids = id.split(ID_SPLITTER);
+        String[] ids = id.split(DataProviderConstants.ID_SEPARATOR);
         for (ITmfTrace opened : TmfTraceManager.getInstance().getOpenedTraces()) {
             if (TmfTraceManager.getTraceSetWithExperiment(opened).contains(trace)) {
                 /* if this trace or an experiment containing this trace is opened */
@@ -163,5 +167,28 @@ public class DataProviderManager {
                 }
             }
         }).start();
+    }
+
+    /**
+     * Get the list of available providers for this trace / experiment without
+     * triggering the analysis or creating the provider
+     *
+     * @param trace
+     *            queried trace
+     * @return list of the available providers for this trace / experiment
+     * @since 4.3
+     */
+    public List<IDataProviderDescriptor> getAvailableProviders(@Nullable ITmfTrace trace) {
+        if (trace == null) {
+            return Collections.emptyList();
+        }
+        List<IDataProviderDescriptor> list = new ArrayList<>();
+        for (IDataProviderFactory factory : fDataProviderFactories.values()) {
+            Collection<IDataProviderDescriptor> descriptors = factory.getDescriptors(trace);
+            if (!descriptors.isEmpty()) {
+                list.addAll(descriptors);
+            }
+        }
+        return list;
     }
 }

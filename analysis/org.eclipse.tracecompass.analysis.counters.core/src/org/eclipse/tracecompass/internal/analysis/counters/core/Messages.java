@@ -28,6 +28,15 @@ public class Messages extends NLS {
      * Chart's title for counters view
      */
     public static @Nullable String CounterDataProvider_ChartTitle;
+
+    /**
+     * Name text for the data provider to be shown to the user
+     */
+    public static @Nullable String CounterDataProviderFactory_Title;
+    /**
+     * Description text for the data provider
+     */
+    public static @Nullable String CounterDataProviderFactory_DescriptionText;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

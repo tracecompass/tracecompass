@@ -20,6 +20,9 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelmemoryusage.messages"; //$NON-NLS-1$
 
+    /** Data Provider help text */
+    public static String KernelMemoryDataProviderFactory_descriptionText;
+
     /**
      * Kernel Memory Usage's title view
      */

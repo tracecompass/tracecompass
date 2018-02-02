@@ -11,11 +11,21 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus;
 
 import org.eclipse.osgi.util.NLS;
 
+/**
+ * Externalized Strings for the {@link ThreadStatusDataProvider} package
+ */
 class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.messages"; //$NON-NLS-1$
 
     /** attribute cpu name */
     public static String ThreadStatusDataProvider_attributeCpuName;
+
+    /** The data provider title text */
+    public static String ThreadStatusDataProviderFactory_title;
+    /**
+     * The data provider description text
+     */
+    public static String ThreadStatusDataProviderFactory_descriptionText;
 
     static {
         // initialize resource bundle
