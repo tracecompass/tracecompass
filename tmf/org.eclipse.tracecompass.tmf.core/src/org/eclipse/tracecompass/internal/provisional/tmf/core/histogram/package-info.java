@@ -7,4 +7,4 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 @org.eclipse.jdt.annotation.NonNullByDefault
-package org.eclipse.tracecompass.internal.examples.histogram;
+package org.eclipse.tracecompass.internal.provisional.tmf.core.histogram;

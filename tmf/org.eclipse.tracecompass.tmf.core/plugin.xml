@@ -54,4 +54,11 @@
             id="org.eclipse.tracecompass.internal.tmf.core.callstack.provider.CallStackDataProvider">
       </dataProviderFactory>
    </extension>
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.dataprovider">
+      <dataProviderFactory
+            class="org.eclipse.tracecompass.internal.provisional.tmf.core.histogram.HistogramDataProviderFactory"
+            id="org.eclipse.tracecompass.internal.provisional.tmf.core.histogram.HistogramDataProvider">
+      </dataProviderFactory>
+   </extension>
 </plugin>

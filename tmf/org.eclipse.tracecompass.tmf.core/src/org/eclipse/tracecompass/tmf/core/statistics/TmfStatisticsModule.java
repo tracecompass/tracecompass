@@ -107,10 +107,7 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
         if (!totalsModule.setTrace(trace)) {
             return false;
         }
-        if (!eventTypesModule.setTrace(trace)) {
-            return false;
-        }
-        return true;
+        return eventTypesModule.setTrace(trace);
     }
 
     @Override
@@ -154,11 +151,8 @@ public class TmfStatisticsModule extends TmfAbstractAnalysisModule
          * The rest of this "execute" will encompass the "execute" of the two
          * sub-analyzes.
          */
-        if (!(totalsModule.waitForCompletion(monitor) &&
-                eventTypesModule.waitForCompletion(monitor))) {
-            return false;
-        }
-        return true;
+        return totalsModule.waitForCompletion(monitor) &&
+                eventTypesModule.waitForCompletion(monitor);
     }
 
     /**

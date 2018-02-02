@@ -1,4 +1,4 @@
-package org.eclipse.tracecompass.internal.examples.histogram;
+package org.eclipse.tracecompass.internal.provisional.tmf.core.histogram;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
@@ -9,7 +9,7 @@ import org.eclipse.osgi.util.NLS;
  * @author Yonni Chen
  */
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.examples.histogram.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.provisional.tmf.core.histogram.messages"; //$NON-NLS-1$
     /**
      * <i>Number of events</i> series' name
      */

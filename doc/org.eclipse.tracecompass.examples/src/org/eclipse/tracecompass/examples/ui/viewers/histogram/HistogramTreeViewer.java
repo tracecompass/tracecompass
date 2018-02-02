@@ -13,8 +13,8 @@ import java.util.Comparator;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.internal.examples.histogram.HistogramDataProvider;
-import org.eclipse.tracecompass.internal.examples.histogram.Messages;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.histogram.HistogramDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.histogram.Messages;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;

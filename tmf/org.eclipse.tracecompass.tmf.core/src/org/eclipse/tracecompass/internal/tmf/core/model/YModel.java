@@ -9,6 +9,10 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.model;
 
+import java.util.Arrays;
+import java.util.Objects;
+
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
 
 import com.google.gson.annotations.SerializedName;
@@ -48,5 +52,28 @@ public class YModel implements IYModel {
     @Override
     public double[] getData() {
         return fYValues;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fName, Arrays.hashCode(fYValues));
+    }
+
+    @Override
+    public boolean equals(@Nullable Object arg0) {
+        if (arg0 == this) {
+            return true;
+        }
+        if (arg0 == null || !(arg0 instanceof IYModel)) {
+            return false;
+        }
+        IYModel otherSeries = (IYModel) arg0;
+        return fName.equals(otherSeries.getName()) &&
+                Arrays.equals(fYValues, otherSeries.getData());
+    }
+
+    @Override
+    public String toString() {
+        return fName + ':' + Arrays.toString(fYValues);
     }
 }

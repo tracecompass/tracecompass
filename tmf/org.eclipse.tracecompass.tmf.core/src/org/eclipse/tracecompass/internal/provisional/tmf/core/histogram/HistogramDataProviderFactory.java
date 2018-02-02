@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  **********************************************************************/
 
-package org.eclipse.tracecompass.internal.examples.histogram;
+package org.eclipse.tracecompass.internal.provisional.tmf.core.histogram;
 
 import java.util.Collection;
 
@@ -27,7 +27,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  *
  * @author Loic Prieur-Drevon
  */
-@SuppressWarnings("restriction")
 public class HistogramDataProviderFactory implements IDataProviderFactory {
 
     @Override

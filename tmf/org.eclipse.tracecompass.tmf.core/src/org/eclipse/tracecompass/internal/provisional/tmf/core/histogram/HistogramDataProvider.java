@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  **********************************************************************/
 
-package org.eclipse.tracecompass.internal.examples.histogram;
+package org.eclipse.tracecompass.internal.provisional.tmf.core.histogram;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,13 +51,12 @@ import com.google.common.collect.ImmutableMap;
  *
  * @author Yonni Chen
  */
-@SuppressWarnings("restriction")
 public class HistogramDataProvider extends AbstractTmfTraceDataProvider implements ITmfTreeXYDataProvider<TmfTreeDataModel> {
 
     /**
      * Extension point ID.
      */
-    public static final String ID = "org.eclipse.tracecompass.internal.examples.histogram.HistogramDataProvider"; //$NON-NLS-1$
+    public static final String ID = "org.eclipse.tracecompass.internal.provisional.tmf.core.histogram.HistogramDataProvider"; //$NON-NLS-1$
     static final String TITLE = Objects.requireNonNull(Messages.HistogramDataProvider_Title);
     private static final AtomicLong TRACE_IDS = new AtomicLong();
 
@@ -85,17 +84,18 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
         if (fCached != null) {
             return fCached;
         }
-
+        fModule.waitForInitialization();
         Builder<TmfTreeDataModel> builder = ImmutableList.builder();
         builder.add(new TmfTreeDataModel(fTraceId, -1, getTrace().getName()));
         builder.add(new TmfTreeDataModel(fTotalId, fTraceId, Objects.requireNonNull(Messages.HistogramDataProvider_Total)));
-        ITmfStateSystem eventsSs = fModule.getStateSystem(TmfStatisticsEventTypesModule.ID);
-        if (eventsSs != null && eventsSs.optQuarkAbsolute(Attributes.LOST_EVENTS) != ITmfStateSystem.INVALID_ATTRIBUTE) {
+        ITmfStateSystem eventsSs = Objects.requireNonNull(fModule.getStateSystem(TmfStatisticsEventTypesModule.ID));
+        if (eventsSs.optQuarkAbsolute(Attributes.LOST_EVENTS) != ITmfStateSystem.INVALID_ATTRIBUTE) {
             builder.add(new TmfTreeDataModel(fLostId, fTraceId, Objects.requireNonNull(Messages.HistogramDataProvider_Lost)));
         }
-        if (eventsSs != null && eventsSs.waitUntilBuilt(0)) {
-            TmfModelResponse<List<TmfTreeDataModel>> reponse = new TmfModelResponse<>(builder.build(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
-            fCached = reponse;
+        if (eventsSs.waitUntilBuilt(0)) {
+            TmfModelResponse<List<TmfTreeDataModel>> response = new TmfModelResponse<>(builder.build(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+            fCached = response;
+            return response;
         }
         return new TmfModelResponse<>(builder.build(), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
     }
