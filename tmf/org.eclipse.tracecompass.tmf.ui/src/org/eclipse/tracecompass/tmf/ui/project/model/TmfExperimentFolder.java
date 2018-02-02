@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -103,7 +103,7 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
      * @since 2.0
      */
     @Override
-    protected void refreshChildren() {
+    protected synchronized void refreshChildren() {
         IFolder folder = getResource();
 
         // Get the children from the model
@@ -204,6 +204,33 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
             && (experiment.getName().equals(name)))
         .findFirst()
         .orElse(null);
+    }
+
+
+    /**
+     * Add an experiment element for the specified experiment resource. If an
+     * experiment already exists for the specified resource, it is returned.
+     *
+     * @param resource
+     *            the experiment resource
+     * @return the experiment element, or null if this experiment folder is not the
+     *         parent of the specified resource
+     * @since 3.3
+     */
+    public synchronized TmfExperimentElement addExperiment(@NonNull IFolder resource) {
+        if (!resource.getParent().equals(getResource())) {
+            return null;
+        }
+        /* If an experiment element already exists for this resource, return it */
+        TmfExperimentElement experiment = getExperiment(resource);
+        if (experiment != null) {
+            return experiment;
+        }
+        /* Create a new experiment element and add it as a child, then return it */
+        String name = resource.getName();
+        experiment = new TmfExperimentElement(name, resource, this);
+        addChild(experiment);
+        return experiment;
     }
 
     // ------------------------------------------------------------------------

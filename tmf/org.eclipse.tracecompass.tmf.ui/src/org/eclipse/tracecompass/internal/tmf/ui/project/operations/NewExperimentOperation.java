@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,9 @@
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.ui.project.operations;
+
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -26,7 +29,9 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 
 /**
  * Operation to create a new experiment.
@@ -38,6 +43,8 @@ public class NewExperimentOperation implements IRunnableWithProgress {
 
     private final @NonNull String fExperimentName;
     private final @NonNull TmfExperimentFolder fExperimentFolderRoot;
+    private final String fExperimentType;
+    private final List<TmfTraceElement> fTraceElements;
     private @Nullable IFolder fExperimentFolder = null;
     private @NonNull IStatus fStatus = Status.OK_STATUS;
 
@@ -52,6 +59,27 @@ public class NewExperimentOperation implements IRunnableWithProgress {
     public NewExperimentOperation (@NonNull TmfExperimentFolder experimentFolder, @NonNull String experimentName) {
         fExperimentFolderRoot = experimentFolder;
         fExperimentName = experimentName;
+        fExperimentType = TmfTraceType.DEFAULT_EXPERIMENT_TYPE;
+        fTraceElements = Collections.emptyList();
+    }
+
+    /**
+     * Constructor
+     *
+     * @param experimentFolder
+     *            the experiment folder root {@link TmfExperimentFolder}
+     * @param experimentName
+     *            the name of the experiment
+     * @param experimentType
+     *            the experiment type, or null for default
+     * @param traceElements
+     *            the initial trace elements
+     */
+    public NewExperimentOperation (@NonNull TmfExperimentFolder experimentFolder, @NonNull String experimentName, String experimentType, List<TmfTraceElement> traceElements) {
+        fExperimentFolderRoot = experimentFolder;
+        fExperimentName = experimentName;
+        fExperimentType = experimentType != null ? experimentType : TmfTraceType.DEFAULT_EXPERIMENT_TYPE;
+        fTraceElements = traceElements != null ? traceElements : Collections.emptyList();
     }
 
     @Override
@@ -66,11 +94,16 @@ public class NewExperimentOperation implements IRunnableWithProgress {
              * Experiments can be set to the default experiment type. No
              * need to force user to select an experiment type
              */
-            IConfigurationElement ce = TmfTraceType.getTraceAttributes(TmfTraceType.DEFAULT_EXPERIMENT_TYPE);
+            IConfigurationElement ce = TmfTraceType.getTraceAttributes(fExperimentType);
             if (ce != null) {
                 experimentFolder.setPersistentProperty(TmfCommonConstants.TRACETYPE, ce.getAttribute(TmfTraceType.ID_ATTR));
             }
             fExperimentFolder = experimentFolder;
+            TmfExperimentElement experimentElement = fExperimentFolderRoot.addExperiment(experimentFolder);
+            for (TmfTraceElement trace : fTraceElements) {
+                experimentElement.addTrace(trace, false);
+            }
+            experimentElement.refresh();
             setStatus(Status.OK_STATUS);
         } catch (InterruptedException e) {
             setStatus(Status.CANCEL_STATUS);
