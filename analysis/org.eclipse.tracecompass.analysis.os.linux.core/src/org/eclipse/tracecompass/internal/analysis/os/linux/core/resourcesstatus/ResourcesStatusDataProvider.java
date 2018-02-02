@@ -243,10 +243,10 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
 
         TreeMultimap<Integer, ITmfStateInterval> intervals = TreeMultimap.create(Comparator.naturalOrder(),
                 Comparator.comparing(ITmfStateInterval::getStartTime));
-        Collection<Integer> quarks = getSelectedQuarks(filter);
+        Map<@NonNull Long, @NonNull Integer> entries = getSelectedEntries(filter);
         Collection<Long> times = getTimes(filter, ss.getStartTime(), ss.getCurrentEndTime());
         /* Do the actual query */
-        for (ITmfStateInterval interval : ss.query2D(quarks, times)) {
+        for (ITmfStateInterval interval : ss.query2D(entries.values(), times)) {
             if (monitor != null && monitor.isCanceled()) {
                 return null;
             }
@@ -255,16 +255,16 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
 
         List<ITimeGraphRowModel> rows = new ArrayList<>();
 
-        for (Map.Entry<Integer, Collection<ITmfStateInterval>> entry : intervals.asMap().entrySet()) {
+        for (Map.Entry<Long, Integer> entry : entries.entrySet()) {
             if (monitor != null && monitor.isCanceled()) {
                 return null;
             }
 
             List<ITimeGraphState> eventList = new ArrayList<>();
-            for (ITmfStateInterval interval : entry.getValue()) {
+            for (ITmfStateInterval interval : intervals.get(entry.getValue())) {
                 eventList.add(createTimeGraphState(interval));
             }
-            rows.add(new TimeGraphRowModel(getId(entry.getKey()), eventList));
+            rows.add(new TimeGraphRowModel(entry.getKey(), eventList));
         }
         if (!ss.waitUntilBuilt(0)) {
             /*

@@ -125,6 +125,31 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
     }
 
     /**
+     * Get selected entries from the filter for this provider
+     *
+     * @param filter
+     *            {@link SelectionTimeQueryFilter}.
+     * @return a BiMap of the valid entries' ID from the filter to their respective
+     *         quark
+     */
+    protected BiMap<Long, Integer> getSelectedEntries(SelectionTimeQueryFilter filter) {
+        fLock.readLock().lock();
+        try {
+            BiMap<Long, Integer> selectedEntries = HashBiMap.create();
+
+            for (Long selectedItem : filter.getSelectedItems()) {
+                Integer quark = fIdToQuark.get(selectedItem);
+                if (quark != null && quark >= 0) {
+                    selectedEntries.put(selectedItem, quark);
+                }
+            }
+            return selectedEntries;
+        } finally {
+            fLock.readLock().unlock();
+        }
+    }
+
+    /**
      * Get the times from the filter in the desired time range
      *
      * @param filter

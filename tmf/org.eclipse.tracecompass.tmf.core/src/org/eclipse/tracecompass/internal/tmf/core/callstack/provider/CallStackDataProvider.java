@@ -16,7 +16,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -209,16 +209,14 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
     @Override
     protected List<ITimeGraphRowModel> getRowModel(ITmfStateSystem ss, SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor)
             throws StateSystemDisposedException {
-        Collection<@NonNull Long> selectedItems = filter.getSelectedItems();
-        Set<@NonNull Integer> quarks = getSelectedQuarks(filter);
-        if (selectedItems.size() == 1 && quarks.size() == 1 && filter.getTimesRequested().length == 2) {
+        Map<@NonNull Long, @NonNull Integer> entries = getSelectedEntries(filter);
+        if (entries.size() == 1 && filter.getTimesRequested().length == 2) {
             // this is a request for a follow event.
-            long selectedItem = selectedItems.iterator().next();
-            int quark = quarks.iterator().next();
+            Entry<@NonNull Long, @NonNull Integer> entry = entries.entrySet().iterator().next();
             if (filter.getStart() == Long.MIN_VALUE) {
-                return getFollowEvent(ss, selectedItem, quark, filter.getEnd(), false);
+                return getFollowEvent(ss, entry, filter.getEnd(), false);
             } else if (filter.getEnd() == Long.MAX_VALUE) {
-                return getFollowEvent(ss, selectedItem, quark, filter.getStart(), true);
+                return getFollowEvent(ss, entry, filter.getStart(), true);
             }
         }
 
@@ -227,7 +225,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         ArrayListMultimap<Integer, ITmfStateInterval> intervals = ArrayListMultimap.create();
         Collection<Long> times = getTimes(filter, ss.getStartTime(), ss.getCurrentEndTime());
         /* Do the actual query */
-        for (ITmfStateInterval interval : ss.query2D(quarks, times)) {
+        for (ITmfStateInterval interval : ss.query2D(entries.values(), times)) {
             if (subMonitor.isCanceled()) {
                 return null;
             }
@@ -236,15 +234,15 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         subMonitor.worked(1);
 
         List<ITimeGraphRowModel> rows = new ArrayList<>();
-        for (Map.Entry<Integer,Collection<ITmfStateInterval>> entry : intervals.asMap().entrySet()) {
+        for (Map.Entry<Long, Integer> entry : entries.entrySet()) {
             if (subMonitor.isCanceled()) {
                 return null;
             }
-            Collection<ITmfStateInterval> states = entry.getValue();
+            Collection<ITmfStateInterval> states = intervals.get(entry.getValue());
             List<ITimeGraphState> eventList = new ArrayList<>(states.size());
             states.forEach(state -> eventList.add(createTimeGraphState(state)));
             eventList.sort(Comparator.comparingLong(ITimeGraphState::getStartTime));
-            rows.add(new TimeGraphRowModel(getId(entry.getKey()), eventList));
+            rows.add(new TimeGraphRowModel(entry.getKey(), eventList));
         }
         subMonitor.worked(1);
         return rows;
@@ -299,11 +297,9 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
      *
      * @param ss
      *            this data provider's state system
-     * @param id
-     *            the ID for the entry whose next / previous state we are searching
-     *            for
-     * @param quark
-     *            call stack entry ID
+     * @param entry
+     *            whose key is the ID and value is the quark for the entry whose
+     *            next / previous state we are searching for
      * @param time
      *            selection start time
      * @param forward
@@ -312,8 +308,8 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
      *         null
      * @throws StateSystemDisposedException
      */
-    private static List<ITimeGraphRowModel> getFollowEvent(ITmfStateSystem ss, long id, int quark, long time, boolean forward) throws StateSystemDisposedException {
-        int parentQuark = ss.getParentAttributeQuark(quark);
+    private static List<ITimeGraphRowModel> getFollowEvent(ITmfStateSystem ss, Entry<Long, Integer> entry, long time, boolean forward) throws StateSystemDisposedException {
+        int parentQuark = ss.getParentAttributeQuark(entry.getValue());
         ITmfStateInterval current = ss.querySingleState(Long.max(ss.getStartTime(), Long.min(time, ss.getCurrentEndTime())), parentQuark);
         ITmfStateInterval interval = null;
         if (forward && current.getEndTime() + 1 <= ss.getCurrentEndTime()) {
@@ -326,7 +322,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
             if (object instanceof Number) {
                 long value = ((Number) object).longValue();
                 TimeGraphState state = new TimeGraphState(interval.getStartTime(), interval.getEndTime() - interval.getStartTime(), value);
-                TimeGraphRowModel row = new TimeGraphRowModel(id, Collections.singletonList(state));
+                TimeGraphRowModel row = new TimeGraphRowModel(entry.getKey(), Collections.singletonList(state));
                 return Collections.singletonList(row);
             }
         }
