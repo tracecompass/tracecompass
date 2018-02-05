@@ -25,23 +25,28 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesStatusDataProvider;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel.Type;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.registry.LinuxStyle;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphEntryModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
-import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NamedTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 
 import com.google.common.collect.ImmutableList;
@@ -91,15 +96,17 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
     }
 
     private static StateItem getEventState(TimeEvent event) {
-        if (event.hasValue()) {
-            ResourcesEntry entry = (ResourcesEntry) event.getEntry();
+        ITimeGraphEntry entry = event.getEntry();
+        if (event.hasValue() && entry instanceof TimeGraphEntry
+                && ((TimeGraphEntry) entry).getModel() instanceof ResourcesEntryModel) {
             int value = event.getValue();
+            ResourcesEntryModel resourcesModel = (ResourcesEntryModel) ((TimeGraphEntry) entry).getModel();
 
-            if (entry.getType() == Type.CPU) {
+            if (resourcesModel.getType() == Type.CPU) {
                 return STATE_MAP.get(value);
-            } else if (entry.getType() == Type.IRQ) {
+            } else if (resourcesModel.getType() == Type.IRQ) {
                 return STATE_MAP.get(StateValues.CPU_STATUS_IRQ);
-            } else if (entry.getType() == Type.SOFT_IRQ) {
+            } else if (resourcesModel.getType() == Type.SOFT_IRQ) {
                 if (value == StateValues.CPU_STATUS_SOFT_IRQ_RAISED) {
                     return STATE_MAP.get(StateValues.CPU_STATUS_SOFT_IRQ_RAISED);
                 }
@@ -140,15 +147,17 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
     @Override
     public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime) {
+        ITimeGraphEntry entry = event.getEntry();
 
-        if (event instanceof TimeEvent && ((TimeEvent) event).hasValue()) {
+        if (event instanceof TimeEvent && ((TimeEvent) event).hasValue() && entry instanceof TimeGraphEntry) {
+            ITimeGraphEntryModel model = ((TimeGraphEntry) entry).getModel();
 
             TimeEvent tcEvent = (TimeEvent) event;
-            ResourcesEntry entry = (ResourcesEntry) event.getEntry();
 
-            if (tcEvent.hasValue()) {
+            if (tcEvent.hasValue() && model instanceof ResourcesEntryModel) {
+                ResourcesEntryModel resourcesModel = (ResourcesEntryModel) model;
                 // Check for IRQ or Soft_IRQ type
-                if (entry.getType().equals(Type.IRQ) || entry.getType().equals(Type.SOFT_IRQ)) {
+                if (resourcesModel.getType().equals(Type.IRQ) || resourcesModel.getType().equals(Type.SOFT_IRQ)) {
 
                     // Get CPU of IRQ or SoftIRQ and provide it for the tooltip
                     // display
@@ -161,11 +170,11 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 }
 
                 // Check for type CPU
-                else if (entry.getType().equals(Type.CPU)) {
+                else if (resourcesModel.getType().equals(Type.CPU)) {
                     int status = tcEvent.getValue();
-                    ResourcesStatusDataProvider provider = DataProviderManager.getInstance().getDataProvider(entry.getTrace(), ResourcesStatusDataProvider.ID, ResourcesStatusDataProvider.class);
+                    ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = BaseDataProviderTimeGraphView.getProvider((TimeGraphEntry) entry);
                     if (provider != null) {
-                        return getTooltipForCpu(provider, entry.getModel().getId(), hoverTime, status);
+                        return getTooltipForCpu(provider, model.getId(), hoverTime, status);
                     }
                 }
             }
@@ -174,7 +183,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
         return Collections.emptyMap();
     }
 
-    private static Map<String, String> getTooltipForCpu(ResourcesStatusDataProvider provider, long id, long hoverTime, int status) {
+    private static Map<String, String> getTooltipForCpu(ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider, long id, long hoverTime, int status) {
         SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(Collections.singletonList(hoverTime), Collections.singleton(id));
         TmfModelResponse<Map<String, String>> response = provider.fetchTooltip(filter, null);
         Map<String, String> tooltip = response.getModel();

@@ -21,10 +21,13 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadEntryModel;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadStatusDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ITimeGraphEntryActiveProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
@@ -89,19 +92,20 @@ public final class ControlFlowCheckActiveProvider implements ITimeGraphEntryActi
     }
 
     private Set<Long> getActiveIds(ControlFlowEntry cfe, TmfTimeRange range) {
-        ThreadStatusDataProvider dataProvider = ControlFlowView.getProvider(cfe);
-        if (range.equals(fRange) && dataProvider.equals(fProvider)) {
+        ITimeGraphDataProvider<? extends TimeGraphEntryModel> dataProvider = BaseDataProviderTimeGraphView.getProvider(cfe);
+        if (range.equals(fRange) && dataProvider.equals(fProvider)
+                || !(dataProvider instanceof ThreadStatusDataProvider)) {
             return fActive;
         }
         TimeQueryFilter filter = new TimeQueryFilter(range.getStartTime().toNanos(), range.getEndTime().toNanos(), 2);
-        TmfModelResponse<List<ThreadEntryModel>> response = dataProvider.fetchTree(filter, null);
+        TmfModelResponse<List<ThreadEntryModel>> response = ((ThreadStatusDataProvider) dataProvider).fetchTree(filter, null);
         List<ThreadEntryModel> model = response.getModel();
         if (model == null) {
             // query must have failed, return empty and don't invalidate the cache.
             return Collections.emptySet();
         }
         fRange = range;
-        fActive = Sets.newHashSet(Iterables.transform(model, thread -> thread.getId()));
+        fActive = Sets.newHashSet(Iterables.transform(model, ThreadEntryModel::getId));
         return fActive;
 
     }

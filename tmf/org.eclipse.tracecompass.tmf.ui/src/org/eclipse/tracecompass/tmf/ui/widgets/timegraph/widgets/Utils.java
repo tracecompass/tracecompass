@@ -917,7 +917,7 @@ public class Utils {
      * @return an {@link Iterable} over the entries.
      * @since 3.3
      */
-    public static Iterable<TimeGraphEntry> flatten(TimeGraphEntry root) {
+    public static @NonNull Iterable<@NonNull TimeGraphEntry> flatten(TimeGraphEntry root) {
         Iterable<Iterable<TimeGraphEntry>> transform = Iterables.transform(root.getChildren(), Utils::flatten);
         return Iterables.concat(Collections.singleton(root), Iterables.concat(transform));
     }
