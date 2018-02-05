@@ -15,13 +15,11 @@ package org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.ConsoleAppender;
@@ -76,8 +74,8 @@ public class CallStackViewTest {
     private static final @NonNull String THREAD = "glxgears-16073";
 
     /** The Log4j logger instance. */
-    private static final Logger fLogger = Logger.getRootLogger();
-    private static SWTWorkbenchBot fBot;
+    private static final Logger sfLogger = Logger.getRootLogger();
+    private static SWTWorkbenchBot sfBot;
 
     /**
      * Timestamp for loading mapping files test
@@ -166,14 +164,14 @@ public class CallStackViewTest {
         Thread.currentThread().setName("SWTBot Thread"); // for the debugger
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
-        fLogger.removeAllAppenders();
-        fLogger.addAppender(new ConsoleAppender(new SimpleLayout()));
-        fBot = new SWTWorkbenchBot();
+        sfLogger.removeAllAppenders();
+        sfLogger.addAppender(new ConsoleAppender(new SimpleLayout()));
+        sfBot = new SWTWorkbenchBot();
 
-        SWTBotUtils.closeView("welcome", fBot);
+        SWTBotUtils.closeView("welcome", sfBot);
 
         SWTBotUtils.switchToTracingPerspective();
-        SWTBotUtils.closeView("Statistics", fBot);
+        SWTBotUtils.closeView("Statistics", sfBot);
         /* finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
     }
@@ -183,7 +181,7 @@ public class CallStackViewTest {
      */
     @AfterClass
     public static void afterClass() {
-        fLogger.removeAllAppenders();
+        sfLogger.removeAllAppenders();
     }
 
     /**
@@ -192,7 +190,7 @@ public class CallStackViewTest {
     @Before
     public void beforeTest() {
         SWTBotUtils.createProject(PROJECT_NAME);
-        SWTBotTreeItem treeItem = SWTBotUtils.selectTracesFolder(fBot, PROJECT_NAME);
+        SWTBotTreeItem treeItem = SWTBotUtils.selectTracesFolder(sfBot, PROJECT_NAME);
         assertNotNull(treeItem);
         final CtfTestTrace cygProfile = CtfTestTrace.CYG_PROFILE;
         final File file = new File(CtfTmfTestTraceUtils.getTrace(cygProfile).getPath());
@@ -207,8 +205,8 @@ public class CallStackViewTest {
      */
     @After
     public void tearDown() {
-        fBot.closeAllEditors();
-        SWTBotUtils.deleteProject(PROJECT_NAME, fBot);
+        sfBot.closeAllEditors();
+        SWTBotUtils.deleteProject(PROJECT_NAME, sfBot);
     }
 
     /**
@@ -216,9 +214,9 @@ public class CallStackViewTest {
      */
     @Test
     public void testOpenCallstack() {
-        SWTBotView viewBot = fBot.viewById(CallStackView.ID);
+        SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
         viewBot.setFocus();
-        waitForSymbolNames(viewBot, new String[]{"0x40472b"});
+        waitForSymbolNames("0x40472b");
     }
 
     /**
@@ -226,12 +224,12 @@ public class CallStackViewTest {
      */
     @Test
     public void testGoToTimeAndCheckStack() {
-        goToTime(TIMESTAMPS[0]);
-
-        final SWTBotView viewBot = fBot.viewById(CallStackView.ID);
+        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
         viewBot.setFocus();
         WaitUtils.waitForJobs();
-        waitForSymbolNames(viewBot, STACK_FRAMES[0]);
+
+        goToTime(TIMESTAMPS[0]);
+        waitForSymbolNames(STACK_FRAMES[0]);
     }
 
     /**
@@ -242,23 +240,23 @@ public class CallStackViewTest {
         int currentEventOffset = 0;
         goToTime(TIMESTAMPS[currentEventOffset]);
 
-        final SWTBotView viewBot = fBot.viewById(CallStackView.ID);
+        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
         // forward 10 times
         for (int i = 0; i < 10; i++) {
             viewBot.toolbarPushButton(SELECT_NEXT_STATE_CHANGE).click();
             currentEventOffset++;
-            fBot.waitUntil(ConditionHelpers.selectionInEventsTable(fBot, TIMESTAMPS[currentEventOffset]));
+            sfBot.waitUntil(ConditionHelpers.selectionInEventsTable(sfBot, TIMESTAMPS[currentEventOffset]));
             WaitUtils.waitForJobs();
-            waitForSymbolNames(viewBot, STACK_FRAMES[currentEventOffset]);
-
+            waitForSymbolNames(STACK_FRAMES[currentEventOffset]);
         }
+
         // back twice
         for (int i = 0; i < 2; i++) {
             viewBot.toolbarPushButton(SELECT_PREVIOUS_STATE_CHANGE).click();
             currentEventOffset--;
-            fBot.waitUntil(ConditionHelpers.selectionInEventsTable(fBot, TIMESTAMPS[currentEventOffset]));
+            sfBot.waitUntil(ConditionHelpers.selectionInEventsTable(sfBot, TIMESTAMPS[currentEventOffset]));
             WaitUtils.waitForJobs();
-            waitForSymbolNames(viewBot, STACK_FRAMES[currentEventOffset]);
+            waitForSymbolNames(STACK_FRAMES[currentEventOffset]);
         }
         // move up and down once to make sure it doesn't explode
         viewBot.toolbarPushButton(SELECT_PREVIOUS_ITEM).click();
@@ -280,7 +278,7 @@ public class CallStackViewTest {
     @Test
     public void testGoToTimeSortAndCheckStack() {
         goToTime(TIMESTAMPS[0]);
-        final SWTBotView viewBot = fBot.viewById(CallStackView.ID);
+        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
         viewBot.setFocus();
         SWTBotTree tree = viewBot.bot().tree();
         tree.header(SORT_BY_NAME).click();
@@ -288,10 +286,11 @@ public class CallStackViewTest {
         tree.header(SORT_BY_START).click();
         viewBot.setFocus();
         WaitUtils.waitForJobs();
-        waitForSymbolNames(viewBot, STACK_FRAMES[0]);
+        waitForSymbolNames(STACK_FRAMES[0]);
     }
 
-    private static void waitForSymbolNames(final SWTBotView viewBot, String[] symbolNames) {
+    private static void waitForSymbolNames(String... symbolNames) {
+        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
         List<String> symbolNameList = Lists.newArrayList(symbolNames);
         WaitUtils.waitUntil(vBot -> symbolNameList.equals(getVisibleStackFrames(vBot)),
                 viewBot, "Wrong symbol names, expected:" + symbolNameList
@@ -311,10 +310,11 @@ public class CallStackViewTest {
     }
 
     private static void goToTime(long timestamp) {
-        SWTBotTable table = fBot.activeEditor().bot().table();
+        SWTBotTable table = sfBot.activeEditor().bot().table();
         table.setFocus();
+        WaitUtils.waitForJobs();
         TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(table.widget, TmfTimestamp.fromNanos(timestamp)));
-        fBot.waitUntil(ConditionHelpers.selectionInEventsTable(fBot, timestamp));
+        sfBot.waitUntil(ConditionHelpers.selectionInEventsTable(sfBot, timestamp));
     }
 
     /**
@@ -328,16 +328,12 @@ public class CallStackViewTest {
     public void testManipulatingMappingFiles() throws IOException {
 
         // 1- Open valid mapping files and invalid mapping file
-        Object mapObjA = CtfTmfTestTraceUtils.class.getResource("cyg-profile-mapping.txt");
-        Object mapObjB = CtfTmfTestTraceUtils.class.getResource("dummy-mapping.txt");
-        Object mapObjC = CtfTmfTestTraceUtils.class.getResource("invalid-cyg-profile-mapping.txt");
-        Object mapObjD = CtfTmfTestTraceUtils.class.getResource("random.out");
-        Object mapObjE = CtfTmfTestTraceUtils.class.getResource("win32Random.exe");
-        URL mapUrlA = (URL) mapObjA;
-        URL mapUrlB = (URL) mapObjB;
-        URL mapUrlC = (URL) mapObjC;
-        URL mapUrlD = (URL) mapObjD;
-        URL mapUrlE = (URL) mapObjE;
+        URL mapUrlA = CtfTmfTestTraceUtils.class.getResource("cyg-profile-mapping.txt");
+        URL mapUrlB = CtfTmfTestTraceUtils.class.getResource("dummy-mapping.txt");
+        URL mapUrlC = CtfTmfTestTraceUtils.class.getResource("invalid-cyg-profile-mapping.txt");
+        URL mapUrlD = CtfTmfTestTraceUtils.class.getResource("random.out");
+        URL mapUrlE = CtfTmfTestTraceUtils.class.getResource("win32Random.exe");
+
         String absoluteFileA = FileLocator.toFileURL(mapUrlA).getFile();
         String absoluteFileB = FileLocator.toFileURL(mapUrlB).getFile();
         String absoluteFileC = FileLocator.toFileURL(mapUrlC).getFile();
@@ -349,32 +345,33 @@ public class CallStackViewTest {
         SWTBotShell shell = openSymbolProviderDialog();
         final SWTBot symbolDialog = shell.bot();
         symbolDialog.button("Add...").click();
-        final SWTBot errorDialog = fBot.shell("Import failure").bot();
+        final SWTBot errorDialog = sfBot.shell("Import failure").bot();
         errorDialog.button("OK").click();
         final SWTBotTable table = symbolDialog.table();
-        assertEquals(table.rowCount(), 4);
-        assertEquals(table.getTableItem(0).getText(), absoluteFileA);
-        assertEquals(table.getTableItem(1).getText(), absoluteFileB);
-        assertEquals(table.getTableItem(2).getText(), absoluteFileD);
-        assertEquals(table.getTableItem(3).getText(), absoluteFileE);
+        assertEquals(4, table.rowCount());
+        assertEquals(absoluteFileA, table.getTableItem(0).getText());
+        assertEquals(absoluteFileB, table.getTableItem(1).getText());
+        assertEquals(absoluteFileD, table.getTableItem(2).getText());
+        assertEquals(absoluteFileE, table.getTableItem(3).getText());
 
         // 2- Change priority of mapping files
         table.select(0);
         symbolDialog.button("Down").click().click().click();
-        assertEquals(table.getTableItem(0).getText(), absoluteFileB);
-        assertEquals(table.getTableItem(1).getText(), absoluteFileD);
-        assertEquals(table.getTableItem(2).getText(), absoluteFileE);
-        assertEquals(table.getTableItem(3).getText(), absoluteFileA);
+        assertEquals(absoluteFileB, table.getTableItem(0).getText());
+        assertEquals(absoluteFileD, table.getTableItem(1).getText());
+        assertEquals(absoluteFileE, table.getTableItem(2).getText());
+        assertEquals(absoluteFileA, table.getTableItem(3).getText());
+
         symbolDialog.button("Up").click().click().click();
-        assertEquals(table.getTableItem(0).getText(), absoluteFileA);
-        assertEquals(table.getTableItem(1).getText(), absoluteFileB);
-        assertEquals(table.getTableItem(2).getText(), absoluteFileD);
-        assertEquals(table.getTableItem(3).getText(), absoluteFileE);
+        assertEquals(absoluteFileA, table.getTableItem(0).getText());
+        assertEquals(absoluteFileB, table.getTableItem(1).getText());
+        assertEquals(absoluteFileD, table.getTableItem(2).getText());
+        assertEquals(absoluteFileE, table.getTableItem(3).getText());
 
         // 3- Remove multiple mapping files
         table.select(0, 1);
         symbolDialog.button("Remove").click();
-        assertEquals(table.rowCount(), 2);
+        assertEquals(2, table.rowCount());
 
         // 4- Close symbol provider dialog
         symbolDialog.button("Cancel").click();
@@ -390,10 +387,8 @@ public class CallStackViewTest {
     public void testLoadingMappingFiles() throws IOException {
 
         // 1- Open conflicting mapping files
-        Object mapObjA = CtfTmfTestTraceUtils.class.getResource("cyg-profile-mapping.txt");
-        Object mapObjB = CtfTmfTestTraceUtils.class.getResource("dummy-mapping.txt");
-        URL mapUrlA = (URL) mapObjA;
-        URL mapUrlB = (URL) mapObjB;
+        URL mapUrlA = CtfTmfTestTraceUtils.class.getResource("cyg-profile-mapping.txt");
+        URL mapUrlB = CtfTmfTestTraceUtils.class.getResource("dummy-mapping.txt");
         String absoluteFileA = FileLocator.toFileURL(mapUrlA).getFile();
         String absoluteFileB = FileLocator.toFileURL(mapUrlB).getFile();
         String[] overrideFiles = { absoluteFileA, absoluteFileB };
@@ -405,15 +400,17 @@ public class CallStackViewTest {
         symbolDialog.button("OK").click();
 
         // 2- Ensure symbols are loaded and prioritized
+        sfBot.viewById(CallStackView.ID).setFocus();
+        WaitUtils.waitForJobs();
         goToTime(TIMESTAMP);
-        assertEquals(Arrays.asList("main", "event_loop", "draw_frame", "draw_gears", "drawB"), getVisibleStackFrames(fBot.viewById(CallStackView.ID)));
+        waitForSymbolNames("main", "event_loop", "draw_frame", "draw_gears", "drawB");
     }
 
     private static SWTBotShell openSymbolProviderDialog() {
-        final SWTBotView viewBot = fBot.viewById(CallStackView.ID);
+        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
         viewBot.setFocus();
         viewBot.toolbarButton(CONFIGURE_SYMBOL_PROVIDERS).click();
-        return fBot.shell("Symbol mapping");
+        return sfBot.shell("Symbol mapping");
     }
 
     /**
@@ -425,12 +422,10 @@ public class CallStackViewTest {
     @Test
     public void testGoToTimeAndCheckStackWithNames() throws IOException {
         goToTime(TIMESTAMPS[0]);
-        final SWTBotView viewBot = fBot.viewById(CallStackView.ID);
+        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
         viewBot.setFocus();
-        Object mapObj = CtfTmfTestTraceUtils.class.getResource("cyg-profile-mapping.txt");
-        assertTrue(mapObj instanceof URL);
-        URL mapUrl = (URL) mapObj;
 
+        URL mapUrl = CtfTmfTestTraceUtils.class.getResource("cyg-profile-mapping.txt");
         String absoluteFile = FileLocator.toFileURL(mapUrl).getFile();
         TmfFileDialogFactory.setOverrideFiles(absoluteFile);
 
@@ -443,7 +438,7 @@ public class CallStackViewTest {
         SWTBotTimeGraphEntry[] threads = timeGraph.getEntry(TRACE, PROCESS).getEntries();
         assertEquals(1, threads.length);
         assertEquals(THREAD, threads[0].getText(0));
-        assertEquals(Arrays.asList("main", "event_loop", "handle_event"), getVisibleStackFrames(viewBot));
+        waitForSymbolNames("main", "event_loop", "handle_event");
     }
 
     /**
@@ -451,12 +446,9 @@ public class CallStackViewTest {
      */
     @Test
     public void testCallStackToolBar() {
-        SWTBotView viewBot = fBot.viewById(CallStackView.ID);
+        SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
         viewBot.setFocus();
-        List<String> buttons = new ArrayList<>();
-        for (SWTBotToolbarButton swtBotToolbarButton : viewBot.getToolbarButtons()) {
-            buttons.add(swtBotToolbarButton.getToolTipText());
-        }
+        List<String> buttons = Lists.transform(viewBot.getToolbarButtons(), SWTBotToolbarButton::getToolTipText);
         assertEquals(TOOLBAR_BUTTONS_TOOLTIPS, buttons);
     }
 }
