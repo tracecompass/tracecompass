@@ -81,6 +81,7 @@ import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.viewers.IImageSave;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.views.ResetUtil;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.ITimeGraphLegendProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ShowFilterDialogAction;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TimeGraphLegend;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
@@ -204,6 +205,8 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
 
     private Composite fTimeAlignedComposite;
 
+    private ITimeGraphLegendProvider fLegendProvider;
+
     private class ListenerNotifier extends Thread {
         private static final long DELAY = 400L;
         private static final long POLLING_INTERVAL = 10L;
@@ -312,6 +315,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
      * Gets the timegraph content provider used by this timegraph viewer.
      *
      * @return the timegraph content provider
+     * @since 3.3
      */
     public ITimeGraphContentProvider getTimeGraphContentProvider() {
         return fTimeGraphContentProvider;
@@ -328,6 +332,16 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
         fTimeGraphCtrl.setTimeGraphProvider(timeGraphProvider);
         fToolTipHandler = new TimeGraphTooltipHandler(fTimeGraphProvider, fTimeDataProvider);
         fToolTipHandler.activateHoverHelp(fTimeGraphCtrl);
+    }
+
+    /**
+     * Gets the timegraph presentation provider used by this timegraph viewer.
+     *
+     * @return the timegraph presentation provider
+     * @since 3.3
+     */
+    public ITimeGraphPresentationProvider getTimeGraphProvider() {
+        return fTimeGraphProvider;
     }
 
     /**
@@ -1213,14 +1227,30 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
     }
 
     /**
+     * Sets the legend provider
+     *
+     * @param legendProvider
+     *            the legend provider
+     * @since 3.3
+     */
+    public void setLegendProvider(ITimeGraphLegendProvider legendProvider) {
+        fLegendProvider = legendProvider;
+    }
+
+    /**
      * Callback for the show legend action
      */
     public void showLegend() {
-        if (fTimeAlignedComposite == null || fTimeAlignedComposite.isDisposed()) {
+        Control tgControl = getControl();
+        if (tgControl == null || tgControl.isDisposed()) {
             return;
         }
-
-        TimeGraphLegend.open(fTimeAlignedComposite.getShell(), fTimeGraphProvider);
+        ITimeGraphLegendProvider legendProvider = fLegendProvider;
+        if (legendProvider == null) {
+            TimeGraphLegend.open(tgControl.getShell(), getTimeGraphProvider());
+        } else {
+            legendProvider.showLegend(tgControl.getShell(), getTimeGraphProvider());
+        }
     }
 
     /**

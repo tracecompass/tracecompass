@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 Ericsson.
+ * Copyright (c) 2009, 2018 Ericsson.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -63,7 +63,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleSt
 public class TimeGraphLegend extends TitleAreaDialog {
 
     private static final ImageDescriptor RESET_IMAGE = Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_RESET_BUTTON);
-    private final ITimeGraphPresentationProvider provider;
+    private final ITimeGraphPresentationProvider fProvider;
     private final LocalResourceManager fResourceManager = new LocalResourceManager(JFaceResources.getResources());
 
     /**
@@ -88,8 +88,18 @@ public class TimeGraphLegend extends TitleAreaDialog {
      */
     public TimeGraphLegend(Shell parent, ITimeGraphPresentationProvider provider) {
         super(parent);
-        this.provider = provider;
+        fProvider = provider;
         this.setShellStyle(getShellStyle() | SWT.RESIZE);
+    }
+
+    /**
+     * Gets the Presentation Provider
+     *
+     * @return the presentation provider
+     * @since 3.3
+     */
+    protected final ITimeGraphPresentationProvider getPresentationProvider() {
+        return fProvider;
     }
 
     @Override
@@ -114,7 +124,14 @@ public class TimeGraphLegend extends TitleAreaDialog {
         return composite;
     }
 
-    private void createStatesGroup(Composite composite) {
+    /**
+     * Creates a states group
+     *
+     * @param composite
+     *            the parent composite
+     * @since 3.3
+     */
+    protected void createStatesGroup(Composite composite) {
         ScrolledComposite sc = new ScrolledComposite(composite, SWT.V_SCROLL | SWT.H_SCROLL);
         sc.setExpandHorizontal(true);
         sc.setExpandVertical(true);
@@ -123,8 +140,8 @@ public class TimeGraphLegend extends TitleAreaDialog {
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         sc.setLayoutData(gd);
 
-        String stateTypeName = provider.getStateTypeName();
-        StringBuffer buffer = new StringBuffer();
+        String stateTypeName = fProvider.getStateTypeName();
+        StringBuilder buffer = new StringBuilder();
         if (!stateTypeName.isEmpty()) {
             buffer.append(stateTypeName);
             buffer.append(" "); //$NON-NLS-1$
@@ -139,7 +156,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
 
         // Go through all the defined pairs of state color and state name and
         // display them.
-        StateItem[] stateItems = provider.getStateTable();
+        StateItem[] stateItems = fProvider.getStateTable();
         for (int i = 0; i < stateItems.length; i++) {
 
             // draw color with name
@@ -160,18 +177,32 @@ public class TimeGraphLegend extends TitleAreaDialog {
                 true);
     }
 
-    private class LegendEntry extends Composite {
+    /**
+     * Widget for a legend entry has a color chooser, a label, a width and a reset
+     * button
+     *
+     * @author Matthew Khouzam
+     * @since 3.3
+     */
+    protected class LegendEntry extends Composite {
         private final Swatch fBar;
         private final Scale fScale;
         private final Button fReset;
 
+        /**
+         * Constructor
+         *
+         * @param parent
+         *            parent composite
+         * @param si
+         *            the state item
+         */
         public LegendEntry(Composite parent, StateItem si) {
             super(parent, SWT.NONE);
             RGB rgb = si.getStateColor();
             String name = si.getStateString();
             float width = (float) si.getStyleMap().getOrDefault(ITimeEventStyleStrings.heightFactor(), 1.0f);
             setLayout(GridLayoutFactory.swtDefaults().numColumns(4).create());
-            setLayoutData(GridDataFactory.swtDefaults().grab(true, false).create());
             fBar = new Swatch(this, rgb);
             fBar.setToolTipText(Messages.TimeGraphLegend_swatchClick);
             fBar.addMouseListener(new MouseAdapter() {
@@ -184,7 +215,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
                     RGB color = cd.open();
                     fBar.setColor(color);
                     si.setStateColor(color);
-                    provider.refresh();
+                    fProvider.refresh();
                 }
             });
             fBar.addMouseTrackListener(new MouseTrackListener() {
@@ -199,7 +230,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
                     Shell shell = parent.getShell();
                     Cursor old = shell.getCursor();
                     shell.setCursor(new Cursor(e.display, SWT.CURSOR_ARROW));
-                    if(old != null) {
+                    if (old != null) {
                         old.dispose();
                     }
                 }
@@ -209,7 +240,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
                     Shell shell = parent.getShell();
                     Cursor old = shell.getCursor();
                     shell.setCursor(new Cursor(e.display, SWT.CURSOR_HAND));
-                    if(old != null) {
+                    if (old != null) {
                         old.dispose();
                     }
                 }
@@ -218,7 +249,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
             fBar.setLayoutData(GridDataFactory.swtDefaults().hint(30, 20).create());
             Label label = new Label(this, SWT.NONE);
             label.setText(name);
-            label.setLayoutData(GridDataFactory.fillDefaults().hint(160, 20).grab(true, true).align(SWT.BEGINNING, SWT.CENTER).create());
+            label.setLayoutData(GridDataFactory.fillDefaults().hint(160, SWT.DEFAULT).align(SWT.FILL, SWT.CENTER).grab(true, false).create());
             fScale = new Scale(this, SWT.NONE);
             fScale.setMaximum(100);
             fScale.setMinimum(1);
@@ -229,7 +260,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     si.getStyleMap().put(ITimeEventStyleStrings.heightFactor(), fScale.getSelection() * 0.01f);
-                    provider.refresh();
+                    fProvider.refresh();
                 }
 
                 @Override
@@ -237,7 +268,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
                     // do nothing
                 }
             });
-            fScale.setLayoutData(GridDataFactory.swtDefaults().hint(120, 20).create());
+            fScale.setLayoutData(GridDataFactory.swtDefaults().hint(120, SWT.DEFAULT).create());
             fReset = new Button(this, SWT.FLAT);
             fReset.addSelectionListener(new SelectionListener() {
 
@@ -246,7 +277,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
                     si.reset();
                     fBar.setColor(si.getStateColor());
                     fScale.setSelection((int) (100 * (float) si.getStyleMap().getOrDefault(ITimeEventStyleStrings.heightFactor(), 1.0f)));
-                    provider.refresh();
+                    fProvider.refresh();
                 }
 
                 @Override

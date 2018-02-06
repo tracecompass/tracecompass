@@ -277,6 +277,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     /** The filter label provider, or null if filter is not used */
     private TreeLabelProvider fFilterLabelProvider;
 
+    private ITimeGraphLegendProvider fLegendProvider;
+
     private int fAutoExpandLevel = ALL_LEVELS;
 
     /** The default column index for sorting */
@@ -991,6 +993,17 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         return fFindTarget;
     }
 
+    /**
+     * Sets the legend provider
+     *
+     * @param legendProvider
+     *            the legend provider
+     * @since 3.3
+     */
+    public void setLegendProvider(ITimeGraphLegendProvider legendProvider) {
+        fLegendProvider = legendProvider;
+    }
+
     // ------------------------------------------------------------------------
     // ViewPart
     // ------------------------------------------------------------------------
@@ -1001,6 +1014,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         fTimeGraphViewer = new TimeGraphViewer(parent, SWT.NONE);
         if (fLabelProvider != null) {
             fTimeGraphViewer.setTimeGraphLabelProvider(fLabelProvider);
+        }
+        if (fLegendProvider != null) {
+            fTimeGraphViewer.setLegendProvider(fLegendProvider);
         }
         if (fColumns != null) {
             fTimeGraphViewer.setColumns(fColumns);
