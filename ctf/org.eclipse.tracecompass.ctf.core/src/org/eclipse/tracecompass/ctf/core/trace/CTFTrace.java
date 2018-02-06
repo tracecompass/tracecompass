@@ -476,9 +476,6 @@ public class CTFTrace implements IDefinitionScope {
         try (FileChannel fc = FileChannel.open(streamFile.toPath(), StandardOpenOption.READ)) {
             /* Map one memory page of 4 kiB */
             byteBuffer = SafeMappedByteBuffer.map(fc, MapMode.READ_ONLY, 0, (int) Math.min(fc.size(), 4096L));
-            if (byteBuffer == null) {
-                throw new IllegalStateException("Failed to allocate memory"); //$NON-NLS-1$
-            }
             /* Create a BitBuffer with this mapping and the trace byte order */
             streamBitBuffer = new BitBuffer(byteBuffer, this.getByteOrder());
             if (fPacketHeaderDecl != null) {

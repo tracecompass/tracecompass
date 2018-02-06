@@ -159,16 +159,11 @@ public class CTFStreamInputReader implements AutoCloseable {
      * @since 2.0
      */
     public ByteBuffer getByteBufferAt(long position, long size) throws CTFException {
-        ByteBuffer map;
         try {
-            map = SafeMappedByteBuffer.map(fFileChannel, MapMode.READ_ONLY, position / BITS_PER_BYTE, (size + BITS_PER_BYTE - 1) / BITS_PER_BYTE);
+            return SafeMappedByteBuffer.map(fFileChannel, MapMode.READ_ONLY, position / BITS_PER_BYTE, (size + BITS_PER_BYTE - 1) / BITS_PER_BYTE);
         } catch (IOException e) {
             throw new CTFIOException(e.getMessage(), e);
         }
-        if (map == null) {
-            throw new CTFIOException("Failed to allocate mapped byte buffer"); //$NON-NLS-1$
-        }
-        return map;
     }
 
     /**

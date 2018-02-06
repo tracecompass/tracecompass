@@ -409,6 +409,89 @@ public final class BitBuffer {
     }
 
     /**
+     * Relative <i>put</i> method to write <i>length</i> bits long.
+     *
+     * Writes <i>length</i> lower-order bits from the provided <i>value</i>,
+     * starting from current bit position in the buffer. Sequential bytes are
+     * written according to the current byte order. The sign bit is carried to the
+     * MSB if signed is true. The sign bit is included in <i>length</i>. The current
+     * position is increased of <i>length</i>.
+     *
+     * @param length
+     *            The number of bits to write
+     * @param value
+     *            The value to write
+     * @throws CTFException
+     *             An error occurred writing the data. If the buffer is written
+     *             beyond its end, this exception will be raised.
+     * @since 2.4
+     */
+    public void putLong(int length, long value) throws CTFException {
+        // No overflow check since a long can only be 64 bits.
+        if (!canRead(length)) {
+            throw new CTFException("Cannot write to bitbuffer, " //$NON-NLS-1$
+                    + "insufficient space. Requested: " + length); //$NON-NLS-1$
+        }
+        if (length == 0) {
+            return;
+        }
+        if (length <= BIT_INT) {
+            putInt(length, (int) value);
+            return;
+        }
+        if (getByteOrder().equals(ByteOrder.LITTLE_ENDIAN)) {
+            putInt(BIT_INT, (int) (value & 0xffffffffL));
+            putInt(length - BIT_INT, (int) (value >> Integer.SIZE));
+            return;
+        }
+        putInt(length - BIT_INT, (int) (value >> Integer.SIZE));
+        putInt(BIT_INT, (int) (value & 0xffffffffL));
+    }
+
+    /**
+     * Relative <i>put</i> method to write a byte array.
+     *
+     * Writes a byte array to the bit buffer.
+     *
+     * @param value
+     *            The value to write
+     * @throws CTFException
+     *             An error occurred writing the data. If the buffer is written
+     *             beyond its end, this exception will be raised.
+     * @since 2.4
+     */
+    public void put(byte[] value) throws CTFException {
+        if (value == null || value.length == 0) {
+            return;
+        }
+        if (!canRead(value.length)) {
+            throw new CTFException("Cannot write to bitbuffer, " //$NON-NLS-1$
+                    + "insufficient space. Requested: " + value.length); //$NON-NLS-1$
+        }
+        fBuffer.put(value);
+    }
+
+    /**
+     * Relative <i>put</i> method to write a byte.
+     *
+     * Writes a byte to the bit buffer.
+     *
+     * @param value
+     *            The value to write
+     * @throws CTFException
+     *             An error occurred writing the data. If the buffer is written
+     *             beyond its end, this exception will be raised.
+     * @since 2.4
+     */
+    public void put(byte value) throws CTFException {
+        if (!canRead(Byte.SIZE)) {
+            throw new CTFException("Cannot write to bitbuffer, " //$NON-NLS-1$
+                    + "insufficient space. Requested: " + Byte.SIZE); //$NON-NLS-1$
+        }
+        fBuffer.put(value);
+    }
+
+    /**
      * Relative <i>put</i> method to write <i>length</i> bits integer.
      *
      * Writes <i>length</i> lower-order bits from the provided <i>value</i>,

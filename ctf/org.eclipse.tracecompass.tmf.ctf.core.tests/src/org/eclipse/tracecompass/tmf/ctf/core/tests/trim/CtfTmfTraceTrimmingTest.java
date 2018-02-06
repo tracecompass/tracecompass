@@ -81,8 +81,7 @@ public class CtfTmfTraceTrimmingTest {
     private final @NonNull CtfTestTrace fTestTrace;
 
     private CtfTmfTrace fOriginalTrace;
-    private ITmfTimestamp fRequestedTraceCutStart;
-    private ITmfTimestamp fRequestedTraceCutEnd;
+    private TmfTimeRange fRequestedTraceCutRange;
 
     private CtfTmfTrace fNewTrace;
     private Path fNewTracePath;
@@ -132,21 +131,20 @@ public class CtfTmfTraceTrimmingTest {
         fOriginalTrace = CtfTmfTestTraceUtils.getTrace(fTestTrace);
         openTrace(fOriginalTrace);
 
-        fRequestedTraceCutStart = getTraceCutStart(fOriginalTrace);
-        fRequestedTraceCutEnd = getTraceCutEnd(fOriginalTrace);
+        TmfTimeRange traceCutRange = getTraceCutRange(fOriginalTrace);
+        assertNotNull(traceCutRange);
+        fRequestedTraceCutRange = traceCutRange;
 
-        ITmfTimestamp requestedTraceCutEnd = fRequestedTraceCutEnd;
-        ITmfTimestamp requestedTraceCutStart = fRequestedTraceCutStart;
-        assertTrue(requestedTraceCutStart.compareTo(fOriginalTrace.getStartTime()) > 0);
-        assertTrue(requestedTraceCutEnd.compareTo(fOriginalTrace.getEndTime()) < 0);
-        assertTrue(fRequestedTraceCutStart.compareTo(fRequestedTraceCutEnd) < 0);
+        ITmfTimestamp requestedTraceCutEnd = traceCutRange.getEndTime();
+        ITmfTimestamp requestedTraceCutStart = traceCutRange.getStartTime();
+        assertTrue(fOriginalTrace.getTimeRange().contains(traceCutRange));
 
         TmfTimeRange range = new TmfTimeRange(
                 requestedTraceCutStart,
                 requestedTraceCutEnd);
         try {
             /* Perform the trim to create the new trace */
-            Path newTracePath = Files.createTempDirectory("trimmed-trace-test");
+            Path newTracePath = Files.createTempDirectory("trimmed-trace-test" + fTestTrace.name());
             fNewTracePath = newTracePath;
             assertNotNull(newTracePath);
             fNewTracePath.toFile().delete();
@@ -202,25 +200,15 @@ public class CtfTmfTraceTrimmingTest {
     }
 
     /**
-     * Get the timestamp at which we should start cutting the trace. It should be
-     * roughly 1/4 into the trace.
+     * Get the range at which we should start cutting the trace. It should be
+     * roughly 1/4 into the trace to 1/2 into the trace.
      */
-    private static ITmfTimestamp getTraceCutStart(CtfTmfTrace trace) {
-        long start = trace.getStartTime().toNanos();
-        long end = trace.getEndTime().toNanos();
+    private static TmfTimeRange getTraceCutRange(CtfTmfTrace trace) {
+        long start = trace.readStart().toNanos();
+        long end = trace.readEnd().toNanos();
 
-        return TmfTimestamp.fromNanos(((end - start) / 4) + start);
-    }
-
-    /**
-     * Get the timestamp at which we should end the trace cutting. It should be
-     * roughly at half the trace.
-     */
-    private static ITmfTimestamp getTraceCutEnd(CtfTmfTrace trace) {
-        long start = trace.getStartTime().toNanos();
-        long end = trace.getEndTime().toNanos();
-
-        return TmfTimestamp.fromNanos(((end - start) / 2) + start);
+        long duration = end - start;
+        return new TmfTimeRange(TmfTimestamp.fromNanos((duration / 4) + start), TmfTimestamp.fromNanos(((duration) / 2) + start));
     }
 
     // ------------------------------------------------------------------------
@@ -238,37 +226,44 @@ public class CtfTmfTraceTrimmingTest {
         assertNotNull(initialTrace);
         assertNotNull(trimmedTrace);
         assertNotNull(newTracePath);
+        ITmfContext trimmedContext = trimmedTrace.seekEvent(0);
+        CtfTmfEvent trimmedEvent = trimmedTrace.getNext(trimmedContext);
+        if(trimmedEvent == null) {
+            // empty trace
+            return;
+        }
 
         /*
          * Verify the bounds of the new trace are fine. The actual trace can be smaller
          * than what was requested if there are no events exactly at the bounds, but
          * should not contain events outside of the requested range.
          */
-        final long newTraceStartTime = trimmedTrace.getStartTime().toNanos();
-        final long newTraceEndTime = trimmedTrace.getEndTime().toNanos();
+        final long newTraceStartTime = trimmedTrace.readStart().toNanos();
+        final long newTraceEndTime = trimmedTrace.readEnd().toNanos();
 
         assertTrue("Cut trace start time " + newTraceStartTime
-                + " is earlier than the requested " + fRequestedTraceCutStart,
-                newTraceStartTime >= fOriginalTrace.getStartTime().toNanos());
+                + " is earlier than the requested " + fRequestedTraceCutRange.getStartTime(),
+                newTraceStartTime >= fOriginalTrace.readStart().toNanos());
 
         assertTrue("Cut trace end time " + newTraceEndTime
-                + " is later than the requested " + fRequestedTraceCutEnd,
-                newTraceEndTime <= fOriginalTrace.getEndTime().toNanos());
+                + " is later than the requested " + fRequestedTraceCutRange.getEndTime(),
+                newTraceEndTime <= fOriginalTrace.readEnd().toNanos());
 
         /*
          * Verify that each trace event from the original trace in the given time range
          * is present in the new one.
          */
-        ITmfTimestamp startTime = fRequestedTraceCutStart;
+        TmfTimeRange traceCutRange = fRequestedTraceCutRange;
+        ITmfTimestamp startTime = traceCutRange.getStartTime();
         ITmfContext initialContext = initialTrace.seekEvent(startTime);
         CtfTmfEvent initialEvent = initialTrace.getNext(initialContext);
-        ITmfContext trimmedContext = trimmedTrace.seekEvent(startTime);
-        CtfTmfEvent trimmedEvent = trimmedTrace.getNext(trimmedContext);
+
+
 
         int count = 0;
-        while (initialEvent.getTimestamp().compareTo(fRequestedTraceCutEnd) <= 0) {
-            assertNotNull(initialEvent);
-            assertNotNull("Expected event not present in trimmed trace: " + eventToString(initialEvent), trimmedEvent);
+        while (traceCutRange.contains(initialEvent.getTimestamp())) {
+            assertNotNull("Initial trace doesn't appear to have events in range", initialEvent);
+            assertNotNull(fRequestedTraceCutRange + "\n" + "Expected event not present in trimmed trace: " + eventToString(initialEvent), trimmedEvent);
 
             if (!eventsEquals(initialEvent, trimmedEvent)) {
                 /*
@@ -276,7 +271,7 @@ public class CtfTmfTraceTrimmingTest {
                  * does not guarantee in which order events of the same timestamp are read.
                  */
                 String comparator = eventToString(initialEvent) + "\n" + eventToString(trimmedEvent);
-                assertEquals(fRequestedTraceCutEnd + "\n" + count + "\n" + comparator, initialEvent.getTimestamp(), trimmedEvent.getTimestamp());
+                assertEquals(fRequestedTraceCutRange + "\n" + count + "\n" + comparator, initialEvent.getTimestamp(), trimmedEvent.getTimestamp());
                 /*
                  * Display warnings
                  */

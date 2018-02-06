@@ -65,15 +65,17 @@ public final class CTFPacketReader implements IPacketReader, IDefinitionScope {
     private final List<@Nullable IEventDeclaration> fDeclarations;
     private boolean fHasLost;
     private long fLastTimestamp;
-    private @Nullable final IDeclaration fStreamEventHeaderDecl;
+    private final @Nullable IDeclaration fStreamEventHeaderDecl;
 
-    private @Nullable final StructDeclaration fStreamContext;
+    private final @Nullable StructDeclaration fStreamContext;
 
-    private @Nullable final ICompositeDefinition fTracePacketHeader;
+    private final @Nullable ICompositeDefinition fTracePacketHeader;
 
-    private @Nullable final IDefinitionScope fPacketScope;
+    private final @Nullable IDefinitionScope fPacketScope;
 
     private @Nullable ICompositeDefinition fEventHeader;
+
+    private long fPosition;
 
     /**
      * Constructor
@@ -98,6 +100,7 @@ public final class CTFPacketReader implements IPacketReader, IDefinitionScope {
             @Nullable ICompositeDefinition packetHeader,
             IDefinitionScope packetScope) {
         fInput = input;
+        fPosition = packetContext.getPayloadStartBits();
         fPacketContext = packetContext;
         fDeclarations = declarations;
         fPacketScope = packetScope;
@@ -176,7 +179,7 @@ public final class CTFPacketReader implements IPacketReader, IDefinitionScope {
             eventID = 0;
         }
         if (eventID < 0 || eventID >= fDeclarations.size()) {
-            throw new CTFIOException("Invalid event id : " + eventID + " File position : " + fInput.position() / 8 + '/' + fPacketContext.getContentSizeBits() / 8); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new CTFIOException("Invalid event id : " + eventID + " File position : " + posStart / 8 + '/' + fPacketContext.getContentSizeBits() / 8); //$NON-NLS-1$ //$NON-NLS-2$
         }
         /* Get the right event definition using the event id. */
         IEventDeclaration eventDeclaration = fDeclarations.get(eventID);
@@ -193,7 +196,7 @@ public final class CTFPacketReader implements IPacketReader, IDefinitionScope {
         if (posStart == fInput.position()) {
             throw new CTFIOException("Empty event not allowed, event: " + eventDef.getDeclaration().getName()); //$NON-NLS-1$
         }
-
+        fPosition = posStart;
         return eventDef;
     }
 
@@ -251,10 +254,28 @@ public final class CTFPacketReader implements IPacketReader, IDefinitionScope {
     }
 
     /**
+     * Get the location of the currentEvent in the {@link BitBuffer}
+     *
+     * @return the location
+     */
+    public long getLocation() {
+        return fPosition;
+    }
+
+    /**
      * TODO: remove when API is reworked a bit.
      */
     @Override
     public @Nullable ICompositeDefinition getCurrentPacketEventHeader() {
         return fEventHeader;
+    }
+
+    /**
+     * Get the trace packet header (Typically, ctf, uuid and stream ids)
+     *
+     * @return the packet header
+     */
+    public @Nullable ICompositeDefinition getTracePacketHeader() {
+        return fTracePacketHeader;
     }
 }

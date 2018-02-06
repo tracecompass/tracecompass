@@ -16,9 +16,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,7 +25,7 @@ import java.nio.file.StandardOpenOption;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFException;
-import org.eclipse.tracecompass.internal.ctf.core.SafeMappedByteBuffer;
+import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.internal.ctf.core.trace.StreamInputPacketIndex;
 
 /**
@@ -60,11 +58,11 @@ public class CTFStreamOutputWriter {
      * Constructs a StreamInput.
      *
      * @param streamInput
-     *            The stream to which this StreamInput belongs to.
+     *                        The stream to which this StreamInput belongs to.
      * @param file
-     *            The output trace directory.
+     *                        The output trace directory.
      * @throws CTFException
-     *             If a reading or writing error occurs
+     *                          If a reading or writing error occurs
      */
     public CTFStreamOutputWriter(@NonNull CTFStreamInput streamInput, @NonNull File file) throws CTFException {
         fStreamInput = streamInput;
@@ -77,22 +75,23 @@ public class CTFStreamOutputWriter {
             throw new CTFIOException("Output file can't be created: " + outFilePath, e); //$NON-NLS-1$
         }
 
-        fStreamPacketOutputWriter = new CTFStreamPacketOutputWriter();
+        fStreamPacketOutputWriter = new CTFStreamPacketOutputWriter(streamInput);
     }
 
     /**
-     * Copies packets from the relevant input this input stream to a
-     * corresponding output stream based on a given time range. The following
-     * condition has to be met so that a packet is written to the output stream:
+     * Copies packets from the relevant input this input stream to a corresponding
+     * output stream based on a given time range. The following condition has to be
+     * met so that a packet is written to the output stream:
      *
-     * startTime <= packet.getTimestampEnd() && packet.getTimestampStart() <= endTime
+     * startTime <= packet.getTimestampEnd() && packet.getTimestampStart() <=
+     * endTime
      *
      * @param startTime
-     *            the start time for packets to be written
+     *                      the start time for packets to be written
      * @param endTime
-     *            the end time for packets to be written
+     *                      the end time for packets to be written
      * @throws CTFException
-     *             if a reading or writing error occurs
+     *                          if a reading or writing error occurs
      * @since 1.0
      */
     public void copyPackets(long startTime, long endTime) throws CTFException {
@@ -101,21 +100,34 @@ public class CTFStreamOutputWriter {
             throw new CTFIOException("StreamInput is null. Can't copy packets"); //$NON-NLS-1$
         }
 
-        try (FileChannel fc = checkNotNull(FileChannel.open(fOutFile.toPath(), StandardOpenOption.WRITE))) {
+        try (FileChannel fc = checkNotNull(FileChannel.open(fOutFile.toPath(), StandardOpenOption.WRITE));
+                FileChannel source = FileChannel.open(streamInput.getFile().toPath(), StandardOpenOption.READ);) {
             StreamInputPacketIndex index = streamInput.getIndex();
             int count = 0;
-            try (FileChannel source = FileChannel.open(streamInput.getFile().toPath(), StandardOpenOption.READ)) {
-                for (int i = 0; i < index.size(); i++) {
-                    ICTFPacketDescriptor entry = index.getElement(i);
-                    if ((entry.getTimestampEnd() >= startTime) && (entry.getTimestampBegin() <= endTime)) {
-                        ByteBuffer buffer = SafeMappedByteBuffer.map(source, MapMode.READ_ONLY, entry.getOffsetBytes(), entry.getPacketSizeBits() / Byte.SIZE);
-                        fStreamPacketOutputWriter.writePacket(buffer, fc);
-                        count++;
-                    }
+            long initialLost = 0;
+            for (int i = 0; i < index.size(); i++) {
+                ICTFPacketDescriptor entry = index.getElement(i);
+                /*
+                 * Entire packet is contained
+                 */
+                long packetStart = entry.getTimestampBegin();
+                long packetEnd = entry.getTimestampEnd();
+                if (count == 0) {
+                    initialLost = (long) entry.getAttributes().getOrDefault(CTFStrings.EVENTS_DISCARDED, 0);
+                }
+                if (startTime <= packetStart && endTime >= packetEnd) {
+                    // MUCH faster
+                    fStreamPacketOutputWriter.writePacket(entry, fc, initialLost);
+                    count++;
+                } else if (startTime <= packetEnd && endTime >= packetStart) {
+                    fStreamPacketOutputWriter.writePacket(entry, startTime, endTime, initialLost, fc);
+                    count++;
+                } else if (entry.getTimestampBegin() > endTime) {
+                    break;
                 }
             }
 
-            if (count == 0 && fOutFile.exists()) {
+            if (count == 0 && fOutFile.exists() || fOutFile.length() == 0) {
                 boolean deleteResult = fOutFile.delete();
                 if (!deleteResult) {
                     throw new CTFIOException("Could not delete " + fOutFile.getAbsolutePath()); //$NON-NLS-1$

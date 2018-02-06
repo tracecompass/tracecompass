@@ -57,29 +57,31 @@ public class CTFTraceWriterTest {
 
         // Stream 0 values
         private static final long STREAM0_FIRST_PACKET_TIME = CLOCK_OFFSET + 4277170993912L;
-        private static final long STREAM0_FIRST_EVENT_TIME = 1332170682440316151L;
-        private static final long STREAM0_LAST_EVENT_TIME = 1332170682702066969L;
-        private static final int STREAM0_FIRST_PACKET_NB_EVENTS = 14219;
+        private static final long STREAM0_FIRST_PACKET_END_TIME = CLOCK_OFFSET + 4277460357870L;
+        private static final long STREAM0_FIRST_EVENT_TIME = 1332170682440133097L;
+        private static final long STREAM0_LAST_EVENT_TIME = 1332170682702070461L;
+        private static final int STREAM0_FIRST_PACKET_NB_EVENTS = 51582;
 
         // Stream 1 values
-        private static final long STREAM1_FIRST_PACKET_TIME = CLOCK_OFFSET + 4277171555436L;
-        private static final int STREAM1_FIRST_PACKET_NB_EVENTS = 8213;
+        private static final long STREAM1_FIRST_PACKET_END_TIME = CLOCK_OFFSET + 4277258595268L ;
+        private static final long STREAM1_LAST_EVENT_TIME = 1332170682500307509L;
+        private static final int STREAM1_FIRST_PACKET_NB_EVENTS = 10312;
         private static final long STREAM1_FIRST_EVENT_TIME = 1332170682440133097L;
         private static final long STREAM1_FIFTH_PACKET_TIME = CLOCK_OFFSET + 4277970712221L;
         private static final long STREAM1_TENTH_PACKET_TIME = CLOCK_OFFSET + 4279440048309L;
-        private static final long STREAM1_FIFTH_PACKET_FIRST_EVENT_TIME = 1332170682702069762L;
-        private static final long STREAM1_TENTH_PACKET_LAST_EVENT_TIME = 1332170685256508077L;
+        private static final long STREAM1_FIFTH_PACKET_FIRST_EVENT_TIME = 1332170683212428164L;
+        private static final long STREAM1_TENTH_PACKET_LAST_EVENT_TIME = 1332170684681762296L;
 
         // Miscellaneous
-        private static final int NB_EVENTS_SEVERAL_PACKETS = 167585;
+        private static final int NB_EVENTS_SEVERAL_PACKETS = 132306;
 
         // Test parameters
         private String fName;
-        private long fStartTime;
-        private long fEndTime;
-        private int fNbEvents;
-        private long fFirstEventTime;
-        private long fLastEventTime;
+        private final long fStartTime;
+        private final long fEndTime;
+        private final int fNbEvents;
+        private final long fFirstEventTime;
+        private final long fLastEventTime;
 
     /**
      * Gets a list of test case parameters.
@@ -105,17 +107,17 @@ public class CTFTraceWriterTest {
 
         addParams(params, "STREAM0_FIRST_PACKET_TIME",
                             STREAM0_FIRST_PACKET_TIME,
-                            STREAM0_FIRST_PACKET_TIME,
+                            STREAM0_FIRST_PACKET_END_TIME,
                             STREAM0_FIRST_PACKET_NB_EVENTS,
                             STREAM0_FIRST_EVENT_TIME,
                             STREAM0_LAST_EVENT_TIME);
 
         addParams(params, "BOTH_STREAMS_FIRST_PACKET_ONLY",
                             STREAM0_FIRST_PACKET_TIME,
-                            STREAM1_FIRST_PACKET_TIME,
-                            STREAM0_FIRST_PACKET_NB_EVENTS + STREAM1_FIRST_PACKET_NB_EVENTS,
+                            STREAM1_FIRST_PACKET_END_TIME,
+                            STREAM1_FIRST_PACKET_NB_EVENTS,
                             STREAM1_FIRST_EVENT_TIME,
-                            STREAM0_LAST_EVENT_TIME);
+                            STREAM1_LAST_EVENT_TIME);
 
         addParams(params, "BOTH_STREAMS_SEVERAL_PACKETS",
                 STREAM1_FIFTH_PACKET_TIME,

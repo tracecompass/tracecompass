@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.ctf.core.CTFException;
+
 /**
  * A common utility for mapping a ByteBuffer safely to work around a bug on
  * Windows which prevents deleting a file after it was mapped. On Windows, the
@@ -31,8 +34,8 @@ public final class SafeMappedByteBuffer {
     private SafeMappedByteBuffer(){}
 
     /**
-     * Maps a region of this channel's file directly into memory. On Windows,
-     * this will allocate a new ByteBuffer and read the file.
+     * Maps a region of this channel's file directly into memory. On Windows, this
+     * will allocate a new ByteBuffer and read the file.
      *
      * @param fc
      *            the file channel
@@ -45,17 +48,24 @@ public final class SafeMappedByteBuffer {
      * @return the mapped ByteBuffer
      * @throws IOException
      *             on FileChannel operations failures
+     * @throws CTFException
+     *             the file mapping refused to map
      */
-    public static ByteBuffer map(FileChannel fc, FileChannel.MapMode mode, long position, long size) throws IOException {
-        ByteBuffer byteBuffer;
+    public static @NonNull ByteBuffer map(FileChannel fc, FileChannel.MapMode mode, long position, long size) throws IOException, CTFException {
+        ByteBuffer byteBuffer = null;
+        long fileSize = fc.size();
         if (IS_WIN32) {
             byteBuffer = ByteBuffer.allocate((int) size);
             fc.read(byteBuffer, position);
             byteBuffer.flip();
         } else {
-            byteBuffer = fc.map(mode, position, size);
+            if (position + size <= fileSize) {
+                byteBuffer = fc.map(mode, position, size);
+            }
+            if (byteBuffer == null) {
+                throw new CTFException("Failed to allocate mapped byte buffer at " + position + " of size " + size + " on a file of size " + fileSize); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            }
         }
-
         return byteBuffer;
     }
 }

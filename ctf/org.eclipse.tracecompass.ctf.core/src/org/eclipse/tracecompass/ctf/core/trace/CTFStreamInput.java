@@ -285,11 +285,7 @@ public class CTFStreamInput implements IDefinitionScope {
     }
 
     private static ByteBuffer getByteBufferAt(FileChannel fc, long position, long size) throws CTFException, IOException {
-        ByteBuffer map = SafeMappedByteBuffer.map(fc, MapMode.READ_ONLY, position, size);
-        if (map == null) {
-            throw new CTFException("Failed to allocate mapped byte buffer"); //$NON-NLS-1$
-        }
-        return map;
+        return SafeMappedByteBuffer.map(fc, MapMode.READ_ONLY, position, size);
     }
 
     private static ByteBuffer createPacketBitBuffer(FileChannel fc,
