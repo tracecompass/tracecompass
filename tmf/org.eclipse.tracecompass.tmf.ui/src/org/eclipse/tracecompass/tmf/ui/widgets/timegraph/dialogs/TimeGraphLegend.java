@@ -168,7 +168,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        shell.setText(Messages.TmfTimeLegend_TRACE_STATES_TITLE);
+        shell.setText(Messages.TmfTimeLegend_LEGEND);
     }
 
     @Override

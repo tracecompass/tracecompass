@@ -114,7 +114,7 @@ public abstract class KernelTimeGraphViewTestBase extends KernelTestBase {
         List<String> labelValues = getLegendValues();
         SWTBotToolbarButton legendButton = getViewBot().toolbarButton("Show Legend");
         legendButton.click();
-        SWTBotShell shell = fBot.shell("States Transition Visualizer");
+        SWTBotShell shell = fBot.shell("Legend");
         shell.activate();
         SWTBot bot = shell.bot();
         for (int i = 1; i <= labelValues.size(); i++) {

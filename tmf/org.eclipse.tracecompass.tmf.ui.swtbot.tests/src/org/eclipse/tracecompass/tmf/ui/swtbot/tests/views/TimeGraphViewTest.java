@@ -86,7 +86,7 @@ public class TimeGraphViewTest {
     /**
      * Legend title
      */
-    private static final String LEGEND_NAME = "States Transition Visualizer";
+    private static final String LEGEND_NAME = "Legend";
     /**
      * OK button
      */
