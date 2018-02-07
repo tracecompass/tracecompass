@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 École Polytechnique de Montréal
+ * Copyright (c) 2015, 2018 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -37,6 +37,8 @@ public class Messages {
     public static @Nullable String CriticalPathView_selectAlgorithm;
     public static @Nullable String CriticalPathView_followArrowFwdText;
     public static @Nullable String CriticalPathView_followArrowBwdText;
+    public static @Nullable String CriticalPathLegend_running;
+    public static @Nullable String CriticalPathLegend_blocked;
 
     static {
         // initialize resource bundle
