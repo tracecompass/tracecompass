@@ -37,6 +37,7 @@
       <module
             analysis_module="org.eclipse.tracecompass.internal.lttng2.ust.core.callstack.LttngUstCallStackAnalysis"
             automatic="false"
+            icon="icons/callstack.png"
             id="org.eclipse.linuxtools.lttng2.ust.analysis.callstack"
             name="%analysis.callstack">
          <tracetype
