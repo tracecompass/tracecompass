@@ -1623,8 +1623,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
         ILinkEvent linkEvent = null;
         double minDistance = Double.MAX_VALUE;
+        Rectangle clientArea = getClientArea();
         for (ILinkEvent event : fItemData.fLinks) {
-            Rectangle rect = getArrowRectangle(new Rectangle(0, 0, 0, 0), event);
+            Rectangle rect = getArrowRectangle(clientArea, event);
             if (rect != null) {
                 int x1 = rect.x;
                 int y1 = rect.y;
