@@ -38,6 +38,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -402,16 +403,22 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                                 }
                             }
                             Display.getDefault().asyncExec(() -> {
-                                for (TmfTraceElement trace : changedTraces) {
-                                    IResource resource = trace.getResource();
-                                    IProject parentProject = TmfProjectModelHelper.getProjectFromShadowProject(project);
-                                    if (((parentProject != null && parentProject.getLocation().isPrefixOf(resource.getLocation())) // link from shadow project to parent project
-                                          ||  resource.getWorkspace().getRoot().getLocation().isPrefixOf(resource.getLocation())) && // link within the workspace
-                                            !new File(resource.getLocation().toOSString()).exists()) {
-                                        handleTraceDeleted(trace);
-                                    } else {
-                                        handleTraceContentChanged(trace);
-                                    }
+                                try {
+                                    ResourcesPlugin.getWorkspace().run((ICoreRunnable) (monitor -> {
+                                        for (TmfTraceElement trace : changedTraces) {
+                                            IResource resource = trace.getResource();
+                                            IProject parentProject = TmfProjectModelHelper.getProjectFromShadowProject(project);
+                                            if (((parentProject != null && parentProject.getLocation().isPrefixOf(resource.getLocation())) // link from shadow project to parent project
+                                                    ||  resource.getWorkspace().getRoot().getLocation().isPrefixOf(resource.getLocation())) && // link within the workspace
+                                                    !new File(resource.getLocation().toOSString()).exists()) {
+                                                handleTraceDeleted(trace);
+                                            } else {
+                                                handleTraceContentChanged(trace);
+                                            }
+                                        }
+                                    }), project, IWorkspace.AVOID_UPDATE, null);
+                                } catch (CoreException e) {
+                                    Activator.getDefault().logError("Error handling resource change event for " + project.getName(), e); //$NON-NLS-1$
                                 }
                                 IProject parentProject = TmfProjectModelHelper.getProjectFromShadowProject(project);
                                 if (parentProject != null) {
