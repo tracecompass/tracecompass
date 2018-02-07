@@ -79,7 +79,7 @@ public class ImportAndReadKernelSmokeTest extends KernelTestBase {
     static {
         Map<String, Set<String>> map  = new HashMap<>();
         map.put("Input/Output", Collections.emptySet());
-        map.put("Tmf Statistics", ImmutableSet.of("org.eclipse.linuxtools.tmf.statistics.totals", "org.eclipse.linuxtools.tmf.statistics.types"));
+        map.put("Statistics", ImmutableSet.of("org.eclipse.linuxtools.tmf.statistics.totals", "org.eclipse.linuxtools.tmf.statistics.types"));
         map.put("Active Thread", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.kernel.tid"));
         map.put("Linux Kernel", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.kernel"));
         map.put("Context switch", Collections.emptySet());

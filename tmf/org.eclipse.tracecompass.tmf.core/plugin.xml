@@ -28,7 +28,7 @@
             automatic="true"
             icon="icons/statistics.png"
             id="org.eclipse.linuxtools.tmf.core.statistics.analysis"
-            name="Tmf Statistics">
+            name="Statistics">
          <tracetype
                applies="true"
                class="org.eclipse.tracecompass.tmf.core.trace.TmfTrace">
