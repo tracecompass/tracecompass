@@ -133,7 +133,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
      *            {@link ITmfStateSystem}
      *
      */
-    protected ThreadStatusDataProvider(@NonNull ITmfTrace trace, KernelAnalysisModule module) {
+    public ThreadStatusDataProvider(@NonNull ITmfTrace trace, KernelAnalysisModule module) {
         super(trace);
         fModule = module;
         if (trace instanceof IKernelTrace) {

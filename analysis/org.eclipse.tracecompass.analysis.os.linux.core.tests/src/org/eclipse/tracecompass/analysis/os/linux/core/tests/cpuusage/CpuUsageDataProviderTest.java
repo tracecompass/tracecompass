@@ -53,7 +53,6 @@ import org.junit.Test;
  *
  * @author Geneviève Bastien
  */
-@SuppressWarnings("restriction")
 public class CpuUsageDataProviderTest {
 
     private static final String CPU_USAGE_FILE = "testfiles/cpu_analysis.xml";
