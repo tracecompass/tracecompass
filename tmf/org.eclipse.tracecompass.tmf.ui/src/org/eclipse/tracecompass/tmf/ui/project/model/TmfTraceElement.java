@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
@@ -204,6 +205,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     private FileInfo fFileInfo;
     private ITmfTimestamp fStartTime = null;
     private ITmfTimestamp fEndTime = null;
+    private boolean fPreDeleted = false;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -750,6 +752,32 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         if (resourceToDelete == null) {
             return;
         }
+
+        SubMonitor subMon = SubMonitor.convert(progressMonitor, 2);
+
+        // Do pre-delete cleanup
+        preDelete(subMon.split(1), overwriting);
+
+        // Finally, delete the trace resource
+        ResourceUtil.deleteResource(resourceToDelete, subMon.split(1));
+    }
+
+    /*
+     * Pre-delete cleanup
+     *
+     * This can also be called by the TmfProjectRegistry when it detects that the
+     * trace resource has been deleted.
+     */
+    void preDelete(IProgressMonitor progressMonitor, boolean overwriting) throws CoreException {
+        if (fPreDeleted) {
+            return;
+        }
+        fPreDeleted = true;
+
+        IResource resourceToDelete = getResource();
+        if (resourceToDelete == null) {
+            return;
+        }
         IPath path = resourceToDelete.getLocation();
         if (path != null) {
             if (getParent() instanceof TmfTraceFolder) {
@@ -774,6 +802,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
                         }
                     }
                 }
+
                 // Delete supplementary files
                 if (overwriting) {
                     deleteSupplementaryResources();
@@ -783,12 +812,18 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
 
             } else if (getParent() instanceof TmfExperimentElement) {
                 TmfExperimentElement experimentElement = (TmfExperimentElement) getParent();
-                experimentElement.removeTrace(this, false);
+                experimentElement.deleteSupplementaryResources();
             }
         }
 
-        // Finally, delete the trace
-        ResourceUtil.deleteResource(resourceToDelete, progressMonitor);
+        if (overwriting) {
+            /*
+             * Remove the trace from the model immediately to prevent preDelete from being
+             * called again from TmfProjectRegistry.handleTraceDeleted() as it would remove
+             * the overwritten trace from any experiments to which it belongs.
+             */
+            ((TmfProjectModelElement) getParent()).removeChild(this);
+        }
     }
 
     /**

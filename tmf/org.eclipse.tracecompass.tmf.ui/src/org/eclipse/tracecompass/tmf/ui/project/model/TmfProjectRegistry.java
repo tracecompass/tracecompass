@@ -404,7 +404,8 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                                 } else if ((visited.getKind() != IResourceDelta.CHANGED)) {
                                     IResource parent = visited.getResource().getParent();
                                     if (((visited.getFlags() & (IResourceDelta.MOVED_FROM | IResourceDelta.MOVED_TO)) == 0)) {
-                                        // visited resource is added or removed, refresh its parent
+                                        // visited resource is added or removed, refresh it and its parent
+                                        resourcesToRefresh.add(visited.getResource());
                                         resourcesToRefresh.add(parent);
                                     } else {
                                         Integer parentFlags = resourceFlags.get(parent);
@@ -428,7 +429,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                             Iterator<ITmfProjectModelElement> iterator = elementsToRefresh.iterator();
                             while (iterator.hasNext()) {
                                 ITmfProjectModelElement element = iterator.next();
-                                if (element instanceof TmfTraceElement && element.getParent() instanceof TmfTraceFolder) {
+                                if (element instanceof TmfTraceElement) {
                                     TmfTraceElement trace = (TmfTraceElement) element;
                                     IResource resource = trace.getResource();
                                     if (isHandleDeleted(resource, parentProject)) {
@@ -554,6 +555,9 @@ public class TmfProjectRegistry implements IResourceChangeListener {
             boolean match = false;
             for (ITmfProjectModelElement child : children) {
                 IResource childResource = child.getResource();
+                if (resource.equals(childResource)) {
+                    return child;
+                }
                 if (childResource != null && segment.equals(childResource.getName())) {
                     element = child;
                     match = true;
@@ -654,7 +658,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
 
     private static void handleTraceDeleted(TmfTraceElement trace) {
         try {
-            trace.delete(new NullProgressMonitor(), false, false);
+            trace.preDelete(new NullProgressMonitor(), false);
         } catch (CoreException e) {
             Activator.getDefault().logError("Error deleting trace " + trace.getName(), e); //$NON-NLS-1$
         }

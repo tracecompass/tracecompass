@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2017 Ericsson
+ * Copyright (c) 2011, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -28,24 +28,22 @@ public class Messages extends NLS {
 
     public static String DeleteDialog_Title;
     public static String DeleteTraceHandler_Message;
-    public static String DeleteTraceHandler_Error;
-    public static String DeleteTraceHandler_TaskName;
     public static String DeleteTraceHandlerGeneric_Message;
     public static String DeleteTraceHandlerGeneric_Error;
+    public static String DeleteTraceHandlerGeneric_TaskName;
     public static String DeleteExperimentHandler_Message;
     public static String DeleteExperimentHandler_Error;
+    public static String DeleteExperimentHandler_TaskName;
     public static String DeleteFolderHandler_Message;
-    public static String DeleteFolderHandler_Error;
-    public static String DeleteFolderHandler_TaskName;
+    public static String CloseTraces_TaskName;
 
     public static String RemoveDialog_Title;
     public static String RemoveTraceFromExperimentHandler_Message;
     public static String RemoveTraceFromExperimentHandler_TaskName;
     public static String RemoveTraceFromExperimentHandler_Error;
+
     public static String ClearDialog_Title;
     public static String DeleteFolderHandlerClear_Message;
-    public static String DeleteFolderHandlerClear_Error;
-    public static String DeleteFolderHandlerClear_TaskName;
 
     public static String SelectTraceTypeHandler_ErrorSelectingTrace;
     public static String SelectTraceTypeHandler_Title;

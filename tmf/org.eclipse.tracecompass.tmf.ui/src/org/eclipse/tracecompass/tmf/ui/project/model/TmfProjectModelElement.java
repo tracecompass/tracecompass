@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -32,6 +33,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.project.model.TmfProjectModelHelper;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
@@ -209,8 +211,11 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
                     CommonViewer commonViewer = ((CommonNavigator) viewPart).getCommonViewer();
                     Object element = TmfProjectModelElement.this;
                     if (element instanceof TmfProjectElement) {
-                        // for the project element the viewer uses the IProject resource
-                        element = getResource();
+                        IProject project = (IProject) getResource();
+                        if (project != null && !TmfProjectModelHelper.isShadowProject(project)) {
+                            // for the project element the viewer uses the IProject resource
+                            element = getResource();
+                        }
                     }
                     commonViewer.refresh(element);
                 }
