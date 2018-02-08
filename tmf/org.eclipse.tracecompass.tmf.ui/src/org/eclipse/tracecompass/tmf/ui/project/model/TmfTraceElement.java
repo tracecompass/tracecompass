@@ -19,6 +19,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
+import java.io.File;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -46,6 +48,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.util.ByteBufferTracker;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.io.ResourceUtil;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtEvent;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTrace;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition;
@@ -423,8 +426,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     @Override
     public boolean testAttribute(Object target, String name, String value) {
         if (name.equals(IS_LINKED)) {
-            boolean isLinked = getElementUnderTraceFolder().getResource().isLinked();
-            return Boolean.toString(isLinked).equals(value);
+            return Boolean.toString(ResourceUtil.isSymbolicLink(getElementUnderTraceFolder().getResource())).equals(value);
         }
         return false;
     }
@@ -489,11 +491,15 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         }
 
         if (LOCATION.equals(id)) {
-            return URIUtil.toUnencodedString(getElementUnderTraceFolder().getLocation());
+            URI uri = ResourceUtil.getLocationURI(getElementUnderTraceFolder().getResource());
+            if (uri == null) {
+                uri = getElementUnderTraceFolder().getLocation();
+            }
+            return URIUtil.toUnencodedString(new File(uri).toURI());
         }
 
         if (IS_LINKED_PROPERTY.equals(id)) {
-            return Boolean.valueOf(getElementUnderTraceFolder().getResource().isLinked()).toString();
+            return Boolean.toString(ResourceUtil.isSymbolicLink(getElementUnderTraceFolder().getResource()));
         }
 
         if (SOURCE_LOCATION.equals(id)) {
@@ -740,7 +746,11 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
             Display.getDefault().syncExec(this::closeEditors);
         }
 
-        IPath path = getResource().getLocation();
+        IResource resourceToDelete = getResource();
+        if (resourceToDelete == null) {
+            return;
+        }
+        IPath path = resourceToDelete.getLocation();
         if (path != null) {
             if (getParent() instanceof TmfTraceFolder) {
                 TmfExperimentFolder experimentFolder = getProject().getExperimentsFolder();
@@ -778,7 +788,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         }
 
         // Finally, delete the trace
-        getResource().delete(true, progressMonitor);
+        ResourceUtil.deleteResource(resourceToDelete, progressMonitor);
     }
 
     /**

@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.tmf.core.io.ResourceUtil;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
@@ -92,7 +93,7 @@ public class CopyTraceDialog extends SelectionStatusDialog {
         composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
         createNewTraceNameGroup(composite);
-        if (fTrace.getResource().isLinked()) {
+        if (ResourceUtil.isSymbolicLink(fTrace.getResource())) {
             createOptionsGroup(composite);
         }
         return composite;

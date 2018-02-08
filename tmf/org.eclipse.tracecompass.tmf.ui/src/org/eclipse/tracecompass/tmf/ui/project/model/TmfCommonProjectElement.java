@@ -47,6 +47,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
+import org.eclipse.tracecompass.tmf.core.io.ResourceUtil;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType.TraceElementType;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -534,9 +535,8 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
             if (copyAsLink) {
                 flags |= IResource.SHALLOW;
             }
-            getResource().copy(destinationPath, flags, null);
-            IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-            IResource trace = workspaceRoot.findMember(destinationPath);
+
+            IResource trace = ResourceUtil.copyResource(getResource(), destinationPath, flags, null);
 
             /* Delete any bookmarks file found in copied trace folder */
             if (trace instanceof IFolder) {

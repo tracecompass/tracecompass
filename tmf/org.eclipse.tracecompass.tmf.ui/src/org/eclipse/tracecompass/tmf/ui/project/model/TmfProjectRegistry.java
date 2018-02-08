@@ -14,7 +14,6 @@
 
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayDeque;
@@ -39,6 +38,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ICoreRunnable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -52,6 +52,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfUIPreferences;
 import org.eclipse.tracecompass.internal.tmf.ui.project.model.TmfProjectModelHelper;
 import org.eclipse.tracecompass.tmf.core.TmfProjectNature;
+import org.eclipse.tracecompass.tmf.core.io.ResourceUtil;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -396,8 +397,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                                 if (element instanceof TmfTraceElement && element.getParent() instanceof TmfTraceFolder) {
                                     TmfTraceElement trace = (TmfTraceElement) element;
                                     IResource resource = trace.getResource();
-                                    if (isInWorkspace(resource, parentProject) &&
-                                            !new File(resource.getLocation().toOSString()).exists()) {
+                                    if (isHandleDeleted(resource, parentProject)) {
                                         deletedTraces.add(trace);
                                     } else {
                                         changedTraces.add(trace);
@@ -464,6 +464,16 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                 }
             }
         }
+    }
+
+    private static boolean isHandleDeleted(IResource resource, IProject parentProject) {
+        IPath path = ResourceUtil.getLocation(resource);
+        if (path == null) {
+            return false;
+        }
+        return ((parentProject != null && parentProject.getLocation().isPrefixOf(path)) // link from shadow project to parent project
+              || resource.getWorkspace().getRoot().getLocation().isPrefixOf(path)) && // link within the workspace
+                !path.toFile().exists();
     }
 
     // -------------------------------------------------------
@@ -534,11 +544,6 @@ public class TmfProjectRegistry implements IResourceChangeListener {
             }
         }
         return element;
-    }
-
-    private static boolean isInWorkspace(IResource resource, IProject parentProject) {
-        return (parentProject != null && parentProject.getLocation().isPrefixOf(resource.getLocation())) // link from shadow project to parent project
-                || resource.getWorkspace().getRoot().getLocation().isPrefixOf(resource.getLocation()); // link within the workspace
     }
 
     private static void handleTraceContentChanged(TmfTraceElement traceElement) {

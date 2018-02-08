@@ -49,6 +49,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
+import org.eclipse.tracecompass.tmf.core.io.ResourceUtil;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
@@ -267,7 +268,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 }
             }
             try {
-                if (operation == DND.DROP_COPY && !sourceResource.isLinked()) {
+                if (operation == DND.DROP_COPY && !ResourceUtil.isSymbolicLink(sourceResource)) {
                     IPath destination = tracesFolder.getResource().getFullPath().addTrailingSeparator().append(targetName);
                     sourceResource.copy(destination, false, null);
                     cleanupBookmarks(destination);
@@ -282,7 +283,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 }
                 String sourceLocation = sourceResource.getPersistentProperty(TmfCommonConstants.SOURCE_LOCATION);
                 if (sourceLocation == null) {
-                     sourceLocation = URIUtil.toUnencodedString(new File(sourceResource.getLocationURI()).toURI());
+                     sourceLocation = URIUtil.toUnencodedString(new File(ResourceUtil.getLocationURI(sourceResource)).toURI());
                 }
                 traceResource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
             } catch (CoreException e) {
@@ -356,7 +357,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             }
         }
         try {
-            if (operation == DND.DROP_COPY && !sourceResource.isLinked()) {
+            if (operation == DND.DROP_COPY && !ResourceUtil.isSymbolicLink(sourceResource)) {
                 IPath destination = traceFolder.getResource().getFullPath().addTrailingSeparator().append(targetName);
                 sourceResource.copy(destination, false, null);
                 cleanupBookmarks(destination);
@@ -367,7 +368,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             if (traceResource != null && traceResource.exists()) {
                 String sourceLocation = sourceResource.getPersistentProperty(TmfCommonConstants.SOURCE_LOCATION);
                 if (sourceLocation == null) {
-                    sourceLocation = URIUtil.toUnencodedString(new File(sourceResource.getLocationURI()).toURI());
+                    sourceLocation = URIUtil.toUnencodedString(new File(ResourceUtil.getLocationURI(sourceResource)).toURI());
                 }
                 traceResource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
                 setTraceType(traceResource);
@@ -554,7 +555,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
      * @param targetName the target name
      */
     private static void createLink(IFolder parentFolder, IResource resource, String targetName) {
-        IPath location = resource.getLocation();
+        IPath location = ResourceUtil.getLocation(resource);
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         try {
             String traceType = TmfTraceType.getTraceTypeId(resource);
