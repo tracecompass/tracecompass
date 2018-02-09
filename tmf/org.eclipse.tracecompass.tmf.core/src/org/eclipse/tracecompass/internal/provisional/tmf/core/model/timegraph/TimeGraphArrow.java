@@ -19,6 +19,29 @@ public class TimeGraphArrow implements ITimeGraphArrow {
     private final long fDestinationId;
     private final long fStartTime;
     private final long fDuration;
+    private final int fValue;
+
+    /**
+     * Constructor
+     *
+     * @param sourceId
+     *            ID of source element
+     * @param destinationId
+     *            ID of destination element
+     * @param time
+     *            Time
+     * @param duration
+     *            Duration
+     * @param value
+     *            value payload associated with this arrow
+     */
+    public TimeGraphArrow(long sourceId, long destinationId, long time, long duration, int value) {
+        fSourceId = sourceId;
+        fDestinationId = destinationId;
+        fStartTime = time;
+        fDuration = duration;
+        fValue = value;
+    }
 
     /**
      * Constructor
@@ -33,10 +56,7 @@ public class TimeGraphArrow implements ITimeGraphArrow {
      *            Duration
      */
     public TimeGraphArrow(long sourceId, long destinationId, long time, long duration) {
-        fSourceId = sourceId;
-        fDestinationId = destinationId;
-        fStartTime = time;
-        fDuration = duration;
+        this(sourceId, destinationId, time, duration, Integer.MIN_VALUE);
     }
 
     @Override
@@ -57,5 +77,10 @@ public class TimeGraphArrow implements ITimeGraphArrow {
     @Override
     public long getDuration() {
         return fDuration;
+    }
+
+    @Override
+    public int getValue() {
+        return fValue;
     }
 }

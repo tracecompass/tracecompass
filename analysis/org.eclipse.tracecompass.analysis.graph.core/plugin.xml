@@ -16,4 +16,11 @@
          </parameter>
       </module>
    </extension>
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.dataprovider">
+      <dataProviderFactory
+            class="org.eclipse.tracecompass.analysis.graph.core.dataprovider.CriticalPathDataProviderFactory"
+            id="org.eclipse.tracecompass.analysis.graph.core.dataprovider.CriticalPathDataProvider">
+      </dataProviderFactory>
+   </extension>
 </plugin>

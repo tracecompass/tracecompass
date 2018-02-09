@@ -72,6 +72,9 @@ public class DataProviderManager {
         DataProviderManager manager = INSTANCE;
         if (manager != null) {
             TmfSignalManager.deregister(manager);
+            for (IDataProviderFactory factory : manager.fDataProviderFactories.values()) {
+                TmfSignalManager.deregister(factory);
+            }
             manager.fDataProviderFactories.clear();
             manager.fInstances.clear();
         }

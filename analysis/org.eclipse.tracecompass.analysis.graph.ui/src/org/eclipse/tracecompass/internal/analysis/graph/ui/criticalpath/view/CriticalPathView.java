@@ -9,52 +9,45 @@
 
 package org.eclipse.tracecompass.internal.analysis.graph.ui.criticalpath.view;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.tracecompass.analysis.graph.core.base.IGraphWorker;
-import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge;
-import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge.EdgeType;
-import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
-import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
 import org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathModule;
-import org.eclipse.tracecompass.analysis.graph.core.criticalpath.ICriticalPathProvider;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.internal.analysis.graph.core.base.TmfGraphStatistics;
-import org.eclipse.tracecompass.internal.analysis.graph.core.base.TmfGraphVisitor;
-import org.eclipse.tracecompass.internal.analysis.graph.ui.criticalpath.view.CriticalPathPresentationProvider.State;
+import org.eclipse.tracecompass.analysis.graph.core.dataprovider.CriticalPathDataProvider;
+import org.eclipse.tracecompass.analysis.graph.core.dataprovider.CriticalPathEntry;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphArrow;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphEntryModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphState;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfStartAnalysisSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
-import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphContentProvider;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 
 /**
@@ -63,7 +56,7 @@ import com.google.common.collect.Table;
  * @author Geneviève Bastien
  * @author Francis Giraldeau
  */
-public class CriticalPathView extends AbstractTimeGraphView {
+public class CriticalPathView extends BaseDataProviderTimeGraphView {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -72,7 +65,7 @@ public class CriticalPathView extends AbstractTimeGraphView {
     /** View ID */
     public static final String ID = "org.eclipse.linuxtools.tmf.analysis.graph.ui.criticalpath.view.criticalpathview"; //$NON-NLS-1$
 
-    private static final double NANOINV = 0.000000001;
+    private static final double NANOINV = 10E-9;
 
     private static final String COLUMN_PROCESS = Messages.getMessage(Messages.CriticalFlowView_columnProcess);
     private static final String COLUMN_ELAPSED = Messages.getMessage(Messages.CriticalFlowView_columnElapsed);
@@ -88,412 +81,39 @@ public class CriticalPathView extends AbstractTimeGraphView {
             COLUMN_PROCESS
     };
 
-    private final Table<ITmfTrace, Object, List<ILinkEvent>> fLinks = HashBasedTable.create();
-    /** The trace to entry list hash map */
-    private final Table<ITmfTrace, Object, TmfGraphStatistics> fObjectStatistics = HashBasedTable.create();
-
-    private final CriticalPathContentProvider fContentProvider = new CriticalPathContentProvider();
-
-    private TmfGraphStatistics fStats = new TmfGraphStatistics();
-
-    private static final IGraphWorker DEFAULT_WORKER = new IGraphWorker() {
-        @Override
-        public String getHostId() {
-            return "default"; //$NON-NLS-1$
-        }
-    };
-
-    private class CriticalPathContentProvider implements ITimeGraphContentProvider {
-
-        private final class HorizontalLinksVisitor extends TmfGraphVisitor {
-            private final CriticalPathEntry fDefaultParent;
-            private final Map<String, CriticalPathEntry> fHostEntries;
-            private final TmfGraph fGraph;
-            private final ITmfTrace fTrace;
-            private final HashMap<Object, CriticalPathEntry> fRootList;
-
-            private HorizontalLinksVisitor(CriticalPathEntry defaultParent, Map<String, CriticalPathEntry> hostEntries, TmfGraph graph, ITmfTrace trace, HashMap<Object, CriticalPathEntry> rootList) {
-                fDefaultParent = defaultParent;
-                fHostEntries = hostEntries;
-                fGraph = graph;
-                fTrace = trace;
-                fRootList = rootList;
-            }
-
-            @Override
-            public void visitHead(TmfVertex node) {
-                /* TODO possible null pointer ? */
-                IGraphWorker owner = fGraph.getParentOf(node);
-                if (owner == null) {
-                    return;
-                }
-                if (fRootList.containsKey(owner)) {
-                    return;
-                }
-                TmfVertex first = fGraph.getHead(owner);
-                TmfVertex last = fGraph.getTail(owner);
-                if (first == null || last == null) {
-                    return;
-                }
-                setStartTime(Math.min(getStartTime(), first.getTs()));
-                setEndTime(Math.max(getEndTime(), last.getTs()));
-                // create host entry
-                CriticalPathEntry parent = fDefaultParent;
-                String host = owner.getHostId();
-                if (!fHostEntries.containsKey(host)) {
-                    fHostEntries.put(host, new CriticalPathEntry(host, fTrace, getStartTime(), getEndTime(), owner));
-                }
-                parent = checkNotNull(fHostEntries.get(host));
-                CriticalPathEntry entry = new CriticalPathEntry(NonNullUtils.nullToEmptyString(owner), fTrace, getStartTime(), getEndTime(), owner);
-                parent.addChild(entry);
-
-                fRootList.put(owner, entry);
-            }
-
-            @Override
-            public void visit(TmfEdge link, boolean horizontal) {
-                if (horizontal) {
-                    Object parent = fGraph.getParentOf(link.getVertexFrom());
-                    CriticalPathEntry entry = fRootList.get(parent);
-                    TimeEvent ev = new TimeEvent(entry, link.getVertexFrom().getTs(), link.getDuration(),
-                            getMatchingState(link.getType()).ordinal());
-                    entry.addEvent(ev);
-                }
-            }
-        }
-
-        private final class VerticalLinksVisitor extends TmfGraphVisitor {
-            private final TmfGraph fGraph;
-            private final List<ILinkEvent> fGraphLinks;
-            private final Map<Object, CriticalPathEntry> fEntryMap;
-
-            private VerticalLinksVisitor(TmfGraph graph, List<ILinkEvent> graphLinks, Map<Object, CriticalPathEntry> entryMap) {
-                fGraph = graph;
-                fGraphLinks = graphLinks;
-                fEntryMap = entryMap;
-            }
-
-            @Override
-            public void visitHead(TmfVertex node) {
-
-            }
-
-            @Override
-            public void visit(TmfVertex node) {
-
-            }
-
-            @Override
-            public void visit(TmfEdge link, boolean horizontal) {
-                if (!horizontal) {
-                    Object parentFrom = fGraph.getParentOf(link.getVertexFrom());
-                    Object parentTo = fGraph.getParentOf(link.getVertexTo());
-                    CriticalPathEntry entryFrom = fEntryMap.get(parentFrom);
-                    CriticalPathEntry entryTo = fEntryMap.get(parentTo);
-                    TimeLinkEvent lk = new TimeLinkEvent(entryFrom, entryTo, link.getVertexFrom().getTs(),
-                            link.getVertexTo().getTs() - link.getVertexFrom().getTs(), getMatchingState(link.getType()).ordinal());
-                    fGraphLinks.add(lk);
-                }
-            }
-        }
-
-        private class BuildThread extends Thread {
-            private final CriticalPathModule fModule;
-            private final IProgressMonitor fMonitor;
-
-            public BuildThread(final CriticalPathModule module) {
-                super("Critical path view build"); //$NON-NLS-1$
-                fModule = module;
-                fMonitor = new NullProgressMonitor();
-            }
-
-            @Override
-            public void run() {
-                try {
-                    CriticalPathModule module = fModule;
-                    module.schedule();
-                    if (module.waitForCompletion(fMonitor)) {
-                        // Module is completed, set the start and end time of
-                        // this view
-                        setStartEndTime(module);
-                        refresh();
-                    }
-
-                } finally {
-                    fSyncLock.lock();
-                    fBuildThread = null;
-                    fSyncLock.unlock();
-                }
-            }
-
-            public void cancel() {
-                fMonitor.setCanceled(true);
-            }
-        }
-
-        private final Lock fSyncLock = new ReentrantLock();
-        private final Map<Object, Map<Object, CriticalPathEntry>> workerMaps = new HashMap<>();
-        private final Map<Object, List<TimeGraphEntry>> workerEntries = new HashMap<>();
-        private @Nullable Object fCurrentObject;
-        private @Nullable BuildThread fBuildThread = null;
-
-        @Override
-        public ITimeGraphEntry[] getElements(@Nullable Object inputElement) {
-            ITimeGraphEntry[] ret = new ITimeGraphEntry[0];
-            if (inputElement instanceof List) {
-                List<?> list = (List<?>) inputElement;
-                if (!list.isEmpty()) {
-                    Object first = list.get(0);
-                    if (first instanceof CriticalPathBaseEntry) {
-                        IGraphWorker worker = ((CriticalPathBaseEntry) first).getWorker();
-                        ret = getWorkerEntries(worker);
-                    }
-                }
-            }
-            return ret;
-        }
-
-        private ITimeGraphEntry[] getWorkerEntries(IGraphWorker worker) {
-            fCurrentObject = worker;
-            List<TimeGraphEntry> entries = workerEntries.get(worker);
-            ITmfTrace trace = getTrace();
-            if (entries == null) {
-                buildEntryList(worker);
-                entries = workerEntries.get(worker);
-            } else if (trace != null) {
-                // Get the statistics object for this worker
-                TmfGraphStatistics stats = fObjectStatistics.get(trace, worker);
-                if (stats == null) {
-                    stats = new TmfGraphStatistics();
-                    final TmfGraph graph = getGraph(trace);
-                    if (graph != null) {
-                        stats.computeGraphStatistics(graph, worker);
-                    }
-                }
-                fStats = stats;
-            }
-
-            return (entries == null) ?
-                new ITimeGraphEntry[0] :
-                entries.toArray(new @NonNull ITimeGraphEntry[entries.size()]);
-        }
-
-        private void buildEntryList(IGraphWorker worker) {
-            final ITmfTrace trace = getTrace();
-            if (trace == null) {
-                return;
-            }
-            final TmfGraph graph = getGraph(trace);
-            if (graph == null) {
-                return;
-            }
-
-            final HashMap<Object, CriticalPathEntry> rootList = new HashMap<>();
-            fLinks.remove(trace, worker);
-
-            TmfVertex vertex = graph.getHead();
-
-            /* Calculate statistics */
-            fStats = new TmfGraphStatistics();
-            fStats.computeGraphStatistics(graph, worker);
-            fObjectStatistics.put(trace, worker, fStats);
-
-            // Hosts entries are parent of each worker entries
-            final Map<String, CriticalPathEntry> hostEntries = new HashMap<>();
-
-            /* create all interval entries and horizontal links */
-
-            final CriticalPathEntry defaultParent = new CriticalPathEntry("default", trace, getStartTime(), getEndTime(), DEFAULT_WORKER); //$NON-NLS-1$
-            graph.scanLineTraverse(vertex, new HorizontalLinksVisitor(defaultParent, hostEntries, graph, trace, rootList));
-
-            workerMaps.put(worker, rootList);
-
-            List<TimeGraphEntry> list = new ArrayList<>();
-            list.addAll(hostEntries.values());
-            if (defaultParent.hasChildren()) {
-                list.add(defaultParent);
-            }
-
-            workerEntries.put(worker, list);
-        }
-
-        private @Nullable TmfGraph getGraph(final ITmfTrace trace) {
-            ICriticalPathProvider module = Iterables.<@Nullable ICriticalPathProvider> getFirst(
-                    TmfTraceUtils.getAnalysisModulesOfClass(trace, ICriticalPathProvider.class),
-                    null);
-            if (module == null) {
-                throw new IllegalStateException("View requires an analysis module"); //$NON-NLS-1$
-            }
-
-            final TmfGraph graph = module.getCriticalPath();
-            return graph;
-        }
-
-        public @Nullable List<ILinkEvent> getLinkList(long startTime, long endTime) {
-            Object current = fCurrentObject;
-            if (current == null) {
-                return null;
-            }
-            final ITmfTrace trace = getTrace();
-            if (trace == null) {
-                return null;
-            }
-            /*
-             * Critical path typically has relatively few links, so we calculate
-             * and save them all, but just return those in range
-             */
-            List<ILinkEvent> links = fLinks.get(trace, current);
-            if (links != null) {
-                return getLinksInRange(links, startTime, endTime);
-            }
-
-            ICriticalPathProvider module = Iterables.<@Nullable ICriticalPathProvider> getFirst(
-                    TmfTraceUtils.getAnalysisModulesOfClass(trace, ICriticalPathProvider.class), null);
-            if (module == null) {
-                throw new IllegalStateException("View requires an analysis module"); //$NON-NLS-1$
-            }
-
-            final TmfGraph graph = module.getCriticalPath();
-            if (graph == null) {
-                return null;
-            }
-            final Map<Object, CriticalPathEntry> entryMap = workerMaps.get(current);
-            if (entryMap == null) {
-                return null;
-            }
-
-            TmfVertex vertex = graph.getHead();
-
-            final List<ILinkEvent> graphLinks = new ArrayList<>();
-
-            /* find vertical links */
-            graph.scanLineTraverse(vertex, new VerticalLinksVisitor(graph, graphLinks, entryMap));
-            fLinks.put(trace, current, graphLinks);
-
-            return getLinksInRange(graphLinks, startTime, endTime);
-        }
-
-        private List<ILinkEvent> getLinksInRange(List<ILinkEvent> allLinks, long startTime, long endTime) {
-            List<ILinkEvent> linksInRange = new ArrayList<>();
-            for (ILinkEvent link : allLinks) {
-                if (((link.getTime() >= startTime) && (link.getTime() <= endTime)) ||
-                        ((link.getTime() + link.getDuration() >= startTime) && (link.getTime() + link.getDuration() <= endTime))) {
-                    linksInRange.add(link);
-                }
-            }
-            return linksInRange;
-        }
-
-        @Override
-        public void dispose() {
-            fSyncLock.lock();
-            try {
-                BuildThread buildThread = fBuildThread;
-                if (buildThread != null) {
-                    buildThread.cancel();
-                }
-            } finally {
-                fSyncLock.unlock();
-            }
-        }
-
-        @Override
-        public void inputChanged(@Nullable Viewer viewer, @Nullable Object oldInput, @Nullable Object newInput) {
-            // The input has changed, the critical path will be re-computed,
-            // wait for the analysis to be finished, then call the refresh
-            // method of the view
-            if (!(newInput instanceof List)) {
-                return;
-            }
-            List<?> list = (List<?>) newInput;
-            if (list.isEmpty()) {
-                return;
-            }
-
-            Object first = list.get(0);
-            if (!(first instanceof CriticalPathBaseEntry)) {
-                return;
-            }
-            CriticalPathModule module = ((CriticalPathBaseEntry) first).getModule();
-
-            fSyncLock.lock();
-            try {
-                BuildThread buildThread = fBuildThread;
-                if (buildThread != null) {
-                    buildThread.cancel();
-                }
-                buildThread = new BuildThread(module);
-                buildThread.start();
-                fBuildThread = buildThread;
-            } finally {
-                fSyncLock.unlock();
-            }
-        }
-
-        @Override
-        public ITimeGraphEntry @Nullable [] getChildren(@Nullable Object parentElement) {
-            if (parentElement instanceof CriticalPathEntry) {
-                List<? extends ITimeGraphEntry> children = ((CriticalPathEntry) parentElement).getChildren();
-                return children.toArray(new TimeGraphEntry[children.size()]);
-            }
-            return null;
-        }
-
-        @Override
-        public @Nullable ITimeGraphEntry getParent(@Nullable Object element) {
-            if (element instanceof CriticalPathEntry) {
-                return ((CriticalPathEntry) element).getParent();
-            }
-            return null;
-        }
-
-        @Override
-        public boolean hasChildren(@Nullable Object element) {
-            if (element instanceof CriticalPathEntry) {
-                return ((CriticalPathEntry) element).hasChildren();
-            }
-            return false;
-        }
-
-    }
-
     private class CriticalPathTreeLabelProvider extends TreeLabelProvider {
 
         @Override
         public String getColumnText(@Nullable Object element, int columnIndex) {
-            if (element == null) {
+            if (!(element instanceof TimeGraphEntry)) {
                 return StringUtils.EMPTY;
             }
-            CriticalPathEntry entry = (CriticalPathEntry) element;
+            TimeGraphEntry entry = (TimeGraphEntry) element;
+            ITimeGraphEntryModel model = entry.getModel();
             if (columnIndex == 0) {
-                return NonNullUtils.nullToEmptyString(entry.getName());
-            } else if (columnIndex == 1) {
-                Long sum = fStats.getSum(entry.getWorker());
-                String value = String.format("%.9f", sum * NANOINV); //$NON-NLS-1$
-                return NonNullUtils.nullToEmptyString(value);
-            } else if (columnIndex == 2) {
-                Double percent = fStats.getPercent(entry.getWorker());
-                String value = String.format("%.2f", percent * 100); //$NON-NLS-1$
-                return NonNullUtils.nullToEmptyString(value);
+                return entry.getName();
+            } else if (columnIndex == 1 && model instanceof CriticalPathEntry) {
+                return String.format("%.9f", ((CriticalPathEntry) model).getSum() * NANOINV); //$NON-NLS-1$
+            } else if (columnIndex == 2 && model instanceof CriticalPathEntry) {
+                double percent = ((CriticalPathEntry) model).getPercent();
+                return String.format("%.2f", percent * 100); //$NON-NLS-1$
             }
             return StringUtils.EMPTY;
         }
-
     }
 
     private class CriticalPathEntryComparator implements Comparator<ITimeGraphEntry> {
 
         @Override
         public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
-
-            int result = 0;
-
-            if ((o1 instanceof CriticalPathEntry) && (o2 instanceof CriticalPathEntry)) {
-                CriticalPathEntry entry1 = (CriticalPathEntry) o1;
-                CriticalPathEntry entry2 = (CriticalPathEntry) o2;
-                result = -1 * fStats.getSum(entry1.getWorker()).compareTo(fStats.getSum(entry2.getWorker()));
+            if ((o1 instanceof TimeGraphEntry) && (o2 instanceof TimeGraphEntry)) {
+                ITimeGraphEntryModel model1 = ((TimeGraphEntry) o1).getModel();
+                ITimeGraphEntryModel model2 = ((TimeGraphEntry) o2).getModel();
+                if (model1 instanceof CriticalPathEntry && model2 instanceof CriticalPathEntry) {
+                    return Long.compare(((CriticalPathEntry) model2).getSum(), ((CriticalPathEntry) model1).getSum());
+                }
             }
-            return result;
+            return 0;
         }
     }
 
@@ -501,11 +121,10 @@ public class CriticalPathView extends AbstractTimeGraphView {
      * Constructor
      */
     public CriticalPathView() {
-        super(ID, new CriticalPathPresentationProvider());
+        super(ID, new CriticalPathPresentationProvider(), CriticalPathDataProvider.ID);
         setTreeColumns(COLUMN_NAMES);
         setFilterColumns(FILTER_COLUMN_NAMES);
         setTreeLabelProvider(new CriticalPathTreeLabelProvider());
-        setTimeGraphContentProvider(fContentProvider);
         setEntryComparator(new CriticalPathEntryComparator());
         setLegendProvider((shell, presentationProvider) -> new CriticalPathLegend(shell, presentationProvider).open());
     }
@@ -514,125 +133,74 @@ public class CriticalPathView extends AbstractTimeGraphView {
     // Internal
     // ------------------------------------------------------------------------
 
-    private static State getMatchingState(EdgeType type) {
-        State state = State.UNKNOWN;
-        switch (type) {
-        case RUNNING:
-            state = State.RUNNING;
-            break;
-        case PREEMPTED:
-            state = State.PREEMPTED;
-            break;
-        case TIMER:
-            state = State.TIMER;
-            break;
-        case BLOCK_DEVICE:
-            state = State.BLOCK_DEVICE;
-            break;
-        case INTERRUPTED:
-            state = State.INTERRUPTED;
-            break;
-        case NETWORK:
-            state = State.NETWORK;
-            break;
-        case USER_INPUT:
-            state = State.USER_INPUT;
-            break;
-        case IPI:
-            state = State.IPI;
-            break;
-        case EPS:
-        case UNKNOWN:
-        case DEFAULT:
-        case BLOCKED:
-            break;
-        default:
-            break;
+    @Override
+    protected List<ITimeEvent> createTimeEvents(TimeGraphEntry entry, List<ITimeGraphState> values) {
+        // need to override to not have transparent events in the gaps.
+        return Lists.transform(values, state -> createTimeEvent(entry, state));
+    }
+
+    @Override
+    protected List<ILinkEvent> getLinkList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
+        List<@NonNull TimeGraphEntry> traceEntries = getEntryList(getTrace());
+        if (traceEntries == null) {
+            return Collections.emptyList();
         }
-        return state;
-    }
+        List<@NonNull ILinkEvent> linkList = new ArrayList<>();
+        TimeQueryFilter queryFilter = new TimeQueryFilter(startTime, endTime, 2);
 
-    @Override
-    protected void buildEntryList(@NonNull ITmfTrace trace, @NonNull ITmfTrace parentTrace, @NonNull IProgressMonitor monitor) {
-        /* This class uses a content provider instead */
-    }
-
-    @Override
-    protected @Nullable List<ITimeEvent> getEventList(TimeGraphEntry entry,
-            long startTime, long endTime, long resolution,
-            IProgressMonitor monitor) {
         /*
-         * The event list is built in the HorizontalLinksVisitor. This is called
-         * only from the zoom thread and only for the CriticalPathBaseEntry.
+         * group entries by critical path data provider as several hosts may refer to
+         * the same data provider
          */
-        return null;
-    }
+        Table<ITimeGraphDataProvider<?>, Long, TimeGraphEntry> table = HashBasedTable.create();
+        for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
+            for (TimeGraphEntry entry : Utils.flatten(traceEntry)) {
+                table.put(traceEntry.getProvider(), entry.getModel().getId(), entry);
+            }
+        }
 
-    @Override
-    protected @Nullable List<ILinkEvent> getLinkList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
-        return fContentProvider.getLinkList(startTime, endTime);
+        for (Map.Entry<ITimeGraphDataProvider<?>, Map<Long, TimeGraphEntry>> entry : table.rowMap().entrySet()) {
+            ITimeGraphDataProvider<?> provider = entry.getKey();
+            Map<Long, TimeGraphEntry> map = entry.getValue();
+            TmfModelResponse<List<ITimeGraphArrow>> response = provider.fetchArrows(queryFilter, monitor);
+            List<ITimeGraphArrow> model = response.getModel();
+
+            if (monitor.isCanceled()) {
+                return null;
+            }
+            if (model != null) {
+                for (ITimeGraphArrow arrow : model) {
+                    ITimeGraphEntry src = map.get(arrow.getSourceId());
+                    ITimeGraphEntry dst = map.get(arrow.getDestinationId());
+                    if (src != null && dst != null) {
+                        linkList.add(new TimeLinkEvent(src, dst, arrow.getStartTime(), arrow.getDuration(), arrow.getValue()));
+                    }
+                }
+            }
+        }
+        return linkList;
     }
 
     /**
-     * Signal handler for analysis started
+     * Signal handler for analysis started, we need to rebuilt the entry list with
+     * updated statistics values for the current graph worker of the critical path
+     * module.
      *
      * @param signal
      *            The signal
      */
     @TmfSignalHandler
     public void analysisStarted(TmfStartAnalysisSignal signal) {
-        if (!(signal.getAnalysisModule() instanceof CriticalPathModule)) {
-            return;
-        }
-        CriticalPathModule module = (CriticalPathModule) signal.getAnalysisModule();
-        Object obj = module.getParameter(CriticalPathModule.PARAM_WORKER);
-        if (obj == null) {
-            return;
-        }
-        if (!(obj instanceof IGraphWorker)) {
-            throw new IllegalStateException("Wrong type for critical path module parameter " + //$NON-NLS-1$
-                    CriticalPathModule.PARAM_WORKER +
-                    " expected IGraphWorker got " + //$NON-NLS-1$
-                    obj.getClass().getSimpleName());
-        }
-        ITmfTrace trace = getTrace();
-        if (trace == null) {
-            throw new IllegalStateException("Trace is null"); //$NON-NLS-1$
-        }
-        IGraphWorker worker = (IGraphWorker) obj;
-
-        TimeGraphEntry tge = new CriticalPathBaseEntry(worker, module);
-        List<TimeGraphEntry> list = Collections.singletonList(tge);
-        putEntryList(trace, list);
-        refresh();
-    }
-
-    private void setStartEndTime(CriticalPathModule module) {
-        // Initialize the start/end time of the view to trace's times
-        ITmfTrace trace = getTrace();
-        if (trace == null) {
-            throw new IllegalStateException("The trace should not be null when we have a critical path to display"); //$NON-NLS-1$
-        }
-        long start = trace.getStartTime().toNanos();
-        long end = trace.getEndTime().toNanos();
-
-        // Set the start/end time of the view
-        TmfGraph graph = module.getCriticalPath();
-        if (graph == null) {
-            return;
-        }
-        TmfVertex head = graph.getHead();
-        if (head != null) {
-            start = Math.min(start, head.getTs());
-            for (IGraphWorker w : graph.getWorkers()) {
-                TmfVertex tail = graph.getTail(w);
-                if (tail != null) {
-                    end = Math.max(end, tail.getTs());
-                }
+        IAnalysisModule analysis = signal.getAnalysisModule();
+        if (analysis instanceof CriticalPathModule) {
+            CriticalPathModule criticalPath = (CriticalPathModule) analysis;
+            Collection<ITmfTrace> traces = TmfTraceManager.getTraceSetWithExperiment(getTrace());
+            if (traces.contains(criticalPath.getTrace())) {
+                rebuild();
+            } else {
+                traces.forEach(this::resetView);
             }
         }
-        setStartTime(start);
-        setEndTime(end);
     }
 
     @Override
@@ -650,6 +218,12 @@ public class CriticalPathView extends AbstractTimeGraphView {
         followArrowFwdAction.setText(Messages.CriticalPathView_followArrowFwdText);
         followArrowFwdAction.setToolTipText(Messages.CriticalPathView_followArrowFwdText);
         manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, followArrowFwdAction);
+    }
+
+    @Override
+    protected Iterable<ITmfTrace> getTracesToBuild(@Nullable ITmfTrace trace) {
+        // we need the critical path module to run on the experiment, not the traces.
+        return trace != null ? Collections.singleton(trace) : Collections.emptyList();
     }
 
 }

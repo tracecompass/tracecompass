@@ -9,18 +9,26 @@
 
 package org.eclipse.tracecompass.internal.analysis.graph.ui.criticalpath.view;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphDataProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.TimeGraphEntryModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
 /**
  * Presentation provider for the critical path view
@@ -32,7 +40,7 @@ public class CriticalPathPresentationProvider extends TimeGraphPresentationProvi
     /**
      * The enumeration of possible states for the view
      */
-    public static enum State {
+    public enum State {
         /** Worker is running */
         RUNNING(new RGB(0x33, 0x99, 0x00)),
         /** Worker is interrupted */
@@ -129,10 +137,15 @@ public class CriticalPathPresentationProvider extends TimeGraphPresentationProvi
             eventHoverToolTipInfo = new LinkedHashMap<>();
         }
         ITimeGraphEntry entry = event.getEntry();
-        if (entry instanceof CriticalPathEntry) {
-            CriticalPathEntry criticalPathEntry = (CriticalPathEntry) entry;
-            Map<String, String> info = criticalPathEntry.getWorker().getWorkerInformation(hoverTime);
-            eventHoverToolTipInfo.putAll(info);
+        if (entry instanceof TimeGraphEntry) {
+            long id = ((TimeGraphEntry) entry).getModel().getId();
+            ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = BaseDataProviderTimeGraphView.getProvider((TimeGraphEntry) entry);
+            SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(Collections.singletonList(hoverTime), Collections.singleton(id));
+            TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> tooltipResponse = provider.fetchTooltip(filter, null);
+            Map<@NonNull String, @NonNull String> tooltipModel = tooltipResponse.getModel();
+            if (tooltipModel != null) {
+                eventHoverToolTipInfo.putAll(tooltipModel);
+            }
         }
         return eventHoverToolTipInfo;
     }

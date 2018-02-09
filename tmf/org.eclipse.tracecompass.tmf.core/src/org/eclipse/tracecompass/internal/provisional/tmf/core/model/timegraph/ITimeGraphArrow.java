@@ -44,4 +44,11 @@ public interface ITimeGraphArrow {
      */
     long getDuration();
 
+    /**
+     * Gets the arrow value
+     *
+     * @return value associated to this arrow
+     */
+    int getValue();
+
 }

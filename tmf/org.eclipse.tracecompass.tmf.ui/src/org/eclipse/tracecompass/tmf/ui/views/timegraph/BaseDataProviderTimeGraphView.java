@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.function.BiFunction;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -43,7 +41,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sampling;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -93,7 +90,6 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             return;
         }
         boolean complete = false;
-        TimeGraphEntry traceEntry = null;
         Map<TimeGraphEntryModel, TimeGraphEntry> modelToEntryMap = new HashMap<>();
         Map<Long, TimeGraphEntry> parentLookupMap = new HashMap<>();
         while (!complete && !monitor.isCanceled()) {
@@ -109,15 +105,17 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             List<TimeGraphEntryModel> model = response.getModel();
             if (model != null) {
                 for (TimeGraphEntryModel entry : model) {
+                    TimeGraphEntry uiEntry = modelToEntryMap.get(entry);
                     if (entry.getParentId() != -1) {
-                        TimeGraphEntry uiEntry = modelToEntryMap.get(entry);
                         if (uiEntry == null) {
                             uiEntry = new TimeGraphEntry(entry);
                             modelToEntryMap.put(entry, uiEntry);
                             parentLookupMap.put(entry.getId(), uiEntry);
 
-                            TimeGraphEntry parent = parentLookupMap.getOrDefault(entry.getParentId(), traceEntry);
-                            parent.addChild(uiEntry);
+                            TimeGraphEntry parent = parentLookupMap.get(entry.getParentId());
+                            if (parent != null) {
+                                parent.addChild(uiEntry);
+                            }
                         } else {
                             uiEntry.updateModel(entry);
                         }
@@ -125,19 +123,20 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                         setStartTime(Long.min(getStartTime(), entry.getStartTime()));
                         setEndTime(Long.max(getEndTime(), entry.getEndTime() + 1));
 
-                        if (traceEntry != null) {
-                            traceEntry.updateModel(entry);
+                        if (uiEntry != null) {
+                            uiEntry.updateModel(entry);
                         } else {
-                            traceEntry = new TraceEntry(entry, trace, dataProvider);
-                            addToEntryList(parentTrace, Collections.singletonList(traceEntry));
+                            uiEntry = new TraceEntry(entry, trace, dataProvider);
+                            modelToEntryMap.put(entry, uiEntry);
+                            parentLookupMap.put(entry.getId(), uiEntry);
+                            addToEntryList(parentTrace, Collections.singletonList(uiEntry));
                         }
                     }
                 }
-                Objects.requireNonNull(traceEntry);
-                long start = traceEntry.getStartTime();
-                long end = traceEntry.getEndTime();
+                long start = getStartTime();
+                long end = getEndTime();
                 final long resolution = Long.max(1, (end - start) / getDisplayWidth());
-                zoomEntries(Utils.flatten(traceEntry), start, end, resolution, monitor);
+                zoomEntries(modelToEntryMap.values(), start, end, resolution, monitor);
             }
 
             if (monitor.isCanceled()) {
@@ -334,11 +333,9 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      * @param values
      *            the list of {@link ITimeGraphState}s from the
      *            {@link ITimeGraphDataProvider}.
-     * @param createTimeEvent
-     *            the {@link BiFunction} to use to create {@link ITimeEvent}s
      * @return a contiguous List of {@link ITimeEvent}s
      */
-    private List<ITimeEvent> createTimeEvents(TimeGraphEntry entry, List<ITimeGraphState> values) {
+    protected List<ITimeEvent> createTimeEvents(TimeGraphEntry entry, List<ITimeGraphState> values) {
         List<ITimeEvent> events = new ArrayList<>(values.size());
         ITimeEvent prev = null;
         for (ITimeGraphState state : values) {
