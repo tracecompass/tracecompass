@@ -19,6 +19,7 @@
             analysis_module="org.eclipse.tracecompass.internal.analysis.timing.core.event.matching.EventMatchingLatencyAnalysis"
             applies_experiment="true"
             automatic="false"
+            icon="icons/eventmatching.png"
             id="org.eclipse.tracecompass.internal.analysis.timing.core.event.matching"
             name="%event.matching.analysis">
          <tracetype
