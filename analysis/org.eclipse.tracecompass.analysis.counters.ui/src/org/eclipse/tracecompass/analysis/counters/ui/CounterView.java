@@ -14,14 +14,8 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.analysis.counters.ui.Messages;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.ui.viewers.ILegendImageProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.XYChartLegendImageProvider;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 import org.eclipse.ui.IActionBars;
@@ -63,15 +57,6 @@ public class CounterView extends TmfChartView {
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
 
-        TmfViewer tree = getLeftChildViewer();
-        TmfXYChartViewer chart = getChartViewer();
-        if (tree instanceof CounterTreeViewer && chart instanceof CounterChartViewer) {
-            ILegendImageProvider legendImageProvider = new XYChartLegendImageProvider((TmfCommonXAxisChartViewer) chart);
-            CounterTreeViewer counterTree = (CounterTreeViewer) tree;
-            counterTree.setTreeListener((CounterChartViewer) chart);
-            counterTree.setLegendImageProvider(legendImageProvider);
-        }
-
         // Add a tool bar button to display counters data cumulatively
         IActionBars bars = getViewSite().getActionBars();
         bars.getToolBarManager().appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getCumulativeAction());
@@ -84,25 +69,15 @@ public class CounterView extends TmfChartView {
 
     @Override
     protected @NonNull TmfViewer createLeftChildViewer(Composite parent) {
-        CounterTreeViewer treeViewer = new CounterTreeViewer(parent);
-
-        // Initialize the tree viewer with the currently selected trace
-        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
-        if (trace != null) {
-            TmfTraceSelectedSignal signal = new TmfTraceSelectedSignal(this, trace);
-            treeViewer.traceSelected(signal);
-        }
-
-        return treeViewer;
+        return new CounterTreeViewer(parent);
     }
 
     private Action getCumulativeAction() {
         Action action = new Action(Messages.CounterView_CumulativeAction_Text, IAction.AS_CHECK_BOX) {
-            private boolean isCumulative = false;
 
             @Override
             public void run() {
-                isCumulative ^= true;
+                boolean isCumulative = isChecked();
                 setToolTipText(isCumulative ? Messages.CounterView_CumulativeAction_DifferentialTooltipText : Messages.CounterView_CumulativeAction_CumulativeTooltipText);
                 TmfXYChartViewer chart = getChartViewer();
                 if (chart instanceof CounterChartViewer) {

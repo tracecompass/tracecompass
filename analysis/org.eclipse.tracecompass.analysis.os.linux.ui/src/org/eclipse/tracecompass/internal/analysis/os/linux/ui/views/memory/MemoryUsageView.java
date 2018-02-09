@@ -15,14 +15,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.memory.MemoryUsageTreeModel;
 import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.ui.viewers.ILegendImageProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.XYChartLegendImageProvider;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
@@ -73,30 +67,12 @@ public class MemoryUsageView extends TmfChartView {
 
     @Override
     protected @NonNull TmfViewer createLeftChildViewer(Composite parent) {
-        MemoryUsageTreeViewer fTreeViewer = new MemoryUsageTreeViewer(parent, fProviderId);
-
-        /* Initialize the viewers with the currently selected trace */
-        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
-        if (trace != null) {
-            TmfTraceSelectedSignal signal = new TmfTraceSelectedSignal(this, trace);
-            fTreeViewer.traceSelected(signal);
-        }
-
-        return fTreeViewer;
+        return new MemoryUsageTreeViewer(parent, fProviderId);
     }
 
     @Override
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
-
-        TmfViewer tree = getLeftChildViewer();
-        TmfXYChartViewer chart = getChartViewer();
-        if (tree instanceof MemoryUsageTreeViewer && chart instanceof TmfFilteredXYChartViewer) {
-            ILegendImageProvider legendImageProvider = new XYChartLegendImageProvider((TmfCommonXAxisChartViewer) chart);
-            MemoryUsageTreeViewer memoryTree = (MemoryUsageTreeViewer) tree;
-            memoryTree.setTreeListener((TmfFilteredXYChartViewer) chart);
-            memoryTree.setLegendImageProvider(legendImageProvider);
-        }
 
         // Add a tool bar button to filter active threads.
         getViewSite().getActionBars().getToolBarManager().appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getFilterAction());

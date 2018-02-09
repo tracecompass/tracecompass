@@ -14,14 +14,8 @@ import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.ui.viewers.ILegendImageProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.XYChartLegendImageProvider;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
@@ -51,28 +45,6 @@ public class DiskIOActivityView extends TmfChartView {
 
     @Override
     protected @NonNull TmfViewer createLeftChildViewer(@Nullable Composite parent) {
-        DiskIOActivityTreeViewer treeViewer = new DiskIOActivityTreeViewer(Objects.requireNonNull(parent));
-
-        // Initialize the tree viewer with the currently selected trace
-        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
-        if (trace != null) {
-            treeViewer.traceSelected(new TmfTraceSelectedSignal(this, trace));
-        }
-
-        return treeViewer;
-    }
-
-    @Override
-    public void createPartControl(@Nullable Composite parent) {
-        super.createPartControl(parent);
-
-        TmfViewer tree = getLeftChildViewer();
-        TmfXYChartViewer chart = getChartViewer();
-        if (tree instanceof DiskIOActivityTreeViewer && chart instanceof DisksIOActivityViewer) {
-            ILegendImageProvider legendImageProvider = new XYChartLegendImageProvider((TmfCommonXAxisChartViewer) chart);
-            DiskIOActivityTreeViewer diskTree = (DiskIOActivityTreeViewer) tree;
-            diskTree.setTreeListener((DisksIOActivityViewer) chart);
-            diskTree.setLegendImageProvider(legendImageProvider);
-        }
+        return new DiskIOActivityTreeViewer(Objects.requireNonNull(parent));
     }
 }

@@ -26,7 +26,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -40,9 +39,14 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
+import org.eclipse.tracecompass.tmf.ui.viewers.ILegendImageProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.XYChartLegendImageProvider;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
 /**
@@ -193,13 +197,7 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
                 if (fSashDragListener == null) {
                     for (Control control : fSashForm.getChildren()) {
                         if (control instanceof Sash) {
-                            fSashDragListener = new Listener() {
-
-                                @Override
-                                public void handleEvent(Event event) {
-                                    TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(fSashForm, getTimeViewAlignmentInfo()));
-                                }
-                            };
+                            fSashDragListener = event -> TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(fSashForm, getTimeViewAlignmentInfo()));
                             control.removePaintListener(this);
                             control.addListener(SWT.Selection, fSashDragListener);
                             // There should be only one sash
@@ -220,6 +218,7 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
         fChartViewer.setStatusLineManager(statusLineManager);
 
         fOriginalTabLabel = getPartName();
+        coupleSelectViewer();
     }
 
     @Override
@@ -408,6 +407,22 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
     public void traceClosed(final TmfTraceClosedSignal signal) {
         if (signal.getTrace() == getTrace() && isPinned()) {
             setPinned(null);
+        }
+    }
+
+    /**
+     * Method to couple {@link AbstractSelectTreeViewer} and
+     * {@link TmfFilteredXYChartViewer} so that they use the same legend and that
+     * the chart listens to selected items in the tree
+     */
+    private void coupleSelectViewer() {
+        TmfViewer tree = getLeftChildViewer();
+        TmfXYChartViewer chart = getChartViewer();
+        if (tree instanceof AbstractSelectTreeViewer && chart instanceof TmfFilteredXYChartViewer) {
+            ILegendImageProvider legendImageProvider = new XYChartLegendImageProvider((TmfCommonXAxisChartViewer) chart);
+            AbstractSelectTreeViewer selectTree = (AbstractSelectTreeViewer) tree;
+            selectTree.setTreeListener((TmfFilteredXYChartViewer) chart);
+            selectTree.setLegendImageProvider(legendImageProvider);
         }
     }
 }

@@ -21,15 +21,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.ui.viewers.ILegendImageProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.XYChartLegendImageProvider;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 import org.eclipse.tracecompass.tmf.ui.views.TmfViewFactory;
@@ -100,15 +93,6 @@ public class XmlXYView extends TmfChartView {
         }
         super.createPartControl(parent);
         setViewTitle();
-
-        TmfViewer tree = getLeftChildViewer();
-        TmfXYChartViewer chart = getChartViewer();
-        if (tree instanceof XmlTreeViewer && chart instanceof TmfFilteredXYChartViewer) {
-            ILegendImageProvider legendImageProvider = new XYChartLegendImageProvider((TmfCommonXAxisChartViewer) chart);
-            XmlTreeViewer kernelMemoryTree = (XmlTreeViewer) tree;
-            kernelMemoryTree.setTreeListener((TmfFilteredXYChartViewer) chart);
-            kernelMemoryTree.setLegendImageProvider(legendImageProvider);
-        }
     }
 
     @Override
@@ -120,15 +104,7 @@ public class XmlXYView extends TmfChartView {
 
     @Override
     protected @NonNull TmfViewer createLeftChildViewer(@Nullable Composite parent) {
-        XmlTreeViewer treeViewer = new XmlTreeViewer(Objects.requireNonNull(parent), fViewInfo);
-
-        /* Initialize the viewers with the currently selected trace */
-        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
-        if (trace != null) {
-            treeViewer.traceSelected(new TmfTraceSelectedSignal(this, trace));
-        }
-
-        return treeViewer;
+        return new XmlTreeViewer(Objects.requireNonNull(parent), fViewInfo);
     }
 
 }

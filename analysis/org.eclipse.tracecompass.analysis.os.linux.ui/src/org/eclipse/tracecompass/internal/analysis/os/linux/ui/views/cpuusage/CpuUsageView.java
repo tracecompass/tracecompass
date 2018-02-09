@@ -20,15 +20,11 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.signals.TmfCpuSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.ui.viewers.ILegendImageProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.XYChartLegendImageProvider;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 
@@ -62,39 +58,9 @@ public class CpuUsageView extends TmfChartView {
     }
 
     @Override
-    public void createPartControl(Composite parent) {
-        super.createPartControl(parent);
-
-        TmfViewer tree = getLeftChildViewer();
-        TmfXYChartViewer chart = getChartViewer();
-        if (tree instanceof CpuUsageTreeViewer && chart instanceof CpuUsageXYViewer) {
-            ILegendImageProvider legendImageProvider = new XYChartLegendImageProvider((TmfCommonXAxisChartViewer) chart);
-            CpuUsageTreeViewer cpuTree = (CpuUsageTreeViewer) tree;
-            cpuTree.setTreeListener((CpuUsageXYViewer) chart);
-            cpuTree.setLegendImageProvider(legendImageProvider);
-        }
-
-        /* Initialize the viewers with the currently selected trace */
-        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
-        if (trace != null) {
-            TmfTraceSelectedSignal signal = new TmfTraceSelectedSignal(this, trace);
-            TmfViewer treeViewer = getLeftChildViewer();
-            if (treeViewer instanceof CpuUsageTreeViewer) {
-                ((CpuUsageTreeViewer) treeViewer).traceSelected(signal);
-            }
-            TmfXYChartViewer xyViewer = getChartViewer();
-            if (xyViewer != null) {
-                xyViewer.traceSelected(signal);
-            }
-        }
-    }
-
-    @Override
     protected TmfXYChartViewer createChartViewer(Composite parent) {
         TmfXYChartSettings settings = new TmfXYChartSettings(Messages.CpuUsageXYViewer_Title, Messages.CpuUsageXYViewer_TimeXAxis, Messages.CpuUsageXYViewer_CpuYAxis, RESOLUTION);
-        CpuUsageXYViewer viewer = new CpuUsageXYViewer(parent, settings);
-        viewer.setSendTimeAlignSignals(true);
-        return viewer;
+        return new CpuUsageXYViewer(parent, settings);
     }
 
     @Override
