@@ -18,4 +18,10 @@
          </adapter>
       </factory>
    </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.analysis.xml.core.files">
+      <xmlfile
+            file="btf-view.xml">
+      </xmlfile>
+   </extension>
 </plugin>
