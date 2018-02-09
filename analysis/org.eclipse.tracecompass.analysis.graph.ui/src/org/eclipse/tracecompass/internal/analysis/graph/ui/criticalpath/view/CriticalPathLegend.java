@@ -85,8 +85,10 @@ public class CriticalPathLegend extends TimeGraphLegend {
             // put the two columns
             LegendEntry lefty = new LegendEntry(blocked, stateItems[i]);
             lefty.setLayoutData(GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.CENTER).create());
-            LegendEntry righty = new LegendEntry(blocked, stateItems[i + stateItems.length / 2]);
-            righty.setLayoutData(GridDataFactory.swtDefaults().align(SWT.END, SWT.CENTER).grab(true, false).create());
+            if (i + stateItems.length / 2 < stateItems.length) {
+                LegendEntry righty = new LegendEntry(blocked, stateItems[i + stateItems.length / 2]);
+                righty.setLayoutData(GridDataFactory.swtDefaults().align(SWT.END, SWT.CENTER).grab(true, false).create());
+            }
         }
         /*
          * even since we start at one

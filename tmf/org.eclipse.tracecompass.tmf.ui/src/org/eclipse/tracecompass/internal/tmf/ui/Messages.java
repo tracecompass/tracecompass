@@ -176,6 +176,7 @@ public class Messages extends NLS {
     public static String TimeGraphFindDialog_WholeWordCheckBoxLabel;
     public static String TimeGraphFindDialog_WrapCheckBoxLabel;
 
+    public static String TimeGraphLegend_Arrows;
     public static String TimeGraphLegend_resetTooltip;
     public static String TimeGraphLegend_swatchClick;
     public static String TimeGraphLegend_widthTooltip;

@@ -13,6 +13,11 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -52,6 +57,8 @@ import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
+
+import com.google.common.collect.Collections2;
 
 /**
  * Legend for the colors used in the time graph view
@@ -112,7 +119,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         composite.setLayoutData(gd);
 
-        createStatesGroup(composite);
+        addStateGroups(composite);
 
         setTitle(Messages.TmfTimeLegend_LEGEND);
         setDialogHelpAvailable(false);
@@ -134,15 +141,46 @@ public class TimeGraphLegend extends TitleAreaDialog {
      *            the parent composite
      * @since 3.3
      */
-    protected void createStatesGroup(Composite composite) {
+    private void addStateGroups(Composite composite) {
+
+        List<StateItem> stateItems = Arrays.asList(fProvider.getStateTable());
+        Collection<StateItem> linkStates = Collections2.filter(stateItems, TimeGraphLegend::isLinkState);
+        int numColumn = linkStates.isEmpty() ? 1 : 2;
+
         ScrolledComposite sc = new ScrolledComposite(composite, SWT.V_SCROLL | SWT.H_SCROLL);
+        Composite innerComposite = new Composite(sc, SWT.NONE);
+
         sc.setExpandHorizontal(true);
         sc.setExpandVertical(true);
-        Group gs = new Group(sc, SWT.H_SCROLL);
-        sc.setContent(gs);
+
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+
+        sc.setLayout(GridLayoutFactory.swtDefaults().margins(20, 0).create());
         sc.setLayoutData(gd);
 
+        GridLayout gridLayout = GridLayoutFactory.swtDefaults().margins(0, 0).create();
+        gridLayout.numColumns = numColumn;
+        gridLayout.makeColumnsEqualWidth = false;
+        innerComposite.setLayout(gridLayout);
+        innerComposite.setLayoutData(gd);
+
+        sc.setContent(innerComposite);
+
+        createStatesGroup(innerComposite);
+        CreateLinkGroup(linkStates, innerComposite);
+
+        sc.setMinSize(innerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+    }
+
+    /**
+     * Creates a states group
+     *
+     * @param composite
+     *            the parent composite
+     * @since 3.3
+     */
+    protected void createStatesGroup(Composite composite) {
+        Group gs = new Group(composite, SWT.NONE);
         String stateTypeName = fProvider.getStateTypeName();
         StringBuilder buffer = new StringBuilder();
         if (!stateTypeName.isEmpty()) {
@@ -157,15 +195,45 @@ public class TimeGraphLegend extends TitleAreaDialog {
         layout.marginBottom = 10;
         gs.setLayout(layout);
 
+        GridData gridData = new GridData();
+        gridData.verticalAlignment = SWT.TOP;
+        gs.setLayoutData(gridData);
+
         // Go through all the defined pairs of state color and state name and
         // display them.
-        StateItem[] stateItems = fProvider.getStateTable();
-        for (int i = 0; i < stateItems.length; i++) {
+        StateItem[] stateTable = fProvider.getStateTable();
+        List<StateItem> stateItems = stateTable != null ? Arrays.asList(stateTable) : Collections.emptyList();
+        stateItems.forEach(si -> {
+            if (!isLinkState(si)) {
+                new LegendEntry(gs, si);
+            }
+        });
+    }
 
-            // draw color with name
-            new LegendEntry(gs, stateItems[i]);
+    private void CreateLinkGroup(Collection<StateItem> linkStates, Composite innerComposite) {
+        if (linkStates.isEmpty()) {
+            return;
         }
-        sc.setMinSize(gs.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+        Group gs = new Group(innerComposite, SWT.NONE);
+        gs.setText(Messages.TimeGraphLegend_Arrows);
+
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 20;
+        layout.marginBottom = 10;
+        gs.setLayout(layout);
+
+        GridData gridData = new GridData();
+        gridData.verticalAlignment = SWT.TOP;
+        gs.setLayoutData(gridData);
+
+        // Go through all the defined pairs of state color and state name and
+        // display them.
+        linkStates.forEach(si -> new LegendEntry(gs, si));
+    }
+
+    private static boolean isLinkState(StateItem si) {
+        Object itemType = si.getStyleMap().getOrDefault(ITimeEventStyleStrings.itemTypeProperty(), ITimeEventStyleStrings.stateType());
+        return itemType instanceof String && ((String) itemType).equals(ITimeEventStyleStrings.linkType());
     }
 
     @Override

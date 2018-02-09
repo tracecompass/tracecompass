@@ -33,7 +33,9 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelR
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NamedTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
@@ -51,6 +53,7 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
     private static final Map<Integer, StateItem> STATE_MAP;
     private static final List<StateItem> STATE_LIST;
     private static final StateItem[] STATE_TABLE;
+    private static final int LINK_VALUE = 8;
 
     private static StateItem createState(LinuxStyle style) {
         return new StateItem(style.toMap());
@@ -68,6 +71,13 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         builder.put(ProcessStatus.WAIT_BLOCKED.getStateValue().unboxInt(), createState(LinuxStyle.WAIT_BLOCKED));
         builder.put(ProcessStatus.WAIT_CPU.getStateValue().unboxInt(), createState(LinuxStyle.WAIT_FOR_CPU));
         builder.put(ProcessStatus.WAIT_UNKNOWN.getStateValue().unboxInt(), createState(LinuxStyle.WAIT_UNKNOWN));
+
+        LinuxStyle link = LinuxStyle.LINK;
+        ImmutableMap.Builder<String, Object> linkyBuilder = new ImmutableMap.Builder<>();
+        linkyBuilder.putAll(link.toMap());
+        linkyBuilder.put(ITimeEventStyleStrings.itemTypeProperty(), ITimeEventStyleStrings.linkType());
+        StateItem linkItem = new StateItem(linkyBuilder.build());
+        builder.put(LINK_VALUE, linkItem);
         /*
          * DO NOT MODIFY AFTER
          */
@@ -96,9 +106,14 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
 
     @Override
     public int getStateTableIndex(ITimeEvent event) {
-        if (event instanceof TimeEvent && ((TimeEvent) event).hasValue()) {
-            int status = ((TimeEvent) event).getValue();
-            return STATE_LIST.indexOf(getMatchingState(status));
+        if (event instanceof TimeEvent) {
+            if (event instanceof ILinkEvent) {
+                return STATE_LIST.indexOf(STATE_MAP.getOrDefault(LINK_VALUE, STATE_MAP.get(ProcessStatus.UNKNOWN.getStateValue().unboxInt())));
+            }
+            if (((TimeEvent) event).hasValue()) {
+                int status = ((TimeEvent) event).getValue();
+                return STATE_LIST.indexOf(getMatchingState(status));
+            }
         }
         if (event instanceof NullTimeEvent) {
             return INVISIBLE;

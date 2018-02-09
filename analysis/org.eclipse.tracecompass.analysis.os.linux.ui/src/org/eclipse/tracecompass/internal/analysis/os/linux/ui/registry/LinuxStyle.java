@@ -24,9 +24,14 @@ import com.google.common.collect.ImmutableMap;
 public enum LinuxStyle {
 
     /**
-     * Unknown state for thread or CPU, often used for lines
+     * Unknown state for thread or CPU
      */
-    UNKNOWN(Messages.LinuxStyles_unknown, 100, 100, 100, 255, 0.10f),
+    UNKNOWN(Messages.LinuxStyles_unknown, 100, 100, 100, 255, 0.33f),
+
+    /**
+     * Link style, the general line style
+     */
+    LINK(Messages.LinuxStyles_unknown, 100, 100, 100, 255, 0.10f),
 
     /**
      * Wait for an unknown reason
