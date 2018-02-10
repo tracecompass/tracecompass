@@ -196,7 +196,7 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
         long stateSystemStartTime = ss.getStartTime();
 
         /* We only need the previous time for differential mode */
-        if (!filter.isCumulative()) {
+        if (!filter.isCumulative() && xValues.length > 1) {
             /*
              * For differential mode, we need to get the time before query start. To do so,
              * we subtract to query start the delta between xValues[1] and query start
