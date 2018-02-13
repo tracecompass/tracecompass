@@ -260,7 +260,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
         while (!complete && !subMonitor.isCanceled()) {
             TmfModelResponse<List<XmlTimeGraphEntryModel>> response = provider.fetchTree(new TimeQueryFilter(0, Long.MAX_VALUE, 2), subMonitor);
             if (response.getStatus() == ITmfResponse.Status.FAILED) {
-                Activator.logError("Call Stack Data Provider failed: " + response.getStatusMessage()); //$NON-NLS-1$
+                Activator.logError("XML Time Graph Data Provider failed: " + response.getStatusMessage()); //$NON-NLS-1$
                 return;
             } else if (response.getStatus() == ITmfResponse.Status.CANCELLED) {
                 return;
@@ -270,28 +270,31 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
             List<XmlTimeGraphEntryModel> model = response.getModel();
             if (model != null) {
                 /*
-                 * Ensure that all the entries exist
+                 * Ensure that all the entries exist and are up to date.
                  */
                 for (XmlTimeGraphEntryModel entry : model) {
-                    map.computeIfAbsent(entry.getId(), id -> {
-                        if (entry.getParentId() != -1) {
-                            return new TimeGraphEntry(entry);
+                    TimeGraphEntry tgEntry = map.get(entry.getId());
+                    if (tgEntry != null) {
+                        tgEntry.updateModel(entry);
+                    }
+                    if (entry.getParentId() != -1 && tgEntry == null) {
+                        map.put(entry.getId(), new TimeGraphEntry(entry));
+                    } else {
+                        if (tgEntry == null) {
+                            TraceEntry traceEntry = new TraceEntry(entry, provider);
+                            addToEntryList(parentTrace, Collections.singletonList(traceEntry));
+                            map.put(entry.getId(), traceEntry);
                         }
-                        TraceEntry traceEntry = new TraceEntry(entry, provider);
-                        addToEntryList(parentTrace, Collections.singletonList(traceEntry));
                         setStartTime(Long.min(getStartTime(), entry.getStartTime()));
                         setEndTime(Long.max(getEndTime(), entry.getEndTime()));
-                        return traceEntry;
-                    });
+                    }
                 }
                 /*
                  * set the correct child / parent relation
                  */
-                for (XmlTimeGraphEntryModel entry : model) {
-                    TimeGraphEntry child = map.get(entry.getId());
-                    TimeGraphEntry parent = map.get(entry.getParentId());
-                    if (child != null && parent != null) {
-                        child.updateModel(entry);
+                for (TimeGraphEntry child : map.values()) {
+                    TimeGraphEntry parent = map.get(child.getModel().getParentId());
+                    if (parent != null) {
                         parent.addChild(child);
                     }
                 }
@@ -387,7 +390,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
      * parent.
      *
      * @param entry
-     *            queried Control Flow Entry.
+     *            queried Time Graph Entry.
      * @return the {@link ITimeGraphDataProvider}
      */
     public static @NonNull ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> getProvider(TimeGraphEntry entry) {
@@ -447,16 +450,7 @@ public class XmlTimeGraphView extends AbstractTimeGraphView {
     }
 
     private int getStringIndex(String state) {
-        XmlPresentationProvider pres = getPresentationProvider();
-        Integer statusInt = fStringValueMap.get(state);
-        if (statusInt != null) {
-            return statusInt;
-        }
-
-        // Add this new state to the presentation provider
-        int status = pres.addState(state);
-        fStringValueMap.put(state, status);
-        return status;
+        return fStringValueMap.computeIfAbsent(state, s -> getPresentationProvider().addState(s));
     }
 
     @Override

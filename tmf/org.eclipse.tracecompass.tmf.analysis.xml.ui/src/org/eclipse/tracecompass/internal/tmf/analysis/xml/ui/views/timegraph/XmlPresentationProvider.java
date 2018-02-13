@@ -170,12 +170,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
             addOrUpdateState(value, name, color);
         }
         stateTable = stateValues.toArray(new StateItem[stateValues.size()]);
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                fireColorSettingsChanged();
-            }
-        });
+        Display.getDefault().asyncExec(this::fireColorSettingsChanged);
     }
 
     /**

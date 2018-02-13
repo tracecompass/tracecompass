@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.module;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -89,13 +90,13 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
             if (entryElement != null) {
                 List<Element> elements = TmfXmlUtils.getChildElements(fElement, TmfXmlStrings.PARENT_ELEMENT);
                 if (!elements.isEmpty()) {
-                    fXmlParentId = getFirstValue(baseQuark, elements.get(0));
+                    fXmlParentId = getFirstValue(baseQuark, Objects.requireNonNull(elements.get(0)));
                 }
 
                 /* Get the name of this entry */
                 elements = TmfXmlUtils.getChildElements(fElement, TmfXmlStrings.NAME_ELEMENT);
                 if (!elements.isEmpty()) {
-                    String nameFromSs = getFirstValue(baseQuark, elements.get(0));
+                    String nameFromSs = getFirstValue(baseQuark, Objects.requireNonNull(elements.get(0)));
                     if (!nameFromSs.isEmpty()) {
                         fName = nameFromSs;
                     }
@@ -104,7 +105,7 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
                 /* Get the id of this entry */
                 elements = TmfXmlUtils.getChildElements(fElement, TmfXmlStrings.ID_ELEMENT);
                 if (!elements.isEmpty()) {
-                    fXmlId = getFirstValue(baseQuark, elements.get(0));
+                    fXmlId = getFirstValue(baseQuark, Objects.requireNonNull(elements.get(0)));
                 } else {
                     fXmlId = name;
                 }
@@ -113,11 +114,7 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
 
         /** Return the state value of the first interval with a non-null value
          * @param baseQuark */
-        private @NonNull String getFirstValue(int baseQuark, Element stateAttribute) {
-            if (stateAttribute == null) {
-                throw new IllegalArgumentException();
-            }
-
+        private @NonNull String getFirstValue(int baseQuark, @NonNull Element stateAttribute) {
             ITmfXmlModelFactory factory = TmfXmlReadOnlyModelFactory.getInstance();
             ITmfXmlStateAttribute display = factory.createStateAttribute(stateAttribute, this);
             int quark = display.getAttributeQuark(baseQuark, null);

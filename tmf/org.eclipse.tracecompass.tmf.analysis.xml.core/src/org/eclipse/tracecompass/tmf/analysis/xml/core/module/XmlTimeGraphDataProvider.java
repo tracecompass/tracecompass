@@ -38,7 +38,6 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.IT
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphState;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.TimeGraphRowModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.TimeGraphState;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse.Status;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
@@ -84,7 +83,12 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
     private final List<ITmfStateSystem> fSs;
     private final List<Element> fEntries;
 
+    /**
+     * Remember the unique mappings of state system and quark to entry ID.
+     */
+    private final Table<ITmfStateSystem, Integer, Long> fBaseQuarkToId = HashBasedTable.create();
     private final Map<Long, Pair<ITmfStateSystem, Integer>> fIDToDisplayQuark = new HashMap<>();
+
 
     /**
      * {@link XmlTimeGraphDataProvider} create method
@@ -131,27 +135,29 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
 
     @Override
     public TmfModelResponse<@NonNull List<XmlTimeGraphEntryModel>> fetchTree(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        // FIXME should not need to wait until the end
-        fSs.forEach(ITmfStateSystem::waitUntilBuilt);
         List<XmlTimeGraphEntryModel> builder = new ArrayList<>();
+        boolean isComplete = true;
 
         String traceName = String.valueOf(getTrace().getName());
         for (ITmfStateSystem ss : fSs) {
+            isComplete &= ss.waitUntilBuilt(0);
             long start = ss.getStartTime();
             long end = ss.getCurrentEndTime();
-            Builder ssEntry = new Builder(sfAtomicId.getAndIncrement(), -1, traceName, start, end, null, ss, ITmfStateSystem.ROOT_ATTRIBUTE);
+            long id = fBaseQuarkToId.row(ss).computeIfAbsent(ITmfStateSystem.ROOT_ATTRIBUTE, s -> sfAtomicId.getAndIncrement());
+            Builder ssEntry = new Builder(id, -1, traceName, start, end, null, ss, ITmfStateSystem.ROOT_ATTRIBUTE);
             builder.add(ssEntry.build());
 
             for (Element entry : fEntries) {
-                buildEntry(ss, entry, ssEntry, -1, StringUtils.EMPTY, builder);
+                buildEntry(ss, entry, ssEntry, -1, StringUtils.EMPTY, end, builder);
             }
         }
-        builder.sort(Comparator.comparingLong(XmlTimeGraphEntryModel::getId));
-        return new TmfModelResponse<>(builder, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        Status status = isComplete ? Status.COMPLETED : Status.RUNNING;
+        String msg = isComplete ? CommonStatusMessage.COMPLETED : CommonStatusMessage.RUNNING;
+        return new TmfModelResponse<>(builder, status, msg);
     }
 
     private void buildEntry(ITmfStateSystem ssq, Element entryElement, @NonNull Builder parentEntry,
-            int prevBaseQuark, @NonNull String prevRegex, List<XmlTimeGraphEntryModel> builder) {
+            int prevBaseQuark, @NonNull String prevRegex, long currentEnd, List<XmlTimeGraphEntryModel> builder) {
         /* Get the attribute string to display */
         String path = entryElement.getAttribute(TmfXmlStrings.PATH);
         if (path.isEmpty()) {
@@ -220,13 +226,13 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
             Builder currentEntry = parentEntry;
             /* Process the current entry, if specified */
             if (displayElement != null) {
-                currentEntry = processEntry(entryElement, displayElement, parentEntry, quark, ss);
+                currentEntry = processEntry(entryElement, displayElement, parentEntry, quark, ss, currentEnd);
                 entryMap.put(currentEntry.getXmlId(), currentEntry);
             }
             /* Process the children entry of this entry */
             for (Element subEntryEl : entryElements) {
                 String regex = prevRegex.isEmpty() ? regexName : prevRegex + '/' + regexName;
-                buildEntry(ss, subEntryEl, currentEntry, quark, regex, builder);
+                buildEntry(ss, subEntryEl, currentEntry, quark, regex, currentEnd, builder);
             }
         }
         buildTree(entryMap, parentEntry.getId());
@@ -237,13 +243,13 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
     }
 
     private Builder processEntry(@NonNull Element entryElement, @NonNull Element displayEl,
-            @NonNull Builder parentEntry, int quark, ITmfStateSystem ss) {
+            @NonNull Builder parentEntry, int quark, ITmfStateSystem ss, long currentEnd) {
         /*
          * Get the start time and end time of this entry from the display attribute
          */
         ITmfXmlStateAttribute display = fFactory.createStateAttribute(displayEl, parentEntry);
         int displayQuark = display.getAttributeQuark(quark, null);
-        long id = sfAtomicId.getAndIncrement();
+        long id = fBaseQuarkToId.row(ss).computeIfAbsent(quark, s -> sfAtomicId.getAndIncrement());
         if (displayQuark == IXmlStateSystemContainer.ERROR_QUARK) {
             return new Builder(id, parentEntry.getId(),
                     String.format("Unknown display quark for %s", ss.getAttributeName(quark)), ss.getStartTime(), ss.getCurrentEndTime(), null, ss, quark); //$NON-NLS-1$
@@ -251,16 +257,15 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
         fIDToDisplayQuark.put(id, new Pair<>(ss, displayQuark));
 
         long entryStart = ss.getStartTime();
-        long entryEnd = ss.getCurrentEndTime() + 1;
+        long entryEnd = currentEnd + 1;
 
         try {
 
             ITmfStateInterval oneInterval = ss.querySingleState(entryStart, displayQuark);
-
             /* The entry start is the first non-null interval */
             while (oneInterval.getStateValue().isNull()) {
                 long ts = oneInterval.getEndTime() + 1;
-                if (ts > ss.getCurrentEndTime()) {
+                if (ts > currentEnd) {
                     break;
                 }
                 oneInterval = ss.querySingleState(ts, displayQuark);
