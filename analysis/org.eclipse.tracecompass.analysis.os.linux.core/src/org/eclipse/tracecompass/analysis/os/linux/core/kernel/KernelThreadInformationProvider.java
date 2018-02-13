@@ -449,8 +449,33 @@ public final class KernelThreadInformationProvider {
      *         returned if either the state system is {@code null} or the quark
      *         is not found
      * @since 2.5
+     * @deprecate Use {@link #getStatusIntervalsForThread(KernelAnalysisModule, Integer, long, long, long)}
      */
+    @Deprecated
     public static Iterator<ITmfStateInterval> getStatusIntervalsForThread(KernelAnalysisModule module, Integer threadId, long start, long end) {
+        return getStatusIntervalsForThread(module, threadId, start, end, -1);
+    }
+
+    /**
+     * Get an iterator for the status intervals of a given thread in a time range
+     *
+     * @param module
+     *            The kernel analysis instance to run this method on
+     * @param threadId
+     *            The ID of the thread to get the intervals for
+     * @param start
+     *            The start time of the requested range
+     * @param end
+     *            The end time of the requested range
+     * @param resolution
+     *            The resolution, ie the number of nanoseconds between kernel status
+     *            queries. A value lower or equal to 1 will return all intervals
+     * @return The list of status intervals for this thread, an empty list is
+     *         returned if either the state system is {@code null} or the quark
+     *         is not found
+     * @since 2.5
+     */
+    public static Iterator<ITmfStateInterval> getStatusIntervalsForThread(KernelAnalysisModule module, Integer threadId, long start, long end, long resolution) {
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
             return NonNullUtils.checkNotNull(Collections.emptyListIterator());
@@ -460,7 +485,7 @@ public final class KernelThreadInformationProvider {
         if (threadQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
             return NonNullUtils.checkNotNull(Collections.emptyListIterator());
         }
-        return new StateSystemUtils.QuarkIterator(ss, threadQuark, start, end - 1);
+        return new StateSystemUtils.QuarkIterator(ss, threadQuark, start, end - 1, resolution);
     }
 
 }

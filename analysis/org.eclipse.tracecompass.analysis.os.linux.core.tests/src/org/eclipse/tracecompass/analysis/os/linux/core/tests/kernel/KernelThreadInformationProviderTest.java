@@ -444,7 +444,7 @@ public class KernelThreadInformationProviderTest {
 
     /**
      * Test the
-     * {@link KernelThreadInformationProvider#getStatusIntervalsForThread(KernelAnalysisModule, Integer, long, long)}
+     * {@link KernelThreadInformationProvider#getStatusIntervalsForThread(KernelAnalysisModule, Integer, long, long, long)}
      * method
      */
     @Test
@@ -455,44 +455,50 @@ public class KernelThreadInformationProviderTest {
         Integer process20 = 20;
 
         /* Check invalid time ranges */
-        Iterator<ITmfStateInterval> intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, -15, -5);
+        Iterator<ITmfStateInterval> intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, -15, -5, -1);
         assertFalse(intervals.hasNext());
 
-        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 90, 1500000000L);
+        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 90, 1500000000L, -1);
         assertFalse(intervals.hasNext());
 
         /* Check invalid quarks */
-        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, -1, 0, 70L);
+        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, -1, 0, 70L, -1);
         assertFalse(intervals.hasNext());
 
-        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, 0, 0, 70L);
+        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, 0, 0, 70L, 0);
         assertFalse(intervals.hasNext());
 
         /* Check different time ranges */
         ProcessStatus[] values = { ProcessStatus.NOT_ALIVE, ProcessStatus.WAIT_CPU,
                 ProcessStatus.RUN, ProcessStatus.WAIT_CPU,
                 ProcessStatus.RUN };
-        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 0, 70L);
+        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 0, 70L, -1);
         testIterator("tid 21 [0,70]", intervals, values);
 
         ProcessStatus[] values2 = { ProcessStatus.WAIT_CPU,
                 ProcessStatus.RUN };
-        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 25, 50L);
+        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 25, 50L, -1);
         testIterator("tid 21 [25,50]", intervals, values2);
 
         ProcessStatus[] values3 = { ProcessStatus.NOT_ALIVE, ProcessStatus.WAIT_UNKNOWN,
                 ProcessStatus.RUN, ProcessStatus.WAIT_BLOCKED };
-        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process20, 0, 70L);
+        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process20, 0, 70L, -1);
         testIterator("tid 20 [0,70]", intervals, values3);
 
         ProcessStatus[] values4 = { ProcessStatus.RUN,
                 ProcessStatus.WAIT_BLOCKED };
-        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process20, 25, 50L);
+        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process20, 25, 50L, -1);
         testIterator("tid 20 [25,50]", intervals, values4);
 
         ProcessStatus[] values5 = { ProcessStatus.WAIT_CPU };
-        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process20, 80L, 85L);
+        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process20, 80L, 85L, -1);
         testIterator("tid 20 [80,85]", intervals, values5);
+
+        /* Check valid time ranges with higher resolution */
+        ProcessStatus[] values6 = { ProcessStatus.NOT_ALIVE, ProcessStatus.RUN,
+                ProcessStatus.RUN };
+        intervals = KernelThreadInformationProvider.getStatusIntervalsForThread(module, process21, 1, 70L, 30);
+        testIterator("tid 21 [0,70,30]", intervals, values6);
     }
 
 }

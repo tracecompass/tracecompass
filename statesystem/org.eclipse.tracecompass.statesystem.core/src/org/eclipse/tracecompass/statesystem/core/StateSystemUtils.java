@@ -296,8 +296,10 @@ public final class StateSystemUtils {
         private final int fQuark;
         private final long fInitialTime;
         private final long fEndTime;
+        private final long fResolution;
 
         private @Nullable ITmfStateInterval fCurrent;
+        private long fLastQueriedTime = 0;
 
         /**
          * Constructor
@@ -316,7 +318,7 @@ public final class StateSystemUtils {
          * @since 2.1
          */
         public QuarkIterator(ITmfStateSystem ss, int quark, long initialTime) {
-            this (ss, quark, initialTime, Long.MAX_VALUE);
+            this (ss, quark, initialTime, Long.MAX_VALUE, 1);
         }
 
         /**
@@ -342,6 +344,34 @@ public final class StateSystemUtils {
          * @since 3.2
          */
         public QuarkIterator(ITmfStateSystem ss, int quark, long initialTime, long endTime) {
+            this (ss, quark, initialTime, endTime, 1);
+        }
+
+        /**
+         * Constructor
+         *
+         * @param ss
+         *            The state system on which to query intervals
+         * @param quark
+         *            The key to the attribute to iterate over
+         * @param initialTime
+         *            The timestamp that the first returned interval will intersect.
+         *            This timestamp can be smaller than the StateSystem's start time,
+         *            in which case, iteration will start at the StateSystem's start, on
+         *            bigger than the StateSystem's current end time, in which case
+         *            iteration will start at the StateSystem's current end time.
+         * @param endTime
+         *            The end of the range of intervals to iterate over, it can be
+         *            greater than the current state system's end time, iteration will
+         *            end at the smallest of the two.
+         * @param resolution
+         *            The resolution, ie the number of nanoseconds between kernel status
+         *            queries. A value lower or equal to 1 will return all intervals
+         * @throws TimeRangeException
+         *             If endTime < initialTime.
+         * @since 3.2
+         */
+        public QuarkIterator(ITmfStateSystem ss, int quark, long initialTime, long endTime, long resolution) {
             if (endTime < initialTime) {
                 throw new TimeRangeException("iterateOverQuark: end < start !"); //$NON-NLS-1$
             }
@@ -349,11 +379,13 @@ public final class StateSystemUtils {
             fQuark = quark;
             fInitialTime = initialTime;
             fEndTime = endTime;
+            fResolution = Math.max(1, resolution);
         }
 
         private long getNextQueryTime() {
             if (fCurrent != null) {
-                return (fCurrent.getEndTime() + 1);
+                long endTime = fCurrent.getEndTime();
+                return (fResolution == 1 ? endTime + 1 : fLastQueriedTime + ((endTime - fLastQueriedTime) / fResolution + 1) * fResolution);
             }
             /* Iteration has not started yet */
             return Long.max(fInitialTime, fSS.getStartTime());
@@ -361,7 +393,8 @@ public final class StateSystemUtils {
 
         private long getPreviousQueryTime() {
             if (fCurrent != null) {
-                return fCurrent.getStartTime() - 1;
+                long startTime = fCurrent.getStartTime();
+                return Long.min(startTime - 1, fLastQueriedTime - ((fLastQueriedTime - startTime) / fResolution + 1) * fResolution);
             }
             /* Iteration has not started yet */
             return Long.min(fInitialTime, fSS.getCurrentEndTime());
@@ -387,7 +420,9 @@ public final class StateSystemUtils {
         public ITmfStateInterval next() {
             if (hasNext()) {
                 try {
-                    fCurrent = fSS.querySingleState(getNextQueryTime(), fQuark);
+                    long queryTime = getNextQueryTime();
+                    fLastQueriedTime = queryTime;
+                    fCurrent = fSS.querySingleState(queryTime, fQuark);
                     return fCurrent;
                 } catch (StateSystemDisposedException e) {
                     /* GOTO throw NoSuchElementException. */
@@ -420,7 +455,9 @@ public final class StateSystemUtils {
         public ITmfStateInterval previous() {
             if (hasPrevious()) {
                 try {
-                    fCurrent = fSS.querySingleState(getPreviousQueryTime(), fQuark);
+                    long queryTime = getPreviousQueryTime();
+                    fLastQueriedTime = queryTime;
+                    fCurrent = fSS.querySingleState(queryTime, fQuark);
                     return fCurrent;
                 } catch (StateSystemDisposedException e) {
                     /* GOTO throw NoSuchElementException. */

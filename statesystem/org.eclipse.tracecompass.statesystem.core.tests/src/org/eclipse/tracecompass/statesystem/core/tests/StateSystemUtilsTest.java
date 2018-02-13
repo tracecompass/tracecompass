@@ -92,14 +92,13 @@ public class StateSystemUtilsTest {
             assertNull(StateSystemUtils.queryUntilNonNullValue(ss, quark, 2001L, 5000L));
 
             /*
-             * Should return null if request within range, but condition is
-             * false
+             * Should return null if request within range, but condition is false
              */
             assertNull(StateSystemUtils.queryUntilNonNullValue(ss, quark, 1000L, 1199L));
 
             /*
-             * Should return the right interval if an interval is within range,
-             * even if the range starts or ends outside state system range
+             * Should return the right interval if an interval is within range, even if the
+             * range starts or ends outside state system range
              */
             ITmfStateInterval interval = StateSystemUtils.queryUntilNonNullValue(ss, quark, 1000L, 1300L);
             assertNotNull(interval);
@@ -240,9 +239,8 @@ public class StateSystemUtilsTest {
             /* There should not be a next interval */
             assertFalse(iterator.hasNext());
 
-
             iterator = new QuarkIterator(ss, quark, 1800, 5000);
-            /* There should be one interval ranging from 1500L to 2000L*/
+            /* There should be one interval ranging from 1500L to 2000L */
             assertTrue(iterator.hasNext());
             interval = iterator.next();
             assertNotNull(interval);
@@ -253,11 +251,123 @@ public class StateSystemUtilsTest {
         }
     }
 
+    /**
+     * Test that the QuarkIterator returns the correct intervals for a range
+     * included in the state system range and a resolution
+     */
+    @Test
+    public void testIteratorOverQuarkResolution() {
+        IStateHistoryBackend backend = StateHistoryBackendFactory.createInMemoryBackend(DUMMY_STRING, 1L);
+        ITmfStateSystemBuilder ss = StateSystemFactory.newStateSystem(backend);
+        try {
+            // Create a small state system with intervals for a resolution
+            int quark = ss.getQuarkAbsoluteAndAdd(DUMMY_STRING);
+
+            /**
+             * Here follows the state system, with each dash representing a nanosecond and
+             * vertical line a change of state. The time are the times that are expected to
+             * be queried
+             *
+             * <pre>
+             *
+             * resolution of 4:  2   6      10
+             * resolution of 3:  2  5    8   11
+             *                  ------|-|-|----
+             * </pre>
+             */
+            ss.modifyAttribute(1L, 1, quark);
+            ss.modifyAttribute(7L, 2, quark);
+            ss.modifyAttribute(8L, 1, quark);
+            ss.modifyAttribute(9L, 2, quark);
+            ss.closeHistory(12L);
+
+            // Verify a resolution of 4
+            QuarkIterator iterator = new QuarkIterator(ss, quark, 2, 14, 4);
+            /*
+             * With steps of 4, there should be 2 intervals and they should be the same
+             * forward and backward
+             */
+            assertTrue(iterator.hasNext());
+            ITmfStateInterval interval = iterator.next();
+            assertNotNull(interval);
+            assertEquals(1L, interval.getStartTime());
+            assertEquals(6L, interval.getEndTime());
+
+            // Check second interval forward
+            assertTrue(iterator.hasNext());
+            interval = iterator.next();
+            assertNotNull(interval);
+            assertEquals(9L, interval.getStartTime());
+            assertEquals(12L, interval.getEndTime());
+
+            /* There should not be a next interval */
+            assertFalse(iterator.hasNext());
+
+            // Check the interval backward
+            assertTrue(iterator.hasPrevious());
+            interval = iterator.previous();
+            assertNotNull(interval);
+            assertEquals(1L, interval.getStartTime());
+            assertEquals(6L, interval.getEndTime());
+
+            assertFalse(iterator.hasPrevious());
+
+            // Verify a resolution of 3
+            iterator = new QuarkIterator(ss, quark, 2, 14, 3);
+            /*
+             * With steps of 3, there should be 3 intervals and they should be the same
+             * forward and backward
+             */
+            assertTrue(iterator.hasNext());
+            interval = iterator.next();
+            assertNotNull(interval);
+            assertEquals(1L, interval.getStartTime());
+            assertEquals(6L, interval.getEndTime());
+
+            // Check second interval forward
+            assertTrue(iterator.hasNext());
+            interval = iterator.next();
+            assertNotNull(interval);
+            assertEquals(8L, interval.getStartTime());
+            assertEquals(8L, interval.getEndTime());
+
+            // Check the interval forward
+            assertTrue(iterator.hasNext());
+            interval = iterator.next();
+            assertNotNull(interval);
+            assertEquals(9L, interval.getStartTime());
+            assertEquals(12L, interval.getEndTime());
+
+            /* There should not be a next interval */
+            assertFalse(iterator.hasNext());
+
+            // Check the first interval backward
+            assertTrue(iterator.hasPrevious());
+            interval = iterator.previous();
+            assertNotNull(interval);
+            assertEquals(8L, interval.getStartTime());
+            assertEquals(8L, interval.getEndTime());
+
+            // Check the second interval backward
+            assertTrue(iterator.hasPrevious());
+            interval = iterator.previous();
+            assertNotNull(interval);
+            assertEquals(1L, interval.getStartTime());
+            assertEquals(6L, interval.getEndTime());
+
+            assertFalse(iterator.hasPrevious());
+
+        } catch (StateValueTypeException e) {
+            fail(e.getMessage());
+        } finally {
+            ss.dispose();
+        }
+    }
 
     /**
-     * With the query end > ss.end, query some intervals, then add a few
-     * intervals to the ss such that end now becomes < ss.end and make sure
-     * those new intervals are picked up
+     * With the query end > ss.end, query some intervals, then add a few intervals
+     * to the ss such that end now becomes < ss.end and make sure those new
+     * intervals are picked up
      */
     @Test
     public void testIteratorOverQuarkAddMoreIntervals() {
