@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2010, 2018 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
@@ -354,19 +355,22 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
      *            Flag for refreshing the project
      */
     public void addTrace(TmfTraceElement trace, boolean refresh) {
+        addTrace(trace.getResource(), trace.getElementPath(), refresh);
+    }
+
+    private void addTrace(IResource resource, String elementPath, boolean refresh) {
         /**
          * Create a link to the actual trace and set the trace type
          */
         IFolder experiment = getResource();
-        IResource resource = trace.getResource();
         IPath location = resource.getLocation();
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         try {
-            String traceTypeId = TmfTraceType.getTraceTypeId(trace.getResource());
+            String traceTypeId = TmfTraceType.getTraceTypeId(resource);
             TraceTypeHelper traceType = TmfTraceType.getTraceType(traceTypeId);
 
             if (resource instanceof IFolder) {
-                IFolder folder = experiment.getFolder(trace.getElementPath());
+                IFolder folder = experiment.getFolder(elementPath);
                 TraceUtils.createFolder((IFolder) folder.getParent(), new NullProgressMonitor());
                 IStatus result = workspace.validateLinkLocation(folder, location);
                 if (result.isOK() || result.matches(IStatus.INFO | IStatus.WARNING)) {
@@ -379,7 +383,7 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
                     Activator.getDefault().logError("Error creating link. Invalid trace location " + location); //$NON-NLS-1$
                 }
             } else {
-                IFile file = experiment.getFile(trace.getElementPath());
+                IFile file = experiment.getFile(elementPath);
                 TraceUtils.createFolder((IFolder) file.getParent(), new NullProgressMonitor());
                 IStatus result = workspace.validateLinkLocation(file, location);
                 if (result.isOK() || result.matches(IStatus.INFO | IStatus.WARNING)) {
@@ -458,55 +462,40 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         }
 
         // Copy the traces
-        List<TmfTraceElement> experimentTraces = copiedExperiment.getTraces();
-        Map<TmfTraceElement, TmfTraceElement> traces = new HashMap<>();
-        for (TmfTraceElement expTraceElement : experimentTraces) {
-            // Populate a list of trace element to copy them later
-            traces.put(expTraceElement, expTraceElement.getElementUnderTraceFolder());
-        }
-        Map<TmfTraceElement, IResource> copiedTraceResources = new HashMap<>();
-        for (Entry<TmfTraceElement, TmfTraceElement> traceElement : traces.entrySet()) {
+        List<TmfTraceElement> originalExpTraces = copiedExperiment.getTraces();
+        Map<IResource, String> copiedTraceResources = new HashMap<>();
+        for (TmfTraceElement originalExpTrace : originalExpTraces) {
+            TmfTraceElement traceElement = originalExpTrace.getElementUnderTraceFolder();
             IFolder newFolder = tracesFolder.getResource().getFolder(newName);
-            IPath traceElementPath = traceElement.getValue().getPath().makeRelativeTo(tracesFolder.getPath());
+            IPath traceElementPath = traceElement.getPath().makeRelativeTo(tracesFolder.getPath());
             IFolder traceDestinationFolder = newFolder.getFolder(traceElementPath.removeLastSegments(1));
             try {
                 if (!traceDestinationFolder.exists()) {
                     TraceUtils.createFolder(traceDestinationFolder, null);
                 }
             } catch (CoreException e) {
-                return null;
+                Activator.getDefault().logError("Error copying experiment", e); //$NON-NLS-1$
             }
             IPath newTracePath = newFolder.getFullPath().append(traceElementPath);
-            copiedTraceResources.put(traceElement.getKey(), traceElement.getValue().copy(copySuppFiles, copyAsLink, newTracePath));
+            String elementPath = new Path(newName).append(traceElementPath).toString();
+            IResource copiedTraceResource = traceElement.copy(copySuppFiles, copyAsLink, newTracePath);
+            if (copiedTraceResource != null) {
+                copiedTraceResources.put(copiedTraceResource, elementPath);
+            }
         }
 
-        // Add traces to the new experiment
-        IFolder experimentNewFolder = copiedExperiment.getResource().getFolder(newName);
-        for (TmfTraceElement traceElement : experimentTraces) {
-            IResource resource = traceElement.getResource();
-            IPath traceResourcePath = resource.getFullPath().makeRelativeTo(copiedExperiment.getPath());
-            IResource resourceToMove = resource;
-            IPath destinationPath = experimentNewFolder.getFullPath().append(traceResourcePath);
-            if(traceResourcePath.segmentCount() > 1) {
-                resourceToMove = copiedExperiment.getResource().getFolder(traceResourcePath.segment(0));
-                destinationPath = experimentNewFolder.getFullPath().append(traceResourcePath.segment(0));
-            }
+        // Remove original traces from the new experiment
+        for (TmfTraceElement originalExpTrace : originalExpTraces) {
             try {
-                TraceUtils.createFolder(experimentNewFolder, null);
-                resourceToMove.move(destinationPath, IResource.FORCE | IResource.SHALLOW, null);
-
-                IResource copiedTraceResource = copiedTraceResources.get(traceElement);
-                if(copiedTraceResource != null && resource instanceof IFolder) {
-                    IFolder linkedFolder = experimentNewFolder.getFolder(traceResourcePath);
-                    linkedFolder.createLink(copiedTraceResource.getLocation(), IResource.REPLACE, null);
-                } else if(copiedTraceResource != null && resource instanceof IFile) {
-                    IFile linkedFile = experimentNewFolder.getFile(traceResourcePath);
-                    linkedFile.createLink(copiedTraceResource.getLocation(), IResource.REPLACE, null);
-                }
+                copiedExperiment.deleteTraceResource(originalExpTrace.getResource());
             } catch (CoreException e) {
-                return null;
+                Activator.getDefault().logError("Error copying experiment", e); //$NON-NLS-1$
             }
+        }
 
+        // Add copied traces to the new experiment
+        for (Entry<IResource, String> copiedTraceEntry : copiedTraceResources.entrySet()) {
+            copiedExperiment.addTrace(copiedTraceEntry.getKey(), copiedTraceEntry.getValue(), false);
         }
 
         return copiedExpResource;

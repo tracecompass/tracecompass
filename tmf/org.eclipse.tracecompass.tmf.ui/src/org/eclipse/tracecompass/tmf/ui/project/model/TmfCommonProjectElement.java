@@ -488,7 +488,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
             }
             return trace;
         } catch (CoreException e) {
-
+            Activator.getDefault().logError("Error copying " + getName(), e); //$NON-NLS-1$
         }
         return null;
     }
