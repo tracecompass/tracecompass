@@ -61,8 +61,7 @@ public class ResourcesEntryModel extends TimeGraphEntryModel {
         if (type == Type.TRACE) {
             // use the trace name.
             return name;
-        }
-        if (type == Type.SOFT_IRQ) {
+        } else if (type == Type.SOFT_IRQ) {
             return type.toString() + ' ' + id + ' ' + SoftIrqLabelProvider.getSoftIrq(id);
         }
         return type.toString() + ' ' + id;

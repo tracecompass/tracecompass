@@ -175,10 +175,10 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             ResourcesEntryModel cpuEntry = new ResourcesEntryModel(getId(cpuQuark), traceId, cpuName, start, end, cpu, Type.CPU);
             builder.add(cpuEntry);
 
-            List<Integer> irqQuarks = ss.getQuarks(Attributes.CPUS, cpuName, Attributes.IRQS, WILDCARD);
+            List<Integer> irqQuarks = ss.getQuarks(cpuQuark, Attributes.IRQS, WILDCARD);
             createInterrupt(ss, start, end, cpuEntry, irqQuarks, Type.IRQ, builder);
 
-            List<Integer> softIrqQuarks = ss.getQuarks(Attributes.CPUS, cpuName, Attributes.SOFT_IRQS, WILDCARD);
+            List<Integer> softIrqQuarks = ss.getQuarks(cpuQuark, Attributes.SOFT_IRQS, WILDCARD);
             createInterrupt(ss, start, end, cpuEntry, softIrqQuarks, Type.SOFT_IRQ, builder);
         }
 

@@ -145,7 +145,6 @@ public class ResourcesView extends AbstractTimeGraphView {
             }
             return ""; //$NON-NLS-1$
         }
-
     }
 
     // ------------------------------------------------------------------------
@@ -183,7 +182,8 @@ public class ResourcesView extends AbstractTimeGraphView {
         SubMonitor subMonitor = SubMonitor.convert(monitor);
         boolean complete = false;
         ResourcesEntry traceEntry = null;
-        Map<Long, TimeGraphEntry> map = new HashMap<>();
+        Map<ResourcesEntryModel, TimeGraphEntry> modelToEntryMap = new HashMap<>();
+        Map<Long, TimeGraphEntry> parentLookupMap = new HashMap<>();
         while (!complete && !subMonitor.isCanceled()) {
             TmfModelResponse<List<ResourcesEntryModel>> response = dataProvider.fetchTree(new TimeQueryFilter(0, Long.MAX_VALUE, 2), subMonitor);
             if (response.getStatus() == ITmfResponse.Status.FAILED) {
@@ -198,12 +198,13 @@ public class ResourcesView extends AbstractTimeGraphView {
             if (model != null) {
                 for (ResourcesEntryModel entry : model) {
                     if (entry.getType() != ResourcesEntryModel.Type.TRACE) {
-                        TimeGraphEntry uiEntry = map.get(entry.getId());
+                        TimeGraphEntry uiEntry = modelToEntryMap.get(entry);
                         if (uiEntry == null) {
                             uiEntry = new ResourcesEntry(entry, trace);
-                            map.put(entry.getId(), uiEntry);
+                            modelToEntryMap.put(entry, uiEntry);
+                            parentLookupMap.put(entry.getId(), uiEntry);
 
-                            TimeGraphEntry parent = map.getOrDefault(entry.getParentId(), traceEntry);
+                            TimeGraphEntry parent = parentLookupMap.getOrDefault(entry.getParentId(), traceEntry);
                             parent.addChild(uiEntry);
                         } else {
                             uiEntry.updateModel(entry);
@@ -224,7 +225,7 @@ public class ResourcesView extends AbstractTimeGraphView {
                 long start = traceEntry.getStartTime();
                 long end = traceEntry.getEndTime();
                 final long resolution = Long.max(1, (end - start) / getDisplayWidth());
-                zoomEntries(map.values(), start, end, resolution, subMonitor);
+                zoomEntries(modelToEntryMap.values(), start, end, resolution, subMonitor);
             }
 
             if (subMonitor.isCanceled()) {
