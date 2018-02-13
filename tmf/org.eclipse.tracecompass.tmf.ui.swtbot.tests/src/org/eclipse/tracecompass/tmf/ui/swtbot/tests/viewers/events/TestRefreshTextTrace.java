@@ -126,6 +126,11 @@ public class TestRefreshTextTrace {
         for (int i = 0; i < NB_REFRESH; i++) {
             appendToTrace(NEW_EVENTS_PER_REFRESH);
 
+            // Force resource refresh and ignore trace change
+            fBot.viewByTitle("Project Explorer").show();
+            fBot.menu().menu("File", "Refresh").click();
+            fBot.shell("Trace Changed").activate().bot().button("No").click();
+
             // Refresh
             SWTBotEditor eventsEditor = SWTBotUtils.activeEventsEditor(fBot);
             eventsEditor.setFocus();
