@@ -143,7 +143,11 @@ public class TimeGraphLegend extends TitleAreaDialog {
      */
     private void addStateGroups(Composite composite) {
 
-        List<StateItem> stateItems = Arrays.asList(fProvider.getStateTable());
+        StateItem[] stateTable = fProvider.getStateTable();
+        if (stateTable == null) {
+            return;
+        }
+        List<StateItem> stateItems = Arrays.asList(stateTable);
         Collection<StateItem> linkStates = Collections2.filter(stateItems, TimeGraphLegend::isLinkState);
         int numColumn = linkStates.isEmpty() ? 1 : 2;
 
@@ -215,7 +219,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
             return;
         }
         Group gs = new Group(innerComposite, SWT.NONE);
-        gs.setText(Messages.TimeGraphLegend_Arrows);
+        gs.setText(fProvider.getLinkTypeName());
 
         GridLayout layout = new GridLayout();
         layout.marginWidth = 20;
@@ -231,7 +235,15 @@ public class TimeGraphLegend extends TitleAreaDialog {
         linkStates.forEach(si -> new LegendEntry(gs, si));
     }
 
-    private static boolean isLinkState(StateItem si) {
+    /**
+     * Test whether a state item is a link state or not
+     *
+     * @param si
+     *            The state item
+     * @return True if the state item is a link state, false otherwise
+     * @since 3.3
+     */
+    protected static boolean isLinkState(StateItem si) {
         Object itemType = si.getStyleMap().getOrDefault(ITimeEventStyleStrings.itemTypeProperty(), ITimeEventStyleStrings.stateType());
         return itemType instanceof String && ((String) itemType).equals(ITimeEventStyleStrings.linkType());
     }

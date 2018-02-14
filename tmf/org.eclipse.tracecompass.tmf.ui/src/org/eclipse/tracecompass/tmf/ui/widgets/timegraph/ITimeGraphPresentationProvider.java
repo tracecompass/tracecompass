@@ -19,6 +19,7 @@ import java.util.Map;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
@@ -168,6 +169,16 @@ public interface ITimeGraphPresentationProvider {
      * @return a map of tool tip information
      */
     Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime);
+
+    /**
+     * Get the name of the link type
+     *
+     * @return The name of the link type
+     * @since 3.3
+     */
+    default String getLinkTypeName() {
+        return Messages.TimeGraphLegend_Arrows;
+    }
 
     /**
      * Check whether time and duration should be displayed in tooltip (after

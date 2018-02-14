@@ -81,23 +81,31 @@ public class CriticalPathLegend extends TimeGraphLegend {
         blocked.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.TOP).grab(true, true).create());
         blocked.setText(Messages.CriticalPathLegend_blocked);
 
+        boolean isLeft = true;
         for (int i = 1; i <= stateItems.length / 2; i++) {
             // put the two columns
-            LegendEntry lefty = new LegendEntry(blocked, stateItems[i]);
-            lefty.setLayoutData(GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.CENTER).create());
-            if (i + stateItems.length / 2 < stateItems.length) {
+            if (!isLinkState(stateItems[i])) {
+                LegendEntry lefty = new LegendEntry(blocked, stateItems[i]);
+                setEntryLayout(lefty, isLeft);
+                isLeft = !isLeft;
+            }
+
+            if (i + stateItems.length / 2 < stateItems.length && !isLinkState(stateItems[i + stateItems.length / 2])) {
                 LegendEntry righty = new LegendEntry(blocked, stateItems[i + stateItems.length / 2]);
-                righty.setLayoutData(GridDataFactory.swtDefaults().align(SWT.END, SWT.CENTER).grab(true, false).create());
+                setEntryLayout(righty, isLeft);
+                isLeft = !isLeft;
             }
         }
-        /*
-         * even since we start at one
-         */
-        if ((stateItems.length % 2) == 0) {
-            LegendEntry lastOne = new LegendEntry(blocked, stateItems[stateItems.length - 1]);
-            lastOne.setLayoutData(GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.CENTER).create());
-        }
+
         sc.setContent(innerComposite);
         sc.setMinSize(innerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+    }
+
+    private static void setEntryLayout(LegendEntry entry, boolean leftColumn) {
+        if (leftColumn) {
+            entry.setLayoutData(GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.CENTER).create());
+        } else {
+            entry.setLayoutData(GridDataFactory.swtDefaults().align(SWT.END, SWT.CENTER).grab(true, false).create());
+        }
     }
 }
