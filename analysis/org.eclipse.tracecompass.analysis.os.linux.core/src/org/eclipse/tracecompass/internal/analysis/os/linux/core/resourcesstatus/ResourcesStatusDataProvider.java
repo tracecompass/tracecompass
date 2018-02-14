@@ -95,7 +95,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             }
 
             String attribute;
-            Function<String, String> trim = Function.identity();
+            Function<@NonNull String, @NonNull String> trim = Function.identity();
             if (status == StateValues.CPU_STATUS_RUN_USERMODE) {
                 attribute = Attributes.EXEC_NAME;
             } else if (status == StateValues.CPU_STATUS_RUN_SYSCALL) {
@@ -172,7 +172,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         for (Integer cpuQuark : ss.getQuarks(Attributes.CPUS, WILDCARD)) {
             final @NonNull String cpuName = ss.getAttributeName(cpuQuark);
             int cpu = Integer.parseInt(cpuName);
-            ResourcesEntryModel cpuEntry = new ResourcesEntryModel(getId(cpuQuark), traceId, cpuName, start, end, cpu, Type.CPU);
+            ResourcesEntryModel cpuEntry = new ResourcesEntryModel(getId(cpuQuark), traceId, computeEntryName(Type.CPU, cpu), start, end, cpu, Type.CPU);
             builder.add(cpuEntry);
 
             List<Integer> irqQuarks = ss.getQuarks(cpuQuark, Attributes.IRQS, WILDCARD);
@@ -214,7 +214,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             long irqId = getId(irqQuark);
 
             builder.add(new ResourcesEntryModel(irqId, cpuEntry.getId(),
-                    resourceName, startTime, endTime, resourceId, type));
+                    computeEntryName(type, resourceId), startTime, endTime, resourceId, type));
 
             /*
              * Search for the aggregate interrupt entry in the list. If it does not
@@ -224,17 +224,26 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             long aggregateId = getId(ssq.optQuarkAbsolute(aggregateIrqtype, resourceName));
             if (!Iterables.any(builder, entry -> entry.getId() == aggregateId)) {
                 builder.add(new ResourcesEntryModel(aggregateId, cpuEntry.getParentId(),
-                        aggregateIrqtype, startTime, endTime, resourceId, type));
+                        computeEntryName(type, resourceId),
+                        startTime, endTime, resourceId, type));
             }
 
             /*
              * This reaches the limit of the contract, each entry model is supposed to have
              * a distinct ID. On the other hand, this is the same entry under a CPU and an
-             * aggregate.
+             * aggregate. Name this entry like a CPU but give it the IRQ type
              */
-            builder.add(new ResourcesEntryModel(irqId, aggregateId, cpuEntry.getName(),
-                    startTime, endTime, cpuEntry.getResourceId(), Type.CPU));
+            builder.add(new ResourcesEntryModel(irqId, aggregateId,
+                    computeEntryName(Type.CPU, cpuEntry.getResourceId()),
+                    startTime, endTime, cpuEntry.getResourceId(), type));
         }
+    }
+
+    private static @NonNull String computeEntryName(Type type, int id) {
+        if (type == Type.SOFT_IRQ) {
+            return type.toString() + ' ' + id + ' ' + SoftIrqLabelProvider.getSoftIrq(id);
+        }
+        return type.toString() + ' ' + id;
     }
 
     @Override

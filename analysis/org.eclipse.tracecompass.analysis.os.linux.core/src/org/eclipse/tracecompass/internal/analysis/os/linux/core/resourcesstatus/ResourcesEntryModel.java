@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.TimeGraphEntryModel;
 
 /**
@@ -51,20 +52,10 @@ public class ResourcesEntryModel extends TimeGraphEntryModel {
      * @param type
      *            type of resource (TRACE / CPU / IRQ / SOFT_IRQ)
      */
-    public ResourcesEntryModel(long id, long parentId, String name, long startTime, long endTime, int resourceId, Type type) {
-        super(id, parentId, computeEntryName(name, type, resourceId), startTime, endTime);
+    public ResourcesEntryModel(long id, long parentId, @NonNull String name, long startTime, long endTime, int resourceId, Type type) {
+        super(id, parentId, name, startTime, endTime);
         fResourceId = resourceId;
         fType = type;
-    }
-
-    private static String computeEntryName(String name, Type type, int id) {
-        if (type == Type.TRACE) {
-            // use the trace name.
-            return name;
-        } else if (type == Type.SOFT_IRQ) {
-            return type.toString() + ' ' + id + ' ' + SoftIrqLabelProvider.getSoftIrq(id);
-        }
-        return type.toString() + ' ' + id;
     }
 
     /**
