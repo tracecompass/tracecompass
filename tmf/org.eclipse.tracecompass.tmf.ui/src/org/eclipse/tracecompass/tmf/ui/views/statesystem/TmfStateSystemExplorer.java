@@ -102,33 +102,24 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
     };
 
     private static final Comparator<ITimeGraphEntry> NAME_COMPARATOR = (a, b) -> {
-        if (a instanceof AttributeEntry && b instanceof AttributeEntry) {
-            return a.getName().compareTo(b.getName());
-
+        if (a instanceof TraceEntry && b instanceof TraceEntry) {
+            ITmfTrace ta = ((TraceEntry) a).fEntryTrace;
+            ITmfTrace tb = ((TraceEntry) b).fEntryTrace;
+            // Puts the experiment entries at the top of the list
+            if (ta instanceof TmfExperiment && !(tb instanceof TmfExperiment)) {
+                return -1;
+            } else if (!(ta instanceof TmfExperiment) && (tb instanceof TmfExperiment)) {
+                return 1;
+            }
         }
-        return 0;
+        return a.getName().compareTo(b.getName());
     };
 
     private static final Comparator<ITimeGraphEntry> QUARK_COMPARATOR = (a, b) -> {
         if (a instanceof AttributeEntry && b instanceof AttributeEntry) {
             return Integer.compare(((AttributeEntry) a).getQuark(), ((AttributeEntry) b).getQuark());
-
         }
         return 0;
-    };
-
-    // Puts the experiment entries at the top of the list
-    private static final Comparator<ITimeGraphEntry> TRACE_ENTRY_COMPARATOR = (a, b) -> {
-        if (a instanceof TraceEntry && b instanceof TraceEntry) {
-            TraceEntry ta = (TraceEntry) a;
-            TraceEntry tb = (TraceEntry) b;
-            if (ta.fEntryTrace instanceof TmfExperiment) {
-                return (tb.fEntryTrace instanceof TmfExperiment) ? a.getName().compareTo(b.getName()) : 1;
-            }
-            return (tb.fEntryTrace instanceof TmfExperiment) ? -1 : a.getName().compareTo(b.getName());
-
-        }
-        return a.getName().compareTo(b.getName());
     };
 
     private static final Comparator<ITimeGraphEntry>[] COLUMN_COMPARATORS;
@@ -140,7 +131,7 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
         COLUMN_COMPARATORS = l.toArray(new Comparator[l.size()]);
     }
 
-    private static final int QUARK_COLUMN_INDEX = 1;
+    private static final int NAME_COLUMN_INDEX = 0;
 
     private static final int ITERATION_WAIT = 500;
     /**
@@ -354,9 +345,8 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
      */
     public TmfStateSystemExplorer() {
         super(ID, new StateSystemPresentationProvider());
-        setTreeColumns(COLUMN_NAMES, COLUMN_COMPARATORS, QUARK_COLUMN_INDEX);
+        setTreeColumns(COLUMN_NAMES, COLUMN_COMPARATORS, NAME_COLUMN_INDEX);
         setTreeLabelProvider(new StateSystemTreeLabelProvider());
-        setEntryComparator(TRACE_ENTRY_COMPARATOR);
         setAutoExpandLevel(DEFAULT_AUTOEXPAND);
     }
 
@@ -400,10 +390,6 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
 
     @Override
     protected void buildEntryList(@NonNull ITmfTrace trace, @NonNull ITmfTrace parentTrace, @NonNull IProgressMonitor monitor) {
-        long start = trace.getStartTime().toNanos();
-        long end = start;
-        TraceEntry traceEntry = new TraceEntry(trace);
-
         synchronized (fStartedAnalysis) {
             /*
              * Ensure that this is the only job running build entry list.
@@ -411,12 +397,12 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
             if (monitor.isCanceled()) {
                 return;
             }
-            if (getEntryList(parentTrace) == null) {
-                addToEntryList(parentTrace, Collections.singletonList(traceEntry));
-            } else {
-                return;
-            }
         }
+
+        long start = trace.getStartTime().toNanos();
+        long end = start;
+        TraceEntry traceEntry = new TraceEntry(trace);
+        addToEntryList(parentTrace, Collections.singletonList(traceEntry));
 
         Iterable<@NonNull ITmfAnalysisModuleWithStateSystems> modules = Iterables.
                 filter(trace.getAnalysisModules(), ITmfAnalysisModuleWithStateSystems.class);
