@@ -285,6 +285,7 @@ public class CtfTmfTrace extends TmfTrace
     @Override
     public synchronized void dispose() {
         fIteratorManager.dispose();
+        fContainedEventTypes.clear();
         if (fTrace != null) {
             fTrace = null;
         }
