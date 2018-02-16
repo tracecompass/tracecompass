@@ -596,7 +596,7 @@ public class CallStackView extends AbstractTimeGraphView {
      * @since 3.3
      */
     public static @NonNull CallStackDataProvider getProvider(TimeGraphEntry entry) {
-        ITimeGraphEntry parent = entry.getParent();
+        ITimeGraphEntry parent = entry;
         while (parent != null) {
             if (parent instanceof TraceEntry) {
                 return ((TraceEntry) parent).getProvider();
