@@ -126,7 +126,7 @@ public class XmlUtils {
     private static final String XSD_SCHEMA_PARSER_ELEMENT = "schemaParser"; //$NON-NLS-1$
     private static final String XSD_PARSER_CLASS_ATTRIB = "class"; //$NON-NLS-1$
     private static final @NonNull Multimap<String, XmlOutputElement> XML_OUTPUT_ELEMENTS = HashMultimap.create();
-    private static Multimap<String, XmlOutputElement> fCachedOutputElement;
+    private static Multimap<String, XmlOutputElement> fCachedOutputElement = HashMultimap.create();
 
     /**
      * Extension for XML files
