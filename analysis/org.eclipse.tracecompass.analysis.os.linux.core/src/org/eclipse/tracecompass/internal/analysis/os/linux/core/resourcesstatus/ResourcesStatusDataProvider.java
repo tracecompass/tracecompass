@@ -79,7 +79,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
      */
     private final CacheLoader<ITmfStateInterval , @Nullable TimeGraphState> fLoader = new CacheLoader<ITmfStateInterval, @Nullable TimeGraphState>() {
         @Override
-        public @Nullable TimeGraphState load(ITmfStateInterval interval) throws StateSystemDisposedException {
+        public @Nullable TimeGraphState load(ITmfStateInterval interval) {
             ITmfStateSystem ss = getAnalysisModule().getStateSystem();
             if (ss == null) {
                 return null;
@@ -111,23 +111,27 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             }
 
             long time = startTime;
-            while (time < interval.getEndTime()) {
-                ITmfStateInterval tidInterval = ss.querySingleState(time, currentThreadQuark);
-                time = Long.max(tidInterval.getStartTime(), time);
-                Object value = tidInterval.getValue();
-                if (value instanceof Integer) {
-                    int currentThreadId = (int) value;
-                    int quark = ss.optQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), attribute);
-                    if (quark != ITmfStateSystem.INVALID_ATTRIBUTE) {
-                        ITmfStateInterval nameInterval = ss.querySingleState(time, quark);
-                        Object label = nameInterval.getValue();
-                        if (label instanceof String) {
-                            return new TimeGraphState(startTime, duration, status, trim.apply((String) label));
+            try {
+                while (time < interval.getEndTime()) {
+                    ITmfStateInterval tidInterval = ss.querySingleState(time, currentThreadQuark);
+                    time = Long.max(tidInterval.getStartTime(), time);
+                    Object value = tidInterval.getValue();
+                    if (value instanceof Integer) {
+                        int currentThreadId = (int) value;
+                        int quark = ss.optQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), attribute);
+                        if (quark != ITmfStateSystem.INVALID_ATTRIBUTE) {
+                            ITmfStateInterval nameInterval = ss.querySingleState(time, quark);
+                            Object label = nameInterval.getValue();
+                            if (label instanceof String) {
+                                return new TimeGraphState(startTime, duration, status, trim.apply((String) label));
+                            }
                         }
                     }
+                    // make sure next time is at least at the next pixel
+                    time = tidInterval.getEndTime() + 1;
                 }
-                // make sure next time is at least at the next pixel
-                time = tidInterval.getEndTime() + 1;
+            } catch (StateSystemDisposedException e) {
+                // do nothing, the trace is closed.
             }
             return new TimeGraphState(startTime, duration, status);
         }
