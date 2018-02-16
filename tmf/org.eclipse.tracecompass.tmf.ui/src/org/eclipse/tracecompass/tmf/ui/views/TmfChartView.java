@@ -405,7 +405,8 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
      */
     @TmfSignalHandler
     public void traceClosed(final TmfTraceClosedSignal signal) {
-        if (signal.getTrace() == getTrace() && isPinned()) {
+        ITmfTrace trace = getTrace();
+        if ((trace == null || signal.getTrace() == trace) && isPinned()) {
             setPinned(null);
         }
     }
