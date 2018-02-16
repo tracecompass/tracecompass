@@ -41,6 +41,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
@@ -50,6 +52,8 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackView;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
+import org.eclipse.ui.IWorkbenchPart;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -238,9 +242,10 @@ public class CallStackViewTest {
     @Test
     public void testGoToTimeGoBackAndForthAndCheckStack() {
         int currentEventOffset = 0;
+        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
+
         goToTime(TIMESTAMPS[currentEventOffset]);
 
-        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
         // forward 10 times
         for (int i = 0; i < 10; i++) {
             viewBot.toolbarPushButton(SELECT_NEXT_STATE_CHANGE).click();
@@ -310,11 +315,15 @@ public class CallStackViewTest {
     }
 
     private static void goToTime(long timestamp) {
+        ITmfTimestamp time = TmfTimestamp.fromNanos(timestamp);
         SWTBotTable table = sfBot.activeEditor().bot().table();
         table.setFocus();
         WaitUtils.waitForJobs();
-        TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(table.widget, TmfTimestamp.fromNanos(timestamp)));
+        TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(table.widget, time));
         sfBot.waitUntil(ConditionHelpers.selectionInEventsTable(sfBot, timestamp));
+        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
+        IWorkbenchPart part = viewBot.getViewReference().getPart(false);
+        sfBot.waitUntil(ConditionHelpers.timeGraphIsReadyCondition((AbstractTimeGraphView) part, new TmfTimeRange(time, time), time));
     }
 
     /**
