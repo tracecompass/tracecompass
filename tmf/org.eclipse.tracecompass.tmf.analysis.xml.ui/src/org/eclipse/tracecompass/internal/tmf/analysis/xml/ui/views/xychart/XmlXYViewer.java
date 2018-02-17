@@ -61,15 +61,9 @@ public class XmlXYViewer extends TmfFilteredXYChartViewer {
         return XmlDataProviderManager.getInstance().getXyProvider(trace, viewElement);
     }
 
-    /**
-     * Tells the viewer that the view info has been updated and the viewer needs to
-     * be reinitialized
-     */
-    public void viewInfoUpdated() {
-        ITmfTrace trace = getTrace();
-        if (trace == null) {
-            return;
-        }
-        initializeDataProvider(trace);
+    @Override
+    public void updateContent() {
+        // make public
+        super.updateContent();
     }
 }

@@ -58,9 +58,15 @@ public class XmlXYView extends TmfChartView {
                 if (newValue instanceof String) {
                     fViewInfo.setViewData((String) newValue);
                     setViewTitle();
-                    TmfXYChartViewer viewer = getChartViewer();
-                    if (viewer instanceof XmlXYViewer) {
-                        ((XmlXYViewer) viewer).viewInfoUpdated();
+
+                    TmfViewer left = getLeftChildViewer();
+                    if (left instanceof XmlTreeViewer) {
+                        ((TmfXYChartViewer) left).reset();
+                    }
+
+                    TmfXYChartViewer chart = getChartViewer();
+                    if (chart instanceof XmlXYViewer) {
+                        ((XmlXYViewer) chart).updateContent();
                     }
                 }
             }

@@ -42,12 +42,12 @@ public class XmlTreeViewer extends AbstractSelectTreeViewer {
         @Override
         public @Nullable Image getColumnImage(@Nullable Object element, int columnIndex) {
             if (columnIndex == 1 && element instanceof TmfGenericTreeEntry && isChecked(element)) {
-                TmfGenericTreeEntry<TmfTreeDataModel> genericEntry = (TmfGenericTreeEntry<TmfTreeDataModel>) element;
-                if (genericEntry.getModel().getParentId() < 0) {
+                TmfTreeDataModel model = ((TmfGenericTreeEntry<TmfTreeDataModel>) element).getModel();
+                if (model.getParentId() < 0) {
                     // do not show the legend for the trace entries.
                     return null;
                 }
-                return getLegendImage(String.valueOf(genericEntry.getModel().getName()));
+                return getLegendImage(String.valueOf(model.getName()));
             }
             return null;
         }
@@ -55,6 +55,14 @@ public class XmlTreeViewer extends AbstractSelectTreeViewer {
 
     private final XmlViewInfo fViewInfo;
 
+    /**
+     * Constructor
+     *
+     * @param parent
+     *            parent composite
+     * @param viewInfo
+     *            {@link XmlViewInfo} to manage the info on the class
+     */
     public XmlTreeViewer(Composite parent, XmlViewInfo viewInfo) {
         super(parent, 1, XmlXYDataProvider.ID);
         fViewInfo = viewInfo;
@@ -63,11 +71,9 @@ public class XmlTreeViewer extends AbstractSelectTreeViewer {
 
     @Override
     protected ITmfTreeColumnDataProvider getColumnDataProvider() {
-        return () -> {
-            return ImmutableList.of(
-                    createColumn(Messages.XmlTree_Name, Comparator.comparing(TmfGenericTreeEntry::getName)),
-                    new TmfTreeColumnData(Messages.XmlTree_Legend));
-        };
+        return () -> ImmutableList.of(
+                createColumn(Messages.XmlTree_Name, Comparator.comparing(TmfGenericTreeEntry::getName)),
+                new TmfTreeColumnData(Messages.XmlTree_Legend));
     }
 
     @Override
