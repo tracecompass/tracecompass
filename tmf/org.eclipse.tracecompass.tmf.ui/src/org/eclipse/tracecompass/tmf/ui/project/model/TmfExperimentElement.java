@@ -410,14 +410,29 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
      *             exception
      */
     public void removeTrace(TmfTraceElement trace) throws CoreException {
+        removeTrace(trace, true);
+    }
+
+    /**
+     * Removes a trace from an experiment
+     *
+     * @param trace
+     *            The trace to remove
+     * @param closeEditors
+     *            if true, editors associated with this trace are first closed
+     *            before proceeding, otherwise it is the responsibility of the
+     *            caller to first close editors before calling the method
+     *
+     * @throws CoreException
+     *             exception
+     * @since 3.3
+     */
+    public void removeTrace(TmfTraceElement trace, boolean closeEditors) throws CoreException {
 
         // Close editors in UI Thread
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                closeEditors();
-            }
-        });
+        if (closeEditors) {
+            Display.getDefault().syncExec(this::closeEditors);
+        }
 
         /* Remove all trace analyses from experiment view */
         TmfViewsElement view = getChildElementViews();

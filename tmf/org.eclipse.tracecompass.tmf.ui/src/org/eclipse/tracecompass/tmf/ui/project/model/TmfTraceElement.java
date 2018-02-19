@@ -731,13 +731,34 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      * @since 3.1
      */
     public void delete(IProgressMonitor progressMonitor, boolean overwriting) throws CoreException {
+        delete(progressMonitor, overwriting, true);
+    }
+
+    /**
+     * Delete the trace resource, and optionally remove it from experiments and
+     * delete its supplementary files. Editors are first closed if requested.
+     *
+     * @param progressMonitor
+     *            a progress monitor, or null if progress reporting is not desired
+     * @param overwriting
+     *            if true, keep the trace in experiments and only delete non-hidden
+     *            supplementary files (keeping the properties sub-folder), otherwise
+     *            remove the trace from experiments and delete the supplementary
+     *            folder completely
+     * @param closeEditors
+     *            if true, editors associated with this trace are first closed
+     *            before proceeding, otherwise it is the responsibility of the
+     *            caller to first close editors before calling the method
+     *
+     * @throws CoreException
+     *             thrown when IResource.delete fails
+     * @since 3.3
+     */
+    public void delete(IProgressMonitor progressMonitor, boolean overwriting, boolean closeEditors) throws CoreException {
         // Close editors in UI Thread
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                closeEditors();
-            }
-        });
+        if (closeEditors) {
+            Display.getDefault().syncExec(this::closeEditors);
+        }
 
         IPath path = getResource().getLocation();
         if (path != null) {
@@ -754,7 +775,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
                             }
                         }
                         for (TmfTraceElement child : toRemove) {
-                            experiment.removeTrace(child);
+                            experiment.removeTrace(child, false);
                         }
                         if (!toRemove.isEmpty() && experiment.getTraces().isEmpty()) {
                             // If experiment becomes empty, delete it
@@ -772,7 +793,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
 
             } else if (getParent() instanceof TmfExperimentElement) {
                 TmfExperimentElement experimentElement = (TmfExperimentElement) getParent();
-                experimentElement.removeTrace(this);
+                experimentElement.removeTrace(this, false);
             }
         }
 

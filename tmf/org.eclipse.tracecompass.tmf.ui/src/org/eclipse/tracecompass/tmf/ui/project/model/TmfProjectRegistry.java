@@ -72,9 +72,9 @@ public class TmfProjectRegistry implements IResourceChangeListener {
     private static final TmfProjectRegistry INSTANCE = new TmfProjectRegistry();
 
     // The map of project resource to project model elements
-    private static Map<IProject, TmfProjectElement> registry = new HashMap<>();
+    private static final Map<IProject, TmfProjectElement> registry = new HashMap<>();
 
-    private static Queue<TmfTraceElement> promptQueue = new ArrayDeque<>();
+    private static final Queue<TmfTraceElement> promptQueue = new ArrayDeque<>();
 
     private TmfProjectRegistry() {
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
@@ -358,6 +358,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                             }
 
                             // Handle resource change in the relevant project
+                            IProject parentProject = TmfProjectModelHelper.getProjectFromShadowProject(project);
                             Set<IResource> resourcesToRefresh = new HashSet<>();
                             Map<IResource, Integer> resourceFlags = new HashMap<>();
                             delta.accept(visited -> {
@@ -387,12 +388,20 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                                     elementsToRefresh.add(element);
                                 }
                             }
+                            Set<TmfTraceElement> deletedTraces = new HashSet<>();
                             Set<TmfTraceElement> changedTraces = new HashSet<>();
                             Iterator<ITmfProjectModelElement> iterator = elementsToRefresh.iterator();
                             while (iterator.hasNext()) {
                                 ITmfProjectModelElement element = iterator.next();
                                 if (element instanceof TmfTraceElement && element.getParent() instanceof TmfTraceFolder) {
-                                    changedTraces.add((TmfTraceElement) element);
+                                    TmfTraceElement trace = (TmfTraceElement) element;
+                                    IResource resource = trace.getResource();
+                                    if (isInWorkspace(resource, parentProject) &&
+                                            !new File(resource.getLocation().toOSString()).exists()) {
+                                        deletedTraces.add(trace);
+                                    } else {
+                                        changedTraces.add(trace);
+                                    }
                                 }
                                 for (ITmfProjectModelElement parent : elementsToRefresh) {
                                     // remove element if any of its parents is included
@@ -402,29 +411,32 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                                     }
                                 }
                             }
-                            Display.getDefault().asyncExec(() -> {
-                                try {
-                                    ResourcesPlugin.getWorkspace().run((ICoreRunnable) (monitor -> {
-                                        for (TmfTraceElement trace : changedTraces) {
-                                            IResource resource = trace.getResource();
-                                            IProject parentProject = TmfProjectModelHelper.getProjectFromShadowProject(project);
-                                            if (((parentProject != null && parentProject.getLocation().isPrefixOf(resource.getLocation())) // link from shadow project to parent project
-                                                    ||  resource.getWorkspace().getRoot().getLocation().isPrefixOf(resource.getLocation())) && // link within the workspace
-                                                    !new File(resource.getLocation().toOSString()).exists()) {
-                                                handleTraceDeleted(trace);
-                                            } else {
-                                                handleTraceContentChanged(trace);
-                                            }
+                            if (!deletedTraces.isEmpty() || !changedTraces.isEmpty()) {
+                                Job.createSystem(monitor -> {
+                                    try {
+                                        if (!deletedTraces.isEmpty()) {
+                                            Display.getDefault().syncExec(() -> {
+                                                for (TmfTraceElement deletedTrace : deletedTraces) {
+                                                    deletedTrace.closeEditors();
+                                                }
+                                            });
                                         }
-                                    }), project, IWorkspace.AVOID_UPDATE, null);
-                                } catch (CoreException e) {
-                                    Activator.getDefault().logError("Error handling resource change event for " + project.getName(), e); //$NON-NLS-1$
-                                }
-                                IProject parentProject = TmfProjectModelHelper.getProjectFromShadowProject(project);
-                                if (parentProject != null) {
-                                    new TmfProjectElement(parentProject.getName(), parentProject, null).refreshViewer();
-                                }
-                            });
+                                        ResourcesPlugin.getWorkspace().run((ICoreRunnable) (mon -> {
+                                            for (TmfTraceElement deletedTrace : deletedTraces) {
+                                                handleTraceDeleted(deletedTrace);
+                                            }
+                                            for (TmfTraceElement changedTrace : changedTraces) {
+                                                handleTraceContentChanged(changedTrace);
+                                            }
+                                        }), project, IWorkspace.AVOID_UPDATE, null);
+                                    } catch (CoreException e) {
+                                        Activator.getDefault().logError("Error handling resource change event for " + project.getName(), e); //$NON-NLS-1$
+                                    }
+                                    if (parentProject != null) {
+                                        new TmfProjectElement(parentProject.getName(), parentProject, null).refreshViewer();
+                                    }
+                                }).schedule();
+                            }
                             for (ITmfProjectModelElement element : elementsToRefresh) {
                                 element.refresh();
                             }
@@ -479,6 +491,10 @@ public class TmfProjectRegistry implements IResourceChangeListener {
         }
     }
 
+    // -------------------------------------------------------
+    // Helper methods
+    // -------------------------------------------------------
+
     /**
      * Finds an existing project model element that matches the given resource.
      * Elements are not created if they do not already exist. If an exact match is
@@ -520,6 +536,11 @@ public class TmfProjectRegistry implements IResourceChangeListener {
         return element;
     }
 
+    private static boolean isInWorkspace(IResource resource, IProject parentProject) {
+        return (parentProject != null && parentProject.getLocation().isPrefixOf(resource.getLocation())) // link from shadow project to parent project
+                || resource.getWorkspace().getRoot().getLocation().isPrefixOf(resource.getLocation()); // link within the workspace
+    }
+
     private static void handleTraceContentChanged(TmfTraceElement traceElement) {
         boolean opened = false;
         for (ITmfTrace openedTrace : TmfTraceManager.getInstance().getOpenedTraces()) {
@@ -534,57 +555,79 @@ public class TmfProjectRegistry implements IResourceChangeListener {
             traceElement.deleteSupplementaryResources();
             return;
         }
-        if (!promptQueue.isEmpty()) {
-            /* already prompting the user */
-            if (!promptQueue.contains(traceElement)) {
-                promptQueue.add(traceElement);
+        synchronized (promptQueue) {
+            if (!promptQueue.isEmpty()) {
+                /* already prompting the user */
+                if (!promptQueue.contains(traceElement)) {
+                    promptQueue.add(traceElement);
+                }
+                return;
             }
-            return;
+            promptQueue.add(traceElement);
         }
-        promptQueue.add(traceElement);
-        TmfTraceElement prompting = traceElement;
-        while (prompting != null) {
-            boolean always = Activator.getDefault().getPreferenceStore().getBoolean(ITmfUIPreferences.ALWAYS_CLOSE_ON_RESOURCE_CHANGE);
-            if (always) {
-                prompting.closeEditors();
-                prompting.deleteSupplementaryResources();
-            } else {
-                Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
-                MessageDialog messageDialog = new MessageDialog(shell,
-                        Messages.TmfProjectRegistry_TraceChangedDialogTitle,
-                        null,
-                        NLS.bind(Messages.TmfProjectRegistry_TraceChangedDialogMessage, prompting.getElementPath()),
-                        MessageDialog.QUESTION,
-                        2, // Always is the default.
-                        IDialogConstants.NO_LABEL,
-                        IDialogConstants.YES_LABEL,
-                        Messages.TmfProjectRegistry_Always);
-                int returnCode = messageDialog.open();
-                if (returnCode >= 1) {
-                    // yes or always.
+        Display.getDefault().asyncExec(() -> {
+            TmfTraceElement prompting = traceElement;
+            while (prompting != null) {
+                boolean always = Activator.getDefault().getPreferenceStore().getBoolean(ITmfUIPreferences.ALWAYS_CLOSE_ON_RESOURCE_CHANGE);
+                if (always) {
                     prompting.closeEditors();
-                    prompting.deleteSupplementaryResources();
+                    deleteSupplementaryResources(prompting);
+                } else {
+                    Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+
+                    MessageDialog messageDialog = new MessageDialog(shell,
+                            Messages.TmfProjectRegistry_TraceChangedDialogTitle,
+                            null,
+                            NLS.bind(Messages.TmfProjectRegistry_TraceChangedDialogMessage, prompting.getElementPath()),
+                            MessageDialog.QUESTION,
+                            2, // Always is the default.
+                            IDialogConstants.NO_LABEL,
+                            IDialogConstants.YES_LABEL,
+                            Messages.TmfProjectRegistry_Always);
+                    int returnCode = messageDialog.open();
+                    if (returnCode >= 1) {
+                        // yes or always.
+                        prompting.closeEditors();
+                        deleteSupplementaryResources(prompting);
+                    }
+                    if (returnCode == 2) {
+                        // remember to always delete supplementary files and close editors
+                        Activator.getDefault().getPreferenceStore().setValue(ITmfUIPreferences.ALWAYS_CLOSE_ON_RESOURCE_CHANGE, true);
+                    }
                 }
-                if (returnCode == 2) {
-                    // remember to always delete supplementary files and close editors
-                    Activator.getDefault().getPreferenceStore().setValue(ITmfUIPreferences.ALWAYS_CLOSE_ON_RESOURCE_CHANGE, true);
+                /*
+                 * Poll at end of the loop: The element must remain in the queue while prompting
+                 * the user, so that another element being handled will be added to the queue
+                 * instead of opening another dialog, and also to prevent the user from being
+                 * prompted twice for the same element.
+                 */
+                synchronized (promptQueue) {
+                    promptQueue.remove();
+                    prompting = promptQueue.peek();
                 }
             }
-            /**
-             * Poll at end of the loop: The element must remain in the queue while prompting
-             * the user, so that another element being handled will be added to the queue
-             * instead of opening another dialog, and also to prevent the user from being
-             * prompted twice for the same element.
-             */
-            promptQueue.remove();
-            prompting = promptQueue.peek();
-        }
+        });
+    }
+
+    private static void deleteSupplementaryResources(TmfTraceElement trace) {
+        /*
+         * Delete supplementary resources as an atomic workspace operation. To ensure no
+         * dialog is shown to the user, run it in a job outside of the UI thread.
+         */
+        Job.createSystem(monitor -> {
+            try {
+                ResourcesPlugin.getWorkspace().run((ICoreRunnable) (mon -> {
+                    trace.deleteSupplementaryResources();
+                }), trace.getProject().getResource(), IWorkspace.AVOID_UPDATE, monitor);
+            } catch (CoreException e) {
+                Activator.getDefault().logError("Error deleting supplementary resources for " + trace.getName(), e); //$NON-NLS-1$
+            }
+        }).schedule();
     }
 
     private static void handleTraceDeleted(TmfTraceElement trace) {
         try {
-            trace.delete(new NullProgressMonitor());
+            trace.delete(new NullProgressMonitor(), false, false);
         } catch (CoreException e) {
             Activator.getDefault().logError("Error deleting trace " + trace.getName(), e); //$NON-NLS-1$
         }
