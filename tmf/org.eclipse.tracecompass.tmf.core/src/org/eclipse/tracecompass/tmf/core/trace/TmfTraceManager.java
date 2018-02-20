@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2017 Ericsson and others
+ * Copyright (c) 2013, 2018 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -390,6 +390,23 @@ public final class TmfTraceManager {
     }
 
     /**
+     * Returns whether a trace should be synchronized in selection and window range
+     * with an other trace.
+     *
+     * @param trace
+     *            The trace that may need to be synchronized
+     * @param other
+     *            The other trace that has a change of selection or window range
+     * @return true if the trace should be synchronized with the other trace
+     * @since 3.3
+     */
+    public synchronized boolean isSynchronized(ITmfTrace trace, ITmfTrace other) {
+        /* other instance of the same trace should never synchronize */
+        final boolean sameTrace = trace.getResource() == null ? false : trace.getResource().equals(other.getResource());
+        return trace.equals(other) || (!sameTrace && getTraceContext(trace).isSynchronized());
+    }
+
+    /**
      * Update the trace context of a given trace.
      *
      * @param trace
@@ -525,13 +542,10 @@ public final class TmfTraceManager {
         final ITmfTimestamp beginTs = signal.getBeginTime();
         final ITmfTimestamp endTs = signal.getEndTime();
         final ITmfTrace signalTrace = signal.getTrace();
-        final IResource signalResource = signalTrace == null ? null : signalTrace.getResource();
 
         for (ITmfTrace trace : fTraces.keySet()) {
-            /* other instance of the same trace should never synchronize */
-            final boolean sameTrace = trace.getResource() == null ? false : trace.getResource().equals(signalResource);
             if ((beginTs.intersects(getValidTimeRange(trace)) || endTs.intersects(getValidTimeRange(trace)))
-                    && ((signalTrace == null) || trace.equals(signalTrace) || (!sameTrace && getTraceContext(trace).isSynchronized()))) {
+                    && (signalTrace == null || isSynchronized(trace, signalTrace))) {
                 updateTraceContext(trace, builder ->
                         builder.setSelection(new TmfTimeRange(beginTs, endTs)));
             }
@@ -553,13 +567,9 @@ public final class TmfTraceManager {
     @TmfSignalHandler
     public synchronized void windowRangeUpdated(final TmfWindowRangeUpdatedSignal signal) {
         final ITmfTrace signalTrace = signal.getTrace();
-        final IResource signalResource = signalTrace == null ? null : signalTrace.getResource();
         for (Map.Entry<ITmfTrace, TmfTraceContext> entry : fTraces.entrySet()) {
             ITmfTrace trace = checkNotNull(entry.getKey());
-            TmfTraceContext ctx = checkNotNull(entry.getValue());
-            /* other instance of the same trace should never synchronize */
-            final boolean sameTrace = trace.getResource() == null ? false : trace.getResource().equals(signalResource);
-            if ((signalTrace != null) && !trace.equals(signalTrace) && (sameTrace || !ctx.isSynchronized())) {
+            if (signalTrace != null && !isSynchronized(trace, signalTrace)) {
                 continue;
             }
             final TmfTimeRange validTr = getValidTimeRange(trace);

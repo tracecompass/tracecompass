@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -366,8 +366,8 @@ public class PinAndCloneTest {
         SWTBotUtils.activateEditor(fBot, kernel.getName());
         fBot.waitUntil(ConditionHelpers.timeGraphRangeCondition(abstractTimeGraphView, kernel, RANGE));
 
-        // unfollow
-        kernelEvent.contextMenu(FOLLOW_TIME_UPDATES_FROM_OTHER_TRACES).click();
+        // unfollow (don't use context menu on table item to avoid updating selection)
+        kernelEventTable.contextMenu(FOLLOW_TIME_UPDATES_FROM_OTHER_TRACES).click();
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, ust.getInitialTimeRange(), ust));
         fBot.waitUntil(ConditionHelpers.timeGraphRangeCondition(abstractTimeGraphView, kernel, RANGE));
 
