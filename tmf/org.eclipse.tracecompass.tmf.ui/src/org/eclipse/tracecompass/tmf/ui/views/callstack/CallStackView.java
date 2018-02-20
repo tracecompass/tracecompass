@@ -433,7 +433,7 @@ public class CallStackView extends BaseDataProviderTimeGraphView {
             return new NullTimeEvent(entry, state.getStartTime(), state.getDuration());
         }
         final int modulo = CallStackPresentationProvider.NUM_COLORS / 2;
-        int value = ((int) state.getValue()) % modulo + modulo;
+        int value = state.getValue() % modulo + modulo;
         String label = state.getLabel();
         if (label != null) {
             return new NamedTimeEvent(entry, state.getStartTime(), state.getDuration(), value, label);
@@ -449,7 +449,7 @@ public class CallStackView extends BaseDataProviderTimeGraphView {
      * @return the {@link CallStackDataProvider}
      * @since 3.3
      *
-     *@deprecated Use BaseDataProviderTimeGraphView#getProvider instead
+     * @deprecated Use BaseDataProviderTimeGraphView#getProvider instead
      */
     @Deprecated
     public static @NonNull CallStackDataProvider getProvider(TimeGraphEntry entry) {
@@ -457,7 +457,7 @@ public class CallStackView extends BaseDataProviderTimeGraphView {
         if (provider instanceof CallStackDataProvider) {
             return (CallStackDataProvider) provider;
         }
-        throw new ClassCastException("The data provider is not an instance of CallStackDataProvider, current value is " + String.valueOf(provider)); //$NON-NLS-1$
+        throw new ClassCastException("The data provider is not an instance of CallStackDataProvider, current value is " + provider); //$NON-NLS-1$
     }
 
     /**
@@ -585,7 +585,7 @@ public class CallStackView extends BaseDataProviderTimeGraphView {
                         } else {
                             viewer.setSelectedTimeNotify(stackInterval.getStartTime(), true);
                         }
-                        int stackLevel = (int) stackInterval.getValue();
+                        int stackLevel = stackInterval.getValue();
                         ITimeGraphEntry selectedEntry = callStackEntry.getParent().getChildren().get(Integer.max(0, stackLevel - 1));
                         viewer.setSelection(selectedEntry, true);
                         viewer.getTimeGraphControl().fireSelectionChanged();
@@ -630,7 +630,7 @@ public class CallStackView extends BaseDataProviderTimeGraphView {
                         }
                         ITimeGraphState stackInterval = row.get(0);
                         viewer.setSelectedTimeNotify(stackInterval.getStartTime(), true);
-                        int stackLevel = (int) stackInterval.getValue();
+                        int stackLevel = stackInterval.getValue();
                         ITimeGraphEntry selectedEntry = callStackEntry.getParent().getChildren().get(Integer.max(0, stackLevel - 1));
                         viewer.setSelection(selectedEntry, true);
                         viewer.getTimeGraphControl().fireSelectionChanged();

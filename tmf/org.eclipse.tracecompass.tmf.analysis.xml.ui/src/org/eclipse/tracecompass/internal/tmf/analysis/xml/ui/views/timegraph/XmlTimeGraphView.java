@@ -286,17 +286,17 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
 
     @Override
     protected TimeEvent createTimeEvent(TimeGraphEntry entry, ITimeGraphState state) {
-        if (state.getValue() == Integer.MIN_VALUE) {
-            return new NullTimeEvent(entry, state.getStartTime(), state.getDuration());
-        }
+        int status = state.getValue();
         String label = state.getLabel();
-        if (state.getValue() == Integer.MIN_VALUE && label != null) {
+        if (status == Integer.MIN_VALUE) {
+            if (label == null) {
+                return new NullTimeEvent(entry, state.getStartTime(), state.getDuration());
+            }
             // String interval
-            int status = getStringIndex(label);
-
-            return new TimeEvent(entry, state.getStartTime(), state.getDuration(), status);
+            int value = getStringIndex(label);
+            return new TimeEvent(entry, state.getStartTime(), state.getDuration(), value);
         }
-        int status = (int) state.getValue();
+
         XmlPresentationProvider pres = getPresentationProvider();
         if (label != null && !pres.hasIndex(status)) {
             status = getStringIndex(label);

@@ -357,7 +357,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                 } else if ((status instanceof Long) && (type == Type.FREQUENCY)) {
                     long s = (long) status;
                     // The value needs to fit in an integer
-                    eventList.add(new TimeGraphState(startTime, duration, s/FREQUENCY_MULTIPLIER, String.valueOf(FREQUENCY_FORMATTER.format(s))));
+                    eventList.add(new TimeGraphState(startTime, duration, (int) (s / FREQUENCY_MULTIPLIER), String.valueOf(FREQUENCY_FORMATTER.format(s))));
                 } else {
                     eventList.add(new TimeGraphState(startTime, duration, Integer.MIN_VALUE));
                 }

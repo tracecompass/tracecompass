@@ -38,7 +38,7 @@ public interface ITimeGraphState {
      *
      * @return State value
      */
-    long getValue();
+    int getValue();
 
     /**
      * Gets the state label

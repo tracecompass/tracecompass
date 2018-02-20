@@ -20,7 +20,7 @@ import org.eclipse.jdt.annotation.Nullable;
 public class TimeGraphState implements ITimeGraphState {
     private final long fStartTime;
     private final long fDuration;
-    private final long fValue;
+    private final int fValue;
     private final @Nullable String fLabel;
 
     /**
@@ -33,7 +33,7 @@ public class TimeGraphState implements ITimeGraphState {
      * @param value
      *            Type of state (event type)
      */
-    public TimeGraphState(long time, long duration, long value) {
+    public TimeGraphState(long time, long duration, int value) {
         fStartTime = time;
         fDuration = duration;
         fValue = value;
@@ -52,7 +52,7 @@ public class TimeGraphState implements ITimeGraphState {
      * @param label
      *            State label
      */
-    public TimeGraphState(long time, long duration, long value, String label) {
+    public TimeGraphState(long time, long duration, int value, String label) {
         fStartTime = time;
         fDuration = duration;
         fValue = value;
@@ -70,7 +70,7 @@ public class TimeGraphState implements ITimeGraphState {
     }
 
     @Override
-    public long getValue() {
+    public int getValue() {
         return fValue;
     }
 

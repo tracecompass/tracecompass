@@ -370,14 +370,14 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
         long duration = statusInterval.getEndTime() - time + 1;
         Object o = statusInterval.getValue();
         if (o instanceof Integer) {
-            return new TimeGraphState(time, duration, ((Integer) o).longValue(), String.valueOf(o));
+            return new TimeGraphState(time, duration, ((Integer) o).intValue(), String.valueOf(o));
         } else if (o instanceof Long) {
             long l = (long) o;
-            return new TimeGraphState(time, duration, l, "0x" + Long.toHexString(l)); //$NON-NLS-1$
+            return new TimeGraphState(time, duration, (int) l, "0x" + Long.toHexString(l)); //$NON-NLS-1$
         } else if (o instanceof String) {
             return new TimeGraphState(time, duration, Integer.MIN_VALUE, (String) o);
         } else if (o instanceof Double) {
-            return new TimeGraphState(time, duration, ((Double) o).longValue());
+            return new TimeGraphState(time, duration, ((Double) o).intValue());
         }
         return new TimeGraphState(time, duration, Integer.MIN_VALUE);
     }

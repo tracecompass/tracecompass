@@ -390,9 +390,9 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         }
         String label = state.getLabel();
         if (label != null) {
-            return new NamedTimeEvent(entry, state.getStartTime(), state.getDuration(), (int) state.getValue(), label);
+            return new NamedTimeEvent(entry, state.getStartTime(), state.getDuration(), state.getValue(), label);
         }
-        return new TimeEvent(entry, state.getStartTime(), state.getDuration(), (int) state.getValue());
+        return new TimeEvent(entry, state.getStartTime(), state.getDuration(), state.getValue());
     }
 
     @Override

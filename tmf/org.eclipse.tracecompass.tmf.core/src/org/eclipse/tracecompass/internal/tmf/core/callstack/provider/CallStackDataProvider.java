@@ -320,7 +320,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         if (interval != null && interval.getValue() instanceof Number) {
             Object object = interval.getValue();
             if (object instanceof Number) {
-                long value = ((Number) object).longValue();
+                int value = ((Number) object).intValue();
                 TimeGraphState state = new TimeGraphState(interval.getStartTime(), interval.getEndTime() - interval.getStartTime(), value);
                 TimeGraphRowModel row = new TimeGraphRowModel(entry.getKey(), Collections.singletonList(state));
                 return Collections.singletonList(row);
