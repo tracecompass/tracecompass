@@ -82,6 +82,11 @@ public class CallStackViewTest {
     private static SWTWorkbenchBot sfBot;
 
     /**
+     * Start time of the trace
+     */
+    private static final @NonNull ITmfTimestamp START_TIME = TmfTimestamp.fromNanos(1378850463596911581l);
+
+    /**
      * Timestamp for loading mapping files test
      */
     private static final long TIMESTAMP = 1378850463804917148l;
@@ -202,6 +207,9 @@ public class CallStackViewTest {
         SWTBotUtils.openTrace(PROJECT_NAME, file.getAbsolutePath(), UST_ID);
         SWTBotUtils.openView(CallStackView.ID);
         WaitUtils.waitForJobs();
+        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
+        IWorkbenchPart part = viewBot.getViewReference().getPart(false);
+        sfBot.waitUntil(ConditionHelpers.timeGraphIsReadyCondition((AbstractTimeGraphView) part, new TmfTimeRange(START_TIME, START_TIME), START_TIME));
     }
 
     /**
