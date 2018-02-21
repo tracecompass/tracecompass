@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
@@ -361,8 +362,8 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
 
         TreeMultimap<Integer, ITmfStateInterval> intervals = TreeMultimap.create(Comparator.naturalOrder(),
                 Comparator.comparing(ITmfStateInterval::getStartTime));
-        Collection<Integer> quarks = getQuarks(filter);
-        Collection<Integer> stateAndSyscallQuarks = addSyscall(quarks, ss);
+        Map<Long, Integer> selectedIdsToQuarks = getSelectedIdsToQuarks(filter);
+        Collection<Integer> stateAndSyscallQuarks = addSyscall(selectedIdsToQuarks.values(), ss);
         Collection<Long> times = getTimes(ss, filter);
         try {
             /* Do the actual query */
@@ -377,34 +378,30 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
         }
 
         List<ITimeGraphRowModel> rows = new ArrayList<>();
-        for (Integer quark : quarks) {
-            String threadAttributeName = ss.getAttributeName(quark);
-            Pair<Integer, Integer> tidCpu = Attributes.parseThreadAttributeName(threadAttributeName);
+        for (Entry<Long, Integer> entry : selectedIdsToQuarks.entrySet()) {
+            int quark = entry.getValue();
             NavigableSet<ITmfStateInterval> states = intervals.get(quark);
             NavigableSet<ITmfStateInterval> syscalls = intervals.get(ss.optQuarkRelative(quark, Attributes.SYSTEM_CALL));
 
-            // Handle PID reuse
-            for (ThreadEntryModel.Builder cfe : fTidToEntry.get(tidCpu.getFirst())) {
-                if (monitor != null && monitor.isCanceled()) {
-                    return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
-                }
-
-                List<ITimeGraphState> eventList = Lists.newArrayList(Iterables.transform(states, i -> createTimeGraphState(i, syscalls)));
-                rows.add(new TimeGraphRowModel(cfe.getId(), eventList));
+            if (monitor != null && monitor.isCanceled()) {
+                return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
             }
+
+            List<ITimeGraphState> eventList = Lists.newArrayList(Iterables.transform(states, i -> createTimeGraphState(i, syscalls)));
+            rows.add(new TimeGraphRowModel(entry.getKey(), eventList));
         }
         return new TmfModelResponse<>(rows, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
-    private Collection<Integer> getQuarks(SelectionTimeQueryFilter filter) {
-        Collection<Integer> set = new HashSet<>();
+    private Map<Long, Integer> getSelectedIdsToQuarks(SelectionTimeQueryFilter filter) {
+        Map<Long, Integer> map = new HashMap<>();
         for (Long id : filter.getSelectedItems()) {
             Integer quark = fQuarkMap.get(id);
             if (quark != null) {
-                set.add(quark);
+                map.put(id, quark);
             }
         }
-        return set;
+        return map;
     }
 
     private static Collection<Integer> addSyscall(Collection<Integer> quarks, ITmfStateSystem ss) {

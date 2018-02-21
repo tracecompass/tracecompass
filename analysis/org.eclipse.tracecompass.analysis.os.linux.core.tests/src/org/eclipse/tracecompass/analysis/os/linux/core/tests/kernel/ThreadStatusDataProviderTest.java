@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,6 +115,8 @@ public class ThreadStatusDataProviderTest {
         assertEquals(ITmfResponse.Status.COMPLETED, rowResponse.getStatus());
         List<ITimeGraphRowModel> rowModel = rowResponse.getModel();
         assertNotNull(rowModel);
+        // ensure row order
+        rowModel.sort(Comparator.comparingLong(ITimeGraphRowModel::getEntryID));
 
         List<String> expectedStrings = Files.readAllLines(Paths.get("testfiles/kernel_analysis/expectedThreadStatusRows"));
         assertEquals(expectedStrings.size(), rowModel.size());
