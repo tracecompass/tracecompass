@@ -348,6 +348,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
                 }
 
                 if (!rootEntry.equals(treeViewer.getInput())) {
+                    saveViewContext();
                     treeViewer.setInput(rootEntry);
                     contentChanged(rootEntry);
                 } else {
