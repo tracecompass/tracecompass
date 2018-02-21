@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2011, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -69,6 +69,10 @@ public class TmfTracingPreferencePage extends FieldEditorPreferencePage implemen
         BooleanFieldEditor resourceRefresh = new BooleanFieldEditor(ITmfUIPreferences.ALWAYS_CLOSE_ON_RESOURCE_CHANGE,
                 Messages.TmfTracingPreferencePage_AlwaysCloseOnResourceChange, getFieldEditorParent());
         addField(resourceRefresh);
+
+        BooleanFieldEditor treeXyWarning = new BooleanFieldEditor(ITmfUIPreferences.HIDE_MANY_ENTRIES_SELECTED_TOGGLE,
+                Messages.TmfTracingPreferencePage_HideManyEntriesSelectedWarning, getFieldEditorParent());
+        addField(treeXyWarning);
     }
 
     @Override

@@ -47,6 +47,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.XYChartLegendImageProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TriStateFilteredCheckboxTree;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
 /**
@@ -424,6 +425,8 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
             AbstractSelectTreeViewer selectTree = (AbstractSelectTreeViewer) tree;
             selectTree.setTreeListener((TmfFilteredXYChartViewer) chart);
             selectTree.setLegendImageProvider(legendImageProvider);
+            TriStateFilteredCheckboxTree checkboxTree = selectTree.getTriStateFilteredCheckboxTree();
+            checkboxTree.setPreCheckStateListener(new ManyEntriesSelectedDialogPreCheckedListener(checkboxTree));
         }
     }
 }

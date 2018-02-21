@@ -428,9 +428,13 @@ public final class SWTBotUtils {
             }
         });
 
-        /* Do not switch perspectives on trace open */
         IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+
+        /* Do not switch perspectives on trace open */
         store.setValue(ITmfUIPreferences.SWITCH_TO_PERSPECTIVE, MessageDialogWithToggle.NEVER);
+
+        /* Do not display the warning when many entries are selected in the tree viewer. */
+        store.setValue(ITmfUIPreferences.HIDE_MANY_ENTRIES_SELECTED_TOGGLE, true);
 
         // Switch to and reset Tracing perspective
         switchToTracingPerspective();

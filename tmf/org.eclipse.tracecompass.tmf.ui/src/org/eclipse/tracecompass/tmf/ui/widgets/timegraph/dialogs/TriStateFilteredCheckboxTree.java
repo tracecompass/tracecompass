@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -34,6 +34,7 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
      * Set containing only the tree items that are grayed
      */
     private Set<Object> fGrayedObjects = new HashSet<>();
+    private IPreCheckStateListener fPreCheckStateListener = null;
 
     /**
      * Create a new instance of the receiver.
@@ -61,6 +62,12 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
 
     @Override
     public boolean setSubtreeChecked(Object element, boolean state) {
+        IPreCheckStateListener preCheckStateListener = fPreCheckStateListener;
+        if (preCheckStateListener != null && preCheckStateListener.setSubtreeChecked(element, state)) {
+            // uncheck the root element
+            setChecked(element, false);
+            return false;
+        }
         checkSubtree(element, state);
         maintainAllCheckIntegrity();
         return getCheckboxTreeViewer().setSubtreeChecked(element, state);
@@ -176,6 +183,17 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
     public void setFilterText(String string) {
         // make public
         super.setFilterText(string);
+    }
+
+    /**
+     * Set the listener for actions to execute before checking the tree.
+     *
+     * @param listener
+     *            pre-check state listener.
+     * @since 3.3
+     */
+    public void setPreCheckStateListener(IPreCheckStateListener listener) {
+        fPreCheckStateListener = listener;
     }
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Ericsson
+ * Copyright (c) 2015, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -47,4 +47,8 @@ public interface ITmfUIPreferences {
      * Preference for behavior on resource refresh: always delete supplementary files and close editors.
      */
     String ALWAYS_CLOSE_ON_RESOURCE_CHANGE = "ALWAYS_CLOSE_ON_RESOURCE_CHANGE"; //$NON-NLS-1$
+    /**
+     * Preference for hiding the Many Entries Selected MessageDialog
+     */
+    String HIDE_MANY_ENTRIES_SELECTED_TOGGLE = "HIDE_MANY_ENTRIES_SELECTED_TOGGLE"; //$NON-NLS-1$
 }

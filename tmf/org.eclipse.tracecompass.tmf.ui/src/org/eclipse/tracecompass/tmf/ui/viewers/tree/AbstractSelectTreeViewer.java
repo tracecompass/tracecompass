@@ -529,13 +529,23 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
      * @return the relevant series name.
      */
     protected static @NonNull String getFullPath(TmfGenericTreeEntry<TmfTreeDataModel> entry) {
-        String path = entry.getName();
+        StringBuilder path = new StringBuilder(entry.getName());
         ITmfTreeViewerEntry parent = entry.getParent();
         while (parent instanceof TmfGenericTreeEntry) {
-            path = parent.getName() + '/' + path;
+            path.insert(0, parent.getName() + '/');
             parent = parent.getParent();
         }
-        return path;
+        return path.toString();
+    }
+
+    /**
+     * Get the checkbox tree in this viewer.
+     *
+     * @return the checkbox tree.
+     * @since 3.3
+     */
+    public TriStateFilteredCheckboxTree getTriStateFilteredCheckboxTree() {
+        return fCheckboxTree;
     }
 
 }
