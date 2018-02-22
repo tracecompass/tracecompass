@@ -36,6 +36,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -517,12 +518,12 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
     }
 
     @Override
-    public IFile createBookmarksFile() throws CoreException {
+    public IFile createBookmarksFile(IProgressMonitor monitor) throws CoreException {
         TmfExperimentFolder experimentFolder = getProject().getExperimentsFolder();
         if (experimentFolder == null) {
             throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TmfProject_ExperimentFolderNotExists));
         }
-        return createBookmarksFile(experimentFolder.getResource(), ITmfEventsEditorConstants.EXPERIMENT_EDITOR_INPUT_TYPE);
+        return createBookmarksFile(experimentFolder.getResource(), ITmfEventsEditorConstants.EXPERIMENT_EDITOR_INPUT_TYPE, monitor);
     }
 
     @Override

@@ -17,10 +17,12 @@ package org.eclipse.tracecompass.tmf.ui.project.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +33,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.URIUtil;
@@ -345,19 +348,32 @@ public class TmfOpenTraceHelper {
      */
     public static void openTraceFromElement(final TmfCommonProjectElement traceElement) {
         try (FlowScopeLog flow = new FlowScopeLogBuilder(LOGGER, Level.FINE, "openTraceFromElement").setCategory(LOCAL_CATEGORY).build()) { //$NON-NLS-1$
-            final IFile file;
+            AtomicReference<IFile> bookmarksFile = new AtomicReference<>();
             try (FlowScopeLog bmFlow = new FlowScopeLogBuilder(LOGGER, Level.FINE, "createBookmarkFile").setParentScope(flow).build()) { //$NON-NLS-1$
-                file = traceElement.createBookmarksFile();
-            } catch (final CoreException e) {
+                PlatformUI.getWorkbench().getProgressService().busyCursorWhile(monitor -> {
+                    try {
+                        traceElement.refreshSupplementaryFolder(monitor);
+                        bookmarksFile.set(traceElement.createBookmarksFile(monitor));
+                    } catch (OperationCanceledException e) {
+                    } catch (CoreException e) {
+                        throw new InvocationTargetException(e);
+                    }
+                });
+            } catch (InterruptedException e) {
+                return;
+            } catch (InvocationTargetException e) {
                 Activator.getDefault().logError(NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getTypeName()) + ' ' + traceElement.getName());
                 TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
-                        NLS.bind(Messages.TmfOpenTraceHelper_ErrorElement, traceElement.getTypeName()) + ENDL + ENDL + e.getMessage());
+                        NLS.bind(Messages.TmfOpenTraceHelper_ErrorElement, traceElement.getTypeName()) + ENDL + ENDL + e.getTargetException().getMessage());
                 return;
             }
-
+            IFile file = bookmarksFile.get();
+            if (file == null) {
+                return;
+            }
             final IWorkbench wb = PlatformUI.getWorkbench();
             IWorkbenchWindow window = wb.getActiveWorkbenchWindow();
-            if(window == null) {
+            if (window == null) {
                 return;
             }
             final IWorkbenchPage activePage = window.getActivePage();
@@ -515,16 +531,29 @@ public class TmfOpenTraceHelper {
     public static void reopenTraceFromElement(final TmfCommonProjectElement traceElement, final IReusableEditor editor) {
 
         try (FlowScopeLog flow = new FlowScopeLogBuilder(LOGGER, Level.FINE, "reopenTraceFromElement").setCategory(LOCAL_CATEGORY).build()) { //$NON-NLS-1$
-            final IFile file;
+            AtomicReference<IFile> bookmarksFile = new AtomicReference<>();
             try (FlowScopeLog scopeLog = new FlowScopeLogBuilder(LOGGER, Level.FINE, "createBookmarks").setParentScope(flow).build()) { //$NON-NLS-1$
-                file = traceElement.createBookmarksFile();
-            } catch (final CoreException e) {
+                PlatformUI.getWorkbench().getProgressService().busyCursorWhile(monitor -> {
+                    try {
+                        traceElement.refreshSupplementaryFolder(monitor);
+                        bookmarksFile.set(traceElement.createBookmarksFile(monitor));
+                    } catch (OperationCanceledException e) {
+                    } catch (CoreException e) {
+                        throw new InvocationTargetException(e);
+                    }
+                });
+            } catch (InterruptedException e) {
+                return;
+            } catch (final InvocationTargetException e) {
                 Activator.getDefault().logError(NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getTypeName()) + ' ' + traceElement.getName());
                 TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
-                        NLS.bind(Messages.TmfOpenTraceHelper_ErrorElement, traceElement.getTypeName()) + ENDL + ENDL + e.getMessage());
+                        NLS.bind(Messages.TmfOpenTraceHelper_ErrorElement, traceElement.getTypeName()) + ENDL + ENDL + e.getTargetException().getMessage());
                 return;
             }
-
+            IFile file = bookmarksFile.get();
+            if (file == null) {
+                return;
+            }
             Thread thread = new Thread() {
                 @Override
                 public void run() {

@@ -34,8 +34,13 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
@@ -330,15 +335,79 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
 
     /**
      * Returns the file resource used to store bookmarks after creating it if
-     * necessary. If the trace resource is a file, it is returned directly. If
-     * the trace resource is a folder, a linked file is returned. The file will
-     * be created if it does not exist.
+     * necessary. If the trace resource is a file, it is returned directly. If the
+     * trace resource is a folder, a linked file is returned. The file will be
+     * created if it does not exist.
+     *
+     * @param monitor
+     *            the progress monitor
+     * @return the bookmarks file
+     * @throws CoreException
+     *             if the bookmarks file cannot be created
+     * @throws OperationCanceledException
+     *             if the operation was canceled
+     * @since 3.3
+     */
+    public IFile createBookmarksFile(IProgressMonitor monitor) throws CoreException, OperationCanceledException {
+        SubMonitor subMonitor = SubMonitor.convert(monitor);
+        IFile file = getBookmarksFile();
+        if (getResource() instanceof IFolder) {
+            TmfTraceFolder tracesFolder = getProject().getTracesFolder();
+            if (tracesFolder == null) {
+                throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TmfProject_TracesFolderNotExists));
+            }
+            return createBookmarksFile(tracesFolder.getResource(), ITmfEventsEditorConstants.TRACE_EDITOR_INPUT_TYPE, subMonitor);
+        }
+        return file;
+    }
+
+    /**
+     * Returns the file resource used to store bookmarks after creating it if
+     * necessary. If the trace resource is a file, it is returned directly. If the
+     * trace resource is a folder, a linked file is returned. The file will be
+     * created if it does not exist.
      *
      * @return the bookmarks file
      * @throws CoreException
      *             if the bookmarks file cannot be created
+     * @deprecated Use {@link #createBookmarksFile(IProgressMonitor)} instead.
      */
-    public abstract IFile createBookmarksFile() throws CoreException;
+    @Deprecated
+    public IFile createBookmarksFile() throws CoreException {
+        return createBookmarksFile(new NullProgressMonitor());
+    }
+
+    /**
+     * Actually returns the bookmark file or creates it in the project element's
+     * folder
+     *
+     * @param bookmarksFolder
+     *            Folder where to put the bookmark file
+     * @param editorInputType
+     *            The editor input type to set (trace or experiment)
+     * @param monitor
+     *            The progress monitor
+     * @return The bookmark file
+     * @throws CoreException
+     *             if the bookmarks file cannot be created
+     * @throws OperationCanceledException
+     *             if the operation was canceled
+     * @since 3.3
+     */
+    protected IFile createBookmarksFile(IFolder bookmarksFolder, String editorInputType, IProgressMonitor monitor) throws CoreException, OperationCanceledException {
+        SubMonitor subMonitor = SubMonitor.convert(monitor, 2);
+        IFile file = getBookmarksFile();
+        if (!file.exists()) {
+            final IFile bookmarksFile = bookmarksFolder.getFile(BOOKMARKS_HIDDEN_FILE);
+            if (!bookmarksFile.exists()) {
+                final InputStream source = new ByteArrayInputStream(new byte[0]);
+                bookmarksFile.create(source, IResource.FORCE | IResource.HIDDEN, subMonitor.split(1));
+            }
+            file.createLink(bookmarksFile.getLocation(), IResource.REPLACE | IResource.HIDDEN, subMonitor.split(1));
+            file.setPersistentProperty(TmfCommonConstants.TRACETYPE, editorInputType);
+        }
+        return file;
+    }
 
     /**
      * Actually returns the bookmark file or creates it in the project element's
@@ -351,19 +420,13 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      * @return The bookmark file
      * @throws CoreException
      *             if the bookmarks file cannot be created
+     * @deprecated Use
+     *             {@link #createBookmarksFile(IFolder, String, IProgressMonitor)}
+     *             instead.
      */
+    @Deprecated
     protected IFile createBookmarksFile(IFolder bookmarksFolder, String editorInputType) throws CoreException {
-        IFile file = getBookmarksFile();
-        if (!file.exists()) {
-            final IFile bookmarksFile = bookmarksFolder.getFile(BOOKMARKS_HIDDEN_FILE);
-            if (!bookmarksFile.exists()) {
-                final InputStream source = new ByteArrayInputStream(new byte[0]);
-                bookmarksFile.create(source, IResource.FORCE | IResource.HIDDEN, null);
-            }
-            file.createLink(bookmarksFile.getLocation(), IResource.REPLACE | IResource.HIDDEN, null);
-            file.setPersistentProperty(TmfCommonConstants.TRACETYPE, editorInputType);
-        }
-        return file;
+        return createBookmarksFile(bookmarksFolder, editorInputType, new NullProgressMonitor());
     }
 
     /**
@@ -607,17 +670,31 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
     }
 
     /**
+     * Refreshes the element specific supplementary folder information. It creates
+     * the folder if not exists. It sets the persistence property of the trace
+     * resource
+     *
+     * @param monitor
+     *            the progress monitor
+     * @since 3.3
+     */
+    public void refreshSupplementaryFolder(IProgressMonitor monitor) {
+        SubMonitor subMonitor = SubMonitor.convert(monitor, 2);
+        IFolder supplFolder = createSupplementaryFolder(subMonitor.split(1));
+        try {
+            supplFolder.refreshLocal(IResource.DEPTH_INFINITE, subMonitor.split(1));
+        } catch (CoreException e) {
+            Activator.getDefault().logError("Error refreshing supplementary folder " + supplFolder, e); //$NON-NLS-1$
+        }
+    }
+
+    /**
      * Refreshes the element specific supplementary folder information. It
      * creates the folder if not exists. It sets the persistence property of the
      * trace resource
      */
     public void refreshSupplementaryFolder() {
-        IFolder supplFolder = createSupplementaryFolder();
-        try {
-            supplFolder.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-        } catch (CoreException e) {
-            Activator.getDefault().logError("Error refreshing supplementary folder " + supplFolder, e); //$NON-NLS-1$
-        }
+        refreshSupplementaryFolder(new NullProgressMonitor());
     }
 
     /**
@@ -672,8 +749,22 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
         deleteSupplementaryResources(getSupplementaryResources());
     }
 
-    private IFolder createSupplementaryFolder() {
-        IFolder supplFolder = prepareTraceSupplementaryFolder(getSupplementaryFolderPath(), true);
+    /**
+     * Returns the trace specific supplementary folder under the project's
+     * supplementary folder. The folder and its parent folders will be created if
+     * they don't exist.
+     *
+     * @param monitor
+     *            the progress monitor
+     * @return the trace specific supplementary folder
+     * @since 3.3
+     */
+    public IFolder prepareSupplementaryFolder(IProgressMonitor monitor) {
+        return prepareTraceSupplementaryFolder(getSupplementaryFolderPath(), true, monitor);
+    }
+
+    private IFolder createSupplementaryFolder(IProgressMonitor monitor) {
+        IFolder supplFolder = prepareTraceSupplementaryFolder(getSupplementaryFolderPath(), true, monitor);
 
         try {
             getResource().setPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, supplFolder.getLocation().toOSString());

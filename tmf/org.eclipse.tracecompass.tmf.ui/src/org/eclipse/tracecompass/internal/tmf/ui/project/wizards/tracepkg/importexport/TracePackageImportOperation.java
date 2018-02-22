@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2017 Ericsson
+ * Copyright (c) 2013, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -279,7 +279,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
                 TmfTraceElement tmfTraceElement = getMatchingTraceElement(traceElement);
                 if (tmfTraceElement != null) {
                     try {
-                        bookmarksFile = tmfTraceElement.createBookmarksFile();
+                        bookmarksFile = tmfTraceElement.createBookmarksFile(monitor);
 
                         // Make sure that if a bookmark is double-clicked first
                         // before opening the trace, it opens the right editor

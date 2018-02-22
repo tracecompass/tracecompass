@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2017 Ericsson
+ * Copyright (c) 2010, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -26,7 +26,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -256,9 +258,48 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
 
     /**
      * Returns the trace specific supplementary folder under the project's
-     * supplementary folder. Its parent folders will be created if they don't
-     * exist. If createFolder is true, the returned folder will be created,
-     * otherwise it may not exist.
+     * supplementary folder. Its parent folders will be created if they don't exist.
+     * If createFolder is true, the returned folder will be created, otherwise it
+     * may not exist.
+     *
+     * @param supplFolderPath
+     *            folder path relative to the project's supplementary folder
+     * @param createFolder
+     *            if true, the returned folder will be created
+     * @param progressMonitor
+     *            the progress monitor
+     * @return the trace specific supplementary folder
+     * @since 3.3
+     */
+    public IFolder prepareTraceSupplementaryFolder(String supplFolderPath, boolean createFolder, IProgressMonitor progressMonitor) {
+        SubMonitor subMonitor = SubMonitor.convert(progressMonitor);
+        IFolder folder = getTraceSupplementaryFolder(supplFolderPath);
+        IFolder propertiesFolder = folder.getFolder(TmfCommonConstants.TRACE_PROPERTIES_FOLDER);
+        if ((createFolder && propertiesFolder.exists() && propertiesFolder.isHidden()) ||
+                (!createFolder && folder.getParent().exists())) {
+            return folder;
+        }
+        try {
+            ICoreRunnable runnable = monitor -> {
+                if (createFolder) {
+                    TraceUtils.createFolder(propertiesFolder, monitor);
+                    propertiesFolder.setHidden(true);
+                } else {
+                    TraceUtils.createFolder((IFolder) folder.getParent(), monitor);
+                }
+            };
+            ResourcesPlugin.getWorkspace().run(runnable, folder.getProject(), IWorkspace.AVOID_UPDATE, subMonitor);
+        } catch (CoreException e) {
+            Activator.getDefault().logError("Error creating supplementary folder " + folder.getFullPath(), e); //$NON-NLS-1$
+        }
+        return folder;
+    }
+
+    /**
+     * Returns the trace specific supplementary folder under the project's
+     * supplementary folder. Its parent folders will be created if they don't exist.
+     * If createFolder is true, the returned folder will be created, otherwise it
+     * may not exist.
      *
      * @param supplFolderPath
      *            folder path relative to the project's supplementary folder
@@ -267,22 +308,7 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
      * @return the trace specific supplementary folder
      */
     public IFolder prepareTraceSupplementaryFolder(String supplFolderPath, boolean createFolder) {
-        IFolder folder = getTraceSupplementaryFolder(supplFolderPath);
-        try {
-            ICoreRunnable runnable = monitor -> {
-                if (createFolder) {
-                    IFolder propertiesFolder = folder.getFolder(TmfCommonConstants.TRACE_PROPERTIES_FOLDER);
-                    TraceUtils.createFolder(propertiesFolder, monitor);
-                    propertiesFolder.setHidden(true);
-                } else {
-                    TraceUtils.createFolder((IFolder) folder.getParent(), monitor);
-                }
-            };
-            ResourcesPlugin.getWorkspace().run(runnable, folder.getProject(), IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
-        } catch (CoreException e) {
-            Activator.getDefault().logError("Error creating supplementary folder " + folder.getFullPath(), e); //$NON-NLS-1$
-        }
-        return folder;
+        return prepareTraceSupplementaryFolder(supplFolderPath, createFolder, new NullProgressMonitor());
     }
 
     @Override

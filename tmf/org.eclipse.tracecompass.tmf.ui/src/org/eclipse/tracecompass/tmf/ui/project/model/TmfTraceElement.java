@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2017 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2010, 2018 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -35,16 +35,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
-import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstants;
 import org.eclipse.tracecompass.internal.util.ByteBufferTracker;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -361,29 +358,6 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
             }
         }
         return null;
-    }
-
-    /**
-     * Returns the file resource used to store bookmarks after creating it if
-     * necessary. If the trace resource is a file, it is returned directly. If
-     * the trace resource is a folder, a linked file is returned. The file will
-     * be created if it does not exist.
-     *
-     * @return the bookmarks file
-     * @throws CoreException
-     *             if the bookmarks file cannot be created
-     */
-    @Override
-    public IFile createBookmarksFile() throws CoreException {
-        IFile file = getBookmarksFile();
-        if (getResource() instanceof IFolder) {
-            TmfTraceFolder tracesFolder = getProject().getTracesFolder();
-            if (tracesFolder == null) {
-                throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TmfProject_TracesFolderNotExists));
-            }
-            return createBookmarksFile(tracesFolder.getResource(), ITmfEventsEditorConstants.TRACE_EDITOR_INPUT_TYPE);
-        }
-        return file;
     }
 
     /**
