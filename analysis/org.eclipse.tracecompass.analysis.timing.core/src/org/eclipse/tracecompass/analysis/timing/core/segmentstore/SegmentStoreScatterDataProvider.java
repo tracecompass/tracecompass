@@ -35,7 +35,6 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.Time
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ISeriesModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
@@ -56,6 +55,7 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Longs;
 
@@ -353,11 +353,8 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             thisSeries.addPoint(segment.getStart(), segment.getLength());
         }
 
-        Map<String, ISeriesModel> model = new HashMap<>();
-        types.entrySet().forEach(entry -> model.put(entry.getKey(), new SeriesModel(entry.getKey(),
-                entry.getValue().getXValues(), entry.getValue().getYValues())));
-        return TmfXyResponseFactory.create(Objects.requireNonNull(Messages.SegmentStoreScatterGraphViewer_title), model, complete);
-
+        return TmfXyResponseFactory.create(Objects.requireNonNull(Messages.SegmentStoreScatterGraphViewer_title),
+                Maps.transformValues(types, Series::build), complete);
     }
 
     private static String getSegmentName(ISegment segment) {
@@ -365,20 +362,23 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
     }
 
     private static class Series {
+        private final long fId;
+        private final String fName;
         private final List<Long> fXValues = new ArrayList<>();
         private final List<Double> fYValues = new ArrayList<>();
 
-        public long[] getXValues() {
-            return Longs.toArray(fXValues);
-        }
-
-        public double[] getYValues() {
-            return Doubles.toArray(fYValues);
+        public Series(long id, String name) {
+            fId = id;
+            fName = name;
         }
 
         public void addPoint(long x, double y) {
             fXValues.add(x);
             fYValues.add(y);
+        }
+
+        public SeriesModel build() {
+            return new SeriesModel(fId, fName, Longs.toArray(fXValues), Doubles.toArray(fYValues));
         }
     }
 
@@ -394,7 +394,8 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
                 continue;
             }
 
-            segmentTypes.put(prefix + string, new Series());
+            String name = prefix + string;
+            segmentTypes.put(name, new Series(id, name));
         }
         return segmentTypes;
     }

@@ -16,9 +16,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NavigableSet;
 import java.util.Objects;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -38,7 +38,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
 import com.google.common.collect.TreeMultimap;
 
 /**
@@ -148,12 +148,12 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
         long stateSystemEndTime = ss.getCurrentEndTime();
         Collection<Long> times = extractRequestedTimes(ss, filter, stateSystemEndTime);
 
-        Set<Integer> quarks = Sets.filter(getSelectedQuarks(filter), q -> ss.getSubAttributes(q, false).isEmpty());
+        Map<Long, Integer> entries = Maps.filterValues(getSelectedEntries(filter), q -> ss.getSubAttributes(q, false).isEmpty());
 
         TreeMultimap<Integer, ITmfStateInterval> countersIntervals = TreeMultimap.create(Comparator.naturalOrder(),
                 Comparator.comparingLong(ITmfStateInterval::getStartTime));
 
-        Iterable<@NonNull ITmfStateInterval> query2d = ss.query2D(quarks, times);
+        Iterable<@NonNull ITmfStateInterval> query2d = ss.query2D(entries.values(), times);
         for (ITmfStateInterval interval : query2d) {
             if (monitor != null && monitor.isCanceled()) {
                 return null;
@@ -162,13 +162,14 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
         }
 
         ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
-        for (Integer quark : quarks) {
+        for (Entry<Long, Integer> entry : entries.entrySet()) {
             if (monitor != null && monitor.isCanceled()) {
                 return null;
             }
+            int quark = entry.getValue();
             double[] yValues = buildYValues(countersIntervals.get(quark), filter);
             String seriesName = getTrace().getName() + '/' + ss.getFullAttributePath(quark);
-            ySeries.put(seriesName, new YModel(seriesName, yValues));
+            ySeries.put(seriesName, new YModel(entry.getKey(), seriesName, yValues));
         }
 
         return ySeries.build();

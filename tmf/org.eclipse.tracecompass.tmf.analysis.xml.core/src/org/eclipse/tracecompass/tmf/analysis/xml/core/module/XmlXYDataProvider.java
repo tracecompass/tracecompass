@@ -55,8 +55,8 @@ import org.w3c.dom.Element;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 
 /**
  * This data provider will return a XY model (wrapped in a response) based on a
@@ -228,7 +228,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         ITmfStateSystem ss = entry.getStateSystem();
 
         long[] xValues = filter.getTimesRequested();
-        Map<Integer, double[]> map = initSeries(filter);
+        Map<Integer, IYModel> map = initSeries(filter);
         if (map.isEmpty()) {
             return TmfXyResponseFactory.create(TITLE, xValues, Collections.emptyMap(), true);
         }
@@ -245,11 +245,11 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
                     break;
                 } else if (ss.getStartTime() <= time) {
                     List<@NonNull ITmfStateInterval> full = ss.queryFullState(time);
-                    for (Entry<Integer, double[]> series : map.entrySet()) {
+                    for (Entry<Integer, IYModel> series : map.entrySet()) {
                         int attributeQuark = display.getAttributeQuark(series.getKey(), null);
                         if (attributeQuark >= 0 && attributeQuark < full.size()) {
                             Object value = full.get(attributeQuark).getValue();
-                            setYValue(i, series.getValue(), extractValue(value), entry.getType());
+                            setYValue(i, series.getValue().getData(), extractValue(value), entry.getType());
                         }
                     }
                 }
@@ -258,33 +258,23 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
             return TmfXyResponseFactory.createFailedResponse(e.getMessage());
         }
 
-        ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
-        fLock.readLock().lock();
-        try {
-            for (Entry<Integer, double[]> tempEntry : map.entrySet()) {
-                String name = String.valueOf(fQuarkToString.get(tempEntry.getKey()));
-                ySeries.put(name, new YModel(name, tempEntry.getValue()));
-            }
-        } finally {
-            fLock.readLock().unlock();
-        }
-
         boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
-        return TmfXyResponseFactory.create(TITLE, xValues, ySeries.build(), complete);
+        return TmfXyResponseFactory.create(TITLE, xValues, Maps.uniqueIndex(map.values(), IYModel::getName), complete);
     }
 
-    private Map<Integer, double[]> initSeries(TimeQueryFilter filter) {
+    private Map<Integer, IYModel> initSeries(TimeQueryFilter filter) {
         if (!(filter instanceof SelectionTimeQueryFilter)) {
             return Collections.emptyMap();
         }
         fLock.readLock().lock();
         try {
-            Map<Integer, double[]> map = new HashMap<>();
+            Map<Integer, IYModel> map = new HashMap<>();
             int length = filter.getTimesRequested().length;
             for (Long id : ((SelectionTimeQueryFilter) filter).getSelectedItems()) {
                 Integer quark = fIdToQuark.get(id);
                 if (quark != null) {
-                    map.put(quark, new double[length]);
+                    String name = String.valueOf(fQuarkToString.get(quark));
+                    map.put(quark, new YModel(id, name, new double[length]));
                 }
             }
             return map;

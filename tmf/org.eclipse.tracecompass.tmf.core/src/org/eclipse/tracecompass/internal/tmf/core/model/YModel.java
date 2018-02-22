@@ -25,6 +25,12 @@ import com.google.gson.annotations.SerializedName;
  */
 public class YModel implements IYModel {
 
+    /**
+     * transient to avoid serializing for tests, as IDs may not be the same from one
+     * run to the other, due to how they are generated.
+     */
+    private final transient long fId;
+
     @SerializedName("label")
     private final String fName;
 
@@ -34,14 +40,22 @@ public class YModel implements IYModel {
     /**
      * Constructor
      *
+     * @param id
+     *            the series' ID
      * @param name
      *            The name of the series
      * @param yValues
      *            The y series values
      */
-    public YModel(String name, double[] yValues) {
+    public YModel(long id, String name, double[] yValues) {
+        fId = id;
         fName = name;
         fYValues = yValues;
+    }
+
+    @Override
+    public long getId() {
+        return fId;
     }
 
     @Override

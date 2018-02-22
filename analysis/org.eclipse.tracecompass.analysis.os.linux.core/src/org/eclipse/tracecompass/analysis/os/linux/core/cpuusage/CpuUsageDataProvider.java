@@ -117,9 +117,10 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
 
         /* CPU usage values for total and selected thread */
         double[] totalValues = new double[xValues.length];
-        Map<String, double[]> selectedThreadValues = new HashMap<>();
-        for (Integer tidInt : getSelectedQuarks(filter)) {
-            selectedThreadValues.put(Integer.toString(tidInt), new double[xValues.length]);
+        Map<String, IYModel> selectedThreadValues = new HashMap<>();
+        for (Entry<Long, Integer> entry : getSelectedEntries(filter).entrySet()) {
+            String name = Integer.toString(entry.getValue());
+            selectedThreadValues.put(name, new YModel(entry.getKey(), getTrace().getName() + ':' + name, new double[xValues.length]));
         }
 
         long prevTime = Math.max(filter.getStart(), ss.getStartTime());
@@ -142,9 +143,9 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
                     if (threadName != null) {
                         long cpuTime = entry.getValue();
                         totalCpu += cpuTime;
-                        double[] values = selectedThreadValues.get(threadName);
+                        IYModel values = selectedThreadValues.get(threadName);
                         if (values != null) {
-                            values[i] = normalize(prevTime, time, cpuTime);
+                            values.getData()[i] = normalize(prevTime, time, cpuTime);
                         }
                     }
                 }
@@ -158,10 +159,9 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
 
         ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
         String key = TOTAL + getTrace().getName();
-        ySeries.put(key, new YModel(key, totalValues));
-        for (Entry<String, double[]> entry : selectedThreadValues.entrySet()) {
-            String selectedThread = getTrace().getName() + ':' + entry.getKey();
-            ySeries.put(selectedThread, new YModel(selectedThread, entry.getValue()));
+        ySeries.put(key, new YModel(getId(ITmfStateSystem.ROOT_ATTRIBUTE), key, totalValues));
+        for (IYModel entry : selectedThreadValues.values()) {
+            ySeries.put(entry.getName(), entry);
         }
 
         return ySeries.build();

@@ -187,7 +187,7 @@ public abstract class XYDataProviderBaseTest {
         double[] yMain = mainSeries.getYSeries();
 
         Map<@NonNull String, @NonNull IYModel> yModels = new LinkedHashMap<>();
-        yModels.put(mainSeriesName, new YModel(mainSeriesName, Objects.requireNonNull(yMain)));
+        yModels.put(mainSeriesName, new YModel(-1, mainSeriesName, Objects.requireNonNull(yMain)));
 
         for (String other : otherSeries) {
             if (other != null) {
@@ -202,7 +202,7 @@ public abstract class XYDataProviderBaseTest {
                     System.out.println("Series don't currently have the same x axis values");
                     return null;
                 }
-                yModels.put(other, new YModel(other, Objects.requireNonNull(ySeries)));
+                yModels.put(other, new YModel(-1, other, Objects.requireNonNull(ySeries)));
             }
         }
 

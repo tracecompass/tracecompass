@@ -18,6 +18,14 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy;
  * @author Geneviève Bastien
  */
 public interface ISeriesModel {
+
+    /**
+     * Get the unique ID for the entry associated to this series.
+     *
+     * @return the unique ID.
+     */
+    long getId();
+
     /**
      * Get the name of the series, AKA, the name of that series to display
      *

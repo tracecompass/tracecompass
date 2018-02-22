@@ -118,7 +118,7 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
             double[] y = new double[n];
             Arrays.setAll(y, values::get);
             String totalName = getTrace().getName() + '/' + Messages.HistogramDataProvider_Total;
-            builder.put(totalName, new YModel(totalName, y));
+            builder.put(totalName, new YModel(fTotalId, totalName, y));
         }
 
         ITmfStateSystem eventsSs = fModule.getStateSystem(TmfStatisticsEventTypesModule.ID);
@@ -188,7 +188,7 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
             }
         }
         String lostName = getTrace().getName() + '/' + Messages.HistogramDataProvider_Lost;
-        return new YModel(lostName, leY);
+        return new YModel(fLostId, lostName, leY);
     }
 
     @Override

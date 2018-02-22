@@ -23,6 +23,13 @@ import org.eclipse.tracecompass.tmf.core.viewmodel.IYSeries;
 public interface IYModel {
 
     /**
+     * Get the Model's unique ID
+     *
+     * @return get the identifier for the entry that this model maps to.
+     */
+    long getId();
+
+    /**
      * Get the name of the series, AKA, the name of that series to display
      *
      * @return The name

@@ -106,22 +106,11 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      * @param filter
      *            {@link SelectionTimeQueryFilter}
      * @return Set of quarks associated to the filter
+     * @deprecated use {@link #getSelectedEntries(SelectionTimeQueryFilter)} instead
      */
+    @Deprecated
     protected Set<Integer> getSelectedQuarks(SelectionTimeQueryFilter filter) {
-        fLock.readLock().lock();
-        try {
-            Set<Integer> quarks = new HashSet<>();
-
-            for (Long selectedItem : filter.getSelectedItems()) {
-                Integer quark = fIdToQuark.get(selectedItem);
-                if (quark != null && quark >= 0) {
-                    quarks.add(quark);
-                }
-            }
-            return quarks;
-        } finally {
-            fLock.readLock().unlock();
-        }
+        return getSelectedEntries(filter).values();
     }
 
     /**

@@ -20,6 +20,13 @@ import com.google.gson.annotations.SerializedName;
  */
 public class SeriesModel implements ISeriesModel {
 
+    /**
+     * transient to avoid serializing for tests, as IDs may not be the same from one
+     * run to the other, due to how they are generated.
+     */
+    @SerializedName("id")
+    private final transient long fId;
+
     @SerializedName("label")
     private final String fName;
 
@@ -32,6 +39,8 @@ public class SeriesModel implements ISeriesModel {
     /**
      * Constructor
      *
+     * @param id
+     *            The unique ID of the associated entry
      * @param name
      *            The name of the series
      * @param xValues
@@ -39,10 +48,16 @@ public class SeriesModel implements ISeriesModel {
      * @param data
      *            The y values of this series
      */
-    public SeriesModel(String name, long[] xValues, double[] data) {
+    public SeriesModel(long id, String name, long[] xValues, double[] data) {
+        fId = id;
         fName = name;
         fXValues = xValues;
         fYValues = data;
+    }
+
+    @Override
+    public long getId() {
+        return fId;
     }
 
     @Override

@@ -408,7 +408,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     @Override
     public TmfModelResponse<Map<String, String>> fetchTooltip(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         ITmfStateSystem ss = getAnalysisModule().getStateSystem();
-        Set<@NonNull Integer> quarks = getSelectedQuarks(filter);
+        Set<@NonNull Integer> quarks = getSelectedEntries(filter).values();
         long start = filter.getStart();
         if (ss == null || quarks.size() != 1 || !getAnalysisModule().isQueryable(start)) {
             /*

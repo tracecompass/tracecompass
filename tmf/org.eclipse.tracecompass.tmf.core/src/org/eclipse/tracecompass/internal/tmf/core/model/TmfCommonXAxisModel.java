@@ -11,7 +11,6 @@ package org.eclipse.tracecompass.internal.tmf.core.model;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -41,7 +40,7 @@ public class TmfCommonXAxisModel implements ITmfCommonXAxisModel {
     @SerializedName("series")
     private final Map<String, IYModel> fYSeries;
 
-    private transient final Map<String, ISeriesModel> fSeries;
+    private final transient Map<String, ISeriesModel> fSeries;
 
     /**
      * Constructor
@@ -57,7 +56,7 @@ public class TmfCommonXAxisModel implements ITmfCommonXAxisModel {
         fTitle = title;
         fXValues = Arrays.copyOf(xValues, xValues.length);
         fYSeries = ImmutableMap.copyOf(ySeries);
-        fSeries = ImmutableMap.copyOf(Objects.requireNonNull(Maps.transformValues(fYSeries, model -> new SeriesModel(model.getName(), fXValues, model.getData()))));
+        fSeries = Maps.transformValues(fYSeries, model -> new SeriesModel(model.getId(), model.getName(), fXValues, model.getData()));
     }
 
     @Override

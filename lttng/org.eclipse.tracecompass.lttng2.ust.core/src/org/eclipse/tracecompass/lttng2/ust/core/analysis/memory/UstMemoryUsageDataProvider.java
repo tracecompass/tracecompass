@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -123,11 +124,12 @@ public class UstMemoryUsageDataProvider extends AbstractTreeCommonXDataProvider<
     private Map<Integer, IYModel> initYModels(ITmfStateSystem ss, SelectionTimeQueryFilter filter) {
         Map<Integer, IYModel> selectedSeries = new HashMap<>();
         int length = filter.getTimesRequested().length;
-        for (Integer tidQuark : getSelectedQuarks(filter)) {
+        for (Entry<Long, Integer> entry : getSelectedEntries(filter).entrySet()) {
+            int tidQuark = entry.getValue();
             int memoryAttribute = ss.optQuarkRelative(tidQuark, UstMemoryStrings.UST_MEMORY_MEMORY_ATTRIBUTE);
             if (memoryAttribute != ITmfStateSystem.INVALID_ATTRIBUTE) {
                 String name = getTrace().getName() + ':' + ss.getAttributeName(tidQuark);
-                selectedSeries.put(memoryAttribute, new YModel(name, new double[length]));
+                selectedSeries.put(memoryAttribute, new YModel(entry.getKey(), name, new double[length]));
             }
         }
         return selectedSeries;

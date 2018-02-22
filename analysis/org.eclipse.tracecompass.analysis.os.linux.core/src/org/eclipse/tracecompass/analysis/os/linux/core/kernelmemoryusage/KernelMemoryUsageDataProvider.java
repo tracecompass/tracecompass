@@ -39,7 +39,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 
 /**
  * This data provider will return a XY model based on a query filter. The model
@@ -116,8 +115,7 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
          * the total and the selected entries.
          */
         double[] totalKernelMemoryValues = new double[xValues.length];
-        Map<Integer, double[]> selectedSeries = Maps.toMap(getSelectedQuarks(filter),
-                k -> new double[xValues.length]);
+        Map<Integer, IYModel> selectedSeries = initSeries(ss, filter);
 
         List<Integer> threadQuarkList = ss.getSubAttributes(-1, false);
         Collection<Long> times = getTimes(filter, ss.getStartTime(), currentEnd);
@@ -140,9 +138,9 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
                     totalKernelMemoryValues[i] += value;
                 }
 
-                double[] selectedThreadValues = selectedSeries.get(interval.getAttribute());
+                IYModel selectedThreadValues = selectedSeries.get(interval.getAttribute());
                 if (selectedThreadValues != null) {
-                    Arrays.fill(selectedThreadValues, from, to, value);
+                    Arrays.fill(selectedThreadValues.getData(), from, to, value);
                 }
             }
         }
@@ -155,14 +153,14 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
         double d = extractTotalValueShift(ss, endState);
         Arrays.setAll(totalKernelMemoryValues, i -> totalKernelMemoryValues[i] + d);
 
-        for (Entry<Integer, double[]> entry : selectedSeries.entrySet()) {
+        for (Entry<Integer, IYModel> entry : selectedSeries.entrySet()) {
             int lowestMemoryQuark = ss.optQuarkRelative(entry.getKey(),
                     KernelMemoryAnalysisModule.THREAD_LOWEST_MEMORY_VALUE);
 
             if (lowestMemoryQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
                 Object value = endState.get(lowestMemoryQuark).getValue();
                 if (value instanceof Number) {
-                    double[] threadValues = entry.getValue();
+                    double[] threadValues = entry.getValue().getData();
                     double shift = ((Number) value).doubleValue();
                     Arrays.setAll(threadValues, i -> threadValues[i] - shift);
                 }
@@ -172,14 +170,32 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
         ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
 
         String total = getTrace().getName() + MemoryUsageTreeModel.TOTAL_SUFFIX;
-        ySeries.put(total, new YModel(total, totalKernelMemoryValues));
+        ySeries.put(total, new YModel(getId(ITmfStateSystem.ROOT_ATTRIBUTE), total, totalKernelMemoryValues));
 
-        for (Entry<Integer, double[]> entry : selectedSeries.entrySet()) {
-            String selectedThreadName = getTrace().getName() + ':' + ss.getAttributeName(entry.getKey());
-            ySeries.put(selectedThreadName, new YModel(selectedThreadName, entry.getValue()));
+        for (IYModel entry : selectedSeries.values()) {
+            ySeries.put(entry.getName(), entry);
         }
 
         return ySeries.build();
+    }
+
+    /**
+     * Initialize a map of quark to primitive double array
+     *
+     * @param filter
+     *            the query object
+     * @return a Map of quarks for the entries which exist for this provider to
+     *         newly initialized primitive double arrays of the same length as the
+     *         number of requested timestamps.
+     */
+    private Map<Integer, IYModel> initSeries(ITmfStateSystem ss, SelectionTimeQueryFilter filter) {
+        int length = filter.getTimesRequested().length;
+        Map<Integer, IYModel> map = new HashMap<>();
+        for (Entry<Long, Integer> entry : getSelectedEntries(filter).entrySet()) {
+            String selectedThreadName = getTrace().getName() + ':' + ss.getAttributeName(entry.getValue());
+            map.put(entry.getValue(), new YModel(entry.getKey(), selectedThreadName, new double[length]));
+        }
+        return map;
     }
 
     /**
