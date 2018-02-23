@@ -28,7 +28,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCLabel;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
@@ -117,10 +117,10 @@ public abstract class KernelTimeGraphViewTestBase extends KernelTestBase {
         SWTBotShell shell = fBot.shell("Legend");
         shell.activate();
         SWTBot bot = shell.bot();
-        for (int i = 1; i <= labelValues.size(); i++) {
-            SWTBotLabel label = bot.label(i);
+        for (int i = 0; i < labelValues.size(); i++) {
+            SWTBotCLabel label = bot.clabel(i);
             assertNotNull(label);
-            assertEquals(labelValues.get(i - 1), label.getText());
+            assertEquals(labelValues.get(i), label.getText());
         }
         bot.button("OK").click();
     }

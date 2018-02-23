@@ -21,6 +21,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -42,7 +43,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
@@ -250,7 +250,14 @@ public class TimeGraphLegend extends TitleAreaDialog {
             });
 
             fBar.setLayoutData(GridDataFactory.swtDefaults().hint(30, 20).create());
-            Label label = new Label(this, SWT.NONE);
+            CLabel label = new CLabel(this, SWT.NONE) {
+                @Override
+                protected String shortenText(GC gc, String t, int w) {
+                    String text = super.shortenText(gc, t, w);
+                    setToolTipText(t.equals(text) ? null : t);
+                    return text;
+                }
+            };
             label.setText(name);
             label.setLayoutData(GridDataFactory.fillDefaults().hint(160, SWT.DEFAULT).align(SWT.FILL, SWT.CENTER).grab(true, false).create());
             fScale = new Scale(this, SWT.NONE);
