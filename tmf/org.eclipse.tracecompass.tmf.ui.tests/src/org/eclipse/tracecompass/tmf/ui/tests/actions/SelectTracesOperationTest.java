@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson and others
+ * Copyright (c) 2017, 2018 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,7 +15,6 @@ package org.eclipse.tracecompass.tmf.ui.tests.actions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,7 +23,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.core.resources.IFolder;
@@ -43,7 +41,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
-import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
@@ -177,7 +174,7 @@ public class SelectTracesOperationTest {
         assertNotNull(fTraces);
         SelectTracesOperation selectTracesOperation = new SelectTracesOperation(Objects.requireNonNull(fExperiment), fTraces, new HashMap<String, TmfTraceElement>());
         PlatformUI.getWorkbench().getProgressService().run(true, true, selectTracesOperation);
-        validateTracesExperiment(false);
+        assertExperimentTraces(fTraces, fExperiment.getTraces());
     }
 
     /**
@@ -192,26 +189,7 @@ public class SelectTracesOperationTest {
         assertNotNull(fTraces);
         SelectTracesOperation selectTracesOperation = new SelectTracesOperation(Objects.requireNonNull(fExperiment), fTraces, new HashMap<String, TmfTraceElement>(), fStartTimeRange, fEndTimeRange);
         PlatformUI.getWorkbench().getProgressService().run(true, true, selectTracesOperation);
-        validateTracesExperiment(true);
-    }
-
-    /**
-     * Validate if the traces in the experiment are the good one
-     *
-     * @param timeRangeFiltering
-     *            Indicate if the filtering mechanism was use or not in the
-     *            operation
-     */
-    private void validateTracesExperiment(boolean timeRangeFiltering) {
-        List<TmfTraceElement> experimentTraces = fExperiment.getTraces();
-
-        if (timeRangeFiltering) {
-            assertEquals(fExpectedTimeRangeTraces.length, experimentTraces.size());
-            assertExperimentTraces(fExpectedTimeRangeTraces, experimentTraces);
-        } else {
-            assertEquals(experimentTraces.size(), fTraces.length);
-            assertExperimentTraces(fTraces, experimentTraces);
-        }
+        assertExperimentTraces(fExpectedTimeRangeTraces, fExperiment.getTraces());
     }
 
     /**
@@ -224,11 +202,9 @@ public class SelectTracesOperationTest {
      *            Actual traces in the experiment
      */
     private static void assertExperimentTraces(TmfTraceElement[] expectedTraces, List<TmfTraceElement> actualTraces) {
-        Map<Pair<String, URI>, TmfTraceElement> expectedTracesMap = new HashMap<>();
-        for (TmfTraceElement traceElement : expectedTraces) {
-            expectedTracesMap.put(new Pair<>(traceElement.getName(), traceElement.getLocation()), traceElement);
+        assertEquals(expectedTraces.length, actualTraces.size());
+        for (int i = 0; i < expectedTraces.length; i++) {
+            assertEquals(expectedTraces[i], actualTraces.get(i).getElementUnderTraceFolder());
         }
-
-        actualTraces.forEach(actualTraceElement -> assertNotNull(expectedTracesMap.get(new Pair<>(actualTraceElement.getName(), actualTraceElement.getLocation()))));
     }
 }

@@ -15,6 +15,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,7 +32,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceProxy;
 import org.eclipse.core.resources.IResourceProxyVisitor;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -174,8 +174,6 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
      */
     @Override
     protected void refreshChildren() {
-        IFolder folder = getResource();
-
         /* Update the trace children of this experiment */
         // Get the children from the model
         Map<String, ITmfProjectModelElement> childrenMap = new HashMap<>();
@@ -186,7 +184,7 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
         List<IResource> members = getTraceResources();
         for (IResource resource : members) {
             String name = resource.getName();
-            String elementPath = resource.getFullPath().makeRelativeTo(folder.getFullPath()).toString();
+            String elementPath = resource.getFullPath().makeRelativeTo(getResource().getFullPath()).toString();
             ITmfProjectModelElement element = childrenMap.get(elementPath);
             if (element instanceof TmfTraceElement) {
                 childrenMap.remove(elementPath);
@@ -258,8 +256,13 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
             folder.accept(new IResourceProxyVisitor() {
                 @Override
                 public boolean visit(IResourceProxy resource) throws CoreException {
-                    if (resource.isLinked()) {
+                    /*
+                     * Trace represented by a file, or a link for backward compatibility
+                     */
+                    if (resource.getType() == IResource.FILE || resource.isLinked()) {
                         list.add(resource.requestResource());
+                        /* don't visit linked folders, as they might contain files */
+                        return false;
                     }
                     return true;
                 }
@@ -360,46 +363,23 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
     }
 
     private void addTrace(IResource resource, String elementPath, boolean refresh) {
-        /**
-         * Create a link to the actual trace and set the trace type
+        /*
+         * Create an empty file to represent the experiment trace. The file's element
+         * path relative to the experiment resource corresponds to the trace's element
+         * path relative to the Traces folder.
          */
-        IFolder experiment = getResource();
-        IPath location = resource.getLocation();
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        IFile file = getResource().getFile(elementPath);
         try {
+            TraceUtils.createFolder((IFolder) file.getParent(), new NullProgressMonitor());
+            file.create(new ByteArrayInputStream(new byte[0]), false, new NullProgressMonitor());
             String traceTypeId = TmfTraceType.getTraceTypeId(resource);
             TraceTypeHelper traceType = TmfTraceType.getTraceType(traceTypeId);
-
-            if (resource instanceof IFolder) {
-                IFolder folder = experiment.getFolder(elementPath);
-                TraceUtils.createFolder((IFolder) folder.getParent(), new NullProgressMonitor());
-                IStatus result = workspace.validateLinkLocation(folder, location);
-                if (result.isOK() || result.matches(IStatus.INFO | IStatus.WARNING)) {
-                    folder.createLink(location, IResource.REPLACE, null);
-                    if (traceType != null) {
-                        TmfTraceTypeUIUtils.setTraceType(folder, traceType, refresh);
-                    }
-
-                } else {
-                    Activator.getDefault().logError("Error creating link. Invalid trace location " + location); //$NON-NLS-1$
-                }
-            } else {
-                IFile file = experiment.getFile(elementPath);
-                TraceUtils.createFolder((IFolder) file.getParent(), new NullProgressMonitor());
-                IStatus result = workspace.validateLinkLocation(file, location);
-                if (result.isOK() || result.matches(IStatus.INFO | IStatus.WARNING)) {
-                    file.createLink(location, IResource.REPLACE, null);
-                    if (traceType != null) {
-                        TmfTraceTypeUIUtils.setTraceType(file, traceType, refresh);
-                    }
-                } else {
-                    Activator.getDefault().logError("Error creating link. Invalid trace location " + location); //$NON-NLS-1$
-                }
+            if (traceType != null) {
+                TmfTraceTypeUIUtils.setTraceType(file, traceType, refresh);
             }
         } catch (CoreException e) {
-            Activator.getDefault().logError("Error creating link to location " + location, e); //$NON-NLS-1$
+            Activator.getDefault().logError("Error adding experiment trace file " + file, e); //$NON-NLS-1$
         }
-
     }
 
     /**

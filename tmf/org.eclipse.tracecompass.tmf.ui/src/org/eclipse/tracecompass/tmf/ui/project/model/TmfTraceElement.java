@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.annotation.NonNull;
@@ -390,15 +391,20 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      */
     public TmfTraceElement getElementUnderTraceFolder() {
 
-        // If trace is under an experiment, return original trace from the
-        // traces folder
+        // If trace is under an experiment, return original trace from the traces folder
         if (getParent() instanceof TmfExperimentElement) {
-            TmfTraceFolder tracesFolder = getProject().getTracesFolder();
-            if (tracesFolder != null) {
-                for (TmfTraceElement aTrace : tracesFolder.getTraces()) {
-                    if (aTrace.getElementPath().equals(getElementPath())) {
-                        return aTrace;
+            ITmfProjectModelElement parent = getProject().getTracesFolder();
+            ITmfProjectModelElement element = null;
+            if (parent != null) {
+                for (String segment : new Path(getElementPath()).segments()) {
+                    element = parent.getChild(segment);
+                    if (element == null) {
+                        return this;
                     }
+                    parent = element;
+                }
+                if (element instanceof TmfTraceElement) {
+                    return (TmfTraceElement) element;
                 }
             }
         }
@@ -417,7 +423,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
     @Override
     public boolean testAttribute(Object target, String name, String value) {
         if (name.equals(IS_LINKED)) {
-            boolean isLinked = getResource().isLinked();
+            boolean isLinked = getElementUnderTraceFolder().getResource().isLinked();
             return Boolean.toString(isLinked).equals(value);
         }
         return false;
@@ -483,11 +489,11 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         }
 
         if (LOCATION.equals(id)) {
-            return URIUtil.toUnencodedString(getLocation());
+            return URIUtil.toUnencodedString(getElementUnderTraceFolder().getLocation());
         }
 
         if (IS_LINKED_PROPERTY.equals(id)) {
-            return Boolean.valueOf(getResource().isLinked()).toString();
+            return Boolean.valueOf(getElementUnderTraceFolder().getResource().isLinked()).toString();
         }
 
         if (SOURCE_LOCATION.equals(id)) {
@@ -502,7 +508,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         }
 
         if (LAST_MODIFIED.equals(id)) {
-            FileInfo fileInfo = getFileInfo();
+            FileInfo fileInfo = getElementUnderTraceFolder().getFileInfo();
             if (fileInfo == null) {
                 return ""; //$NON-NLS-1$
             }
@@ -512,11 +518,11 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         }
 
         if (SIZE.equals(id)) {
-            FileInfo fileInfo = getFileInfo();
+            FileInfo fileInfo = getElementUnderTraceFolder().getFileInfo();
             if (fileInfo == null) {
                 return ""; //$NON-NLS-1$
             }
-            if (getResource() instanceof IFolder) {
+            if (getElementUnderTraceFolder().getResource() instanceof IFolder) {
                 if (fileInfo.count <= FOLDER_MAX_COUNT) {
                     return NLS.bind(Messages.TmfTraceElement_FolderSizeString,
                             NumberFormat.getInstance().format(fileInfo.size), fileInfo.count);
