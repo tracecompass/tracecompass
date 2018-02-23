@@ -32,6 +32,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
 import com.google.common.collect.ImmutableList;
@@ -129,7 +130,7 @@ public class ActiveThreadsFilter extends ViewerFilter {
         }
         ControlFlowEntry cfe = (ControlFlowEntry) element;
 
-        ITmfTrace trace = cfe.getTrace();
+        ITmfTrace trace = BaseDataProviderTimeGraphView.getTrace(cfe);
 
         Set<Long> onCpusThreadForTimeRange = fCachedOnCpusThreadForTimeRange.get(trace);
         Set<Long> activeThreadForTimeRange = fCachedActiveThreadForTimeRange.get(trace);

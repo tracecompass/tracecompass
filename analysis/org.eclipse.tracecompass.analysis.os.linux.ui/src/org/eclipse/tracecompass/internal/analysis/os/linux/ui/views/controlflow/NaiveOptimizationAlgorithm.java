@@ -31,7 +31,7 @@ import com.google.common.collect.Multisets;
  * @author Matthew Khouzam
  * @author Samuel Gagnon
  */
-public class NaiveOptimizationAlgorithm implements Function<Collection<ILinkEvent>, Map<Integer, Long>> {
+public final class NaiveOptimizationAlgorithm implements Function<Collection<ILinkEvent>, Map<Integer, Long>> {
 
     /**
      * Get the scheduling column order by arrows

@@ -22,15 +22,11 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Function;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.ControlFlowEntry;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.NaiveOptimizationAlgorithm;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
-import org.junit.AfterClass;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
@@ -49,25 +45,12 @@ import com.google.common.collect.ImmutableMap;
 public class ControlFlowOptimizerTest {
 
     /**
-     * Trace needed to satisfy nonnull requirements.
-     */
-    private static final @NonNull ITmfTrace TRACE = new CtfTmfTrace();
-
-    /**
      * Overridable method to get the optimization method to test.
      *
      * @return the optimization method to test.
      */
     protected Function<Collection<ILinkEvent>, Map<Integer, Long>> getOptimizationMethod() {
         return new NaiveOptimizationAlgorithm();
-    }
-
-    /**
-     * Clean up
-     */
-    @AfterClass
-    public static void afterClass() {
-        TRACE.dispose();
     }
 
     /**
@@ -259,7 +242,7 @@ public class ControlFlowOptimizerTest {
      * @return a {@link ControlFlowEntry} with the correct tid.
      */
     private static ControlFlowEntry generateCFVEntry(int tid) {
-        return new ControlFlowEntry(0, TRACE, "exec", tid, 0, Long.MIN_VALUE, Long.MAX_VALUE);
+        return new ControlFlowEntry(0, "exec", tid, 0, Long.MIN_VALUE, Long.MAX_VALUE);
     }
 
     // -------------------------------------------------------------------------

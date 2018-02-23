@@ -17,18 +17,15 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadEntryModel;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
 /**
  * An entry in the Control Flow view
  */
 public class ControlFlowEntry extends TimeGraphEntry {
-
-    private final @NonNull ITmfTrace fTrace;
 
     /**
      * This column is for keeping the order we found with the scheduling algorithm.
@@ -41,8 +38,6 @@ public class ControlFlowEntry extends TimeGraphEntry {
      *
      * @param quark
      *            The attribute quark matching the thread
-     * @param trace
-     *            The trace on which we are working
      * @param execName
      *            The exec_name of this entry
      * @param threadId
@@ -54,8 +49,8 @@ public class ControlFlowEntry extends TimeGraphEntry {
      * @param endTime
      *            The end time of this process
      */
-    public ControlFlowEntry(int quark, @NonNull ITmfTrace trace, String execName, int threadId, int parentThreadId, long startTime, long endTime) {
-        this(new ThreadEntryModel(quark, -1, execName, startTime, endTime, threadId, parentThreadId), trace);
+    public ControlFlowEntry(int quark, @NonNull String execName, int threadId, int parentThreadId, long startTime, long endTime) {
+        this(new ThreadEntryModel(quark, -1, execName, startTime, endTime, threadId, parentThreadId));
     }
 
     /**
@@ -63,12 +58,9 @@ public class ControlFlowEntry extends TimeGraphEntry {
      *
      * @param model
      *            the {@link ThreadEntryModel} to compose this entry
-     * @param trace
-     *            The trace on which we are working
      */
-    public ControlFlowEntry(ThreadEntryModel model, @NonNull ITmfTrace trace) {
+    public ControlFlowEntry(ThreadEntryModel model) {
         super(model);
-        fTrace = trace;
         fSchedulingPosition = Long.MAX_VALUE;
     }
 
@@ -79,15 +71,6 @@ public class ControlFlowEntry extends TimeGraphEntry {
      */
     public int getThreadId() {
         return ((ThreadEntryModel) getModel()).getThreadId();
-    }
-
-    /**
-     * Get the entry's trace
-     *
-     * @return the entry's trace
-     */
-    public @NonNull ITmfTrace getTrace() {
-        return fTrace;
     }
 
     /**
