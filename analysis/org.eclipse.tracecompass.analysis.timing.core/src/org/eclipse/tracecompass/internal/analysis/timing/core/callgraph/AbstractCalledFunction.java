@@ -9,8 +9,6 @@
 
 package org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -19,12 +17,9 @@ import java.util.Objects;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
-import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
-
-import com.google.common.collect.Ordering;
 
 /**
- * Called Functuon common class, defines the start, end, depth, parent and
+ * Called Function common class, defines the start, end, depth, parent and
  * children. Does not define the symbol
  *
  * @author Matthew Khouzam
@@ -32,15 +27,7 @@ import com.google.common.collect.Ordering;
  */
 abstract class AbstractCalledFunction implements ICalledFunction {
 
-    static final Comparator<ISegment> COMPARATOR;
-    static {
-        /*
-         * checkNotNull() has to be called separately, or else it breaks the
-         * type inference.
-         */
-        Comparator<ISegment> comp = Ordering.from(SegmentComparators.INTERVAL_START_COMPARATOR).compound(SegmentComparators.INTERVAL_END_COMPARATOR);
-        COMPARATOR = checkNotNull(comp);
-    }
+    static final Comparator<ISegment> COMPARATOR = Objects.requireNonNull(Comparator.comparingLong(ISegment::getStart).thenComparingLong(ISegment::getEnd));
 
     /**
      * Serial Version UID
@@ -106,17 +93,7 @@ abstract class AbstractCalledFunction implements ICalledFunction {
             throw new IllegalArgumentException("Child parent not the same as child being added to."); //$NON-NLS-1$
         }
         fChildren.add(child);
-        substractChildDuration(child.getEnd() - child.getStart());
-    }
-
-    /**
-     * Subtract the child's duration to the duration of the segment.
-     *
-     * @param childDuration
-     *            The child's duration
-     */
-    private void substractChildDuration(long childDuration) {
-        fSelfTime -= childDuration;
+        fSelfTime -= child.getLength();
     }
 
     @Override
@@ -144,7 +121,7 @@ abstract class AbstractCalledFunction implements ICalledFunction {
 
     @Override
     public String toString() {
-        return '[' + String.valueOf(fStart) + ", " + String.valueOf(fEnd) + ']' + " Duration: " + getLength() + ", Self Time: " + fSelfTime; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        return "[" + fStart + ", " + fEnd + ']' + " Duration: " + getLength() + ", Self Time: " + fSelfTime; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 
     @Override

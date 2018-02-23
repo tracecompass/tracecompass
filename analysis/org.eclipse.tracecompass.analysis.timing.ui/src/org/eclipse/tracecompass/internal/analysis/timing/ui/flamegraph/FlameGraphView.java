@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph;
 
+import java.util.Collection;
 import java.util.concurrent.Semaphore;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -22,7 +23,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -32,14 +32,13 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MenuDetectEvent;
-import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphAnalysis;
+import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.ThreadNode;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
@@ -49,16 +48,14 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
-import org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor;
 import org.eclipse.tracecompass.tmf.ui.symbols.TmfSymbolProviderUpdatedSignal;
 import org.eclipse.tracecompass.tmf.ui.views.SaveImageUtil;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -111,16 +108,12 @@ public class FlameGraphView extends TmfView {
 
     private FlameGraphContentProvider fTimeGraphContentProvider;
 
-    private TimeGraphPresentationProvider fPresentationProvider;
-
     private ITmfTrace fTrace;
 
-    private final @NonNull MenuManager fEventMenuManager = new MenuManager();
     /**
      * A plain old semaphore is used since different threads will be competing
      * for the same resource.
      */
-
     private final Semaphore fLock = new Semaphore(1);
 
     private Action fSortByNameAction;
@@ -140,16 +133,13 @@ public class FlameGraphView extends TmfView {
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
         fTimeGraphViewer = new TimeGraphViewer(parent, SWT.NONE);
-        fTimeGraphContentProvider = new FlameGraphContentProvider();
-        fPresentationProvider = new FlameGraphPresentationProvider();
-        fTimeGraphViewer.setTimeGraphContentProvider(fTimeGraphContentProvider);
-        fTimeGraphViewer.setTimeGraphProvider(fPresentationProvider);
-        IEditorPart editor = getSite().getPage().getActiveEditor();
-        if (editor instanceof ITmfTraceEditor) {
-            ITmfTrace trace = ((ITmfTraceEditor) editor).getTrace();
-            if (trace != null) {
-                traceSelected(new TmfTraceSelectedSignal(this, trace));
-            }
+        FlameGraphContentProvider timeGraphContentProvider = new FlameGraphContentProvider();
+        fTimeGraphContentProvider = timeGraphContentProvider;
+        fTimeGraphViewer.setTimeGraphContentProvider(timeGraphContentProvider);
+        fTimeGraphViewer.setTimeGraphProvider(new FlameGraphPresentationProvider());
+        ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
+        if (trace != null) {
+            traceSelected(new TmfTraceSelectedSignal(this, trace));
         }
         contributeToActionBars();
         loadSortOption();
@@ -159,13 +149,9 @@ public class FlameGraphView extends TmfView {
         IMenuManager menuManager = getViewSite().getActionBars().getMenuManager();
         MenuManager item = new MenuManager(Messages.FlameGraphView_ContentPresentation);
         item.setRemoveAllWhenShown(true);
-        item.addMenuListener(new IMenuListener() {
-
-            @Override
-            public void menuAboutToShow(IMenuManager manager) {
-                item.add(VIEW_BY_THREAD);
-                item.add(VIEW_AGGREGATE);
-            }
+        item.addMenuListener(manager -> {
+            item.add(VIEW_BY_THREAD);
+            item.add(VIEW_AGGREGATE);
         });
         menuManager.add(item);
         createTimeEventContextMenu();
@@ -250,7 +236,6 @@ public class FlameGraphView extends TmfView {
             fLock.release();
             return;
         }
-        fTimeGraphViewer.setInput(fContentPresentation == ContentPresentation.BY_THREAD ? callGraphAnalysis.getThreadNodes() : callGraphAnalysis.getFlameGraph());
         callGraphAnalysis.schedule();
         job = new Job(Messages.CallGraphAnalysis_Execution) {
 
@@ -261,8 +246,10 @@ public class FlameGraphView extends TmfView {
                         return Status.CANCEL_STATUS;
                     }
                     callGraphAnalysis.waitForCompletion(monitor);
+                    // compute input outside of display thread.
+                    Collection<ThreadNode> input = fContentPresentation == ContentPresentation.BY_THREAD ? callGraphAnalysis.getThreadNodes() : callGraphAnalysis.getFlameGraph();
                     Display.getDefault().asyncExec(() -> {
-                        fTimeGraphViewer.setInput(fContentPresentation == ContentPresentation.BY_THREAD ? callGraphAnalysis.getThreadNodes() : callGraphAnalysis.getFlameGraph());
+                        fTimeGraphViewer.setInput(input);
                         fTimeGraphViewer.resetStartFinishTime();
                     });
                     return Status.OK_STATUS;
@@ -314,44 +301,36 @@ public class FlameGraphView extends TmfView {
     // ------------------------------------------------------------------------
 
     private void createTimeEventContextMenu() {
-        fEventMenuManager.setRemoveAllWhenShown(true);
+        MenuManager eventMenuManager = new MenuManager();
+        eventMenuManager.setRemoveAllWhenShown(true);
         TimeGraphControl timeGraphControl = fTimeGraphViewer.getTimeGraphControl();
-        final Menu timeEventMenu = fEventMenuManager.createContextMenu(timeGraphControl);
+        final Menu timeEventMenu = eventMenuManager.createContextMenu(timeGraphControl);
 
-        timeGraphControl.addTimeGraphEntryMenuListener(new MenuDetectListener() {
-            @Override
-            public void menuDetected(MenuDetectEvent event) {
-                /*
-                 * The TimeGraphControl will call the TimeGraphEntryMenuListener
-                 * before the TimeEventMenuListener. We need to clear the menu
-                 * for the case the selection was done on the namespace where
-                 * the time event listener below won't be called afterwards.
-                 */
-                timeGraphControl.setMenu(null);
-                event.doit = false;
-            }
+        timeGraphControl.addTimeGraphEntryMenuListener(event -> {
+            /*
+             * The TimeGraphControl will call the TimeGraphEntryMenuListener
+             * before the TimeEventMenuListener. We need to clear the menu
+             * for the case the selection was done on the namespace where
+             * the time event listener below won't be called afterwards.
+             */
+            timeGraphControl.setMenu(null);
+            event.doit = false;
         });
-        timeGraphControl.addTimeEventMenuListener(new MenuDetectListener() {
-            @Override
-            public void menuDetected(MenuDetectEvent event) {
-                Menu menu = timeEventMenu;
-                if (event.data instanceof FlamegraphEvent) {
-                    timeGraphControl.setMenu(menu);
-                    return;
-                }
-                timeGraphControl.setMenu(null);
-                event.doit = false;
+        timeGraphControl.addTimeEventMenuListener(event -> {
+            Menu menu = timeEventMenu;
+            if (event.data instanceof FlamegraphEvent) {
+                timeGraphControl.setMenu(menu);
+                return;
             }
+            timeGraphControl.setMenu(null);
+            event.doit = false;
         });
 
-        fEventMenuManager.addMenuListener(new IMenuListener() {
-            @Override
-            public void menuAboutToShow(IMenuManager manager) {
-                fillTimeEventContextMenu(fEventMenuManager);
-                fEventMenuManager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-            }
+        eventMenuManager.addMenuListener(manager -> {
+            fillTimeEventContextMenu(eventMenuManager);
+            eventMenuManager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
         });
-        getSite().registerContextMenu(fEventMenuManager, fTimeGraphViewer.getSelectionProvider());
+        getSite().registerContextMenu(eventMenuManager, fTimeGraphViewer.getSelectionProvider());
     }
 
     /**
@@ -451,20 +430,17 @@ public class FlameGraphView extends TmfView {
         getSortByIdAction().setImageDescriptor(SORT_BY_ID_ICON);
 
         if (sortOption.equals(SortOption.BY_NAME)) {
-            fTimeGraphContentProvider.setSortOption(SortOption.BY_NAME);
             getSortByNameAction().setChecked(true);
         } else if (sortOption.equals(SortOption.BY_NAME_REV)) {
-            fTimeGraphContentProvider.setSortOption(SortOption.BY_NAME_REV);
             getSortByNameAction().setChecked(true);
             getSortByNameAction().setImageDescriptor(SORT_BY_NAME_REV_ICON);
         } else if (sortOption.equals(SortOption.BY_ID)) {
-            fTimeGraphContentProvider.setSortOption(SortOption.BY_ID);
             getSortByIdAction().setChecked(true);
         } else if (sortOption.equals(SortOption.BY_ID_REV)) {
-            fTimeGraphContentProvider.setSortOption(SortOption.BY_ID_REV);
             getSortByIdAction().setChecked(true);
             getSortByIdAction().setImageDescriptor(SORT_BY_ID_REV_ICON);
         }
+        fTimeGraphContentProvider.setSortOption(sortOption);
         saveSortOption();
         fTimeGraphViewer.refresh();
     }

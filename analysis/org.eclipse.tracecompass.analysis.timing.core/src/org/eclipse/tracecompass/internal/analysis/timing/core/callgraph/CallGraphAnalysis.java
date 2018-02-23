@@ -10,11 +10,9 @@
 package org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -22,19 +20,15 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
-import org.eclipse.tracecompass.common.core.StreamUtils;
 import org.eclipse.tracecompass.internal.analysis.timing.core.Activator;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory;
 import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory.SegmentStoreType;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.callstack.CallStackAnalysis;
@@ -45,6 +39,8 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 /**
  * Call stack analysis used to create a segment for each call function from an
@@ -81,7 +77,8 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
     private final ISegmentStore<@NonNull ISegment> fStore;
 
     /**
-     * Listeners
+     * Listeners. {@link ListenerList}s are typed since 4.6 (Neon), type these when
+     * support for 4.5 (Mars) is no longer required.
      */
     private final ListenerList fListeners = new ListenerList(ListenerList.IDENTITY);
 
@@ -135,9 +132,8 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
 
     @Override
     protected Iterable<IAnalysisModule> getDependentAnalyses() {
-        return TmfTraceManager.getTraceSet(getTrace()).stream()
-                .flatMap(trace -> StreamUtils.getStream(TmfTraceUtils.getAnalysisModulesOfClass(trace, CallStackAnalysis.class)))
-                .distinct().collect(Collectors.toList());
+        return Iterables.concat(Iterables.transform(TmfTraceManager.getTraceSet(getTrace()),
+                trace -> TmfTraceUtils.getAnalysisModulesOfClass(trace, CallStackAnalysis.class)));
     }
 
     @Override
@@ -155,13 +151,12 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
         }
         // TODO:Look at updates while the state system's being built
         dependentAnalyses.forEach(t -> t.waitForCompletion(monitor));
-        for (IAnalysisModule module : dependentAnalyses) {
-            CallStackAnalysis callstackModule = (CallStackAnalysis) module;
+        for (CallStackAnalysis callstackModule : Iterables.filter(dependentAnalyses, CallStackAnalysis.class)) {
             String[] threadsPattern = callstackModule.getThreadsPattern();
             String[] processesPattern = callstackModule.getProcessesPattern();
             String[] callStackPath = callstackModule.getCallStackPath();
             ITmfStateSystem ss = callstackModule.getStateSystem();
-            if (!iterateOverStateSystem(ss, threadsPattern, processesPattern, callStackPath, monitor)) {
+            if (ss == null || !iterateOverStateSystem(ss, threadsPattern, processesPattern, callStackPath, monitor)) {
                 return false;
             }
         }
@@ -188,10 +183,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      * @return Boolean
      */
     @VisibleForTesting
-    protected boolean iterateOverStateSystem(@Nullable ITmfStateSystem ss, String[] threadsPattern, String[] processesPattern, String[] callStackPath, IProgressMonitor monitor) {
-        if (ss == null) {
-            return false;
-        }
+    protected boolean iterateOverStateSystem(ITmfStateSystem ss, String[] threadsPattern, String[] processesPattern, String[] callStackPath, IProgressMonitor monitor) {
         List<Integer> processQuarks = ss.getQuarks(processesPattern);
         for (int processQuark : processQuarks) {
             int processId = getProcessId(ss, processQuark, ss.getCurrentEndTime());
@@ -206,8 +198,8 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
     }
 
     /**
-     * Iterate over functions with the same quark,search for their callees then
-     * add them to the segment store
+     * Iterate over functions with the same quark, search for their callees then add
+     * them to the segment store
      *
      * @param stateSystem
      *            The state system
@@ -223,23 +215,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      */
     private boolean iterateOverQuark(ITmfStateSystem stateSystem, int processId, int threadQuark, String[] subAttributePath, IProgressMonitor monitor) {
         String threadName = stateSystem.getAttributeName(threadQuark);
-        long threadId = -1;
-        ITmfStateInterval interval = null;
-        try {
-            interval = stateSystem.querySingleState(stateSystem.getStartTime(), threadQuark);
-            ITmfStateValue threadStateValue = interval.getStateValue();
-            if (threadStateValue.getType() == Type.LONG || threadStateValue.getType() == Type.INTEGER) {
-                threadId = threadStateValue.unboxLong();
-            } else {
-                try {
-                    threadId = Long.parseLong(threadName);
-                } catch (NumberFormatException e) {
-                    /* use default threadId */
-                }
-            }
-        } catch (StateSystemDisposedException error) {
-            Activator.getInstance().logError(Messages.QueringStateSystemError, error);
-        }
+        long threadId = getProcessId(stateSystem, threadQuark, stateSystem.getStartTime());
         try {
             long curTime = stateSystem.getStartTime();
             long limit = stateSystem.getCurrentEndTime();
@@ -249,17 +225,20 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
                 if (monitor.isCanceled()) {
                     return false;
                 }
-                int callStackQuark = stateSystem.getQuarkRelative(threadQuark, subAttributePath);
+                int callStackQuark = stateSystem.optQuarkRelative(threadQuark, subAttributePath);
+                if (callStackQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+                    return false;
+                }
                 fCurrentQuarks = stateSystem.getSubAttributes(callStackQuark, false);
                 if (fCurrentQuarks.isEmpty()) {
                     return false;
                 }
                 final int depth = 0;
                 int quarkParent = fCurrentQuarks.get(depth);
-                interval = stateSystem.querySingleState(curTime, quarkParent);
-                ITmfStateValue stateValue = interval.getStateValue();
+                ITmfStateInterval interval = stateSystem.querySingleState(curTime, quarkParent);
+                Object stateValue = interval.getValue();
 
-                if (!stateValue.isNull()) {
+                if (stateValue != null) {
                     long intervalStart = interval.getStartTime();
                     long intervalEnd = interval.getEndTime();
                     // Create the segment for the first call event.
@@ -275,7 +254,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
                 curTime = interval.getEndTime() + 1;
             }
             fThreadNodes.add(init);
-        } catch (AttributeNotFoundException | StateSystemDisposedException | TimeRangeException e) {
+        } catch (StateSystemDisposedException | TimeRangeException e) {
             Activator.getInstance().logError(Messages.QueringStateSystemError, e);
             return false;
         }
@@ -287,7 +266,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      * segments for each child, updating the self times of each node
      * accordingly.
      *
-     * @param node
+     * @param parentFunction
      *            The segment of the stack call event(the parent) callStackQuark
      * @param depth
      *            The depth of the parent function
@@ -295,7 +274,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      *            The quark of the segment parent ss The actual state system
      * @param maxQuark
      *            The last quark in the state system
-     * @param aggregatedCalledFunction
+     * @param parent
      *            A node in the aggregation tree
      * @param processId
      *            The process ID of the traced application
@@ -303,10 +282,11 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      *            The progress monitor The progress monitor TODO: if stack size
      *            is an issue, convert to a stack instead of recursive function
      */
-    private boolean findChildren(AbstractCalledFunction node, int depth, ITmfStateSystem ss, int maxQuark, AggregatedCalledFunction aggregatedCalledFunction, int processId, IProgressMonitor monitor) {
-        fStore.add(node);
-        long curTime = node.getStart();
-        long limit = node.getEnd();
+    private boolean findChildren(AbstractCalledFunction parentFunction, int depth, ITmfStateSystem ss,
+            int maxQuark, AggregatedCalledFunction parent, int processId, IProgressMonitor monitor) {
+        fStore.add(parentFunction);
+        long curTime = parentFunction.getStart();
+        long limit = parentFunction.getEnd();
         ITmfStateInterval interval = null;
         while (curTime < limit) {
             if (monitor.isCanceled()) {
@@ -322,19 +302,19 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
                 Activator.getInstance().logError(Messages.QueringStateSystemError, e);
                 return false;
             }
-            ITmfStateValue stateValue = interval.getStateValue();
-            if (!stateValue.isNull()) {
+            Object stateValue = interval.getValue();
+            if (stateValue != null) {
                 long intervalStart = interval.getStartTime();
                 long intervalEnd = interval.getEndTime();
-                if (intervalStart < node.getStart() || intervalEnd > limit) {
+                if (intervalStart < parentFunction.getStart() || intervalEnd > limit) {
                     return true;
                 }
-                AbstractCalledFunction function = CalledFunctionFactory.create(intervalStart, intervalEnd + 1, node.getDepth() + 1, stateValue, processId, node);
-                AggregatedCalledFunction childNode = new AggregatedCalledFunction(function, aggregatedCalledFunction);
+                AbstractCalledFunction function = CalledFunctionFactory.create(intervalStart, intervalEnd + 1, parentFunction.getDepth() + 1, stateValue, processId, parentFunction);
+                AggregatedCalledFunction childNode = new AggregatedCalledFunction(function, parent);
                 // Search for the children with the next quark.
                 findChildren(function, depth + 1, ss, maxQuark, childNode, processId, monitor);
-                node.addChild(function);
-                aggregatedCalledFunction.addChild(function, childNode);
+                parentFunction.addChild(function);
+                parent.addChild(function, childNode);
 
             }
             curTime = interval.getEndTime() + 1;
@@ -378,10 +358,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      * @return The listeners
      */
     protected Iterable<IAnalysisProgressListener> getListeners() {
-        return Arrays.stream(fListeners.getListeners())
-                .filter(listener -> listener instanceof IAnalysisProgressListener)
-                .map(listener -> (IAnalysisProgressListener) listener)
-                .collect(Collectors.toList());
+        return Lists.newArrayList(fListeners.iterator());
     }
 
     /**
@@ -419,26 +396,20 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
     }
 
     private static int getProcessId(ITmfStateSystem ss, int processQuark, long curTime) {
-        int processId = -1;
         if (processQuark != ITmfStateSystem.ROOT_ATTRIBUTE) {
             try {
                 ITmfStateInterval interval = ss.querySingleState(curTime, processQuark);
                 String processName = ss.getAttributeName(processQuark);
-                ITmfStateValue processStateValue = interval.getStateValue();
-                if (processStateValue.getType() == Type.INTEGER) {
-                    processId = processStateValue.unboxInt();
-                } else {
-                    try {
-                        processId = Integer.parseInt(processName);
-                    } catch (NumberFormatException e) {
-                        /* use default processId */
-                    }
+                Object processValue = interval.getValue();
+                if (processValue != null && (processValue instanceof Integer || processValue instanceof Long)) {
+                    return ((Number) processValue).intValue();
                 }
-            } catch (StateSystemDisposedException e) {
-                // ignore
+                return Integer.parseInt(processName);
+            } catch (StateSystemDisposedException | NumberFormatException e) {
+                /* use default processId */
             }
         }
-        return processId;
+        return -1;
     }
 
 }

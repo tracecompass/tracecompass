@@ -12,11 +12,11 @@ package org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 
 /**
  * This class represents a function call in a certain level in the call stack.
@@ -151,10 +151,9 @@ public class AggregatedCalledFunction implements Cloneable {
         aggregatedChild.getFunctionStatistics().update(child);
         AggregatedCalledFunction node = fChildren.get(aggregatedChild.getSymbol());
         if (node == null) {
-            fChildren.put(aggregatedChild.getSymbol(), aggregatedChild.clone());
+            fChildren.put(aggregatedChild.getSymbol(), aggregatedChild);
         } else {
             merge(node, aggregatedChild);
-            fChildren.replace(node.getSymbol(), node);
         }
     }
 
@@ -182,17 +181,15 @@ public class AggregatedCalledFunction implements Cloneable {
      *            The first parent secondNode The second parent
      */
     private static void mergeChildren(AggregatedCalledFunction firstNode, AggregatedCalledFunction secondNode) {
-        for (Map.Entry<Object, AggregatedCalledFunction> FunctionEntry : secondNode.fChildren.entrySet()) {
-            Object childSymbol = NonNullUtils.checkNotNull(FunctionEntry.getKey());
-            AggregatedCalledFunction secondNodeChild = NonNullUtils.checkNotNull(FunctionEntry.getValue());
+        for (Map.Entry<Object, AggregatedCalledFunction> functionEntry : secondNode.fChildren.entrySet()) {
+            Object childSymbol = Objects.requireNonNull(functionEntry.getKey());
+            AggregatedCalledFunction secondNodeChild = Objects.requireNonNull(functionEntry.getValue());
             AggregatedCalledFunction aggregatedCalledFunction = firstNode.fChildren.get(childSymbol);
             if (aggregatedCalledFunction == null) {
                 firstNode.fChildren.put(secondNodeChild.getSymbol(), secondNodeChild);
             } else {
                 // combine children
-                AggregatedCalledFunction firstNodeChild = aggregatedCalledFunction;
-                merge(firstNodeChild, secondNodeChild);
-                firstNode.fChildren.replace(firstNodeChild.getSymbol(), firstNodeChild);
+                merge(aggregatedCalledFunction, secondNodeChild);
             }
         }
     }
@@ -207,10 +204,8 @@ public class AggregatedCalledFunction implements Cloneable {
      *            the node to merge
      */
     private static void merge(AggregatedCalledFunction destination, AggregatedCalledFunction source) {
-        long sourceDuration = source.getDuration();
-        long sourceSelfTime = source.getSelfTime();
-        destination.addToDuration(sourceDuration);
-        destination.addToSelfTime(sourceSelfTime);
+        destination.addToDuration(source.getDuration());
+        destination.addToSelfTime(source.getSelfTime());
         destination.getFunctionStatistics().merge(source.getFunctionStatistics());
         // merge the children callees.
         mergeChildren(destination, source);
@@ -284,7 +279,7 @@ public class AggregatedCalledFunction implements Cloneable {
      *
      * @return Boolean
      */
-    public Boolean hasChildren() {
+    public boolean hasChildren() {
         return !fChildren.isEmpty();
     }
 
