@@ -49,7 +49,6 @@ import org.eclipse.ui.IViewPart;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -255,13 +254,16 @@ public class FlameGraphTest extends AggregationTreeTest {
         assertEquals(new TmfTimeRange(TmfTimestamp.fromNanos(0), TmfTimestamp.fromNanos(80)), new TmfTimeRange(TmfTimestamp.fromNanos(fTimeGraphViewer.getTime0()), TmfTimestamp.fromNanos(fTimeGraphViewer.getTime1())));
     }
 
-    /**
-     * Takes too much ram
-     */
-    @Ignore
     @Override
     public void largeTest() {
-        // Do nothing
+        super.largeTest();
+        loadFlameGraph();
+        ITimeGraphEntry entry = selectRoot();
+        assertEquals(1000, entry.getChildren().size());
+        ITimeGraphEntry actualEntry = entry.getChildren().get(1);
+        ITimeEvent actualEvent = getFirstEvent(actualEntry);
+        assertNotNull(actualEvent);
+        assertEquals(10, actualEvent.getDuration());
     }
 
 }

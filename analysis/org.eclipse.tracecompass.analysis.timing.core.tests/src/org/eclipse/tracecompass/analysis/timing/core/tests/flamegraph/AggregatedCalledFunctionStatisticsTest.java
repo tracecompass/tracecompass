@@ -10,7 +10,6 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.AggregatedCalledFunction;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.AggregatedCalledFunctionStatistics;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphAnalysis;
@@ -52,7 +51,7 @@ public class AggregatedCalledFunctionStatisticsTest {
     private class CGAnalysis extends CallGraphAnalysis {
 
         @Override
-        protected boolean iterateOverStateSystem(@Nullable ITmfStateSystem ss, String[] threadsPattern, String[] processesPattern, String[] callStackPath, IProgressMonitor monitor) {
+        protected boolean iterateOverStateSystem(@NonNull ITmfStateSystem ss, String[] threadsPattern, String[] processesPattern, String[] callStackPath, IProgressMonitor monitor) {
             return super.iterateOverStateSystem(ss, threadsPattern, processesPattern, callStackPath, monitor);
         }
 
@@ -62,11 +61,9 @@ public class AggregatedCalledFunctionStatisticsTest {
         }
     }
 
-    private static ITmfStateSystemBuilder createFixture() {
-        IStateHistoryBackend backend;
-        backend = StateHistoryBackendFactory.createInMemoryBackend("Test", 0L);
-        ITmfStateSystemBuilder fixture = StateSystemFactory.newStateSystem(backend);
-        return fixture;
+    private static @NonNull ITmfStateSystemBuilder createFixture() {
+        IStateHistoryBackend backend = StateHistoryBackendFactory.createInMemoryBackend("Test", 0L);
+        return StateSystemFactory.newStateSystem(backend);
     }
 
     /**

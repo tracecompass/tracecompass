@@ -10,7 +10,6 @@
 package org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 
 /**
  * Factory to create {@link ICalledFunction}s.
@@ -43,23 +42,15 @@ public final class CalledFunctionFactory {
      *            the parent node
      * @return an ICalledFunction with the specified properties
      */
-    public static AbstractCalledFunction create(long start, long end, int depth, ITmfStateValue stateValue, int processId, @Nullable ICalledFunction parent) {
-        switch (stateValue.getType()) {
-        case INTEGER:
-            return create(start, end, depth, stateValue.unboxInt(), processId, parent);
-        case LONG:
-            return create(start, end, depth, stateValue.unboxLong(), processId, parent);
-        case STRING:
-            return create(start, end, depth, stateValue.unboxStr(), processId, parent);
-        case CUSTOM:
-            // Fall through
-        case DOUBLE:
-            // Fall through
-        case NULL:
-            // Fall through
-        default:
-            throw new IllegalArgumentException(ERROR_MSG + stateValue.getType() + SEPARATOR + stateValue.toString());
+    public static AbstractCalledFunction create(long start, long end, int depth, Object stateValue, int processId, @Nullable ICalledFunction parent) {
+        if (stateValue instanceof Integer) {
+            return create(start, end, depth, (int) stateValue, processId, parent);
+        } else if (stateValue instanceof Long) {
+            return create(start, end, depth, (long) stateValue, processId, parent);
+        } else if (stateValue instanceof String) {
+            return create(start, end, depth, (String) stateValue, processId, parent);
         }
+        throw new IllegalArgumentException(ERROR_MSG + stateValue.getClass() + SEPARATOR + stateValue.toString());
     }
 
     /**

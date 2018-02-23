@@ -87,7 +87,7 @@ public class AggregationTreeTest {
         }
 
         @Override
-        protected boolean iterateOverStateSystem(@Nullable ITmfStateSystem ss, String[] threadsPattern, String[] processesPattern, String[] callStackPath, IProgressMonitor monitor) {
+        protected boolean iterateOverStateSystem(ITmfStateSystem ss, String[] threadsPattern, String[] processesPattern, String[] callStackPath, IProgressMonitor monitor) {
             return super.iterateOverStateSystem(ss, threadsPattern, processesPattern, callStackPath, monitor);
         }
 
@@ -100,11 +100,9 @@ public class AggregationTreeTest {
 
     }
 
-    private static ITmfStateSystemBuilder createFixture() {
-        IStateHistoryBackend backend;
-        backend = StateHistoryBackendFactory.createInMemoryBackend("Test", 0L);
-        ITmfStateSystemBuilder fixture = StateSystemFactory.newStateSystem(backend);
-        return fixture;
+    private static @NonNull ITmfStateSystemBuilder createFixture() {
+        IStateHistoryBackend backend = StateHistoryBackendFactory.createInMemoryBackend("Test", 0L);
+        return StateSystemFactory.newStateSystem(backend);
     }
 
     private CGAnalysis fCga;

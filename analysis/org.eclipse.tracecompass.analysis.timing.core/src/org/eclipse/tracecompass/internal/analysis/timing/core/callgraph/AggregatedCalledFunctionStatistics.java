@@ -31,8 +31,8 @@ public class AggregatedCalledFunctionStatistics {
      * Constructor
      */
     public AggregatedCalledFunctionStatistics() {
-        fDurations = new Statistics<>(f -> f.getLength());
-        fSelfTimes = new Statistics<>(f -> f.getSelfTime());
+        fDurations = new Statistics<>(ICalledFunction::getLength);
+        fSelfTimes = new Statistics<>(ICalledFunction::getSelfTime);
     }
 
     /**
