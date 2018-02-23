@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -80,7 +81,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
 
     /** ID of the checked tree items in the map of data in {@link TmfTraceContext} */
     private static final @NonNull String CHECKED_ELEMENTS = ".CHECKED_ELEMENTS"; //$NON-NLS-1$
-    private static final @NonNull String FILTER_STRING = ".FILTER_STRING";
+    private static final @NonNull String FILTER_STRING = ".FILTER_STRING"; //$NON-NLS-1$
     private static final @NonNull String UPDATE_CONTENT_JOB_NAME = "AbstractSelectTreeViewer#updateContent Job"; //$NON-NLS-1$
     private static final String FAILED_TO_SLEEP_PREFIX = "Failed to sleep the "; //$NON-NLS-1$
 
@@ -346,8 +347,8 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
                 if (treeViewer.getControl().isDisposed()) {
                     return;
                 }
-
-                if (!rootEntry.equals(treeViewer.getInput())) {
+                Object input = treeViewer.getInput();
+                if (!(input instanceof ITmfTreeViewerEntry) || !treeEquals(rootEntry, (ITmfTreeViewerEntry) input)) {
                     saveViewContext();
                     treeViewer.setInput(rootEntry);
                     contentChanged(rootEntry);
@@ -360,6 +361,34 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
                 }
             });
         }
+    }
+
+    /**
+     * Recursively compare two trees, as the tree viewer requires a fast method,
+     * {@link Object#hashCode()} for example.
+     *
+     * @param entry1
+     *            one of the root tree entries to compare
+     * @param entry2
+     *            the other tree entry to compare
+     * @return if the trees are equal
+     */
+    private boolean treeEquals(ITmfTreeViewerEntry entry1, ITmfTreeViewerEntry entry2) {
+        if (!Objects.equals(entry1.getName(), entry2.getName())) {
+            return false;
+        }
+        List<@NonNull ? extends ITmfTreeViewerEntry> children1 = entry1.getChildren();
+        List<@NonNull ? extends ITmfTreeViewerEntry> children2 = entry2.getChildren();
+        if (children1.size() != children2.size()) {
+            return false;
+        }
+        int size = children1.size();
+        for (int i = 0; i < size; i++) {
+            if (!treeEquals(children1.get(i), children2.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

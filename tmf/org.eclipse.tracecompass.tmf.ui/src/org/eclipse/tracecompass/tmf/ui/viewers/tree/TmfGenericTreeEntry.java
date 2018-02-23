@@ -9,8 +9,6 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.tree;
 
-import java.util.Objects;
-
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
 
@@ -45,23 +43,5 @@ public class TmfGenericTreeEntry<M extends TmfTreeDataModel> extends TmfTreeView
      */
     public M getModel() {
         return fModel;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!super.equals(obj)) {
-            // reference equality, nullness, getName and children
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        TmfGenericTreeEntry<?> other = (TmfGenericTreeEntry<?>) obj;
-        return Objects.equals(fModel, other.fModel);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), fModel);
     }
 }
