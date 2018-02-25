@@ -9,11 +9,9 @@
 
 package org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,83 +33,36 @@ import com.google.common.collect.Iterables;
  */
 public class FlameGraphContentProvider implements ITimeGraphContentProvider {
 
+    /**
+     * remember the input to avoid recomputing for every refresh.
+     */
+    private Collection<?> fCurrentInput = null;
     private final List<FlamegraphDepthEntry> fFlameGraphEntries = new ArrayList<>();
     private SortOption fSortOption = SortOption.BY_NAME;
     private @NonNull Comparator<FlamegraphDepthEntry> fThreadComparator = Objects.requireNonNull(Comparator.comparing(FlamegraphDepthEntry::getName));
 
-    /**
-     * Parse the aggregated tree created by the callGraphAnalysis and creates
-     * the event list (functions) for each entry (depth)
-     *
-     * @param firstNode
-     *            The first node of the aggregation tree
-     * @param childrenEntries
-     *            The list of entries for one thread
-     * @param timestampStack
-     *            A stack used to save the functions timeStamps
-     */
-    private void setData(AggregatedCalledFunction firstNode, List<@NonNull FlamegraphDepthEntry> childrenEntries, Deque<Long> timestampStack) {
-        long lastEnd = timestampStack.peek();
-        for (int i = 0; i < firstNode.getMaxDepth(); i++) {
-            if (i >= childrenEntries.size()) {
-                FlamegraphDepthEntry entry = new FlamegraphDepthEntry(String.valueOf(i), 0, firstNode.getDuration(), i, i);
-                childrenEntries.add(entry);
-            }
-            childrenEntries.get(i).updateEndTime(lastEnd + firstNode.getDuration());
-        }
-        FlamegraphDepthEntry firstEntry = childrenEntries.get(0);
-        firstEntry.addEvent(new FlamegraphEvent(firstEntry, lastEnd, firstNode));
-        // Build the event list for next entries (next depth)
-        addEvent(firstNode, childrenEntries, timestampStack);
-        timestampStack.pop();
-    }
-
-    /**
-     * Build the events list for an entry (depth), then creates recursively the
-     * events for the next entries. This parses the aggregation tree starting
-     * from the bottom. This uses a stack to save the timestamp for each
-     * function. Once we save a function's timestamp we'll use it to create the
-     * callees events.
-     *
-     * @param node
-     *            The node of the aggregation tree
-     * @param childrenEntries
-     *            The list of entries for one thread
-     * @param timestampStack
-     *            A stack used to save the functions timeStamps
-     */
-    private void addEvent(AggregatedCalledFunction node, List<@NonNull FlamegraphDepthEntry> childrenEntries, Deque<Long> timestampStack) {
-        if (node.hasChildren()) {
-            List<AggregatedCalledFunction> children = new ArrayList<>(node.getChildren());
-            children.sort(Comparator.comparingLong(AggregatedCalledFunction::getDuration));
-            for (AggregatedCalledFunction child : children) {
-                addEvent(child, childrenEntries, timestampStack);
-            }
-            node.getChildren().forEach(child -> timestampStack.pop());
-        }
-        FlamegraphDepthEntry entry = childrenEntries.get(node.getDepth());
-        // Create the event corresponding to the function using the caller's
-        // timestamp
-        entry.addEvent(new FlamegraphEvent(entry, timestampStack.peek(), node));
-        timestampStack.push(timestampStack.peek() + node.getDuration());
-    }
-
     @Override
     public boolean hasChildren(Object element) {
-        return !fFlameGraphEntries.isEmpty();
+        if (element instanceof FlamegraphDepthEntry) {
+            return ((FlamegraphDepthEntry) element).hasChildren();
+        }
+        return false;
     }
 
     @Override
     public ITimeGraphEntry[] getElements(Object inputElement) {
-        fFlameGraphEntries.clear();
-        // Get the root of each thread
-        if (inputElement instanceof Collection<?>) {
-            Collection<?> threadNodes = (Collection<?>) inputElement;
-            for (ThreadNode object : Iterables.filter(threadNodes, ThreadNode.class)) {
-                buildChildrenEntries(object);
+        if (!Objects.equals(fCurrentInput, inputElement)) {
+            fFlameGraphEntries.clear();
+            // Get the root of each thread
+            if (inputElement instanceof Collection<?>) {
+                Collection<?> threadNodes = (Collection<?>) inputElement;
+                for (ThreadNode object : Iterables.filter(threadNodes, ThreadNode.class)) {
+                    buildChildrenEntries(object);
+                }
+                fCurrentInput = threadNodes;
+            } else {
+                return new ITimeGraphEntry[0];
             }
-        } else {
-            return new ITimeGraphEntry[0];
         }
 
         // Sort the threads
@@ -127,36 +78,67 @@ public class FlameGraphContentProvider implements ITimeGraphContentProvider {
      */
     private void buildChildrenEntries(ThreadNode threadNode) {
         FlamegraphDepthEntry threadEntry = new FlamegraphDepthEntry(threadNode.getSymbol().toString(), 0, 0, fFlameGraphEntries.size(), threadNode.getId());
-        List<@NonNull FlamegraphDepthEntry> childrenEntries = new ArrayList<>();
-        Deque<Long> timestampStack = new ArrayDeque<>();
-        timestampStack.push(0L);
-        // Sort children by duration
-        threadNode.getChildren().stream()
-                .sorted(Comparator.comparingLong(AggregatedCalledFunction::getDuration))
-                .forEach(rootFunction -> {
-                    setData(rootFunction, childrenEntries, timestampStack);
-                    long currentThreadDuration = timestampStack.pop() + rootFunction.getDuration();
-                    timestampStack.push(currentThreadDuration);
-                });
-        childrenEntries.forEach(threadEntry::addChild);
-        threadEntry.updateEndTime(timestampStack.pop());
+        for (AggregatedCalledFunction child : getSortedChildren(threadNode)) {
+            addEntries(threadEntry, child);
+        }
         fFlameGraphEntries.add(threadEntry);
+    }
+
+    /**
+     * recursively add functions to the thread entry, incrementing its depth as
+     * required, and adding each function to the list of events.
+     *
+     * @param threadEntry
+     *            root thread entry for this call graph
+     * @param function
+     *            function to add to the call graph
+     */
+    private static void addEntries(FlamegraphDepthEntry threadEntry, AggregatedCalledFunction function) {
+        // get the flame graph entry for the correct depth, create it if absent.
+        int depth = function.getDepth();
+        TimeGraphEntry depthEntry;
+        if (threadEntry.getChildren().size() <= depth) {
+            depthEntry = new FlamegraphDepthEntry(String.valueOf(depth), 0, 0, depth, depth);
+            threadEntry.addChild(depthEntry);
+        } else {
+            depthEntry = threadEntry.getChildren().get(depth);
+        }
+
+        // also updates the depthEntry's end time.
+        depthEntry.addEvent(new FlamegraphEvent(depthEntry, threadEntry.getEndTime(), function));
+
+        for (AggregatedCalledFunction node : getSortedChildren(function)) {
+            addEntries(threadEntry, node);
+        }
+        threadEntry.updateEndTime(depthEntry.getEndTime());
+    }
+
+    private static Iterable<@NonNull AggregatedCalledFunction> getSortedChildren(AggregatedCalledFunction function) {
+        List<@NonNull AggregatedCalledFunction> children = new ArrayList<>(function.getChildren());
+        children.sort(Comparator.comparingLong(AggregatedCalledFunction::getDuration));
+        return children;
     }
 
     @Override
     public ITimeGraphEntry[] getChildren(Object parentElement) {
-        return fFlameGraphEntries.toArray(new TimeGraphEntry[fFlameGraphEntries.size()]);
+        if (parentElement instanceof FlamegraphDepthEntry) {
+            List<@NonNull TimeGraphEntry> children = ((FlamegraphDepthEntry) parentElement).getChildren();
+            return children.toArray(new TimeGraphEntry[children.size()]);
+        }
+        return new ITimeGraphEntry[0];
     }
 
     @Override
     public ITimeGraphEntry getParent(Object element) {
-        // Do nothing
+        if (element instanceof FlamegraphDepthEntry) {
+            return ((FlamegraphDepthEntry) element).getParent();
+        }
         return null;
     }
 
     @Override
     public void dispose() {
-        // Do nothing
+        fFlameGraphEntries.clear();
     }
 
     @Override
