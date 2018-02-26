@@ -76,6 +76,10 @@ class StatisticsUpdateJob extends Job {
 
     @Override
     protected IStatus run(IProgressMonitor monitor) {
+        IStatus st = fStatsMod.schedule();
+        if (!st.isOK()) {
+            return st;
+        }
 
         /* Wait until the analysis is ready to be queried */
         if (!fStatsMod.waitForInitialization()) {
