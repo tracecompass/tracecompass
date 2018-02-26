@@ -85,12 +85,13 @@ public class SystemCallLatencyScatterChartViewTest extends XYDataProviderBaseTes
 
         final Chart chart = getChart();
         assertNotNull(chart);
+        SWTBotUtils.waitUntil(bot -> bot.tree().visibleRowCount() >= 25, getSWTBotView().bot(), "Missing rows, expected 25, was " + getSWTBotView().bot().tree().visibleRowCount());
         SWTBotTreeItem[] items = getSWTBotView().bot().tree().getAllItems();
         for (SWTBotTreeItem item : items) {
             item.check();
         }
 
-        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length > 0, chart, "No data available");
+        SWTBotUtils.waitUntil(c -> c.getSeriesSet().getSeries().length >= 24, chart, "No data available");
 
         /* Test type, style and color of series */
         verifyChartStyle();
