@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.w3c.dom.Element;
 
@@ -134,7 +135,7 @@ public class TmfXmlCondition implements ITmfXmlCondition {
         ArrayList<ITmfXmlStateValue> stateValues;
         ConditionOperator conditionOperator;
         TmfXmlTimestampCondition timeCondition = null;
-        int size = rootNode.getElementsByTagName(TmfXmlStrings.STATE_VALUE).getLength();
+        int size = TmfXmlUtils.getChildElements(rootNode, TmfXmlStrings.STATE_VALUE).size();
         if (size != 0) {
             stateValues = new ArrayList<>(size);
             if (size == 1) {
