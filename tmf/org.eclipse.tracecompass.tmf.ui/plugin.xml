@@ -814,7 +814,7 @@
               </with>
            </visibleWhen>
         </command>
-        <!--  <command
+        <command
                commandId="org.eclipse.tracecompass.tmf.ui.command.trim_trace"
                label="%command.trim_trace"
                style="push"
@@ -822,7 +822,7 @@
             <visibleWhen
                   checkEnabled="true">
             </visibleWhen>
-         </command> -->
+         </command>
          <separator
                name="org.eclipse.linuxtools.tmf.ui.separator3"
                visible="true">
