@@ -88,6 +88,10 @@ public class Activator extends Plugin {
         TmfTraceManager.getInstance();
         /* Initialize the analysis manager */
         TmfAnalysisManager.initialize();
+        /* Initialize the symbol provider manager */
+        SymbolProviderManager.getInstance();
+        /* Initialize the data provider manager */
+        DataProviderManager.getInstance();
     }
 
     @Override
