@@ -37,7 +37,7 @@ public class CTFTraceWriter {
     /**
      * The trace to read from.
      */
-    @Nullable private final CTFTrace fInTrace;
+    private final @Nullable CTFTrace fInTrace;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -59,9 +59,9 @@ public class CTFTraceWriter {
     }
 
     /**
-     * Copies packets from the relevant input to the output trace based
-     * on a given time range. The following condition has to be met so that
-     * a packet is written to the output trace:
+     * Copies packets from the relevant input to the output trace based on a given
+     * time range. The following condition has to be met so that a packet is written
+     * to the output trace:
      *
      * startTime <= packet.getTimestampBegin() <= endTime
      *
@@ -72,7 +72,7 @@ public class CTFTraceWriter {
      * @param newTracePath
      *            the path of the new trace to be written
      * @throws CTFException
-     *            If a reading or writing error occurs
+     *             If a reading or writing error occurs
      */
     public void copyPackets(long startTime, long endTime, String newTracePath) throws CTFException {
         CTFTrace trace = fInTrace;
@@ -81,15 +81,15 @@ public class CTFTraceWriter {
             long adjustedEnd = endTime - trace.getClock().getClockOffset();
             File out = new File(newTracePath);
             if (out.exists()) {
-                throw new CTFIOException("Trace segment cannot be created since trace already exists: " + newTracePath); //$NON-NLS-1$
+                if (!out.isDirectory() || out.listFiles().length != 0) {
+                    throw new CTFIOException("Trace segment cannot be created since trace already exists: " + newTracePath); //$NON-NLS-1$
+                }
+            } else {
+                // create new directory
+                if (!out.mkdirs()) {
+                    throw new CTFIOException("Creating trace directory failed: " + newTracePath); //$NON-NLS-1$
+                }
             }
-
-            // create new directory
-            boolean isSuccess = out.mkdir();
-            if (!isSuccess) {
-                throw new CTFIOException("Creating trace directory failed: " + newTracePath); //$NON-NLS-1$
-            }
-
             // copy metadata
             Metadata metadata = new Metadata(fInTrace);
             try {
