@@ -33,6 +33,7 @@ public class TmfSignalTracer {
     }
 
     private TmfSignalTracer() {
+        // Do nothing
     }
 
     /**
