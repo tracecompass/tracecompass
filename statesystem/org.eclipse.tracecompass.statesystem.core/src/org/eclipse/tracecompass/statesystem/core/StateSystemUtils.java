@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2016 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2018 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -380,7 +380,7 @@ public final class StateSystemUtils {
          *            queries. A value lower or equal to 1 will return all intervals
          * @throws TimeRangeException
          *             If endTime < initialTime.
-         * @since 3.2
+         * @since 3.3
          */
         public QuarkIterator(ITmfStateSystem ss, int quark, long initialTime, long endTime, long resolution) {
             if (endTime < initialTime) {
