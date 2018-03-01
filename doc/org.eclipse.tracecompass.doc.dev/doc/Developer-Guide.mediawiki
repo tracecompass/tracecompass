@@ -4876,3 +4876,111 @@ To advertise this extension to the execution graph, the following extension shou
     </extension>
 
 The ''class'' attribute links to the handler builder class and the ''priority'' attribute indicates at which priority the handler will be registered. A handler with a lower priority will be executed before a handler with a higher one. The default priority is 10 and this is the priority at which the kernel graph itself is built.
+
+= Data Providers =
+
+Starting in Trace Compass 3.3, the core and UI are being decoupled with the data provider interface. This interface aims to provide a standard data model for different types of views.
+
+Data providers are queried with a filter object, which usually contains a time range as well as other parameters required to correctly filter and sample the returned data. They also take an optional progress monitor to cancel the task. The returned models are encapsulated in a '''TmfModelResponse''' object, which is generic (to the response's type) and also encapsulates the Status of the reponse:
+
+* CANCELLED if the query was cancelled by the progress monitor
+* FAILED if an error occurred inside the data provider
+* RUNNING if the response was returned before the underlying analysis was completed, and querying the provider again with the same parameters can return a different model.
+* COMPLETED if the underlying analysis is finished and we do not expect a different model for the query parameters.
+
+== Data provider types ==
+The base data provider returns a tree, as a list of '''TmfTreeDataModel''', with a name, ID and parent ID. The ID is unique to a provider type and the parent ID indicates which element from the list is the entry's parent to rebuild the tree from the list of models.
+
+The base '''TimeGraphEntryModel''' class extends this with a start time and end time. Concrete classes are free to add other required fields, as long as the model is serializable.
+
+=== Tree XY ===
+The tree XY data provider type is used to associate XY series to an entry from the tree. The data provider is queried with a filter that also contains a Collection of the IDs of the entries for which we want XY series. The response contains a map of the series for the desired IDs.
+
+Each XY series can have its own x axis ('''ISeriesModel''' / '''SeriesModel''' - encapsulated in an '''ITmfXyModel''' / '''TmfXyModel''') or they can be shared by all models ('''IYModel''' / '''YModel''' encapsulated in an '''ITmfCommonXAxisModel''' / '''TmfCommonXAxisModel'''). The X axis is an array of longs, which makes it useful for a time axis or time buckets, but it can be used for any XY content.
+
+The interface to implement is '''ITmfTreeXYDataProvider'''.
+
+=== Time Graph ===
+The Time Graph data provider is used to associate states to tree entries, i.e. a sampled list of states, with a start time, duration, integer value and optional label. The time graph states ('''ITimeGraphState''' / '''TimeGraphState''') are encapsulated in an '''ITimeGraphRowModel''' which also provides the ID of the entry they map to.
+
+The time graph data provider can also supply arrows to link entries one to another with a start time and start ID as well as a duration and target ID. The interface to implement is '''ITimeGraphArrow''', else '''TimeGraphArrow''' can be extended.
+
+Additional information can be added to the states with tooltips, which are maps of tooltip entry names to tooltip entry values.
+
+The interface to implement is '''ITimeGraphDataProvider'''.
+
+== Data provider management ==
+Data providers can be handled by the '''DataProviderManager''' class, which uses an extension point and factories for data providers.
+This manager associates a unique data provider per trace and extension point ID, ensuring that data providers can be reused and that each entry for a trace reuses the same unique entry ID.
+
+=== Extension point ===
+example:
+<pre>
+<extension point="org.eclipse.tracecompass.tmf.core.dataprovider">
+    <dataProviderFactory
+        class="org.eclipse.tracecompass.analysis.graph.core.dataprovider.CriticalPathDataProviderFactory"
+        id="org.eclipse.tracecompass.analysis.graph.core.dataprovider.CriticalPathDataProvider">
+    </dataProviderFactory>
+</extension>
+</pre>
+
+=== Experiments ===
+In the data provider manager, experiments also get a unique instance of a data provider, which can be specific or encapsulate the data providers from the child traces. For example, an experiment can have its own concrete data provider when required (an analysis that runs only on experiments), or the factory would create a '''CompositeDataProvider''' (using '''TmfTreeXYCompositeDataProvider''' or '''TmfTimeGraphCompositeDataProvider''') encapsulating the providers from its traces. The benefit of encapsulating the providers from child traces is that their entries/IDs can be reused, limiting the number of created objects and ensuring consistency in views. These composite data providers dispatch the request to all the encapsulated providers and aggregates the results into the expected data structure.
+
+== Utilities ==
+Abstract base classes are provided for TreeXY and time graph data providers based on '''TmfStateSystemAnalysisModule'''s ('''AbstractTreeCommonXDataProvider''' and '''AbstractTimeGraphDataProvider''', respectively). They handle concurrency, mapping of state system attributes to unique IDs, exceptions, caching and encapsulating the model in a response with the correct status.
+
+On the view side, we recommend building TreeXY views from '''AbstractSelectTreeViewer''' and '''TmfFilteredXYChartViewer''' and building Time Graph Views by extending  '''BaseDataProviderTimeGraphView'''.
+
+=== Example Tree XY code ===
+
+Below is an example of the minimum implementation required to display the data from a tree XY data provider.
+
+Out of the box, it supports experiments, updating during the trace analysis, Pin & Clone and a number of chart viewer features.
+
+<pre>
+public class TreeXyView extends TmfChartView {
+
+    /**
+     * Constructor
+     */
+    public TreeXyView() {
+        super("Tree XY View");
+    }
+
+    @Override
+    protected TmfXYChartViewer createChartViewer(Composite parent) {
+        TmfXYChartSettings settings = new TmfXYChartSettings(null, null, null, 1);
+        return new TmfFilteredXYChartViewer(parent, settings, DataProvider.ID);
+    }
+
+    private static final class TreeXyViewer extends AbstractSelectTreeViewer {
+
+        private final class TreeXyLabelProvider extends TreeLabelProvider {
+            @Override
+            public Image getColumnImage(Object element, int columnIndex) {
+                if (columnIndex == 1 && element instanceof TmfTreeViewerEntry && isChecked(element)) {
+                    return getLegendImage(((TmfTreeViewerEntry) element).getName());
+                }
+                return null;
+            }
+        }
+
+        public TreeXyViewer(Composite parent) {
+            super(parent, 1, DataProvider.ID);
+            setLabelProvider(new TreeXyLabelProvider());
+        }
+
+        @Override
+        protected ITmfTreeColumnDataProvider getColumnDataProvider() {
+            return () -> ImmutableList.of(createColumn("Name", Comparator.comparing(TmfTreeViewerEntry::getName)),
+                    new TmfTreeColumnData("Legend"));
+        }
+    }
+
+    @Override
+    protected @NonNull TmfViewer createLeftChildViewer(Composite parent) {
+        return new TreeXyViewer(parent);
+    }
+}
+</pre>
