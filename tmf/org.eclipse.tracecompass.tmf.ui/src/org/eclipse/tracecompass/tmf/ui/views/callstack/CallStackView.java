@@ -52,6 +52,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
@@ -313,6 +314,10 @@ public class CallStackView extends BaseDataProviderTimeGraphView {
             @Override
             public void mouseDoubleClick(MouseEvent event) {
                 ITimeGraphEntry selection = getTimeGraphViewer().getSelection();
+                if (!(selection instanceof TimeGraphEntry)) {
+                    // also null checks
+                    return;
+                }
                 ITimeGraphState function = fFunctions.get(((TimeGraphEntry) selection).getModel().getId());
                 if (function != null) {
                     long entryTime = function.getStartTime();
@@ -716,6 +721,20 @@ public class CallStackView extends BaseDataProviderTimeGraphView {
     private void updateConfigureSymbolsAction() {
         ISymbolProviderPreferencePage[] providerPages = getProviderPages();
         getConfigureSymbolsAction().setEnabled(providerPages.length > 0);
+    }
+
+    @TmfSignalHandler
+    @Override
+    public void traceClosed(TmfTraceClosedSignal signal) {
+        List<@NonNull TimeGraphEntry> traceEntries = getEntryList(signal.getTrace());
+        if (traceEntries != null) {
+            /*
+             * remove functions associated to the trace's entries.
+             */
+            Iterable<TimeGraphEntry> all = Iterables.concat(Iterables.transform(traceEntries, Utils::flatten));
+            all.forEach(entry -> fFunctions.remove(entry.getModel().getId()));
+        }
+        super.traceClosed(signal);
     }
 
 }
