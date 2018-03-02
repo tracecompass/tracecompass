@@ -12,9 +12,11 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -43,9 +45,6 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.TreeMultimap;
@@ -71,74 +70,6 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
      * rectangle. This depends on the trace's event layout.
      */
     private final Function<@NonNull String, @NonNull String> fSyscallTrim;
-
-    /**
-     * Loader to load named states (EXEC_NAME or SYSCALL_NAME) from the CPU status
-     * interval. Needs to find the current running thread from the CPU and resolve
-     * the EXEC_NAME or SYSCALL_NAME from that thread's sub-attributes.
-     */
-    private final CacheLoader<ITmfStateInterval , @Nullable TimeGraphState> fLoader = new CacheLoader<ITmfStateInterval, @Nullable TimeGraphState>() {
-        @Override
-        public @Nullable TimeGraphState load(ITmfStateInterval interval) {
-            ITmfStateSystem ss = getAnalysisModule().getStateSystem();
-            if (ss == null) {
-                return null;
-            }
-
-            long startTime = interval.getStartTime();
-            long duration = interval.getEndTime() - startTime + 1;
-            int status = interval.getStateValue().unboxInt();
-
-            int currentThreadQuark = ss.optQuarkRelative(interval.getAttribute(), Attributes.CURRENT_THREAD);
-            if (currentThreadQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
-                return new TimeGraphState(startTime, duration, status);
-            }
-
-            String attribute;
-            Function<@NonNull String, @NonNull String> trim = Function.identity();
-            if (status == StateValues.CPU_STATUS_RUN_USERMODE) {
-                attribute = Attributes.EXEC_NAME;
-            } else if (status == StateValues.CPU_STATUS_RUN_SYSCALL) {
-                attribute = Attributes.SYSTEM_CALL;
-                /*
-                 * Remove the "sys_" or "syscall_entry_" or similar from what we draw in the
-                 * rectangle. This depends on the trace's event layout.
-                 */
-                trim = fSyscallTrim;
-            } else {
-                // no reason to be here
-                return null;
-            }
-
-            long time = startTime;
-            try {
-                while (time < interval.getEndTime()) {
-                    ITmfStateInterval tidInterval = ss.querySingleState(time, currentThreadQuark);
-                    time = Long.max(tidInterval.getStartTime(), time);
-                    Object value = tidInterval.getValue();
-                    if (value instanceof Integer) {
-                        int currentThreadId = (int) value;
-                        int quark = ss.optQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), attribute);
-                        if (quark != ITmfStateSystem.INVALID_ATTRIBUTE) {
-                            ITmfStateInterval nameInterval = ss.querySingleState(time, quark);
-                            Object label = nameInterval.getValue();
-                            if (label instanceof String) {
-                                return new TimeGraphState(startTime, duration, status, trim.apply((String) label));
-                            }
-                        }
-                    }
-                    // make sure next time is at least at the next pixel
-                    time = tidInterval.getEndTime() + 1;
-                }
-            } catch (StateSystemDisposedException e) {
-                // do nothing, the trace is closed.
-            }
-            return new TimeGraphState(startTime, duration, status);
-        }
-    };
-
-    private final LoadingCache<ITmfStateInterval, @Nullable TimeGraphState> fTimeEventNames = CacheBuilder.newBuilder()
-            .maximumSize(1000).build(fLoader);
 
     /**
      * Constructor
@@ -259,7 +190,8 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         Map<@NonNull Long, @NonNull Integer> entries = getSelectedEntries(filter);
         Collection<Long> times = getTimes(filter, ss.getStartTime(), ss.getCurrentEndTime());
         /* Do the actual query */
-        for (ITmfStateInterval interval : ss.query2D(entries.values(), times)) {
+        Collection<@NonNull Integer> quarks = addThreadStatus(ss, entries.values());
+        for (ITmfStateInterval interval : ss.query2D(quarks, times)) {
             if (monitor != null && monitor.isCanceled()) {
                 return null;
             }
@@ -275,31 +207,128 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
 
             List<ITimeGraphState> eventList = new ArrayList<>();
             for (ITmfStateInterval interval : intervals.get(entry.getValue())) {
-                eventList.add(createTimeGraphState(interval));
+                long startTime = interval.getStartTime();
+                long duration = interval.getEndTime() - startTime + 1;
+                Object status = interval.getValue();
+                if (status instanceof Integer) {
+                    int s = (int) status;
+                    int currentThreadQuark = ss.optQuarkRelative(interval.getAttribute(), Attributes.CURRENT_THREAD);
+                    if (s == StateValues.CPU_STATUS_RUN_SYSCALL) {
+                        eventList.add(getSyscall(ss, interval, intervals.get(currentThreadQuark)));
+                    } else if (s == StateValues.CPU_STATUS_RUN_USERMODE) {
+                        // add events for all the sampled current threads.
+                        eventList.addAll(getCurrentThreads(ss, interval, intervals.get(currentThreadQuark)));
+                    } else {
+                        eventList.add(new TimeGraphState(startTime, duration, s));
+                    }
+                } else {
+                    eventList.add(new TimeGraphState(startTime, duration, Integer.MIN_VALUE));
+                }
             }
             rows.add(new TimeGraphRowModel(entry.getKey(), eventList));
-        }
-        if (!ss.waitUntilBuilt(0)) {
-            /*
-             * Avoid caching incomplete results from state system.
-             */
-            fTimeEventNames.invalidateAll();
         }
         return rows;
     }
 
-    private ITimeGraphState createTimeGraphState(ITmfStateInterval interval) {
+    /**
+     * Add the quarks for the thread status attribute, for all the CPU quarks in
+     * values
+     *
+     * @param ss
+     *            backing state system
+     * @param values
+     *            original quarks
+     * @return set containing values, and Current Thread attributes for all the
+     *         quarks
+     */
+    private static @NonNull Set<@NonNull Integer> addThreadStatus(@NonNull ITmfStateSystem ss, @NonNull Collection<@NonNull Integer> values) {
+        Set<@NonNull Integer> set = new HashSet<>(values);
+        for (Integer quark : values) {
+            int parentAttributeQuark = ss.getParentAttributeQuark(quark);
+            if (ss.getAttributeName(parentAttributeQuark).equals(Attributes.CPUS)) {
+                int threadStatus = ss.optQuarkRelative(quark, Attributes.CURRENT_THREAD);
+                if (threadStatus != ITmfStateSystem.INVALID_ATTRIBUTE) {
+                    set.add(threadStatus);
+                }
+            }
+        }
+        return set;
+    }
+
+    /**
+     * Get a list of all the current threads over the duration of the current
+     * usermode interval, as several threads can be scheduled over that interval
+     *
+     * @param ss
+     *            backing state system
+     * @param userModeInterval
+     *            interval representing the CPUs current user mode state.
+     * @param currentThreadIntervals
+     *            Current Threads intervals for the same CPU with the time query
+     *            filter sampling
+     * @return a List of intervals with the current thread name label.
+     */
+    private static List<TimeGraphState> getCurrentThreads(@NonNull ITmfStateSystem ss, ITmfStateInterval userModeInterval,
+            @NonNull NavigableSet<ITmfStateInterval> currentThreadIntervals) throws StateSystemDisposedException {
+        List<TimeGraphState> list = new ArrayList<>();
+        for (ITmfStateInterval currentThread : currentThreadIntervals) {
+            // filter the current thread intervals which overlap the usermode interval
+            if (currentThread.getStartTime() <= userModeInterval.getEndTime()
+                    && currentThread.getEndTime() >= userModeInterval.getStartTime()) {
+                long start = Long.max(userModeInterval.getStartTime(), currentThread.getStartTime());
+                long end = Long.min(userModeInterval.getEndTime(), currentThread.getEndTime());
+                long duration = end - start + 1;
+                Object tid = currentThread.getValue();
+                if (tid instanceof Integer) {
+                    int execNameQuark = ss.optQuarkAbsolute(Attributes.THREADS, String.valueOf(tid), Attributes.EXEC_NAME);
+                    if (execNameQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
+                        Object currentThreadName = ss.querySingleState(currentThread.getEndTime(), execNameQuark).getValue();
+                        if (currentThreadName instanceof String) {
+                            list.add(new TimeGraphState(start, duration, StateValues.CPU_STATUS_RUN_USERMODE, (String) currentThreadName));
+                            continue;
+                        }
+                    }
+                }
+                list.add(new TimeGraphState(start, duration, StateValues.CPU_STATUS_RUN_USERMODE));
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Get a {@link TimeGraphState} with the syscall name.
+     *
+     * @param ss
+     *            backing state system
+     * @param interval
+     *            current userMode interval
+     * @param currentThreadIntervals
+     *            sampled current thread intervals for the CPU
+     * @return a {@link TimeGraphState} with the System Call name if we found it
+     */
+    private ITimeGraphState getSyscall(@NonNull ITmfStateSystem ss, ITmfStateInterval interval,
+            @NonNull NavigableSet<ITmfStateInterval> currentThreadIntervals) throws StateSystemDisposedException {
         long startTime = interval.getStartTime();
         long duration = interval.getEndTime() - startTime + 1;
-        Object status = interval.getValue();
-        if (status instanceof Integer) {
-            int s = (int) status;
-            if (s == StateValues.CPU_STATUS_RUN_USERMODE || s == StateValues.CPU_STATUS_RUN_SYSCALL) {
-                return fTimeEventNames.getUnchecked(interval);
+        int status = StateValues.CPU_STATUS_RUN_SYSCALL;
+
+        ITmfStateInterval tidInterval = currentThreadIntervals.floor(interval);
+        if (tidInterval != null) {
+            Object value = tidInterval.getValue();
+            if (value instanceof Integer) {
+                int currentThreadId = (int) value;
+                int quark = ss.optQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), Attributes.SYSTEM_CALL);
+                if (quark != ITmfStateSystem.INVALID_ATTRIBUTE) {
+                    ITmfStateInterval nameInterval = ss.querySingleState(startTime, quark);
+                    Object syscallName = nameInterval.getValue();
+                    if (syscallName instanceof String) {
+                        String label = fSyscallTrim.apply((String) syscallName);
+                        return new TimeGraphState(startTime, duration, status, label);
+                    }
+                }
             }
-            return new TimeGraphState(startTime, duration, s);
         }
-        return new TimeGraphState(startTime, duration, Integer.MIN_VALUE);
+        return new TimeGraphState(startTime, duration, status);
     }
 
     @Override
