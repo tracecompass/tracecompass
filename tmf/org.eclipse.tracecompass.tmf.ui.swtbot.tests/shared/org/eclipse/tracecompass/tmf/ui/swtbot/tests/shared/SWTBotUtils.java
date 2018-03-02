@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2017 Ericsson
+ * Copyright (c) 2014, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -17,6 +17,7 @@ import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.anyOf;
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withMnemonic;
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withStyle;
+import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withText;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -135,6 +136,7 @@ public final class SWTBotUtils {
 
     private static final String WINDOW_MENU = "Window";
     private static final String PREFERENCES_MENU_ITEM = "Preferences";
+    private static final String PREFERENCES_SHELL = "Preferences";
     private static boolean fPrintedEnvironment = false;
     private static Logger log = Logger.getLogger(SWTBotUtils.class);
 
@@ -1139,8 +1141,7 @@ public final class SWTBotUtils {
             bot.menu(WINDOW_MENU).menu(PREFERENCES_MENU_ITEM).click();
         }
 
-        bot.waitUntil(Conditions.shellIsActive(PREFERENCES_MENU_ITEM));
-        return bot.activeShell();
+        return bot.shell(PREFERENCES_SHELL).activate();
     }
 
     /**
@@ -1171,6 +1172,24 @@ public final class SWTBotUtils {
         Matcher<Widget> anyOf = anyOf(Lists.transform(Arrays.asList(texts), text -> withMnemonic(text)));
         Iterable<Matcher<? extends Widget>> matchers = Arrays.asList(widgetOfType(Button.class), anyOf, withStyle(SWT.PUSH, "SWT.PUSH"));
         return new SWTBotButton((Button) bot.widget(allOf(matchers), 0), allOf(matchers));
+    }
+
+    /**
+     * Get the first shell that has any one of the specified texts. Useful when
+     * shells change text between releases, or when one of many shells could appear.
+     *
+     * @param bot
+     *            a given bot
+     * @param texts
+     *            the possible shell texts
+     * @return a SWTBotShell
+     * @throws WidgetNotFoundException
+     *             if the widget is not found or is disposed.
+     */
+    public static SWTBotShell anyShellOf(SWTBot bot, String... texts) {
+        Matcher<Widget> anyOf = anyOf(Lists.transform(Arrays.asList(texts), text -> withText(text)));
+        Iterable<Matcher<? extends Widget>> matchers = Arrays.asList(widgetOfType(Shell.class), anyOf);
+        return new SWTBotShell((Shell) bot.widget(allOf(matchers), 0), allOf(matchers));
     }
 
     /**

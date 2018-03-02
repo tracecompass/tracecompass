@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<profiles>
+    <version>0.1</version>
+    <profile name="TestAllRecursive">
+        <node name="node1">
+            <uri>file:/</uri>
+            <traceGroup recursive="true" root="/rootpath">
+                <trace name="" type="">
+                    <file name=".*"/>
+                </trace>
+            </traceGroup>
+        </node>
+    </profile>
+    <profile name="TestAllNonRecursive">
+        <node name="node1">
+            <uri>file:/</uri>
+            <traceGroup recursive="false" root="/rootpath">
+                <trace name="" type="">
+                    <file name=".*"/>
+                </trace>
+            </traceGroup>
+        </node>
+    </profile>
+    <profile name="TestSpecificRecursive">
+        <node name="node1">
+            <uri>file:/</uri>
+            <traceGroup recursive="true" root="/rootpath">
+                <trace name="" type="org.eclipse.linuxtools.tmf.ui.type.ctf">
+                    <file name="(.*/)?synthetic-trace"/>
+                </trace>
+                <trace name="" type="">
+                    <file name="(.*/)?syslog"/>
+                </trace>
+            </traceGroup>
+        </node>
+    </profile>
+    <profile name="TestSpecificNonRecursive">
+        <node name="node1">
+            <uri>file:/</uri>
+            <traceGroup recursive="false" root="/rootpath">
+                <trace name="" type="org.eclipse.linuxtools.tmf.ui.type.ctf">
+                    <file name="(.*/)?synthetic-trace"/>
+                </trace>
+                <trace name="" type="">
+                    <file name="(.*/)?syslog"/>
+                </trace>
+            </traceGroup>
+        </node>
+    </profile>
+    <profile name="TestSpecificMultiGroupRecursive">
+        <node name="node1">
+            <uri>file:/</uri>
+            <traceGroup recursive="true" root="/rootpath">
+                <trace name="" type="org.eclipse.linuxtools.tmf.ui.type.ctf">
+                    <file name="(.*/)?synthetic-trace"/>
+                </trace>
+            </traceGroup>
+            <traceGroup recursive="true" root="/rootpath">
+                <trace name="" type="">
+                    <file name="(.*/)?syslog"/>
+                </trace>
+            </traceGroup>
+        </node>
+    </profile>
+    <profile name="TestMultiNode">
+        <node name="node1">
+            <uri>file:/</uri>
+            <traceGroup recursive="true" root="/rootpath">
+                <trace name="" type="org.eclipse.linuxtools.tmf.ui.type.ctf">
+                    <file name="(.*/)?synthetic-trace"/>
+                </trace>
+            </traceGroup>
+        </node>
+        <node name="node2">
+            <uri>file:/</uri>
+            <traceGroup recursive="true" root="/rootpath">
+                <trace name="" type="">
+                    <file name="(.*/)?syslog"/>
+                </trace>
+            </traceGroup>
+        </node>
+    </profile>
+    <profile name="TestUnknown">
+        <node name="Unknown">
+            <uri>ssh://anonymous@unknown.unknown.unknown</uri>
+            <traceGroup recursive="true" root="/rootpath">
+                <trace name="" type="">
+                    <file name=".*"/>
+                </trace>
+            </traceGroup>
+        </node>
+    </profile>
+    <profile name="TestLocal">
+        <node name="Local">
+            <uri>ssh://anonymous@127.0.0.1</uri>
+            <traceGroup recursive="true" root="/rootpath">
+                <trace name="" type="">
+                    <file name=".*"/>
+                </trace>
+            </traceGroup>
+        </node>
+    </profile>
+</profiles>
