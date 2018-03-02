@@ -90,7 +90,7 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
     private static final @NonNull ITmfTimestamp CPU0_TIME2 = TmfTimestamp.fromNanos(1368000272651852656L);
     private static final @NonNull ITmfTimestamp CPU0_TIME3 = TmfTimestamp.fromNanos(1368000272652067404L);
     private static final @NonNull ITmfTimestamp CPU0_TIME4 = TmfTimestamp.fromNanos(1368000272652282152L);
-    private static final @NonNull ITmfTimestamp CPU0_TIME5 = TmfTimestamp.fromNanos(1368000272653141144L);
+    private static final @NonNull ITmfTimestamp CPU0_TIME5 = TmfTimestamp.fromNanos(1368000272652496900L);
     private static final int TOP_MARGIN = 1;
     private static final Point TOGGLE_SIZE = new Point(7, 8);
     private static final Point HIDE_SIZE = new Point(16, 16);
