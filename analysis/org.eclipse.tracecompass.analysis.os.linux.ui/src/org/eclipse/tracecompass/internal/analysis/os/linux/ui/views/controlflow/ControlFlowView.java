@@ -852,6 +852,12 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
         }
     }
 
+    @Override
+    protected void zoomEntries(@NonNull Iterable<@NonNull TimeGraphEntry> entries, long zoomStartTime, long zoomEndTime, long resolution, @NonNull IProgressMonitor monitor) {
+        super.zoomEntries(entries, zoomStartTime, zoomEndTime, resolution, monitor);
+        fActiveThreadsFilter.updateData(zoomStartTime, zoomEndTime);
+    }
+
     private boolean syncToRow(ITimeGraphRowModel rowModel, long time, Map<Long, TimeGraphEntry> entryMap) {
         long id = rowModel.getEntryID();
         List<@NonNull ITimeGraphState> list = rowModel.getStates();
