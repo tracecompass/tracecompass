@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.function.Function;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
@@ -71,6 +73,19 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
      */
     private final Function<@NonNull String, @NonNull String> fSyscallTrim;
 
+    private final HashMap<Integer, Type> fEntryModelTypes = new HashMap<>();
+
+    private static final Comparator<ITmfStateInterval> CACHE_COMPARATOR = (a, b) -> {
+        if (a.getEndTime() < b.getStartTime()) {
+            return -1;
+        } else if (a.getStartTime() > b.getEndTime()) {
+            return 1;
+        }
+        return 0;
+    };
+
+    private final TreeMultimap<Integer, ITmfStateInterval> fExecNamesCache = TreeMultimap.create(Integer::compare, CACHE_COMPARATOR);
+
     /**
      * Constructor
      *
@@ -98,7 +113,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         long start = ss.getStartTime();
         long end = ss.getCurrentEndTime();
 
-        @NonNull List<@NonNull ResourcesEntryModel> builder = new ArrayList<>();
+        List<@NonNull ResourcesEntryModel> builder = new ArrayList<>();
 
         long traceId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
         ResourcesEntryModel resourcesEntryModel = new ResourcesEntryModel(traceId, -1, getTrace().getName(), start, end, -1, ResourcesEntryModel.Type.TRACE);
@@ -107,8 +122,17 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         for (Integer cpuQuark : ss.getQuarks(Attributes.CPUS, WILDCARD)) {
             final @NonNull String cpuName = ss.getAttributeName(cpuQuark);
             int cpu = Integer.parseInt(cpuName);
+
+            Integer currentThreadQuark = ss.optQuarkRelative(cpuQuark, Attributes.CURRENT_THREAD);
+            if (currentThreadQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
+                ResourcesEntryModel currentThreadEntry = new ResourcesEntryModel(getId(currentThreadQuark), traceId, computeEntryName(Type.CURRENT_THREAD, cpu), start, end, cpu, Type.CURRENT_THREAD);
+                builder.add(currentThreadEntry);
+                fEntryModelTypes.put(currentThreadQuark, Type.CURRENT_THREAD);
+            }
+
             ResourcesEntryModel cpuEntry = new ResourcesEntryModel(getId(cpuQuark), traceId, computeEntryName(Type.CPU, cpu), start, end, cpu, Type.CPU);
             builder.add(cpuEntry);
+            fEntryModelTypes.put(cpuQuark, Type.CPU);
 
             List<Integer> irqQuarks = ss.getQuarks(cpuQuark, Attributes.IRQS, WILDCARD);
             createInterrupt(ss, start, end, cpuEntry, irqQuarks, Type.IRQ, builder);
@@ -151,12 +175,18 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             builder.add(new ResourcesEntryModel(irqId, cpuEntry.getId(),
                     computeEntryName(type, resourceId), startTime, endTime, resourceId, type));
 
+            fEntryModelTypes.put(irqQuark, type);
+
             /*
-             * Search for the aggregate interrupt entry in the list. If it does not
-             * exist yet, create it.
+             * Search for the aggregate interrupt entry in the list. If it does not exist
+             * yet, create it.
              */
             String aggregateIrqtype = type == Type.IRQ ? Attributes.IRQS : Attributes.SOFT_IRQS;
-            long aggregateId = getId(ssq.optQuarkAbsolute(aggregateIrqtype, resourceName));
+            int aggregateQuark = ssq.optQuarkAbsolute(aggregateIrqtype, resourceName);
+            if (aggregateQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+                continue;
+            }
+            long aggregateId = getId(aggregateQuark);
             if (!Iterables.any(builder, entry -> entry.getId() == aggregateId)) {
                 builder.add(new ResourcesEntryModel(aggregateId, cpuEntry.getParentId(),
                         computeEntryName(type, resourceId),
@@ -171,12 +201,23 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             builder.add(new ResourcesEntryModel(irqId, aggregateId,
                     computeEntryName(Type.CPU, cpuEntry.getResourceId()),
                     startTime, endTime, cpuEntry.getResourceId(), type));
+            fEntryModelTypes.put(aggregateQuark, type);
         }
     }
 
     private static @NonNull String computeEntryName(Type type, int id) {
         if (type == Type.SOFT_IRQ) {
             return type.toString() + ' ' + id + ' ' + SoftIrqLabelProvider.getSoftIrq(id);
+        } else if (type == Type.CURRENT_THREAD) {
+            String threadEntryName = NLS.bind(Messages.ThreadEntry, id);
+            if (threadEntryName != null) {
+                return threadEntryName;
+            }
+        } else if (type == Type.CPU) {
+            String cpuEntryName = NLS.bind(Messages.CpuEntry, id);
+            if (cpuEntryName != null) {
+                return cpuEntryName;
+            }
         }
         return type.toString() + ' ' + id;
     }
@@ -210,14 +251,34 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                 long startTime = interval.getStartTime();
                 long duration = interval.getEndTime() - startTime + 1;
                 Object status = interval.getValue();
+                Type type = fEntryModelTypes.get(interval.getAttribute());
                 if (status instanceof Integer) {
                     int s = (int) status;
                     int currentThreadQuark = ss.optQuarkRelative(interval.getAttribute(), Attributes.CURRENT_THREAD);
-                    if (s == StateValues.CPU_STATUS_RUN_SYSCALL) {
+                    if (type == Type.CPU && s == StateValues.CPU_STATUS_RUN_SYSCALL) {
                         eventList.add(getSyscall(ss, interval, intervals.get(currentThreadQuark)));
-                    } else if (s == StateValues.CPU_STATUS_RUN_USERMODE) {
+                    } else if (type == Type.CPU && s == StateValues.CPU_STATUS_RUN_USERMODE) {
                         // add events for all the sampled current threads.
                         eventList.addAll(getCurrentThreads(ss, interval, intervals.get(currentThreadQuark)));
+                    } else if (type == Type.CURRENT_THREAD && s != 0) {
+                        String execName = null;
+                        synchronized (fExecNamesCache) {
+                            if (fExecNamesCache.containsEntry(status, interval)) {
+                                NavigableSet<ITmfStateInterval> intervalSet = fExecNamesCache.get(s);
+                                ITmfStateInterval execNameInterval = intervalSet.ceiling(interval);
+                                if (execNameInterval != null && CACHE_COMPARATOR.compare(execNameInterval, interval) == 0) {
+                                    execName = (String) execNameInterval.getValue();
+                                }
+                            } else {
+                                int quark = ss.optQuarkAbsolute(Attributes.THREADS, Integer.toString(s), Attributes.EXEC_NAME);
+                                if (quark != ITmfStateSystem.INVALID_ATTRIBUTE) {
+                                    ITmfStateInterval namedInterval = ss.querySingleState(interval.getEndTime(), quark);
+                                    fExecNamesCache.put(s, namedInterval);
+                                    execName = (String) namedInterval.getValue();
+                                }
+                            }
+                        }
+                        eventList.add(new TimeGraphState(startTime, duration, s, execName != null ? execName + ' ' + '(' + String.valueOf(s) + ')' : String.valueOf(s)));
                     } else {
                         eventList.add(new TimeGraphState(startTime, duration, s));
                     }
@@ -226,6 +287,9 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                 }
             }
             rows.add(new TimeGraphRowModel(entry.getKey(), eventList));
+        }
+        synchronized (fExecNamesCache) {
+            fExecNamesCache.clear();
         }
         return rows;
     }
@@ -359,7 +423,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         String attributeName = ss.getAttributeName(quark);
         Integer cpuNumber = Ints.tryParse(attributeName);
         String parent = ss.getAttributeName(ss.getParentAttributeQuark(quark));
-        if (!parent.equals(Attributes.CPUS) || cpuNumber == null) {
+        if ((!parent.equals(Attributes.CPUS) || cpuNumber == null) && !attributeName.equals(Attributes.CURRENT_THREAD)) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
 
@@ -375,6 +439,8 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                     putIrq(ss, attributeName, retMap, full, Attributes.SOFT_IRQS);
                 } else if (status == StateValues.CPU_STATUS_RUN_USERMODE || status == StateValues.CPU_STATUS_RUN_SYSCALL) {
                     putCpuTooltip(ss, attributeName, retMap, full, status);
+                } else if (attributeName.equals(Attributes.CURRENT_THREAD)) {
+                    putCurrentThreadTooltip(ss, retMap, full, status);
                 }
             }
             return new TmfModelResponse<>(retMap, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
@@ -423,6 +489,20 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                 if (syscall instanceof String) {
                     retMap.put(Attributes.SYSTEM_CALL, (String) syscall);
                 }
+            }
+        }
+    }
+
+    private static void putCurrentThreadTooltip(ITmfStateSystem ss,
+            Map<String, String> retMap, List<ITmfStateInterval> full, int tid) {
+        String currentThread = String.valueOf(tid);
+        retMap.put(Attributes.CURRENT_THREAD, currentThread);
+
+        int execNameQuark = ss.optQuarkAbsolute(Attributes.THREADS, currentThread, Attributes.EXEC_NAME);
+        if (execNameQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
+            Object processName = full.get(execNameQuark).getValue();
+            if (processName instanceof String) {
+                retMap.put(Attributes.EXEC_NAME, (String) processName);
             }
         }
     }

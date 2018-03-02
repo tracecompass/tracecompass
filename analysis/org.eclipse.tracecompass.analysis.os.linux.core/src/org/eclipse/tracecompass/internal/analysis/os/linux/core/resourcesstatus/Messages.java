@@ -40,6 +40,10 @@ class Messages extends NLS {
     public static String SoftIrqLabelProvider_softIrq9;
     /** other softirq */
     public static String SoftIrqLabelProvider_Unknown;
+    /** thread entry */
+    public static String ThreadEntry;
+    /** cpu entry */
+    public static String CpuEntry;
 
     static {
         // initialize resource bundle

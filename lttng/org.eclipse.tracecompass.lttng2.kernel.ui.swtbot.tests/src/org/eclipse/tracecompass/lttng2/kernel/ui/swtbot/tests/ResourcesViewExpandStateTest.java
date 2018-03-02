@@ -30,6 +30,6 @@ public class ResourcesViewExpandStateTest extends TimegraphViewExpandStateTestBa
 
     @Override
     protected String[] getItemLabel() {
-        return new String[] {"CPU 0", "CPU 1"};
+        return new String[] {"CPU 0 States", "CPU 1 States"};
     }
 }

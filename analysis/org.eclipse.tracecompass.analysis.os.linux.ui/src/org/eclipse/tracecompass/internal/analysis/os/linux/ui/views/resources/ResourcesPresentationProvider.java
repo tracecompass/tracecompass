@@ -1,18 +1,15 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2017 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2018 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *   Patrick Tasse - Initial API and implementation
- *   Geneviève Bastien - Move code to provide base classes for time graph view
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -63,11 +60,24 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
     private Color fColorWhite;
     private Color fColorGray;
     private Integer fAverageCharWidth;
+    /*
+     * FIXME Use color palette instead
+     */
+    private static final int NUM_COLORS = 25;
+    private static final float BRIGHTNESS = 0.8f;
+    private static final float SATURATION = 0.8f;
+    private static final int COLOR_DIFFERENCIATION_FACTOR = NUM_COLORS / 2 + 2;
+    /**
+     * State table index for an idle event (light grey)
+     */
+    private static final int IDLE_THREAD = 0;
 
     private static final Map<Integer, StateItem> STATE_MAP;
 
     private static final List<StateItem> STATE_LIST;
     private static final StateItem[] STATE_TABLE;
+
+    private final List<RGB> fColors = new ArrayList<>();
 
     private static StateItem createState(LinuxStyle style) {
         int rgbInt = (int) style.toMap().getOrDefault(ITimeEventStyleStrings.fillColor(), 0);
@@ -77,9 +87,9 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
     static {
         ImmutableMap.Builder<Integer, StateItem> builder = new ImmutableMap.Builder<>();
-        builder.put(StateValues.CPU_STATUS_IDLE, createState(LinuxStyle.IDLE));
-        builder.put(StateValues.CPU_STATUS_RUN_USERMODE, createState(LinuxStyle.USERMODE));
-        builder.put(StateValues.CPU_STATUS_RUN_SYSCALL, createState(LinuxStyle.SYSCALL));
+        builder.put(StateValues.CPU_STATUS_IDLE, new StateItem(LinuxStyle.IDLE.toMap()));
+        builder.put(StateValues.CPU_STATUS_RUN_USERMODE, new StateItem(LinuxStyle.USERMODE.toMap()));
+        builder.put(StateValues.CPU_STATUS_RUN_SYSCALL, new StateItem(LinuxStyle.SYSCALL.toMap()));
         builder.put(StateValues.CPU_STATUS_IRQ, createState(LinuxStyle.INTERRUPTED));
         builder.put(StateValues.CPU_STATUS_SOFTIRQ, createState(LinuxStyle.SOFT_IRQ));
         builder.put(StateValues.CPU_STATUS_SOFT_IRQ_RAISED, createState(LinuxStyle.SOFT_IRQ_RAISED));
@@ -93,6 +103,9 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
      */
     public ResourcesPresentationProvider() {
         super();
+        for (int i = 0; i < NUM_COLORS; i++) {
+            fColors.add(new RGB((int) (360.0 / NUM_COLORS * i), SATURATION, BRIGHTNESS));
+        }
     }
 
     private static StateItem getEventState(TimeEvent event) {
@@ -104,16 +117,25 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 && ((TimeGraphEntry) entry).getModel() instanceof ResourcesEntryModel) {
             int value = event.getValue();
             ResourcesEntryModel resourcesModel = (ResourcesEntryModel) ((TimeGraphEntry) entry).getModel();
-            if (resourcesModel.getType() == Type.CPU) {
+            Type type = resourcesModel.getType();
+            switch (type) {
+            case CPU:
                 return STATE_MAP.get(value);
-            } else if (resourcesModel.getType() == Type.IRQ) {
+            case IRQ:
                 return STATE_MAP.get(StateValues.CPU_STATUS_IRQ);
-            } else if (resourcesModel.getType() == Type.SOFT_IRQ) {
+            case SOFT_IRQ:
                 if (value == StateValues.CPU_STATUS_SOFT_IRQ_RAISED) {
                     return STATE_MAP.get(StateValues.CPU_STATUS_SOFT_IRQ_RAISED);
                 }
                 return STATE_MAP.get(StateValues.CPU_STATUS_SOFTIRQ);
+            case CURRENT_THREAD:
+                return STATE_MAP.get(StateValues.CPU_STATUS_RUN_USERMODE);
+            case TRACE:
+                return null;
+            default:
+                return null;
             }
+
         }
         return null;
     }
@@ -141,7 +163,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
         if (state != null) {
             return state.getStateString();
         }
-        if (event instanceof NullTimeEvent) {
+        if (event instanceof NullTimeEvent || isType(event.getEntry(), Type.CURRENT_THREAD)) {
             return null;
         }
         return Messages.ResourcesView_multipleStates;
@@ -172,7 +194,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 }
 
                 // Check for type CPU
-                else if (resourcesModel.getType().equals(Type.CPU)) {
+                else if (resourcesModel.getType().equals(Type.CPU) || resourcesModel.getType().equals(Type.CURRENT_THREAD)) {
                     int status = tcEvent.getValue();
                     ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = BaseDataProviderTimeGraphView.getProvider((TimeGraphEntry) entry);
                     if (provider != null) {
@@ -181,7 +203,6 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 }
             }
         }
-
         return Collections.emptyMap();
     }
 
@@ -206,7 +227,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             if (irq != null) {
                 retMap.put(Messages.ResourcesView_attributeSoftIrqName, irq);
             }
-        } else if (status == StateValues.CPU_STATUS_RUN_USERMODE || status == StateValues.CPU_STATUS_RUN_SYSCALL) {
+        } else if (status == StateValues.CPU_STATUS_RUN_USERMODE || status == StateValues.CPU_STATUS_RUN_SYSCALL || status > StateValues.CPU_STATUS_IRQ) {
             // In running state get the current TID
             retMap.put(Messages.ResourcesView_attributeHoverTime, FormatTimeUtils.formatTime(hoverTime, TimeFormat.CALENDAR, Resolution.NANOSEC));
             String tidName = tooltip.get(Attributes.CURRENT_THREAD);
@@ -239,6 +260,21 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
     }
 
     @Override
+    public Map<String, Object> getSpecificEventStyle(ITimeEvent event) {
+        if (isType(event.getEntry(), Type.CURRENT_THREAD) && event instanceof TimeEvent) {
+            int threadEventValue = ((TimeEvent) event).getValue();
+            if (threadEventValue == IDLE_THREAD) {
+                return ImmutableMap.of(ITimeEventStyleStrings.fillColor(), 0);
+            }
+            RGB color = fColors.get((((threadEventValue + COLOR_DIFFERENCIATION_FACTOR) % NUM_COLORS) + NUM_COLORS) % NUM_COLORS);
+            return ImmutableMap.of(ITimeEventStyleStrings.fillColor(), color.red << 24 | color.green << 16 | color.blue << 8 | 0xff,
+                    ITimeEventStyleStrings.label(), String.valueOf(threadEventValue));
+
+        }
+        return super.getSpecificEventStyle(event);
+    }
+
+    @Override
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
         if (fColorGray == null) {
             fColorGray = gc.getDevice().getSystemColor(SWT.COLOR_GRAY);
@@ -250,16 +286,26 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             fAverageCharWidth = getAverageCharWidth(gc);
         }
 
-        if (bounds.width <= fAverageCharWidth) {
-            return;
-        }
-
-        if (!(event instanceof NamedTimeEvent)) {
+        if (bounds.width <= fAverageCharWidth || !(event instanceof NamedTimeEvent)) {
             return;
         }
         NamedTimeEvent tcEvent = (NamedTimeEvent) event;
         gc.setForeground(fColorWhite);
-        Utils.drawText(gc, tcEvent.getLabel(), bounds.x, bounds.y, bounds.width, bounds.height, true, true);
+
+        String label = tcEvent.getLabel();
+
+        Utils.drawText(gc, label, bounds.x, bounds.y, bounds.width, bounds.height, true, true);
+
         gc.setForeground(fColorGray);
+    }
+
+    private static boolean isType(ITimeGraphEntry entry, Type type) {
+        if (entry instanceof TimeGraphEntry) {
+            ITimeGraphEntryModel model = ((TimeGraphEntry) entry).getModel();
+            if (model instanceof ResourcesEntryModel) {
+                return (((ResourcesEntryModel) model).getType().equals(type));
+            }
+        }
+        return false;
     }
 }

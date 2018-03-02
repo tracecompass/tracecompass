@@ -35,6 +35,8 @@ import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraph
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
+import com.google.common.base.Function;
+
 /**
  * Main implementation for the LTTng 2.0 kernel Resource view
  *
@@ -58,8 +60,9 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
      * We want to filter on the Type first (the "ABC" part), then on the ID ("123")
      * in numerical order (so we get 1,2,10 and not 1,10,2).
      */
-    private static final Comparator<ResourcesEntryModel> COMPARATOR = Comparator.comparing(ResourcesEntryModel::getType)
-            .thenComparingInt(ResourcesEntryModel::getResourceId);
+    private static final Comparator<ResourcesEntryModel> COMPARATOR = Comparator
+            .comparing((Function<ResourcesEntryModel, Type>) resModel -> resModel.getType() == Type.CURRENT_THREAD ? Type.CPU : resModel.getType())
+            .thenComparing(ResourcesEntryModel::getResourceId);
 
     // ------------------------------------------------------------------------
     // Constructors
