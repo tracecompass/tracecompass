@@ -26,7 +26,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.common.core.StreamUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
@@ -108,7 +107,7 @@ public final class KernelThreadInformationProvider {
             return null;
         }
 
-        Set<Long> uniqueCpus = (cpus instanceof Set ? (Set<Long>) cpus : ImmutableSet.copyOf(cpus));
+        Set<Long> uniqueCpus = ImmutableSet.copyOf(cpus);
 
         int threadsQuark = ss.optQuarkAbsolute(Attributes.THREADS);
         if (threadsQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
@@ -129,11 +128,13 @@ public final class KernelThreadInformationProvider {
 
                     /* Check if the thread was seen on any of the requested CPUs. */
                     QuarkIterator it = new QuarkIterator(ss, threadCurrentCpuQuark, rangeStart, rangeEnd);
-                    return StreamUtils.getStream(it)
-                            .map(ITmfStateInterval::getStateValue)
-                            .filter(value -> !value.isNull())
-                            .map(value -> Long.valueOf(value.unboxLong()))
-                            .anyMatch(uniqueCpus::contains);
+                    while (it.hasNext()) {
+                        Object o = it.next().getValue();
+                        if (o instanceof Number && uniqueCpus.contains(((Number) o).longValue())) {
+                            return true;
+                        }
+                    }
+                    return false;
                 })
 
                 /* Convert the thread quarks to their corresponding TIDs */
@@ -182,14 +183,14 @@ public final class KernelThreadInformationProvider {
             return Collections.emptySet();
         }
 
+        int threadsQuark = ss.optQuarkAbsolute(Attributes.THREADS);
+        if (threadsQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+            return Collections.emptySet();
+        }
+
         List<ITmfStateInterval> fullQueryAtStart;
-        int threadsQuark;
         try {
             fullQueryAtStart = ss.queryFullState(start);
-            threadsQuark = ss.optQuarkAbsolute(Attributes.THREADS);
-            if (threadsQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
-                return Collections.emptySet();
-            }
         } catch (StateSystemDisposedException e) {
             return Collections.emptySet();
         }

@@ -24,6 +24,7 @@ import java.util.stream.StreamSupport;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
+@Deprecated
 public final class StreamUtils {
 
     private StreamUtils() {}

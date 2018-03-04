@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.tmf.chart.ui.swtchart;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.text.Format;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -61,8 +62,8 @@ import org.eclipse.tracecompass.internal.tmf.chart.ui.consumer.XYSeriesConsumer;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRangeMap;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.dialog.Messages;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.format.LabelFormat;
-import org.swtchart.Chart;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.swtchart.Chart;
 import org.swtchart.IAxis;
 import org.swtchart.IAxisSet;
 import org.swtchart.IAxisTick;
@@ -249,8 +250,7 @@ public final class SwtScatterChart extends SwtXYChartViewer {
     protected ISeries createSwtSeries(ChartSeries chartSeries, ISeriesSet swtSeriesSet, @NonNull Color color) {
         String title = chartSeries.getY().getName();
 
-        boolean multiSeries = (getXDescriptors().stream().distinct().count() > 1);
-        if (multiSeries) {
+        if (getXDescriptors().stream().distinct().count() > 1) {
             title = NLS.bind(Messages.ChartSeries_MultiSeriesTitle, title, chartSeries.getX().getLabel());
         }
 
@@ -409,12 +409,10 @@ public final class SwtScatterChart extends SwtXYChartViewer {
         // FIXME: the refresh of labels should be done differently for numerical
         // or string axes. Here this only refreshes the X axis labels for string
         // labels.
-        if (fXStringMap.size() > 0) {
+        if (!fXStringMap.isEmpty()) {
 
             /* Find the longest category string */
-            String longestString = fXStringMap.keySet().stream()
-                    .max(Comparator.comparingInt(String::length))
-                    .orElse(fXStringMap.keySet().iterator().next());
+            String longestString = Collections.max(fXStringMap.keySet(), Comparator.comparingInt(String::length));
 
             /* Get the length and height of the longest label in pixels */
             Point pixels = gc.stringExtent(longestString);
@@ -532,16 +530,14 @@ public final class SwtScatterChart extends SwtXYChartViewer {
                      */
                     double distance = Math.hypot(dataPoint.x - event.x, dataPoint.y - event.y);
 
-                    if (distance < snapRangeRadius) {
-                        if (closestDistance == -1 || distance < closestDistance) {
-                            fHoveringPoint.x = dataPoint.x;
-                            fHoveringPoint.y = dataPoint.y;
+                    if (distance < snapRangeRadius && (closestDistance == -1 || distance < closestDistance)) {
+                        fHoveringPoint.x = dataPoint.x;
+                        fHoveringPoint.y = dataPoint.y;
 
-                            fHoveredPoint = new SwtChartPoint(series, i);
+                        fHoveredPoint = new SwtChartPoint(series, i);
 
-                            closestDistance = distance;
-                            found = true;
-                        }
+                        closestDistance = distance;
+                        found = true;
                     }
                 }
             }
@@ -623,7 +619,7 @@ public final class SwtScatterChart extends SwtXYChartViewer {
             drawHoveringCross(gc);
 
             /* Don't draw if there's no selection */
-            if (getSelection().getPoints().size() > 0) {
+            if (!getSelection().getPoints().isEmpty()) {
                 /* Draw the selected points */
                 drawSelectedDot(gc);
             }

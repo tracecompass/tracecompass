@@ -11,7 +11,7 @@ package org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.handler;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -21,7 +21,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.LamiConfigUtils;
 import org.eclipse.tracecompass.tmf.core.analysis.ondemand.OnDemandAnalysisManager;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfOnDemandAnalysesElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfUserDefinedOnDemandAnalysisElement;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -45,29 +44,29 @@ public class RemoveAnalysisHandler extends AbstractHandler {
 
         OnDemandAnalysisManager mgr = OnDemandAnalysisManager.getInstance();
 
-        List<TmfUserDefinedOnDemandAnalysisElement> analysisElements = elements.stream()
-                .filter(elem -> elem instanceof TmfUserDefinedOnDemandAnalysisElement)
-                .map(elem -> (TmfUserDefinedOnDemandAnalysisElement) elem)
-                .collect(Collectors.toList());
+        Optional<TmfUserDefinedOnDemandAnalysisElement> optionalParent = elements.stream()
+                .filter(TmfUserDefinedOnDemandAnalysisElement.class::isInstance)
+                .map(TmfUserDefinedOnDemandAnalysisElement.class::cast)
+                .findFirst();
 
-        final TmfOnDemandAnalysesElement parentElement = analysisElements.get(0).getParent();
+        elements.stream()
+                .filter(TmfUserDefinedOnDemandAnalysisElement.class::isInstance)
+                .map(TmfUserDefinedOnDemandAnalysisElement.class::cast)
+                .map(TmfUserDefinedOnDemandAnalysisElement::getAnalysis)
+                .forEach(analysis -> {
+                    /* Unregister from the manager */
+                    mgr.unregisterAnalysis(analysis);
 
-        analysisElements.stream()
-            .map(analysisElem -> analysisElem.getAnalysis())
-            .forEach(analysis -> {
-                /* Unregister from the manager */
-                mgr.unregisterAnalysis(analysis);
-
-                /* Remove the corresponding configuration file */
-                try {
-                    LamiConfigUtils.removeConfigFile(analysis.getName());
-                } catch (IOException e) {
-                    // Ignore this: not the end of the world
-                }
-            });
+                    /* Remove the corresponding configuration file */
+                    try {
+                        LamiConfigUtils.removeConfigFile(analysis.getName());
+                    } catch (IOException e) {
+                        // Ignore this: not the end of the world
+                    }
+                });
 
         /* Refresh the project explorer */
-        parentElement.refresh();
+        optionalParent.ifPresent(TmfUserDefinedOnDemandAnalysisElement::refresh);
 
         return null;
     }

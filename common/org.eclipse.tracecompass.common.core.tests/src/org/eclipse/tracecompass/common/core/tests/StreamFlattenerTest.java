@@ -23,6 +23,7 @@ import org.junit.Test;
  *
  * @author Alexandre Montplaisir
  */
+@Deprecated
 public class StreamFlattenerTest {
 
     /**

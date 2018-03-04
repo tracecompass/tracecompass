@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiData;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiTimeRange;
@@ -68,8 +67,8 @@ public class LamiTableEntry {
          * one we find directly.
          */
         Optional<LamiTimeRange> oTimerange = fValues.stream()
-                .filter(data -> (data instanceof LamiTimeRange))
-                .<@NonNull LamiTimeRange> map(data -> (LamiTimeRange) data)
+                .filter(LamiTimeRange.class::isInstance)
+                .map(LamiTimeRange.class::cast)
                 .findFirst();
         if (oTimerange.isPresent()) {
             return oTimerange.get();
@@ -77,8 +76,8 @@ public class LamiTableEntry {
 
         /* Look for individual timestamps instead  */
         List<LamiTimestamp> timestamps = fValues.stream()
-            .filter(data -> (data instanceof LamiTimestamp))
-            .<@NonNull LamiTimestamp> map(data -> (LamiTimestamp) data)
+            .filter(LamiTimestamp.class::isInstance)
+            .map(LamiTimestamp.class::cast)
             .collect(Collectors.toList());
 
         if (timestamps.size() > 1) {

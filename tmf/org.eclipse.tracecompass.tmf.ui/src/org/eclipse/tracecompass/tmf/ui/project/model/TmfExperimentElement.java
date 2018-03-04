@@ -18,7 +18,6 @@ package org.eclipse.tracecompass.tmf.ui.project.model;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -235,18 +234,12 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
 
     @Override
     public List<TmfAnalysisElement> getAvailableChildrenAnalyses() {
-        List<TmfTraceElement> traces = getChildren().stream()
-                        .filter(elem -> (elem instanceof TmfTraceElement))
-                        .map(elem -> ((TmfTraceElement) elem).getElementUnderTraceFolder())
-                        .collect(Collectors.toList());
-
-        List<TmfAnalysisElement> analyses = new ArrayList<>();
-        for (TmfTraceElement traceElem : traces) {
-            if (traceElem.getChildElementViews() != null) {
-                analyses.addAll(traceElem.getAvailableAnalysis());
-            }
-        }
-        return analyses;
+        return getChildren().stream().filter(TmfTraceElement.class::isInstance)
+                .map(TmfTraceElement.class::cast)
+                .map(TmfTraceElement::getElementUnderTraceFolder)
+                .filter(traceElement -> traceElement.getChildElementViews() != null)
+                .flatMap(traceElement -> traceElement.getAvailableAnalysis().stream())
+                .collect(Collectors.toList());
     }
 
     private List<IResource> getTraceResources() {
@@ -269,13 +262,7 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
             }, IResource.NONE);
         } catch (CoreException e) {
         }
-        Comparator<IResource> comparator = new Comparator<IResource>() {
-            @Override
-            public int compare(IResource o1, IResource o2) {
-                return o1.getFullPath().toString().compareTo(o2.getFullPath().toString());
-            }
-        };
-        Collections.sort(list, comparator);
+        list.sort(Comparator.comparing(resource -> resource.getFullPath().toString()));
         return list;
     }
 
@@ -598,30 +585,26 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
             return getLocation().toString();
         }
 
-        if (EXPERIMENT_TYPE.equals(id)) {
-            if (getTraceType() != null) {
-                IConfigurationElement ce = TRACE_TYPE_ATTRIBUTES.get(getTraceType());
-                if (ce == null) {
-                    return ""; //$NON-NLS-1$
-                }
-                String categoryId = ce.getAttribute(TmfTraceType.CATEGORY_ATTR);
-                if (categoryId != null) {
-                    IConfigurationElement category = TRACE_CATEGORIES.get(categoryId);
-                    if (category != null) {
-                        return category.getAttribute(TmfTraceType.NAME_ATTR) + ':' + ce.getAttribute(TmfTraceType.NAME_ATTR);
-                    }
-                }
-                return ce.getAttribute(TmfTraceType.NAME_ATTR);
+        if (EXPERIMENT_TYPE.equals(id) && getTraceType() != null) {
+            IConfigurationElement ce = TRACE_TYPE_ATTRIBUTES.get(getTraceType());
+            if (ce == null) {
+                return ""; //$NON-NLS-1$
             }
+            String categoryId = ce.getAttribute(TmfTraceType.CATEGORY_ATTR);
+            if (categoryId != null) {
+                IConfigurationElement category = TRACE_CATEGORIES.get(categoryId);
+                if (category != null) {
+                    return category.getAttribute(TmfTraceType.NAME_ATTR) + ':' + ce.getAttribute(TmfTraceType.NAME_ATTR);
+                }
+            }
+            return ce.getAttribute(TmfTraceType.NAME_ATTR);
         }
-        if (EXPERIMENT_TYPE_ID.equals(id)) {
-            if (getTraceType() != null) {
-                IConfigurationElement ce = TRACE_TYPE_ATTRIBUTES.get(getTraceType());
-                if (ce == null) {
-                    return ""; //$NON-NLS-1$
-                }
-                return ce.getAttribute(TmfTraceType.ID_ATTR);
+        if (EXPERIMENT_TYPE_ID.equals(id) && getTraceType() != null) {
+            IConfigurationElement ce = TRACE_TYPE_ATTRIBUTES.get(getTraceType());
+            if (ce == null) {
+                return ""; //$NON-NLS-1$
             }
+            return ce.getAttribute(TmfTraceType.ID_ATTR);
         }
 
         return null;

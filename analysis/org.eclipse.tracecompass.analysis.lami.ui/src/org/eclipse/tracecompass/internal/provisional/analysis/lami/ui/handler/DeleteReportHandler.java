@@ -17,7 +17,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.tracecompass.tmf.core.analysis.ondemand.IOnDemandAnalysisReport;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfReportElement;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -37,12 +36,9 @@ public class DeleteReportHandler extends AbstractHandler {
 
         /* Ask the parent element to remove each corresponding report. */
         elements.stream()
-            .filter(elem -> elem instanceof TmfReportElement)
-            .map(elem -> (TmfReportElement) elem)
-            .forEach(reportElem -> {
-                IOnDemandAnalysisReport report = reportElem.getReport();
-                reportElem.getParent().removeReport(report);
-            });
+                .filter(TmfReportElement.class::isInstance)
+                .map(TmfReportElement.class::cast)
+                .forEach(reportElem -> reportElem.getParent().removeReport(reportElem.getReport()));
 
         return null;
     }

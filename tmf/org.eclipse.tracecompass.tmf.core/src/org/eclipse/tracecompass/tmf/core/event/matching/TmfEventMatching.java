@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -134,7 +134,6 @@ public class TmfEventMatching implements ITmfEventMatching {
         fIndividualTraces = individualTraces;
         fDistinctHosts = individualTraces.stream()
                 .map(ITmfTrace::getHostId)
-                .distinct()
                 .collect(Collectors.toSet());
     }
 
@@ -339,22 +338,17 @@ public class TmfEventMatching implements ITmfEventMatching {
     }
 
     private Table<String, String, TmfEventDependency> getLastMatchTable(@NonNull IEventMatchingKey eventKey) {
-        Table<String, String, TmfEventDependency> table = fLastMatches.get(eventKey.getClass());
-        if (table == null) {
-            table = HashBasedTable.create();
-            fLastMatches.put(eventKey.getClass(), table);
-        }
-        return table;
+        return fLastMatches.computeIfAbsent(eventKey.getClass(), k -> HashBasedTable.create());
     }
 
-    private void cleanupList(@NonNull IEventMatchingKey eventKey, Map<String, TmfEventDependency> lastMatches, DependencyEvent lastDep, Function<TmfEventDependency, Long> mapToTime, Table<ITmfTrace, IEventMatchingKey, DependencyEvent> toClean) {
+    private void cleanupList(@NonNull IEventMatchingKey eventKey, Map<String, TmfEventDependency> lastMatches, DependencyEvent lastDep, ToLongFunction<TmfEventDependency> mapToTime, Table<ITmfTrace, IEventMatchingKey, DependencyEvent> toClean) {
      // Is there a match with all other hosts
         long otherHosts = lastMatches.keySet().stream().filter(s -> !s.equals(lastDep.getTrace().getHostId())).count();
         if (otherHosts == fDistinctHosts.size() - 1) {
             // A match has been found with all hosts, cleanup the previously sent packets for this trace
-            Long earliest = lastMatches.values().stream()
-                    .map(mapToTime)
-                    .min(Long::compareTo)
+            long earliest = lastMatches.values().stream()
+                    .mapToLong(mapToTime)
+                    .min()
                     .orElse(0L);
             if (earliest > 0) {
                 List<IEventMatchingKey> toRemove = new ArrayList<>();
@@ -377,7 +371,7 @@ public class TmfEventMatching implements ITmfEventMatching {
     public boolean matchEvents() {
 
         /* Are there traces to match? If no, return false */
-        if (!(fTraces.size() > 0)) {
+        if (fTraces.isEmpty()) {
             return false;
         }
 

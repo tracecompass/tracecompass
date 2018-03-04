@@ -22,12 +22,12 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.CoreException;
@@ -597,9 +597,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
          * a shell.
          */
         builder.add(DOUBLE_QUOTES + tracePath + DOUBLE_QUOTES);
-        List<String> list = builder.build();
-        String ret = list.stream().collect(Collectors.joining(" ")); //$NON-NLS-1$
-        return checkNotNull(ret);
+        return Objects.requireNonNull(String.join(" ", builder.build())); //$NON-NLS-1$
     }
 
     /**

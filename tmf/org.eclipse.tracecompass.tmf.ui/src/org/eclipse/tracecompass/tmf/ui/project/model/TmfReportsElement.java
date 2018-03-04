@@ -104,13 +104,11 @@ public class TmfReportsElement extends TmfProjectModelElement {
      *            The report to remove
      */
     public void removeReport(IOnDemandAnalysisReport report) {
-        String displayName = fCurrentReports.inverse().get(report);
-        fCurrentReports.values().remove(report);
+        String displayName = fCurrentReports.inverse().remove(report);
 
-        ITmfProjectModelElement elementToRemove = getChildren().stream()
+        getChildren().stream()
                 .filter(elem -> elem.getName().equals(displayName))
-                .findFirst().orElse(null);
-        removeChild(elementToRemove);
+                .findFirst().ifPresent(this::removeChild);
         refresh();
     }
 }

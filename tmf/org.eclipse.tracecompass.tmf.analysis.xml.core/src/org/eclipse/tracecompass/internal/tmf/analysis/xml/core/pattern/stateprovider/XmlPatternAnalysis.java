@@ -13,7 +13,6 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
@@ -322,8 +321,7 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
         @Override
         public @Nullable String resolve(ISegment segment) {
             if (segment instanceof TmfXmlPatternSegment) {
-                List<String> values = ((TmfXmlPatternSegment) segment).getContent().entrySet().stream().map(c -> c.getKey() + '=' + c.getValue()).collect(Collectors.toList());
-                return String.join(", ", values); //$NON-NLS-1$
+                return ((TmfXmlPatternSegment) segment).getContent().entrySet().stream().map(c -> c.getKey() + '=' + c.getValue()).collect(Collectors.joining(", ")); //$NON-NLS-1$
             }
             return EMPTY_STRING;
         }

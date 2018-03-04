@@ -139,7 +139,7 @@ public final class SWTBotCustomChartUtils {
         xTable.getTableItem(xSerie).click();
 
         SWTBotTable yTable = bot.table(Y_SERIES_TABLE_INDEX);
-        ySeries.stream().forEach(s -> yTable.getTableItem(s).check());
+        ySeries.forEach(s -> yTable.getTableItem(s).check());
 
         bot.buttonInGroup("Series Creator", 0).click();
     }

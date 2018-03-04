@@ -255,9 +255,7 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
         fChartConsumer = chartConsumer;
 
         /* Process all the objects from the stream of data */
-        fData.getDataProvider().getSource().forEach(o -> {
-            chartConsumer.accept(o);
-        });
+        fData.getDataProvider().getSource().forEach(chartConsumer::accept);
         chartConsumer.finish();
 
         /* Create the SWT series */
@@ -552,12 +550,12 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
          * units, display that.
          */
         long nbDiffDescriptorName = descriptors.stream()
-                .map(d -> d.getName())
+                .map(IDataChartDescriptor::getName)
                 .distinct()
                 .count();
 
         long nbDiffDescriptorUnits = descriptors.stream()
-                .map(d -> d.getUnit())
+                .map(IDataChartDescriptor::getUnit)
                 .distinct()
                 .count();
 
@@ -849,9 +847,9 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
      * @return The stream of X descriptors
      */
     protected Collection<IDataChartDescriptor<?, ?>> getXDescriptors() {
-        return checkNotNull(getData().getChartSeries().stream()
+        return getData().getChartSeries().stream()
                 .map(series -> series.getX())
-                .collect(checkNotNull(Collectors.toList())));
+                .collect(Collectors.toList());
     }
 
     /**
@@ -860,9 +858,9 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
      * @return The stream of Y descriptors
      */
     protected Collection<IDataChartDescriptor<?, ?>> getYDescriptors() {
-        return checkNotNull(getData().getChartSeries().stream()
+        return getData().getChartSeries().stream()
                 .map(series -> series.getY())
-                .collect(checkNotNull(Collectors.toList())));
+                .collect(Collectors.toList());
     }
 
     // ------------------------------------------------------------------------

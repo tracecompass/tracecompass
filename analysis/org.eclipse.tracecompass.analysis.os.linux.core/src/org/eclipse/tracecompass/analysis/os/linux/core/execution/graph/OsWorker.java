@@ -10,8 +10,8 @@
 package org.eclipse.tracecompass.analysis.os.linux.core.execution.graph;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -69,26 +69,23 @@ public class OsWorker implements IGraphWorker {
     public @NonNull Map<@NonNull String, @NonNull String> getWorkerInformation(long t) {
         int tid = fHostTid.getTid();
         if (tid == -1) {
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         }
         Optional<@Nullable KernelAnalysisModule> kam = TmfTraceManager.getInstance().getActiveTraceSet()
                 .stream()
                 .filter(trace -> trace.getHostId().equals(getHostId()))
                 .map(trace -> TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelAnalysisModule.class, KernelAnalysisModule.ID))
-                .filter(mod -> mod != null)
+                .filter(Objects::nonNull)
                 .findFirst();
         if (!kam.isPresent()) {
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         }
-        KernelAnalysisModule module = kam.get();
 
-        Map<String, String> info = new HashMap<>();
-
-        int priority = KernelThreadInformationProvider.getThreadPriority(module, tid, t);
+        int priority = KernelThreadInformationProvider.getThreadPriority(kam.get(), tid, t);
         if (priority != -1) {
-            info.put(NonNullUtils.nullToEmptyString(Messages.OsWorker_threadPriority), Integer.toString(priority));
+            return Collections.singletonMap(NonNullUtils.nullToEmptyString(Messages.OsWorker_threadPriority), Integer.toString(priority));
         }
-        return info;
+        return Collections.emptyMap();
     }
 
     /**

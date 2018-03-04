@@ -13,8 +13,6 @@
 
 package org.eclipse.tracecompass.tmf.core.signal;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -241,10 +239,10 @@ public class TmfSignalManager {
         /* Check if the source,signal tuple is blacklisted */
         Object source = signal.getSource();
         if (source != null) {
-            boolean isBlackListed = fOutboundSignalBlacklist.get(source).stream()
-                    .anyMatch(x -> x.isAssignableFrom(signal.getClass()));
-            if (isBlackListed) {
-                return;
+            for (Class<? extends TmfSignal> signalClass : fOutboundSignalBlacklist.get(source)) {
+                if (signalClass.isAssignableFrom(signal.getClass())) {
+                    return;
+                }
             }
         }
 
@@ -268,12 +266,7 @@ public class TmfSignalManager {
      */
     public static void dispatchSignalAsync(final TmfSignal signal) {
         if (!fExecutor.isShutdown()) {
-            fExecutor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    dispatchSignal(signal);
-                }
-            });
+            fExecutor.execute(() -> dispatchSignal(signal));
         }
     }
 
@@ -311,22 +304,25 @@ public class TmfSignalManager {
         Class<?> signalClass = signal.getClass();
 
         Map<Object, List<Method>> targets = new HashMap<>();
-        targets.clear();
         for (Map.Entry<Object, Method[]> entry : listeners.entrySet()) {
             List<Method> matchingMethods = new ArrayList<>();
+
             for (Method method : entry.getValue()) {
                 Class<?> classParam = method.getParameterTypes()[0];
                 if (classParam.isAssignableFrom(signalClass)) {
-                    if (fInboundSignalBlacklist.containsKey(entry.getKey())) {
-                        /* Check if any of the ignore rule apply to the signal */
-                        boolean isBlackListed = fInboundSignalBlacklist.get(checkNotNull(entry.getKey())).stream()
-                                .anyMatch( x ->  x.isAssignableFrom(classParam));
-                        if (isBlackListed) {
-                            continue;
+                    /* Check if any of the ignore rule apply to the signal */
+                    boolean isBlackListed = false;
+                    for (Class<? extends TmfSignal> signalClazz : fInboundSignalBlacklist.get(entry.getKey())) {
+                        if (signalClazz.isAssignableFrom(classParam)) {
+                            isBlackListed = true;
+                            break;
                         }
                     }
-                    /* No rules apply add it */
-                    matchingMethods.add(method);
+
+                    /* No rules apply, add it */
+                    if (!isBlackListed) {
+                        matchingMethods.add(method);
+                    }
                 }
             }
             if (!matchingMethods.isEmpty()) {
@@ -338,7 +334,7 @@ public class TmfSignalManager {
         for (Map.Entry<Object, List<Method>> entry : targets.entrySet()) {
             for (Method method : entry.getValue()) {
                 try {
-                    method.invoke(entry.getKey(), new Object[] { signal });
+                    method.invoke(entry.getKey(), signal);
                     if (TmfCoreTracer.isSignalTraced()) {
                         Object key = entry.getKey();
                         String hash = String.format("%1$08X", entry.getKey().hashCode()); //$NON-NLS-1$

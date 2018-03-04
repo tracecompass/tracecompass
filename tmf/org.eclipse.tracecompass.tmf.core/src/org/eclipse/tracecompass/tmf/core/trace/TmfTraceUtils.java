@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.StreamUtils;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -159,7 +158,7 @@ public final class TmfTraceUtils {
      * @since 3.1
      */
     public static Iterable<ITmfEventAspect<?>> getEventAspects(ITmfTrace trace, Class<? extends ITmfEventAspect<?>> aspectClass) {
-         return Iterables.filter(Iterables.concat(trace.getEventAspects(), EXTRA_ASPECTS), aspect -> aspectClass.isAssignableFrom(aspect.getClass()));
+        return Iterables.filter(Iterables.concat(trace.getEventAspects(), EXTRA_ASPECTS), aspect -> aspectClass.isAssignableFrom(aspect.getClass()));
     }
 
     /**
@@ -179,20 +178,25 @@ public final class TmfTraceUtils {
     public static <T extends ITmfEventAspect<?>> @Nullable Object resolveEventAspectOfClassForEvent(
             ITmfTrace trace, Class<T> aspectClass, ITmfEvent event) {
         // First look in the trace aspects
-        Object value = StreamUtils.getStream(trace.getEventAspects())
-                .filter(aspect -> aspectClass.isAssignableFrom(aspect.getClass()))
-                .map(aspect -> aspect.resolve(event))
-                .filter(obj -> obj != null)
-                .findFirst().orElse(null);
-        if (value != null) {
-            return value;
+        for (ITmfEventAspect<?> aspect : trace.getEventAspects()) {
+            if (aspectClass.isAssignableFrom(aspect.getClass())) {
+                Object value = aspect.resolve(event);
+                if (value != null) {
+                    return value;
+                }
+            }
         }
+
         // If the value is not found, look at the global aspects
-        return EXTRA_ASPECTS.stream()
-                .filter(aspect -> aspectClass.isAssignableFrom(aspect.getClass()))
-                .map(aspect -> aspect.resolve(event))
-                .filter(obj -> obj != null)
-                .findFirst().orElse(null);
+        for (ITmfEventAspect<?> aspect : EXTRA_ASPECTS) {
+            if (aspectClass.isAssignableFrom(aspect.getClass())) {
+                Object value = aspect.resolve(event);
+                if (value != null) {
+                    return value;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -212,18 +216,19 @@ public final class TmfTraceUtils {
      */
     public static @Nullable Object resolveAspectOfNameForEvent(ITmfTrace trace, String aspectName, ITmfEvent event) {
         // First look in the trace aspects
-        Object value = StreamUtils.getStream(trace.getEventAspects())
-                .filter(aspect -> aspectName.equalsIgnoreCase(aspect.getName()))
-                .map(aspect -> aspect.resolve(event))
-                .filter(obj -> obj != null)
-                .findFirst().orElse(null);
-        if (value != null) {
-            return value;
+        for (ITmfEventAspect<?> aspect : trace.getEventAspects()) {
+            if (aspectName.equalsIgnoreCase(aspect.getName())) {
+                Object value = aspect.resolve(event);
+                if (value != null) {
+                    return value;
+                }
+            }
         }
+
         // If the value is not found, look at the global aspects
         for (ITmfEventAspect<?> aspect : EXTRA_ASPECTS) {
             if (aspectName.equalsIgnoreCase(aspect.getName())) {
-                value = aspect.resolve(event);
+                Object value = aspect.resolve(event);
                 if (value != null) {
                     return value;
                 }
@@ -250,21 +255,26 @@ public final class TmfTraceUtils {
      */
     public static <T extends ITmfEventAspect<Integer>> @Nullable Integer resolveIntEventAspectOfClassForEvent(
             ITmfTrace trace, Class<T> aspectClass, ITmfEvent event) {
-        Integer value = StreamUtils.getStream(trace.getEventAspects())
-                .filter(aspect -> aspectClass.isAssignableFrom(aspect.getClass()))
-                /* Enforced by the T parameter bounding */
-                .map(aspect -> (Integer) aspect.resolve(event))
-                .filter(obj -> obj != null)
-                .findFirst().orElse(null);
-        if (value != null) {
-            return value;
+        // First look in the trace aspects
+        for (ITmfEventAspect<?> aspect : trace.getEventAspects()) {
+            if (aspectClass.isAssignableFrom(aspect.getClass())) {
+                Object value = aspect.resolve(event);
+                if (value instanceof Integer) {
+                    return (Integer) value;
+                }
+            }
         }
+
         // If the value is not found, look at the global aspects
-        return EXTRA_ASPECTS.stream()
-                .filter(aspect -> aspectClass.isAssignableFrom(aspect.getClass()))
-                .map(aspect -> (Integer) aspect.resolve(event))
-                .filter(obj -> obj != null)
-                .findFirst().orElse(null);
+        for (ITmfEventAspect<?> aspect : EXTRA_ASPECTS) {
+            if (aspectClass.isAssignableFrom(aspect.getClass())) {
+                Object value = aspect.resolve(event);
+                if (value instanceof Integer) {
+                    return (Integer) value;
+                }
+            }
+        }
+        return null;
     }
 
     /**

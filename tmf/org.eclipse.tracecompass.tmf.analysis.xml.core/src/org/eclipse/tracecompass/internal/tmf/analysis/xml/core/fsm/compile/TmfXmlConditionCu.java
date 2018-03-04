@@ -79,7 +79,7 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
         @Override
         public DataDrivenCondition generate() {
             List<DataDrivenCondition> conditions = fConditions.stream()
-                    .map(cond -> cond.generate())
+                    .map(TmfXmlConditionCu::generate)
                     .collect(Collectors.toList());
             return new DataDrivenCondition.DataDrivenAndCondition(conditions);
         }
@@ -98,7 +98,7 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
         @Override
         public DataDrivenCondition generate() {
             List<DataDrivenCondition> conditions = fConditions.stream()
-                    .map(cond -> cond.generate())
+                    .map(TmfXmlConditionCu::generate)
                     .collect(Collectors.toList());
             return new DataDrivenCondition.DataDrivenOrCondition(conditions);
         }
@@ -146,7 +146,7 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
 
     private static @Nullable List<TmfXmlConditionCu> getCompiledChildConditions(AnalysisCompilationData analysisData, Element conditionEl) {
         List<@Nullable Element> childElements = XmlUtils.getChildElements(conditionEl);
-        if (childElements.size() < 1) {
+        if (childElements.isEmpty()) {
             Activator.logError("Compiling condition: AND and OR condition must have at least 1 element"); //$NON-NLS-1$
             return null;
         }
@@ -178,7 +178,7 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
             TmfXmlStateValueCu secondValue = TmfXmlStateValueCu.compileValue(analysisData, childElements.get(0));
             TmfXmlStateValueCu firstValue = null;
             List<Element> attributes = TmfXmlUtils.getChildElements(conditionEl, TmfXmlStrings.STATE_ATTRIBUTE);
-            if (attributes.size() >= 1) {
+            if (!attributes.isEmpty()) {
                 // The first value is an array of state attributes
                 List<TmfXmlStateValueCu> attributesCu = new ArrayList<>();
                 for (Element stateAttributeEl : attributes) {

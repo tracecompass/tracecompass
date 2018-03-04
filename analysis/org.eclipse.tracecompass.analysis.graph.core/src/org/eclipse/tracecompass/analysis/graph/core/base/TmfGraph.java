@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
@@ -29,6 +30,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.ListMultimap;
 
 /**
@@ -227,12 +229,12 @@ public class TmfGraph {
         if (fNodeMap.isEmpty()) {
             return null;
         }
-        IGraphWorker headWorker = fNodeMap.keySet().stream()
-                .filter(k -> !fNodeMap.get(k).isEmpty())
-                .sorted((k1, k2) -> fNodeMap.get(k1).get(0).compareTo(fNodeMap.get(k2).get(0)))
-                .findFirst()
-                .get();
-        return getHead(headWorker);
+        Optional<TmfVertex> min = fNodeMap.asMap().values().stream()
+                .filter(c -> !c.isEmpty())
+                .map(c -> Iterables.get(c, 0))
+                .min((k1, k2) -> k1.compareTo(k2));
+        // issue with annotations, cannot return min.orElse(null);
+        return min.isPresent() ? min.get() : null;
     }
 
     /**

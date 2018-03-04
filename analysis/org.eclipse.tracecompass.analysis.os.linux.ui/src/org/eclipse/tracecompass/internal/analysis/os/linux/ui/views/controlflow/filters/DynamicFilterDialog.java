@@ -252,7 +252,7 @@ public class DynamicFilterDialog extends TitleAreaDialog {
         List<Range<Long>> results = new ArrayList<>();
         if (validateCpuRange(string)) {
             string.split(RANGES_DELIMITER);
-            for (String range : Arrays.asList(string.split(RANGES_DELIMITER))) {
+            for (String range : string.split(RANGES_DELIMITER)) {
                 if (range.contains(INTERNAL_RANGE_SEPARATOR)) {
                     /* Parse as a range */
                     String[] split = range.split(INTERNAL_RANGE_SEPARATOR);
@@ -261,7 +261,9 @@ public class DynamicFilterDialog extends TitleAreaDialog {
                         continue;
                     }
 
-                    long[] sorted = Arrays.asList(split).stream().map(Long::parseLong).sorted().mapToLong(Long::longValue).toArray();
+                    long[] sorted = new long[split.length];
+                    Arrays.setAll(sorted, i -> Long.parseLong(split[i]));
+                    Arrays.sort(sorted);
                     results.add(Range.closed(sorted[0], sorted[1]));
                 } else {
                     /* Parse as an individual number */

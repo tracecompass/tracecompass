@@ -281,7 +281,7 @@ public class HistogramDataModel implements IHistogramDataModel {
      */
     public String[] getTraceNames() {
         return TmfTraceManager.getTraceSet(fTrace).stream()
-            .map(trace -> trace.getName())
+            .map(ITmfTrace::getName)
             .toArray(String[]::new);
     }
 

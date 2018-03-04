@@ -267,14 +267,14 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
             }
         };
 
-        for (String host : tracesPerHost.keySet()) {
+        for (Collection<ITmfTrace> values : tracesPerHost.asMap().values()) {
             /*
              * Only attempt to synchronize traces that provide a clock_offset
              * property.
              */
-            Collection<ITmfPropertiesProvider> tracesToSynchronize = tracesPerHost.get(host).stream()
-                    .filter(trace -> trace instanceof ITmfPropertiesProvider)
-                    .map(trace -> (ITmfPropertiesProvider) trace)
+            Collection<ITmfPropertiesProvider> tracesToSynchronize = values.stream()
+                    .filter(ITmfPropertiesProvider.class::isInstance)
+                    .map(ITmfPropertiesProvider.class::cast)
                     .filter(trace -> offsetGetter.apply(trace) != null)
                     .collect(Collectors.toList());
 

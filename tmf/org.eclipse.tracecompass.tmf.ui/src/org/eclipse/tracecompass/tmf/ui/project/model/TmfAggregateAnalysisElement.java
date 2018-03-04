@@ -13,14 +13,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
-
-import com.google.common.base.Joiner;
 
 /**
  * Class for project elements of type compound analysis modules.
@@ -116,8 +113,8 @@ public class TmfAggregateAnalysisElement extends TmfAnalysisElement {
         for (TmfAnalysisElement analysis : fContainedAnalyses) {
             messages.add(analysis.getHelpMessage());
         }
-        if (messages.size() > 0) {
-            return Joiner.on(',').join(messages.stream().collect(Collectors.toList()));
+        if (!messages.isEmpty()) {
+            return String.join(",", messages); //$NON-NLS-1$
         }
         return super.getHelpMessage();
     }

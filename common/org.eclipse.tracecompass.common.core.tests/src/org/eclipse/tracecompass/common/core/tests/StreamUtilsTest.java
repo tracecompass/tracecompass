@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Alexandre Montplaisir
  */
+@Deprecated
 public class StreamUtilsTest {
 
     /**

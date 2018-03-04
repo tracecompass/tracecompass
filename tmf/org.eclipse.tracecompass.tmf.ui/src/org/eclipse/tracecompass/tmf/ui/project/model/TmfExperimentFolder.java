@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -197,13 +198,11 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
      * @since 2.0
      */
     public @Nullable TmfExperimentElement getExperiment(@NonNull String name) {
-        return getExperiments()
-        .stream()
-        .filter(experiment ->
-            (experiment != null)
-            && (experiment.getName().equals(name)))
-        .findFirst()
-        .orElse(null);
+        return getExperiments().stream()
+                .filter(Objects::nonNull)
+                .filter(experiment -> experiment.getName().equals(name))
+                .findFirst()
+                .orElse(null);
     }
 
 

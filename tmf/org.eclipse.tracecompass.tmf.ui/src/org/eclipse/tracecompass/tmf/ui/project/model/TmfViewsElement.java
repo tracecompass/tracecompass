@@ -198,7 +198,7 @@ public class TmfViewsElement extends TmfProjectModelElement {
 
     private TmfAggregateAnalysisElement getAggregateAnalysisElement(TmfAnalysisElement element) {
         return getChildren().stream()
-                .filter(elem -> (elem instanceof TmfAggregateAnalysisElement))
+                .filter(TmfAggregateAnalysisElement.class::isInstance)
                 .map(elem -> ((TmfAggregateAnalysisElement) elem))
                 .filter(elem -> elem.getAnalysisHelper().getId().equals(element.getAnalysisHelper().getId()))
                 .findFirst().orElse(null);

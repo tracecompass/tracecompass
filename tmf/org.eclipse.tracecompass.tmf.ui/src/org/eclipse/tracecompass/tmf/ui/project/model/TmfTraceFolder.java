@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -202,21 +203,11 @@ public class TmfTraceFolder extends TmfProjectModelElement implements IActionFil
      * @since 2.0
      */
     public @NonNull List<TmfTraceElement> getTraceElements(@NonNull List<IResource> resources) {
-        List<TmfTraceElement> traceElements = new ArrayList<>();
-        List<TmfTraceElement> children = getTraces();
-        for (IResource resource : resources) {
-            TmfTraceElement el = children.stream()
-                    .filter(traceElement ->
-                    ((traceElement != null) &&
-                    traceElement.getResource().equals(resource)))
-                .findFirst()
-                .orElse(null);
-
-            if (el != null) {
-                traceElements.add(el);
-            }
-        }
-        return traceElements;
+        return resources.stream()
+                .flatMap(resource -> getTraces().stream()
+                        .filter(traceElement -> traceElement.getResource().equals(resource)))
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     // ------------------------------------------------------------------------

@@ -21,6 +21,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -476,11 +477,12 @@ final class CTFVariantField extends CtfTmfEventField {
     @Override
     public ITmfEventField getField(final String... path) {
         /*
-         * We use the == to make sure that this constant was used, otherwise, it
-         * could conflict with a field with the same name
+         * We use the == to make sure that this constant was used, otherwise, it could
+         * conflict with a field with the same name
          */
         if (path.length == 1 && path[0] == FIELD_VARIANT_SELECTED) {
-            return getFields().stream().findFirst().orElse(null);
+            Iterator<ITmfEventField> it = getFields().iterator();
+            return it.hasNext() ? it.next() : null;
         }
         return super.getField(path);
     }

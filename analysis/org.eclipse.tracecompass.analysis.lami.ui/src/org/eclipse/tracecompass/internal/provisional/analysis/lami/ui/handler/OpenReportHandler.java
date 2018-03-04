@@ -10,7 +10,6 @@
 package org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.handler;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -21,7 +20,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiAnalysisReport;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportViewFactory;
-import org.eclipse.tracecompass.tmf.core.analysis.ondemand.IOnDemandAnalysisReport;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfReportElement;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -42,26 +40,19 @@ public class OpenReportHandler extends AbstractHandler {
         /* Types should have been checked by the plugin.xml already */
         ISelection selection = HandlerUtil.getCurrentSelectionChecked(event);
         List<?> elements = ((IStructuredSelection) selection).toList();
-        List<TmfReportElement> reportElements = elements.stream()
-            .filter(elem -> elem instanceof TmfReportElement)
-            .map(elem -> (TmfReportElement) elem)
-            .collect(Collectors.toList());
 
-        for (TmfReportElement reportElem : reportElements) {
-            IOnDemandAnalysisReport report = reportElem.getReport();
-            if (!(report instanceof LamiAnalysisReport)) {
-                /* This handler deals with LAMI reports only */
-                continue;
-            }
-            LamiAnalysisReport lamiReport = (LamiAnalysisReport) report;
-
-            Display.getDefault().syncExec(() -> {
-                try {
-                    LamiReportViewFactory.createNewView(lamiReport);
-                } catch (PartInitException e) {
-                }
-            });
-        }
+        Display.getDefault().syncExec(() -> elements.stream()
+                .filter(TmfReportElement.class::isInstance)
+                .map(TmfReportElement.class::cast)
+                .map(TmfReportElement::getReport)
+                .filter(LamiAnalysisReport.class::isInstance)
+                .map(LamiAnalysisReport.class::cast)
+                .forEach(lamiReport -> {
+                    try {
+                        LamiReportViewFactory.createNewView(lamiReport);
+                    } catch (PartInitException e) {
+                    }
+                }));
 
         return null;
     }

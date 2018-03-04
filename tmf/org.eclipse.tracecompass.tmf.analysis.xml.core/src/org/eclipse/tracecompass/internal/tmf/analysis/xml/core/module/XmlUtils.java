@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -82,7 +81,7 @@ public class XmlUtils {
     /**
      * Enum to match the name of an output's XML element to its output ID.
      */
-    public static enum OutputType {
+    public enum OutputType {
         /**
          * Time graph output element
          */
@@ -491,11 +490,10 @@ public class XmlUtils {
      */
     public static void initOutputElements() {
         // Get all the xml files, builtin and not builtin
-        Set<File> files = listBuiltinFiles().values().stream()
-                .map(p -> p.toFile())
-                .collect(Collectors.toSet());
-        listFiles().values().stream()
-                .forEach(f -> files.add(f));
+        Set<File> files = new HashSet<>(listFiles().values());
+        for (IPath path : listBuiltinFiles().values()) {
+            files.add(path.toFile());
+        }
 
         for (File xmlFile : files) {
             preloadXmlAnalysesOutput(xmlFile);

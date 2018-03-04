@@ -482,7 +482,7 @@ public class EnableLoggersComposite extends Composite implements IBaseEnableUstE
             }
             if (parentElement instanceof TraceProviderGroup) {
                 List<ITraceControlComponent> ustProviderChildren = ((ITraceControlComponent) parentElement).getChildren(UstProviderComponent.class)
-                        .stream().filter(comp -> ((UstProviderComponent) comp).getLoggerComponents(fDomain).size() > 0)
+                        .stream().filter(comp -> !((UstProviderComponent) comp).getLoggerComponents(fDomain).isEmpty())
                         .collect(Collectors.toList());
                 return ustProviderChildren.toArray(new ITraceControlComponent[ustProviderChildren.size()]);
             }

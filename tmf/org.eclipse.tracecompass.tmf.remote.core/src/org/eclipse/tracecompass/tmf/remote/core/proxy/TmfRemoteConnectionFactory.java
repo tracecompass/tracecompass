@@ -18,6 +18,7 @@ import java.net.URI;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -226,12 +227,11 @@ public class TmfRemoteConnectionFactory {
             return null;
         }
         return manager.getAllRemoteConnections().stream()
-            .filter(connection ->
-                (connection != null) &&
-                connection.getConnectionType().getId().equals(remoteServicesId) &&
-                connection.getName().equals(name))
-            .findFirst()
-            .orElse(null);
+                .filter(Objects::nonNull)
+                .filter(connection -> connection.getName().equals(name))
+                .filter(connection -> connection.getConnectionType().getId().equals(remoteServicesId))
+                .findFirst()
+                .orElse(null);
     }
 
     /**

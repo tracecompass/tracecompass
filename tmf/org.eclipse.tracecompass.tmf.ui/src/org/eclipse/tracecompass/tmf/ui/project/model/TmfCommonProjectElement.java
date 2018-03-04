@@ -565,10 +565,11 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
         TmfViewsElement viewsElement = getChildElementViews();
         if (viewsElement != null) {
             return viewsElement.getChildren().stream()
-                    .map(elem -> (TmfAnalysisElement) elem)
+                    .filter(TmfAnalysisElement.class::isInstance)
+                    .map(TmfAnalysisElement.class::cast)
                     .collect(Collectors.toList());
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     /**
@@ -576,7 +577,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      * @return list of children analysis elements
      */
     public List<TmfAnalysisElement> getAvailableChildrenAnalyses() {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     // ------------------------------------------------------------------------

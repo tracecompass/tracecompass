@@ -101,7 +101,7 @@ public abstract class ViewsResponseTest {
     }
 
     private void closeAllViews(Collection<String> viewIDs) {
-        viewIDs.stream().forEach(id -> {
+        viewIDs.forEach(id -> {
             SWTBotUtils.openView(id);
             SWTBotUtils.closeViewById(id, fBot);
         });

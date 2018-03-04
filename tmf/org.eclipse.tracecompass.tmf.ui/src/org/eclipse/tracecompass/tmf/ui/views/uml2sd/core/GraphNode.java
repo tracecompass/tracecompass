@@ -673,15 +673,15 @@ public abstract class GraphNode {
 
     private void sortNodes(Map<String, List<GraphNode>> nodesToSort, Map.Entry<String, Boolean> sortMapEntry, boolean forward) {
         String nodeType = sortMapEntry.getKey();
-        GraphNode[] temp = checkNotNull(nodesToSort.get(nodeType)).stream().toArray(GraphNode[]::new);
+        List<GraphNode> temp = checkNotNull(nodesToSort.get(nodeType));
         GraphNode node = checkNotNull(fNodes.get(nodeType)).get(0);
         if (forward) {
-            Arrays.sort(temp, node.getComparator());
-            fNodes.put(nodeType, Arrays.asList(temp));
+            temp.sort(node.getComparator());
+            fNodes.put(nodeType, temp);
         } else {
-            Arrays.sort(temp, node.getBackComparator());
+            temp.sort(node.getBackComparator());
         }
-        nodesToSort.put(nodeType, Arrays.asList(temp));
+        nodesToSort.put(nodeType, temp);
         sortMapEntry.setValue(Boolean.FALSE);
         if (TmfUiTracer.isSortingTraced()) {
             TmfUiTracer.traceSorting(nodeType + " array sorted\n"); //$NON-NLS-1$

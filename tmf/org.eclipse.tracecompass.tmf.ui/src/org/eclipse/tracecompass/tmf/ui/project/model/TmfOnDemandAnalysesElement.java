@@ -12,7 +12,6 @@ package org.eclipse.tracecompass.tmf.ui.project.model;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFolder;
@@ -75,11 +74,8 @@ public class TmfOnDemandAnalysesElement extends TmfProjectModelElement {
             return;
         }
 
-        // Remove children first
-        List<ITmfProjectModelElement> children = new ArrayList<>(getChildren());
-        children.stream().forEach(elem -> {
-            removeChild(elem);
-        });
+        // Remove children first (create a copy as the array will be modified).
+        new ArrayList<>(getChildren()).forEach(this::removeChild);
 
         Set<IOnDemandAnalysis> analyses =
                 OnDemandAnalysisManager.getInstance().getOndemandAnalyses(trace);

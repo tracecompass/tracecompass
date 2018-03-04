@@ -14,6 +14,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.TreeSet;
@@ -206,13 +207,10 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
 
             /* Get the most probable base address from all the known ones */
             OptionalLong potentialBaddr = possibleBaddrQuarks.stream()
-                    .filter(quark -> {
-                        /* Keep only currently (at ts) mapped objects. */
-                        ITmfStateValue value = state.get(quark).getStateValue();
-                        return value.getType() == ITmfStateValue.Type.INTEGER && value.unboxInt() == 1;
-                    })
-                    .map(quark -> ss.getAttributeName(quark.intValue()))
-                    .mapToLong(baddrStr -> Long.parseLong(baddrStr))
+                    /* Keep only currently (at ts) mapped objects. */
+                    .filter(quark -> Objects.equals(1, state.get(quark).getValue()))
+                    .map(ss::getAttributeName)
+                    .mapToLong(Long::parseLong)
                     .filter(baddr -> baddr <= ip)
                     .max();
 

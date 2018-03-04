@@ -510,8 +510,8 @@ public final class TmfTraceManager {
         fTraces.remove(signal.getTrace());
 
         IResource resource = signal.getTrace().getResource();
-        if (resource != null && !fTraces.keySet().stream()
-                .anyMatch(trace -> resource.equals(trace.getResource()))) {
+        if (resource != null && fTraces.keySet().stream()
+                .noneMatch(trace -> resource.equals(trace.getResource()))) {
             /* Reset the instance count only when no other instance remains */
             fInstanceCounts.setCount(resource, 0);
         }
