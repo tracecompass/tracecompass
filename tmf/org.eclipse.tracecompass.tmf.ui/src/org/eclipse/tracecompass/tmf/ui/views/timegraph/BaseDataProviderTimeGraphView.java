@@ -82,6 +82,16 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         fProviderId = providerId;
     }
 
+    /**
+     * Get a data provider ID
+     *
+     * @return the data provider ID
+     * @since 3.3
+     */
+    protected String getProviderId() {
+        return fProviderId;
+    }
+
     @Override
     protected void buildEntryList(@NonNull ITmfTrace trace, @NonNull ITmfTrace parentTrace, @NonNull IProgressMonitor monitor) {
         ITimeGraphDataProvider<@NonNull TimeGraphEntryModel> dataProvider = DataProviderManager

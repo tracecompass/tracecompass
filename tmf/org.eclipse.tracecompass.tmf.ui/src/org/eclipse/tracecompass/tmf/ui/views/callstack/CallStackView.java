@@ -64,6 +64,7 @@ import org.eclipse.tracecompass.tmf.ui.editors.ITmfTraceEditor;
 import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
 import org.eclipse.tracecompass.tmf.ui.symbols.SymbolProviderConfigDialog;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NamedTimeEvent;
@@ -182,8 +183,6 @@ public class CallStackView extends BaseDataProviderTimeGraphView {
     // Classes
     // ------------------------------------------------------------------------
 
-
-
     private class CallStackComparator implements Comparator<ITimeGraphEntry> {
         @Override
         public int compare(ITimeGraphEntry o1, ITimeGraphEntry o2) {
@@ -276,7 +275,23 @@ public class CallStackView extends BaseDataProviderTimeGraphView {
      * Default constructor
      */
     public CallStackView() {
-        super(ID, new CallStackPresentationProvider(), CallStackDataProvider.ID);
+        this(ID, new CallStackPresentationProvider(), CallStackDataProvider.ID);
+    }
+
+    /**
+     * Custom constructor, used for extending the callstack view with a custom
+     * presentation provider or data provider.
+     *
+     * @param id
+     *            The ID of the view
+     * @param presentationProvider
+     *            the presentation provider
+     * @param dataProviderID
+     *            the data provider id
+     * @since 3.3
+     */
+    public CallStackView(String id, TimeGraphPresentationProvider presentationProvider, String dataProviderID) {
+        super(id, presentationProvider, dataProviderID);
         setTreeColumns(COLUMN_NAMES, COMPARATORS, 0);
         setTreeLabelProvider(new CallStackTreeLabelProvider());
         setEntryComparator(new CallStackComparator());
@@ -396,7 +411,7 @@ public class CallStackView extends BaseDataProviderTimeGraphView {
     @Override
     protected void buildEntryList(final ITmfTrace trace, final ITmfTrace parentTrace, final IProgressMonitor monitor) {
         CallStackDataProvider provider = DataProviderManager.getInstance().getDataProvider(trace,
-                CallStackDataProvider.ID, CallStackDataProvider.class);
+                getProviderId(), CallStackDataProvider.class);
         if (provider == null) {
             addUnavailableEntry(trace, parentTrace);
             return;
@@ -665,9 +680,9 @@ public class CallStackView extends BaseDataProviderTimeGraphView {
         fConfigureSymbolsAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(IMPORT_BINARY_ICON_PATH));
 
         /*
-         * The updateConfigureSymbolsAction() method (called by refresh()) will
-         * set the action to true if applicable after the symbol provider has
-         * been properly loaded.
+         * The updateConfigureSymbolsAction() method (called by refresh()) will set the
+         * action to true if applicable after the symbol provider has been properly
+         * loaded.
          */
         fConfigureSymbolsAction.setEnabled(false);
 
@@ -675,8 +690,8 @@ public class CallStackView extends BaseDataProviderTimeGraphView {
     }
 
     /**
-     * @return an array of {@link ISymbolProviderPreferencePage} that will
-     *         configure the current traces
+     * @return an array of {@link ISymbolProviderPreferencePage} that will configure
+     *         the current traces
      */
     private ISymbolProviderPreferencePage[] getProviderPages() {
         List<ISymbolProviderPreferencePage> pages = new ArrayList<>();
