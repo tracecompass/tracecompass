@@ -68,6 +68,7 @@ import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
 import org.eclipse.tracecompass.tmf.ui.symbols.SymbolProviderConfigDialog;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphContentProvider;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
@@ -188,6 +189,8 @@ public class CallStackView extends AbstractTimeGraphView {
     private boolean fSyncSelection = false;
 
     private final Map<Long, ITimeGraphState> fFunctions = new HashMap<>();
+
+    private final String fDataProviderID;
 
     // ------------------------------------------------------------------------
     // Classes
@@ -321,7 +324,24 @@ public class CallStackView extends AbstractTimeGraphView {
      * Default constructor
      */
     public CallStackView() {
-        super(ID, new CallStackPresentationProvider());
+        this(ID, new CallStackPresentationProvider(), CallStackDataProvider.ID);
+    }
+
+    /**
+     * Custom constructor, used for extending the callstack view with a custom
+     * presentation provider or data provider.
+     *
+     * @param id
+     *            The ID of the view
+     * @param presentationProvider
+     *            the presentation provider
+     * @param dataProviderID
+     *            the data provider id
+     * @since 3.3
+     */
+    public CallStackView(String id, TimeGraphPresentationProvider presentationProvider, String dataProviderID) {
+        super(id, presentationProvider);
+        fDataProviderID = dataProviderID;
         setTreeColumns(COLUMN_NAMES, COMPARATORS, 0);
         setTreeLabelProvider(new CallStackTreeLabelProvider());
         setEntryComparator(new CallStackComparator());
@@ -442,7 +462,7 @@ public class CallStackView extends AbstractTimeGraphView {
     @Override
     protected void buildEntryList(final ITmfTrace trace, final ITmfTrace parentTrace, final IProgressMonitor monitor) {
         CallStackDataProvider provider = DataProviderManager.getInstance().getDataProvider(trace,
-                CallStackDataProvider.ID, CallStackDataProvider.class);
+                fDataProviderID, CallStackDataProvider.class);
         if (provider == null) {
             addUnavailableEntry(trace, parentTrace);
             return;
