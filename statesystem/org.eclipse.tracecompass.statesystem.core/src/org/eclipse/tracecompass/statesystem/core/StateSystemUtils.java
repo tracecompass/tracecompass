@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -297,7 +298,18 @@ public final class StateSystemUtils {
         private final long fInitialTime;
         private final long fEndTime;
 
+        /**
+         * The last returned interval
+         */
         private @Nullable ITmfStateInterval fCurrent;
+        /**
+         * The previous interval (pre-fetched)
+         */
+        private @Nullable ITmfStateInterval fPrevious;
+        /**
+         * The next interval (pre-fetched)
+         */
+        private @Nullable ITmfStateInterval fNext;
 
         /**
          * Constructor
@@ -369,6 +381,9 @@ public final class StateSystemUtils {
 
         @Override
         public boolean hasNext() {
+            if (fNext != null) {
+                return true;
+            }
             /*
              * Compute the query's real end time here, to update it if the
              * iterator is used during state system build
@@ -380,18 +395,26 @@ public final class StateSystemUtils {
              * query time range. By definition getNextQueryTime() is larger than
              * the state system's start time.
              */
-            return (getNextQueryTime() <= end);
+            long nextQueryTime = getNextQueryTime();
+            if (nextQueryTime <= end) {
+                try {
+                    fNext = fSS.querySingleState(nextQueryTime, fQuark);
+                } catch (StateSystemDisposedException e) {
+                    fNext = null;
+                    return false;
+                }
+            }
+            return fNext != null;
         }
 
         @Override
         public ITmfStateInterval next() {
             if (hasNext()) {
-                try {
-                    fCurrent = fSS.querySingleState(getNextQueryTime(), fQuark);
-                    return fCurrent;
-                } catch (StateSystemDisposedException e) {
-                    /* GOTO throw NoSuchElementException. */
-                }
+                ITmfStateInterval next = Objects.requireNonNull(fNext, "Inconsistent state, should be non null if hasNext returned true"); //$NON-NLS-1$
+                fPrevious = fCurrent;
+                fCurrent = next;
+                fNext = null;
+                return next;
             }
             throw new NoSuchElementException();
         }
@@ -404,12 +427,24 @@ public final class StateSystemUtils {
          * @return true if the iteration has more previous elements
          */
         public boolean hasPrevious() {
+            if (fPrevious != null) {
+                return true;
+            }
             /*
              * Ensure that the next query time falls within state system and
              * query time range. By definition getPreviousQueryTime() is smaller
              * than the state system's end time.
              */
-            return (getPreviousQueryTime() >= fSS.getStartTime());
+            long previousQueryTime = getPreviousQueryTime();
+            if (previousQueryTime >= fSS.getStartTime()) {
+                try {
+                    fPrevious = fSS.querySingleState(previousQueryTime, fQuark);
+                } catch (StateSystemDisposedException e) {
+                    fPrevious = null;
+                    return false;
+                }
+            }
+            return fPrevious != null;
         }
 
         /**
@@ -419,12 +454,11 @@ public final class StateSystemUtils {
          */
         public ITmfStateInterval previous() {
             if (hasPrevious()) {
-                try {
-                    fCurrent = fSS.querySingleState(getPreviousQueryTime(), fQuark);
-                    return fCurrent;
-                } catch (StateSystemDisposedException e) {
-                    /* GOTO throw NoSuchElementException. */
-                }
+                ITmfStateInterval prev = Objects.requireNonNull(fPrevious, "Inconsistent state, should be non null if hasPrevious returned true"); //$NON-NLS-1$
+                fNext = fCurrent;
+                fCurrent = prev;
+                fPrevious = null;
+                return prev;
             }
             throw new NoSuchElementException();
         }
