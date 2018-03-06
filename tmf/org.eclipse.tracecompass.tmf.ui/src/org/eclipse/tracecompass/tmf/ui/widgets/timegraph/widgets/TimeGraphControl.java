@@ -38,6 +38,7 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
@@ -76,6 +77,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -165,6 +167,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     private static final String PREFERRED_WIDTH = "width"; //$NON-NLS-1$
 
+    private static final ColorRegistry COLOR_REGISTRY = new ColorRegistry();
+
     /** Resource manager */
     private LocalResourceManager fResourceManager = new LocalResourceManager(JFaceResources.getResources());
 
@@ -227,7 +231,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private int fHeaderHeight = 0;
 
     private boolean fFirstHeightWarning = true;
-
     /**
      * Standard constructor
      *
@@ -2528,10 +2531,22 @@ public class TimeGraphControl extends TimeGraphBaseControl
             return false;
         }
         Color stateColor = null;
-        if (colorIdx < fEventColorMap.length) {
-            stateColor = fEventColorMap[colorIdx];
+        Integer fillColor = (Integer) styleMap.get(ITimeEventStyleStrings.fillColor());
+        if (fillColor != null) {
+            String hexRGB = Integer.toHexString(fillColor);
+            stateColor = COLOR_REGISTRY.get(hexRGB);
+            if (stateColor == null) {
+                COLOR_REGISTRY.put(hexRGB, new RGB((fillColor >> 24) & 0xff, (fillColor >> 16) & 0xff, (fillColor >> 8) & 0xff));
+                stateColor = COLOR_REGISTRY.get(hexRGB);
+            }
+
         } else {
-            stateColor = black;
+            fillColor = 0xff;
+            if (colorIdx < fEventColorMap.length) {
+                stateColor = fEventColorMap[colorIdx];
+            } else {
+                stateColor = black;
+            }
         }
 
         boolean reallySelected = timeSelected && selected;
@@ -2539,7 +2554,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         gc.setBackground(stateColor);
         if (visible) {
             int prevAlpha = gc.getAlpha();
-            int alpha = ((int) styleMap.getOrDefault(ITimeEventStyleStrings.fillColor(), 0xff)) & 0xff;
+            int alpha = fillColor & 0xff;
             gc.setAlpha(alpha);
             gc.fillRectangle(drawRect);
             gc.setAlpha(prevAlpha);
