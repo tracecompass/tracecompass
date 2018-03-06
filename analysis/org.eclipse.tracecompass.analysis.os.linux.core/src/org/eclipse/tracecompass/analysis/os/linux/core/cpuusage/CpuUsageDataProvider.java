@@ -260,7 +260,7 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
         /* Find a name in this attribute's intervals */
         Iterator<ITmfStateInterval> iterator = new StateSystemUtils.QuarkIterator(kernelSs, execNameQuark, start);
         Iterator<String> names = Iterators.filter(Iterators.transform(iterator, ITmfStateInterval::getValue), String.class);
-        if (iterator.hasNext()) {
+        if (names.hasNext()) {
             execName = names.next();
             fProcessNameMap.put(tid, execName);
             return execName;
