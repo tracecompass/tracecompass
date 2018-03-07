@@ -96,12 +96,14 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
     }
 
     private static StateItem getEventState(TimeEvent event) {
+        if (event instanceof NullTimeEvent) {
+            return null;
+        }
         ITimeGraphEntry entry = event.getEntry();
-        if (event.hasValue() && entry instanceof TimeGraphEntry
+        if (entry instanceof TimeGraphEntry
                 && ((TimeGraphEntry) entry).getModel() instanceof ResourcesEntryModel) {
             int value = event.getValue();
             ResourcesEntryModel resourcesModel = (ResourcesEntryModel) ((TimeGraphEntry) entry).getModel();
-
             if (resourcesModel.getType() == Type.CPU) {
                 return STATE_MAP.get(value);
             } else if (resourcesModel.getType() == Type.IRQ) {
