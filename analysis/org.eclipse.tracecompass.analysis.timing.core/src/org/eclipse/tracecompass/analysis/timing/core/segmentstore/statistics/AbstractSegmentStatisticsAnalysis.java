@@ -10,9 +10,7 @@ package org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.function.Function;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -37,8 +35,6 @@ import com.google.common.collect.ImmutableList;
  * @since 3.0
  */
 public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnalysisModule {
-
-    private static Function<ISegment, Long> FCT_LENGTH = s -> s.getLength();
 
     private @Nullable ISegmentStoreProvider fSegmentStoreProviderModule;
 
@@ -159,26 +155,19 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
         if (segmentStoreProviderModule instanceof IAnalysisModule) {
             ((IAnalysisModule) segmentStoreProviderModule).waitForCompletion();
         }
-        long t0 = start;
-        long t1 = end;
-        if (end < start) {
-            t0 = end;
-            t1 = start;
-        }
+        long t0 = Long.min(start, end);
+        long t1 = Long.max(start, end);
         ISegmentStore<@NonNull ISegment> segmentStore = segmentStoreProviderModule.getSegmentStore();
         return segmentStore != null ? t0 != TmfTimeRange.ETERNITY.getStartTime().toNanos() || t1 != TmfTimeRange.ETERNITY.getEndTime().toNanos() ?
-                (Iterable<@NonNull ISegment>) segmentStore.getIntersectingElements(t0, t1) : segmentStore
-                : Collections.emptyList();
+                segmentStore.getIntersectingElements(t0, t1) : segmentStore : Collections.emptyList();
     }
 
     private static @Nullable IStatistics<ISegment> calculateTotalManual(Iterable<@NonNull ISegment> segments, IProgressMonitor monitor) {
-        IStatistics<ISegment> total = new Statistics<>(FCT_LENGTH);
-        Iterator<@NonNull ISegment> iter = segments.iterator();
-        while (iter.hasNext()) {
+        IStatistics<ISegment> total = new Statistics<>(ISegment::getLength);
+        for (ISegment segment : segments) {
             if (monitor.isCanceled()) {
                 return null;
             }
-            ISegment segment = iter.next();
             total.update(segment);
         }
         return total;
@@ -187,18 +176,14 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
     private Map<@NonNull String, org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics<ISegment>> calculateTotalPerType(Iterable<ISegment> segments, IProgressMonitor monitor) {
         Map<String, IStatistics<ISegment>> perSegmentTypeStats = new HashMap<>();
 
-        Iterator<ISegment> iter = segments.iterator();
-        while (iter.hasNext()) {
+        for (ISegment segment : segments) {
             if (monitor.isCanceled()) {
-                return Collections.EMPTY_MAP;
+                return Collections.emptyMap();
             }
-            ISegment segment = iter.next();
             String segmentType = getSegmentType(segment);
             if (segmentType != null) {
-                IStatistics<ISegment> values = perSegmentTypeStats.get(segmentType);
-                if (values == null) {
-                    values = new Statistics<>(FCT_LENGTH);
-                }
+                // TODO should use computeIfAbsent but that would change the order in the tests.
+                IStatistics<ISegment> values = perSegmentTypeStats.getOrDefault(segmentType, new Statistics<>(ISegment::getLength));
                 values.update(segment);
                 perSegmentTypeStats.put(segmentType, values);
             }

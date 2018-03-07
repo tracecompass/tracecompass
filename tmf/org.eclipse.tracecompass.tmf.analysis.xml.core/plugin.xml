@@ -9,4 +9,11 @@
             class="org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlAnalysisModuleSource">
       </source>
    </extension>
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.dataprovider">
+      <dataProviderFactory
+            class="org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternLatencyStatisticsDataProviderFactory"
+            id="org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternLatencyStatisticsAnalysis.statistics">
+      </dataProviderFactory>
+   </extension>
 </plugin>

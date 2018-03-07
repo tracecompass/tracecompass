@@ -16,13 +16,14 @@ import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreStatisticsModel;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentsStatisticsViewer;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphStatisticsAnalysis;
-import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
 import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderUtils;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
 
 /**
  * A tree viewer implementation for displaying function duration statistics
@@ -32,19 +33,16 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  */
 public class CallGraphStatisticsViewer extends AbstractSegmentsStatisticsViewer {
 
-    private static final class SymbolFormatter implements Function<SegmentStoreStatisticsEntry, String> {
+    private static final class SymbolFormatter implements Function<@NonNull TmfGenericTreeEntry<@NonNull SegmentStoreStatisticsModel>, String> {
 
         private final @NonNull Collection<@NonNull ISymbolProvider> fSymbolProviders;
 
         public SymbolFormatter(@Nullable ITmfTrace trace) {
-            fSymbolProviders = trace != null ? SymbolProviderManager.getInstance().getSymbolProviders(trace) : Collections.EMPTY_SET;
+            fSymbolProviders = trace != null ? SymbolProviderManager.getInstance().getSymbolProviders(trace) : Collections.emptySet();
         }
 
         @Override
-        public String apply(@Nullable SegmentStoreStatisticsEntry stat) {
-            if (stat == null) {
-                return "null"; //$NON-NLS-1$
-            }
+        public String apply(@NonNull TmfGenericTreeEntry<@NonNull SegmentStoreStatisticsModel> stat) {
             String original = stat.getName();
             try {
                 Long address = Long.decode(original);
@@ -63,27 +61,17 @@ public class CallGraphStatisticsViewer extends AbstractSegmentsStatisticsViewer 
      *            the parent composite
      */
     public CallGraphStatisticsViewer(Composite parent) {
-        super(Objects.requireNonNull(parent));
+        super(Objects.requireNonNull(parent), CallGraphStatisticsAnalysis.ID);
         setLabelProvider(new SegmentStoreStatisticsLabelProvider() {
             @Override
             public @NonNull String getColumnText(@Nullable Object element, int columnIndex) {
-                if (columnIndex == 0 && (element instanceof SegmentStoreStatisticsEntry)) {
-                    SegmentStoreStatisticsEntry entry = (SegmentStoreStatisticsEntry) element;
+                if (columnIndex == 0 && (element instanceof TmfGenericTreeEntry)) {
+                    TmfGenericTreeEntry<@NonNull SegmentStoreStatisticsModel> entry = (TmfGenericTreeEntry<@NonNull SegmentStoreStatisticsModel>) element;
                     SymbolFormatter fe = new SymbolFormatter(getTrace());
                     return String.valueOf(fe.apply(entry));
                 }
                 return super.getColumnText(element, columnIndex);
             }
         });
-    }
-
-    /**
-     * Gets the statistics analysis module
-     *
-     * @return the statistics analysis module
-     */
-    @Override
-    protected @Nullable TmfAbstractAnalysisModule createStatisticsAnalysiModule() {
-        return new CallGraphStatisticsAnalysis();
     }
 }

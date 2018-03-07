@@ -46,4 +46,12 @@ public interface ITmfTreeDataProvider<T extends ITmfTreeDataModel> {
      * @return The ID
      */
     String getId();
+
+    /**
+     * Dispose of the provider to avoid resource leakage.
+     *
+     * @since 4.0
+     */
+    public default void dispose() {
+    }
 }

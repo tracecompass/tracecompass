@@ -16,7 +16,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -122,10 +121,7 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
                 return viewReference.getView(true);
             }
         });
-        assertNotNull(viewPart);
-        if (!(viewPart instanceof SegmentStoreStatisticsView)) {
-            fail("Could not instanciate view");
-        }
+        assertTrue("Could not instanciate view", viewPart instanceof SegmentStoreStatisticsView);
         fTreeBot = viewBot.bot().tree();
         assertNotNull(fTreeBot);
     }

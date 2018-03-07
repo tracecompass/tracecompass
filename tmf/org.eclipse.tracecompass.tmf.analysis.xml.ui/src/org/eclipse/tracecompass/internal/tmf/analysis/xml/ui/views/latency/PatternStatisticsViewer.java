@@ -9,12 +9,10 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentsStatisticsViewer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternLatencyStatisticsAnalysis;
-import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternLatencyStatisticsDataProviderFactory;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -23,8 +21,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * @author Jean-Christian Kouame
  */
 public class PatternStatisticsViewer extends AbstractSegmentsStatisticsViewer {
-
-    private String fAnalysisId;
 
     private static final @NonNull String PATTERN_SEGMENTS_LEVEL = "Pattern Segments"; //$NON-NLS-1$
 
@@ -35,12 +31,7 @@ public class PatternStatisticsViewer extends AbstractSegmentsStatisticsViewer {
      *            The parent composite
      */
     public PatternStatisticsViewer(@NonNull Composite parent) {
-        super(parent);
-    }
-
-    @Override
-    protected @Nullable TmfAbstractAnalysisModule createStatisticsAnalysiModule() {
-        return new XmlPatternLatencyStatisticsAnalysis(fAnalysisId);
+        super(parent, null);
     }
 
     @Override
@@ -60,17 +51,14 @@ public class PatternStatisticsViewer extends AbstractSegmentsStatisticsViewer {
             return;
         }
         if (analysisId != null) {
-            fAnalysisId = analysisId;
+            setProviderId(XmlPatternLatencyStatisticsDataProviderFactory.ID + ':' + analysisId);
             initializeDataSource(trace);
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    if (!trace.equals(getTrace())) {
-                        return;
-                    }
-                    clearContent();
-                    updateContent(getWindowStartTime(), getWindowEndTime(), false);
+            Display.getDefault().asyncExec(() -> {
+                if (!trace.equals(getTrace())) {
+                    return;
                 }
+                clearContent();
+                updateContent(getWindowStartTime(), getWindowEndTime(), false);
             });
         }
     }

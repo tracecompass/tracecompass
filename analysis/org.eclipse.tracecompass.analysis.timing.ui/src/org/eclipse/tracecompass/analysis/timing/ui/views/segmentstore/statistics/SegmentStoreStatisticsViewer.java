@@ -13,6 +13,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProvider;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.segment.interfaces.INamedSegment;
@@ -38,10 +39,11 @@ public class SegmentStoreStatisticsViewer extends AbstractSegmentsStatisticsView
      *            The ID of the segment store provider to do statistics on
      */
     public SegmentStoreStatisticsViewer(Composite parent, String analysisId) {
-        super(parent);
+        super(parent, SegmentStoreStatisticsDataProvider.ID + ':' + analysisId);
         fAnalysisId = analysisId;
     }
 
+    @Deprecated
     @Override
     protected @Nullable TmfAbstractAnalysisModule createStatisticsAnalysiModule() {
         AbstractSegmentStatisticsAnalysis module = new AbstractSegmentStatisticsAnalysis() {

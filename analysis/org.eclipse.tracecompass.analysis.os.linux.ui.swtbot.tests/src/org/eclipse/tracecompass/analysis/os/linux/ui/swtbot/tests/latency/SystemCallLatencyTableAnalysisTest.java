@@ -15,7 +15,6 @@ package org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests.latency;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
@@ -87,10 +86,7 @@ public class SystemCallLatencyTableAnalysisTest extends SegmentTableTest {
                 return viewReference.getView(true);
             }
         });
-        assertNotNull(viewPart);
-        if (!(viewPart instanceof SegmentStoreTableView)) {
-            fail("Could not instanciate view");
-        }
+        assertTrue("Could not instanciate view", viewPart instanceof SegmentStoreTableView);
         return (SegmentStoreTableView) viewPart;
     }
 

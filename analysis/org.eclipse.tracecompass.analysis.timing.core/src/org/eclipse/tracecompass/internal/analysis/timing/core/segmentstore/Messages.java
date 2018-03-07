@@ -39,6 +39,16 @@ public class Messages extends NLS {
      */
     public static String SegmentStoreDataProvider_SegmentNotAvailable;
 
+    /**
+     * Externalized name of the Selection entry
+     */
+    public static String SegmentStoreStatisticsDataProvider_Selection;
+
+    /**
+     * Externalized name of the Total entry
+     */
+    public static String SegmentStoreStatisticsDataProvider_Total;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

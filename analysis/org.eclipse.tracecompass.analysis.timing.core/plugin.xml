@@ -34,5 +34,13 @@
             class="org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreScatterDataProviderFactory"
             id="org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.scatter.dataprovider">
       </dataProviderFactory>
+      <dataProviderFactory
+            class="org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProviderFactory"
+            id="org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProvider">
+      </dataProviderFactory>
+      <dataProviderFactory
+            class="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphStatisticsDataProviderFactory"
+            id="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.callgraphanalysis.statistics">
+      </dataProviderFactory>
    </extension>
 </plugin>

@@ -154,7 +154,7 @@ public class DataProviderManager {
     @TmfSignalHandler
     public synchronized void traceClosed(final TmfTraceClosedSignal signal) {
         for (ITmfTrace trace : TmfTraceManager.getTraceSetWithExperiment(signal.getTrace())) {
-            fInstances.removeAll(trace);
+            fInstances.removeAll(trace).forEach(ITmfTreeDataProvider::dispose);
         }
     }
 }
