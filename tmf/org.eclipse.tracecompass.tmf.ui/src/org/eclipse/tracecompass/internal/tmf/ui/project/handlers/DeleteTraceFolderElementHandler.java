@@ -80,7 +80,7 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
         /**
          * Only Traces under experiments are selected.
          */
-        REMOVE_TRACES_FROM_EXPERIMENT
+        DELETE_TRACES_FROM_EXPERIMENT
     }
 
     // ------------------------------------------------------------------------
@@ -168,7 +168,7 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
         }
 
         if (numTracesUnderExperiment == total) {
-            return DeleteType.REMOVE_TRACES_FROM_EXPERIMENT;
+            return DeleteType.DELETE_TRACES_FROM_EXPERIMENT;
         }
 
         return DeleteType.DELETE_GENERIC;
@@ -180,11 +180,10 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
         case DELETE_GENERIC:
         case DELETE_TRACES:
         case DELETE_TRACE_FOLDERS:
+        case DELETE_TRACES_FROM_EXPERIMENT:
             return Messages.DeleteDialog_Title;
         case CLEAR_TRACES_FOLDER:
             return Messages.ClearDialog_Title;
-        case REMOVE_TRACES_FROM_EXPERIMENT:
-            return Messages.RemoveDialog_Title;
         default:
             throw new IllegalArgumentException();
         }
@@ -201,23 +200,15 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
             return Messages.DeleteFolderHandlerClear_Message;
         case DELETE_TRACE_FOLDERS:
             return Messages.DeleteFolderHandler_Message;
-        case REMOVE_TRACES_FROM_EXPERIMENT:
-            return Messages.RemoveTraceFromExperimentHandler_Message;
+        case DELETE_TRACES_FROM_EXPERIMENT:
+            return Messages.DeleteTraceHandler_Message;
         default:
             throw new IllegalArgumentException();
         }
     }
 
-    private static String getTraceErrorMessage(DeleteType deleteType) {
-        return deleteType == DeleteType.REMOVE_TRACES_FROM_EXPERIMENT ? Messages.RemoveTraceFromExperimentHandler_Error : Messages.DeleteFolderHandler_Error;
-    }
-
     private static String getFolderErrorMessage(DeleteType deleteType) {
         return deleteType == DeleteType.CLEAR_TRACES_FOLDER ? Messages.DeleteFolderHandlerClear_Error : Messages.DeleteFolderHandler_Error;
-    }
-
-    private static String getTraceTaskName(DeleteType deleteType) {
-        return deleteType == DeleteType.REMOVE_TRACES_FROM_EXPERIMENT ? Messages.RemoveTraceFromExperimentHandler_TaskName : Messages.DeleteFolderHandler_TaskName;
     }
 
     private static String getTraceFolderTaskName(DeleteType deleteType) {
@@ -271,21 +262,17 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
                         if (!trace.getResource().exists()) {
                             continue;
                         }
-                        subMonitor.setTaskName(getTraceTaskName(deleteType) + " " + trace.getElementPath()); //$NON-NLS-1$
+                        final TmfTraceElement trace1 = trace.getElementUnderTraceFolder();
+                        subMonitor.setTaskName(Messages.DeleteTraceHandler_TaskName + ' ' + trace1.getElementPath());
                         try {
                             SubMonitor deleteSubMonitor = SubMonitor.convert(elementSubMonitor, 1);
-                            trace.delete(deleteSubMonitor);
+                            trace1.delete(deleteSubMonitor);
                         } catch (final CoreException e) {
-                            Display.getDefault().asyncExec(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-                                            null,
-                                            null,
-                                            new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, getTraceErrorMessage(deleteType) + ' ' + trace.getName(), e));
-                                }
-                            });
-                            Activator.getDefault().logError(getTraceErrorMessage(deleteType) + trace.getName(), e);
+                            Display.getDefault().asyncExec(() -> ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                                    null,
+                                    null,
+                                    new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, Messages.DeleteTraceHandler_Error + ' ' + trace1.getName(), e)));
+                            Activator.getDefault().logError(Messages.DeleteTraceHandler_Error + ' ' + trace1.getName(), e);
                         }
                     } else if (element instanceof TmfTraceFolder) {
                         final TmfTraceFolder folder = (TmfTraceFolder) element;
@@ -322,15 +309,10 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
                             }
                             childrenSubMonitor.done();
                         } catch (final CoreException e) {
-                            Display.getDefault().asyncExec(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-                                            null,
-                                            null,
-                                            new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, getFolderErrorMessage(deleteType) + ' ' + folder.getName(), e));
-                                }
-                            });
+                            Display.getDefault().asyncExec(() -> ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                                    null,
+                                    null,
+                                    new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.ERROR, getFolderErrorMessage(deleteType) + ' ' + folder.getName(), e)));
                             Activator.getDefault().logError(getFolderErrorMessage(deleteType) + folder.getName(), e);
                         }
                     }

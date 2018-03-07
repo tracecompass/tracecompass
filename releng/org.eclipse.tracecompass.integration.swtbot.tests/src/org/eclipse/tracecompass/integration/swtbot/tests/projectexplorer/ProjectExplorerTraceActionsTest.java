@@ -44,6 +44,7 @@ import org.eclipse.tracecompass.tmf.ui.views.statistics.TmfStatisticsView;
 import org.eclipse.ui.IEditorReference;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -80,6 +81,7 @@ public class ProjectExplorerTraceActionsTest {
     private static final Logger fLogger = Logger.getRootLogger();
 
     private static final File TEST_TRACES_PATH = new File(new Path(TmfTraceManager.getTemporaryDirPath()).append("testtraces").toOSString());
+
     private static String getPath(String relativePath) {
         return new Path(TEST_TRACES_PATH.getAbsolutePath()).append(relativePath).toOSString();
     }
@@ -96,7 +98,10 @@ public class ProjectExplorerTraceActionsTest {
 
         SWTBotUtils.initialize();
 
-        // FIXME: We can't use Manage Custom Parsers > Import because it uses a native dialog. We'll still check that they show up in the dialog
+        /*
+         * FIXME: We can't use Manage Custom Parsers > Import because it uses a native
+         * dialog. We'll still check that they show up in the dialog
+         */
         CustomTxtTraceDefinition[] txtDefinitions = CustomTxtTraceDefinition.loadAll(getPath("customParsers/ExampleCustomTxtParser.xml"));
         txtDefinitions[0].save();
         /* set up test trace */
@@ -132,10 +137,24 @@ public class ProjectExplorerTraceActionsTest {
     }
 
     /**
+     * Open the custom log trace (which all tests use), wait for the open operation
+     * to complete and setFocus on the project explorer.
+     */
+    @Before
+    public void openTrace() {
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
+        fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, TRACE_NAME));
+        fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
+    }
+
+    /**
      * Test tear down method.
      */
     @After
     public void afterTest() {
+        fBot.closeAllEditors();
+        SWTBotUtils.clearExperimentFolder(fBot, TRACE_PROJECT_NAME);
+        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
         SWTBotUtils.closeSecondaryShells(fBot);
     }
 
@@ -151,15 +170,27 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_01ContextMenuPresence() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
 
-        final List<String> EXPECTED_MENU_LABELS = ImmutableList.of("Open", "Open As Experiment...", "Open With", "", "Copy...", "Rename...", "Delete", "", "Delete Supplementary Files...", "", "Export Trace Package...", "", "Select Trace Type...", "", "Apply Time Offset...",
-                "Clear Time Offset", "", "Refresh");
+        final List<String> EXPECTED_MENU_LABELS = ImmutableList.of("Open",
+                "Open As Experiment...",
+                "Open With",
+                "",
+                "Copy...",
+                "Rename...",
+                "Delete", "",
+                "Delete Supplementary Files...",
+                "",
+                "Export Trace Package...",
+                "",
+                "Select Trace Type...",
+                "",
+                "Apply Time Offset...",
+                "Clear Time Offset",
+                "",
+                "Refresh");
         List<String> menuItems = traceItem.contextMenu().menuItems();
         assertEquals(EXPECTED_MENU_LABELS, menuItems);
-
-        fBot.closeAllEditors();
     }
 
     /**
@@ -174,13 +205,11 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_02Open() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
 
         traceItem.contextMenu().menu("Open").click();
         SWTBotImportWizardUtils.testEventsTable(fBot, TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
         testStatisticsView();
-        fBot.closeAllEditors();
     }
 
     /**
@@ -195,7 +224,6 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_03Copy() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
 
         // Copy the trace as link (default)
@@ -214,49 +242,6 @@ public class ProjectExplorerTraceActionsTest {
         // Make sure that the traces have the correct link status (linked or not)
         testLinkStatus(copiedItem, true);
         testLinkStatus(copiedAsNewItem, false);
-
-        fBot.closeAllEditors();
-        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
-    }
-
-    /**
-     * Test that the experiment can be copied with the context menu
-     * <p>
-     * Action : Copy experiment
-     * <p>
-     * Procedure :Select the Copy menu and provide a new name. Open.
-     * <p>
-     * Expected Results: Experiment is replicated under the new name
-     *
-     */
-    @Test
-    public void test_CopyExperiment() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
-        SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
-
-        // Copy the trace as a new trace
-        createCopy(traceItem, false);
-
-        SWTBotTreeItem tracesFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
-        tracesFolder.contextMenu().menu("Open As Experiment...", "Generic Experiment").click();
-        SWTBotTreeItem experimentsItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME), "Experiments");
-        experimentsItem.expand();
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable("Experiment [2]", experimentsItem));
-
-        SWTBotTreeItem expItem = SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, "Experiment");
-
-        // Copy the experiment
-        createExperimentCopy(expItem, false);
-        SWTBotTreeItem copiedExpItem = SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, RENAMED_EXP_NAME);
-        verifyExperimentCopy(copiedExpItem, false);
-
-        // Make a deep copy of the experiment
-        createExperimentCopy(expItem, true);
-        SWTBotTreeItem deepCopiedExpItem = SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, RENAMED_EXP_DEEP_COPY);
-        verifyExperimentCopy(deepCopiedExpItem, true);
-
-        assertEquals(3, experimentsItem.getItems().length);
-        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
     }
 
     /**
@@ -270,7 +255,6 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_04Rename() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
 
         traceItem.contextMenu().menu("Rename...").click();
@@ -286,8 +270,6 @@ public class ProjectExplorerTraceActionsTest {
         SWTBotTreeItem copiedItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), RENAMED_TRACE_NAME);
         copiedItem.contextMenu().menu("Open").click();
         SWTBotImportWizardUtils.testEventsTable(fBot, RENAMED_TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
-        fBot.closeAllEditors();
-        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
     }
 
     /**
@@ -302,7 +284,6 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_05Delete() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
 
         traceItem.contextMenu().menu("Delete").click();
@@ -330,14 +311,12 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_06OpenKeyboard() throws WidgetNotFoundException {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
         traceItem.select();
         fBot.activeShell().pressShortcut(Keystrokes.CR);
 
         SWTBotImportWizardUtils.testEventsTable(fBot, TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
         testStatisticsView();
-        fBot.closeAllEditors();
     }
 
     /**
@@ -351,7 +330,6 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_07DeleteKeyboard() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
         traceItem.select();
         fBot.activeShell().pressShortcut(Keystrokes.DELETE);
@@ -378,14 +356,11 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_08OpenDoubleClick() throws WidgetNotFoundException {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
-        fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
         traceItem.doubleClick();
 
         SWTBotImportWizardUtils.testEventsTable(fBot, TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
         testStatisticsView();
-        fBot.closeAllEditors();
     }
 
     /**
@@ -399,9 +374,7 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void test4_09BringToTop() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), CUSTOM_TEXT_LOG.getTraceType());
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
-        fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
         traceItem.doubleClick();
         fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, TRACE_NAME));
         IEditorReference originalEditor = fBot.activeEditor().getReference();
@@ -417,9 +390,125 @@ public class ProjectExplorerTraceActionsTest {
         traceItem.doubleClick();
         fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, TRACE_NAME));
         assertTrue(originalEditor == fBot.activeEditor().getReference());
+    }
 
+    /**
+     * Test that the experiment can be copied with the context menu
+     * <p>
+     * Action : Copy experiment
+     * <p>
+     * Procedure :Select the Copy menu and provide a new name. Open.
+     * <p>
+     * Expected Results: Experiment is replicated under the new name
+     *
+     */
+    @Test
+    public void test4_10CopyExperiment() {
+        SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
+
+        // Copy the trace as a new trace
+        createCopy(traceItem, false);
+
+        SWTBotTreeItem tracesFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        tracesFolder.contextMenu().menu("Open As Experiment...", "Generic Experiment").click();
+        fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, "Experiment"));
+        SWTBotTreeItem experimentsItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME), "Experiments");
+        experimentsItem.expand();
+        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable("Experiment [2]", experimentsItem));
+
+        SWTBotTreeItem expItem = SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, "Experiment");
+
+        // Copy the experiment
+        createExperimentCopy(expItem, false);
+        SWTBotTreeItem copiedExpItem = SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, RENAMED_EXP_NAME);
+        verifyExperimentCopy(copiedExpItem, false);
+
+        // Make a deep copy of the experiment
+        createExperimentCopy(expItem, true);
+        SWTBotTreeItem deepCopiedExpItem = SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, RENAMED_EXP_DEEP_COPY);
+        verifyExperimentCopy(deepCopiedExpItem, true);
+
+        assertEquals(3, experimentsItem.getItems().length);
+    }
+
+    /**
+     * Test that deleting a trace from an experiment: deletes the experiment if the
+     * experiment is empty and deletes the trace from the Traces folder.
+     */
+    @Test
+    public void test4_11DeleteTraceFromExperiment() {
+        /*
+         * close the editor for the trace to avoid name conflicts with the one for the
+         * experiment
+         */
         fBot.closeAllEditors();
-        SWTBotUtils.clearTracesFolderUI(fBot, TRACE_PROJECT_NAME);
+
+        // create experiment
+        SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
+        traceItem.contextMenu().menu("Open As Experiment...", "Generic Experiment").click();
+        fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, TRACE_NAME));
+
+        // find the trace under the experiment
+        fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
+        SWTBotTreeItem experimentsItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME), "Experiments");
+        experimentsItem.expand();
+        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable("ExampleCustomTxt.log [1]", experimentsItem));
+        SWTBotTreeItem expItem = SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, "ExampleCustomTxt.log [1]");
+        expItem.expand();
+        SWTBotTreeItem expTrace = expItem.getNode(TRACE_NAME);
+
+        // delete it
+        expTrace.contextMenu("Delete").click();
+        fBot.waitUntil(Conditions.shellIsActive("Confirm Delete"));
+        SWTBotShell shell = fBot.shell("Confirm Delete");
+        shell.bot().button("Yes").click();
+        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitWhile(new ConditionHelpers.ActiveEventsEditor(fBot, null));
+
+        // ensure that it is properly deleted from places.
+        SWTBotUtils.waitUntil(exp -> exp.getItems().length == 0, experimentsItem,
+                "Failed to delete the trace from the experiment");
+        fBot.waitUntil(new TraceDeletedCondition());
+    }
+
+    /**
+     * Test that removing a trace from an experiment: removes it from the experiment
+     * but does not delete the experiment if empty, keeps in in the Traces folders
+     */
+    @Test
+    public void test4_12RemoveTraceFromExperiment() {
+        /*
+         * close the editor for the trace to avoid name conflicts with the one for the
+         * experiment
+         */
+        fBot.closeAllEditors();
+
+        // create experiment
+        SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
+        traceItem.contextMenu().menu("Open As Experiment...", "Generic Experiment").click();
+        fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, TRACE_NAME));
+
+        // find the trace under the experiment
+        fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
+        SWTBotTreeItem experimentsItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME), "Experiments");
+        experimentsItem.expand();
+        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable("ExampleCustomTxt.log [1]", experimentsItem));
+        SWTBotTreeItem expItem = SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, "ExampleCustomTxt.log [1]");
+        expItem.expand();
+        SWTBotTreeItem expTrace = expItem.getNode(TRACE_NAME);
+
+        // remove the trace from the experiment
+        expTrace.contextMenu().menu("Remove").click();
+        fBot.waitUntil(Conditions.shellIsActive("Confirm Remove"));
+        SWTBotShell shell = fBot.shell("Confirm Remove");
+        shell.bot().button("Yes").click();
+        fBot.waitUntil(Conditions.shellCloses(shell));
+
+        // ensure that it is properly removed from the experiment.
+        SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, "ExampleCustomTxt.log [0]");
+
+        // ensure that the trace still exists in the Traces folder
+        SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
     }
 
     private static void createCopy(SWTBotTreeItem traceItem, boolean copyAsLink) {
@@ -477,11 +566,14 @@ public class ProjectExplorerTraceActionsTest {
         tracesFolder.expand();
         SWTBotTreeItem[] traceItems = tracesFolder.getItems();
         copiedExpItem.expand();
-        if(isDeepCopied) {
-            // Traces folder should contain the previous two traces and the new folder for the copied traces
+        if (isDeepCopied) {
+            /*
+             * Traces folder should contain the previous two traces and the new folder for
+             * the copied traces
+             */
             assertEquals(3, traceItems.length);
-            copiedExpItem.getNode(RENAMED_EXP_DEEP_COPY + '/'+ TRACE_NAME);
-            copiedExpItem.getNode(RENAMED_EXP_DEEP_COPY + '/'+ RENAMED_AS_NEW_TRACE_NAME);
+            copiedExpItem.getNode(RENAMED_EXP_DEEP_COPY + '/' + TRACE_NAME);
+            copiedExpItem.getNode(RENAMED_EXP_DEEP_COPY + '/' + RENAMED_AS_NEW_TRACE_NAME);
             SWTBotTreeItem deepCopiedExpTracesFolder = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, RENAMED_EXP_DEEP_COPY);
             deepCopiedExpTracesFolder.expand();
             SWTBotTreeItem[] expTracesFolderItems = deepCopiedExpTracesFolder.getItems();

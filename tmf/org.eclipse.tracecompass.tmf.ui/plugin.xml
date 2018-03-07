@@ -619,12 +619,6 @@
                                  <instanceof
                                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
                                  </instanceof>
-                                 <not>
-                                    <test
-                                          forcePluginActivation="true"
-                                          property="org.eclipse.linuxtools.tmf.ui.isExperimentTrace">
-                                    </test>
-                                 </not>
                               </and>
                            </or>
                         </iterate>
@@ -667,9 +661,9 @@
             </visibleWhen>
          </command>
          <command
-               commandId="org.eclipse.ui.edit.delete"
-               disabledIcon="icons/dtool16/delete.gif"
-               icon="icons/etool16/delete.gif"
+               commandId="org.eclipse.linuxtools.tmf.ui.command.remove"
+               disabledIcon="icons/dtool16/remove.gif"
+               icon="icons/etool16/remove.gif"
                label="%command.remove"
                mnemonic="%command.remove.mnemonic"
                style="push">
@@ -1305,6 +1299,11 @@
             id="org.eclipse.tracecompass.tmf.ui.command.convert_project"
             name="%command.convert">
       </command>
+      <command
+            defaultHandler="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.RemoveTraceFromExperimentHandler"
+            id="org.eclipse.linuxtools.tmf.ui.command.remove"
+            name="%command.remove">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -1503,6 +1502,19 @@
                   </and>
                </iterate>
             </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.RemoveTraceFromExperimentHandler"
+            commandId="org.eclipse.linuxtools.tmf.ui.command.remove">
+         <activeWhen>
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
+               </instanceof>
+            </iterate>
          </activeWhen>
       </handler>
       <handler

@@ -531,11 +531,19 @@ If an experiment with the same name and traces already exists, it will be reopen
 
 === Removing Traces from an Experiment ===
 
-To remove one or more traces for an experiment select the trace(s) to remove under the Experiment folder and click the right mouse button. Select '''Remove''' from the context sensitive menu.
+To remove one or more traces from an experiment select the trace(s) to remove under the Experiment folder and click the right mouse button. Select '''Remove''' from the context sensitive menu.
 
 [[Image:images/RemoveTracesAction.png]]
 
 After that the selected trace(s) are removed from the experiment. Note that the traces are still in the '''Traces''' folder.
+
+=== Deleting Traces from an Experiment ===
+
+To delete one or more traces from an experiment select the trace(s) to delete under the Experiment folder and click the right mouse button. Select '''Delete''' from the context sensitive menu.
+
+[[Image:images/RemoveTracesAction.png]]
+
+After that, the selected trace(s) are removed from the experiment. Note that the traces are also deleted from the '''Traces''' folder.
 
 === Renaming a Trace or Experiment ===
 
