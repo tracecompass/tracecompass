@@ -16,9 +16,11 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.antlr.runtime.tree.CommonTree;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.tracecompass.ctf.parser.CTFParser;
+import org.eclipse.tracecompass.internal.ctf.core.Activator;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ICommonTreeParser;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ParseException;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.tsdl.UnaryIntegerParser;
@@ -114,13 +116,13 @@ public final class EnumeratorParser implements ICommonTreeParser {
             throw new ParseException("enum low value greater than high value"); //$NON-NLS-1$
         }
         if (valueSpecified && !enumDeclaration.add(low, high, label)) {
-            throw new ParseException("enum declarator values overlap."); //$NON-NLS-1$
+            Activator.log(IStatus.WARNING, "enum declarator values overlap. " + enumDeclaration.getLabels() + " and " + label); //$NON-NLS-1$ //$NON-NLS-2$
         } else if (!valueSpecified && !enumDeclaration.add(label)) {
             throw new ParseException("enum cannot add element " + label); //$NON-NLS-1$
         }
 
-        if (valueSpecified && (BigInteger.valueOf(low).compareTo(enumDeclaration.getContainerType().getMinValue()) == -1 ||
-                BigInteger.valueOf(high).compareTo(enumDeclaration.getContainerType().getMaxValue()) == 1)) {
+        if (valueSpecified && (BigInteger.valueOf(low).compareTo(enumDeclaration.getContainerType().getMinValue()) < 0 ||
+                BigInteger.valueOf(high).compareTo(enumDeclaration.getContainerType().getMaxValue()) > 0)) {
             throw new ParseException("enum value is not in range"); //$NON-NLS-1$
         }
 
