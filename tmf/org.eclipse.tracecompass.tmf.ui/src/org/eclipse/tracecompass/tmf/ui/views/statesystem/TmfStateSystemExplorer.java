@@ -112,6 +112,11 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
                 return 1;
             }
         }
+        try {
+            return Long.compare(Long.parseLong(a.getName()), Long.parseLong(b.getName()));
+        } catch (NumberFormatException e) {
+            // fall through to string compare
+        }
         return a.getName().compareTo(b.getName());
     };
 
