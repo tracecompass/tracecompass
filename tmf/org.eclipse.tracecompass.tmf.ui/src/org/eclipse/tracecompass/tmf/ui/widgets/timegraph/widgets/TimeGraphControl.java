@@ -2509,8 +2509,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
             heightFactor = Math.max(0.0f, Math.min(1.0f, heightFactor));
         }
-
-        int height = (int) (rect.height * heightFactor);
+        int height = 0;
+        if (heightFactor != 0 && rect.height != 0) {
+            height = Math.max(1, (int) (rect.height * heightFactor));
+        }
         Rectangle drawRect = new Rectangle(rect.x, rect.y + ((rect.height - height) / 2), rect.width, height);
 
         if (colorIdx == ITimeGraphPresentationProvider.TRANSPARENT) {
