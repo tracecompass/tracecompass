@@ -139,6 +139,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Get item height from provider
      */
     private static final int CUSTOM_ITEM_HEIGHT = -1;
+    private static final int MIN_MIDLINE_HEIGHT = 3;
 
     private static final double ZOOM_FACTOR = 1.5;
     private static final double ZOOM_IN_FACTOR = 0.8;
@@ -2009,7 +2010,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
             drawName(item, nameRect, gc);
             if (item.fEntry.hasTimeEvents()) {
                 Rectangle rect = new Rectangle(nameSpace, itemRect.y, itemRect.width - nameSpace, itemRect.height);
-                drawMidLine(rect, gc);
+                if (item.fItemHeight > MIN_MIDLINE_HEIGHT) {
+                    drawMidLine(rect, gc);
+                }
             }
         }
     }
@@ -2448,7 +2451,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             if (textWidth > 0) {
                 idealNameSpace = rect.x + width;
             }
-            if (columns.length == 1) {
+            if (columns.length == 1 && item.fItemHeight > MIN_MIDLINE_HEIGHT) {
                 drawMidLine(new Rectangle(bounds.x + width, bounds.y, bounds.x + bounds.width, bounds.height), gc);
             }
             if (fAutoResizeColumns && width > column.getWidth()) {
