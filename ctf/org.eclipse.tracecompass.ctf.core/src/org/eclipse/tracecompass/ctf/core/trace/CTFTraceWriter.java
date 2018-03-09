@@ -77,8 +77,8 @@ public class CTFTraceWriter {
     public void copyPackets(long startTime, long endTime, String newTracePath) throws CTFException {
         CTFTrace trace = fInTrace;
         if (trace != null) {
-            long adjustedStart = startTime - trace.getClock().getClockOffset();
-            long adjustedEnd = endTime - trace.getClock().getClockOffset();
+            long adjustedStart = trace.timestampNanoToCycles(startTime);
+            long adjustedEnd = trace.timestampNanoToCycles(endTime);
             File out = new File(newTracePath);
             if (out.exists()) {
                 if (!out.isDirectory() || out.listFiles().length != 0) {
