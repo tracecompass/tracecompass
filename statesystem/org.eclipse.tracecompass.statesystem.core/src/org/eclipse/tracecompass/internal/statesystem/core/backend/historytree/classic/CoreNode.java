@@ -280,19 +280,17 @@ public final class CoreNode extends ParentNode {
     }
 
     @Override
-    public Collection<Integer> selectNextChildren2D(IntegerRangeCondition quarks, TimeRangeCondition times) {
+    public void queueNextChildren2D(IntegerRangeCondition quarks, TimeRangeCondition times, Collection<Integer> queue) {
         rwl.readLock().lock();
         try {
             /* Selectively search children */
-            List<Integer> list = new ArrayList<>();
             for (int child = 0; child < fNbChildren; child++) {
                 if (times.intersects(fChildStart[child], fChildEnd[child])
                         && quarks.intersects(fChildMin[child], fChildMax[child])) {
                     int potentialNextSeqNb = fChildren[child];
-                    list.add(potentialNextSeqNb);
+                    queue.add(potentialNextSeqNb);
                 }
             }
-            return list;
         } finally {
             rwl.readLock().unlock();
         }

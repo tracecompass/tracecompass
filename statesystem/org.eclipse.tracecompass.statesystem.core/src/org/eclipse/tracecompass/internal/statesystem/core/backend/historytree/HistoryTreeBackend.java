@@ -383,7 +383,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
                             if (subQuarks != null && subTimes != null) {
                                 if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
                                     // Queue the relevant children nodes for BFS.
-                                    seqNumberQueue.addAll(((ParentNode) currentNode).selectNextChildren2D(subQuarks, subTimes));
+                                    ((ParentNode) currentNode).queueNextChildren2D(subQuarks, subTimes, seqNumberQueue);
                                 }
                                 intervalQueue = currentNode.iterable2D(subQuarks, subTimes).iterator();
                             }

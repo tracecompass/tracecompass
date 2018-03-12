@@ -528,26 +528,13 @@ public abstract class HTNode {
      */
     public Iterable<HTInterval> iterable2D(IntegerRangeCondition quarks, TimeRangeCondition times) {
         fRwl.readLock().lock();
-        try  (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINEST, "HTNode:query2D", //$NON-NLS-1$
+        try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINEST, "HTNode:query2D", //$NON-NLS-1$
                 "quarks", quarks, //$NON-NLS-1$
                 "times", times)) { //$NON-NLS-1$
-            /*
-             * Narrow Down the RangeConditions to faster evaluation of the .test and
-             * .intersects conditions.
-             */
-            IntegerRangeCondition subQuarks = quarks.subCondition(fMinQuark, fMaxQuark);
-            if (subQuarks == null) {
-                return Collections.emptyList();
-            }
-            TimeRangeCondition subTimes = times.subCondition(fNodeStart, fNodeEnd);
-            if (subTimes == null) {
-                return Collections.emptyList();
-            }
-            long start = subTimes.min();
             List<HTInterval> intervals = new ArrayList<>();
-            for (HTInterval interval : fIntervals.subList(getStartIndexFor(start), fIntervals.size())) {
-                if (subQuarks.test(interval.getAttribute())
-                        && subTimes.intersects(interval.getStartTime(), interval.getEndTime())) {
+            for (HTInterval interval : fIntervals.subList(getStartIndexFor(times.min()), fIntervals.size())) {
+                if (quarks.test(interval.getAttribute())
+                        && times.intersects(interval.getStartTime(), interval.getEndTime())) {
                     intervals.add(interval);
                 }
             }

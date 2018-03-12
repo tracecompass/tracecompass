@@ -114,18 +114,18 @@ public abstract class ParentNode extends HTNode {
     public abstract @NonNull Collection<@NonNull Integer> selectNextChildren(long t, int k);
 
     /**
-     * Get a collection of sequence numbers for the children nodes that contain
-     * intervals with quarks from quarks, and times intersecting times from
-     * times.
+     * Append the sequence numbers for the children nodes that contain intervals
+     * with quarks from quarks, and times intersecting times from times to the
+     * queue.
      *
      * @param quarks
      *            NumCondition on the quarks we are interested in.
      * @param subTimes
      *            NumCondition on the time stamps we are interested in.
-     * @return a collection of the sequence numbers for the children that match
-     *         the conditions.
+     * @param queue
+     *            queue of sequence numbers to add the relevant nodes too
      */
-    public abstract Collection<Integer> selectNextChildren2D(IntegerRangeCondition quarks, TimeRangeCondition subTimes);
+    public abstract void queueNextChildren2D(IntegerRangeCondition quarks, TimeRangeCondition subTimes, Collection<Integer> queue);
 
     /**
      * Get the end time for this child, the last child's end time will be

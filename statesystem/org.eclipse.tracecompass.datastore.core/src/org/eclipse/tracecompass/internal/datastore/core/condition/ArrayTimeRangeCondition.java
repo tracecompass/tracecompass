@@ -73,39 +73,38 @@ public class ArrayTimeRangeCondition implements TimeRangeCondition {
     public boolean intersects(long low, long high) {
         int lowIndex = Arrays.binarySearch(fTimeArray, low);
         if (lowIndex >= 0) {
-            // low is one of the quarks.
+            // low is one of the times.
             return true;
         }
         if (lowIndex == -fTimeArray.length - 1) {
-            // low is higher than the maximum quark
+            // low is higher than the maximum times
             return false;
         }
-        int highIndex = Arrays.binarySearch(fTimeArray, high);
-        if (highIndex >= 0) {
-            // high is one of the quarks
-            return true;
-        }
-        if (highIndex == -1) {
-            // high is smaller than the minimum quark
-            return false;
-        }
-        // there is a quark between low and high
-        return highIndex < lowIndex;
+        /**
+         * -lowIndex - 1 is the insertion position low, which means that the current
+         * value at -lowIndex - 1 is larger than low. we just need to check that it is
+         * also smaller than or equal to high for the intersection
+         */
+        return fTimeArray[-lowIndex - 1] <= high;
     }
 
     @Override
     public @Nullable TimeRangeCondition subCondition(long from, long to) {
+        if (from <= min() && max() <= to) {
+            // all the elements are within the bounds
+            return this;
+        }
         int fromIndex = Arrays.binarySearch(fTimeArray, from);
         if (fromIndex == -fTimeArray.length - 1) {
             // from is larger than than the maximum quark
             return null;
         }
-        int toIndex = Arrays.binarySearch(fTimeArray, to);
+        fromIndex = (fromIndex >= 0) ? fromIndex : -fromIndex - 1;
+        int toIndex = Arrays.binarySearch(fTimeArray, fromIndex, fTimeArray.length, to);
         if (toIndex == -1) {
             // to is smaller than the minimum quark
             return null;
         }
-        fromIndex = (fromIndex >= 0) ? fromIndex : -fromIndex - 1;
         toIndex = (toIndex >= 0) ? toIndex + 1 : -toIndex - 1;
         if (toIndex <= fromIndex) {
             return null;
