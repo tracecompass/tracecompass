@@ -79,9 +79,29 @@ public class TmfTreeXYCompositeDataProvider<M extends ITmfTreeDataModel, P exten
      *         encapsulating the providers
      */
     public static @Nullable ITmfTreeXYDataProvider<ITmfTreeDataModel> create(Collection<ITmfTrace> traces, String title, String id) {
+        return create(traces, title, id, null);
+    }
+
+    /**
+     * Return a composite {@link ITmfTreeXYDataProvider} from a list of traces.
+     *
+     * @param traces
+     *            A list of traces from which to generate a provider.
+     * @param title
+     *            Chart's title
+     * @param id
+     *            the provider's ID
+     * @param secondaryId
+     *            The provider's secondaryId
+     * @return null if the non of the traces returns a provider, the provider if the
+     *         lists only return one, else a {@link TmfTreeXYCompositeDataProvider}
+     *         encapsulating the providers
+     */
+    public static @Nullable ITmfTreeXYDataProvider<ITmfTreeDataModel> create(Collection<ITmfTrace> traces, String title, String id, @Nullable String secondaryId) {
+        String providerId = secondaryId == null ? id : id + ':' + secondaryId;
         List<@NonNull ITmfTreeXYDataProvider<ITmfTreeDataModel>> providers = new ArrayList<>();
         for (ITmfTrace child : traces) {
-            ITmfTreeXYDataProvider<ITmfTreeDataModel> provider = DataProviderManager.getInstance().getDataProvider(child, id, ITmfTreeXYDataProvider.class);
+            ITmfTreeXYDataProvider<ITmfTreeDataModel> provider = DataProviderManager.getInstance().getDataProvider(child, providerId, ITmfTreeXYDataProvider.class);
             if (provider != null) {
                 providers.add(provider);
             }
@@ -91,7 +111,7 @@ public class TmfTreeXYCompositeDataProvider<M extends ITmfTreeDataModel, P exten
         } else if (providers.size() == 1) {
             return providers.get(0);
         }
-        return new TmfTreeXYCompositeDataProvider<>(providers, title, id);
+        return new TmfTreeXYCompositeDataProvider<>(providers, title, providerId);
     }
 
     @Override

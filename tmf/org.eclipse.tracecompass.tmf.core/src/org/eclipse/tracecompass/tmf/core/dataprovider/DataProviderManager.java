@@ -37,6 +37,7 @@ import com.google.common.collect.Multimap;
  */
 public class DataProviderManager {
 
+    private static final @NonNull String ID_SPLITTER = ":"; //$NON-NLS-1$
     /**
      * The singleton instance of this manager
      */
@@ -112,7 +113,9 @@ public class DataProviderManager {
      * @param trace
      *            The trace
      * @param id
-     *            Id of the data provider
+     *            Id of the data provider. This ID can be the concatenation of a
+     *            provider ID + ':' + a secondary ID used to differentiate multiple
+     *            instances of a same provider.
      * @param dataProviderClass
      *            Returned data provider must extend this class
      * @return Data provider
@@ -123,12 +126,13 @@ public class DataProviderManager {
                 return dataProviderClass.cast(dataProvider);
             }
         }
+        String[] ids = id.split(ID_SPLITTER);
         for (ITmfTrace opened : TmfTraceManager.getInstance().getOpenedTraces()) {
             if (TmfTraceManager.getTraceSetWithExperiment(opened).contains(trace)) {
                 /* if this trace or an experiment containing this trace is opened */
-                IDataProviderFactory providerFactory = fDataProviderFactories.get(id);
+                IDataProviderFactory providerFactory = fDataProviderFactories.get(ids[0]);
                 if (providerFactory != null) {
-                    ITmfTreeDataProvider<? extends ITmfTreeDataModel> dataProvider = providerFactory.createProvider(trace);
+                    ITmfTreeDataProvider<? extends ITmfTreeDataModel> dataProvider = ids.length > 1 ? providerFactory.createProvider(trace, String.valueOf(ids[1])) : providerFactory.createProvider(trace);
                     if (dataProvider != null && id.equals(dataProvider.getId()) && dataProviderClass.isAssignableFrom(dataProvider.getClass())) {
                         fInstances.put(trace, dataProvider);
                         return dataProviderClass.cast(dataProvider);

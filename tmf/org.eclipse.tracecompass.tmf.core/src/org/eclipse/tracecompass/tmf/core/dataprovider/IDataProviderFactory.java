@@ -35,4 +35,25 @@ public interface IDataProviderFactory {
      */
     @Nullable ITmfTreeDataProvider<? extends ITmfTreeDataModel> createProvider(@NonNull ITmfTrace trace);
 
+    /**
+     * Create a {@link ITmfTreeDataProvider} for the given trace. If this factory
+     * does not know how to handle the given trace it will return null. The
+     * resulting provider should have an ID that is an aggregate of the provider's
+     * own ID and the secondaryId as such: <provider ID>:<secondaryId>
+     *
+     * @param trace
+     *            A trace
+     * @param secondaryId
+     *            Additional ID to identify different instances of the same
+     *            provider, for instance, when the same provider can be used for
+     *            different analysis modules
+     * @return {@link ITmfTreeDataProvider} that can be use for the given trace with
+     *         ID <provider ID>:<secondaryId>, or <code>null</code> if no provider
+     *         is available for this trace and ID
+     * @since 3.3
+     */
+    default @Nullable ITmfTreeDataProvider<? extends ITmfTreeDataModel> createProvider(@NonNull ITmfTrace trace, @NonNull String secondaryId) {
+        return createProvider(trace);
+    }
+
 }
