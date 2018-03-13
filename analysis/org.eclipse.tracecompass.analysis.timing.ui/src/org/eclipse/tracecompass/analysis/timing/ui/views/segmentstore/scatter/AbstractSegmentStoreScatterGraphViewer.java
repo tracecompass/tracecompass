@@ -22,10 +22,12 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreP
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreScatterDataProvider;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter.SegmentStoreScatterGraphTooltipProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -42,9 +44,9 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXLin
  * @author France Lapointe Nguyen
  * @author Matthew Khouzam - reduced memory usage
  * @since 2.0
- * TODO : Please deprecated this class when no longer used. Use
- *        {@link AbstractSegmentStoreScatterChartViewer} if possible
+ * @deprecated Use {@link AbstractSegmentStoreScatterChartViewer} if possible
  */
+@Deprecated
 @SuppressWarnings("restriction")
 public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXLineChartViewer {
 
@@ -98,9 +100,8 @@ public abstract class AbstractSegmentStoreScatterGraphViewer extends TmfCommonXL
         ITmfTrace trace = getTrace();
         if (trace != null) {
             final ISegmentStoreProvider segmentStoreProvider = getSegmentStoreProvider(trace);
-            if (segmentStoreProvider != null) {
-                setDataProvider(SegmentStoreScatterDataProvider.getOrCreate(trace, segmentStoreProvider));
-            }
+            String providerId = (segmentStoreProvider instanceof IAnalysisModule) ? SegmentStoreScatterDataProvider.ID + ':' + ((IAnalysisModule) segmentStoreProvider).getId() : SegmentStoreScatterDataProvider.ID;
+            setDataProvider(DataProviderManager.getInstance().getDataProvider(trace, providerId, ITmfTreeXYDataProvider.class));
         }
     }
 

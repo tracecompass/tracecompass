@@ -32,10 +32,13 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatus
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TmfXyResponseFactory;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ISeriesModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXyModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.core.model.SeriesModel;
@@ -45,6 +48,7 @@ import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 import org.eclipse.tracecompass.segmentstore.core.segment.interfaces.INamedSegment;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.BiMap;
@@ -77,6 +81,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
     private static final AtomicLong ENTRY_ID = new AtomicLong();
 
     private final ISegmentStoreProvider fProvider;
+    private final String fId;
 
     private final BiMap<Long, String> fIdToType = HashBiMap.create();
     private final long fTraceId = ENTRY_ID.getAndIncrement();
@@ -194,7 +199,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
      * @return An instance of SegmentStoreDataProvider. Returns a null if the
      *         ISegmentStoreProvider is null.
      * @deprecated Use the
-     *             {@link SegmentStoreScatterDataProvider#getOrCreate(ITmfTrace, ISegmentStoreProvider)}
+     *             {@link SegmentStoreScatterDataProvider#create(ITmfTrace, String)}
      *             method instead
      */
     @Deprecated
@@ -207,45 +212,53 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             if (p instanceof IAnalysisModule) {
                 ((IAnalysisModule) p).schedule();
             }
-            return new SegmentStoreScatterDataProvider(trace, p);
+            return new SegmentStoreScatterDataProvider(trace, p, ""); //$NON-NLS-1$
         });
 
     }
 
     /**
-     * Get an instance of {@link SegmentStoreScatterDataProvider} for a trace and
-     * provider. Returns a null instance if the ISegmentStoreProvider is null. If
+     * Create an instance of {@link SegmentStoreScatterDataProvider} for a given
+     * analysis ID. Returns a null instance if the ISegmentStoreProvider is null. If
      * the provider is an instance of {@link IAnalysisModule}, analysis is also
      * scheduled.
+     * <p>
+     * If the trace has multiple analysis modules with the same secondary ID,
+     * <code>null</code> is returned so the caller can try to make a
+     * {@link TmfTreeXYCompositeDataProvider} for all the traces instead
      *
      * @param trace
      *            A trace on which we are interested to fetch a model
-     * @param provider
-     *            A segment store provider.
+     * @param secondaryId
+     *            The ID of the analysis to use for this provider
      * @return An instance of SegmentStoreDataProvider. Returns a null if the
      *         ISegmentStoreProvider is null.
      * @since 3.2
      */
-    public static synchronized @Nullable SegmentStoreScatterDataProvider getOrCreate(ITmfTrace trace, @Nullable ISegmentStoreProvider provider) {
-        if (provider == null) {
-            return null;
-        }
-
-        return PROVIDER_MAP.computeIfAbsent(provider, p -> {
-            if (p instanceof IAnalysisModule) {
-                ((IAnalysisModule) p).schedule();
+    public static @Nullable ITmfTreeDataProvider<? extends ITmfTreeDataModel> create(ITmfTrace trace, String secondaryId) {
+        // The trace can be an experiment, so we need to know if there are multiple analysis modules with the same ID
+        Iterable<ISegmentStoreProvider> modules = TmfTraceUtils.getAnalysisModulesOfClass(trace, ISegmentStoreProvider.class);
+        Iterable<ISegmentStoreProvider> filteredModules = Iterables.filter(modules, m -> ((IAnalysisModule) m).getId().equals(secondaryId));
+        Iterator<ISegmentStoreProvider> iterator = filteredModules.iterator();
+        if (iterator.hasNext()) {
+            ISegmentStoreProvider module = iterator.next();
+            if (iterator.hasNext()) {
+                // More than one module, must be an experiment, return null so the factory can try with individual traces
+                return null;
             }
-            return new SegmentStoreScatterDataProvider(trace, p);
-        });
-
+            ((IAnalysisModule) module).schedule();
+            return new SegmentStoreScatterDataProvider(trace, module, secondaryId);
+        }
+        return null;
     }
 
     /**
      * Constructor
      */
-    private SegmentStoreScatterDataProvider(ITmfTrace trace, ISegmentStoreProvider provider) {
+    private SegmentStoreScatterDataProvider(ITmfTrace trace, ISegmentStoreProvider provider, String secondaryId) {
         super(trace);
         fProvider = provider;
+        fId = ID + ':' + secondaryId;
     }
 
     /**
@@ -399,6 +412,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
      */
     @Override
     public String getId() {
-        return ID;
+        return fId;
     }
+
 }

@@ -9,13 +9,9 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterChartViewer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 
 /**
@@ -25,7 +21,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSet
  */
 public class PatternScatterGraphViewer extends AbstractSegmentStoreScatterChartViewer {
 
-    private String fAnalysisId;
+    private @NonNull String fAnalysisId = ""; //$NON-NLS-1$
 
     /**
      * Constructor
@@ -44,8 +40,8 @@ public class PatternScatterGraphViewer extends AbstractSegmentStoreScatterChartV
     }
 
     @Override
-    protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(@NonNull ITmfTrace trace) {
-        return fAnalysisId != null ? TmfTraceUtils.getAnalysisModuleOfClass(trace, XmlPatternAnalysis.class, fAnalysisId) : null;
+    protected @NonNull String getAnalysisId() {
+        return fAnalysisId;
     }
 
     /**

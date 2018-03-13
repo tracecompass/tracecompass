@@ -16,11 +16,7 @@ import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter.Messages;
-import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
@@ -62,35 +58,13 @@ public class SegmentStoreScatterView extends TmfChartView {
         String analysisId = String.valueOf(getViewSite().getSecondaryId());
         return new AbstractSegmentStoreScatterChartViewer(Objects.requireNonNull(parent),
                 new TmfXYChartSettings(nullToEmptyString(Messages.SegmentStoreScatterGraphViewer_title), nullToEmptyString(Messages.SegmentStoreScatterGraphViewer_xAxis),
-                        nullToEmptyString(Messages.SegmentStoreScatterGraphViewer_yAxis), 1)) {
-
-            @Override
-            protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace) {
-                IAnalysisModule module = TmfTraceUtils.getAnalysisModuleOfClass(trace, IAnalysisModule.class, analysisId);
-                if (module instanceof ISegmentStoreProvider) {
-                    return (ISegmentStoreProvider) module;
-                }
-                return null;
-            }
-
-        };
+                        nullToEmptyString(Messages.SegmentStoreScatterGraphViewer_yAxis), 1), analysisId);
     }
 
     @Override
     protected @NonNull TmfViewer createLeftChildViewer(@Nullable Composite parent) {
         String analysisId = String.valueOf(getViewSite().getSecondaryId());
-        return new AbstractSegmentStoreScatterChartTreeViewer(Objects.requireNonNull(parent)) {
-
-            @Override
-            protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace) {
-                IAnalysisModule module = TmfTraceUtils.getAnalysisModuleOfClass(trace, IAnalysisModule.class, analysisId);
-                if (module instanceof ISegmentStoreProvider) {
-                    return (ISegmentStoreProvider) module;
-                }
-                return null;
-            }
-
-        };
+        return new AbstractSegmentStoreScatterChartTreeViewer(Objects.requireNonNull(parent), analysisId);
     }
 
 }

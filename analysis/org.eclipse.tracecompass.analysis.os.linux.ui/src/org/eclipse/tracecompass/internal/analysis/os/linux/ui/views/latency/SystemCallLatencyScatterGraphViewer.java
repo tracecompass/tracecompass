@@ -13,13 +13,9 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterChartViewer;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 
 /**
@@ -44,11 +40,7 @@ public class SystemCallLatencyScatterGraphViewer extends AbstractSegmentStoreSca
      *            name of the y axis
      */
     public SystemCallLatencyScatterGraphViewer(Composite parent, String title, String xLabel, String yLabel) {
-        super(parent, new TmfXYChartSettings(title, xLabel, yLabel, 1));
+        super(parent, new TmfXYChartSettings(title, xLabel, yLabel, 1), SystemCallLatencyAnalysis.ID);
     }
 
-    @Override
-    protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace) {
-        return TmfTraceUtils.getAnalysisModuleOfClass(trace, SystemCallLatencyAnalysis.class, SystemCallLatencyAnalysis.ID);
-    }
 }

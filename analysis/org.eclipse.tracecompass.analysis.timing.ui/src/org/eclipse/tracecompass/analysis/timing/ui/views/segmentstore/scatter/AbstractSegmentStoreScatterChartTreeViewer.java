@@ -21,9 +21,13 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreSc
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.Messages;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
+import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
@@ -38,8 +42,9 @@ import com.google.common.collect.ImmutableList;
  * @author Geneviève Bastien
  * @since 2.2
  */
-public abstract class AbstractSegmentStoreScatterChartTreeViewer extends AbstractSelectTreeViewer {
+public class AbstractSegmentStoreScatterChartTreeViewer extends AbstractSelectTreeViewer {
 
+    private final String fAnalysisId;
     private @Nullable ISegmentStoreProvider fSegmentProvider = null;
     private SegmentStoreProviderProgressListener fListener = new SegmentStoreProviderProgressListener();
 
@@ -75,9 +80,43 @@ public abstract class AbstractSegmentStoreScatterChartTreeViewer extends Abstrac
         }
     }
 
+    /**
+     * Constructor
+     *
+     * @param parent
+     *            The parent composite
+     * @deprecated Use the
+     *             {@link #AbstractSegmentStoreScatterChartTreeViewer(Composite, String)}
+     *             constructor instead
+     */
+    @Deprecated
     public AbstractSegmentStoreScatterChartTreeViewer(Composite parent) {
+        this(parent, ""); //$NON-NLS-1$
+    }
+
+    /**
+     * Constructor
+     *
+     * @param parent
+     *            The parent composite
+     * @param analysisId
+     *            The ID of the analysis to show in this viewer
+     */
+    public AbstractSegmentStoreScatterChartTreeViewer(Composite parent, String analysisId) {
         super(parent, 1, SegmentStoreScatterDataProvider.ID);
+        fAnalysisId = analysisId;
         setLabelProvider(new SegStoreScatterLabelProvider());
+    }
+
+    /**
+     * Get the analysis ID used to retrieve the scatter data provider. Extenders may
+     * override this method to return another analysis ID than the one in the
+     * constructor
+     *
+     * @return The analysis ID
+     */
+    protected String getAnalysisId() {
+        return fAnalysisId;
     }
 
     /**
@@ -86,18 +125,34 @@ public abstract class AbstractSegmentStoreScatterChartTreeViewer extends Abstrac
      * @param trace
      *            The trace to consider
      * @return the segment store provider
+     * @deprecated This method is not used anymore as the analysisId is passed in the constructor
      */
-    protected abstract @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace);
+    @Deprecated
+    protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace) {
+        return null;
+    }
 
     @Override
     protected @Nullable ITmfTreeDataProvider<@NonNull TmfTreeDataModel> getProvider(@NonNull ITmfTrace trace) {
-        final ISegmentStoreProvider segmentStoreProvider = getSegmentStoreProvider(trace);
-        if (segmentStoreProvider == null) {
+        String analysisId = getAnalysisId();
+        /* Support legacy code, get the analysis ID of the segment store */
+        if (analysisId.isEmpty()) {
+            ISegmentStoreProvider segmentStoreProvider = getSegmentStoreProvider(trace);
+            if (!(segmentStoreProvider instanceof IAnalysisModule)) {
+                return null;
+            }
+            analysisId = ((IAnalysisModule) segmentStoreProvider).getId();
+        }
+        /* End support of legacy */
+        // TODO: Find another mechanism to update the view rather than listeners, so
+        // that we don't need to expose the analysis to the view
+        IAnalysisModule module = TmfTraceUtils.getAnalysisModuleOfClass(trace, IAnalysisModule.class, analysisId);
+        if (!(module instanceof ISegmentStoreProvider)) {
             return null;
         }
-        fSegmentProvider = segmentStoreProvider;
-        segmentStoreProvider.addListener(fListener);
-        return SegmentStoreScatterDataProvider.getOrCreate(trace, segmentStoreProvider);
+        fSegmentProvider = (ISegmentStoreProvider) module;
+        ((ISegmentStoreProvider) module).addListener(fListener);
+        return DataProviderManager.getInstance().getDataProvider(trace, SegmentStoreScatterDataProvider.ID + ':' + analysisId, ITmfTreeXYDataProvider.class);
     }
 
     @Override

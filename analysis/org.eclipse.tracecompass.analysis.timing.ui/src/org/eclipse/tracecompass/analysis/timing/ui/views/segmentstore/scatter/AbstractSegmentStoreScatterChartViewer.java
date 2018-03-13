@@ -18,8 +18,11 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreP
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreScatterDataProvider;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter.SegmentStoreScatterGraphTooltipProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
+import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -37,10 +40,11 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSet
  * @since 2.1
  */
 @SuppressWarnings("restriction")
-public abstract class AbstractSegmentStoreScatterChartViewer extends TmfFilteredXYChartViewer {
+public class AbstractSegmentStoreScatterChartViewer extends TmfFilteredXYChartViewer {
 
     private static final Format FORMAT = new SubSecondTimeWithUnitFormat();
     private static final int DEFAULT_SERIES_WIDTH = 1;
+    private String fAnalysisId;
 
     /**
      * Constructor
@@ -51,7 +55,23 @@ public abstract class AbstractSegmentStoreScatterChartViewer extends TmfFiltered
      *            See {@link TmfXYChartSettings} to know what it contains
      */
     public AbstractSegmentStoreScatterChartViewer(Composite parent, TmfXYChartSettings settings) {
+        this(parent, settings, ""); //$NON-NLS-1$
+    }
+
+    /**
+     * Constructor
+     *
+     * @param parent
+     *            parent composite
+     * @param settings
+     *            See {@link TmfXYChartSettings} to know what it contains
+     * @param analysisId
+     *            The ID of the analysis to show in this viewer
+     * @since 2.2
+     */
+    public AbstractSegmentStoreScatterChartViewer(Composite parent, TmfXYChartSettings settings, String analysisId) {
         super(parent, settings, SegmentStoreScatterDataProvider.ID);
+        fAnalysisId = analysisId;
         setTooltipProvider(new SegmentStoreScatterGraphTooltipProvider(this));
         getSwtChart().getLegend().setVisible(false);
         getSwtChart().getAxisSet().getYAxis(0).getTick().setFormat(FORMAT);
@@ -61,13 +81,29 @@ public abstract class AbstractSegmentStoreScatterChartViewer extends TmfFiltered
     // Operations
     // ------------------------------------------------------------------------
 
+    /**
+     * Get the analysis ID to show in the viewer
+     *
+     * @return The analysis ID
+     * @since 2.2
+     */
+    protected String getAnalysisId() {
+        return fAnalysisId;
+    }
+
     @Override
     protected @Nullable ITmfXYDataProvider initializeDataProvider(ITmfTrace trace) {
-        final ISegmentStoreProvider segmentStoreProvider = getSegmentStoreProvider(trace);
-        if (segmentStoreProvider != null) {
-            return SegmentStoreScatterDataProvider.getOrCreate(trace, segmentStoreProvider);
+        String analysisId = getAnalysisId();
+        /* Support legacy code, get the analysis ID of the segment store */
+        if (analysisId.isEmpty()) {
+            ISegmentStoreProvider segmentStoreProvider = getSegmentStoreProvider(trace);
+            if (!(segmentStoreProvider instanceof IAnalysisModule)) {
+                return null;
+            }
+            analysisId = ((IAnalysisModule) segmentStoreProvider).getId();
         }
-        return null;
+        /* End support of legacy */
+        return DataProviderManager.getInstance().getDataProvider(trace, SegmentStoreScatterDataProvider.ID + ':' + analysisId, ITmfTreeXYDataProvider.class);
     }
 
     /**
@@ -76,8 +112,12 @@ public abstract class AbstractSegmentStoreScatterChartViewer extends TmfFiltered
      * @param trace
      *            The trace to consider
      * @return the segment store provider
+     * @deprecated This method is not used anymore as the analysisId is passed in the constructor
      */
-    protected abstract @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace);
+    @Deprecated
+    protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace) {
+        return null;
+    }
 
     // ------------------------------------------------------------------------
     // Signal handlers

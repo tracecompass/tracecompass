@@ -28,5 +28,11 @@
          </tracetype>
       </module>
    </extension>
-
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.dataprovider">
+      <dataProviderFactory
+            class="org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreScatterDataProviderFactory"
+            id="org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.scatter.dataprovider">
+      </dataProviderFactory>
+   </extension>
 </plugin>
