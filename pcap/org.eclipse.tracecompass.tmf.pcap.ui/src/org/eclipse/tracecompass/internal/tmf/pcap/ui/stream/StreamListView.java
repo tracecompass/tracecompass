@@ -43,6 +43,7 @@ import org.eclipse.tracecompass.internal.tmf.pcap.core.signal.TmfPacketStreamSel
 import org.eclipse.tracecompass.internal.tmf.pcap.core.trace.PcapTrace;
 import org.eclipse.tracecompass.internal.tmf.pcap.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
+import org.eclipse.tracecompass.tmf.core.filter.FilterManager;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAspectNode;
@@ -60,7 +61,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
-import org.eclipse.tracecompass.tmf.ui.views.filter.FilterManager;
 import org.eclipse.tracecompass.tmf.ui.views.filter.FilterView;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;

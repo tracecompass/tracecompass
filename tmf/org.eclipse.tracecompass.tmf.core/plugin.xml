@@ -61,4 +61,11 @@
             id="org.eclipse.tracecompass.internal.provisional.tmf.core.histogram.HistogramDataProvider">
       </dataProviderFactory>
    </extension>
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.dataprovider">
+      <dataProviderFactory
+            class="org.eclipse.tracecompass.internal.provisional.tmf.core.model.events.TmfEventTableDataProviderFactory"
+            id="org.eclipse.tracecompass.internal.provisional.tmf.core.model.events.TmfEventTableDataProvider">
+      </dataProviderFactory>
+   </extension>
 </plugin>
