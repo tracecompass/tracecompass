@@ -10,8 +10,10 @@
 package org.eclipse.tracecompass.integration.swtbot.tests.projectexplorer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,8 +23,11 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -45,6 +50,7 @@ import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTxtTraceDefinition
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceImportException;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
@@ -517,6 +523,54 @@ public class ProjectExplorerTraceActionsTest {
 
         // ensure that the trace still exists in the Traces folder
         SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
+    }
+
+    /**
+     * Test the backward compatibility
+     */
+    @Test
+    public void testExperimentLinkBackwardCompatibility() {
+        /*
+         * close the editor for the trace to avoid name conflicts with the one for the
+         * experiment
+         */
+        fBot.closeAllEditors();
+
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        IWorkspaceRoot root = workspace.getRoot();
+        final IProject project = root.getProject(TRACE_PROJECT_NAME);
+        assertTrue(project.exists());
+        TmfProjectElement projectElement = TmfProjectRegistry.getProject(project);
+
+        // Get the experiment folder
+        TmfExperimentFolder experimentsFolder = projectElement.getExperimentsFolder();
+        assertNotNull("Experiment folder should exist", experimentsFolder);
+        IFolder experimentsFolderResource = experimentsFolder.getResource();
+        String experimentName = "exp";
+        IFolder expFolder = experimentsFolderResource.getFolder(experimentName);
+        assertFalse(expFolder.exists());
+
+        // Create the experiment
+        try {
+            expFolder.create(true, true, null);
+            IFile file = expFolder.getFile(TRACE_NAME);
+            file.createLink(Path.fromOSString(fTestFile.getAbsolutePath()), IResource.REPLACE, new NullProgressMonitor());
+        } catch (CoreException e) {
+            fail("Failed to create the experiment");
+        }
+
+        fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
+        SWTBotTreeItem experimentsItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME), "Experiments");
+
+        SWTBotTreeItem expItem = SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, "exp");
+
+        // find the trace under the experiment
+        expItem.expand();
+        expItem.getNode(TRACE_NAME);
+
+        // Open the experiment
+        expItem.contextMenu().menu("Open").click();
+        fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, experimentName));
     }
 
     /**
