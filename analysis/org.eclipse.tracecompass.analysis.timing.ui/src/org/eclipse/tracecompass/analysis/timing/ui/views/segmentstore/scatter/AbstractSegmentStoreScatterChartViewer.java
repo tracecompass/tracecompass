@@ -67,7 +67,7 @@ public class AbstractSegmentStoreScatterChartViewer extends TmfFilteredXYChartVi
      *            See {@link TmfXYChartSettings} to know what it contains
      * @param analysisId
      *            The ID of the analysis to show in this viewer
-     * @since 2.2
+     * @since 2.3
      */
     public AbstractSegmentStoreScatterChartViewer(Composite parent, TmfXYChartSettings settings, String analysisId) {
         super(parent, settings, SegmentStoreScatterDataProvider.ID);
@@ -85,7 +85,7 @@ public class AbstractSegmentStoreScatterChartViewer extends TmfFilteredXYChartVi
      * Get the analysis ID to show in the viewer
      *
      * @return The analysis ID
-     * @since 2.2
+     * @since 2.3
      */
     protected String getAnalysisId() {
         return fAnalysisId;

@@ -40,7 +40,7 @@ import com.google.common.collect.ImmutableList;
  * store scatter views
  *
  * @author Geneviève Bastien
- * @since 2.2
+ * @since 2.3
  */
 public class AbstractSegmentStoreScatterChartTreeViewer extends AbstractSelectTreeViewer {
 

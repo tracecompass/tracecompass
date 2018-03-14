@@ -67,7 +67,7 @@ import com.google.common.collect.Table;
  * draw time graphs. Model returned is for XML analysis.
  *
  * @author Loic Prieur-Drevon
- * @since 2.5
+ * @since 2.6
  */
 @SuppressWarnings("restriction")
 public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider implements ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> {

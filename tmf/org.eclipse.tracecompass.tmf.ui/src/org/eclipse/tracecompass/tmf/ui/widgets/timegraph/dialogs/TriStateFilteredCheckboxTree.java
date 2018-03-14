@@ -190,7 +190,7 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
      *
      * @param listener
      *            pre-check state listener.
-     * @since 3.3
+     * @since 3.4
      */
     public void setPreCheckStateListener(IPreCheckStateListener listener) {
         fPreCheckStateListener = listener;

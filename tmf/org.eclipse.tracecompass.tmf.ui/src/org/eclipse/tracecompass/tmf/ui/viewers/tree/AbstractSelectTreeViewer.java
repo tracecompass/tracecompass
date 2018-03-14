@@ -542,7 +542,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
      * Get the checkbox tree in this viewer.
      *
      * @return the checkbox tree.
-     * @since 3.3
+     * @since 3.4
      */
     public TriStateFilteredCheckboxTree getTriStateFilteredCheckboxTree() {
         return fCheckboxTree;

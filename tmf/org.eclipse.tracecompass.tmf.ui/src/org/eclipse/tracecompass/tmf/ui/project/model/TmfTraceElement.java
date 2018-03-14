@@ -738,7 +738,7 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
      *
      * @throws CoreException
      *             thrown when IResource.delete fails
-     * @since 3.3
+     * @since 3.4
      */
     public void delete(IProgressMonitor progressMonitor, boolean overwriting, boolean closeEditors) throws CoreException {
         // Close editors in UI Thread

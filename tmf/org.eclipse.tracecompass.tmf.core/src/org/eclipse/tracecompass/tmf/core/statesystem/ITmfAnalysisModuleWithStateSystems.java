@@ -32,7 +32,7 @@ public interface ITmfAnalysisModuleWithStateSystems extends IAnalysisModule {
      *
      * @return The providers' versions, key is the state system ID, value is the
      *         version number.
-     * @since 3.3
+     * @since 3.4
      */
     default Map<String, Integer> getProviderVersions() {
         return Collections.emptyMap();

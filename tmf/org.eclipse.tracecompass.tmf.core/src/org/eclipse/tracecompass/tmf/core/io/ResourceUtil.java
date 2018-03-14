@@ -41,7 +41,7 @@ import org.eclipse.tracecompass.internal.tmf.core.Activator;
  * Utility class for handling {@link IResource} instances.
  *
  * @author Bernd Hufmann
- * @since 3.3
+ * @since 3.4
  */
 @NonNullByDefault
 public class ResourceUtil {

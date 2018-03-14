@@ -398,7 +398,7 @@ public final class TmfTraceManager {
      * @param other
      *            The other trace that has a change of selection or window range
      * @return true if the trace should be synchronized with the other trace
-     * @since 3.3
+     * @since 3.4
      */
     public synchronized boolean isSynchronized(ITmfTrace trace, ITmfTrace other) {
         /* other instance of the same trace should never synchronize */

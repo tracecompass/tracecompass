@@ -147,7 +147,7 @@ public class XmlDataProviderManager {
      * @param viewElement
      *            the XML XY view for which we are querying a provider
      * @return the unique instance of an XY provider for the queried parameters
-     * @since 2.5
+     * @since 2.6
      */
     public synchronized ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> getTimeGraphProvider(@NonNull ITmfTrace trace, @NonNull Element viewElement) {
         if (!viewElement.hasAttribute(ID_ATTRIBUTE)) {

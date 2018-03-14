@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
  * {@link TimeGraphEntryModel} for XML Time Graphs
  *
  * @author Loic Prieur-Drevon
- * @since 2.5
+ * @since 2.6
  */
 public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
 

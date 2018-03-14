@@ -347,7 +347,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      *             if the bookmarks file cannot be created
      * @throws OperationCanceledException
      *             if the operation was canceled
-     * @since 3.3
+     * @since 3.4
      */
     public IFile createBookmarksFile(IProgressMonitor monitor) throws CoreException, OperationCanceledException {
         SubMonitor subMonitor = SubMonitor.convert(monitor);
@@ -393,7 +393,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      *             if the bookmarks file cannot be created
      * @throws OperationCanceledException
      *             if the operation was canceled
-     * @since 3.3
+     * @since 3.4
      */
     protected IFile createBookmarksFile(IFolder bookmarksFolder, String editorInputType, IProgressMonitor monitor) throws CoreException, OperationCanceledException {
         SubMonitor subMonitor = SubMonitor.convert(monitor, 2);
@@ -687,7 +687,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      *
      * @param monitor
      *            the progress monitor
-     * @since 3.3
+     * @since 3.4
      */
     public void refreshSupplementaryFolder(IProgressMonitor monitor) {
         SubMonitor subMonitor = SubMonitor.convert(monitor, 2);
@@ -768,7 +768,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      * @param monitor
      *            the progress monitor
      * @return the trace specific supplementary folder
-     * @since 3.3
+     * @since 3.4
      */
     public IFolder prepareSupplementaryFolder(IProgressMonitor monitor) {
         return prepareTraceSupplementaryFolder(getSupplementaryFolderPath(), true, monitor);
