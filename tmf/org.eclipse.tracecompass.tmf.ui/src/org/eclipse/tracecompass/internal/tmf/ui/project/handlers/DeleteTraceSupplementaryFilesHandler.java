@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,12 +14,12 @@
 package org.eclipse.tracecompass.internal.tmf.ui.project.handlers;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -29,13 +29,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfUIPreferences;
 import org.eclipse.tracecompass.internal.tmf.ui.project.dialogs.SelectSupplementaryResourcesDialog;
@@ -109,17 +107,18 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
             }
         }
 
-        final List<IResource> allResourcesToDelete;
         boolean confirm = Activator.getDefault().getPreferenceStore().getBoolean(ITmfUIPreferences.CONFIRM_DELETION_SUPPLEMENTARY_FILES);
         if (confirm) {
             final SelectSupplementaryResourcesDialog dialog = new SelectSupplementaryResourcesDialog(window.getShell(), resourceMap);
             if (dialog.open() != Window.OK) {
                 return null;
             }
-            allResourcesToDelete = Arrays.asList(dialog.getResources());
-        } else {
-            allResourcesToDelete = new ArrayList<>(resourceMap.values());
+            // Only keep selected resource in the map
+            resourceMap.values().retainAll(Arrays.asList(dialog.getResources()));
         }
+
+        // Close editors for traces that have supplementary resources to delete
+        resourceMap.keys().forEach(TmfCommonProjectElement::closeEditors);
 
         TmfWorkspaceModifyOperation operation = new TmfWorkspaceModifyOperation() {
             @Override
@@ -127,40 +126,29 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
 
                 Set<IProject> projectsToRefresh = new HashSet<>();
 
-                SubMonitor subMonitor = SubMonitor.convert(monitor, allResourcesToDelete.size());
+                // Initial work is number of resources to delete plus number of traces
+                SubMonitor subMonitor = SubMonitor.convert(monitor, resourceMap.size() + resourceMap.keySet().size());
 
-                for (final TmfCommonProjectElement element : resourceMap.keySet()) {
-                    if (monitor.isCanceled()) {
-                        throw new OperationCanceledException();
-                    }
-                    List<IResource> traceResourcesToDelete = new ArrayList<>(resourceMap.get(element));
-                    traceResourcesToDelete.retainAll(allResourcesToDelete);
-                    if (!traceResourcesToDelete.isEmpty()) {
-                        subMonitor.setTaskName(NLS.bind(Messages.DeleteSupplementaryFiles_DeletionTask, element.getElementPath()));
-                        // Delete the selected resources
-                        Display.getDefault().syncExec(element::closeEditors);
-                        element.deleteSupplementaryResources(traceResourcesToDelete.toArray(new IResource[0]));
-                        projectsToRefresh.add(element.getProject().getResource());
-                    }
-                    subMonitor.worked(traceResourcesToDelete.size());
+                for (Entry<TmfCommonProjectElement, Collection<IResource>> entry : resourceMap.asMap().entrySet()) {
+                    TmfCommonProjectElement trace = entry.getKey();
+                    Collection<IResource> resources = entry.getValue();
+                    subMonitor.split(resources.size());
+                    subMonitor.setTaskName(NLS.bind(Messages.DeleteSupplementaryFiles_DeletionTask, trace.getElementPath()));
+                    trace.deleteSupplementaryResources(resources.toArray(new IResource[0]));
+                    projectsToRefresh.add(trace.getProject().getResource());
                 }
 
-                subMonitor = SubMonitor.convert(monitor, projectsToRefresh.size());
+                // Redistribute work remaining from number of traces to number of projects
+                subMonitor.setWorkRemaining(projectsToRefresh.size());
 
                 // Refresh projects
-                Iterator<IProject> projectIterator = projectsToRefresh.iterator();
-                while (projectIterator.hasNext()) {
-                    if (monitor.isCanceled()) {
-                        throw new OperationCanceledException();
-                    }
-                    IProject project = projectIterator.next();
+                for (IProject project : projectsToRefresh) {
                     subMonitor.setTaskName(NLS.bind(Messages.DeleteSupplementaryFiles_ProjectRefreshTask, project.getName()));
                     try {
-                        project.refreshLocal(IResource.DEPTH_INFINITE, null);
+                        project.refreshLocal(IResource.DEPTH_INFINITE, subMonitor.split(1));
                     } catch (CoreException e) {
                         Activator.getDefault().logError("Error refreshing project " + project, e); //$NON-NLS-1$
                     }
-                    subMonitor.worked(1);
                 }
            }
         };
