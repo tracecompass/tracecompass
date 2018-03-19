@@ -101,14 +101,12 @@ public abstract class HTNode {
      * 16 - 2x long (start time, end time)
      * 16 - 3x int (seq number, parent seq number, intervalcount)
      * 16 - 2x int (minimum quark and maximum quark)
-     *  1 - byte (done or not)
      * </pre>
      */
     private static final int COMMON_HEADER_SIZE = Byte.BYTES
             + 2 * Long.BYTES
             + 3 * Integer.BYTES
-            + 2 * Integer.BYTES
-            + Byte.BYTES;
+            + 2 * Integer.BYTES;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -205,7 +203,6 @@ public abstract class HTNode {
         int seqNb = buffer.getInt();
         int parentSeqNb = buffer.getInt();
         int intervalCount = buffer.getInt();
-        buffer.get(); // TODO Used to be "isDone", to be removed from the header
 
         /* Now the rest of the header depends on the node type */
         switch (type) {
@@ -276,13 +273,14 @@ public abstract class HTNode {
             buffer.putInt(fSequenceNumber);
             buffer.putInt(fParentSequenceNumber);
             buffer.putInt(fIntervals.size());
-            buffer.put((byte) 1); // TODO Used to be "isDone", to be removed from header
 
             /* Now call the inner method to write the specific header part */
             writeSpecificHeader(buffer);
 
             /* Back to us, we write the intervals */
-            fIntervals.forEach(i -> i.writeInterval(buffer));
+            for (HTInterval interval : fIntervals) {
+                interval.writeInterval(buffer);
+            }
             if (blockSize - buffer.position() != getNodeFreeSpace()) {
                 throw new IllegalStateException("Wrong free space: Actual: " + (blockSize - buffer.position()) + ", Expected: " + getNodeFreeSpace()); //$NON-NLS-1$ //$NON-NLS-2$
             }
@@ -394,7 +392,11 @@ public abstract class HTNode {
 
             /* Find the insert position to keep the list sorted */
             int index = 0;
-            if (!fIntervals.isEmpty()) {
+            if (fIntervals.isEmpty()) {
+                index = 0;
+            } else if (NODE_ORDER.compare(fIntervals.get(fIntervals.size() - 1), newInterval) <= 0) {
+                index = fIntervals.size();
+            } else {
                 index = Collections.binarySearch(fIntervals, newInterval, NODE_ORDER);
                 /*
                  * Interval should not already be in the node, binarySearch will
@@ -591,10 +593,11 @@ public abstract class HTNode {
      */
     public int getNodeFreeSpace() {
         fRwl.readLock().lock();
-        int ret = fConfig.getBlockSize() - getDataSectionEndOffset();
-        fRwl.readLock().unlock();
-
-        return ret;
+        try {
+            return fConfig.getBlockSize() - getDataSectionEndOffset();
+        } finally {
+            fRwl.readLock().unlock();
+        }
     }
 
     /**

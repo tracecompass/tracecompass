@@ -48,9 +48,6 @@ public final class CoreNode extends ParentNode {
     private int[] fChildMin;
     private int[] fChildMax;
 
-    /** Seq number of this node's extension. -1 if none */
-    private volatile int extension = -1;
-
     /**
      * Lock used to gate the accesses to the children arrays. Meant to be a
      * different lock from the one in {@link HTNode}.
@@ -95,7 +92,6 @@ public final class CoreNode extends ParentNode {
     protected void readSpecificHeader(ByteBuffer buffer) {
         int size = getConfig().getMaxChildren();
 
-        extension = buffer.getInt();
         fNbChildren = buffer.getInt();
 
         fChildren = new int[size];
@@ -126,7 +122,6 @@ public final class CoreNode extends ParentNode {
 
     @Override
     protected void writeSpecificHeader(ByteBuffer buffer) {
-        buffer.putInt(extension);
         buffer.putInt(fNbChildren);
 
         /* Write the "children's sequence number" array */
@@ -200,21 +195,6 @@ public final class CoreNode extends ParentNode {
         rwl.readLock().lock();
         try {
             return fChildEnd[index];
-        } finally {
-            rwl.readLock().unlock();
-        }
-    }
-
-    /**
-     * Get the sequence number of the extension to this node (if there is one).
-     *
-     * @return The sequence number of the extended node. '-1' is returned if
-     *         there is no extension node.
-     */
-    public int getExtensionSequenceNumber() {
-        rwl.readLock().lock();
-        try {
-            return extension;
         } finally {
             rwl.readLock().unlock();
         }
@@ -326,8 +306,7 @@ public final class CoreNode extends ParentNode {
     @Override
     protected int getSpecificHeaderSize() {
         int maxChildren = getConfig().getMaxChildren();
-        return    Integer.BYTES /* 1x int (extension node) */
-                + Integer.BYTES /* 1x int (nbChildren) */
+        return    Integer.BYTES /* 1x int (nbChildren) */
 
                 /* MAX_NB * int ('children' table) */
                 + Integer.BYTES * maxChildren

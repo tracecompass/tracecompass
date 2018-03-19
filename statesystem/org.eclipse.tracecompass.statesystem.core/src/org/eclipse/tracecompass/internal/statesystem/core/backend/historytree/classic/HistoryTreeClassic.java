@@ -54,7 +54,7 @@ public class HistoryTreeClassic implements IHistoryTree {
     public static final int HISTORY_FILE_MAGIC_NUMBER = 0x05FFA900;
 
     /** File format version. Increment when breaking compatibility. */
-    private static final int FILE_VERSION = 9;
+    private static final int FILE_VERSION = 10;
 
     private static final IHTNodeFactory CLASSIC_NODE_FACTORY = new IHTNodeFactory() {
 
