@@ -643,8 +643,10 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
             try {
                 IFolder newSupplFolder = prepareTraceSupplementaryFolder(newElementPath + getSuffix(), false);
                 oldSupplFolder.copy(newSupplFolder.getFullPath(), true, new NullProgressMonitor());
+                // Temporary fix for Bug 532677: IResource.copy() does not copy the hidden flag
+                hidePropertiesFolder(newSupplFolder);
             } catch (CoreException e) {
-                Activator.getDefault().logError("Error renaming supplementary folder " + oldSupplFolder, e); //$NON-NLS-1$
+                Activator.getDefault().logError("Error copying supplementary folder " + oldSupplFolder, e); //$NON-NLS-1$
             }
         }
     }
@@ -663,9 +665,18 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
             try {
                 TraceUtils.createFolder((IFolder) destination.getParent(), new NullProgressMonitor());
                 oldSupplFolder.copy(destination.getFullPath(), true, new NullProgressMonitor());
+                // Temporary fix for Bug 532677: IResource.copy() does not copy the hidden flag
+                hidePropertiesFolder(destination);
             } catch (CoreException e) {
                 Activator.getDefault().logError("Error copying supplementary folder " + oldSupplFolder, e); //$NON-NLS-1$
             }
+        }
+    }
+
+    private static void hidePropertiesFolder(IFolder supplFolder) throws CoreException {
+        IFolder propertiesFolder = supplFolder.getFolder(TmfCommonConstants.TRACE_PROPERTIES_FOLDER);
+        if (propertiesFolder.exists()) {
+            propertiesFolder.setHidden(true);
         }
     }
 
