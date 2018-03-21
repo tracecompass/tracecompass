@@ -99,6 +99,11 @@ public final class EnumDefinition extends SimpleDatatypeDefinition {
         return fInteger.size();
     }
 
+    @Override
+    public byte[] getBytes() {
+        return fInteger.getBytes();
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

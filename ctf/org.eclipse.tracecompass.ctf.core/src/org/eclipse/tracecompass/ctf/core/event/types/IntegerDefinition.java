@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.ctf.core.event.types;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
@@ -152,5 +153,14 @@ public final class IntegerDefinition extends SimpleDatatypeDefinition {
             break;
         }
         return s;
+    }
+
+    @Override
+    public byte[] getBytes() {
+        byte[] data = new byte[(int) Math.ceil(getDeclaration().getLength()/8.0)];
+        ByteBuffer bb = ByteBuffer.wrap(data);
+        bb.order(getDeclaration().getByteOrder());
+        bb.putLong(fValue);
+        return data;
     }
 }

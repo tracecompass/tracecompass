@@ -257,5 +257,4 @@ public final class CTFPacketReader implements IPacketReader, IDefinitionScope {
     public @Nullable ICompositeDefinition getCurrentPacketEventHeader() {
         return fEventHeader;
     }
-
 }

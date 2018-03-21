@@ -95,6 +95,8 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
 
     private final long fEndPacketHeaderBits;
 
+    private final StructDefinition fStreamPacketContextDef;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -122,6 +124,7 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
         fTimestampBegin = 0;
         fTimestampEnd = Long.MAX_VALUE;
         fEndPacketHeaderBits = dataOffsetBits;
+        fStreamPacketContextDef = null;
     }
 
     /**
@@ -157,6 +160,7 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
      *            end of packet headers
      */
     public StreamInputPacketIndexEntry(long dataOffsetBits, StructDefinition streamPacketContextDef, long fileSizeBytes, long lostSoFar, long endPacketHeaderBits) {
+        fStreamPacketContextDef = streamPacketContextDef;
         fEndPacketHeaderBits = endPacketHeaderBits;
         fAttributes = computeAttributeMap(streamPacketContextDef);
         fContentSizeBits = computeContentSize(fileSizeBytes);
@@ -182,6 +186,12 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
      *            the new timestamp end
      */
     public StreamInputPacketIndexEntry(ICTFPacketDescriptor entryToAdd, long newTimestampEnd) {
+        if (entryToAdd instanceof StreamInputPacketIndexEntry) {
+            fStreamPacketContextDef = ((StreamInputPacketIndexEntry) entryToAdd).getStreamPacketContextDef();
+        } else {
+            fStreamPacketContextDef = null;
+        }
+
         fEndPacketHeaderBits = entryToAdd.getPayloadStartBits();
         fAttributes = entryToAdd.getAttributes();
         fContentSizeBits = entryToAdd.getContentSizeBits();
@@ -391,5 +401,14 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
     @Override
     public long getPayloadStartBits() {
         return fEndPacketHeaderBits;
+    }
+
+    /**
+     * Get the backing stream packet context
+     *
+     * @return the backing context definition
+     */
+    public StructDefinition getStreamPacketContextDef() {
+        return fStreamPacketContextDef;
     }
 }

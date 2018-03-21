@@ -30,8 +30,7 @@ public abstract class SimpleDatatypeDefinition extends Definition {
      * @param definitionScope
      *            The scope of this definition
      * @param fieldName
-     *            The name of the field matching this definition in the parent
-     *            scope
+     *            The name of the field matching this definition in the parent scope
      */
     public SimpleDatatypeDefinition(@NonNull IDeclaration declaration, IDefinitionScope definitionScope,
             @NonNull String fieldName) {
@@ -56,4 +55,13 @@ public abstract class SimpleDatatypeDefinition extends Definition {
         return null;
     }
 
+    /**
+     * Gets the bytes that make this definition
+     *
+     * @return the byte array
+     * @since 2.4
+     */
+    public byte[] getBytes() {
+        throw new UnsupportedOperationException("getBytes not implemented for " + this.getClass().getCanonicalName()); //$NON-NLS-1$
+    }
 }
