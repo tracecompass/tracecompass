@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 import org.eclipse.tracecompass.ctf.core.event.scope.ILexicalScope;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration.InternalDef;
@@ -138,6 +139,15 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
     @Override
     public StructDeclaration getDeclaration() {
         return (StructDeclaration) super.getDeclaration();
+    }
+
+    @Override
+    public long size() {
+        long size = 0;
+        for (IDefinition def : fDefinitions) {
+            size = SaturatedArithmetic.add(size, def.size());
+        }
+        return size;
     }
 
     // ------------------------------------------------------------------------

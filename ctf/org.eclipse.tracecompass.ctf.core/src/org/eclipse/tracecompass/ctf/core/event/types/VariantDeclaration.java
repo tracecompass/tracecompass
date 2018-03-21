@@ -134,7 +134,7 @@ public class VariantDeclaration extends Declaration {
                     definitionScope.getScopePath().getPath());
         }
         Definition fieldValue = fDeclarationToPopulate.createDefinition(definitionScope, fieldName, input);
-        return new VariantDefinition(this, definitionScope, varFieldName, fieldName, fieldValue);
+        return new VariantDefinition(this, definitionScope, tagDef, varFieldName, fieldName, fieldValue);
     }
 
     /**

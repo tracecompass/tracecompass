@@ -89,6 +89,11 @@ public final class IntegerDefinition extends SimpleDatatypeDefinition {
     }
 
     @Override
+    public long size() {
+        return getDeclaration().getMaximumSize();
+    }
+
+    @Override
     public String getStringValue() {
         return this.toString();
     }

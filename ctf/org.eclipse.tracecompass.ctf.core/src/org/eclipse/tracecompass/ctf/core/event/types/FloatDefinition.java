@@ -72,6 +72,10 @@ public final class FloatDefinition extends Definition {
         return (FloatDeclaration) super.getDeclaration();
     }
 
+    @Override
+    public long size() {
+        return getDeclaration().getMaximumSize();
+    }
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

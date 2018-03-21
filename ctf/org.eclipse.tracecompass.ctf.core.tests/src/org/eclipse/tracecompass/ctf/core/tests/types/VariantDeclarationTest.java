@@ -84,6 +84,7 @@ public class VariantDeclarationTest {
         VariantDefinition variantDefinition = new VariantDefinition(
                 variantDeclaration,
                 CtfTestTraceUtils.getTrace(testTrace),
+                tagDef,
                 "tag",
                 "tag",
                 new StringDefinition(

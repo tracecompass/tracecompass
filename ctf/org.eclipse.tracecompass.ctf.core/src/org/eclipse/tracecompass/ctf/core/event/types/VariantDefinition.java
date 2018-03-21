@@ -35,10 +35,37 @@ public final class VariantDefinition extends ScopedDefinition {
     private final Definition fDefinition;
     private final String fCurrentField;
     private final String fFieldName;
+    private final EnumDefinition fTagDef;
 
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
+
+    /**
+     * Constructor
+     *
+     * @param declaration
+     *            the parent declaration
+     * @param definitionScope
+     *            the parent scope
+     * @param tagDef
+     *            the tagging definition
+     * @param selectedField
+     *            the selected field
+     * @param fieldName
+     *            the field name
+     * @param fieldValue
+     *            the field value
+     * @since 2.4
+     */
+    public VariantDefinition(@NonNull VariantDeclaration declaration, IDefinitionScope definitionScope, EnumDefinition tagDef, String selectedField, @NonNull String fieldName, Definition fieldValue) {
+        super(declaration, definitionScope, fieldName);
+
+        fTagDef = tagDef;
+        fFieldName = fieldName;
+        fCurrentField = selectedField;
+        fDefinition = fieldValue;
+    }
 
     /**
      * Constructor
@@ -53,15 +80,12 @@ public final class VariantDefinition extends ScopedDefinition {
      *            the field name
      * @param fieldValue
      *            the field value
+     *            @deprecated use {@link VariantDefinition#VariantDefinition(VariantDeclaration, IDefinitionScope, EnumDefinition, String, String, Definition)} instead or trace splitting will break
      */
+    @Deprecated
     public VariantDefinition(@NonNull VariantDeclaration declaration,
             IDefinitionScope definitionScope, String selectedField, @NonNull String fieldName, Definition fieldValue) {
-        super(declaration, definitionScope, fieldName);
-
-        fFieldName = fieldName;
-        fCurrentField = selectedField;
-        fDefinition = fieldValue;
-
+        this(declaration, definitionScope, new EnumDefinition(new EnumDeclaration(IntegerDeclaration.INT_8_DECL), null, fieldName, new IntegerDefinition(IntegerDeclaration.INT_8_DECL, null, fieldName, -1)), selectedField, fieldName, fieldValue);
     }
 
     // ------------------------------------------------------------------------
@@ -89,6 +113,11 @@ public final class VariantDefinition extends ScopedDefinition {
      */
     public Definition getCurrentField() {
         return fDefinition;
+    }
+
+    @Override
+    public long size() {
+        return fDefinition.size() + fTagDef.size();
     }
 
     // ------------------------------------------------------------------------

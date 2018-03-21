@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 
 /**
@@ -34,8 +35,7 @@ public abstract class AbstractArrayDefinition extends Definition {
      * @param definitionScope
      *            the definition is in a scope, (normally a struct) what is it?
      * @param fieldName
-     *            the name of the definition. (it is a field in the parent
-     *            scope)
+     *            the name of the definition. (it is a field in the parent scope)
      */
     public AbstractArrayDefinition(IDeclaration declaration, @Nullable IDefinitionScope definitionScope, String fieldName) {
         super(declaration, definitionScope, fieldName);
@@ -55,5 +55,18 @@ public abstract class AbstractArrayDefinition extends Definition {
      * @since 1.0
      */
     public abstract int getLength();
+
+    @Override
+    public long size() {
+        List<@Nullable Definition> definitions = getDefinitions();
+        if (definitions.isEmpty()) {
+            return 0;
+        }
+        Definition definition = definitions.get(0);
+        if (definition == null) {
+            return 0;
+        }
+        return SaturatedArithmetic.multiply(getLength(), definition.size());
+    }
 
 }

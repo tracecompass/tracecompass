@@ -124,6 +124,11 @@ public abstract class Definition implements IDefinition {
         return fDefinitionScope;
     }
 
+    @Override
+    public long size() {
+        return getDeclaration().getMaximumSize();
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

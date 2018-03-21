@@ -73,6 +73,11 @@ public final class StringDefinition extends Definition {
         return fString;
     }
 
+    @Override
+    public long size() {
+        return fString.length();
+    }
+
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

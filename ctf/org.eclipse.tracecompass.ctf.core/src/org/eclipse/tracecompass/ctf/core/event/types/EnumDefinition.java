@@ -31,7 +31,7 @@ public final class EnumDefinition extends SimpleDatatypeDefinition {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private final long fIntegerValue;
+    private final IntegerDefinition fInteger;
 
     private final String fValue;
 
@@ -55,8 +55,8 @@ public final class EnumDefinition extends SimpleDatatypeDefinition {
             IDefinitionScope definitionScope, @NonNull String fieldName, IntegerDefinition intValue) {
         super(declaration, definitionScope, fieldName);
 
-        fIntegerValue = intValue.getValue();
-        fValue = declaration.query(fIntegerValue);
+        fInteger = intValue;
+        fValue = declaration.query(fInteger.getValue());
     }
 
     // ------------------------------------------------------------------------
@@ -86,12 +86,17 @@ public final class EnumDefinition extends SimpleDatatypeDefinition {
      */
     @Override
     public Long getIntegerValue() {
-        return fIntegerValue;
+        return fInteger.getValue();
     }
 
     @Override
     public EnumDeclaration getDeclaration() {
         return (EnumDeclaration) super.getDeclaration();
+    }
+
+    @Override
+    public long size() {
+        return fInteger.size();
     }
 
     // ------------------------------------------------------------------------
@@ -101,7 +106,7 @@ public final class EnumDefinition extends SimpleDatatypeDefinition {
     @Override
     public String toString() {
         return "{ value = " + getValue() + //$NON-NLS-1$
-                ", container = " + fIntegerValue + //$NON-NLS-1$
+                ", container = " + fInteger.getValue()+ //$NON-NLS-1$
                 " }"; //$NON-NLS-1$
     }
 }

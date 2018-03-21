@@ -39,4 +39,14 @@ public interface IDefinition {
      */
     IDeclaration getDeclaration();
 
+    /**
+     * Get the size in bits
+     *
+     * @return the size in bits. Long#MAX_VALUE means unset.
+     * @since 2.4
+     */
+    default long size() {
+        return Long.MAX_VALUE;
+    }
+
 }
