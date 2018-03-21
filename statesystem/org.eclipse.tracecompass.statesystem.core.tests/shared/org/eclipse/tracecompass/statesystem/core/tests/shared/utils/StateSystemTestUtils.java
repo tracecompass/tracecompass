@@ -25,6 +25,8 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 
+import com.google.common.base.Objects;
+
 /**
  * Contains utilities to test the content of state systems
  *
@@ -78,13 +80,15 @@ public final class StateSystemTestUtils {
     }
 
     private static boolean compareIntervalContent(ITmfStateInterval expected, ITmfStateInterval actual) {
+        Object expectedVal = expected.getValue();
+        Object actualVal = actual.getValue();
         return (expected.getStartTime() == actual.getStartTime()) &&
                 (expected.getEndTime() == actual.getEndTime()) &&
-                (expected.getStateValue().equals(actual.getStateValue()));
+                (Objects.equal(expectedVal, actualVal));
     }
 
     private static String displayInterval(ITmfStateInterval interval) {
-        return "[" + interval.getStartTime() + "," + interval.getEndTime() + "]:" + interval.getStateValue();
+        return "[" + interval.getStartTime() + "," + interval.getEndTime() + "]:" + interval.getValue();
     }
 
     /**

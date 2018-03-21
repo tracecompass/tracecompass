@@ -9,8 +9,10 @@
 
 package org.eclipse.tracecompass.statesystem.core.tests.shared.utils;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 /**
  * State interval class to help with unit testing. This class should be used in
@@ -30,7 +32,22 @@ public class StateIntervalStub implements ITmfStateInterval {
 
     private final long fStart;
     private final long fEnd;
-    private final ITmfStateValue fValue;
+    private final @Nullable Object fObject;
+
+    /**
+     * Constructor. New code using this class should consider using
+     * {@link #StateIntervalStub(int, int, Object)} instead
+     *
+     * @param start
+     *            Start time of the interval
+     * @param end
+     *            End time of the interval
+     * @param value
+     *            Value of the interval
+     */
+    public StateIntervalStub(final int start, final int end, final ITmfStateValue value) {
+        this (start, end, value.unboxValue());
+    }
 
     /**
      * Constructor
@@ -42,10 +59,10 @@ public class StateIntervalStub implements ITmfStateInterval {
      * @param value
      *            Value of the interval
      */
-    public StateIntervalStub(final int start, final int end, final ITmfStateValue value) {
+    public StateIntervalStub(final int start, final int end, final @Nullable Object value) {
         fStart = start;
         fEnd = end;
-        fValue = value;
+        fObject = value;
     }
 
     @Override
@@ -65,7 +82,12 @@ public class StateIntervalStub implements ITmfStateInterval {
 
     @Override
     public ITmfStateValue getStateValue() {
-        return fValue;
+        return TmfStateValue.newValue(fObject);
+    }
+
+    @Override
+    public @Nullable Object getValue() {
+        return fObject;
     }
 
     @Override
