@@ -97,6 +97,11 @@ public class ResourceUtil {
 
         SubMonitor subMon = SubMonitor.convert(monitor, 3);
         try {
+            IPath location = getLocation(link);
+            // Only create link if it doesn't already exist.
+            if ((location != null) && link.exists() && location.equals(targetLocation)) {
+                return true;
+            }
             Path linkPath = Paths.get(link.getProject().getLocation().append(link.getProjectRelativePath()).toOSString());
             if (!checkResource(link, linkPath)) {
                 return false;

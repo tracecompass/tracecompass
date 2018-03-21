@@ -219,8 +219,8 @@ public class ResourceUtilTest {
         // Re-do file Eclipse link to a file
         createAndVerifyLink(path, ECLIPSE_LINK_FILE_NAME, true, false);
 
-        // Override file Eclipse link with file system link to a file
-        IResource res2 = createAndVerifyLink(path, ECLIPSE_LINK_FILE_NAME, true, isSymLink);
+        // Re-do with file system link to a file. Eclipse link won't be replaced since link to same location exists.
+        IResource res2 = createAndVerifyLink(path, ECLIPSE_LINK_FILE_NAME, true, isSymLink, false);
 
         // Break file system symbolic link (eclipse resource won't exist)
         fTargetFile.delete();
@@ -270,8 +270,8 @@ public class ResourceUtilTest {
         // Re-do file Eclipse link to a folder
         createAndVerifyLink(path, ECLIPSE_LINK_FOLDER_NAME, false, false);
 
-        // Override file Eclipse link with file system link to a folder
-        res2 = createAndVerifyLink(path, ECLIPSE_LINK_FOLDER_NAME, false, isSymLink);
+        // re-do with file system link to a folder. Eclipse link won't be replaced since link to same location exists
+        res2 = createAndVerifyLink(path, ECLIPSE_LINK_FOLDER_NAME, false, isSymLink, false);
 
         // delete linked folders
         res1.delete(true, null);
@@ -501,6 +501,10 @@ public class ResourceUtilTest {
     }
 
     private @NonNull IResource createAndVerifyLink(IPath path, String name, boolean isFile, boolean isSymLink) throws IOException, CoreException {
+        return createAndVerifyLink(path, name, isFile, isSymLink, true);
+    }
+
+    private @NonNull IResource createAndVerifyLink(IPath path, String name, boolean isFile, boolean isSymLink, boolean checkSymLink) throws IOException, CoreException {
         IResource resource;
         if (isFile) {
             resource = fTestFolder.getFile(name);
@@ -511,8 +515,8 @@ public class ResourceUtilTest {
         boolean success = ResourceUtil.createSymbolicLink(resource, path, isSymLink, null);
         assertTrue(success);
         assertTrue(resource.exists());
-        assertTrue(isFileSystemSymbolicLink(resource) == isSymLink);
-        assertTrue(resource.isLinked() != isSymLink);
+        assertTrue(isFileSystemSymbolicLink(resource) == (checkSymLink ? isSymLink : false));
+        assertTrue(resource.isLinked() == ((checkSymLink ? !isSymLink : true)));
         assertTrue(ResourceUtil.isSymbolicLink(resource));
         verifyLocation(path, resource);
         return resource;
