@@ -209,4 +209,9 @@ public abstract class CustomStateValue extends TmfStateValue {
         return false;
     }
 
+    @Override
+    public @Nullable Object unboxValue() {
+        return this;
+    }
+
 }
