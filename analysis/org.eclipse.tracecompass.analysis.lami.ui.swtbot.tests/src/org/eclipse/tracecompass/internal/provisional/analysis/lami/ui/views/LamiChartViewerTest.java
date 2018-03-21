@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 École Polytechnique de Montréal
+ * Copyright (c) 2017, 2018 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -41,7 +41,6 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiResultTable;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiTableEntry;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiLongNumber;
-import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportView;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartType;
 import org.eclipse.tracecompass.tmf.chart.ui.swtbot.tests.shared.SWTBotCustomChartUtils;
 import org.eclipse.tracecompass.tmf.chart.ui.swtbot.tests.shared.SWTBotCustomChartUtils.AxisType;
@@ -175,7 +174,7 @@ public class LamiChartViewerTest {
         fBot.waitUntil(isLamiAnalysisEnabled(externalAnalyses));
         externalAnalyses.doubleClick();
 
-        fBot.waitUntil(org.eclipse.swtbot.swt.finder.waits.Conditions.shellIsActive("External Analysis Parameters"));
+        fBot.shell("External Analysis Parameters").activate();
         fBot.button("OK").click();
         WaitUtils.waitForJobs();
 
@@ -369,8 +368,7 @@ public class LamiChartViewerTest {
         // Create a bar chart of Waker process (name) vs scheduling latency,
         // Priority and Target CPU
         menu.click();
-        fBot.waitUntil(org.eclipse.swtbot.swt.finder.waits.Conditions.shellIsActive("Custom chart creation"));
-        fBot.shell("Custom chart creation").setFocus();
+        fBot.shell("Custom chart creation").activate();
 
         SWTBotCustomChartUtils.selectChartType(fBot, ChartType.BAR_CHART);
         SWTBotCustomChartUtils.addSeries(fBot, "Waker process (name)", ImmutableSet.of("Scheduling latency (ns)", "Priority", "Target CPU"));

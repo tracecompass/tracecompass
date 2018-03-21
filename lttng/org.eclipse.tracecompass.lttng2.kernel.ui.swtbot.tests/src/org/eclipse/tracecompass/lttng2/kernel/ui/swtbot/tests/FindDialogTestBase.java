@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Ericsson and others
+ * Copyright (c) 2016, 2018 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -170,7 +170,7 @@ public abstract class FindDialogTestBase {
         } else {
             KEYBOARD.pressShortcut(Keystrokes.CTRL, KeyStroke.getInstance('F'));
         }
-        fBot.waitUntil(Conditions.shellIsActive(DIALOG_TITLE));
+        fBot.shell(DIALOG_TITLE).activate();
     }
 
     /**

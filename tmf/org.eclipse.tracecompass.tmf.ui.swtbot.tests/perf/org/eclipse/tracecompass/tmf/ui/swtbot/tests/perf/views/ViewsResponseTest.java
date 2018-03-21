@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 École Polytechnique de Montréal
+ * Copyright (c) 2016, 2018 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -188,8 +188,7 @@ public abstract class ViewsResponseTest {
 
         traceItem.contextMenu().menu("Rename...").click();
         final String RENAME_TRACE_DIALOG_TITLE = "Rename Trace";
-        fBot.waitUntil(Conditions.shellIsActive(RENAME_TRACE_DIALOG_TITLE));
-        SWTBotShell shell = fBot.shell(RENAME_TRACE_DIALOG_TITLE);
+        SWTBotShell shell = fBot.shell(RENAME_TRACE_DIALOG_TITLE).activate();
         SWTBotText text = shell.bot().textWithLabel("New Trace name:");
         text.setText(newName);
         shell.bot().button("OK").click();

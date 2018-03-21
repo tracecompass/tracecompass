@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2016 Ericsson
+ * Copyright (c) 2014, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -22,7 +22,6 @@ import java.io.IOException;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
@@ -102,12 +101,11 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
 
         SWTBotTreeItem treeNode = SWTBotUtils.selectTracesFolder(fBot, PROJECT_NAME);
         treeNode.contextMenu("Manage Custom Parsers...").click();
-        fBot.waitUntil(Conditions.shellIsActive(MANAGE_CUSTOM_PARSERS_SHELL_TITLE));
-        fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).setFocus();
+        fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).activate();
 
         // Open the new custom txt parser dialog
         fBot.button("New...").click();
-        fBot.waitUntil(Conditions.shellIsActive(CUSTOM_TEXT_PARSER_SHELL_TITLE));
+        fBot.shell(CUSTOM_TEXT_PARSER_SHELL_TITLE).activate();
 
         // Setting header
         fBot.textWithLabel("Category:").setText(CATEGORY_NAME);
@@ -205,12 +203,11 @@ public class TestCustomTxtWizard extends AbstractCustomParserWizard {
         SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotTreeItem treeNode = SWTBotUtils.selectTracesFolder(fBot, PROJECT_NAME);
         treeNode.contextMenu("Manage Custom Parsers...").click();
-        fBot.waitUntil(Conditions.shellIsActive(MANAGE_CUSTOM_PARSERS_SHELL_TITLE));
+        fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).activate();
         // Open the edition dialog for txt parser
-        fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).setFocus();
         fBot.list().select("Demo Category : Demo trace");
         fBot.button("Edit...").click();
-        fBot.waitUntil(Conditions.shellIsActive(CUSTOM_TEXT_PARSER_SHELL_TITLE));
+        fBot.shell(CUSTOM_TEXT_PARSER_SHELL_TITLE).activate();
 
         // update parser's data
         fBot.textWithLabel("Category:").setText(CATEGORY_NAME);

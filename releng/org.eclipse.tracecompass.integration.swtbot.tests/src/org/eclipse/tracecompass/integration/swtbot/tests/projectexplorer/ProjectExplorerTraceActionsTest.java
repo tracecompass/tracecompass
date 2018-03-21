@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2016, 2017 Ericsson
+ * Copyright (c) 2016, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -272,8 +272,7 @@ public class ProjectExplorerTraceActionsTest {
 
         traceItem.contextMenu().menu("Rename...").click();
         final String RENAME_TRACE_DIALOG_TITLE = "Rename Trace";
-        fBot.waitUntil(Conditions.shellIsActive(RENAME_TRACE_DIALOG_TITLE));
-        SWTBotShell shell = fBot.shell(RENAME_TRACE_DIALOG_TITLE);
+        SWTBotShell shell = fBot.shell(RENAME_TRACE_DIALOG_TITLE).activate();
         SWTBotText text = shell.bot().textWithLabel("New Trace name:");
         text.setText(RENAMED_TRACE_NAME);
         shell.bot().button("OK").click();
@@ -301,8 +300,7 @@ public class ProjectExplorerTraceActionsTest {
 
         traceItem.contextMenu().menu("Delete").click();
         final String DELETE_TRACE_DIALOG_TITLE = "Confirm Delete";
-        fBot.waitUntil(Conditions.shellIsActive(DELETE_TRACE_DIALOG_TITLE));
-        SWTBotShell shell = fBot.shell(DELETE_TRACE_DIALOG_TITLE);
+        SWTBotShell shell = fBot.shell(DELETE_TRACE_DIALOG_TITLE).activate();
         shell.bot().button("Yes").click();
         fBot.waitUntil(Conditions.shellCloses(shell));
         fBot.waitWhile(new ConditionHelpers.ActiveEventsEditor(fBot, null));
@@ -326,7 +324,7 @@ public class ProjectExplorerTraceActionsTest {
     public void test4_06OpenKeyboard() throws WidgetNotFoundException {
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
         traceItem.select();
-        fBot.activeShell().pressShortcut(Keystrokes.CR);
+        traceItem.pressShortcut(Keystrokes.CR);
 
         SWTBotImportWizardUtils.testEventsTable(fBot, TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
         testStatisticsView();
@@ -345,10 +343,9 @@ public class ProjectExplorerTraceActionsTest {
     public void test4_07DeleteKeyboard() {
         SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
         traceItem.select();
-        fBot.activeShell().pressShortcut(Keystrokes.DELETE);
+        traceItem.pressShortcut(Keystrokes.DELETE);
         final String DELETE_TRACE_DIALOG_TITLE = "Confirm Delete";
-        fBot.waitUntil(Conditions.shellIsActive(DELETE_TRACE_DIALOG_TITLE));
-        SWTBotShell shell = fBot.shell(DELETE_TRACE_DIALOG_TITLE);
+        SWTBotShell shell = fBot.shell(DELETE_TRACE_DIALOG_TITLE).activate();
         shell.bot().button("Yes").click();
         fBot.waitUntil(Conditions.shellCloses(shell));
         fBot.waitWhile(new ConditionHelpers.ActiveEventsEditor(fBot, null));
@@ -472,8 +469,7 @@ public class ProjectExplorerTraceActionsTest {
 
         // delete it
         expTrace.contextMenu("Delete").click();
-        fBot.waitUntil(Conditions.shellIsActive("Confirm Delete"));
-        SWTBotShell shell = fBot.shell("Confirm Delete");
+        SWTBotShell shell = fBot.shell("Confirm Delete").activate();
         shell.bot().button("Yes").click();
         fBot.waitUntil(Conditions.shellCloses(shell));
         fBot.waitWhile(new ConditionHelpers.ActiveEventsEditor(fBot, null));
@@ -512,8 +508,7 @@ public class ProjectExplorerTraceActionsTest {
 
         // remove the trace from the experiment
         expTrace.contextMenu().menu("Remove").click();
-        fBot.waitUntil(Conditions.shellIsActive("Confirm Remove"));
-        SWTBotShell shell = fBot.shell("Confirm Remove");
+        SWTBotShell shell = fBot.shell("Confirm Remove").activate();
         shell.bot().button("Yes").click();
         fBot.waitUntil(Conditions.shellCloses(shell));
 
@@ -575,8 +570,7 @@ public class ProjectExplorerTraceActionsTest {
 
         traceItem.contextMenu().menu("Rename...").click();
         final String RENAME_TRACE_DIALOG_TITLE = "Rename Trace";
-        fBot.waitUntil(Conditions.shellIsActive(RENAME_TRACE_DIALOG_TITLE));
-        SWTBotShell shell = fBot.shell(RENAME_TRACE_DIALOG_TITLE);
+        SWTBotShell shell = fBot.shell(RENAME_TRACE_DIALOG_TITLE).activate();
         SWTBotText text = shell.bot().textWithLabel("New Trace name:");
         text.setText(RENAMED_TRACE_NAME);
         shell.bot().button("OK").click();
@@ -609,8 +603,7 @@ public class ProjectExplorerTraceActionsTest {
     private static void createCopy(SWTBotTreeItem traceItem, boolean copyAsLink) {
         fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
         traceItem.contextMenu().menu("Copy...").click();
-        fBot.waitUntil(Conditions.shellIsActive(COPY_TRACE_DIALOG_TITLE));
-        SWTBotShell shell = fBot.shell(COPY_TRACE_DIALOG_TITLE);
+        SWTBotShell shell = fBot.shell(COPY_TRACE_DIALOG_TITLE).activate();
         SWTBotText text = shell.bot().textWithLabel("New Trace name:");
         text.setText(RENAMED_TRACE_NAME);
         if (!copyAsLink) {
@@ -624,8 +617,7 @@ public class ProjectExplorerTraceActionsTest {
     private static void createExperimentCopy(SWTBotTreeItem expItem, boolean deepCopy) {
         fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
         expItem.contextMenu().menu("Copy...").click();
-        fBot.waitUntil(Conditions.shellIsActive(COPY_EXPERIMENT_DIALOG_TITLE));
-        SWTBotShell shell = fBot.shell(COPY_EXPERIMENT_DIALOG_TITLE);
+        SWTBotShell shell = fBot.shell(COPY_EXPERIMENT_DIALOG_TITLE).activate();
         SWTBotText text = shell.bot().textWithLabel("New Experiment name:");
         text.setText(RENAMED_EXP_NAME);
         if (deepCopy) {

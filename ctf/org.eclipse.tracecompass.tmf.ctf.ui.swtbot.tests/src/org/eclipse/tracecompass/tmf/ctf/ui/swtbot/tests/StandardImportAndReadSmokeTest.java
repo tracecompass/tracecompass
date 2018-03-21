@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2017 Ericsson
+ * Copyright (c) 2014, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -647,8 +647,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         SWTBotTreeItem traceFilesProject = SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME);
         traceFilesProject.contextMenu("Export...").click();
 
-        fBot.waitUntil(Conditions.shellIsActive("Export"));
-        SWTBotShell activeShell = fBot.activeShell();
+        SWTBotShell activeShell = fBot.shell("Export").activate();
         SWTBotTree exportWizardsTree = fBot.tree();
         SWTBotTreeItem treeItem = SWTBotUtils.getTreeItem(fBot, exportWizardsTree, "General", "Archive File");
         treeItem.select();

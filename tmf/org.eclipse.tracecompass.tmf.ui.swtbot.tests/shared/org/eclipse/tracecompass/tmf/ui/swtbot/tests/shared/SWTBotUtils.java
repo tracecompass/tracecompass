@@ -304,13 +304,15 @@ public final class SWTBotUtils {
      * Focus on the main window
      *
      * @param shellBots
-     *            swtbotshells for all the shells
+     *            SWTBotShell for all the shells
+     * @return the main shell
      */
-    public static void focusMainWindow(SWTBotShell[] shellBots) {
+    public static SWTBotShell focusMainWindow(SWTBotShell[] shellBots) {
         SWTBotShell mainShell = getMainShell(shellBots);
         if (mainShell != null) {
             mainShell.activate();
         }
+        return mainShell;
     }
 
     private static SWTBotShell getMainShell(SWTBotShell[] shellBots) {
@@ -420,9 +422,7 @@ public final class SWTBotUtils {
             // There seems to be problems on some system where the main shell is
             // not in focus initially. This was seen using Xvfb and Xephyr on
             // some occasions.
-            focusMainWindow(bot.shells());
-
-            Shell shell = bot.activeShell().widget;
+            Shell shell = focusMainWindow(bot.shells()).widget;
 
             // Only adjust shell if it appears to be the top-most
             if (shell.getParent() == null) {
@@ -742,9 +742,7 @@ public final class SWTBotUtils {
         SWTBotTreeItem tracesFolder = selectTracesFolder(bot, projectName);
         tracesFolder.contextMenu().menu("Clear").click();
         String CONFIRM_CLEAR_DIALOG_TITLE = "Confirm Clear";
-        bot.waitUntil(Conditions.shellIsActive(CONFIRM_CLEAR_DIALOG_TITLE));
-
-        SWTBotShell shell = bot.shell(CONFIRM_CLEAR_DIALOG_TITLE);
+        SWTBotShell shell = bot.shell(CONFIRM_CLEAR_DIALOG_TITLE).activate();
         shell.bot().button("Yes").click();
         bot.waitUntil(Conditions.shellCloses(shell));
         bot.waitWhile(ConditionHelpers.treeItemHasChildren(tracesFolder));

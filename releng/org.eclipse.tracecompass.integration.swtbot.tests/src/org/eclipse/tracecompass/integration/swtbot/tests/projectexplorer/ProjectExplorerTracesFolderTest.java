@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2016, 2017 Ericsson
+ * Copyright (c) 2016, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -215,8 +215,7 @@ public class ProjectExplorerTracesFolderTest {
 
         SWTBotTreeItem traceFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
         traceFolder.contextMenu("Manage Custom Parsers...").click();
-        fBot.waitUntil(Conditions.shellIsActive(MANAGE_CUSTOM_PARSERS_SHELL_TITLE));
-        SWTBotShell shell = fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE);
+        SWTBotShell shell = fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).activate();
         SWTBot shellBot = shell.bot();
 
         // Make sure the custom text trace type is imported
@@ -1426,9 +1425,7 @@ public class ProjectExplorerTracesFolderTest {
         SWTBotTreeItem tracesFolderItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
         tracesFolderItem.contextMenu().menu("New Folder...").click();
         final String NEW_FOLDER_DIALOG_TITLE = "New Folder";
-        fBot.waitUntil(Conditions.shellIsActive(NEW_FOLDER_DIALOG_TITLE));
-        SWTBotShell shell = fBot.shell(NEW_FOLDER_DIALOG_TITLE);
-        shell.activate();
+        SWTBotShell shell = fBot.shell(NEW_FOLDER_DIALOG_TITLE).activate();
 
         SWTBotText text = shell.bot().textWithLabel("Folder name:");
         final String FOLDER_NAME = "aaa";
@@ -1455,9 +1452,7 @@ public class ProjectExplorerTracesFolderTest {
         final String NEW_FOLDER_NAME = "bbb";
         folderItem.contextMenu().menu("Rename...").click();
         final String RENAME_FOLDER_DIALOG_TITLE = "Rename Folder";
-        fBot.waitUntil(Conditions.shellIsActive(RENAME_FOLDER_DIALOG_TITLE));
-        shell = fBot.shell(RENAME_FOLDER_DIALOG_TITLE);
-        shell.activate();
+        shell = fBot.shell(RENAME_FOLDER_DIALOG_TITLE).activate();
         text = shell.bot().textWithLabel("New Folder name:");
         text.setText(NEW_FOLDER_NAME);
         shell.bot().button("OK").click();
@@ -1615,8 +1610,7 @@ public class ProjectExplorerTracesFolderTest {
         ImportConfirmation importConfirmation = confirmationSuplier.get();
         while (importConfirmation != null) {
             if (importConfirmation != ImportConfirmation.CONTINUE) {
-                fBot.waitUntil(Conditions.shellIsActive("Confirmation"));
-                SWTBotShell shell2 = fBot.activeShell();
+                SWTBotShell shell2 = fBot.shell("Confirmation").activate();
                 SWTBotButton button = shell2.bot().button(importConfirmation.getInName());
                 button.click();
             }
@@ -1645,17 +1639,14 @@ public class ProjectExplorerTracesFolderTest {
 
     private static SWTBotShell openTraceFoldersImport(SWTBotTreeItem traceItem) {
         traceItem.contextMenu().menu("Import...").click();
-        fBot.waitUntil(Conditions.shellIsActive("Trace Import"));
 
-        SWTBotShell shell = fBot.shell("Trace Import");
-        return shell;
+        return fBot.shell("Trace Import").activate();
     }
 
     private static SWTBotShell openWorkbenchMenuImport() {
         fBot.menu().menu("File", "Import...").click();
-        fBot.waitUntil(Conditions.shellIsActive("Import"));
 
-        SWTBot shellBot = fBot.shell("Import").bot();
+        SWTBot shellBot = fBot.shell("Import").activate().bot();
         SWTBotTree tree = shellBot.tree();
         SWTBotUtils.getTreeItem(fBot, tree, "Tracing", "Trace Import").select();
         shellBot.button("Next >").click();

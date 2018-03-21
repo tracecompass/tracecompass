@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -35,7 +35,6 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -153,8 +152,7 @@ public class TraceTypePreferencePageTest {
      */
     @Test
     public void testPreferencePage() {
-        openTraceTypePreferences();
-        SWTBot bot = fBot.activeShell().bot();
+        SWTBot bot = openTraceTypePreferences().bot();
         SWTBotTree treeBot = bot.tree(1);
         //get default count
         bot.button(CHECK_ALL).click();
@@ -303,8 +301,7 @@ public class TraceTypePreferencePageTest {
     }
 
     private static void setTraceTypePreferences(@NonNull String button, @NonNull String... pathToCheck) {
-        openTraceTypePreferences();
-        SWTBot bot = fBot.activeShell().bot();
+        SWTBot bot = openTraceTypePreferences().bot();
         SWTBotTree treeBot = bot.tree(1);
         if (!button.isEmpty()) {
             bot.button(button).click();
@@ -329,7 +326,7 @@ public class TraceTypePreferencePageTest {
         return menuItems;
     }
 
-    private static void openTraceTypePreferences() {
+    private static SWTBotShell openTraceTypePreferences() {
         SWTBotShell preferencesShell = SWTBotUtils.openPreferences(fBot);
         SWTBot bot = preferencesShell.bot();
         SWTBotTree tree = bot.tree(0);
@@ -339,14 +336,14 @@ public class TraceTypePreferencePageTest {
         bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable("Trace Types", treeNode));
         treeNode = treeNode.getNode("Trace Types");
         treeNode.select();
+        return preferencesShell;
     }
 
     private static String[] getTraceTypeComboItems() {
         SWTBotTreeItem tracesFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
         SWTBotMenu menu = tracesFolder.contextMenu().menu("Import...");
         menu.click();
-        fBot.waitUntil(Conditions.shellIsActive("Trace Import"));
-        SWTBot bot = fBot.activeShell().bot();
+        SWTBot bot = fBot.shell("Trace Import").activate().bot();
         SWTBotCombo combo = bot.comboBox(2);
         String[] items = combo.items();
         bot.button("Cancel").click();

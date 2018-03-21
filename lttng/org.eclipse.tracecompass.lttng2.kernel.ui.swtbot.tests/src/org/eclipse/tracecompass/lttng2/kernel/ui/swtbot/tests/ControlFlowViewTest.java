@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Ericsson and others
+ * Copyright (c) 2015, 2018 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -27,7 +27,6 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
 import org.eclipse.swtbot.swt.finder.keyboard.KeyboardFactory;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
-import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -275,8 +274,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         SWTBotView viewBot = getViewBot();
         SWTBotToolbarButton filterButton = viewBot.toolbarButton("Show View Filters");
         filterButton.click();
-        fBot.waitUntil(org.eclipse.swtbot.swt.finder.waits.Conditions.shellIsActive("Filter"));
-        SWTBot bot = fBot.activeShell().bot();
+        SWTBot bot = fBot.shell("Filter").activate().bot();
         SWTBotTree treeBot = bot.tree();
         // get how many items there are
         int checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
@@ -353,9 +351,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         timeGraphIsReadyCondition(range);
 
         getViewBot().viewMenu(DYNAMIC_FILTER_CONFIGURE_LABEL).click();
-        fBot.waitUntil(Conditions.shellIsActive(DYNAMIC_FILTERS_SHELL_TEXT));
-        SWTBotShell shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT);
-        shell.activate();
+        SWTBotShell shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT).activate();
 
         /* Make sure nothing is checked and radio buttons are disabled */
         SWTBotCheckBox activeThreadsCheckbox = shell.bot().checkBox(DYNAMIC_FILTERS_SHOW_ACTIVE_THREADS_ONLY_CHECKBOX);
@@ -449,9 +445,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
 
         /* Reopen the dialog */
         getViewBot().viewMenu(DYNAMIC_FILTER_CONFIGURE_LABEL).click();
-        fBot.waitUntil(Conditions.shellIsActive(DYNAMIC_FILTERS_SHELL_TEXT));
-        shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT);
-        shell.activate();
+        shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT).activate();
 
         /* Make sure nothing is checked and radio buttons are disabled */
         activeThreadsCheckbox = shell.bot().checkBox(DYNAMIC_FILTERS_SHOW_ACTIVE_THREADS_ONLY_CHECKBOX);
@@ -485,9 +479,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
 
         /* Open the dialog */
         getViewBot().viewMenu(DYNAMIC_FILTER_CONFIGURE_LABEL).click();
-        fBot.waitUntil(Conditions.shellIsActive(DYNAMIC_FILTERS_SHELL_TEXT));
-        shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT);
-        shell.activate();
+        shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT).activate();
 
         activeThreadsCheckbox = shell.bot().checkBox(DYNAMIC_FILTERS_SHOW_ACTIVE_THREADS_ONLY_CHECKBOX);
         onCpuRadio = shell.bot().radio(DYNAMIC_FILTERS_ON_CPU_RADIO);
@@ -523,9 +515,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         int originLength = traceEntry.getEntries().length;
 
         getViewBot().viewMenu(DYNAMIC_FILTER_CONFIGURE_LABEL).click();
-        fBot.waitUntil(Conditions.shellIsActive(DYNAMIC_FILTERS_SHELL_TEXT));
-        SWTBotShell shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT);
-        shell.activate();
+        SWTBotShell shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT).activate();
 
         /* Make sure nothing is checked and radio buttons are disabled */
         SWTBotCheckBox activeThreadsCheckbox = shell.bot().checkBox(DYNAMIC_FILTERS_SHOW_ACTIVE_THREADS_ONLY_CHECKBOX);
@@ -554,9 +544,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         assertTrue(originLength > traceEntry.getEntries().length);
 
         getViewBot().viewMenu(DYNAMIC_FILTER_CONFIGURE_LABEL).click();
-        fBot.waitUntil(Conditions.shellIsActive(DYNAMIC_FILTERS_SHELL_TEXT));
-        shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT);
-        shell.activate();
+        shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT).activate();
 
         activeThreadsCheckbox = shell.bot().checkBox(DYNAMIC_FILTERS_SHOW_ACTIVE_THREADS_ONLY_CHECKBOX);
         assertTrue(activeThreadsCheckbox.isChecked());

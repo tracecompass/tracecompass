@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -210,8 +210,7 @@ public class TestInvalidCtfTrace {
     public void testOpen() {
         SWTBotUtils.selectTracesFolder(fBot, PROJET_NAME);
         SWTBotUtils.openTrace(PROJET_NAME, fLocation.getAbsolutePath(), "org.eclipse.linuxtools.tmf.ui.type.ctf", false);
-        fBot.waitUntil(Conditions.shellIsActive("Open Trace"));
-        final SWTBotShell shell = fBot.activeShell();
+        final SWTBotShell shell = fBot.shell("Open Trace").activate();
         final SWTBot dialogBot = shell.bot();
         String text = dialogBot.label(1).getText();
         dialogBot.button().click();

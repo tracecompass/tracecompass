@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 École Polytechnique de Montréal
+ * Copyright (c) 2017, 2018 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -29,7 +29,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartType;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRange;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRangeMap;
-import org.eclipse.tracecompass.internal.tmf.chart.ui.dialog.Messages;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.format.ChartDecimalUnitFormat;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.format.ChartTimeStampFormat;
 import org.hamcrest.Description;
@@ -83,8 +82,7 @@ public final class SWTBotCustomChartUtils {
     }
 
     private static void ensureDialogFocus(SWTWorkbenchBot bot) {
-        bot.waitUntil(org.eclipse.swtbot.swt.finder.waits.Conditions.shellIsActive(Messages.ChartMakerDialog_Title));
-        bot.shell(Messages.ChartMakerDialog_Title).setFocus();
+        bot.shell("Custom chart creation").activate();
     }
 
     /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Ericsson and others
+ * Copyright (c) 2015, 2018 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -417,8 +417,7 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME), START_TIME);
         SWTBotToolbarButton filterButton = getViewBot().toolbarButton("Show View Filters");
         filterButton.click();
-        fBot.waitUntil(org.eclipse.swtbot.swt.finder.waits.Conditions.shellIsActive("Filter"));
-        SWTBot bot = fBot.activeShell().bot();
+        SWTBot bot = fBot.shell("Filter").activate().bot();
         SWTBotTree treeBot = bot.tree();
         // get how many items there are
         int checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);

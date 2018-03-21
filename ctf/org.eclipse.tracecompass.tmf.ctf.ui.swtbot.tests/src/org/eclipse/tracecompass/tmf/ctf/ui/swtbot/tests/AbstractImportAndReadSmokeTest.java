@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 Ericsson
+ * Copyright (c) 2014, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests;
 
 import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -118,7 +119,7 @@ public abstract class AbstractImportAndReadSmokeTest {
         SWTBotUtils.focusMainWindow(fBot.shells());
         fBot.menu("File").menu("New").menu("Project...").click();
 
-        fBot.shell("New Project").setFocus();
+        fBot.shell("New Project").activate();
         SWTBotTree tree = fBot.tree();
         assertNotNull(tree);
         final String tracingKey = "Tracing";
@@ -137,7 +138,7 @@ public abstract class AbstractImportAndReadSmokeTest {
         SWTBotButton nextButton = fBot.button("Next >");
         fBot.waitUntil(Conditions.widgetIsEnabled(nextButton));
         nextButton.click();
-        fBot.shell("Tracing Project").setFocus();
+        fBot.shell("Tracing Project").activate();
 
         final SWTBotText text = fBot.text();
         text.setText(traceProjectName);
@@ -167,13 +168,11 @@ public abstract class AbstractImportAndReadSmokeTest {
         final SWTBotButton finishButton = fBot.button("Finish");
         finishButton.click();
         if (confirmationMode == ImportConfirmation.RENAME_ALL) {
-            fBot.waitUntil(Conditions.shellIsActive("Confirmation"));
-            SWTBotShell shell2 = fBot.activeShell();
+            SWTBotShell shell2 = fBot.shell("Confirmation").activate();
             SWTBotButton button = shell2.bot().button("Rename All");
             button.click();
         } else if (confirmationMode == ImportConfirmation.OVERWRITE_ALL) {
-            fBot.waitUntil(Conditions.shellIsActive("Confirmation"));
-            SWTBotShell shell2 = fBot.activeShell();
+            SWTBotShell shell2 = fBot.shell("Confirmation").activate();
             SWTBotButton button = shell2.bot().button("Overwrite All");
             button.click();
         }
