@@ -1762,8 +1762,13 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                             long selectionEndTime = ctx == null ? SWT.DEFAULT : ctx.getSelectionRange().getEndTime().toNanos();
                             long startTime = ctx == null ? SWT.DEFAULT : ctx.getWindowRange().getStartTime().toNanos();
                             long endTime = ctx == null ? SWT.DEFAULT : ctx.getWindowRange().getEndTime().toNanos();
-                            startTime = (fStartTime == Long.MAX_VALUE ? SWT.DEFAULT : Math.max(startTime, fStartTime));
-                            endTime = (fEndTime == Long.MIN_VALUE ? SWT.DEFAULT : Math.min(endTime, fEndTime));
+                            if (fStartTime > fEndTime) {
+                                startTime = SWT.DEFAULT;
+                                endTime = SWT.DEFAULT;
+                            } else {
+                                startTime = Math.min(Math.max(startTime, fStartTime), fEndTime);
+                                endTime = Math.min(Math.max(endTime, fStartTime), fEndTime);
+                            }
                             fTimeGraphViewer.setSelectionRange(selectionBeginTime, selectionEndTime, false);
                             fTimeGraphViewer.setStartFinishTime(startTime, endTime);
 
