@@ -12,7 +12,6 @@ package org.eclipse.tracecompass.analysis.os.linux.core.cpuusage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,8 +21,8 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
+import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelThreadInformationProvider;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.Messages;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCpuQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
@@ -31,15 +30,11 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.AbstractT
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
-import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 
 /**
@@ -72,13 +67,12 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
     public static final int TOTAL_SERIES_TID = -2;
 
     /* A map that caches the mapping of a thread ID to its executable name */
-    private final Map<String, String> fProcessNameMap = new HashMap<>();
+    private final Map<Integer, String> fProcessNameMap = new HashMap<>();
 
     /**
-     * {@link KernelAnalysisModule}'s {@link ITmfStateSystem} used to retrieve
-     * Process names from their PIDs.
+     * {@link KernelAnalysisModule} used to retrieve Process names from their TIDs.
      */
-    private @Nullable ITmfStateSystem fKernelSs;
+    private final KernelAnalysisModule fKernelAnalysisModule;
 
     /**
      * Create an instance of {@link CpuUsageDataProvider}. Returns a null instance
@@ -91,9 +85,11 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
      */
     public static @Nullable CpuUsageDataProvider create(ITmfTrace trace) {
         KernelCpuUsageAnalysis module = TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelCpuUsageAnalysis.class, KernelCpuUsageAnalysis.ID);
-        if (module != null) {
+        KernelAnalysisModule kernelAnalysisModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelAnalysisModule.class, KernelAnalysisModule.ID);
+        if (module != null && kernelAnalysisModule != null) {
             module.schedule();
-            return new CpuUsageDataProvider(trace, module);
+            kernelAnalysisModule.schedule();
+            return new CpuUsageDataProvider(trace, module, kernelAnalysisModule);
         }
         return null;
     }
@@ -101,8 +97,9 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
     /**
      * Constructor
      */
-    private CpuUsageDataProvider(ITmfTrace trace, KernelCpuUsageAnalysis module) {
+    private CpuUsageDataProvider(ITmfTrace trace, KernelCpuUsageAnalysis module, KernelAnalysisModule kernelAnalysisModule) {
         super(trace, module);
+        fKernelAnalysisModule = kernelAnalysisModule;
     }
 
     /**
@@ -195,13 +192,7 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
         SelectedCpuQueryFilter cpuQueryFilter = (SelectedCpuQueryFilter) filter;
         long end = filter.getEnd();
 
-        ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystem(getTrace(), KernelAnalysisModule.ID);
-        if (kernelSs == null) {
-            // let the abstract class handle the error.
-            throw new StateSystemDisposedException();
-        }
         List<CpuUsageEntryModel> entryList = new ArrayList<>();
-
         Map<String, Long> cpuUsageMap = getAnalysisModule().getCpuUsageInRange(cpuQueryFilter.getSelectedCpus(), filter.getStart(), end);
 
         long totalTime = cpuUsageMap.getOrDefault(KernelCpuUsageAnalysis.TOTAL, 0l);
@@ -222,7 +213,7 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
             if (strings.length > 1) {
                 int tid = Integer.parseInt(strings[1]);
                 if (tid != 0) {
-                    entryList.add(new CpuUsageEntryModel(getId(tid), totalId, getProcessName(strings[1], filter.getStart()), tid, entry.getValue()));
+                    entryList.add(new CpuUsageEntryModel(getId(tid), totalId, getProcessName(tid, strings[1]), tid, entry.getValue()));
                 }
             }
         }
@@ -233,39 +224,21 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
      * Get the process name from its TID by using the LTTng kernel analysis
      * module
      */
-    private String getProcessName(String tid, long start) {
+    private String getProcessName(int tid, String defaultTidName) {
+        // try and get from cache
         String execName = fProcessNameMap.get(tid);
         if (execName != null) {
             return execName;
         }
 
-        ITmfStateSystem kernelSs = fKernelSs;
-        if (kernelSs == null) {
-            kernelSs = TmfStateSystemAnalysisModule.getStateSystem(getTrace(), KernelAnalysisModule.ID);
-        }
-        if (kernelSs == null) {
-            return tid;
-        }
-        fKernelSs = kernelSs;
-
-        /* Retrieve the quark for process tid's execName */
-        int execNameQuark = kernelSs.optQuarkAbsolute(Attributes.THREADS, tid, Attributes.EXEC_NAME);
-        if (execNameQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
-            /*
-             * No information on this thread (yet?), skip it for now
-             */
-            return tid;
-        }
-
-        /* Find a name in this attribute's intervals */
-        Iterator<ITmfStateInterval> iterator = new StateSystemUtils.QuarkIterator(kernelSs, execNameQuark, start);
-        Iterator<String> names = Iterators.filter(Iterators.transform(iterator, ITmfStateInterval::getValue), String.class);
-        if (names.hasNext()) {
-            execName = names.next();
+        execName = KernelThreadInformationProvider.getExecutableName(fKernelAnalysisModule, tid);
+        ITmfStateSystem ss = fKernelAnalysisModule.getStateSystem();
+        if (ss != null && ss.waitUntilBuilt(0) && execName != null) {
+            // cache only if non null and state system analysis completed
             fProcessNameMap.put(tid, execName);
             return execName;
         }
-        return tid;
+        return defaultTidName;
     }
 
     /**
