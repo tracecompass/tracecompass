@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 École Polytechnique de Montréal
+ * Copyright (c) 2013, 2018 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -123,17 +123,18 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                 final TmfExperimentElement exp = uiexperiment.get(0);
 
                 for (int i = 0; i < tl.size(); i++) {
-                    ITmfTrace trace = tl.get(i).instantiateTrace();
-                    ITmfEvent traceEvent = tl.get(i).instantiateEvent();
+                    TmfTraceElement traceElement = tl.get(i).getElementUnderTraceFolder();
+                    ITmfTrace trace = traceElement.instantiateTrace();
+                    ITmfEvent traceEvent = traceElement.instantiateEvent();
                     if (trace == null) {
-                        TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title, Messages.SynchronizeTracesHandler_WrongType + tl.get(i).getName());
+                        TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title, Messages.SynchronizeTracesHandler_WrongType + traceElement.getName());
                         for (int j = 0; j < i; j++) {
                             traces[j].dispose();
                         }
                         return;
                     }
                     try {
-                        trace.initTrace(tl.get(i).getResource(), tl.get(i).getResource().getLocation().toOSString(), traceEvent.getClass());
+                        trace.initTrace(traceElement.getResource(), traceElement.getResource().getLocation().toOSString(), traceEvent.getClass());
                         TmfTraceManager.refreshSupplementaryFiles(trace);
                     } catch (TmfTraceException e) {
                         TraceUtils.displayErrorMsg(Messages.SynchronizeTracesHandler_Title, Messages.SynchronizeTracesHandler_InitError + CR + CR + e);
@@ -143,7 +144,7 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                         }
                         return;
                     }
-                    if (tl.get(i).getElementPath().equals(fRootNode.getElementPath())) {
+                    if (traceElement.getElementPath().equals(fRootNode.getElementPath())) {
                         fRootNodeId = trace.getHostId();
                     }
                     traces[i] = trace;
@@ -174,21 +175,21 @@ public class SynchronizeTracesHandler extends AbstractHandler {
                          * a new state system will be generated with sync time.
                          */
                         for (TmfTraceElement traceel : tl) {
+                            /* Find the original trace */
+                            TmfTraceElement origtrace = traceel.getElementUnderTraceFolder();
+
                             /*
                              * Find the trace corresponding to this element in
                              * the experiment
                              */
                             ITmfTrace expTrace = null;
                             for (ITmfTrace t : experiment.getTraces()) {
-                                if (t.getResource().equals(traceel.getResource())) {
+                                if (t.getResource().equals(origtrace.getResource())) {
                                     expTrace = t;
                                     break;
                                 }
                             }
                             if ((expTrace != null) && syncAlgo.isTraceSynced(expTrace.getHostId())) {
-                                /* Find the original trace */
-                                TmfTraceElement origtrace = traceel.getElementUnderTraceFolder();
-
                                 /*
                                  * Make sure a trace with the new name does not
                                  * exist
