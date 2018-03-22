@@ -80,9 +80,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
     private final List<RGB> fColors = new ArrayList<>();
 
     private static StateItem createState(LinuxStyle style) {
-        int rgbInt = (int) style.toMap().getOrDefault(ITimeEventStyleStrings.fillColor(), 0);
-        RGB color = new RGB(rgbInt >> 24 & 0xff, rgbInt >> 16 & 0xff, rgbInt >> 8 & 0xff);
-        return new StateItem(color, style.getLabel());
+        return new StateItem(style.toMap());
     }
 
     static {

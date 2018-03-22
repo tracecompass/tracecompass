@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.registry;
 
 import java.util.Map;
 
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 
 import com.google.common.collect.ImmutableMap;
@@ -111,7 +112,7 @@ public enum LinuxStyle {
         }
         fMap = ImmutableMap.of(ITimeEventStyleStrings.label(), label,
                 ITimeEventStyleStrings.fillStyle(), ITimeEventStyleStrings.solidColorFillStyle(),
-                ITimeEventStyleStrings.fillColor(), red << 24 | green << 16 | blue << 8 | alpha,
+                ITimeEventStyleStrings.fillColor(), new RGBAColor(red, green, blue, alpha).toInt(),
                 ITimeEventStyleStrings.heightFactor(), heightFactor);
     }
 
