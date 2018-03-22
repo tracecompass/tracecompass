@@ -36,7 +36,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDat
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IXYPresentationProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RGBColor;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.XYPresentationProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
@@ -430,7 +430,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             IYAppearance appearance = getSeriesAppearance(seriesName);
 
             String type = appearance.getType();
-            RGBColor rgb = appearance.getColor();
+            RGBAColor rgb = appearance.getColor();
             Color color = new Color(Display.getDefault(), rgb.getRed(), rgb.getGreen(), rgb.getBlue());
 
             if (type.equals(IYAppearance.Type.BAR)) {

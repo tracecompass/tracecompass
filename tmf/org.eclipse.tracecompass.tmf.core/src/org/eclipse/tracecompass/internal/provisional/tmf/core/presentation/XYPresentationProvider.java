@@ -40,7 +40,7 @@ public class XYPresentationProvider implements IXYPresentationProvider {
             YAppearance.Type.SCATTER);
 
     /* Gets the default palette for available colors for XY series */
-    private static final List<RGBColor> COLOR_PALETTE = ColorPalette.getDefaultPalette();
+    private static final List<RGBAColor> COLOR_PALETTE = ColorPalette.getDefaultPalette();
 
     /* This map a series name and an IYAppearance */
     private final Map<String, IYAppearance> fYAppearances = new HashMap<>();
@@ -67,7 +67,7 @@ public class XYPresentationProvider implements IXYPresentationProvider {
     }
 
     private IYAppearance createAppearance(String seriesName, String seriesType, int width) {
-        RGBColor color = generateColor();
+        RGBAColor color = generateColor();
         String style = generateStyle(seriesType);
         return new YAppearance(seriesName, seriesType, style, color, width);
     }
@@ -78,7 +78,7 @@ public class XYPresentationProvider implements IXYPresentationProvider {
      *
      * @return An instance of {@link RGB} that represent the color
      */
-    private RGBColor generateColor() {
+    private RGBAColor generateColor() {
         return Iterables.get(COLOR_PALETTE, fYAppearances.keySet().size() % COLOR_PALETTE.size());
     }
 

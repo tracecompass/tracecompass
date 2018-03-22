@@ -121,7 +121,7 @@ public interface IYAppearance {
      *
      * @return the color of the Y serie
      */
-    RGBColor getColor();
+    RGBAColor getColor();
 
     /**
      * Gets Y serie type. Serie type define the type of chart : Bar, Line, Scatter,

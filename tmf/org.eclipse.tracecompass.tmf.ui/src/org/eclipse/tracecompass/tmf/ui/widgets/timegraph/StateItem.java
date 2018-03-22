@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 
 import com.google.common.collect.ImmutableMap;
@@ -82,7 +83,7 @@ public class StateItem {
      *            A state string
      */
     public StateItem(RGB stateColor, String stateString) {
-        int stateColorInt = stateColor.red << 24 | stateColor.green << 16 | stateColor.blue << 8 | 0xff;
+        int stateColorInt = new RGBAColor(stateColor.red, stateColor.green, stateColor.blue).toInt();
         Map<String, Object> styleMap = new HashMap<>();
         styleMap.put(ITimeEventStyleStrings.fillStyle(), ITimeEventStyleStrings.solidColorFillStyle());
         styleMap.put(ITimeEventStyleStrings.fillColor(), stateColorInt);
@@ -112,7 +113,7 @@ public class StateItem {
      */
     public void setStateColor(RGB stateColor) {
         if (stateColor != null) {
-            int rbgVal = stateColor.red << 24 | stateColor.green << 16 | stateColor.blue << 8 | 0xff;
+            int rbgVal = new RGBAColor(stateColor.red, stateColor.green, stateColor.blue).toInt();
             fStyleMap.put(ITimeEventStyleStrings.fillColor(), rbgVal);
         }
     }

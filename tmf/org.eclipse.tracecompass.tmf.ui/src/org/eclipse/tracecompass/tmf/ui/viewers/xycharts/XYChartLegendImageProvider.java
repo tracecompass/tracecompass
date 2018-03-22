@@ -18,7 +18,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RGBColor;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.ui.viewers.ILegendImageProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.swtchart.LineStyle;
@@ -54,7 +54,7 @@ public class XYChartLegendImageProvider implements ILegendImageProvider {
          * still be created.
          */
         IYAppearance appearance = fChartViewer.getSeriesAppearance(name);
-        RGBColor rgb = appearance.getColor();
+        RGBAColor rgb = appearance.getColor();
         Color lineColor = new Color(Display.getDefault(), rgb.getRed(), rgb.getGreen(), rgb.getBlue());
         Color background = Display.getDefault().getSystemColor(SWT.COLOR_WHITE);
 

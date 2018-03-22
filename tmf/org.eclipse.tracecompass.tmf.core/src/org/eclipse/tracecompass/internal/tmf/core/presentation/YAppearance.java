@@ -10,7 +10,7 @@
 package org.eclipse.tracecompass.internal.tmf.core.presentation;
 
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RGBColor;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RGBAColor;
 
 /**
  * This is a base implementation of {@link IYAppearance}
@@ -23,7 +23,7 @@ public class YAppearance implements IYAppearance {
     private final String fName;
     private final String fStyle;
     private final String fType;
-    private final RGBColor fColor;
+    private final RGBAColor fColor;
     private final int fWidth;
 
     /**
@@ -40,7 +40,7 @@ public class YAppearance implements IYAppearance {
      * @param width
      *            The Y series width
      */
-    public YAppearance(String name, String type, String style, RGBColor color, int width) {
+    public YAppearance(String name, String type, String style, RGBAColor color, int width) {
         fName = name;
         fStyle = style;
         fType = type;
@@ -59,7 +59,7 @@ public class YAppearance implements IYAppearance {
     }
 
     @Override
-    public RGBColor getColor() {
+    public RGBAColor getColor() {
         return fColor;
     }
 
