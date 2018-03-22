@@ -13,6 +13,13 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IPropertyCollection;
+
 /**
  * Interface for time events, for use in the timegraph view
  *
@@ -20,7 +27,7 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
  * @author Alvaro Sanchez-Leon
  * @author Patrick Tasse
  */
-public interface ITimeEvent {
+public interface ITimeEvent extends IPropertyCollection, IElementResolver {
 
     /**
      * Get the entry matching this time event.
@@ -68,4 +75,18 @@ public interface ITimeEvent {
      * @return The part after the split time
      */
     ITimeEvent splitAfter(long splitTime);
+
+    /**
+     * @since 4.0
+     */
+    @Override
+    default @NonNull Map<@NonNull String, @NonNull String> computeData() {
+        Map<@NonNull String, @NonNull String> data = new HashMap<>();
+        String entryName = getEntry().getName();
+        if (entryName != null) {
+            data.put(IElementResolver.ENTRY_NAME_KEY, entryName);
+        }
+
+        return data;
+    }
 }

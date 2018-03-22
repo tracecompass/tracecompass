@@ -2897,4 +2897,46 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
         layout.marginRight = Math.max(0, marginSize);
         fTimeAlignedComposite.layout();
     }
+
+    /**
+     * set whether a filtering on time events is active or not
+     *
+     * @param isFilterApplied
+     *            The time events filtering status
+     * @since 4.0
+     */
+    public void setTimeEventFilterApplied(boolean isFilterApplied) {
+        getTimeGraphControl().setFilterActive(isFilterApplied);
+    }
+
+    /**
+     * Get the time event filtering status of the timegraph
+     *
+     * @return True whether the view has time event filters, false otherwise
+     * @since 4.0
+     */
+    public boolean isTimeEventFilterActive() {
+        return getTimeGraphControl().isFilterActive();
+    }
+
+    /**
+     * Set whether filters have been saved or not.
+     *
+     * @param hasSavedFilter
+     *            The saved filter status
+     * @since 4.0
+     */
+    public void setSavedFilterStatus(boolean hasSavedFilter) {
+        getTimeGraphControl().setSavedFilterStatus(hasSavedFilter);
+    }
+
+    /**
+     * Tells whether the timegraph has saved filters or not
+     *
+     * @return True whether there is saved filters, false otherwise
+     * @since 4.0
+     */
+    public boolean hasSavedFilters() {
+        return getTimeGraphControl().hasSavedFilters();
+    }
 }

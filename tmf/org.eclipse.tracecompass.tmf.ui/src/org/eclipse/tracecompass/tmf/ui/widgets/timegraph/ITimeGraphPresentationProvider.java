@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
@@ -277,4 +278,16 @@ public interface ITimeGraphPresentationProvider {
      * @since 4.0
      */
     void removeColorListener(ITimeGraphColorListener listener);
+
+    /**
+     * Get input data used for filtering
+     *
+     * @param event
+     *            The ongoing time event
+     * @return The map of input data
+     * @since 4.0
+     */
+    default @NonNull Map<String, String> getFilterInput(ITimeEvent event) {
+        return new HashMap<>();
+    }
 }

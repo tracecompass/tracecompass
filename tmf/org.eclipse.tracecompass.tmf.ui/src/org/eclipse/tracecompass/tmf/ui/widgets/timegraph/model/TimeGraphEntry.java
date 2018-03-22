@@ -463,4 +463,13 @@ public class TimeGraphEntry implements ITimeGraphEntry {
         fModel = model;
     }
 
+    /**
+     * Tells whether there is actual zoomed event or not
+     *
+     * @return True if there is actual new zoomedEvents, false otherwise
+     * @since 4.0
+     */
+    public boolean hasZoomedEvents() {
+        return !fZoomedEventList.isEmpty();
+    }
 }

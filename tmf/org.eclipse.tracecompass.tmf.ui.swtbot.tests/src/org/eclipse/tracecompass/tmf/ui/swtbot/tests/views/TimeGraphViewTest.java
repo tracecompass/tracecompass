@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -25,20 +26,25 @@ import java.util.stream.StreamSupport;
 import org.apache.log4j.Logger;
 import org.apache.log4j.varia.NullAppender;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
+import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
+import org.eclipse.swtbot.swt.finder.results.IntResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.presentation.IPaletteProvider;
@@ -60,6 +66,8 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ImageHelper;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.ui.IWorkbenchPart;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -535,6 +543,84 @@ public class TimeGraphViewTest {
         for (RGB rgb : rgbs) {
             assertTrue(rgb.toString(), histogram.count(rgb) > 0);
         }
+    }
+
+    /**
+     * Integration test for the time event filtering dialog
+     */
+    @Test
+    public void testTimegraphEventFiltering() {
+        SWTWorkbenchBot bot = new SWTWorkbenchBot();
+        resetTimeRange(bot);
+
+        SWTBot viewBot = fViewBot.bot();
+        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(viewBot);
+        assertTrue("timegraph visible", timegraph.isVisible());
+        timegraph.setFocus();
+
+        Rectangle bounds = fBounds;
+
+        ImageHelper ref = ImageHelper.grabImage(bounds);
+
+        timegraph.setFocus();
+        //Press '/' to open the filter dialog
+        timegraph.pressShortcut(KeyStroke.getInstance('/'));
+
+        SWTBotShell dialogShell = viewBot.shell("Time Event Filter").activate();
+        SWTBot shellBot = dialogShell.bot();
+        SWTBotText text = shellBot.text();
+        text.setText("Hat1");
+        bot.waitWhile(fTimeGraphIsDirty);
+
+        timegraph.setFocus();
+        ImageHelper filtered = ImageHelper.waitForNewImage(bounds, ref);
+        ImageHelper delta = ref.diff(filtered);
+
+        Set<RGB> changedValues = getTop5ColorSet(delta);
+        Set<Float> changedHues = new HashSet<>();
+        for(RGB color : changedValues) {
+            changedHues.add(color.getHSB()[0]);
+        }
+
+        RGB desiredColor = new RGB(255, 255, 161);
+        Float desiredHue = desiredColor.getHSB()[0];
+        if(desiredHue > 360.0f) {
+            desiredHue = (float) (desiredHue % 360.0f);
+        }
+
+        assertTrue("Color diff do not match the expected one, " +
+                Multisets.copyHighestCountFirst(delta.getHistogram()).entrySet(), changedHues.contains(desiredHue));
+
+        int count = getVisibleItems(timegraph);
+
+        dialogShell = viewBot.shell("Time Event Filter").activate();
+        shellBot = dialogShell.bot();
+        text = shellBot.text();
+        text.setFocus();
+        SWTBotUtils.pressShortcut(text, Keystrokes.CR);
+
+        bot.waitWhile(fTimeGraphIsDirty);
+        int newCount = getVisibleItems(timegraph);
+        assertTrue("Fewer entries should be visible here. Current value is " + + newCount + " previous was " + count, newCount < count);
+
+    }
+
+    private static int getVisibleItems(SWTBotTimeGraph timegraph) {
+        return UIThreadRunnable.syncExec(Display.getDefault(), new IntResult() {
+            @Override
+            public Integer run() {
+                int count = 0;
+                TimeGraphControl control = timegraph.widget;
+                ITimeGraphEntry[] expandedElements = control.getExpandedElements();
+                for (ITimeGraphEntry entry : expandedElements) {
+                    Rectangle itemBounds = control.getItemBounds(entry);
+                    if (itemBounds.height > 0) {
+                        count++;
+                    }
+                }
+                return count;
+            }
+        });
     }
 
     /**

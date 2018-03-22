@@ -41,6 +41,11 @@ public class Messages extends NLS {
     public static String AbstractTimeGraphView_ExportImageActionText;
     /** @since 3.3*/
     public static String AbstractTimeGraphView_ExportImageToolTipText;
+
+    /**
+     * @since 4.0
+     */
+    public static String AbstractTimeGraphView_TimeEventFilterDialogTitle;
     public static String TimeGraphPresentationProvider_multipleStates;
     static {
         // initialize resource bundle

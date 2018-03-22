@@ -21,17 +21,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.TimeEventFilterDialog;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
@@ -147,6 +153,14 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             if (end < start) {
                 return;
             }
+
+            TimeEventFilterDialog timeEventFilterDialog = getTimeEventFilterDialog();
+            boolean isFilterActive = timeEventFilterDialog != null && timeEventFilterDialog.isFilterActive();
+            getTimeGraphViewer().setTimeEventFilterApplied(isFilterActive);
+
+            boolean hasSavedFilter = timeEventFilterDialog != null && timeEventFilterDialog.hasActiveSavedFilters();
+            getTimeGraphViewer().setSavedFilterStatus(hasSavedFilter);
+
             if (fullRange) {
                 redraw();
             }
@@ -154,9 +168,11 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                 @Override
                 public void handle(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) {
                     try (TraceCompassLogUtils.ScopeLog scope = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStates");) { //$NON-NLS-1$
-                        if (!fullRange) {
+                        if (!fullRange || isFilterActive) {
                             for (TimeGraphEntry entry : entryList) {
-                                zoom(checkNotNull(entry), ss, fullStates, prevFullState, monitor);
+                                if (!monitor.isCanceled()) {
+                                    zoom(checkNotNull(entry), ss, fullStates, prevFullState, monitor);
+                                }
                             }
                         }
                     }
@@ -175,22 +191,30 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
 
         private void zoom(@NonNull TimeGraphEntry entry, ITmfStateSystem ss, @NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState, @NonNull IProgressMonitor monitor) {
             List<ITimeEvent> eventList = getEventList(entry, ss, fullStates, prevFullState, monitor);
-            if (eventList != null) {
-                applyResults(() -> {
-                    for (ITimeEvent event : eventList) {
-                        if (monitor.isCanceled()) {
-                            return;
+
+            try {
+                @NonNull Map<@NonNull String, @NonNull BiPredicate<@NonNull IElementResolver, @NonNull Function<@NonNull IElementResolver, @NonNull Map<@NonNull String, @NonNull String>>>> predicates = computeRegexPredicate();
+
+                if (eventList != null) {
+                    doFilterEvents(entry, eventList, predicates);
+                    applyResults(() -> {
+                        for (ITimeEvent event : eventList) {
+                            if (monitor.isCanceled()) {
+                                return;
+                            }
+                            entry.addZoomedEvent(event);
                         }
-                        entry.addZoomedEvent(event);
-                    }
-                });
-            }
-            for (TimeGraphEntry child : entry.getChildren()) {
-                if (monitor.isCanceled()) {
-                    TraceCompassLogUtils.traceInstant(LOGGER, Level.FINE, "TimeGraphView:ZoomThreadCanceled"); //$NON-NLS-1$
-                    return;
+                    });
                 }
-                zoom(child, ss, fullStates, prevFullState, monitor);
+                for (TimeGraphEntry child : entry.getChildren()) {
+                    if (monitor.isCanceled()) {
+                        TraceCompassLogUtils.traceInstant(LOGGER, Level.FINE, "TimeGraphView:ZoomThreadCanceled"); //$NON-NLS-1$
+                        return;
+                    }
+                    zoom(child, ss, fullStates, prevFullState, monitor);
+                }
+            } catch (PatternSyntaxException e) {
+                Activator.getDefault().logInfo("Invalid regex"); //$NON-NLS-1$
             }
         }
 

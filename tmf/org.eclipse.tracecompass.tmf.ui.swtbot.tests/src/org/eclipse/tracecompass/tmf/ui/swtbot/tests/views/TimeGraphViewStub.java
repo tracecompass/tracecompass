@@ -151,7 +151,11 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
 
     @Override
     protected StubPresentationProvider getPresentationProvider() {
-        return fPresentationProvider;
+        StubPresentationProvider presentationProvider = fPresentationProvider;
+        if (presentationProvider == null && (super.getPresentationProvider() instanceof StubPresentationProvider)) {
+            return (StubPresentationProvider) super.getPresentationProvider();
+        }
+        return presentationProvider;
     }
 
     /**

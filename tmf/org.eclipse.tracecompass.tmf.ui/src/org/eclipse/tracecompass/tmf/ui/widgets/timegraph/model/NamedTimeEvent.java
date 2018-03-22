@@ -9,9 +9,11 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
+import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 
 /**
  * {@link TimeEvent} with a label.
@@ -49,6 +51,16 @@ public class NamedTimeEvent extends TimeEvent {
      */
     public @NonNull String getLabel() {
         return fLabel;
+    }
+
+    /**
+     * @since 4.0
+     */
+    @Override
+    public @NonNull Map<@NonNull String, @NonNull String> computeData() {
+        Map<@NonNull String, @NonNull String> data = super.computeData();
+        data.put(IElementResolver.LABEL_KEY, getLabel());
+        return data;
     }
 
     @Override

@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 
 /**
  * <p>
@@ -190,5 +191,16 @@ public interface ITimeEventStyleStrings {
      */
     static String linkType() {
         return ".type.link"; //$NON-NLS-1$
+    }
+
+    /**
+     * The event is annotated. When this is set,
+     * {@link ITimeGraphPresentationProvider#postDrawEvent} will not be called
+     *
+     * @return the key to get the annotated value
+     * @since 4.0
+     */
+    static String annotated() {
+        return ".annotated"; //$NON-NLS-1$
     }
 }

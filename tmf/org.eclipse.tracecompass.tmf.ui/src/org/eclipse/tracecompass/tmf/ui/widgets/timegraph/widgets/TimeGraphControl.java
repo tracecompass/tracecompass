@@ -23,6 +23,7 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -77,7 +78,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -89,7 +90,10 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.internal.tmf.ui.util.LineClipper;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
+import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
@@ -110,6 +114,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
 import com.google.common.collect.Iterables;
 
@@ -170,6 +175,13 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private static final String PREFERRED_WIDTH = "width"; //$NON-NLS-1$
 
     private static final ColorRegistry COLOR_REGISTRY = new ColorRegistry();
+
+    /**
+     * The alpha color component value for dimmed events
+     *
+     * @since 4.0
+     */
+    private static final int DIMMED_ALPHA_COEFFICIENT = 4;
 
     /** Resource manager */
     private LocalResourceManager fResourceManager = new LocalResourceManager(JFaceResources.getResources());
@@ -235,6 +247,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private int fLastTransparentX = -1;
 
     private boolean fFirstHeightWarning = true;
+
+    private boolean fFilterActive;
+    private boolean fHasSavedFilters;
+
     /**
      * Standard constructor
      *
@@ -349,8 +365,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Assign the status line manager
      *
      * @param statusLineManager
-     *            The status line manager, or null to disable status line
-     *            messages
+     *            The status line manager, or null to disable status line messages
      */
     public void setStatusLineManager(IStatusLineManager statusLineManager) {
         if (fStatusLineManager != null && statusLineManager == null) {
@@ -371,9 +386,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Returns the tree control associated with this time graph control. The
-     * tree is only used for column handling of the name space and contains no
-     * tree items.
+     * Returns the tree control associated with this time graph control. The tree is
+     * only used for column handling of the name space and contains no tree items.
      *
      * @return the tree control
      * @since 2.3
@@ -638,8 +652,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Set the top index so that the requested element is at the specified
-     * position.
+     * Set the top index so that the requested element is at the specified position.
      *
      * @param entry
      *            the time graph entry to be positioned
@@ -668,12 +681,11 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Sets the auto-expand level to be used for new entries discovered when
-     * calling {@link #refreshData()} or {@link #refreshData(ITimeGraphEntry[])}
-     * . The value 0 means that there is no auto-expand; 1 means that top-level
-     * entries are expanded, but not their children; 2 means that top-level
-     * entries are expanded, and their children, but not grand-children; and so
-     * on.
+     * Sets the auto-expand level to be used for new entries discovered when calling
+     * {@link #refreshData()} or {@link #refreshData(ITimeGraphEntry[])} . The value
+     * 0 means that there is no auto-expand; 1 means that top-level entries are
+     * expanded, but not their children; 2 means that top-level entries are
+     * expanded, and their children, but not grand-children; and so on.
      * <p>
      * The value {@link #ALL_LEVELS} means that all subtrees should be expanded.
      * </p>
@@ -689,8 +701,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
     /**
      * Returns the auto-expand level.
      *
-     * @return non-negative level, or <code>ALL_LEVELS</code> if all levels of
-     *         the tree are expanded automatically
+     * @return non-negative level, or <code>ALL_LEVELS</code> if all levels of the
+     *         tree are expanded automatically
      * @see #setAutoExpandLevel
      */
     public int getAutoExpandLevel() {
@@ -748,8 +760,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Set the expanded state of a given entry to certain relative level. It
-     * will call fireTreeEvent() for each changed entry. At the end it will call
+     * Set the expanded state of a given entry to certain relative level. It will
+     * call fireTreeEvent() for each changed entry. At the end it will call
      * redraw().
      *
      * @param entry
@@ -765,8 +777,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Set the expanded state of a given entry and its children to the first
-     * level that has one collapsed entry.
+     * Set the expanded state of a given entry and its children to the first level
+     * that has one collapsed entry.
      *
      * @param entry
      *            The entry
@@ -821,8 +833,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Set the expanded state of a given entry to certain relative level. It
-     * will call fireTreeEvent() for each changed entry. No redraw is done.
+     * Set the expanded state of a given entry to certain relative level. It will
+     * call fireTreeEvent() for each changed entry. No redraw is done.
      *
      * @param entry
      *            The entry
@@ -1010,8 +1022,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Menu event callback on {@link ITimeGraphEntry}s
      *
      * @param event
-     *            The MenuDetectEvent, with field {@link TypedEvent#data} set to
-     *            the selected {@link ITimeGraphEntry}
+     *            The MenuDetectEvent, with field {@link TypedEvent#data} set to the
+     *            selected {@link ITimeGraphEntry}
      */
     private void fireMenuEventOnTimeGraphEntry(MenuDetectEvent event) {
         for (MenuDetectListener listener : fTimeGraphEntryMenuListeners) {
@@ -1047,8 +1059,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Menu event callback on {@link ITimeEvent}s
      *
      * @param event
-     *            The MenuDetectEvent, with field {@link TypedEvent#data} set to
-     *            the selected {@link ITimeEvent}
+     *            The MenuDetectEvent, with field {@link TypedEvent#data} set to the
+     *            selected {@link ITimeEvent}
      */
     private void fireMenuEventOnTimeEvent(MenuDetectEvent event) {
         for (MenuDetectListener listener : fTimeEventMenuListeners) {
@@ -1065,9 +1077,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Returns the current selection for this time graph. If a time graph entry
-     * is selected, it will be the first element in the selection. If a time
-     * event is selected, it will be the second element in the selection.
+     * Returns the current selection for this time graph. If a time graph entry is
+     * selected, it will be the first element in the selection. If a time event is
+     * selected, it will be the second element in the selection.
      *
      * @return the current selection
      */
@@ -1102,8 +1114,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Enable/disable one of the traces in the model
      *
      * @param n
-     *            1 to enable it, -1 to disable. The method returns immediately
-     *            if another value is used.
+     *            1 to enable it, -1 to disable. The method returns immediately if
+     *            another value is used.
      */
     public void selectTrace(int n) {
         if ((n != 1) && (n != -1)) {
@@ -1632,8 +1644,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *
      * @param pt
      *            a point in the widget
-     * @return the {@link ITimeGraphEntry} at this point, or <code>null</code>
-     *         if none.
+     * @return the {@link ITimeGraphEntry} at this point, or <code>null</code> if
+     *         none.
      * @since 2.0
      */
     public ITimeGraphEntry getEntry(Point pt) {
@@ -1642,8 +1654,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Return the arrow event closest to the given point that is no further than
-     * a maximum distance.
+     * Return the arrow event closest to the given point that is no further than a
+     * maximum distance.
      *
      * @param pt
      *            a point in the widget
@@ -1751,8 +1763,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param entry
      *            The entry to select
      * @param addSelection
-     *            <code>true</code> to add the entry to the current selection,
-     *            or <code>false</code> to set a new selection
+     *            <code>true</code> to add the entry to the current selection, or
+     *            <code>false</code> to set a new selection
      */
     public void selectItem(ITimeGraphEntry entry, boolean addSelection) {
         int idx = fItemData.findItemIndex(entry);
@@ -1765,8 +1777,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param entry
      *            The entry to select
      * @param addSelection
-     *            <code>true</code> to add the entry to the current selection,
-     *            or <code>false</code> to set a new selection
+     *            <code>true</code> to add the entry to the current selection, or
+     *            <code>false</code> to set a new selection
      * @param reveal
      *            <code>true</code> if the selection is to be made visible, and
      *            <code>false</code> otherwise
@@ -1914,6 +1926,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
         // draw the background markers
         drawMarkers(bounds, fTimeProvider, fMarkers, false, nameSpace, gc);
 
+        // Draw the time event filter background is needed
+        drawHighlightBackground(bounds, nameSpace, gc);
+
         // draw the items
         drawItems(bounds, fTimeProvider, fItemData.fExpandedItems, fTopIndex, nameSpace, gc);
 
@@ -1996,10 +2011,21 @@ public class TimeGraphControl extends TimeGraphBaseControl
         gc.setAlpha(OPAQUE);
     }
 
+    private void drawHighlightBackground(Rectangle bounds, int nameSpace, GC gc) {
+        if (isFilterActive()) {
+            Rectangle rect = new Rectangle(bounds.x + nameSpace, bounds.y, bounds.width - nameSpace, bounds.height);
+            Color color = getColorScheme().getColor(new RGBA(255, 255, 255, 150));
+            gc.setBackground(color);
+            gc.setAlpha(color.getAlpha());
+            gc.fillRectangle(rect);
+            gc.setAlpha(255);
+        }
+    }
+
     /**
-     * Draw the background layer. Fills the background of the control's name
-     * space and states space, updates the background of items if necessary, and
-     * draws the item's name text and middle line.
+     * Draw the background layer. Fills the background of the control's name space
+     * and states space, updates the background of items if necessary, and draws the
+     * item's name text and middle line.
      *
      * @param bounds
      *            The bounds of the control
@@ -2208,7 +2234,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         // K pixels per second
         double pixelsPerNanoSec = (rect.width <= RIGHT_MARGIN) ? 0 : (double) (rect.width - RIGHT_MARGIN) / (time1 - time0);
 
-        if (item.fEntry.hasTimeEvents()) {
+        if (item.fEntry.hasTimeEvents() && !(isFilterActive() && hasSavedFilters() && !((TimeGraphEntry) item.fEntry).hasZoomedEvents())) {
             gc.setClipping(new Rectangle(nameSpace, 0, bounds.width - nameSpace, bounds.height));
             fillSpace(rect, gc, selected);
 
@@ -2349,7 +2375,12 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
         boolean visible = ((rect.height == 0) && (rect.width == 0)) ? false : true;
 
+        Map<String, Object> styleMap = fTimeGraphProvider.getEventStyle(event);
+        Map<String, Object> updatedStyleMap = applyEventStyleProperties(styleMap, event);
+        int alpha = ((int) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.fillColor(), 0xff)) & 0xff;
         if (visible) {
+            int prevAlpha = gc.getAlpha();
+            gc.setAlpha(alpha);
             Color stateColor = null;
             if (colorIdx < fEventColorMap.length) {
                 stateColor = fEventColorMap[colorIdx];
@@ -2360,8 +2391,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             gc.setForeground(stateColor);
             gc.setBackground(stateColor);
             int old = gc.getLineWidth();
-            Map<String, Object> styleMap = fTimeGraphProvider.getEventStyle(event);
-            float heightFactor = (float) styleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), 0.1f);
+            float heightFactor = (float) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), 0.1f);
             if (heightFactor > 1.0 || heightFactor < 0) {
                 heightFactor = 0.1f;
             }
@@ -2371,9 +2401,12 @@ public class TimeGraphControl extends TimeGraphBaseControl
             Point newEndpoint = drawArrowHead(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, heightFactor, gc);
             gc.drawLine(rect.x, rect.y, newEndpoint.x, newEndpoint.y);
             gc.setLineWidth(old);
+            gc.setAlpha(prevAlpha);
 
         }
-        fTimeGraphProvider.postDrawEvent(event, rect, gc);
+        if (visible && !(boolean) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.annotated(), false)) {
+            fTimeGraphProvider.postDrawEvent(event, rect, gc);
+        }
         return visible;
     }
 
@@ -2525,8 +2558,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param gc
      *            Graphics context
      * @param selected
-     *            Is this time event currently selected (so it appears
-     *            highlighted)
+     *            Is this time event currently selected (so it appears highlighted)
      * @param timeSelected
      *            Is the timestamp currently selected
      * @return true if the state was drawn
@@ -2543,7 +2575,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
         Color black = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
         gc.setForeground(black);
         Map<String, Object> styleMap = fTimeGraphProvider.getEventStyle(event);
-        float heightFactor = (float) styleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), 1.0f);
+        Map<String, Object> updatedStyleMap = applyEventStyleProperties(styleMap, event);
+        float heightFactor = (float) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), 1.0f);
         if (heightFactor > 1.0 || heightFactor < 0) {
             if (fFirstHeightWarning) {
                 TraceCompassLog.getLogger(this.getClass()).warning("Heightfactor out of range : " + heightFactor + " for event " + event.toString() + " - clamping results"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
@@ -2592,17 +2625,17 @@ public class TimeGraphControl extends TimeGraphBaseControl
             return false;
         }
         Color stateColor = null;
-        Integer fillColor = (Integer) styleMap.get(ITimeEventStyleStrings.fillColor());
-        if (fillColor != null) {
+        int fillColor = (int) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.fillColor(), 255);
+        Integer previousFillColor = (Integer) styleMap.get(ITimeEventStyleStrings.fillColor());
+        if (previousFillColor != null) {
             String hexRGB = Integer.toHexString(fillColor);
             stateColor = COLOR_REGISTRY.get(hexRGB);
             if (stateColor == null) {
-                COLOR_REGISTRY.put(hexRGB, new RGB((fillColor >> 24) & 0xff, (fillColor >> 16) & 0xff, (fillColor >> 8) & 0xff));
+                COLOR_REGISTRY.put(hexRGB, RGBAUtil.fromInt(fillColor).rgb);
                 stateColor = COLOR_REGISTRY.get(hexRGB);
             }
 
         } else {
-            fillColor = 0xff;
             if (colorIdx < fEventColorMap.length) {
                 stateColor = fEventColorMap[colorIdx];
             } else {
@@ -2631,8 +2664,22 @@ public class TimeGraphControl extends TimeGraphBaseControl
         if (!visible) {
             gc.drawPoint(rect.x, rect.y - 2);
         }
-        fTimeGraphProvider.postDrawEvent(event, drawRect, gc);
+        if (visible && !(boolean) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.annotated(), false)) {
+            fTimeGraphProvider.postDrawEvent(event, drawRect, gc);
+        }
         return visible;
+    }
+
+    private static Map<String, Object> applyEventStyleProperties(Map<String, Object> styleMap, ITimeEvent event) {
+        Map<String, Object> updatedStyles = new HashMap<>(styleMap);
+        if (event.isPropertyActive(IFilterProperty.isDimmed())) {
+            Integer colorInt = (Integer) updatedStyles.getOrDefault(ITimeEventStyleStrings.fillColor(), 255);
+            RGBAColor oldRgbaColor = new RGBAColor(colorInt);
+            RGBAColor rgbaColor = new RGBAColor(oldRgbaColor.getRed(), oldRgbaColor.getGreen(), oldRgbaColor.getBlue(), Integer.divideUnsigned(oldRgbaColor.getAlpha(), DIMMED_ALPHA_COEFFICIENT));
+            updatedStyles.put(ITimeEventStyleStrings.fillColor(), rgbaColor.toInt());
+            updatedStyles.put(ITimeEventStyleStrings.annotated(), true);
+        }
+        return updatedStyles;
     }
 
     /**
@@ -2665,10 +2712,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     private static int getMarginForHeight(int height) {
         /*
-         * State rectangle is smaller than the item bounds when height is > 4.
-         * Don't use any margin if the height is below or equal that threshold.
-         * Use a maximum of 6 pixels for both margins, otherwise try to use 13
-         * pixels for the state height, but with a minimum margin of 1.
+         * State rectangle is smaller than the item bounds when height is > 4. Don't use
+         * any margin if the height is below or equal that threshold. Use a maximum of 6
+         * pixels for both margins, otherwise try to use 13 pixels for the state height,
+         * but with a minimum margin of 1.
          */
         final int MARGIN_THRESHOLD = 4;
         final int PREFERRED_HEIGHT = 13;
@@ -2711,15 +2758,27 @@ public class TimeGraphControl extends TimeGraphBaseControl
             idx = getSelectedIndex();
             if (idx < 0) {
                 idx = 0;
-            } else if (idx < fItemData.fExpandedItems.length - 1) {
-                idx++;
+            } else {
+                // Skip invisible items
+                while (idx < fItemData.fExpandedItems.length - 1) {
+                    idx++;
+                    if (fItemData.fExpandedItems[idx].fItemHeight > 0) {
+                        break;
+                    }
+                }
             }
         } else if (SWT.ARROW_UP == e.keyCode) {
             idx = getSelectedIndex();
             if (idx < 0) {
                 idx = 0;
-            } else if (idx > 0) {
-                idx--;
+            } else {
+                // Skip invisible items
+                while (idx > 0) {
+                    idx--;
+                    if (fItemData.fExpandedItems[idx].fItemHeight > 0) {
+                        break;
+                    }
+                }
             }
         } else if (SWT.ARROW_LEFT == e.keyCode && fDragState == DRAG_NONE) {
             boolean extend = (e.stateMask & SWT.SHIFT) != 0;
@@ -3235,9 +3294,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
 
         /*
-         * On some platforms the mouse scroll event is sent to the control that
-         * has focus even if it is not under the cursor. Handle the event only
-         * if over the time graph control.
+         * On some platforms the mouse scroll event is sent to the control that has
+         * focus even if it is not under the cursor. Handle the event only if over the
+         * time graph control.
          */
         Point size = getSize();
         Rectangle bounds = new Rectangle(0, 0, size.x, size.y);
@@ -3289,8 +3348,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * selection. If there is no selection or if the selection is not visible,
      * return an alignment entry with a null time graph entry.
      *
-     * @return a map entry where the key is the selection's time graph entry and
-     *         the value is the center y-coordinate of that entry, or null
+     * @return a map entry where the key is the selection's time graph entry and the
+     *         value is the center y-coordinate of that entry, or null
      */
     private Entry<ITimeGraphEntry, Integer> getVerticalZoomAlignSelection() {
         Entry<ITimeGraphEntry, Integer> alignEntry = getVerticalZoomAlignOngoing();
@@ -3313,13 +3372,13 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Get the vertical zoom alignment entry and position at the specified
-     * cursor position.
+     * Get the vertical zoom alignment entry and position at the specified cursor
+     * position.
      *
      * @param y
      *            the cursor y-coordinate
-     * @return a map entry where the key is the time graph entry under the
-     *         cursor and the value is the cursor y-coordinate
+     * @return a map entry where the key is the time graph entry under the cursor
+     *         and the value is the cursor y-coordinate
      */
     private Entry<ITimeGraphEntry, Integer> getVerticalZoomAlignCursor(int y) {
         Entry<ITimeGraphEntry, Integer> alignEntry = getVerticalZoomAlignOngoing();
@@ -3335,18 +3394,18 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Get the vertical zoom alignment entry and position if there is an ongoing
-     * one and we are within the vertical zoom delay, or otherwise return null.
+     * Get the vertical zoom alignment entry and position if there is an ongoing one
+     * and we are within the vertical zoom delay, or otherwise return null.
      *
-     * @return a map entry where the key is a time graph entry and the value is
-     *         a y-coordinate, or null
+     * @return a map entry where the key is a time graph entry and the value is a
+     *         y-coordinate, or null
      */
     private Entry<ITimeGraphEntry, Integer> getVerticalZoomAlignOngoing() {
         long currentTimeMillis = System.currentTimeMillis();
         if (currentTimeMillis < fVerticalZoomAlignTime + VERTICAL_ZOOM_DELAY) {
             /*
-             * If the vertical zoom is triggered repeatedly in a short amount of
-             * time, use the initial event's entry and position.
+             * If the vertical zoom is triggered repeatedly in a short amount of time, use
+             * the initial event's entry and position.
              */
             fVerticalZoomAlignTime = currentTimeMillis;
             return fVerticalZoomAlignEntry;
@@ -3452,10 +3511,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Set whether all time events with a duration shorter than one pixel should
-     * be blended in. If false, only the first such time event will be drawn and
-     * the subsequent time events in the same pixel will be discarded. The
-     * default value is false.
+     * Set whether all time events with a duration shorter than one pixel should be
+     * blended in. If false, only the first such time event will be drawn and the
+     * subsequent time events in the same pixel will be discarded. The default value
+     * is false.
      *
      * @param blend
      *            true if sub-pixel events should be blended, false otherwise.
@@ -3635,8 +3694,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                     item.fExpanded = oldItem.fExpanded;
                 } else {
                     /*
-                     * new items set the expanded state according to auto-expand
-                     * level
+                     * new items set the expanded state according to auto-expand level
                      */
                     item.fExpanded = fAutoExpandLevel == ALL_LEVELS || level < fAutoExpandLevel;
                 }
@@ -3657,11 +3715,29 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 Item item = findItem(entry);
                 refreshExpanded(expandedItemList, item);
             }
+
+            if (hasSavedFilters()) {
+                filterData(expandedItemList);
+            }
+
             fExpandedItems = expandedItemList.toArray(new Item[0]);
             fTopIndex = Math.min(fTopIndex, Math.max(0, fExpandedItems.length - 1));
         }
 
-        private void refreshExpanded(List<Item> expandedItemList, Item item) {
+        private boolean hasEvents(Item item) {
+            ITimeGraphEntry entry = item.fEntry;
+            return (!entry.hasTimeEvents() || (entry instanceof TimeGraphEntry && ((TimeGraphEntry) entry).hasZoomedEvents()));
+        }
+
+        private void filterData(List<Item> expandedItemList) {
+            for (Item item : expandedItemList) {
+                if (!hasEvents(item)) {
+                    item.fItemHeight = 0;
+                }
+            }
+        }
+
+        private void refreshExpanded(Collection<Item> expandedItemList, Item item) {
             // Check for filters
             boolean display = true;
             for (ViewerFilter filter : fFilters) {
@@ -3743,16 +3819,14 @@ public class TimeGraphControl extends TimeGraphBaseControl
         if (e.detail == SWT.MENU_MOUSE && isOverTimeSpace(p.x, p.y)) {
             if (fPendingMenuDetectEvent == null) {
                 /*
-                 * Feature in Linux. The MenuDetectEvent is received before
-                 * mouseDown. Store the event and trigger it later just before
-                 * handling mouseUp. This allows for the method to detect if
-                 * mouse is used to drag zoom.
+                 * Feature in Linux. The MenuDetectEvent is received before mouseDown. Store the
+                 * event and trigger it later just before handling mouseUp. This allows for the
+                 * method to detect if mouse is used to drag zoom.
                  */
                 fPendingMenuDetectEvent = e;
                 /*
-                 * Prevent the platform to show the menu when returning. The
-                 * menu will be shown (see below) when this method is called
-                 * again during mouseUp().
+                 * Prevent the platform to show the menu when returning. The menu will be shown
+                 * (see below) when this method is called again during mouseUp().
                  */
                 e.doit = false;
                 return;
@@ -3760,9 +3834,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
             fPendingMenuDetectEvent = null;
             if (fDragState != DRAG_ZOOM || !isInDragZoomMargin()) {
                 /*
-                 * Don't show the menu on mouseUp() if a drag zoom is in
-                 * progress with a drag range outside of the drag zoom margin,
-                 * or if any other drag operation, or none, is in progress.
+                 * Don't show the menu on mouseUp() if a drag zoom is in progress with a drag
+                 * range outside of the drag zoom margin, or if any other drag operation, or
+                 * none, is in progress.
                  */
                 e.doit = false;
                 return;
@@ -3770,8 +3844,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
         } else {
             if (fDragState != DRAG_NONE) {
                 /*
-                 * Don't show the menu on keyboard menu or mouse menu outside of
-                 * the time space if any drag operation is in progress.
+                 * Don't show the menu on keyboard menu or mouse menu outside of the time space
+                 * if any drag operation is in progress.
                  */
                 e.doit = false;
                 return;
@@ -3836,5 +3910,47 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     private boolean isInDragZoomMargin() {
         return (Math.abs(fDragX - fDragX0) < DRAG_MARGIN);
+    }
+
+    /**
+     * Set the filtering status of the timegraph
+     * @param isActive True whether there is active filters, false otherwise
+     * @since 4.0
+     */
+    public void setFilterActive(boolean isActive) {
+        fFilterActive = isActive;
+    }
+
+    /**
+     * Test if a time event filter is applied, basically it tells if the view is in
+     * filter mode
+     *
+     * @return True if the view is in filter mode, false otherwise
+     * @since 4.0
+     *
+     */
+    public boolean isFilterActive() {
+        return fFilterActive;
+    }
+
+    /**
+     * Set whether filters have been saved or not.
+     *
+     * @param hasSavedFilter
+     *            The saved filter status
+     * @since 4.0
+     */
+    public void setSavedFilterStatus(boolean hasSavedFilter) {
+        fHasSavedFilters = hasSavedFilter;
+    }
+
+    /**
+     * Tells whether the timegraph has saved filters or not
+     *
+     * @return True whether there is saved filters, false otherwise
+     * @since 4.0
+     */
+    public boolean hasSavedFilters() {
+        return fHasSavedFilters;
     }
 }

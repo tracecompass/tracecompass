@@ -30,6 +30,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITmfTimeGraphDr
  * Provider class for the time graph provider
  *
  * @author Patrick Tasse
+ * @since 3.4
  *
  */
 public class TimeGraphPresentationProvider implements ITimeGraphPresentationProvider2 {

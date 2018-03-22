@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.test.stub.model;
 
+import java.util.Set;
+
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
@@ -90,6 +92,11 @@ public class EventImpl implements ITimeEvent {
     @Override
     public ITimeEvent splitAfter(long splitTime) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Set<String> getActiveProperties() {
+        throw new UnsupportedOperationException("Not supported"); //$NON-NLS-1$
     }
 
 }

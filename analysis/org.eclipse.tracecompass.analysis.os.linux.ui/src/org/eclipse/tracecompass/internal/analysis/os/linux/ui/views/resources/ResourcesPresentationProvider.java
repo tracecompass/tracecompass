@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -227,20 +228,25 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
     @Override
     public Map<String, Object> getSpecificEventStyle(ITimeEvent event) {
+        Map<String, Object> map = new HashMap<>(super.getSpecificEventStyle(event));
+        Integer oldColor = (Integer) map.getOrDefault(ITimeEventStyleStrings.fillColor(), 255);
+        RGBAColor rgbaColor = new RGBAColor(oldColor);
+        short alpha = rgbaColor.getAlpha();
         if (isType(event.getEntry(), Type.CURRENT_THREAD) && event instanceof TimeEvent) {
             int threadEventValue = ((TimeEvent) event).getValue();
             RGBAColor color = PALETTE.get(Math.floorMod(threadEventValue + COLOR_DIFFERENCIATION_FACTOR, NUM_COLORS));
-            return ImmutableMap.of(ITimeEventStyleStrings.fillColor(), color.toInt(),
-                    ITimeEventStyleStrings.label(), String.valueOf(threadEventValue));
+            RGBAColor newColor = new RGBAColor(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+            map.put(ITimeEventStyleStrings.fillColor(), newColor.toInt());
+            map.put(ITimeEventStyleStrings.label(), String.valueOf(threadEventValue));
 
         } else if (event.getEntry() instanceof TimeGraphEntry &&
                 ((TimeGraphEntry) event.getEntry()).getModel() instanceof ITimeGraphEntryModelWeighted) {
             ITimeGraphEntryModelWeighted model = (ITimeGraphEntryModelWeighted) ((TimeGraphEntry) event.getEntry()).getModel();
             int eventValue = ((TimeEvent) event).getValue();
 
-            return ImmutableMap.of(ITimeEventStyleStrings.heightFactor(), (float) model.getWeight(eventValue));
+            map.put(ITimeEventStyleStrings.heightFactor(), (float) model.getWeight(eventValue));
         }
-        return super.getSpecificEventStyle(event);
+        return map;
     }
 
     @Override
