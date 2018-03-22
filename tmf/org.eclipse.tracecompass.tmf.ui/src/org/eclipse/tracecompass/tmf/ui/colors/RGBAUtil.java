@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.tmf.ui.colors;
 
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.RGBA;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RGBAColor;
 
 /**
  * RGBA Utility to create them from ints
@@ -45,5 +46,15 @@ public final class RGBAUtil {
     public static int fromRGBA(RGBA value) {
         RGB rgb = value.rgb;
         return (rgb.red << 24) | (rgb.green << 16) | (rgb.blue << 8) | value.alpha;
+    }
+
+    /**
+     * Convert from an RGBAColor to an RGBA, useful for dealing with palettes.
+     *
+     * @param color The {@link RGBAColor}
+     * @return an {@link RGBA}
+     */
+    public static RGBA fromRGBAColor(RGBAColor color) {
+        return fromInt(color.toInt());
     }
 }

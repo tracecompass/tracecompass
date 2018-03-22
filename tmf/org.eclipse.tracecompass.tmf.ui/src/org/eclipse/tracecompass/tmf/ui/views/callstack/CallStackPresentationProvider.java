@@ -12,13 +12,18 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.callstack;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphEntryModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IPaletteProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RGBAColor;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RotatingPaletteProvider;
 import org.eclipse.tracecompass.internal.tmf.core.callstack.provider.CallStackEntryModel;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
+import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -41,14 +46,8 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
 
     private static final StateItem[] STATE_TABLE;
     static {
-        final float saturation = 0.6f;
-        final float brightness = 0.6f;
         STATE_TABLE = new StateItem[NUM_COLORS + 1];
         STATE_TABLE[0] = new StateItem(State.MULTIPLE.rgb, State.MULTIPLE.toString());
-        for (int i = 0; i < NUM_COLORS; i++) {
-            RGB rgb = new RGB(i, saturation, brightness);
-            STATE_TABLE[i + 1] = new StateItem(rgb, State.EXEC.toString());
-        }
     }
 
     /**
@@ -57,6 +56,7 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
      * the ellipsis characters.
      */
     private Integer fMinimumBarWidth;
+    private @NonNull IPaletteProvider fPalette = new RotatingPaletteProvider.Builder().setNbColors(NUM_COLORS).build();
 
     private enum State {
         MULTIPLE (new RGB(100, 100, 100)),
@@ -75,6 +75,7 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
      * @since 1.2
      */
     public CallStackPresentationProvider() {
+        // Do nothing
     }
 
     /**
@@ -88,6 +89,7 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
      */
     @Deprecated
     public void setCallStackView(CallStackView view) {
+        // Do nothing
     }
 
     @Override
@@ -108,6 +110,14 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
 
     @Override
     public StateItem[] getStateTable() {
+        if (STATE_TABLE[1] == null) {
+            int i = 1;
+            String exec = State.EXEC.toString();
+            for (RGBAColor color : fPalette.get()) {
+                STATE_TABLE[i] = new StateItem(RGBAUtil.fromRGBAColor(color).rgb, exec);
+                i++;
+            }
+        }
         return STATE_TABLE;
     }
 
@@ -115,7 +125,7 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
     public int getStateTableIndex(ITimeEvent event) {
         if (event instanceof NamedTimeEvent) {
             NamedTimeEvent callStackEvent = (NamedTimeEvent) event;
-            return callStackEvent.getValue() + 1;
+            return Math.floorMod(callStackEvent.getValue(), fPalette.get().size()) + 1;
         } else if (event instanceof NullTimeEvent) {
             return INVISIBLE;
         }
@@ -151,5 +161,4 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
         gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
         Utils.drawText(gc, label, bounds.x, bounds.y, bounds.width, bounds.height, true, true);
     }
-
 }

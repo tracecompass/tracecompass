@@ -9,7 +9,6 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,7 +17,6 @@ import java.util.Map;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
@@ -30,6 +28,8 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.Sele
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.TimeGraphEntryModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RGBAColor;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RotatingPaletteProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
@@ -60,12 +60,14 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
     private Color fColorWhite;
     private Color fColorGray;
     private Integer fAverageCharWidth;
-    /*
-     * FIXME Use color palette instead
-     */
     private static final int NUM_COLORS = 25;
     private static final float BRIGHTNESS = 0.8f;
     private static final float SATURATION = 0.8f;
+    private static final List<RGBAColor> PALETTE =  new RotatingPaletteProvider.Builder()
+            .setNbColors(NUM_COLORS)
+            .setBrightness(BRIGHTNESS)
+            .setSaturation(SATURATION)
+            .build().get();
     private static final int COLOR_DIFFERENCIATION_FACTOR = NUM_COLORS / 2 + 2;
     /**
      * State table index for an idle event (light grey)
@@ -76,8 +78,6 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
     private static final List<StateItem> STATE_LIST;
     private static final StateItem[] STATE_TABLE;
-
-    private final List<RGB> fColors = new ArrayList<>();
 
     private static StateItem createState(LinuxStyle style) {
         return new StateItem(style.toMap());
@@ -101,9 +101,6 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
      */
     public ResourcesPresentationProvider() {
         super();
-        for (int i = 0; i < NUM_COLORS; i++) {
-            fColors.add(new RGB((int) (360.0 / NUM_COLORS * i), SATURATION, BRIGHTNESS));
-        }
     }
 
     private static StateItem getEventState(TimeEvent event) {
@@ -267,8 +264,8 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             if (threadEventValue == IDLE_THREAD) {
                 return ImmutableMap.of(ITimeEventStyleStrings.fillColor(), 0);
             }
-            RGB color = fColors.get((((threadEventValue + COLOR_DIFFERENCIATION_FACTOR) % NUM_COLORS) + NUM_COLORS) % NUM_COLORS);
-            return ImmutableMap.of(ITimeEventStyleStrings.fillColor(), color.red << 24 | color.green << 16 | color.blue << 8 | 0xff,
+            RGBAColor color = PALETTE.get(Math.floorMod(threadEventValue + COLOR_DIFFERENCIATION_FACTOR, NUM_COLORS));
+            return ImmutableMap.of(ITimeEventStyleStrings.fillColor(), color.toInt(),
                     ITimeEventStyleStrings.label(), String.valueOf(threadEventValue));
 
         }

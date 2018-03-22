@@ -12,12 +12,14 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.presentation;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
- * Regroups all available colors
+ * Regroups all available colors, the standard color scheme of Eclipse Trace Compass.
  *
  * @author Yonni Chen
  */
-public class ColorPalette {
+public final class DefaultColorPaletteProvider implements IPaletteProvider {
 
     /**
      * Gets an instance of {@link RGBAColor} that represents blue color
@@ -89,18 +91,21 @@ public class ColorPalette {
      */
     public static final RGBAColor YELLOW = new RGBAColor(255, 255, 0);
 
+    private static final List<@NonNull RGBAColor> PALETTE = Arrays.asList(
+            BLUE, RED, GREEN, MAGENTA, CYAN, DARK_BLUE, DARK_RED, DARK_GREEN,
+            DARK_MAGENTA, DARK_CYAN, DARK_YELLOW, BLACK, GRAY, YELLOW);
+
     /**
-     * Gets the list of default palette colors
-     *
-     * @return The list that contains all colors from this palette
+     * Get the default default color palette provider
      */
-    public static List<RGBAColor> getDefaultPalette() {
-        return Arrays.asList(
-                BLUE, RED, GREEN, MAGENTA, CYAN, DARK_BLUE, DARK_RED, DARK_GREEN,
-                DARK_MAGENTA, DARK_CYAN, DARK_YELLOW, BLACK, GRAY, YELLOW);
+    public static final IPaletteProvider INSTANCE = new DefaultColorPaletteProvider();
+
+    private DefaultColorPaletteProvider() {
+        // do nothing
     }
 
-    private ColorPalette() {
-
+    @Override
+    public List<@NonNull RGBAColor> get() {
+        return PALETTE;
     }
 }

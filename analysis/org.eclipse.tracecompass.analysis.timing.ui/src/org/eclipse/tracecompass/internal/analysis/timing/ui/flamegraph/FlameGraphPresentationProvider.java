@@ -10,6 +10,7 @@ package org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph;
 
 import java.text.Format;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
@@ -20,8 +21,12 @@ import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondT
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.AggregatedCalledFunctionStatistics;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.ICalledFunction;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.SymbolAspect;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IPaletteProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RGBAColor;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RotatingPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -40,23 +45,14 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
     /** Number of colors used for flameGraph events */
     public static final int NUM_COLORS = 360;
 
-    private static final StateItem[] STATE_TABLE;
-    static {
-        final float saturation = 0.6f;
-        final float brightness = 0.6f;
-        STATE_TABLE = new StateItem[NUM_COLORS + 1];
-        STATE_TABLE[0] = new StateItem(State.MULTIPLE.rgb, State.MULTIPLE.toString());
-        for (int i = 0; i < NUM_COLORS; i++) {
-            RGB rgb = new RGB(i, saturation, brightness);
-            STATE_TABLE[i + 1] = new StateItem(rgb, State.EXEC.toString());
-        }
-    }
-
     private static final Format FORMATTER = new SubSecondTimeWithUnitFormat();
 
+    private final StateItem[] fStateTable;
     private FlameGraphView fView;
 
     private Integer fAverageCharWidth;
+
+    private IPaletteProvider fPalette = new RotatingPaletteProvider.Builder().setNbColors(NUM_COLORS).build();
 
     private enum State {
         MULTIPLE(new RGB(100, 100, 100)), EXEC(new RGB(0, 200, 0));
@@ -72,12 +68,17 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
      * Constructor
      */
     public FlameGraphPresentationProvider() {
-        // Do nothing
+        fStateTable = new StateItem[NUM_COLORS + 1];
+        fStateTable[0] = new StateItem(State.MULTIPLE.rgb, State.MULTIPLE.toString());
+        List<RGBAColor> rgbs = fPalette.get();
+        for (int i = 0; i < NUM_COLORS; i++) {
+            fStateTable[i + 1] = new StateItem(RGBAUtil.fromRGBAColor(rgbs.get(i)).rgb, State.EXEC.toString());
+        }
     }
 
     @Override
     public StateItem[] getStateTable() {
-        return STATE_TABLE;
+        return fStateTable;
     }
 
     @Override
@@ -115,7 +116,7 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
     public int getStateTableIndex(ITimeEvent event) {
         if (event instanceof FlamegraphEvent) {
             FlamegraphEvent flameGraphEvent = (FlamegraphEvent) event;
-            return flameGraphEvent.getValue() + 1;
+            return Math.floorMod(flameGraphEvent.getValue(), fPalette.get().size()) + 1;
         } else if (event instanceof NullTimeEvent) {
             return INVISIBLE;
         }
@@ -198,5 +199,4 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
     public void setView(FlameGraphView view) {
         fView = view;
     }
-
 }

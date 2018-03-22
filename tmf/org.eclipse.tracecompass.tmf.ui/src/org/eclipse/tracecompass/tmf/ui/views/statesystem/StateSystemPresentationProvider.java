@@ -9,17 +9,22 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.statesystem;
 
-import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IPaletteProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RGBAColor;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RotatingPaletteProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
+import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
 import org.eclipse.tracecompass.tmf.ui.views.statesystem.TmfStateSystemExplorer.AttributeEntry;
 import org.eclipse.tracecompass.tmf.ui.views.statesystem.TmfStateSystemExplorer.ModuleEntry;
 import org.eclipse.tracecompass.tmf.ui.views.statesystem.TmfStateSystemExplorer.StateSystemEntry;
@@ -42,10 +47,8 @@ class StateSystemPresentationProvider extends TimeGraphPresentationProvider {
     public static final int NUM_COLORS = 18;
 
     private static final StateItem[] STATE_TABLE = new StateItem[NUM_COLORS + 1];
-    private static final float SATURATION = 0.6f;
-    private static final float BRIGHTNESS = 0.6f;
+
     static {
-        Arrays.setAll(STATE_TABLE, i -> new StateItem(new RGB(20 * i, SATURATION, BRIGHTNESS)));
         // Set the last one to grey.
         STATE_TABLE[NUM_COLORS] = new StateItem(new RGB(192, 192, 192));
     }
@@ -57,8 +60,16 @@ class StateSystemPresentationProvider extends TimeGraphPresentationProvider {
      */
     private Integer fMinimumBarWidth;
 
+    private IPaletteProvider fPalette = new RotatingPaletteProvider.Builder().setNbColors(NUM_COLORS).build();
+
     @Override
     public StateItem[] getStateTable() {
+        if (STATE_TABLE[0] == null) {
+            List<@NonNull RGBAColor> colors = fPalette.get();
+            for (int i = 0; i < colors.size(); i++) {
+                STATE_TABLE[i] = new StateItem(RGBAUtil.fromRGBAColor(colors.get(i)).rgb);
+            }
+        }
         return STATE_TABLE;
     }
 
@@ -157,5 +168,4 @@ class StateSystemPresentationProvider extends TimeGraphPresentationProvider {
         gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
         Utils.drawText(gc, value.toString(), bounds.x, bounds.y, bounds.width, bounds.height, true, true);
     }
-
 }

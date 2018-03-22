@@ -44,7 +44,7 @@ public class RGBAColor {
     public static final RGBAColor fromHSBA(float hue, float saturation, float brightness, float alpha) {
         if (hue < 0 || hue > TAU || saturation < 0 || saturation > 1 ||
                 brightness < 0 || brightness > 1) {
-            throw new IllegalArgumentException(String.format("Invalid color value (%d,%d,%d,%d)", hue, saturation, brightness, alpha)); //$NON-NLS-1$
+            throw new IllegalArgumentException(String.format("Invalid color value (%f,%f,%f,%f)", hue, saturation, brightness, alpha)); //$NON-NLS-1$
         }
         double r, g, b;
         if (saturation == 0) {
