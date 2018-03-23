@@ -29,6 +29,11 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
  */
 public abstract class PalettedPresentationProvider extends StubPresentationProvider {
 
+    @Override
+    public String getPreferenceKey() {
+        return "Paletted";
+    }
+
     /**
      * Constructor
      */

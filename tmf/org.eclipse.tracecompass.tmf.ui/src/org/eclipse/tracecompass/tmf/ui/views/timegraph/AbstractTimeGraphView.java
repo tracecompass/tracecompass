@@ -107,6 +107,7 @@ import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerConfigXmlParser;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.markers.MarkerUtils;
+import org.eclipse.tracecompass.internal.tmf.ui.util.TimeGraphStyleUtil;
 import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.TimeEventFilterDialog;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
@@ -136,6 +137,7 @@ import org.eclipse.tracecompass.tmf.ui.views.SaveImageUtil;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphBookmarkListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphContentProvider;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
@@ -185,7 +187,7 @@ import com.google.common.collect.Multimap;
  *
  * This view contains a time graph viewer.
  */
-public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeAligned, ITmfAllowMultiple, ITmfPinnable, IResourceChangeListener {
+public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeAligned, ITmfAllowMultiple, ITmfPinnable, IResourceChangeListener{
 
     private static final String CONTEXT = "org.eclipse.tracecompass.tmf.ui.view.timegraph.context"; //$NON-NLS-1$
 
@@ -1177,7 +1179,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         fTimeGraphViewer.setFilterLabelProvider(fFilterLabelProvider);
         fTimeGraphViewer.setFilterColumns(fFilterColumns);
 
-        fTimeGraphViewer.setTimeGraphProvider(fPresentation);
+        ITimeGraphPresentationProvider presentationProvider = getPresentationProvider();
+        fTimeGraphViewer.setTimeGraphProvider(presentationProvider);
+        presentationProvider.addColorListener(stateItems -> TimeGraphStyleUtil.loadValues(getPresentationProvider()));
+        presentationProvider.refresh();
         fTimeGraphViewer.setAutoExpandLevel(fAutoExpandLevel);
 
         fTimeGraphViewer.setWeights(fWeight);
@@ -1412,8 +1417,13 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
         deactivateContextService();
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-        getSite().getPage().removePartListener(fPartListener);
-        getSite().getPage().removePartListener(fPartListener2);
+        IWorkbenchPage page = getSite().getPage();
+        if (fPartListener != null) {
+            page.removePartListener(fPartListener);
+        }
+        if (fPartListener2 != null) {
+            page.removePartListener(fPartListener2);
+        }
     }
 
     /**
@@ -1647,6 +1657,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 setTimeBoundsAndRefresh();
             }
         }
+        getPresentationProvider().refresh();
     }
 
     private void setTimeBoundsAndRefresh() {

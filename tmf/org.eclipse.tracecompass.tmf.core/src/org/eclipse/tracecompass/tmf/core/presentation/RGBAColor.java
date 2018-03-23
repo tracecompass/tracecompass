@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.tmf.core.presentation;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * This class represents a color with its red, green and blue component. The
  * red, green and blue values must be between 0 and 255.
@@ -93,6 +95,22 @@ public class RGBAColor {
             }
         }
         return new RGBAColor((int) Math.round(r * 255), (int) Math.round(g * 255), (int) Math.round(b * 255), Math.round(alpha * 255));
+    }
+
+    /**
+     * String parser, parses the output of {@link RGBAColor#toString()}
+     *
+     * @param toString
+     *            the color
+     * @return the RGBA or null if invalid
+     * @since 4.1
+     */
+    public static @Nullable RGBAColor fromString(String toString) {
+        try {
+            return new RGBAColor(Long.decode(toString).intValue());
+        } catch (NumberFormatException ne) {
+            return null;
+        }
     }
 
     /**
@@ -246,6 +264,6 @@ public class RGBAColor {
 
     @Override
     public String toString() {
-        return "#" + Integer.toHexString(toInt()); //$NON-NLS-1$
+        return String.format("#%08X", toInt()); //$NON-NLS-1$
     }
 }

@@ -210,7 +210,7 @@ public class TimeGraphViewTest {
         // Wait for trace to be loaded
         fViewBot.bot().waitUntil(new TgConditionHelper(t -> tgBot.getEntries().length == 0));
         fBounds = getBounds();
-        TmfSignalManager.dispatchSignal(new TmfTraceOpenedSignal(this, trace, null));
+        UIThreadRunnable.syncExec(() -> TmfSignalManager.dispatchSignal(new TmfTraceOpenedSignal(this, trace, null)));
         // Wait for trace to be loaded
         fViewBot.bot().waitUntil(new TgConditionHelper(t -> tgBot.getEntries().length >= 2));
 
@@ -409,6 +409,8 @@ public class TimeGraphViewTest {
      * Test the legend and export operations. Resize states, take screenshots and
      * compare, they should be different. then reset the sizes and compare, they
      * should be the same.
+     *
+     * NOTE: This utterly fails in GTK3.
      *
      * @throws IOException
      *             file not found, someone deleted files while the test is running

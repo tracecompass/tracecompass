@@ -130,6 +130,18 @@ public class TimeGraphControl extends TimeGraphBaseControl
         MenuDetectListener, ITmfTimeGraphDrawingHelper, ITimeGraphColorListener, Listener {
 
     /**
+     * Default state width ratio
+     * @since 4.1
+     */
+    public static final float DEFAULT_STATE_WIDTH = 1.0f;
+
+    /**
+     * Default link width ratio
+     * @since 4.1
+     */
+    public static final float DEFAULT_LINK_WIDTH = 0.1f;
+
+    /**
      * Constant indicating that all levels of the time graph should be expanded
      */
     public static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
@@ -2398,7 +2410,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             gc.setForeground(stateColor);
             gc.setBackground(stateColor);
             int old = gc.getLineWidth();
-            float heightFactor = (float) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), 0.1f);
+            float heightFactor = (float) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), DEFAULT_LINK_WIDTH);
             if (heightFactor > 1.0 || heightFactor < 0) {
                 heightFactor = 0.1f;
             }
@@ -2583,7 +2595,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         gc.setForeground(black);
         Map<String, Object> styleMap = fTimeGraphProvider.getEventStyle(event);
         Map<String, Object> updatedStyleMap = applyEventStyleProperties(styleMap, event);
-        float heightFactor = (float) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), 1.0f);
+        float heightFactor = (float) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), DEFAULT_STATE_WIDTH);
         if (heightFactor > 1.0 || heightFactor < 0) {
             if (fFirstHeightWarning) {
                 TraceCompassLog.getLogger(this.getClass()).warning("Heightfactor out of range : " + heightFactor + " for event " + event.toString() + " - clamping results"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$

@@ -206,7 +206,7 @@ public interface ITimeGraphPresentationProvider {
         if (index >= 0 && index < stateTable.length) {
             stateItem = stateTable[index];
         }
-        Map<String, Object> styleMap = stateItem == null ? Collections.EMPTY_MAP : stateItem.getStyleMap();
+        Map<String, Object> styleMap = stateItem == null ? Collections.emptyMap() : stateItem.getStyleMap();
         Map<String, Object> specificEventStyles = getSpecificEventStyle(event);
         if (specificEventStyles.isEmpty()) {
             return styleMap;
@@ -217,6 +217,17 @@ public interface ITimeGraphPresentationProvider {
         styleMap = new HashMap<>(styleMap);
         styleMap.putAll(specificEventStyles);
         return styleMap;
+    }
+
+    /**
+     * Get the id of the state provider
+     *
+     * @return The preference key, if there are many instances of a class, this
+     *         method needs to be overridden
+     * @since 4.1
+     */
+    default String getPreferenceKey() {
+        return getClass().getName();
     }
 
     /**

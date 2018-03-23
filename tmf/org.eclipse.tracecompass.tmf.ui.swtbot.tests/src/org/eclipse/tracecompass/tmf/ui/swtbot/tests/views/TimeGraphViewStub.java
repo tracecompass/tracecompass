@@ -81,6 +81,7 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
      */
     public TimeGraphViewStub() {
         super(ID, new StubPresentationProvider());
+        fPresentationProvider = (StubPresentationProvider) super.getPresentationProvider();
         TimeGraphEntry hero1 = new TimeGraphEntry("Plumber guy", 0, 120);
         TimeGraphEntry hat1 = new TimeGraphEntry("Hat1", 0, 120);
         TimeGraphEntry hat2 = new TimeGraphEntry("Hat2", 0, 120);

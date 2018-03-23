@@ -1,0 +1,4 @@
+class org/eclipse/jface/preference/IPreferenceStore
+getString
+ (Ljava/lang/String;)Ljava/lang/String;
+ (Ljava/lang/String;)L1java/lang/String;

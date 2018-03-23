@@ -46,7 +46,7 @@ class StateSystemPresentationProvider extends TimeGraphPresentationProvider {
 
     static {
         // Set the last one to grey.
-        STATE_TABLE[NUM_COLORS] = new StateItem(new RGB(192, 192, 192));
+        STATE_TABLE[NUM_COLORS] = new StateItem(new RGB(192, 192, 192), "UNKNOWN"); //$NON-NLS-1$
     }
 
     private IPaletteProvider fPalette = new RotatingPaletteProvider.Builder().setNbColors(NUM_COLORS).build();
@@ -56,7 +56,8 @@ class StateSystemPresentationProvider extends TimeGraphPresentationProvider {
         if (STATE_TABLE[0] == null) {
             List<@NonNull RGBAColor> colors = fPalette.get();
             for (int i = 0; i < colors.size(); i++) {
-                STATE_TABLE[i] = new StateItem(RGBAUtil.fromRGBAColor(colors.get(i)).rgb);
+                RGBAColor rgbaColor = colors.get(i);
+                STATE_TABLE[i] = new StateItem(RGBAUtil.fromInt(rgbaColor.toInt()).rgb, rgbaColor.toString());
             }
         }
         return STATE_TABLE;

@@ -55,9 +55,11 @@ public class StateItem {
      *
      * @param stateColor
      *            A state color
+     * @deprecated use {@link StateItem#StateItem(Map)}
      */
+    @Deprecated
     public StateItem(RGB stateColor) {
-        this(stateColor, UNDEFINED_STATE_NAME);
+        this(stateColor, stateColor.toString());
     }
 
     /**

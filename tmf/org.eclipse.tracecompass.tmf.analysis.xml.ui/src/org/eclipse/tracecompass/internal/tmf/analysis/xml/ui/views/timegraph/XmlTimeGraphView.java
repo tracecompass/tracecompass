@@ -41,6 +41,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.views.TmfViewFactory;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
@@ -87,6 +88,8 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
     private final @NonNull XmlViewInfo fViewInfo = new XmlViewInfo(ID);
     private final Map<String, Integer> fStringValueMap = new HashMap<>();
 
+    private XmlPresentationProvider fPresentationProvider;
+
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -95,7 +98,7 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
      * Default constructor
      */
     public XmlTimeGraphView() {
-        super(ID, new XmlPresentationProvider(), XmlTimeGraphDataProvider.ID);
+        super(ID, new XmlPresentationProvider(ID), XmlTimeGraphDataProvider.ID);
         setWeight(fWeight);
         setTreeColumns(DEFAULT_COLUMN_NAMES);
         setTreeLabelProvider(new XmlTreeLabelProvider());
@@ -107,6 +110,8 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
             if (event.getProperty().equals(TmfXmlStrings.XML_OUTPUT_DATA) && newValue instanceof String) {
                 String data = (String) newValue;
                 fViewInfo.setViewData(data);
+                TimeGraphViewer timeGraphViewer = getTimeGraphViewer();
+                timeGraphViewer.getTimeGraphControl().colorSettingsChanged(timeGraphViewer.getTimeGraphProvider().getStateTable());
                 rebuild();
             }
         });
@@ -122,6 +127,8 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
             /* must initialize view info before calling super */
             fViewInfo.setName(name);
         }
+        fPresentationProvider = new XmlPresentationProvider(name);
+        fPresentationProvider.addColorListener(stateItems -> super.getPresentationProvider().refresh());
         super.createPartControl(parent);
     }
 
@@ -156,7 +163,10 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
      */
     @Override
     protected XmlPresentationProvider getPresentationProvider() {
-        return (XmlPresentationProvider) super.getPresentationProvider();
+        /*
+         * masking a field.
+         */
+        return fPresentationProvider;
     }
 
     /**
@@ -211,9 +221,14 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
              * TODO: Each entry of a line could have their own states/color. That will
              * require an update to the presentation provider
              */
-            Map<String, Integer> newStringStates = ((XmlPresentationProvider) pres).loadNewStates(viewElement);
-            fStringValueMap.putAll(newStringStates);
-
+            ((XmlPresentationProvider) pres).loadNewStates(viewElement);
+            Display.getDefault().asyncExec(() -> {
+                TimeGraphViewer timeGraphViewer = getTimeGraphViewer();
+                if (timeGraphViewer.getTimeGraphControl().isDisposed()) {
+                    return;
+                }
+                timeGraphViewer.getTimeGraphControl().colorSettingsChanged(timeGraphViewer.getTimeGraphProvider().getStateTable());
+            });
         }
 
         String title = fViewInfo.getViewTitle(viewElement);

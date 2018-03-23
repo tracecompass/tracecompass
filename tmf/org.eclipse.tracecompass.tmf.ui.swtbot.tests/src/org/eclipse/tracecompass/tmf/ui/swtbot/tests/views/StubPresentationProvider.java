@@ -26,6 +26,11 @@ import com.google.common.collect.ImmutableMap;
  */
 class StubPresentationProvider extends TimeGraphPresentationProvider {
 
+    @Override
+    public String getPreferenceKey() {
+        return "Stub";
+    }
+
     private static final StateItem LASER = new StateItem(
             ImmutableMap.of(
                     ITimeEventStyleStrings.label(), "\"LASER\"",

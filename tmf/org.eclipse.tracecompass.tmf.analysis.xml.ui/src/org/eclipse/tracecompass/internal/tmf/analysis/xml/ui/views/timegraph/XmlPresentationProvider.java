@@ -70,6 +70,20 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
     private Map<Integer, Integer> stateIndex = new HashMap<>();
     private StateItem[] stateTable = new StateItem[0];
 
+    private final String fId;
+
+    /**
+     * Presentation provider constructor
+     *
+     * @param id
+     *               the id of the generating analysis. This is needed since each
+     *               xml view has the same presentation provider, so this can
+     *               differentiate them.
+     */
+    public XmlPresentationProvider(String id) {
+        fId = id;
+    }
+
     @Override
     public int getStateTableIndex(ITimeEvent event) {
         if (event instanceof NullTimeEvent) {
@@ -284,4 +298,8 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
         return stateIndex.containsKey(status);
     }
 
+    @Override
+    public String getPreferenceKey() {
+        return fId + '.' + super.getPreferenceKey();
+    }
 }
