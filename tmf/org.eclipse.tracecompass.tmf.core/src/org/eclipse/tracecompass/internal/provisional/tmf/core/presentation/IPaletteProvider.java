@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 
 /**
  * Color palette provider. Returns a list of colors. Use the {@link #get()}

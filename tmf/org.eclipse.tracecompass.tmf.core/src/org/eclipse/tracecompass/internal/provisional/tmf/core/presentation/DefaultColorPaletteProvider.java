@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 
 /**
  * Regroups all available colors, the standard color scheme of Eclipse Trace Compass.

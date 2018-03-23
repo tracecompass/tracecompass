@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.presentation;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;

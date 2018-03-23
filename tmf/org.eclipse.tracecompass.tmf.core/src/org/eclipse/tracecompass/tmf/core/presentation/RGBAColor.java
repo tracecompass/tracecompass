@@ -7,13 +7,14 @@
  * http://www.eclipse.org/legal/epl-v10.html
  **********************************************************************/
 
-package org.eclipse.tracecompass.internal.provisional.tmf.core.presentation;
+package org.eclipse.tracecompass.tmf.core.presentation;
 
 /**
  * This class represents a color with its red, green and blue component. The
  * red, green and blue values must be between 0 and 255.
  *
  * @author Yonni Chen
+ * @since 3.4
  */
 public class RGBAColor {
 

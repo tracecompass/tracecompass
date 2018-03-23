@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.presentation;
 
+import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
+
 /**
  * This represents the appearance of a Y series for a XY chart. It contains
  * information about the name, type (ex. Bar, Line, Scatter), the style (ex.

@@ -11,7 +11,7 @@ package org.eclipse.tracecompass.tmf.ui.colors;
 
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.RGBA;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RGBAColor;
+import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 
 /**
  * RGBA Utility to create them from ints

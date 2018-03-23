@@ -11,7 +11,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.registry;
 
 import java.util.Map;
 
-import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RGBAColor;
+import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 
 import com.google.common.collect.ImmutableMap;
