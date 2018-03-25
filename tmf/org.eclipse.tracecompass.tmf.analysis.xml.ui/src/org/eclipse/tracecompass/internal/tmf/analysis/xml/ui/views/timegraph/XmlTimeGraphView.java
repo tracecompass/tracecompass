@@ -39,7 +39,7 @@ import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlTimeGraphEntryMo
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.views.TmfViewFactory;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
@@ -201,7 +201,7 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
         if (viewElement == null) {
             return;
         }
-        ITimeGraphPresentationProvider2 pres = this.getPresentationProvider();
+        ITimeGraphPresentationProvider pres = this.getPresentationProvider();
         if (pres instanceof XmlPresentationProvider) {
             /*
              * TODO: Each entry of a line could have their own states/color. That will

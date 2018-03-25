@@ -1403,7 +1403,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *
      * @param visible
      *            true to show the middle lines, false otherwise
-     * @since 3.4
+     * @since 4.0
      */
     public void setMidLinesVisible(boolean visible) {
         fMidLinesVisible = visible;
@@ -1414,7 +1414,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Get the horizontal middle lines visibility.
      *
      * @return true if the middle lines are visible, false otherwise
-     * @since 3.4
+     * @since 4.0
      */
     public boolean getMidLinesVisible() {
         return fMidLinesVisible;

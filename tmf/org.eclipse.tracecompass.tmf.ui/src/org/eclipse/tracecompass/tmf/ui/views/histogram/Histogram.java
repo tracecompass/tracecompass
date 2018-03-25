@@ -355,7 +355,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      * @param statusLineManager
      *            The status line manager, or null to disable status line
      *            messages
-     * @since 3.4
+     * @since 4.0
      */
     public void setStatusLineManager(IStatusLineManager statusLineManager) {
         if (fStatusLineManager != null && statusLineManager == null) {

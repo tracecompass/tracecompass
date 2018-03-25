@@ -24,7 +24,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.IPreCheckStateL
  * checking a sub-tree
  *
  * @author Loic Prieur-Drevon
- * @since 3.4
+ * @since 4.0
  */
 public class ManyEntriesSelectedDialogPreCheckedListener implements IPreCheckStateListener {
 

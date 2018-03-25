@@ -13,8 +13,10 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * Messages for {@link ManyEntriesSelectedDialogPreCheckedListener}
- * @since 3.4
+ * @since 4.0
+ * @deprecated move to internal
  */
+@Deprecated
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.tmf.ui.views.messages"; //$NON-NLS-1$
     /**

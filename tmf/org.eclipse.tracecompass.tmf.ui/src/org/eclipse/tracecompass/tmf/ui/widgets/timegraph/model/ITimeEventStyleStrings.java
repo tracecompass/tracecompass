@@ -166,7 +166,7 @@ public interface ITimeEventStyleStrings {
      * or {@link ITimeEventStyleStrings#linkType()}
      *
      * @return The key to get the item property of a state item
-     * @since 3.4
+     * @since 4.0
      */
     static String itemTypeProperty() {
         return ".type"; //$NON-NLS-1$
@@ -176,7 +176,7 @@ public interface ITimeEventStyleStrings {
      * Indicate that the item type is a STATE
      *
      * @return The state item type value
-     * @since 3.4
+     * @since 4.0
      */
     static String stateType() {
         return ".type.state"; //$NON-NLS-1$
@@ -186,7 +186,7 @@ public interface ITimeEventStyleStrings {
      * Indicate that the item type is a LINK
      *
      * @return The link item type value
-     * @since 3.4
+     * @since 4.0
      */
     static String linkType() {
         return ".type.link"; //$NON-NLS-1$

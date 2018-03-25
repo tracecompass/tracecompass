@@ -17,7 +17,7 @@ import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
  * RGBA Utility to create them from ints
  *
  * @author Matthew Khouzam
- * @since 3.4
+ * @since 4.0
  */
 public final class RGBAUtil {
 

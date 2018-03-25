@@ -269,7 +269,7 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
      * @param progressMonitor
      *            the progress monitor
      * @return the trace specific supplementary folder
-     * @since 3.4
+     * @since 4.0
      */
     public IFolder prepareTraceSupplementaryFolder(String supplFolderPath, boolean createFolder, IProgressMonitor progressMonitor) {
         SubMonitor subMonitor = SubMonitor.convert(progressMonitor);

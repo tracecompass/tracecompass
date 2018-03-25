@@ -14,7 +14,7 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs;
  * {@link TriStateFilteredCheckboxTree}.
  *
  * @author Loic Prieur-Drevon
- * @since 3.4
+ * @since 4.0
  */
 public interface IPreCheckStateListener {
 

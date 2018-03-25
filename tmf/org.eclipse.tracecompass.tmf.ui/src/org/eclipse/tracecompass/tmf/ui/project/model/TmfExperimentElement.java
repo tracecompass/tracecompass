@@ -393,7 +393,7 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
      *
      * @throws CoreException
      *             exception
-     * @since 3.4
+     * @since 4.0
      */
     public void removeTrace(TmfTraceElement trace, boolean closeEditors) throws CoreException {
 

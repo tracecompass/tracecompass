@@ -12,48 +12,15 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph;
 
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITmfTimeGraphDrawingHelper;
-
 /**
  * Extension of the ITimeGraphPresentationProvider interface to avoid API breakage
  *
  * @author Geneviève Bastien
  * TODO: Add me to ITimeGraphPresentationProvider before the 3.0 release
+ * @Deprecated use ITimeGraphPresentationProvider
  */
+@Deprecated
 public interface ITimeGraphPresentationProvider2 extends ITimeGraphPresentationProvider {
 
-    /**
-     * Returns the drawing helper for this presentation provider.
-     *
-     * @return The drawing helper
-     */
-    ITmfTimeGraphDrawingHelper getDrawingHelper();
-
-    /**
-     * Sets this presentation provider's drawing helper.
-     * This helper be needed to know where to draw items, get its coordinates
-     * given a time, etc.
-     *
-     * @param helper
-     *            The drawing helper
-     */
-    void setDrawingHelper(ITmfTimeGraphDrawingHelper helper);
-
-    /**
-     * Adds a color settings listener, to be notified when the presentation
-     * provider's state colors change.
-     *
-     * @param listener
-     *            The new listener for color settings changes
-     */
-    void addColorListener(ITimeGraphColorListener listener);
-
-    /**
-     * Removes a color settings listener.
-     *
-     * @param listener
-     *            The color settings listener to remove
-     */
-    void removeColorListener(ITimeGraphColorListener listener);
 
 }

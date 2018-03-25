@@ -23,6 +23,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITmfTimeGraphDrawingHelper;
 
 /**
  * Interface for the time graph widget provider
@@ -174,7 +175,7 @@ public interface ITimeGraphPresentationProvider {
      * Get the name of the link type
      *
      * @return The name of the link type
-     * @since 3.4
+     * @since 4.0
      */
     default String getLinkTypeName() {
         return Messages.TimeGraphLegend_Arrows;
@@ -238,4 +239,42 @@ public interface ITimeGraphPresentationProvider {
         // do nothing
     }
 
+
+    /**
+     * Returns the drawing helper for this presentation provider.
+     *
+     * @return The drawing helper
+     * @since 4.0
+     */
+    ITmfTimeGraphDrawingHelper getDrawingHelper();
+
+    /**
+     * Sets this presentation provider's drawing helper.
+     * This helper be needed to know where to draw items, get its coordinates
+     * given a time, etc.
+     *
+     * @param helper
+     *            The drawing helper
+     * @since 4.0
+     */
+    void setDrawingHelper(ITmfTimeGraphDrawingHelper helper);
+
+    /**
+     * Adds a color settings listener, to be notified when the presentation
+     * provider's state colors change.
+     *
+     * @param listener
+     *            The new listener for color settings changes
+     * @since 4.0
+     */
+    void addColorListener(ITimeGraphColorListener listener);
+
+    /**
+     * Removes a color settings listener.
+     *
+     * @param listener
+     *            The color settings listener to remove
+     * @since 4.0
+     */
+    void removeColorListener(ITimeGraphColorListener listener);
 }

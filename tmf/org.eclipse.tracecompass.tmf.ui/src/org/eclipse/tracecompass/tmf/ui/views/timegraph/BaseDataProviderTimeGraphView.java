@@ -49,7 +49,7 @@ import com.google.common.collect.Multimap;
  * {@link AbstractTimeGraphView} for views with data providers.
  *
  * @author Loic Prieur-Drevon
- * @since 3.4
+ * @since 4.0
  */
 public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
 
