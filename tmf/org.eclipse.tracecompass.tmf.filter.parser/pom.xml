@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright (C) 2018, Ericsson.
+
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+   
+   Contributors:
+     Jean-Christian Kouame - Initial API and implementation
+-->
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>org.eclipse.tracecompass.tmf-parent</artifactId>
+<!--     <groupId>org.eclipse.tracecompass</groupId> -->
+    <version>3.3.0-SNAPSHOT</version>
+    <groupId>org.eclipse.tracecompass</groupId>
+  </parent>
+
+  <name>Trace Compass Filter Parser</name>
+  <artifactId>org.eclipse.tracecompass.tmf.filter.parser</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>eclipse-plugin</packaging>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-source-plugin</artifactId>
+      </plugin>
+      <!-- Do not delete the existing .java parser files in target/ -->
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <configuration>
+          <excludeDefaultDirectories>true</excludeDefaultDirectories>
+          <filesets>
+            <fileset>
+              <directory>target</directory>
+              <followSymlinks>false</followSymlinks>
+              <includes>
+                <include>*/**</include>
+              </includes>
+              <excludes>
+                <exclude>generated-sources/antlr3/org/eclipse/tracecompass/tmf/filter/parser/FilterParserLexer.java</exclude>
+                <exclude>generated-sources/antlr3/org/eclipse/tracecompass/tmf/filter/parser/FilterParserParser.java</exclude>
+              </excludes>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <!-- Only rebuild the CTF grammar files if the filter-grammar profile is active -->
+  <profiles>
+    <profile>
+      <id>filter-grammar</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr3-maven-plugin</artifactId>
+            <version>3.5.2</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>antlr</goal>
+                </goals>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr-runtime</artifactId>
+                <version>3.5.2</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

@@ -101,6 +101,8 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.IFilterStrings;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerConfigXmlParser;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -170,6 +172,7 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -588,11 +591,20 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     zoomEntries(incorrectSample, getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
                 }
             }
-            List<ILinkEvent> links;
+            List<ILinkEvent> computedLinks;
             try (TraceCompassLogUtils.ScopeLog linkLog = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingLinks")) { //$NON-NLS-1$
                 /* Refresh the arrows when zooming */
-                links = getLinkList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
+                computedLinks = getLinkList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
+                TimeEventFilterDialog filterDialog = getTimeEventFilterDialog();
+                if (filterDialog != null && computedLinks != null) {
+                    if (filterDialog.hasActiveSavedFilters()) {
+                        computedLinks = null;
+                    } else {
+                        computedLinks.forEach(link -> link.setProperty(IFilterProperty.DIMMED, filterDialog.isFilterActive()));
+                    }
+                }
             }
+            List<ILinkEvent> links = computedLinks;
             /* Refresh the view-specific markers when zooming */
             try (TraceCompassLogUtils.ScopeLog markerLoglog = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingMarkers")) { //$NON-NLS-1$
                 List<IMarkerEvent> markers = new ArrayList<>(getViewMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
@@ -728,29 +740,14 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         Multimap<Integer, String> regexes = getRegexes();
         Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         for (Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
-            for (String regex : Objects.requireNonNull(entry.getValue())) {
-                if (regex.isEmpty()) {
-                    continue;
-                }
-                @Nullable Predicate<Map<String, String>> predicate = getPredicate(regex);
-                Predicate<Map<String, String>> oldPredicate = predicates.get(entry.getKey());
-                if (oldPredicate != null && predicate != null) {
-                    predicate = oldPredicate.and(predicate);
-                }
+            String regex = Joiner.on(IFilterStrings.AND).skipNulls().join(Iterables.filter(Objects.requireNonNull(entry.getValue()), s -> !s.isEmpty())); //$NON-NLS-1$
+            FilterCu cu = FilterCu.compile(regex);
+            Predicate<@NonNull Map<@NonNull String, @NonNull String>> predicate = cu != null ? cu.generate() : null;
                 if (predicate != null) {
                     predicates.put(entry.getKey(), predicate);
                 }
-            }
         }
         return predicates;
-    }
-
-    private static Predicate<Map<String, String>> getPredicate(String regex) {
-        if (regex == null || regex.isEmpty()) {
-            return null;
-        }
-        Pattern filterPattern = Pattern.compile(regex);
-        return (toTest) -> Iterables.any(toTest.entrySet(), entry -> filterPattern.matcher(entry.getValue()).find());
     }
 
     // ------------------------------------------------------------------------

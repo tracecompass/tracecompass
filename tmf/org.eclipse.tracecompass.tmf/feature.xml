@@ -30,6 +30,7 @@
       <import plugin="org.eclipse.ui.navigator.resources"/>
       <import plugin="org.eclipse.emf.common" version="2.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.ecore" version="2.5.0" match="greaterOrEqual"/>
+      <import plugin="org.antlr.runtime"/>
    </requires>
 
    <plugin
@@ -152,6 +153,13 @@
 
    <plugin
          id="org.eclipse.tracecompass.analysis.profiling.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.tracecompass.tmf.filter.parser"
          download-size="0"
          install-size="0"
          version="0.0.0"

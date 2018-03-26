@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-Vendor: %Bundle-Vendor
+Bundle-Version: 1.0.0.qualifier
+Bundle-Localization: plugin
+Bundle-SymbolicName: org.eclipse.tracecompass.tmf.filter.parser
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: org.antlr.runtime,
+ org.antlr.runtime.tree
+Export-Package: org.eclipse.tracecompass.tmf.filter.parser;x-friends:="org.eclipse.tracecompass.tmf.core",
+ org.eclipse.tracecompass.tmf.filter.parser.error

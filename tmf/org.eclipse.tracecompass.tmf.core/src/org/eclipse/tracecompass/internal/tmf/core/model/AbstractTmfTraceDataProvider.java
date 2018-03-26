@@ -14,13 +14,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.IFilterStrings;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
@@ -67,28 +68,13 @@ public abstract class AbstractTmfTraceDataProvider {
         Multimap<@NonNull Integer, @NonNull String> regexes = queryFilter.getRegexes();
         Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         for (Map.Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
-            for (String regex : Objects.requireNonNull(entry.getValue())) {
-                if (regex.isEmpty()) {
-                    continue;
-                }
-                @Nullable Predicate<Map<String, String>> predicate = getPredicate(regex);
-                Predicate<Map<String, String>> oldPredicate = predicates.get(entry.getKey());
-                if (oldPredicate != null && predicate != null) {
-                    predicate = oldPredicate.and(predicate);
-                }
+            String regex = Joiner.on(IFilterStrings.AND).skipNulls().join(Iterables.filter(Objects.requireNonNull(entry.getValue()), s -> !s.isEmpty())); //$NON-NLS-1$
+            FilterCu cu = FilterCu.compile(regex);
+            Predicate<@NonNull Map<@NonNull String, @NonNull String>> predicate = cu != null ? cu.generate() : null;
                 if (predicate != null) {
                     predicates.put(entry.getKey(), predicate);
                 }
-            }
         }
         return predicates;
-    }
-
-    private static @Nullable Predicate<Map<String, String>> getPredicate(@Nullable String regex) {
-        if (regex == null || regex.isEmpty()) {
-            return null;
-        }
-        Pattern filterPattern = Pattern.compile(regex);
-        return (toTest) -> Iterables.any(toTest.entrySet(), entry -> filterPattern.matcher(entry.getValue()).find());
     }
 }

@@ -1,0 +1,7 @@
+This file describes how to build the IElementResolver Filter Java parser files. They are stored in
+the git repository (to avoid additional compile-time dependencies), but if you
+do modify the .g files in src/, you should rebuild the resulting .java files and
+commit them.
+
+To rebuild the parser files, run Maven with the "filter" profile, as such:
+$ mvn clean install -Pfilter-grammar
