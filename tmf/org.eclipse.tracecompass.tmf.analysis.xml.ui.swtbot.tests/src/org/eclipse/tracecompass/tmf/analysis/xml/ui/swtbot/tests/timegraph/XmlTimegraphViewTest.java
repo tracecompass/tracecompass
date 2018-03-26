@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,7 +9,6 @@
 package org.eclipse.tracecompass.tmf.analysis.xml.ui.swtbot.tests.timegraph;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.runtime.Path;
@@ -114,18 +113,15 @@ public class XmlTimegraphViewTest {
 
         // Test the window range
         TimeGraphControl widget = timegraph.widget;
-        assertNotNull(widget);
-        assertEquals("window start time", 1, widget.getTimeDataProvider().getTime0());
-        assertEquals("window end time", 7, widget.getTimeDataProvider().getTime1());
+        SWTBotUtils.waitUntil(control -> control.getTimeDataProvider().getTime0() == 1, widget, "window start time");
+        SWTBotUtils.waitUntil(control -> control.getTimeDataProvider().getTime1() == 7, widget, "window end time");
 
         // test entries
-        SWTBotTimeGraphEntry[] entries = timegraph.getEntries();
-        assertEquals("number of entries", 1, entries.length);
-        entries = entries[0].getEntries();
-        assertEquals("number of entries", 1, entries.length);
-        SWTBotTimeGraphEntry entry = entries[0];
-        assertNotNull(entry);
-        assertEquals("name of entries[0]", "checkpoint", entry.getText());
+        SWTBotTimeGraphEntry traceEntry = timegraph.getEntry(TRACE_NAME);
+        SWTBotTimeGraphEntry entry = traceEntry.getEntry("checkpoint");
+        assertEquals("number of entries", 1, timegraph.getEntries().length);
+        assertEquals("number of entries", 1, traceEntry.getEntries().length);
+        assertEquals("name of entry", "checkpoint", entry.getText());
     }
 
     private static SWTBotTimeGraph getTimegraph() {
