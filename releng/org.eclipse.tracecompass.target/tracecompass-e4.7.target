@@ -64,7 +64,7 @@
 <unit id="org.eclipse.swt.tools.spies" version="0.0.0"/>
 <unit id="org.eclipse.ui.trace" version="0.0.0"/>
 <unit id="org.eclipse.ui.views.log" version="0.0.0"/>
-<repository location="http://download.eclipse.org/eclipse/updates/4.7-M-builds/M-4.7.3RC4-201803010715/"/>
+<repository location="http://download.eclipse.org/eclipse/updates/4.7/R-4.7.3-201803010715/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf" version="1.7.2"/>
