@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -38,8 +39,12 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.QualitativePaletteProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.SequentialPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.presentation.IPaletteProvider;
+import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -49,6 +54,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
+import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
 import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ImageHelper;
@@ -63,6 +69,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;
 import com.google.common.collect.Multisets;
@@ -475,6 +482,59 @@ public class TimeGraphViewTest {
         delta = refImage.diff(resetImage);
         Set<RGB> result = getFilteredColorSetOfImage(delta, 20);
         assertEquals(Collections.singleton(BLACK), result);
+    }
+
+    /**
+     * Test time graph with color palettes
+     */
+    @Test
+    public void testPalettes() {
+        SWTWorkbenchBot bot = new SWTWorkbenchBot();
+        resetTimeRange(bot);
+        TimeGraphViewStub view = getView();
+        Rectangle bounds = fBounds;
+        IPaletteProvider paletteBlue = SequentialPaletteProvider.create(new RGBAColor(0x23, 0x67, 0xf3, 0xff), 5);
+        UIThreadRunnable.syncExec(() -> view.setPresentationProvider(new PalettedPresentationProvider() {
+            @Override
+            public IPaletteProvider getPalette() {
+                return paletteBlue;
+            }
+        }));
+        ImageHelper blueish = ImageHelper.grabImage(bounds);
+        assertNotNull(blueish);
+        Multiset<RGB> histogram = blueish.getHistogram();
+        List<RGB> rgbs = Lists.transform(paletteBlue.get(), a->RGBAUtil.fromInt(a.toInt()).rgb);
+        for (RGB rgb : rgbs) {
+            assertTrue(rgb.toString(), histogram.count(rgb) > 0);
+        }
+        IPaletteProvider paletteGreen = SequentialPaletteProvider.create(new RGBAColor(0x23, 0xf3, 0x67, 0xff), 5);
+        UIThreadRunnable.syncExec(() -> view.setPresentationProvider(new PalettedPresentationProvider() {
+            @Override
+            public IPaletteProvider getPalette() {
+                return paletteGreen;
+            }
+        }));
+        ImageHelper greenish = ImageHelper.grabImage(bounds);
+        assertNotNull(greenish);
+        histogram = greenish.getHistogram();
+        rgbs = Lists.transform(paletteGreen.get(), a->RGBAUtil.fromInt(a.toInt()).rgb);
+        for (RGB rgb : rgbs) {
+            assertTrue(rgb.toString(), histogram.count(rgb) > 0);
+        }
+        IPaletteProvider rotating = new QualitativePaletteProvider.Builder().setAttenuation(0.5f).setBrightness(1.0f).setNbColors(4).build();
+        UIThreadRunnable.syncExec(() -> view.setPresentationProvider(new PalettedPresentationProvider() {
+            @Override
+            public IPaletteProvider getPalette() {
+                return rotating;
+            }
+        }));
+        ImageHelper rainbowish = ImageHelper.grabImage(bounds);
+        assertNotNull(rainbowish);
+        histogram = rainbowish.getHistogram();
+        rgbs = Lists.transform(rotating.get(), a->RGBAUtil.fromInt(a.toInt()).rgb);
+        for (RGB rgb : rgbs) {
+            assertTrue(rgb.toString(), histogram.count(rgb) > 0);
+        }
     }
 
     /**

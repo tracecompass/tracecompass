@@ -74,6 +74,7 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
     private final @NonNull TimeGraphEntry fRow2;
     private final @NonNull TimeGraphEntry fHead1;
     private final @NonNull TimeGraphEntry fRow4;
+    private StubPresentationProvider fPresentationProvider;
 
     /**
      * Constructor
@@ -145,6 +146,23 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
         if (entryList == null || entryList.isEmpty()) {
             addToEntryList(trace, fEntries);
         }
+        refresh();
+    }
+
+    @Override
+    protected StubPresentationProvider getPresentationProvider() {
+        return fPresentationProvider;
+    }
+
+    /**
+     * Set the presentation provider
+     *
+     * @param presentaitonProvider
+     *                                 the presentation provider
+     */
+    public void setPresentationProvider(StubPresentationProvider presentaitonProvider) {
+        fPresentationProvider = presentaitonProvider;
+        getTimeGraphViewer().setTimeGraphProvider(presentaitonProvider);
         refresh();
     }
 
