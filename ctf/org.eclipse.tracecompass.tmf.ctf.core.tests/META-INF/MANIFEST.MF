@@ -32,5 +32,6 @@ Export-Package: org.eclipse.tracecompass.tmf.ctf.core.tests.context,
 Import-Package: com.google.common.base,
  com.google.common.collect,
  org.apache.commons.io,
+ org.apache.commons.lang3.builder,
  org.eclipse.test.performance,
  org.eclipse.tracecompass.testtraces.ctf;version="1.0.0"

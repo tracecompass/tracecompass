@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -49,8 +50,6 @@ import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
-import com.google.common.base.MoreObjects;
 
 /**
  * Tests related to the trimming feature of CTF traces
@@ -307,12 +306,12 @@ public class CtfTmfTraceTrimmingTest {
     }
 
     private static String eventToString(CtfTmfEvent event) {
-        return MoreObjects.toStringHelper(event)
-                .add("Timestamp", event.getTimestamp())
-                .add("Type", event.getType())
-                .add("Content", event.getContent())
-                .add("CPU", event.getCPU())
-                .add("Channel", event.getChannel())
+        return new ToStringBuilder(event)
+                .append("Timestamp", event.getTimestamp())
+                .append("Type", event.getType())
+                .append("Content", event.getContent())
+                .append("CPU", event.getCPU())
+                .append("Channel", event.getChannel())
                 .toString();
     }
 }
