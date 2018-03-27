@@ -2019,6 +2019,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @since 2.0
      */
     protected void fillLocalMenu(IMenuManager manager) {
+        manager.add(fTimeGraphViewer.getGridlinesMenu());
         manager.add(fTimeGraphViewer.getMarkersMenu());
         manager.add(getMarkerSetMenu());
     }

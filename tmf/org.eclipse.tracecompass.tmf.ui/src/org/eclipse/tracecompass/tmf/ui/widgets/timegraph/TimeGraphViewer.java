@@ -32,6 +32,7 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
@@ -116,6 +117,8 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
     private static final int MAX_NAME_WIDTH = 1000;
     private static final int DEFAULT_HEIGHT = 22;
     private static final String HIDE_ARROWS_KEY = "hide.arrows"; //$NON-NLS-1$
+    private static final String HIDE_GRIDLINES_HORIZONTAL_KEY = "hide.gridlines.horizontal"; //$NON-NLS-1$
+    private static final String HIDE_GRIDLINES_VERTICAL_KEY = "hide.gridlines.vertical"; //$NON-NLS-1$
     private static final long DEFAULT_FREQUENCY = 1000000000L;
     private static final int H_SCROLLBAR_MAX = Integer.MAX_VALUE - 1;
 
@@ -185,6 +188,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
     private Action fNextMarkerAction;
     private Action fPreviousMarkerAction;
     private MenuManager fMarkersMenu;
+    private MenuManager fGridlinesMenu;
 
     /** The list of bookmarks */
     private final List<IMarkerEvent> fBookmarks = new ArrayList<>();
@@ -499,6 +503,9 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
         fTimeAlignedComposite.addDisposeListener((e) -> {
             if (fMarkersMenu != null) {
                 fMarkersMenu.dispose();
+            }
+            if (fGridlinesMenu != null) {
+                fGridlinesMenu.dispose();
             }
         });
         GridLayout gl = new GridLayout(3, false);
@@ -2512,6 +2519,42 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
             });
         }
         return fMarkersMenu;
+    }
+
+    /**
+     * Get the show gridlines menu.
+     *
+     * @return The menu manager object
+     * @since 3.4
+     */
+    public MenuManager getGridlinesMenu() {
+        if (fGridlinesMenu == null) {
+            IDialogSettings settings = DialogSettings.getOrCreateSection(Activator.getDefault().getDialogSettings(), TimeGraphControl.class.getName());
+            fGridlinesMenu = new MenuManager(Messages.TmfTimeGraphViewer_ShowGridlinesMenuText);
+            Action horizontalAction = new Action(Messages.TmfTimeGraphViewer_ShowGridlinesHorizontalActionText, IAction.AS_CHECK_BOX) {
+                @Override
+                public void run() {
+                    boolean showHorizontal = isChecked();
+                    fTimeGraphCtrl.setMidLinesVisible(showHorizontal);
+                    settings.put(HIDE_GRIDLINES_HORIZONTAL_KEY, !showHorizontal);
+                }
+            };
+            horizontalAction.setChecked(!settings.getBoolean(HIDE_GRIDLINES_HORIZONTAL_KEY));
+            fTimeGraphCtrl.setMidLinesVisible(horizontalAction.isChecked());
+            fGridlinesMenu.add(horizontalAction);
+            Action verticalAction = new Action(Messages.TmfTimeGraphViewer_ShowGridlinesVerticalActionText, IAction.AS_CHECK_BOX) {
+                @Override
+                public void run() {
+                    boolean showVertical = isChecked();
+                    fTimeGraphCtrl.setGridLinesVisible(showVertical);
+                    settings.put(HIDE_GRIDLINES_VERTICAL_KEY, !showVertical);
+                }
+            };
+            verticalAction.setChecked(!settings.getBoolean(HIDE_GRIDLINES_VERTICAL_KEY));
+            fTimeGraphCtrl.setGridLinesVisible(verticalAction.isChecked());
+            fGridlinesMenu.add(verticalAction);
+        }
+        return fGridlinesMenu;
     }
 
     /**

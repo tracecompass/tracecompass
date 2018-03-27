@@ -223,6 +223,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private MenuDetectEvent fPendingMenuDetectEvent = null;
     private boolean fGridLinesVisible = true;
     private Color fGridLineColor = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
+    private boolean fMidLinesVisible = true;
     private boolean fHideArrows = false;
     private int fAutoExpandLevel = ALL_LEVELS;
     private Entry<ITimeGraphEntry, Integer> fVerticalZoomAlignEntry = null;
@@ -1354,7 +1355,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
-     * Set the grid lines visibility. The default is true.
+     * Set the vertical grid lines visibility. The default is true.
      *
      * @param visible
      *            true to show the grid lines, false otherwise
@@ -1362,10 +1363,11 @@ public class TimeGraphControl extends TimeGraphBaseControl
      */
     public void setGridLinesVisible(boolean visible) {
         fGridLinesVisible = visible;
+        redraw();
     }
 
     /**
-     * Get the grid lines visibility.
+     * Get the vertical grid lines visibility.
      *
      * @return true if the grid lines are visible, false otherwise
      * @since 2.0
@@ -1383,6 +1385,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      */
     public void setGridLineColor(Color color) {
         fGridLineColor = color;
+        redraw();
     }
 
     /**
@@ -1393,6 +1396,28 @@ public class TimeGraphControl extends TimeGraphBaseControl
      */
     public Color getGridLineColor() {
         return fGridLineColor;
+    }
+
+    /**
+     * Set the horizontal middle lines visibility. The default is true.
+     *
+     * @param visible
+     *            true to show the middle lines, false otherwise
+     * @since 3.4
+     */
+    public void setMidLinesVisible(boolean visible) {
+        fMidLinesVisible = visible;
+        redraw();
+    }
+
+    /**
+     * Get the horizontal middle lines visibility.
+     *
+     * @return true if the middle lines are visible, false otherwise
+     * @since 3.4
+     */
+    public boolean getMidLinesVisible() {
+        return fMidLinesVisible;
     }
 
     /**
@@ -2011,11 +2036,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
             // draw the name space
             Rectangle nameRect = new Rectangle(itemRect.x, itemRect.y, nameSpace, itemRect.height);
             drawName(item, nameRect, gc);
-            if (item.fEntry.hasTimeEvents()) {
+            if (fMidLinesVisible && item.fEntry.hasTimeEvents() && item.fItemHeight > MIN_MIDLINE_HEIGHT) {
                 Rectangle rect = new Rectangle(nameSpace, itemRect.y, itemRect.width - nameSpace, itemRect.height);
-                if (item.fItemHeight > MIN_MIDLINE_HEIGHT) {
-                    drawMidLine(rect, gc);
-                }
+                drawMidLine(rect, gc);
             }
         }
     }
@@ -2467,7 +2490,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             if (textWidth > 0) {
                 idealNameSpace = rect.x + width;
             }
-            if (columns.length == 1 && item.fItemHeight > MIN_MIDLINE_HEIGHT) {
+            if (fMidLinesVisible && columns.length == 1 && item.fItemHeight > MIN_MIDLINE_HEIGHT) {
                 drawMidLine(new Rectangle(bounds.x + width, bounds.y, bounds.x + bounds.width, bounds.height), gc);
             }
             if (fAutoResizeColumns && width > column.getWidth()) {
