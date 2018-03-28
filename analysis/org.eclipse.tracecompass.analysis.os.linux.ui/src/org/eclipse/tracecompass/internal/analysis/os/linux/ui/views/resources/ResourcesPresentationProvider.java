@@ -127,6 +127,9 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 }
                 return STATE_MAP.get(StateValues.CPU_STATUS_SOFTIRQ);
             case CURRENT_THREAD:
+                if (!event.hasValue()) {
+                    return null;
+                }
                 return STATE_MAP.get(StateValues.CPU_STATUS_RUN_USERMODE);
             case TRACE:
                 return null;
