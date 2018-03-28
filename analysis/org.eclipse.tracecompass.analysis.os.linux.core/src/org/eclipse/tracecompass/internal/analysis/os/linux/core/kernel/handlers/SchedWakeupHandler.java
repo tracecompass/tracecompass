@@ -20,6 +20,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundExc
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 
 /**
  * Waking/wakeup handler.
@@ -41,8 +42,12 @@ public class SchedWakeupHandler extends KernelEventHandler {
     @Override
     public void handleEvent(ITmfStateSystemBuilder ss, ITmfEvent event) throws AttributeNotFoundException {
         Integer cpu = KernelEventHandlerUtils.getCpu(event);
-        final int tid = ((Long) event.getContent().getField(getLayout().fieldTid()).getValue()).intValue();
-        final int prio = ((Long) event.getContent().getField(getLayout().fieldPrio()).getValue()).intValue();
+        ITmfEventField content = event.getContent();
+        final Integer tid = content.getFieldValue(Integer.class, getLayout().fieldTid());
+        if (tid == null) {
+            return;
+        }
+        final Integer prio = content.getFieldValue(Integer.class, getLayout().fieldPrio());
         Long targetCpu = event.getContent().getFieldValue(Long.class, getLayout().fieldTargetCpu());
 
         String threadAttributeName = Attributes.buildThreadAttributeName(tid, cpu);
@@ -75,8 +80,10 @@ public class SchedWakeupHandler extends KernelEventHandler {
          * When a user changes a threads prio (e.g. with pthread_setschedparam),
          * it shows in ftrace with a sched_wakeup.
          */
-        quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.PRIO);
-        value = TmfStateValue.newValueInt(prio);
-        ss.modifyAttribute(timestamp, value, quark);
+        if (prio != null) {
+            quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.PRIO);
+            value = TmfStateValue.newValueInt(prio);
+            ss.modifyAttribute(timestamp, value, quark);
+        }
     }
 }

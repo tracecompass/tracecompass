@@ -49,14 +49,17 @@ public class SchedSwitchHandler extends KernelEventHandler {
 
         ITmfEventField content = event.getContent();
         String prevProcessName = checkNotNull((String) content.getField(getLayout().fieldPrevComm()).getValue());
-        Integer prevTid = ((Long) content.getField(getLayout().fieldPrevTid()).getValue()).intValue();
-        Long prevState = checkNotNull((Long) content.getField(getLayout().fieldPrevState()).getValue());
-        Integer prevPrio = ((Long) content.getField(getLayout().fieldPrevPrio()).getValue()).intValue();
-        String nextProcessName = checkNotNull((String) content.getField(getLayout().fieldNextComm()).getValue());
-        Integer nextTid = ((Long) content.getField(getLayout().fieldNextTid()).getValue()).intValue();
-        Integer nextPrio = ((Long) content.getField(getLayout().fieldNextPrio()).getValue()).intValue();
+        Integer prevTid = content.getFieldValue(Integer.class, getLayout().fieldPrevTid());
+        Long prevState = content.getFieldValue(Long.class, getLayout().fieldPrevState());
+        Integer prevPrio = content.getFieldValue(Integer.class, getLayout().fieldPrevPrio());
+        String nextProcessName = content.getFieldValue(String.class, getLayout().fieldNextComm());
+        Integer nextTid = content.getFieldValue(Integer.class, getLayout().fieldNextTid());
+        Integer nextPrio = content.getFieldValue(Integer.class, getLayout().fieldNextPrio());
 
         /* Will never return null since "cpu" is null checked */
+        if (prevTid == null || prevState == null || nextTid == null) {
+            return;
+        }
         String formerThreadAttributeName = Attributes.buildThreadAttributeName(prevTid, cpu);
         String currenThreadAttributeName = Attributes.buildThreadAttributeName(nextTid, cpu);
 
@@ -87,13 +90,19 @@ public class SchedSwitchHandler extends KernelEventHandler {
         setProcessExecName(ss, prevProcessName, formerThreadNode, timestamp);
 
         /* Set the exec name of the new process */
-        setProcessExecName(ss, nextProcessName, newCurrentThreadNode, timestamp);
+        if (nextProcessName != null) {
+            setProcessExecName(ss, nextProcessName, newCurrentThreadNode, timestamp);
+        }
 
         /* Set the current prio for the former process */
-        setProcessPrio(ss, prevPrio, formerThreadNode, timestamp);
+        if (prevPrio != null) {
+            setProcessPrio(ss, prevPrio, formerThreadNode, timestamp);
+        }
 
         /* Set the current prio for the new process */
-        setProcessPrio(ss, nextPrio, newCurrentThreadNode, timestamp);
+        if (nextPrio != null) {
+            setProcessPrio(ss, nextPrio, newCurrentThreadNode, timestamp);
+        }
 
         /* Set the current scheduled process on the relevant CPU */
         int currentCPUNode = KernelEventHandlerUtils.getCurrentCPUNode(cpu, ss);

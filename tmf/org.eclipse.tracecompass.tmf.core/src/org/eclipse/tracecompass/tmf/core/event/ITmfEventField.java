@@ -19,6 +19,10 @@ import java.util.Collection;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
+import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
+
 /**
  * The generic event payload in TMF. Each field can be either a terminal or
  * further decomposed into subfields.
@@ -100,18 +104,70 @@ public interface ITmfEventField {
      *         the correct type, or 'null' otherwise
      * @since 2.1
      */
+
     default <T> @Nullable T getFieldValue(@NonNull Class<T> type, @NonNull String @NonNull ... fieldName) {
         ITmfEventField field = getField(fieldName);
         if (field == null) {
             return null;
         }
         Object value = field.getValue();
-        if (value == null || !type.isAssignableFrom(value.getClass())) {
+        if (value == null) {
             return null;
         }
-        @SuppressWarnings("unchecked")
-        T ret = (T) value;
-        return ret;
+        if (type.isAssignableFrom(value.getClass())) {
+            @SuppressWarnings("unchecked")
+            T ret = (T) value;
+            return ret;
+        }
+        // See if we can force a cast to some known type
+        if (type.equals(String.class)) {
+            @SuppressWarnings("unchecked")
+            T ret = (T) String.valueOf(value);
+            return ret;
+        }
+        if (type.equals(Long.class)) {
+            if (Number.class.isAssignableFrom(value.getClass())) {
+                @SuppressWarnings("unchecked")
+                T ret = (T) ((Long) ((Number) value).longValue());
+                return ret;
+            }
+            Long longVal = Longs.tryParse(String.valueOf(value));
+            if (longVal != null) {
+                @SuppressWarnings("unchecked")
+                T ret = (T) longVal;
+                return ret;
+            }
+            return null;
+        }
+        if (type.equals(Integer.class)) {
+            if (Number.class.isAssignableFrom(value.getClass())) {
+                @SuppressWarnings("unchecked")
+                T ret = (T) ((Integer) ((Number) value).intValue());
+                return ret;
+            }
+            Integer intVal = Ints.tryParse(String.valueOf(value));
+            if (intVal != null) {
+                @SuppressWarnings("unchecked")
+                T ret = (T) intVal;
+                return ret;
+            }
+            return null;
+        }
+        if (type.equals(Double.class)) {
+            if (Number.class.isAssignableFrom(value.getClass())) {
+                @SuppressWarnings("unchecked")
+                T ret = (T) ((Double) ((Number) value).doubleValue());
+                return ret;
+            }
+            Double dblVal = Doubles.tryParse(String.valueOf(value));
+            if (dblVal != null) {
+                @SuppressWarnings("unchecked")
+                T ret = (T) dblVal;
+                return ret;
+            }
+            return null;
+        }
+        return null;
     }
 
 }

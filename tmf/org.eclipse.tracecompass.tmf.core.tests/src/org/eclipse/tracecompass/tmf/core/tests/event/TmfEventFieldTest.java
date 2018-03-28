@@ -43,28 +43,31 @@ public class TmfEventFieldTest {
     // Variables
     // ------------------------------------------------------------------------
 
-    private final @NonNull String fFieldName1 = "Field-1";
-    private final @NonNull String fFieldName2 = "Field-2";
+    private final @NonNull String fFieldName1 = "FieldString";
+    private final @NonNull String fFieldName2 = "FieldInteger";
+    private final @NonNull String fFieldName3 = "FieldStrInt";
 
-    private final Object fValue1 = "Value";
-    private final Object fValue2 = Integer.valueOf(10);
+    private final String fValue1 = "Value";
+    private final Integer fValue2 = Integer.valueOf(10);
+    private final String fValue3 = String.valueOf(fValue2);
 
     private final TmfEventField fField1 = new TmfEventField(fFieldName1, fValue1, null);
     private final TmfEventField fField2 = new TmfEventField(fFieldName2, fValue2, null);
-    private final TmfEventField fField3 = new TmfEventField(fFieldName1, fValue2, null);
+    private final TmfEventField fField3 = new TmfEventField(fFieldName3, fValue3, null);
+    private final TmfEventField fFieldOther = new TmfEventField(fFieldName1, fValue2, null);
 
     private final @NonNull String fStructRootFieldName = "Root-S";
     private final String[] fStructFieldNames = new String[] { fFieldName1, fFieldName2 };
     private final TmfEventField fStructTerminalField1 = new TmfEventField(fFieldName1, null, null);
     private final TmfEventField fStructTerminalField2 = new TmfEventField(fFieldName2, null, null);
-    private final TmfEventField fStructTerminalField3 = new TmfEventField(fFieldName1, null, null);
+    private final TmfEventField fStructTerminalFieldOther = new TmfEventField(fFieldName1, null, null);
     private final TmfEventField fStructRootField = new TmfEventField(fStructRootFieldName, null,
             new ITmfEventField[] { fStructTerminalField1, fStructTerminalField2 });
 
     private final @NonNull String fRootFieldName = "Root";
-    private final String[] fFieldNames = new String[] { fFieldName1, fFieldName2 };
+    private final String[] fFieldNames = new String[] { fFieldName1, fFieldName2, fFieldName3 };
     private final TmfEventField fRootField = new TmfEventField(fRootFieldName, null,
-            new ITmfEventField[] { fField1, fField2 });
+            new ITmfEventField[] { fField1, fField2, fField3 });
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -110,12 +113,12 @@ public class TmfEventFieldTest {
     public void testNonTerminalConstructor() {
         assertSame("getName", fRootFieldName, fRootField.getName());
         assertNull("getValue", fRootField.getValue());
-        assertEquals("getFields", 2, fRootField.getFields().size());
+        assertEquals("getFields", fFieldNames.length, fRootField.getFields().size());
         assertSame("getField(name)", fField1, fRootField.getField(fFieldName1));
         assertSame("getField(name)", fField2, fRootField.getField(fFieldName2));
 
         final Collection<String> names = fRootField.getFieldNames();
-        assertEquals("getFieldNames length", 2, names.size());
+        assertEquals("getFieldNames length", fFieldNames.length, names.size());
         assertArrayEquals(fFieldNames, names.toArray(new String[names.size()]));
     }
 
@@ -133,12 +136,12 @@ public class TmfEventFieldTest {
     public void testNonTerminalCopyConstructor() {
         assertSame("getName", fRootFieldName, fRootField.getName());
         assertNull("getValue", fRootField.getValue());
-        assertEquals("getFields", 2, fRootField.getFields().size());
+        assertEquals("getFields", fFieldNames.length, fRootField.getFields().size());
         assertSame("getField(name)", fField1, fRootField.getField(fFieldName1));
         assertSame("getField(name)", fField2, fRootField.getField(fFieldName2));
 
         final Collection<String> names = fRootField.getFieldNames();
-        assertEquals("getFieldNames length", 2, names.size());
+        assertEquals("getFieldNames length", fFieldNames.length, names.size());
         assertArrayEquals(fFieldNames, names.toArray(new String[names.size()]));
     }
 
@@ -232,11 +235,11 @@ public class TmfEventFieldTest {
 
     @Test
     public void testEquals() {
-        assertTrue("equals", fStructTerminalField1.equals(fStructTerminalField3));
-        assertTrue("equals", fStructTerminalField3.equals(fStructTerminalField1));
+        assertTrue("equals", fStructTerminalField1.equals(fStructTerminalFieldOther));
+        assertTrue("equals", fStructTerminalFieldOther.equals(fStructTerminalField1));
 
-        assertFalse("equals", fStructTerminalField1.equals(fField3));
-        assertFalse("equals", fField3.equals(fStructTerminalField1));
+        assertFalse("equals", fStructTerminalField1.equals(fFieldOther));
+        assertFalse("equals", fFieldOther.equals(fStructTerminalField1));
     }
 
     @Test
@@ -300,7 +303,7 @@ public class TmfEventFieldTest {
         final String fieldName = "myfield";
         final Object value = new String("test-string");
         final TmfEventField[] fields1 = { fField1, fField2 };
-        final TmfEventField[] fields2 = { fField2, fField3 };
+        final TmfEventField[] fields2 = { fField2, fFieldOther };
 
         final TmfEventField field1 = new TmfEventField(fieldName, value, fields1);
         final TmfEventField field2 = new TmfEventField(fieldName, value, fields2);
@@ -353,7 +356,7 @@ public class TmfEventFieldTest {
 
         root = TmfEventField.makeRoot(fFieldNames);
         names = root.getFieldNames();
-        assertEquals("getFieldNames length", 2, names.size());
+        assertEquals("getFieldNames length", fFieldNames.length, names.size());
         assertArrayEquals(fFieldNames, names.toArray(new String[names.size()]));
     }
 
@@ -372,6 +375,43 @@ public class TmfEventFieldTest {
     public void testGetFieldValueExistsButWrongType() {
         Integer value = fRootField.getFieldValue(Integer.class, fFieldName1);
         assertNull(value);
+    }
+
+    @Test
+    public void testGetFieldValueCast() {
+        // Field 2 can be cast to a Number or String
+        Object value = fRootField.getFieldValue(String.class, fFieldName2);
+        assertNotNull(value);
+        assertEquals(String.valueOf(fValue2), value);
+
+        value = fRootField.getFieldValue(Integer.class, fFieldName2);
+        assertNotNull(value);
+        assertEquals(fValue2, value);
+
+        value = fRootField.getFieldValue(Long.class, fFieldName2);
+        assertNotNull(value);
+        assertEquals(fValue2.longValue(), value);
+
+        value = fRootField.getFieldValue(Double.class, fFieldName2);
+        assertNotNull(value);
+        assertEquals(fValue2.doubleValue(), value);
+
+        // Field 3 can be cast to a Number or String
+        value = fRootField.getFieldValue(String.class, fFieldName3);
+        assertNotNull(value);
+        assertEquals(fValue3, value);
+
+        value = fRootField.getFieldValue(Integer.class, fFieldName3);
+        assertNotNull(value);
+        assertEquals(fValue2, value);
+
+        value = fRootField.getFieldValue(Long.class, fFieldName3);
+        assertNotNull(value);
+        assertEquals(fValue2.longValue(), value);
+
+        value = fRootField.getFieldValue(Double.class, fFieldName3);
+        assertNotNull(value);
+        assertEquals(fValue2.doubleValue(), value);
     }
 
     @Test
