@@ -174,7 +174,7 @@ public interface ITimeGraphPresentationProvider {
      * Get the name of the link type
      *
      * @return The name of the link type
-     * @since 3.3
+     * @since 3.4
      */
     default String getLinkTypeName() {
         return Messages.TimeGraphLegend_Arrows;

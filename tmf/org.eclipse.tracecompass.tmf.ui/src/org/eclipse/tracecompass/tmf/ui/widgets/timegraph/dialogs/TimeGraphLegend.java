@@ -241,7 +241,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
      * @param si
      *            The state item
      * @return True if the state item is a link state, false otherwise
-     * @since 3.3
+     * @since 3.4
      */
     protected static boolean isLinkState(StateItem si) {
         Object itemType = si.getStyleMap().getOrDefault(ITimeEventStyleStrings.itemTypeProperty(), ITimeEventStyleStrings.stateType());
