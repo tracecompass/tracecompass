@@ -70,12 +70,11 @@ public class BaseHandler extends AbstractTraceEventHandler {
         Collection<ITmfTrace> traceSet = TmfTraceManager.getTraceSet(trace);
         for (ITmfTrace traceItem : traceSet) {
             IKernelAnalysisEventLayout layout = getProvider().getEventLayout(traceItem);
+            /* default wake-up event */
+            String wakeupEvent = layout.eventSchedProcessWakeup();
             if (traceItem instanceof ITmfTraceWithPreDefinedEvents) {
                 Set<? extends ITmfEventType> content = ((ITmfTraceWithPreDefinedEvents) traceItem).getContainedEventTypes();
                 Set<String> traceEvents = TmfEventTypeCollectionHelper.getEventNames(content);
-
-                /* default wake-up event */
-                String wakeupEvent = layout.eventSchedProcessWakeup();
 
                 /*
                  * FIXME: downcast in the client should be avoided
@@ -93,8 +92,8 @@ public class BaseHandler extends AbstractTraceEventHandler {
                         }
                     }
                 }
-                fWakeupEventMap.put(traceItem, wakeupEvent);
             }
+            fWakeupEventMap.put(traceItem, wakeupEvent);
         }
     }
 
