@@ -19,6 +19,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEven
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.EventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
@@ -29,6 +30,8 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  * @author Geneviève Bastien
  */
 public class TraceEventHandlerSched extends BaseHandler {
+
+    private static final String TASK_UNKNOWN = "Unknown"; //$NON-NLS-1$
 
     /**
      * Constructor
@@ -65,12 +68,16 @@ public class TraceEventHandlerSched extends BaseHandler {
         Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
         OsSystemModel system = getProvider().getSystem();
+        ITmfEventField content = event.getContent();
 
-        Integer next = EventField.getInt(event, eventLayout.fieldNextTid());
-        Integer prev = EventField.getInt(event, eventLayout.fieldPrevTid());
+        Integer next = content.getFieldValue(Integer.class, eventLayout.fieldNextTid());
+        Integer prev = content.getFieldValue(Integer.class, eventLayout.fieldPrevTid());
+        if (next == null || prev == null) {
+            return;
+        }
         long ts = event.getTimestamp().getValue();
-        long prev_state = EventField.getLong(event, eventLayout.fieldPrevState());
-        prev_state = (long) ((int) prev_state) & (LinuxValues.TASK_STATE_RUNNING | LinuxValues.TASK_INTERRUPTIBLE | LinuxValues.TASK_UNINTERRUPTIBLE);
+        Integer prev_state = content.getFieldValue(Integer.class, eventLayout.fieldPrevState());
+        prev_state = prev_state == null ? 0 : prev_state & (LinuxValues.TASK_STATE_RUNNING | LinuxValues.TASK_INTERRUPTIBLE | LinuxValues.TASK_UNINTERRUPTIBLE);
         String host = event.getTrace().getHostId();
 
         system.cacheTidOnCpu(cpu, new HostThread(event.getTrace().getHostId(), next));
@@ -106,9 +113,14 @@ public class TraceEventHandlerSched extends BaseHandler {
         String host = event.getTrace().getHostId();
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
         OsSystemModel system = getProvider().getSystem();
+        ITmfEventField content = event.getContent();
 
-        Integer childTid = EventField.getInt(event, eventLayout.fieldChildTid());
-        String name = EventField.getString(event, eventLayout.fieldChildComm());
+        Integer childTid = content.getFieldValue(Integer.class, eventLayout.fieldChildTid());
+        String name = content.getFieldValue(String.class, eventLayout.fieldChildComm());
+        if (childTid == null) {
+            return;
+        }
+        name = (name == null ? String.valueOf(childTid) : name);
         long ts = event.getTimestamp().getValue();
 
         HostThread childHt = new HostThread(host, childTid);
@@ -128,7 +140,10 @@ public class TraceEventHandlerSched extends BaseHandler {
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
         OsSystemModel system = getProvider().getSystem();
 
-        Integer tid = EventField.getInt(event, eventLayout.fieldTid());
+        Integer tid = event.getContent().getFieldValue(Integer.class, eventLayout.fieldTid());
+        if (tid == null) {
+            return;
+        }
         HostThread targetHt = new HostThread(host, tid);
 
         OsWorker target = system.findWorker(targetHt);
@@ -159,7 +174,10 @@ public class TraceEventHandlerSched extends BaseHandler {
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
         OsSystemModel system = getProvider().getSystem();
 
-        Integer tid = EventField.getInt(event, eventLayout.fieldTid());
+        Integer tid = event.getContent().getFieldValue(Integer.class, eventLayout.fieldTid());
+        if (tid == null) {
+            return;
+        }
         OsWorker task = system.findWorker(new HostThread(host, tid));
         if (task == null) {
             return;
@@ -173,12 +191,12 @@ public class TraceEventHandlerSched extends BaseHandler {
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
         OsSystemModel system = getProvider().getSystem();
 
-        String filename = EventField.getString(event, eventLayout.fieldFilename());
+        String filename = event.getContent().getFieldValue(String.class, eventLayout.fieldFilename());
         OsWorker task = system.getWorkerOnCpu(host, cpu);
         if (task == null) {
             return;
         }
-        task.setName(filename);
+        task.setName(filename == null ? TASK_UNKNOWN : filename);
     }
 
 }

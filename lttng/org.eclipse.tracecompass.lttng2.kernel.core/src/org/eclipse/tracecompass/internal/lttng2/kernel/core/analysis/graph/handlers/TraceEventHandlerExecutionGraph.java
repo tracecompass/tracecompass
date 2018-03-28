@@ -21,23 +21,23 @@ import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge.EdgeType;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex.EdgeDirection;
-import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsInterruptContext;
 import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider.Context;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsInterruptContext;
 import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsSystemModel;
 import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsWorker;
-import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider.Context;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.LinuxValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.TcpEventStrings;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.EventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.event.matching.IMatchProcessingUnit;
-import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventDependency.DependencyEvent;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventDependency;
+import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventDependency.DependencyEvent;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -201,9 +201,14 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         long ts = event.getTimestamp().getValue();
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
         OsSystemModel system = getProvider().getSystem();
+        ITmfEventField content = event.getContent();
 
-        Integer next = EventField.getInt(event, eventLayout.fieldNextTid());
-        Integer prev = EventField.getInt(event, eventLayout.fieldPrevTid());
+        Integer next = content.getFieldValue(Integer.class, eventLayout.fieldNextTid());
+        Integer prev =content.getFieldValue(Integer.class, eventLayout.fieldPrevTid());
+
+        if (next == null || prev == null) {
+            return;
+        }
 
         OsWorker nextTask = system.findWorker(new HostThread(host, next));
         OsWorker prevTask = system.findWorker(new HostThread(host, prev));
@@ -223,7 +228,10 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         OsSystemModel system = getProvider().getSystem();
 
         long ts = event.getTimestamp().getValue();
-        Integer tid = EventField.getInt(event, eventLayout.fieldTid());
+        Integer tid = event.getContent().getFieldValue(Integer.class, eventLayout.fieldTid());
+        if (tid == null) {
+            return;
+        }
 
         OsWorker target = system.findWorker(new HostThread(host, tid));
         OsWorker current = system.getWorkerOnCpu(host, cpu);
@@ -280,12 +288,13 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
     private void softIrq(ITmfEvent event, TmfGraph graph, Integer cpu, IKernelAnalysisEventLayout eventLayout, long ts, OsWorker target, OsInterruptContext context) {
         TmfVertex wup = new TmfVertex(ts);
         TmfEdge l2 = graph.append(target, wup);
+        ITmfEventField content = context.getEvent().getContent();
         if (l2 != null) {
-            int vec = EventField.getLong(context.getEvent(), eventLayout.fieldVec()).intValue();
+            Integer vec = content.getFieldValue(Integer.class, eventLayout.fieldVec());
             l2.setType(resolveSoftirq(vec));
         }
         // special case for network related softirq
-        Long vec = EventField.getLong(context.getEvent(), eventLayout.fieldVec());
+        Long vec = content.getFieldValue(Long.class, eventLayout.fieldVec());
         if (vec == LinuxValues.SOFTIRQ_NET_RX || vec == LinuxValues.SOFTIRQ_NET_TX) {
             // create edge if wake up is caused by incoming packet
             OsWorker k = getOrCreateKernelWorker(event, cpu);
@@ -311,7 +320,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
     private static void irq(TmfGraph graph, IKernelAnalysisEventLayout eventLayout, long ts, OsWorker target, OsInterruptContext context) {
         TmfEdge link = graph.append(target, new TmfVertex(ts));
         if (link != null) {
-            int vec = EventField.getLong(context.getEvent(), eventLayout.fieldIrq()).intValue();
+            Integer vec = context.getEvent().getContent().getFieldValue(Integer.class, eventLayout.fieldIrq());
             link.setType(resolveIRQ(vec));
         }
     }
@@ -326,8 +335,11 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         }
     }
 
-    private static EdgeType resolveIRQ(int vec) {
+    private static EdgeType resolveIRQ(@Nullable Integer vec) {
         EdgeType ret = EdgeType.UNKNOWN;
+        if (vec == null) {
+            return ret;
+        }
         switch (vec) {
         case IRQ_TIMER:
             ret = EdgeType.INTERRUPTED;
@@ -339,8 +351,11 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         return ret;
     }
 
-    private static EdgeType resolveSoftirq(int vec) {
+    private static EdgeType resolveSoftirq(@Nullable Integer vec) {
         EdgeType ret = EdgeType.UNKNOWN;
+        if (vec == null) {
+            return ret;
+        }
         switch (vec) {
         case LinuxValues.SOFTIRQ_HRTIMER:
         case LinuxValues.SOFTIRQ_TIMER:
@@ -406,7 +421,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
     private void handleSoftirqEntry(ITmfEvent event) {
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
         TmfGraph graph = NonNullUtils.checkNotNull(getProvider().getAssignedGraph());
-        Long vec = EventField.getLong(event, eventLayout.fieldVec());
+        Long vec = event.getContent().getFieldValue(Long.class, eventLayout.fieldVec());
         if (vec == LinuxValues.SOFTIRQ_NET_RX || vec == LinuxValues.SOFTIRQ_NET_TX) {
             Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
             OsWorker k = getOrCreateKernelWorker(event, cpu);

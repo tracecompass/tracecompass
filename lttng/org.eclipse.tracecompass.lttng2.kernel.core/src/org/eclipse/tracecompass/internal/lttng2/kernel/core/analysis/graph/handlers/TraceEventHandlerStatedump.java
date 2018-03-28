@@ -19,6 +19,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.EventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 
 /**
  * Handles the LTTng statedump events necessary for the initialization of the
@@ -49,10 +50,14 @@ public class TraceEventHandlerStatedump extends BaseHandler {
         if (!eventName.equals(eventLayout.eventStatedumpProcessState())) {
             return;
         }
-
-        Integer tid = EventField.getInt(event, eventLayout.fieldTid());
+        ITmfEventField content = event.getContent();
+        Integer tid = content.getFieldValue(Integer.class, eventLayout.fieldTid());
         String name = EventField.getOrDefault(event, eventLayout.fieldName(), nullToEmptyString(Messages.TraceEventHandlerSched_UnknownThreadName));
-        Integer status = EventField.getInt(event, eventLayout.fieldStatus());
+        Integer status = content.getFieldValue(Integer.class, eventLayout.fieldStatus());
+        if (tid == null || status == null) {
+            // Insufficient data, ignore this event
+            return;
+        }
 
         String host = event.getTrace().getHostId();
         long ts = event.getTimestamp().getValue();
