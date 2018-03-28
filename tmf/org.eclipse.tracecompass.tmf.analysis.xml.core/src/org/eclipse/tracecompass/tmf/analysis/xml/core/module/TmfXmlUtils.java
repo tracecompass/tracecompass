@@ -271,6 +271,8 @@ public final class TmfXmlUtils {
                 value = TmfStateValue.newValueDouble(fieldDouble);
                 break;
             }
+        } else {
+            value = TmfStateValue.newValueString(objValue.toString());
         }
         return value;
     }
