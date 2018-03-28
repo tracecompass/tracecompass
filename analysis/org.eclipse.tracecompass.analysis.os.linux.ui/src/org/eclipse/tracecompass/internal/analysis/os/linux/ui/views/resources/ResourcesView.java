@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2017 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2018 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources;
 
 import java.util.Comparator;
+import java.util.function.Function;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.IMenuManager;
@@ -34,8 +35,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
-
-import com.google.common.base.Function;
 
 /**
  * Main implementation for the LTTng 2.0 kernel Resource view
