@@ -14,13 +14,14 @@
 package org.eclipse.tracecompass.tmf.core.statistics;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 
@@ -44,10 +45,10 @@ public class TmfStateStatistics implements ITmfStatistics {
     // ------------------------------------------------------------------------
 
     /** The event totals state system */
-    private final ITmfStateSystem totalsStats;
+    private final ITmfStateSystem fTotalsStats;
 
     /** The state system for event types */
-    private final ITmfStateSystem typesStats;
+    private final ITmfStateSystem fTypesStats;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -62,8 +63,8 @@ public class TmfStateStatistics implements ITmfStatistics {
      *            The state system containing the "event types" information
      */
     public TmfStateStatistics(@NonNull ITmfStateSystem totals, @NonNull ITmfStateSystem eventTypes) {
-        this.totalsStats = totals;
-        this.typesStats = eventTypes;
+        fTotalsStats = totals;
+        fTypesStats = eventTypes;
     }
 
     /**
@@ -72,7 +73,7 @@ public class TmfStateStatistics implements ITmfStatistics {
      * @return The "totals" state system
      */
     public ITmfStateSystem getTotalsSS() {
-        return totalsStats;
+        return fTotalsStats;
     }
 
     /**
@@ -81,7 +82,7 @@ public class TmfStateStatistics implements ITmfStatistics {
      * @return The "event types" state system
      */
     public ITmfStateSystem getEventTypesSS() {
-        return typesStats;
+        return fTypesStats;
     }
 
     // ------------------------------------------------------------------------
@@ -90,8 +91,8 @@ public class TmfStateStatistics implements ITmfStatistics {
 
     @Override
     public void dispose() {
-        totalsStats.dispose();
-        typesStats.dispose();
+        fTotalsStats.dispose();
+        fTypesStats.dispose();
     }
 
     @Override
@@ -99,7 +100,7 @@ public class TmfStateStatistics implements ITmfStatistics {
         final List<@NonNull Long> list = new ArrayList<>();
         final long increment = (end - start) / nb;
 
-        if (totalsStats.isCancelled()) {
+        if (fTotalsStats.isCancelled()) {
             return list;
         }
 
@@ -107,13 +108,12 @@ public class TmfStateStatistics implements ITmfStatistics {
          * We will do one state system query per "border", and save the
          * differences between each border.
          */
-        long prevTotal = (start == totalsStats.getStartTime()) ? 0 : getEventCountAt(start);
+        long prevTotal = (start == fTotalsStats.getStartTime()) ? 0 : getEventCountAt(start);
         long curTime = start + increment;
 
-        long curTotal, count;
         for (int i = 0; i < nb - 1; i++) {
-            curTotal = getEventCountAt(curTime);
-            count = curTotal - prevTotal;
+            long curTotal = getEventCountAt(curTime);
+            long count = curTotal - prevTotal;
             list.add(count);
 
             curTime += increment;
@@ -124,65 +124,61 @@ public class TmfStateStatistics implements ITmfStatistics {
          * For the last bucket, we'll stretch its end time to the end time of
          * the requested range, in case it got truncated down.
          */
-        curTotal = getEventCountAt(end);
-        count = curTotal - prevTotal;
-        list.add(count);
+        long curTotal = getEventCountAt(end);
+        list.add(curTotal - prevTotal);
 
         return list;
     }
 
     @Override
     public long getEventsTotal() {
-        long endTime = totalsStats.getCurrentEndTime();
-        int count = 0;
-
+        long endTime = fTotalsStats.getCurrentEndTime();
+        final int quark = fTotalsStats.optQuarkAbsolute(Attributes.TOTAL);
+        if (quark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+            return 0;
+        }
         try {
-            final int quark = totalsStats.getQuarkAbsolute(Attributes.TOTAL);
-            count= totalsStats.querySingleState(endTime, quark).getStateValue().unboxInt();
-
+            return extractCount(fTotalsStats.querySingleState(endTime, quark).getValue());
         } catch (StateSystemDisposedException e) {
             /* Assume there is no events for that range */
             return 0;
-        } catch (AttributeNotFoundException e) {
-            e.printStackTrace();
         }
-
-        return count;
     }
 
     @Override
     public Map<@NonNull String, @NonNull Long> getEventTypesTotal() {
-        final Map<@NonNull String, @NonNull Long> map = new HashMap<>();
-        long endTime = typesStats.getCurrentEndTime();
 
+        int quark = fTypesStats.optQuarkAbsolute(Attributes.EVENT_TYPES);
+        if (quark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+            return Collections.emptyMap();
+        }
+
+        /* Get the list of quarks, one for each even type in the database */
+        List<Integer> quarks = fTypesStats.getSubAttributes(quark, false);
+        long endTime = fTypesStats.getCurrentEndTime();
+        final Map<@NonNull String, @NonNull Long> map = new HashMap<>();
         try {
-            /* Get the list of quarks, one for each even type in the database */
-            int quark = typesStats.getQuarkAbsolute(Attributes.EVENT_TYPES);
-            List<Integer> quarks = typesStats.getSubAttributes(quark, false);
 
             /* Since we want the total we can look only at the end */
-            List<ITmfStateInterval> endState = typesStats.queryFullState(endTime);
+            List<ITmfStateInterval> endState = fTypesStats.queryFullState(endTime);
 
-            String curEventName;
-            long eventCount;
             for (int typeQuark : quarks) {
-                curEventName = typesStats.getAttributeName(typeQuark);
-                eventCount = endState.get(typeQuark).getStateValue().unboxInt();
+                String curEventName = fTypesStats.getAttributeName(typeQuark);
+                long eventCount = extractCount(endState.get(typeQuark).getValue());
                 map.put(curEventName, eventCount);
             }
 
+            return map;
         } catch (StateSystemDisposedException e) {
             /* Assume there is no events, nothing will be put in the map. */
-        } catch (AttributeNotFoundException e) {
-            e.printStackTrace();
+            return Collections.emptyMap();
         }
-        return map;
     }
 
     @Override
     public long getEventsInRange(long start, long end) {
         long startCount;
-        if (start == totalsStats.getStartTime()) {
+        if (start == fTotalsStats.getStartTime()) {
             startCount = 0;
         } else {
             /*
@@ -198,64 +194,55 @@ public class TmfStateStatistics implements ITmfStatistics {
 
     @Override
     public Map<String, Long> getEventTypesInRange(long start, long end) {
-        final Map<String, Long> map = new HashMap<>();
-        List<Integer> quarks;
 
-        /* Make sure the start/end times are within the state history, so we
-         * don't get TimeRange exceptions.
+        /*
+         * Make sure the start/end times are within the state history, so we don't get
+         * TimeRange exceptions.
          */
-        long startTime = checkStartTime(start, typesStats);
-        long endTime = checkEndTime(end, typesStats);
+        long startTime = Long.max(start, fTypesStats.getStartTime());
+        long endTime = Long.min(end, fTypesStats.getCurrentEndTime());
         if (endTime < startTime) {
-            /* The start/end times do not intersect this state system range.
-             * Return the empty map. */
-            return map;
-        }
-
-        try {
-            /* Get the list of quarks, one for each even type in the database */
-            int quark = typesStats.getQuarkAbsolute(Attributes.EVENT_TYPES);
-            quarks = typesStats.getSubAttributes(quark, false);
-        } catch (AttributeNotFoundException e) {
             /*
-             * The state system does not (yet?) have the needed attributes, it
-             * probably means there are no events counted yet. Return the empty
-             * map.
+             * The start/end times do not intersect this state system range. Return the
+             * empty map.
              */
-            return map;
+            return Collections.emptyMap();
         }
 
-        try {
-            List<ITmfStateInterval> endState = typesStats.queryFullState(endTime);
+        /* Get the list of quarks, one for each even type in the database */
+        int quark = fTypesStats.optQuarkAbsolute(Attributes.EVENT_TYPES);
+        if (quark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+            /*
+             * The state system does not (yet?) have the needed attributes, it probably
+             * means there are no events counted yet. Return the empty map.
+             */
+            return Collections.emptyMap();
+        }
 
-            if (startTime == typesStats.getStartTime()) {
+        List<Integer> quarks = fTypesStats.getSubAttributes(quark, false);
+        final Map<String, Long> map = new HashMap<>();
+
+        try {
+            List<ITmfStateInterval> endState = fTypesStats.queryFullState(endTime);
+
+            if (startTime == fTypesStats.getStartTime()) {
                 /* Only use the values picked up at the end time */
                 for (int typeQuark : quarks) {
-                    String curEventName = typesStats.getAttributeName(typeQuark);
-                    long eventCount = endState.get(typeQuark).getStateValue().unboxInt();
-                    if (eventCount == -1) {
-                        eventCount = 0;
-                    }
-                    map.put(curEventName, eventCount);
+                    String curEventName = fTypesStats.getAttributeName(typeQuark);
+                    Object eventCount = endState.get(typeQuark).getValue();
+                    map.put(curEventName, extractCount(eventCount));
                 }
             } else {
                 /*
                  * Query the start time at -1, so the beginning of the interval
                  * is inclusive.
                  */
-                List<ITmfStateInterval> startState = typesStats.queryFullState(startTime - 1);
+                List<ITmfStateInterval> startState = fTypesStats.queryFullState(startTime - 1);
                 for (int typeQuark : quarks) {
-                    String curEventName = typesStats.getAttributeName(typeQuark);
-                    long countAtStart = startState.get(typeQuark).getStateValue().unboxInt();
-                    long countAtEnd = endState.get(typeQuark).getStateValue().unboxInt();
-
-                    if (countAtStart == -1) {
-                        countAtStart = 0;
-                    }
-                    if (countAtEnd == -1) {
-                        countAtEnd = 0;
-                    }
-                    long eventCount = countAtEnd - countAtStart;
+                    String curEventName = fTypesStats.getAttributeName(typeQuark);
+                    Object countAtStart = startState.get(typeQuark).getValue();
+                    Object countAtEnd = endState.get(typeQuark).getValue();
+                    long eventCount = extractCount(countAtEnd) - extractCount(countAtStart);
                     map.put(curEventName, eventCount);
                 }
             }
@@ -272,43 +259,36 @@ public class TmfStateStatistics implements ITmfStatistics {
 
     private long getEventCountAt(long timestamp) {
         /* Make sure the target time is within the range of the history */
-        long ts = checkStartTime(timestamp, totalsStats);
-        ts = checkEndTime(ts, totalsStats);
+        long ts = Long.max(fTotalsStats.getStartTime(), timestamp);
+        ts = Long.min(ts, fTotalsStats.getCurrentEndTime());
+
+        final int quark = fTotalsStats.optQuarkAbsolute(Attributes.TOTAL);
+        if (quark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+            return 0l;
+        }
 
         try {
-            final int quark = totalsStats.getQuarkAbsolute(Attributes.TOTAL);
-            long count = totalsStats.querySingleState(ts, quark).getStateValue().unboxInt();
-            return count;
-
+            return extractCount(fTotalsStats.querySingleState(ts, quark).getValue());
         } catch (StateSystemDisposedException e) {
             /* Assume there is no (more) events, nothing will be put in the map. */
-        } catch (AttributeNotFoundException e) {
-            e.printStackTrace();
+            return 0;
         }
-
-        return 0;
     }
 
-    private static long checkStartTime(long initialStart, ITmfStateSystem ss) {
-        long start = initialStart;
-        if (start < ss.getStartTime()) {
-            return ss.getStartTime();
+    private static long extractCount(@Nullable Object state) {
+        if (state instanceof Number) {
+            return ((Number) state).longValue();
         }
-        return start;
-    }
-
-    private static long checkEndTime(long initialEnd, ITmfStateSystem ss) {
-        long end = initialEnd;
-        if (end > ss.getCurrentEndTime()) {
-            return ss.getCurrentEndTime();
-        }
-        return end;
+        return 0l;
     }
 
     /**
      * The attribute names that are used in the state provider
      */
-    public static class Attributes {
+    public static final class Attributes {
+        private Attributes() {
+
+        }
 
         /** Total nb of events */
         public static final String TOTAL = "total"; //$NON-NLS-1$

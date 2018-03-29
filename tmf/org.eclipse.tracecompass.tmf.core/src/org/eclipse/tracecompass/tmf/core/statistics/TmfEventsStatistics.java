@@ -14,9 +14,9 @@ package org.eclipse.tracecompass.tmf.core.statistics;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -81,8 +81,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
         HistogramQueryRequest req = new HistogramQueryRequest(borders, end);
         sendAndWait(req);
 
-        List<@NonNull Long> results = new LinkedList<>(req.getResults());
-        return results;
+        return new ArrayList<>(req.getResults());
 
     }
 
@@ -100,8 +99,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
         StatsTotalRequest request = new StatsTotalRequest(trace, TmfTimeRange.ETERNITY);
         sendAndWait(request);
 
-        long total = request.getResult();
-        return total;
+        return request.getResult();
     }
 
     @Override
@@ -121,8 +119,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
         StatsTotalRequest request = new StatsTotalRequest(trace, range);
         sendAndWait(request);
 
-        long total =  request.getResult();
-        return total;
+        return request.getResult();
     }
 
     @Override
@@ -134,8 +131,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
         StatsPerTypeRequest request = new StatsPerTypeRequest(trace, range);
         sendAndWait(request);
 
-        Map<String, Long> stats =  request.getResults();
-        return stats;
+        return request.getResults();
     }
 
     private void sendAndWait(TmfEventRequest request) {
