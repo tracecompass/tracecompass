@@ -191,7 +191,8 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
      * Zero - a zero time constant. The value is zero, so this allows some
      * interesting simplifications.
      */
-    public static final @NonNull ITmfTimestamp ZERO = new TmfTimestamp() {
+    public static final @NonNull ITmfTimestamp ZERO = new Zero();
+    private static final class Zero extends TmfTimestamp {
         @Override
         public long getValue() {
             return 0;
@@ -214,12 +215,13 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
         public int compareTo(ITmfTimestamp ts) {
             return Long.compare(0, ts.getValue());
         }
-    };
+    }
 
     /**
      * The beginning of time will be lesser than any other timestamp
      */
-    public static final @NonNull ITmfTimestamp BIG_BANG = new TmfTimestamp() {
+    public static final @NonNull ITmfTimestamp BIG_BANG = new BigBang();
+    private static final class BigBang extends TmfTimestamp {
         @Override
         public long getValue() {
             return Long.MIN_VALUE;
@@ -247,12 +249,13 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
         public boolean equals(Object other) {
             return this == other;
         }
-    };
+    }
 
     /**
      * The end of time will be greater than any other timestamp
      */
-    public static final @NonNull ITmfTimestamp BIG_CRUNCH = new TmfTimestamp() {
+    public static final @NonNull ITmfTimestamp BIG_CRUNCH = new BigCrunch();
+    private static final class BigCrunch extends TmfTimestamp {
         @Override
         public long getValue() {
             return Long.MAX_VALUE;
@@ -280,7 +283,7 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
         public boolean equals(Object other) {
             return this == other;
         }
-    };
+    }
 
     // ------------------------------------------------------------------------
     // ITmfTimestamp
