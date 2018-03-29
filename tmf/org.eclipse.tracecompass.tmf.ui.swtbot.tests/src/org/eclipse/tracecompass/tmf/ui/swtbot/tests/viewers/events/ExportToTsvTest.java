@@ -181,32 +181,36 @@ public class ExportToTsvTest {
     }
 
     /**
-     * Test export a single selection
+     * Test full export
      *
      * @throws IOException
      *             File not found or such
      */
     @Test
-    public void testExportSingleSelection() throws IOException {
+    public void testExport() throws IOException {
         SWTBotEditor editorBot = fEditorBot;
         assertNotNull(editorBot);
         final SWTBotTable tableBot = editorBot.bot().table();
-        tableBot.getTableItem(0).click(3);
-        KEYBOARD.typeText("LoggerA");
-        KEYBOARD.pressShortcut(Keystrokes.CTRL, Keystrokes.CR);
-        fBot.waitUntil(Conditions.tableHasRows(tableBot, 4), 5000);
-        tableBot.contextMenu(EXPORT_TO_TSV).click();
-        assertTsvContentsEquals(ImmutableList.of(HEADER_TEXT, EVENT1_TEXT));
+
+        tableBot.getTableItem(1).contextMenu(EXPORT_TO_TSV).click();
+        File file = new File(fAbsolutePath);
+        fBot.waitUntil(new FileLargerThanZeroCondition(file));
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            long lines = br.lines().count();
+            assertEquals("Line count", 23, lines);
+        } finally {
+            new File(fAbsolutePath).delete();
+        }
     }
 
     /**
-     * Test export multiple selection
+     * Test export when a filter is applied to the table
      *
      * @throws IOException
      *             File not found or such
      */
     @Test
-    public void testExportMultipleSelection() throws IOException {
+    public void testExportWithFilter() throws IOException {
         SWTBotEditor editorBot = fEditorBot;
         assertNotNull(editorBot);
         final SWTBotTable tableBot = editorBot.bot().table();
@@ -214,33 +218,9 @@ public class ExportToTsvTest {
         KEYBOARD.typeText("LoggerA|LoggerB|LoggerC");
         KEYBOARD.pressShortcut(Keystrokes.CTRL, Keystrokes.CR);
         fBot.waitUntil(Conditions.tableHasRows(tableBot, 6), 5000);
-        tableBot.contextMenu(EXPORT_TO_TSV).click();
+
+        tableBot.getTableItem(1).contextMenu(EXPORT_TO_TSV).click();
         assertTsvContentsEquals(ImmutableList.of(HEADER_TEXT, EVENT1_TEXT, EVENT2_TEXT, EVENT3_TEXT));
-    }
-
-    /**
-     * Test full export
-     *
-     * @throws IOException
-     *             File not found or such
-     */
-    @Test
-    public void testExportNoSelection() throws IOException {
-        SWTBotEditor editorBot = fEditorBot;
-        assertNotNull(editorBot);
-        final SWTBotTable tableBot = editorBot.bot().table();
-        tableBot.getTableItem(1).click();
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.UP);
-
-        tableBot.contextMenu(EXPORT_TO_TSV).click();
-        File file = new File(fAbsolutePath);
-        fBot.waitUntil(new FileLargerThanZeroCondition(file));
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            long lines = br.lines().count();
-            assertEquals("Both reads", 23, lines);
-        } finally {
-            new File(fAbsolutePath).delete();
-        }
     }
 
     private void assertTsvContentsEquals(final List<String> expected) throws FileNotFoundException, IOException {
@@ -248,7 +228,7 @@ public class ExportToTsvTest {
         fBot.waitUntil(new FileLargerThanZeroCondition(file));
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             List<String> lines = br.lines().collect(Collectors.toList());
-            assertEquals("Both reads", expected, lines);
+            assertEquals("File content", expected, lines);
         } finally {
             file.delete();
         }
