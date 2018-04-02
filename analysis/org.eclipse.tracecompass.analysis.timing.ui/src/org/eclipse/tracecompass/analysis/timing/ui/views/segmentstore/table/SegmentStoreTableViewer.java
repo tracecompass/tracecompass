@@ -11,9 +11,11 @@ package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisModule;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 /**
  * Displays the segment store provider data in a column table
@@ -63,7 +65,9 @@ public class SegmentStoreTableViewer extends AbstractSegmentStoreTableViewer {
 
     @Override
     protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace) {
-        IAnalysisModule module = trace.getAnalysisModule(fAnalysisId);
+        // TODO: Add support for multiple analysis modules in case of an experiment,
+        // right now only the module of the first trace is returned.
+        IAnalysisModule module = TmfTraceUtils.getAnalysisModuleOfClass(trace, AbstractSegmentStoreAnalysisModule.class, fAnalysisId);
         if (!(module instanceof ISegmentStoreProvider)) {
             return null;
         }
