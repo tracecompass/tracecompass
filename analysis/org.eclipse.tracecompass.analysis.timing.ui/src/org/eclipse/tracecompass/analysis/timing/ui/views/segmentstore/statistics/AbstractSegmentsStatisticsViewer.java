@@ -40,6 +40,7 @@ import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondT
 import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics.Messages;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.FilterTimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
@@ -376,13 +377,13 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
 
     @Override
     protected @Nullable ITmfTreeViewerEntry updateElements(ITmfTrace trace, long start, long end, boolean isSelection) {
-        SegmentStoreStatisticsDataProvider provider = null;
+        ITmfTreeDataProvider<SegmentStoreStatisticsModel> provider = null;
 
         // first try to get the data provider from the data provider manager.
         String providerId = fProviderId;
         if (providerId != null) {
             provider = DataProviderManager.getInstance().getDataProvider(trace,
-                    fProviderId, SegmentStoreStatisticsDataProvider.class);
+                    fProviderId, ITmfTreeDataProvider.class);
         }
 
         // then try to get it from the legacy way
@@ -403,31 +404,34 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
             return null;
         }
 
-        return modelToTree(model);
+        return modelToTree(trace.getName(), model);
     }
 
     /**
      * Algorithm to convert a model (List of {@link SegmentStoreStatisticsModel}) to
      * the tree.
      *
-     * @param start
-     *            queried start time
-     * @param end
-     *            queried end time
+     * @param traceName
+     *            trace / experiment name, we add it to help when debugging.
      * @param model
      *            model to convert
      * @return the resulting {@link TmfTreeViewerEntry}.
      */
-    private static @Nullable TmfTreeViewerEntry modelToTree(List<SegmentStoreStatisticsModel> model) {
-        TmfTreeViewerEntry root = null;
+    private static @Nullable TmfTreeViewerEntry modelToTree(String traceName, List<SegmentStoreStatisticsModel> model) {
+        TmfTreeViewerEntry root = new TmfTreeViewerEntry(traceName);
         Map<Long, TmfTreeViewerEntry> map = new HashMap<>();
+        map.put(-1L, root);
+
         for (TmfTreeDataModel entry : model) {
             TmfTreeViewerEntry viewerEntry;
             if (entry.getParentId() != -1) {
                 viewerEntry = new TmfGenericTreeEntry<>(entry);
             } else {
+                /*
+                 * create a regular TmfTreeViewerEntry to avoid displaying statistics for trace
+                 * level entries.
+                 */
                 viewerEntry = new TmfTreeViewerEntry(entry.getName());
-                root = viewerEntry;
             }
             map.put(entry.getId(), viewerEntry);
 

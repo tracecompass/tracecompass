@@ -9,14 +9,19 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.ImmutableList;
 
@@ -39,6 +44,33 @@ public class TmfTreeCompositeDataProvider<M extends ITmfTreeDataModel, P extends
 
     private final List<P> fProviders;
     private final String fId;
+
+    /**
+     * Return a composite {@link ITmfTreeDataProvider} from a list of traces.
+     *
+     * @param traces
+     *            A list of traces from which to generate a provider.
+     * @param id
+     *            the provider's ID
+     * @return null if the non of the traces returns a provider, the provider if the
+     *         lists only return one, else a {@link TmfTreeCompositeDataProvider}
+     *         encapsulating the providers
+     */
+    public static @Nullable ITmfTreeDataProvider<? extends ITmfTreeDataModel> create(Collection<ITmfTrace> traces, String id) {
+        List<@NonNull ITmfTreeDataProvider<ITmfTreeDataModel>> providers = new ArrayList<>();
+        for (ITmfTrace child : traces) {
+            ITmfTreeDataProvider<ITmfTreeDataModel> provider = DataProviderManager.getInstance().getDataProvider(child, id, ITmfTreeDataProvider.class);
+            if (provider != null) {
+                providers.add(provider);
+            }
+        }
+        if (providers.isEmpty()) {
+            return null;
+        } else if (providers.size() == 1) {
+            return providers.get(0);
+        }
+        return new TmfTreeCompositeDataProvider<>(providers, id);
+    }
 
     /**
      * Constructor
