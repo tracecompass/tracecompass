@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -26,9 +26,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.widgets.Display;
@@ -151,7 +149,6 @@ public class CopyToClipboardTest {
      */
     @Test
     public void testCopySingleSelection() {
-        assumeTrue(!isAffectedByBug486302());
         final SWTBotTable tableBot = fEditorBot.bot().table();
         tableBot.getTableItem(1).click();
 
@@ -164,7 +161,6 @@ public class CopyToClipboardTest {
      */
     @Test
     public void testCopyMultipleSelection() {
-        assumeTrue(!isAffectedByBug486302());
         final SWTBotTable tableBot = fEditorBot.bot().table();
         tableBot.getTableItem(1).click();
         KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.DOWN);
@@ -172,22 +168,6 @@ public class CopyToClipboardTest {
 
         tableBot.contextMenu(COPY_TO_CLIPBOARD).click();
         assertClipboardContentsEquals(HEADER_TEXT + EVENT1_TEXT + EVENT2_TEXT + EVENT3_TEXT);
-    }
-
-    /**
-     * Returns whether or not the running Eclipse is affected by Bug 486302. The
-     * bug is present in Eclipse 4.5.2 and earlier running GTK3.
-     */
-    private static boolean isAffectedByBug486302() {
-        String property = System.getProperty("org.eclipse.swt.internal.gtk.version");
-        if (property != null) {
-            @NonNull String @NonNull [] versionSegments = property.split("\\.");
-            if (versionSegments.length > 0) {
-                return SWT.getVersion() <= 4530 && versionSegments[0].equals("3");
-            }
-        }
-
-        return false;
     }
 
     /**

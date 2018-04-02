@@ -67,21 +67,18 @@
   <setupTask
       xsi:type="setup:VariableTask"
       name="eclipse.target.platform"
-      defaultValue="tracecompass-e4.6"
+      defaultValue="tracecompass-e4.7"
       storageURI="scope://Workspace"
       label="Target Platform">
-  <choice
-        value="tracecompass-e4.7"
-        label="Trace Compass Eclipse Oxygen - 4.7"/>
     <choice
         value="tracecompass-e4.6"
         label="Trace Compass Eclipse Neon - 4.6"/>
     <choice
-        value="tracecompass-eStaging"
+        value="tracecompass-e4.7"
         label="Trace Compass Eclipse Oxygen - 4.7"/>
     <choice
-        value="tracecompass-e4.5"
-        label="Trace Compass Eclipse Mars - 4.5"/>
+        value="tracecompass-eStaging"
+        label="Trace Compass Eclipse Photon - 4.8"/>
     <description>Choose the compatibly level of the target platform</description>
   </setupTask>
   <stream name="master">

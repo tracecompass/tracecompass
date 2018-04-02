@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -30,10 +30,8 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.SWTBot;
@@ -190,8 +188,6 @@ public class ExportToTsvTest {
      */
     @Test
     public void testExportSingleSelection() throws IOException {
-        assumeTrue(!isAffectedByBug486302());
-
         SWTBotEditor editorBot = fEditorBot;
         assertNotNull(editorBot);
         final SWTBotTable tableBot = editorBot.bot().table();
@@ -211,7 +207,6 @@ public class ExportToTsvTest {
      */
     @Test
     public void testExportMultipleSelection() throws IOException {
-        assumeTrue(!isAffectedByBug486302());
         SWTBotEditor editorBot = fEditorBot;
         assertNotNull(editorBot);
         final SWTBotTable tableBot = editorBot.bot().table();
@@ -221,23 +216,6 @@ public class ExportToTsvTest {
         fBot.waitUntil(Conditions.tableHasRows(tableBot, 6), 5000);
         tableBot.contextMenu(EXPORT_TO_TSV).click();
         assertTsvContentsEquals(ImmutableList.of(HEADER_TEXT, EVENT1_TEXT, EVENT2_TEXT, EVENT3_TEXT));
-    }
-
-    /**
-     * Returns whether or not the running Eclipse is affected by Bug 486302. The
-     * bug is present in Eclipse 4.5.2 and earlier running GTK3.
-     */
-    private static boolean isAffectedByBug486302() {
-        String property = System.getProperty("org.eclipse.swt.internal.gtk.version");
-        if (property != null) {
-            @NonNull
-            String @NonNull [] versionSegments = property.split("\\.");
-            if (versionSegments.length > 0) {
-                return SWT.getVersion() <= 4530 && versionSegments[0].equals("3");
-            }
-        }
-
-        return false;
     }
 
     /**

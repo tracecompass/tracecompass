@@ -29,11 +29,6 @@
               <configuration>
                 <artifacts>
                   <artifact>
-                    <file>tracecompass-e4.5.target</file>
-                    <type>target</type>
-                    <classifier>tracecompass-e4.5</classifier>
-                  </artifact>
-                  <artifact>
                     <file>tracecompass-e4.6.target</file>
                     <type>target</type>
                     <classifier>tracecompass-e4.6</classifier>
