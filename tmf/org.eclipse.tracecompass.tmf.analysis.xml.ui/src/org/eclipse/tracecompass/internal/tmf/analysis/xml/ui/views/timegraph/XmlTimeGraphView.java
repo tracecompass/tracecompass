@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2017 École Polytechnique de Montréal and others
+ * Copyright (c) 2014, 2018 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -237,17 +237,18 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
                  */
                 for (XmlTimeGraphEntryModel entry : model) {
                     TimeGraphEntry tgEntry = map.get(entry.getId());
-                    if (tgEntry != null) {
+                    if (tgEntry == null) {
+                        if (entry.getParentId() == -1) {
+                            tgEntry = new TraceEntry(entry, trace, provider);
+                            addToEntryList(parentTrace, Collections.singletonList(tgEntry));
+                        } else {
+                            tgEntry = new TimeGraphEntry(entry);
+                        }
+                        map.put(entry.getId(), tgEntry);
+                    } else {
                         tgEntry.updateModel(entry);
                     }
-                    if (entry.getParentId() != -1 && tgEntry == null) {
-                        map.put(entry.getId(), new TimeGraphEntry(entry));
-                    } else {
-                        if (tgEntry == null) {
-                            TraceEntry traceEntry = new TraceEntry(entry, trace, provider);
-                            addToEntryList(parentTrace, Collections.singletonList(traceEntry));
-                            map.put(entry.getId(), traceEntry);
-                        }
+                    if (entry.getParentId() == -1) {
                         setStartTime(Long.min(getStartTime(), entry.getStartTime()));
                         setEndTime(Long.max(getEndTime(), entry.getEndTime()));
                     }
