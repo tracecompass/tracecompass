@@ -26,9 +26,10 @@ import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 
 /**
  * Generalized {@link SegmentStoreStatisticsDataProvider} factory using
- * secondaty ID to identify which segment store provider to build it from.
+ * secondary ID to identify which segment store provider to build it from.
  *
  * @author Loic Prieur-Drevon
+ * @since 3.2
  */
 public class SegmentStoreStatisticsDataProviderFactory implements IDataProviderFactory {
 

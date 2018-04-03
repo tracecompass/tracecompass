@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2015, 2018 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -97,7 +97,7 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
      *            the parent composite
      * @param dataProviderId
      *            the data provider extension point ID.
-     * @since 3.3
+     * @since 2.3
      */
     public AbstractSegmentsStatisticsViewer(Composite parent, @Nullable String dataProviderId) {
         super(parent, false);
@@ -513,7 +513,7 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
      *
      * @param newProviderId
      *            the new provider ID to use
-     * @since 3.3
+     * @since 2.3
      */
     public void setProviderId(String newProviderId) {
         fProviderId = newProviderId;
