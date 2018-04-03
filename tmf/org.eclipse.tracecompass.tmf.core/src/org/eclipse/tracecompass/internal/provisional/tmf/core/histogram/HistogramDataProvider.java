@@ -106,6 +106,7 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
 
     @Override
     public @NonNull TmfModelResponse<ITmfXyModel> fetchXY(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        fModule.waitForInitialization();
         long[] xValues = filter.getTimesRequested();
 
         if (!(filter instanceof SelectionTimeQueryFilter)) {
@@ -134,8 +135,9 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
                 return TmfXyResponseFactory.createFailedResponse(CommonStatusMessage.STATE_SYSTEM_FAILED);
             }
         }
+        boolean completed = eventsSs != null ? eventsSs.waitUntilBuilt(0) || eventsSs.getCurrentEndTime() >= filter.getEnd() : false;
 
-        return TmfXyResponseFactory.create(TITLE, xValues, builder.build(), true);
+        return TmfXyResponseFactory.create(TITLE, xValues, builder.build(), completed);
     }
 
     private YModel getLostEvents(ITmfStateSystem ss, long[] times) throws StateSystemDisposedException {

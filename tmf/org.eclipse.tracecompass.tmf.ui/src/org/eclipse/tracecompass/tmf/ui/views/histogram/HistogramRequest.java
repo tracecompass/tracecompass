@@ -29,8 +29,10 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
  *
  * @version 1.0
  * @author Francois Chouinard
- *         <p>
+ *
+ * @deprecated Use the {@link HistogramDataProviderJob} to update the model
  */
+@Deprecated
 public class HistogramRequest extends TmfEventRequest {
 
     // ------------------------------------------------------------------------
