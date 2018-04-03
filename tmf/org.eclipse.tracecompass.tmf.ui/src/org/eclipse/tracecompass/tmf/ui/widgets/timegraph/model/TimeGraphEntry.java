@@ -394,7 +394,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      */
     public synchronized void sortChildren(Comparator<ITimeGraphEntry> comparator) {
         fComparator = comparator;
-        if (comparator == null) {
+        if (comparator == null || fChildren.isEmpty()) {
             return;
         }
         List<@NonNull TimeGraphEntry> copy = new ArrayList<>(fChildren);

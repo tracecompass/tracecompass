@@ -649,7 +649,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
     private Iterable<@NonNull ITmfStateInterval> query2D(@NonNull Collection<@NonNull Integer> quarks, TimeRangeCondition timeCondition)
             throws TimeRangeException, IndexOutOfBoundsException {
         if (timeCondition.min() < getStartTime()) {
-            throw new TimeRangeException();
+            throw new TimeRangeException("Time conditions " + timeCondition.min() + " is lower than state system start time: " + getStartTime());  //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         if (quarks.isEmpty()) {
