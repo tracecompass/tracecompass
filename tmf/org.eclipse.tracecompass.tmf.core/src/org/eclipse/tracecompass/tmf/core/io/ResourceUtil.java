@@ -285,7 +285,8 @@ public class ResourceUtil {
     }
 
     private static boolean isFileSystemSymbolicLink(IResource resource) {
-        return Files.isSymbolicLink(Paths.get(resource.getLocationURI()));
+        URI uri = resource.getLocationURI();
+        return (uri == null ? false : Files.isSymbolicLink(Paths.get(uri)));
     }
 
     private static boolean checkResource(IResource link, Path linkPath) throws CoreException, IOException {
