@@ -16,6 +16,11 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.histogram;
 
+import java.util.Objects;
+
+import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -37,23 +42,26 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.tracecompass.internal.tmf.ui.views.histogram.HistogramTimeAdapter;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampDelta;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampDelta;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphScale;
 
 /**
  * Re-usable histogram widget.
@@ -95,6 +103,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
+
+    private static final int TIME_SCALE_HEIGHT = 27;
 
     // Histogram colors
 
@@ -163,16 +173,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     // Histogram text fields
     private Label fMaxNbEventsLabel;
-    private Label fMinNbEventsLabel;
-    private Label fTimeRangeStartLabel;
-    private Label fTimeRangeEndLabel;
 
     /**
      * Histogram drawing area
      */
     protected Canvas fCanvas;
-
-    private Composite canvasComposite;
 
     /**
      * The histogram data model.
@@ -227,6 +232,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     private boolean fSendTimeAlignSignals = false;
 
+    private IStatusLineManager fStatusLineManager;
+
+    private TimeGraphScale fTimeLineScale;
+    private TimeGraphColorScheme fColorScheme;
+
     // ------------------------------------------------------------------------
     // Construction
     // ------------------------------------------------------------------------
@@ -257,6 +267,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     public Histogram(final TmfView view, final Composite parent, final boolean sendTimeAlignSignals) {
         fParentView = view;
         fSendTimeAlignSignals = sendTimeAlignSignals;
+        fColorScheme = new TimeGraphColorScheme();
         fComposite = createWidget(parent);
         fDataModel = new HistogramDataModel();
         fDataModel.addHistogramListener(this);
@@ -291,55 +302,28 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
         fFont = adjustFont(parent);
 
-        final int initalWidth = 10;
-
         // --------------------------------------------------------------------
         // Define the histogram
         // --------------------------------------------------------------------
 
-        final GridLayout gridLayout = new GridLayout();
-        gridLayout.numColumns = 3;
-        gridLayout.marginHeight = 0;
-        gridLayout.marginWidth = 0;
-        gridLayout.marginTop = 0;
-        gridLayout.horizontalSpacing = 0;
-        gridLayout.verticalSpacing = 0;
-        gridLayout.marginLeft = 0;
-        gridLayout.marginRight = 0;
         final Composite composite = new Composite(parent, SWT.FILL);
-        composite.setLayout(gridLayout);
+        composite.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
 
         // Use all the horizontal space
-        GridData gridData = new GridData();
-        gridData.horizontalAlignment = SWT.FILL;
-        gridData.verticalAlignment = SWT.FILL;
-        gridData.grabExcessHorizontalSpace = true;
-        gridData.grabExcessVerticalSpace = true;
-        composite.setLayoutData(gridData);
+        composite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
         // Y-axis max event
-        gridData = new GridData();
-        gridData.horizontalAlignment = SWT.RIGHT;
-        gridData.verticalAlignment = SWT.TOP;
         fMaxNbEventsLabel = new Label(composite, SWT.RIGHT);
         fMaxNbEventsLabel.setFont(fFont);
         fMaxNbEventsLabel.setText("0"); //$NON-NLS-1$
-        fMaxNbEventsLabel.setLayoutData(gridData);
+        fMaxNbEventsLabel.setLayoutData(GridDataFactory.fillDefaults().align(SWT.RIGHT, SWT.TOP).create());
 
         // Histogram itself
-        canvasComposite = new Composite(composite, SWT.BORDER);
-        gridData = new GridData();
-        gridData.horizontalSpan = 2;
-        gridData.verticalSpan = 2;
-        gridData.horizontalAlignment = SWT.FILL;
-        gridData.verticalAlignment = SWT.FILL;
-        gridData.heightHint = 0;
-        gridData.widthHint = 0;
-        gridData.grabExcessHorizontalSpace = true;
-        gridData.grabExcessVerticalSpace = true;
-        canvasComposite.setLayoutData(gridData);
-        canvasComposite.setLayout(new FillLayout());
+        Composite canvasComposite = new Composite(composite, SWT.BORDER);
+        canvasComposite.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0).create());
+        canvasComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).span(1, 1).create());
         fCanvas = new Canvas(canvasComposite, SWT.DOUBLE_BUFFERED);
+        fCanvas.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
         fCanvas.addDisposeListener(new DisposeListener() {
             @Override
             public void widgetDisposed(DisposeEvent e) {
@@ -350,39 +334,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             }
         });
 
-        // Y-axis min event (always 0...)
-        gridData = new GridData();
-        gridData.horizontalAlignment = SWT.RIGHT;
-        gridData.verticalAlignment = SWT.BOTTOM;
-        fMinNbEventsLabel = new Label(composite, SWT.RIGHT);
-        fMinNbEventsLabel.setFont(fFont);
-        fMinNbEventsLabel.setText("0"); //$NON-NLS-1$
-        fMinNbEventsLabel.setLayoutData(gridData);
-
-        // Dummy cell
-        gridData = new GridData(initalWidth, SWT.DEFAULT);
-        gridData.horizontalAlignment = SWT.RIGHT;
-        gridData.verticalAlignment = SWT.BOTTOM;
-        final Label dummyLabel = new Label(composite, SWT.NONE);
-        dummyLabel.setLayoutData(gridData);
-
-        // Window range start time
-        gridData = new GridData();
-        gridData.horizontalAlignment = SWT.LEFT;
-        gridData.verticalAlignment = SWT.BOTTOM;
-        gridData.grabExcessHorizontalSpace = true;
-        fTimeRangeStartLabel = new Label(composite, SWT.NONE);
-        fTimeRangeStartLabel.setFont(fFont);
-        fTimeRangeStartLabel.setLayoutData(gridData);
-
-        // Window range end time
-        gridData = new GridData();
-        gridData.horizontalAlignment = SWT.RIGHT;
-        gridData.verticalAlignment = SWT.BOTTOM;
-        gridData.grabExcessHorizontalSpace = true;
-        fTimeRangeEndLabel = new Label(composite, SWT.NONE);
-        fTimeRangeEndLabel.setFont(fFont);
-        fTimeRangeEndLabel.setLayoutData(gridData);
+        fTimeLineScale = new TimeGraphScale(canvasComposite, fColorScheme, SWT.BOTTOM);
+        fTimeLineScale.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+        fTimeLineScale.setHeight(TIME_SCALE_HEIGHT);
 
         return composite;
     }
@@ -393,6 +347,21 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         final Font font = composite.getFont();
         final FontData fontData = font.getFontData()[0];
         return new Font(font.getDevice(), fontData.getName(), fontData.getHeight() + fontSizeAdjustment, fontData.getStyle());
+    }
+
+    /**
+     * Assign the status line manager
+     *
+     * @param statusLineManager
+     *            The status line manager, or null to disable status line
+     *            messages
+     * @since 3.4
+     */
+    public void setStatusLineManager(IStatusLineManager statusLineManager) {
+        if (fStatusLineManager != null && statusLineManager == null) {
+            fStatusLineManager.setMessage(""); //$NON-NLS-1$
+        }
+        fStatusLineManager = statusLineManager;
     }
 
     // ------------------------------------------------------------------------
@@ -642,8 +611,16 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                         synchronized (fDataModel) {
                             if (fScaledData != null) {
                                 fCanvas.redraw();
+                                HistogramTimeAdapter adapter = null;
+                                if (fTimeLineScale.getTimeProvider() instanceof HistogramTimeAdapter) {
+                                    adapter = (HistogramTimeAdapter) fTimeLineScale.getTimeProvider();
+                                } else {
+                                    adapter = new HistogramTimeAdapter(Objects.requireNonNull(fDataModel));
+                                    fTimeLineScale.setTimeProvider(adapter);
+                                }
+                                adapter.setTimeSpace(canvasWidth);
                                 // Display histogram and update X-,Y-axis labels
-                                updateRangeTextControls();
+                                ((HistogramTimeAdapter) fTimeLineScale.getTimeProvider()).setTimeSpace(canvasWidth);
                                 long maxNbEvents = HistogramScaledData.hideLostEvents ? fScaledData.fMaxValue : fScaledData.fMaxCombinedValue;
                                 String old = fMaxNbEventsLabel.getText();
                                 fMaxNbEventsLabel.setText(Long.toString(maxNbEvents));
@@ -657,6 +634,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                                     }
                                 }
                             }
+                            fTimeLineScale.redraw();
                         }
                     }
                 }
@@ -717,19 +695,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         ((HistogramView) fParentView).updateSelectionTime(fSelectionBegin, fSelectionEnd);
     }
 
-    /**
-     * Update the range text controls
-     */
-    private void updateRangeTextControls() {
-        if (fDataModel.getNbEvents() != 0 || fDataModel.getStartTime() < fDataModel.getEndTime()) {
-            fTimeRangeStartLabel.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getStartTime()));
-            fTimeRangeEndLabel.setText(TmfTimestampFormat.getDefaulTimeFormat().format(fDataModel.getEndTime()));
-        } else {
-            fTimeRangeStartLabel.setText(""); //$NON-NLS-1$
-            fTimeRangeEndLabel.setText(""); //$NON-NLS-1$
-        }
-    }
-
     // ------------------------------------------------------------------------
     // PaintListener
     // ------------------------------------------------------------------------
@@ -765,6 +730,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         formatImage(imageGC, image);
         event.gc.drawImage(image, 0, 0);
         imageGC.dispose();
+        fTimeLineScale.redraw();
     }
 
     private void formatImage(final GC imageGC, final Image image) {
@@ -978,7 +944,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                 fSelectionEnd = fSelectionBegin;
                 fScaledData.fSelectionEndBucket = fScaledData.fSelectionBeginBucket;
             }
+            updateStatusLine(fSelectionBegin, fSelectionEnd, getTimestamp(event.x));
             fCanvas.redraw();
+            fTimeLineScale.redraw();
         }
     }
 
@@ -989,6 +957,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             fDragButton = 0;
             updateSelectionTime();
         }
+        updateStatusLine(fSelectionBegin, fSelectionEnd, getTimestamp(event.x));
     }
 
     // ------------------------------------------------------------------------
@@ -1001,7 +970,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             fSelectionEnd = Math.max(getStartTime(), Math.min(getEndTime(), getTimestamp(event.x)));
             fScaledData.fSelectionEndBucket = Math.max(0, Math.min(fScaledData.fWidth - 1, event.x));
             fCanvas.redraw();
+            fTimeLineScale.redraw();
         }
+        updateStatusLine(fSelectionBegin, fSelectionEnd, getTimestamp(event.x));
     }
 
     // ------------------------------------------------------------------------
@@ -1010,10 +981,12 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     @Override
     public void mouseEnter(final MouseEvent event) {
+        updateStatusLine(fSelectionBegin, fSelectionEnd, getTimestamp(event.x));
     }
 
     @Override
     public void mouseExit(final MouseEvent event) {
+        updateStatusLine(fSelectionBegin, fSelectionEnd, -1);
     }
 
     @Override
@@ -1060,6 +1033,46 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         return buffer.toString();
     }
 
+    private void updateStatusLine(long startTime, long endTime, long cursorTime) {
+        TimeFormat timeFormat = fTimeLineScale.getTimeProvider().getTimeFormat().convert();
+        boolean isCalendar = timeFormat == TimeFormat.CALENDAR;
+
+        StringBuilder message = new StringBuilder();
+        String spaces = "     "; //$NON-NLS-1$
+        if (cursorTime >= 0) {
+            message.append("T: "); //$NON-NLS-1$
+            if (isCalendar) {
+                message.append(FormatTimeUtils.formatDate(cursorTime) + ' ');
+            }
+            message.append(FormatTimeUtils.formatTime(cursorTime, timeFormat, Resolution.NANOSEC));
+            message.append(spaces);
+        }
+
+        if (startTime == endTime) {
+            message.append("T1: "); //$NON-NLS-1$
+            if (isCalendar) {
+                message.append(FormatTimeUtils.formatDate(startTime) + ' ');
+            }
+            message.append(FormatTimeUtils.formatTime(startTime, timeFormat, Resolution.NANOSEC));
+        } else {
+            message.append("T1: "); //$NON-NLS-1$
+            if (isCalendar) {
+                message.append(FormatTimeUtils.formatDate(startTime) + ' ');
+            }
+            message.append(FormatTimeUtils.formatTime(startTime, timeFormat, Resolution.NANOSEC));
+            message.append(spaces);
+            message.append("T2: "); //$NON-NLS-1$
+            if (isCalendar) {
+                message.append(FormatTimeUtils.formatDate(endTime) + ' ');
+            }
+            message.append(FormatTimeUtils.formatTime(endTime, timeFormat, Resolution.NANOSEC));
+            message.append(spaces);
+            message.append("\u0394: " + FormatTimeUtils.formatDelta(endTime - startTime, timeFormat, Resolution.NANOSEC)); //$NON-NLS-1$
+        }
+
+        fStatusLineManager.setMessage(message.toString());
+    }
+
     // ------------------------------------------------------------------------
     // ControlListener
     // ------------------------------------------------------------------------
@@ -1086,8 +1099,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     @TmfSignalHandler
     public void timestampFormatUpdated(TmfTimestampFormatUpdateSignal signal) {
-        updateRangeTextControls();
-
+        fTimeLineScale.redraw();
         fComposite.layout();
     }
 

@@ -24,6 +24,7 @@ import java.util.Collection;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -315,6 +316,7 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
         fTimeSpanControl.setLayoutData(gridData);
         fTimeSpanControl.setValue(Long.MIN_VALUE);
 
+        IStatusLineManager statusLineManager = getViewSite().getActionBars().getStatusLineManager();
         // --------------------------------------------------------------------
         // Time range histogram
         // --------------------------------------------------------------------
@@ -330,6 +332,7 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
 
         // Histogram
         fTimeRangeHistogram = new TimeRangeHistogram(this, fTimeRangeComposite, true);
+        fTimeRangeHistogram.setStatusLineManager(statusLineManager);
 
         // --------------------------------------------------------------------
         // Full range histogram
@@ -344,6 +347,7 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
 
         // Histogram
         fFullTraceHistogram = new FullTraceHistogram(this, fullRangeComposite);
+        fFullTraceHistogram.setStatusLineManager(statusLineManager);
 
         fLegendArea = new Composite(viewComposite, SWT.FILL);
         fLegendArea.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true, false, 2, 1));

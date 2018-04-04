@@ -791,9 +791,11 @@ The large (full) histogram, at the bottom, shows the event distribution over the
 
 The smaller (zoom) histogram, on top right, corresponds to the current zoom window, a sub-range of the event set. The window size can be adjusted by dragging the sash left beside the zoom window.
 
-The x-axis of each histogram corresponds to the event timestamps. The start time and end time of the histogram range is displayed. The y-axis shows the maximum number of events in the corresponding histogram bars.
+The x-axis of each histogram corresponds to the event timestamps. The axis is now the same as the other views for a better visualization of the range. The y-axis shows the maximum number of events in the corresponding histogram bars.
 
-The vertical blue line(s) show the current selection time (or range). If applicable, the region in the selection range will be shaded.
+The vertical blue line(s) show the current selection time (or range). If applicable, the region in the selection range will be shaded. In addition, when a selection is performed the status line (line placed at the very left bottom corner of Trace Compass) is now updated with the cursor position, the selection time or range and the delta for a range.
+
+[[Image:images/HistogramStatusLine.png]]
 
 The mouse can be used to control the histogram:
 
