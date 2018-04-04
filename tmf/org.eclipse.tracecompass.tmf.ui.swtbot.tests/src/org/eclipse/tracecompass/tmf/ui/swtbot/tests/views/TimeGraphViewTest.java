@@ -298,7 +298,6 @@ public class TimeGraphViewTest {
      *
      * TODO: make stable
      */
-    @Ignore
     @Test
     public void testLegendArrow() {
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
@@ -326,7 +325,7 @@ public class TimeGraphViewTest {
 
         // collect top 3 so that we don't count single pixel errors due to text
         // antialiasing
-        Set<RGB> changedValues = getTop3ColorSet(delta);
+        Set<RGB> changedValues = getTop5ColorSet(delta);
 
         assertTrue("Color of \"\"LASER\"\" did not get change despite change of width, " +
                 Multisets.copyHighestCountFirst(delta.getHistogram()).entrySet(), changedValues.contains(new RGB(255, 255, 128)));
@@ -454,7 +453,7 @@ public class TimeGraphViewTest {
         bot.waitUntil(new FileWritten(skinny, MIN_FILE_SIZE));
         /* Compare with the original, they should be different */
         ImageHelper delta = refImage.diff(skinnyImage);
-        Set<RGB> changedValues = getTop3ColorSet(delta);
+        Set<RGB> changedValues = getTop5ColorSet(delta);
         assertTrue("Color of \"HAIR\" did not get change despite change of width, " + Multisets.copyHighestCountFirst(delta.getHistogram()), changedValues.contains(new RGB(255, 255, 129)));
 
         /* reset all */
@@ -488,9 +487,9 @@ public class TimeGraphViewTest {
      *            source image
      * @return the set of RGBs
      */
-    private static @NonNull Set<RGB> getTop3ColorSet(ImageHelper source) {
+    private static @NonNull Set<RGB> getTop5ColorSet(ImageHelper source) {
         Set<Multiset.Entry<RGB>> histogramByCount = Multisets.copyHighestCountFirst(source.getHistogram()).entrySet();
-        return histogramByCount.stream().limit(3).map(Entry<RGB>::getElement).collect(Collectors.toSet());
+        return histogramByCount.stream().limit(5).map(Entry<RGB>::getElement).collect(Collectors.toSet());
     }
 
     /**
