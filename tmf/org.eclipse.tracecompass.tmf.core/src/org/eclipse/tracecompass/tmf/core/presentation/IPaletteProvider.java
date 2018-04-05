@@ -7,20 +7,23 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.provisional.tmf.core.presentation;
+package org.eclipse.tracecompass.tmf.core.presentation;
 
 import java.util.List;
 import java.util.function.Supplier;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 
 /**
  * Color palette provider. Returns a list of colors. Use the {@link #get()}
  * method to get the colors
  *
  * @author Matthew Khouzam
+ * @since 3.4
  */
 public interface IPaletteProvider extends Supplier<@NonNull List<@NonNull RGBAColor>> {
+
+    @Override
+    @NonNull List<@NonNull RGBAColor> get();
 
 }

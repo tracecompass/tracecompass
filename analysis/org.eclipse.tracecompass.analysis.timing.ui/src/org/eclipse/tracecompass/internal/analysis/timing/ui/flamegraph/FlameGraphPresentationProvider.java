@@ -21,8 +21,8 @@ import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondT
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.AggregatedCalledFunctionStatistics;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.ICalledFunction;
 import org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.SymbolAspect;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IPaletteProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RotatingPaletteProvider;
+import org.eclipse.tracecompass.tmf.core.presentation.IPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
