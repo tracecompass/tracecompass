@@ -48,6 +48,7 @@ public class Messages extends NLS {
     public static String TmfEventsTable_AddAsFilterText;
     public static String TmfEventsTable_AddBookmarkActionText;
     public static String TmfEventsTable_ApplyPresetFilterMenuName;
+    public static String TmfEventsTable_AutoFit;
     public static String TmfEventsTable_ClearFiltersActionText;
     public static String TmfEventsTable_CollapseFilterMenuName;
     public static String TmfEventsTable_ContentColumnHeader;
@@ -63,6 +64,7 @@ public class Messages extends NLS {
     public static String TmfEventsTable_OpenModelUnsupportedURI;
     public static String TmfEventsTable_ReferenceColumnHeader;
     public static String TmfEventsTable_RemoveBookmarkActionText;
+    public static String TmfEventsTable_ResetAll;
     public static String TmfEventsTable_SearchHint;
     public static String TmfEventsTable_SearchingJobName;
     public static String TmfEventsTable_ShowAll;

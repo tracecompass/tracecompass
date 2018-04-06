@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 Ericsson and others.
+ * Copyright (c) 2010, 2018 Ericsson and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Table;
@@ -888,6 +889,16 @@ public class TmfVirtualTable extends Composite {
         }
     }
 
+    @Override
+    public ScrollBar getHorizontalBar() {
+        return fTable.getHorizontalBar();
+    }
+
+    @Override
+    public ScrollBar getVerticalBar() {
+        return fTable.getVerticalBar();
+    }
+
     /**
      * Method indexOf. Return the index of a table item
      * @param ti TableItem the table item to search for in the table
@@ -940,12 +951,42 @@ public class TmfVirtualTable extends Composite {
     }
 
     /**
-     * Method getItem.
-     * @param point Point the coordinates in the table
-     * @return TableItem the corresponding table item
+     * Returns the table item at the given point in the table or null if no such
+     * item exists. The point is in coordinates relative to the table.
+     *
+     * @param point
+     *            the point in coordinates relative to the table
+     * @return the corresponding table item, or null
      */
     public TableItem getItem(Point point) {
         return fTable.getItem(point);
+    }
+
+    /**
+     * Returns the table column at the given point in the table or null if no such
+     * column exists. The point is in coordinates relative to the table.
+     *
+     * @param point
+     *            the point in coordinates relative to the table
+     * @return the corresponding table column, or null
+     * @since 3.4
+     */
+    public TableColumn getColumn(Point point) {
+        Rectangle clientArea = fTable.getClientArea();
+        Point p = new Point(clientArea.x + point.x, clientArea.y + point.y);
+        if (!clientArea.contains(p)) {
+            return null;
+        }
+        int x = 0;
+        for (int i : fTable.getColumnOrder()) {
+            TableColumn column = fTable.getColumn(i);
+            int width = column.getWidth();
+            x += width;
+            if (p.x < x && width > 0) {
+                return column;
+            }
+        }
+        return null;
     }
 
     /**

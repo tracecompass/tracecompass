@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 Ericsson and others.
+ * Copyright (c) 2010, 2018 Ericsson and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -22,11 +22,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -164,6 +166,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
+import org.eclipse.tracecompass.tmf.ui.TmfUiRefreshHandler;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsCache.CachedEvent;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsTableHeader.IEventsTableHeaderListener;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn;
@@ -211,6 +214,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     protected static final @NonNull String EMPTY_STRING = ""; //$NON-NLS-1$
 
     private static final boolean IS_LINUX = System.getProperty("os.name").contains("Linux") ? true : false; //$NON-NLS-1$ //$NON-NLS-2$
+    private static final boolean IS_WIN32 = SWT.getPlatform().equals("win32"); //$NON-NLS-1$
 
     private static final String FONT_DEFINITION_ID = "org.eclipse.tracecompass.tmf.ui.font.eventtable"; //$NON-NLS-1$
     private static final String HIGHLIGHT_COLOR_DEFINITION_ID = "org.eclipse.tracecompass.tmf.ui.color.eventtable.highlight"; //$NON-NLS-1$
@@ -270,10 +274,15 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         @Override
         public void controlResized(ControlEvent e) {
             TableColumn column = (TableColumn) e.widget;
+            if (fPacking) {
+                /* Don't update column width if resize due to packing */
+                return;
+            }
             if (column.getResizable() && !isExpanded(column)) {
-                int i = (int) column.getData(Key.INDEX);
-                fColumnSize[i] = column.getWidth();
-                column.setData(Key.WIDTH, fColumnSize[i]);
+                int index = (int) column.getData(Key.INDEX);
+                fColumnSize[index] = column.getWidth();
+                /* Turns off AutoFit */
+                column.setData(Key.WIDTH, fColumnSize[index]);
             }
         }
     }
@@ -702,6 +711,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     private Composite fTableComposite;
     private TmfRawEventViewer fRawViewer;
     private ITmfTrace fTrace;
+    private volatile boolean fPacking = false;
     private volatile boolean fPackDone = false;
     private volatile boolean fPackMarginDone = false;
     private HeaderState fHeaderState = HeaderState.NO_SEARCH;
@@ -878,29 +888,29 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
         fColumnSize = new int[fColumns.size()];
         fColumnResizable = new boolean[fColumns.size()];
-        int i = 0;
+        int index = 0;
         // Create the UI columns in the table
         for (TmfEventTableColumn col : fColumns) {
             TableColumn column = fTable.newTableColumn(SWT.LEFT);
             column.setText(col.getHeaderName());
             column.setToolTipText(col.getHeaderTooltip());
             column.setData(Key.ASPECT, col.getEventAspect());
-            column.setData(Key.INDEX, i);
+            column.setData(Key.INDEX, index);
             if (col instanceof TmfMarginColumn) {
                 column.setResizable(false);
             } else {
                 column.pack();
                 column.setMoveable(true);
-                column.setData(Key.WIDTH, column.getWidth());
+                column.setData(Key.WIDTH, SWT.DEFAULT);
                 if (col.getEventAspect().isHiddenByDefault()) {
                     column.setWidth(0);
                     column.setResizable(false);
                 }
-                fColumnSize[i] = column.getWidth();
             }
             column.addControlListener(new ColumnListener());
-            fColumnResizable[i] = column.getResizable();
-            i++;
+            fColumnSize[index] = SWT.DEFAULT;
+            fColumnResizable[index] = column.getResizable();
+            index++;
         }
         fColumnOrder = fTable.getColumnOrder();
 
@@ -969,24 +979,43 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         });
     }
 
-    /**
-     * Checked menu creator to make columns visible or not.
-     *
-     * @param parent
-     *            the parent menu
-     * @param column
-     *            the column
-     */
-    private IAction createHeaderAction(final TableColumn column) {
+    private IAction createAutoFitAction(TableColumn column) {
+        final IAction autoFitAction = new Action(Messages.TmfEventsTable_AutoFit, IAction.AS_CHECK_BOX) {
+            @Override
+            public void run() {
+                boolean isChecked = isChecked();
+                int index = (int) column.getData(Key.INDEX);
+                if (isChecked) {
+                    fPacking = true;
+                    column.pack();
+                    fPacking = false;
+                    column.setData(Key.WIDTH, SWT.DEFAULT);
+                    fColumnSize[index] = SWT.DEFAULT;
+                } else {
+                    fColumnSize[index] = column.getWidth();
+                    column.setData(Key.WIDTH, fColumnSize[index]);
+                }
+            }
+        };
+        autoFitAction.setChecked(Objects.equals(column.getData(Key.WIDTH), SWT.DEFAULT));
+        return autoFitAction;
+    }
+
+    private IAction createShowColumnAction(final TableColumn column) {
         final IAction columnMenuAction = new Action(column.getText(), IAction.AS_CHECK_BOX) {
             @Override
             public void run() {
                 boolean isChecked = isChecked();
+                int index = (int) column.getData(Key.INDEX);
                 if (isChecked) {
                     int width = (int) column.getData(Key.WIDTH);
                     column.setResizable(true);
-                    if (width == 0) {
+                    if (width <= 0) {
+                        fPacking = true;
                         column.pack();
+                        fPacking = false;
+                        column.setData(Key.WIDTH, SWT.DEFAULT);
+                        fColumnSize[index] = SWT.DEFAULT;
                     } else {
                         column.setWidth(width);
                     }
@@ -994,8 +1023,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     column.setResizable(false);
                     column.setWidth(0);
                 }
-                int pos = (int) column.getData(Key.INDEX);
-                fColumnResizable[pos] = isChecked;
+                fColumnResizable[index] = isChecked;
                 fTable.refresh();
             }
         };
@@ -1003,7 +1031,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         return columnMenuAction;
     }
 
-    private IAction createResetHeaderAction() {
+    private IAction createShowAllAction() {
         return new Action(Messages.TmfEventsTable_ShowAll) {
             @Override
             public void run() {
@@ -1012,14 +1040,50 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     if (index != MARGIN_COLUMN_INDEX) {
                         final int width = (int) column.getData(Key.WIDTH);
                         column.setResizable(true);
-                        if (width == 0) {
+                        if (width <= 0) {
+                            fPacking = true;
                             column.pack();
+                            fPacking = false;
+                            column.setData(Key.WIDTH, SWT.DEFAULT);
+                            fColumnSize[index] = SWT.DEFAULT;
                         } else {
                             column.setWidth(width);
                         }
                         fColumnResizable[index] = true;
                     }
                 }
+                fTable.refresh();
+            }
+        };
+    }
+
+    private IAction createResetAllAction() {
+        return new Action(Messages.TmfEventsTable_ResetAll) {
+            @Override
+            public void run() {
+                for (int index = 0; index < fColumnOrder.length; index++) {
+                    fColumnOrder[index] = index;
+                }
+                fTable.setColumnOrder(fColumnOrder);
+                for (TableColumn column : fTable.getColumns()) {
+                    int index = (int) column.getData(Key.INDEX);
+                    if (index != MARGIN_COLUMN_INDEX) {
+                        ITmfEventAspect<?> aspect = (ITmfEventAspect<?>) column.getData(Key.ASPECT);
+                        if (aspect.isHiddenByDefault()) {
+                            column.setWidth(0);
+                            column.setResizable(false);
+                        } else {
+                            fPacking = true;
+                            column.pack();
+                            fPacking = false;
+                            column.setResizable(true);
+                        }
+                        column.setData(Key.WIDTH, SWT.DEFAULT);
+                        fColumnSize[index] = SWT.DEFAULT;
+                        fColumnResizable[index] = column.getResizable();
+                    }
+                }
+                fTable.refresh();
             }
         };
     }
@@ -1336,13 +1400,21 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fHeaderPopupMenuManager.addMenuListener(new IMenuListener() {
             @Override
             public void menuAboutToShow(IMenuManager manager) {
+                final Point point = fTable.toControl(fLastMenuCursorLocation);
+                TableColumn selectedColumn = fTable.getColumn(point);
+                if (selectedColumn != null && selectedColumn.getResizable()) {
+                    fHeaderPopupMenuManager.add(createAutoFitAction(selectedColumn));
+                    fHeaderPopupMenuManager.add(new Separator());
+                }
                 for (int index : fTable.getColumnOrder()) {
-                    if (fTable.getColumns()[index].getData(Key.WIDTH) != null) {
-                        fHeaderPopupMenuManager.add(createHeaderAction(fTable.getColumns()[index]));
+                    TableColumn column = fTable.getColumns()[index];
+                    if (column.getData(Key.WIDTH) != null) {
+                        fHeaderPopupMenuManager.add(createShowColumnAction(column));
                     }
                 }
                 fHeaderPopupMenuManager.add(new Separator());
-                fHeaderPopupMenuManager.add(createResetHeaderAction());
+                fHeaderPopupMenuManager.add(createShowAllAction());
+                fHeaderPopupMenuManager.add(createResetAllAction());
             }
         });
 
@@ -1681,6 +1753,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         if ((itemStrings[MARGIN_COLUMN_INDEX] != null) && !itemStrings[MARGIN_COLUMN_INDEX].isEmpty()) {
             packMarginColumn();
         }
+        TmfUiRefreshHandler.getInstance().queueUpdate(this, () -> packColumns());
     }
 
     /**
@@ -2592,29 +2665,32 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
     /**
      * Pack the columns.
      *
-     * @return Whether or not a pack was done in this call. Otherwise, it was
-     *         already done by a previous call
+     * @return true if this is the first call to pack columns
      *
      * @since 2.0
      */
     protected boolean packColumns() {
-        if (fPackDone) {
-            return false;
-        }
+        boolean packDone = fPackDone;
         fTable.setRedraw(false);
         try {
+            int horizontalPos = fTable.getHorizontalBar().getSelection();
             TableColumn tableColumns[] = fTable.getColumns();
             for (int i = 0; i < tableColumns.length; i++) {
                 final TableColumn column = tableColumns[i];
-                packSingleColumn(i, column);
+                if (Objects.equals(column.getData(Key.WIDTH), SWT.DEFAULT)) {
+                    packSingleColumn(i, column);
+                }
             }
-
+            if (!IS_WIN32) {
+                /* Bug 410369: Cannot programmatically scroll on Windows */
+                fTable.getHorizontalBar().setSelection(horizontalPos);
+            }
         } finally {
             // Make sure that redraw is always enabled.
             fTable.setRedraw(true);
         }
         fPackDone = true;
-        return true;
+        return !packDone;
     }
 
     private void packMarginColumn() {
@@ -2628,8 +2704,8 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         if (i != MARGIN_COLUMN_INDEX && !column.getResizable()) {
             return;
         }
-        Object data = column.getData(Key.WIDTH);
-        final int headerWidth = data instanceof Integer ? (int) data : -1;
+        int minWidth = column.getWidth();
+        fPacking = true;
         column.pack();
         /*
          * Workaround for Linux which doesn't consider the image width of
@@ -2640,11 +2716,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             column.setWidth(column.getWidth() + SEARCH_IMAGE.getBounds().width);
         }
 
-        if (column.getWidth() < headerWidth) {
-            column.setWidth(headerWidth);
-        } else if (i != MARGIN_COLUMN_INDEX) {
-            column.setData(Key.WIDTH, column.getWidth());
+        if (column.getWidth() < minWidth) {
+            column.setWidth(minWidth);
         }
+        fPacking = false;
     }
 
     /**
@@ -2819,14 +2894,21 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         if (width == null || resizable == null || resizable.length != length || width.length != length) {
             return;
         }
+        if (width.length > 0 && width[0] == 0) {
+            /*
+             * When width of margin column is 0 instead of SWT.DEFAULT, it is an old
+             * setting. Reset all widths to SWT.DEFAULT to initially enable AutoFit.
+             */
+            Arrays.fill(width, SWT.DEFAULT);
+        }
         int i = 0;
         for (TableColumn column : fTable.getColumns()) {
             if (i != MARGIN_COLUMN_INDEX) {
                 column.setData(Key.WIDTH, width[i]);
                 column.setResizable(resizable[i]);
-                if (column.getResizable()) {
-                    column.setWidth((int) column.getData(Key.WIDTH));
-                } else {
+                if (column.getResizable() && width[i] > 0) {
+                    column.setWidth(width[i]);
+                } else if (width[i] == 0){
                     column.setWidth(0);
                 }
             }
@@ -2834,8 +2916,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         }
         fColumnSize = width;
         fColumnResizable = resizable;
-        /* Don't pack, it would override these settings */
-        fPackDone = true;
     }
 
     /**
@@ -2961,7 +3041,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             public void run() {
                 if (!fTable.isDisposed()) {
                     fTable.refresh();
-                    packColumns();
                 }
                 if (completed) {
                     populateCompleted();
