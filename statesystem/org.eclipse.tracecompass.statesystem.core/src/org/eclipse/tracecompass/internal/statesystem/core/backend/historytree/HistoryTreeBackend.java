@@ -374,18 +374,17 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
                             /*
                              * Compute reduced conditions here to reduce complexity in queuing operations.
                              */
-                            IntegerRangeCondition subQuarks = quarks.subCondition(currentNode.getMinQuark(), currentNode.getMaxQuark());
                             TimeRangeCondition subTimes = times.subCondition(currentNode.getNodeStart(), currentNode.getNodeEnd());
                             /*
                              * During the SHT construction, the bounds of the children are not final, so we
                              * may have queued some nodes which don't overlap the query.
                              */
-                            if (subQuarks != null && subTimes != null) {
+                            if (quarks.intersects(currentNode.getMinQuark(), currentNode.getMaxQuark()) && subTimes != null) {
                                 if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
                                     // Queue the relevant children nodes for BFS.
-                                    ((ParentNode) currentNode).queueNextChildren2D(subQuarks, subTimes, seqNumberQueue);
+                                    ((ParentNode) currentNode).queueNextChildren2D(quarks, subTimes, seqNumberQueue);
                                 }
-                                intervalQueue = currentNode.iterable2D(subQuarks, subTimes).iterator();
+                                intervalQueue = currentNode.iterable2D(quarks, subTimes).iterator();
                             }
                         } catch (ClosedChannelException e) {
                             try (TraceCompassLogUtils.FlowScopeLog closedChannelLog = new TraceCompassLogUtils.FlowScopeLogBuilder(LOGGER, Level.FINER,

@@ -23,7 +23,20 @@ import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.In
  */
 public class ArrayIntegerRangeCondition implements IntegerRangeCondition {
 
+    private static final int[] MASKS = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80 };
+
+    /**
+     * This array contains the actual integer values
+     */
     private final int[] fQuarkArray;
+    /**
+     * This array is used for efficient lookup: we use bytes to reduce the memory
+     * usage ( JVM would allocate a byte per boolean if we were using a boolean
+     * array , thus increasing overhead). For lookup, the first bit in this array
+     * corresponds to the minimum value, and then, there is a bit for every integer
+     * to max.
+     */
+    private final byte[] fQuarkSet;
 
     /**
      * {@link ArrayIntegerRangeCondition} from a collection
@@ -42,6 +55,7 @@ public class ArrayIntegerRangeCondition implements IntegerRangeCondition {
             i++;
         }
         Arrays.sort(fQuarkArray);
+        fQuarkSet = buildQuarkSet(fQuarkArray);
     }
 
     /**
@@ -52,6 +66,21 @@ public class ArrayIntegerRangeCondition implements IntegerRangeCondition {
      */
     private ArrayIntegerRangeCondition(int[] intArray) {
         fQuarkArray = intArray;
+        fQuarkSet = buildQuarkSet(intArray);
+    }
+
+    private static byte[] buildQuarkSet(int[] sortedQuarkArray) {
+        int min = sortedQuarkArray[0];
+        int max = sortedQuarkArray[sortedQuarkArray.length - 1];
+        byte[] quarkSet = new byte[(max - min) / 8 + 1];
+
+        for (int quark : sortedQuarkArray) {
+            int delta = quark - min;
+            int index = delta / 8;
+            int offset = delta & 0x7;
+            quarkSet[index] |= MASKS[offset];
+        }
+        return quarkSet;
     }
 
     @Override
@@ -66,7 +95,13 @@ public class ArrayIntegerRangeCondition implements IntegerRangeCondition {
 
     @Override
     public boolean test(int element) {
-        return Arrays.binarySearch(fQuarkArray, element) >= 0;
+        if (element < min() || max() < element) {
+            return false;
+        }
+        int delta = element - min();
+        int index = delta / 8;
+        int offset = delta & 0x7;
+        return (fQuarkSet[index] & MASKS[offset]) != 0;
     }
 
     @Override
@@ -85,7 +120,7 @@ public class ArrayIntegerRangeCondition implements IntegerRangeCondition {
          * value at -lowIndex - 1 is larger than low. we just need to check that it is
          * also smaller than or equal to high for the intersection
          */
-        return fQuarkArray[-lowIndex - 1] < high;
+        return fQuarkArray[-lowIndex - 1] <= high;
     }
 
     @Override
@@ -114,7 +149,7 @@ public class ArrayIntegerRangeCondition implements IntegerRangeCondition {
 
     @Override
     public String toString() {
-        return "ArrayIntegerRangeCondition[" + fQuarkArray.length + "](" + min() + '\u2025' + max() + ')'; //$NON-NLS-1$ //$NON-NLS-2$
+        return "ArrayIntegerRangeCondition[" + fQuarkSet.length + "](" + min() + '\u2025' + max() + ')'; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
 }
