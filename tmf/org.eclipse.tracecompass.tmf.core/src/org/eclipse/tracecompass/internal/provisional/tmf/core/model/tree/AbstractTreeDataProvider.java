@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -185,7 +185,11 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
         boolean complete = ss.waitUntilBuilt(0);
         try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "AbstractTreeDataProvider#fetchTree") //$NON-NLS-1$
                 .setCategory(getClass().getSimpleName()).build()) {
-            List<M> tree = getTree(ss, filter, monitor);
+            List<M> tree = null;
+            /* Don't query empty state system */
+            if (ss.getNbAttributes() > 0 && ss.getStartTime() != Long.MIN_VALUE) {
+                tree = getTree(ss, filter, monitor);
+            }
             if (complete) {
                 TmfModelResponse<List<M>> response = new TmfModelResponse<>(tree,
                         ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);

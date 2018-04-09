@@ -164,55 +164,59 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
          */
         synchronized (fBuildMap) {
             boolean complete = ss.waitUntilBuilt(0);
-            long end = ss.getCurrentEndTime();
-            fLastEnd = Long.max(fLastEnd, ss.getStartTime());
+            List<ThreadEntryModel> list = null;
+            /* Don't query empty state system */
+            if (ss.getNbAttributes() > 0 && ss.getStartTime() != Long.MIN_VALUE) {
+                long end = ss.getCurrentEndTime();
+                fLastEnd = Long.max(fLastEnd, ss.getStartTime());
 
-            TreeMultimap<Integer, ITmfStateInterval> execNamesPPIDs = TreeMultimap.create(Comparator.naturalOrder(),
-                    Comparator.comparing(ITmfStateInterval::getStartTime));
+                TreeMultimap<Integer, ITmfStateInterval> execNamesPPIDs = TreeMultimap.create(Comparator.naturalOrder(),
+                        Comparator.comparing(ITmfStateInterval::getStartTime));
 
-            /*
-             * Create a List with the threads' PPID and EXEC_NAME quarks for the 2D query .
-             */
-            List<Integer> quarks = new ArrayList<>(ss.getQuarks(Attributes.THREADS, WILDCARD, Attributes.EXEC_NAME));
-            quarks.addAll(ss.getQuarks(Attributes.THREADS, WILDCARD, Attributes.PPID));
-            try {
-                for (ITmfStateInterval interval : ss.query2D(quarks, Long.min(fLastEnd, end), end)) {
-                    if (monitor != null && monitor.isCanceled()) {
-                        return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
+                /*
+                 * Create a List with the threads' PPID and EXEC_NAME quarks for the 2D query .
+                 */
+                List<Integer> quarks = new ArrayList<>(ss.getQuarks(Attributes.THREADS, WILDCARD, Attributes.EXEC_NAME));
+                quarks.addAll(ss.getQuarks(Attributes.THREADS, WILDCARD, Attributes.PPID));
+                try {
+                    for (ITmfStateInterval interval : ss.query2D(quarks, Long.min(fLastEnd, end), end)) {
+                        if (monitor != null && monitor.isCanceled()) {
+                            return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
+                        }
+                        execNamesPPIDs.put(interval.getAttribute(), interval);
                     }
-                    execNamesPPIDs.put(interval.getAttribute(), interval);
-                }
-            } catch (TimeRangeException | StateSystemDisposedException e) {
-                return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, e.getClass().getName() + ':' + String.valueOf(e.getMessage()));
-            }
-
-            // update the trace Entry.
-            fTidToEntry.replaceValues(Integer.MIN_VALUE, Collections.singleton(new ThreadEntryModel.Builder(fTraceId, getTrace().getName(),
-                    ss.getStartTime(), end, Integer.MIN_VALUE, Integer.MIN_VALUE)));
-
-            for (Integer threadQuark : ss.getQuarks(Attributes.THREADS, WILDCARD)) {
-                String threadAttributeName = ss.getAttributeName(threadQuark);
-                Pair<Integer, Integer> entryKey = Attributes.parseThreadAttributeName(threadAttributeName);
-                int threadId = entryKey.getFirst();
-                if (threadId < 0) {
-                    // ignore the 'unknown' (-1) thread
-                    continue;
+                } catch (TimeRangeException | StateSystemDisposedException e) {
+                    return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, e.getClass().getName() + ':' + String.valueOf(e.getMessage()));
                 }
 
-                int execNameQuark = ss.optQuarkRelative(threadQuark, Attributes.EXEC_NAME);
-                int ppidQuark = ss.optQuarkRelative(threadQuark, Attributes.PPID);
-                NavigableSet<ITmfStateInterval> ppidIntervals = execNamesPPIDs.get(ppidQuark);
-                for (ITmfStateInterval execNameInterval : execNamesPPIDs.get(execNameQuark)) {
-                    if (monitor != null && monitor.isCanceled()) {
-                        return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
+                // update the trace Entry.
+                fTidToEntry.replaceValues(Integer.MIN_VALUE, Collections.singleton(new ThreadEntryModel.Builder(fTraceId, getTrace().getName(),
+                        ss.getStartTime(), end, Integer.MIN_VALUE, Integer.MIN_VALUE)));
+
+                for (Integer threadQuark : ss.getQuarks(Attributes.THREADS, WILDCARD)) {
+                    String threadAttributeName = ss.getAttributeName(threadQuark);
+                    Pair<Integer, Integer> entryKey = Attributes.parseThreadAttributeName(threadAttributeName);
+                    int threadId = entryKey.getFirst();
+                    if (threadId < 0) {
+                        // ignore the 'unknown' (-1) thread
+                        continue;
                     }
-                    updateEntry(threadQuark, entryKey, ppidIntervals, execNameInterval);
+
+                    int execNameQuark = ss.optQuarkRelative(threadQuark, Attributes.EXEC_NAME);
+                    int ppidQuark = ss.optQuarkRelative(threadQuark, Attributes.PPID);
+                    NavigableSet<ITmfStateInterval> ppidIntervals = execNamesPPIDs.get(ppidQuark);
+                    for (ITmfStateInterval execNameInterval : execNamesPPIDs.get(execNameQuark)) {
+                        if (monitor != null && monitor.isCanceled()) {
+                            return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
+                        }
+                        updateEntry(threadQuark, entryKey, ppidIntervals, execNameInterval);
+                    }
                 }
+
+                fLastEnd = end;
+
+                list = filter(fTidToEntry, filter);
             }
-
-            fLastEnd = end;
-
-            List<ThreadEntryModel> list = filter(fTidToEntry, filter);
             if (complete) {
                 fBuildMap.clear();
                 fLastEnd = Long.MAX_VALUE;

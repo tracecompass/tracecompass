@@ -141,14 +141,17 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
         String traceName = String.valueOf(getTrace().getName());
         for (ITmfStateSystem ss : fSs) {
             isComplete &= ss.waitUntilBuilt(0);
-            long start = ss.getStartTime();
-            long end = ss.getCurrentEndTime();
-            long id = fBaseQuarkToId.row(ss).computeIfAbsent(ITmfStateSystem.ROOT_ATTRIBUTE, s -> sfAtomicId.getAndIncrement());
-            Builder ssEntry = new Builder(id, -1, traceName, start, end, null, ss, ITmfStateSystem.ROOT_ATTRIBUTE);
-            builder.add(ssEntry.build());
+            /* Don't query empty state system */
+            if (ss.getNbAttributes() > 0 && ss.getStartTime() != Long.MIN_VALUE) {
+                long start = ss.getStartTime();
+                long end = ss.getCurrentEndTime();
+                long id = fBaseQuarkToId.row(ss).computeIfAbsent(ITmfStateSystem.ROOT_ATTRIBUTE, s -> sfAtomicId.getAndIncrement());
+                Builder ssEntry = new Builder(id, -1, traceName, start, end, null, ss, ITmfStateSystem.ROOT_ATTRIBUTE);
+                builder.add(ssEntry.build());
 
-            for (Element entry : fEntries) {
-                buildEntry(ss, entry, ssEntry, -1, StringUtils.EMPTY, end, builder);
+                for (Element entry : fEntries) {
+                    buildEntry(ss, entry, ssEntry, -1, StringUtils.EMPTY, end, builder);
+                }
             }
         }
         Status status = isComplete ? Status.COMPLETED : Status.RUNNING;
