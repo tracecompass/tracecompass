@@ -9,9 +9,12 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.histogram;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
@@ -43,6 +46,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 /**
  * This data provider will return a XY model (model is wrapped in a response)
@@ -138,57 +142,90 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
         int leEndQuark = ss.optQuarkAbsolute(Attributes.LOST_EVENTS);
         int leCountQuark = ss.optQuarkAbsolute(Attributes.EVENT_TYPES, "Lost event"); //$NON-NLS-1$
         long step = (times[times.length - 1] - times[0]) / times.length;
+        long lastTime = times[times.length - 1];
+        long firstTime = times[0];
         double[] leY = new double[times.length];
-        ITmfStateInterval lePrevValueInterval = null;
-        ITmfStateInterval leEndInterval = null;
-        ITmfStateInterval leCountInterval = null;
-        long prevValue = 0l;
-        /*
-         * FIXME : in the worst case scenario, filling in one value for the lost events
-         * requires querying THREE intervals. Fixing this would require modifying the
-         * state system for the desired value to be directly accessible.
-         */
-        for (int i = 0; i < times.length; i++) {
-            long t = times[i];
-            if (t > ss.getCurrentEndTime()) {
-                break;
-            } else if (ss.getStartTime() <= t) {
-                // try to reuse the end and count intervals.
-                if (leEndInterval == null || !leEndInterval.intersects(t)) {
-                    leEndInterval = ss.querySingleState(t, leEndQuark);
-                }
 
-                if (leCountInterval == null || !leCountInterval.intersects(t)) {
-                    leCountInterval = ss.querySingleState(t, leCountQuark);
-                }
-                Object endValue = leEndInterval.getValue();
-                Object countValue = leCountInterval.getValue();
+        long t = firstTime;
+        if (ss.getStartTime() <= t) {
+            List<ITmfStateInterval> sortedEndIntervals = Lists.newArrayList(ss.query2D(Collections.singleton(leEndQuark), firstTime, lastTime));
+            sortedEndIntervals.sort(Comparator.comparing(ITmfStateInterval::getStartTime));
+            List<ITmfStateInterval> sortedCountIntervals = Lists.newArrayList(ss.query2D(Collections.singleton(leCountQuark), firstTime, lastTime));
+            sortedCountIntervals.sort(Comparator.comparing(ITmfStateInterval::getStartTime));
 
-                long prevValueTime = leEndInterval.getStartTime() - 1;
-                if (prevValueTime >= ss.getStartTime()) {
-                    // try to reuse the previous count intervals.
-                    if (lePrevValueInterval == null || lePrevValueInterval.getEndTime() != prevValueTime) {
-                        lePrevValueInterval = ss.querySingleState(prevValueTime, leCountQuark);
-                        Object prevValueObject = lePrevValueInterval.getValue();
-                        if (prevValueObject instanceof Number) {
-                            prevValue = ((Number) prevValueObject).longValue();
-                        }
+            Iterator<ITmfStateInterval> endTimeIter = sortedEndIntervals.iterator();
+            List<LostEventInterval> lostEventIntervals = new ArrayList<>();
+            ITmfStateInterval endTimeInterval = endTimeIter.next();
+            for (ITmfStateInterval lostCountInterval : sortedCountIntervals) {
+                while (!endTimeInterval.intersects(lostCountInterval.getStartTime())) {
+                    if (!endTimeIter.hasNext()) {
+                        throw new IllegalStateException();
                     }
-                } else {
-                    prevValue = 0;
+                    endTimeInterval = endTimeIter.next();
+                }
+                Object endTime = endTimeInterval.getValue();
+                Object lostCount = lostCountInterval.getValue();
+                if (endTime instanceof Number && lostCount instanceof Number) {
+                    lostEventIntervals.add(new LostEventInterval(endTimeInterval.getStartTime(), ((Number) endTime).longValue(), ((Number) lostCount).longValue()));
+                }
+            }
+
+            for (int i = 0; i < times.length - 2; i++) {
+                int intervalIndex;
+                boolean intersect = false;
+                for (intervalIndex = 0; intervalIndex < lostEventIntervals.size(); intervalIndex++) {
+                    if (lostEventIntervals.get(intervalIndex).intersects(times[i], times[i + 1])) {
+                        intersect = true;
+                        break;
+                    }
                 }
 
-                if (endValue instanceof Number && countValue instanceof Number) {
-                    long end = ((Number) endValue).longValue();
-                    double count = ((Number) countValue).doubleValue();
-                    if (end >= t) {
-                        leY[i] = step * (count - prevValue) / (end - leEndInterval.getStartTime());
+                if (intersect) {
+                    LostEventInterval lostEventInterval = lostEventIntervals.get(intervalIndex);
+                    long prevCount = 0;
+                    if (intervalIndex - 1 >= 0) {
+                        prevCount = lostEventIntervals.get(intervalIndex - 1).getLostEventCount();
                     }
+
+                    long lostEventCount = lostEventInterval.getLostEventCount();
+                    double yValue = step * (double) (lostEventCount - prevCount) / (lostEventInterval.getEndTime() - lostEventInterval.getStartTime());
+                    if (yValue > lostEventCount) {
+                        yValue = (double) lostEventCount - prevCount;
+                    }
+                    leY[i] = yValue;
                 }
             }
         }
         String lostName = getTrace().getName() + '/' + Messages.HistogramDataProvider_Lost;
         return new YModel(fLostId, lostName, leY);
+    }
+
+    private class LostEventInterval {
+        private final long fStartTime;
+        private final long fEndTime;
+        private final long fLostEventCount;
+
+        public LostEventInterval(long startTime, long endTime, long lostEventCount) {
+            fStartTime = startTime;
+            fEndTime = endTime;
+            fLostEventCount = lostEventCount;
+        }
+
+        public long getEndTime() {
+            return fEndTime;
+        }
+
+        public long getStartTime() {
+            return fStartTime;
+        }
+
+        public long getLostEventCount() {
+            return fLostEventCount;
+        }
+
+        public boolean intersects(long start, long end) {
+            return start <= fEndTime && end >= fStartTime;
+        }
     }
 
     @Override
