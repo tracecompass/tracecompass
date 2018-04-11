@@ -340,22 +340,35 @@ public class TmfProjectRegistry implements IResourceChangeListener {
             for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
                 if (delta.getResource() instanceof IProject) {
                     IProject project = (IProject) delta.getResource();
-                    // Handle project moved - it covers only if it's not shadow project
-                    if ((delta.getKind() == IResourceDelta.ADDED) && (delta.getFlags() & IResourceDelta.MOVED_FROM) != 0 ) {
-                        handleProjectMoved(project);
-                        return;
-                    }
 
                     try {
-                        if (delta.getKind() == IResourceDelta.CHANGED &&
-                                project.isOpen() && project.hasNature(TmfProjectNature.ID)) {
+                        if (delta.getKind() == IResourceDelta.REMOVED) {
+                            // Handle project deleted (it is also closed)
+                            TmfProjectElement projectElement = registry.remove(project);
+
+                            if (projectElement != null) {
+                                projectElement.dispose();
+                            }
+
+                            // Refresh viewer for parent project
+                            IProject parentProject = TmfProjectModelHelper.getProjectFromShadowProject(project);
+                            if (parentProject != null) {
+                                new TmfProjectElement(parentProject.getName(), parentProject, null).refreshViewer();
+                            }
+                        } else if (!project.isOpen() || !project.hasNature(TmfProjectNature.ID)) {
+                            // Project is closed or does not have tracing nature, skip it
+                            continue;
+                        } else if ((delta.getKind() == IResourceDelta.ADDED) && (delta.getFlags() & IResourceDelta.MOVED_FROM) != 0 ) {
+                            // Handle project moved - it covers only if it's not shadow project
+                            handleProjectMoved(project);
+                        } else if (delta.getKind() == IResourceDelta.CHANGED) {
                             // If shadow project exists, handle resource change in the shadow project
                             if (TmfProjectModelHelper.shadowProjectAccessible(project)) {
                                 handleParentProjectRefresh(project);
-                                return;
+                                continue;
                             } else if ((delta.getFlags() & IResourceDelta.OPEN) != 0) {
                                 handleParentProjectOpen(project);
-                                return;
+                                continue;
                             }
 
                             // Handle resource change in the relevant project
@@ -444,18 +457,6 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                             if (projectElement != null) {
                                 // refresh only the viewer for the affected project
                                 projectElement.refreshViewer();
-                            }
-                        } else if (delta.getKind() == IResourceDelta.REMOVED) {
-                            TmfProjectElement projectElement = registry.remove(project);
-
-                            if (projectElement != null) {
-                                projectElement.dispose();
-                            }
-
-                            // Refresh viewer for parent project
-                            IProject parentProject = TmfProjectModelHelper.getProjectFromShadowProject(project);
-                            if (parentProject != null) {
-                                new TmfProjectElement(parentProject.getName(), parentProject, null).refreshViewer();
                             }
                         }
                     } catch (CoreException e) {
