@@ -211,6 +211,10 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
 
     private ITimeGraphLegendProvider fLegendProvider;
 
+    private Action fHorizontalAction;
+
+    private Action fVerticalAction;
+
     private class ListenerNotifier extends Thread {
         private static final long DELAY = 400L;
         private static final long POLLING_INTERVAL = 10L;
@@ -618,6 +622,23 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
                         extendToPrevMarker();
                     } else {
                         selectPrevMarker();
+                    }
+                } else if (e.keyCode == 'g' && (e.stateMask & SWT.MODIFIER_MASK) == 0) {
+                    if (fHorizontalAction == null) {
+                        getGridlinesMenu();
+                    }
+                    boolean hChecked = fHorizontalAction.isChecked();
+                    boolean vChecked = fVerticalAction.isChecked();
+
+                    boolean nextH = !vChecked;
+                    boolean nextV = hChecked;
+                    if (nextV != vChecked) {
+                        fVerticalAction.setChecked(nextV);
+                        fVerticalAction.runWithEvent(null);
+                    }
+                    if (nextH != hChecked) {
+                        fHorizontalAction.setChecked(nextH);
+                        fHorizontalAction.runWithEvent(null);
                     }
                 }
                 adjustVerticalScrollBar();
@@ -2531,7 +2552,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
         if (fGridlinesMenu == null) {
             IDialogSettings settings = DialogSettings.getOrCreateSection(Activator.getDefault().getDialogSettings(), TimeGraphControl.class.getName());
             fGridlinesMenu = new MenuManager(Messages.TmfTimeGraphViewer_ShowGridlinesMenuText);
-            Action horizontalAction = new Action(Messages.TmfTimeGraphViewer_ShowGridlinesHorizontalActionText, IAction.AS_CHECK_BOX) {
+            fHorizontalAction = new Action(Messages.TmfTimeGraphViewer_ShowGridlinesHorizontalActionText, IAction.AS_CHECK_BOX) {
                 @Override
                 public void run() {
                     boolean showHorizontal = isChecked();
@@ -2539,10 +2560,10 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
                     settings.put(HIDE_GRIDLINES_HORIZONTAL_KEY, !showHorizontal);
                 }
             };
-            horizontalAction.setChecked(!settings.getBoolean(HIDE_GRIDLINES_HORIZONTAL_KEY));
-            fTimeGraphCtrl.setMidLinesVisible(horizontalAction.isChecked());
-            fGridlinesMenu.add(horizontalAction);
-            Action verticalAction = new Action(Messages.TmfTimeGraphViewer_ShowGridlinesVerticalActionText, IAction.AS_CHECK_BOX) {
+            fHorizontalAction.setChecked(!settings.getBoolean(HIDE_GRIDLINES_HORIZONTAL_KEY));
+            fTimeGraphCtrl.setMidLinesVisible(fHorizontalAction.isChecked());
+            fGridlinesMenu.add(fHorizontalAction);
+            fVerticalAction = new Action(Messages.TmfTimeGraphViewer_ShowGridlinesVerticalActionText, IAction.AS_CHECK_BOX) {
                 @Override
                 public void run() {
                     boolean showVertical = isChecked();
@@ -2550,9 +2571,9 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
                     settings.put(HIDE_GRIDLINES_VERTICAL_KEY, !showVertical);
                 }
             };
-            verticalAction.setChecked(!settings.getBoolean(HIDE_GRIDLINES_VERTICAL_KEY));
-            fTimeGraphCtrl.setGridLinesVisible(verticalAction.isChecked());
-            fGridlinesMenu.add(verticalAction);
+            fVerticalAction.setChecked(!settings.getBoolean(HIDE_GRIDLINES_VERTICAL_KEY));
+            fTimeGraphCtrl.setGridLinesVisible(fVerticalAction.isChecked());
+            fGridlinesMenu.add(fVerticalAction);
         }
         return fGridlinesMenu;
     }

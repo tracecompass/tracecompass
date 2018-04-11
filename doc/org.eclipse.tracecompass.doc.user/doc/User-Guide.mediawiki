@@ -2130,6 +2130,7 @@ When the mouse cursor is over entries (left pane):
 *'''-''': Collapse selected entry
 *'''+''': Expand selected entry
 *'''*''': Expand selected entry to the level with at least one collapsed entry
+*'''g''': Toggles both vertical and horizontal gridlines
 
 '''Please note that the behavior of some shortcuts can slightly differ based on the operating system.'''
 
