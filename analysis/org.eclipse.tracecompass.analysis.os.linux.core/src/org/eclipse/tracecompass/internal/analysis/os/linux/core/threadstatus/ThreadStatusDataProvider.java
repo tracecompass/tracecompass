@@ -40,6 +40,7 @@ import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProv
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils.QuarkIterator;
+import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -320,12 +321,27 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
                     Object o = interval.getValue();
                     if (o instanceof Number && cpus.contains(((Number) o).longValue())) {
                         int attribute = interval.getAttribute();
-                        int tid = rqToPidCache.computeIfAbsent(attribute, a -> Attributes.parseThreadAttributeName(ss.getAttributeName(ss.getParentAttributeQuark(a))).getFirst());
-                        for (ThreadEntryModel.Builder model : tidToEntry.get(tid)) {
-                            if (interval.getStartTime() <= model.getEndTime() &&
-                                    model.getStartTime() <= interval.getEndTime()) {
-                                models.add(build(model));
+
+                        try {
+                            // Get the name of the thread
+                            int nameQuark = ss.getQuarkRelative(ss.getParentAttributeQuark(attribute), Attributes.EXEC_NAME);
+                            Iterable<@NonNull ITmfStateInterval> names2d = ss.query2D(Collections.singleton(nameQuark), interval.getStartTime(), interval.getEndTime());
+                            Iterable<@NonNull String> names = Iterables.transform(names2d, intervalName -> String.valueOf(intervalName.getValue()));
+
+                            int tid = rqToPidCache.computeIfAbsent(attribute, a -> Attributes.parseThreadAttributeName(ss.getAttributeName(ss.getParentAttributeQuark(a))).getFirst());
+
+                            for (ThreadEntryModel.Builder model : tidToEntry.get(tid)) {
+                                if (interval.getStartTime() <= model.getEndTime() &&
+                                        model.getStartTime() <= interval.getEndTime()) {
+                                    ThreadEntryModel build = build(model);
+                                    if (!Iterables.any(names, name -> name.equals(build.getName()))) {
+                                        continue;
+                                    }
+                                    models.add(build);
+                                }
                             }
+                        } catch (AttributeNotFoundException e) {
+                            Activator.getDefault().logWarning("Unable to get the quark for the attribute name", e); //$NON-NLS-1$
                         }
                     }
                 }
