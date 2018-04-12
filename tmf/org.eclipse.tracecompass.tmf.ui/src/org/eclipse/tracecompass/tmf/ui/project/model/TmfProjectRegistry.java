@@ -318,17 +318,38 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                             }
                         }
 
+                        boolean removeProjectElement = (event.getType() == IResourceChangeEvent.PRE_CLOSE);
+
                         // If parent project was deleted and a shadow project exists,
                         if (!isShadowProject) {
                             final IProject shadowProject = TmfProjectModelHelper.getShadowProject(aProject);
                             if (shadowProject.exists()) {
-                                Display.getDefault().asyncExec(() -> {
-                                    try {
-                                        shadowProject.delete(false, true, null);
-                                    } catch (CoreException e) {
-                                        Activator.getDefault().logError("Error remove shadow project when is parent project being deleted " + shadowProject.getName(), e); //$NON-NLS-1$
-                                    }
-                                });
+                                if (event.getType() == IResourceChangeEvent.PRE_DELETE) {
+                                    Display.getDefault().asyncExec(() -> {
+                                        try {
+                                            shadowProject.delete(false, true, null);
+                                        } catch (CoreException e) {
+                                            Activator.getDefault().logError("Error deleting shadow project when is parent project being deleted " + shadowProject.getName(), e); //$NON-NLS-1$
+                                        }
+                                    });
+                                } else {
+                                    Display.getDefault().asyncExec(() -> {
+                                        try {
+                                            shadowProject.close(null);
+                                        } catch (CoreException e) {
+                                            Activator.getDefault().logError("Error removing shadow project when is parent project being closed " + shadowProject.getName(), e); //$NON-NLS-1$
+                                        }
+                                    });
+                                }
+                                removeProjectElement = false;
+                            }
+                        }
+
+                        if (removeProjectElement) {
+                            // IResourceChangeEvent.PRE_CLOSE of a non-shadow project
+                            TmfProjectElement projectElement = registry.remove(project);
+                            if (projectElement != null) {
+                                projectElement.dispose();
                             }
                         }
                     }
@@ -641,6 +662,14 @@ public class TmfProjectRegistry implements IResourceChangeListener {
 
     private static void handleParentProjectOpen(IProject project) {
         Job job = Job.createSystem(monitor -> {
+            IProject shadowProject = TmfProjectModelHelper.getShadowProject(project);
+            if (shadowProject != null && shadowProject.exists() && !shadowProject.isOpen()) {
+                try {
+                    shadowProject.open(new NullProgressMonitor());
+                } catch (CoreException e) {
+                    // Do nothing ... addTracingNature() will handle this
+                }
+            }
             addTracingNature(project, monitor);
         });
         job.schedule();

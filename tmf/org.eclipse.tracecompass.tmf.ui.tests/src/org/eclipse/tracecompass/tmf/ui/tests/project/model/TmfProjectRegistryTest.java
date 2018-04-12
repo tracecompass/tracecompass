@@ -154,7 +154,7 @@ public class TmfProjectRegistryTest {
 
         // Verify content provider for shadow project if project is closed
         fSomeProject.close(progressMonitor);
-        WaitUtils.waitUntil(project -> !project.exists(), fShadowSomeProject, "Shadow project did not get deleted");
+        WaitUtils.waitUntil(project -> (project.exists() && !project.isOpen()), fShadowSomeProject, "Shadow project did not get closed");
 
         fSomeProject.open(progressMonitor);
         WaitUtils.waitUntil(project -> project.isOpen(), fShadowSomeProject, "Shadow project did not get opened");
