@@ -2525,7 +2525,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
      * Get the show gridlines menu.
      *
      * @return The menu manager object
-     * @since 3.4
+     * @since 4.0
      */
     public MenuManager getGridlinesMenu() {
         if (fGridlinesMenu == null) {
