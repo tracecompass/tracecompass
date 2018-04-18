@@ -2203,6 +2203,19 @@ A user can fine tune this filter by providing ranges of CPUs allowing the filter
 
 [[Image:images/DynamicFilters/DynamicFilter_ShowActiveThreadsConfigure.png]]
 
+==== Time Event Filtering ====
+
+It is possible to filter the time events in a time graph view and at the current zoom level. To filter the timegraph view, press '''/''' in the timegraph view. When the filter dialog will show up, user can enter the filtering regex in the text box. The filter is applied and the view is updated as the user type the text.
+
+[[Image:images/TimeEventFilter/FilterDialog.png]]
+
+It is possible to save multiple filters. They will be all activated at the same time in the view. To save filters, user need to press ENTER on the ongoing regex. The '''saved filters''' will appear at the left of the dialog text element. The view has a limit of 4 saved filter.
+When the view has '''saved filters''', the time events that do not match these filters are hidden in the view and entries that have nothing to show are hidden too. User can use the dialog text box to filter the remaining time events.
+
+[[Image:images/TimeEventFilter/SavedFilter.png]]
+
+To remove a '''saved filter''', click on the remove button accross the filter.
+
 === Toolbar ===
 
 <!-- Keep in sync with ref:resource-view-toolbar -->
