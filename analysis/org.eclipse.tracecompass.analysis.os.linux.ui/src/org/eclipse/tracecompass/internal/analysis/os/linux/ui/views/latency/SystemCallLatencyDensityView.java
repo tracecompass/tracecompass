@@ -44,7 +44,7 @@ public class SystemCallLatencyDensityView extends AbstractSegmentStoreDensityVie
             protected void createProviderColumns() {
                 super.createProviderColumns();
                 Table t = (Table) getControl();
-                t.setColumnOrder(new int[] { 2, 3, 4, 5, 0, 1 });
+                t.setColumnOrder(new int[] { 2, 3, 4, 5, 0, 1, 6, 7});
             }
         };
     }

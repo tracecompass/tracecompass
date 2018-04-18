@@ -156,28 +156,28 @@ public class SystemCallLatencyTableAnalysisTest extends SegmentTableTest {
     protected void testTsv(String[] lines) {
         assertNotNull(lines);
         assertEquals("number of lines", 21, lines.length);
-        assertEquals("header", "Start Time\tEnd Time\tDuration\tSystem Call\tTID\tReturn value", lines[0]);
+        assertEquals("header", "Start Time\tEnd Time\tDuration\tSystem Call\tTID\tReturn value\tComponent\tFile", lines[0]);
         // not a straight up string compare due to time zones. Kathmandu and
         // Eucla have 15 minute time zones.
-        assertTrue("line 1 : " + lines[1], lines[1].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s001\\t\\d\\d:\\d\\d:00.000 000 002\\t1\\tleftpad\\t10\\t1"));
-        assertTrue("line 2 : " + lines[2], lines[2].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s002\\t\\d\\d:\\d\\d:00.000 000 006\\t4\\tleftpad\\t10\\t1"));
-        assertTrue("line 3 : " + lines[3], lines[3].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s003\\t\\d\\d:\\d\\d:00.000 000 012\\t9\\trightpad\\t10\\t1"));
-        assertTrue("line 4 : " + lines[4], lines[4].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s004\\t\\d\\d:\\d\\d:00.000 000 020\\t16\\tleftpad\\t10\\t1"));
-        assertTrue("line 5 : " + lines[5], lines[5].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s005\\t\\d\\d:\\d\\d:00.000 000 030\\t25\\tleftpad\\t10\\t1"));
-        assertTrue("line 6 : " + lines[6], lines[6].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s006\\t\\d\\d:\\d\\d:00.000 000 042\\t36\\trightpad\\t10\\t1"));
-        assertTrue("line 7 : " + lines[7], lines[7].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s007\\t\\d\\d:\\d\\d:00.000 000 056\\t49\\tleftpad\\t10\\t1"));
-        assertTrue("line 8 : " + lines[8], lines[8].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s008\\t\\d\\d:\\d\\d:00.000 000 072\\t64\\tleftpad\\t10\\t1"));
-        assertTrue("line 9 : " + lines[9], lines[9].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s009\\t\\d\\d:\\d\\d:00.000 000 090\\t81\\trightpad\\t10\\t1"));
-        assertTrue("line 10 : " + lines[10], lines[10].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s010\\t\\d\\d:\\d\\d:00.000 000 110\\t100\\tleftpad\\t10\\t1"));
-        assertTrue("line 11 : " + lines[11], lines[11].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s011\\t\\d\\d:\\d\\d:00.000 000 132\\t121\\tleftpad\\t10\\t1"));
-        assertTrue("line 12 : " + lines[12], lines[12].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s012\\t\\d\\d:\\d\\d:00.000 000 156\\t144\\trightpad\\t10\\t1"));
-        assertTrue("line 13 : " + lines[13], lines[13].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s013\\t\\d\\d:\\d\\d:00.000 000 182\\t169\\tleftpad\\t10\\t1"));
-        assertTrue("line 14 : " + lines[14], lines[14].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s014\\t\\d\\d:\\d\\d:00.000 000 210\\t196\\tleftpad\\t10\\t1"));
-        assertTrue("line 15 : " + lines[15], lines[15].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s015\\t\\d\\d:\\d\\d:00.000 000 240\\t225\\trightpad\\t10\\t1"));
-        assertTrue("line 16 : " + lines[16], lines[16].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s016\\t\\d\\d:\\d\\d:00.000 000 272\\t256\\tleftpad\\t10\\t1"));
-        assertTrue("line 17 : " + lines[17], lines[17].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s017\\t\\d\\d:\\d\\d:00.000 000 306\\t289\\tleftpad\\t10\\t1"));
-        assertTrue("line 18 : " + lines[18], lines[18].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s018\\t\\d\\d:\\d\\d:00.000 000 342\\t324\\trightpad\\t10\\t1"));
-        assertTrue("line 19 : " + lines[19], lines[19].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s019\\t\\d\\d:\\d\\d:00.000 000 380\\t361\\tleftpad\\t10\\t1"));
-        assertTrue("line 20 : " + lines[20], lines[20].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s020\\t\\d\\d:\\d\\d:00.000 000 420\\t400\\tleftpad\\t10\\t1"));
+        assertTrue("line 1 : " + lines[1], lines[1].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s001\\t\\d\\d:\\d\\d:00.000 000 002\\t1\\tleftpad\\t10\\t1\\t\\t"));
+        assertTrue("line 2 : " + lines[2], lines[2].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s002\\t\\d\\d:\\d\\d:00.000 000 006\\t4\\tleftpad\\t10\\t1\\t\\t"));
+        assertTrue("line 3 : " + lines[3], lines[3].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s003\\t\\d\\d:\\d\\d:00.000 000 012\\t9\\trightpad\\t10\\t1\\t\\t"));
+        assertTrue("line 4 : " + lines[4], lines[4].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s004\\t\\d\\d:\\d\\d:00.000 000 020\\t16\\tleftpad\\t10\\t1\\t\\t"));
+        assertTrue("line 5 : " + lines[5], lines[5].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s005\\t\\d\\d:\\d\\d:00.000 000 030\\t25\\tleftpad\\t10\\t1\\t\\t"));
+        assertTrue("line 6 : " + lines[6], lines[6].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s006\\t\\d\\d:\\d\\d:00.000 000 042\\t36\\trightpad\\t10\\t1\\t\\t"));
+        assertTrue("line 7 : " + lines[7], lines[7].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s007\\t\\d\\d:\\d\\d:00.000 000 056\\t49\\tleftpad\\t10\\t1\\t\\t"));
+        assertTrue("line 8 : " + lines[8], lines[8].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s008\\t\\d\\d:\\d\\d:00.000 000 072\\t64\\tleftpad\\t10\\t1\\t\\t"));
+        assertTrue("line 9 : " + lines[9], lines[9].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s009\\t\\d\\d:\\d\\d:00.000 000 090\\t81\\trightpad\\t10\\t1\\t\\t"));
+        assertTrue("line 10 : " + lines[10], lines[10].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s010\\t\\d\\d:\\d\\d:00.000 000 110\\t100\\tleftpad\\t10\\t1\\t\\t"));
+        assertTrue("line 11 : " + lines[11], lines[11].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s011\\t\\d\\d:\\d\\d:00.000 000 132\\t121\\tleftpad\\t10\\t1\\t\\t"));
+        assertTrue("line 12 : " + lines[12], lines[12].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s012\\t\\d\\d:\\d\\d:00.000 000 156\\t144\\trightpad\\t10\\t1\\t\\t"));
+        assertTrue("line 13 : " + lines[13], lines[13].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s013\\t\\d\\d:\\d\\d:00.000 000 182\\t169\\tleftpad\\t10\\t1\\t\\t"));
+        assertTrue("line 14 : " + lines[14], lines[14].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s014\\t\\d\\d:\\d\\d:00.000 000 210\\t196\\tleftpad\\t10\\t1\\t\\t"));
+        assertTrue("line 15 : " + lines[15], lines[15].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s015\\t\\d\\d:\\d\\d:00.000 000 240\\t225\\trightpad\\t10\\t1\\t\\t"));
+        assertTrue("line 16 : " + lines[16], lines[16].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s016\\t\\d\\d:\\d\\d:00.000 000 272\\t256\\tleftpad\\t10\\t1\\t\\t"));
+        assertTrue("line 17 : " + lines[17], lines[17].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s017\\t\\d\\d:\\d\\d:00.000 000 306\\t289\\tleftpad\\t10\\t1\\t\\t"));
+        assertTrue("line 18 : " + lines[18], lines[18].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s018\\t\\d\\d:\\d\\d:00.000 000 342\\t324\\trightpad\\t10\\t1\\t\\t"));
+        assertTrue("line 19 : " + lines[19], lines[19].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s019\\t\\d\\d:\\d\\d:00.000 000 380\\t361\\tleftpad\\t10\\t1\\t\\t"));
+        assertTrue("line 20 : " + lines[20], lines[20].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s020\\t\\d\\d:\\d\\d:00.000 000 420\\t400\\tleftpad\\t10\\t1\\t\\t"));
     }
 }

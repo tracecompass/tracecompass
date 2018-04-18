@@ -12,7 +12,13 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core;
 
+import java.io.IOException;
+import java.net.URL;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.Nullable;
@@ -65,6 +71,24 @@ public class Activator extends Plugin {
             throw new IllegalStateException();
         }
         return plugin;
+    }
+
+
+    /**
+     * Gets the absolute path from a path relative to this plugin's root
+     *
+     * @param relativePath
+     *            The path relative to this plugin
+     * @return The absolute path corresponding to this relative path
+     */
+    public @Nullable IPath getAbsolutePath(Path relativePath) {
+        URL location = FileLocator.find(getBundle(), relativePath, null);
+        try {
+            IPath path = new Path(FileLocator.toFileURL(location).getPath());
+            return path;
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     // ------------------------------------------------------------------------
