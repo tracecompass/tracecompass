@@ -69,29 +69,12 @@ public class HistogramBucket {
 
     /**
      * Add an event in this bucket
-     *
-     * @param traceIndex
-     *            a trace index - see {@link HistogramDataModel#setTrace}.
+     * @param traceIndex a trace index - see {@link HistogramDataModel#setTrace}.
      */
     public synchronized void addEvent(int traceIndex) {
         ensureCapacity(traceIndex + 1);
         fEvents[traceIndex]++;
         fNbEvents++;
-    }
-
-    /**
-     * Add an event in this bucket
-     *
-     * @param traceIndex
-     *            a trace index - see {@link HistogramDataModel#setTrace}.
-     * @param nbEvents
-     *            Number of event to add in this bucket
-     * @since 3.4
-     */
-    public synchronized void addEvent(int traceIndex, int nbEvents) {
-        ensureCapacity(traceIndex + 1);
-        fEvents[traceIndex] += nbEvents;
-        fNbEvents += nbEvents;
     }
 
     private void ensureCapacity(int len) {

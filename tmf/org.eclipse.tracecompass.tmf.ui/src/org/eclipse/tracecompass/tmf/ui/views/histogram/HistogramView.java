@@ -20,9 +20,7 @@
 package org.eclipse.tracecompass.tmf.ui.views.histogram;
 
 import java.util.Collection;
-import java.util.Objects;
 
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -53,6 +51,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
+import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
+import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -95,10 +95,6 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
     // ------------------------------------------------------------------------
     // Constants
     // ------------------------------------------------------------------------
-
-    private static final String FULL_RANGE_JOB_NAME = "Full Range Histogram"; //$NON-NLS-1$
-
-    private static final String TIME_RANGE_JOB_NAME = "Time Range Histogram"; //$NON-NLS-1$
 
     /**
      *  The view ID as defined in plugin.xml
@@ -143,11 +139,11 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
 
     // Histogram/request for the full trace range
     private FullTraceHistogram fFullTraceHistogram;
-    private HistogramDataProviderJob fFullTraceJob;
+    private HistogramRequest fFullTraceRequest;
 
     // Histogram/request for the selected time range
     private TimeRangeHistogram fTimeRangeHistogram;
-    private HistogramDataProviderJob fTimeRangeJob;
+    private HistogramRequest fTimeRangeRequest;
 
     // Legend area
     private Composite fLegendArea;
@@ -177,13 +173,12 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
 
     @Override
     public void dispose() {
-        if (fTimeRangeJob != null && fTimeRangeJob.getState() != Job.NONE) {
-            fTimeRangeJob.cancel();
+        if ((fTimeRangeRequest != null) && !fTimeRangeRequest.isCompleted()) {
+            fTimeRangeRequest.cancel();
         }
-        if (fFullTraceJob != null && fFullTraceJob.getState() != Job.NONE) {
-            fFullTraceJob.cancel();
+        if ((fFullTraceRequest != null) && !fFullTraceRequest.isCompleted()) {
+            fFullTraceRequest.cancel();
         }
-
         fFullTraceHistogram.dispose();
         fTimeRangeHistogram.dispose();
         fSelectionStartControl.dispose();
@@ -677,11 +672,11 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
         }
 
         // Kill any running request
-        if (fTimeRangeJob != null && fTimeRangeJob.getState() != Job.NONE) {
-            fTimeRangeJob.cancel();
+        if ((fTimeRangeRequest != null) && !fTimeRangeRequest.isCompleted()) {
+            fTimeRangeRequest.cancel();
         }
-        if (fFullTraceJob != null && fFullTraceJob.getState() != Job.NONE) {
-            fFullTraceJob.cancel();
+        if ((fFullTraceRequest != null) && !fFullTraceRequest.isCompleted()) {
+            fFullTraceRequest.cancel();
         }
 
         // Initialize the internal data
@@ -719,6 +714,7 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
      */
     @TmfSignalHandler
     public void traceRangeUpdated(TmfTraceRangeUpdatedSignal signal) {
+
         if (signal.getTrace() != fTrace) {
             return;
         }
@@ -731,14 +727,6 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
         fFullTraceHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
         fTimeRangeHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
 
-        /*
-         * In order to provide a valid range to the histogram provider, if the signal
-         * range end time is BIG_CRUNCH no request is sent. An other signal with a valid
-         * range will come later.
-         */
-        if (fTraceEndTime == TmfTimeRange.ETERNITY.getEndTime().toNanos()) {
-            return;
-        }
         sendFullRangeRequest(fullRange);
     }
 
@@ -758,16 +746,7 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
         fFullTraceHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
         fTimeRangeHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
 
-        /*
-         * In order to provide a valid range to the histogram provider, if the signal
-         * range end time is BIG_CRUNCH no request is sent. An other signal with a valid
-         * range will come later.
-         */
-        if (fTraceEndTime == TmfTimeRange.ETERNITY.getEndTime().toNanos()) {
-            return;
-        }
-
-        if ((fFullTraceJob != null) && fFullTraceJob.getRange().getEndTime().compareTo(signal.getRange().getEndTime()) < 0) {
+        if ((fFullTraceRequest != null) && fFullTraceRequest.getRange().getEndTime().compareTo(signal.getRange().getEndTime()) < 0) {
             sendFullRangeRequest(fullRange);
         }
 }
@@ -858,8 +837,8 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
         long startTime = ctx.getWindowRange().getStartTime().toNanos();
         long duration = ctx.getWindowRange().getEndTime().toNanos() - startTime;
 
-        if (fTimeRangeJob != null && fTimeRangeJob.getState() != Job.NONE) {
-            fTimeRangeJob.cancel();
+        if ((fTimeRangeRequest != null) && !fTimeRangeRequest.isCompleted()) {
+            fTimeRangeRequest.cancel();
         }
         fTimeRangeHistogram.clear();
         fTimeRangeHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
@@ -867,8 +846,8 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
         fTimeRangeHistogram.setSelection(selectionBeginTime, selectionEndTime);
         fTimeRangeHistogram.fDataModel.setTrace(fTrace);
 
-        if (fFullTraceJob != null && fFullTraceJob.getState() != Job.NONE) {
-            fFullTraceJob.cancel();
+        if ((fFullTraceRequest != null) && !fFullTraceRequest.isCompleted()) {
+            fFullTraceRequest.cancel();
         }
         fFullTraceHistogram.clear();
         fFullTraceHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
@@ -959,6 +938,9 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
     }
 
     private void sendTimeRangeRequest(long startTime, long endTime) {
+        if ((fTimeRangeRequest != null) && !fTimeRangeRequest.isCompleted()) {
+            fTimeRangeRequest.cancel();
+        }
         ITmfTimestamp startTS = TmfTimestamp.fromNanos(startTime);
         ITmfTimestamp endTS = TmfTimestamp.fromNanos(endTime);
         TmfTimeRange timeRange = new TmfTimeRange(startTS, endTS);
@@ -967,25 +949,24 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
         fTimeRangeHistogram.setFullRange(fTraceStartTime, fTraceEndTime);
         fTimeRangeHistogram.setTimeRange(startTime, endTime - startTime);
 
-        if (fTimeRangeJob != null && fTimeRangeJob.getState() != Job.NONE) {
-            fTimeRangeJob.cancel();
-        }
-        fTimeRangeJob = new HistogramDataProviderJob(TIME_RANGE_JOB_NAME + System.currentTimeMillis(), Objects.requireNonNull(fTrace), fTimeRangeHistogram.getDataModel(), timeRange);
-        fTimeRangeJob.schedule();
+        int cacheSize = fTrace.getCacheSize();
+        fTimeRangeRequest = new HistogramRequest(fTimeRangeHistogram.getDataModel(),
+                timeRange, 0, ITmfEventRequest.ALL_DATA, cacheSize, ExecutionType.FOREGROUND, false);
+        fTrace.sendRequest(fTimeRangeRequest);
     }
 
     private void sendFullRangeRequest(TmfTimeRange fullRange) {
-        // Ignore the case where the range is eternity or the end time is BIG_CRUNCH
-        if (fullRange.equals(TmfTimeRange.ETERNITY) || fullRange.getEndTime().toNanos() == TmfTimeRange.ETERNITY.getEndTime().toNanos()) {
-            return;
+        if ((fFullTraceRequest != null) && !fFullTraceRequest.isCompleted()) {
+            fFullTraceRequest.cancel();
         }
-
-        if (fFullTraceJob != null && fFullTraceJob.getState() != Job.NONE) {
-            fFullTraceJob.cancel();
-        }
-
-        fFullTraceJob = new HistogramDataProviderJob(FULL_RANGE_JOB_NAME + System.currentTimeMillis(), Objects.requireNonNull(fTrace), fFullTraceHistogram.getDataModel(), fullRange);
-        fFullTraceJob.schedule();
+        int cacheSize = fTrace.getCacheSize();
+        fFullTraceRequest = new HistogramRequest(fFullTraceHistogram.getDataModel(),
+                fullRange,
+                (int) fFullTraceHistogram.fDataModel.getNbEvents(),
+                ITmfEventRequest.ALL_DATA,
+                cacheSize,
+                ExecutionType.BACKGROUND, true);
+        fTrace.sendRequest(fFullTraceRequest);
     }
 
     private void contributeToActionBars() {

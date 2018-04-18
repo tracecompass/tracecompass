@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -280,8 +281,8 @@ public class HistogramDataModel implements IHistogramDataModel {
      */
     public String[] getTraceNames() {
         return TmfTraceManager.getTraceSet(fTrace).stream()
-                .map(ITmfTrace::getName)
-                .toArray(String[]::new);
+            .map(ITmfTrace::getName)
+            .toArray(String[]::new);
     }
 
     /**
@@ -598,52 +599,6 @@ public class HistogramDataModel implements IHistogramDataModel {
     }
 
     /**
-     * Set the data for this histogram data model. Do not use countEvent and
-     * countLostEvent with setData. The goal is to replace them.
-     *
-     * @param buckets
-     *            Histogram buckets to assign to the model
-     * @param lostEvents
-     *            Lost events for this model
-     * @param startTime
-     *            Start time of the first bucket
-     * @param duration
-     *            Bucket duration
-     * @since 3.4
-     */
-    public void setData(HistogramBucket[] buckets, long[] lostEvents, long startTime, long duration) {
-        if (startTime < 0) {
-            return;
-        }
-
-        if (buckets.length != fNbBuckets) {
-            throw new IllegalArgumentException("Wrong number of buckets, excepted " + fNbBuckets + " was " + buckets.length); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        fNbEvents = 0;
-        fLastBucket = 0;
-        for (int i = 0; i < buckets.length; i++) {
-            if(buckets[i] != null) {
-                fBuckets[i] = buckets[i];
-                fNbEvents += buckets[i].getNbEvents();
-                fLastBucket = i;
-            }
-        }
-        if (lostEvents != null) {
-            for (int i = 0; i < lostEvents.length; i++) {
-                fLostEventsBuckets[i] = lostEvents[i];
-                fNbEvents += lostEvents[i];
-            }
-        }
-        fFirstBucketTime = startTime;
-        fFirstEventTime = startTime;
-        fBucketDuration = duration;
-        fEndTime = fFirstBucketTime + fLastBucket * fBucketDuration;
-        updateEndTime();
-
-        fireModelUpdateNotification();
-    }
-
-    /**
      * Scale the model data to the width, height and bar width requested.
      *
      * @param width
@@ -652,8 +607,8 @@ public class HistogramDataModel implements IHistogramDataModel {
      *            A height of the histogram canvas
      * @param barWidth
      *            A width (in pixel) of a histogram bar
-     * @return the result array of size [width] and where the highest value doesn't
-     *         exceed [height]
+     * @return the result array of size [width] and where the highest value
+     *         doesn't exceed [height]
      *
      * @see org.eclipse.tracecompass.tmf.ui.views.histogram.IHistogramDataModel#scaleTo(int,
      *      int, int)
@@ -679,9 +634,9 @@ public class HistogramDataModel implements IHistogramDataModel {
         final long modelBucketStartTime = fFirstBucketTime;
         final long modelBucketEndTime = fEndTime;
         /*
-         * If there is only one model bucket, use a duration of 1 to spread the value
-         * over the scaled width, but store a scaled bucket duration of 0 to prevent the
-         * half-bucket offset in the bucket time calculations.
+         * If there is only one model bucket, use a duration of 1 to spread the
+         * value over the scaled width, but store a scaled bucket duration of 0
+         * to prevent the half-bucket offset in the bucket time calculations.
          */
         double bucketDuration = Math.max(modelBucketEndTime - modelBucketStartTime, 1) / (double) nbBars;
         result.fBucketDuration = fLastBucket == 0 ? 0 : bucketDuration;
