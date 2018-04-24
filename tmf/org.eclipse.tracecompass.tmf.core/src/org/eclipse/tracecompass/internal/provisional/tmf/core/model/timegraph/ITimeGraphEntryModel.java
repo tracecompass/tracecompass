@@ -13,7 +13,8 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTre
 
 /**
  * Represents a time graph entry model. These objects are typically returned by
- * {@link ITimeGraphDataProvider#fetchTree}
+ * {@link ITimeGraphDataProvider#fetchTree}. The entry may or may not have a
+ * {@link ITimeGraphRowModel} associated to it.
  *
  * @author Simon Delisle
  */
@@ -33,4 +34,13 @@ public interface ITimeGraphEntryModel extends ITmfTreeDataModel {
      */
     long getEndTime();
 
+    /**
+     * Returns true if the entry has a row model, or false if it is a blank entry
+     * with no associated states.
+     *
+     * @return true if the entry has a row model
+     */
+    default boolean hasRowModel() {
+        return true;
+    }
 }

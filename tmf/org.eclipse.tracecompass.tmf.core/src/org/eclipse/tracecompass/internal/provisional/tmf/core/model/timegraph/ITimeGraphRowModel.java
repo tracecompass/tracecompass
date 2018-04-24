@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * Represents a time graph row model. Typically returned by
- * {@link ITimeGraphDataProvider#fetchArrows}.
+ * {@link ITimeGraphDataProvider#fetchRowModel}.
  *
  * @author Simon Delisle
  */

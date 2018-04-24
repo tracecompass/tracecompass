@@ -19,6 +19,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTree
 public class TimeGraphEntryModel extends TmfTreeDataModel implements ITimeGraphEntryModel {
     private final long fStartTime;
     private final long fEndTime;
+    private final boolean fHasRowModel;
 
     /**
      * Constructor
@@ -38,6 +39,30 @@ public class TimeGraphEntryModel extends TmfTreeDataModel implements ITimeGraphE
         super(id, parentId, name);
         fStartTime = startTime;
         fEndTime = endTime;
+        fHasRowModel = true;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param id
+     *            Entry ID
+     * @param parentId
+     *            Parent ID
+     * @param name
+     *            Entry name to be displayed
+     * @param startTime
+     *            Start time
+     * @param endTime
+     *            End time
+     * @param hasRowModel
+     *            true if the entry has a row model
+     */
+    public TimeGraphEntryModel(long id, long parentId, String name, long startTime, long endTime, boolean hasRowModel) {
+        super(id, parentId, name);
+        fStartTime = startTime;
+        fEndTime = endTime;
+        fHasRowModel = hasRowModel;
     }
 
     @Override
@@ -51,8 +76,13 @@ public class TimeGraphEntryModel extends TmfTreeDataModel implements ITimeGraphE
     }
 
     @Override
+    public boolean hasRowModel() {
+        return fHasRowModel;
+    }
+
+@Override
     public String toString() {
         return "<name=" + getName() + " id=" + getId() + " parentId=" + getParentId() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                + " start=" + fStartTime + " end=" + fEndTime + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                + " start=" + fStartTime + " end=" + fEndTime + " hasRowModel=" + hasRowModel() + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 }

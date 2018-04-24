@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2018 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -177,7 +177,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
          * Model is immutable, this is the only way to do this, consider not updating
          * name in the future?
          */
-        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), name, getStartTime(), getEndTime());
+        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), name, getStartTime(), getEndTime(), fModel.hasRowModel());
     }
 
     @Override
@@ -201,12 +201,12 @@ public class TimeGraphEntry implements ITimeGraphEntry {
          * Model is immutable, this is the only way to do this, consider not updating
          * end time in the future?
          */
-        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), fModel.getName(), fModel.getStartTime(), Long.max(getEndTime(), endTime));
+        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), fModel.getName(), fModel.getStartTime(), Long.max(getEndTime(), endTime), fModel.hasRowModel());
     }
 
     @Override
     public boolean hasTimeEvents() {
-        return true;
+        return fModel.hasRowModel();
     }
 
     @Override
@@ -317,7 +317,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
          * Model is immutable, this is the only way to do this, consider not updating
          * bounds in the future?
          */
-        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), getName(), newStart, newEnd);
+        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), getName(), newStart, newEnd, fModel.hasRowModel());
     }
 
     /**

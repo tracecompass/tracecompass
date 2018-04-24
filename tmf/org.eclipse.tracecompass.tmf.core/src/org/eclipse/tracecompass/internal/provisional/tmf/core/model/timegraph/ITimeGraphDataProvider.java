@@ -22,17 +22,17 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelR
 /**
  * Interface that provides data for states to time. Such a model has a
  * collection of {@link ITimeGraphEntryModel}s, which can be organized into a
- * tree. Each entry can have consecutive {@link ITimeGraphState}s associated to
- * it by its unique ID. The entries can also be connected by
- * {@link ITimeGraphArrow}s which go from a source entry at a start time to a
- * destination entry after a certain duration. These items can also display
- * additional information in tool tips.
+ * tree. Each entry may have a {@link ITimeGraphRowModel} that contains
+ * consecutive {@link ITimeGraphState}s associated to it by its unique ID. The
+ * entries can also be connected by {@link ITimeGraphArrow}s which go from a
+ * source entry at a start time to a destination entry after a certain duration.
+ * These items can also display additional information in tool tips.
  *
- * Typical usage is to build a tree of {@link ITimeGraphEntryModel}s, and
- * associate the relevant line of {@link ITimeGraphState}s to each.
- * {@link ITimeGraphArrow}s then describe additional relations from one state to
- * another. {@link ITimeGraphState#getValue()} can be used to assign a color to
- * a state.
+ * Typical usage is to build a tree of {@link ITimeGraphEntryModel}s, and fetch
+ * its {@link ITimeGraphRowModel} to associate the relevant line of
+ * {@link ITimeGraphState}s to each entry. {@link ITimeGraphArrow}s then
+ * describe additional relations from one state to another.
+ * {@link ITimeGraphState#getValue()} can be used to assign a color to a state.
  *
  * @param <M>
  *            the type of {@link ITimeGraphEntryModel} that the
