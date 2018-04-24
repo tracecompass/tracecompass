@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2008, 2016 Intel Corporation, Ericsson
+ * Copyright (c) 2008, 2018 Intel Corporation, Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -291,11 +291,11 @@ public class TimeGraphColorScheme {
         new SysCol(SWT.COLOR_WIDGET_BACKGROUND), // LEGEND_BACKGROUND
         new SysCol(SWT.COLOR_WIDGET_DARK_SHADOW), // LEGEND_FOREGROUND
 
-        new Mix(new RGB(150, 200, 240), new SysCol(SWT.COLOR_LIST_BACKGROUND)),     // GR_BACKGROUND
+        new Mix(new SysCol(SWT.COLOR_GRAY), new SysCol(SWT.COLOR_LIST_BACKGROUND)), // GR_BACKGROUND
         new RGB(0, 0, 50),                                                          // GR_FOREGROUND
-        new Mix(new RGB(150, 200, 240), new SysCol(SWT.COLOR_WHITE), 6, 1),         // GR_BACKGROUND_SEL
+        new Mix(new SysCol(SWT.COLOR_GRAY), new RGB(232, 242, 254)),                // GR_BACKGROUND_SEL
         new RGB(0, 0, 50),                                                          // GR_FOREGROUND_SEL
-        new Mix(new RGB(150, 200, 240), new SysCol(SWT.COLOR_WHITE), 6, 1),         // GR_BACKGROUND_SEL_NOFOCUS
+        new Mix(new SysCol(SWT.COLOR_GRAY), new SysCol(SWT.COLOR_WIDGET_BACKGROUND)), // GR_BACKGROUND_SEL_NOFOCUS
         new RGB(0, 0, 50),                                                          // GR_FOREGROUND_SEL_NOFOCUS
 
         new Mix(new SysCol(SWT.COLOR_GRAY), new SysCol(SWT.COLOR_LIST_BACKGROUND), 1, 3), // LIGHT_LINE

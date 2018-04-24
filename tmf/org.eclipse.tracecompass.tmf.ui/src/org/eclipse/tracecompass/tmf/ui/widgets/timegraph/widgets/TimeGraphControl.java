@@ -2490,7 +2490,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             if (textWidth > 0) {
                 idealNameSpace = rect.x + width;
             }
-            if (fMidLinesVisible && columns.length == 1 && item.fItemHeight > MIN_MIDLINE_HEIGHT) {
+            if (fMidLinesVisible && item.fEntry.hasTimeEvents() && columns.length == 1 && item.fItemHeight > MIN_MIDLINE_HEIGHT) {
                 drawMidLine(new Rectangle(bounds.x + width, bounds.y, bounds.x + bounds.width, bounds.height), gc);
             }
             if (fAutoResizeColumns && width > column.getWidth()) {
