@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -241,8 +241,12 @@ public final class KernelEventHandlerUtils {
         ITmfStateValue softIrq = TmfStateValue.nullValue();
         for (Integer quark : softIrqs) {
             ITmfStateValue softIrqState = ssb.queryOngoingState(quark.intValue());
-            if (softIrqState.unboxInt() > softIrq.unboxInt()) {
-                softIrq = softIrqState;
+            if (!softIrqState.isNull()) {
+                if (softIrqState.unboxInt() == StateValues.CPU_STATUS_SOFT_IRQ_RAISED) {
+                    softIrq = StateValues.SOFT_IRQ_RAISED_VALUE;
+                } else {
+                    return StateValues.CPU_STATUS_SOFTIRQ_VALUE;
+                }
             }
         }
         if (!softIrq.isNull()) {
