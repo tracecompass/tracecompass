@@ -60,6 +60,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
     private Color fColorWhite;
     private Color fColorGray;
     private Integer fAverageCharWidth;
+    private static final int SEPARATOR_HEIGHT = 4;
     private static final int NUM_COLORS = 25;
     private static final float BRIGHTNESS = 0.8f;
     private static final float SATURATION = 0.8f;
@@ -128,7 +129,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                     return null;
                 }
                 return STATE_MAP.get(StateValues.CPU_STATUS_RUN_USERMODE);
-            case TRACE:
+            case GROUP:
                 return null;
             default:
                 return null;
@@ -136,6 +137,14 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
         }
         return null;
+    }
+
+    @Override
+    public int getItemHeight(ITimeGraphEntry entry) {
+        if (!entry.hasTimeEvents() && entry.getParent() != null) {
+            return SEPARATOR_HEIGHT;
+        }
+        return super.getItemHeight(entry);
     }
 
     @Override

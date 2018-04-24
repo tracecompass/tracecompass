@@ -19,10 +19,10 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.Ti
  */
 public class ResourcesEntryModel extends TimeGraphEntryModel {
 
-    /** Type of resource */
+    /** Type of entry */
     public enum Type {
-        /** Null resources (filler rows, etc.) */
-        TRACE,
+        /** Group entries (trace, separators) */
+        GROUP,
         /** Entries for CPUs */
         CPU,
         /** Entries for Current Thread */
@@ -52,10 +52,10 @@ public class ResourcesEntryModel extends TimeGraphEntryModel {
      * @param resourceId
      *            resource ID (IRQ or CPU number)
      * @param type
-     *            type of resource (TRACE / CPU / IRQ / SOFT_IRQ)
+     *            type of entry (GROUP / CPU / CURRENT_THREAD / IRQ / SOFT_IRQ)
      */
     public ResourcesEntryModel(long id, long parentId, @NonNull String name, long startTime, long endTime, int resourceId, Type type) {
-        super(id, parentId, name, startTime, endTime);
+        super(id, parentId, name, startTime, endTime, !name.isEmpty());
         fResourceId = resourceId;
         fType = type;
     }

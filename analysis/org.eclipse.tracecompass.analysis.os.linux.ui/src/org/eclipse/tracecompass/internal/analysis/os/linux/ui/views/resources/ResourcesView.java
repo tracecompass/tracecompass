@@ -60,7 +60,13 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
      * in numerical order (so we get 1,2,10 and not 1,10,2).
      */
     private static final Comparator<ResourcesEntryModel> COMPARATOR = Comparator
-            .comparing((Function<ResourcesEntryModel, Type>) resModel -> resModel.getType() == Type.CURRENT_THREAD ? Type.CPU : resModel.getType())
+            .comparing((Function<ResourcesEntryModel, Type>) entry -> {
+                Type type = entry.getType();
+                if (type == Type.CPU || type == Type.CURRENT_THREAD) {
+                    return Type.GROUP;
+                }
+                return type;
+            })
             .thenComparing(ResourcesEntryModel::getResourceId);
 
     // ------------------------------------------------------------------------
@@ -107,16 +113,19 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
             if (sSel.getFirstElement() instanceof TimeGraphEntry) {
                 TimeGraphEntry resourcesEntry = (TimeGraphEntry) sSel.getFirstElement();
                 ITimeGraphEntryModel model = resourcesEntry.getModel();
-                if (model instanceof ResourcesEntryModel && ((ResourcesEntryModel) model).getType() == Type.CPU) {
+                if (model instanceof ResourcesEntryModel) {
                     ResourcesEntryModel resourcesModel = (ResourcesEntryModel) model;
-                    ITmfTrace trace = getTrace(resourcesEntry);
-                    TmfTraceContext ctx = TmfTraceManager.getInstance().getTraceContext(trace);
-                    Integer data = (Integer) ctx.getData(RESOURCES_FOLLOW_CPU);
-                    int cpu = data != null ? data.intValue() : -1;
-                    if (cpu >= 0) {
-                        menuManager.add(new UnfollowCpuAction(ResourcesView.this, resourcesModel.getResourceId(), trace));
-                    } else {
-                        menuManager.add(new FollowCpuAction(ResourcesView.this, resourcesModel.getResourceId(), trace));
+                    Type type = resourcesModel.getType();
+                    if (type == Type.CPU || type == Type.CURRENT_THREAD) {
+                        ITmfTrace trace = getTrace(resourcesEntry);
+                        TmfTraceContext ctx = TmfTraceManager.getInstance().getTraceContext(trace);
+                        Integer data = (Integer) ctx.getData(RESOURCES_FOLLOW_CPU);
+                        int cpu = data != null ? data.intValue() : -1;
+                        if (cpu >= 0) {
+                            menuManager.add(new UnfollowCpuAction(ResourcesView.this, resourcesModel.getResourceId(), trace));
+                        } else {
+                            menuManager.add(new FollowCpuAction(ResourcesView.this, resourcesModel.getResourceId(), trace));
+                        }
                     }
                 }
             }

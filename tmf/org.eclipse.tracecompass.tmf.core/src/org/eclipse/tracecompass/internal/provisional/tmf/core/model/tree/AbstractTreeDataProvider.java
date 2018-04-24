@@ -101,6 +101,15 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
     }
 
     /**
+     * Get a new unique id, unbound to any quark.
+     *
+     * @return the unique id
+     */
+    protected long getEntryId() {
+        return ENTRY_ID.getAndIncrement();
+    }
+
+    /**
      * Get the quarks associated to the entries in the filter
      *
      * @param filter

@@ -67,13 +67,19 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
 
     private static final String WILDCARD = "*"; //$NON-NLS-1$
 
+    private static final @NonNull String SEPARATOR = ""; //$NON-NLS-1$
+
     /**
      * Remove the "sys_" or "syscall_entry_" or similar from what we draw in the
      * rectangle. This depends on the trace's event layout.
      */
     private final Function<@NonNull String, @NonNull String> fSyscallTrim;
 
+    /** Map of attribute quark to its ResourcesEntryModel type */
     private final HashMap<Integer, Type> fEntryModelTypes = new HashMap<>();
+
+    /** Map of CPU number to its separator entry's model id */
+    private final Map<Integer, Long> fSeparatorIds = new HashMap<>();
 
     private static final Comparator<ITmfStateInterval> CACHE_COMPARATOR = (a, b) -> {
         if (a.getEndTime() < b.getStartTime()) {
@@ -84,6 +90,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         return 0;
     };
 
+    /** Map of thread id to Exec_name intervals */
     private final TreeMultimap<Integer, ITmfStateInterval> fExecNamesCache = TreeMultimap.create(Integer::compare, CACHE_COMPARATOR);
 
     /**
@@ -116,7 +123,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         List<@NonNull ResourcesEntryModel> builder = new ArrayList<>();
 
         long traceId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
-        ResourcesEntryModel resourcesEntryModel = new ResourcesEntryModel(traceId, -1, getTrace().getName(), start, end, -1, ResourcesEntryModel.Type.TRACE);
+        ResourcesEntryModel resourcesEntryModel = new ResourcesEntryModel(traceId, -1, getTrace().getName(), start, end, -1, Type.GROUP);
         builder.add(resourcesEntryModel);
 
         for (Integer cpuQuark : ss.getQuarks(Attributes.CPUS, WILDCARD)) {
@@ -133,6 +140,10 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             ResourcesEntryModel cpuEntry = new ResourcesEntryModel(getId(cpuQuark), traceId, computeEntryName(Type.CPU, cpu), start, end, cpu, Type.CPU);
             builder.add(cpuEntry);
             fEntryModelTypes.put(cpuQuark, Type.CPU);
+
+            // Add a separator entry after each CPU entry
+            long id = fSeparatorIds.computeIfAbsent(cpu, key -> getEntryId());
+            builder.add(new ResourcesEntryModel(id, traceId, SEPARATOR, start, end, cpu, Type.GROUP));
 
             List<Integer> irqQuarks = ss.getQuarks(cpuQuark, Attributes.IRQS, WILDCARD);
             createInterrupt(ss, start, end, cpuEntry, irqQuarks, Type.IRQ, builder);

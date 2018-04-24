@@ -421,7 +421,7 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         SWTBotTree treeBot = bot.tree();
         // get how many items there are
         int checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
-        assertEquals("default", 51, checked);
+        assertEquals("default", 76, checked);
         // test "uncheck all button"
         bot.button(UNCHECK_ALL).click();
         checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
@@ -429,7 +429,7 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         // test check all
         bot.button(CHECK_ALL).click();
         checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
-        assertEquals(CHECK_ALL, 51, checked);
+        assertEquals(CHECK_ALL, 76, checked);
         // test uncheck inactive
         treeBot.getTreeItem(LttngTraceGenerator.getName()).select("CPU 1 States");
         bot.button(UNCHECK_ALL).click();
@@ -445,12 +445,12 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         bot.button(CHECK_ALL).click();
         bot.button(UNCHECK_SELECTED).click();
         checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
-        assertEquals(UNCHECK_SELECTED, 50, checked);
+        assertEquals(UNCHECK_SELECTED, 75, checked);
         // test uncheck subtree
         bot.button(CHECK_ALL).click();
         bot.button(UNCHECK_SUBTREE).click();
         checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
-        assertEquals(UNCHECK_SELECTED, 50, checked);
+        assertEquals(UNCHECK_SELECTED, 75, checked);
         // test filter
         bot.button(UNCHECK_ALL).click();
         checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
@@ -458,10 +458,10 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         bot.text().setText("CPU 2");
         SWTBotTreeItem treeItem = treeBot.getTreeItem(LttngTraceGenerator.getName());
         treeItem.rowCount();
-        fBot.waitUntil(ConditionHelpers.treeItemCount(treeItem, 50));
+        fBot.waitUntil(ConditionHelpers.treeItemCount(treeItem, 75));
         bot.button(CHECK_ALL).click();
         checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
-        assertEquals("Filtered", 51, checked);
+        assertEquals("Filtered", 76, checked);
         bot.button("OK").click();
     }
 
