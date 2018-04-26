@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.statesystem.core;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -109,6 +110,30 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *             If the attribute quark is out of range
      */
     void updateOngoingState(@NonNull ITmfStateValue newValue, int attributeQuark);
+
+    /**
+     * Modify a current "ongoing" state (instead of inserting a state change,
+     * like modifyAttribute() and others).
+     *
+     * This can be used to update the value of a previous state change, for
+     * example when we get information at the end of the state and not at the
+     * beginning. (return values of system calls, etc.)
+     *
+     * Note that past states can only be modified while they are still in
+     * memory, so only the "current state" can be updated. Once they get
+     * committed to disk (by inserting a new state change) it becomes too late.
+     *
+     * @param newValue
+     *            The new value that will overwrite the "current" one.
+     * @param attributeQuark
+     *            For which attribute in the system
+     * @throws IndexOutOfBoundsException
+     *             If the attribute quark is out of range
+     * @since 3.3
+     */
+    default void updateOngoingState(@Nullable Object newValue, int attributeQuark) {
+        updateOngoingState(TmfStateValue.newValue(newValue), attributeQuark);
+    }
 
     /**
      * Basic attribute modification method, we simply specify a new value, for a

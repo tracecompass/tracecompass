@@ -527,6 +527,11 @@ public class StateSystem implements ITmfStateSystemBuilder {
 
     @Override
     public void updateOngoingState(ITmfStateValue newValue, int attributeQuark) {
+        transState.changeOngoingStateValue(attributeQuark, newValue.unboxValue());
+    }
+
+    @Override
+    public void updateOngoingState(Object newValue, int attributeQuark) {
         transState.changeOngoingStateValue(attributeQuark, newValue);
     }
 

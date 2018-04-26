@@ -138,7 +138,7 @@ public class TransientState {
      * @throws IndexOutOfBoundsException
      *             If the quark is out of range
      */
-    public void changeOngoingStateValue(int quark, Object newValue) {
+    public void changeOngoingStateValue(int quark, @Nullable Object newValue) {
         fRWLock.writeLock().lock();
         try {
             fOngoingStateInfo.set(quark, newValue);
