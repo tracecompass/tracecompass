@@ -62,7 +62,7 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
     private static final Comparator<ResourcesEntryModel> COMPARATOR = Comparator
             .comparing((Function<ResourcesEntryModel, Type>) entry -> {
                 Type type = entry.getType();
-                if (type == Type.CPU || type == Type.CURRENT_THREAD) {
+                if (type == Type.CPU || type == Type.CURRENT_THREAD || type == Type.FREQUENCY) {
                     return Type.GROUP;
                 }
                 return type;

@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus;
 
+import java.text.FieldPosition;
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -29,6 +31,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModu
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
+import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel.Type;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.CommonStatusMessage;
@@ -70,6 +73,21 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     private static final String WILDCARD = "*"; //$NON-NLS-1$
 
     private static final @NonNull String SEPARATOR = ""; //$NON-NLS-1$
+    private static final @NonNull Format FREQUENCY_FORMATTER = new DecimalUnitFormat() {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = 2101980732073309988L;
+
+        @Override
+        public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
+            return super.format(obj, toAppendTo, pos).append("Hz"); //$NON-NLS-1$
+        }
+
+
+    };
+    private static final long FREQUENCY_MULTIPLIER = 1000;
 
     /**
      * Remove the "sys_" or "syscall_entry_" or similar from what we draw in the
@@ -150,6 +168,17 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             builder.add(cpuEntry);
             fEntryModelTypes.put(cpuQuark, Type.CPU);
 
+            // Add a line for the frequency if available
+            Integer currentFreqQuark = ss.optQuarkRelative(cpuQuark, Attributes.CURRENT_FREQUENCY);
+            if (currentFreqQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
+                // Get the minimum and maximum frequencies of the CPU, if avaible. If not, these values won't be used anyway
+                long minFrequency = getCpuFrequency(ss, cpuQuark, Attributes.MIN_FREQUENCY);
+                long maxFrequency = getCpuFrequency(ss, cpuQuark, Attributes.MAX_FREQUENCY);
+                ResourcesEntryModel currentFreqEntry = new ResourcesEntryModelWeighted(getId(currentFreqQuark), traceId, computeEntryName(Type.FREQUENCY, cpu), start, end, cpu, Type.FREQUENCY, minFrequency, maxFrequency);
+                builder.add(currentFreqEntry);
+                fEntryModelTypes.put(currentFreqQuark, Type.FREQUENCY);
+            }
+
             // Add a separator entry after each CPU entry
             long id = fSeparatorIds.computeIfAbsent(cpu, key -> getEntryId());
             builder.add(new ResourcesEntryModel(id, traceId, SEPARATOR, start, end, cpu, Type.GROUP));
@@ -162,6 +191,17 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         }
 
         return ImmutableList.copyOf(builder);
+    }
+
+    private static long getCpuFrequency(@NonNull ITmfStateSystem ss, int cpuQuark, @NonNull String freqAttribute) throws StateSystemDisposedException {
+        int quark = ss.optQuarkRelative(cpuQuark, freqAttribute);
+        if (quark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+            // This value will not be used if unavailable, so just return something
+            return 1;
+        }
+        Object value = ss.querySingleState(ss.getStartTime(), quark).getValue();
+        // The frequency needs to fit in an int, so divide by 1000
+        return value instanceof Long ? ((Long) value).longValue() / FREQUENCY_MULTIPLIER : 1;
     }
 
     /**
@@ -239,6 +279,11 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             if (cpuEntryName != null) {
                 return cpuEntryName;
             }
+        } else if (type == Type.FREQUENCY) {
+            String cpuEntryName = NLS.bind(Messages.FrequencyEntry, id);
+            if (cpuEntryName != null) {
+                return cpuEntryName;
+            }
         }
         return type.toString() + ' ' + id;
     }
@@ -308,6 +353,10 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                     } else {
                         eventList.add(new TimeGraphState(startTime, duration, s));
                     }
+                } else if ((status instanceof Long) && (type == Type.FREQUENCY)) {
+                    long s = (long) status;
+                    // The value needs to fit in an integer
+                    eventList.add(new TimeGraphState(startTime, duration, s/FREQUENCY_MULTIPLIER, String.valueOf(FREQUENCY_FORMATTER.format(s))));
                 } else {
                     eventList.add(new TimeGraphState(startTime, duration, Integer.MIN_VALUE));
                 }
@@ -462,7 +511,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         String attributeName = ss.getAttributeName(quark);
         Integer cpuNumber = Ints.tryParse(attributeName);
         String parent = ss.getAttributeName(ss.getParentAttributeQuark(quark));
-        if ((!parent.equals(Attributes.CPUS) || cpuNumber == null) && !attributeName.equals(Attributes.CURRENT_THREAD)) {
+        if ((!parent.equals(Attributes.CPUS) || cpuNumber == null) && !(attributeName.equals(Attributes.CURRENT_THREAD) || attributeName.equals(Attributes.CURRENT_FREQUENCY))) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
 
@@ -481,6 +530,8 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                 } else if (attributeName.equals(Attributes.CURRENT_THREAD)) {
                     putCurrentThreadTooltip(ss, retMap, full, status);
                 }
+            } else if (object instanceof Long && attributeName.equals(Attributes.CURRENT_FREQUENCY)) {
+                retMap.put("Frequency", FREQUENCY_FORMATTER.format(object)); //$NON-NLS-1$
             }
             return new TmfModelResponse<>(retMap, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         } catch (StateSystemDisposedException e) {

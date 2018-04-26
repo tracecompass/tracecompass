@@ -918,4 +918,14 @@ public interface IKernelAnalysisEventLayout {
         return Collections.EMPTY_SET;
     }
 
+    /**
+     * Get the name of the kernel event when the CPU frequency is changed
+     *
+     * @return The name of the cpu frequency change event
+     * @since 3.0
+     */
+    default String eventCpuFrequency() {
+        return "power_cpu_frequency"; //$NON-NLS-1$
+    }
+
 }

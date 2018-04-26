@@ -18,6 +18,7 @@ import org.eclipse.osgi.util.NLS;
  */
 class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.messages"; //$NON-NLS-1$
+
     /** softirq 0 */
     public static String SoftIrqLabelProvider_softIrq0;
     /** softirq 1 */
@@ -44,6 +45,8 @@ class Messages extends NLS {
     public static String ThreadEntry;
     /** cpu entry */
     public static String CpuEntry;
+    /** Frequency entry */
+    public static String FrequencyEntry;
 
     static {
         // initialize resource bundle

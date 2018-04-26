@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.ui.registry.LinuxStyl
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphEntryModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphEntryModelWeighted;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.RotatingPaletteProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
@@ -127,6 +128,11 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 return STATE_MAP.get(StateValues.CPU_STATUS_RUN_USERMODE);
             case GROUP:
                 return null;
+            case FREQUENCY:
+                if (!event.hasValue()) {
+                    return null;
+                }
+                return STATE_MAP.get(StateValues.CPU_STATUS_RUN_USERMODE);
             default:
                 return null;
             }
@@ -197,7 +203,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                 }
 
                 // Check for type CPU
-                else if (resourcesModel.getType().equals(Type.CPU) || resourcesModel.getType().equals(Type.CURRENT_THREAD)) {
+                else if (resourcesModel.getType().equals(Type.CPU) || resourcesModel.getType().equals(Type.CURRENT_THREAD) || resourcesModel.getType().equals(Type.FREQUENCY)) {
                     int status = tcEvent.getValue();
                     ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = BaseDataProviderTimeGraphView.getProvider((TimeGraphEntry) entry);
                     if (provider != null) {
@@ -217,7 +223,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             return Collections.emptyMap();
         }
 
-        Map<String, String> retMap = new LinkedHashMap<>();
+        Map<String, String> retMap = new LinkedHashMap<>(tooltip);
         if (status == StateValues.CPU_STATUS_IRQ) {
             // In IRQ state get the IRQ that caused the interruption
             String irq = tooltip.get(Attributes.IRQS);
@@ -270,6 +276,12 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             return ImmutableMap.of(ITimeEventStyleStrings.fillColor(), color.toInt(),
                     ITimeEventStyleStrings.label(), String.valueOf(threadEventValue));
 
+        } else if (event.getEntry() instanceof TimeGraphEntry &&
+                ((TimeGraphEntry) event.getEntry()).getModel() instanceof ITimeGraphEntryModelWeighted) {
+            ITimeGraphEntryModelWeighted model = (ITimeGraphEntryModelWeighted) ((TimeGraphEntry) event.getEntry()).getModel();
+            int eventValue = ((TimeEvent) event).getValue();
+
+            return ImmutableMap.of(ITimeEventStyleStrings.heightFactor(), (float) model.getWeight(eventValue));
         }
         return super.getSpecificEventStyle(event);
     }

@@ -34,6 +34,9 @@ public interface Attributes {
     String CURRENT_THREAD = "Current_thread";
     String SOFT_IRQS = "Soft_IRQs";
     String IRQS = "IRQs";
+    String CURRENT_FREQUENCY = "Frequency";
+    String MIN_FREQUENCY = "Min frequency";
+    String MAX_FREQUENCY = "Max frequency";
 
     /* Sub-attributes of the Thread nodes */
     String CURRENT_CPU_RQ = "Current_cpu_rq";

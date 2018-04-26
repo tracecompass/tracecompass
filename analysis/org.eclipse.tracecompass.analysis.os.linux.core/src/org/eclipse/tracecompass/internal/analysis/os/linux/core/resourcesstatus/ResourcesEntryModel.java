@@ -30,7 +30,9 @@ public class ResourcesEntryModel extends TimeGraphEntryModel {
         /** Entries for IRQs */
         IRQ,
         /** Entries for Soft IRQ */
-        SOFT_IRQ
+        SOFT_IRQ,
+        /** Entries for CPU frequencies */
+        FREQUENCY
     }
 
     private final int fResourceId;

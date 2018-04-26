@@ -18,6 +18,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.CpuFrequencyHandler;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.IPIEntryHandler;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.IPIExitHandler;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.IrqEntryHandler;
@@ -137,6 +138,7 @@ public class KernelStateProvider extends AbstractTmfStateProvider {
         builder.put(layout.eventSchedProcessFree(), new ProcessFreeHandler(layout));
         builder.put(layout.eventSchedProcessWaking(), new SchedWakeupHandler(layout));
         builder.put(layout.eventSchedMigrateTask(), new SchedMigrateTaskHandler(layout));
+        builder.put(layout.eventCpuFrequency(), new CpuFrequencyHandler(layout));
 
         for (String s : layout.getIPIIrqVectorsEntries()) {
             builder.put(s, new IPIEntryHandler(layout));
