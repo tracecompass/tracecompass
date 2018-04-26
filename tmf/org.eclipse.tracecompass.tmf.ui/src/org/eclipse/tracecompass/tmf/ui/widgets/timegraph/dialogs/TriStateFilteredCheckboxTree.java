@@ -9,7 +9,9 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
@@ -34,7 +36,7 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
      * Set containing only the tree items that are grayed
      */
     private Set<Object> fGrayedObjects = new HashSet<>();
-    private IPreCheckStateListener fPreCheckStateListener = null;
+    private List<IPreCheckStateListener> fPreCheckStateListener = new ArrayList<>();
 
     /**
      * Create a new instance of the receiver.
@@ -62,13 +64,14 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
 
     @Override
     public boolean setSubtreeChecked(Object element, boolean state) {
-        IPreCheckStateListener preCheckStateListener = fPreCheckStateListener;
-        if (preCheckStateListener != null && preCheckStateListener.setSubtreeChecked(element, state)) {
-            // uncheck the root element
-            setChecked(element, false);
-            return false;
+        for (IPreCheckStateListener preCheckStateListener : fPreCheckStateListener) {
+            if (preCheckStateListener != null && preCheckStateListener.setSubtreeChecked(element, state)) {
+                // uncheck the root element
+                setChecked(element, false);
+                return false;
+            }
+            checkSubtree(element, state);
         }
-        checkSubtree(element, state);
         maintainAllCheckIntegrity();
         return getCheckboxTreeViewer().setSubtreeChecked(element, state);
     }
@@ -192,8 +195,8 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
      *            pre-check state listener.
      * @since 4.0
      */
-    public void setPreCheckStateListener(IPreCheckStateListener listener) {
-        fPreCheckStateListener = listener;
+    public void addPreCheckStateListener(IPreCheckStateListener listener) {
+        fPreCheckStateListener.add(listener);
     }
 
 }
