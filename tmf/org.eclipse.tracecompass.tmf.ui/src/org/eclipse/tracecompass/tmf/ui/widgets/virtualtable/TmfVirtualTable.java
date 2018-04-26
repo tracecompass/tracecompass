@@ -969,7 +969,7 @@ public class TmfVirtualTable extends Composite {
      * @param point
      *            the point in coordinates relative to the table
      * @return the corresponding table column, or null
-     * @since 3.4
+     * @since 4.0
      */
     public TableColumn getColumn(Point point) {
         Rectangle clientArea = fTable.getClientArea();
