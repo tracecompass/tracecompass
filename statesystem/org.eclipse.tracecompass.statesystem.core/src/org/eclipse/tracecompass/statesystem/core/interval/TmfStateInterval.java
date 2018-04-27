@@ -13,7 +13,6 @@
 package org.eclipse.tracecompass.statesystem.core.interval;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
@@ -31,27 +30,6 @@ public final class TmfStateInterval implements ITmfStateInterval {
     private final long fEnd;
     private final int fAttribute;
     private final @Nullable Object fValue;
-
-    /**
-     * Construct an interval from its given parameters
-     *
-     * @param start
-     *            Start time
-     * @param end
-     *            End time
-     * @param attribute
-     *            Attribute linked to this interval
-     * @param sv
-     *            State value this interval will contain
-     */
-    @Deprecated
-    public TmfStateInterval(long start, long end, int attribute,
-            @NonNull ITmfStateValue sv) {
-        fStart = start;
-        fEnd = end;
-        fAttribute = attribute;
-        fValue = sv.unboxValue();
-    }
 
     /**
     * Construct an interval from its given parameters

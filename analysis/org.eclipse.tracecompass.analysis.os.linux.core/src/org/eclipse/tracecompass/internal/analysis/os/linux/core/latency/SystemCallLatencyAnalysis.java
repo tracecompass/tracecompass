@@ -11,8 +11,6 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.latency;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -89,12 +87,6 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
     @Override
     protected @NonNull IHTIntervalReader<ISegment> getSegmentReader() {
         return SystemCall.READER;
-    }
-
-    @Deprecated
-    @Override
-    protected Object[] readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
-        return checkNotNull((Object[]) ois.readObject());
     }
 
     private class SyscallLatencyAnalysisRequest extends AbstractSegmentStoreAnalysisRequest {

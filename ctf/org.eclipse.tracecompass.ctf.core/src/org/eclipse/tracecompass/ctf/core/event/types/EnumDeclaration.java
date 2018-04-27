@@ -25,7 +25,6 @@ import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.event.io.BitBuffer;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 
-import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -252,18 +251,6 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      */
     public @Nullable String query(long value) {
         return fEnumTree.get(new Pair(value, value));
-    }
-
-    /**
-     * Get the lookup table
-     *
-     * @return the lookup table
-     * @since 1.1
-     * @deprecated use {@link #getLookupTable()} instead
-     */
-    @Deprecated
-    public Map<String, Pair> getEnumTable() {
-        return ImmutableBiMap.copyOf(fEnumTree).inverse();
     }
 
     /**

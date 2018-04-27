@@ -23,7 +23,6 @@ import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.Ti
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 
 /**
  * An implement of a state history back-end to simply discards *all* the
@@ -60,18 +59,6 @@ public class NullBackend implements IStateHistoryBackend {
     @Override
     public long getEndTime() {
         return 0;
-    }
-
-    /**
-     * The interval will be discarded when using a null backend.
-     * @deprecated use insertPastState(long stateStartTime, long stateEndTime,
-            int quark, Object value) instead
-     */
-    @Deprecated
-    @Override
-    public void insertPastState(long stateStartTime, long stateEndTime,
-            int quark, ITmfStateValue value) {
-        /* The interval is always discarded. */
     }
 
     /**

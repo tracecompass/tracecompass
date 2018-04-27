@@ -468,39 +468,6 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
         return new ArrayList<>();
     }
 
-    /**
-     * @deprecated The subclass should implement
-     *             {@link #getEventList(TimeGraphEntry, ITmfStateSystem, List, List, IProgressMonitor)}
-     *             instead.
-     */
-    @Deprecated
-    @Override
-    protected final @Nullable List<@NonNull ITimeEvent> getEventList(TimeGraphEntry entry, long startTime, long endTime, long resolution, IProgressMonitor monitor) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * @deprecated The subclass should implement
-     *             {@link #getLinkList(ITmfStateSystem, List, List, IProgressMonitor)}
-     *             instead.
-     */
-    @Deprecated
-    @Override
-    protected final @Nullable List<@NonNull ILinkEvent> getLinkList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * @deprecated The subclass should implement
-     *             {@link #getViewMarkerList(ITmfStateSystem, List, List, IProgressMonitor)}
-     *             instead.
-     */
-    @Deprecated
-    @Override
-    protected final @NonNull List<IMarkerEvent> getViewMarkerList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
-        throw new UnsupportedOperationException();
-    }
-
     @Override
     protected void resetView(ITmfTrace viewTrace) {
         // Don't remove super call

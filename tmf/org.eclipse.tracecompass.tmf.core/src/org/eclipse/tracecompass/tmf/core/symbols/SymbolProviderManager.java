@@ -192,21 +192,6 @@ public final class SymbolProviderManager {
         }
     }
 
-   /**
-    * Locate an {@link ISymbolProvider} capable to resolve symbols from the
-    * given trace. If no such provider is defined an instance of
-    * {@link DefaultSymbolProvider} will be returned
-    *
-    * @param trace
-    *            The trace to create a provider for
-    * @return a valid {@link ISymbolProvider}, never null
-    * @deprecated Use {@link #getSymbolProviders(ITmfTrace)} instead
-    */
-    @Deprecated
-    public ISymbolProvider getSymbolProvider(ITmfTrace trace) {
-        return getSymbolProviders(trace).iterator().next();
-    }
-
     /**
      * Signal handler for the traceClosed signal.
      *

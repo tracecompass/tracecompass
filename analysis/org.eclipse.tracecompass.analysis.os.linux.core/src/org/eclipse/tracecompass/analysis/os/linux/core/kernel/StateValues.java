@@ -27,37 +27,6 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 @SuppressWarnings("javadoc")
 public interface StateValues {
 
-    /* Process status */
-    @Deprecated
-    int PROCESS_STATUS_UNKNOWN = 0;
-    @Deprecated
-    int PROCESS_STATUS_WAIT_BLOCKED = 1;
-    @Deprecated
-    int PROCESS_STATUS_RUN_USERMODE = 2;
-    @Deprecated
-    int PROCESS_STATUS_RUN_SYSCALL = 3;
-    @Deprecated
-    int PROCESS_STATUS_INTERRUPTED = 4;
-    @Deprecated
-    int PROCESS_STATUS_WAIT_FOR_CPU = 5;
-    @Deprecated
-    int PROCESS_STATUS_WAIT_UNKNOWN = 6;
-
-    @Deprecated
-    ITmfStateValue PROCESS_STATUS_UNKNOWN_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_UNKNOWN);
-    @Deprecated
-    ITmfStateValue PROCESS_STATUS_WAIT_UNKNOWN_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_WAIT_UNKNOWN);
-    @Deprecated
-    ITmfStateValue PROCESS_STATUS_WAIT_BLOCKED_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_WAIT_BLOCKED);
-    @Deprecated
-    ITmfStateValue PROCESS_STATUS_RUN_USERMODE_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_RUN_USERMODE);
-    @Deprecated
-    ITmfStateValue PROCESS_STATUS_RUN_SYSCALL_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_RUN_SYSCALL);
-    @Deprecated
-    ITmfStateValue PROCESS_STATUS_INTERRUPTED_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_INTERRUPTED);
-    @Deprecated
-    ITmfStateValue PROCESS_STATUS_WAIT_FOR_CPU_VALUE = TmfStateValue.newValueInt(PROCESS_STATUS_WAIT_FOR_CPU);
-
     /* CPU Status */
     int CPU_STATUS_IDLE = 0;
     /**

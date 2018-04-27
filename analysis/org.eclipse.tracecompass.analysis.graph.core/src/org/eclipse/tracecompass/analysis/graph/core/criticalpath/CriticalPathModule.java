@@ -38,35 +38,12 @@ public class CriticalPathModule extends TmfAbstractAnalysisModule implements ICr
      */
     public static final String ANALYSIS_ID = "org.eclipse.tracecompass.analysis.graph.core.criticalpath"; //$NON-NLS-1$
 
-    /**
-     * Graph parameter name
-     *
-     * @deprecated The graph parameter is set in the constructor now
-     */
-    @Deprecated
-    public static final String PARAM_GRAPH = "graph"; //$NON-NLS-1$
-
     /** Worker_id parameter name */
     public static final String PARAM_WORKER = "workerid"; //$NON-NLS-1$
 
-    // TODO: Remove @Nullable when the default construtor is removed
-    private final @Nullable TmfGraphBuilderModule fGraphModule;
+    private final TmfGraphBuilderModule fGraphModule;
 
     private volatile @Nullable TmfGraph fCriticalPath;
-
-    /**
-     * Default constructor
-     *
-     * @deprecated Use the {@link #CriticalPathModule(TmfGraphBuilderModule)}
-     *             constructor instead
-     */
-    @Deprecated
-    public CriticalPathModule() {
-        super();
-        addParameter(PARAM_WORKER);
-        setId(ANALYSIS_ID);
-        fGraphModule = null;
-    }
 
     /**
      * Default constructor
@@ -97,10 +74,6 @@ public class CriticalPathModule extends TmfAbstractAnalysisModule implements ICr
 
         /* Get the graph */
         TmfGraphBuilderModule graphModule = fGraphModule;
-        if (graphModule == null) {
-            Activator.getInstance().logWarning("No graph was found to execute the critical path on"); //$NON-NLS-1$
-            return true;
-        }
         graphModule.schedule();
 
         monitor.setTaskName(NLS.bind(Messages.CriticalPathModule_waitingForGraph, graphModule.getName()));

@@ -50,7 +50,7 @@ public interface IDataProviderFactory {
      * @return {@link ITmfTreeDataProvider} that can be use for the given trace with
      *         ID <provider ID>:<secondaryId>, or <code>null</code> if no provider
      *         is available for this trace and ID
-     * @since 3.4
+     * @since 4.0
      */
     default @Nullable ITmfTreeDataProvider<? extends ITmfTreeDataModel> createProvider(@NonNull ITmfTrace trace, @NonNull String secondaryId) {
         return createProvider(trace);

@@ -96,21 +96,6 @@ public class TmfEventDependency {
      *            The source event of this dependency
      * @param destination
      *            The destination event of this dependency
-     * @deprecated use {@link #TmfEventDependency(DependencyEvent, DependencyEvent)}
-     */
-    @Deprecated
-    public TmfEventDependency(final ITmfEvent source, final ITmfEvent destination) {
-        fSource = new DependencyEvent(source);
-        fDestination = new DependencyEvent(destination);
-    }
-
-    /**
-     * Constructor
-     *
-     * @param source
-     *            The source event of this dependency
-     * @param destination
-     *            The destination event of this dependency
      * @since 3.3
      */
     public TmfEventDependency(final DependencyEvent source, final DependencyEvent destination) {
@@ -137,27 +122,4 @@ public class TmfEventDependency {
     public DependencyEvent getDestination() {
         return fDestination;
     }
-
-    /**
-     * Getter for fSourceEvent
-     *
-     * @return The source event
-     * @deprecated Use {@link #getSource()} instead
-     */
-    @Deprecated
-    public ITmfEvent getSourceEvent() {
-        return null;
-    }
-
-    /**
-     * Getter for fDestEvent
-     *
-     * @return the Destination event
-     * @deprecated Use {@link #getDestination()} instead
-     */
-    @Deprecated
-    public ITmfEvent getDestinationEvent() {
-        return null;
-    }
-
 }

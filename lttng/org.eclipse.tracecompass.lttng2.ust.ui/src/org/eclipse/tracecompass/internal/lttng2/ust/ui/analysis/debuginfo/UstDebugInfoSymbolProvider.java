@@ -56,18 +56,6 @@ public class UstDebugInfoSymbolProvider extends DefaultSymbolProvider implements
         return (LttngUstTrace) super.getTrace();
     }
 
-    @Deprecated
-    @Override
-    public @Nullable String getSymbolText(int pid, long timestamp, long address) {
-        BinaryCallsite bc = UstDebugInfoBinaryAspect.getBinaryCallsite(getTrace(), pid, timestamp, address);
-        if (bc == null) {
-            return null;
-        }
-
-        FunctionLocation loc = UstDebugInfoFunctionAspect.getFunctionFromBinaryLocation(bc);
-        return (loc == null ? null : loc.getFunctionName());
-    }
-
     @Override
     public @Nullable TmfResolvedSymbol getSymbol(int pid, long timestamp, long address) {
         BinaryCallsite bc = UstDebugInfoBinaryAspect.getBinaryCallsite(getTrace(), pid, timestamp, address);

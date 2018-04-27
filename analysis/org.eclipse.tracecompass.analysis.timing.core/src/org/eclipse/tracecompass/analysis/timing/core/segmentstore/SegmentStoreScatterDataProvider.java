@@ -72,7 +72,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
 
     /**
      * Extension point ID.
-     * @since 3.2
+     * @since 4.0
      */
     public static final String ID = "org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.scatter.dataprovider"; //$NON-NLS-1$
 
@@ -233,7 +233,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
      *            The ID of the analysis to use for this provider
      * @return An instance of SegmentStoreDataProvider. Returns a null if the
      *         ISegmentStoreProvider is null.
-     * @since 3.2
+     * @since 4.0
      */
     public static @Nullable ITmfTreeDataProvider<? extends ITmfTreeDataModel> create(ITmfTrace trace, String secondaryId) {
         // The trace can be an experiment, so we need to know if there are multiple analysis modules with the same ID
@@ -262,7 +262,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
     }
 
     /**
-     * @since 3.2
+     * @since 4.0
      */
     @Override
     public TmfModelResponse<List<TmfTreeDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
@@ -409,7 +409,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
     }
 
     /**
-     * @since 3.2
+     * @since 4.0
      */
     @Override
     public String getId() {

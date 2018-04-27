@@ -21,15 +21,6 @@ public abstract class AbstractTraceEventHandler implements ITraceEventHandler {
     private final int fPriority;
 
     /**
-     * Default constructor
-     * @deprecated Use the constructor with priority instead
-     */
-    @Deprecated
-    public AbstractTraceEventHandler() {
-        fPriority = 5;
-    }
-
-    /**
      * Constructor with priority
      *
      * @param priority The priority of this handler

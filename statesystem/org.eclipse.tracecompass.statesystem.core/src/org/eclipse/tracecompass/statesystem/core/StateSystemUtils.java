@@ -380,7 +380,7 @@ public final class StateSystemUtils {
          *            queries. A value lower or equal to 1 will return all intervals
          * @throws TimeRangeException
          *             If endTime < initialTime.
-         * @since 3.3
+         * @since 4.0
          */
         public QuarkIterator(ITmfStateSystem ss, int quark, long initialTime, long endTime, long resolution) {
             if (endTime < initialTime) {

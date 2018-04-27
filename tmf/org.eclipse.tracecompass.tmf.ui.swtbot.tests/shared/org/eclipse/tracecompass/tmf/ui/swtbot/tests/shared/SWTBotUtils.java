@@ -90,7 +90,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -859,47 +858,6 @@ public final class SWTBotUtils {
             fail(res[0].getMessage());
         }
         WaitUtils.waitForJobs();
-    }
-
-    /**
-     * Maximize a table
-     *
-     * @param tableBot
-     *            the {@link SWTBotTable} table
-     * @deprecated Use
-     *             {@link #maximize(IWorkbenchPartReference, AbstractSWTBotControl)}.
-     */
-    @Deprecated
-    public static void maximizeTable(SWTBotTable tableBot) {
-        final AtomicBoolean controlResized = new AtomicBoolean();
-        UIThreadRunnable.syncExec(new VoidResult() {
-            @Override
-            public void run() {
-                tableBot.widget.addControlListener(new ControlAdapter() {
-                    @Override
-                    public void controlResized(ControlEvent e) {
-                        tableBot.widget.removeControlListener(this);
-                        controlResized.set(true);
-                    }
-                });
-            }
-        });
-        try {
-            tableBot.pressShortcut(KeyStroke.getInstance(IKeyLookup.CTRL_NAME + "+"), KeyStroke.getInstance("M"));
-        } catch (ParseException e) {
-            fail();
-        }
-        new SWTBot().waitUntil(new DefaultCondition() {
-            @Override
-            public boolean test() throws Exception {
-                return controlResized.get();
-            }
-
-            @Override
-            public String getFailureMessage() {
-                return "Control was not resized";
-            }
-        });
     }
 
     /**

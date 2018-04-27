@@ -152,18 +152,6 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
         return null;
     }
 
-    /**
-     * Sets the ITmfTrace implementation
-     *
-     * @param trace
-     *            The ITmfTrace implementation {@link ITmfTrace}
-     * @deprecated
-     *            This method will be removed
-     */
-    @Deprecated
-    protected void setTrace(ITmfTrace trace) {
-    }
-
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------

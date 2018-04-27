@@ -56,7 +56,7 @@ public final class VariantDefinition extends ScopedDefinition {
      *            the field name
      * @param fieldValue
      *            the field value
-     * @since 2.4
+     * @since 3.0
      */
     public VariantDefinition(@NonNull VariantDeclaration declaration, IDefinitionScope definitionScope, EnumDefinition tagDef, String selectedField, @NonNull String fieldName, Definition fieldValue) {
         super(declaration, definitionScope, fieldName);

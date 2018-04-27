@@ -34,10 +34,10 @@ import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
 public class TmfExperimentStub extends TmfExperiment {
 
     /**
-     * Default constructor. Should not be called directly by the code, but
-     * needed for the extension point.
+     * Default constructor. Should not be called directly by the code, but needed
+     * for the extension point.
      *
-     * @deprecated Only used by the extension point.
+     * @deprecated Do not call this directly (but do not remove it either!)
      */
     @Deprecated
     public TmfExperimentStub() {

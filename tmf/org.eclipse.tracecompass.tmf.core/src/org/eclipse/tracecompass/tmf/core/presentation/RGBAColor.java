@@ -14,7 +14,7 @@ package org.eclipse.tracecompass.tmf.core.presentation;
  * red, green and blue values must be between 0 and 255.
  *
  * @author Yonni Chen
- * @since 3.4
+ * @since 4.0
  */
 public class RGBAColor {
 

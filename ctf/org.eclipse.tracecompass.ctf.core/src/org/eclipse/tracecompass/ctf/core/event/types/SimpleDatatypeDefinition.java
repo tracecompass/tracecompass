@@ -59,7 +59,7 @@ public abstract class SimpleDatatypeDefinition extends Definition {
      * Gets the bytes that make this definition
      *
      * @return the byte array
-     * @since 2.4
+     * @since 3.0
      */
     public byte[] getBytes() {
         throw new UnsupportedOperationException("getBytes not implemented for " + this.getClass().getCanonicalName()); //$NON-NLS-1$

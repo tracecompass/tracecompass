@@ -30,7 +30,6 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
@@ -147,13 +146,6 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
     @Override
     public long getEndTime() {
         return fLatestTime;
-    }
-
-    @Deprecated
-    @Override
-    public void insertPastState(long stateStartTime, long stateEndTime, int quark,
-            @NonNull ITmfStateValue value) throws TimeRangeException {
-        insertPastState(stateStartTime, stateEndTime, quark, value.unboxValue());
     }
 
     @Override

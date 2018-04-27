@@ -392,19 +392,6 @@ public class CallStackView extends BaseDataProviderTimeGraphView {
     // ------------------------------------------------------------------------
 
     /**
-     * @since 2.1
-     * @deprecated no need to link back and forth between the
-     *             {@link CallStackPresentationProvider} and {@link CallStackView}
-     *             anymore
-     */
-    @Deprecated
-    @Override
-    protected CallStackPresentationProvider getPresentationProvider() {
-        /* Set to this type by the constructor */
-        return (CallStackPresentationProvider) super.getPresentationProvider();
-    }
-
-    /**
      * @since 2.0
      */
     @Override

@@ -50,7 +50,6 @@ import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.io.ResourceUtil;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType.TraceElementType;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.ui.IEditorReference;
@@ -784,15 +783,6 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
             Activator.getDefault().logError("Error setting persistant property " + TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER, e); //$NON-NLS-1$
         }
         return supplFolder;
-    }
-
-    /**
-     * @param signal
-     *            The incoming signal
-     * @deprecated No longer used
-     */
-    @Deprecated
-    public void traceOpened(TmfTraceOpenedSignal signal) {
     }
 
 }

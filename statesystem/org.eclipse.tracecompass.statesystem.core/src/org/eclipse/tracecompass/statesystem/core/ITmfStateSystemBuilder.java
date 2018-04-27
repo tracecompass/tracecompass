@@ -129,7 +129,7 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *            For which attribute in the system
      * @throws IndexOutOfBoundsException
      *             If the attribute quark is out of range
-     * @since 3.3
+     * @since 4.0
      */
     default void updateOngoingState(@Nullable Object newValue, int attributeQuark) {
         updateOngoingState(TmfStateValue.newValue(newValue), attributeQuark);

@@ -17,7 +17,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
  * A {@link TmfTreeDataModel} extended with the getters from {@link IStatistics}
  *
  * @author Loic Prieur-Drevon
- * @since 3.2
+ * @since 4.0
  */
 @SuppressWarnings("restriction")
 public class SegmentStoreStatisticsModel extends TmfTreeDataModel {

@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
  * that contains only the events in a given time range.
  *
  * @author Alexandre Montplaisir
- * @since 3.4
+ * @since 4.0
  */
 public interface ITmfTrimmableTrace {
 

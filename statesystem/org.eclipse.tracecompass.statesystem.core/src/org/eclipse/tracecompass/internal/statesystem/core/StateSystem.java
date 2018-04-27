@@ -363,24 +363,10 @@ public class StateSystem implements ITmfStateSystemBuilder {
     // Methods related to insertions in the history
     // --------------------------------------------------------------------------
 
-    @Deprecated
-    @Override
-    public void modifyAttribute(long t, @NonNull ITmfStateValue value, int attributeQuark)
-            throws TimeRangeException, StateValueTypeException {
-        transState.processStateChange(t, value.unboxValue(), attributeQuark);
-    }
-
     @Override
     public void modifyAttribute(long t, Object value, int attributeQuark)
             throws TimeRangeException, StateValueTypeException {
         transState.processStateChange(t, value, attributeQuark);
-    }
-
-    @Deprecated
-    @Override
-    public void pushAttribute(long t, @NonNull ITmfStateValue value, int attributeQuark)
-            throws TimeRangeException, StateValueTypeException {
-        pushAttribute(t, value.unboxValue(), attributeQuark);
     }
 
     @Override

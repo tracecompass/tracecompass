@@ -43,7 +43,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * selected range.
  *
  * @author Loic Prieur-Drevon
- * @since 3.2
+ * @since 4.0
  */
 @SuppressWarnings("restriction")
 public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProvider

@@ -8,10 +8,6 @@
  ******************************************************************************/
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -52,12 +48,6 @@ public class XmlPatternSegmentStoreModule extends AbstractSegmentStoreAnalysisMo
     public XmlPatternSegmentStoreModule(@NonNull XmlPatternAnalysis parent) {
         super();
         fParent = parent;
-    }
-
-    @Deprecated
-    @Override
-    protected Object @NonNull [] readObject(@NonNull ObjectInputStream ois) throws ClassNotFoundException, IOException {
-        return checkNotNull((Object[]) ois.readObject());
     }
 
     @Override

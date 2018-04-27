@@ -33,8 +33,6 @@ import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-
 import com.google.common.collect.Iterables;
 
 /**
@@ -94,13 +92,6 @@ public class InMemoryBackend implements IStateHistoryBackend {
     @Override
     public long getEndTime() {
         return latestTime;
-    }
-
-    @Deprecated
-    @Override
-    public void insertPastState(long stateStartTime, long stateEndTime,
-            int quark, ITmfStateValue value) throws TimeRangeException {
-        insertPastState(stateStartTime, stateEndTime, quark, value.unboxValue());
     }
 
     @Override

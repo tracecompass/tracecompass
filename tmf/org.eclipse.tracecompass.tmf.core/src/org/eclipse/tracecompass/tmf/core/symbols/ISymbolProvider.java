@@ -42,18 +42,6 @@ public interface ISymbolProvider {
     void loadConfiguration(@Nullable IProgressMonitor monitor);
 
     /**
-     * Return the symbol text corresponding to the given address or null if
-     * there is no such symbol
-     *
-     * @param address
-     *            the address of the symbol
-     * @return the symbol text or <code>null</code> if the symbol cannot be found
-     * @deprecated Use {@link #getSymbol(long)} instead
-     */
-    @Deprecated
-    @Nullable String getSymbolText(long address);
-
-    /**
      * Return the symbol and address corresponding to the given address or null if
      * there is no such symbol
      *
@@ -62,38 +50,7 @@ public interface ISymbolProvider {
      * @return the symbol or <code>null</code> if the symbol cannot be found
      * @since 3.2
      */
-    default @Nullable TmfResolvedSymbol getSymbol(long address) {
-        String symbolText = getSymbolText(address);
-        if (symbolText != null) {
-            return new TmfResolvedSymbol(address, symbolText);
-        }
-        return null;
-    }
-
-    /**
-     * Return the symbol text corresponding to the given pid/timestamp/address
-     * tuple, or null if there is no such symbol. An implementation that does
-     * not support pid and timestamp should return the symbol based on address
-     * only.
-     *
-     * A caller that has pid and timestamp information should call this method.
-     * {@link #getSymbolText(long)} should only be invoked by callers that do
-     * not have access to the pid and timestamp.
-     *
-     * @param pid
-     *            The process Id for which to query
-     * @param timestamp
-     *            The timestamp of the query
-     * @param address
-     *            the address of the symbol
-     * @return the symbol text or <code>null</code> if the symbol cannot be
-     *         found
-     * @deprecated Use {@link #getSymbol(int, long, long)} instead
-     */
-    @Deprecated
-    default @Nullable String getSymbolText(int pid, long timestamp, long address) {
-        return getSymbolText(address);
-    }
+    public @Nullable TmfResolvedSymbol getSymbol(long address);
 
     /**
      * Return the symbol and address corresponding to the given
@@ -114,11 +71,5 @@ public interface ISymbolProvider {
      * @return the symbol or <code>null</code> if the symbol cannot be found
      * @since 3.2
      */
-    default @Nullable TmfResolvedSymbol getSymbol(int pid, long timestamp, long address) {
-        String symbolText = getSymbolText(pid, timestamp, address);
-        if (symbolText != null) {
-            return new TmfResolvedSymbol(address, symbolText);
-        }
-        return null;
-    }
+    public @Nullable TmfResolvedSymbol getSymbol(int pid, long timestamp, long address);
 }

@@ -310,7 +310,7 @@ public abstract class StateHistoryBackendTestBase {
             assertEquals("String interval value", STR_VAL1, interval.getValue());
 
             /* Custom state values */
-            backend.insertPastState(startTime, startTime + timeStep, customQuark, (Object) customVal);
+            backend.insertPastState(startTime, startTime + timeStep, customQuark, customVal);
             interval = backend.doSingularQuery(startTime, customQuark);
 
             assertEquals("Custom interval start time", startTime, interval.getStartTime());
@@ -373,12 +373,12 @@ public abstract class StateHistoryBackendTestBase {
                     new TmfStateInterval(startTime, startTime + timeStep, longQuark, LONG_VAL1),
                     new TmfStateInterval(startTime, startTime + timeStep, doubleQuark, DOUBLE_VAL1),
                     new TmfStateInterval(startTime, startTime + timeStep, strQuark, STR_VAL1),
-                    new TmfStateInterval(startTime, startTime + timeStep, customQuark, (Object) customVal),
+                    new TmfStateInterval(startTime, startTime + timeStep, customQuark, customVal),
                     new TmfStateInterval(nextStart, endTime, intQuark, INT_VAL2),
                     new TmfStateInterval(nextStart, endTime, longQuark, LONG_VAL2),
                     new TmfStateInterval(nextStart, endTime, doubleQuark, DOUBLE_VAL2),
                     new TmfStateInterval(nextStart, endTime, strQuark, STR_VAL2),
-                    new TmfStateInterval(nextStart, endTime, customQuark, (Object) customVal2)));
+                    new TmfStateInterval(nextStart, endTime, customQuark, customVal2)));
 
             backend.finishedBuilding(endTime);
 

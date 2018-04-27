@@ -19,7 +19,7 @@ import org.eclipse.jdt.annotation.NonNull;
  * method to get the colors
  *
  * @author Matthew Khouzam
- * @since 3.4
+ * @since 4.0
  */
 public interface IPaletteProvider extends Supplier<@NonNull List<@NonNull RGBAColor>> {
 

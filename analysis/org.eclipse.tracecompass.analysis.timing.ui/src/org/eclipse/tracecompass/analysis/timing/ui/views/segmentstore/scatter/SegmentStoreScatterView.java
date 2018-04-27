@@ -28,7 +28,7 @@ import org.eclipse.ui.views.IViewDescriptor;
  * Scatter graph showing the segments' data in the form a scatter view.
  *
  * @author Geneviève Bastien
- * @since 2.3
+ * @since 3.0
  */
 public class SegmentStoreScatterView extends TmfChartView {
     /**

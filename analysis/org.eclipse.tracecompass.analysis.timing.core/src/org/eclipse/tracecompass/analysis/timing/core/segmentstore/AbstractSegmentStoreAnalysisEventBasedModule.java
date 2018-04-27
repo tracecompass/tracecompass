@@ -51,18 +51,14 @@ public abstract class AbstractSegmentStoreAnalysisEventBasedModule extends Abstr
     /**
      * Returns the analysis request for creating the segment store
      *
-     * TODO: Make this abstract when incrementing the major version
-     *
      * @param segmentStore
      *            a segment store to fill
      * @param monitor
      *            The progress monitor to use for the request
      * @return the segment store analysis request implementation
-     * @since 3.2
+     * @since 4.0
      */
-    protected AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> segmentStore, IProgressMonitor monitor) {
-        throw new UnsupportedOperationException("This method should be overridden by implementations"); //$NON-NLS-1$
-    }
+    protected abstract AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> segmentStore, IProgressMonitor monitor);
 
     @Override
     protected void canceling() {

@@ -133,15 +133,4 @@ public class BasicSymbolProvider implements ISymbolProvider {
     public ISymbolProviderPreferencePage createPreferencePage() {
         return new BasicSymbolProviderPreferencePage(this);
     }
-
-    @Deprecated
-    @Override
-    public @Nullable String getSymbolText(long address) {
-        TmfResolvedSymbol symbol = getSymbol(address);
-        if (symbol == null) {
-            return null;
-        }
-        return symbol.getSymbolName();
-    }
-
 }

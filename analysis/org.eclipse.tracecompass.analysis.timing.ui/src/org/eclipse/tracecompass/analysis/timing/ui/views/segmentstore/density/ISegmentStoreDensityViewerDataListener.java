@@ -9,8 +9,6 @@
 
 package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density;
 
-import java.util.List;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 
@@ -19,29 +17,6 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
  * data selection change.
  */
 public interface ISegmentStoreDensityViewerDataListener {
-    /**
-     * Notification that the data changed in the viewer.
-     *
-     * @param newData
-     *            the new data
-     * @deprecated Use {@link #viewDataChanged(Iterable)} instead
-     */
-    @Deprecated
-    default void dataChanged(List<ISegment> newData) {
-        // do nothing
-    }
-
-    /**
-     * Notification that the selection of the data changed in the viewer.
-     *
-     * @param newSelectionData
-     *            the new selection of the data
-     * @deprecated Use {@link #selectedDataChanged(Iterable)} instead
-     */
-    @Deprecated
-    default void dataSelectionChanged(@Nullable List<ISegment> newSelectionData) {
-        // do nothing
-    }
 
     /**
      * Notification that the data changed in the viewer.

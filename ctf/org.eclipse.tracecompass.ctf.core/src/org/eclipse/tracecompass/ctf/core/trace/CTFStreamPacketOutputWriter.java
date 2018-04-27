@@ -60,7 +60,7 @@ public class CTFStreamPacketOutputWriter {
      *
      * @param streamInput
      *            the reference input stream to copy
-     * @since 2.4
+     * @since 3.0
      */
     public CTFStreamPacketOutputWriter(@NonNull CTFStreamInput streamInput) {
         fStreamInput = streamInput;
@@ -96,7 +96,7 @@ public class CTFStreamPacketOutputWriter {
      *             if a reading or writing error occurs
      * @throws CTFException
      *             ctf reading error
-     * @since 2.4
+     * @since 3.0
      */
     public void writePacket(ICTFPacketDescriptor entry, FileChannel output, long initialLost) throws IOException, CTFException {
         long startOffsetBits = entry.getPayloadStartBits();
@@ -145,7 +145,7 @@ public class CTFStreamPacketOutputWriter {
      *             if a reading or writing error occurs
      * @throws CTFException
      *             ctf reading error
-     * @since 2.4
+     * @since 3.0
      */
     public void writePacket(ICTFPacketDescriptor entry, long startTime, long endTime, long initialLost, FileChannel output) throws IOException, CTFException {
         if (entry.getTimestampBegin() > endTime || entry.getTimestampEnd() < startTime || startTime > endTime) {

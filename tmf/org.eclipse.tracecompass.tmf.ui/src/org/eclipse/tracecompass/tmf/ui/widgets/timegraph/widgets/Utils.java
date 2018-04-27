@@ -120,16 +120,6 @@ public class Utils {
      */
     public static final String ELLIPSIS = "…"; //$NON-NLS-1$
 
-    /**
-     * Update the time and date formats to use the current time zone
-     *
-     * @deprecated As of 3.3, use {@link FormatTimeUtils}
-     */
-    @Deprecated
-    public static void updateTimeZone() {
-        FormatTimeUtils.updateTimeZone();
-    }
-
     static Rectangle clone(Rectangle source) {
         return new Rectangle(source.x, source.y, source.width, source.height);
     }
@@ -421,103 +411,6 @@ public class Utils {
         gc.drawText(stringToDisplay, realX, realY, isTransparent);
 
         return len;
-    }
-
-    /**
-     * Formats time in format: MM:SS:NNN
-     *
-     * @param time
-     *            time
-     * @param format
-     *            0: MMMM:ss:nnnnnnnnn, 1: HH:MM:ss MMM.mmmm.nnn
-     * @param resolution
-     *            the resolution
-     * @return the formatted time
-     *
-     * @deprecated As of 3.3, use {@link FormatTimeUtils}
-     */
-    @Deprecated
-    public static String formatTime(long time, TimeFormat format, Resolution resolution) {
-        return FormatTimeUtils.formatTime(time, format.convert(), resolution.convert());
-    }
-
-    /**
-     * From input time in nanoseconds, convert to Date format YYYY-MM-dd
-     *
-     * @param absTime
-     *            The source time, in ns
-     * @return the formatted date
-     * @deprecated As of 3.3, use {@link FormatTimeUtils}
-     */
-    @Deprecated
-    public static String formatDate(long absTime) {
-        return FormatTimeUtils.formatDate(absTime);
-    }
-
-    /**
-     * Formats time in ns to Calendar format: HH:MM:SS MMM.mmm.nnn
-     *
-     * @param time
-     *            The source time, in ns
-     * @param res
-     *            The resolution to use
-     * @return the formatted time
-     * @deprecated As of 3.3, use {@link FormatTimeUtils}
-     */
-    @Deprecated
-    public static String formatTimeAbs(long time, Resolution res) {
-        return FormatTimeUtils.formatTimeAbs(time, res.convert());
-    }
-
-    /**
-     * Formats time delta
-     *
-     * @param delta
-     *            The time delta, in ns
-     * @param format
-     *            The time format to use
-     * @param resolution
-     *            The resolution to use
-     * @return the formatted time delta
-     * @deprecated As of 3.3, use {@link FormatTimeUtils}
-     */
-    @Deprecated
-    public static String formatDelta(long delta, TimeFormat format, Resolution resolution) {
-        return FormatTimeUtils.formatDelta(delta, format.convert(), resolution.convert());
-    }
-
-    /**
-     * Formats time delta in ns to Calendar format, only formatting the years,
-     * days, hours or minutes if necessary.
-     *
-     * @param delta
-     *            The time delta, in ns
-     * @param resolution
-     *            The resolution to use
-     * @return the formatted time delta
-     * @deprecated As of 3.3, use {@link FormatTimeUtils}
-     */
-    @Deprecated
-    public static String formatDeltaAbs(long delta, Resolution resolution) {
-        return FormatTimeUtils.formatDeltaAbs(delta, resolution.convert());
-    }
-
-    /**
-     * Obtains the remainder fraction on unit Seconds of the entered value in
-     * nanoseconds. e.g. input: 1241207054171080214 ns The number of fraction
-     * seconds can be obtained by removing the last 9 digits: 1241207054 the
-     * fractional portion of seconds, expressed in ns is: 171080214
-     *
-     * @param srcTime
-     *            The source time in ns
-     * @param res
-     *            The Resolution to use
-     * @return the formatted nanosec
-     * @deprecated As of 3.3, use {@link FormatTimeUtils}
-     */
-    @Deprecated
-    public static String formatNs(long srcTime, Resolution res) {
-        return FormatTimeUtils.formatNs(srcTime, res.convert());
     }
 
     /**

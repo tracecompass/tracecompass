@@ -78,20 +78,6 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
         // Do nothing
     }
 
-    /**
-     * Sets the call stack view
-     *
-     * @param view
-     *            The call stack view that will contain the time events
-     * @since 1.2
-     * @deprecated {@link CallStackPresentationProvider} no longer needs the
-     *             reference to the {@link CallStackView}
-     */
-    @Deprecated
-    public void setCallStackView(CallStackView view) {
-        // Do nothing
-    }
-
     @Override
     public String getStateTypeName(ITimeGraphEntry entry) {
         if (entry instanceof TimeGraphEntry) {

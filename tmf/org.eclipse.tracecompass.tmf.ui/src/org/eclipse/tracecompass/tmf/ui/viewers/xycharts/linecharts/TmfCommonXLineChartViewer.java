@@ -75,9 +75,9 @@ import com.google.common.collect.Iterables;
  * series appearance can be overridden when creating it.
  *
  * @author - Geneviève Bastien
- * TODO Use {@link TmfCommonXAxisChartViewer} if possible
- * TODO Deprecate this class when no longer used
+ * @deprecated Use {@link TmfCommonXAxisChartViewer}
  */
+@Deprecated
 public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
     private static final String DIRTY_UNDERFLOW_ERROR = "Dirty underflow error"; //$NON-NLS-1$
@@ -612,30 +612,6 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      */
     protected @Nullable String getSeriesStyle(@NonNull String seriesType) {
         return getLineStyle(seriesType, getModel().getSeries().size());
-    }
-
-    /**
-     * Add a new series to the XY line chart. By default, it is a simple solid line.
-     *
-     * Warning do not override
-     *
-     * @param seriesName
-     *            The name of the series to create
-     * @return The series so that the concrete viewer can modify its properties if
-     *         required
-     *
-     * @deprecated Use {@link TmfCommonXLineChartViewer#addSeries2(String)} instead.
-     */
-    @Deprecated
-    protected ILineSeries addSeries(String seriesName) {
-        if (seriesName == null) {
-            return null;
-        }
-        IYSeries ySeries = getModel().findSeries(seriesName);
-        if (ySeries != null && ySeries.getSeriesType() == IYSeries.BAR) {
-            return null;
-        }
-        return (ILineSeries) addSeries2(seriesName);
     }
 
     /**

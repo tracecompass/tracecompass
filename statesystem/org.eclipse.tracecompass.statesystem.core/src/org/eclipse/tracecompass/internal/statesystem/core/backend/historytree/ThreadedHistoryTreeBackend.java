@@ -30,7 +30,6 @@ import org.eclipse.tracecompass.internal.statesystem.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 
 import com.google.common.collect.Iterables;
@@ -140,18 +139,6 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
      *
      * TODO but what about streaming??
      */
-
-    @Deprecated
-    @Override
-    public void insertPastState(long stateStartTime, long stateEndTime,
-            int quark, ITmfStateValue value) throws TimeRangeException {
-        /*
-         * Here, instead of directly inserting the elements in the History Tree
-         * underneath, we'll put them in the Queue. They will then be taken and
-         * processed by the other thread executing the run() method.
-         */
-        insertPastState(stateStartTime, stateEndTime, quark, value.unboxValue());
-    }
 
     @Override
     public void insertPastState(long stateStartTime, long stateEndTime,

@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 
 /**
  * @author Geneviève Bastien
- * @since 3.2
+ * @since 4.0
  */
 public class SegmentStoreScatterDataProviderFactory implements IDataProviderFactory {
 

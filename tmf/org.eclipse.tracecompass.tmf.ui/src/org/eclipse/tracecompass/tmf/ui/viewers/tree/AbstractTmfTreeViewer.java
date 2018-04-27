@@ -378,17 +378,6 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
      * Method called when the trace is loaded, to initialize any data once the trace
      * has been set, but before the first call to update the content of the viewer.
      *
-     * @deprecated Use {@link #initializeDataSource(ITmfTrace)} instead.
-     */
-    @Deprecated
-    protected void initializeDataSource() {
-        /* Override */
-    }
-
-    /**
-     * Method called when the trace is loaded, to initialize any data once the trace
-     * has been set, but before the first call to update the content of the viewer.
-     *
      * @param trace
      *            the trace being loaded
      * @since 3.3
@@ -479,34 +468,6 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
      * This method is not called in the UI thread when using the default viewer
      * content update. Resource-intensive calculations here should not block the UI.
      *
-     * @param start
-     *            The start time of the requested content
-     * @param end
-     *            The end time of the requested content
-     * @param isSelection
-     *            <code>true</code> if this time range is for a selection,
-     *            <code>false</code> for the visible time range
-     * @return The root entry of the list of entries to display or <code>null</code>
-     *         if no update necessary
-     * @deprecated Use {@link #updateElements(ITmfTrace, long, long, boolean)} instead.
-     */
-    @Deprecated
-    protected ITmfTreeViewerEntry updateElements(long start, long end, boolean isSelection) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Update the entries to the given start/end time. An extra parameter defines
-     * whether these times correspond to the selection or the visible range, as the
-     * viewer may update differently in those cases. This methods returns a root
-     * node that is not meant to be visible. The children of this 'fake' root node
-     * are the first level of entries that will appear in the tree. If no update is
-     * necessary, the method should return <code>null</code>. To empty the tree, a
-     * root node containing an empty list of children should be returned.
-     *
-     * This method is not called in the UI thread when using the default viewer
-     * content update. Resource-intensive calculations here should not block the UI.
-     *
      * @param trace
      *            The trace
      * @param start
@@ -520,9 +481,7 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
      *         if no update necessary
      * @since 3.3
      */
-    protected ITmfTreeViewerEntry updateElements(@NonNull ITmfTrace trace, long start, long end, boolean isSelection) {
-        return updateElements(start, end, isSelection);
-    }
+    protected abstract ITmfTreeViewerEntry updateElements(@NonNull ITmfTrace trace, long start, long end, boolean isSelection);
 
     /**
      * Get the current input displayed by the viewer

@@ -47,7 +47,7 @@ import com.google.gson.annotations.Since;
  *
  * @author Alexandre Montplaisir
  * @author Philippe Proulx
- * @since 3.3
+ * @since 4.0
  */
 @NonNullByDefault
 public class StateSnapshot {

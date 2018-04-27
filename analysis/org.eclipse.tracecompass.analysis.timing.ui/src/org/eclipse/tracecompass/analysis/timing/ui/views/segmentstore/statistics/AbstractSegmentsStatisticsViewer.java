@@ -97,7 +97,7 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
      *            the parent composite
      * @param dataProviderId
      *            the data provider extension point ID.
-     * @since 2.3
+     * @since 3.0
      */
     public AbstractSegmentsStatisticsViewer(Composite parent, @Nullable String dataProviderId) {
         super(parent, false);
@@ -513,7 +513,7 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
      *
      * @param newProviderId
      *            the new provider ID to use
-     * @since 2.3
+     * @since 3.0
      */
     public void setProviderId(String newProviderId) {
         fProviderId = newProviderId;

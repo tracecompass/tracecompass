@@ -11,7 +11,6 @@ package org.eclipse.tracecompass.analysis.timing.core.segmentstore;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -95,24 +94,6 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
      */
     protected String getDataFileName() {
         return getId() + EXTENSION;
-    }
-
-    /**
-     * Read an object from the ObjectInputStream.
-     *
-     * @param ois
-     *            the ObjectInputStream to used
-     * @return the read object
-     * @throws ClassNotFoundException
-     *             - Class of a serialized object cannot be found.
-     * @throws IOException
-     *             - Any of the usual Input/Output related exceptions.
-     * @deprecated The segment store analysis modules are either on disk or all
-     *             in memory, no in between anymore
-     */
-    @Deprecated
-    protected Object[] readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
-        return checkNotNull((Object[]) ois.readObject());
     }
 
     /**

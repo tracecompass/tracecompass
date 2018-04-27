@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
  *
  * @version 1.0
  * @author Patrick Tasse
- * @since 3.4
+ * @since 4.0
  */
 public class FilterManager {
 

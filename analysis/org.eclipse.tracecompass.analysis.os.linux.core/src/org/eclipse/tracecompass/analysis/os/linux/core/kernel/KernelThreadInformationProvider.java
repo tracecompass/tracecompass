@@ -474,7 +474,7 @@ public final class KernelThreadInformationProvider {
      * @return The list of status intervals for this thread, an empty list is
      *         returned if either the state system is {@code null} or the quark
      *         is not found
-     * @since 2.6
+     * @since 3.0
      */
     public static Iterator<ITmfStateInterval> getStatusIntervalsForThread(KernelAnalysisModule module, Integer threadId, long start, long end, long resolution) {
         ITmfStateSystem ss = module.getStateSystem();

@@ -424,7 +424,7 @@ public final class BitBuffer {
      * @throws CTFException
      *             An error occurred writing the data. If the buffer is written
      *             beyond its end, this exception will be raised.
-     * @since 2.4
+     * @since 3.0
      */
     public void putLong(int length, long value) throws CTFException {
         // No overflow check since a long can only be 64 bits.
@@ -458,7 +458,7 @@ public final class BitBuffer {
      * @throws CTFException
      *             An error occurred writing the data. If the buffer is written
      *             beyond its end, this exception will be raised.
-     * @since 2.4
+     * @since 3.0
      */
     public void put(byte[] value) throws CTFException {
         if (value == null || value.length == 0) {
@@ -481,7 +481,7 @@ public final class BitBuffer {
      * @throws CTFException
      *             An error occurred writing the data. If the buffer is written
      *             beyond its end, this exception will be raised.
-     * @since 2.4
+     * @since 3.0
      */
     public void put(byte value) throws CTFException {
         if (!canRead(Byte.SIZE)) {
