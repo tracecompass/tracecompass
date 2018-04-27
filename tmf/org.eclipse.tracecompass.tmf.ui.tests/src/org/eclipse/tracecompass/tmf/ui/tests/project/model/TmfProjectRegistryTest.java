@@ -158,6 +158,8 @@ public class TmfProjectRegistryTest {
 
         fSomeProject.open(progressMonitor);
         WaitUtils.waitUntil(project -> project.isOpen(), fShadowSomeProject, "Shadow project did not get opened");
+        // Bug 534157: Wait until open operation is done and project description is set
+        WaitUtils.waitUntil(project -> fSomeProject.getLocation().isPrefixOf(project.getLocation()), fShadowSomeProject, "Shadow project location did not get set");
         // Traces folder
         TmfTraceFolder traceFolder = projectElement.getTracesFolder();
         assertNotNull(traceFolder);
