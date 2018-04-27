@@ -66,7 +66,7 @@ public class ProcessForkHandler extends KernelEventHandler {
         int quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.PPID);
         ITmfStateValue value = TmfStateValue.newValueInt(parentTid);
         long timestamp = KernelEventHandlerUtils.getTimestamp(event);
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, parentTid, quark);
 
         if (childPid != null && childPid.intValue() != childTid) {
             /* Assign the process ID of the new thread */
@@ -77,11 +77,11 @@ public class ProcessForkHandler extends KernelEventHandler {
         /* Set the new process' exec_name */
         quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.EXEC_NAME);
         value = TmfStateValue.newValueString(childProcessName);
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, childProcessName, quark);
 
         /* Set the new process' status */
         value = ProcessStatus.WAIT_CPU.getStateValue();
-        ss.modifyAttribute(timestamp, value, childTidNode);
+        ss.modifyAttribute(timestamp, ProcessStatus.WAIT_CPU.getStateValue().unboxValue(), childTidNode);
 
         /*
          * Set the process's run queue to be the same as the parent's, if
@@ -91,7 +91,7 @@ public class ProcessForkHandler extends KernelEventHandler {
         if (quark != ITmfStateSystem.INVALID_ATTRIBUTE) {
             value = ss.queryOngoingState(quark);
             quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.CURRENT_CPU_RQ);
-            ss.modifyAttribute(timestamp, value, quark);
+            ss.modifyAttribute(timestamp, value.unboxValue(), quark);
         }
 
         /* Set the process' syscall name, to be the same as the parent's */
@@ -99,7 +99,7 @@ public class ProcessForkHandler extends KernelEventHandler {
         value = ss.queryOngoingState(quark);
         if (!value.isNull()) {
             quark = ss.getQuarkRelativeAndAdd(childTidNode, Attributes.SYSTEM_CALL);
-            ss.modifyAttribute(timestamp, value, quark);
+            ss.modifyAttribute(timestamp, value.unboxValue(), quark);
         }
 
     }

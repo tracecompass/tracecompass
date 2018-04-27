@@ -124,7 +124,7 @@ public final class KernelEventHandlerUtils {
             /* We were previously in kernel mode */
             value = ProcessStatus.RUN_SYTEMCALL.getStateValue();
         }
-        ssb.modifyAttribute(timestamp, value, currentThreadNode);
+        ssb.modifyAttribute(timestamp, value.unboxValue(), currentThreadNode);
     }
 
     /**
@@ -195,7 +195,7 @@ public final class KernelEventHandlerUtils {
         int currentCPUNode = getCurrentCPUNode(cpuNumber, ssb);
 
         ITmfStateValue value = getCpuStatus(ssb, currentCPUNode);
-        ssb.modifyAttribute(timestamp, value, currentCPUNode);
+        ssb.modifyAttribute(timestamp, value.unboxValue(), currentCPUNode);
     }
 
     /**

@@ -27,7 +27,6 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
@@ -144,7 +143,7 @@ public abstract class AbstractTmfMipmapStateProvider extends AbstractTmfStatePro
     public void modifyMipmapAttribute(long ts, ITmfStateValue value, int baseQuark, int mipmapFeatureBits, int resolution)
             throws TimeRangeException, StateValueTypeException {
         ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
-        ss.modifyAttribute(ts, value, baseQuark);
+        ss.modifyAttribute(ts, value.unboxValue(), baseQuark);
         if (value.getType() == Type.LONG || value.getType() == Type.INTEGER || value.getType() == Type.DOUBLE || value.isNull()) {
             Set<ITmfMipmapFeature> features = getFeatureSet(baseQuark, ts, value, mipmapFeatureBits, resolution);
             for (ITmfMipmapFeature mf : features) {
@@ -173,19 +172,19 @@ public abstract class AbstractTmfMipmapStateProvider extends AbstractTmfStatePro
             try {
                 if ((mipmapFeatureBits & MAX) != 0) {
                     int featureQuark = ss.getQuarkRelativeAndAdd(baseQuark, MAX_STRING);
-                    ss.modifyAttribute(ts, TmfStateValue.newValueInt(0), featureQuark);
+                    ss.modifyAttribute(ts, 0, featureQuark);
                     MaxMipmapFeature mf = new MaxMipmapFeature(baseQuark, featureQuark, resolution, ss);
                     features.add(mf);
                 }
                 if ((mipmapFeatureBits & MIN) != 0) {
                     int featureQuark = ss.getQuarkRelativeAndAdd(baseQuark, MIN_STRING);
-                    ss.modifyAttribute(ts, TmfStateValue.newValueInt(0), featureQuark);
+                    ss.modifyAttribute(ts, 0, featureQuark);
                     MinMipmapFeature mf = new MinMipmapFeature(baseQuark, featureQuark, resolution, ss);
                     features.add(mf);
                 }
                 if ((mipmapFeatureBits & AVG) != 0) {
                     int featureQuark = ss.getQuarkRelativeAndAdd(baseQuark, AVG_STRING);
-                    ss.modifyAttribute(ts, TmfStateValue.newValueInt(0), featureQuark);
+                    ss.modifyAttribute(ts, 0, featureQuark);
                     AvgMipmapFeature mf = new AvgMipmapFeature(baseQuark, featureQuark, resolution, ss);
                     features.add(mf);
                 }

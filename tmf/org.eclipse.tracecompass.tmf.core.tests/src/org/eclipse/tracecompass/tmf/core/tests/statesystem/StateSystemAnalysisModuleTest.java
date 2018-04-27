@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -159,7 +158,7 @@ public class StateSystemAnalysisModuleTest {
                     String crucialInfo = (String) event.getContent().getField(CRUCIAL_FIELD).getValue();
                     int quark = ss.getQuarkAbsoluteAndAdd(CRUCIAL_FIELD);
                     try {
-                        ss.modifyAttribute(event.getTimestamp().toNanos(), TmfStateValue.newValueString(crucialInfo), quark);
+                        ss.modifyAttribute(event.getTimestamp().toNanos(), crucialInfo, quark);
                     } catch (Exception e) {
                         fail(e.getMessage());
                     }

@@ -14,8 +14,6 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEven
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
@@ -59,13 +57,11 @@ public class SchedMigrateTaskHandler extends KernelEventHandler {
          * the kernel/tracers may not have the corresponding sched_waking events
          * that also does so, so we can set it at the migrate, if applicable.
          */
-        ITmfStateValue value = ProcessStatus.WAIT_CPU.getStateValue();
-        ss.modifyAttribute(t, value, threadNode);
+        ss.modifyAttribute(t, ProcessStatus.WAIT_CPU.getStateValue().unboxValue(), threadNode);
 
         /* Update the thread's running queue to the new one indicated by the event */
         int quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.CURRENT_CPU_RQ);
-        value = TmfStateValue.newValueInt(destCpu.intValue());
-        ss.modifyAttribute(t, value, quark);
+        ss.modifyAttribute(t, destCpu.intValue(), quark);
     }
 
 }

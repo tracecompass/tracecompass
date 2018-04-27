@@ -24,7 +24,6 @@ import org.eclipse.tracecompass.statesystem.core.StateSystemBuilderUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool.QueueType;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
@@ -70,7 +69,7 @@ public class DiskWriteModel extends Disk {
     public void setDiskName(String diskname) {
         super.setDiskName(diskname);
         try {
-            fSs.modifyAttribute(fSs.getCurrentEndTime(), TmfStateValue.newValueString(diskname), getQuark());
+            fSs.modifyAttribute(fSs.getCurrentEndTime(), diskname, getQuark());
         } catch (StateValueTypeException e) {
             Activator.getDefault().logError("Cannot set the diskname for disk " + diskname, e); //$NON-NLS-1$
         }
@@ -135,16 +134,16 @@ public class DiskWriteModel extends Disk {
 
         /* Insertion in waiting queue */
         try {
-            fSs.modifyAttribute(ts, statusState, slotQuark);
+            fSs.modifyAttribute(ts, statusState.unboxValue(), slotQuark);
 
             int currentRequestQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.CURRENT_REQUEST);
-            fSs.modifyAttribute(ts, TmfStateValue.newValueLong(request.getSector()), currentRequestQuark);
+            fSs.modifyAttribute(ts, request.getSector(), currentRequestQuark);
 
             int requestSizeQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.REQUEST_SIZE);
-            fSs.modifyAttribute(ts, TmfStateValue.newValueInt(request.getNrSector()), requestSizeQuark);
+            fSs.modifyAttribute(ts, request.getNrSector(), requestSizeQuark);
 
             int mergedInQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.MERGED_IN);
-            fSs.modifyAttribute(ts, TmfStateValue.nullValue(), mergedInQuark);
+            fSs.modifyAttribute(ts, (Object) null, mergedInQuark);
         } catch (StateValueTypeException e) {
             Activator.getDefault().logError("Error inserting request", e); //$NON-NLS-1$
         }
@@ -185,13 +184,13 @@ public class DiskWriteModel extends Disk {
          */
         try {
             int currentRequestQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.CURRENT_REQUEST);
-            fSs.modifyAttribute(ts, TmfStateValue.newValueLong(request.getSector()), currentRequestQuark);
+            fSs.modifyAttribute(ts, request.getSector(), currentRequestQuark);
 
             int requestSizeQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.REQUEST_SIZE);
-            fSs.modifyAttribute(ts, TmfStateValue.newValueInt(request.getNrSector()), requestSizeQuark);
+            fSs.modifyAttribute(ts, request.getNrSector(), requestSizeQuark);
 
             int mergedInQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.MERGED_IN);
-            fSs.modifyAttribute(ts, TmfStateValue.nullValue(), mergedInQuark);
+            fSs.modifyAttribute(ts, (Object) null, mergedInQuark);
         } catch (StateValueTypeException e) {
             Activator.getDefault().logError("Error inserting request", e); //$NON-NLS-1$
         }
@@ -253,11 +252,10 @@ public class DiskWriteModel extends Disk {
      */
     public int issueRequest(long ts, Request request) {
         /* Remove from waiting queue */
-        TmfStateValue issuedFromValue = TmfStateValue.nullValue();
+        Object issuedFromValue = null;
         int fromQuark = removeWaitingRequest(ts, request.getSector());
         if (fromQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
-            String reqQueueId = fSs.getAttributeName(fromQuark);
-            issuedFromValue = TmfStateValue.newValueInt(Integer.parseInt(reqQueueId));
+            issuedFromValue = Integer.parseInt(fSs.getAttributeName(fromQuark));
         }
 
         ITmfStateValue statusState = request.getType() == IoOperationType.READ ? StateValues.READING_REQUEST_VALUE : StateValues.WRITING_REQUEST_VALUE;
@@ -265,13 +263,13 @@ public class DiskWriteModel extends Disk {
 
         /* Insertion in driver queue */
         try {
-            fSs.modifyAttribute(ts, statusState, slotQuark);
+            fSs.modifyAttribute(ts, statusState.unboxValue(), slotQuark);
 
             int currentRequestQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.CURRENT_REQUEST);
-            fSs.modifyAttribute(ts, TmfStateValue.newValueLong(request.getSector()), currentRequestQuark);
+            fSs.modifyAttribute(ts, request.getSector(), currentRequestQuark);
 
             int requestSizeQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.REQUEST_SIZE);
-            fSs.modifyAttribute(ts, TmfStateValue.newValueInt(request.getNrSector()), requestSizeQuark);
+            fSs.modifyAttribute(ts, request.getNrSector(), requestSizeQuark);
 
             int issuedFromQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.ISSUED_FROM);
             fSs.modifyAttribute(ts, issuedFromValue, issuedFromQuark);
@@ -337,10 +335,8 @@ public class DiskWriteModel extends Disk {
         if (mergedQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
             /* Add the merge information */
             try {
-                String reqQueueId = fSs.getAttributeName(baseQuark);
-
                 int issuedFromQuark = fSs.getQuarkRelativeAndAdd(mergedQuark, Attributes.MERGED_IN);
-                fSs.modifyAttribute(ts, TmfStateValue.newValueInt(Integer.parseInt(reqQueueId)), issuedFromQuark);
+                fSs.modifyAttribute(ts, Integer.parseInt(fSs.getAttributeName(baseQuark)), issuedFromQuark);
             } catch (StateValueTypeException e) {
                 Activator.getDefault().logError("Error adding the merged request information", e); //$NON-NLS-1$
             }
@@ -360,9 +356,9 @@ public class DiskWriteModel extends Disk {
     private void updateQueuesLength(long ts) {
         try {
             int fDriverQueueLength = fSs.getQuarkRelativeAndAdd(getQuark(), Attributes.DRIVER_QUEUE_LENGTH);
-            fSs.modifyAttribute(ts, TmfStateValue.newValueInt(getDriverQueueSize()), fDriverQueueLength);
+            fSs.modifyAttribute(ts, getDriverQueueSize(), fDriverQueueLength);
             int fWaitinQueueLength = fSs.getQuarkRelativeAndAdd(getQuark(), Attributes.WAITING_QUEUE_LENGTH);
-            fSs.modifyAttribute(ts, TmfStateValue.newValueInt(getWaitingQueueSize()), fWaitinQueueLength);
+            fSs.modifyAttribute(ts, getWaitingQueueSize(), fWaitinQueueLength);
         } catch (StateValueTypeException e) {
             Activator.getDefault().logError("Error updating queues lengths", e); //$NON-NLS-1$
         }

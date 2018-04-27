@@ -17,8 +17,6 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEven
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 
@@ -64,17 +62,14 @@ public class SchedWakeupHandler extends KernelEventHandler {
          * running.
          */
         ProcessStatus status = ProcessStatus.getStatusFromStateValue(ss.queryOngoingState(threadNode));
-        ITmfStateValue value = null;
         long timestamp = KernelEventHandlerUtils.getTimestamp(event);
         if (status != ProcessStatus.RUN && status != ProcessStatus.RUN_SYTEMCALL) {
-            value = ProcessStatus.WAIT_CPU.getStateValue();
-            ss.modifyAttribute(timestamp, value, threadNode);
+            ss.modifyAttribute(timestamp, ProcessStatus.WAIT_CPU.getStateValue().unboxValue(), threadNode);
         }
 
         /* Set the thread's target run queue */
         int quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.CURRENT_CPU_RQ);
-        value = TmfStateValue.newValueInt(targetCpu.intValue());
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, targetCpu.intValue(), quark);
 
         /*
          * When a user changes a threads prio (e.g. with pthread_setschedparam),
@@ -82,8 +77,7 @@ public class SchedWakeupHandler extends KernelEventHandler {
          */
         if (prio != null) {
             quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.PRIO);
-            value = TmfStateValue.newValueInt(prio);
-            ss.modifyAttribute(timestamp, value, quark);
+            ss.modifyAttribute(timestamp, prio, quark);
         }
     }
 }

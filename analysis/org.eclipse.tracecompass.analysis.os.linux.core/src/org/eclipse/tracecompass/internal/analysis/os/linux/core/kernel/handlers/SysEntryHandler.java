@@ -18,8 +18,6 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEven
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
@@ -46,18 +44,15 @@ public class SysEntryHandler extends KernelEventHandler {
         /* Assign the new system call to the process */
         int currentThreadNode = KernelEventHandlerUtils.getCurrentThreadNode(cpu, ss);
         int quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
-        ITmfStateValue value = TmfStateValue.newValueString(event.getName());
         long timestamp = KernelEventHandlerUtils.getTimestamp(event);
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, event.getName(), quark);
 
         /* Put the process in system call mode */
-        value = ProcessStatus.RUN_SYTEMCALL.getStateValue();
-        ss.modifyAttribute(timestamp, value, currentThreadNode);
+        ss.modifyAttribute(timestamp, ProcessStatus.RUN_SYTEMCALL.getStateValue().unboxValue(), currentThreadNode);
 
         /* Put the CPU in system call (kernel) mode */
         int currentCPUNode = KernelEventHandlerUtils.getCurrentCPUNode(cpu, ss);
-        value = StateValues.CPU_STATUS_RUN_SYSCALL_VALUE;
-        ss.modifyAttribute(timestamp, value, currentCPUNode);
+        ss.modifyAttribute(timestamp, StateValues.CPU_STATUS_RUN_SYSCALL_VALUE.unboxValue(), currentCPUNode);
     }
 
 }

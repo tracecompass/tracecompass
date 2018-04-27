@@ -147,7 +147,7 @@ public abstract class TmfMipmapFeature implements ITmfMipmapFeature {
             intervals.get(level).add(interval);
 
             /* update the current-level attribute */
-            ss.modifyAttribute(startTime, value, levelQuark);
+            ss.modifyAttribute(startTime, value.unboxValue(), levelQuark);
         } catch (StateValueTypeException e) {
             Activator.logError("TmfMipmapFeature : Bad state value type", e); //$NON-NLS-1$
         } catch (TimeRangeException e) {

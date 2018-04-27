@@ -26,7 +26,6 @@ import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayou
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
@@ -281,20 +280,20 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
         int buildIdQuark = ss.getQuarkRelativeAndAdd(baddrQuark, BUILD_ID_ATTRIB);
         int debugLinkQuark = ss.getQuarkRelativeAndAdd(baddrQuark, DEBUG_LINK_ATTRIB);
         try {
-            ss.modifyAttribute(ts, TmfStateValue.newValueInt(1), baddrQuark);
-            ss.modifyAttribute(ts, TmfStateValue.newValueLong(memsz), memszQuark);
-            ss.modifyAttribute(ts, TmfStateValue.newValueString(path), pathQuark);
-            ss.modifyAttribute(ts, TmfStateValue.newValueInt(isPIC ? 1 : 0), isPICQuark);
+            ss.modifyAttribute(ts, 1, baddrQuark);
+            ss.modifyAttribute(ts, memsz, memszQuark);
+            ss.modifyAttribute(ts, path, pathQuark);
+            ss.modifyAttribute(ts, isPIC ? 1 : 0, isPICQuark);
             if (buildId != null) {
-                ss.modifyAttribute(ts, TmfStateValue.newValueString(buildId), buildIdQuark);
+                ss.modifyAttribute(ts, buildId, buildIdQuark);
             } else {
-                ss.modifyAttribute(ts, TmfStateValue.nullValue(), buildIdQuark);
+                ss.modifyAttribute(ts, (Object) null, buildIdQuark);
             }
 
             if (debugLink != null) {
-                ss.modifyAttribute(ts,  TmfStateValue.newValueString(debugLink), debugLinkQuark);
+                ss.modifyAttribute(ts,  debugLink, debugLinkQuark);
             } else {
-                ss.modifyAttribute(ts, TmfStateValue.nullValue(), debugLinkQuark);
+                ss.modifyAttribute(ts, (Object) null, debugLinkQuark);
             }
         } catch (StateValueTypeException e) {
             /* Something went very wrong. */

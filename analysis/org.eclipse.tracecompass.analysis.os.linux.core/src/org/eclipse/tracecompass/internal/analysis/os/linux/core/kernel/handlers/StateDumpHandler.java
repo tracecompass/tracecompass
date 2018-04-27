@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attribute
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 
@@ -92,7 +91,7 @@ public class StateDumpHandler extends KernelEventHandler {
         ITmfStateValue value;
         if (ss.queryOngoingState(curThreadNode).isNull()) {
             value = ProcessStatus.getStatusFromStatedump(status).getStateValue();
-            ss.modifyAttribute(timestamp, value, curThreadNode);
+            ss.modifyAttribute(timestamp, value.unboxValue(), curThreadNode);
             if (status == LinuxValues.STATEDUMP_PROCESS_STATUS_WAIT_CPU) {
                 setRunQueue(ss, curThreadNode, cpu, timestamp);
             }
@@ -102,8 +101,7 @@ public class StateDumpHandler extends KernelEventHandler {
     private static void setRunQueue(ITmfStateSystemBuilder ss, int curThreadNode, @Nullable Long cpu, long timestamp) {
         if (cpu != null) {
             int quark = ss.getQuarkRelativeAndAdd(curThreadNode, Attributes.CURRENT_CPU_RQ);
-            ITmfStateValue value = TmfStateValue.newValueInt(cpu.intValue());
-            ss.modifyAttribute(timestamp, value, quark);
+            ss.modifyAttribute(timestamp, cpu.intValue(), quark);
         }
     }
 
@@ -115,12 +113,10 @@ public class StateDumpHandler extends KernelEventHandler {
     }
 
     private static void setProcessName(ITmfStateSystemBuilder ss, String name, int curThreadNode, long timestamp) {
-        ITmfStateValue value;
         int quark = ss.getQuarkRelativeAndAdd(curThreadNode, Attributes.EXEC_NAME);
         if (ss.queryOngoingState(quark).isNull()) {
             /* If the value didn't exist previously, set it */
-            value = TmfStateValue.newValueString(name);
-            ss.modifyAttribute(timestamp, value, quark);
+            ss.modifyAttribute(timestamp, name, quark);
         }
     }
 }

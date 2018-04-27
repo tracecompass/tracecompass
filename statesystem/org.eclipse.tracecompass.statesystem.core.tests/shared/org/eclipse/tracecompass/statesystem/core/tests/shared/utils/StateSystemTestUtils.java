@@ -18,13 +18,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-
 import com.google.common.base.Objects;
 
 /**
@@ -103,15 +102,15 @@ public final class StateSystemTestUtils {
      *            A mapping between the full path of an attribute and its
      *            expected value
      */
-    public static void testValuesAtTime(ITmfStateSystem ss, long t, Map<String[], ITmfStateValue> expected) {
+    public static void testValuesAtTime(ITmfStateSystem ss, long t, Map<String[], @Nullable Object> expected) {
         try {
             List<ITmfStateInterval> intervals = ss.queryFullState(t);
-            for (Entry<String[], ITmfStateValue> entry : expected.entrySet()) {
+            for (Entry<String[], @Nullable Object> entry : expected.entrySet()) {
                 String[] path = entry.getKey();
                 try {
                     int quark = ss.getQuarkAbsolute(entry.getKey());
                     ITmfStateInterval interval = intervals.get(quark);
-                    assertEquals(Arrays.deepToString(path) + " at time " + t, entry.getValue(), interval.getStateValue());
+                    assertEquals(Arrays.deepToString(path) + " at time " + t, entry.getValue(), interval.getValue());
                 } catch (AttributeNotFoundException e) {
                     fail("Attribute " + Arrays.deepToString(path) + " does not exist at time " + t);
                 }

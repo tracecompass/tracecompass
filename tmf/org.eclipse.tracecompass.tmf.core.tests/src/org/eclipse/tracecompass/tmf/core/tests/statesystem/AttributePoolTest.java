@@ -38,7 +38,7 @@ public class AttributePoolTest {
 
     private static final long START_TIME = 1000L;
     private static final String DUMMY_STRING = "test";
-    private static final ITmfStateValue VALUE = TmfStateValue.newValueInt(2);
+    private static final Object VALUE = 2;
 
     private ITmfStateSystemBuilder fStateSystem;
 

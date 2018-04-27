@@ -121,7 +121,7 @@ public class TmfXmlScenarioHistoryBuilder {
         long ts = getTimestamp(event, ss);
         try {
             int attributeQuark = getQuarkRelativeAndAdd(ss, info.getQuark(), TmfXmlStrings.STORED_FIELDS, attributeName);
-            ss.modifyAttribute(ts, value, attributeQuark);
+            ss.modifyAttribute(ts, value.unboxValue(), attributeQuark);
         } catch (StateValueTypeException e) {
             Activator.logError("failed to save the stored field " + attributeName, e); //$NON-NLS-1$
         }
@@ -142,10 +142,9 @@ public class TmfXmlScenarioHistoryBuilder {
     public void resetStoredFields(final IXmlStateSystemContainer container, final String attributeName, final TmfXmlScenarioInfo info, final ITmfEvent event) {
         ITmfStateSystemBuilder ss = (ITmfStateSystemBuilder) container.getStateSystem();
         long ts = getTimestamp(event, ss);
-        ITmfStateValue value = TmfStateValue.nullValue();
         try {
             int attributeQuark = getQuarkRelativeAndAdd(ss, info.getQuark(), TmfXmlStrings.STORED_FIELDS, attributeName);
-            ss.modifyAttribute(ts, value, attributeQuark);
+            ss.modifyAttribute(ts, (Object) null, attributeQuark);
         } catch (StateValueTypeException e) {
             Activator.logError("failed to clear the stored fields", e); //$NON-NLS-1$
         }
@@ -337,7 +336,7 @@ public class TmfXmlScenarioHistoryBuilder {
                 value = TmfStateValue.nullValue();
                 break;
             }
-            ss.modifyAttribute(ts, NonNullUtils.checkNotNull(value), info.getStatusQuark());
+            ss.modifyAttribute(ts, NonNullUtils.checkNotNull(value).unboxValue(), info.getStatusQuark());
         } catch (StateValueTypeException e) {
             Activator.logError("failed to update scenario status"); //$NON-NLS-1$
         }
@@ -358,9 +357,8 @@ public class TmfXmlScenarioHistoryBuilder {
         long ts = getTimestamp(event, ss);
         try {
             // save the status
-            ITmfStateValue value = TmfStateValue.newValueString(info.getActiveState());
             int attributeQuark = ss.getQuarkRelativeAndAdd(info.getQuark(), TmfXmlStrings.STATE);
-            ss.modifyAttribute(ts, value, attributeQuark);
+            ss.modifyAttribute(ts, info.getActiveState(), attributeQuark);
         } catch (StateValueTypeException e) {
             Activator.logError("failed to update scenario state"); //$NON-NLS-1$
         }
@@ -384,8 +382,7 @@ public class TmfXmlScenarioHistoryBuilder {
             String activeState = ss.queryOngoingState(stateQuark).unboxStr();
             if (activeState.compareTo(info.getActiveState()) != 0) {
                 int attributeQuark = ss.getQuarkRelativeAndAdd(stateQuark, info.getActiveState(), START_TIME);
-                ITmfStateValue value = TmfStateValue.newValueLong(ts);
-                ss.modifyAttribute(ts, value, attributeQuark);
+                ss.modifyAttribute(ts, ts, attributeQuark);
             }
         } catch (StateValueTypeException e) {
             Activator.logError("failed to update the start time of the state"); //$NON-NLS-1$
@@ -408,9 +405,8 @@ public class TmfXmlScenarioHistoryBuilder {
         long ts = getTimestamp(event, ss);
         try {
             // save the status
-            ITmfStateValue value = TmfStateValue.newValueLong(ts);
             int attributeQuark = ss.getQuarkRelativeAndAdd(info.getQuark(), START_TIME);
-            ss.modifyAttribute(ts, value, attributeQuark);
+            ss.modifyAttribute(ts, ts, attributeQuark);
         } catch (StateValueTypeException e) {
             Activator.logError("failed to update the start time of the scenario"); //$NON-NLS-1$
         }

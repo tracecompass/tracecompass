@@ -141,8 +141,7 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
             ss.updateOngoingState(TmfStateValue.newValueLong(threadId), threadQuark);
 
             int callStackQuark = ss.getQuarkRelativeAndAdd(threadQuark, CALL_STACK);
-            ITmfStateValue value = functionEntryName;
-            ss.pushAttribute(timestamp, value, callStackQuark);
+            ss.pushAttribute(timestamp, functionEntryName.unboxValue(), callStackQuark);
             return;
         }
 

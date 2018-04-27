@@ -15,8 +15,6 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEven
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
@@ -51,19 +49,16 @@ public class IPIEntryHandler extends KernelEventHandler {
          */
         int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeIRQs(cpu, ss), irqId.toString());
 
-        ITmfStateValue value = TmfStateValue.newValueInt(cpu.intValue());
         long timestamp = KernelEventHandlerUtils.getTimestamp(event);
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, cpu.intValue(), quark);
 
         /* Change the status of the running process to interrupted */
         quark = KernelEventHandlerUtils.getCurrentThreadNode(cpu, ss);
-        value = ProcessStatus.INTERRUPTED.getStateValue();
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, ProcessStatus.INTERRUPTED.getStateValue().unboxValue(), quark);
 
         /* Change the status of the CPU to interrupted */
         quark = KernelEventHandlerUtils.getCurrentCPUNode(cpu, ss);
-        value = StateValues.CPU_STATUS_IRQ_VALUE;
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, StateValues.CPU_STATUS_IRQ_VALUE.unboxValue(), quark);
 
         /* Update the aggregate IRQ entry to set it to this CPU */
         int aggregateQuark = ss.getQuarkAbsoluteAndAdd(Attributes.IRQS, irqId.toString());

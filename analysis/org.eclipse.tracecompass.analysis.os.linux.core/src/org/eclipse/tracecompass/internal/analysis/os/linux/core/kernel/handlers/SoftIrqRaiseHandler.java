@@ -51,12 +51,12 @@ public class SoftIrqRaiseHandler extends KernelEventHandler {
         ITmfStateValue value = isInSoftirq(ss.queryOngoingState(quark)) ?
                 StateValues.SOFT_IRQ_RAISED_RUNNING_VALUE :
                 StateValues.SOFT_IRQ_RAISED_VALUE;
-        ss.modifyAttribute(KernelEventHandlerUtils.getTimestamp(event), value, quark);
+        ss.modifyAttribute(KernelEventHandlerUtils.getTimestamp(event), value.unboxValue(), quark);
 
         /* Update the aggregate IRQ entry to set it to this CPU */
         int aggregateQuark = ss.getQuarkAbsoluteAndAdd(Attributes.SOFT_IRQS, softIrqId.toString());
         ITmfStateValue aggregateValue = KernelEventHandlerUtils.getAggregate(ss, Attributes.SOFT_IRQS, softIrqId);
-        ss.modifyAttribute(KernelEventHandlerUtils.getTimestamp(event), aggregateValue, aggregateQuark);
+        ss.modifyAttribute(KernelEventHandlerUtils.getTimestamp(event), aggregateValue.unboxValue(), aggregateQuark);
 
         KernelEventHandlerUtils.updateCpuStatus(KernelEventHandlerUtils.getTimestamp(event), cpu, ss);
     }

@@ -15,7 +15,6 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.Inpu
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.KernelEventHandler;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
@@ -46,7 +45,6 @@ public class SysEntryHandler extends KernelEventHandler {
             return;
         }
         int threadSyscallQuark = ss.getQuarkRelativeAndAdd(InputOutputStateProvider.getNodeSyscalls(ss), String.valueOf(tid));
-        TmfStateValue value = TmfStateValue.newValueString(eventName);
-        ss.modifyAttribute(ts, value, threadSyscallQuark);
+        ss.modifyAttribute(ts, eventName, threadSyscallQuark);
     }
 }

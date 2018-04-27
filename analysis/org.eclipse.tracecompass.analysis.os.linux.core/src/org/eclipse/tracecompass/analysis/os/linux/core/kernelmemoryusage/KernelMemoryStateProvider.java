@@ -19,7 +19,6 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemBuilderUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
@@ -131,7 +130,7 @@ public class KernelMemoryStateProvider extends AbstractTmfStateProvider {
             long previousLowest = lowestMemoryValue.isNull() ? 0 : lowestMemoryValue.unboxLong();
 
             if (previousLowest > currentMemoryValue) {
-                ss.modifyAttribute(ts, TmfStateValue.newValueLong(currentMemoryValue), lowestMemoryQuark);
+                ss.modifyAttribute(ts, currentMemoryValue, lowestMemoryQuark);
             }
         } catch (AttributeNotFoundException | InterruptedException e) {
             Activator.getDefault().logError(String.valueOf(e.getMessage()), e);

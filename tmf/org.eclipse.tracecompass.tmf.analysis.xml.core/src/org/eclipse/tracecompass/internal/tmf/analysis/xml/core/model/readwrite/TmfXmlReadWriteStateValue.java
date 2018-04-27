@@ -220,7 +220,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
                 ss.popAttribute(timestamp, quark);
                 break;
             case PUSH:
-                ss.pushAttribute(timestamp, value, quark);
+                ss.pushAttribute(timestamp, value.unboxValue(), quark);
                 break;
             case POP_ALL:
                 // The stack state will contain the number of elements on the
@@ -239,7 +239,7 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
                 if (isUpdate()) {
                     ss.updateOngoingState(value, quark);
                 } else {
-                    ss.modifyAttribute(timestamp, value, quark);
+                    ss.modifyAttribute(timestamp, value.unboxValue(), quark);
                 }
                 break;
             }

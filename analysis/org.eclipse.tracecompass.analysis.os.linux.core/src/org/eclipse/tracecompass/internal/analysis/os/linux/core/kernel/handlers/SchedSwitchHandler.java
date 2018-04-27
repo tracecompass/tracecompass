@@ -83,8 +83,7 @@ public class SchedSwitchHandler extends KernelEventHandler {
          * it here too.
          */
         int quark = ss.getQuarkRelativeAndAdd(newCurrentThreadNode, Attributes.CURRENT_CPU_RQ);
-        ITmfStateValue value = TmfStateValue.newValueInt(cpu);
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, cpu, quark);
 
         /* Set the exec name of the former process */
         setProcessExecName(ss, prevProcessName, formerThreadNode, timestamp);
@@ -115,7 +114,7 @@ public class SchedSwitchHandler extends KernelEventHandler {
     private static void setOldProcessStatus(ITmfStateSystemBuilder ss, Long prevState, Integer formerThreadNode, int cpu, long timestamp) {
         ITmfStateValue value = ProcessStatus.getStatusFromKernelState(prevState).getStateValue();
 
-        ss.modifyAttribute(timestamp, value, formerThreadNode);
+        ss.modifyAttribute(timestamp, value.unboxValue(), formerThreadNode);
 
         boolean staysOnRunQueue = ProcessStatus.WAIT_CPU.getStateValue().equals(value);
         int quark = ss.getQuarkRelativeAndAdd(formerThreadNode, Attributes.CURRENT_CPU_RQ);
@@ -129,7 +128,7 @@ public class SchedSwitchHandler extends KernelEventHandler {
         } else {
             value = TmfStateValue.nullValue();
         }
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, value.unboxValue(), quark);
     }
 
     private static void setCpuStatus(ITmfStateSystemBuilder ss, Integer nextTid, Integer newCurrentThreadNode, long timestamp, int currentCPUNode, int cpu) {
@@ -143,7 +142,7 @@ public class SchedSwitchHandler extends KernelEventHandler {
             } else {
                 value = StateValues.CPU_STATUS_RUN_SYSCALL_VALUE;
             }
-            ss.modifyAttribute(timestamp, value, currentCPUNode);
+            ss.modifyAttribute(timestamp, value.unboxValue(), currentCPUNode);
         } else {
             KernelEventHandlerUtils.updateCpuStatus(timestamp, cpu, ss);
         }
@@ -151,26 +150,20 @@ public class SchedSwitchHandler extends KernelEventHandler {
 
     private static void setCpuProcess(ITmfStateSystemBuilder ss, Integer nextTid, long timestamp, int currentCPUNode) {
         int quark;
-        ITmfStateValue value;
         quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.CURRENT_THREAD);
-        value = TmfStateValue.newValueInt(nextTid);
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, nextTid, quark);
     }
 
     private static void setProcessPrio(ITmfStateSystemBuilder ss, Integer prio, Integer threadNode, long timestamp) {
         int quark;
-        ITmfStateValue value;
         quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.PRIO);
-        value = TmfStateValue.newValueInt(prio);
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, prio, quark);
     }
 
     private static void setProcessExecName(ITmfStateSystemBuilder ss, String processName, Integer threadNode, long timestamp) {
         int quark;
-        ITmfStateValue value;
         quark = ss.getQuarkRelativeAndAdd(threadNode, Attributes.EXEC_NAME);
-        value = TmfStateValue.newValueString(processName);
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, processName, quark);
     }
 
 }

@@ -51,17 +51,15 @@ public class SoftIrqEntryHandler extends KernelEventHandler {
          * Mark this SoftIRQ as active in the resource tree.
          */
         int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeSoftIRQs(cpu, ss), softIrqId.toString());
-        ITmfStateValue value = StateValues.CPU_STATUS_SOFTIRQ_VALUE;
-        ss.modifyAttribute(timestamp, value, quark);
+        ss.modifyAttribute(timestamp, StateValues.CPU_STATUS_SOFTIRQ_VALUE.unboxValue(), quark);
 
         /* Update the aggregate IRQ entry to set it to the highest raised Soft IRQ */
         int aggregateQuark = ss.getQuarkAbsoluteAndAdd(Attributes.SOFT_IRQS, softIrqId.toString());
         ITmfStateValue aggregateValue = KernelEventHandlerUtils.getAggregate(ss, Attributes.SOFT_IRQS, softIrqId);
-        ss.modifyAttribute(timestamp, aggregateValue, aggregateQuark);
+        ss.modifyAttribute(timestamp, aggregateValue.unboxValue(), aggregateQuark);
 
         /* Change the status of the running process to interrupted */
-        value = ProcessStatus.INTERRUPTED.getStateValue();
-        ss.modifyAttribute(timestamp, value, currentThreadNode);
+        ss.modifyAttribute(timestamp, ProcessStatus.INTERRUPTED.getStateValue().unboxValue(), currentThreadNode);
 
         /* Change the status of the CPU to interrupted */
         KernelEventHandlerUtils.updateCpuStatus(timestamp, cpu, ss);

@@ -108,7 +108,7 @@ public class StateSystemTest {
 
         // Modify with a state value, the query the ongoing value
         val = 12L;
-        ss.modifyAttribute(time + 1, TmfStateValue.newValue(val), quark);
+        ss.modifyAttribute(time + 1, val, quark);
         // Query the state value
         ongoingState = ss.queryOngoingState(quark);
         assertTrue(ongoingState.getType() == Type.LONG);

@@ -35,7 +35,6 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemFactory;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.junit.Assert;
 import org.junit.Test;
@@ -60,6 +59,8 @@ public class CallGraphAnalysisTest {
     private static final String @NonNull [] CSP = { CALLSTACK_PATH };
     private static final String @NonNull [] PP = { PROCESS_PATH };
     private static final String @NonNull [] TP = { THREAD_PATH };
+
+    private static final Object NULL_STATE_VALUE = null;
 
     /**
      * This class is used to make the CallGraphAnalysis's method
@@ -104,10 +105,9 @@ public class CallGraphAnalysisTest {
         int parentQuark = fixture.getQuarkAbsoluteAndAdd(PROCESS_PATH, THREAD_PATH, CALLSTACK_PATH);
         for (int i = 1; i <= SMALL_AMOUNT_OF_SEGMENT; i++) {
             int quark = fixture.getQuarkRelativeAndAdd(parentQuark, Integer.toString(i));
-            TmfStateValue statev = TmfStateValue.newValueLong(i);
-            fixture.modifyAttribute(start, TmfStateValue.nullValue(), quark);
-            fixture.modifyAttribute(start + i, statev, quark);
-            fixture.modifyAttribute(end - i, TmfStateValue.nullValue(), quark);
+            fixture.modifyAttribute(start, NULL_STATE_VALUE, quark);
+            fixture.modifyAttribute(start + i, i, quark);
+            fixture.modifyAttribute(end - i, NULL_STATE_VALUE, quark);
         }
 
         fixture.closeHistory(1002);
@@ -153,21 +153,18 @@ public class CallGraphAnalysisTest {
         int parentQuark = fixture.getQuarkAbsoluteAndAdd(PROCESS_PATH, THREAD_PATH, CALLSTACK_PATH);
         // Create the first function
         int quark = fixture.getQuarkRelativeAndAdd(parentQuark, QUARK_0);
-        TmfStateValue statev = TmfStateValue.newValueLong(0);
-        fixture.modifyAttribute(0, TmfStateValue.nullValue(), quark);
-        fixture.modifyAttribute(10, statev, quark);
-        fixture.modifyAttribute(20, TmfStateValue.nullValue(), quark);
+        fixture.modifyAttribute(0, NULL_STATE_VALUE, quark);
+        fixture.modifyAttribute(10, 0, quark);
+        fixture.modifyAttribute(20, NULL_STATE_VALUE, quark);
         // Create the second function
         quark = fixture.getQuarkRelativeAndAdd(parentQuark, QUARK_1);
-        statev = TmfStateValue.newValueLong(1);
-        fixture.modifyAttribute(0, TmfStateValue.nullValue(), quark);
-        fixture.modifyAttribute(5, statev, quark);
-        fixture.modifyAttribute(25, TmfStateValue.nullValue(), quark);
+        fixture.modifyAttribute(0, NULL_STATE_VALUE, quark);
+        fixture.modifyAttribute(5, 1, quark);
+        fixture.modifyAttribute(25, NULL_STATE_VALUE, quark);
         // Create the third function
         quark = fixture.getQuarkRelativeAndAdd(parentQuark, QUARK_2);
-        statev = TmfStateValue.newValueLong(2);
-        fixture.modifyAttribute(0, statev, quark);
-        fixture.modifyAttribute(30, TmfStateValue.nullValue(), quark);
+        fixture.modifyAttribute(0, 2, quark);
+        fixture.modifyAttribute(30, NULL_STATE_VALUE, quark);
 
         fixture.closeHistory(31);
     }
@@ -216,22 +213,18 @@ public class CallGraphAnalysisTest {
         int parentQuark = fixture.getQuarkAbsoluteAndAdd(PROCESS_PATH, THREAD_PATH, CALLSTACK_PATH);
         // Create the first root function
         int quark = fixture.getQuarkRelativeAndAdd(parentQuark, QUARK_0);
-        TmfStateValue statev = TmfStateValue.newValueLong(0);
-        fixture.modifyAttribute(0, statev, quark);
-        fixture.modifyAttribute(20, TmfStateValue.nullValue(), quark);
+        fixture.modifyAttribute(0, 0, quark);
+        fixture.modifyAttribute(20, NULL_STATE_VALUE, quark);
         // Create the second root function
-        statev = TmfStateValue.newValueLong(1);
-        fixture.modifyAttribute(30, statev, quark);
-        fixture.modifyAttribute(50, TmfStateValue.nullValue(), quark);
+        fixture.modifyAttribute(30, 1, quark);
+        fixture.modifyAttribute(50, NULL_STATE_VALUE, quark);
         // Create the first root function's callee
         quark = fixture.getQuarkRelativeAndAdd(parentQuark, QUARK_1);
-        statev = TmfStateValue.newValueLong(2);
-        fixture.modifyAttribute(0, statev, quark);
-        fixture.modifyAttribute(10, TmfStateValue.nullValue(), quark);
+        fixture.modifyAttribute(0, 2, quark);
+        fixture.modifyAttribute(10, NULL_STATE_VALUE, quark);
         // Create the second root function's callee
-        statev = TmfStateValue.newValueLong(3);
-        fixture.modifyAttribute(30, statev, quark);
-        fixture.modifyAttribute(40, TmfStateValue.nullValue(), quark);
+        fixture.modifyAttribute(30, 3, quark);
+        fixture.modifyAttribute(40, NULL_STATE_VALUE, quark);
         fixture.closeHistory(51);
 
         // Execute the callGraphAnalysis
@@ -274,8 +267,7 @@ public class CallGraphAnalysisTest {
         int parentQuark = fixture.getQuarkAbsoluteAndAdd(PROCESS_PATH, THREAD_PATH, CALLSTACK_PATH);
         for (int i = 0; i < LARGE_AMOUNT_OF_SEGMENTS; i++) {
             int quark = fixture.getQuarkRelativeAndAdd(parentQuark, Integer.toString(i));
-            TmfStateValue statev = TmfStateValue.newValueLong(i);
-            fixture.pushAttribute(0, statev, quark);
+            fixture.pushAttribute(0, i, quark);
         }
         for (int i = 0; i < LARGE_AMOUNT_OF_SEGMENTS; i++) {
             int quark = fixture.getQuarkRelativeAndAdd(parentQuark, Integer.toString(i));
@@ -329,29 +321,24 @@ public class CallGraphAnalysisTest {
         int parentQuark = fixture.getQuarkAbsoluteAndAdd(PROCESS_PATH, THREAD_PATH, CALLSTACK_PATH);
         // Create the root function
         int quark = fixture.getQuarkRelativeAndAdd(parentQuark, QUARK_0);
-        TmfStateValue statev = TmfStateValue.newValueLong(0);
-        fixture.modifyAttribute(0, statev, quark);
-        fixture.modifyAttribute(100, TmfStateValue.nullValue(), quark);
+        fixture.modifyAttribute(0, 0, quark);
+        fixture.modifyAttribute(100, NULL_STATE_VALUE, quark);
         // Create the first child
         quark = fixture.getQuarkRelativeAndAdd(parentQuark, QUARK_1);
-        statev = TmfStateValue.newValueLong(1);
-        fixture.modifyAttribute(0, TmfStateValue.nullValue(), quark);
-        fixture.modifyAttribute(10, statev, quark);
-        fixture.modifyAttribute(40, TmfStateValue.nullValue(), quark);
+        fixture.modifyAttribute(0, NULL_STATE_VALUE, quark);
+        fixture.modifyAttribute(10, 1, quark);
+        fixture.modifyAttribute(40, NULL_STATE_VALUE, quark);
         // Create the second child
-        statev = TmfStateValue.newValueLong(2);
-        fixture.modifyAttribute(50, statev, quark);
-        fixture.modifyAttribute(70, TmfStateValue.nullValue(), quark);
+        fixture.modifyAttribute(50, 2, quark);
+        fixture.modifyAttribute(70, NULL_STATE_VALUE, quark);
         // Create the third child
-        statev = TmfStateValue.newValueLong(1);
-        fixture.modifyAttribute(80, statev, quark);
-        fixture.modifyAttribute(100, TmfStateValue.nullValue(), quark);
+        fixture.modifyAttribute(80, 1, quark);
+        fixture.modifyAttribute(100, NULL_STATE_VALUE, quark);
         // Create the leaf
         quark = fixture.getQuarkRelativeAndAdd(parentQuark, QUARK_2);
-        statev = TmfStateValue.newValueLong(3);
-        fixture.modifyAttribute(0, TmfStateValue.nullValue(), quark);
-        fixture.modifyAttribute(15, statev, quark);
-        fixture.modifyAttribute(20, TmfStateValue.nullValue(), quark);
+        fixture.modifyAttribute(0, NULL_STATE_VALUE, quark);
+        fixture.modifyAttribute(15, 3, quark);
+        fixture.modifyAttribute(20, NULL_STATE_VALUE, quark);
         fixture.closeHistory(102);
 
         // Execute the callGraphAnalysis

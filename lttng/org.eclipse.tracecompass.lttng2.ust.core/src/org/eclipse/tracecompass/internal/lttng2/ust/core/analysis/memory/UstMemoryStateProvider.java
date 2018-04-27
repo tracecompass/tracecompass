@@ -229,13 +229,13 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
                 if (tid.equals(MINUS_ONE)) {
                     procName = UstMemoryStrings.OTHERS;
                 }
-                ss.modifyAttribute(ts, TmfStateValue.newValueString(procName), procNameQuark);
+                ss.modifyAttribute(ts, procName, procNameQuark);
                 prevMem = TmfStateValue.newValueLong(0);
             }
 
             long prevMemValue = prevMem.unboxLong();
             prevMemValue += memoryDiff.longValue();
-            ss.modifyAttribute(ts, TmfStateValue.newValueLong(prevMemValue), tidMemQuark);
+            ss.modifyAttribute(ts, prevMemValue, tidMemQuark);
         } catch (TimeRangeException | StateValueTypeException e) {
             throw new IllegalStateException(e);
         }

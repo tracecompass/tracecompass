@@ -146,15 +146,14 @@ public class TmfStatisticsEventTypesModule extends TmfStateSystemAnalysisModule 
                         curVal = 0;
                     }
 
-                    ITmfStateValue value1 = TmfStateValue.newValueInt((int) (curVal + le.getNbLostEvents()));
-                    ss.modifyAttribute(ts, value1, quark);
+                    ss.modifyAttribute(ts, (int) (curVal + le.getNbLostEvents()), quark);
 
                     long lostEventsStartTime = le.getTimeRange().getStartTime().toNanos();
                     long lostEventsEndTime = le.getTimeRange().getEndTime().toNanos();
                     int lostEventsQuark = ss.getQuarkAbsoluteAndAdd(Attributes.LOST_EVENTS);
                     ITmfStateValue currentLostEventsEndTime = ss.queryOngoingState(lostEventsQuark);
                     if (currentLostEventsEndTime.isNull() || currentLostEventsEndTime.unboxLong() < lostEventsStartTime) {
-                        ss.modifyAttribute(lostEventsStartTime, TmfStateValue.newValueLong(lostEventsEndTime), lostEventsQuark);
+                        ss.modifyAttribute(lostEventsStartTime, lostEventsEndTime, lostEventsQuark);
                     } else if (currentLostEventsEndTime.unboxLong() < lostEventsEndTime) {
                         ss.updateOngoingState(TmfStateValue.newValueLong(lostEventsEndTime), lostEventsQuark);
                     }

@@ -20,11 +20,11 @@ import java.util.Set;
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.Activator;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 
@@ -85,7 +85,7 @@ public class LinuxTestCase {
     public static class PunctualInfo {
 
         private final long fTs;
-        private final Map<String[], ITmfStateValue> fValueMap;
+        private final Map<String[], @Nullable Object> fValueMap;
 
         /**
          * Constructor
@@ -112,7 +112,7 @@ public class LinuxTestCase {
          *
          * @return The map of attribute path and values
          */
-        public Map<String[], ITmfStateValue> getValues() {
+        public Map<String[], @Nullable Object> getValues() {
             return fValueMap;
         }
 
@@ -124,7 +124,7 @@ public class LinuxTestCase {
          * @param value
          *            The value of this attribute at timestamp
          */
-        public void addValue(String[] key, ITmfStateValue value) {
+        public void addValue(String[] key, @Nullable Object value) {
             fValueMap.put(key, value);
         }
     }

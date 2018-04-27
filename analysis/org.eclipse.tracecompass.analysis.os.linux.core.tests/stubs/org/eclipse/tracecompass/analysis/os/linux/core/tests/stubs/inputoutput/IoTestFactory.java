@@ -14,12 +14,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.Attributes;
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.IoOperationType;
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.StateValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.LinuxTestCase;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.StateIntervalStub;
 import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.StateSystemTestUtils;
 
@@ -37,6 +37,8 @@ public final class IoTestFactory {
     private static final String DEVICE_ID = "8388624";
     private static final String DEVICE_NAME = "sda";
     private static final String SECOND_DEVICE_ID = "8388608";
+
+    private static final @Nullable Object NULL_STATE_VALUE = null;
 
     private IoTestFactory() {
 
@@ -59,40 +61,40 @@ public final class IoTestFactory {
             Set<IntervalInfo> info = new HashSet<>();
 
             /* Driver and waiting queue length */
-            ImmutableList<ITmfStateInterval> intervals = ImmutableList.of(new StateIntervalStub(1, 4, TmfStateValue.nullValue()),
-                    new StateIntervalStub(5, 9, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(10, 24, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(25, 26, TmfStateValue.newValueInt(2)),
-                    new StateIntervalStub(27, 28, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(29, 39, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(40, 49, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(50, 60, TmfStateValue.newValueInt(0)));
+            ImmutableList<ITmfStateInterval> intervals = ImmutableList.of(new StateIntervalStub(1, 4, NULL_STATE_VALUE),
+                    new StateIntervalStub(5, 9, 1),
+                    new StateIntervalStub(10, 24, 0),
+                    new StateIntervalStub(25, 26, 2),
+                    new StateIntervalStub(27, 28, 1),
+                    new StateIntervalStub(29, 39, 0),
+                    new StateIntervalStub(40, 49, 1),
+                    new StateIntervalStub(50, 60, 0));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE_LENGTH));
 
-            intervals = ImmutableList.of(new StateIntervalStub(1, 4, TmfStateValue.nullValue()),
-                    new StateIntervalStub(5, 9, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(10, 19, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(20, 26, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(27, 28, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(29, 29, TmfStateValue.newValueInt(2)),
-                    new StateIntervalStub(30, 34, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(35, 49, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(50, 59, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(60, 60, TmfStateValue.newValueInt(0)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 4, NULL_STATE_VALUE),
+                    new StateIntervalStub(5, 9, 0),
+                    new StateIntervalStub(10, 19, 1),
+                    new StateIntervalStub(20, 26, 0),
+                    new StateIntervalStub(27, 28, 1),
+                    new StateIntervalStub(29, 29, 2),
+                    new StateIntervalStub(30, 34, 1),
+                    new StateIntervalStub(35, 49, 0),
+                    new StateIntervalStub(50, 59, 1),
+                    new StateIntervalStub(60, 60, 0));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE_LENGTH));
 
             /* Bytes read and written */
-            intervals = ImmutableList.of(new StateIntervalStub(1, 59, TmfStateValue.nullValue()),
-                    new StateIntervalStub(60, 60, TmfStateValue.newValueInt(256)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 59, NULL_STATE_VALUE),
+                    new StateIntervalStub(60, 60, 256));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.SECTORS_READ));
 
-            intervals = ImmutableList.of(new StateIntervalStub(1, 19, TmfStateValue.nullValue()),
-                    new StateIntervalStub(20, 29, TmfStateValue.newValueInt(8)),
-                    new StateIntervalStub(30, 34, TmfStateValue.newValueInt(16)),
-                    new StateIntervalStub(35, 60, TmfStateValue.newValueInt(24)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 19, NULL_STATE_VALUE),
+                    new StateIntervalStub(20, 29, 8),
+                    new StateIntervalStub(30, 34, 16),
+                    new StateIntervalStub(35, 60, 24));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.SECTORS_WRITTEN));
 
-            intervals = ImmutableList.of(new StateIntervalStub(1, 60, TmfStateValue.newValueString(DEVICE_NAME)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 60, DEVICE_NAME));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID));
             return info;
         }
@@ -102,135 +104,135 @@ public final class IoTestFactory {
             Set<PunctualInfo> info = new HashSet<>();
 
             PunctualInfo oneInfo = new PunctualInfo(5L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(444L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), 444L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), 8);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(10L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
 
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(444L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), TmfStateValue.newValueInt(0));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), 444L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), 8);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), 0);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(20L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
 
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), TmfStateValue.nullValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), NULL_STATE_VALUE);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(25L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(111L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), StateValues.WRITING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(222L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), 111L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), 8);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), StateValues.WRITING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), 222L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), 8);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(27L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), StateValues.WRITING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(222L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), StateValues.WRITING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), 222L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), 8);
 
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(111L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), TmfStateValue.newValueInt(0));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), 111L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), 8);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), 0);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(29L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
 
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(111L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), TmfStateValue.newValueInt(0));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1"), StateValues.WRITING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(222L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.ISSUED_FROM), TmfStateValue.newValueInt(1));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), 111L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), 8);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), 0);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1"), StateValues.WRITING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.CURRENT_REQUEST), 222L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.REQUEST_SIZE), 8);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.ISSUED_FROM), 1);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(30L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
 
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1"), StateValues.WRITING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(222L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.ISSUED_FROM), TmfStateValue.newValueInt(1));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1"), StateValues.WRITING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.CURRENT_REQUEST), 222L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.REQUEST_SIZE), 8);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.ISSUED_FROM), 1);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(35L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.ISSUED_FROM), TmfStateValue.nullValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "1", Attributes.ISSUED_FROM), NULL_STATE_VALUE);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(40L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.READING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(444L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(256));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.READING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), 444L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), 256);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(50L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
 
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), StateValues.READING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(444L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(256));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), TmfStateValue.newValueInt(0));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), StateValues.READING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), 444L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), 256);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), 0);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(60L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
 
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), TmfStateValue.nullValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), NULL_STATE_VALUE);
             info.add(oneInfo);
 
             return info;
@@ -281,13 +283,13 @@ public final class IoTestFactory {
             Set<IntervalInfo> info = new HashSet<>();
 
             /* Driver and waiting queue length */
-            ImmutableList<ITmfStateInterval> intervals = ImmutableList.of(new StateIntervalStub(5, 9, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(10, 20, TmfStateValue.newValueInt(0)));
+            ImmutableList<ITmfStateInterval> intervals = ImmutableList.of(new StateIntervalStub(5, 9, 1),
+                    new StateIntervalStub(10, 20, 0));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE_LENGTH));
 
-            intervals = ImmutableList.of(new StateIntervalStub(5, 9, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(10, 19, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(20, 20, TmfStateValue.newValueInt(0)));
+            intervals = ImmutableList.of(new StateIntervalStub(5, 9, 0),
+                    new StateIntervalStub(10, 19, 1),
+                    new StateIntervalStub(20, 20, 0));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE_LENGTH));
 
             return info;
@@ -317,14 +319,14 @@ public final class IoTestFactory {
             Set<IntervalInfo> info = new HashSet<>();
 
             /* Bytes read for a given process */
-            ImmutableList<ITmfStateInterval> intervals = ImmutableList.of(new StateIntervalStub(1, 9, TmfStateValue.nullValue()),
-                    new StateIntervalStub(10, 24, TmfStateValue.newValueInt(8)),
-                    new StateIntervalStub(25, 50, TmfStateValue.newValueInt(44)));
+            ImmutableList<ITmfStateInterval> intervals = ImmutableList.of(new StateIntervalStub(1, 9, NULL_STATE_VALUE),
+                    new StateIntervalStub(10, 24, 8),
+                    new StateIntervalStub(25, 50, 44));
             info.add(new IntervalInfo(intervals, Attributes.THREADS, "2", Attributes.BYTES_READ));
 
             /* Bytes read for a given process */
-            intervals = ImmutableList.of(new StateIntervalStub(1, 49, TmfStateValue.nullValue()),
-                    new StateIntervalStub(50, 50, TmfStateValue.newValueInt(8)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 49, NULL_STATE_VALUE),
+                    new StateIntervalStub(50, 50, 8));
             info.add(new IntervalInfo(intervals, Attributes.THREADS, "5", Attributes.BYTES_READ));
 
             return info;
@@ -346,16 +348,16 @@ public final class IoTestFactory {
             Set<IntervalInfo> info = new HashSet<>();
 
             /* Bytes read for a given process */
-            ImmutableList<ITmfStateInterval> intervals = ImmutableList.of(new StateIntervalStub(1, 9, TmfStateValue.nullValue()),
-                    new StateIntervalStub(10, 29, TmfStateValue.newValueInt(16)),
-                    new StateIntervalStub(30, 39, TmfStateValue.newValueInt(26)),
-                    new StateIntervalStub(40, 50, TmfStateValue.newValueInt(36)));
+            ImmutableList<ITmfStateInterval> intervals = ImmutableList.of(new StateIntervalStub(1, 9, NULL_STATE_VALUE),
+                    new StateIntervalStub(10, 29, 16),
+                    new StateIntervalStub(30, 39, 26),
+                    new StateIntervalStub(40, 50, 36));
             info.add(new IntervalInfo(intervals, Attributes.THREADS, "2", Attributes.BYTES_WRITTEN));
 
             /* Bytes read for a given process */
-            intervals = ImmutableList.of(new StateIntervalStub(1, 29, TmfStateValue.nullValue()),
-                    new StateIntervalStub(30, 49, TmfStateValue.newValueInt(32)),
-                    new StateIntervalStub(50, 50, TmfStateValue.newValueInt(96)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 29, NULL_STATE_VALUE),
+                    new StateIntervalStub(30, 49, 32),
+                    new StateIntervalStub(50, 50, 96));
             info.add(new IntervalInfo(intervals, Attributes.THREADS, "5", Attributes.BYTES_WRITTEN));
 
             return info;
@@ -382,34 +384,34 @@ public final class IoTestFactory {
             Set<IntervalInfo> info = new HashSet<>();
 
             /* Driver and waiting queue length */
-            ImmutableList<ITmfStateInterval> intervals = ImmutableList.of(new StateIntervalStub(1, 4, TmfStateValue.nullValue()),
-                    new StateIntervalStub(5, 9, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(10, 14, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(15, 34, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(35, 39, TmfStateValue.newValueInt(2)),
-                    new StateIntervalStub(40, 41, TmfStateValue.newValueInt(3)),
-                    new StateIntervalStub(42, 44, TmfStateValue.newValueInt(2)),
-                    new StateIntervalStub(45, 49, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(50, 54, TmfStateValue.newValueInt(2)),
-                    new StateIntervalStub(55, 59, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(60, 65, TmfStateValue.newValueInt(0)));
+            ImmutableList<ITmfStateInterval> intervals = ImmutableList.of(new StateIntervalStub(1, 4, NULL_STATE_VALUE),
+                    new StateIntervalStub(5, 9, 1),
+                    new StateIntervalStub(10, 14, 0),
+                    new StateIntervalStub(15, 34, 1),
+                    new StateIntervalStub(35, 39, 2),
+                    new StateIntervalStub(40, 41, 3),
+                    new StateIntervalStub(42, 44, 2),
+                    new StateIntervalStub(45, 49, 1),
+                    new StateIntervalStub(50, 54, 2),
+                    new StateIntervalStub(55, 59, 1),
+                    new StateIntervalStub(60, 65, 0));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE_LENGTH));
 
-            intervals = ImmutableList.of(new StateIntervalStub(1, 4, TmfStateValue.nullValue()),
-                    new StateIntervalStub(5, 9, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(10, 19, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(20, 59, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(60, 64, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(65, 65, TmfStateValue.newValueInt(0)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 4, NULL_STATE_VALUE),
+                    new StateIntervalStub(5, 9, 0),
+                    new StateIntervalStub(10, 19, 1),
+                    new StateIntervalStub(20, 59, 0),
+                    new StateIntervalStub(60, 64, 1),
+                    new StateIntervalStub(65, 65, 0));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE_LENGTH));
 
             /* Bytes read and written */
-            intervals = ImmutableList.of(new StateIntervalStub(1, 64, TmfStateValue.nullValue()),
-                    new StateIntervalStub(65, 65, TmfStateValue.newValueInt(40)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 64, NULL_STATE_VALUE),
+                    new StateIntervalStub(65, 65, 40));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.SECTORS_READ));
 
-            intervals = ImmutableList.of(new StateIntervalStub(1, 19, TmfStateValue.nullValue()),
-                    new StateIntervalStub(20, 65, TmfStateValue.newValueInt(16)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 19, NULL_STATE_VALUE),
+                    new StateIntervalStub(20, 65, 16));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.SECTORS_WRITTEN));
 
             return info;
@@ -420,144 +422,144 @@ public final class IoTestFactory {
             Set<PunctualInfo> info = new HashSet<>();
 
             PunctualInfo oneInfo = new PunctualInfo(5L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(444L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), 444L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), 8);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(7L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(436L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(16));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), 436L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), 16);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(10L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(436L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(16));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), 436L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), 16);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(15L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.READING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(292L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(436L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(16));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.READING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), 292L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), 8);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), StateValues.WRITING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), 436L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), 16);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(20L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(35L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.READING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(292L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), StateValues.READING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(284L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.READING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), 292L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), 8);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), StateValues.READING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), 284L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), 8);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(40L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.READING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(292L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), StateValues.READING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(284L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2"), StateValues.READING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(300L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(16));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.READING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), 292L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), 8);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), StateValues.READING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), 284L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), 8);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2"), StateValues.READING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.CURRENT_REQUEST), 300L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.REQUEST_SIZE), 16);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(42L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.READING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(292L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(24));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.MERGED_IN), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), StateValues.READING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(284L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.MERGED_IN), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.MERGED_IN), TmfStateValue.newValueInt(0));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.READING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), 292L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), 24);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.MERGED_IN), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), StateValues.READING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), 284L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), 8);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.MERGED_IN), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.MERGED_IN), 0);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(45L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.MERGED_IN), TmfStateValue.newValueInt(1));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), StateValues.READING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(284L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(32));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.MERGED_IN), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.MERGED_IN), TmfStateValue.newValueInt(0));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.MERGED_IN), 1);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), StateValues.READING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), 284L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), 32);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.MERGED_IN), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.MERGED_IN), 0);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(50L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.READING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(316L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(8));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.MERGED_IN), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), StateValues.READING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(284L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(32));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.MERGED_IN), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.MERGED_IN), TmfStateValue.newValueInt(0));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), StateValues.READING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), 316L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), 8);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.MERGED_IN), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), StateValues.READING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), 284L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), 32);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.MERGED_IN), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.MERGED_IN), 0);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(55L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.MERGED_IN), TmfStateValue.newValueInt(1));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), StateValues.READING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(284L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(40));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.MERGED_IN), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.MERGED_IN), TmfStateValue.newValueInt(0));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.MERGED_IN), 1);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), StateValues.READING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), 284L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), 40);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.MERGED_IN), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.MERGED_IN), 0);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(60L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "1", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE, "2", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
 
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), StateValues.READING_REQUEST_VALUE);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.newValueLong(284L));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.newValueInt(40));
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), TmfStateValue.newValueInt(1));
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), StateValues.READING_REQUEST_VALUE.unboxValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), 284L);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), 40);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), 1);
             info.add(oneInfo);
 
             oneInfo = new PunctualInfo(65L);
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), TmfStateValue.nullValue());
-            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), TmfStateValue.nullValue());
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0"), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.CURRENT_REQUEST), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.REQUEST_SIZE), NULL_STATE_VALUE);
+            oneInfo.addValue(StateSystemTestUtils.makeAttribute(Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE, "0", Attributes.ISSUED_FROM), NULL_STATE_VALUE);
             info.add(oneInfo);
 
             return info;
@@ -592,42 +594,42 @@ public final class IoTestFactory {
             Set<IntervalInfo> info = new HashSet<>();
 
             /* Driver and waiting queue length */
-            ImmutableList<ITmfStateInterval> intervals = ImmutableList.of(new StateIntervalStub(1, 4, TmfStateValue.nullValue()),
-                    new StateIntervalStub(5, 14, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(15, 19, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(20, 34, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(35, 39, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(40, 49, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(50, 59, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(60, 79, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(80, 99, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(100, 119, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(120, 140, TmfStateValue.newValueInt(1)));
+            ImmutableList<ITmfStateInterval> intervals = ImmutableList.of(new StateIntervalStub(1, 4, NULL_STATE_VALUE),
+                    new StateIntervalStub(5, 14, 0),
+                    new StateIntervalStub(15, 19, 1),
+                    new StateIntervalStub(20, 34, 0),
+                    new StateIntervalStub(35, 39, 1),
+                    new StateIntervalStub(40, 49, 0),
+                    new StateIntervalStub(50, 59, 1),
+                    new StateIntervalStub(60, 79, 0),
+                    new StateIntervalStub(80, 99, 1),
+                    new StateIntervalStub(100, 119, 0),
+                    new StateIntervalStub(120, 140, 1));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE_LENGTH));
 
-            intervals = ImmutableList.of(new StateIntervalStub(1, 4, TmfStateValue.nullValue()),
-                    new StateIntervalStub(5, 9, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(10, 19, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(20, 24, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(25, 39, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(40, 44, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(45, 59, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(60, 64, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(65, 99, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(100, 140, TmfStateValue.newValueInt(1)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 4, NULL_STATE_VALUE),
+                    new StateIntervalStub(5, 9, 1),
+                    new StateIntervalStub(10, 19, 0),
+                    new StateIntervalStub(20, 24, 1),
+                    new StateIntervalStub(25, 39, 0),
+                    new StateIntervalStub(40, 44, 1),
+                    new StateIntervalStub(45, 59, 0),
+                    new StateIntervalStub(60, 64, 1),
+                    new StateIntervalStub(65, 99, 0),
+                    new StateIntervalStub(100, 140, 1));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE_LENGTH));
 
             /* Bytes read and written */
-            intervals = ImmutableList.of(new StateIntervalStub(1, 29, TmfStateValue.nullValue()),
-                    new StateIntervalStub(30, 44, TmfStateValue.newValueInt(16)),
-                    new StateIntervalStub(45, 64, TmfStateValue.newValueInt(56)),
-                    new StateIntervalStub(65, 140, TmfStateValue.newValueInt(96)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 29, NULL_STATE_VALUE),
+                    new StateIntervalStub(30, 44, 16),
+                    new StateIntervalStub(45, 64, 56),
+                    new StateIntervalStub(65, 140, 96));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.SECTORS_READ));
 
-            intervals = ImmutableList.of(new StateIntervalStub(1, 9, TmfStateValue.nullValue()),
-                    new StateIntervalStub(10, 24, TmfStateValue.newValueInt(8)),
-                    new StateIntervalStub(25, 139, TmfStateValue.newValueInt(24)),
-                    new StateIntervalStub(140, 140, TmfStateValue.newValueInt(32)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 9, NULL_STATE_VALUE),
+                    new StateIntervalStub(10, 24, 8),
+                    new StateIntervalStub(25, 139, 24),
+                    new StateIntervalStub(140, 140, 32));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.SECTORS_WRITTEN));
 
             return info;
@@ -654,43 +656,43 @@ public final class IoTestFactory {
             Set<IntervalInfo> info = new HashSet<>();
 
             /* Driver and waiting queue length */
-            ImmutableList<ITmfStateInterval> intervals = ImmutableList.of(new StateIntervalStub(1, 4, TmfStateValue.nullValue()),
-                    new StateIntervalStub(5, 9, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(10, 20, TmfStateValue.newValueInt(0)));
+            ImmutableList<ITmfStateInterval> intervals = ImmutableList.of(new StateIntervalStub(1, 4, NULL_STATE_VALUE),
+                    new StateIntervalStub(5, 9, 1),
+                    new StateIntervalStub(10, 20, 0));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.WAITING_QUEUE_LENGTH));
 
-            intervals = ImmutableList.of(new StateIntervalStub(1, 4, TmfStateValue.nullValue()),
-                    new StateIntervalStub(5, 9, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(10, 19, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(20, 20, TmfStateValue.newValueInt(0)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 4, NULL_STATE_VALUE),
+                    new StateIntervalStub(5, 9, 0),
+                    new StateIntervalStub(10, 19, 1),
+                    new StateIntervalStub(20, 20, 0));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE_LENGTH));
 
             /* Bytes read and written */
-            intervals = ImmutableList.of(new StateIntervalStub(1, 20, TmfStateValue.nullValue()));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 20, NULL_STATE_VALUE));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.SECTORS_READ));
 
-            intervals = ImmutableList.of(new StateIntervalStub(1, 19, TmfStateValue.nullValue()),
-                    new StateIntervalStub(20, 20, TmfStateValue.newValueInt(8)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 19, NULL_STATE_VALUE),
+                    new StateIntervalStub(20, 20, 8));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.SECTORS_WRITTEN));
 
             /* Driver and waiting queue length */
-            intervals = ImmutableList.of(new StateIntervalStub(1, 7, TmfStateValue.nullValue()),
-                    new StateIntervalStub(8, 11, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(12, 20, TmfStateValue.newValueInt(0)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 7, NULL_STATE_VALUE),
+                    new StateIntervalStub(8, 11, 1),
+                    new StateIntervalStub(12, 20, 0));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, SECOND_DEVICE_ID, Attributes.WAITING_QUEUE_LENGTH));
 
-            intervals = ImmutableList.of(new StateIntervalStub(1, 7, TmfStateValue.nullValue()),
-                    new StateIntervalStub(8, 11, TmfStateValue.newValueInt(0)),
-                    new StateIntervalStub(12, 17, TmfStateValue.newValueInt(1)),
-                    new StateIntervalStub(18, 20, TmfStateValue.newValueInt(0)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 7, NULL_STATE_VALUE),
+                    new StateIntervalStub(8, 11, 0),
+                    new StateIntervalStub(12, 17, 1),
+                    new StateIntervalStub(18, 20, 0));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, SECOND_DEVICE_ID, Attributes.DRIVER_QUEUE_LENGTH));
 
             /* Bytes read and written */
-            intervals = ImmutableList.of(new StateIntervalStub(1, 17, TmfStateValue.nullValue()),
-                    new StateIntervalStub(18, 20, TmfStateValue.newValueInt(16)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 17, NULL_STATE_VALUE),
+                    new StateIntervalStub(18, 20, 16));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, SECOND_DEVICE_ID, Attributes.SECTORS_READ));
 
-            intervals = ImmutableList.of(new StateIntervalStub(1, 20, TmfStateValue.nullValue()));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 20, NULL_STATE_VALUE));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, SECOND_DEVICE_ID, Attributes.SECTORS_WRITTEN));
 
             return info;
@@ -725,36 +727,36 @@ public final class IoTestFactory {
             Set<IntervalInfo> info = new HashSet<>();
 
             /* Bytes read and written for thread 1 */
-            ImmutableList<ITmfStateInterval> intervals = ImmutableList.of(new StateIntervalStub(1, 29, TmfStateValue.nullValue()),
-                    new StateIntervalStub(30, 45, TmfStateValue.newValueInt(20)));
+            ImmutableList<ITmfStateInterval> intervals = ImmutableList.of(new StateIntervalStub(1, 29, NULL_STATE_VALUE),
+                    new StateIntervalStub(30, 45, 20));
             info.add(new IntervalInfo(intervals, Attributes.THREADS, "1", Attributes.BYTES_READ));
 
-            intervals = ImmutableList.of(new StateIntervalStub(1, 45, TmfStateValue.nullValue()));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 45, NULL_STATE_VALUE));
             info.add(new IntervalInfo(intervals, Attributes.THREADS, "1", Attributes.BYTES_WRITTEN));
 
             /* Bytes read and written for thread 2 */
-            intervals = ImmutableList.of(new StateIntervalStub(1, 9, TmfStateValue.nullValue()),
-                    new StateIntervalStub(10, 45, TmfStateValue.newValueInt(8)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 9, NULL_STATE_VALUE),
+                    new StateIntervalStub(10, 45, 8));
             info.add(new IntervalInfo(intervals, Attributes.THREADS, "2", Attributes.BYTES_READ));
 
-            intervals = ImmutableList.of(new StateIntervalStub(1, 45, TmfStateValue.nullValue()));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 45, NULL_STATE_VALUE));
             info.add(new IntervalInfo(intervals, Attributes.THREADS, "2", Attributes.BYTES_WRITTEN));
 
             /* Bytes read and written for thread 3 */
-            intervals = ImmutableList.of(new StateIntervalStub(1, 34, TmfStateValue.nullValue()),
-                    new StateIntervalStub(35, 45, TmfStateValue.newValueInt(36)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 34, NULL_STATE_VALUE),
+                    new StateIntervalStub(35, 45, 36));
             info.add(new IntervalInfo(intervals, Attributes.THREADS, "3", Attributes.BYTES_READ));
 
-            intervals = ImmutableList.of(new StateIntervalStub(1, 39, TmfStateValue.nullValue()),
-                    new StateIntervalStub(40, 45, TmfStateValue.newValueInt(64)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 39, NULL_STATE_VALUE),
+                    new StateIntervalStub(40, 45, 64));
             info.add(new IntervalInfo(intervals, Attributes.THREADS, "3", Attributes.BYTES_WRITTEN));
 
             /* Bytes read and written for thread 4 */
-            intervals = ImmutableList.of(new StateIntervalStub(1, 45, TmfStateValue.nullValue()));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 45, NULL_STATE_VALUE));
             info.add(new IntervalInfo(intervals, Attributes.THREADS, "4", Attributes.BYTES_READ));
 
-            intervals = ImmutableList.of(new StateIntervalStub(1, 9, TmfStateValue.nullValue()),
-                    new StateIntervalStub(10, 45, TmfStateValue.newValueInt(16)));
+            intervals = ImmutableList.of(new StateIntervalStub(1, 9, NULL_STATE_VALUE),
+                    new StateIntervalStub(10, 45, 16));
             info.add(new IntervalInfo(intervals, Attributes.THREADS, "4", Attributes.BYTES_WRITTEN));
 
             return info;

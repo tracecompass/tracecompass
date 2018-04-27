@@ -31,6 +31,7 @@ import java.util.stream.StreamSupport;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.KernelCpuUsageAnalysis;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.Activator;
@@ -41,8 +42,6 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attribute
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.StateIntervalStub;
 import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.StateSystemTestUtils;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
@@ -68,6 +67,8 @@ import com.google.common.collect.ImmutableSet;
 public class CpuUsageStateProviderTest {
 
     private static final String CPU_USAGE_FILE = "testfiles/cpu_analysis.xml";
+
+    private static final Object NULL_STATE_VALUE = null;
 
     private IKernelTrace fTrace;
     private KernelCpuUsageAnalysis fModule;
@@ -166,40 +167,40 @@ public class CpuUsageStateProviderTest {
 
             /* Test the intervals of proc2 on CPU 0 */
             List<@NonNull ITmfStateInterval> intervals = new ArrayList<>();
-            intervals.add(new StateIntervalStub(1, 19, TmfStateValue.nullValue()));
-            intervals.add(new StateIntervalStub(20, 25, TmfStateValue.newValueLong(19L)));
+            intervals.add(new StateIntervalStub(1, 19, NULL_STATE_VALUE));
+            intervals.add(new StateIntervalStub(20, 25, 19L));
             StateSystemTestUtils.testIntervalForAttributes(ss, intervals, Attributes.CPUS, "0", "2");
 
             /* Test the intervals of proc 4 CPU 1 */
             intervals.clear();
-            intervals.add(new StateIntervalStub(1, 4, TmfStateValue.nullValue()));
-            intervals.add(new StateIntervalStub(5, 14, TmfStateValue.newValueLong(3L)));
-            intervals.add(new StateIntervalStub(15, 25, TmfStateValue.newValueLong(8L)));
+            intervals.add(new StateIntervalStub(1, 4, NULL_STATE_VALUE));
+            intervals.add(new StateIntervalStub(5, 14, 3L));
+            intervals.add(new StateIntervalStub(15, 25, 8L));
             StateSystemTestUtils.testIntervalForAttributes(ss, intervals, Attributes.CPUS, "1", "4");
 
             /* Test the intervals of proc 3 on both CPUs */
             intervals.clear();
-            intervals.add(new StateIntervalStub(1, 24, TmfStateValue.nullValue()));
-            intervals.add(new StateIntervalStub(25, 25, TmfStateValue.newValueLong(5L)));
+            intervals.add(new StateIntervalStub(1, 24, NULL_STATE_VALUE));
+            intervals.add(new StateIntervalStub(25, 25, 5L));
             StateSystemTestUtils.testIntervalForAttributes(ss, intervals, Attributes.CPUS, "0", "3");
 
             intervals.clear();
-            intervals.add(new StateIntervalStub(1, 1, TmfStateValue.nullValue()));
-            intervals.add(new StateIntervalStub(2, 9, TmfStateValue.newValueLong(1L)));
-            intervals.add(new StateIntervalStub(10, 25, TmfStateValue.newValueLong(6L)));
+            intervals.add(new StateIntervalStub(1, 1, NULL_STATE_VALUE));
+            intervals.add(new StateIntervalStub(2, 9, 1L));
+            intervals.add(new StateIntervalStub(10, 25, 6L));
             StateSystemTestUtils.testIntervalForAttributes(ss, intervals, Attributes.CPUS, "1", "3");
 
             /*
              * Query at the end and make sure all processes on all CPU have the
              * expected values
              */
-            Map<@NonNull String @NonNull [], @NonNull ITmfStateValue> map = new HashMap<>();
-            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "0", "1"), TmfStateValue.newValueLong(0L));
-            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "0", "2"), TmfStateValue.newValueLong(19L));
-            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "0", "3"), TmfStateValue.newValueLong(5L));
-            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "1", "1"), TmfStateValue.newValueLong(5L));
-            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "1", "3"), TmfStateValue.newValueLong(6L));
-            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "1", "4"), TmfStateValue.newValueLong(8L));
+            Map<@NonNull String @NonNull [], @Nullable Object> map = new HashMap<>();
+            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "0", "1"), 0L);
+            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "0", "2"), 19L);
+            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "0", "3"), 5L);
+            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "1", "1"), 5L);
+            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "1", "3"), 6L);
+            map.put(StateSystemTestUtils.makeAttribute(Attributes.CPUS, "1", "4"), 8L);
             StateSystemTestUtils.testValuesAtTime(ss, 25L, map);
 
         } catch (AttributeNotFoundException e) {

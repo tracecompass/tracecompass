@@ -195,7 +195,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
                      * name for each guest event
                      */
                     vmQuark = ss.getQuarkRelativeAndAdd(getNodeVirtualMachines(), host.getHostId());
-                    TmfStateValue machineName = TmfStateValue.newValueString(event.getTrace().getName());
+                    String machineName = event.getTrace().getName();
                     ss.modifyAttribute(ts, machineName, vmQuark);
                 }
             }
@@ -237,7 +237,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
                     if (nextTid > 0) {
                         value = TmfStateValue.newValueInt(VcpuStateValues.VCPU_RUNNING);
                     }
-                    ss.modifyAttribute(ts, value, curStatusQuark);
+                    ss.modifyAttribute(ts, value.unboxValue(), curStatusQuark);
                     break;
                 }
 
@@ -261,7 +261,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
                     if ((value.unboxInt() & VcpuStateValues.VCPU_IDLE) == 0) {
                         int newVal = Math.max(VcpuStateValues.VCPU_UNKNOWN, value.unboxInt());
                         value = TmfStateValue.newValueInt(newVal | VcpuStateValues.VCPU_PREEMPT);
-                        ss.modifyAttribute(ts, value, curStatusQuark);
+                        ss.modifyAttribute(ts, value.unboxValue(), curStatusQuark);
                     }
                 }
 
@@ -282,7 +282,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
                     value = ss.queryOngoingState(curStatusQuark);
                     int newVal = Math.max(VcpuStateValues.VCPU_UNKNOWN, value.unboxInt());
                     value = TmfStateValue.newValueInt(newVal & ~VcpuStateValues.VCPU_PREEMPT);
-                    ss.modifyAttribute(ts, value, curStatusQuark);
+                    ss.modifyAttribute(ts, value.unboxValue(), curStatusQuark);
 
                 }
 
@@ -311,7 +311,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
                     if ((value.unboxInt() & VcpuStateValues.VCPU_IDLE) == 0) {
                         int newVal = Math.max(VcpuStateValues.VCPU_UNKNOWN, value.unboxInt());
                         value = TmfStateValue.newValueInt(newVal | VcpuStateValues.VCPU_VMM);
-                        ss.modifyAttribute(ts, value, curStatusQuark);
+                        ss.modifyAttribute(ts, value.unboxValue(), curStatusQuark);
                     }
                 }
 
@@ -328,7 +328,7 @@ public class VirtualMachineStateProvider extends AbstractTmfStateProvider {
                     value = ss.queryOngoingState(curStatusQuark);
                     int newVal = Math.max(VcpuStateValues.VCPU_UNKNOWN, value.unboxInt());
                     value = TmfStateValue.newValueInt(newVal & ~VcpuStateValues.VCPU_VMM);
-                    ss.modifyAttribute(ts, value, curStatusQuark);
+                    ss.modifyAttribute(ts, value.unboxValue(), curStatusQuark);
                 }
 
             }

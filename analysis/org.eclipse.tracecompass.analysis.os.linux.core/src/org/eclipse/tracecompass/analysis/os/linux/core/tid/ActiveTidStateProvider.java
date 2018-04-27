@@ -18,7 +18,6 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
@@ -93,8 +92,7 @@ class ActiveTidStateProvider extends AbstractTmfStateProvider {
         }
         try {
             int nextTid = ((Long) event.getContent().getField(fNextTid).getValue()).intValue();
-            final TmfStateValue value = TmfStateValue.newValueInt(nextTid);
-            ssb.modifyAttribute(event.getTimestamp().toNanos(), value, cpuQuark);
+            ssb.modifyAttribute(event.getTimestamp().toNanos(), nextTid, cpuQuark);
         } catch (StateValueTypeException e) {
             Activator.getDefault().logError(NonNullUtils.nullToEmptyString(e.getMessage()), e);
         }

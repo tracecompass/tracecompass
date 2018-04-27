@@ -154,8 +154,11 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *             If the inserted state value's type does not match what is
      *             already assigned to this attribute.
      */
-    void modifyAttribute(long t, @NonNull ITmfStateValue value, int attributeQuark)
-            throws StateValueTypeException;
+    @Deprecated
+    default void modifyAttribute(long t, @NonNull ITmfStateValue value, int attributeQuark)
+            throws StateValueTypeException {
+        modifyAttribute(t, value.unboxValue(), attributeQuark);
+    }
 
     /**
      * Basic attribute modification method, we simply specify a new value, for a
@@ -177,10 +180,8 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *             already assigned to this attribute.
      * @since 3.1
      */
-    default void modifyAttribute(long t, Object value, int attributeQuark)
-            throws StateValueTypeException {
-        modifyAttribute(t, TmfStateValue.newValue(value), attributeQuark);
-    }
+    void modifyAttribute(long t, Object value, int attributeQuark)
+            throws StateValueTypeException;
 
     /**
      * "Push" helper method. This uses the given integer attribute as a stack:
@@ -204,8 +205,11 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *             If the attribute 'attributeQuark' already exists, but is not
      *             of integer type.
      */
-    void pushAttribute(long t, @NonNull ITmfStateValue value, int attributeQuark)
-            throws StateValueTypeException;
+    @Deprecated
+    default void pushAttribute(long t, @NonNull ITmfStateValue value, int attributeQuark)
+            throws StateValueTypeException {
+        pushAttribute(t, value.unboxValue(), attributeQuark);
+    }
 
     /**
      * "Push" helper method. This uses the given integer attribute as a stack:
@@ -230,10 +234,8 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      *             of integer type.
      * @since 3.1
      */
-    default void pushAttribute(long t, Object value, int attributeQuark)
-            throws StateValueTypeException {
-        pushAttribute(t, TmfStateValue.newValue(value), attributeQuark);
-    }
+    void pushAttribute(long t, Object value, int attributeQuark)
+            throws StateValueTypeException;
 
     /**
      * Antagonist of the pushAttribute(), pops the top-most attribute on the
@@ -327,11 +329,7 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      * index file to persist on disk. This could be limited to actions
      * originating from the user.
      *
-     * FIXME Change to abstract for 3.0
-     *
      * @since 2.1
      */
-    default void removeFiles() {
-        // FIXME Change to abstract for 3.0
-    }
+    void removeFiles();
 }

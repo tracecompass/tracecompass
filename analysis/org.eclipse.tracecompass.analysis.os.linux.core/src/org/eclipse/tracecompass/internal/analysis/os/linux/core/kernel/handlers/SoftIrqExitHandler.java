@@ -54,11 +54,11 @@ public class SoftIrqExitHandler extends KernelEventHandler {
 
         /* Update the aggregate IRQ entry to set it to this CPU */
         boolean softIrqRaised = isSoftIrqRaised(ss.queryOngoingState(quark));
-        ss.modifyAttribute(timestamp, softIrqRaised ? StateValues.SOFT_IRQ_RAISED_VALUE : TmfStateValue.nullValue(), quark);
+        ss.modifyAttribute(timestamp, softIrqRaised ? StateValues.SOFT_IRQ_RAISED_VALUE.unboxValue() : TmfStateValue.nullValue().unboxValue(), quark);
 
         int aggregateQuark = ss.getQuarkAbsoluteAndAdd(Attributes.SOFT_IRQS, softIrqId.toString());
         ITmfStateValue aggregateValue = KernelEventHandlerUtils.getAggregate(ss, Attributes.SOFT_IRQS, softIrqId);
-        ss.modifyAttribute(timestamp, aggregateValue, aggregateQuark);
+        ss.modifyAttribute(timestamp, aggregateValue.unboxValue(), aggregateQuark);
 
         /* Set the CPU status back to "busy" or "idle" */
         KernelEventHandlerUtils.updateCpuStatus(timestamp, cpu, ss);

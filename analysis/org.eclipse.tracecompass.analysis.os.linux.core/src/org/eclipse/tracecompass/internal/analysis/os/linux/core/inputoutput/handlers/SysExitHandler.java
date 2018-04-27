@@ -22,8 +22,6 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemBuilderUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -68,8 +66,7 @@ public class SysExitHandler extends KernelEventHandler {
         if (syscallQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
             return;
         }
-        ITmfStateValue currentSyscall = ss.queryOngoingState(syscallQuark);
-        String syscallValue = currentSyscall.unboxStr();
+        String syscallValue = ss.queryOngoingState(syscallQuark).unboxStr();
         Long retValue = content.getFieldValue(Long.class, getLayout().fieldSyscallRet());
         if (retValue != null) {
             int ret = retValue.intValue();
@@ -87,8 +84,8 @@ public class SysExitHandler extends KernelEventHandler {
                 }
             }
         }
-        TmfStateValue value = TmfStateValue.nullValue();
-        ss.modifyAttribute(ts, value, syscallQuark);
+
+        ss.modifyAttribute(ts, (Object) null, syscallQuark);
     }
 
 }

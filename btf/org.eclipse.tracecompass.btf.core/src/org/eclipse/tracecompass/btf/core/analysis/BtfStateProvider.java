@@ -161,18 +161,16 @@ public class BtfStateProvider extends AbstractTmfStateProvider {
                     task = target;
 
                     quark = ssb.getQuarkAbsoluteAndAdd(ATTRIBUTE_TASKS, task, core);
-                    ssb.modifyAttribute(ts, STATE_RUNNING.getValue(), quark);
+                    ssb.modifyAttribute(ts, STATE_RUNNING.getValue().unboxValue(), quark);
 
                     /* Mark this task as active in the ActiveCore attribute */
                     quark = ssb.getQuarkAbsoluteAndAdd(ATTRIBUTE_TASKS, task, ATTRIBUTE_ACTIVE_CORE);
-                    ITmfStateValue value = TmfStateValue.newValueString(core);
-                    ssb.modifyAttribute(ts, value, quark);
+                    ssb.modifyAttribute(ts, core, quark);
 
                     /* Mark this task as active in the Cores/* attribute */
                     quark = ssb.getQuarkAbsoluteAndAdd(ATTRIBUTE_CORES, core);
                     /* Until the view can display the string */
-                    value = STATE_RUNNING.getValue();
-                    ssb.modifyAttribute(ts, value, quark);
+                    ssb.modifyAttribute(ts, STATE_RUNNING.getValue().unboxValue(), quark);
 
                 } else if (source.startsWith(ENTITY_TASK)) {
                     task = source;
@@ -180,7 +178,7 @@ public class BtfStateProvider extends AbstractTmfStateProvider {
                     String core = getCoreOfTask(ssb, task);
 
                     quark = ssb.getQuarkAbsoluteAndAdd(ATTRIBUTE_TASKS, task, core, runnable);
-                    ssb.modifyAttribute(ts, STATE_RUNNING.getValue(), quark);
+                    ssb.modifyAttribute(ts, STATE_RUNNING.getValue().unboxValue(), quark);
                 }
                 break;
 
@@ -193,9 +191,9 @@ public class BtfStateProvider extends AbstractTmfStateProvider {
 
                     /* We'll update both the Core and Runnable attributes */
                     quark = ssb.getQuarkAbsoluteAndAdd(ATTRIBUTE_TASKS, task, core);
-                    ssb.modifyAttribute(ts, STATE_SUSPENDED.getValue(), quark);
+                    ssb.modifyAttribute(ts, STATE_SUSPENDED.getValue().unboxValue(), quark);
                     quark = ssb.getQuarkRelativeAndAdd(quark, runnable);
-                    ssb.modifyAttribute(ts, STATE_SUSPENDED.getValue(), quark);
+                    ssb.modifyAttribute(ts, STATE_SUSPENDED.getValue().unboxValue(), quark);
                 }
                 break;
 
@@ -207,16 +205,16 @@ public class BtfStateProvider extends AbstractTmfStateProvider {
                     task = target;
 
                     quark = ssb.getQuarkAbsoluteAndAdd(ATTRIBUTE_TASKS, task, core);
-                    ssb.modifyAttribute(ts, STATE_NOT_RUNNING.getValue(), quark);
+                    ssb.modifyAttribute(ts, STATE_NOT_RUNNING.getValue().unboxValue(), quark);
 
                     /* Remove our "active task on core" bookmark */
                     quark = ssb.getQuarkAbsoluteAndAdd(ATTRIBUTE_TASKS, task, ATTRIBUTE_ACTIVE_CORE);
                     ITmfStateValue value = TmfStateValue.nullValue();
-                    ssb.modifyAttribute(ts, value, quark);
+                    ssb.modifyAttribute(ts, value.unboxValue(), quark);
 
                     /* Mark the Cores/* attribute as not running */
                     quark = ssb.getQuarkAbsoluteAndAdd(ATTRIBUTE_CORES, core);
-                    ssb.modifyAttribute(ts, STATE_CORE_IDLE.getValue(), quark);
+                    ssb.modifyAttribute(ts, STATE_CORE_IDLE.getValue().unboxValue(), quark);
 
                 } else if (source.startsWith(ENTITY_TASK)) {
                     task = source;
@@ -224,7 +222,7 @@ public class BtfStateProvider extends AbstractTmfStateProvider {
                     String core = getCoreOfTask(ssb, task);
 
                     quark = ssb.getQuarkAbsoluteAndAdd(ATTRIBUTE_TASKS, task, core, runnable);
-                    ssb.modifyAttribute(ts, STATE_NOT_RUNNING.getValue(), quark);
+                    ssb.modifyAttribute(ts, STATE_NOT_RUNNING.getValue().unboxValue(), quark);
                 }
                 break;
 
@@ -265,7 +263,7 @@ public class BtfStateProvider extends AbstractTmfStateProvider {
         if (name.equals("Task")) { //$NON-NLS-1$
             String task = event.getTarget();
             int quark = ssb.getQuarkAbsoluteAndAdd(ATTRIBUTE_TASKS, task);
-            ssb.modifyAttribute(ts, stateValue.getValue(), quark);
+            ssb.modifyAttribute(ts, stateValue.getValue().unboxValue(), quark);
         }
     }
 
