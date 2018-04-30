@@ -70,10 +70,6 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             .setSaturation(SATURATION)
             .build().get();
     private static final int COLOR_DIFFERENCIATION_FACTOR = NUM_COLORS / 2 + 2;
-    /**
-     * State table index for an idle event (light grey)
-     */
-    private static final int IDLE_THREAD = 0;
 
     private static final Map<Integer, StateItem> STATE_MAP;
 
@@ -270,9 +266,6 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
     public Map<String, Object> getSpecificEventStyle(ITimeEvent event) {
         if (isType(event.getEntry(), Type.CURRENT_THREAD) && event instanceof TimeEvent) {
             int threadEventValue = ((TimeEvent) event).getValue();
-            if (threadEventValue == IDLE_THREAD) {
-                return ImmutableMap.of(ITimeEventStyleStrings.fillColor(), 0);
-            }
             RGBAColor color = PALETTE.get(Math.floorMod(threadEventValue + COLOR_DIFFERENCIATION_FACTOR, NUM_COLORS));
             return ImmutableMap.of(ITimeEventStyleStrings.fillColor(), color.toInt(),
                     ITimeEventStyleStrings.label(), String.valueOf(threadEventValue));

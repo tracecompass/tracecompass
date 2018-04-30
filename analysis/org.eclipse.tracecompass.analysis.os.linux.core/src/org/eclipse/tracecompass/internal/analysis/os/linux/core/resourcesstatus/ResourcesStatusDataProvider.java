@@ -290,6 +290,9 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                             }
                         }
                         eventList.add(new TimeGraphState(startTime, duration, s, execName != null ? execName + ' ' + '(' + String.valueOf(s) + ')' : String.valueOf(s)));
+                    } else if (type == Type.CURRENT_THREAD) {
+                        // add null state when current thread is 0
+                        eventList.add(new TimeGraphState(startTime, duration, Integer.MIN_VALUE));
                     } else {
                         eventList.add(new TimeGraphState(startTime, duration, s));
                     }
