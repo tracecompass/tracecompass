@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphState;
@@ -34,6 +35,7 @@ import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NamedTimeEvent;
@@ -41,8 +43,10 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sampling;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
 /**
@@ -59,6 +63,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
     protected static final long BUILD_UPDATE_TIMEOUT = 500;
 
     private final String fProviderId;
+    private Map<Long, @NonNull TimeGraphEntry> fEntries = new HashMap<>();
 
     /**
      * Constructs a time graph view that contains a time graph viewer.
@@ -100,8 +105,6 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             return;
         }
         boolean complete = false;
-        Map<TimeGraphEntryModel, TimeGraphEntry> modelToEntryMap = new HashMap<>();
-        Map<Long, TimeGraphEntry> parentLookupMap = new HashMap<>();
         while (!complete && !monitor.isCanceled()) {
             TmfModelResponse<List<TimeGraphEntryModel>> response = dataProvider.fetchTree(new TimeQueryFilter(0, Long.MAX_VALUE, 2), monitor);
             if (response.getStatus() == ITmfResponse.Status.FAILED) {
@@ -114,39 +117,39 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
 
             List<TimeGraphEntryModel> model = response.getModel();
             if (model != null) {
-                for (TimeGraphEntryModel entry : model) {
-                    TimeGraphEntry uiEntry = modelToEntryMap.get(entry);
-                    if (entry.getParentId() != -1) {
-                        if (uiEntry == null) {
-                            uiEntry = new TimeGraphEntry(entry);
-                            modelToEntryMap.put(entry, uiEntry);
-                            parentLookupMap.put(entry.getId(), uiEntry);
+                synchronized (fEntries) {
+                    for (TimeGraphEntryModel entry : model) {
+                        TimeGraphEntry uiEntry = fEntries.get(entry.getId());
+                        if (entry.getParentId() != -1) {
+                            if (uiEntry == null) {
+                                uiEntry = new TimeGraphEntry(entry);
+                                fEntries.put(entry.getId(), uiEntry);
 
-                            TimeGraphEntry parent = parentLookupMap.get(entry.getParentId());
-                            if (parent != null) {
-                                parent.addChild(uiEntry);
+                                TimeGraphEntry parent = fEntries.get(entry.getParentId());
+                                if (parent != null) {
+                                    parent.addChild(uiEntry);
+                                }
+                            } else {
+                                uiEntry.updateModel(entry);
                             }
                         } else {
-                            uiEntry.updateModel(entry);
-                        }
-                    } else {
-                        setStartTime(Long.min(getStartTime(), entry.getStartTime()));
-                        setEndTime(Long.max(getEndTime(), entry.getEndTime() + 1));
+                            setStartTime(Long.min(getStartTime(), entry.getStartTime()));
+                            setEndTime(Long.max(getEndTime(), entry.getEndTime() + 1));
 
-                        if (uiEntry != null) {
-                            uiEntry.updateModel(entry);
-                        } else {
-                            uiEntry = new TraceEntry(entry, trace, dataProvider);
-                            modelToEntryMap.put(entry, uiEntry);
-                            parentLookupMap.put(entry.getId(), uiEntry);
-                            addToEntryList(parentTrace, Collections.singletonList(uiEntry));
+                            if (uiEntry != null) {
+                                uiEntry.updateModel(entry);
+                            } else {
+                                uiEntry = new TraceEntry(entry, trace, dataProvider);
+                                fEntries.put(entry.getId(), uiEntry);
+                                addToEntryList(parentTrace, Collections.singletonList(uiEntry));
+                            }
                         }
                     }
                 }
                 long start = getStartTime();
                 long end = getEndTime();
                 final long resolution = Long.max(1, (end - start) / getDisplayWidth());
-                zoomEntries(modelToEntryMap.values(), start, end, resolution, monitor);
+                zoomEntries(fEntries.values(), start, end, resolution, monitor);
             }
 
             if (monitor.isCanceled()) {
@@ -384,6 +387,35 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             return new NamedTimeEvent(entry, state.getStartTime(), state.getDuration(), (int) state.getValue(), label);
         }
         return new TimeEvent(entry, state.getStartTime(), state.getDuration(), (int) state.getValue());
+    }
+
+    @Override
+    protected List<@NonNull ILinkEvent> getLinkList(long zoomStartTime, long zoomEndTime, long resolution,
+            @NonNull IProgressMonitor monitor) {
+        List<@NonNull TimeGraphEntry> traceEntries = getEntryList(getTrace());
+        if (traceEntries == null) {
+            return Collections.emptyList();
+        }
+        List<@NonNull ILinkEvent> linkList = new ArrayList<>();
+        List<@NonNull Long> times = StateSystemUtils.getTimes(zoomStartTime, zoomEndTime, resolution);
+        TimeQueryFilter queryFilter = new TimeQueryFilter(times);
+
+        for (TraceEntry entry : Iterables.filter(traceEntries, TraceEntry.class)) {
+            ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = entry.getProvider();
+            TmfModelResponse<List<ITimeGraphArrow>> response = provider.fetchArrows(queryFilter, monitor);
+            List<ITimeGraphArrow> model = response.getModel();
+
+            if (model != null) {
+                for (ITimeGraphArrow arrow : model) {
+                    ITimeGraphEntry prevEntry = fEntries.get(arrow.getSourceId());
+                    ITimeGraphEntry nextEntry = fEntries.get(arrow.getDestinationId());
+                    if (prevEntry != null && nextEntry != null) {
+                        linkList.add(new TimeLinkEvent(prevEntry, nextEntry, arrow.getStartTime(), arrow.getDuration(), 0));
+                    }
+                }
+            }
+        }
+        return linkList;
     }
 
 }
