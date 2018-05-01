@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph;
 
+import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
+
 /**
  * An interface for entry model whose corresponding row states have value that
  * are between a minimum and maximum value. An entry that implements this

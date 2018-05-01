@@ -13,8 +13,8 @@ import java.util.Comparator;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.counters.core.CounterDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.internal.analysis.counters.core.CounterDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
@@ -41,7 +41,6 @@ import com.google.common.collect.Lists;
  * @author Matthew Khouzam
  * @author Mikael Ferland
  */
-@SuppressWarnings("restriction")
 public class CounterTreeViewer extends AbstractSelectTreeViewer {
 
     private final class CounterTreeLabelProvider extends TreeLabelProvider {

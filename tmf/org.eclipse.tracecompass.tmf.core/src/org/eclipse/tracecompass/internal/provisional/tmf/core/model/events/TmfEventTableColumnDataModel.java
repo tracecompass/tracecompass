@@ -12,12 +12,13 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.events;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 
 /**
  * Model that contain all the information on a column for a virtual table
  *
  * @author Simon Delisle
+ * @since 4.0
  */
 public class TmfEventTableColumnDataModel extends TmfTreeDataModel {
 

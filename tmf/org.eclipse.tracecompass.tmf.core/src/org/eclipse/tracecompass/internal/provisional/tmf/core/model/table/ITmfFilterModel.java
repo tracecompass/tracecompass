@@ -18,7 +18,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * Model for table filter
  *
  * @author Simon Delisle
- * @since 3.3
+ * @since 4.0
  */
 public interface ITmfFilterModel {
 

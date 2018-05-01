@@ -11,9 +11,9 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.events;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderFactory;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -21,6 +21,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * point.
  *
  * @author Simon Delisle
+ * @since 4.0
  */
 public class TmfEventTableDataProviderFactory implements IDataProviderFactory {
 

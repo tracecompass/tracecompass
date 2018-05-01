@@ -9,7 +9,7 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.kernelmemoryusage;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernelmemoryusage.KernelMemoryUsageDataProvider;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelmemoryusage.KernelMemoryUsageDataProvider;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory.MemoryUsageView;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 

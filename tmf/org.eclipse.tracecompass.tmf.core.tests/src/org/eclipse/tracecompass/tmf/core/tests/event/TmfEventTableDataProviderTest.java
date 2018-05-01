@@ -27,14 +27,14 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.events.TmfEv
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.events.TmfEventTableDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.events.TmfEventTableFilterModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.EventTableQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.VirtualTableQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.EventTableLine;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfVirtualTableDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfVirtualTableModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.TmfVirtualTableModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
@@ -78,7 +78,7 @@ public class TmfEventTableDataProviderTest {
         fColumns = fetchColumnId();
     }
 
-    private static @NonNull Map<String, Long> fetchColumnId() {
+    private static Map<String, Long> fetchColumnId() {
         List<TmfEventTableColumnDataModel> columns = fProvider.fetchTree(new TimeQueryFilter(0, 0, 1), null).getModel();
         if (columns == null) {
             return Collections.emptyMap();
@@ -261,7 +261,7 @@ public class TmfEventTableDataProviderTest {
 
         TmfModelResponse<ITmfVirtualTableModel<EventTableLine>> response = fProvider.fetchLines(queryFilter, null);
         ITmfVirtualTableModel<EventTableLine> currentModel = response.getModel();
-        
+
         TmfVirtualTableModel<@NonNull EventTableLine> expectedModel = new TmfVirtualTableModel<>(expectedColumnsId, expectedData, 0, 1429);
         assertEquals(expectedModel, currentModel);
     }

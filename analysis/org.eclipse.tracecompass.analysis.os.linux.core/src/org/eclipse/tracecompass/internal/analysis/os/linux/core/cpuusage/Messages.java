@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 
 /**
@@ -22,7 +23,7 @@ public class Messages extends NLS {
     /**
      * CPU Usage title
      */
-    public static String CpuUsageDataProvider_title;
+    public static @Nullable String CpuUsageDataProvider_title;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

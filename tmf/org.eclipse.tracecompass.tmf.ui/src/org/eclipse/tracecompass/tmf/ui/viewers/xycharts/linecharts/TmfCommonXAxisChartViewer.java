@@ -29,18 +29,18 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ISeriesModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXyModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IXYPresentationProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.XYPresentationProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
+import org.eclipse.tracecompass.tmf.core.model.xy.ITmfCommonXAxisModel;
+import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXYDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
+import org.eclipse.tracecompass.tmf.core.presentation.IXYPresentationProvider;
+import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
+import org.eclipse.tracecompass.tmf.core.presentation.XYPresentationProvider;
+import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
+import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
@@ -143,7 +143,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      * @param trace
      *            The trace
      * @return the data provider
-     * @since 3.3
+     * @since 4.0
      */
     protected ITmfXYDataProvider initializeDataProvider(@NonNull ITmfTrace trace) {
         throw new UnsupportedOperationException("This needs to be implemented concrete classes"); //$NON-NLS-1$
@@ -153,6 +153,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      * Gets the presentation provider
      *
      * @return The presentation provider
+     * @since 4.0
      */
     protected IXYPresentationProvider getPresentationProvider() {
         return Objects.requireNonNull(fXYPresentationProvider.get(getTrace()));
@@ -172,6 +173,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      *            The number of entries
      * @return An {@link TimeQueryFilter} instance that data provider will use to
      *         extract a model
+     * @since 4.0
      */
     protected @NonNull TimeQueryFilter createQueryFilter(long start, long end, int nb) {
         return new TimeQueryFilter(start, end, nb);
@@ -184,6 +186,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      * @param seriesName
      *            The name of the series
      * @return An {@link IYAppearance} instance for the series
+     * @since 4.0
      */
     public @NonNull IYAppearance getSeriesAppearance(@NonNull String seriesName) {
         return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH);

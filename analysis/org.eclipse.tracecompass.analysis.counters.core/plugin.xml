@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.tracecompass.tmf.core.dataprovider">
       <dataProviderFactory
-            class="org.eclipse.tracecompass.analysis.counters.core.CounterDataProviderFactory"
+            class="org.eclipse.tracecompass.internal.analysis.counters.core.CounterDataProviderFactory"
             id="org.eclipse.tracecompass.analysis.counters.core.CounterDataProvider">
       </dataProviderFactory>
    </extension>

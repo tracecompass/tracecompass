@@ -16,6 +16,7 @@ import java.util.List;
  *
  * @author Yonni Chen
  * @param <L> A {@link IVirtualTableLine} implementation
+ * @since 4.0
  */
 public interface ITmfVirtualTableModel<L extends IVirtualTableLine> {
 

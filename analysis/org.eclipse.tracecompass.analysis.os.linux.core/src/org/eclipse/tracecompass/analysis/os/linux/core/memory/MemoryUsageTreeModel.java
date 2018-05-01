@@ -13,7 +13,7 @@ import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 
 /**
  * This class represents an entry in the tree viewer of the kernel memory usage
@@ -23,7 +23,6 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTree
  * @since 2.4
  */
 @NonNullByDefault
-@SuppressWarnings("restriction")
 public class MemoryUsageTreeModel extends TmfTreeDataModel {
 
     /**

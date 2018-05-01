@@ -22,6 +22,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfFi
  * table query filter and pass it to data providers if needed.
  *
  * @author Yonni Chen
+ * @since 4.0
  */
 public class EventTableQueryFilter extends VirtualTableQueryFilter {
 

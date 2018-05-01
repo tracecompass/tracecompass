@@ -45,13 +45,14 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
+import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
+import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
@@ -277,7 +278,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
                     try (FlowScopeLog runScope = new FlowScopeLogBuilder(LOGGER, Level.FINE, UPDATE_CONTENT_JOB_NAME + " run") //$NON-NLS-1$
                             .setParentScope(scope).build()) {
 
-                        ITmfTreeDataProvider<@NonNull TmfTreeDataModel> provider = getProvider(trace);
+                        ITmfTreeDataProvider<@NonNull ITmfTreeDataModel> provider = getProvider(trace);
                         if (provider == null) {
                             Activator.getDefault().logInfo("Trace: " + trace.getName() + " does not have a data provider for ID: " + fId); //$NON-NLS-1$ //$NON-NLS-2$
                             return Status.OK_STATUS;
@@ -290,12 +291,12 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
 
                         boolean isComplete = false;
                         do {
-                            TmfModelResponse<@NonNull List<@NonNull TmfTreeDataModel>> response;
+                            TmfModelResponse<@NonNull List<@NonNull ITmfTreeDataModel>> response;
                             try (FlowScopeLog iterScope = new FlowScopeLogBuilder(LOGGER, Level.FINE, UPDATE_CONTENT_JOB_NAME + " query") //$NON-NLS-1$
                                     .setParentScope(scope).build()) {
 
                                 response = provider.fetchTree(filter, monitor);
-                                List<@NonNull TmfTreeDataModel> model = response.getModel();
+                                List<@NonNull ITmfTreeDataModel> model = response.getModel();
                                 if (model != null) {
                                     updateTree(trace, start, end, model);
                                 }
@@ -335,7 +336,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         }
     }
 
-    private void updateTree(ITmfTrace trace, long start, long end, List<@NonNull TmfTreeDataModel> model) {
+    private void updateTree(ITmfTrace trace, long start, long end, List<@NonNull ITmfTreeDataModel> model) {
         final ITmfTreeViewerEntry rootEntry = modelToTree(start, end, model);
         /* Set the input in main thread only if it didn't change */
         if (rootEntry != null) {
@@ -445,9 +446,9 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
      *
      * @param trace the trace
      * @return the relevant provider, if any
-     * @since 3.3
+     * @since 4.0
      */
-    protected ITmfTreeDataProvider<@NonNull TmfTreeDataModel> getProvider(@NonNull ITmfTrace trace) {
+    protected ITmfTreeDataProvider<@NonNull ITmfTreeDataModel> getProvider(@NonNull ITmfTrace trace) {
         return DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeDataProvider.class);
     }
 
@@ -466,6 +467,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
      * @param isSelection
      *            if the query is a selection
      * @return the resulting query filter
+     * @since 4.0
      */
     protected @Nullable TimeQueryFilter getFilter(long start, long end, boolean isSelection) {
         return new TimeQueryFilter(Long.min(start, end), Long.max(start, end), 2);
@@ -482,13 +484,13 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
      *            model to convert
      * @return the resulting {@link TmfTreeViewerEntry}.
      */
-    protected ITmfTreeViewerEntry modelToTree(long start, long end, List<TmfTreeDataModel> model) {
+    protected ITmfTreeViewerEntry modelToTree(long start, long end, List<ITmfTreeDataModel> model) {
         TmfTreeViewerEntry root = new TmfTreeViewerEntry(StringUtils.EMPTY);
 
         Map<Long, TmfTreeViewerEntry> map = new HashMap<>();
         map.put(-1L, root);
-        for (TmfTreeDataModel entry : model) {
-            TmfGenericTreeEntry<TmfTreeDataModel> viewerEntry = new TmfGenericTreeEntry<>(entry);
+        for (ITmfTreeDataModel entry : model) {
+            TmfGenericTreeEntry<ITmfTreeDataModel> viewerEntry = new TmfGenericTreeEntry<>(entry);
             map.put(entry.getId(), viewerEntry);
 
             TmfTreeViewerEntry parent = map.get(entry.getParentId());

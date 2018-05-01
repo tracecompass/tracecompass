@@ -13,9 +13,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.DisksIODataProvider;
 import org.eclipse.tracecompass.common.core.format.DataSpeedWithUnitFormat;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.DisksIODataProvider;
+import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.swtchart.Chart;
@@ -25,7 +25,6 @@ import org.swtchart.Chart;
  *
  * @author Houssem Daoud
  */
-@SuppressWarnings("restriction")
 public class DisksIOActivityViewer extends TmfFilteredXYChartViewer {
 
     private static final int DEFAULT_SERIES_WIDTH = 1;

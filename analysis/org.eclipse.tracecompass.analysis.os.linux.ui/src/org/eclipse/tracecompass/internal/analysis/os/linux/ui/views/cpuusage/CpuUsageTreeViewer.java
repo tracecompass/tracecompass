@@ -22,11 +22,11 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageDataProvider;
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageEntryModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCpuQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.CpuUsageDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.filters.SelectedCpuQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
@@ -43,7 +43,6 @@ import com.google.common.collect.Iterables;
  *
  * @author Geneviève Bastien
  */
-@SuppressWarnings("restriction")
 public class CpuUsageTreeViewer extends AbstractSelectTreeViewer {
 
     /** Provides label for the CPU usage tree viewer cells */
@@ -124,7 +123,7 @@ public class CpuUsageTreeViewer extends AbstractSelectTreeViewer {
     }
 
     @Override
-    protected ITmfTreeViewerEntry modelToTree(long start, long end, List<TmfTreeDataModel> model) {
+    protected ITmfTreeViewerEntry modelToTree(long start, long end, List<ITmfTreeDataModel> model) {
         double time = end - start;
 
         Map<Long, TmfTreeViewerEntry> map = new HashMap<>();

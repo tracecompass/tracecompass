@@ -10,7 +10,7 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.TimeGraphEntryModel;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 
 /**
  * {@link TimeGraphEntryModel} for the Resources Status data provider.

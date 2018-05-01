@@ -59,7 +59,7 @@
    <extension
          point="org.eclipse.tracecompass.tmf.core.dataprovider">
       <dataProviderFactory
-            class="org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryDataProviderFactory"
+            class="org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryDataProviderFactory"
             id="org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryUsageDataProvider">
       </dataProviderFactory>
    </extension>

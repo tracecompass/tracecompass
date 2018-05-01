@@ -14,7 +14,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.memory.MemoryUsageTreeModel;
 import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
+import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
@@ -31,7 +31,6 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  * @author Mahdi Zolnouri
  * @author Wassim Nasrallah
  */
-@SuppressWarnings("restriction")
 public class MemoryUsageView extends TmfChartView {
    private final String fProviderId;
    private final TmfXYChartSettings fSettings;

@@ -19,6 +19,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
  * Event table line model.
  *
  * @author Simon Delisle
+ * @since 4.0
  */
 public class EventTableLine extends VirtualTableLine {
 

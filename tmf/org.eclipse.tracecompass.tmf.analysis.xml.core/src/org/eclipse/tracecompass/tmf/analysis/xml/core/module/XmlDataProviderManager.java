@@ -16,11 +16,14 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.TmfTimeGraphCompositeDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfTreeXYDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlTimeGraphDataProvider;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlTimeGraphEntryModel;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlXYDataProvider;
+import org.eclipse.tracecompass.internal.tmf.core.model.timegraph.TmfTimeGraphCompositeDataProvider;
+import org.eclipse.tracecompass.internal.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
@@ -40,13 +43,12 @@ import com.google.common.collect.Table;
  * @since 2.4
  * @author Loic Prieur-Drevon
  */
-@SuppressWarnings("restriction")
 public class XmlDataProviderManager {
 
     private static @Nullable XmlDataProviderManager INSTANCE;
 
     private static final String ID_ATTRIBUTE = "id"; //$NON-NLS-1$
-    private final Table<ITmfTrace, String, ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel>> fXyProviders = HashBasedTable.create();
+    private final Table<ITmfTrace, String, ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel>> fXyProviders = HashBasedTable.create();
     private final Table<ITmfTrace, String, ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel>> fTimeGraphProviders = HashBasedTable.create();
 
     /**
@@ -92,13 +94,14 @@ public class XmlDataProviderManager {
      * @param viewElement
      *            the XML XY view for which we are querying a provider
      * @return the unique instance of an XY provider for the queried parameters
+     * @since 3.0
      */
-    public synchronized ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel> getXyProvider(@NonNull ITmfTrace trace, @NonNull Element viewElement) {
+    public synchronized ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> getXyProvider(@NonNull ITmfTrace trace, @NonNull Element viewElement) {
         if (!viewElement.hasAttribute(ID_ATTRIBUTE)) {
             return null;
         }
         String viewId = viewElement.getAttribute(ID_ATTRIBUTE);
-        ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel> provider = fXyProviders.get(trace, viewId);
+        ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> provider = fXyProviders.get(trace, viewId);
         if (provider != null) {
             return provider;
         }
@@ -122,10 +125,10 @@ public class XmlDataProviderManager {
         return null;
     }
 
-    private ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel> generateExperimentProviderXy(Collection<@NonNull ITmfTrace> traces, @NonNull Element viewElement) {
-        List<@NonNull ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel>> providers = new ArrayList<>();
+    private ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> generateExperimentProviderXy(Collection<@NonNull ITmfTrace> traces, @NonNull Element viewElement) {
+        List<@NonNull ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel>> providers = new ArrayList<>();
         for (ITmfTrace child : traces) {
-            ITmfTreeXYDataProvider<@NonNull TmfTreeDataModel> childProvider = getXyProvider(child, viewElement);
+            ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> childProvider = getXyProvider(child, viewElement);
             if (childProvider != null) {
                 providers.add(childProvider);
             }
@@ -147,7 +150,7 @@ public class XmlDataProviderManager {
      * @param viewElement
      *            the XML XY view for which we are querying a provider
      * @return the unique instance of an XY provider for the queried parameters
-     * @since 2.6
+     * @since 3.0
      */
     public synchronized ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> getTimeGraphProvider(@NonNull ITmfTrace trace, @NonNull Element viewElement) {
         if (!viewElement.hasAttribute(ID_ATTRIBUTE)) {

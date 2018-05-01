@@ -10,8 +10,8 @@
 package org.eclipse.tracecompass.analysis.timing.core.segmentstore;
 
 import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 
 /**
  * A {@link TmfTreeDataModel} extended with the getters from {@link IStatistics}
@@ -19,7 +19,6 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
  * @author Loic Prieur-Drevon
  * @since 4.0
  */
-@SuppressWarnings("restriction")
 public class SegmentStoreStatisticsModel extends TmfTreeDataModel {
 
     private final long fMin;

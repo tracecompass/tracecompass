@@ -14,11 +14,11 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.xychart;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlXYDataProvider;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlDataProviderManager;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlXYDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
@@ -32,7 +32,6 @@ import org.w3c.dom.Element;
  *
  * @author Geneviève Bastien
  */
-@SuppressWarnings("restriction")
 public class XmlXYViewer extends TmfFilteredXYChartViewer {
 
     private final XmlViewInfo fViewInfo;

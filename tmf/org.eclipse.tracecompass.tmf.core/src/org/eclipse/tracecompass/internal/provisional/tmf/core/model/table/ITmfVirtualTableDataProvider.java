@@ -12,9 +12,9 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.table;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.VirtualTableQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
+import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 
 /**
  * This interface represents a virtual table data provider. It returns a
@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelR
  *            Model that represent the column for a table, returned by fetchTree
  * @param <L>
  *            Model that represent a line in a table, returned by fetchLines
+ * @since 4.0
  */
 public interface ITmfVirtualTableDataProvider<M extends ITmfTreeDataModel, L extends IVirtualTableLine> extends ITmfTreeDataProvider<M> {
 

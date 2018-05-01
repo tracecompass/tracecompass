@@ -13,7 +13,7 @@
 package org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage;
 
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory.MemoryUsageView;
-import org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryUsageDataProvider;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryUsageDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 
 /**

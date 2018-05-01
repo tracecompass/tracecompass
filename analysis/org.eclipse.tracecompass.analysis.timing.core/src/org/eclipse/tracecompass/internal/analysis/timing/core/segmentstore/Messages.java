@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 
 /**
@@ -22,32 +23,32 @@ public class Messages extends NLS {
     /**
      * XY series name
      */
-    public static String SegmentStoreDataProvider_Duration;
+    public static @Nullable String SegmentStoreDataProvider_Duration;
 
     /**
      * XY chart title
      */
-    public static String SegmentStoreScatterGraphViewer_title;
+    public static @Nullable String SegmentStoreScatterGraphViewer_title;
 
     /**
      * Error message to say that SegmentStore must be an IAnalysisModule
      */
-    public static String SegmentStoreDataProvider_SegmentMustBeAnIAnalysisModule;
+    public static @Nullable String SegmentStoreDataProvider_SegmentMustBeAnIAnalysisModule;
 
     /**
      * Error message to say that SegmentStore is not available
      */
-    public static String SegmentStoreDataProvider_SegmentNotAvailable;
+    public static @Nullable String SegmentStoreDataProvider_SegmentNotAvailable;
 
     /**
      * Externalized name of the Selection entry
      */
-    public static String SegmentStoreStatisticsDataProvider_Selection;
+    public static @Nullable String SegmentStoreStatisticsDataProvider_Selection;
 
     /**
      * Externalized name of the Total entry
      */
-    public static String SegmentStoreStatisticsDataProvider_Total;
+    public static @Nullable String SegmentStoreStatisticsDataProvider_Total;
 
     static {
         // initialize resource bundle

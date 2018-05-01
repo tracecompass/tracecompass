@@ -31,11 +31,11 @@
    <extension
          point="org.eclipse.tracecompass.tmf.core.dataprovider">
       <dataProviderFactory
-            class="org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreScatterDataProviderFactory"
+            class="org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreScatterDataProviderFactory"
             id="org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.scatter.dataprovider">
       </dataProviderFactory>
       <dataProviderFactory
-            class="org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProviderFactory"
+            class="org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProviderFactory"
             id="org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProvider">
       </dataProviderFactory>
       <dataProviderFactory

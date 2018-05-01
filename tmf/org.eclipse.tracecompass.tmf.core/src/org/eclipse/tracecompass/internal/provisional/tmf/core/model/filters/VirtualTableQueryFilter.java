@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
  * table query filter and pass it to data providers if needed.
  *
  * @author Yonni Chen
+ * @since 4.0
  */
 public class VirtualTableQueryFilter {
 

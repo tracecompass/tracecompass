@@ -18,6 +18,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * Basic implementation of {@link IVirtualTableLine}
  *
  * @author Simon Delisle
+ * @since 4.0
  */
 public class VirtualTableLine implements IVirtualTableLine {
 

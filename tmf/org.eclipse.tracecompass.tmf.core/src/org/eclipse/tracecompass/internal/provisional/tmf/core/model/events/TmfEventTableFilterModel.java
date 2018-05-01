@@ -20,6 +20,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfFi
  * Implementation of {@link ITmfFilterModel} for the event table.
  *
  * @author Simon Delisle
+ * @since 4.0
  */
 public class TmfEventTableFilterModel implements ITmfFilterModel {
     private final @Nullable Map<Long, String> fTableFilter;

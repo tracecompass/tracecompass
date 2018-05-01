@@ -110,7 +110,14 @@ public class Disk {
         return extractDeviceIdString(fDev);
     }
 
-    protected static String extractDeviceIdString(int dev) {
+    /**
+     * Extract a string from a device ID
+     *
+     * @param dev
+     *            Device ID
+     * @return The extracted string
+     */
+    public static String extractDeviceIdString(int dev) {
         int major = dev >> MINORBITS;
         int minor = dev & MINORMASK;
         return major + "," + minor; //$NON-NLS-1$
@@ -168,7 +175,7 @@ public class Disk {
      *            the desired time
      * @return The number of sectors affected by operation at the end of the range
      */
-    protected static double extractCount(int sectorQuark, ITmfStateSystem ss, List<ITmfStateInterval> states, long ts) {
+    public static double extractCount(int sectorQuark, ITmfStateSystem ss, List<ITmfStateInterval> states, long ts) {
         // Determine if we are handling read or write requests.
         String sectorName = ss.getAttributeName(sectorQuark);
         int rw = sectorName.equals(Attributes.SECTORS_READ) ? StateValues.READING_REQUEST : StateValues.WRITING_REQUEST;

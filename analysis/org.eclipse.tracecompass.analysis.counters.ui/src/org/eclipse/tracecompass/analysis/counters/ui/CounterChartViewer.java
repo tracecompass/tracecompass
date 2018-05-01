@@ -10,9 +10,9 @@
 package org.eclipse.tracecompass.analysis.counters.ui;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.counters.core.CounterDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectedCounterQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.internal.analysis.counters.core.CounterDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.filters.SelectedCounterQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 
@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSet
  * @author Matthew Khouzam
  * @author Mikael Ferland
  */
-@SuppressWarnings("restriction")
 public final class CounterChartViewer extends TmfFilteredXYChartViewer {
 
     private boolean fIsCumulative = false;

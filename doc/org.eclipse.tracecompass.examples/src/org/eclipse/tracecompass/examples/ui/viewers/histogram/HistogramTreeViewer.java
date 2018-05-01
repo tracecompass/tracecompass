@@ -13,9 +13,9 @@ import java.util.Comparator;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.histogram.HistogramDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.histogram.Messages;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.internal.tmf.core.histogram.HistogramDataProvider;
+import org.eclipse.tracecompass.internal.tmf.core.histogram.Messages;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
@@ -29,7 +29,6 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Loic Prieur-Drevon
  */
-@SuppressWarnings("restriction")
 public class HistogramTreeViewer extends AbstractSelectTreeViewer {
 
     private class HistogramLabelProvider extends TreeLabelProvider {

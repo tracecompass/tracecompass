@@ -37,14 +37,14 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfCommonXAxisModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXYDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.ITmfXyModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.xy.ITmfCommonXAxisModel;
+import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXYDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
+import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
+import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.viewmodel.ICommonXAxisModel;
@@ -177,7 +177,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      *
      * @param dataProvider
      *            A data provider used for fetching a XY Model
-     * @since 3.1
+     * @since 4.0
      */
     protected void setDataProvider(ITmfXYDataProvider dataProvider) {
         fXYDataProvider = dataProvider;
@@ -480,7 +480,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      *            The number of entries
      * @return An {@link TimeQueryFilter} instance that data provider will use to
      *         extract a model
-     * @since 3.1
+     * @since 4.0
      */
     protected @NonNull TimeQueryFilter createQueryFilter(long start, long end, int nb) {
         return new TimeQueryFilter(start, end, nb);

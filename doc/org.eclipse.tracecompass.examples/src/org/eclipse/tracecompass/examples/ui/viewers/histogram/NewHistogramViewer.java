@@ -14,8 +14,8 @@ package org.eclipse.tracecompass.examples.ui.viewers.histogram;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.histogram.HistogramDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
+import org.eclipse.tracecompass.internal.tmf.core.histogram.HistogramDataProvider;
+import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.barcharts.TmfHistogramTooltipProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
@@ -28,7 +28,6 @@ import org.swtchart.LineStyle;
  * @author Alexandre Montplaisir
  * @author Bernd Hufmann
  */
-@SuppressWarnings("restriction")
 public class NewHistogramViewer extends TmfFilteredXYChartViewer {
 
     private static final int DEFAULT_SERIES_WIDTH = 1;

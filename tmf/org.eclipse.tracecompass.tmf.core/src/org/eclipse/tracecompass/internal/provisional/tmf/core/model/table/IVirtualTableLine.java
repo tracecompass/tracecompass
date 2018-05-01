@@ -15,6 +15,7 @@ import java.util.List;
  * Interface that represent a line in a virtual table.
  *
  * @author Simon Delisle
+ * @since 4.0
  */
 public interface IVirtualTableLine {
     /**

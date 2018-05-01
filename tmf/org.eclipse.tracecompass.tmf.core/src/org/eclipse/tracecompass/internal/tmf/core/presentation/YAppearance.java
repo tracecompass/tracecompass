@@ -9,7 +9,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.presentation;
 
-import org.eclipse.tracecompass.internal.provisional.tmf.core.presentation.IYAppearance;
+import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 
 /**

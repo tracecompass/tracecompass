@@ -12,7 +12,8 @@ package org.eclipse.tracecompass.analysis.os.linux.core.cpuusage;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.CpuUsageDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 
 /**
  * Entry Model to represent entries for the {@link CpuUsageDataProvider}.
@@ -20,7 +21,6 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTree
  * @author Loic Prieur-Drevon
  * @since 2.4
  */
-@SuppressWarnings("restriction")
 public class CpuUsageEntryModel extends TmfTreeDataModel {
     private final int fTid;
     private final long fTime;

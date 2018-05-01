@@ -33,9 +33,9 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
 import org.eclipse.swtbot.swt.finder.utils.FileUtils;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.xy.IYModel;
-import org.eclipse.tracecompass.internal.tmf.core.model.TmfCommonXAxisModel;
-import org.eclipse.tracecompass.internal.tmf.core.model.YModel;
+import org.eclipse.tracecompass.tmf.core.model.TmfCommonXAxisModel;
+import org.eclipse.tracecompass.tmf.core.model.YModel;
+import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
@@ -64,7 +64,6 @@ import com.google.gson.GsonBuilder;
  *
  * @author Yonni Chen
  */
-@SuppressWarnings("restriction")
 @RunWith(SWTBotJunit4ClassRunner.class)
 public abstract class XYDataProviderBaseTest {
 

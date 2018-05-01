@@ -9,8 +9,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.tree;
 
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 
 /**
  * Generic implementation for a {@link TmfTreeViewerEntry} that also
@@ -21,7 +21,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTree
  * @author Loic Prieur-Drevon
  * @since 3.2
  */
-public class TmfGenericTreeEntry<M extends TmfTreeDataModel> extends TmfTreeViewerEntry {
+public class TmfGenericTreeEntry<M extends ITmfTreeDataModel> extends TmfTreeViewerEntry {
 
     private final M fModel;
 
@@ -30,6 +30,7 @@ public class TmfGenericTreeEntry<M extends TmfTreeDataModel> extends TmfTreeView
      *
      * @param model
      *            the model to encapsulate
+     * @since 4.0
      */
     public TmfGenericTreeEntry(M model) {
         super(model.getName());
@@ -40,6 +41,7 @@ public class TmfGenericTreeEntry<M extends TmfTreeDataModel> extends TmfTreeView
      * Get the encapsulated model
      *
      * @return the encapsulated model.
+     * @since 4.0
      */
     public M getModel() {
         return fModel;

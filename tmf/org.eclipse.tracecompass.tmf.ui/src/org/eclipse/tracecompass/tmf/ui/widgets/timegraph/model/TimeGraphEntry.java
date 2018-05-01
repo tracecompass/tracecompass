@@ -24,8 +24,8 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphEntryModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.TimeGraphEntryModel;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 
 /**
  * An entry for use in the time graph views
@@ -114,7 +114,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      *
      * @param model
      *            Time graph model
-     * @since 3.3
+     * @since 4.0
      */
     public TimeGraphEntry(TimeGraphEntryModel model) {
         fModel = model;
@@ -443,7 +443,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      * Getter for the underlying time graph entry model
      *
      * @return The underlying time graph entry model
-     * @since 3.3
+     * @since 4.0
      */
     public ITimeGraphEntryModel getModel() {
         return fModel;
@@ -454,7 +454,7 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      *
      * @param model
      *            new model for this TimeGraphEntry.
-     * @since 3.3
+     * @since 4.0
      */
     public void updateModel(@NonNull TimeGraphEntryModel model) {
         if (fModel.getId() != model.getId()) {

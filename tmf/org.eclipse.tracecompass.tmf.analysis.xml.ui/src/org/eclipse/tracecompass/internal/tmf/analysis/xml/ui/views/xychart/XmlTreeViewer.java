@@ -14,12 +14,13 @@ import java.util.Comparator;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.ITmfTreeDataProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlXYDataProvider;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlDataProviderManager;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlXYDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
@@ -34,7 +35,6 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Loic Prieur-Drevon
  */
-@SuppressWarnings("restriction")
 public class XmlTreeViewer extends AbstractSelectTreeViewer {
 
     private class XmlLabelProvider extends TreeLabelProvider {
@@ -77,7 +77,7 @@ public class XmlTreeViewer extends AbstractSelectTreeViewer {
     }
 
     @Override
-    protected @Nullable ITmfTreeDataProvider<TmfTreeDataModel> getProvider(ITmfTrace trace) {
+    protected @Nullable ITmfTreeDataProvider<ITmfTreeDataModel> getProvider(ITmfTrace trace) {
         Element viewElement = fViewInfo.getViewElement(TmfXmlStrings.XY_VIEW);
         if (viewElement == null) {
             return null;
