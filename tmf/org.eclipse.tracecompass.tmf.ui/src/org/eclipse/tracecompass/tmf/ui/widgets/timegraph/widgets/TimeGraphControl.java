@@ -163,6 +163,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private static final int PPI = 72;
     private static final int DPI = Display.getDefault().getDPI().y;
 
+    private static final int OPAQUE = 255;
+
     private static final int VERTICAL_ZOOM_DELAY = 400;
 
     private static final String PREFERRED_WIDTH = "width"; //$NON-NLS-1$
@@ -230,6 +232,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private long fVerticalZoomAlignTime = 0;
     private int fBorderWidth = 0;
     private int fHeaderHeight = 0;
+    private int fLastTransparentX = -1;
 
     private boolean fFirstHeightWarning = true;
     /**
@@ -1922,8 +1925,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
         fTimeGraphProvider.postDrawControl(bounds, gc);
 
-        int alpha = gc.getAlpha();
-        gc.setAlpha(100);
+        gc.setAlpha(OPAQUE * 2 / 5);
 
         long time0 = fTimeProvider.getTime0();
         long time1 = fTimeProvider.getTime1();
@@ -1991,7 +1993,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
         }
 
-        gc.setAlpha(alpha);
+        gc.setAlpha(OPAQUE);
     }
 
     /**
@@ -2061,7 +2063,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         for (int x : fTimeGraphScale.getTickList()) {
             gc.drawLine(x, bounds.y, x, bounds.y + bounds.height);
         }
-        gc.setAlpha(255);
+        gc.setAlpha(OPAQUE);
     }
 
     /**
@@ -2135,7 +2137,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         gc.setBackground(color);
         gc.setAlpha(color.getAlpha());
         gc.fillRectangle(rect);
-        gc.setAlpha(255);
+        gc.setAlpha(OPAQUE);
         String label = marker.getLabel();
         if (label != null && marker.getEntry() != null) {
             label = label.substring(0, Math.min(label.indexOf('\n') != -1 ? label.indexOf('\n') : label.length(), MAX_LABEL_LENGTH));
@@ -2222,6 +2224,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             Iterator<ITimeEvent> iterator = entry.getTimeEventsIterator(time0, time1, maxDuration);
 
             int lastX = -1;
+            fLastTransparentX = -1;
             while (iterator.hasNext()) {
                 ITimeEvent event = iterator.next();
                 int x = SaturatedArithmetic.add(rect.x, (int) ((event.getTime() - time0) * pixelsPerNanoSec));
@@ -2232,18 +2235,18 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 }
                 xEnd = Math.min(rect.x + rect.width, xEnd);
                 stateRect.x = Math.max(rect.x, x);
-                stateRect.width = Math.max(0, xEnd - stateRect.x + 1);
-                if (stateRect.x == lastX) {
-                    stateRect.width -= 1;
+                stateRect.width = Math.max(1, xEnd - stateRect.x + 1);
+                if (stateRect.x < lastX) {
+                    stateRect.width -= (lastX - stateRect.x);
                     if (stateRect.width > 0) {
-                        gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
-                        gc.drawPoint(stateRect.x, stateRect.y - 2);
-                        stateRect.x += 1;
+                        stateRect.x = lastX;
+                    } else {
+                        stateRect.width = 0;
                     }
                 }
                 boolean timeSelected = selectedTime >= event.getTime() && selectedTime < event.getTime() + event.getDuration();
                 if (drawState(getColorScheme(), event, stateRect, gc, selected, timeSelected)) {
-                    lastX = stateRect.x;
+                    lastX = stateRect.x + stateRect.width;
                 }
             }
             gc.setClipping((Rectangle) null);
@@ -2535,7 +2538,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         if (colorIdx < 0 && colorIdx != ITimeGraphPresentationProvider.TRANSPARENT) {
             return false;
         }
-        boolean visible = rect.width == 0 ? false : true;
+        boolean visible = rect.width <= 0 ? false : true;
         rect.width = Math.max(1, rect.width);
         Color black = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
         gc.setForeground(black);
@@ -2556,12 +2559,34 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
         if (colorIdx == ITimeGraphPresentationProvider.TRANSPARENT) {
             if (visible) {
-                // Only draw the top and bottom borders
-                gc.drawLine(drawRect.x, drawRect.y, drawRect.x + drawRect.width - 1, drawRect.y);
-                gc.drawLine(drawRect.x, drawRect.y + drawRect.height - 1, drawRect.x + drawRect.width - 1, drawRect.y + drawRect.height - 1);
-                if (drawRect.width == 1) {
-                    gc.drawPoint(drawRect.x, drawRect.y - 2);
+                // Avoid overlapping transparent states
+                int x = Math.max(fLastTransparentX, drawRect.x);
+                int width = drawRect.x + drawRect.width - x;
+                if (width > 0) {
+                    // Draw transparent background
+                    drawRect.x = x;
+                    drawRect.width = width;
+                    gc.setAlpha(OPAQUE / 4);
+                    gc.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
+                    gc.fillRectangle(drawRect);
+                    fLastTransparentX = Math.max(fLastTransparentX, drawRect.x + drawRect.width);
+                    gc.setAlpha(OPAQUE);
+                } else {
+                    drawRect.width = 0;
                 }
+                if (drawRect.width <= 2) {
+                    // Draw point over state
+                    gc.drawPoint(rect.x, rect.y - 2);
+                    if (drawRect.width == 2) {
+                        gc.drawPoint(rect.x + 1, rect.y - 2);
+                    }
+                } else {
+                    // Draw the top and bottom borders
+                    gc.drawLine(drawRect.x, drawRect.y, drawRect.x + drawRect.width - 1, drawRect.y);
+                    gc.drawLine(drawRect.x, drawRect.y + drawRect.height - 1, drawRect.x + drawRect.width - 1, drawRect.y + drawRect.height - 1);
+                }
+            } else {
+                gc.drawPoint(rect.x, rect.y - 2);
             }
             fTimeGraphProvider.postDrawEvent(event, drawRect, gc);
             return false;
@@ -2589,15 +2614,14 @@ public class TimeGraphControl extends TimeGraphBaseControl
         // fill all rect area
         gc.setBackground(stateColor);
         if (visible) {
-            int prevAlpha = gc.getAlpha();
             int alpha = fillColor & 0xff;
             gc.setAlpha(alpha);
             gc.fillRectangle(drawRect);
-            gc.setAlpha(prevAlpha);
+            gc.setAlpha(OPAQUE);
         } else if (fBlendSubPixelEvents) {
-            gc.setAlpha(128);
+            gc.setAlpha(OPAQUE / 2);
             gc.fillRectangle(drawRect);
-            gc.setAlpha(255);
+            gc.setAlpha(OPAQUE);
         }
 
         if (reallySelected) {
@@ -2605,7 +2629,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             gc.drawLine(drawRect.x, drawRect.y + drawRect.height, drawRect.x + drawRect.width - 1, drawRect.y + drawRect.height);
         }
         if (!visible) {
-            gc.drawPoint(drawRect.x, drawRect.y - 2);
+            gc.drawPoint(rect.x, rect.y - 2);
         }
         fTimeGraphProvider.postDrawEvent(event, drawRect, gc);
         return visible;
