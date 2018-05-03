@@ -90,6 +90,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -1084,6 +1085,21 @@ public final class SWTBotUtils {
      * @return the preferences shell
      */
     public static SWTBotShell openPreferences(SWTBot bot) {
+        return openPreferences(bot, null);
+    }
+
+    /**
+     * Open the preferences dialog and return the corresponding shell. See also
+     * {@link #pressOKishButtonInPreferences(SWTBot)} to close the dialog.
+     *
+     * @param bot
+     *            a given workbench bot
+     * @param text
+     *            an alternative text for the preferences dialog, useful when a
+     *            specific preference page was previously selected
+     * @return the preferences shell
+     */
+    public static SWTBotShell openPreferences(SWTBot bot, String text) {
         if (SWTUtils.isMac()) {
             // On Mac, the Preferences menu item is under the application name.
             // For some reason, we can't access the application menu anymore so
@@ -1097,6 +1113,9 @@ public final class SWTBotUtils {
             bot.menu(WINDOW_MENU).menu(PREFERENCES_MENU_ITEM).click();
         }
 
+        if (text != null) {
+            return anyShellOf(bot, PREFERENCES_SHELL, text).activate();
+        }
         return bot.shell(PREFERENCES_SHELL).activate();
     }
 
@@ -1238,6 +1257,29 @@ public final class SWTBotUtils {
                     total += getChecked(child);
                 }
                 return total;
+            }
+        });
+    }
+
+    /**
+     * Get the number of checked items of a table
+     *
+     * @param table
+     *            The table bot
+     * @return The number of checked items
+     */
+    public static int getTableCheckedItemCount(SWTBotTable table) {
+        return UIThreadRunnable.syncExec(new IntResult() {
+
+            @Override
+            public Integer run() {
+                int checked = 0;
+                for (TableItem item : table.widget.getItems()) {
+                    if (item.getChecked()) {
+                        checked++;
+                    }
+                }
+                return checked;
             }
         });
     }

@@ -28,8 +28,22 @@ public class Messages extends NLS {
     /** Property name for type */
     public static String XmlModuleHelper_PropertyType;
 
+    /** Error opening XML file */
+    public static String XmlUtils_ErrorOpeningFile;
     /** Error copying XML file to workspace folder */
     public static String XmlUtils_ErrorCopyingFile;
+    /** Error accessing file */
+    public static String XmlUtils_ErrorAccessIO;
+    /** IO exception */
+    public static String XmlUtils_ExceptionIO;
+    /** Error getting analysis modules */
+    public static String XmlUtils_ErrorAnalysisModules;
+    /** Error cannot find file */
+    public static String XmlUtils_ErrorNotFound;
+    /** Error fail analyses ID */
+    public static String XmlUtils_ErrorAnalysesID;
+    /** Error saving preferences */
+    public static String XmlUtils_ErrorSavingPreferences;
     /** XML parse error */
     public static String XmlUtils_XmlParseError;
     /** Error occurred while validating XML */

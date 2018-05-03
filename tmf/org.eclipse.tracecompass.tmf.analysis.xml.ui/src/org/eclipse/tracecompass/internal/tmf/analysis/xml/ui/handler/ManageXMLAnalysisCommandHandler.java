@@ -12,6 +12,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 /**
  * Manager for XML analysis files
@@ -20,10 +21,11 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ManageXMLAnalysisCommandHandler extends AbstractHandler {
 
+    private static final String PAGE_ID = "org.eclipse.tracecompass.tmf.analysis.xml.ui.manager"; //$NON-NLS-1$
+
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        ManageXMLAnalysisDialog dialog = new ManageXMLAnalysisDialog(Display.getDefault().getActiveShell());
-        dialog.open();
+        PreferencesUtil.createPreferenceDialogOn(Display.getDefault().getActiveShell(), PAGE_ID, new String[] {PAGE_ID}, null).open();
         return null;
     }
 

@@ -52,12 +52,14 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.ITmfXmlSchemaParser;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.osgi.framework.Bundle;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -66,9 +68,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 
 /**
  * Class containing some utilities for the XML plug-in packages: for example, it
@@ -127,6 +132,11 @@ public class XmlUtils {
     private static final @NonNull Multimap<String, XmlOutputElement> XML_OUTPUT_ELEMENTS = HashMultimap.create();
     private static Multimap<String, XmlOutputElement> fCachedOutputElement = HashMultimap.create();
 
+    /** File enabling/disabling */
+    private static final String ENABLED_FILES_PREFERENCE_KEY = "enabled_files"; //$NON-NLS-1$
+    private static final String ENABLED_FILES_SEP = ";"; //$NON-NLS-1$
+    private static Set<String> fEnabledFiles;
+
     /**
      * Extension for XML files
      */
@@ -138,8 +148,30 @@ public class XmlUtils {
     }
 
     /**
-     * Get the path where the XML files are stored. Create it if it does not
-     * exist
+     * Load files status from preference store.
+     */
+    public static void loadFilesStatus() {
+        IPreferenceStore preferenceStore = Activator.getDefault().getCorePreferenceStore();
+        String joined = preferenceStore.getString(ENABLED_FILES_PREFERENCE_KEY);
+        fEnabledFiles = Sets.newHashSet(Splitter.on(ENABLED_FILES_SEP).omitEmptyStrings().split(joined));
+    }
+
+    /**
+     * Save files status to preference store.
+     */
+    public static void saveFilesStatus() {
+        ScopedPreferenceStore preferenceStore = Activator.getDefault().getCorePreferenceStore();
+        String joined = Joiner.on(ENABLED_FILES_SEP).join(fEnabledFiles);
+        preferenceStore.setValue(ENABLED_FILES_PREFERENCE_KEY, joined);
+        try {
+            preferenceStore.save();
+        } catch (IOException e) {
+            Activator.logError(Messages.XmlUtils_ErrorSavingPreferences, e);
+        }
+    }
+
+    /**
+     * Get the path where the XML files are stored. Create it if it does not exist
      *
      * @return path to XML files
      */
@@ -178,9 +210,9 @@ public class XmlUtils {
 
         try {
             /*
-             * Even though the XSDs do not define a namespace, there is one
-             * default namespace of null and to allow multiple XSDs to be parsed
-             * together, we must allow namespace growth
+             * Even though the XSDs do not define a namespace, there is one default
+             * namespace of null and to allow multiple XSDs to be parsed together, we must
+             * allow namespace growth
              */
             schemaFactory.setFeature("http://apache.org/xml/features/namespace-growth", true); //$NON-NLS-1$
             schema = schemaFactory.newSchema(sources);
@@ -211,7 +243,7 @@ public class XmlUtils {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, error, e);
         } catch (IOException e) {
             String error = Messages.XmlUtils_XmlValidateError;
-            Activator.logError("IO exception occurred", e); //$NON-NLS-1$
+            Activator.logError(Messages.XmlUtils_ExceptionIO, e);
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, error, e);
         }
         return Status.OK_STATUS;
@@ -219,8 +251,8 @@ public class XmlUtils {
 
     /**
      * Adds an XML file to the plugin's path. The XML file should have been
-     * validated using the {@link XmlUtils#xmlValidate(File)} method before
-     * calling this method.
+     * validated using the {@link XmlUtils#xmlValidate(File)} method before calling
+     * this method.
      *
      * @param fromFile
      *            The XML file to add
@@ -235,14 +267,16 @@ public class XmlUtils {
 
         if (status.isOK()) {
             preloadXmlAnalysesOutput(toFile);
+            // Add to enabled files by default
+            fEnabledFiles.add(fromFile.getName());
         }
 
         return status;
     }
 
     /**
-     * List all files under the XML analysis files path. It returns a map where
-     * the key is the file name.
+     * List all files under the XML analysis files path. It returns a map where the
+     * key is the file name (with extension).
      *
      * @return A map with all the XML analysis files
      */
@@ -261,15 +295,15 @@ public class XmlUtils {
                     }
                 }
             } else {
-                Activator.logError("I/O error occured while accessing files in folder " + folder.getPath()); //$NON-NLS-1$
+                Activator.logError(Messages.XmlUtils_ErrorAccessIO + " " + folder.getPath()); //$NON-NLS-1$
             }
         }
         return Collections.unmodifiableMap(fileMap);
     }
 
     /**
-     * List all files advertised through the builtin extension point. It returns
-     * a map where the key is the file name.
+     * List all files advertised through the builtin extension point. It returns a
+     * map where the key is the file name.
      *
      * @return A map with all the XMl analysis builtin files
      */
@@ -344,7 +378,7 @@ public class XmlUtils {
                     ITmfXmlSchemaParser parser = NonNullUtils.checkNotNull((ITmfXmlSchemaParser) element.createExecutableExtension(XSD_PARSER_CLASS_ATTRIB));
                     list.add(parser);
                 } catch (CoreException e) {
-                    Activator.logError("Error getting analysis modules from configuration files", e); //$NON-NLS-1$
+                    Activator.logError(Messages.XmlUtils_ErrorAnalysisModules, e);
                 }
             }
         }
@@ -368,6 +402,34 @@ public class XmlUtils {
     }
 
     /**
+     * Enable an XML analysis file that already exists.
+     *
+     * @param name
+     *            the name of the XML file to enable, with extension
+     */
+    public static void enableFile(String name) {
+        File fileName = getXmlFilesPath().addTrailingSeparator().append(name).toFile();
+        preloadXmlAnalysesOutput(fileName);
+        fEnabledFiles.add(name);
+    }
+
+    /**
+     * Disable an XML analysis file without removing it.
+     *
+     * @param name
+     *            the name of the XML file to disable, with extension
+     */
+    public static void disableFile(String name) {
+        Map<String, File> files = listFiles();
+        File file = files.get(name);
+        if (file == null) {
+            return;
+        }
+        removeXmlOutput(file.getAbsolutePath());
+        fEnabledFiles.remove(name);
+    }
+
+    /**
      * Export an XML analysis file to an external path
      *
      * @param from
@@ -382,7 +444,7 @@ public class XmlUtils {
         File fromFile = getXmlFilesPath().addTrailingSeparator().append(from).toFile();
 
         if (!fromFile.exists()) {
-            Activator.logError("Failed to find XML analysis file " + fromFile.getName()); //$NON-NLS-1$
+            Activator.logError(Messages.XmlUtils_ErrorNotFound + " " + fromFile.getName()); //$NON-NLS-1$
             return Status.CANCEL_STATUS;
         }
 
@@ -416,7 +478,7 @@ public class XmlUtils {
     }
 
     /**
-     * Get the IDs of all the analysis described in a single file
+     * Get the IDs of all the analyses described in a single file.
      *
      * @param fileName
      *            The file name
@@ -441,7 +503,7 @@ public class XmlUtils {
                     ids.add(nullToEmptyString(((Element) patternNodes.item(i)).getAttribute(TmfXmlStrings.ID)));
                 }
             } catch (ParserConfigurationException | SAXException | IOException e) {
-                Activator.logError("Failed to get analyses IDs from " + fileName); //$NON-NLS-1$
+                Activator.logError(Messages.XmlUtils_ErrorAnalysesID + " " + fileName); //$NON-NLS-1$
             }
         }
         return ids;
@@ -486,22 +548,25 @@ public class XmlUtils {
     }
 
     /**
-     * preload all the xml analyses output for the existing xml files
+     * Preload the built-in or enabled xml analyses output for the existing xml
+     * files.
      */
     public static void initOutputElements() {
-        // Get all the xml files, builtin and not builtin
-        Set<File> files = new HashSet<>(listFiles().values());
+        // Preload built-in xml files
         for (IPath path : listBuiltinFiles().values()) {
-            files.add(path.toFile());
+            preloadXmlAnalysesOutput(path.toFile());
         }
 
-        for (File xmlFile : files) {
-            preloadXmlAnalysesOutput(xmlFile);
+        // Check external xml files
+        for (Map.Entry<String, File> pair : listFiles().entrySet()) {
+            if (isAnalysisEnabled(pair.getKey())) {
+                preloadXmlAnalysesOutput(pair.getValue());
+            }
         }
     }
 
     /**
-     * Preload the xml analyses file output data
+     * Preload the xml analyses file output data.
      *
      * @param file
      *            The xml file
@@ -511,7 +576,7 @@ public class XmlUtils {
     }
 
     /**
-     * preload all the xml analyses output in the given file.
+     * Preload all the xml analyses output in the given file.
      *
      * @param xmlFile
      *            The xml file
@@ -526,25 +591,25 @@ public class XmlUtils {
         try {
             Document doc = XmlUtils.getDocumentFromFile(xmlFile);
 
-                for (OutputType outputType : OutputType.values()) {
-                    NodeList outputNodes = doc.getElementsByTagName(outputType.getXmlElem());
-                    for (int i = 0; i < outputNodes.getLength(); i++) {
-                        Set<String> analysesId = new HashSet<>();
-                        Element node = (Element) outputNodes.item(i);
+            for (OutputType outputType : OutputType.values()) {
+                NodeList outputNodes = doc.getElementsByTagName(outputType.getXmlElem());
+                for (int i = 0; i < outputNodes.getLength(); i++) {
+                    Set<String> analysesId = new HashSet<>();
+                    Element node = (Element) outputNodes.item(i);
 
-                        /* Check if analysis is the right one */
-                        List<Element> headNodes = TmfXmlUtils.getChildElements(node, TmfXmlStrings.HEAD);
-                        if (headNodes.size() != 1) {
-                            return;
-                        }
+                    /* Check if analysis is the right one */
+                    List<Element> headNodes = TmfXmlUtils.getChildElements(node, TmfXmlStrings.HEAD);
+                    if (headNodes.size() != 1) {
+                        return;
+                    }
 
-                        Element headElement = headNodes.get(0);
-                        List<Element> analysisNodes = TmfXmlUtils.getChildElements(headElement, TmfXmlStrings.ANALYSIS);
-                        for (Element analysis : analysisNodes) {
-                            String analysisId = analysis.getAttribute(TmfXmlStrings.ID);
-                            analysesId.add(analysisId);
-                        }
-                        String outputId = node.getAttribute(TmfXmlStrings.ID);
+                    Element headElement = headNodes.get(0);
+                    List<Element> analysisNodes = TmfXmlUtils.getChildElements(headElement, TmfXmlStrings.ANALYSIS);
+                    for (Element analysis : analysisNodes) {
+                        String analysisId = analysis.getAttribute(TmfXmlStrings.ID);
+                        analysesId.add(analysisId);
+                    }
+                    String outputId = node.getAttribute(TmfXmlStrings.ID);
 
                         List<Element> label = TmfXmlUtils.getChildElements(headNodes.get(0), TmfXmlStrings.LABEL);
                         String outputLabel = outputId;
@@ -553,14 +618,14 @@ public class XmlUtils {
                             outputLabel = labelElement.getAttribute(TmfXmlStrings.VALUE);
                         }
 
-                        XmlOutputElement output = new XmlOutputElement(xmlFile.getAbsolutePath(), outputType.getXmlElem(), outputId, outputLabel, analysesId);
-                        addXmlOutput(output);
-                    }
+                    XmlOutputElement output = new XmlOutputElement(xmlFile.getAbsolutePath(), outputType.getXmlElem(), outputId, outputLabel, analysesId);
+                    addXmlOutput(output);
                 }
-                updateCachedOuputElements();
+            }
+            updateCachedOuputElements();
 
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            Activator.logError("Error opening XML file", e); //$NON-NLS-1$
+            Activator.logError(Messages.XmlUtils_ErrorOpeningFile, e);
         }
     }
 
@@ -602,5 +667,44 @@ public class XmlUtils {
      */
     public static Multimap<String, XmlOutputElement> getXmlOutputElements() {
         return fCachedOutputElement;
+    }
+
+    /**
+     * Check if a given analysis file is enabled.
+     *
+     * @param xmlName
+     *            the name of the xml file, with extension
+     * @return true if file is enabled, false otherwise
+     */
+    public static boolean isAnalysisEnabled(String xmlName) {
+        return fEnabledFiles.contains(xmlName);
+    }
+
+    /**
+     * Create an XML file string from a base file name.
+     *
+     * @param baseName
+     *            the base name of the file (without an extension)
+     * @return the base name with the XML extension
+     */
+    public static String createXmlFileString(String baseName) {
+        IPath path = new Path(baseName).addFileExtension(XmlUtils.XML_EXTENSION);
+        return path.toString();
+    }
+
+    /**
+     * Get all enabled files, including built-in files.
+     *
+     * @return the enabled files
+     */
+    public static Map<String, @NonNull File> getEnabledFiles() {
+        Map<@NonNull String, @NonNull File> files = listFiles();
+        Map<@NonNull String, @NonNull File> enabledFiles = new HashMap<>();
+        files.forEach((name, file) -> {
+            if (isAnalysisEnabled(name)) {
+                enabledFiles.put(name, file);
+            }
+        });
+        return enabledFiles;
     }
 }

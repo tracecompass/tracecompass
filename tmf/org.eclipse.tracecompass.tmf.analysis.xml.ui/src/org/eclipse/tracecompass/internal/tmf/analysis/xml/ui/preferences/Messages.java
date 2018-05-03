@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.handler;
+package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.preferences;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -17,7 +17,7 @@ import org.eclipse.osgi.util.NLS;
  * @author Jean-Christian Kouame
  */
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.handler.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.preferences.messages"; //$NON-NLS-1$
 
     /** Import XML file title */
     public static String ManageXMLAnalysisDialog_ImportXmlFile;
@@ -91,6 +91,31 @@ public class Messages extends NLS {
      * Invalid file message
      */
     public static String ManageXMLAnalysisDialog_FileValidationError;
+
+    /**
+     * Enabled file message
+     */
+    public static String ManageXMLAnalysisDialog_FileEnabled;
+
+    /**
+     * Check all files
+     */
+    public static String ManageXMLAnalysisDialog_CHECK_ALL;
+
+    /**
+     * Uncheck all files
+     */
+    public static String ManageXMLAnalysisDialog_UNCHECK_ALL;
+
+    /**
+     * Check selected files
+     */
+    public static String ManageXMLAnalysisDialog_CHECK_SELECTED;
+
+    /**
+     * Uncheck selected files
+     */
+    public static String ManageXMLAnalysisDialog_UNCHECK_SELECTED;
 
     static {
         // initialize resource bundle

@@ -145,7 +145,7 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
                 }
             }
         }
-        Map<String, @NonNull File> files = XmlUtils.listFiles();
+        Map<String, @NonNull File> files = XmlUtils.getEnabledFiles();
         for (File xmlFile : files.values()) {
             processFile(xmlFile);
         }

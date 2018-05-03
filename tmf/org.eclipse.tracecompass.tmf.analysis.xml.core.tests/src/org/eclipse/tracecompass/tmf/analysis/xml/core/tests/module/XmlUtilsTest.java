@@ -148,7 +148,7 @@ public class XmlUtilsTest {
     }
 
     /**
-     * test the {@link XmlUtils#addXmlFile(File)} method
+     * Test the {@link XmlUtils#addXmlFile(File)} method
      */
     @Test
     public void testXmlAddFile() {
@@ -165,6 +165,29 @@ public class XmlUtilsTest {
 
         XmlUtils.addXmlFile(testXmlFile);
         assertTrue(destFile.exists());
+    }
+
+    /**
+     * Test the enabling and disabling methods
+     */
+    @Test
+    public void testXmlEnableDisableFile() {
+        IPath xmlPath = XmlUtils.getXmlFilesPath().addTrailingSeparator().append("test_valid.xml");
+        File destFile = xmlPath.toFile();
+        File testXmlFile = TmfXmlTestFiles.VALID_FILE.getFile();
+
+        XmlUtils.addXmlFile(testXmlFile);
+        assertTrue(destFile.exists());
+
+        /* Check that the file was enabled after being added */
+        assertTrue(XmlUtils.isAnalysisEnabled(destFile.getName()));
+        assertTrue(XmlUtils.getEnabledFiles().containsKey(destFile.getName()));
+
+        XmlUtils.disableFile(destFile.getName());
+
+        /* Check that the file was marked as disabled */
+        assertFalse(XmlUtils.isAnalysisEnabled(destFile.getName()));
+        assertFalse(XmlUtils.getEnabledFiles().containsKey(destFile.getName()));
     }
 
     /**

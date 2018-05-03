@@ -117,4 +117,13 @@
             restorable="true">
       </view>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.linuxtools.tmf.ui.TmfTracingPreferences"
+            class="org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.preferences.XMLAnalysesManagerPreferencePage"
+            id="org.eclipse.tracecompass.tmf.analysis.xml.ui.manager"
+            name="XML Analyses">
+      </page>
+   </extension>
 </plugin>
