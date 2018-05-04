@@ -54,7 +54,7 @@ public class CallStackAndGraphBenchmark {
     private static final String TEST_CALLSTACK_BUILD = "Building Callstack (%s)";
     private static final String TEST_CALLGRAPH_BUILD = "Building CallGraph (%s)";
 
-    private static final int LOOP_COUNT = 5;
+    private static final int LOOP_COUNT = 25;
 
     private final String fName;
     private final String fTestTrace;

@@ -33,6 +33,8 @@ import org.junit.runners.Suite;
     org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.event.matching.EventMatchingBenchmark.class,
     org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.event.matching.TraceSynchronizationBenchmark.class,
 
+    org.eclipse.tracecompass.lttng2.ust.core.tests.perf.cygprofile.CallStackAndGraphBenchmark.class,
+
     org.eclipse.tracecompass.pcap.core.tests.perf.trace.PcapReadBenchmark.class,
     org.eclipse.tracecompass.pcap.core.tests.perf.trace.PcapSeekBenchmark.class,
 
