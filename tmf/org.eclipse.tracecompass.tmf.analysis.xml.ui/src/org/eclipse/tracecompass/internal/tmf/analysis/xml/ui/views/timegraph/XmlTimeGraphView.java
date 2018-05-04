@@ -219,7 +219,6 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
         SubMonitor subMonitor = SubMonitor.convert(monitor);
         boolean complete = false;
         ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> provider = XmlDataProviderManager.getInstance().getTimeGraphProvider(trace, viewElement);
-        Map<Long, TimeGraphEntry> map = new HashMap<>();
         while (!complete && !subMonitor.isCanceled()) {
             TmfModelResponse<List<XmlTimeGraphEntryModel>> response = provider.fetchTree(new TimeQueryFilter(0, Long.MAX_VALUE, 2), subMonitor);
             if (response.getStatus() == ITmfResponse.Status.FAILED) {
@@ -232,32 +231,34 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
 
             List<XmlTimeGraphEntryModel> model = response.getModel();
             if (model != null) {
-                /*
-                 * Ensure that all the entries exist and are up to date.
-                 */
-                for (XmlTimeGraphEntryModel entry : model) {
-                    TimeGraphEntry tgEntry = map.get(entry.getId());
-                    if (tgEntry == null) {
-                        if (entry.getParentId() == -1) {
-                            tgEntry = new TraceEntry(entry, trace, provider);
-                            addToEntryList(parentTrace, Collections.singletonList(tgEntry));
+                synchronized (fEntries) {
+                    /*
+                     * Ensure that all the entries exist and are up to date.
+                     */
+                    for (XmlTimeGraphEntryModel entry : model) {
+                        TimeGraphEntry tgEntry = fEntries.get(provider, entry.getId());
+                        if (tgEntry == null) {
+                            if (entry.getParentId() == -1) {
+                                tgEntry = new TraceEntry(entry, trace, provider);
+                                addToEntryList(parentTrace, Collections.singletonList(tgEntry));
+                            } else {
+                                tgEntry = new TimeGraphEntry(entry);
+                            }
+                            fEntries.put(provider, entry.getId(), tgEntry);
                         } else {
-                            tgEntry = new TimeGraphEntry(entry);
+                            tgEntry.updateModel(entry);
                         }
-                        map.put(entry.getId(), tgEntry);
-                    } else {
-                        tgEntry.updateModel(entry);
-                    }
-                    if (entry.getParentId() == -1) {
-                        setStartTime(Long.min(getStartTime(), entry.getStartTime()));
-                        setEndTime(Long.max(getEndTime(), entry.getEndTime()));
+                        if (entry.getParentId() == -1) {
+                            setStartTime(Long.min(getStartTime(), entry.getStartTime()));
+                            setEndTime(Long.max(getEndTime(), entry.getEndTime()));
+                        }
                     }
                 }
                 /*
                  * set the correct child / parent relation
                  */
-                for (TimeGraphEntry child : map.values()) {
-                    TimeGraphEntry parent = map.get(child.getModel().getParentId());
+                for (TimeGraphEntry child : fEntries.row(provider).values()) {
+                    TimeGraphEntry parent = fEntries.get(provider, child.getModel().getParentId());
                     if (parent != null) {
                         parent.addChild(child);
                     }
@@ -265,7 +266,7 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
                 long start = getStartTime();
                 long end = getEndTime();
                 final long resolution = Long.max(1, (end - start) / getDisplayWidth());
-                zoomEntries(map.values(), start, end, resolution, subMonitor);
+                zoomEntries(fEntries.row(provider).values(), start, end, resolution, subMonitor);
             }
             if (parentTrace.equals(getTrace())) {
                 refresh();

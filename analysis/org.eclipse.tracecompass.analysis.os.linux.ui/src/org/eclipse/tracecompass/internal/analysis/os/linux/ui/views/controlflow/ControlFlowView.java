@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -60,14 +59,10 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.filters.DynamicFilterDialog;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphArrow;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphState;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelResponse;
-import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
@@ -87,17 +82,14 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
 
-import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Table;
 
 /**
  * The Control Flow view main object
@@ -174,8 +166,6 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
     private IAction fFlatAction;
 
     private IAction fHierarchicalAction;
-
-    private Table<TimeGraphEntry, Long, ControlFlowEntry> fControlFlowEntries = HashBasedTable.create();
 
     private @NonNull ActiveThreadsFilter fActiveThreadsFilter = new ActiveThreadsFilter(null, false, null);
 
@@ -453,7 +443,7 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
                     List<@NonNull TimeGraphEntry> entryList = getEntryList(parentTrace);
                     if (entryList != null) {
                         for (TimeGraphEntry traceEntry : entryList) {
-                            Collection<ControlFlowEntry> controlFlowEntries = fControlFlowEntries.row(traceEntry).values();
+                            Collection<TimeGraphEntry> controlFlowEntries = fEntries.row(getProvider(traceEntry)).values();
                             controlFlowEntries.forEach(e -> e.setParent(null));
                             addEntriesToHierarchicalTree(controlFlowEntries, traceEntry);
                         }
@@ -487,7 +477,7 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
             List<@NonNull TimeGraphEntry> entryList = getEntryList(parentTrace);
             if (entryList != null) {
                 for (TimeGraphEntry traceEntry : entryList) {
-                    Collection<ControlFlowEntry> entries = fControlFlowEntries.row(traceEntry).values();
+                    Collection<TimeGraphEntry> entries = fEntries.row(getProvider(traceEntry)).values();
                     addEntriesToFlatTree(entries, traceEntry);
                 }
             }
@@ -566,15 +556,18 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
              * each threads in the view. For this, we assign a value to an invisible column
              * and sort according to the values in this column.
              */
-            for (TimeGraphEntry entry : currentList) {
-                Collection<ControlFlowEntry> controlFlowEntries = fControlFlowEntries.row(entry).values();
-                for (ControlFlowEntry child : controlFlowEntries) {
-                    /*
-                     * If the thread is in our list, we give it a position. Otherwise, it means
-                     * there's no activity in the current interval for that thread. We set its
-                     * position to Long.MAX_VALUE so it goes to the bottom.
-                     */
-                    child.setSchedulingPosition(orderedTidMap.getOrDefault(child.getThreadId(), Long.MAX_VALUE));
+            synchronized (fEntries) {
+                for (TimeGraphEntry entry : currentList) {
+                    Collection<TimeGraphEntry> controlFlowEntries = fEntries.row(getProvider(entry)).values();
+                    for (TimeGraphEntry child : controlFlowEntries) {
+                        /*
+                         * If the thread is in our list, we give it a position. Otherwise, it means
+                         * there's no activity in the current interval for that thread. We set its
+                         * position to Long.MAX_VALUE so it goes to the bottom.
+                         */
+                        ControlFlowEntry controlFlowEntry = (ControlFlowEntry) child;
+                        controlFlowEntry.setSchedulingPosition(orderedTidMap.getOrDefault(controlFlowEntry.getThreadId(), Long.MAX_VALUE));
+                    }
                 }
             }
 
@@ -635,17 +628,9 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
     @Override
     public void traceClosed(TmfTraceClosedSignal signal) {
         ITmfTrace parentTrace = signal.getTrace();
-        List<@NonNull TimeGraphEntry> entryList = getEntryList(parentTrace);
         super.traceClosed(signal);
         synchronized (fFlatTraces) {
             fFlatTraces.remove(parentTrace);
-        }
-        if (entryList != null) {
-            synchronized (fControlFlowEntries) {
-                for (TimeGraphEntry traceEntry : entryList) {
-                    fControlFlowEntries.row(traceEntry).clear();
-                }
-            }
         }
     }
 
@@ -707,14 +692,17 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
 
             List<ThreadEntryModel> model = response.getModel();
             if (model != null) {
-                synchronized (fControlFlowEntries) {
+                synchronized (fEntries) {
                     for (ThreadEntryModel entry : model) {
                         if (entry.getThreadId() != Integer.MIN_VALUE) {
-                            ControlFlowEntry e = fControlFlowEntries.get(trace, entry.getId());
+                            if (traceEntry == null) {
+                                break;
+                            }
+                            TimeGraphEntry e = fEntries.get(traceEntry.getProvider(), entry.getId());
                             if (e != null) {
                                 e.updateModel(entry);
                             } else {
-                                fControlFlowEntries.put(traceEntry, entry.getId(), new ControlFlowEntry(entry));
+                                fEntries.put(traceEntry.getProvider(), entry.getId(), new ControlFlowEntry(entry));
                             }
                         } else {
                             setStartTime(Long.min(getStartTime(), entry.getStartTime()));
@@ -730,8 +718,8 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
                     }
                 }
 
-                Objects.requireNonNull(traceEntry, "ControfFlow tree model should have a trace entry with PID=Integer.MIN_VALUE"); //$NON-NLS-1$
-                Collection<ControlFlowEntry> controlFlowEntries = fControlFlowEntries.row(traceEntry).values();
+                Objects.requireNonNull(traceEntry, "ControlFlow tree model should have a trace entry with PID=Integer.MIN_VALUE"); //$NON-NLS-1$
+                Collection<TimeGraphEntry> controlFlowEntries = fEntries.row(getProvider(traceEntry)).values();
                 synchronized (fFlatTraces) {
                     if (fFlatTraces.contains(parentTrace)) {
                         addEntriesToFlatTree(controlFlowEntries, traceEntry);
@@ -760,9 +748,9 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
     /**
      * Add entries to the traces's child list in a flat fashion (no hierarchy).
      */
-    private static void addEntriesToFlatTree(Collection<@NonNull ControlFlowEntry> entries, TimeGraphEntry traceEntry) {
+    private static void addEntriesToFlatTree(Collection<@NonNull TimeGraphEntry> entries, TimeGraphEntry traceEntry) {
         traceEntry.clearChildren();
-        for (ControlFlowEntry e : entries) {
+        for (TimeGraphEntry e : entries) {
             // reset the entries
             e.setParent(null);
             e.clearChildren();
@@ -773,16 +761,16 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
     /**
      * Add entries to the trace's child list in a hierarchical fashion.
      */
-    private static void addEntriesToHierarchicalTree(Iterable<ControlFlowEntry> entryList, TimeGraphEntry traceEntry) {
+    private static void addEntriesToHierarchicalTree(Iterable<TimeGraphEntry> entryList, TimeGraphEntry traceEntry) {
         traceEntry.clearChildren();
-        Map<Long, ControlFlowEntry> map = Maps.uniqueIndex(entryList, entry -> entry.getModel().getId());
-        for (ControlFlowEntry e : entryList) {
+        Map<Long, TimeGraphEntry> map = Maps.uniqueIndex(entryList, entry -> entry.getModel().getId());
+        for (TimeGraphEntry e : entryList) {
             // reset children tree prior to rebuild
             e.clearChildren();
             e.setParent(null);
         }
         for (TimeGraphEntry entry : entryList) {
-            ControlFlowEntry parent = map.get(entry.getModel().getParentId());
+            TimeGraphEntry parent = map.get(entry.getModel().getParentId());
             /*
              * Associate the parent entry only if their time overlap. A child entry may
              * start before its parent, for example at the beginning of the trace if a
@@ -796,36 +784,6 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
                 traceEntry.addChild(entry);
             }
         }
-    }
-
-    @Override
-    protected List<@NonNull ILinkEvent> getLinkList(long zoomStartTime, long zoomEndTime, long resolution,
-            @NonNull IProgressMonitor monitor) {
-        List<@NonNull TimeGraphEntry> traceEntries = getEntryList(getTrace());
-        if (traceEntries == null) {
-            return Collections.emptyList();
-        }
-        List<@NonNull ILinkEvent> linkList = new ArrayList<>();
-        List<@NonNull Long> times = StateSystemUtils.getTimes(zoomStartTime, zoomEndTime, resolution);
-        TimeQueryFilter queryFilter = new TimeQueryFilter(times);
-
-        for (TraceEntry entry : Iterables.filter(traceEntries, TraceEntry.class)) {
-            ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = entry.getProvider();
-            TmfModelResponse<List<ITimeGraphArrow>> response = provider.fetchArrows(queryFilter, monitor);
-            List<ITimeGraphArrow> model = response.getModel();
-
-            if (model != null) {
-                Map<Long, ControlFlowEntry> map = fControlFlowEntries.row(entry);
-                for (ITimeGraphArrow arrow : model) {
-                    ITimeGraphEntry prevEntry = map.get(arrow.getSourceId());
-                    ITimeGraphEntry nextEntry = map.get(arrow.getDestinationId());
-                    if (prevEntry != null && nextEntry != null) {
-                        linkList.add(new TimeLinkEvent(prevEntry, nextEntry, arrow.getStartTime(), arrow.getDuration(), 0));
-                    }
-                }
-            }
-        }
-        return linkList;
     }
 
     @Override

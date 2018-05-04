@@ -12,7 +12,6 @@ package org.eclipse.tracecompass.tmf.ui.views.timegraph;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,6 +32,8 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.response.TmfModelR
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
@@ -45,9 +46,11 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sampling;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
 
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Table;
 
 /**
  * {@link AbstractTimeGraphView} for views with data providers.
@@ -62,8 +65,14 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      */
     protected static final long BUILD_UPDATE_TIMEOUT = 500;
 
+    /**
+     * Table of (data provider, model id) to time graph entry. The table should be
+     * filled by {@link #buildEntryList} and is read by {@link #zoomEntries} and
+     * {@link #getLinkList}.
+     */
+    protected final Table<ITimeGraphDataProvider<? extends @NonNull TimeGraphEntryModel>, Long, @NonNull TimeGraphEntry> fEntries = HashBasedTable.create();
+
     private final String fProviderId;
-    private Map<Long, @NonNull TimeGraphEntry> fEntries = new HashMap<>();
 
     /**
      * Constructs a time graph view that contains a time graph viewer.
@@ -119,13 +128,13 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             if (model != null) {
                 synchronized (fEntries) {
                     for (TimeGraphEntryModel entry : model) {
-                        TimeGraphEntry uiEntry = fEntries.get(entry.getId());
+                        TimeGraphEntry uiEntry = fEntries.get(dataProvider, entry.getId());
                         if (entry.getParentId() != -1) {
                             if (uiEntry == null) {
                                 uiEntry = new TimeGraphEntry(entry);
-                                fEntries.put(entry.getId(), uiEntry);
+                                fEntries.put(dataProvider, entry.getId(), uiEntry);
 
-                                TimeGraphEntry parent = fEntries.get(entry.getParentId());
+                                TimeGraphEntry parent = fEntries.get(dataProvider, entry.getParentId());
                                 if (parent != null) {
                                     parent.addChild(uiEntry);
                                 }
@@ -140,7 +149,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                                 uiEntry.updateModel(entry);
                             } else {
                                 uiEntry = new TraceEntry(entry, trace, dataProvider);
-                                fEntries.put(entry.getId(), uiEntry);
+                                fEntries.put(dataProvider, entry.getId(), uiEntry);
                                 addToEntryList(parentTrace, Collections.singletonList(uiEntry));
                             }
                         }
@@ -271,18 +280,17 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         long end = Long.max(zoomStartTime, zoomEndTime);
         List<@NonNull Long> times = StateSystemUtils.getTimes(start, end, resolution);
         Sampling sampling = new Sampling(start, end, resolution);
-        Map<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Multimap<Long, TimeGraphEntry>> groupedEntries = filterGroupEntries(entries, zoomStartTime, zoomEndTime);
-        SubMonitor subMonitor = SubMonitor.convert(monitor, getClass().getSimpleName() + "#zoomEntries", groupedEntries.size()); //$NON-NLS-1$
+        Multimap<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Long> providersToModelIds = filterGroupEntries(entries, zoomStartTime, zoomEndTime);
+        SubMonitor subMonitor = SubMonitor.convert(monitor, getClass().getSimpleName() + "#zoomEntries", providersToModelIds.size()); //$NON-NLS-1$
 
-        for (Entry<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Multimap<Long, TimeGraphEntry>> entry : groupedEntries.entrySet()) {
+        for (Entry<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Collection<Long>> entry : providersToModelIds.asMap().entrySet()) {
             ITimeGraphDataProvider<? extends TimeGraphEntryModel> dataProvider = entry.getKey();
-            Multimap<Long, TimeGraphEntry> map = entry.getValue();
-            SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(times, map.keySet());
+            SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(times, entry.getValue());
             TmfModelResponse<List<ITimeGraphRowModel>> response = dataProvider.fetchRowModel(filter, monitor);
 
             List<ITimeGraphRowModel> model = response.getModel();
             if (model != null) {
-                zoomEntries(map, model, response.getStatus() == ITmfResponse.Status.COMPLETED, sampling);
+                zoomEntries(fEntries.row(dataProvider), model, response.getStatus() == ITmfResponse.Status.COMPLETED, sampling);
             }
             subMonitor.worked(1);
         }
@@ -298,40 +306,38 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      *            the leftmost time bound of the view
      * @param zoomEndTime
      *            the rightmost time bound of the view
-     * @return A Map of the visible entries keyed by their model ID and grouped by
-     *         their data provider.
+     * @return A Multimap of data providers to their visible entries' model IDs.
      */
-    private static Map<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Multimap<Long, TimeGraphEntry>> filterGroupEntries(Iterable<TimeGraphEntry> visible,
+    private static Multimap<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Long> filterGroupEntries(Iterable<TimeGraphEntry> visible,
             long zoomStartTime, long zoomEndTime) {
-        Map<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Multimap<Long, TimeGraphEntry>> quarksToEntries = new HashMap<>();
+        Multimap<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Long> providersToModelIds = HashMultimap.create();
         for (TimeGraphEntry entry : visible) {
             if (zoomStartTime <= entry.getEndTime() && zoomEndTime >= entry.getStartTime() && entry.hasTimeEvents()) {
                 ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = getProvider(entry);
                 if (provider != null) {
-                    Multimap<Long, TimeGraphEntry> multimap = quarksToEntries.computeIfAbsent(provider, p -> HashMultimap.create());
-                    multimap.put(entry.getModel().getId(), entry);
+                    providersToModelIds.put(provider, entry.getModel().getId());
                 }
             }
         }
-        return quarksToEntries;
+        return providersToModelIds;
     }
 
-    private void zoomEntries(Multimap<Long, TimeGraphEntry> map, List<ITimeGraphRowModel> model, boolean completed, Sampling sampling) {
+    private void zoomEntries(Map<Long, TimeGraphEntry> map, List<ITimeGraphRowModel> model, boolean completed, Sampling sampling) {
         boolean isZoomThread = Thread.currentThread() instanceof ZoomThread;
         for (ITimeGraphRowModel rowModel : model) {
-            Collection<TimeGraphEntry> resourceEntries = map.get(rowModel.getEntryID());
+            TimeGraphEntry entry = map.get(rowModel.getEntryID());
 
-            for (TimeGraphEntry resourceEntry : resourceEntries) {
-                List<ITimeEvent> events = createTimeEvents(resourceEntry, rowModel.getStates());
+            if (entry != null) {
+                List<ITimeEvent> events = createTimeEvents(entry, rowModel.getStates());
                 if (isZoomThread) {
                     applyResults(() -> {
-                        resourceEntry.setZoomedEventList(events);
+                        entry.setZoomedEventList(events);
                         if (completed) {
-                            resourceEntry.setSampling(sampling);
+                            entry.setSampling(sampling);
                         }
                     });
                 } else {
-                    resourceEntry.setEventList(events);
+                    entry.setEventList(events);
                 }
             }
         }
@@ -407,15 +413,30 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
 
             if (model != null) {
                 for (ITimeGraphArrow arrow : model) {
-                    ITimeGraphEntry prevEntry = fEntries.get(arrow.getSourceId());
-                    ITimeGraphEntry nextEntry = fEntries.get(arrow.getDestinationId());
+                    ITimeGraphEntry prevEntry = fEntries.get(provider, arrow.getSourceId());
+                    ITimeGraphEntry nextEntry = fEntries.get(provider, arrow.getDestinationId());
                     if (prevEntry != null && nextEntry != null) {
-                        linkList.add(new TimeLinkEvent(prevEntry, nextEntry, arrow.getStartTime(), arrow.getDuration(), 0));
+                        linkList.add(new TimeLinkEvent(prevEntry, nextEntry, arrow.getStartTime(), arrow.getDuration(), arrow.getValue()));
                     }
                 }
             }
         }
         return linkList;
+    }
+
+    @TmfSignalHandler
+    @Override
+    public void traceClosed(TmfTraceClosedSignal signal) {
+        ITmfTrace parentTrace = signal.getTrace();
+        List<@NonNull TimeGraphEntry> entryList = getEntryList(parentTrace);
+        super.traceClosed(signal);
+        if (entryList != null) {
+            synchronized (fEntries) {
+                for (TimeGraphEntry entry : entryList) {
+                    fEntries.row(getProvider(entry)).clear();
+                }
+            }
+        }
     }
 
 }

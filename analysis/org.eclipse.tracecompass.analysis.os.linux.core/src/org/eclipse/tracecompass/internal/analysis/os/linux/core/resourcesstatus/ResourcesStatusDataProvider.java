@@ -47,6 +47,8 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.TreeMultimap;
@@ -80,6 +82,13 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
 
     /** Map of CPU number to its separator entry's model id */
     private final Map<Integer, Long> fSeparatorIds = new HashMap<>();
+
+    /**
+     * BiMap of IRQ/SoftIRQ twin model id to quark, the key is the model id of the
+     * CPU entry under an aggregate IRQ/SoftIRQ entry, the value is the quark of its
+     * twin IRQ/SoftIRQ entry under a CPU. These entries share the same states.
+     */
+    private final BiMap<Long, Integer> fTwinIdsToQuark = HashBiMap.create();
 
     private static final Comparator<ITmfStateInterval> CACHE_COMPARATOR = (a, b) -> {
         if (a.getEndTime() < b.getStartTime()) {
@@ -203,16 +212,17 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                         computeEntryName(type, resourceId),
                         startTime, endTime, resourceId, type));
             }
+            fEntryModelTypes.put(aggregateQuark, type);
 
             /*
-             * This reaches the limit of the contract, each entry model is supposed to have
-             * a distinct ID. On the other hand, this is the same entry under a CPU and an
-             * aggregate. Name this entry like a CPU but give it the IRQ type
+             * Create an IRQ or SOFT_IRQ entry under the aggregate interrupt entry, but name
+             * it like a CPU entry. Add the mapping to its twin IRQ/SOFT_IRQ entry's quark
+             * under the CPU entry. The twin entries share the same quark.
              */
-            builder.add(new ResourcesEntryModel(irqId, aggregateId,
+            long id = fTwinIdsToQuark.inverse().computeIfAbsent(irqQuark, key -> getEntryId());
+            builder.add(new ResourcesEntryModel(id, aggregateId,
                     computeEntryName(Type.CPU, cpuEntry.getResourceId()),
                     startTime, endTime, cpuEntry.getResourceId(), type));
-            fEntryModelTypes.put(aggregateQuark, type);
         }
     }
 
@@ -239,10 +249,12 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
 
         TreeMultimap<Integer, ITmfStateInterval> intervals = TreeMultimap.create(Comparator.naturalOrder(),
                 Comparator.comparing(ITmfStateInterval::getStartTime));
-        Map<@NonNull Long, @NonNull Integer> entries = getSelectedEntries(filter);
+        Map<@NonNull Long, @NonNull Integer> idsToQuark = getSelectedEntries(filter);
+        /* Add the mapping for twin entries as they are not in the parent class BiMap */
+        addTwinIrqIds(filter, idsToQuark);
         Collection<Long> times = getTimes(filter, ss.getStartTime(), ss.getCurrentEndTime());
         /* Do the actual query */
-        Collection<@NonNull Integer> quarks = addThreadStatus(ss, entries.values());
+        Collection<@NonNull Integer> quarks = addThreadStatus(ss, idsToQuark.values());
         for (ITmfStateInterval interval : ss.query2D(quarks, times)) {
             if (monitor != null && monitor.isCanceled()) {
                 return null;
@@ -252,13 +264,13 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
 
         List<ITimeGraphRowModel> rows = new ArrayList<>();
 
-        for (Map.Entry<Long, Integer> entry : entries.entrySet()) {
+        for (Map.Entry<Long, Integer> idToQuark : idsToQuark.entrySet()) {
             if (monitor != null && monitor.isCanceled()) {
                 return null;
             }
 
             List<ITimeGraphState> eventList = new ArrayList<>();
-            for (ITmfStateInterval interval : intervals.get(entry.getValue())) {
+            for (ITmfStateInterval interval : intervals.get(idToQuark.getValue())) {
                 long startTime = interval.getStartTime();
                 long duration = interval.getEndTime() - startTime + 1;
                 Object status = interval.getValue();
@@ -300,7 +312,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                     eventList.add(new TimeGraphState(startTime, duration, Integer.MIN_VALUE));
                 }
             }
-            rows.add(new TimeGraphRowModel(entry.getKey(), eventList));
+            rows.add(new TimeGraphRowModel(idToQuark.getKey(), eventList));
         }
         synchronized (fExecNamesCache) {
             fExecNamesCache.clear();
@@ -331,6 +343,19 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             }
         }
         return set;
+    }
+
+    private void addTwinIrqIds(SelectionTimeQueryFilter filter, Map<@NonNull Long, @NonNull Integer> idsToQuark) {
+        for (Long id : filter.getSelectedItems()) {
+            Integer quark = fTwinIdsToQuark.get(id);
+            if (quark != null) {
+                /*
+                 * The selected id is a twin id. Add it to the idsToQuark map, using its
+                 * corresponding twin entry's quark.
+                 */
+                idsToQuark.put(id, quark);
+            }
+        }
     }
 
     /**
@@ -422,7 +447,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     @Override
     public TmfModelResponse<Map<String, String>> fetchTooltip(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         ITmfStateSystem ss = getAnalysisModule().getStateSystem();
-        Set<@NonNull Integer> quarks = getSelectedEntries(filter).values();
+        Collection<@NonNull Integer> quarks = getSelectedEntries(filter).values();
         long start = filter.getStart();
         if (ss == null || quarks.size() != 1 || !getAnalysisModule().isQueryable(start)) {
             /*

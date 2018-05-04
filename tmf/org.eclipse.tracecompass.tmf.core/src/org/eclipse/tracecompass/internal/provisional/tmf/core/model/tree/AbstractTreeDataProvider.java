@@ -10,8 +10,10 @@
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.tree;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -119,7 +121,7 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      */
     @Deprecated
     protected Set<Integer> getSelectedQuarks(SelectionTimeQueryFilter filter) {
-        return getSelectedEntries(filter).values();
+        return new HashSet<>(getSelectedEntries(filter).values());
     }
 
     /**
@@ -127,13 +129,13 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      *
      * @param filter
      *            {@link SelectionTimeQueryFilter}.
-     * @return a BiMap of the valid entries' ID from the filter to their respective
+     * @return a map of the valid entries' ID from the filter to their respective
      *         quark
      */
-    protected BiMap<Long, Integer> getSelectedEntries(SelectionTimeQueryFilter filter) {
+    protected Map<Long, Integer> getSelectedEntries(SelectionTimeQueryFilter filter) {
         fLock.readLock().lock();
         try {
-            BiMap<Long, Integer> selectedEntries = HashBiMap.create();
+            Map<Long, Integer> selectedEntries = new HashMap<>();
 
             for (Long selectedItem : filter.getSelectedItems()) {
                 Integer quark = fIdToQuark.get(selectedItem);
