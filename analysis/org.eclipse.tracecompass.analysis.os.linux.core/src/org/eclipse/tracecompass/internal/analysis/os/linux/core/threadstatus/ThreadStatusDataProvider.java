@@ -614,7 +614,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
             ITmfStateInterval interval = ss.querySingleState(start, currentCpuRqQuark);
             Object value = interval.getValue();
             if (value instanceof Integer) {
-                return new TmfModelResponse<>(ImmutableMap.of(CPU, String.valueOf(value)), status, statusMessage);
+                return new TmfModelResponse<>(ImmutableMap.of(Messages.ThreadStatusDataProvider_attributeCpuName, String.valueOf(value)), status, statusMessage);
             }
         } catch (StateSystemDisposedException e) {
             /* Ignored */

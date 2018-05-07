@@ -23,7 +23,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadStatusDataProvider;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.registry.LinuxStyle;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
@@ -162,12 +161,9 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         ITimeGraphDataProvider<? extends TimeGraphEntryModel> dataProvider = BaseDataProviderTimeGraphView.getProvider(entry);
         TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> response = dataProvider.fetchTooltip(
                 new SelectionTimeQueryFilter(hoverTime, hoverTime, 1, Collections.singletonList(entry.getModel().getId())), null);
-        Map<@NonNull String, @NonNull String> map = response.getModel();
-        if (map != null) {
-            String cpu = map.get(ThreadStatusDataProvider.CPU);
-            if (cpu != null) {
-                retMap.put(Messages.ControlFlowView_attributeCpuName, cpu);
-            }
+        Map<@NonNull String, @NonNull String> tooltipModel = response.getModel();
+        if (tooltipModel != null) {
+            retMap.putAll(tooltipModel);
         }
 
         return retMap;

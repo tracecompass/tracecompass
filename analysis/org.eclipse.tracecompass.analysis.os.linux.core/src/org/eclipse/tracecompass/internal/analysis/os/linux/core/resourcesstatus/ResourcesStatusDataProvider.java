@@ -13,6 +13,7 @@ import java.text.FieldPosition;
 import java.text.Format;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -496,6 +497,20 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     public TmfModelResponse<Map<String, String>> fetchTooltip(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         ITmfStateSystem ss = getAnalysisModule().getStateSystem();
         Collection<@NonNull Integer> quarks = getSelectedEntries(filter).values();
+
+        boolean isACopy = false;
+        if (quarks.size() != 1) {
+            Map<Long, Integer> selectedEntries = new HashMap<>();
+            for (Long selectedItem : filter.getSelectedItems()) {
+                Integer quark = fTwinIdsToQuark.get(selectedItem);
+                if (quark != null && quark >= 0) {
+                    selectedEntries.put(selectedItem, quark);
+                    isACopy = true;
+                }
+            }
+            quarks = selectedEntries.values();
+        }
+
         long start = filter.getStart();
         if (ss == null || quarks.size() != 1 || !getAnalysisModule().isQueryable(start)) {
             /*
@@ -510,7 +525,8 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         String attributeName = ss.getAttributeName(quark);
         Integer cpuNumber = Ints.tryParse(attributeName);
         String parent = ss.getAttributeName(ss.getParentAttributeQuark(quark));
-        if ((!parent.equals(Attributes.CPUS) || cpuNumber == null) && !(attributeName.equals(Attributes.CURRENT_THREAD) || attributeName.equals(Attributes.CURRENT_FREQUENCY))) {
+
+        if (cpuNumber == null && !(attributeName.equals(Attributes.CURRENT_THREAD) || attributeName.equals(Attributes.CURRENT_FREQUENCY))) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
 
@@ -520,10 +536,16 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             Object object = full.get(quark).getValue();
             if (object instanceof Integer) {
                 int status = (int) object;
-                if (status == StateValues.CPU_STATUS_IRQ) {
-                    putIrq(ss, attributeName, retMap, full, Attributes.IRQS);
+                if (isACopy) {
+                    retMap.put(parent.equals(Attributes.IRQS) ? Messages.ResourcesStatusDataProvider_attributeIrqName :
+                                                                Messages.ResourcesStatusDataProvider_attributeSoftIrqName,
+                               attributeName);
+                } else if (parent.equals(Attributes.IRQS) || parent.equals(Attributes.SOFT_IRQS)) {
+                    putCpus(ss, quark, retMap, full, parent, status);
+                } else if (status == StateValues.CPU_STATUS_IRQ) {
+                    putIrq(ss, attributeName, retMap, full, Attributes.IRQS, status);
                 } else if (status == StateValues.CPU_STATUS_SOFTIRQ) {
-                    putIrq(ss, attributeName, retMap, full, Attributes.SOFT_IRQS);
+                    putIrq(ss, attributeName, retMap, full, Attributes.SOFT_IRQS, status);
                 } else if (status == StateValues.CPU_STATUS_RUN_USERMODE || status == StateValues.CPU_STATUS_RUN_SYSCALL) {
                     putCpuTooltip(ss, attributeName, retMap, full, status);
                 } else if (attributeName.equals(Attributes.CURRENT_THREAD)) {
@@ -539,14 +561,52 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         return new TmfModelResponse<>(null, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
+    private static void putCpus(ITmfStateSystem ss, int quark, Map<String, String> retMap,
+            List<ITmfStateInterval> full, String irqs, int status) {
+        List<@NonNull String> cpuList = new ArrayList<>();
+
+        int grandParentAttribute = ss.getParentAttributeQuark(ss.getParentAttributeQuark(quark));
+        if (grandParentAttribute != org.eclipse.tracecompass.statesystem.core.ITmfStateSystem.ROOT_ATTRIBUTE
+                && ss.getAttributeName(ss.getParentAttributeQuark(ss.getParentAttributeQuark(ss.getParentAttributeQuark(quark)))).equals(Attributes.CPUS)) {
+            cpuList.add(ss.getAttributeName(grandParentAttribute));
+        } else {
+            for (int cpuQuark : ss.getQuarks(Attributes.CPUS, "*", irqs, ss.getAttributeName(quark))) { //$NON-NLS-1$
+                ITmfStateInterval interval = full.get(cpuQuark);
+                if (interval.getValue() != null) {
+                    Object object = full.get(cpuQuark).getValue();
+                    if (object instanceof Integer) {
+                        int objectStatus = (int) object;
+                        if (objectStatus == status) {
+                            String cpu = ss.getAttributeName(ss.getParentAttributeQuark(ss.getParentAttributeQuark(cpuQuark)));
+                            cpuList.add(cpu);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!cpuList.isEmpty()) {
+            Collections.sort(cpuList, (s1, s2) -> Integer.compare(Integer.parseInt(s1), Integer.parseInt(s2)));
+            retMap.put(Messages.ResourcesStatusDataProvider_attributeCpuName, String.join(", ", cpuList)); //$NON-NLS-1$
+        }
+    }
+
     private static void putIrq(ITmfStateSystem ss, String attributeName,
-            Map<String, String> retMap, List<ITmfStateInterval> full, String irqs) {
+            Map<String, String> retMap, List<ITmfStateInterval> full, String irqs, int status) {
+
         for (int irqQuark : ss.getQuarks(Attributes.CPUS, attributeName, irqs, "*")) { //$NON-NLS-1$
             ITmfStateInterval interval = full.get(irqQuark);
             if (interval.getValue() != null) {
-                String irq = ss.getAttributeName(irqQuark);
-                retMap.put(irqs, irq);
-                return;
+                Object object = full.get(irqQuark).getValue();
+                if (object instanceof Integer) {
+                    int objectStatus = (int) object;
+                    if (objectStatus == status) {
+                        retMap.put(status == StateValues.CPU_STATUS_IRQ ? Messages.ResourcesStatusDataProvider_attributeIrqName :
+                                                                          Messages.ResourcesStatusDataProvider_attributeSoftIrqName,
+                                   ss.getAttributeName(irqQuark));
+                        return;
+                    }
+                }
             }
         }
     }
@@ -561,13 +621,13 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         Object currentThreadObject = full.get(currentThreadQuark).getValue();
         if (currentThreadObject instanceof Number) {
             String currentThread = currentThreadObject.toString();
-            retMap.put(Attributes.CURRENT_THREAD, currentThread);
+            retMap.put(Messages.ResourcesStatusDataProvider_attributeTidName, currentThread);
 
             int execNameQuark = ss.optQuarkAbsolute(Attributes.THREADS, currentThread, Attributes.EXEC_NAME);
             if (execNameQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
                 Object processName = full.get(execNameQuark).getValue();
                 if (processName instanceof String) {
-                    retMap.put(Attributes.EXEC_NAME, (String) processName);
+                    retMap.put(Messages.ResourcesStatusDataProvider_attributeProcessName, (String) processName);
                 }
             }
 

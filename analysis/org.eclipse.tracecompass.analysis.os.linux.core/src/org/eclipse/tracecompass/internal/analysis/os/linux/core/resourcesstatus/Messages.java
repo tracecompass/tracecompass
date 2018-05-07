@@ -47,6 +47,18 @@ class Messages extends NLS {
     public static String CpuEntry;
     /** Frequency entry */
     public static String FrequencyEntry;
+    /** cpu name */
+    public static String ResourcesStatusDataProvider_attributeCpuName;
+    /** irq name */
+    public static String ResourcesStatusDataProvider_attributeIrqName;
+    /** soft irq name */
+    public static String ResourcesStatusDataProvider_attributeSoftIrqName;
+    /** tid name */
+    public static String ResourcesStatusDataProvider_attributeTidName;
+    /** process name */
+    public static String ResourcesStatusDataProvider_attributeProcessName;
+    /** syscall name */
+    public static String ResourcesStatusDataProvider_attributeSyscallName;
 
     static {
         // initialize resource bundle

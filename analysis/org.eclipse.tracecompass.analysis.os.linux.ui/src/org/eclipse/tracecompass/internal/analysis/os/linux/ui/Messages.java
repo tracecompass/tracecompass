@@ -40,7 +40,6 @@ public class Messages extends NLS {
     public static String ControlFlowView_uncheckInactiveLabel;
     public static String ControlFlowView_uncheckInactiveToolTip;
     public static String ControlFlowView_attributeSyscallName;
-    public static String ControlFlowView_attributeCpuName;
     public static String ControlFlowView_flatViewLabel;
     public static String ControlFlowView_flatViewToolTip;
     public static String ControlFlowView_hierarchicalViewLabel;
@@ -54,13 +53,6 @@ public class Messages extends NLS {
     public static String ResourcesView_nextResourceActionToolTipText;
     public static String ResourcesView_previousResourceActionNameText;
     public static String ResourcesView_previousResourceActionToolTipText;
-    public static String ResourcesView_attributeCpuName;
-    public static String ResourcesView_attributeIrqName;
-    public static String ResourcesView_attributeSoftIrqName;
-    public static String ResourcesView_attributeHoverTime;
-    public static String ResourcesView_attributeTidName;
-    public static String ResourcesView_attributeProcessName;
-    public static String ResourcesView_attributeSyscallName;
 
     static {
         // initialize resource bundle

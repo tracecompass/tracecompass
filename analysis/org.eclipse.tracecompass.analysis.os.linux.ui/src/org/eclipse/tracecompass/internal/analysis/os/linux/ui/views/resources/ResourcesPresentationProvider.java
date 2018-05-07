@@ -19,7 +19,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel.Type;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
@@ -32,9 +31,6 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.presentation.RotatingPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
-import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
-import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
-import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
@@ -189,25 +185,12 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
             if (tcEvent.hasValue() && model instanceof ResourcesEntryModel) {
                 ResourcesEntryModel resourcesModel = (ResourcesEntryModel) model;
-                // Check for IRQ or Soft_IRQ type
-                if (resourcesModel.getType().equals(Type.IRQ) || resourcesModel.getType().equals(Type.SOFT_IRQ)) {
-
-                    // Get CPU of IRQ or SoftIRQ and provide it for the tooltip
-                    // display
-                    int cpu = tcEvent.getValue();
-                    if (cpu >= 0) {
-                        Map<String, String> retMap = new LinkedHashMap<>(1);
-                        retMap.put(Messages.ResourcesView_attributeCpuName, String.valueOf(cpu));
-                        return retMap;
-                    }
-                }
-
-                // Check for type CPU
-                else if (resourcesModel.getType().equals(Type.CPU) || resourcesModel.getType().equals(Type.CURRENT_THREAD) || resourcesModel.getType().equals(Type.FREQUENCY)) {
-                    int status = tcEvent.getValue();
+                if (resourcesModel.getType().equals(Type.IRQ) || resourcesModel.getType().equals(Type.SOFT_IRQ) ||
+                        resourcesModel.getType().equals(Type.CPU) || resourcesModel.getType().equals(Type.CURRENT_THREAD) ||
+                        resourcesModel.getType().equals(Type.FREQUENCY)) {
                     ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = BaseDataProviderTimeGraphView.getProvider((TimeGraphEntry) entry);
                     if (provider != null) {
-                        return getTooltipForCpu(provider, model.getId(), hoverTime, status);
+                        return getTooltip(provider, model.getId(), hoverTime);
                     }
                 }
             }
@@ -215,43 +198,17 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
         return Collections.emptyMap();
     }
 
-    private static Map<String, String> getTooltipForCpu(ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider, long id, long hoverTime, int status) {
+    private static Map<String, String> getTooltip(ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider, long id, long hoverTime) {
         SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(Collections.singletonList(hoverTime), Collections.singleton(id));
         TmfModelResponse<Map<String, String>> response = provider.fetchTooltip(filter, null);
         Map<String, String> tooltip = response.getModel();
+
         if (tooltip == null) {
             return Collections.emptyMap();
         }
 
-        Map<String, String> retMap = new LinkedHashMap<>(tooltip);
-        if (status == StateValues.CPU_STATUS_IRQ) {
-            // In IRQ state get the IRQ that caused the interruption
-            String irq = tooltip.get(Attributes.IRQS);
-            if (irq != null) {
-                retMap.put(Messages.ResourcesView_attributeIrqName, irq);
-            }
-        } else if (status == StateValues.CPU_STATUS_SOFTIRQ) {
-            // In SOFT_IRQ state get the SOFT_IRQ that caused the interruption
-            String irq = tooltip.get(Attributes.SOFT_IRQS);
-            if (irq != null) {
-                retMap.put(Messages.ResourcesView_attributeSoftIrqName, irq);
-            }
-        } else if (status == StateValues.CPU_STATUS_RUN_USERMODE || status == StateValues.CPU_STATUS_RUN_SYSCALL || status > StateValues.CPU_STATUS_IRQ) {
-            // In running state get the current TID
-            retMap.put(Messages.ResourcesView_attributeHoverTime, FormatTimeUtils.formatTime(hoverTime, TimeFormat.CALENDAR, Resolution.NANOSEC));
-            String tidName = tooltip.get(Attributes.CURRENT_THREAD);
-            if (tidName != null) {
-                retMap.put(Messages.ResourcesView_attributeTidName, tidName);
-            }
-            String execName = tooltip.get(Attributes.EXEC_NAME);
-            if (execName != null) {
-                retMap.put(Messages.ResourcesView_attributeProcessName, execName);
-            }
-            String syscallName = tooltip.get(Attributes.SYSTEM_CALL);
-            if (syscallName != null) {
-                retMap.put(Messages.ResourcesView_attributeSyscallName, syscallName);
-            }
-        }
+        Map<String, String> retMap = new LinkedHashMap<>();
+        retMap.putAll(tooltip);
         return retMap;
     }
 
