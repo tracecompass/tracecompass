@@ -28,7 +28,10 @@
     </timeGraphView>
 
 	<stateProvider id="test.xml.attributes" version="1">
-
+		<head>
+			<traceType id="org.eclipse.linuxtools.tmf.core.tests.xmlstub" />
+			<label value="Xml State Values test" />
+		</head>
 		<mappingGroup id="operation">
 			<entry>
 				<stateValue type="string" value="read only" />

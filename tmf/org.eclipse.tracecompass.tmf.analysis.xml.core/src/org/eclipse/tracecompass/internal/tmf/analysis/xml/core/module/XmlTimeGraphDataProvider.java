@@ -42,6 +42,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
+import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
@@ -113,9 +114,11 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
             Iterables.addAll(stateSystemModules, TmfTraceUtils.getAnalysisModulesOfClass(trace, ITmfAnalysisModuleWithStateSystems.class));
         } else {
             for (String moduleId : analysisIds) {
-                ITmfAnalysisModuleWithStateSystems module = TmfTraceUtils.getAnalysisModuleOfClass(trace, ITmfAnalysisModuleWithStateSystems.class, moduleId);
-                if (module != null) {
-                    stateSystemModules.add(module);
+                // Get the module for the current trace only. The caller will take care of
+                // generating composite providers with experiments
+                IAnalysisModule module = trace.getAnalysisModule(moduleId);
+                if (module instanceof ITmfAnalysisModuleWithStateSystems) {
+                    stateSystemModules.add((ITmfAnalysisModuleWithStateSystems) module);
                 }
             }
         }
@@ -126,7 +129,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
                 module.getStateSystems().forEach(sss::add);
             }
         }
-        return new XmlTimeGraphDataProvider(trace, sss, entries);
+        return (sss.isEmpty() ? null : new XmlTimeGraphDataProvider(trace, sss, entries));
     }
 
     private XmlTimeGraphDataProvider(@NonNull ITmfTrace trace, List<ITmfStateSystem> stateSystems, List<Element> entries) {

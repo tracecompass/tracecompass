@@ -22,6 +22,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlTimeGraphDataProvider;
@@ -221,6 +222,9 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
         SubMonitor subMonitor = SubMonitor.convert(monitor);
         boolean complete = false;
         ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> provider = XmlDataProviderManager.getInstance().getTimeGraphProvider(trace, viewElement);
+        if (provider == null) {
+            return;
+        }
         while (!complete && !subMonitor.isCanceled()) {
             TmfModelResponse<List<XmlTimeGraphEntryModel>> response = provider.fetchTree(new TimeQueryFilter(0, Long.MAX_VALUE, 2), subMonitor);
             if (response.getStatus() == ITmfResponse.Status.FAILED) {
@@ -307,6 +311,12 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
 
     private int getStringIndex(String state) {
         return fStringValueMap.computeIfAbsent(state, s -> getPresentationProvider().addState(s));
+    }
+
+    @Override
+    protected @NonNull Iterable<ITmfTrace> getTracesToBuild(@Nullable ITmfTrace trace) {
+        // The data provider factory will build the proper data provider
+        return Collections.singleton(trace);
     }
 
 }

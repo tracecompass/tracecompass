@@ -59,7 +59,9 @@ public enum TmfXmlTestFiles {
     /** A valid xml timegraph view */
     VALID_TIMEGRAPH_VIEW_ELEMENT_FILE("test_xml_files/test_valid/test_valid_xml_timegraphView.xml"),
     /** A valid test with elements from an extended XSD */
-    VALID_FILE_EXTENDED("test_xml_files/test_valid/test_valid_extended.xml");
+    VALID_FILE_EXTENDED("test_xml_files/test_valid/test_valid_extended.xml"),
+    /** A valid file with analysis and view for experiments only */
+    EXPERIMENT("test_xml_files/test_valid/test_experiment.xml");
 
     private final String fPath;
 
