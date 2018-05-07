@@ -114,20 +114,15 @@ public class TimeQueryFilter {
             throw new IllegalArgumentException("Number of entries requested is 1, but start and end are different. Impossible to create array."); //$NON-NLS-1$
         }
 
-        long delta = (end - start);
-        if (delta < 0) {
-            throw new IllegalArgumentException("End value must be greater or equal to start value"); //$NON-NLS-1$
-        }
-
-        double stepSize = delta / ((double) n - 1);
+        double stepSize = Math.abs(end - start) / ((double) n - 1);
         long[] result = new long[n];
 
         for (int i = 0; i < n; i++) {
-            result[i] = start + Math.round(i * stepSize);
+            result[i] = Math.min(start, end) + Math.round(i * stepSize);
         }
 
         /* This is to make sure that last value will always be end */
-        result[result.length - 1] = end;
+        result[result.length - 1] = Math.max(start, end);
         return result;
     }
 }
