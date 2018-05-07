@@ -152,7 +152,7 @@ public class XmlDataProviderManager {
      * @return the unique instance of an XY provider for the queried parameters
      * @since 3.0
      */
-    public synchronized ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> getTimeGraphProvider(@NonNull ITmfTrace trace, @NonNull Element viewElement) {
+    public synchronized @Nullable ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> getTimeGraphProvider(@NonNull ITmfTrace trace, @NonNull Element viewElement) {
         if (!viewElement.hasAttribute(ID_ATTRIBUTE)) {
             return null;
         }
@@ -164,12 +164,18 @@ public class XmlDataProviderManager {
 
         if (Iterables.any(TmfTraceManager.getInstance().getOpenedTraces(),
                 opened -> TmfTraceManager.getTraceSetWithExperiment(opened).contains(trace))) {
-            /* if this trace or an experiment containing this trace is opened */
-            Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
-            if (traces.size() == 1) {
-                provider = XmlTimeGraphDataProvider.create(trace, viewElement);
-            } else {
-                provider = generateExperimentProviderTimeGraph(traces, viewElement);
+
+            // Create with the trace or experiment first
+            provider = XmlTimeGraphDataProvider.create(trace, viewElement);
+            if (provider == null) {
+                // Otherwise, see if it's an experiment and create a composite if that's the
+                // case
+                Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
+                if (traces.size() > 1) {
+                    // Try creating a composite only if there are many traces, otherwise, the
+                    // previous call to create should have returned the data provider
+                    provider = generateExperimentProviderTimeGraph(traces, viewElement);
+                }
             }
             if (provider != null) {
                 fTimeGraphProviders.put(trace, viewId, provider);
@@ -179,7 +185,7 @@ public class XmlDataProviderManager {
         return null;
     }
 
-    private ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> generateExperimentProviderTimeGraph(Collection<@NonNull ITmfTrace> traces, @NonNull Element viewElement) {
+    private @Nullable ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> generateExperimentProviderTimeGraph(Collection<@NonNull ITmfTrace> traces, @NonNull Element viewElement) {
         List<@NonNull ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel>> providers = new ArrayList<>();
         for (ITmfTrace child : traces) {
             ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> childProvider = getTimeGraphProvider(child, viewElement);

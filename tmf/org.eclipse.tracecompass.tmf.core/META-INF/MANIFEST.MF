@@ -42,7 +42,7 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.core.model.eve
    org.eclipse.tracecompass.analysis.graph.core,
    org.eclipse.tracecompass.analysis.profiling.core,
    org.eclipse.tracecompass.tmf.analysis.xml.core",
- org.eclipse.tracecompass.internal.tmf.core.model.timegraph;x-friends:="org.eclipse.tracecompass.analysis.os.linux.core,org.eclipse.tracecompass.tmf.analysis.xml.core,org.eclipse.tracecompass.analysis.profiling.core",
+ org.eclipse.tracecompass.internal.tmf.core.model.timegraph;x-friends:="org.eclipse.tracecompass.analysis.os.linux.core,org.eclipse.tracecompass.tmf.analysis.xml.core,org.eclipse.tracecompass.tmf.analysis.xml.core.tests,org.eclipse.tracecompass.analysis.profiling.core",
  org.eclipse.tracecompass.internal.tmf.core.model.tree;
   x-friends:="org.eclipse.tracecompass.analysis.os.linux.core,
    org.eclipse.tracecompass.analysis.timing.core,
