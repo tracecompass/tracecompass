@@ -95,8 +95,11 @@ public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
                 if (fCheckboxTreeViewer.getTree().isDisposed()) {
                     return;
                 }
+                Object[] elements = fCheckboxTreeViewer.getExpandedElements();
                 fCheckboxTreeViewer.expandAll();
                 fCheckboxTreeViewer.setCheckedElements(getCheckedElements());
+                fCheckboxTreeViewer.collapseAll();
+                fCheckboxTreeViewer.setExpandedElements(elements);
             }
         });
         return job;

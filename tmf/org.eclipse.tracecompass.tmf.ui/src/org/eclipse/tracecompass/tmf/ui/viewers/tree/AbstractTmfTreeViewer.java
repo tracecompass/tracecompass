@@ -492,6 +492,27 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
         return (ITmfTreeViewerEntry) fTreeViewer.getInput();
     }
 
+    /**
+     * Sets the auto-expand level to be used for the input of the viewer. The value
+     * 0 means that there is no auto-expand; 1 means that top-level elements are
+     * expanded, but not their children; 2 means that top-level elements are
+     * expanded, and their children, but not grand-children; and so on.
+     * <p>
+     * The value {@link AbstractTreeViewer#ALL_LEVELS} means that all subtrees
+     * should be expanded.
+     * </p>
+     *
+     * @param level
+     *            non-negative level, or {@link AbstractTreeViewer#ALL_LEVELS} to
+     *            expand all levels of the tree
+     * @since 4.0
+     */
+    public void setAutoExpandLevel(int level) {
+        if (fTreeViewer != null) {
+            fTreeViewer.setAutoExpandLevel(level);
+        }
+    }
+
     // ------------------------------------------------------------------------
     // Signal Handler
     // ------------------------------------------------------------------------
