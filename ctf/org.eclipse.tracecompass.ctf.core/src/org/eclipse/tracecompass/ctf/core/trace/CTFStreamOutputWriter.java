@@ -113,7 +113,7 @@ public class CTFStreamOutputWriter {
                 long packetStart = entry.getTimestampBegin();
                 long packetEnd = entry.getTimestampEnd();
                 if (count == 0) {
-                    initialLost = (long) entry.getAttributes().getOrDefault(CTFStrings.EVENTS_DISCARDED, 0);
+                    initialLost = (long) entry.getAttributes().getOrDefault(CTFStrings.EVENTS_DISCARDED, 0L);
                 }
                 if (startTime <= packetStart && endTime >= packetEnd) {
                     // MUCH faster
