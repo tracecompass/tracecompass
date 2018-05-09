@@ -218,26 +218,30 @@ public class CTFStreamPacketOutputWriter {
     private static void writeCustomPacket(ICTFPacketDescriptor entry, FileChannel source, FileChannel output, long startOffsetBits, long endOffsetBits, StructDefinition packetContext, ICompositeDefinition tracePacketHeader, long startTime,
             long initialLost)
             throws IOException, CTFException {
-        ByteBuffer inBuffer = SafeMappedByteBuffer.map(source, MapMode.READ_ONLY, entry.getOffsetBytes(), (long) Math.ceil(entry.getContentSizeBits() / (double) Byte.SIZE));
+        ByteBuffer inBuffer = SafeMappedByteBuffer.map(source, MapMode.READ_ONLY, entry.getOffsetBytes(), bitsToBytes(entry.getContentSizeBits()));
         int headerSize = (int) (tracePacketHeader == null ? 0 : tracePacketHeader.size());
         int packetSize = (int) (headerSize + packetContext.size() + endOffsetBits - startOffsetBits);
-        byte[] toWrite = new byte[packetSize / 8];
+        byte[] toWrite = new byte[(int) bitsToBytes(packetSize)];
         ByteBuffer buffer = ByteBuffer.wrap(toWrite);
-        byte[] header = new byte[headerSize / 8];
-        byte[] body = new byte[(int) (endOffsetBits - startOffsetBits) / 8];
+        byte[] header = new byte[(int) bitsToBytes(headerSize)];
+        byte[] body = new byte[(int) bitsToBytes(endOffsetBits - startOffsetBits)];
         inBuffer.get(header);
-        inBuffer.position((int) (startOffsetBits / 8));
+        inBuffer.position((int) bitsToBytes(startOffsetBits));
         inBuffer.get(body);
         buffer.put(header);
         writeContext(startTime, packetContext, packetSize, initialLost, buffer);
-        buffer.position((int) (headerSize + packetContext.size()) / 8);
+        buffer.position((int) bitsToBytes(headerSize + packetContext.size()));
         buffer.put(body);
         output.write(ByteBuffer.wrap(toWrite));
     }
 
+    private static long bitsToBytes(long bits) {
+        return (long) Math.ceil(bits / (double) Byte.SIZE);
+    }
+
     private static void writeContext(long startTime, StructDefinition context, int newPacketSize, long initialLost, @NonNull ByteBuffer buffer) throws CTFException {
         BitBuffer bb = new BitBuffer(buffer);
-        bb.position(buffer.position() * 8L);
+        bb.position(buffer.position() * Byte.SIZE);
         for (String field : context.getFieldNames()) {
             Definition def = context.getDefinition(field);
             IDeclaration declaration = def.getDeclaration();
@@ -262,7 +266,7 @@ public class CTFStreamPacketOutputWriter {
             } else if (def instanceof FloatDefinition) {
                 writeFloat(bb, def);
             } else {
-                buffer.put(new byte[(int) (def.size() / 8)]);
+                buffer.put(new byte[(int) bitsToBytes(def.size())]);
                 bb.position(buffer.position() * 8L);
             }
         }
