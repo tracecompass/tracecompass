@@ -11,6 +11,8 @@ package org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
+import java.io.File;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
@@ -108,7 +110,8 @@ public class UstDebugInfoBinaryAspect implements ITmfEventAspect<BinaryCallsite>
         }
 
         /* Apply the path prefix defined by the trace, if any */
-        String fullPath = (trace.getSymbolProviderConfig().getActualRootDirPath() + file.getFilePath());
+
+        String fullPath = new File(trace.getSymbolProviderConfig().getActualRootDirPath(), file.getFilePath()).toString();
 
         long offset;
         if (file.isPic()) {
