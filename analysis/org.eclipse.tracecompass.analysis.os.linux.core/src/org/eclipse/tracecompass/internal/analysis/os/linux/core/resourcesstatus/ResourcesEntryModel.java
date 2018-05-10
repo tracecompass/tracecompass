@@ -27,12 +27,12 @@ public class ResourcesEntryModel extends TimeGraphEntryModel {
         CPU,
         /** Entries for Current Thread */
         CURRENT_THREAD,
+        /** Entries for CPU frequencies */
+        FREQUENCY,
         /** Entries for IRQs */
         IRQ,
         /** Entries for Soft IRQ */
-        SOFT_IRQ,
-        /** Entries for CPU frequencies */
-        FREQUENCY
+        SOFT_IRQ
     }
 
     private final int fResourceId;

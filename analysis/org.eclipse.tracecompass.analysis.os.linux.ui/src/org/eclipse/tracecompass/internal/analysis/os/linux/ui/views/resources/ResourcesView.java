@@ -13,7 +13,9 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources;
 
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Function;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -54,20 +56,15 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
     };
 
     /**
-     * Resources entry names should all be of type "ABC 123"
-     *
-     * We want to filter on the Type first (the "ABC" part), then on the ID ("123")
-     * in numerical order (so we get 1,2,10 and not 1,10,2).
+     * CPU group entries (Current Thread, CPU, Frequency, separator) first, then IRQ, then SoftIRQ.
+     * Numerical order second, then CPU group entries in their correct order.
      */
+    private static final @NonNull List<Type> CPU_GROUP_ORDER = Arrays.asList(Type.CURRENT_THREAD, Type.CPU, Type.FREQUENCY, Type.GROUP);
+
     private static final Comparator<ResourcesEntryModel> COMPARATOR = Comparator
-            .comparing((Function<ResourcesEntryModel, Type>) entry -> {
-                Type type = entry.getType();
-                if (type == Type.CPU || type == Type.CURRENT_THREAD || type == Type.FREQUENCY) {
-                    return Type.GROUP;
-                }
-                return type;
-            })
-            .thenComparing(ResourcesEntryModel::getResourceId);
+            .comparing((Function<ResourcesEntryModel, Type>) entry -> CPU_GROUP_ORDER.contains(entry.getType()) ? Type.GROUP : entry.getType())
+            .thenComparing(ResourcesEntryModel::getResourceId)
+            .thenComparing(entry -> CPU_GROUP_ORDER.indexOf(entry.getType()));
 
     // ------------------------------------------------------------------------
     // Constructors
