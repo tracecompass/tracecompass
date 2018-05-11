@@ -188,7 +188,7 @@ public class TraceTypePreferencePageTest {
         checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
         assertEquals("Filtered check all", 2, checked);
         bot.text(1).setText("");
-        SWTBotUtils.waitUntil(tree -> tree.visibleRowCount() == defaultVisibleRows, treeBot, "Visible row count: Default expected " + defaultCount +", but actual value is " + treeBot.visibleRowCount());
+        SWTBotUtils.waitUntil(tree -> tree.visibleRowCount() == defaultVisibleRows + 1, treeBot, "Visible row count: Default expected " + defaultCount +", but actual value is " + treeBot.visibleRowCount());
         bot.button(CHECK_ALL).click();
         checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
         assertEquals("Filtered removed all check", defaultCount, checked);

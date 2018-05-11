@@ -12,11 +12,13 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckable;
@@ -54,6 +56,7 @@ public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
      */
     private CheckboxTreeViewer fCheckboxTreeViewer;
 
+
     /**
      * Create a new instance of the receiver.
      *
@@ -89,20 +92,27 @@ public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
     @Override
     protected WorkbenchJob doCreateRefreshJob() {
         WorkbenchJob job = super.doCreateRefreshJob();
-        job.addJobChangeListener(new JobChangeAdapter() {
+        return new WorkbenchJob("Refresh Filter") {//$NON-NLS-1$
             @Override
-            public void done(IJobChangeEvent event) {
+            public IStatus runInUIThread(IProgressMonitor monitor) {
                 if (fCheckboxTreeViewer.getTree().isDisposed()) {
-                    return;
+                    return Status.CANCEL_STATUS;
                 }
-                Object[] elements = fCheckboxTreeViewer.getExpandedElements();
+                // Save expanded elements before and after the filtering
+                Set<Object> expandedElements = new HashSet<>(Arrays.asList(fCheckboxTreeViewer.getExpandedElements()));
+                job.runInUIThread(monitor);
+                expandedElements.addAll(Arrays.asList(fCheckboxTreeViewer.getExpandedElements()));
+                fCheckboxTreeViewer.getTree().setRedraw(false);
+                // Expand all to be able to store all checked elements
                 fCheckboxTreeViewer.expandAll();
                 fCheckboxTreeViewer.setCheckedElements(getCheckedElements());
                 fCheckboxTreeViewer.collapseAll();
-                fCheckboxTreeViewer.setExpandedElements(elements);
+                fCheckboxTreeViewer.getTree().setRedraw(true);
+                // Expand tree according to the saved expanded elements
+                fCheckboxTreeViewer.setExpandedElements(expandedElements.toArray());
+                return Status.OK_STATUS;
             }
-        });
-        return job;
+        };
     }
 
     @Override
