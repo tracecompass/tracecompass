@@ -2636,6 +2636,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
 
         } else {
+            fillColor = OPAQUE;
             if (colorIdx < fEventColorMap.length) {
                 stateColor = fEventColorMap[colorIdx];
             } else {
@@ -2646,20 +2647,23 @@ public class TimeGraphControl extends TimeGraphBaseControl
         boolean reallySelected = timeSelected && selected;
         // fill all rect area
         gc.setBackground(stateColor);
-        if (visible) {
-            int alpha = fillColor & 0xff;
-            gc.setAlpha(alpha);
-            gc.fillRectangle(drawRect);
-            gc.setAlpha(OPAQUE);
-        } else if (fBlendSubPixelEvents) {
-            gc.setAlpha(OPAQUE / 2);
-            gc.fillRectangle(drawRect);
-            gc.setAlpha(OPAQUE);
+        boolean draw = visible || fBlendSubPixelEvents;
+        int old = gc.getAlpha();
+        int alpha = fillColor & 0xff;
+        int arc = Math.min(drawRect.height + 1, drawRect.width) / 2;
+        if (draw) {
+            gc.setAlpha(visible ? alpha : alpha / 2);
+            if (arc >= 1) {
+                gc.fillRoundRectangle(drawRect.x, drawRect.y, drawRect.width, drawRect.height, arc, arc);
+            } else {
+                gc.fillRectangle(drawRect);
+            }
         }
 
+        gc.setAlpha(OPAQUE);
+
         if (reallySelected) {
-            gc.drawLine(drawRect.x, drawRect.y - 1, drawRect.x + drawRect.width - 1, drawRect.y - 1);
-            gc.drawLine(drawRect.x, drawRect.y + drawRect.height, drawRect.x + drawRect.width - 1, drawRect.y + drawRect.height);
+            gc.drawRoundRectangle(drawRect.x - 1, drawRect.y - 1, drawRect.width, drawRect.height + 1, arc, arc);
         }
         if (!visible) {
             gc.drawPoint(rect.x, rect.y - 2);
@@ -2667,6 +2671,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         if (visible && !(boolean) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.annotated(), false)) {
             fTimeGraphProvider.postDrawEvent(event, drawRect, gc);
         }
+        gc.setAlpha(old);
         return visible;
     }
 
