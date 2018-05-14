@@ -13,6 +13,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.timegraph;
 
+import com.google.common.primitives.Ints;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -173,21 +174,35 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
      *
      * @param viewElement
      *            The XML view element
+     * @return A map of string values loaded and their corresponding numerical value
      */
-    public synchronized void loadNewStates(@NonNull Element viewElement) {
+    public synchronized Map<String, Integer> loadNewStates(@NonNull Element viewElement) {
+        Map<String, Integer> map = new HashMap<>();
         stateValues.clear();
         stateIndex.clear();
         List<Element> states = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.DEFINED_VALUE);
 
         for (Element state : states) {
-            int value = Integer.parseInt(state.getAttribute(TmfXmlStrings.VALUE));
+            String valueStr = state.getAttribute(TmfXmlStrings.VALUE);
+            Integer value = Ints.tryParse(valueStr);
             String name = state.getAttribute(TmfXmlStrings.NAME);
+            if (value == null) {
+                // find a numerical value for this one
+                int innerVal = 10000;
+                while (stateIndex.get(innerVal) != null) {
+                    innerVal++;
+                }
+                value = innerVal;
+                //  FIXME: We will use the value as the name, as this is how the colors work, when value is a string, the name attribute will be ignored.
+                name = valueStr;
+                map.put(name, value);
+            }
             String color = state.getAttribute(TmfXmlStrings.COLOR);
-
             addOrUpdateState(value, name, color);
         }
         stateTable = stateValues.toArray(new StateItem[stateValues.size()]);
         Display.getDefault().asyncExec(this::fireColorSettingsChanged);
+        return map;
     }
 
     /**

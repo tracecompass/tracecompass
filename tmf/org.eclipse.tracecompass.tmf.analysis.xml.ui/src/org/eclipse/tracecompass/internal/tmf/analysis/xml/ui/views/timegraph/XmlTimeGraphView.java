@@ -202,20 +202,21 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
         if (viewElement == null) {
             return;
         }
+        // Empty the additional state values
+        fStringValueMap.clear();
         ITimeGraphPresentationProvider pres = this.getPresentationProvider();
         if (pres instanceof XmlPresentationProvider) {
             /*
              * TODO: Each entry of a line could have their own states/color. That will
              * require an update to the presentation provider
              */
-            ((XmlPresentationProvider) pres).loadNewStates(viewElement);
+            Map<String, Integer> newStringStates = ((XmlPresentationProvider) pres).loadNewStates(viewElement);
+            fStringValueMap.putAll(newStringStates);
+
         }
 
         String title = fViewInfo.getViewTitle(viewElement);
         setViewTitle(title != null ? title : Messages.XmlTimeGraphView_DefaultTitle);
-
-        // Empty the additional state values
-        fStringValueMap.clear();
 
         SubMonitor subMonitor = SubMonitor.convert(monitor);
         boolean complete = false;

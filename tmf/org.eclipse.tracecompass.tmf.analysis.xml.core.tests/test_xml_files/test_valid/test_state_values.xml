@@ -13,6 +13,20 @@
 <tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
 
+    <timeGraphView id="org.eclipse.linuxtools.tmf.analysis.xml.ui.views.statesystem">
+        <head>
+            <analysis id="test.xml.attributes" />
+            <label value="Test XML Attributes view" />
+        </head>
+        <!-- Test string value for colors for this analysis -->
+        <definedValue name="Good" value="GOOD" color="#118811" />
+        <definedValue name="Bad" value="BAD" color="#DDDD00" />
+
+        <entry path="update/*">
+            <display type="self" />
+        </entry>
+    </timeGraphView>
+
 	<stateProvider id="test.xml.attributes" version="1">
 
 		<mappingGroup id="operation">
