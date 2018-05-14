@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -12,7 +12,6 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
@@ -48,7 +47,7 @@ public class SoftIrqRaiseHandler extends KernelEventHandler {
          */
         int quark = ss.getQuarkRelativeAndAdd(KernelEventHandlerUtils.getNodeSoftIRQs(cpu, ss), softIrqId.toString());
 
-        ITmfStateValue value = isInSoftirq(ss.queryOngoingState(quark)) ?
+        ITmfStateValue value = KernelEventHandlerUtils.isInSoftIrq(ss, quark) ?
                 StateValues.SOFT_IRQ_RAISED_RUNNING_VALUE :
                 StateValues.SOFT_IRQ_RAISED_VALUE;
         ss.modifyAttribute(KernelEventHandlerUtils.getTimestamp(event), value.unboxValue(), quark);
@@ -57,13 +56,5 @@ public class SoftIrqRaiseHandler extends KernelEventHandler {
         int aggregateQuark = ss.getQuarkAbsoluteAndAdd(Attributes.SOFT_IRQS, softIrqId.toString());
         ITmfStateValue aggregateValue = KernelEventHandlerUtils.getAggregate(ss, Attributes.SOFT_IRQS, softIrqId);
         ss.modifyAttribute(KernelEventHandlerUtils.getTimestamp(event), aggregateValue.unboxValue(), aggregateQuark);
-
-        KernelEventHandlerUtils.updateCpuStatus(KernelEventHandlerUtils.getTimestamp(event), cpu, ss);
-    }
-
-    private static boolean isInSoftirq(@Nullable ITmfStateValue state) {
-        return (state != null &&
-                !state.isNull() &&
-                (state.unboxInt() & StateValues.CPU_STATUS_SOFTIRQ) == StateValues.CPU_STATUS_SOFTIRQ);
     }
 }

@@ -234,23 +234,10 @@ public final class KernelEventHandlerUtils {
         /* Check if there is a soft IRQ running */
         int softIrqQuarks = ssb.getQuarkRelativeAndAdd(cpuQuark, Attributes.SOFT_IRQS);
         List<Integer> softIrqs = ssb.getSubAttributes(softIrqQuarks, false);
-        /*
-         * Get soft IRQ if there is one, else a raised soft IRQ if there is one, if not
-         * leave the value as null.
-         */
-        ITmfStateValue softIrq = TmfStateValue.nullValue();
         for (Integer quark : softIrqs) {
-            ITmfStateValue softIrqState = ssb.queryOngoingState(quark.intValue());
-            if (!softIrqState.isNull()) {
-                if (softIrqState.unboxInt() == StateValues.CPU_STATUS_SOFT_IRQ_RAISED) {
-                    softIrq = StateValues.SOFT_IRQ_RAISED_VALUE;
-                } else {
-                    return StateValues.CPU_STATUS_SOFTIRQ_VALUE;
-                }
+            if (isInSoftIrq(ssb, quark)) {
+                return StateValues.CPU_STATUS_SOFTIRQ_VALUE;
             }
-        }
-        if (!softIrq.isNull()) {
-            return softIrq;
         }
 
         /*
@@ -309,5 +296,20 @@ public final class KernelEventHandlerUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns true if the Soft IRQ is in running state
+     *
+     * @param ss
+     *            state system
+     * @param softIrqQuark
+     *            soft IRQ quark
+     * @return true if the Soft IRQ is in running state
+     */
+    public static boolean isInSoftIrq(ITmfStateSystemBuilder ss, int softIrqQuark) {
+        ITmfStateValue state = ss.queryOngoingState(softIrqQuark);
+        return (!state.isNull() &&
+                (state.unboxInt() & StateValues.CPU_STATUS_SOFTIRQ) == StateValues.CPU_STATUS_SOFTIRQ);
     }
 }
