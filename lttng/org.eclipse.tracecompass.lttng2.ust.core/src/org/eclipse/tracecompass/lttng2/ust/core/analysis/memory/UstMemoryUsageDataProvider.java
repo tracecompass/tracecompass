@@ -170,7 +170,8 @@ public class UstMemoryUsageDataProvider extends AbstractTreeCommonXDataProvider<
 
             if (memoryAttribute != ITmfStateSystem.INVALID_ATTRIBUTE
                     && procNameQuark != ITmfStateSystem.INVALID_ATTRIBUTE
-                    && (active == null || active.get(memoryAttribute).getEndTime() < end)) {
+                    && procNameQuark < nameFullState.size()
+                    && (active == null || (memoryAttribute < active.size() && active.get(memoryAttribute).getEndTime() < end))) {
                 String name = String.valueOf(nameFullState.get(procNameQuark).getValue());
                 int tid = Integer.parseInt(ss.getAttributeName(quark));
 
