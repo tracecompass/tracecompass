@@ -40,7 +40,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.tmf.core.io.ResourceUtil;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTracesFolder;
@@ -217,13 +216,13 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
         }
 
         IRunnableWithProgress operation = monitor -> {
-            Multimap<TmfProjectElement, TmfTraceElement> tracesToDelete = LinkedHashMultimap.create();
+            Multimap<IProject, TmfTraceElement> tracesToDelete = LinkedHashMultimap.create();
             Multimap<IProject, IResource> resourcesToDelete = LinkedHashMultimap.create();
             Multimap<IProject, IFolder> foldersToCreate = LinkedHashMultimap.create();
             for (Object element : fSelection.toList()) {
                 if (element instanceof TmfTraceElement) {
                     TmfTraceElement traceElement = ((TmfTraceElement) element).getElementUnderTraceFolder();
-                    tracesToDelete.put(traceElement.getProject(), traceElement);
+                    tracesToDelete.put(traceElement.getProject().getResource(), traceElement);
                     IResource resource = traceElement.getResource();
                     resourcesToDelete.put(resource.getProject(), resource);
                 } else if (element instanceof TmfTracesFolder) {
@@ -232,7 +231,7 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
                      * them than to delete each of their child members individually
                      */
                     TmfTracesFolder tracesFolder = (TmfTracesFolder) element;
-                    tracesToDelete.putAll(tracesFolder.getProject(), tracesFolder.getTraces());
+                    tracesToDelete.putAll(tracesFolder.getProject().getResource(), tracesFolder.getTraces());
                     IFolder resource = tracesFolder.getResource();
                     IProject project = resource.getProject();
                     resourcesToDelete.put(project, resource);
@@ -245,7 +244,7 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
                     }
                 } else if (element instanceof TmfTraceFolder) {
                     TmfTraceFolder traceFolder = (TmfTraceFolder) element;
-                    tracesToDelete.putAll(traceFolder.getProject(), traceFolder.getTraces());
+                    tracesToDelete.putAll(traceFolder.getProject().getResource(), traceFolder.getTraces());
                     IFolder resource = traceFolder.getResource();
                     resourcesToDelete.put(resource.getProject(), resource);
                 }
@@ -271,14 +270,14 @@ public class DeleteTraceFolderElementHandler extends AbstractHandler {
 
             SubMonitor subMon = SubMonitor.convert(monitor, tracesToDelete.size() + resourcesToDelete.size() + foldersToCreate.size());
             subMon.setTaskName(Messages.DeleteTraceHandlerGeneric_TaskName);
-            for (Entry<TmfProjectElement, Collection<TmfTraceElement>> entry : tracesToDelete.asMap().entrySet()) {
-                IProject project = entry.getKey().getResource();
+            for (Entry<IProject, Collection<IResource>> entry : resourcesToDelete.asMap().entrySet()) {
+                IProject project = entry.getKey();
                 try {
                     ResourcesPlugin.getWorkspace().run(mon -> {
-                        for (IResource resource : resourcesToDelete.get(project)) {
+                        for (IResource resource : entry.getValue()) {
                             ResourceUtil.deleteResource(resource, subMon.split(1));
                         }
-                        for (TmfTraceElement traceElement : entry.getValue()) {
+                        for (TmfTraceElement traceElement : tracesToDelete.get(project)) {
                             traceElement.delete(subMon.split(1), false, false);
                         }
                         for (IFolder folder : foldersToCreate.get(project)) {
