@@ -547,11 +547,11 @@ public class XmlUtils {
                         String outputId = node.getAttribute(TmfXmlStrings.ID);
 
                         List<Element> label = TmfXmlUtils.getChildElements(headNodes.get(0), TmfXmlStrings.LABEL);
-                        if (label.isEmpty()) {
-                            return;
+                        String outputLabel = outputId;
+                        if (!label.isEmpty()) {
+                            Element labelElement = label.get(0);
+                            outputLabel = labelElement.getAttribute(TmfXmlStrings.VALUE);
                         }
-                        Element labelElement = label.get(0);
-                        String outputLabel = labelElement.getAttribute(TmfXmlStrings.VALUE);
 
                         XmlOutputElement output = new XmlOutputElement(xmlFile.getAbsolutePath(), outputType.getXmlElem(), outputId, outputLabel, analysesId);
                         addXmlOutput(output);

@@ -61,7 +61,7 @@ public class XmlXYView extends TmfChartView {
 
                     TmfViewer left = getLeftChildViewer();
                     if (left instanceof XmlTreeViewer) {
-                        ((TmfXYChartViewer) left).reset();
+                        ((XmlTreeViewer) left).reset();
                     }
 
                     TmfXYChartViewer chart = getChartViewer();
