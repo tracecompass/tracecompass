@@ -324,7 +324,8 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                     int s = (int) status;
                     int currentThreadQuark = ss.optQuarkRelative(interval.getAttribute(), Attributes.CURRENT_THREAD);
                     if (type == Type.CPU && s == StateValues.CPU_STATUS_RUN_SYSCALL) {
-                        eventList.add(getSyscall(ss, interval, intervals.get(currentThreadQuark)));
+                        // add events for all the sampled current threads.
+                        eventList.addAll(getSyscalls(ss, interval, intervals.get(currentThreadQuark)));
                     } else if (type == Type.CPU && s == StateValues.CPU_STATUS_RUN_USERMODE) {
                         // add events for all the sampled current threads.
                         eventList.addAll(getCurrentThreads(ss, interval, intervals.get(currentThreadQuark)));
@@ -448,39 +449,43 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     }
 
     /**
-     * Get a {@link TimeGraphState} with the syscall name.
+     * Get a list of all the system call states over the duration of the current
+     * syscall interval, as several threads can be scheduled over that interval
      *
      * @param ss
      *            backing state system
-     * @param interval
-     *            current userMode interval
+     * @param syscallInterval
+     *            current syscall interval
      * @param currentThreadIntervals
      *            sampled current thread intervals for the CPU
-     * @return a {@link TimeGraphState} with the System Call name if we found it
+     * @return a List of intervals with the system call name label.
      */
-    private ITimeGraphState getSyscall(@NonNull ITmfStateSystem ss, ITmfStateInterval interval,
+    private List<ITimeGraphState> getSyscalls(@NonNull ITmfStateSystem ss, ITmfStateInterval syscallInterval,
             @NonNull NavigableSet<ITmfStateInterval> currentThreadIntervals) throws StateSystemDisposedException {
-        long startTime = interval.getStartTime();
-        long duration = interval.getEndTime() - startTime + 1;
-        int status = StateValues.CPU_STATUS_RUN_SYSCALL;
-
-        ITmfStateInterval tidInterval = currentThreadIntervals.floor(interval);
-        if (tidInterval != null) {
-            Object value = tidInterval.getValue();
-            if (value instanceof Integer) {
-                int currentThreadId = (int) value;
-                int quark = ss.optQuarkAbsolute(Attributes.THREADS, Integer.toString(currentThreadId), Attributes.SYSTEM_CALL);
-                if (quark != ITmfStateSystem.INVALID_ATTRIBUTE) {
-                    ITmfStateInterval nameInterval = ss.querySingleState(startTime, quark);
-                    Object syscallName = nameInterval.getValue();
-                    if (syscallName instanceof String) {
-                        String label = fSyscallTrim.apply((String) syscallName);
-                        return new TimeGraphState(startTime, duration, status, label);
+        List<ITimeGraphState> list = new ArrayList<>();
+        for (ITmfStateInterval currentThread : currentThreadIntervals) {
+            // filter the current thread intervals which overlap the syscall interval
+            if (currentThread.getStartTime() <= syscallInterval.getEndTime()
+                    && currentThread.getEndTime() >= syscallInterval.getStartTime()) {
+                long start = Long.max(syscallInterval.getStartTime(), currentThread.getStartTime());
+                long end = Long.min(syscallInterval.getEndTime(), currentThread.getEndTime());
+                long duration = end - start + 1;
+                Object tid = currentThread.getValue();
+                if (tid instanceof Integer) {
+                    int syscallQuark = ss.optQuarkAbsolute(Attributes.THREADS, String.valueOf(tid), Attributes.SYSTEM_CALL);
+                    if (syscallQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
+                        Object syscallName = ss.querySingleState(start, syscallQuark).getValue();
+                        if (syscallName instanceof String) {
+                            String label = fSyscallTrim.apply((String) syscallName);
+                            list.add(new TimeGraphState(start, duration, StateValues.CPU_STATUS_RUN_SYSCALL, label));
+                            continue;
+                        }
                     }
                 }
+                list.add(new TimeGraphState(start, duration, StateValues.CPU_STATUS_RUN_SYSCALL));
             }
         }
-        return new TimeGraphState(startTime, duration, status);
+        return list;
     }
 
     @Override
