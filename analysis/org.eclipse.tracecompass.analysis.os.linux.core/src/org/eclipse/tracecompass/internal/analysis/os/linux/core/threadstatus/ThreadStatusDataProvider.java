@@ -329,7 +329,10 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
                             Iterable<@NonNull String> names = Iterables.transform(names2d, intervalName -> String.valueOf(intervalName.getValue()));
 
                             int tid = rqToPidCache.computeIfAbsent(attribute, a -> Attributes.parseThreadAttributeName(ss.getAttributeName(ss.getParentAttributeQuark(a))).getFirst());
-
+                            //Skip Idle (thread 0)
+                            if (tid == 0) {
+                                continue;
+                            }
                             for (ThreadEntryModel.Builder model : tidToEntry.get(tid)) {
                                 if (interval.getStartTime() <= model.getEndTime() &&
                                         model.getStartTime() <= interval.getEndTime()) {
