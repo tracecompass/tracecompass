@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -107,6 +107,7 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
 
     @Override
     public @NonNull TmfModelResponse<ITmfXyModel> fetchXY(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        fModule.waitForInitialization();
         long[] xValues = filter.getTimesRequested();
 
         if (!(filter instanceof SelectionTimeQueryFilter)) {
@@ -118,7 +119,7 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
 
         final ITmfStatistics stats = Objects.requireNonNull(fModule.getStatistics());
         if (selected.contains(fTotalId)) {
-            List<Long> values = stats.histogramQuery(filter.getStart(), filter.getEnd(), n);
+            List<Long> values = stats.histogramQuery(filter.getTimesRequested());
 
             double[] y = new double[n];
             Arrays.setAll(y, values::get);
@@ -135,8 +136,9 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
                 return TmfXyResponseFactory.createFailedResponse(CommonStatusMessage.STATE_SYSTEM_FAILED);
             }
         }
+        boolean completed = eventsSs != null ? eventsSs.waitUntilBuilt(0) || eventsSs.getCurrentEndTime() >= filter.getEnd() : false;
 
-        return TmfXyResponseFactory.create(TITLE, xValues, builder.build(), true);
+        return TmfXyResponseFactory.create(TITLE, xValues, builder.build(), completed);
     }
 
     private YModel getLostEvents(ITmfStateSystem ss, long[] times) throws StateSystemDisposedException {

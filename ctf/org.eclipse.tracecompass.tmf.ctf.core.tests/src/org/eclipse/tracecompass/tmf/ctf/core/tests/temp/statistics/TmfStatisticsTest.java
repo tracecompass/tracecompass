@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
+import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.statistics.ITmfStatistics;
 import org.junit.Rule;
 import org.junit.Test;
@@ -70,7 +71,8 @@ public abstract class TmfStatisticsTest {
     @Test
     public void testHistogramQuerySmall() {
         final int NB_REQ = 10;
-        List<Long> results = backend.histogramQuery(t1, t6, NB_REQ);
+        TimeQueryFilter histogramFilter = new TimeQueryFilter(t1, t6, NB_REQ);
+        List<@NonNull Long> results = backend.histogramQuery(histogramFilter.getTimesRequested());
 
         /* Make sure the returned array has the right size */
         assertEquals(NB_REQ, results.size());
@@ -80,8 +82,8 @@ public abstract class TmfStatisticsTest {
         assertEquals(0, results.get(1).longValue());
         assertEquals(0, results.get(2).longValue());
         assertEquals(0, results.get(3).longValue());
-        assertEquals(1, results.get(4).longValue());
-        assertEquals(0, results.get(5).longValue());
+        assertEquals(0, results.get(4).longValue());
+        assertEquals(1, results.get(5).longValue());
         assertEquals(0, results.get(6).longValue());
         assertEquals(0, results.get(7).longValue());
         assertEquals(0, results.get(8).longValue());
@@ -96,7 +98,8 @@ public abstract class TmfStatisticsTest {
     @Test
     public void testHistogramQueryFull() {
         final int NB_REQ = 10;
-        List<Long> results = backend.histogramQuery(tStart, tEnd, NB_REQ);
+        TimeQueryFilter histogramFilter = new TimeQueryFilter(tStart, tEnd, NB_REQ);
+        List<@NonNull Long> results = backend.histogramQuery(histogramFilter.getTimesRequested());
 
         /* Make sure the returned array has the right size */
         assertEquals(NB_REQ, results.size());
@@ -109,16 +112,16 @@ public abstract class TmfStatisticsTest {
         assertEquals(totalNbEvents, count);
 
         /* Check the contents of each "bucket" */
-        assertEquals(94161, results.get(0).longValue());
-        assertEquals(87348, results.get(1).longValue());
-        assertEquals(58941, results.get(2).longValue());
-        assertEquals(59879, results.get(3).longValue());
-        assertEquals(66941, results.get(4).longValue());
-        assertEquals(68939, results.get(5).longValue());
-        assertEquals(72746, results.get(6).longValue());
-        assertEquals(60749, results.get(7).longValue());
-        assertEquals(61208, results.get(8).longValue());
-        assertEquals(64407, results.get(9).longValue());
+        assertEquals(1, results.get(0).longValue());
+        assertEquals(98663, results.get(1).longValue());
+        assertEquals(99506, results.get(2).longValue());
+        assertEquals(62165, results.get(3).longValue());
+        assertEquals(66797, results.get(4).longValue());
+        assertEquals(80895, results.get(5).longValue());
+        assertEquals(71439, results.get(6).longValue());
+        assertEquals(73656, results.get(7).longValue());
+        assertEquals(71792, results.get(8).longValue());
+        assertEquals(70405, results.get(9).longValue());
     }
 
     // ------------------------------------------------------------------------

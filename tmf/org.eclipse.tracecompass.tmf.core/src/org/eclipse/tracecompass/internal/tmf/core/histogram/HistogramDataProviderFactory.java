@@ -36,7 +36,7 @@ public class HistogramDataProviderFactory implements IDataProviderFactory {
         if (traces.size() == 1) {
             TmfStatisticsModule statsMod = TmfTraceUtils.getAnalysisModuleOfClass(trace, TmfStatisticsModule.class, TmfStatisticsModule.ID);
             if (statsMod != null) {
-                statsMod.waitForInitialization();
+                statsMod.schedule();
                 return new HistogramDataProvider(trace, statsMod);
             }
         }

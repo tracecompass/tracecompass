@@ -67,6 +67,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
         cancelOngoingRequests();
     }
 
+    @Deprecated
     @Override
     public List<@NonNull Long> histogramQuery(long start, long end, int nb) {
         final long[] borders = new long[nb];
@@ -78,11 +79,15 @@ public class TmfEventsStatistics implements ITmfStatistics {
             curTime += increment;
         }
 
-        HistogramQueryRequest req = new HistogramQueryRequest(borders, end);
+        return histogramQuery(borders);
+    }
+
+    @Override
+    public List<@NonNull Long> histogramQuery(long[] timeRequested) {
+        HistogramQueryRequest req = new HistogramQueryRequest(timeRequested, timeRequested[timeRequested.length - 1]);
         sendAndWait(req);
 
         return new ArrayList<>(req.getResults());
-
     }
 
     private synchronized void cancelOngoingRequests() {
@@ -265,7 +270,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
             super.handleData(event);
             if (event.getTrace() == trace) {
                 long ts = event.getTimestamp().toNanos();
-                Long key = results.floorKey(ts);
+                Long key = results.ceilingKey(ts);
                 if (key != null) {
                     incrementValue(key);
                 }

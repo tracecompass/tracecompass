@@ -95,6 +95,7 @@ public class TmfStateStatistics implements ITmfStatistics {
         fTypesStats.dispose();
     }
 
+    @Deprecated
     @Override
     public List<@NonNull Long> histogramQuery(final long start, final long end, final int nb) {
         final List<@NonNull Long> list = new ArrayList<>();
@@ -126,6 +127,24 @@ public class TmfStateStatistics implements ITmfStatistics {
          */
         long curTotal = getEventCountAt(end);
         list.add(curTotal - prevTotal);
+
+        return list;
+    }
+
+    @Override
+    public List<@NonNull Long> histogramQuery(long[] timeRequested) {
+        final List<@NonNull Long> list = new ArrayList<>();
+        if (fTotalsStats.isCancelled()) {
+            return list;
+        }
+
+        long prevTotal = (timeRequested[0] == fTotalsStats.getStartTime()) ? 0 : getEventCountAt(timeRequested[0] - 1);
+        for (int i = 0; i < timeRequested.length; i++) {
+            long curTotal = getEventCountAt(timeRequested[i]);
+            long count = curTotal - prevTotal;
+            list.add(count);
+            prevTotal = curTotal;
+        }
 
         return list;
     }
