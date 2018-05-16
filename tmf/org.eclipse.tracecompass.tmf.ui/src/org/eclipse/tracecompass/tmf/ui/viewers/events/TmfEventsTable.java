@@ -1753,7 +1753,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         if ((itemStrings[MARGIN_COLUMN_INDEX] != null) && !itemStrings[MARGIN_COLUMN_INDEX].isEmpty()) {
             packMarginColumn();
         }
-        TmfUiRefreshHandler.getInstance().queueUpdate(this, () -> packColumns());
+        TmfUiRefreshHandler.getInstance().queueUpdate(this, () -> {
+            if (fTable.isDisposed()) {
+                return;
+            }
+            packColumns();
+        });
     }
 
     /**
