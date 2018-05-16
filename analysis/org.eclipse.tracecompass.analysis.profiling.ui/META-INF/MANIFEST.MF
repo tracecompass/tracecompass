@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-Vendor: %Bundle-Vendor
+Bundle-SymbolicName: org.eclipse.tracecompass.analysis.profiling.ui;singleton:=true
+Bundle-Version: 0.0.1.qualifier
+Bundle-Localization: plugin
+Bundle-Activator: org.eclipse.tracecompass.internal.analysis.profiling.ui.Activator
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Automatic-Module-Name: org.eclipse.tracecompass.analysis.profiling.ui
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.tracecompass.common.core,
+ org.eclipse.tracecompass.analysis.profiling.core
+Export-Package: org.eclipse.tracecompass.internal.analysis.profiling.ui;x-internal:=true

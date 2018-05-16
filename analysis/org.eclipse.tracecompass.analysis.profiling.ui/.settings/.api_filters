@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.eclipse.tracecompass.tmf.ui" version="2">
+    <resource path="src/org/eclipse/tracecompass/tmf/ui/dialog/TmfFileDialogFactory.java" type="org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory">
+        <filter comment="For SWTBot, cannot extend FileDialog, which is a native dialog" id="571519004">
+            <message_arguments>
+                <message_argument value="org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory.createNewFileDialog(Shell, int, List&lt;String&gt;)"/>
+                <message_argument value="FileDialog"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/eclipse/tracecompass/tmf/ui/editors/UnsortedPropertySheetPage.java" type="org.eclipse.tracecompass.tmf.ui.editors.UnsortedPropertySheetPage">
+        <filter comment="See bug 109617." id="571473929">
+            <message_arguments>
+                <message_argument value="PropertySheetPage"/>
+                <message_argument value="UnsortedPropertySheetPage"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/eclipse/tracecompass/tmf/ui/views/statesystem/TmfStateSystemExplorer.java" type="org.eclipse.tracecompass.tmf.ui.views.statesystem.TmfStateSystemExplorer">
+        <filter id="388194388">
+            <message_arguments>
+                <message_argument value="org.eclipse.tracecompass.tmf.ui.views.statesystem.TmfStateSystemExplorer"/>
+                <message_argument value="ID"/>
+                <message_argument value="org.eclipse.linuxtools.tmf.ui.views.ssview"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/eclipse/tracecompass/tmf/ui/widgets/timegraph/model/ITimeGraphEntry.java" type="org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry">
+        <filter comment="API preference INTERFACE_ELEMENT_TYPE_ADDED_DEFAULT_METHOD=Ignore is not properly supported (Bug 507246)" id="403984517">
+            <message_arguments>
+                <message_argument value="org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry"/>
+                <message_argument value="org.eclipse.jface.viewers.ISelection"/>
+                <message_argument value="isEmpty()"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/eclipse/tracecompass/tmf/ui/widgets/timegraph/model/IMarkerEventSource.java" type="org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEventSource">
+        <filter comment="API preference INTERFACE_ELEMENT_TYPE_ADDED_DEFAULT_METHOD=Ignore is not properly supported (Bug 507246)" id="404000815">
+            <message_arguments>
+                <message_argument value="org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEventSource"/>
+                <message_argument value="getMarkerList(long, long, long, IProgressMonitor)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>

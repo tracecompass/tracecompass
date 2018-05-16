@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-Vendor: %Bundle-Vendor
+Bundle-SymbolicName: org.eclipse.tracecompass.analysis.profiling.core.tests
+Bundle-Version: 0.0.1.qualifier
+Bundle-Localization: plugin
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Automatic-Module-Name: org.eclipse.tracecompass.analysis.profiling.core.tests
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.tracecompass.common.core,
+ org.eclipse.tracecompass.analysis.profiling.core,
+ org.junit
+Export-Package: org.eclipse.tracecompass.analysis.profiling.core.tests
