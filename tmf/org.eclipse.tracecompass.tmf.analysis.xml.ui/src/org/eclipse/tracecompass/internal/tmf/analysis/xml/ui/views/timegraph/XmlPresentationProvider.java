@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2017 École Polytechnique de Montréal and others.
+ * Copyright (c) 2014, 2018 École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
@@ -70,6 +71,9 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
 
     @Override
     public int getStateTableIndex(ITimeEvent event) {
+        if (event instanceof NullTimeEvent) {
+            return INVISIBLE;
+        }
         if (event instanceof TimeEvent && ((TimeEvent) event).hasValue()) {
             TimeEvent tcEvent = (TimeEvent) event;
 
@@ -86,7 +90,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
                 }
             }
         }
-        return INVISIBLE;
+        return TRANSPARENT;
     }
 
     @Override

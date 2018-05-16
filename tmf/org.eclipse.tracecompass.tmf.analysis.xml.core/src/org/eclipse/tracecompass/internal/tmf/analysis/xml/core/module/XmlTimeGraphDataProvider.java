@@ -49,8 +49,8 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
-import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse.Status;
+import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -367,7 +367,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
 
     private static @NonNull TimeGraphState getStateFromInterval(ITmfStateInterval statusInterval) {
         long time = statusInterval.getStartTime();
-        long duration = statusInterval.getEndTime() - time;
+        long duration = statusInterval.getEndTime() - time + 1;
         Object o = statusInterval.getValue();
         if (o instanceof Integer) {
             return new TimeGraphState(time, duration, ((Integer) o).longValue(), String.valueOf(o));
@@ -379,7 +379,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
         } else if (o instanceof Double) {
             return new TimeGraphState(time, duration, ((Double) o).longValue());
         }
-        return new TimeGraphState(time, duration, -1, String.valueOf(-1));
+        return new TimeGraphState(time, duration, Integer.MIN_VALUE);
     }
 
     private static @NonNull Set<@NonNull Long> getTimes(ITmfStateSystem key, long[] timesRequested) {
