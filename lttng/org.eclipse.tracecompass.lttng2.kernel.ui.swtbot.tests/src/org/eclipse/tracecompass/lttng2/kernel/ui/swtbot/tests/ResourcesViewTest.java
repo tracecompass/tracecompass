@@ -418,7 +418,18 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         SWTBotToolbarButton filterButton = getViewBot().toolbarButton("Show View Filters");
         filterButton.click();
         SWTBot bot = fBot.shell("Filter").activate().bot();
+        /*
+         * The filtered tree initialization triggers a delayed refresh job that can
+         * interfere with the tree selection. Wait for new refresh jobs to avoid this.
+         */
         SWTBotTree treeBot = bot.tree();
+        // set filter text
+        SWTBotTreeItem treeItem = treeBot.getTreeItem(LttngTraceGenerator.getName());
+        bot.text().setText("24");
+        fBot.waitUntil(ConditionHelpers.treeItemCount(treeItem, 2));
+        // clear filter text
+        bot.text().setText(LttngTraceGenerator.getName());
+        fBot.waitUntil(ConditionHelpers.treeItemCount(treeItem, 75));
         // get how many items there are
         int checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
         assertEquals("default", 76, checked);
@@ -456,8 +467,6 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
         assertEquals(0, checked);
         bot.text().setText("CPU 2");
-        SWTBotTreeItem treeItem = treeBot.getTreeItem(LttngTraceGenerator.getName());
-        treeItem.rowCount();
         fBot.waitUntil(ConditionHelpers.treeItemCount(treeItem, 75));
         bot.button(CHECK_ALL).click();
         checked = SWTBotUtils.getTreeCheckedItemCount(treeBot);
