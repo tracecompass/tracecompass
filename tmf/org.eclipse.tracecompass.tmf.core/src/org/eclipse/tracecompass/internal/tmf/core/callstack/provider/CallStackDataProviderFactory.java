@@ -25,6 +25,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  *
  * @author Loic Prieur-Drevon
  */
+@Deprecated
 public class CallStackDataProviderFactory implements IDataProviderFactory {
 
     @Override

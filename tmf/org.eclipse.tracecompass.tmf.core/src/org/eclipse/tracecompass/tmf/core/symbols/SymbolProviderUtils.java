@@ -23,7 +23,10 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
  *
  * @author Geneviève Bastien
  * @since 3.2
+ * @deprecated Use the class with same name in the
+ *             org.eclipse.tracecompass.analysis.profiling.core plugin
  */
+@Deprecated
 public final class SymbolProviderUtils {
 
     private static final Logger LOGGER = TraceCompassLog.getLogger(SymbolProviderUtils.class);

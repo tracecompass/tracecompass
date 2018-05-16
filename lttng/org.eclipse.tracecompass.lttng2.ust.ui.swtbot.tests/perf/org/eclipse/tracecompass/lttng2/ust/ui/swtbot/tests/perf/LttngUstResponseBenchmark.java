@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart.FlameChartView;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfBenchmarkTrace;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.callstack.LttngUstCallStackAnalysis;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
@@ -26,7 +27,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.perf.views.ViewsResponseTest;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.TracingPerspectiveFactory;
-import org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackView;
 import org.junit.Test;
 
 /**
@@ -39,7 +39,7 @@ import org.junit.Test;
  */
 public class LttngUstResponseBenchmark extends ViewsResponseTest {
 
-    private static final @NonNull String CALLSTACK_VIEW_ID = CallStackView.ID;
+    private static final @NonNull String FLAMECHART_VIEW_ID = FlameChartView.ID;
     private static final String TRACE_TYPE = "org.eclipse.linuxtools.lttng2.ust.tracetype";
 
     @Override
@@ -79,7 +79,7 @@ public class LttngUstResponseBenchmark extends ViewsResponseTest {
      */
     @Test
     public void testWithCygProfile() throws SecurityException, IllegalArgumentException, IOException {
-        runTestWithTrace(FileLocator.toFileURL(CtfTestTrace.CYG_PROFILE.getTraceURL()).getPath(), TRACE_TYPE, Collections.singleton(CALLSTACK_VIEW_ID));
+        runTestWithTrace(FileLocator.toFileURL(CtfTestTrace.CYG_PROFILE.getTraceURL()).getPath(), TRACE_TYPE, Collections.singleton(FLAMECHART_VIEW_ID));
     }
 
     /**
@@ -94,7 +94,7 @@ public class LttngUstResponseBenchmark extends ViewsResponseTest {
      */
     @Test
     public void testWithQmlScene() throws SecurityException, IllegalArgumentException {
-        runTestWithTrace(CtfBenchmarkTrace.UST_QMLSCENE.getTracePath().toOSString(), TRACE_TYPE, Collections.singleton(CALLSTACK_VIEW_ID));
+        runTestWithTrace(CtfBenchmarkTrace.UST_QMLSCENE.getTracePath().toOSString(), TRACE_TYPE, Collections.singleton(FLAMECHART_VIEW_ID));
     }
 
 }

@@ -7,27 +7,28 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.views.callstack;
+package org.eclipse.tracecompass.internal.analysis.profiling.ui.views.flamechart;
 
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
+import org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart.FlameChartView;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.ITmfNewAnalysisModuleListener;
-import org.eclipse.tracecompass.tmf.core.callstack.CallStackAnalysis;
 import org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput;
 
 /**
- * Registers the {@link CallStackView} to {@link CallStackAnalysis}. The
+ * Registers the {@link FlameChartView} to {@link CallStackAnalysis}. The
  * analysis being an abstract class, it is not possible to use the output
  * extension to add the view, but the listener fixes the issue.
  *
  * @author Geneviève Bastien
- * @since 2.2
  */
 public class CallStackAnalysisListener implements ITmfNewAnalysisModuleListener {
 
     @Override
-    public void moduleCreated(IAnalysisModule module) {
+    public void moduleCreated(@Nullable IAnalysisModule module) {
         if (module instanceof CallStackAnalysis) {
-            module.registerOutput(new TmfAnalysisViewOutput(CallStackView.ID));
+            module.registerOutput(new TmfAnalysisViewOutput(FlameChartView.ID));
         }
     }
 

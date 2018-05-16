@@ -20,7 +20,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
-import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.osgi.framework.BundleContext;
 
@@ -89,8 +88,6 @@ public class Activator extends Plugin {
         TmfTraceManager.getInstance();
         /* Initialize the analysis manager */
         TmfAnalysisManager.initialize();
-        /* Initialize the symbol provider manager */
-        SymbolProviderManager.getInstance();
         /* Initialize the data provider manager */
         DataProviderManager.getInstance();
     }
@@ -100,7 +97,6 @@ public class Activator extends Plugin {
         TmfCoreTracer.stop();
         TmfTraceManager.getInstance().dispose();
         TmfAnalysisManager.dispose();
-        SymbolProviderManager.dispose();
         DataProviderManager.dispose();
         TmfSignalManager.dispose();
         setDefault(null);

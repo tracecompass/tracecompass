@@ -11,6 +11,18 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: org.eclipse.tracecompass.analysis.profiling.ui
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.ui.navigator,
+ org.eclipse.ui.navigator.resources,
  org.eclipse.tracecompass.common.core,
- org.eclipse.tracecompass.analysis.profiling.core
-Export-Package: org.eclipse.tracecompass.internal.analysis.profiling.ui;x-internal:=true
+ org.eclipse.tracecompass.analysis.profiling.core,
+ org.eclipse.tracecompass.tmf.core,
+ org.eclipse.tracecompass.tmf.ui
+Export-Package: org.eclipse.tracecompass.analysis.profiling.ui.symbols,
+ org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart,
+ org.eclipse.tracecompass.internal.analysis.profiling.ui;x-internal:=true,
+ org.eclipse.tracecompass.internal.analysis.profiling.ui.symbols;x-friends:="org.eclipse.tracecompass.analysis.profiling.ui.tests",
+ org.eclipse.tracecompass.internal.analysis.profiling.ui.views.flamechart;x-internal:=true
+Import-Package: com.google.common.base,
+ com.google.common.collect,
+ org.apache.commons.lang3

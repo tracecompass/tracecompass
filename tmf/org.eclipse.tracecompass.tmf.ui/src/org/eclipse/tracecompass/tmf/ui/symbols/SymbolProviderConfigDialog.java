@@ -48,8 +48,10 @@ import org.eclipse.ui.PlatformUI;
  *
  * @author Robert Kiss
  * @since 2.0
- *
+ * @deprecated Use the class with same name in the
+ *             org.eclipse.tracecompass.analysis.profiling.ui plugin
  */
+@Deprecated
 public class SymbolProviderConfigDialog extends TitleAreaDialog implements IPreferencePageContainer {
 
     private ISymbolProviderPreferencePage[] fPreferencePages;

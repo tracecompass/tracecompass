@@ -15,7 +15,10 @@ import org.eclipse.osgi.util.NLS;
  * Message bundle
  *
  * @noreference Messages class
+ * @deprecated Use the class with same name in the
+ *             org.eclipse.tracecompass.analysis.profiling.ui plugin
  */
+@Deprecated
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
 

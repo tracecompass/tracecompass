@@ -50,7 +50,10 @@ import com.google.common.collect.ImmutableMap;
  * Class containing the different methods to import an address->name mapping.
  *
  * @author Alexandre Montplaisir
+ * @deprecated Use the class with same name in the
+ *             org.eclipse.tracecompass.analysis.profiling.core plugin
  */
+@Deprecated
 public final class FunctionNameMapper {
 
     /**

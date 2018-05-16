@@ -54,6 +54,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Loic Prieur-Drevon
  */
+@Deprecated
 public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNull CallStackAnalysis, @NonNull CallStackEntryModel> {
 
     /**

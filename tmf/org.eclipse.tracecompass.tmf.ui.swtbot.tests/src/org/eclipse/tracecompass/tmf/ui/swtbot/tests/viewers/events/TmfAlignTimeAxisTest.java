@@ -40,8 +40,8 @@ import org.eclipse.tracecompass.tmf.ui.project.wizards.NewTmfProjectWizard;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotSash;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.views.TimeGraphViewStub;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
-import org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackView;
 import org.eclipse.tracecompass.tmf.ui.views.histogram.HistogramView;
 import org.eclipse.tracecompass.tmf.ui.views.timechart.TimeChartView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
@@ -158,76 +158,77 @@ public class TmfAlignTimeAxisTest {
     }
 
     /**
-     * Test 3 views, none overlap, the histogram, callstack and timechart are
-     * aligned. The histogram is moved, we check that the callstack and
+     * Test 3 views, none overlap, the histogram, time graph stub and timechart are
+     * aligned. The histogram is moved, we check that the time graph stub and
      * timechart follow.
      */
     @Test
     public void testMoveHistogramOthersFollow() {
         fBot = new SWTWorkbenchBot();
         switchToPerspective(AlignPerspectiveFactory1.ID);
-        testAligned(HistogramView.ID, CallStackView.ID, TimeChartView.ID);
+        testAligned(HistogramView.ID, TimeGraphViewStub.ID, TimeChartView.ID);
     }
 
     /**
-     * Test 3 views, none overlap, the histogram, callstack and timechart are
-     * aligned. The callstack is moved, we check that the histogram and
+     * Test 3 views, none overlap, the histogram, time graph stub and timechart are
+     * aligned. The time graph stub is moved, we check that the histogram and
      * timechart follow.
      */
     @Test
-    public void testMoveCallstackOthersFollow() {
+    public void testMoveTgStubOthersFollow() {
         fBot = new SWTWorkbenchBot();
         switchToPerspective(AlignPerspectiveFactory1.ID);
-        testAligned(CallStackView.ID, HistogramView.ID, TimeChartView.ID);
+        testAligned(TimeGraphViewStub.ID, HistogramView.ID, TimeChartView.ID);
     }
 
     /**
      * Test 3 views, overlap on the resizing view. The histogram and timechart
-     * are overlapping, and the callstack is aligned. The histogram is moved, we
-     * check that the callstack follows. The hidden timechart is not checked.
+     * are overlapping, and the time graph stub is aligned. The histogram is moved, we
+     * check that the time graph stub follows. The hidden timechart is not checked.
      */
     @Test
     public void testOverlappingHistogramMove() {
         fBot = new SWTWorkbenchBot();
         switchToPerspective(AlignPerspectiveFactory2.ID);
-        testAligned(HistogramView.ID, CallStackView.ID);
+        testAligned(HistogramView.ID, TimeGraphViewStub.ID);
     }
 
     /**
-     * Test 3 views, overlap on the resizing view. The histogram and timechart
-     * are overlapping, and the callstack is aligned. The callstack is moved, we
-     * check that the histogram follows. The hidden timechart is not checked.
+     * Test 3 views, overlap on the resizing view. The histogram and timechart are
+     * overlapping, and the time graph stub is aligned. The time graph stub is
+     * moved, we check that the histogram follows. The hidden timechart is not
+     * checked.
      */
     @Test
-    public void testOverlappingCallstackMove() {
+    public void testOverlappingTgStubMove() {
         fBot = new SWTWorkbenchBot();
         switchToPerspective(AlignPerspectiveFactory2.ID);
-        testAligned(CallStackView.ID, HistogramView.ID);
+        testAligned(TimeGraphViewStub.ID, HistogramView.ID);
     }
 
     /**
      * Test 3 views. No overlap. The histogram and timechart are aligned, but
-     * the callstack is not aligned. The histogram is moved, we check that the
-     * timechart follows and that the callstack does NOT follow.
+     * the time graph stub is not aligned. The histogram is moved, we check that the
+     * timechart follows and that the time graph stub does NOT follow.
      */
     @Test
     public void testNotOverlappingHistogramMove() {
         fBot = new SWTWorkbenchBot();
         switchToPerspective(AlignPerspectiveFactory3.ID);
         testAligned(HistogramView.ID, TimeChartView.ID);
-        testNotAligned(HistogramView.ID, CallStackView.ID);
+        testNotAligned(HistogramView.ID, TimeGraphViewStub.ID);
     }
 
     /**
      * Test 3 views. No overlap. The histogram and timechart are aligned, but
-     * the callstack is not aligned. The callstack is moved, we check that the
+     * the time graph stub is not aligned. The time graph stub is moved, we check that the
      * histogram and timechart do NOT follow.
      */
     @Test
-    public void testNotOverlappingCallstackMove() {
+    public void testNotOverlappingTgStubMove() {
         fBot = new SWTWorkbenchBot();
         switchToPerspective(AlignPerspectiveFactory3.ID);
-        testNotAligned(CallStackView.ID, HistogramView.ID, TimeChartView.ID);
+        testNotAligned(TimeGraphViewStub.ID, HistogramView.ID, TimeChartView.ID);
     }
 
     /**
@@ -237,7 +238,7 @@ public class TmfAlignTimeAxisTest {
     public void testMenuItem() {
         fBot = new SWTWorkbenchBot();
         switchToPerspective(AlignPerspectiveFactory1.ID);
-        SWTBotView viewBot = fBot.viewById(CallStackView.ID);
+        SWTBotView viewBot = fBot.viewById(TimeGraphViewStub.ID);
         SWTBotRootMenu viewMenu = viewBot.viewMenu();
 
         SWTBotMenu menuItems = viewMenu.menu(ALIGN_VIEWS_ACTION_NAME);
@@ -256,7 +257,7 @@ public class TmfAlignTimeAxisTest {
         switch (viewId) {
         case HistogramView.ID:
             return new SWTBotSash(viewBot.bot().widget(WidgetOfType.widgetOfType(Sash.class)));
-        case CallStackView.ID:
+        case TimeGraphViewStub.ID:
         case TimeChartView.ID:
             return new SWTBotTimeGraph(viewBot.bot().widget(WidgetOfType.widgetOfType(TimeGraphControl.class)));
         default:
@@ -341,7 +342,7 @@ public class TmfAlignTimeAxisTest {
     }
 
     /**
-     * Histogram, Callstack and timechart aligned but in different sites
+     * Histogram, time graph stub and timechart aligned but in different sites
      */
     public static class AlignPerspectiveFactory1 implements IPerspectiveFactory {
 
@@ -370,7 +371,7 @@ public class TmfAlignTimeAxisTest {
 
             // Create the middle right folder
             IFolderLayout middleRightFolder = layout.createFolder("middleRightFolder", IPageLayout.BOTTOM, 0.50f, "topRightFolder"); //$NON-NLS-1$
-            middleRightFolder.addView(CallStackView.ID);
+            middleRightFolder.addView(TimeGraphViewStub.ID);
 
             // Create the bottom right folder
             IFolderLayout bottomRightFolder = layout.createFolder("bottomRightFolder", IPageLayout.BOTTOM, 0.65f, "middleRightFolder"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -414,7 +415,7 @@ public class TmfAlignTimeAxisTest {
 
             // Create the bottom right folder
             IFolderLayout bottomRightFolder = layout.createFolder("bottomRightFolder", IPageLayout.BOTTOM, 0.65f, "middleRightFolder"); //$NON-NLS-1$ //$NON-NLS-2$
-            bottomRightFolder.addView(CallStackView.ID);
+            bottomRightFolder.addView(TimeGraphViewStub.ID);
 
             // Populate menus, etc
             layout.addPerspectiveShortcut(ID);
@@ -424,7 +425,7 @@ public class TmfAlignTimeAxisTest {
     }
 
     /**
-     * Histogram and timechart aligned, callstack not aligned
+     * Histogram and timechart aligned, time graph stub not aligned
      */
     public static class AlignPerspectiveFactory3 implements IPerspectiveFactory {
 
@@ -448,7 +449,7 @@ public class TmfAlignTimeAxisTest {
             topLeftFolder.addView(IPageLayout.ID_PROJECT_EXPLORER);
 
             IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeftFolder", IPageLayout.BOTTOM, 0.5f, "topLeftFolder"); //$NON-NLS-1$
-            bottomLeftFolder.addView(CallStackView.ID);
+            bottomLeftFolder.addView(TimeGraphViewStub.ID);
 
             // Create the middle right folder
             IFolderLayout middleRightFolder = layout.createFolder("middleRightFolder", IPageLayout.BOTTOM, EDITOR_AREA_RATIO, IPageLayout.ID_EDITOR_AREA); //$NON-NLS-1$

@@ -27,7 +27,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.ctf.core,
  org.eclipse.tracecompass.analysis.os.linux.core,
  org.eclipse.tracecompass.lttng2.common.core,
- org.eclipse.tracecompass.analysis.counters.core
+ org.eclipse.tracecompass.analysis.counters.core,
+ org.eclipse.tracecompass.analysis.profiling.core
 Import-Package: com.google.common.annotations;version="15.0.0",
  com.google.common.base,
  com.google.common.cache,

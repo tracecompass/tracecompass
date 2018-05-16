@@ -38,7 +38,10 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
  * presentation provider.
  *
  * @author Patrick Tasse
+ * @deprecated Use the class with same name in the
+ *             org.eclipse.tracecompass.analysis.profiling.ui plugin
  */
+@Deprecated
 public class CallStackPresentationProvider extends TimeGraphPresentationProvider {
 
     /** Number of colors used for call stack events */

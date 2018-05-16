@@ -15,12 +15,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.ui.symbols.BasicSymbolProvider;
-import org.eclipse.tracecompass.internal.tmf.ui.symbols.BasicSymbolProviderFactory;
-import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
-import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
+import org.eclipse.tracecompass.analysis.profiling.core.symbols.ISymbolProvider;
+import org.eclipse.tracecompass.analysis.profiling.core.symbols.TmfResolvedSymbol;
+import org.eclipse.tracecompass.analysis.profiling.core.tests.symbols.MappingFileTest;
+import org.eclipse.tracecompass.internal.analysis.profiling.ui.symbols.BasicSymbolProvider;
+import org.eclipse.tracecompass.internal.analysis.profiling.ui.symbols.BasicSymbolProviderFactory;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
-import org.eclipse.tracecompass.tmf.core.tests.symbols.MappingFileTest;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.junit.After;
 import org.junit.Before;

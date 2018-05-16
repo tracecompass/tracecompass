@@ -11,5 +11,15 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: org.eclipse.tracecompass.analysis.profiling.core
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.eclipse.tracecompass.common.core
-Export-Package: org.eclipse.tracecompass.internal.analysis.profiling.core;x-friends:="org.eclipse.tracecompass.analysis.profiling.core.tests"
+ org.eclipse.tracecompass.common.core,
+ org.eclipse.tracecompass.tmf.core,
+ org.eclipse.cdt.core,
+ org.eclipse.tracecompass.datastore.core,
+ org.eclipse.tracecompass.segmentstore.core
+Export-Package: org.eclipse.tracecompass.analysis.profiling.core.callstack,
+ org.eclipse.tracecompass.analysis.profiling.core.symbols,
+ org.eclipse.tracecompass.internal.analysis.profiling.core;x-friends:="org.eclipse.tracecompass.analysis.profiling.core.tests,org.eclipse.tracecompass.analysis.profiling.ui",
+ org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.provider;x-friends:="org.eclipse.tracecompass.analysis.profiling.core.tests,org.eclipse.tracecompass.analysis.profiling.ui",
+ org.eclipse.tracecompass.internal.analysis.profiling.core.symbols;x-friends:="org.eclipse.tracecompass.analysis.profiling.core.tests,org.eclipse.tracecompass.analysis.profiling.ui"
+Import-Package: com.google.common.cache,
+ com.google.common.collect

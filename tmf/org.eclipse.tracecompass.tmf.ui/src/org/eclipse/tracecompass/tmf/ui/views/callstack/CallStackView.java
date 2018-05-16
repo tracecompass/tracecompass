@@ -85,7 +85,10 @@ import com.google.common.collect.Maps;
  * Main implementation for the Call Stack view
  *
  * @author Patrick Tasse
+ * @deprecated Use the class with same name in the
+ *             org.eclipse.tracecompass.analysis.profiling.ui plugin
  */
+@Deprecated
 public class CallStackView extends BaseDataProviderTimeGraphView {
 
     // ------------------------------------------------------------------------

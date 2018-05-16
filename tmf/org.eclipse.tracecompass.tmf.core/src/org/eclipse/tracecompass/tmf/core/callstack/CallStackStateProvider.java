@@ -71,7 +71,10 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * </ul>
  *
  * @author Patrick Tasse
+ * @deprecated Use the class with same name in the
+ *             org.eclipse.tracecompass.analysis.profiling.core plugin
  */
+@Deprecated
 public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
 
     /**

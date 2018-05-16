@@ -23,7 +23,10 @@ import org.eclipse.jface.preference.PreferencePage;
  *
  * @author Robert Kiss
  * @since 2.0
+ * @deprecated Use the class with same name in the
+ *             org.eclipse.tracecompass.analysis.profiling.ui plugin
  */
+@Deprecated
 @NonNullByDefault
 public abstract class AbstractSymbolProviderPreferencePage extends PreferencePage implements ISymbolProviderPreferencePage {
 

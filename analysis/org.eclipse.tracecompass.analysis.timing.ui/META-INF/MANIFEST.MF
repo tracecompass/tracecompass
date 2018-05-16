@@ -19,7 +19,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.tmf.ui,
  org.swtchart,
  org.eclipse.tracecompass.analysis.timing.ui,
- org.eclipse.jface
+ org.eclipse.jface,
+ org.eclipse.tracecompass.analysis.profiling.core,
+ org.eclipse.tracecompass.analysis.profiling.ui
 Export-Package: org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore,
  org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density,
  org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter,

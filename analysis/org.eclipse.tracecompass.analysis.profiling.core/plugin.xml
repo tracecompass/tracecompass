@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="org.eclipse.tracecompass.analysis.profiling.core.symbolProvider" name="%extensionpoint.symbol_provider.name" schema="schema/org.eclipse.tracecompass.analysis.profiling.core.symbolProvider.exsd"/>
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.dataprovider">
+      <dataProviderFactory
+            class="org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.provider.CallStackDataProviderFactory"
+            id="org.eclipse.tracecompass.internal.analysis.profiling.callstack.provider.CallStackDataProvider">
+      </dataProviderFactory>
+   </extension>
+</plugin>

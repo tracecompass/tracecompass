@@ -16,7 +16,10 @@ import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
  * A resolved symbol that has a size
  *
  * @author Geneviève Bastien
+ * @deprecated Use the class with same name in the
+ *             org.eclipse.tracecompass.analysis.profiling.core plugin
  */
+@Deprecated
 public class TmfResolvedSizedSymbol extends TmfResolvedSymbol implements ISegment {
 
     /**

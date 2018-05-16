@@ -20,7 +20,10 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
  *
  * @author Matthew Khouzam
  * @since 2.2
+ * @deprecated Use the class with same name in the
+ *             org.eclipse.tracecompass.analysis.profiling.ui plugin
  */
+@Deprecated
 public class TmfSymbolProviderUpdatedSignal extends TmfSignal {
     /**
      * Constructor

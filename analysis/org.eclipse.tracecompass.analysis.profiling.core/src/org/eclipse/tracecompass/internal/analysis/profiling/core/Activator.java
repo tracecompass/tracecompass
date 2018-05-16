@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.internal.analysis.profiling.core;
 
+import org.eclipse.tracecompass.analysis.profiling.core.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.common.core.TraceCompassActivator;
 
 /**
@@ -37,10 +38,13 @@ public class Activator extends TraceCompassActivator {
 
     @Override
     protected void startActions() {
+        /* Initialize the symbol provider manager */
+        SymbolProviderManager.getInstance();
     }
 
     @Override
     protected void stopActions() {
+        SymbolProviderManager.dispose();
     }
 
 }

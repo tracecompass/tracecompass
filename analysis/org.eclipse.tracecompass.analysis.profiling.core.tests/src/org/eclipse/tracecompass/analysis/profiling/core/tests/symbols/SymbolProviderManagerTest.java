@@ -7,15 +7,15 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.core.tests.symbols;
+package org.eclipse.tracecompass.analysis.profiling.core.tests.symbols;
 
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 
+import org.eclipse.tracecompass.analysis.profiling.core.symbols.ISymbolProvider;
+import org.eclipse.tracecompass.analysis.profiling.core.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
-import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;

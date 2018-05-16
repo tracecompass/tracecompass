@@ -143,4 +143,18 @@
          version="0.0.0"
          unpack="false"/>
 
+   <plugin
+         id="org.eclipse.tracecompass.analysis.profiling.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.tracecompass.analysis.profiling.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
 </feature>

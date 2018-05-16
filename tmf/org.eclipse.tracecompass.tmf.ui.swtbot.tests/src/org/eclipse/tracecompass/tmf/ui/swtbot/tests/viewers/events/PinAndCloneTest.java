@@ -37,8 +37,8 @@ import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.views.TimeGraphViewStub;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
-import org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackView;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.ui.IWorkbenchPart;
 import org.junit.After;
@@ -64,13 +64,13 @@ public class PinAndCloneTest {
     private static final String TRACE_PROJECT_NAME = "test";
     private static final String TRACETYPE_ID = "org.eclipse.linuxtools.lttng2.ust.tracetype";
 
-    private static final String CALL_STACK_VIEW_TITLE = "Call Stack";
-    private static final String PINNED_TO_UST_CALL_STACK_VIEW_TITLE = "Call Stack <context-switches-ust>";
-    private static final String PINNED_TO_KERNEL_CALL_STACK_VIEW_TITLE = "Call Stack <context-switches-kernel>";
+    private static final String TIME_GRAPH_VIEW_TITLE = "Time Graph Stub";
+    private static final String PINNED_TO_UST_TIME_GRAPH_VIEW_TITLE = "Time Graph Stub <context-switches-ust>";
+    private static final String PINNED_TO_KERNEL_TIME_GRAPH_VIEW_TITLE = "Time Graph Stub <context-switches-kernel>";
     private static final String PIN_VIEW_BUTTON_NAME = "Pin View";
     private static final String UNPIN_VIEW_BUTTON_NAME = "Unpin View";
     private static final String PIN_TO_PREFIX = "Pin to ";
-    private static final String NEW_CALL_STACK_MENU = "New Call Stack view";
+    private static final String NEW_VIEW_MENU = "New Time Graph Stub view";
     private static final String PINNED_TO_PREFIX = "pinned to ";
     private static final String CLONED_TRACE_SUFFIX = " | 2";
     private static final String FOLLOW_TIME_UPDATES_FROM_OTHER_TRACES = "Follow time updates from other traces";
@@ -81,6 +81,8 @@ public class PinAndCloneTest {
 
     private static final @NonNull TmfTimeRange RANGE = new TmfTimeRange(TmfTimestamp.fromNanos(UST_START + SECOND), TmfTimestamp.fromNanos(UST_START + 2 * SECOND));
     private static final @NonNull TmfTimeRange INITIAL_UST_RANGE = new TmfTimeRange(TmfTimestamp.fromNanos(UST_START), TmfTimestamp.fromNanos(1450193697134689597L));
+
+    private static final @NonNull String PINNED_TO_UST_TIME_GRAPH_VIEW_TITLE2 = "Time Graph Stub <context-switches-ust | 2>";
 
     private SWTBotView fOriginalViewBot;
 
@@ -121,8 +123,8 @@ public class PinAndCloneTest {
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fUstTestTrace.getPath(), TRACETYPE_ID);
         SWTBotUtils.activateEditor(fBot, fUstTestTrace.getName());
 
-        SWTBotUtils.openView(CallStackView.ID);
-        fOriginalViewBot = fBot.viewById(CallStackView.ID);
+        SWTBotUtils.openView(TimeGraphViewStub.ID);
+        fOriginalViewBot = fBot.viewById(TimeGraphViewStub.ID);
         fOriginalViewBot.show();
     }
 
@@ -142,7 +144,7 @@ public class PinAndCloneTest {
     @Test
     public void testPinSingleTrace() {
         // ensure that the view name is correct before
-        assertEquals(CALL_STACK_VIEW_TITLE, fOriginalViewBot.getTitle());
+        assertEquals(TIME_GRAPH_VIEW_TITLE, fOriginalViewBot.getTitle());
 
         // ensure that the pin drop down is present, pin the view.
         fBot.waitUntil(new DefaultCondition() {
@@ -168,20 +170,20 @@ public class PinAndCloneTest {
 
         // ensure that the view has been renamed. Get the view by title and ensure it
         // has the same widget as there is a renaming bug.
-        assertOriginalViewTitle(PINNED_TO_UST_CALL_STACK_VIEW_TITLE);
+        assertOriginalViewTitle(PINNED_TO_UST_TIME_GRAPH_VIEW_TITLE);
 
         fOriginalViewBot.toolbarButton(UNPIN_VIEW_BUTTON_NAME).click();
 
         // ensure that the view has been renamed. Get the view by title and ensure it
         // has the same widget as there is a renaming bug.
-        assertOriginalViewTitle(CALL_STACK_VIEW_TITLE);
+        assertOriginalViewTitle(TIME_GRAPH_VIEW_TITLE);
 
         // ensure that the pin button is present, pin the view.
         fOriginalViewBot.toolbarButton(PIN_VIEW_BUTTON_NAME).click();
 
         // ensure that the view has been renamed. Get the view by title and ensure it
         // has the same widget as there is a renaming bug.
-        assertOriginalViewTitle(PINNED_TO_UST_CALL_STACK_VIEW_TITLE);
+        assertOriginalViewTitle(PINNED_TO_UST_TIME_GRAPH_VIEW_TITLE);
     }
 
     private void assertOriginalViewTitle(String newName) {
@@ -236,7 +238,7 @@ public class PinAndCloneTest {
          * assert that the pinned view is the UST trace despite the active trace being
          * the kernel trace.
          */
-        assertOriginalViewTitle(PINNED_TO_UST_CALL_STACK_VIEW_TITLE);
+        assertOriginalViewTitle(PINNED_TO_UST_TIME_GRAPH_VIEW_TITLE);
         ITmfTrace activeTrace = TmfTraceManager.getInstance().getActiveTrace();
         assertNotNull("There should be an active trace", activeTrace);
         assertEquals("context-switches-kernel should be the active trace", kernelTestTrace.getName(), activeTrace.getName());
@@ -248,10 +250,10 @@ public class PinAndCloneTest {
 
         // switch back and forth
         SWTBotUtils.activateEditor(fBot, fUstTestTrace.getName());
-        assertOriginalViewTitle(PINNED_TO_UST_CALL_STACK_VIEW_TITLE);
+        assertOriginalViewTitle(PINNED_TO_UST_TIME_GRAPH_VIEW_TITLE);
 
         SWTBotUtils.activateEditor(fBot, kernelTestTrace.getName());
-        assertOriginalViewTitle(PINNED_TO_UST_CALL_STACK_VIEW_TITLE);
+        assertOriginalViewTitle(PINNED_TO_UST_TIME_GRAPH_VIEW_TITLE);
 
         IWorkbenchPart part = fOriginalViewBot.getViewReference().getPart(false);
         assertTrue(part instanceof AbstractTimeGraphView);
@@ -265,10 +267,10 @@ public class PinAndCloneTest {
         // unpin from another active trace
         SWTBotUtils.activateEditor(fBot, kernelTrace.getName());
         fOriginalViewBot.toolbarButton(UNPIN_VIEW_BUTTON_NAME).click();
-        assertOriginalViewTitle(CALL_STACK_VIEW_TITLE);
+        assertOriginalViewTitle(TIME_GRAPH_VIEW_TITLE);
 
         fOriginalViewBot.toolbarButton(PIN_VIEW_BUTTON_NAME).click();
-        assertOriginalViewTitle(PINNED_TO_KERNEL_CALL_STACK_VIEW_TITLE);
+        assertOriginalViewTitle(PINNED_TO_KERNEL_TIME_GRAPH_VIEW_TITLE);
 
         SWTBotTable kernelEventTable = kernelEditor.bot().table();
         SWTBotTableItem kernelEvent = kernelEventTable.getTableItem(5);
@@ -281,7 +283,7 @@ public class PinAndCloneTest {
         // close the pinned trace
         SWTBotEditor kernelTable = fBot.editorByTitle(kernelTestTrace.getName());
         kernelTable.close();
-        assertOriginalViewTitle(CALL_STACK_VIEW_TITLE);
+        assertOriginalViewTitle(TIME_GRAPH_VIEW_TITLE);
 
         kernelTestTrace.dispose();
     }
@@ -292,15 +294,15 @@ public class PinAndCloneTest {
     @Test
     public void testCloneSingleTrace() {
         // single trace.
-        SWTBotMenu cloneMenu = fOriginalViewBot.viewMenu().menu(NEW_CALL_STACK_MENU);
+        SWTBotMenu cloneMenu = fOriginalViewBot.viewMenu().menu(NEW_VIEW_MENU);
 
         /*
          * assert that the original editor was not renamed and that the cloned one
          * exists and is pinned to the UST trace.
          */
         cloneMenu.menu(PINNED_TO_PREFIX + fUstTestTrace.getName()).click();
-        assertOriginalViewTitle(CALL_STACK_VIEW_TITLE);
-        SWTBotView clonedView = fBot.viewByTitle(PINNED_TO_UST_CALL_STACK_VIEW_TITLE);
+        assertOriginalViewTitle(TIME_GRAPH_VIEW_TITLE);
+        SWTBotView clonedView = fBot.viewByTitle(PINNED_TO_UST_TIME_GRAPH_VIEW_TITLE);
         assertEquals("Should not have created a new instance", 1, fBot.editors().size());
         clonedView.close();
 
@@ -308,8 +310,8 @@ public class PinAndCloneTest {
          * Assert that a new instance is created.
          */
         cloneMenu.menu(PINNED_TO_PREFIX + fUstTestTrace.getName() + " | new instance").click();
-        assertOriginalViewTitle(CALL_STACK_VIEW_TITLE);
-        clonedView = fBot.viewByTitle("Call Stack <context-switches-ust | 2>");
+        assertOriginalViewTitle(TIME_GRAPH_VIEW_TITLE);
+        clonedView = fBot.viewByTitle(PINNED_TO_UST_TIME_GRAPH_VIEW_TITLE2);
         assertEquals("Should have created a new instance", 2, fBot.editors().size());
         SWTBotEditor cloneEditor = fBot.editorByTitle(fUstTestTrace.getName() + CLONED_TRACE_SUFFIX);
 

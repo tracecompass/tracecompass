@@ -10,6 +10,8 @@
 package org.eclipse.tracecompass.internal.analysis.profiling.ui;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -49,6 +51,30 @@ public class Activator extends AbstractUIPlugin {
      */
     public static @Nullable Activator getDefault() {
         return plugin;
+    }
+
+    /**
+     * Gets an image object using given path within plug-in.
+     *
+     * @param path
+     *            path to image file
+     *
+     * @return image object
+     */
+    public Image getImageFromPath(String path) {
+        return getImageDescripterFromPath(path).createImage();
+    }
+
+    /**
+     * Gets an image descriptor using given path within plug-in.
+     *
+     * @param path
+     *            path to image file
+     *
+     * @return image descriptor object
+     */
+    public ImageDescriptor getImageDescripterFromPath(String path) {
+        return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
 
 }

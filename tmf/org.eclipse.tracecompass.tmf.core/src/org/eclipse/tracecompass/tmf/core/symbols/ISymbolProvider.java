@@ -21,7 +21,10 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
  * @author Matthew Khouzam
  * @author Robert Kiss
  * @since 3.0
+ * @deprecated Use the class with same name in the
+ *             org.eclipse.tracecompass.analysis.profiling.core plugin
  */
+@Deprecated
 public interface ISymbolProvider {
 
     /**

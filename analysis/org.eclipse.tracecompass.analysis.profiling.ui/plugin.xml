@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+     <view
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart.FlameChartView"
+            icon="icons/eview16/callstack_view.gif"
+            id="org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart"
+            name="%flamechart.view.name"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <listener
+            class="org.eclipse.tracecompass.internal.analysis.profiling.ui.views.flamechart.CallStackAnalysisListener">
+      </listener>
+   </extension>
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.symbolProvider">
+      <providerFactory
+            class="org.eclipse.tracecompass.internal.analysis.profiling.ui.symbols.BasicSymbolProviderFactory"
+            id="org.eclipse.tracecompass.analysis.profiling.ui.providerFactory.basic"
+            priority="0">
+      </providerFactory>
+   </extension>
+</plugin>

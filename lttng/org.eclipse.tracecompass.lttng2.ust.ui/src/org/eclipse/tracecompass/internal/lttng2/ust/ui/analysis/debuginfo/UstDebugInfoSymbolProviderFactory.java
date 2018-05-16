@@ -10,10 +10,10 @@
 package org.eclipse.tracecompass.internal.lttng2.ust.ui.analysis.debuginfo;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.profiling.core.symbols.ISymbolProvider;
+import org.eclipse.tracecompass.analysis.profiling.core.symbols.ISymbolProviderFactory;
 import org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.UstDebugInfoAnalysisModule;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
-import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
-import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProviderFactory;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 

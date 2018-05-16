@@ -16,7 +16,10 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModul
  *
  * @author Matthew Khouzam
  * @since 2.1
+ * @deprecated Use the class with same name in the
+ *             org.eclipse.tracecompass.analysis.profiling.core plugin
  */
+@Deprecated
 public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule {
 
     private static final String[] DEFAULT_PROCESSES_PATTERN = new String[] { CallStackStateProvider.PROCESSES, "*" }; //$NON-NLS-1$

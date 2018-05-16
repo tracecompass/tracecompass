@@ -38,6 +38,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart.FlameChartView;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -51,7 +52,6 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
-import org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackView;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.ui.IWorkbenchPart;
 import org.junit.After;
@@ -68,7 +68,7 @@ import com.google.common.collect.Lists;
  * Test for the Call Stack view in trace compass
  */
 @RunWith(SWTBotJunit4ClassRunner.class)
-public class CallStackViewTest {
+public class FlameChartViewTest {
 
     private static final String UST_ID = "org.eclipse.linuxtools.lttng2.ust.tracetype";
 
@@ -205,9 +205,9 @@ public class CallStackViewTest {
         final File file = new File(CtfTmfTestTraceUtils.getTrace(cygProfile).getPath());
         CtfTmfTestTraceUtils.dispose(cygProfile);
         SWTBotUtils.openTrace(PROJECT_NAME, file.getAbsolutePath(), UST_ID);
-        SWTBotUtils.openView(CallStackView.ID);
+        SWTBotUtils.openView(FlameChartView.ID);
         WaitUtils.waitForJobs();
-        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
+        final SWTBotView viewBot = sfBot.viewById(FlameChartView.ID);
         IWorkbenchPart part = viewBot.getViewReference().getPart(false);
         sfBot.waitUntil(ConditionHelpers.timeGraphIsReadyCondition((AbstractTimeGraphView) part, new TmfTimeRange(START_TIME, START_TIME), START_TIME));
     }
@@ -226,7 +226,7 @@ public class CallStackViewTest {
      */
     @Test
     public void testOpenCallstack() {
-        SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
+        SWTBotView viewBot = sfBot.viewById(FlameChartView.ID);
         viewBot.setFocus();
         waitForSymbolNames("0x40472b");
     }
@@ -236,7 +236,7 @@ public class CallStackViewTest {
      */
     @Test
     public void testGoToTimeAndCheckStack() {
-        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
+        final SWTBotView viewBot = sfBot.viewById(FlameChartView.ID);
         viewBot.setFocus();
         WaitUtils.waitForJobs();
 
@@ -250,7 +250,7 @@ public class CallStackViewTest {
     @Test
     public void testGoToTimeGoBackAndForthAndCheckStack() {
         int currentEventOffset = 0;
-        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
+        final SWTBotView viewBot = sfBot.viewById(FlameChartView.ID);
 
         goToTime(TIMESTAMPS[currentEventOffset]);
 
@@ -291,7 +291,7 @@ public class CallStackViewTest {
     @Test
     public void testGoToTimeSortAndCheckStack() {
         goToTime(TIMESTAMPS[0]);
-        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
+        final SWTBotView viewBot = sfBot.viewById(FlameChartView.ID);
         viewBot.setFocus();
         SWTBotTree tree = viewBot.bot().tree();
         tree.header(SORT_BY_NAME).click();
@@ -303,7 +303,7 @@ public class CallStackViewTest {
     }
 
     private static void waitForSymbolNames(String... symbolNames) {
-        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
+        final SWTBotView viewBot = sfBot.viewById(FlameChartView.ID);
         List<String> symbolNameList = Lists.newArrayList(symbolNames);
         WaitUtils.waitUntil(vBot -> symbolNameList.equals(getVisibleStackFrames(vBot)),
                 viewBot, "Wrong symbol names, expected:" + symbolNameList
@@ -329,7 +329,7 @@ public class CallStackViewTest {
         WaitUtils.waitForJobs();
         TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(table.widget, time));
         sfBot.waitUntil(ConditionHelpers.selectionInEventsTable(sfBot, timestamp));
-        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
+        final SWTBotView viewBot = sfBot.viewById(FlameChartView.ID);
         IWorkbenchPart part = viewBot.getViewReference().getPart(false);
         sfBot.waitUntil(ConditionHelpers.timeGraphIsReadyCondition((AbstractTimeGraphView) part, new TmfTimeRange(time, time), time));
     }
@@ -417,14 +417,14 @@ public class CallStackViewTest {
         symbolDialog.button("OK").click();
 
         // 2- Ensure symbols are loaded and prioritized
-        sfBot.viewById(CallStackView.ID).setFocus();
+        sfBot.viewById(FlameChartView.ID).setFocus();
         WaitUtils.waitForJobs();
         goToTime(TIMESTAMP);
         waitForSymbolNames("main", "event_loop", "draw_frame", "draw_gears", "drawB");
     }
 
     private static SWTBotShell openSymbolProviderDialog() {
-        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
+        final SWTBotView viewBot = sfBot.viewById(FlameChartView.ID);
         viewBot.setFocus();
         viewBot.toolbarButton(CONFIGURE_SYMBOL_PROVIDERS).click();
         return sfBot.shell("Symbol mapping");
@@ -439,7 +439,7 @@ public class CallStackViewTest {
     @Test
     public void testGoToTimeAndCheckStackWithNames() throws IOException {
         goToTime(TIMESTAMPS[0]);
-        final SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
+        final SWTBotView viewBot = sfBot.viewById(FlameChartView.ID);
         viewBot.setFocus();
 
         URL mapUrl = CtfTmfTestTraceUtils.class.getResource("cyg-profile-mapping.txt");
@@ -463,7 +463,7 @@ public class CallStackViewTest {
      */
     @Test
     public void testCallStackToolBar() {
-        SWTBotView viewBot = sfBot.viewById(CallStackView.ID);
+        SWTBotView viewBot = sfBot.viewById(FlameChartView.ID);
         viewBot.setFocus();
         List<String> buttons = Lists.transform(viewBot.getToolbarButtons(), SWTBotToolbarButton::getToolTipText);
         assertEquals(TOOLBAR_BUTTONS_TOOLTIPS, buttons);

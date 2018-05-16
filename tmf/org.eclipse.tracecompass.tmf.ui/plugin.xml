@@ -82,14 +82,6 @@
             restorable="true">
       </view>
       <view
-            category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackView"
-            icon="icons/eview16/callstack_view.gif"
-            id="org.eclipse.linuxtools.tmf.ui.views.callstack"
-            name="%callstack.view.name"
-            restorable="true">
-      </view>
-      <view
             allowMultiple="false"
             category="org.eclipse.linuxtools.tmf.ui.views.category"
             class="org.eclipse.tracecompass.tmf.ui.views.synchronization.TmfSynchronizationView"
@@ -2019,9 +2011,6 @@
                id="org.eclipse.linuxtools.tmf.core.statistics.analysis">
             </analysisId>
       </output>
-      <listener
-            class="org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackAnalysisListener">
-      </listener>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.ui.tracetypeui">
@@ -2100,13 +2089,5 @@
             id="org.eclipse.tracecompass.tmf.ui.traceTypes"
             name="%preferences.page.trace.types">
       </page>
-   </extension>
-   <extension
-         point="org.eclipse.tracecompass.tmf.core.symbolProvider">
-      <providerFactory
-            class="org.eclipse.tracecompass.internal.tmf.ui.symbols.BasicSymbolProviderFactory"
-            id="org.eclipse.tracecompass.tmf.ui.providerFactory.basic"
-            priority="0">
-      </providerFactory>
    </extension>
 </plugin>

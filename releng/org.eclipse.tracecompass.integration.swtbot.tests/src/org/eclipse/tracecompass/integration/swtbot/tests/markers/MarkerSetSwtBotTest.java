@@ -20,6 +20,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRootMenu;
+import org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart.FlameChartView;
 import org.eclipse.tracecompass.lttng2.ust.core.tests.shared.LttngUstTestTraceUtils;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
@@ -31,7 +32,6 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
-import org.eclipse.tracecompass.tmf.ui.views.callstack.CallStackView;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -97,8 +97,8 @@ public class MarkerSetSwtBotTest {
         final File file = new File(trace.getPath());
         LttngUstTestTraceUtils.dispose(cygProfile);
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, file.getAbsolutePath(), UST_ID);
-        SWTBotUtils.openView(CallStackView.ID);
-        fViewBot = fBot.viewByTitle("Call Stack");
+        SWTBotUtils.openView(FlameChartView.ID);
+        fViewBot = fBot.viewByTitle("Flame Chart");
         WaitUtils.waitForJobs();
     }
 
