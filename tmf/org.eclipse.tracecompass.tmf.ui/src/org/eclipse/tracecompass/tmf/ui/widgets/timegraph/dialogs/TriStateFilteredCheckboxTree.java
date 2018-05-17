@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,15 +65,20 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
 
     @Override
     public boolean setSubtreeChecked(Object element, boolean state) {
+        Set<Object> prevChecked = new HashSet<>(Arrays.asList(getCheckedElements()));
+        if (state) {
+            prevChecked.remove(element);
+        } else {
+            prevChecked.add(element);
+        }
         for (IPreCheckStateListener preCheckStateListener : fPreCheckStateListeners) {
             if (preCheckStateListener != null && preCheckStateListener.setSubtreeChecked(element, state)) {
-                // uncheck the root element
-                setChecked(element, false);
+                // revert situation
+                setCheckedElements(prevChecked.toArray());
                 return false;
             }
-            checkSubtree(element, state);
         }
-        maintainAllCheckIntegrity();
+        checkSubtree(element, state);
         return getCheckboxTreeViewer().setSubtreeChecked(element, state);
     }
 
@@ -114,6 +120,7 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
         for (Object o : ((ITreeContentProvider) checkboxTreeViewer.getContentProvider()).getChildren(element)) {
             checkSubtree(o, state);
         }
+        maintainAllCheckIntegrity();
     }
 
     /**
