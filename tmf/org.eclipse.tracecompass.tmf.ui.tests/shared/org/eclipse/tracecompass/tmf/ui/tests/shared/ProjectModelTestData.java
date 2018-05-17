@@ -75,6 +75,9 @@ public class ProjectModelTestData {
             linkedTrace.setPersistentProperty(TmfCommonConstants.TRACETYPE,
                     "org.eclipse.linuxtools.tmf.core.tests.tracetype");
 
+            // Refresh the project model
+            tracesFolder.refresh();
+
             TmfTraceElement traceElement = tracesFolder.getTraces().get(0);
             traceElement.refreshTraceType();
         }
