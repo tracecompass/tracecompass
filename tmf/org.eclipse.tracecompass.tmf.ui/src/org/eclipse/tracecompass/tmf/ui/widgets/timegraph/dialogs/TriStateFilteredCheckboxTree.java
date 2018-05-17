@@ -36,7 +36,7 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
      * Set containing only the tree items that are grayed
      */
     private Set<Object> fGrayedObjects = new HashSet<>();
-    private List<IPreCheckStateListener> fPreCheckStateListener = new ArrayList<>();
+    private List<IPreCheckStateListener> fPreCheckStateListeners = new ArrayList<>();
 
     /**
      * Create a new instance of the receiver.
@@ -64,7 +64,7 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
 
     @Override
     public boolean setSubtreeChecked(Object element, boolean state) {
-        for (IPreCheckStateListener preCheckStateListener : fPreCheckStateListener) {
+        for (IPreCheckStateListener preCheckStateListener : fPreCheckStateListeners) {
             if (preCheckStateListener != null && preCheckStateListener.setSubtreeChecked(element, state)) {
                 // uncheck the root element
                 setChecked(element, false);
@@ -196,7 +196,7 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
      * @since 4.0
      */
     public void addPreCheckStateListener(IPreCheckStateListener listener) {
-        fPreCheckStateListener.add(listener);
+        fPreCheckStateListeners.add(listener);
     }
 
 }
