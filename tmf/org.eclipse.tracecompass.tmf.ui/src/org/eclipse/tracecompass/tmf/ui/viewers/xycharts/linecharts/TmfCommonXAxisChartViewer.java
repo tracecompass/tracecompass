@@ -265,7 +265,11 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                     return;
                 }
                 try {
-                    TimeQueryFilter filter = createQueryFilter(getWindowStartTime(), getWindowEndTime(), fNumRequests);
+                    int numRequests = fNumRequests;
+                    if(numRequests == 0) {
+                        return;
+                    }
+                    TimeQueryFilter filter = createQueryFilter(getWindowStartTime(), getWindowEndTime(), numRequests);
                     updateData(dataProvider, filter, fMonitor);
                 } finally {
                     /*
