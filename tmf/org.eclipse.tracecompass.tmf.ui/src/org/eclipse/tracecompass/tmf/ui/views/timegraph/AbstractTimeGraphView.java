@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -77,10 +78,14 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -167,6 +172,8 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.contexts.IContextActivation;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.ide.IDE;
@@ -184,6 +191,8 @@ import com.google.common.collect.Multimap;
  * This view contains a time graph viewer.
  */
 public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeAligned, ITmfAllowMultiple, ITmfPinnable, IResourceChangeListener {
+
+    private static final String CONTEXT = "org.eclipse.tracecompass.tmf.ui.view.timegraph.context"; //$NON-NLS-1$
 
     private static final String DIRTY_UNDERFLOW_ERROR = "Dirty underflow error"; //$NON-NLS-1$
 
@@ -358,6 +367,13 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     private TimeGraphPartListener2 fPartListener2;
 
+    private IContextService fContextService;
+
+    private final AtomicBoolean fIsMouseInTimegraph = new AtomicBoolean(false);
+
+    private List<IContextActivation> fActiveContexts = new ArrayList<>();
+
+    // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------
     // Classes
     // ------------------------------------------------------------------------
@@ -788,8 +804,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * Getter for the time graph viewer
      *
      * @return The time graph viewer
+     * @since 4.1
      */
-    protected TimeGraphViewer getTimeGraphViewer() {
+    public TimeGraphViewer getTimeGraphViewer() {
         return fTimeGraphViewer;
     }
 
@@ -1320,18 +1337,70 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
 
         // make selection available to other views
-        getSite().setSelectionProvider(fTimeGraphViewer.getSelectionProvider());
+        IWorkbenchPartSite site = getSite();
+        site.setSelectionProvider(fTimeGraphViewer.getSelectionProvider());
 
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
 
         createContextMenu();
         fPartListener = new TimeGraphPartListener();
-        getSite().getPage().addPartListener(fPartListener);
+        site.getPage().addPartListener(fPartListener);
 
         fPartListener2 = new TimeGraphPartListener2();
-        getSite().getPage().addPartListener(fPartListener2);
+        site.getPage().addPartListener(fPartListener2);
 
         fOriginalTabLabel = getPartName();
+        fContextService = site.getWorkbenchWindow().getService(IContextService.class);
+
+        if (timeGraphControl.isInFocus()) {
+            activateContextService();
+        }
+        timeGraphControl.addMouseTrackListener(new MouseTrackListener() {
+
+            @Override
+            public void mouseHover(MouseEvent e) {
+                // do nothing
+            }
+
+            @Override
+            public void mouseExit(MouseEvent e) {
+                fIsMouseInTimegraph.set(false);
+                deactivateContextService();
+            }
+
+            @Override
+            public void mouseEnter(MouseEvent e) {
+                fIsMouseInTimegraph.set(true);
+                if (timeGraphControl.isInFocus()) {
+                    activateContextService();
+                }
+            }
+        });
+        timeGraphControl.addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                deactivateContextService();
+            }
+
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (fIsMouseInTimegraph.get()) {
+                   activateContextService();
+                }
+            }
+        });
+    }
+
+    private void activateContextService() {
+        if (fActiveContexts.isEmpty()) {
+            fActiveContexts.add(fContextService.activateContext(CONTEXT));
+        }
+    }
+
+    private void deactivateContextService() {
+        fContextService.deactivateContexts(fActiveContexts);
+        fActiveContexts.clear();
     }
 
     /**

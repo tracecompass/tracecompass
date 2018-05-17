@@ -62,6 +62,7 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.ui;x-friends:="org.eclipse
  org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.model;x-friends:="org.eclipse.tracecompass.tmf.ui.tests",
  org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics;x-friends:="org.eclipse.tracecompass.tmf.ui.tests",
  org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model;x-friends:="org.eclipse.tracecompass.tmf.ui.tests",
+ org.eclipse.tracecompass.internal.tmf.ui.viewers.timegraph.handlers;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.viewers.xycharts;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.views;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.views.statistics;
