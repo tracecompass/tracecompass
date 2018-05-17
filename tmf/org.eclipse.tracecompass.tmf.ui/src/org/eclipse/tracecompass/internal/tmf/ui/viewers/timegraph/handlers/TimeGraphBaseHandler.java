@@ -26,7 +26,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * @author Matthew Khouzam
  *
  */
-abstract class TimeGraphBaseHandler extends AbstractHandler {
+class TimeGraphBaseHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -38,18 +38,45 @@ abstract class TimeGraphBaseHandler extends AbstractHandler {
         IWorkbenchPart part = HandlerUtil.getActivePart(event);
         if (part instanceof AbstractTimeGraphView) {
             AbstractTimeGraphView view = (AbstractTimeGraphView) part;
-            TimeGraphViewer viewer = view.getTimeGraphViewer();
-            if (viewer == null) {
-                return null;
-            }
-            TimeGraphControl control = viewer.getTimeGraphControl();
-            if (control != null) {
-                execute(control);
-            }
+            execute(view);
 
         }
         return null;
     }
 
-    public abstract void execute(TimeGraphControl timegraph);
+    /**
+     * Handle a view
+     *
+     * @param view
+     *            the view
+     */
+    public void execute(AbstractTimeGraphView view) {
+        TimeGraphViewer viewer = view.getTimeGraphViewer();
+        if (viewer != null) {
+            execute(viewer);
+        }
+    }
+
+    /**
+     * Handle a viewer
+     *
+     * @param viewer
+     *            the viewer
+     */
+    public void execute(TimeGraphViewer viewer) {
+        TimeGraphControl control = viewer.getTimeGraphControl();
+        if (control != null) {
+            execute(control);
+        }
+    }
+
+    /**
+     * Handle the control
+     *
+     * @param timegraph
+     *            the control
+     */
+    public void execute(TimeGraphControl timegraph) {
+        // Do nothing
+    }
 }

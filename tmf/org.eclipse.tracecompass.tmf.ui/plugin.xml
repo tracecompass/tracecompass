@@ -1330,6 +1330,11 @@
             id="org.eclipse.tracecompass.tmf.ui.timegraph.zoomout"
             name="%command.zoomout">
       </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
+            id="org.eclipse.tracecompass.tmf.ui.timegraph.bookmark"
+            name="%command.addbookmark">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -1874,6 +1879,10 @@
             class="org.eclipse.tracecompass.internal.tmf.ui.viewers.timegraph.handlers.TimeGraphZoomOutHandler"
             commandId="org.eclipse.tracecompass.tmf.ui.timegraph.zoomout">
       </handler>
+      <handler
+            class="org.eclipse.tracecompass.internal.tmf.ui.viewers.timegraph.handlers.TimeGraphAddBookmarkHandler"
+            commandId="org.eclipse.tracecompass.tmf.ui.timegraph.bookmark">
+      </handler>
    </extension>
    <extension point="org.eclipse.ui.bindings">
       <key
@@ -1941,6 +1950,12 @@
             contextId="org.eclipse.tracecompass.tmf.ui.view.timegraph.context"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="S">
+      </key>
+      <key
+            commandId="org.eclipse.tracecompass.tmf.ui.timegraph.bookmark"
+            contextId="org.eclipse.tracecompass.tmf.ui.view.timegraph.context"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+D">
       </key>
    </extension>
    <extension
