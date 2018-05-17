@@ -15,6 +15,9 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -42,13 +45,15 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers.SWTB
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
-import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import com.google.common.collect.Lists;
 
 /**
  * SWTBot tests for column sorting in the Control Flow view.
@@ -252,27 +257,37 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
 
     private static SWTBotTestCondition getSortCondition(final String testCase, final int column, final String[] expected, final SWTBotTimeGraph timeGraph, final boolean reverse) {
         return new SWTBotTestCondition() {
+            List<String> expectedTexts = reverse ? Lists.reverse(Arrays.asList(expected)) : Arrays.asList(expected);
+            List<String> actualTexts;
+            Exception exception;
             @Override
             public boolean test() throws Exception {
-                SWTBotTimeGraphEntry[] entries = timeGraph.getEntry(TRACE_NAME).getEntries();
-                if (reverse) {
-                    for (int i = expected.length - 1; i > 0; i--) {
-                        if (!expected[i].equals(entries[expected.length - (i + 1)].getText(column))) {
-                            return false;
+                actualTexts = null;
+                exception = null;
+                try {
+                    SWTBotTimeGraphEntry[] entries = timeGraph.getEntry(TRACE_NAME).getEntries();
+                    actualTexts = new ArrayList<>();
+                    if (reverse) {
+                        for (int i = expected.length - 1; i >= 0; i--) {
+                            actualTexts.add(entries[expected.length - (i + 1)].getText(column));
+                        }
+                    } else {
+                        for (int i = 0; i < expected.length; i++) {
+                            actualTexts.add(entries[i].getText(column));
                         }
                     }
-                } else {
-                    for (int i = 0; i < expected.length; i++) {
-                        if (!expected[i].equals(entries[i].getText(column))) {
-                            return false;
-                        }
-                    }
+                } catch (Exception e) {
+                    exception = e;
+                    throw e;
                 }
-                return true;
+                return expectedTexts.equals(actualTexts);
             }
             @Override
             public String getFailureMessage() {
-                return NLS.bind("Test Case: {0} failed!", testCase);
+                if (exception != null) {
+                    return NLS.bind("Test Case: {0} failed! {1}", new String[] { testCase, exception.toString() });
+                }
+                return NLS.bind("Test Case: {0} failed! expected={1} actual={2}", new String[] { testCase, String.valueOf(expectedTexts), String.valueOf(actualTexts) });
             }
         };
     }
