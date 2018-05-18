@@ -61,7 +61,7 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
     /**
      * Extension point ID.
      */
-    public static final String ID = "org.eclipse.tracecompass.internal.provisional.tmf.core.histogram.HistogramDataProvider"; //$NON-NLS-1$
+    public static final String ID = "org.eclipse.tracecompass.internal.tmf.core.histogram.HistogramDataProvider"; //$NON-NLS-1$
     static final String TITLE = Objects.requireNonNull(Messages.HistogramDataProvider_Title);
     private static final AtomicLong TRACE_IDS = new AtomicLong();
 
