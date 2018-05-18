@@ -10,6 +10,8 @@
 package org.eclipse.tracecompass.tmf.core.model.timegraph;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IPropertyCollection;
 
 /**
  * Represents a time graph state.
@@ -17,7 +19,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author Simon Delisle
  * @since 4.0
  */
-public interface ITimeGraphState {
+public interface ITimeGraphState extends IElementResolver, IPropertyCollection {
 
     /**
      * Gets the state start time

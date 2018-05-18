@@ -19,11 +19,12 @@ import java.util.Map.Entry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
-import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
@@ -285,7 +286,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
 
         for (Entry<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Collection<Long>> entry : providersToModelIds.asMap().entrySet()) {
             ITimeGraphDataProvider<? extends TimeGraphEntryModel> dataProvider = entry.getKey();
-            SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(times, entry.getValue());
+            TimeGraphStateQueryFilter filter = new TimeGraphStateQueryFilter(times, entry.getValue(), getRegexes());
             TmfModelResponse<List<ITimeGraphRowModel>> response = dataProvider.fetchRowModel(filter, monitor);
 
             List<ITimeGraphRowModel> model = response.getModel();
@@ -361,9 +362,13 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             ITimeEvent event = createTimeEvent(entry, state);
             if (prev != null) {
                 long prevEnd = prev.getTime() + prev.getDuration();
-                if (prevEnd < event.getTime()) {
+                if (prevEnd < event.getTime() && (getTimeEventFilterDialog() == null || !getTimeEventFilterDialog().hasActiveSavedFilters())) {
                     // fill in the gap.
-                    events.add(new TimeEvent(entry, prevEnd, event.getTime() - prevEnd));
+                    TimeEvent timeEvent = new TimeEvent(entry, prevEnd, event.getTime() - prevEnd);
+                    if (getTimeEventFilterDialog() != null && getTimeEventFilterDialog().isFilterActive()) {
+                        timeEvent.setProperty(IFilterProperty.DIMMED, true);
+                    }
+                    events.add(timeEvent);
                 }
             }
             prev = event;
@@ -390,9 +395,9 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         }
         String label = state.getLabel();
         if (label != null) {
-            return new NamedTimeEvent(entry, state.getStartTime(), state.getDuration(), state.getValue(), label);
+            return new NamedTimeEvent(entry, state.getStartTime(), state.getDuration(), state.getValue(), label, state.getActiveProperties());
         }
-        return new TimeEvent(entry, state.getStartTime(), state.getDuration(), state.getValue());
+        return new TimeEvent(entry, state.getStartTime(), state.getDuration(), state.getValue(), state.getActiveProperties());
     }
 
     @Override

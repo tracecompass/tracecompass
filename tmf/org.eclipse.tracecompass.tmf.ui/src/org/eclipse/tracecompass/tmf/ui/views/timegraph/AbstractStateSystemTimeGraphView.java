@@ -21,8 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.PatternSyntaxException;
@@ -37,7 +36,6 @@ import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.TimeEventFilterD
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
@@ -193,7 +191,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             List<ITimeEvent> eventList = getEventList(entry, ss, fullStates, prevFullState, monitor);
 
             try {
-                @NonNull Map<@NonNull Integer, @NonNull BiPredicate<@NonNull IElementResolver, @NonNull Function<@NonNull IElementResolver, @NonNull Map<@NonNull String, @NonNull String>>>> predicates = computeRegexPredicate();
+                @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = computeRegexPredicate();
 
                 if (eventList != null) {
                     doFilterEvents(entry, eventList, predicates);

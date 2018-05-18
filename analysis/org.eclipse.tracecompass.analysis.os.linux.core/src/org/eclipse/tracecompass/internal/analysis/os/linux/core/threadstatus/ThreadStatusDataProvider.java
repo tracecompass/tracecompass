@@ -24,6 +24,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -35,6 +36,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils.QuarkIterator;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -380,6 +382,11 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, String.valueOf(e.getMessage()));
         }
 
+        Map<@NonNull Integer, @NonNull Predicate< @NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        if (filter instanceof TimeGraphStateQueryFilter) {
+            TimeGraphStateQueryFilter timeEventFilter = (TimeGraphStateQueryFilter) filter;
+            predicates.putAll(computeRegexPredicate(timeEventFilter));
+        }
         List<ITimeGraphRowModel> rows = new ArrayList<>();
         for (Entry<Long, Integer> entry : selectedIdsToQuarks.entrySet()) {
             int quark = entry.getValue();
@@ -389,8 +396,12 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
             if (monitor != null && monitor.isCanceled()) {
                 return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
             }
-
-            List<ITimeGraphState> eventList = Lists.newArrayList(Iterables.transform(states, i -> createTimeGraphState(i, syscalls)));
+            List<ITimeGraphState> eventList = new ArrayList<>();
+            states.forEach(i -> {
+                ITimeGraphState timegraphState = createTimeGraphState(i, syscalls);
+                Long key = Objects.requireNonNull(entry.getKey());
+                addToStateList(eventList, timegraphState, key, predicates, monitor);
+            });
             rows.add(new TimeGraphRowModel(entry.getKey(), eventList));
         }
         return new TmfModelResponse<>(rows, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
@@ -440,7 +451,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
         return times;
     }
 
-    private ITimeGraphState createTimeGraphState(ITmfStateInterval interval, NavigableSet<ITmfStateInterval> syscalls) {
+    private @NonNull ITimeGraphState createTimeGraphState(ITmfStateInterval interval, NavigableSet<ITmfStateInterval> syscalls) {
         long startTime = interval.getStartTime();
         long duration = interval.getEndTime() - startTime + 1;
         Object status = interval.getValue();

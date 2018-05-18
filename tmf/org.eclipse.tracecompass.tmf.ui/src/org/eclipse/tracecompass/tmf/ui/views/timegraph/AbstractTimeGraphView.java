@@ -33,8 +33,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -107,7 +106,6 @@ import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.markers.MarkerUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.TimeEventFilterDialog;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
 import org.eclipse.tracecompass.tmf.core.signal.TmfMarkerEventSourceUpdatedSignal;
@@ -637,7 +635,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             long zoomStartTime, long zoomEndTime, long resolution, @NonNull IProgressMonitor monitor) {
 
         try {
-            Map<Integer, BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>>> predicates = computeRegexPredicate();
+            Map<Integer, Predicate<Map<String, String>>> predicates = computeRegexPredicate();
 
             for (TimeGraphEntry entry : entries) {
                 List<ITimeEvent> zoomedEventList = getEventList(entry, zoomStartTime, zoomEndTime, resolution, monitor);
@@ -667,14 +665,17 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @since 4.0
      */
     @NonNullByDefault
-    protected void doFilterEvents(TimeGraphEntry entry, List<ITimeEvent> eventList, Map<Integer, BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>>> predicates) {
+    protected void doFilterEvents(TimeGraphEntry entry, List<ITimeEvent> eventList, Map<Integer, Predicate<Map<String, String>>> predicates) {
         if (!predicates.isEmpty()) {
             // For each event in the events list, test each predicates and set the
             // status of the property associated to the predicate
             eventList.forEach(te -> {
-                for (Map.Entry<Integer, BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>>> mapEntry : predicates.entrySet()) {
-                    BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>> value = Objects.requireNonNull(mapEntry.getValue());
-                    boolean status = value.test(te, item -> getPresentationProvider().getFilterInput((ITimeEvent) item));
+                for (Map.Entry<Integer, Predicate<Map<String, String>>> mapEntry : predicates.entrySet()) {
+                    Predicate<Map<String, String>> value = Objects.requireNonNull(mapEntry.getValue());
+                    Map<String, String> toTest = new HashMap<>(getPresentationProvider().getFilterInput(te));
+                    toTest.putAll(te.computeData());
+
+                    boolean status = value.test(toTest);
                     Integer property = mapEntry.getKey();
                     if (property == IFilterProperty.DIMMED || property == IFilterProperty.EXCLUDE) {
                         te.setProperty(property, !status);
@@ -723,16 +724,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @since 4.0
      */
     @NonNullByDefault
-    protected Map<Integer, BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>>> computeRegexPredicate() {
+    protected Map<Integer, Predicate<Map<String, String>>> computeRegexPredicate() {
         Multimap<Integer, String> regexes = getRegexes();
-        Map<@NonNull Integer, @NonNull BiPredicate<IElementResolver, @NonNull Function<IElementResolver, @NonNull Map<@NonNull String, @NonNull String>>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         for (Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
             for (String regex : Objects.requireNonNull(entry.getValue())) {
                 if (regex.isEmpty()) {
                     continue;
                 }
-                @Nullable BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>> predicate = getPredicate(regex);
-                BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>> oldPredicate = predicates.get(entry.getKey());
+                @Nullable Predicate<Map<String, String>> predicate = getPredicate(regex);
+                Predicate<Map<String, String>> oldPredicate = predicates.get(entry.getKey());
                 if (oldPredicate != null && predicate != null) {
                     predicate = oldPredicate.and(predicate);
                 }
@@ -744,21 +745,13 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         return predicates;
     }
 
-    private static BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>> getPredicate(String regex) {
+    private static Predicate<Map<String, String>> getPredicate(String regex) {
         if (regex == null || regex.isEmpty()) {
             return null;
         }
         Pattern filterPattern = Pattern.compile(regex);
-        BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>> filterPredicate = (item, function) -> {
-            Map<String, String> toTest = function.apply(item);
-            if (toTest == null) {
-                toTest = new HashMap<>();
-            }
-            if (item != null) {
-                toTest.putAll(item.computeData());
-            }
-            boolean any = Iterables.any(toTest.entrySet(), entry -> filterPattern.matcher(entry.getValue()).find());
-            return any;
+        Predicate<Map<String, String>> filterPredicate = (toTest) -> {
+            return Iterables.any(toTest.entrySet(), entry -> filterPattern.matcher(entry.getValue()).find());
         };
         return filterPredicate;
     }

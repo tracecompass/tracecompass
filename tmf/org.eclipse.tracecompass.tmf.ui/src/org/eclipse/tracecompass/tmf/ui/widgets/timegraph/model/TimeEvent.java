@@ -15,6 +15,8 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
 import java.util.Objects;
 
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
+
 /**
  * Generic TimeEvent implementation
  *
@@ -70,12 +72,36 @@ public class TimeEvent implements ITimeEvent {
      * @param value
      *            The status assigned to the event
      */
-    public TimeEvent(ITimeGraphEntry entry, long time, long duration,
-            int value) {
+    public TimeEvent(ITimeGraphEntry entry, long time, long duration, int value) {
         fEntry = entry;
         fTime = time;
         fDuration = duration;
         fValue = value;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param entry
+     *            The entry to which this time event is assigned
+     * @param time
+     *            The timestamp of this event
+     * @param duration
+     *            The duration of this event
+     * @param value
+     *            The status assigned to the event
+     * @param activeProperties
+     *            The active properties of the event reprensented by a bitmask
+     *            value. Each bit represents a property. Available properties could
+     *            be find in {@link IFilterProperty}.
+     * @since 4.0
+     */
+    public TimeEvent(ITimeGraphEntry entry, long time, long duration, int value, int activeProperties) {
+        fEntry = entry;
+        fTime = time;
+        fDuration = duration;
+        fValue = value;
+        fActiveProperties = activeProperties;
     }
 
     /**

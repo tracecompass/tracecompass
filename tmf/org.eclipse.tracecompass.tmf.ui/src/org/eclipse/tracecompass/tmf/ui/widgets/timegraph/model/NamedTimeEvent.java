@@ -45,6 +45,28 @@ public class NamedTimeEvent extends TimeEvent {
     }
 
     /**
+     * Constructor
+     *
+     * @param entry
+     *            The entry to which this time event is assigned
+     * @param time
+     *            The timestamp of this event
+     * @param duration
+     *            The duration of this event
+     * @param value
+     *            The status assigned to the event
+     * @param label
+     *            This event's label
+     * @param activeProperties
+     *            The active properties
+     * @since 4.0
+     */
+    public NamedTimeEvent(TimeGraphEntry entry, long time, long duration, int value, String label, int activeProperties) {
+        super(entry, time, duration, value, activeProperties);
+        fLabel = label.intern();
+    }
+
+    /**
      * Getter for the label
      *
      * @return the event's label

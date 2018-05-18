@@ -9,6 +9,9 @@
 
 package org.eclipse.tracecompass.tmf.core.model.timegraph;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
@@ -22,6 +25,10 @@ public class TimeGraphState implements ITimeGraphState {
     private final long fDuration;
     private final int fValue;
     private final @Nullable String fLabel;
+    /**
+     * A map of properties to activate or deactivate
+     */
+    private int fActiveProperties = 0;
 
     /**
      * Constructor
@@ -77,5 +84,25 @@ public class TimeGraphState implements ITimeGraphState {
     @Override
     public @Nullable String getLabel() {
         return fLabel;
+    }
+
+    @Override
+    public Map<String, String> computeData() {
+        Map<String, String> toTest = new HashMap<>();
+        String label = getLabel();
+        if (label != null) {
+            toTest.put(IElementResolver.LABEL_KEY, label);
+        }
+        return toTest;
+    }
+
+    @Override
+    public int getActiveProperties() {
+        return fActiveProperties;
+    }
+
+    @Override
+    public void setActiveProperties(int activeProperties) {
+        fActiveProperties = activeProperties;
     }
 }

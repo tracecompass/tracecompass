@@ -40,7 +40,7 @@ import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
  * @author Simon Delisle
  * @since 4.0
  */
-public interface ITimeGraphDataProvider<M extends ITimeGraphEntryModel> extends ITmfTreeDataProvider<M> {
+public interface ITimeGraphDataProvider<M extends ITimeGraphEntryModel> extends ITmfTreeDataProvider<M>, ITimeGraphStateFilter {
 
     /**
      * Computes a list of time graph row models, which associate an entry's ID to

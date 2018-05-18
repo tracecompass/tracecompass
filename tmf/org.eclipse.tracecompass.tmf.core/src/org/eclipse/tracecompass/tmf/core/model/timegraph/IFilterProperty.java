@@ -9,7 +9,7 @@
 package org.eclipse.tracecompass.tmf.core.model.timegraph;
 
 /**
- * Interface that contains the list of possible properties for a timegraph item
+ * Interface that contains the list of possible properties for a timegraph item.
  *
  * @author Jean-Christian Kouame
  * @since 4.0

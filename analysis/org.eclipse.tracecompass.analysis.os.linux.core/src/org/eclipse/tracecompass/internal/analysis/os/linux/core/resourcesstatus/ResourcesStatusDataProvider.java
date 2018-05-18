@@ -21,8 +21,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -35,6 +37,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel.Type;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
 import org.eclipse.tracecompass.internal.tmf.core.model.timegraph.AbstractTimeGraphDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -307,6 +310,12 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             intervals.put(interval.getAttribute(), interval);
         }
 
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        if (filter instanceof TimeGraphStateQueryFilter) {
+            TimeGraphStateQueryFilter timeEventFilter = (TimeGraphStateQueryFilter) filter;
+            predicates.putAll(computeRegexPredicate(timeEventFilter));
+        }
+
         List<ITimeGraphRowModel> rows = new ArrayList<>();
 
         for (Map.Entry<Long, Integer> idToQuark : idsToQuark.entrySet()) {
@@ -314,6 +323,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                 return null;
             }
 
+            Long key = Objects.requireNonNull(idToQuark.getKey());
             List<ITimeGraphState> eventList = new ArrayList<>();
             for (ITmfStateInterval interval : intervals.get(idToQuark.getValue())) {
                 long startTime = interval.getStartTime();
@@ -325,10 +335,12 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                     int currentThreadQuark = ss.optQuarkRelative(interval.getAttribute(), Attributes.CURRENT_THREAD);
                     if (type == Type.CPU && s == StateValues.CPU_STATUS_RUN_SYSCALL) {
                         // add events for all the sampled current threads.
-                        eventList.addAll(getSyscalls(ss, interval, intervals.get(currentThreadQuark)));
+                        List<@NonNull ITimeGraphState> syscalls = getSyscalls(ss, interval, intervals.get(currentThreadQuark));
+                        syscalls.forEach(timeGraphState -> addToStateList(eventList, timeGraphState, key, predicates, monitor));
                     } else if (type == Type.CPU && s == StateValues.CPU_STATUS_RUN_USERMODE) {
                         // add events for all the sampled current threads.
-                        eventList.addAll(getCurrentThreads(ss, interval, intervals.get(currentThreadQuark)));
+                        List<@NonNull TimeGraphState> currentThreads = getCurrentThreads(ss, interval, intervals.get(currentThreadQuark));
+                        currentThreads.forEach(timeGraphState -> addToStateList(eventList, timeGraphState, key, predicates, monitor));
                     } else if (type == Type.CURRENT_THREAD && s != 0) {
                         String execName = null;
                         synchronized (fExecNamesCache) {
@@ -347,19 +359,24 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                                 }
                             }
                         }
-                        eventList.add(new TimeGraphState(startTime, duration, s, execName != null ? execName + ' ' + '(' + String.valueOf(s) + ')' : String.valueOf(s)));
+                        TimeGraphState timeGraphState = new TimeGraphState(startTime, duration, s, execName != null ? execName + ' ' + '(' + String.valueOf(s) + ')' : String.valueOf(s));
+                        addToStateList(eventList, timeGraphState, key, predicates, monitor);
                     } else if (type == Type.CURRENT_THREAD) {
                         // add null state when current thread is 0
-                        eventList.add(new TimeGraphState(startTime, duration, Integer.MIN_VALUE));
+                        ITimeGraphState timeGraphState = new TimeGraphState(startTime, duration, Integer.MIN_VALUE);
+                        addToStateList(eventList, timeGraphState, key, predicates, monitor);
                     } else {
-                        eventList.add(new TimeGraphState(startTime, duration, s));
+                        TimeGraphState timeGraphState = new TimeGraphState(startTime, duration, s);
+                        addToStateList(eventList, timeGraphState, key, predicates, monitor);
                     }
                 } else if ((status instanceof Long) && (type == Type.FREQUENCY)) {
                     long s = (long) status;
                     // The value needs to fit in an integer
-                    eventList.add(new TimeGraphState(startTime, duration, (int) (s / FREQUENCY_MULTIPLIER), String.valueOf(FREQUENCY_FORMATTER.format(s))));
+                    TimeGraphState timeGraphState = new TimeGraphState(startTime, duration, (int) (s / FREQUENCY_MULTIPLIER), String.valueOf(FREQUENCY_FORMATTER.format(s)));
+                    addToStateList(eventList, timeGraphState, key, predicates, monitor);
                 } else {
-                    eventList.add(new TimeGraphState(startTime, duration, Integer.MIN_VALUE));
+                    ITimeGraphState timeGraphState = new TimeGraphState(startTime, duration, Integer.MIN_VALUE);
+                    addToStateList(eventList, timeGraphState, key, predicates, monitor);
                 }
             }
             rows.add(new TimeGraphRowModel(idToQuark.getKey(), eventList));
@@ -421,9 +438,9 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
      *            filter sampling
      * @return a List of intervals with the current thread name label.
      */
-    private static List<TimeGraphState> getCurrentThreads(@NonNull ITmfStateSystem ss, ITmfStateInterval userModeInterval,
+    private static List<@NonNull TimeGraphState> getCurrentThreads(@NonNull ITmfStateSystem ss, ITmfStateInterval userModeInterval,
             @NonNull NavigableSet<ITmfStateInterval> currentThreadIntervals) throws StateSystemDisposedException {
-        List<TimeGraphState> list = new ArrayList<>();
+        List<@NonNull TimeGraphState> list = new ArrayList<>();
         for (ITmfStateInterval currentThread : currentThreadIntervals) {
             // filter the current thread intervals which overlap the usermode interval
             if (currentThread.getStartTime() <= userModeInterval.getEndTime()
@@ -460,9 +477,9 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
      *            sampled current thread intervals for the CPU
      * @return a List of intervals with the system call name label.
      */
-    private List<ITimeGraphState> getSyscalls(@NonNull ITmfStateSystem ss, ITmfStateInterval syscallInterval,
+    private List<@NonNull ITimeGraphState> getSyscalls(@NonNull ITmfStateSystem ss, ITmfStateInterval syscallInterval,
             @NonNull NavigableSet<ITmfStateInterval> currentThreadIntervals) throws StateSystemDisposedException {
-        List<ITimeGraphState> list = new ArrayList<>();
+        List<@NonNull ITimeGraphState> list = new ArrayList<>();
         for (ITmfStateInterval currentThread : currentThreadIntervals) {
             // filter the current thread intervals which overlap the syscall interval
             if (currentThread.getStartTime() <= syscallInterval.getEndTime()
@@ -666,4 +683,14 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         return true;
     }
 
+    @Override
+    public @NonNull Map<@NonNull String, @NonNull String> getFilterInput(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<@NonNull String, @NonNull String> inputs = super.getFilterInput(filter, monitor);
+        TmfModelResponse<Map<String, String>> response = fetchTooltip(filter, monitor);
+        Map<@NonNull String, @NonNull String> model = response.getModel();
+        if (model != null) {
+            inputs.putAll(model);
+        }
+        return inputs;
+    }
 }
