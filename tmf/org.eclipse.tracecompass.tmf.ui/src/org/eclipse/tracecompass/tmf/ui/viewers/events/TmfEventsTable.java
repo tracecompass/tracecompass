@@ -2805,7 +2805,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 if (passedEvent == null || (!tableColumn.getResizable() && tableColumn.getWidth() == 0)) {
                     itemStrings[i] = EMPTY_STRING;
                 } else {
-                    itemStrings[i] = column.getItemString(passedEvent);
+                    String s = column.getItemString(passedEvent);
+                    s = s.replaceAll("\\n", " "); //$NON-NLS-1$//$NON-NLS-2$
+                    s = s.replaceAll("\\r", " "); //$NON-NLS-1$//$NON-NLS-2$
+                    itemStrings[i] = s;
                 }
             }
             return itemStrings;
