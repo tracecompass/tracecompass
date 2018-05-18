@@ -9,7 +9,11 @@
 
 package org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph;
 
+import java.util.Iterator;
+
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.profiling.core.callgraph.ICallGraphProvider;
+import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
 import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.tree.TmfTreeCompositeDataProvider;
 import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderFactory;
@@ -29,15 +33,21 @@ import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
  */
 public class CallGraphStatisticsDataProviderFactory implements IDataProviderFactory {
 
-    private static final String ID = "org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.callgraphanalysis.statistics"; //$NON-NLS-1$
+    private static final String ID = "org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.callgraphanalysis.statistics"; //$NON-NLS-1$
 
     @Override
     public @Nullable ITmfTreeDataProvider<? extends ITmfTreeDataModel> createProvider(ITmfTrace trace) {
         if (trace instanceof TmfExperiment) {
             return TmfTreeCompositeDataProvider.create(TmfTraceManager.getTraceSet(trace), ID);
         }
-        CallGraphAnalysis analysis = TmfTraceUtils.getAnalysisModuleOfClass(trace, CallGraphAnalysis.class, CallGraphAnalysis.ID);
-        if (analysis == null) {
+        Iterator<CallStackAnalysis> csModules = TmfTraceUtils.getAnalysisModulesOfClass(trace, CallStackAnalysis.class).iterator();
+        if (!csModules.hasNext()) {
+            return null;
+        }
+        CallStackAnalysis csModule = csModules.next();
+        csModule.schedule();
+        ICallGraphProvider cgModule = csModule.getCallGraph();
+        if (!(cgModule instanceof CallGraphAnalysis)) {
             return null;
         }
         CallGraphStatisticsAnalysis statisticsAnalysis = new CallGraphStatisticsAnalysis();

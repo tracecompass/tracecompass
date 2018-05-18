@@ -18,9 +18,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.profiling.core.callgraph.ICallGraphProvider;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
+import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.SymbolAspect;
 import org.eclipse.tracecompass.internal.analysis.timing.core.Activator;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -34,12 +36,9 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 /**
@@ -60,7 +59,7 @@ import com.google.common.collect.Lists;
  *
  * @author Sonia Farrah
  */
-public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISegmentStoreProvider {
+public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISegmentStoreProvider, ICallGraphProvider {
 
     /**
      * ID
@@ -97,12 +96,27 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      */
     private List<ThreadNode> fThreadNodes = new ArrayList<>();
 
+    private final @Nullable CallStackAnalysis fCallStackAnalysis;
+
     /**
-     * Default constructor
+     * Protected constructor, without the analysis
      */
-    public CallGraphAnalysis() {
+    protected CallGraphAnalysis() {
         super();
         fStore = SegmentStoreFactory.createSegmentStore(SegmentStoreType.Fast);
+        fCallStackAnalysis = null;
+    }
+
+    /**
+     * Default constructor
+     *
+     * @param callStackAnalysis
+     *            The callstack analysis this callgraph will be built upon
+     */
+    public CallGraphAnalysis(CallStackAnalysis callStackAnalysis) {
+        super();
+        fStore = SegmentStoreFactory.createSegmentStore(SegmentStoreType.Fast);
+        fCallStackAnalysis = callStackAnalysis;
     }
 
     @Override
@@ -132,8 +146,11 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
 
     @Override
     protected Iterable<IAnalysisModule> getDependentAnalyses() {
-        return Iterables.concat(Iterables.transform(TmfTraceManager.getTraceSet(getTrace()),
-                trace -> TmfTraceUtils.getAnalysisModulesOfClass(trace, CallStackAnalysis.class)));
+        CallStackAnalysis callStackAnalysis = fCallStackAnalysis;
+        if (callStackAnalysis == null) {
+            throw new NullPointerException("If the analysis is not set, this method should not be called");
+        }
+        return Collections.singleton(callStackAnalysis);
     }
 
     @Override
@@ -142,23 +159,19 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
         if (monitor == null || trace == null) {
             return false;
         }
-        Iterable<IAnalysisModule> dependentAnalyses = getDependentAnalyses();
-        for (IAnalysisModule module : dependentAnalyses) {
-            if (!(module instanceof CallStackAnalysis)) {
-                return false;
-            }
-            module.schedule();
+        CallStackAnalysis callstackModule = fCallStackAnalysis;
+        if (callstackModule == null) {
+            return false;
         }
+        callstackModule.schedule();
+        callstackModule.waitForCompletion(monitor);
         // TODO:Look at updates while the state system's being built
-        dependentAnalyses.forEach(t -> t.waitForCompletion(monitor));
-        for (CallStackAnalysis callstackModule : Iterables.filter(dependentAnalyses, CallStackAnalysis.class)) {
-            String[] threadsPattern = callstackModule.getThreadsPattern();
-            String[] processesPattern = callstackModule.getProcessesPattern();
-            String[] callStackPath = callstackModule.getCallStackPath();
-            ITmfStateSystem ss = callstackModule.getStateSystem();
-            if (ss == null || !iterateOverStateSystem(ss, threadsPattern, processesPattern, callStackPath, monitor)) {
-                return false;
-            }
+        String[] threadsPattern = callstackModule.getThreadsPattern();
+        String[] processesPattern = callstackModule.getProcessesPattern();
+        String[] callStackPath = callstackModule.getCallStackPath();
+        ITmfStateSystem ss = callstackModule.getStateSystem();
+        if (ss == null || !iterateOverStateSystem(ss, threadsPattern, processesPattern, callStackPath, monitor)) {
+            return false;
         }
         monitor.worked(1);
         monitor.done();

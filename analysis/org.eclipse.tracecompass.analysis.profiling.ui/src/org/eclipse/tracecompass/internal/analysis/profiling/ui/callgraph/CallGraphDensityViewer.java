@@ -12,11 +12,13 @@ package org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityViewer;
-import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CallGraphAnalysis;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+
+import com.google.common.collect.Iterables;
 
 /**
  * Call stack segments density viewer
@@ -37,6 +39,7 @@ public class CallGraphDensityViewer extends AbstractSegmentStoreDensityViewer {
 
     @Override
     protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(@NonNull ITmfTrace trace) {
-        return TmfTraceUtils.getAnalysisModuleOfClass(trace, CallGraphAnalysis.class, CallGraphAnalysis.ID);
+        Iterable<CallStackAnalysis> csModules = TmfTraceUtils.getAnalysisModulesOfClass(trace, CallStackAnalysis.class);
+        return Iterables.getFirst(csModules, null);
     }
 }

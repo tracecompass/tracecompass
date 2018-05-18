@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph;
+package org.eclipse.tracecompass.internal.analysis.profiling.core.callstack;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -18,6 +18,8 @@ import org.eclipse.tracecompass.analysis.profiling.core.symbols.ISymbolProvider;
 import org.eclipse.tracecompass.analysis.profiling.core.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.analysis.profiling.core.symbols.SymbolProviderUtils;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.ICalledFunction;
+import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.Messages;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;

@@ -18,11 +18,15 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.tracecompass.analysis.profiling.core.callgraph.ICallGraphProvider;
+import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CallGraphAnalysis;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+
+import com.google.common.collect.Iterables;
 
 /**
  * Displays the Call Stack data in a column table
@@ -51,16 +55,22 @@ public class CallGraphTableViewer extends AbstractSegmentStoreTableViewer {
 
     @Override
     protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(@NonNull ITmfTrace trace) {
-        CallGraphAnalysis fModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, CallGraphAnalysis.class, CallGraphAnalysis.ID);
-        if (fModule == null) {
+        Iterable<CallStackAnalysis> csModules = TmfTraceUtils.getAnalysisModulesOfClass(trace, CallStackAnalysis.class);
+        @Nullable CallStackAnalysis csModule = Iterables.getFirst(csModules, null);
+        if (csModule == null) {
             return null;
         }
-        fModule.schedule();
+        ICallGraphProvider cgModule = csModule.getCallGraph();
+        if (!(cgModule instanceof CallGraphAnalysis)) {
+            return null;
+        }
+        CallGraphAnalysis module = (CallGraphAnalysis) cgModule;
+        module.schedule();
         Job job = new Job(Messages.CallGraphAnalysis) {
 
             @Override
             protected IStatus run(IProgressMonitor monitor) {
-                fModule.waitForCompletion(Objects.requireNonNull((monitor)));
+                module.waitForCompletion(Objects.requireNonNull((monitor)));
                 if (monitor.isCanceled()) {
                     return Status.CANCEL_STATUS;
                 }
@@ -68,6 +78,6 @@ public class CallGraphTableViewer extends AbstractSegmentStoreTableViewer {
             }
         };
         job.schedule();
-        return fModule;
+        return module;
     }
 }

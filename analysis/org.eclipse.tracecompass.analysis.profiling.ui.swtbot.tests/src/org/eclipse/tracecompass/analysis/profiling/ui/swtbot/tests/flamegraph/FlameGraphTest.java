@@ -15,6 +15,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterator;
@@ -119,7 +120,7 @@ public class FlameGraphTest extends AggregationTreeTest {
     }
 
     private void loadFlameGraph() {
-        UIThreadRunnable.syncExec(() -> fFg.buildFlameGraph(getCga()));
+        UIThreadRunnable.syncExec(() -> fFg.buildFlameGraph(Collections.singleton(getCga())));
         try {
             fFg.waitForUpdate();
         } catch (InterruptedException e) {
@@ -146,8 +147,9 @@ public class FlameGraphTest extends AggregationTreeTest {
     public void emptyStateSystemTest() {
         super.emptyStateSystemTest();
         loadFlameGraph();
-        ITimeGraphEntry entry = fTimeGraphViewer.getSelection();
-        assertNull(entry);
+        // Get the root entry and make sure there are no children
+        ITimeGraphEntry entry = selectRoot();
+        assertEquals(0, entry.getChildren().size());
     }
 
     @Override

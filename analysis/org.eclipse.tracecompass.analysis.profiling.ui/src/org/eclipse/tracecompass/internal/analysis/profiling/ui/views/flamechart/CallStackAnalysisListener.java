@@ -12,6 +12,9 @@ package org.eclipse.tracecompass.internal.analysis.profiling.ui.views.flamechart
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
 import org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart.FlameChartView;
+import org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph.CallGraphDensityView;
+import org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph.statistics.CallGraphStatisticsView;
+import org.eclipse.tracecompass.internal.analysis.profiling.ui.flamegraph.FlameGraphView;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.ITmfNewAnalysisModuleListener;
 import org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput;
@@ -29,6 +32,9 @@ public class CallStackAnalysisListener implements ITmfNewAnalysisModuleListener 
     public void moduleCreated(@Nullable IAnalysisModule module) {
         if (module instanceof CallStackAnalysis) {
             module.registerOutput(new TmfAnalysisViewOutput(FlameChartView.ID));
+            module.registerOutput(new TmfAnalysisViewOutput(FlameGraphView.ID));
+            module.registerOutput(new TmfAnalysisViewOutput(CallGraphDensityView.ID));
+            module.registerOutput(new TmfAnalysisViewOutput(CallGraphStatisticsView.ID));
         }
     }
 

@@ -11,7 +11,8 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.analysis.profiling.ui.flamegraph;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -37,6 +38,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.tracecompass.analysis.profiling.core.callgraph.ICallGraphProvider;
+import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
 import org.eclipse.tracecompass.analysis.profiling.ui.symbols.TmfSymbolProviderUpdatedSignal;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CallGraphAnalysis;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.ThreadNode;
@@ -84,7 +87,7 @@ public class FlameGraphView extends TmfView {
         @Override
         public void run() {
             if (fContentPresentation != ContentPresentation.BY_THREAD) {
-                buildFlameGraph(fFlamegraphModule);
+                buildFlameGraph(fFlamegraphModules);
                 fContentPresentation = ContentPresentation.BY_THREAD;
                 saveContentPresentationOption(fContentPresentation);
             }
@@ -95,7 +98,7 @@ public class FlameGraphView extends TmfView {
         @Override
         public void run() {
             if (fContentPresentation != ContentPresentation.AGGREGATE_THREADS) {
-                buildFlameGraph(fFlamegraphModule);
+                buildFlameGraph(fFlamegraphModules);
                 fContentPresentation = ContentPresentation.AGGREGATE_THREADS;
                 saveContentPresentationOption(fContentPresentation);
             }
@@ -120,7 +123,7 @@ public class FlameGraphView extends TmfView {
     private Action fSortByIdAction;
     private Job fJob;
 
-    private CallGraphAnalysis fFlamegraphModule = null;
+    private Iterable<CallGraphAnalysis> fFlamegraphModules = null;
 
     /**
      * Constructor
@@ -193,21 +196,31 @@ public class FlameGraphView extends TmfView {
      */
     @TmfSignalHandler
     public void traceSelected(final TmfTraceSelectedSignal signal) {
-        fTrace = signal.getTrace();
-        if (fTrace != null) {
-            fFlamegraphModule = TmfTraceUtils.getAnalysisModuleOfClass(fTrace, CallGraphAnalysis.class, CallGraphAnalysis.ID);
-            buildFlameGraph(fFlamegraphModule);
+        ITmfTrace trace = signal.getTrace();
+        fTrace = trace;
+        if (trace != null) {
+            Iterable<CallStackAnalysis> csModules = TmfTraceUtils.getAnalysisModulesOfClass(trace, CallStackAnalysis.class);
+            List<CallGraphAnalysis> cgModules = new ArrayList<>();
+            for (CallStackAnalysis csModule : csModules) {
+                csModule.schedule();
+                ICallGraphProvider cgModule = csModule.getCallGraph();
+                if (cgModule instanceof CallGraphAnalysis) {
+                    cgModules.add((CallGraphAnalysis) cgModule);
+                }
+            }
+            fFlamegraphModules = cgModules;
+            buildFlameGraph(cgModules);
         }
     }
 
     /**
      * Get the necessary data for the flame graph and display it
      *
-     * @param callGraphAnalysis
+     * @param callGraphProviders
      *            the callGraphAnalysis
      */
     @VisibleForTesting
-    public void buildFlameGraph(CallGraphAnalysis callGraphAnalysis) {
+    public void buildFlameGraph(Iterable<CallGraphAnalysis> callGraphProviders) {
         /*
          * Note for synchronization:
          *
@@ -231,12 +244,14 @@ public class FlameGraphView extends TmfView {
             Activator.getDefault().logError(e.getMessage(), e);
             fLock.release();
         }
-        if (callGraphAnalysis == null) {
+        if (!callGraphProviders.iterator().hasNext()) {
             fTimeGraphViewer.setInput(null);
             fLock.release();
             return;
         }
-        callGraphAnalysis.schedule();
+        for (CallGraphAnalysis provider : callGraphProviders) {
+            provider.schedule();
+        }
         job = new Job(Messages.CallGraphAnalysis_Execution) {
 
             @Override
@@ -245,9 +260,12 @@ public class FlameGraphView extends TmfView {
                     if (monitor.isCanceled()) {
                         return Status.CANCEL_STATUS;
                     }
-                    callGraphAnalysis.waitForCompletion(monitor);
+                    List<ThreadNode> input = new ArrayList<>();
+                    for (CallGraphAnalysis callGraphAnalysis : callGraphProviders) {
+                        callGraphAnalysis.waitForCompletion(monitor);
+                        input.addAll(fContentPresentation == ContentPresentation.BY_THREAD ? callGraphAnalysis.getThreadNodes() : callGraphAnalysis.getFlameGraph());
+                    }
                     // compute input outside of display thread.
-                    Collection<ThreadNode> input = fContentPresentation == ContentPresentation.BY_THREAD ? callGraphAnalysis.getThreadNodes() : callGraphAnalysis.getFlameGraph();
                     Display.getDefault().asyncExec(() -> {
                         fTimeGraphViewer.setInput(input);
                         fTimeGraphViewer.resetStartFinishTime();

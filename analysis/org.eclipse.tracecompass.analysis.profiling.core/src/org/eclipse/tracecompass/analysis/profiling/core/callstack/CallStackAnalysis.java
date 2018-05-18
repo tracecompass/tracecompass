@@ -8,7 +8,17 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.analysis.profiling.core.callstack;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.profiling.core.callgraph.ICallGraphProvider;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
+import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CallGraphAnalysis;
+import org.eclipse.tracecompass.segmentstore.core.ISegment;
+import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
+import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
  * The base classes for analyses who want to populate the CallStack state
@@ -17,11 +27,13 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModul
  * @author Matthew Khouzam
  * @since 2.1
  */
-public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule {
+public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule implements IFlameChartProvider {
 
     private static final String[] DEFAULT_PROCESSES_PATTERN = new String[] { CallStackStateProvider.PROCESSES, "*" }; //$NON-NLS-1$
     private static final String[] DEFAULT_THREADS_PATTERN = new String[] { "*" }; //$NON-NLS-1$
     private static final String[] DEFAULT_CALL_STACK_PATH = new String[] { CallStackStateProvider.CALL_STACK };
+
+    private final CallGraphAnalysis fCallGraphAnalysis;
 
     /**
      * Abstract constructor (should only be called via the sub-classes'
@@ -29,6 +41,7 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule {
      */
     protected CallStackAnalysis() {
         super();
+        fCallGraphAnalysis = new CallGraphAnalysis(this);
     }
 
     /**
@@ -81,6 +94,60 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule {
      */
     public String[] getCallStackPath() {
         return DEFAULT_CALL_STACK_PATH;
+    }
+
+    // ------------------------------------------------------------------------
+    // Method overwrites for sub-modules
+    // ------------------------------------------------------------------------
+
+    @Override
+    public boolean setTrace(@NonNull ITmfTrace trace) throws TmfAnalysisException {
+        boolean ret = super.setTrace(trace);
+        if (!ret) {
+            return ret;
+        }
+        ret = fCallGraphAnalysis.setTrace(trace);
+        return ret;
+    }
+
+    @Override
+    public void dispose() {
+        fCallGraphAnalysis.dispose();
+        super.dispose();
+    }
+
+    // ------------------------------------------------------------------------
+    // ISegmentStoreProvider
+    // ------------------------------------------------------------------------
+
+    @Override
+    public void addListener(IAnalysisProgressListener listener) {
+        fCallGraphAnalysis.addListener(listener);
+    }
+
+    @Override
+    public void removeListener(IAnalysisProgressListener listener) {
+        fCallGraphAnalysis.removeListener(listener);
+    }
+
+    @Override
+    public Iterable<ISegmentAspect> getSegmentAspects() {
+        return fCallGraphAnalysis.getSegmentAspects();
+    }
+
+    @Override
+    public @Nullable ISegmentStore<ISegment> getSegmentStore() {
+        fCallGraphAnalysis.schedule();
+        return fCallGraphAnalysis.getSegmentStore();
+    }
+
+    /**
+     * Get the callgraph module associated with this callstack
+     *
+     * @return The callgraph module
+     */
+    public ICallGraphProvider getCallGraph() {
+        return fCallGraphAnalysis;
     }
 
 }

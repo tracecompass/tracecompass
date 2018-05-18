@@ -116,6 +116,7 @@ public class AggregationTreeTest {
         ITmfStateSystemBuilder fixture = createFixture();
         fixture.closeHistory(1002);
         CGAnalysis cga = new CGAnalysis();
+        setCga(cga);
         assertTrue(cga.iterateOverStateSystem(fixture, TP, PP, CSP, new NullProgressMonitor()));
         List<ThreadNode> threads = cga.getThreadNodes();
         assertNotNull(threads);
@@ -675,9 +676,9 @@ public class AggregationTreeTest {
     }
 
     /**
-     * Set the callgraphanalysis
+     * Set the call graph analysis
      *
-     * @param cga
+     * @param cga The call graph analysis
      */
     protected void setCga(CGAnalysis cga) {
         fCga = cga;

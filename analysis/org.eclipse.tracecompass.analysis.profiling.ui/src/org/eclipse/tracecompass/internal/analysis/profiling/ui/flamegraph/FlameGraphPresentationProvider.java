@@ -20,7 +20,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.AggregatedCalledFunctionStatistics;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.ICalledFunction;
-import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.SymbolAspect;
+import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.SymbolAspect;
 import org.eclipse.tracecompass.tmf.core.presentation.IPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.presentation.RotatingPaletteProvider;

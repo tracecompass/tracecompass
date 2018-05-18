@@ -13,19 +13,4 @@
             id="org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.callgraphanalysis.statistics">
       </dataProviderFactory>
    </extension>
-   <extension
-         point="org.eclipse.linuxtools.tmf.core.analysis">
-      <module
-            analysis_module="org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CallGraphAnalysis"
-            applies_experiment="true"
-            automatic="false"
-            icon="icons/callgraph.png"
-            id="org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.callgraphanalysis"
-            name="%callgraph.analysis">
-         <tracetype
-               applies="true"
-               class="org.eclipse.tracecompass.tmf.core.trace.TmfTrace">
-         </tracetype>
-      </module>
-   </extension>
 </plugin>

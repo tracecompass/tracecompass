@@ -33,7 +33,7 @@
             category="org.eclipse.linuxtools.tmf.ui.views.category"
             class="org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph.statistics.CallGraphStatisticsView"
             icon="icons/eview16/statistics_view.gif"
-            id="org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph.statistics.callgraphstatistics"
+            id="org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph.statistics.callgraphStatistics"
             name="%view.callgraph.statistics"
             restorable="true">
       </view>
@@ -43,27 +43,6 @@
       <listener
             class="org.eclipse.tracecompass.internal.analysis.profiling.ui.views.flamechart.CallStackAnalysisListener">
       </listener>
-      <output
-            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
-            id="org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph.callgraphDensity">
-         <analysisModuleClass
-               class="org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CallGraphAnalysis">
-         </analysisModuleClass>
-      </output>
-      <output
-            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
-            id="org.eclipse.tracecompass.internal.analysis.profiling.ui.flamegraph.flamegraphView">
-         <analysisModuleClass
-               class="org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CallGraphAnalysis">
-         </analysisModuleClass>
-      </output>
-      <output
-            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
-            id="org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph.statistics.callgraphstatistics">
-         <analysisModuleClass
-               class="org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CallGraphAnalysis">
-         </analysisModuleClass>
-      </output>
    </extension>
    <extension
          point="org.eclipse.tracecompass.tmf.core.symbolProvider">
