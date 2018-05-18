@@ -113,9 +113,9 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
             TmfTimestampFormat.updateDefaultFormats();
 
             String tracePath = Paths.get(FileLocator.toFileURL(CtfTestTrace.SYNC_DEST.getTraceURL()).toURI()).toString();
-            SWTBotUtils.openTrace(TRACE_PROJECT_NAME, tracePath, KERNEL_TRACE_TYPE);
             fViewBot = fBot.viewByTitle("Control Flow");
             fViewBot.show();
+            SWTBotUtils.openTrace(TRACE_PROJECT_NAME, tracePath, KERNEL_TRACE_TYPE);
             fViewBot.setFocus();
         } catch (IOException | URISyntaxException e) {
             fail();

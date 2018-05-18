@@ -136,9 +136,9 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
     @Override
     @Before
     public void before() {
-        super.before();
         SWTBotView viewBot = getViewBot();
         viewBot.show();
+        super.before();
         viewBot.setFocus();
     }
 
