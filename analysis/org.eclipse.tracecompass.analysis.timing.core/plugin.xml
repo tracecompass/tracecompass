@@ -4,18 +4,6 @@
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <module
-            analysis_module="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphAnalysis"
-            applies_experiment="true"
-            automatic="false"
-            icon="icons/callgraph.png"
-            id="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.callgraphanalysis"
-            name="%callgraph.analysis">
-         <tracetype
-               applies="true"
-               class="org.eclipse.tracecompass.tmf.core.trace.TmfTrace">
-         </tracetype>
-      </module>
-      <module
             analysis_module="org.eclipse.tracecompass.internal.analysis.timing.core.event.matching.EventMatchingLatencyAnalysis"
             applies_experiment="true"
             automatic="false"
@@ -37,10 +25,6 @@
       <dataProviderFactory
             class="org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProviderFactory"
             id="org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProvider">
-      </dataProviderFactory>
-      <dataProviderFactory
-            class="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphStatisticsDataProviderFactory"
-            id="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.callgraphanalysis.statistics">
       </dataProviderFactory>
    </extension>
 </plugin>

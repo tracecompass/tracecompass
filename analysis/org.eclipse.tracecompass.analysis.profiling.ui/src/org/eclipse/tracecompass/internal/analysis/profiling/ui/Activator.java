@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.analysis.profiling.ui;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -49,8 +51,12 @@ public class Activator extends AbstractUIPlugin {
      *
      * @return the shared instance
      */
-    public static @Nullable Activator getDefault() {
-        return plugin;
+    public static Activator getDefault() {
+        Activator activator = plugin;
+        if (activator == null) {
+            throw new NullPointerException("This method should not be called when Activator is null"); //$NON-NLS-1$
+        }
+        return activator;
     }
 
     /**
@@ -75,6 +81,81 @@ public class Activator extends AbstractUIPlugin {
      */
     public ImageDescriptor getImageDescripterFromPath(String path) {
         return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+    }
+
+    // --------------------------------------
+    // Log functions
+    // --------------------------------------
+
+    /**
+     * Logs a message with severity INFO in the runtime log of the plug-in.
+     *
+     * @param message
+     *            A message to log
+     */
+    public void logInfo(String message) {
+        getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
+    }
+
+    /**
+     * Logs a message and exception with severity INFO in the runtime log of the
+     * plug-in.
+     *
+     * @param message
+     *            A message to log
+     * @param exception
+     *            A exception to log
+     */
+    public void logInfo(String message, Throwable exception) {
+        getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message, exception));
+    }
+
+    /**
+     * Logs a message and exception with severity WARNING in the runtime log of
+     * the plug-in.
+     *
+     * @param message
+     *            A message to log
+     */
+    public void logWarning(String message) {
+        getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
+    }
+
+    /**
+     * Logs a message and exception with severity WARNING in the runtime log of
+     * the plug-in.
+     *
+     * @param message
+     *            A message to log
+     * @param exception
+     *            A exception to log
+     */
+    public void logWarning(String message, Throwable exception) {
+        getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, exception));
+    }
+
+    /**
+     * Logs a message and exception with severity ERROR in the runtime log of
+     * the plug-in.
+     *
+     * @param message
+     *            A message to log
+     */
+    public void logError(String message) {
+        getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message));
+    }
+
+    /**
+     * Logs a message and exception with severity ERROR in the runtime log of
+     * the plug-in.
+     *
+     * @param message
+     *            A message to log
+     * @param exception
+     *            A exception to log
+     */
+    public void logError(String message, Throwable exception) {
+        getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, exception));
     }
 
 }

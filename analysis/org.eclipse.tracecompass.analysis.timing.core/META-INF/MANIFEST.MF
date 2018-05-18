@@ -13,13 +13,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.tmf.core,
  org.eclipse.tracecompass.datastore.core,
- org.eclipse.tracecompass.segmentstore.core,
- org.eclipse.tracecompass.analysis.profiling.core
+ org.eclipse.tracecompass.segmentstore.core
 Export-Package: org.eclipse.tracecompass.analysis.timing.core.segmentstore,
  org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics,
  org.eclipse.tracecompass.analysis.timing.core.statistics,
  org.eclipse.tracecompass.internal.analysis.timing.core,
- org.eclipse.tracecompass.internal.analysis.timing.core.callgraph;x-friends:="org.eclipse.tracecompass.analysis.timing.ui,org.eclipse.tracecompass.analysis.timing.core.tests",
  org.eclipse.tracecompass.internal.analysis.timing.core.event.matching;x-friends:="org.eclipse.tracecompass.analysis.timing.ui,org.eclipse.tracecompass.analysis.timing.core.tests",
  org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore;x-friends:="org.eclipse.tracecompass.analysis.timing.ui,org.eclipse.tracecompass.tmf.analysis.xml.core"
 Import-Package: com.google.common.annotations,

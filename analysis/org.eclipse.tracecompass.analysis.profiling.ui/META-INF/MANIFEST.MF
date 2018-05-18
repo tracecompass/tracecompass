@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
 Bundle-SymbolicName: org.eclipse.tracecompass.analysis.profiling.ui;singleton:=true
-Bundle-Version: 0.0.1.qualifier
+Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-Activator: org.eclipse.tracecompass.internal.analysis.profiling.ui.Activator
 Bundle-ActivationPolicy: lazy
@@ -17,12 +17,21 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.analysis.profiling.core,
  org.eclipse.tracecompass.tmf.core,
- org.eclipse.tracecompass.tmf.ui
+ org.eclipse.tracecompass.tmf.ui,
+ org.eclipse.tracecompass.analysis.timing.core,
+ org.eclipse.tracecompass.analysis.timing.ui,
+ org.swtchart,
+ org.eclipse.tracecompass.segmentstore.core,
+ org.eclipse.tracecompass.datastore.core
 Export-Package: org.eclipse.tracecompass.analysis.profiling.ui.symbols,
  org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart,
  org.eclipse.tracecompass.internal.analysis.profiling.ui;x-internal:=true,
+ org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph;x-friends:="org.eclipse.tracecompass.analysis.profiling.ui.swtbot.tests",
+ org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph.statistics;x-friends:="org.eclipse.tracecompass.analysis.profiling.ui.swtbot.tests",
+ org.eclipse.tracecompass.internal.analysis.profiling.ui.flamegraph;x-friends:="org.eclipse.tracecompass.analysis.profiling.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.analysis.profiling.ui.symbols;x-friends:="org.eclipse.tracecompass.analysis.profiling.ui.tests",
  org.eclipse.tracecompass.internal.analysis.profiling.ui.views.flamechart;x-internal:=true
-Import-Package: com.google.common.base,
+Import-Package: com.google.common.annotations,
+ com.google.common.base,
  com.google.common.collect,
  org.apache.commons.lang3

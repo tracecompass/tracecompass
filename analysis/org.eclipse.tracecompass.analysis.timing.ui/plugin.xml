@@ -5,27 +5,6 @@
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <output
             class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
-            id="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.callgraphDensity">
-         <analysisModuleClass
-               class="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphAnalysis">
-         </analysisModuleClass>
-      </output>
-      <output
-            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
-            id="org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph.flamegraphView">
-         <analysisModuleClass
-               class="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphAnalysis">
-         </analysisModuleClass>
-      </output>
-      <output
-            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
-            id="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.statistics.callgraphstatistics">
-         <analysisModuleClass
-               class="org.eclipse.tracecompass.internal.analysis.timing.core.callgraph.CallGraphAnalysis">
-         </analysisModuleClass>
-      </output>
-      <output
-            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="org.eclipse.tracecompass.analysis.timing.ui.segstore.statistics:org.eclipse.tracecompass.internal.analysis.timing.core.event.matching">
          <analysisId
                id="org.eclipse.tracecompass.internal.analysis.timing.core.event.matching">
@@ -49,23 +28,6 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            allowMultiple="false"
-            category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.CallGraphDensityView"
-            icon="icons/elcl16/funcdensity.png"
-            id="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.callgraphDensity"
-            name="%view.callgraphDensity"
-            restorable="true">
-      </view>
-      <view
-            category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph.FlameGraphView"
-            icon="icons/elcl16/flame.png"
-            id="org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph.flamegraphView"
-            name="%view.flameGraph"
-            restorable="true">
-      </view>
-      <view
             category="org.eclipse.linuxtools.tmf.ui.views.category"
             class="org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.SegmentStoreTableView"
             icon="icons/eview16/latency.png"
@@ -87,15 +49,6 @@
             icon="icons/eview16/latency.png"
             id="org.eclipse.tracecompass.analysis.timing.ui.segstore.scatter"
             name="%view.segstore.scatters"
-            restorable="true">
-      </view>
-      <view
-            allowMultiple="false"
-            category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.statistics.CallGraphStatisticsView"
-            icon="icons/eview16/statistics_view.gif"
-            id="org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.statistics.callgraphstatistics"
-            name="%view.callgraph.statistics"
             restorable="true">
       </view>
       <view

@@ -8,7 +8,33 @@
             class="org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart.FlameChartView"
             icon="icons/eview16/callstack_view.gif"
             id="org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart"
-            name="%flamechart.view.name"
+            name="%view.flamechart.name"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph.CallGraphDensityView"
+            icon="icons/eview16/funcdensity.png"
+            id="org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph.callgraphDensity"
+            name="%view.callgraphDensity"
+            restorable="true">
+      </view>
+      <view
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.tracecompass.internal.analysis.profiling.ui.flamegraph.FlameGraphView"
+            icon="icons/eview16/flame.png"
+            id="org.eclipse.tracecompass.internal.analysis.profiling.ui.flamegraph.flamegraphView"
+            name="%view.flameGraph"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph.statistics.CallGraphStatisticsView"
+            icon="icons/eview16/statistics_view.gif"
+            id="org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph.statistics.callgraphstatistics"
+            name="%view.callgraph.statistics"
             restorable="true">
       </view>
    </extension>
@@ -17,6 +43,27 @@
       <listener
             class="org.eclipse.tracecompass.internal.analysis.profiling.ui.views.flamechart.CallStackAnalysisListener">
       </listener>
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph.callgraphDensity">
+         <analysisModuleClass
+               class="org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CallGraphAnalysis">
+         </analysisModuleClass>
+      </output>
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.internal.analysis.profiling.ui.flamegraph.flamegraphView">
+         <analysisModuleClass
+               class="org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CallGraphAnalysis">
+         </analysisModuleClass>
+      </output>
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph.statistics.callgraphstatistics">
+         <analysisModuleClass
+               class="org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CallGraphAnalysis">
+         </analysisModuleClass>
+      </output>
    </extension>
    <extension
          point="org.eclipse.tracecompass.tmf.core.symbolProvider">
