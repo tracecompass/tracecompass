@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
@@ -71,10 +72,13 @@ public class XMLAnalysesManagerPreferencePageTest {
     private static final String TEST_FILES_FOLDER = "test_xml_files/";
     private static final String VALID_FILES_FOLDER = "test_valid/";
     private static final String INVALID_FILES_FOLDER = "test_invalid/";
-    private static final String FILE_DELETE = "test_valid_extended";
-    private static final String FILE_IMPORT_VALID = "test_valid";
+    private static final String[] FILES_IMPORT_VALID = new String[] { "test_valid",
+                                                                      "test_valid_xml_timegraphView" };
     private static final String FILE_IMPORT_INVALID = "test_invalid";
-    private static final String FILE_EDIT = "kvm_exits";
+    private static final String[] FILES_DELETE = new String[] { "test_valid_extended",
+                                                                "test_valid_pattern" };
+    private static final String[] FILES_EDIT = new String[] { "kvm_exits",
+                                                              "test_consuming_fsm" };
     private static final String FILE_EXPORT = "state_provider_placement";
     private static final String[] FILES_BUTTONS = new String[] { "test_state_values",
                                                                  "test_state_values_pattern",
@@ -134,51 +138,69 @@ public class XMLAnalysesManagerPreferencePageTest {
     }
 
     /**
-     * Test opening up the preference page
+     * Test opening up the preference page through menu bar
      */
     @Test
-    public void testPreferencePage() {
+    public void testPreferencePageMenuBar() {
         SWTBot bot = openXMLAnalysesPreferences().bot();
         SWTBotUtils.pressOKishButtonInPreferences(bot);
     }
 
     /**
-     * Test the deletion of a file
+     * Test the deletion of files
      */
     @Test
     public void testDelete() {
         // Import valid analysis file
         SWTBot bot = openXMLAnalysesPreferences().bot();
-        importAnalysis(bot, TEST_FILES_FOLDER + VALID_FILES_FOLDER + FILE_DELETE + EXTENSION);
+        importAnalysis(bot, getRelativePaths(VALID_FILES_FOLDER, FILES_DELETE));
 
-        // Delete file
         SWTBotTable tablebot = bot.table(0);
-        tablebot.getTableItem(FILE_DELETE).select();
+
+        // Open editor for first file
+        tablebot.select(FILES_DELETE[0]);
+        bot.button("Edit...").click();
+
+        // Delete files
+        tablebot.select(FILES_DELETE);
         bot.button("Delete").click();
 
         // Check that the confirmation pop-up is displayed
         SWTBotShell deleteShell = bot.shell("Delete XML file").activate();
         deleteShell.bot().button("Yes").click();
 
-        // Check that the file does not exist anymore
-        assertFalse(tablebot.containsItem(FILE_DELETE));
+        // Check that the files do not exist anymore
+        for (String deleteFile : FILES_DELETE) {
+            assertFalse(deleteFile, tablebot.containsItem(deleteFile));
+        }
+
+        // Check that the opened editor was closed
+        fBot.editors().forEach(editor -> {
+            if (editor != null) {
+                if (editor.getTitle().equals(FILES_DELETE[0] + EXTENSION)) {
+                    fail("Editor is still open: " + FILES_DELETE[0] + EXTENSION);
+                }
+            }
+        });
 
         SWTBotUtils.pressOKishButtonInPreferences(bot);
     }
 
     /**
-     * Test the import of a valid file
+     * Test the import of valid files
      */
     @Test
     public void testImportValid() {
         // Import valid analysis file
         SWTBot bot = openXMLAnalysesPreferences().bot();
-        importAnalysis(bot, TEST_FILES_FOLDER + VALID_FILES_FOLDER + FILE_IMPORT_VALID + EXTENSION);
+        importAnalysis(bot, getRelativePaths(VALID_FILES_FOLDER, FILES_IMPORT_VALID));
 
         // Check that the "enabled" label is displayed
         SWTBotTable tablebot = bot.table(0);
-        tablebot.getTableItem(FILE_IMPORT_VALID).select();
-        assertTrue(bot.label("File enabled").isVisible());
+        for (String importedItem : FILES_IMPORT_VALID) {
+            tablebot.getTableItem(importedItem).select();
+            assertTrue(bot.label("File enabled").isVisible());
+        }
 
         SWTBotUtils.pressOKishButtonInPreferences(bot);
     }
@@ -204,20 +226,22 @@ public class XMLAnalysesManagerPreferencePageTest {
      */
     @Test
     public void testEdit() {
-        // Import valid analysis file
+        // Import valid analysis files
         SWTBot bot = openXMLAnalysesPreferences().bot();
-        importAnalysis(bot, TEST_FILES_FOLDER + VALID_FILES_FOLDER + FILE_EDIT + EXTENSION);
+        importAnalysis(bot, getRelativePaths(VALID_FILES_FOLDER, FILES_EDIT));
 
         // Open the editor
         SWTBotTable tablebot = bot.table(0);
-        tablebot.getTableItem(FILE_EDIT).select();
+        tablebot.select(FILES_EDIT);
         bot.button("Edit...").click();
 
         SWTBotUtils.pressOKishButtonInPreferences(bot);
 
-        // Check that the editor was opened
-        // No need to actually check that it is active
-        fBot.editorByTitle(FILE_EDIT + EXTENSION).isActive();
+        // Check that the editors were opened
+        // No need to actually check that they are active
+        for (String editFile : FILES_EDIT) {
+            fBot.editorByTitle(editFile + EXTENSION).isActive();
+        }
     }
 
     /**
@@ -254,9 +278,13 @@ public class XMLAnalysesManagerPreferencePageTest {
         SWTBotTable tableBot = bot.table(0);
 
         // Delete existing analysis files, if any
-        int rowCount = tableBot.rowCount();
-        for (int i = 0; i < rowCount; ++i) {
-            tableBot.getTableItem(0).select();
+        int rowsCount = tableBot.rowCount();
+        if (rowsCount > 0) {
+            String[] itemNames = new String[rowsCount];
+            for (int i = 0; i < rowsCount; ++i) {
+                itemNames[i] = tableBot.getTableItem(i).getText();
+            }
+            tableBot.select(itemNames);
             bot.button("Delete").click();
             SWTBotShell deleteShell = bot.shell("Delete XML file").activate();
             deleteShell.bot().button("Yes").click();
@@ -264,22 +292,21 @@ public class XMLAnalysesManagerPreferencePageTest {
 
         // Import files
         int preRowCount = tableBot.rowCount();
-        for (String file : FILES_BUTTONS) {
-            importAnalysis(bot, TEST_FILES_FOLDER + VALID_FILES_FOLDER + file + EXTENSION);
-        }
+        importAnalysis(bot, getRelativePaths(VALID_FILES_FOLDER, FILES_BUTTONS));
         int postRowCount = tableBot.rowCount();
         assertEquals(preRowCount + FILES_BUTTONS.length, postRowCount);
 
         // Uncheck selected
         int preCheckCount = SWTBotUtils.getTableCheckedItemCount(tableBot);
-        int uncheckIndex = 2;
-        tableBot.getTableItem(FILES_BUTTONS[uncheckIndex]).select();
+        int uncheckCount = 2;
+        String[] toUncheck = Arrays.copyOfRange(FILES_BUTTONS, 0, uncheckCount);
+        tableBot.select(toUncheck);
         bot.button(UNCHECK_SELECTED).click();
         int postCheckCount = SWTBotUtils.getTableCheckedItemCount(tableBot);
-        assertEquals(UNCHECK_SELECTED, preCheckCount - 1, postCheckCount);
+        assertEquals(UNCHECK_SELECTED, preCheckCount - uncheckCount, postCheckCount);
 
         // Check selected
-        tableBot.getTableItem(FILES_BUTTONS[uncheckIndex]).select();
+        tableBot.select(toUncheck);
         bot.button(CHECK_SELECTED).click();
         postCheckCount = SWTBotUtils.getTableCheckedItemCount(tableBot);
         assertEquals(CHECK_SELECTED, preCheckCount, postCheckCount);
@@ -311,12 +338,12 @@ public class XMLAnalysesManagerPreferencePageTest {
             File targetFile = File.createTempFile(FILE_EXPORT, EXTENSION);
             TmfFileDialogFactory.setOverrideFiles(targetFile.getAbsolutePath());
         } catch (IOException e) {
-            fail("Failed to export XML file");
+            fail("Failed to export XML file " + FILE_EXPORT);
         }
 
         // Export
         SWTBotTable tableBot = bot.table(0);
-        tableBot.getTableItem(FILE_EXPORT).select();
+        tableBot.select(FILE_EXPORT);
         bot.button("Export").click();
 
         SWTBotUtils.pressOKishButtonInPreferences(bot);
@@ -339,8 +366,20 @@ public class XMLAnalysesManagerPreferencePageTest {
         fLogger.removeAllAppenders();
     }
 
-    private static void importAnalysis(SWTBot bot, String relativePath) {
-        TmfFileDialogFactory.setOverrideFiles(Activator.getAbsolutePath(new Path(relativePath)).toString());
+    private static String[] getRelativePaths(String folder, String[] files) {
+        String[] relativePaths = new String[files.length];
+        for (int i = 0; i < files.length; ++i) {
+            relativePaths[i] = TEST_FILES_FOLDER + folder + files[i] + EXTENSION;
+        }
+        return relativePaths;
+    }
+
+    private static void importAnalysis(SWTBot bot, String... relativePaths) {
+        String[] absolutePaths = new String[relativePaths.length];
+        for (int i = 0; i < relativePaths.length; ++i) {
+            absolutePaths[i] = Activator.getAbsolutePath(new Path(relativePaths[i])).toString();
+        }
+        TmfFileDialogFactory.setOverrideFiles(absolutePaths);
         bot.button("Import").click();
         SWTBotUtils.waitUntil(tree -> tree.rowCount() > 0, bot.tree(0), "Failed to import analysis");
     }
@@ -357,5 +396,4 @@ public class XMLAnalysesManagerPreferencePageTest {
         treeNode.select();
         return preferencesShell;
     }
-
 }

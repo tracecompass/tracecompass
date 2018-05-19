@@ -425,14 +425,23 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
      * Import new analysis.
      */
     private void importAnalysis() {
-        FileDialog dialog = TmfFileDialogFactory.create(Display.getCurrent().getActiveShell(), SWT.OPEN);
+        FileDialog dialog = TmfFileDialogFactory.create(Display.getCurrent().getActiveShell(), SWT.OPEN | SWT.MULTI);
         dialog.setText(Messages.ManageXMLAnalysisDialog_SelectFileImport);
         dialog.setFilterNames(new String[] { Messages.ManageXMLAnalysisDialog_ImportXmlFile + " (" + XML_FILTER_EXTENSION + ")" }); //$NON-NLS-1$ //$NON-NLS-2$
         dialog.setFilterExtensions(new String[] { XML_FILTER_EXTENSION });
-        String path = dialog.open();
-        if (path != null) {
-            File file = new File(path);
-            if (loadXmlFile(file, true)) {
+        dialog.open();
+        String directoryPath = dialog.getFilterPath();
+        if (!directoryPath.isEmpty()) {
+            File directory = new File(directoryPath);
+            String[] files = dialog.getFileNames();
+            boolean isFileImported = false;
+            for (String fileName : files) {
+                File file = new File(directory, fileName);
+                if (loadXmlFile(file, true)) {
+                    isFileImported |= true;
+                }
+            }
+            if (isFileImported) {
                 fillAnalysesTable();
             }
         }
@@ -475,23 +484,23 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
      * Export analysis to new file.
      */
     private void exportAnalysis() {
-        /**
-         * FIXME support exporting multiple files?
-         */
         FileDialog dialog = TmfFileDialogFactory.create(Display.getCurrent().getActiveShell(), SWT.SAVE);
-        String selection = fAnalysesTable.getSelection()[0].getText();
-        dialog.setText(NLS.bind(Messages.ManageXMLAnalysisDialog_SelectFileExport, selection));
-        dialog.setFilterExtensions(new String[] { XML_FILTER_EXTENSION, TmfXmlStrings.WILDCARD });
-        String selectionXml = XmlUtils.createXmlFileString(selection);
-        dialog.setFileName(selectionXml);
-        String path = dialog.open();
-        if (path != null && !XmlUtils.exportXmlFile(selectionXml, path).isOK()) {
-            Activator.logError(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToExport, selectionXml));
+        TableItem[] selection = fAnalysesTable.getSelection();
+        for (TableItem item : selection) {
+            String fileName = item.getText();
+            dialog.setText(NLS.bind(Messages.ManageXMLAnalysisDialog_SelectFileExport, fileName));
+            dialog.setFilterExtensions(new String[] { XML_FILTER_EXTENSION, TmfXmlStrings.WILDCARD });
+            String fileNameXml = XmlUtils.createXmlFileString(fileName);
+            dialog.setFileName(fileNameXml);
+            String path = dialog.open();
+            if (path != null && !XmlUtils.exportXmlFile(fileNameXml, path).isOK()) {
+                Activator.logError(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToExport, fileNameXml));
+            }
         }
     }
 
     /**
-     * Edit analysis file with built-in editor.
+     * Edit analysis file(s) with built-in editor.
      */
     private void editAnalysis() {
         for (TableItem item : fAnalysesTable.getSelection()) {
@@ -523,7 +532,8 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
     }
 
     /**
-     * Delete an analysis and remove the corresponding file.
+     * Delete an analysis, remove the corresponding file, and close the editor, if
+     * opened.
      */
     private void deleteAnalysis() {
         boolean confirm = MessageDialog.openQuestion(
@@ -531,15 +541,22 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
                 Messages.ManageXMLAnalysisDialog_DeleteFile,
                 Messages.ManageXMLAnalysisDialog_DeleteConfirmation);
         if (confirm) {
+            Set<IEditorReference> editorReferences = getEditorReferences();
             List<TmfCommonProjectElement> elements = new ArrayList<>();
             for (TableItem item : fAnalysesTable.getSelection()) {
-                String selection = XmlUtils.createXmlFileString(item.getText());
+                String itemTitle = XmlUtils.createXmlFileString(item.getText());
+                // If opened, close the editor before deleting the file
+                editorReferences.forEach(editorReference -> {
+                    if (editorReference.getTitle().equals(itemTitle)) {
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeEditor(editorReference.getEditor(false), false);
+                    }
+                });
                 // We do not need to re-open the elements of an analysis that was already
                 // disabled
-                if (XmlUtils.isAnalysisEnabled(selection)) {
-                    elements.addAll(deleteSupplementaryFile(selection));
+                if (XmlUtils.isAnalysisEnabled(itemTitle)) {
+                    elements.addAll(deleteSupplementaryFile(itemTitle));
                 }
-                XmlUtils.deleteFile(selection);
+                XmlUtils.deleteFile(itemTitle);
             }
             fillAnalysesTable();
             fInvalidFileLabel.setVisible(false);
@@ -576,13 +593,7 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
                     tElements.addAll(experimentsFolder.getExperiments());
                 }
 
-                Set<IEditorReference> editorReferences = new HashSet<>();
-                IWorkbench wb = PlatformUI.getWorkbench();
-                for (IWorkbenchWindow wbWindow : wb.getWorkbenchWindows()) {
-                    for (IWorkbenchPage wbPage : wbWindow.getPages()) {
-                        editorReferences.addAll(Arrays.asList(wbPage.getEditorReferences()));
-                    }
-                }
+                Set<IEditorReference> editorReferences = getEditorReferences();
 
                 for (TmfCommonProjectElement tElement : tElements) {
                     for (IResource resource : tElement.getSupplementaryResources()) {
@@ -668,5 +679,21 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
         Map<String, File> files = XmlUtils.listFiles();
         File file = files.get(xmlName);
         return (file != null && XmlUtils.xmlValidate(file).isOK());
+    }
+
+    /**
+     * Get editor references.
+     *
+     * @return the set of editor references
+     */
+    private static Set<IEditorReference> getEditorReferences() {
+        Set<IEditorReference> editorReferences = new HashSet<>();
+        IWorkbench wb = PlatformUI.getWorkbench();
+        for (IWorkbenchWindow wbWindow : wb.getWorkbenchWindows()) {
+            for (IWorkbenchPage wbPage : wbWindow.getPages()) {
+                editorReferences.addAll(Arrays.asList(wbPage.getEditorReferences()));
+            }
+        }
+        return editorReferences;
     }
 }
