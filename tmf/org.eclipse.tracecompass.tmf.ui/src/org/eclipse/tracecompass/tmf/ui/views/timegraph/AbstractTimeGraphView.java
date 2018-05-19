@@ -32,7 +32,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -80,12 +79,8 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -369,8 +364,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     private IContextService fContextService;
 
-    private final AtomicBoolean fIsMouseInTimegraph = new AtomicBoolean(false);
-
     private List<IContextActivation> fActiveContexts = new ArrayList<>();
 
     // ------------------------------------------------------------------------
@@ -387,10 +380,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         @Override
         public void addListener(ILabelProviderListener listener) {
+            // do nothing
         }
 
         @Override
         public void dispose() {
+            // do nothing
         }
 
         @Override
@@ -400,6 +395,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         @Override
         public void removeListener(ILabelProviderListener listener) {
+            // do nothing
         }
 
         @Override
@@ -1187,8 +1183,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         fTimeGraphViewer.setWeights(fWeight);
 
         TimeGraphControl timeGraphControl = fTimeGraphViewer.getTimeGraphControl();
-
-        fTimeEventFilterAction = new Action() {
+        Action timeEventFilterAction = new Action() {
 
             @Override
             public void run() {
@@ -1204,19 +1199,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             }
         };
 
-        timeGraphControl.addKeyListener(new KeyListener() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.character == '/') {
-                    fTimeEventFilterAction.run();
-                }
-            }
+        fTimeEventFilterAction = timeEventFilterAction;
 
-            @Override
-            public void keyReleased(KeyEvent e) {
-                // Do nothing
-            }
-        });
 
         fTimeGraphViewer.addRangeListener(new ITimeGraphRangeListener() {
             @Override
@@ -1355,27 +1339,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         if (timeGraphControl.isInFocus()) {
             activateContextService();
         }
-        timeGraphControl.addMouseTrackListener(new MouseTrackListener() {
-
-            @Override
-            public void mouseHover(MouseEvent e) {
-                // do nothing
-            }
-
-            @Override
-            public void mouseExit(MouseEvent e) {
-                fIsMouseInTimegraph.set(false);
-                deactivateContextService();
-            }
-
-            @Override
-            public void mouseEnter(MouseEvent e) {
-                fIsMouseInTimegraph.set(true);
-                if (timeGraphControl.isInFocus()) {
-                    activateContextService();
-                }
-            }
-        });
         timeGraphControl.addFocusListener(new FocusListener() {
 
             @Override
@@ -1385,9 +1348,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
             @Override
             public void focusGained(FocusEvent e) {
-                if (fIsMouseInTimegraph.get()) {
-                   activateContextService();
-                }
+                activateContextService();
             }
         });
     }
@@ -2632,6 +2593,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     public void addPaintListener(PaintListener listener) {
         Control tgControl = getTimeGraphViewer().getTimeGraphControl();
         tgControl.addPaintListener(listener);
+    }
+
+    /**
+     * Gets the time event filter action
+     *
+     * @return the timeEventFilterAction
+     * @since 4.1
+     */
+    public Action getTimeEventFilterAction() {
+        return fTimeEventFilterAction;
     }
 
     /*

@@ -1262,11 +1262,17 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *            true to zoom in, false to zoom out
      */
     public void zoom(boolean zoomIn) {
-        int globalX = getDisplay().getCursorLocation().x;
-        Point p = toControl(globalX, 0);
+        Point cursorDisplayLocation = getDisplay().getCursorLocation();
+        Point cursorControlLocation = toControl(cursorDisplayLocation);
+        Point cursorParentLocation = getParent().toControl(cursorDisplayLocation);
+        Rectangle controlBounds = getBounds();
+        // check the X axis only
+        if (!controlBounds.contains(cursorParentLocation.x, controlBounds.y)) {
+            return;
+        }
         int nameSpace = fTimeProvider.getNameSpace();
         int timeSpace = fTimeProvider.getTimeSpace();
-        int xPos = Math.max(nameSpace, Math.min(nameSpace + timeSpace, p.x));
+        int xPos = Math.max(nameSpace, Math.min(nameSpace + timeSpace, cursorControlLocation.x));
         long time0 = fTimeProvider.getTime0();
         long time1 = fTimeProvider.getTime1();
         long interval = time1 - time0;
