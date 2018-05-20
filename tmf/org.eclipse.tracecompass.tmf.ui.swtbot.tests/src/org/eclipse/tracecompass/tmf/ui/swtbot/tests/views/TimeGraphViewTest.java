@@ -42,6 +42,7 @@ import org.eclipse.swtbot.swt.finder.results.IntResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
@@ -492,6 +493,42 @@ public class TimeGraphViewTest {
         assertEquals(Collections.singleton(BLACK), result);
     }
 
+    private static class PaletteIsPresent extends DefaultCondition  {
+
+        private String fFailureMessage;
+        private List<RGB> fRgbs;
+        private Rectangle fRect;
+
+
+        public PaletteIsPresent(List<RGB> rgbs, Rectangle bounds) {
+            fRgbs = rgbs;
+            fRect = bounds;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            ImageHelper image = ImageHelper.grabImage(fRect);
+            if (image == null) {
+                fFailureMessage = "Grabbed image is null";
+                return false;
+            }
+            Multiset<RGB> histogram = image.getHistogram();
+            for (RGB rgb : fRgbs) {
+                if (histogram.count(rgb) <= 0) {
+                    fFailureMessage = "Color not found: " + rgb;
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return fFailureMessage;
+        }
+    }
+
+
     /**
      * Test time graph with color palettes
      */
@@ -508,13 +545,9 @@ public class TimeGraphViewTest {
                 return paletteBlue;
             }
         }));
-        ImageHelper blueish = ImageHelper.grabImage(bounds);
-        assertNotNull(blueish);
-        Multiset<RGB> histogram = blueish.getHistogram();
         List<RGB> rgbs = Lists.transform(paletteBlue.get(), a->RGBAUtil.fromInt(a.toInt()).rgb);
-        for (RGB rgb : rgbs) {
-            assertTrue(rgb.toString(), histogram.count(rgb) > 0);
-        }
+        fViewBot.bot().waitUntil(new PaletteIsPresent(rgbs, bounds));
+
         IPaletteProvider paletteGreen = SequentialPaletteProvider.create(new RGBAColor(0x23, 0xf3, 0x67, 0xff), 5);
         UIThreadRunnable.syncExec(() -> view.setPresentationProvider(new PalettedPresentationProvider() {
             @Override
@@ -522,13 +555,9 @@ public class TimeGraphViewTest {
                 return paletteGreen;
             }
         }));
-        ImageHelper greenish = ImageHelper.grabImage(bounds);
-        assertNotNull(greenish);
-        histogram = greenish.getHistogram();
         rgbs = Lists.transform(paletteGreen.get(), a->RGBAUtil.fromInt(a.toInt()).rgb);
-        for (RGB rgb : rgbs) {
-            assertTrue(rgb.toString(), histogram.count(rgb) > 0);
-        }
+        fViewBot.bot().waitUntil(new PaletteIsPresent(rgbs, bounds));
+
         IPaletteProvider rotating = new QualitativePaletteProvider.Builder().setAttenuation(0.5f).setBrightness(1.0f).setNbColors(4).build();
         UIThreadRunnable.syncExec(() -> view.setPresentationProvider(new PalettedPresentationProvider() {
             @Override
@@ -536,13 +565,8 @@ public class TimeGraphViewTest {
                 return rotating;
             }
         }));
-        ImageHelper rainbowish = ImageHelper.grabImage(bounds);
-        assertNotNull(rainbowish);
-        histogram = rainbowish.getHistogram();
         rgbs = Lists.transform(rotating.get(), a->RGBAUtil.fromInt(a.toInt()).rgb);
-        for (RGB rgb : rgbs) {
-            assertTrue(rgb.toString(), histogram.count(rgb) > 0);
-        }
+        fViewBot.bot().waitUntil(new PaletteIsPresent(rgbs, bounds));
     }
 
     /**
