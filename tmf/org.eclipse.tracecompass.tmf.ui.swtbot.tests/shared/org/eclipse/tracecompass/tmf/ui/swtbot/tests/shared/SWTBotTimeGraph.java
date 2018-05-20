@@ -104,6 +104,7 @@ public class SWTBotTimeGraph extends AbstractSWTBotControl<TimeGraphControl> {
                 }
             });
             ITableLabelProvider labelProvider = timegraph.getLabelProvider();
+            parent.set(null);
             for (String name : names) {
                 boolean found = false;
                 for (ITimeGraphEntry entry : entries) {
@@ -120,7 +121,7 @@ public class SWTBotTimeGraph extends AbstractSWTBotControl<TimeGraphControl> {
                 }
             }
             return true;
-        }, widget, "Timed out waiting for time graph entry " + missing.get());
+        }, widget, () -> "Timed out waiting for time graph entry " + missing.get() + " of parent " + parent.get());
         return new SWTBotTimeGraphEntry(widget, parent.get());
     }
 

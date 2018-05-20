@@ -178,7 +178,7 @@ public class SWTBotTimeGraphEntry extends AbstractSWTBotControl<TimeGraphControl
                 }
             }
             return false;
-        }, widget, "Timed out waiting for time graph entry " + name);
+        }, widget, () -> "Timed out waiting for time graph entry " + name);
         return new SWTBotTimeGraphEntry(widget, found.get());
     }
 
