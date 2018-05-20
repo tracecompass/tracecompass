@@ -180,9 +180,8 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(getViewBot().bot());
         timeGraph.setFocus();
 
-        /* select first item */
-        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.HOME);
-        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.DOWN);
+        /* select first thread */
+        timeGraph.getEntry(LttngTraceGenerator.getName(), "gnuplot").select();
 
         /* click "Select Next State Change" 3 times */
         selectNext.run();
@@ -577,9 +576,8 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(viewBot.bot());
         timeGraph.setFocus();
 
-        /* select first item */
-        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.HOME);
-        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.DOWN);
+        /* select first thread */
+        timeGraph.getEntry(LttngTraceGenerator.getName(), "gnuplot").select();
 
         /* click "Follow CPU Forward" 3 times */
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME));
