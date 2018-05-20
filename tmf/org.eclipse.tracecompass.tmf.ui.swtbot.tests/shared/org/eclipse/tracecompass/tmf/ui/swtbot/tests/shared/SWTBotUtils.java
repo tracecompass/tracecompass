@@ -29,6 +29,7 @@ import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.commands.ExecutionException;
@@ -1337,6 +1338,23 @@ public final class SWTBotUtils {
      *             value
      */
     public static <E> void waitUntil(final Predicate<E> predicate, final E argument, final String failureMessage) {
+        WaitUtils.waitUntil(predicate, argument, failureMessage, SWTBotPreferences.TIMEOUT);
+    }
+
+    /**
+     * Wait for a predicate to succeed.
+     *
+     * @param predicate
+     *            The predicate
+     * @param argument
+     *            The argument used by the predicate for match
+     * @param failureMessage
+     *            The failure message supplier
+     * @throws WaitTimeoutException
+     *             if the waiting time passes the {@link SWTBotPreferences#TIMEOUT}
+     *             value
+     */
+    public static <E> void waitUntil(final Predicate<E> predicate, final E argument, final Supplier<String> failureMessage) {
         WaitUtils.waitUntil(predicate, argument, failureMessage, SWTBotPreferences.TIMEOUT);
     }
 }

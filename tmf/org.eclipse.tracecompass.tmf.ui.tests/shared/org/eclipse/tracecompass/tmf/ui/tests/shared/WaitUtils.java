@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.tmf.ui.tests.shared;
 
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
@@ -124,6 +125,37 @@ public final class WaitUtils {
     }
 
     /**
+     * Wait for a predicate to succeed.
+     * <p>
+     * Note: When testing with SWTBot, use SWTBotUtils.waitUntil() to use SWTBot's
+     * timeout preference value.
+     *
+     * @param predicate
+     *            The predicate
+     * @param argument
+     *            The argument used by the predicate for match
+     * @param failureMessage
+     *            The failure message supplier
+     * @throws WaitTimeoutException
+     *             once the waiting time passes the maximum value
+     */
+    public static <E> void waitUntil(final Predicate<E> predicate, final E argument, final Supplier<String> failureMessage) {
+        IWaitCondition condition = new IWaitCondition() {
+
+            @Override
+            public boolean test() throws Exception {
+                return predicate.test(argument);
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return failureMessage.get();
+            }
+        };
+        waitUntil(condition);
+    }
+
+    /**
      * Waits for a certain condition to be met.
      *
      * @param condition
@@ -184,6 +216,25 @@ public final class WaitUtils {
      *             once the waiting time passes the maximum value
      */
     public static <E> void waitUntil(final Predicate<E> predicate, final E argument, final String failureMessage, long maxWait) {
+        waitUntil(predicate, argument, () -> failureMessage, maxWait);
+    }
+
+    /**
+     * Wait for a predicate to succeed.
+     *
+     * @param predicate
+     *            The predicate
+     * @param argument
+     *            The argument used by the predicate for match
+     * @param failureMessage
+     *            The failure message supplier
+     * @param maxWait
+     *            the maximum time to wait, in milliseconds. Once the waiting time
+     *            passes the maximum value, a WaitTimeoutException is thrown
+     * @throws WaitTimeoutException
+     *             once the waiting time passes the maximum value
+     */
+    public static <E> void waitUntil(final Predicate<E> predicate, final E argument, final Supplier<String> failureMessage, long maxWait) {
         IWaitCondition condition = new IWaitCondition() {
 
             @Override
@@ -193,7 +244,7 @@ public final class WaitUtils {
 
             @Override
             public String getFailureMessage() {
-                return failureMessage;
+                return failureMessage.get();
             }
         };
         waitUntil(condition, maxWait);
