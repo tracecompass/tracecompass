@@ -598,7 +598,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 TimeEventFilterDialog filterDialog = getTimeEventFilterDialog();
                 if (filterDialog != null && computedLinks != null) {
                     if (filterDialog.hasActiveSavedFilters()) {
-                        computedLinks = null;
+                        computedLinks = Collections.emptyList();
                     } else {
                         computedLinks.forEach(link -> link.setProperty(IFilterProperty.DIMMED, filterDialog.isFilterActive()));
                     }
