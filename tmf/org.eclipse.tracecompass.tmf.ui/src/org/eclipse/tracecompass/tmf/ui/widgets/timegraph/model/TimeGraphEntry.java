@@ -27,6 +27,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 
+import com.google.common.collect.Iterables;
+
 /**
  * An entry for use in the time graph views
  */
@@ -470,6 +472,6 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      * @since 4.0
      */
     public boolean hasZoomedEvents() {
-        return !fZoomedEventList.isEmpty();
+        return !fZoomedEventList.isEmpty() && Iterables.any(fZoomedEventList, event -> !(event instanceof NullTimeEvent));
     }
 }

@@ -750,10 +750,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             return null;
         }
         Pattern filterPattern = Pattern.compile(regex);
-        Predicate<Map<String, String>> filterPredicate = (toTest) -> {
-            return Iterables.any(toTest.entrySet(), entry -> filterPattern.matcher(entry.getValue()).find());
-        };
-        return filterPredicate;
+        return (toTest) -> Iterables.any(toTest.entrySet(), entry -> filterPattern.matcher(entry.getValue()).find());
     }
 
     // ------------------------------------------------------------------------

@@ -295,14 +295,14 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
             }
             // String interval
             int value = getStringIndex(label);
-            return new TimeEvent(entry, state.getStartTime(), state.getDuration(), value);
+            return new TimeEvent(entry, state.getStartTime(), state.getDuration(), value, state.getActiveProperties());
         }
 
         XmlPresentationProvider pres = getPresentationProvider();
         if (label != null && !pres.hasIndex(status)) {
             status = getStringIndex(label);
         }
-        return new TimeEvent(entry, state.getStartTime(), state.getDuration(), status);
+        return new TimeEvent(entry, state.getStartTime(), state.getDuration(), status, state.getActiveProperties());
     }
 
     private int getStringIndex(String state) {

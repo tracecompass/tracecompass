@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +35,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStat
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readonly.TmfXmlReadOnlyModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlTimeGraphEntryModel.Builder;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -335,7 +337,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
         List<@NonNull ITimeGraphRowModel> allRows = new ArrayList<>();
         try {
             for (Entry<ITmfStateSystem, Map<Integer, Long>> ssEntry : table.rowMap().entrySet()) {
-                Collection<@NonNull ITimeGraphRowModel> rows = createRows(ssEntry.getKey(), ssEntry.getValue(), filter.getTimesRequested(), monitor);
+                Collection<@NonNull ITimeGraphRowModel> rows = createRows(ssEntry.getKey(), ssEntry.getValue(), filter.getTimesRequested(), filter, monitor);
                 allRows.addAll(rows);
             }
         } catch (IndexOutOfBoundsException | TimeRangeException | StateSystemDisposedException e) {
@@ -344,8 +346,14 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
         return new TmfModelResponse<>(allRows, Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
-    private static @NonNull Collection<@NonNull ITimeGraphRowModel> createRows(ITmfStateSystem ss, Map<Integer, Long> idToDisplayQuark,
-            long[] timesRequested, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
+    private @NonNull Collection<@NonNull ITimeGraphRowModel> createRows(ITmfStateSystem ss, Map<Integer, Long> idToDisplayQuark,
+            long[] timesRequested, SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        if (filter instanceof TimeGraphStateQueryFilter) {
+            TimeGraphStateQueryFilter timeEventFilter = (TimeGraphStateQueryFilter) filter;
+            predicates.putAll(computeRegexPredicate(timeEventFilter));
+        }
+
         Map<Integer, ITimeGraphRowModel> quarkToRow = new HashMap<>(idToDisplayQuark.size());
         for (Entry<Integer, Long> entry : idToDisplayQuark.entrySet()) {
             quarkToRow.put(entry.getKey(), new TimeGraphRowModel(entry.getValue(), new ArrayList<>()));
@@ -356,7 +364,9 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
             }
             ITimeGraphRowModel row = quarkToRow.get(interval.getAttribute());
             if (row != null) {
-                row.getStates().add(getStateFromInterval(interval));
+                List<@NonNull ITimeGraphState> states = row.getStates();
+                ITimeGraphState timeGraphState = getStateFromInterval(interval);
+                addToStateList(states, timeGraphState, row.getEntryID(), predicates, monitor);
             }
         }
         for (ITimeGraphRowModel model : quarkToRow.values()) {

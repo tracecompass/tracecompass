@@ -17,12 +17,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
 import org.eclipse.tracecompass.internal.tmf.core.model.timegraph.AbstractTimeGraphDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -233,14 +236,24 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         }
         subMonitor.worked(1);
 
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        if (filter instanceof TimeGraphStateQueryFilter) {
+            TimeGraphStateQueryFilter timeEventFilter = (TimeGraphStateQueryFilter) filter;
+            predicates.putAll(computeRegexPredicate(timeEventFilter));
+        }
+
         List<ITimeGraphRowModel> rows = new ArrayList<>();
         for (Map.Entry<Long, Integer> entry : entries.entrySet()) {
             if (subMonitor.isCanceled()) {
                 return null;
             }
             Collection<ITmfStateInterval> states = intervals.get(entry.getValue());
+            Long key = Objects.requireNonNull(entry.getKey());
             List<ITimeGraphState> eventList = new ArrayList<>(states.size());
-            states.forEach(state -> eventList.add(createTimeGraphState(state)));
+            states.forEach(state -> {
+                ITimeGraphState timeGraphState = createTimeGraphState(state);
+                addToStateList(eventList, timeGraphState, key, predicates, monitor);
+            });
             eventList.sort(Comparator.comparingLong(ITimeGraphState::getStartTime));
             rows.add(new TimeGraphRowModel(entry.getKey(), eventList));
         }

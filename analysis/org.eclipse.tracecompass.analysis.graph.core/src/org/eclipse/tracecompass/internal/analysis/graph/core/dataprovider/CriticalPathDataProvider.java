@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Predicate;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -33,6 +34,7 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.graph.core.base.TmfGraphStatistics;
 import org.eclipse.tracecompass.internal.analysis.graph.core.base.TmfGraphVisitor;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
@@ -43,8 +45,8 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
-import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse.Status;
+import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.cache.CacheBuilder;
@@ -162,6 +164,13 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
         if (visitor == null) {
             return new TmfModelResponse<>(null, Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
+
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        if (filter instanceof TimeGraphStateQueryFilter) {
+            TimeGraphStateQueryFilter timeEventFilter = (TimeGraphStateQueryFilter) filter;
+            predicates.putAll(computeRegexPredicate(timeEventFilter));
+        }
+
         List<@NonNull ITimeGraphRowModel> rowModels = new ArrayList<>();
         for (Long id : filter.getSelectedItems()) {
             /*
@@ -174,7 +183,9 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
                 List<ITimeGraphState> filteredStates = new ArrayList<>();
                 for (ITimeGraphState state : states) {
                     if (overlaps(state.getStartTime(), state.getDuration(), filter.getTimesRequested())) {
-                        filteredStates.add(state);
+                        // Reset the properties for this state before filtering
+                        state.setActiveProperties(0);
+                        addToStateList(filteredStates, state, id, predicates, monitor);
                     }
                 }
                 rowModels.add(new TimeGraphRowModel(id, filteredStates));
