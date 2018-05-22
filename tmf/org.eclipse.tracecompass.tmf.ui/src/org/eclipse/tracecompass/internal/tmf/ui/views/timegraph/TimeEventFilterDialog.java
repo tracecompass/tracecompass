@@ -44,8 +44,6 @@ import org.eclipse.ui.PlatformUI;
  * This class implements a time event filter dialog.
  *
  * @author Jean-Christian Kouame
- * @since 4.0
- *
  */
 public class TimeEventFilterDialog extends Dialog {
 
@@ -80,7 +78,6 @@ public class TimeEventFilterDialog extends Dialog {
      *
      * @param parentShell
      *            The parent shell of the dialog
-     * @param bounds The timegraph control bounds
      * @param view
      *            The timegraph this dialog belongs to
      * @param control The timegraph control

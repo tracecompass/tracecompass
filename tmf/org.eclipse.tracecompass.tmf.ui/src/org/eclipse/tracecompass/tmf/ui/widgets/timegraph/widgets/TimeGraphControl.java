@@ -2672,7 +2672,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     private static Map<String, Object> applyEventStyleProperties(Map<String, Object> styleMap, ITimeEvent event) {
         Map<String, Object> updatedStyles = new HashMap<>(styleMap);
-        if (event.isPropertyActive(IFilterProperty.isDimmed())) {
+        if (event.isPropertyActive(IFilterProperty.DIMMED)) {
             Integer colorInt = (Integer) updatedStyles.getOrDefault(ITimeEventStyleStrings.fillColor(), 255);
             RGBAColor oldRgbaColor = new RGBAColor(colorInt);
             RGBAColor rgbaColor = new RGBAColor(oldRgbaColor.getRed(), oldRgbaColor.getGreen(), oldRgbaColor.getBlue(), Integer.divideUnsigned(oldRgbaColor.getAlpha(), DIMMED_ALPHA_COEFFICIENT));

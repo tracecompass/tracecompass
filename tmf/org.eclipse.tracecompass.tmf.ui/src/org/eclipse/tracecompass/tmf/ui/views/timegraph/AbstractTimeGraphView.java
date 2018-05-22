@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -636,7 +637,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             long zoomStartTime, long zoomEndTime, long resolution, @NonNull IProgressMonitor monitor) {
 
         try {
-            Map<String, BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>>> predicates = computeRegexPredicate();
+            Map<Integer, BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>>> predicates = computeRegexPredicate();
 
             for (TimeGraphEntry entry : entries) {
                 List<ITimeEvent> zoomedEventList = getEventList(entry, zoomStartTime, zoomEndTime, resolution, monitor);
@@ -666,16 +667,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @since 4.0
      */
     @NonNullByDefault
-    protected void doFilterEvents(TimeGraphEntry entry, List<ITimeEvent> eventList, Map<String, BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>>> predicates) {
+    protected void doFilterEvents(TimeGraphEntry entry, List<ITimeEvent> eventList, Map<Integer, BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>>> predicates) {
         if (!predicates.isEmpty()) {
             // For each event in the events list, test each predicates and set the
             // status of the property associated to the predicate
             eventList.forEach(te -> {
-                for (Map.Entry<String, BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>>> mapEntry : predicates.entrySet()) {
+                for (Map.Entry<Integer, BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>>> mapEntry : predicates.entrySet()) {
                     BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>> value = Objects.requireNonNull(mapEntry.getValue());
                     boolean status = value.test(te, item -> getPresentationProvider().getFilterInput((ITimeEvent) item));
-                    String property = mapEntry.getKey();
-                    if (property.equals(IFilterProperty.isDimmed()) || property.equals(IFilterProperty.exclude())) {
+                    Integer property = mapEntry.getKey();
+                    if (property == IFilterProperty.DIMMED || property == IFilterProperty.EXCLUDE) {
                         te.setProperty(property, !status);
                     } else {
                         te.setProperty(property, status);
@@ -689,7 +690,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
             eventList.forEach(te -> {
                 // Keep only the events that do not have the 'exclude' property activated
-                if (!te.isPropertyActive(IFilterProperty.exclude())) {
+                if (!te.isPropertyActive(IFilterProperty.EXCLUDE)) {
                     filtered.add(te);
                 }
             });
@@ -701,7 +702,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             for (ITimeEvent event : filtered) {
                 if (prevTime < event.getTime()) {
                     NullTimeEvent nullTimeEvent = new NullTimeEvent(entry, prevTime, event.getTime() - prevTime);
-                    nullTimeEvent.setProperty(IFilterProperty.isDimmed(), true);
+                    nullTimeEvent.setProperty(IFilterProperty.DIMMED, true);
                     eventList.add(nullTimeEvent);
                 }
                 eventList.add(event);
@@ -709,7 +710,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             }
             if (!eventList.isEmpty() && prevTime < endTime) {
                 NullTimeEvent nullTimeEvent = new NullTimeEvent(entry, prevTime, endTime - prevTime);
-                nullTimeEvent.setProperty(IFilterProperty.isDimmed(), true);
+                nullTimeEvent.setProperty(IFilterProperty.DIMMED, true);
                 eventList.add(nullTimeEvent);
             }
         }
@@ -722,10 +723,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @since 4.0
      */
     @NonNullByDefault
-    protected Map<String, BiPredicate<IElementResolver, @NonNull Function<@NonNull IElementResolver, @NonNull Map<@NonNull String, @NonNull String>>>> computeRegexPredicate() {
-        Multimap<@NonNull String, @NonNull String> regexes = getRegexes();
-        Map<@NonNull String, @NonNull BiPredicate<IElementResolver, @NonNull Function<IElementResolver, @NonNull Map<@NonNull String, @NonNull String>>>> predicates = new HashMap<>();
-        for (Map.Entry<String, Collection<String>> entry : regexes.asMap().entrySet()) {
+    protected Map<Integer, BiPredicate<IElementResolver, Function<IElementResolver, Map<String, String>>>> computeRegexPredicate() {
+        Multimap<Integer, String> regexes = getRegexes();
+        Map<@NonNull Integer, @NonNull BiPredicate<IElementResolver, @NonNull Function<IElementResolver, @NonNull Map<@NonNull String, @NonNull String>>>> predicates = new HashMap<>();
+        for (Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
             for (String regex : Objects.requireNonNull(entry.getValue())) {
                 if (regex.isEmpty()) {
                     continue;
@@ -2514,16 +2515,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @return The multimap of regexes by property
      * @since 4.0
      */
-    protected @NonNull Multimap<@NonNull String, @NonNull String> getRegexes() {
-        Multimap<@NonNull String, @NonNull String> regexes = HashMultimap.create();
+    protected @NonNull Multimap<@NonNull Integer, @NonNull String> getRegexes() {
+        Multimap<@NonNull Integer, @NonNull String> regexes = HashMultimap.create();
 
         @NonNull String dialogRegex = fTimeEventFilterDialog != null ? fTimeEventFilterDialog.getTextBoxRegex() : ""; //$NON-NLS-1$
-        regexes.put(IFilterProperty.isDimmed(), dialogRegex);
+        regexes.put(IFilterProperty.DIMMED, dialogRegex);
 
         Set<@NonNull String> savedFilters = fTimeEventFilterDialog != null ? fTimeEventFilterDialog.getSavedFilters() : Collections.emptySet();
         for (String savedFilter : savedFilters) {
-            regexes.put(IFilterProperty.exclude(), savedFilter);
-            regexes.put(IFilterProperty.isDimmed(), savedFilter);
+            regexes.put(IFilterProperty.EXCLUDE, savedFilter);
+            regexes.put(IFilterProperty.DIMMED, savedFilter);
         }
 
         return regexes;

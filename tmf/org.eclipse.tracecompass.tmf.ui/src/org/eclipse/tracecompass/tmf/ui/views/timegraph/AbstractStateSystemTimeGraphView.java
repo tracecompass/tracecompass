@@ -193,7 +193,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             List<ITimeEvent> eventList = getEventList(entry, ss, fullStates, prevFullState, monitor);
 
             try {
-                @NonNull Map<@NonNull String, @NonNull BiPredicate<@NonNull IElementResolver, @NonNull Function<@NonNull IElementResolver, @NonNull Map<@NonNull String, @NonNull String>>>> predicates = computeRegexPredicate();
+                @NonNull Map<@NonNull Integer, @NonNull BiPredicate<@NonNull IElementResolver, @NonNull Function<@NonNull IElementResolver, @NonNull Map<@NonNull String, @NonNull String>>>> predicates = computeRegexPredicate();
 
                 if (eventList != null) {
                     doFilterEvents(entry, eventList, predicates);

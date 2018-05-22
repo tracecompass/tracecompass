@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.tmf.ui.views.timechart;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
 
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSettingsManager;
@@ -387,13 +386,4 @@ public class TimeChartEvent implements ITimeEvent {
             }
         }
     }
-
-    /**
-     * @since 4.0
-     */
-    @Override
-    public Set<String> getActiveProperties() {
-        throw new UnsupportedOperationException("Not supported"); //$NON-NLS-1$
-    }
-
 }

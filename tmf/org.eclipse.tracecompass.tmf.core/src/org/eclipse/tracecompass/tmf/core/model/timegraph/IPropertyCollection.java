@@ -8,11 +8,6 @@
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.core.model.timegraph;
 
-import java.util.Set;
-
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.NonNullByDefault;
-
 /**
  * Interface to get and set properties. This represents a group of items known
  * as properties. It provides a caching method for filtering elements, storing
@@ -25,43 +20,57 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * @since 4.0
  *
  */
-@NonNullByDefault
 public interface IPropertyCollection {
 
     /**
-     * Get all the item properties
+     * Get the item active properties value. Each bit of the value corresponds to a
+     * item property. Available properties can be found at {@link IFilterProperty}.
      *
-     * @return The properties
+     * @return The properties value
      */
-    Set<String> getActiveProperties();
+    default int getActiveProperties() {
+        return 0;
+    }
+
+    /**
+     * Set the active properties value. Each bit of the value corresponds to a item
+     * property. Available properties can be found at {@link IFilterProperty}.
+     *
+     * @param activeProperties
+     *            The active properties value
+     */
+    default void setActiveProperties(int activeProperties) {
+        // Do nothing
+    }
 
     /**
      * Activate/deactivate a property. The possible properties could be found in
      * {@link IFilterProperty}
      *
-     * @param property
-     *            the property key
+     * @param propertyMask
+     *            The property key found in {@link IFilterProperty}
      * @param isActive
-     *            the activation status of the property.
+     *            The activation status of the property.
      */
-    default void setProperty(@NonNull String property, boolean isActive) {
-        Set<String> activeProperties = getActiveProperties();
+    default void setProperty(int propertyMask, boolean isActive) {
+        int activeProperties = getActiveProperties();
         if (isActive) {
-            activeProperties.add(property);
-        } else if (activeProperties.contains(property)) {
-            activeProperties.remove(property);
+            activeProperties |= propertyMask;
+        } else {
+            activeProperties &= ~propertyMask;
         }
+        setActiveProperties(activeProperties);
     }
 
     /**
      * Get the active status of a specific property. The possible properties could
      * be found in {@link IFilterProperty}
      *
-     * @param property
-     *            The property key
+     * @param propertyMask
+     *            The property key found in {@link IFilterProperty}
      * @return The property activation status false if not set
      */
-    default boolean isPropertyActive(@NonNull String property) {
-        return getActiveProperties().contains(property);
+    default boolean isPropertyActive(int propertyMask) {
+        return (getActiveProperties() & propertyMask) != 0;
     }
 }

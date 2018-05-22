@@ -8,8 +8,6 @@
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.core.model.timegraph;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
-
 /**
  * Interface that contains the list of possible properties for a timegraph item
  *
@@ -17,33 +15,20 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * @since 4.0
  *
  */
-@NonNullByDefault
 public interface IFilterProperty {
 
     /**
-     * get the dimmed property key string
-     *
-     * @return The dimmed property key string
+     * The dimmed property mask
      */
-    public static String isDimmed() {
-        return "dimmed"; //$NON-NLS-1$
-    }
+    public static final int DIMMED = 1 << 0;
 
     /**
-     * get the draw bound property key string
-     *
-     * @return The draw bound property key string
+     * The draw bound property mask
      */
-    public static String drawBound() {
-        return "bound"; //$NON-NLS-1$
-    }
+    public static final int BOUND = 1 << 1;
 
     /**
-     * Get the exclude property key string
-     *
-     * @return The exclude property key string
+     * The exclude property mask
      */
-    public static String exclude() {
-        return "exclude"; //$NON-NLS-1$
-    }
+    public static final int EXCLUDE = 1 << 2;
 }

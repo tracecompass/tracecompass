@@ -13,11 +13,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
-
-import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * Generic TimeEvent implementation
@@ -41,7 +37,7 @@ public class TimeEvent implements ITimeEvent {
     /**
      * A map of properties to activate or deactivate
      */
-    private final Set<@NonNull String> fActiveProperties = new HashSet<>();
+    private int fActiveProperties = 0;
 
     /**
      * Default value when no other value present
@@ -162,7 +158,15 @@ public class TimeEvent implements ITimeEvent {
      * @since 4.0
      */
     @Override
-    public Set<String> getActiveProperties() {
+    public int getActiveProperties() {
         return fActiveProperties;
+    }
+
+    /**
+     * @since 4.0
+     */
+    @Override
+    public void setActiveProperties(int activeProperties) {
+        fActiveProperties = activeProperties;
     }
 }
