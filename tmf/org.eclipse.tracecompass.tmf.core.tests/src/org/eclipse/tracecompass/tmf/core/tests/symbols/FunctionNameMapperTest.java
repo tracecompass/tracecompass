@@ -10,7 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.profiling.core.tests.symbols;
+package org.eclipse.tracecompass.tmf.core.tests.symbols;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -22,10 +22,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
-import org.eclipse.tracecompass.analysis.profiling.core.symbols.TmfResolvedSymbol;
-import org.eclipse.tracecompass.internal.analysis.profiling.core.symbols.FunctionNameMapper;
-import org.eclipse.tracecompass.internal.analysis.profiling.core.symbols.FunctionNameMapper.MappingType;
-import org.eclipse.tracecompass.internal.analysis.profiling.core.symbols.TmfResolvedSizedSymbol;
+import org.eclipse.tracecompass.internal.tmf.core.callstack.FunctionNameMapper;
+import org.eclipse.tracecompass.internal.tmf.core.callstack.FunctionNameMapper.MappingType;
+import org.eclipse.tracecompass.internal.tmf.core.callstack.TmfResolvedSizedSymbol;
+import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
 import org.junit.Test;
 
 /**

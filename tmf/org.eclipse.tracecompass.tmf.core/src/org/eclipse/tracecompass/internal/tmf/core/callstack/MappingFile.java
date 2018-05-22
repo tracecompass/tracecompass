@@ -34,10 +34,7 @@ import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
  * area of this mapping.
  *
  * @author Mikael Ferland
- * @deprecated Use the class with same name in the
- *             org.eclipse.tracecompass.analysis.profiling.core plugin
  */
-@Deprecated
 public final class MappingFile implements IMappingFile {
 
     private static final String DEFAULT_END_SUFFIX = "END__"; //$NON-NLS-1$

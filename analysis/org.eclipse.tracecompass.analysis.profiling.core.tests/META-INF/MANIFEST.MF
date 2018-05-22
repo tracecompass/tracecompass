@@ -20,6 +20,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.analysis.timing.core
 Export-Package: org.eclipse.tracecompass.analysis.profiling.core.tests,
  org.eclipse.tracecompass.analysis.profiling.core.tests.callgraph,
- org.eclipse.tracecompass.analysis.profiling.core.tests.flamegraph,
- org.eclipse.tracecompass.analysis.profiling.core.tests.symbols
+ org.eclipse.tracecompass.analysis.profiling.core.tests.flamegraph
 Import-Package: com.google.common.collect

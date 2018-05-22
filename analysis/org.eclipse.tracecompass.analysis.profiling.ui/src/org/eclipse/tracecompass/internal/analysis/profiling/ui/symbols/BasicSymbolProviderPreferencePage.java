@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -43,10 +44,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.tracecompass.analysis.profiling.core.symbols.IMappingFile;
-import org.eclipse.tracecompass.analysis.profiling.ui.symbols.AbstractSymbolProviderPreferencePage;
 import org.eclipse.tracecompass.internal.analysis.profiling.ui.Activator;
+import org.eclipse.tracecompass.tmf.core.symbols.IMappingFile;
 import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
+import org.eclipse.tracecompass.tmf.ui.symbols.AbstractSymbolProviderPreferencePage;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.google.common.collect.ImmutableList;

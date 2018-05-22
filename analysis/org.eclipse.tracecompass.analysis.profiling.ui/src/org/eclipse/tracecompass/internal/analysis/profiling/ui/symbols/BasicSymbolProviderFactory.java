@@ -12,8 +12,8 @@ package org.eclipse.tracecompass.internal.analysis.profiling.ui.symbols;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.tracecompass.analysis.profiling.core.symbols.ISymbolProvider;
-import org.eclipse.tracecompass.analysis.profiling.core.symbols.ISymbolProviderFactory;
+import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
+import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProviderFactory;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**

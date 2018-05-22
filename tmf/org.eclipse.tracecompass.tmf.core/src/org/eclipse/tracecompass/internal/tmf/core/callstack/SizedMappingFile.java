@@ -27,10 +27,7 @@ import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
  * lesser than the requested address, but within the length of the symbol.
  *
  * @author Geneviève Bastien
- * @deprecated Use the class with same name in the
- *             org.eclipse.tracecompass.analysis.profiling.core plugin
  */
-@Deprecated
 public class SizedMappingFile implements IMappingFile {
 
     private final String fFullPath;

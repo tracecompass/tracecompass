@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.analysis.profiling.core.symbols.IMappingFile;
-import org.eclipse.tracecompass.analysis.profiling.core.symbols.TmfResolvedSymbol;
-import org.eclipse.tracecompass.analysis.profiling.ui.symbols.ISymbolProvider;
-import org.eclipse.tracecompass.analysis.profiling.ui.symbols.ISymbolProviderPreferencePage;
+import org.eclipse.tracecompass.tmf.core.symbols.IMappingFile;
+import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
+import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
 
 import com.google.common.collect.ImmutableList;
 

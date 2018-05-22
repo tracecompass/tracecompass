@@ -20,10 +20,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  *
  * @author Robert Kiss
  * @since 3.0
- * @deprecated Use the class with same name in the
- *             org.eclipse.tracecompass.analysis.profiling.core plugin
  */
-@Deprecated
 public class DefaultSymbolProvider implements ISymbolProvider {
 
     private final ITmfTrace fTrace;

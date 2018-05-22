@@ -14,14 +14,14 @@ import java.util.Comparator;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.analysis.profiling.core.symbols.ISymbolProvider;
-import org.eclipse.tracecompass.analysis.profiling.core.symbols.SymbolProviderManager;
-import org.eclipse.tracecompass.analysis.profiling.core.symbols.SymbolProviderUtils;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.ICalledFunction;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.Messages;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
+import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
+import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
+import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderUtils;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 

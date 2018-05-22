@@ -33,10 +33,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.tracecompass.analysis.profiling.ui.symbols.AbstractSymbolProviderPreferencePage;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace.SymbolProviderConfig;
 import org.eclipse.tracecompass.tmf.ui.dialog.DirectoryDialogFactory;
+import org.eclipse.tracecompass.tmf.ui.symbols.AbstractSymbolProviderPreferencePage;
 
 /**
  * Preference page to configure a path prefix from which to resolve all the

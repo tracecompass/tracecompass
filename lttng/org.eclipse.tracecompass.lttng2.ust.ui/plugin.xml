@@ -30,7 +30,7 @@
       </output>
    </extension>
    <extension
-         point="org.eclipse.tracecompass.analysis.profiling.core.symbolProvider">
+         point="org.eclipse.tracecompass.tmf.core.symbolProvider">
       <providerFactory
             class="org.eclipse.tracecompass.internal.lttng2.ust.ui.analysis.debuginfo.UstDebugInfoSymbolProviderFactory"
             id="org.eclipse.tracecompass.lttng2.ust.ui.analysis.debuginfo.providerFactory"

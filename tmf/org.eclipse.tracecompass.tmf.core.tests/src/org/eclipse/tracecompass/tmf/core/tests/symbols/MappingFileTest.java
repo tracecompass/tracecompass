@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.profiling.core.tests.symbols;
+package org.eclipse.tracecompass.tmf.core.tests.symbols;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -22,10 +22,10 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.analysis.profiling.core.symbols.IMappingFile;
-import org.eclipse.tracecompass.analysis.profiling.core.symbols.TmfResolvedSymbol;
-import org.eclipse.tracecompass.internal.analysis.profiling.core.symbols.MappingFile;
-import org.eclipse.tracecompass.internal.analysis.profiling.core.symbols.SizedMappingFile;
+import org.eclipse.tracecompass.internal.tmf.core.callstack.MappingFile;
+import org.eclipse.tracecompass.internal.tmf.core.callstack.SizedMappingFile;
+import org.eclipse.tracecompass.tmf.core.symbols.IMappingFile;
+import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
 import org.junit.Test;
 
 /**

@@ -26,10 +26,7 @@ import org.eclipse.tracecompass.internal.tmf.core.callstack.SizedMappingFile;
  *
  * @author Geneviève Bastien
  * @since 3.2
- * @deprecated Use the class with same name in the
- *             org.eclipse.tracecompass.analysis.profiling.core plugin
  */
-@Deprecated
 public interface IMappingFile {
 
     /**
