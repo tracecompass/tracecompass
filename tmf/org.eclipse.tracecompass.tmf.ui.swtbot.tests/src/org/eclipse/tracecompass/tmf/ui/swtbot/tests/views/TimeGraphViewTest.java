@@ -532,6 +532,7 @@ public class TimeGraphViewTest {
     /**
      * Test time graph with color palettes
      */
+    @Ignore
     @Test
     public void testPalettes() {
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
