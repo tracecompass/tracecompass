@@ -95,7 +95,7 @@ public class FlameChartView extends BaseDataProviderTimeGraphView {
     // ------------------------------------------------------------------------
 
     /** View ID. */
-    public static final String ID = "org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart"; //$NON-NLS-1$
+    public static final String ID = "org.eclipse.linuxtools.tmf.ui.views.callstack"; //$NON-NLS-1$
 
     private static final String[] COLUMN_NAMES = new String[] {
             Messages.CallStackView_FunctionColumn,

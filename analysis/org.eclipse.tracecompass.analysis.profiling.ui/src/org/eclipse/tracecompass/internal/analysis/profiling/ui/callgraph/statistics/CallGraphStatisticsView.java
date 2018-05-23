@@ -27,7 +27,7 @@ import com.google.common.annotations.VisibleForTesting;
 public class CallGraphStatisticsView extends AbstractSegmentsStatisticsView {
 
     /** The view ID */
-    public static final String ID = CallGraphStatisticsView.class.getPackage().getName() + ".callgraphStatistics"; //$NON-NLS-1$
+    public static final String ID = "org.eclipse.tracecompass.internal.analysis.timing.ui.callgraph.statistics.callgraphstatistics"; //$NON-NLS-1$
     private @Nullable CallGraphStatisticsViewer fViewer;
 
     /**

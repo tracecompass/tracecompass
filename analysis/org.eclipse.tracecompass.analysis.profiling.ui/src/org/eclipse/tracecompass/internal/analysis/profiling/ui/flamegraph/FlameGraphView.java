@@ -74,7 +74,7 @@ public class FlameGraphView extends TmfView {
     /**
      *
      */
-    public static final String ID = FlameGraphView.class.getPackage().getName() + ".flamegraphView"; //$NON-NLS-1$
+    public static final String ID = "org.eclipse.tracecompass.internal.analysis.timing.ui.flamegraph.flamegraphView"; //$NON-NLS-1$
 
     private static final String SORT_OPTION_KEY = "sort.option"; //$NON-NLS-1$
     private static final String CONTENT_PRESENTATION_OPTION_KEY = "presentation.option"; //$NON-NLS-1$
