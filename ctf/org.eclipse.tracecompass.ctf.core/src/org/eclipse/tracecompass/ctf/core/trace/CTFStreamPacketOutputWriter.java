@@ -156,7 +156,7 @@ public class CTFStreamPacketOutputWriter {
         StructDefinition context = null;
         File file = fStreamInput.getFile();
         try (FileChannel fc = FileChannel.open(file.toPath(), StandardOpenOption.READ);) {
-            ByteBuffer bb = SafeMappedByteBuffer.map(fc, FileChannel.MapMode.READ_ONLY, entry.getOffsetBytes(), (long) Math.ceil(entry.getContentSizeBits() / (double) Byte.SIZE));
+            ByteBuffer bb = SafeMappedByteBuffer.map(fc, FileChannel.MapMode.READ_ONLY, entry.getOffsetBytes(), bitsToBytes(entry.getContentSizeBits()));
             BitBuffer bbInput = new BitBuffer(bb);
             bbInput.position(entry.getPayloadStartBits());
             ICTFStream stream = fStreamInput.getStream();
@@ -186,7 +186,7 @@ public class CTFStreamPacketOutputWriter {
                     // before the trim
                     ICompositeDefinition eventHeader = event.getEventHeader();
                     Definition def = null;
-                    if(eventHeader != null) {
+                    if (eventHeader != null) {
                         def = eventHeader.getDefinition(CTFStrings.TIMESTAMP);
                     }
                     if (def == null && eventHeader instanceof StructDefinition) {
@@ -270,7 +270,7 @@ public class CTFStreamPacketOutputWriter {
                 bb.position(buffer.position() * 8L);
             }
         }
-        buffer.position((int) (bb.position() / 8));
+        buffer.position((int) bitsToBytes(bb.position()));
     }
 
     private static void align(long align, BitBuffer input) throws CTFException {

@@ -68,7 +68,7 @@ public class CTFStreamInputPacketIndexEntryTest {
         assertNotNull(fixture);
         assertEquals(expectedResult, fixture.toString());
         assertEquals(1, fixture.getOffsetBits());
-        assertEquals(0, fixture.getOffsetBytes());
+        assertEquals(1, fixture.getOffsetBytes());
     }
 
     /**
