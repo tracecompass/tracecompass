@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.Tree;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
 
@@ -84,6 +85,8 @@ public class FilterSimpleExpressionCu {
         if (tree.getToken() == null) {
             return null;
         }
+        String separator = " "; //$NON-NLS-1$
+
         switch (tree.getToken().getType()) {
         case FilterParserParser.CONSTANT:
             return new FilterSimpleExpressionCu(IFilterStrings.WILDCARD, ConditionOperator.MATCHES, tree.getChild(0).getText());
@@ -97,6 +100,46 @@ public class FilterSimpleExpressionCu {
             BiPredicate<String, String> op1 = getConditionOperator(tree.getChild(1).getText());
             String right1 = null;
             return new FilterSimpleExpressionCu(left1, op1, right1);
+        case FilterParserParser.OPERATION2:
+            StringBuilder builder = new StringBuilder();
+            int count = tree.getChildCount();
+            boolean stop = false;
+            int index;
+            for (index = 0; index < count && !stop; index++) {
+                Tree child = tree.getChild(index);
+                if (child.getType() != FilterParserParser.TEXT) {
+                    stop = true;
+                    continue;
+                }
+                builder.append(child.getText());
+                builder.append(separator);
+            }
+            index--;
+            String left2 = builder.toString().trim();
+            BiPredicate<String, String> op2 = getConditionOperator(tree.getChild(index++).getText());
+            String right2 = tree.getChild(index).getText();
+            return new FilterSimpleExpressionCu(left2, op2, right2);
+        case FilterParserParser.OPERATION3:
+            StringBuilder builder1 = new StringBuilder();
+            int count1 = tree.getChildCount();
+            boolean stop1 = false;
+            int index1;
+            for (index1 = 0; index1 < count1 && !stop1; index1++) {
+                Tree child = tree.getChild(index1);
+                if (child.getType() != FilterParserParser.TEXT) {
+                    stop1 = true;
+                    continue;
+                }
+                builder1.append(child.getText());
+                builder1.append(separator);
+            }
+            index1--;
+            String left3 = builder1.toString().trim();
+            BiPredicate<String, String> op3 = getConditionOperator(tree.getChild(index1).getText());
+            String right3 = null;
+            return new FilterSimpleExpressionCu(left3, op3, right3);
+        case FilterParserParser.EXP_PAR:
+            return FilterSimpleExpressionCu.compile((CommonTree) tree.getChild(0));
         default:
             break;
         }
@@ -124,6 +167,10 @@ public class FilterSimpleExpressionCu {
             return ConditionOperator.CONTAINS;
         case IFilterStrings.PRESENT:
             return ConditionOperator.PRESENT;
+        case IFilterStrings.GT:
+            return ConditionOperator.GT;
+        case IFilterStrings.LT:
+            return ConditionOperator.LT;
         default:
             throw new IllegalArgumentException("FilterSimpleExpression: invalid comparison operator."); //$NON-NLS-1$
         }

@@ -9,11 +9,13 @@ options {
 tokens {
   ROOT;
   EXP_NODE;
+  EXP_NEG;
+  EXP_PAR;
   OPERATION;
   OPERATION1;
   OPERATION2;
+  OPERATION3;
   CONSTANT;
-  EXP_PAR;
 }
 @header {
 /*******************************************************************************
@@ -81,18 +83,22 @@ public void reportError(RecognitionException e) {
 
 parse : (expression)+ -> ^(ROOT (expression)+);
 expression : left = expr (sep = SEPARATOR right = expr)? -> ^(EXP_NODE $left ($sep $right)?)
-           | '(' expression ')' -> ^(EXP_PAR expression)
-           | (OP_NEGATE)(expression) -> ^(OPERATION2 OP_NEGATE expression);
+           | (OP_NEGATE)(expression) -> ^(EXP_NEG OP_NEGATE expression);
 
 SEPARATOR  :'||' | '&&';
 
+paragraph : TEXT+;
+
 expr       : TEXT OP TEXT -> ^(OPERATION TEXT OP TEXT)
            | TEXT OP_PRESENT -> ^(OPERATION1 TEXT OP_PRESENT)
+           | '"' key0 = paragraph '"' op = OP text = TEXT -> ^(OPERATION2 $key0 $op $text)
+           | '"' key1 = paragraph '"' op_present = OP_PRESENT -> ^(OPERATION3 $key1 $op_present)
+           | '(' expr ')' -> ^(EXP_PAR expr)
            | TEXT  -> ^(CONSTANT TEXT);
 
 OP_PRESENT : 'present';
 OP_NEGATE  : '!';
 OP         : '==' | '!=' | 'contains' | 'matches' | '>' | '<';
-TEXT   : (('a'..'z')|('A'..'Z')|('0'..'9')|'-'|'_'|'['|']'|'.'|'*'|'$'|'^'|'|')+;
+TEXT   : (('a'..'z')|('A'..'Z')|('0'..'9')|'-'|'_'|'['|']'|'.'|'*'|'$'|'^'|'|'|'\\'|'{'|'}')+;
 
 WS         : (' '|'\t'|'\r'|'\n')+ { skip(); } ;
