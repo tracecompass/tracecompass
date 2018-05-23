@@ -117,9 +117,13 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
                 fCheckedObjects.remove(element);
             }
         }
+        boolean expanded = checkboxTreeViewer.getExpandedState(element);
+        /* make sure element is expanded so that testFindItem will find the children */
+        checkboxTreeViewer.setExpandedState(element, true);
         for (Object o : ((ITreeContentProvider) checkboxTreeViewer.getContentProvider()).getChildren(element)) {
             checkSubtree(o, state);
         }
+        checkboxTreeViewer.setExpandedState(element, expanded);
         maintainAllCheckIntegrity();
     }
 

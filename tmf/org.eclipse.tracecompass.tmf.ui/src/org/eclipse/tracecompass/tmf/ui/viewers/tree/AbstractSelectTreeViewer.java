@@ -105,6 +105,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     private final class CheckStateChangedListener implements ICheckStateListener {
         @Override
         public void checkStateChanged(CheckStateChangedEvent event) {
+            saveViewContext();
             if (fChartViewer != null) {
                 fChartViewer.handleCheckStateChangedEvent(getCheckedViewerEntries());
 
@@ -139,6 +140,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         if (treeViewer instanceof CheckboxTreeViewer) {
             ((CheckboxTreeViewer) treeViewer).addCheckStateListener(new CheckStateChangedListener());
         }
+        checkboxTree.getFilterControl().addModifyListener(e -> saveViewContext());
         fCheckboxTree = checkboxTree;
         fLegendIndex = legendIndex;
         fId = id;
@@ -209,8 +211,10 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
             fCheckboxTree.setCheckedElements(checkedElements.toArray());
         }
         Object filterString = ctx.getData(getClass() + FILTER_STRING);
-        if (rootEntry != null && filterString instanceof String) {
+        if (filterString instanceof String) {
             fCheckboxTree.setFilterText((String) filterString);
+        } else {
+            fCheckboxTree.setFilterText(""); //$NON-NLS-1$
         }
 
         if (fChartViewer != null) {
@@ -251,17 +255,27 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
         saveViewContext();
+        restorePatternFilter(signal.getTrace());
+        fCheckboxTree.setCheckedElements(new Object[0]);
         super.traceOpened(signal);
     }
 
     @Override
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
-        if (signal != null && getTrace() != signal.getTrace()) {
+        if (getTrace() != signal.getTrace()) {
             saveViewContext();
-            fCheckboxTree.getFilterControl().clearSelection();
+            restorePatternFilter(signal.getTrace());
+            fCheckboxTree.setCheckedElements(new Object[0]);
         }
         super.traceSelected(signal);
+    }
+
+    @Override
+    public void reset() {
+        fCheckboxTree.setCheckedElements(new Object[0]);
+        fCheckboxTree.setFilterText(""); //$NON-NLS-1$
+        super.reset();
     }
 
     @Override
@@ -280,7 +294,6 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
 
                         ITmfTreeDataProvider<@NonNull ITmfTreeDataModel> provider = getProvider(trace);
                         if (provider == null) {
-                            Activator.getDefault().logInfo("Trace: " + trace.getName() + " does not have a data provider for ID: " + fId); //$NON-NLS-1$ //$NON-NLS-2$
                             return Status.OK_STATUS;
                         }
 
@@ -350,7 +363,6 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
                 }
                 Object input = treeViewer.getInput();
                 if (!(input instanceof ITmfTreeViewerEntry) || !treeEquals(rootEntry, (ITmfTreeViewerEntry) input)) {
-                    saveViewContext();
                     treeViewer.setInput(rootEntry);
                     contentChanged(rootEntry);
                 } else {
@@ -411,6 +423,20 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
             TmfTraceManager.getInstance().updateTraceContext(previousTrace,
                     builder -> builder.setData(getClass() + CHECKED_ELEMENTS, ids)
                     .setData(getClass() + FILTER_STRING, filterString));
+        }
+    }
+
+    private void restorePatternFilter(ITmfTrace trace) {
+        if (trace == null) {
+            fCheckboxTree.getPatternFilter().setPattern(null);
+            return;
+        }
+        TmfTraceContext ctx = TmfTraceManager.getInstance().getTraceContext(trace);
+        Object filterString = ctx.getData(getClass() + FILTER_STRING);
+        if (filterString instanceof String) {
+            fCheckboxTree.getPatternFilter().setPattern((String) filterString);
+        } else {
+            fCheckboxTree.getPatternFilter().setPattern(null);
         }
     }
 

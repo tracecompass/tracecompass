@@ -320,10 +320,7 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
      *            The trace opened signal {@link TmfTraceOpenedSignal}
      */
     @TmfSignalHandler
-    public void traceOpened(@Nullable TmfTraceOpenedSignal signal) {
-        if (signal == null) {
-            return;
-        }
+    public void traceOpened(TmfTraceOpenedSignal signal) {
         fTrace = signal.getTrace();
         loadTrace(getTrace());
     }
@@ -335,8 +332,8 @@ public abstract class TmfTimeViewer extends TmfViewer implements ITmfTimeProvide
      *            The trace selected signal {@link TmfTraceSelectedSignal}
      */
     @TmfSignalHandler
-    public void traceSelected(@Nullable TmfTraceSelectedSignal signal) {
-        if (signal != null && fTrace != signal.getTrace()) {
+    public void traceSelected(TmfTraceSelectedSignal signal) {
+        if (fTrace != signal.getTrace()) {
             fTrace = signal.getTrace();
             loadTrace(getTrace());
         }
