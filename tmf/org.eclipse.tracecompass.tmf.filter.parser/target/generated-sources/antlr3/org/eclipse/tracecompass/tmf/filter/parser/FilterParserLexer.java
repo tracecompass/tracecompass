@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g 2018-05-23 13:02:29
+// $ANTLR 3.5.2 org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g 2018-05-24 14:09:42
 
 /*******************************************************************************
  * Copyright (c) 2018 Ericsson
@@ -25,21 +25,24 @@ import java.util.ArrayList;
 @SuppressWarnings("all")
 public class FilterParserLexer extends Lexer {
 	public static final int EOF=-1;
-	public static final int T__17=17;
-	public static final int T__18=18;
+	public static final int T__19=19;
+	public static final int T__20=20;
+	public static final int T__21=21;
 	public static final int CONSTANT=4;
-	public static final int EXP_NODE=5;
-	public static final int EXP_PAR=6;
-	public static final int OP=7;
-	public static final int OPERATION=8;
-	public static final int OPERATION1=9;
-	public static final int OPERATION2=10;
-	public static final int OP_NEGATE=11;
-	public static final int OP_PRESENT=12;
-	public static final int ROOT=13;
-	public static final int SEPARATOR=14;
-	public static final int TEXT=15;
-	public static final int WS=16;
+	public static final int EXP_NEG=5;
+	public static final int EXP_NODE=6;
+	public static final int EXP_PAR=7;
+	public static final int OP=8;
+	public static final int OPERATION=9;
+	public static final int OPERATION1=10;
+	public static final int OPERATION2=11;
+	public static final int OPERATION3=12;
+	public static final int OP_NEGATE=13;
+	public static final int OP_PRESENT=14;
+	public static final int ROOT=15;
+	public static final int SEPARATOR=16;
+	public static final int TEXT=17;
+	public static final int WS=18;
 
 	private IErrorListener errListener;
 
@@ -69,13 +72,33 @@ public class FilterParserLexer extends Lexer {
 	}
 	@Override public String getGrammarFileName() { return "org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g"; }
 
-	// $ANTLR start "T__17"
-	public final void mT__17() throws RecognitionException {
+	// $ANTLR start "T__19"
+	public final void mT__19() throws RecognitionException {
 		try {
-			int _type = T__17;
+			int _type = T__19;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:38:7: ( '(' )
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:38:9: '('
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:38:7: ( '\"' )
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:38:9: '\"'
+			{
+			match('\"'); 
+			}
+
+			state.type = _type;
+			state.channel = _channel;
+		}
+		finally {
+			// do for sure before leaving
+		}
+	}
+	// $ANTLR end "T__19"
+
+	// $ANTLR start "T__20"
+	public final void mT__20() throws RecognitionException {
+		try {
+			int _type = T__20;
+			int _channel = DEFAULT_TOKEN_CHANNEL;
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:39:7: ( '(' )
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:39:9: '('
 			{
 			match('('); 
 			}
@@ -87,15 +110,15 @@ public class FilterParserLexer extends Lexer {
 			// do for sure before leaving
 		}
 	}
-	// $ANTLR end "T__17"
+	// $ANTLR end "T__20"
 
-	// $ANTLR start "T__18"
-	public final void mT__18() throws RecognitionException {
+	// $ANTLR start "T__21"
+	public final void mT__21() throws RecognitionException {
 		try {
-			int _type = T__18;
+			int _type = T__21;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:39:7: ( ')' )
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:39:9: ')'
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:40:7: ( ')' )
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:40:9: ')'
 			{
 			match(')'); 
 			}
@@ -107,14 +130,14 @@ public class FilterParserLexer extends Lexer {
 			// do for sure before leaving
 		}
 	}
-	// $ANTLR end "T__18"
+	// $ANTLR end "T__21"
 
 	// $ANTLR start "SEPARATOR"
 	public final void mSEPARATOR() throws RecognitionException {
 		try {
 			int _type = SEPARATOR;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:87:12: ( '||' | '&&' )
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:88:12: ( '||' | '&&' )
 			int alt1=2;
 			int LA1_0 = input.LA(1);
 			if ( (LA1_0=='|') ) {
@@ -132,14 +155,14 @@ public class FilterParserLexer extends Lexer {
 
 			switch (alt1) {
 				case 1 :
-					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:87:13: '||'
+					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:88:13: '||'
 					{
 					match("||"); 
 
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:87:20: '&&'
+					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:88:20: '&&'
 					{
 					match("&&"); 
 
@@ -161,8 +184,8 @@ public class FilterParserLexer extends Lexer {
 		try {
 			int _type = OP_PRESENT;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:93:12: ( 'present' )
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:93:14: 'present'
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:99:12: ( 'present' )
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:99:14: 'present'
 			{
 			match("present"); 
 
@@ -182,8 +205,8 @@ public class FilterParserLexer extends Lexer {
 		try {
 			int _type = OP_NEGATE;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:94:12: ( '!' )
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:94:14: '!'
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:100:12: ( '!' )
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:100:14: '!'
 			{
 			match('!'); 
 			}
@@ -202,7 +225,7 @@ public class FilterParserLexer extends Lexer {
 		try {
 			int _type = OP;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:95:12: ( '==' | '!=' | 'contains' | 'matches' | '>' | '<' )
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:101:12: ( '==' | '!=' | 'contains' | 'matches' | '>' | '<' )
 			int alt2=6;
 			switch ( input.LA(1) ) {
 			case '=':
@@ -242,41 +265,41 @@ public class FilterParserLexer extends Lexer {
 			}
 			switch (alt2) {
 				case 1 :
-					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:95:14: '=='
+					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:101:14: '=='
 					{
 					match("=="); 
 
 					}
 					break;
 				case 2 :
-					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:95:21: '!='
+					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:101:21: '!='
 					{
 					match("!="); 
 
 					}
 					break;
 				case 3 :
-					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:95:28: 'contains'
+					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:101:28: 'contains'
 					{
 					match("contains"); 
 
 					}
 					break;
 				case 4 :
-					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:95:41: 'matches'
+					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:101:41: 'matches'
 					{
 					match("matches"); 
 
 					}
 					break;
 				case 5 :
-					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:95:53: '>'
+					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:101:53: '>'
 					{
 					match('>'); 
 					}
 					break;
 				case 6 :
-					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:95:59: '<'
+					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:101:59: '<'
 					{
 					match('<'); 
 					}
@@ -297,16 +320,16 @@ public class FilterParserLexer extends Lexer {
 		try {
 			int _type = TEXT;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:96:8: ( ( ( 'a' .. 'z' ) | ( 'A' .. 'Z' ) | ( '0' .. '9' ) | '-' | '_' | '[' | ']' | '.' | '*' | '$' | '^' | '|' )+ )
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:96:10: ( ( 'a' .. 'z' ) | ( 'A' .. 'Z' ) | ( '0' .. '9' ) | '-' | '_' | '[' | ']' | '.' | '*' | '$' | '^' | '|' )+
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:102:8: ( ( ( 'a' .. 'z' ) | ( 'A' .. 'Z' ) | ( '0' .. '9' ) | '-' | '_' | '[' | ']' | '.' | '*' | '$' | '^' | '|' | '\\\\' | '{' | '}' )+ )
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:102:10: ( ( 'a' .. 'z' ) | ( 'A' .. 'Z' ) | ( '0' .. '9' ) | '-' | '_' | '[' | ']' | '.' | '*' | '$' | '^' | '|' | '\\\\' | '{' | '}' )+
 			{
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:96:10: ( ( 'a' .. 'z' ) | ( 'A' .. 'Z' ) | ( '0' .. '9' ) | '-' | '_' | '[' | ']' | '.' | '*' | '$' | '^' | '|' )+
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:102:10: ( ( 'a' .. 'z' ) | ( 'A' .. 'Z' ) | ( '0' .. '9' ) | '-' | '_' | '[' | ']' | '.' | '*' | '$' | '^' | '|' | '\\\\' | '{' | '}' )+
 			int cnt3=0;
 			loop3:
 			while (true) {
 				int alt3=2;
 				int LA3_0 = input.LA(1);
-				if ( (LA3_0=='$'||LA3_0=='*'||(LA3_0 >= '-' && LA3_0 <= '.')||(LA3_0 >= '0' && LA3_0 <= '9')||(LA3_0 >= 'A' && LA3_0 <= '[')||(LA3_0 >= ']' && LA3_0 <= '_')||(LA3_0 >= 'a' && LA3_0 <= 'z')||LA3_0=='|') ) {
+				if ( (LA3_0=='$'||LA3_0=='*'||(LA3_0 >= '-' && LA3_0 <= '.')||(LA3_0 >= '0' && LA3_0 <= '9')||(LA3_0 >= 'A' && LA3_0 <= '_')||(LA3_0 >= 'a' && LA3_0 <= '}')) ) {
 					alt3=1;
 				}
 
@@ -314,7 +337,7 @@ public class FilterParserLexer extends Lexer {
 				case 1 :
 					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:
 					{
-					if ( input.LA(1)=='$'||input.LA(1)=='*'||(input.LA(1) >= '-' && input.LA(1) <= '.')||(input.LA(1) >= '0' && input.LA(1) <= '9')||(input.LA(1) >= 'A' && input.LA(1) <= '[')||(input.LA(1) >= ']' && input.LA(1) <= '_')||(input.LA(1) >= 'a' && input.LA(1) <= 'z')||input.LA(1)=='|' ) {
+					if ( input.LA(1)=='$'||input.LA(1)=='*'||(input.LA(1) >= '-' && input.LA(1) <= '.')||(input.LA(1) >= '0' && input.LA(1) <= '9')||(input.LA(1) >= 'A' && input.LA(1) <= '_')||(input.LA(1) >= 'a' && input.LA(1) <= '}') ) {
 						input.consume();
 					}
 					else {
@@ -349,10 +372,10 @@ public class FilterParserLexer extends Lexer {
 		try {
 			int _type = WS;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:98:12: ( ( ' ' | '\\t' | '\\r' | '\\n' )+ )
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:98:14: ( ' ' | '\\t' | '\\r' | '\\n' )+
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:104:12: ( ( ' ' | '\\t' | '\\r' | '\\n' )+ )
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:104:14: ( ' ' | '\\t' | '\\r' | '\\n' )+
 			{
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:98:14: ( ' ' | '\\t' | '\\r' | '\\n' )+
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:104:14: ( ' ' | '\\t' | '\\r' | '\\n' )+
 			int cnt4=0;
 			loop4:
 			while (true) {
@@ -399,115 +422,120 @@ public class FilterParserLexer extends Lexer {
 
 	@Override
 	public void mTokens() throws RecognitionException {
-		// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:8: ( T__17 | T__18 | SEPARATOR | OP_PRESENT | OP_NEGATE | OP | TEXT | WS )
-		int alt5=8;
+		// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:8: ( T__19 | T__20 | T__21 | SEPARATOR | OP_PRESENT | OP_NEGATE | OP | TEXT | WS )
+		int alt5=9;
 		switch ( input.LA(1) ) {
-		case '(':
+		case '\"':
 			{
 			alt5=1;
 			}
 			break;
-		case ')':
+		case '(':
 			{
 			alt5=2;
 			}
 			break;
+		case ')':
+			{
+			alt5=3;
+			}
+			break;
 		case '|':
 			{
-			int LA5_3 = input.LA(2);
-			if ( (LA5_3=='|') ) {
-				int LA5_12 = input.LA(3);
-				if ( (LA5_12=='$'||LA5_12=='*'||(LA5_12 >= '-' && LA5_12 <= '.')||(LA5_12 >= '0' && LA5_12 <= '9')||(LA5_12 >= 'A' && LA5_12 <= '[')||(LA5_12 >= ']' && LA5_12 <= '_')||(LA5_12 >= 'a' && LA5_12 <= 'z')||LA5_12=='|') ) {
-					alt5=7;
+			int LA5_4 = input.LA(2);
+			if ( (LA5_4=='|') ) {
+				int LA5_13 = input.LA(3);
+				if ( (LA5_13=='$'||LA5_13=='*'||(LA5_13 >= '-' && LA5_13 <= '.')||(LA5_13 >= '0' && LA5_13 <= '9')||(LA5_13 >= 'A' && LA5_13 <= '_')||(LA5_13 >= 'a' && LA5_13 <= '}')) ) {
+					alt5=8;
 				}
 
 				else {
-					alt5=3;
+					alt5=4;
 				}
 
 			}
 
 			else {
-				alt5=7;
+				alt5=8;
 			}
 
 			}
 			break;
 		case '&':
 			{
-			alt5=3;
+			alt5=4;
 			}
 			break;
 		case 'p':
 			{
-			int LA5_5 = input.LA(2);
-			if ( (LA5_5=='r') ) {
-				int LA5_13 = input.LA(3);
-				if ( (LA5_13=='e') ) {
-					int LA5_17 = input.LA(4);
-					if ( (LA5_17=='s') ) {
-						int LA5_20 = input.LA(5);
-						if ( (LA5_20=='e') ) {
-							int LA5_23 = input.LA(6);
-							if ( (LA5_23=='n') ) {
-								int LA5_26 = input.LA(7);
-								if ( (LA5_26=='t') ) {
-									int LA5_29 = input.LA(8);
-									if ( (LA5_29=='$'||LA5_29=='*'||(LA5_29 >= '-' && LA5_29 <= '.')||(LA5_29 >= '0' && LA5_29 <= '9')||(LA5_29 >= 'A' && LA5_29 <= '[')||(LA5_29 >= ']' && LA5_29 <= '_')||(LA5_29 >= 'a' && LA5_29 <= 'z')||LA5_29=='|') ) {
-										alt5=7;
+			int LA5_6 = input.LA(2);
+			if ( (LA5_6=='r') ) {
+				int LA5_14 = input.LA(3);
+				if ( (LA5_14=='e') ) {
+					int LA5_18 = input.LA(4);
+					if ( (LA5_18=='s') ) {
+						int LA5_21 = input.LA(5);
+						if ( (LA5_21=='e') ) {
+							int LA5_24 = input.LA(6);
+							if ( (LA5_24=='n') ) {
+								int LA5_27 = input.LA(7);
+								if ( (LA5_27=='t') ) {
+									int LA5_30 = input.LA(8);
+									if ( (LA5_30=='$'||LA5_30=='*'||(LA5_30 >= '-' && LA5_30 <= '.')||(LA5_30 >= '0' && LA5_30 <= '9')||(LA5_30 >= 'A' && LA5_30 <= '_')||(LA5_30 >= 'a' && LA5_30 <= '}')) ) {
+										alt5=8;
 									}
 
 									else {
-										alt5=4;
+										alt5=5;
 									}
 
 								}
 
 								else {
-									alt5=7;
+									alt5=8;
 								}
 
 							}
 
 							else {
-								alt5=7;
+								alt5=8;
 							}
 
 						}
 
 						else {
-							alt5=7;
+							alt5=8;
 						}
 
 					}
 
 					else {
-						alt5=7;
+						alt5=8;
 					}
 
 				}
 
 				else {
-					alt5=7;
+					alt5=8;
 				}
 
 			}
 
 			else {
-				alt5=7;
+				alt5=8;
 			}
 
 			}
 			break;
 		case '!':
 			{
-			int LA5_6 = input.LA(2);
-			if ( (LA5_6=='=') ) {
-				alt5=6;
+			int LA5_7 = input.LA(2);
+			if ( (LA5_7=='=') ) {
+				alt5=7;
 			}
 
 			else {
-				alt5=5;
+				alt5=6;
 			}
 
 			}
@@ -516,135 +544,135 @@ public class FilterParserLexer extends Lexer {
 		case '=':
 		case '>':
 			{
-			alt5=6;
+			alt5=7;
 			}
 			break;
 		case 'c':
 			{
-			int LA5_8 = input.LA(2);
-			if ( (LA5_8=='o') ) {
-				int LA5_15 = input.LA(3);
-				if ( (LA5_15=='n') ) {
-					int LA5_18 = input.LA(4);
-					if ( (LA5_18=='t') ) {
-						int LA5_21 = input.LA(5);
-						if ( (LA5_21=='a') ) {
-							int LA5_24 = input.LA(6);
-							if ( (LA5_24=='i') ) {
-								int LA5_27 = input.LA(7);
-								if ( (LA5_27=='n') ) {
-									int LA5_30 = input.LA(8);
-									if ( (LA5_30=='s') ) {
-										int LA5_33 = input.LA(9);
-										if ( (LA5_33=='$'||LA5_33=='*'||(LA5_33 >= '-' && LA5_33 <= '.')||(LA5_33 >= '0' && LA5_33 <= '9')||(LA5_33 >= 'A' && LA5_33 <= '[')||(LA5_33 >= ']' && LA5_33 <= '_')||(LA5_33 >= 'a' && LA5_33 <= 'z')||LA5_33=='|') ) {
-											alt5=7;
+			int LA5_9 = input.LA(2);
+			if ( (LA5_9=='o') ) {
+				int LA5_16 = input.LA(3);
+				if ( (LA5_16=='n') ) {
+					int LA5_19 = input.LA(4);
+					if ( (LA5_19=='t') ) {
+						int LA5_22 = input.LA(5);
+						if ( (LA5_22=='a') ) {
+							int LA5_25 = input.LA(6);
+							if ( (LA5_25=='i') ) {
+								int LA5_28 = input.LA(7);
+								if ( (LA5_28=='n') ) {
+									int LA5_31 = input.LA(8);
+									if ( (LA5_31=='s') ) {
+										int LA5_34 = input.LA(9);
+										if ( (LA5_34=='$'||LA5_34=='*'||(LA5_34 >= '-' && LA5_34 <= '.')||(LA5_34 >= '0' && LA5_34 <= '9')||(LA5_34 >= 'A' && LA5_34 <= '_')||(LA5_34 >= 'a' && LA5_34 <= '}')) ) {
+											alt5=8;
 										}
 
 										else {
-											alt5=6;
+											alt5=7;
 										}
 
 									}
 
 									else {
-										alt5=7;
+										alt5=8;
 									}
 
 								}
 
 								else {
-									alt5=7;
+									alt5=8;
 								}
 
 							}
 
 							else {
-								alt5=7;
+								alt5=8;
 							}
 
 						}
 
 						else {
-							alt5=7;
+							alt5=8;
 						}
 
 					}
 
 					else {
-						alt5=7;
+						alt5=8;
 					}
 
 				}
 
 				else {
-					alt5=7;
+					alt5=8;
 				}
 
 			}
 
 			else {
-				alt5=7;
+				alt5=8;
 			}
 
 			}
 			break;
 		case 'm':
 			{
-			int LA5_9 = input.LA(2);
-			if ( (LA5_9=='a') ) {
-				int LA5_16 = input.LA(3);
-				if ( (LA5_16=='t') ) {
-					int LA5_19 = input.LA(4);
-					if ( (LA5_19=='c') ) {
-						int LA5_22 = input.LA(5);
-						if ( (LA5_22=='h') ) {
-							int LA5_25 = input.LA(6);
-							if ( (LA5_25=='e') ) {
-								int LA5_28 = input.LA(7);
-								if ( (LA5_28=='s') ) {
-									int LA5_31 = input.LA(8);
-									if ( (LA5_31=='$'||LA5_31=='*'||(LA5_31 >= '-' && LA5_31 <= '.')||(LA5_31 >= '0' && LA5_31 <= '9')||(LA5_31 >= 'A' && LA5_31 <= '[')||(LA5_31 >= ']' && LA5_31 <= '_')||(LA5_31 >= 'a' && LA5_31 <= 'z')||LA5_31=='|') ) {
-										alt5=7;
+			int LA5_10 = input.LA(2);
+			if ( (LA5_10=='a') ) {
+				int LA5_17 = input.LA(3);
+				if ( (LA5_17=='t') ) {
+					int LA5_20 = input.LA(4);
+					if ( (LA5_20=='c') ) {
+						int LA5_23 = input.LA(5);
+						if ( (LA5_23=='h') ) {
+							int LA5_26 = input.LA(6);
+							if ( (LA5_26=='e') ) {
+								int LA5_29 = input.LA(7);
+								if ( (LA5_29=='s') ) {
+									int LA5_32 = input.LA(8);
+									if ( (LA5_32=='$'||LA5_32=='*'||(LA5_32 >= '-' && LA5_32 <= '.')||(LA5_32 >= '0' && LA5_32 <= '9')||(LA5_32 >= 'A' && LA5_32 <= '_')||(LA5_32 >= 'a' && LA5_32 <= '}')) ) {
+										alt5=8;
 									}
 
 									else {
-										alt5=6;
+										alt5=7;
 									}
 
 								}
 
 								else {
-									alt5=7;
+									alt5=8;
 								}
 
 							}
 
 							else {
-								alt5=7;
+								alt5=8;
 							}
 
 						}
 
 						else {
-							alt5=7;
+							alt5=8;
 						}
 
 					}
 
 					else {
-						alt5=7;
+						alt5=8;
 					}
 
 				}
 
 				else {
-					alt5=7;
+					alt5=8;
 				}
 
 			}
 
 			else {
-				alt5=7;
+				alt5=8;
 			}
 
 			}
@@ -690,6 +718,7 @@ public class FilterParserLexer extends Lexer {
 		case 'Y':
 		case 'Z':
 		case '[':
+		case '\\':
 		case ']':
 		case '^':
 		case '_':
@@ -716,8 +745,10 @@ public class FilterParserLexer extends Lexer {
 		case 'x':
 		case 'y':
 		case 'z':
+		case '{':
+		case '}':
 			{
-			alt5=7;
+			alt5=8;
 			}
 			break;
 		case '\t':
@@ -725,7 +756,7 @@ public class FilterParserLexer extends Lexer {
 		case '\r':
 		case ' ':
 			{
-			alt5=8;
+			alt5=9;
 			}
 			break;
 		default:
@@ -735,56 +766,63 @@ public class FilterParserLexer extends Lexer {
 		}
 		switch (alt5) {
 			case 1 :
-				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:10: T__17
+				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:10: T__19
 				{
-				mT__17(); 
+				mT__19(); 
 
 				}
 				break;
 			case 2 :
-				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:16: T__18
+				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:16: T__20
 				{
-				mT__18(); 
+				mT__20(); 
 
 				}
 				break;
 			case 3 :
-				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:22: SEPARATOR
+				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:22: T__21
+				{
+				mT__21(); 
+
+				}
+				break;
+			case 4 :
+				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:28: SEPARATOR
 				{
 				mSEPARATOR(); 
 
 				}
 				break;
-			case 4 :
-				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:32: OP_PRESENT
+			case 5 :
+				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:38: OP_PRESENT
 				{
 				mOP_PRESENT(); 
 
 				}
 				break;
-			case 5 :
-				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:43: OP_NEGATE
+			case 6 :
+				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:49: OP_NEGATE
 				{
 				mOP_NEGATE(); 
 
 				}
 				break;
-			case 6 :
-				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:53: OP
+			case 7 :
+				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:59: OP
 				{
 				mOP(); 
 
 				}
 				break;
-			case 7 :
-				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:56: TEXT
+			case 8 :
+				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:62: TEXT
 				{
 				mTEXT(); 
 
 				}
 				break;
-			case 8 :
-				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:61: WS
+			case 9 :
+				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:1:67: WS
 				{
 				mWS(); 
 

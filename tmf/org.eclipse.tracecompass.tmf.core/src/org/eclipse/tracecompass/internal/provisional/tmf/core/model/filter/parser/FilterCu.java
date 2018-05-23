@@ -88,10 +88,7 @@ public class FilterCu {
             List<FilterExpressionCu> expressions = new ArrayList<>();
             for (CommonTree child : children) {
                 switch (child.getToken().getType()) {
-                case FilterParserParser.EXP_PAR:
-                    String substring = regex.substring(1, regex.length() - 1);
-                    return FilterCu.compile(substring);
-                case FilterParserParser.OPERATION2:
+                case FilterParserParser.EXP_NEG:
                     String substring2 = regex.substring(1);
                     return FilterNotCu.compile(substring2);
                 default:

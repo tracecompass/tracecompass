@@ -24,6 +24,8 @@ public interface IFilterStrings {
     static final String CONTAINS = "contains";
     static final String PRESENT = "present";
     static final String NOT = "!";
+    static final String GT = ">";
+    static final String LT = "<";
 
     static final String WILDCARD = "*";
     static final String OR = "||";
