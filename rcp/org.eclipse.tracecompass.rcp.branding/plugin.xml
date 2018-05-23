@@ -21,7 +21,7 @@
             </property>
             <property
                   name="aboutText"
-                  value="Trace Compass&#x0A;&#x0A;Version: 3.3.0&#x0A;&#x0A;Copyright (c) 2013, 2018 Ericsson and others.&#x0A;&#x0A;All rights reserved. This program and the accompanying materials are&#x0A;made available under the terms of the Eclipse Public License v1.0 which&#x0A;accompanies this distribution, and is available at&#x0A;http://www.eclipse.org/legal/epl-v10.html">
+                  value="Trace Compass&#x0A;&#x0A;Version: 4.0.0&#x0A;&#x0A;Copyright (c) 2013, 2018 Ericsson and others.&#x0A;&#x0A;All rights reserved. This program and the accompanying materials are&#x0A;made available under the terms of the Eclipse Public License v1.0 which&#x0A;accompanies this distribution, and is available at&#x0A;http://www.eclipse.org/legal/epl-v10.html">
             </property>
             <property
                   name="windowImages"

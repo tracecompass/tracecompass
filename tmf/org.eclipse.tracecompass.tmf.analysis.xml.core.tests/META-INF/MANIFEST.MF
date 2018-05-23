@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.tracecompass.tmf.analysis.xml.core.tests;singleton:=true
-Bundle-Version: 1.0.4.qualifier
+Bundle-Version: 1.0.5.qualifier
 Bundle-Activator: org.eclipse.tracecompass.tmf.analysis.xml.core.tests.Activator
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.junit,
