@@ -117,7 +117,7 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
         fContentSizeBits = (fileSizeBytes * Byte.SIZE);
         fPacketSizeBits = (fileSizeBytes * Byte.SIZE);
         fOffsetBits = dataOffsetBits;
-        fOffsetBytes = dataOffsetBits / Byte.SIZE;
+        fOffsetBytes = bitsToBytes(dataOffsetBits);
         fLostEvents = 0;
         fTarget = ""; //$NON-NLS-1$
         fTargetID = 0;
@@ -125,6 +125,10 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
         fTimestampEnd = Long.MAX_VALUE;
         fEndPacketHeaderBits = dataOffsetBits;
         fStreamPacketContextDef = null;
+    }
+
+    private static long bitsToBytes(long value) {
+        return (long) Math.ceil(value / (double) Byte.SIZE);
     }
 
     /**
@@ -168,7 +172,7 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
         fTimestampBegin = computeTsBegin();
         fTimestampEnd = computeTsEnd();
         fOffsetBits = dataOffsetBits;
-        fOffsetBytes = dataOffsetBits / Byte.SIZE;
+        fOffsetBytes = bitsToBytes(dataOffsetBits);
 
         // LTTng Specific
         Target target = lookupTarget(streamPacketContextDef);
