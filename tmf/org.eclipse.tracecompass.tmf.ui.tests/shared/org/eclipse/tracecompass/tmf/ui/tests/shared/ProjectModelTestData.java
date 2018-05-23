@@ -112,8 +112,9 @@ public class ProjectModelTestData {
             try {
                 PlatformUI.getWorkbench().getProgressService().busyCursorWhile(operation);
             } catch (InterruptedException | InvocationTargetException | RuntimeException exception) {
-
+                exception.printStackTrace();
             }
+            experimentsFolder.refresh();
             for (ITmfProjectModelElement el : experimentsFolder.getChildren()) {
                 if (el.getName().equals(experimentName) && (el instanceof TmfExperimentElement)) {
                     return (TmfExperimentElement) el;
