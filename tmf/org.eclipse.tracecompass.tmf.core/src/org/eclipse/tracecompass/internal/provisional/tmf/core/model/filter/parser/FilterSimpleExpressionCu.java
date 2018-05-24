@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
@@ -202,8 +203,13 @@ public class FilterSimpleExpressionCu {
 
         private static BiFunction<String, String, Boolean> matchFunc() {
             return (i, j) -> {
-                Pattern filterPattern = Pattern.compile(j);
-                return filterPattern.matcher(i).find();
+                try {
+                    Pattern filterPattern = Pattern.compile(j);
+                    return filterPattern.matcher(i).find();
+                } catch (PatternSyntaxException e) {
+                    Activator.logWarning("The regex syntax is invalid"); //$NON-NLS-1$
+                    return false;
+                }
             };
         }
 
