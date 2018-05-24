@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -108,7 +108,9 @@ public class DataProviderManager {
     }
 
     /**
-     * Get the data provider for the given trace
+     * Get the data provider for the given trace.
+     * <p>
+     * This method should never be called from within a {@link TmfSignalHandler}.
      *
      * @param trace
      *            The trace
@@ -153,9 +155,13 @@ public class DataProviderManager {
      * @since 3.3
      */
     @TmfSignalHandler
-    public synchronized void traceClosed(final TmfTraceClosedSignal signal) {
-        for (ITmfTrace trace : TmfTraceManager.getTraceSetWithExperiment(signal.getTrace())) {
-            fInstances.removeAll(trace).forEach(ITmfTreeDataProvider::dispose);
-        }
+    public void traceClosed(final TmfTraceClosedSignal signal) {
+        new Thread(() -> {
+            synchronized (DataProviderManager.this) {
+                for (ITmfTrace trace : TmfTraceManager.getTraceSetWithExperiment(signal.getTrace())) {
+                    fInstances.removeAll(trace).forEach(ITmfTreeDataProvider::dispose);
+                }
+            }
+        }).start();
     }
 }
