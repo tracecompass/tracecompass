@@ -27,7 +27,7 @@ import com.google.common.collect.ImmutableMap;
 @SuppressWarnings("javadoc")
 public class ElementResolverFilterTest {
 
-    private static final ElementResolverStub ELEMENT = new ElementResolverStub(ImmutableMap.of("label", "elementLabel", "key0", "value0", "key1", "value1"));
+    private static final ElementResolverStub ELEMENT = new ElementResolverStub(ImmutableMap.of("label", "elementLabel", "key0", "value0", "key1", "value1", "key 2", "value2", "key3", "10"));
 
     @Test
     public void testRegex() {
@@ -138,6 +138,43 @@ public class ElementResolverFilterTest {
         assertTrue(predicate.test(ELEMENT.computeData()));
 
         cu = FilterCu.compile("key1 matches v.*ue$");
+        predicate = cu.generate();
+        assertFalse(predicate.test(ELEMENT.computeData()));
+
+        cu = FilterCu.compile(" \"key 2\" matches value2");
+        predicate = cu.generate();
+        assertTrue(predicate.test(ELEMENT.computeData()));
+    }
+
+    @Test
+    public void testGreaterThanOperator() {
+        FilterCu cu = FilterCu.compile("key3 > 9");
+        Predicate<Map<String, String>> predicate = cu.generate();
+        assertTrue(predicate.test(ELEMENT.computeData()));
+
+        cu = FilterCu.compile("key3 > 10");
+        predicate = cu.generate();
+        assertFalse(predicate.test(ELEMENT.computeData()));
+    }
+
+    @Test
+    public void testLessThanOperator() {
+        FilterCu cu = FilterCu.compile("key3 < 11");
+        Predicate<Map<String, String>> predicate = cu.generate();
+        assertTrue(predicate.test(ELEMENT.computeData()));
+
+        cu = FilterCu.compile("key3 < 10");
+        predicate = cu.generate();
+        assertFalse(predicate.test(ELEMENT.computeData()));
+    }
+
+    @Test
+    public void testComplexFilter() {
+        FilterCu cu = FilterCu.compile("(key1 matches v.*ue) && Label");
+        Predicate<Map<String, String>> predicate = cu.generate();
+        assertTrue(predicate.test(ELEMENT.computeData()));
+
+        cu = FilterCu.compile("!(key1 matches v.*ue) && Label");
         predicate = cu.generate();
         assertFalse(predicate.test(ELEMENT.computeData()));
     }
