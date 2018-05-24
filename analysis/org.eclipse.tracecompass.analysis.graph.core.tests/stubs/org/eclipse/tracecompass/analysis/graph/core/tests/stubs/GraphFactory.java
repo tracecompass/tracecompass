@@ -34,6 +34,9 @@ public class GraphFactory {
      */
     public static final TestGraphWorker Actor1 = new TestGraphWorker(1);
 
+    /** An optional link qualifier on some edges */
+    private static final String LINK_QUALIFIER = "testLinkQualifier";
+
     /**
      * Simple RUNNING edge involving one object
      */
@@ -76,7 +79,7 @@ public class GraphFactory {
                     graph.add(Actor0, new TmfVertex(0));
                     TmfVertex vStart = new TmfVertex(1);
                     graph.append(Actor0, vStart, EdgeType.RUNNING);
-                    graph.append(Actor0, new TmfVertex(2), EdgeType.RUNNING);
+                    graph.append(Actor0, new TmfVertex(2), EdgeType.RUNNING, LINK_QUALIFIER);
                     TmfVertex vEnd = new TmfVertex(3);
                     graph.append(Actor0, vEnd, EdgeType.BLOCKED);
                     graph.append(Actor0, new TmfVertex(4), EdgeType.RUNNING);
@@ -90,7 +93,7 @@ public class GraphFactory {
                     TmfGraph graph = new TmfGraph();
                     graph.add(Actor0, new TmfVertex(0));
                     graph.append(Actor0, new TmfVertex(1), EdgeType.RUNNING);
-                    graph.append(Actor0, new TmfVertex(2), EdgeType.RUNNING);
+                    graph.append(Actor0, new TmfVertex(2), EdgeType.RUNNING, LINK_QUALIFIER);
                     graph.append(Actor0, new TmfVertex(3), EdgeType.TIMER);
                     graph.append(Actor0, new TmfVertex(4), EdgeType.RUNNING);
                     return graph;
@@ -122,7 +125,7 @@ public class GraphFactory {
                     TmfGraph graph = new TmfGraph();
                     graph.add(Actor0, new TmfVertex(0));
                     graph.append(Actor0, new TmfVertex(2), EdgeType.RUNNING);
-                    graph.append(Actor0, new TmfVertex(4), EdgeType.BLOCKED);
+                    graph.append(Actor0, new TmfVertex(4), EdgeType.BLOCKED, LINK_QUALIFIER);
                     graph.append(Actor0, new TmfVertex(6), EdgeType.RUNNING);
                     return graph;
                 }
@@ -132,7 +135,7 @@ public class GraphFactory {
                     TmfGraph graph = new TmfGraph();
                     graph.add(Actor0, new TmfVertex(0));
                     graph.append(Actor0, new TmfVertex(2), EdgeType.RUNNING);
-                    graph.append(Actor0, new TmfVertex(4), EdgeType.BLOCKED);
+                    graph.append(Actor0, new TmfVertex(4), EdgeType.BLOCKED, LINK_QUALIFIER);
                     graph.append(Actor0, new TmfVertex(6), EdgeType.RUNNING);
                     return graph;
                 }
@@ -227,12 +230,12 @@ public class GraphFactory {
                     TmfVertex vWakeup = new TmfVertex(6);
                     graph.add(Actor0, new TmfVertex(0));
                     graph.append(Actor0, vSrcLink, EdgeType.RUNNING);
-                    graph.append(Actor0, new TmfVertex(4), EdgeType.RUNNING);
+                    graph.append(Actor0, new TmfVertex(4), EdgeType.RUNNING, LINK_QUALIFIER);
                     graph.append(Actor0, vBlockEnd, EdgeType.BLOCKED);
-                    graph.append(Actor0, new TmfVertex(8), EdgeType.RUNNING);
+                    graph.append(Actor0, new TmfVertex(8), EdgeType.RUNNING, LINK_QUALIFIER);
 
                     graph.add(Actor1, vDstLink);
-                    graph.append(Actor1, vWakeup, EdgeType.RUNNING);
+                    graph.append(Actor1, vWakeup, EdgeType.RUNNING, LINK_QUALIFIER);
 
                     graph.link(vSrcLink, vDstLink);
                     graph.link(vWakeup, vBlockEnd);
@@ -248,12 +251,12 @@ public class GraphFactory {
                     TmfVertex vWakeup = new TmfVertex(6);
                     graph.add(Actor0, new TmfVertex(0));
                     graph.append(Actor0, new TmfVertex(2), EdgeType.RUNNING);
-                    graph.append(Actor0, vBlockStart, EdgeType.RUNNING);
+                    graph.append(Actor0, vBlockStart, EdgeType.RUNNING, LINK_QUALIFIER);
                     graph.add(Actor0, vBlockEnd);
-                    graph.append(Actor0, new TmfVertex(8), EdgeType.RUNNING);
+                    graph.append(Actor0, new TmfVertex(8), EdgeType.RUNNING, LINK_QUALIFIER);
 
                     graph.add(Actor1, vDstLink);
-                    graph.append(Actor1, vWakeup, EdgeType.RUNNING);
+                    graph.append(Actor1, vWakeup, EdgeType.RUNNING, LINK_QUALIFIER);
 
                     graph.link(vBlockStart, vDstLink);
                     graph.link(vWakeup, vBlockEnd);
@@ -270,10 +273,10 @@ public class GraphFactory {
                     graph.add(Actor0, new TmfVertex(0));
                     graph.append(Actor0, vSrcLink, EdgeType.RUNNING);
                     graph.add(Actor0, vBlockEnd);
-                    graph.append(Actor0, new TmfVertex(8), EdgeType.RUNNING);
+                    graph.append(Actor0, new TmfVertex(8), EdgeType.RUNNING, LINK_QUALIFIER);
 
                     graph.add(Actor1, vDstLink);
-                    graph.append(Actor1, vWakeup, EdgeType.RUNNING);
+                    graph.append(Actor1, vWakeup, EdgeType.RUNNING, LINK_QUALIFIER);
 
                     graph.link(vSrcLink, vDstLink);
                     graph.link(vWakeup, vBlockEnd);

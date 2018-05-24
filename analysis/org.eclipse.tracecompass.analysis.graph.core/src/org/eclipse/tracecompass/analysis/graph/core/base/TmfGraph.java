@@ -112,6 +112,32 @@ public class TmfGraph {
     }
 
     /**
+     * Add node to object's list and make horizontal link with tail.
+     *
+     * @param worker
+     *            The key of the object the vertex belongs to
+     * @param vertex
+     *            The new vertex
+     * @param type
+     *            The type of edge to create
+     * @param linkQualifier
+     *            An optional qualifier to identify this link
+     * @return The edge constructed
+     * @since 2.1
+     */
+    public @Nullable TmfEdge append(IGraphWorker worker, TmfVertex vertex, EdgeType type, @Nullable String linkQualifier) {
+        List<TmfVertex> list = fNodeMap.get(worker);
+        TmfVertex tail = getTail(worker);
+        TmfEdge link = null;
+        if (tail != null) {
+            link = tail.linkHorizontal(vertex, type, linkQualifier);
+        }
+        list.add(vertex);
+        fReverse.put(vertex, worker);
+        return link;
+    }
+
+    /**
      * Add a link between two vertices of the graph. The from vertex must be in
      * the graph. If the 'to' vertex is not in the graph, it will be appended to
      * the object the 'from' vertex is for. Otherwise a vertical or horizontal
@@ -167,6 +193,48 @@ public class TmfGraph {
             link = from.linkVertical(to);
         }
         link.setType(type);
+        return link;
+    }
+
+    /**
+     * Add a link between two vertices of the graph. The from vertex must be in the
+     * graph. If the 'to' vertex is not in the graph, it will be appended to the
+     * object the 'from' vertex is for. Otherwise a vertical or horizontal link will
+     * be created between the vertices.
+     *
+     * Caution: this will remove without warning any previous link from the 'from'
+     * vertex
+     *
+     * @param from
+     *            The source vertex
+     * @param to
+     *            The destination vertex
+     * @param type
+     *            The type of edge to create
+     * @param linkQualifier
+     *            An optional qualifier to identify this link
+     * @return The newly created edge
+     * @since 2.1
+     */
+    public TmfEdge link(TmfVertex from, TmfVertex to, EdgeType type, String linkQualifier) {
+        IGraphWorker ofrom = fReverse.get(from);
+        IGraphWorker oto = fReverse.get(to);
+        if (ofrom == null) {
+            throw new IllegalArgumentException(Messages.TmfGraph_FromNotInGraph);
+        }
+
+        /* to vertex not in the graph, add it to ofrom */
+        if (oto == null) {
+            this.add(ofrom, to);
+            oto = ofrom;
+        }
+
+        TmfEdge link;
+        if (oto.equals(ofrom)) {
+            link = from.linkHorizontal(to, type, linkQualifier);
+        } else {
+            link = from.linkVertical(to, type, linkQualifier);
+        }
         return link;
     }
 

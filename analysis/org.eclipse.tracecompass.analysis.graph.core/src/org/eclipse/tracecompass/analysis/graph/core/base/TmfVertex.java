@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.analysis.graph.core.base;
 import java.util.Comparator;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge.EdgeType;
 
 /**
  * Timed vertex for TmfGraph
@@ -173,6 +174,27 @@ public class TmfVertex implements Comparable<TmfVertex> {
         return linkHorizontalRaw(to);
     }
 
+    /**
+     * Adds an horizontal edge from the current vertex to the 'to' vertex
+     *
+     * @param to
+     *            The vertex to link to, belongs to the same object
+     * @param type
+     *            The type of the link to add
+     * @param linkQualifier
+     *            An optional qualifier to identify this link
+     *
+     * @return The new edge
+     * @since 2.1
+     */
+    public TmfEdge linkHorizontal(TmfVertex to, EdgeType type, @Nullable String linkQualifier) {
+        checkTimestamps(to);
+        checkNotSelf(to);
+        TmfEdge link = linkHorizontalRaw(to);
+        link.setType(type, linkQualifier);
+        return link;
+    }
+
     private TmfEdge linkHorizontalRaw(TmfVertex node) {
         TmfEdge link = new TmfEdge(this, node);
         fOutgoingHorizontal = link;
@@ -191,6 +213,26 @@ public class TmfVertex implements Comparable<TmfVertex> {
         checkTimestamps(to);
         checkNotSelf(to);
         return linkVerticalRaw(to);
+    }
+
+    /**
+     * Adds a vertical edge from the current vertex to the 'to' vertex
+     *
+     * @param to
+     *            The vertex to link to, belongs to a different object
+     * @param type
+     *            The type of the link to add
+     * @param linkQualifier
+     *            An optional qualifier to identify this link
+     * @return The new edge
+     * @since 2.1
+     */
+    public TmfEdge linkVertical(TmfVertex to, EdgeType type, @Nullable String linkQualifier) {
+        checkTimestamps(to);
+        checkNotSelf(to);
+        TmfEdge link = linkVerticalRaw(to);
+        link.setType(type, linkQualifier);
+        return link;
     }
 
     private TmfEdge linkVerticalRaw(TmfVertex to) {

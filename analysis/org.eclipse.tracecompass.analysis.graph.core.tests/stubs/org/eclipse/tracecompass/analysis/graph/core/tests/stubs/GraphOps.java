@@ -64,7 +64,8 @@ public class GraphOps {
                     assertEquals("Edge type for " + graphObject + ", node " + i, edge1.getType(), edge2.getType());
                     assertEquals("Edge duration for " + graphObject + ", node " + i + " edge direction " + dir, edge1.getDuration(), edge2.getDuration());
                     assertEquals("From objects for " + graphObject + ", node " + i, g1.getParentOf(edge1.getVertexFrom()), g2.getParentOf(edge2.getVertexFrom()));
-                    assertEquals("To objects for" + graphObject + ", node " + i, g1.getParentOf(edge1.getVertexTo()), g2.getParentOf(edge2.getVertexTo()));
+                    assertEquals("To objects for " + graphObject + ", node " + i, g1.getParentOf(edge1.getVertexTo()), g2.getParentOf(edge2.getVertexTo()));
+                    assertEquals("Edge qualifier for " + graphObject + ", node " + i, edge1.getLinkQualifier(), edge2.getLinkQualifier());
                 }
             }
         }

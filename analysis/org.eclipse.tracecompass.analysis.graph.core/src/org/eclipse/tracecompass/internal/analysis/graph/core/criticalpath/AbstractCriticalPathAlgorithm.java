@@ -63,9 +63,11 @@ public abstract class AbstractCriticalPathAlgorithm implements ICriticalPathAlgo
      *            The timestamp of the edge
      * @param type
      *            The type of the edge to create
+     * @param string
+     *            An optional qualifier for the link
      * @return The destination vertex in the path graph
      */
-    public TmfVertex copyLink(TmfGraph criticalPath, TmfGraph graph, TmfVertex anchor, TmfVertex from, TmfVertex to, long ts, TmfEdge.EdgeType type) {
+    protected TmfVertex copyLink(TmfGraph criticalPath, TmfGraph graph, TmfVertex anchor, TmfVertex from, TmfVertex to, long ts, TmfEdge.EdgeType type, @Nullable String string) {
         IGraphWorker parentFrom = graph.getParentOf(from);
         IGraphWorker parentTo = graph.getParentOf(to);
         if (parentTo == null) {
@@ -74,9 +76,9 @@ public abstract class AbstractCriticalPathAlgorithm implements ICriticalPathAlgo
         TmfVertex tmp = new TmfVertex(ts);
         criticalPath.add(parentTo, tmp);
         if (parentFrom == parentTo) {
-            anchor.linkHorizontal(tmp).setType(type);
+            anchor.linkHorizontal(tmp, type, string);
         } else {
-            anchor.linkVertical(tmp).setType(type);
+            anchor.linkVertical(tmp, type, string);
         }
         return tmp;
     }

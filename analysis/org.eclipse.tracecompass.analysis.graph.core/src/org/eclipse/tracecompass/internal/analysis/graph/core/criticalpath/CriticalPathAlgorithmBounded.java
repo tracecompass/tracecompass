@@ -97,7 +97,7 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
                 if (parentTo != parent) {
                     throw new CriticalPathAlgorithmException("no, the parents of horizontal edges are not always identical... shouldn't they be?"); //$NON-NLS-1$
                 }
-                criticalPath.append(parentTo, new TmfVertex(nextEdge.getVertexTo()), nextEdge.getType());
+                criticalPath.append(parentTo, new TmfVertex(nextEdge.getVertexTo()), nextEdge.getType(), nextEdge.getLinkQualifier());
                 break;
             case NETWORK:
             case BLOCKED:
@@ -134,7 +134,7 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
             if (next == null) {
                 return;
             }
-            criticalPath.append(currentActor, new TmfVertex(next.getVertexTo()), next.getType());
+            criticalPath.append(currentActor, new TmfVertex(next.getVertexTo()), next.getType(), next.getLinkQualifier());
             return;
         }
         // FIXME: assert last link.to actor == currentActor
@@ -166,10 +166,10 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
             // check connectivity
             if (prev != null && prev.getVertexTo() != link.getVertexFrom()) {
                 anchor = copyLink(criticalPath, graph, anchor, prev.getVertexTo(), link.getVertexFrom(),
-                        prev.getVertexTo().getTs(), TmfEdge.EdgeType.DEFAULT);
+                        prev.getVertexTo().getTs(), TmfEdge.EdgeType.DEFAULT, link.getLinkQualifier());
             }
             anchor = copyLink(criticalPath, graph, anchor, link.getVertexFrom(), link.getVertexTo(),
-                    link.getVertexTo().getTs(), link.getType());
+                    link.getVertexTo().getTs(), link.getType(), link.getLinkQualifier());
             prev = link;
         }
     }

@@ -13,6 +13,8 @@
 
 package org.eclipse.tracecompass.analysis.graph.core.base;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * Edge of a TmfGraph
  *
@@ -84,9 +86,10 @@ public class TmfEdge {
         IPI,
     }
 
-    private EdgeType fType;
     private final TmfVertex fVertexFrom;
     private final TmfVertex fVertexTo;
+    private EdgeType fType;
+    private @Nullable String fQualifier = null;
 
     /**
      * Constructor
@@ -144,6 +147,31 @@ public class TmfEdge {
     }
 
     /**
+     * Sets the edge type
+     *
+     * @param type
+     *            The edge type
+     * @param linkQualifier
+     *            A string to qualify this link
+     * @since 2.1
+     */
+    public void setType(EdgeType type, @Nullable String linkQualifier) {
+        fType = type;
+        fQualifier = linkQualifier;
+    }
+
+    /**
+     * Get the link qualifier, ie a descriptor for the link. This has no effect on
+     * the graph or critical path
+     *
+     * @return The link qualifier
+     * @since 2.1
+     */
+    public @Nullable String getLinkQualifier() {
+        return fQualifier;
+    }
+
+    /**
      * Returns the duration of the edge
      *
      * @return The duration (in nanoseconds)
@@ -157,4 +185,5 @@ public class TmfEdge {
     public String toString() {
         return "[" + fVertexFrom + "--" + fType + "->" + fVertexTo + "]";
     }
+
 }

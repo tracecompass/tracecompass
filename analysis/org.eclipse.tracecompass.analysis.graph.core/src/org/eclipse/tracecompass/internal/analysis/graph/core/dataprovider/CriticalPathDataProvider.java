@@ -305,7 +305,9 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
                 IGraphWorker parent = fGraph.getParentOf(link.getVertexFrom());
                 Long id = fWorkerToEntryId.get(parent);
                 if (id != null) {
-                    ITimeGraphState ev = new TimeGraphState(link.getVertexFrom().getTs(), link.getDuration(), getMatchingState(link.getType()));
+                    String linkQualifier = link.getLinkQualifier();
+                    ITimeGraphState ev = (linkQualifier == null) ? new TimeGraphState(link.getVertexFrom().getTs(), link.getDuration(), getMatchingState(link.getType())) :
+                        new TimeGraphState(link.getVertexFrom().getTs(), link.getDuration(), getMatchingState(link.getType()), linkQualifier);
                     fStates.put(id, ev);
                 }
             } else {
