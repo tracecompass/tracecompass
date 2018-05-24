@@ -1241,6 +1241,58 @@ Various options are available in the ''' Options ''' group :
 
 The ''' Direction ''' group allows to select the search direction : ''' Forward ''' or ''' Backward '''.
 
+==== Filtering Time Events in Time Graph Views ====
+
+Filtering time events in a '''Time Graph view''', e.g. [[#Control_Flow_View | Control Flow View]] or [[#Resources_View | Resources View]], using the ''' Time Event Filter ''' dialog box. To do so:
+
+* Select the '''Time Graph view''' you want to filter in
+* Press ''' / '''. The ''' Time Event Filter ''' dialog box will show on the bottom right corner of the view.
+* Enter the string to use as filter in the opened dialog box. The view updates its content as the user enter the string. The filter is applied and unsuccessful time events are dimmed.
+
+[[Image:images/TimeEventFilter/FilterDialog.png]]
+
+Note that ''' Regular expression ''' is supported.
+
+It is possible to save multiple filters. They will be all activated at the same time in the view. To save a filter:
+
+* Select ''' Time Event Filter ''' dialog box
+* Enter the filter string to save. The view is updated and new unsuccessful time events are dimmed.
+* With the focus on the dialog box, press ''' ENTER '''. The '''saved filter''' will appear at the left of the dialog box and the text in the dialog box is cleared. The view is updated and previous unsuccessful dimmed time events are removed from the view and entries that have no time events to show are removed too.
+
+[[Image:images/TimeEventFilter/SavedFilter.png]]
+
+Note that user can still use the dialog box to filter the remaining visible time events in the view.
+
+Note that the view has a limit of 4 saved filters.
+
+Note that all ''' links ''' are dimmed when a filter is applied and completely removed when there is active '''saved filters'''.
+
+To remove a '''saved filter''', click on the remove button next to the filter.
+
+The time event filtering uses its own ''' domain-specific language (DSL) '''. Various logical operators are suppported:
+
+* ''' && ''' performs a logical AND operation between two filter expressions. Example: '' ioctl && 5755 ''
+* ''' || ''' performs a logical OR operation between two filter expressions. Example: '' ioctl || splice ''
+* ''' ! ''' performs a logical NOT operation between two filter expressions. Example: '' !ioctl ''
+
+''' Filter expressions ''' have the following pattern ''' '' field '' '' operator '' '' argument '' ''' in general. Several relational operators are available:
+
+* ''' == ''' test whether the value of the specified field is equal to the given argument . Example: '' TID == 5755 ''
+* ''' != ''' test whether the value of the specified field is not equal to the given argument . Example: '' TID != 5755 ''
+* ''' matches ''' test whether the value of the specified field matches to the given argument . Example: '' TID matches 5.*5$ ''
+* ''' contains ''' test whether the value of the specified field contains to the given argument . Example: '' TID contains 7 ''
+* ''' > ''' test whether the value of the specified field is greater than the given argument . Example: '' "SOFT IRQ" > 4 ''
+* ''' < ''' test whether the value of the specified field is less than the given argument . Example: '' "SOFT IRQ" < 4 ''
+
+
+''' Filter expressions ''' can have the following pattern ''' '' field '' '' operator '' '''. The available relational operators for this pattern is :
+
+* ''' present ''' test whether the specified field exist. Example: '' TID present ''
+
+The DSL allows the possibility to realize complex filters, combining several ''' Filter expressions ''' and using parenthesis. Example: '' TID != 5755 && (System_call contains select) ''
+
+Note that ''' field ''' parameter with whitespace should be specified using quotes mark. Example: '' "SOFT IRQ" present ''
+
 == Configurable Marker Sets ==
 
 Time graph views can allow the user to display periodic markers over time graphs by selecting a marker set. The marker sets are user-configurable by editing the ''markers.xml'' file.
@@ -2202,19 +2254,6 @@ A thread is considered inactive when it is in the following state:
 A user can fine tune this filter by providing ranges of CPUs allowing the filter to only show active thread running on the specified CPUs.
 
 [[Image:images/DynamicFilters/DynamicFilter_ShowActiveThreadsConfigure.png]]
-
-==== Time Event Filtering ====
-
-It is possible to filter the time events in a time graph view and at the current zoom level. To filter the timegraph view, press '''/''' in the timegraph view. When the filter dialog will show up, user can enter the filtering regex in the text box. The filter is applied and the view is updated as the user type the text.
-
-[[Image:images/TimeEventFilter/FilterDialog.png]]
-
-It is possible to save multiple filters. They will be all activated at the same time in the view. To save filters, user need to press ENTER on the ongoing regex. The '''saved filters''' will appear at the left of the dialog text element. The view has a limit of 4 saved filter.
-When the view has '''saved filters''', the time events that do not match these filters are hidden in the view and entries that have nothing to show are hidden too. User can use the dialog text box to filter the remaining time events.
-
-[[Image:images/TimeEventFilter/SavedFilter.png]]
-
-To remove a '''saved filter''', click on the remove button accross the filter.
 
 === Toolbar ===
 
