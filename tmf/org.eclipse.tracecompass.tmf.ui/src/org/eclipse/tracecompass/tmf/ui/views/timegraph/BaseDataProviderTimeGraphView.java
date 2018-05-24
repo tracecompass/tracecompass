@@ -438,7 +438,9 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         if (entryList != null) {
             synchronized (fEntries) {
                 for (TimeGraphEntry entry : entryList) {
-                    fEntries.row(getProvider(entry)).clear();
+                    if (entry instanceof TraceEntry) {
+                        fEntries.row(((TraceEntry) entry).getProvider()).clear();
+                    }
                 }
             }
         }
