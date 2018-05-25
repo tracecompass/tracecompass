@@ -74,6 +74,11 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      * Segment store
      */
     private final ISegmentStore<@NonNull ISegment> fStore;
+    /**
+     * This field will be set once the segment store is completed. Because the
+     * segment store to return must be either null or completed
+     */
+    private @Nullable ISegmentStore<@NonNull ISegment> fCompletedStore = null;
 
     /**
      * Listeners. {@link ListenerList}s are typed since 4.6 (Neon), type these when
@@ -206,6 +211,8 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
                 }
             }
         }
+        // Set the completed store and send updates
+        fCompletedStore = fStore;
         sendUpdate(fStore);
         return true;
     }
@@ -352,7 +359,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
 
     @Override
     public @Nullable ISegmentStore<@NonNull ISegment> getSegmentStore() {
-        return fStore;
+        return fCompletedStore;
     }
 
     /**

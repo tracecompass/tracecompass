@@ -9,8 +9,11 @@
 
 package org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph;
 
+import java.util.Iterator;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.profiling.core.callgraph.ICallGraphProvider;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
@@ -18,8 +21,6 @@ import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.Symbo
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
-
-import com.google.common.collect.Iterables;
 
 /**
  * Call graph statistics analysis used to get statistics on each function type.
@@ -33,12 +34,26 @@ public class CallGraphStatisticsAnalysis extends AbstractSegmentStatisticsAnalys
 
     @Override
     protected @Nullable ISegmentStoreProvider getSegmentProviderAnalysis(@NonNull ITmfTrace trace) {
+        // FIXME: Return the CallStackAnalysis when the segment store comes from there
+        // and not the CallGraph. Now, we return the CallGraphAnalysis, just so we can
+        // wait for this analysis to finish to get the full segment store
         Iterable<CallStackAnalysis> csModules = TmfTraceUtils.getAnalysisModulesOfClass(trace, CallStackAnalysis.class);
-        return Iterables.getFirst(csModules, null);
+        Iterator<CallStackAnalysis> iterator = csModules.iterator();
+        if (!iterator.hasNext()) {
+            return null;
+        }
+        CallStackAnalysis csModule = iterator.next();
+        ICallGraphProvider callGraph = csModule.getCallGraph();
+        if (!(callGraph instanceof CallGraphAnalysis)) {
+            return null;
+        }
+        return (CallGraphAnalysis) callGraph;
     }
 
     @Override
     protected @Nullable String getSegmentType(@NonNull ISegment segment) {
         return String.valueOf(SymbolAspect.SYMBOL_ASPECT.resolve(segment));
     }
+
+
 }
