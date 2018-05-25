@@ -8,6 +8,7 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.analysis.profiling.core.callstack;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.profiling.core.callgraph.ICallGraphProvider;
@@ -101,6 +102,16 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
     // ------------------------------------------------------------------------
 
     @Override
+    protected boolean executeAnalysis(@Nullable IProgressMonitor monitor) {
+        boolean result = super.executeAnalysis(monitor);
+        if (!result) {
+            return false;
+        }
+        fCallGraphAnalysis.schedule();
+        return result;
+    }
+
+    @Override
     public boolean setTrace(@NonNull ITmfTrace trace) throws TmfAnalysisException {
         boolean ret = super.setTrace(trace);
         if (!ret) {
@@ -137,7 +148,6 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
 
     @Override
     public @Nullable ISegmentStore<ISegment> getSegmentStore() {
-        fCallGraphAnalysis.schedule();
         return fCallGraphAnalysis.getSegmentStore();
     }
 

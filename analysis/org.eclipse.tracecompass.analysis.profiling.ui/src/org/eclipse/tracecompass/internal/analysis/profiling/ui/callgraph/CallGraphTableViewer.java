@@ -60,16 +60,18 @@ public class CallGraphTableViewer extends AbstractSegmentStoreTableViewer {
         if (csModule == null) {
             return null;
         }
+        csModule.schedule();
         ICallGraphProvider cgModule = csModule.getCallGraph();
         if (!(cgModule instanceof CallGraphAnalysis)) {
             return null;
         }
         CallGraphAnalysis module = (CallGraphAnalysis) cgModule;
-        module.schedule();
         Job job = new Job(Messages.CallGraphAnalysis) {
 
             @Override
             protected IStatus run(IProgressMonitor monitor) {
+                // The callgraph module will be scheduled by the callstack analysis, but we need
+                // to wait for its specific termination
                 module.waitForCompletion(Objects.requireNonNull((monitor)));
                 if (monitor.isCanceled()) {
                     return Status.CANCEL_STATUS;
@@ -78,6 +80,6 @@ public class CallGraphTableViewer extends AbstractSegmentStoreTableViewer {
             }
         };
         job.schedule();
-        return module;
+        return csModule;
     }
 }
