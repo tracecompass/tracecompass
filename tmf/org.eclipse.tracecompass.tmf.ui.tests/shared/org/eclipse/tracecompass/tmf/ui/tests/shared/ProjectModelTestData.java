@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2017 École Polytechnique de Montréal and others
+ * Copyright (c) 2013, 2018 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -240,33 +240,23 @@ public class ProjectModelTestData {
      * delays, while still not failing tests when it randomly takes a bit more
      * time for the trace to open.
      *
-     * If the project model element sent in parameter is not a trace element,
-     * then the thread is delayed only once by the default delay time. For
-     * longer delays in those cases, it is preferable to use the
-     * {@link ProjectModelTestData#delayThread(long)} instead.
-     *
-     * @param projectElement
-     *            The trace element we are waiting for. If the element if not of
-     *            type TmfTraceElement, the thread is delayed only once.
+     * @param traceElement
+     *            The trace element we are waiting for.
      * @throws WaitTimeoutException
      *             If after the maximum number of delays the trace is still
      *             null, we throw a timeout exception, the trace has not opened.
      */
-    public static void delayUntilTraceOpened(final ITmfProjectModelElement projectElement) throws WaitTimeoutException {
-        if (projectElement instanceof TmfCommonProjectElement) {
-            TmfCommonProjectElement traceElement = (TmfCommonProjectElement) projectElement;
-            WaitUtils.waitUntil(new IWaitCondition() {
-                @Override
-                public boolean test() throws Exception {
-                    return traceElement.getTrace() != null;
-                }
+    public static void delayUntilTraceOpened(final TmfCommonProjectElement traceElement) throws WaitTimeoutException {
+        WaitUtils.waitUntil(new IWaitCondition() {
+            @Override
+            public boolean test() throws Exception {
+                return traceElement.getTrace() != null;
+            }
 
-                @Override
-                public String getFailureMessage() {
-                    return "Timeout while waiting for " + traceElement;
-                }
-            });
-        }
-
+            @Override
+            public String getFailureMessage() {
+                return "Timeout while waiting for " + traceElement;
+            }
+        });
     }
 }

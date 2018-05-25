@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 École Polytechnique de Montréal
+ * Copyright (c) 2013, 2018 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.tracecompass.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisOutputElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfCommonProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
@@ -108,11 +109,12 @@ public class ProjectModelOutputTest {
     @Test
     public void testListOutputs() {
         TmfAnalysisElement analysis = getTestAnalysisUi();
+        TmfCommonProjectElement traceElement = analysis.getParent().getParent();
 
         /* To get the list of outputs the trace needs to be opened */
         analysis.activateParentTrace();
         try {
-            ProjectModelTestData.delayUntilTraceOpened(analysis.getParent());
+            ProjectModelTestData.delayUntilTraceOpened(traceElement);
         } catch (WaitTimeoutException e) {
             fail("The analysis parent did not open in a reasonable time");
         }
@@ -131,6 +133,7 @@ public class ProjectModelOutputTest {
             }
         }
         assertTrue(found);
+        traceElement.closeEditors();
     }
 
     /**
@@ -139,10 +142,11 @@ public class ProjectModelOutputTest {
     @Test
     public void testOpenView() {
         TmfAnalysisElement analysis = getTestAnalysisUi();
+        TmfCommonProjectElement traceElement = analysis.getParent().getParent();
 
         analysis.activateParentTrace();
         try {
-            ProjectModelTestData.delayUntilTraceOpened(analysis.getParent());
+            ProjectModelTestData.delayUntilTraceOpened(traceElement);
         } catch (WaitTimeoutException e) {
             fail("The analysis parent did not open in a reasonable time");
         }
@@ -171,9 +175,9 @@ public class ProjectModelOutputTest {
         assertNotNull(outputElement);
 
         outputElement.outputAnalysis();
-        ProjectModelTestData.delayThread(1000);
-        view = activePage.findView(TestAnalysisUi.VIEW_ID);
-        assertNotNull(view);
+        WaitUtils.waitUntil(workbenchPage -> workbenchPage.findView(TestAnalysisUi.VIEW_ID) != null,
+                activePage, "Test Analysis View did not open");
+        traceElement.closeEditors();
     }
 
     private static final class ConditionTraceChildrenElements implements IWaitCondition {
