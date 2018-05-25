@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2018 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -109,6 +109,8 @@ public class TraceAndExperimentTypeTest {
 
         ITmfTrace trace = fExperiment.getTrace();
         assertTrue(trace instanceof TmfExperimentStub);
+
+        fExperiment.closeEditors();
     }
 
     /**
@@ -128,6 +130,8 @@ public class TraceAndExperimentTypeTest {
         /* Test the editor class. Cannot test table class since it is unexposed */
         assertNotNull(editor);
         assertTrue(editor.getClass().equals(TmfEventsEditor.class));
+
+        fExperiment.closeEditors();
     }
 
     /**
@@ -165,6 +169,7 @@ public class TraceAndExperimentTypeTest {
         assertNotNull(table);
         assertTrue(table.getClass().equals(TmfEventsTable.class));
 
+        fExperiment.closeEditors();
     }
 
     /**
