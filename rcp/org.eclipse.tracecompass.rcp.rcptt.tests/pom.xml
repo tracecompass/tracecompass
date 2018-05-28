@@ -95,7 +95,7 @@
             </vmArgs>
           </aut>
           <runner>
-            <version>2.2.0</version>
+            <version>2.3.0-M6c</version>
           </runner>
           <suites>
             <suite>open_trace_suite</suite>

@@ -148,7 +148,7 @@ public class LamiChartViewerTest {
          * to confirm the action. The current thread will click on the 'Yes'
          * button
          */
-        Runnable runnable = () -> fBot.button("Yes").click();
+        Runnable runnable = () -> SWTBotUtils.anyButtonOf(fBot, "Yes", "Reset Perspective").click();
         UIThreadRunnable.asyncExec(() -> {
             IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getWorkbenchWindows()[0];
             ActionFactory.RESET_PERSPECTIVE.create(activeWorkbenchWindow).run();
