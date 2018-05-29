@@ -52,14 +52,9 @@ public class TimeEventFilterDialog extends Dialog {
      */
     public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
-    /**
-     * The time event filter dialog width
-     */
-    public static final int FIND_X_WIDTH_HINT = 200;
+    private static final int FIND_X_WIDTH_HINT = 200;
 
     private static final int MAX_FILTER_REGEX_SIZE = 4;
-
-    private static final int X_OFFSET = -10;
 
     private static final int Y_OFFSET = -15;
 
@@ -69,9 +64,11 @@ public class TimeEventFilterDialog extends Dialog {
     /** The time event filter regex */
     private Set<@NonNull String> fFilterRegexes = new LinkedHashSet<>(MAX_FILTER_REGEX_SIZE);
 
-    private TimeGraphControl fControl;
+    private final TimeGraphControl fControl;
 
-    private AbstractTimeGraphView fView;
+    private final AbstractTimeGraphView fView;
+
+    private final ControlListener fControlListener = new ControlMovedListener();
 
     /**
      * Constructor
@@ -86,8 +83,6 @@ public class TimeEventFilterDialog extends Dialog {
         super(parentShell);
         fView = view;
         fControl = control;
-
-        fControl.addControlListener(new ControlMovedListener());
     }
 
     @Override
@@ -153,6 +148,9 @@ public class TimeEventFilterDialog extends Dialog {
         for (String label : fFilterRegexes) {
             createCLabels(parent, labels, label);
         }
+
+        fControl.addControlListener(fControlListener);
+        fControl.getShell().addControlListener(fControlListener);
 
         return parent;
     }
@@ -224,23 +222,27 @@ public class TimeEventFilterDialog extends Dialog {
 
     @Override
     protected Point getInitialLocation(Point initialSize) {
-        return getFilterBounds();
+        return getFilterLocation();
     }
 
     @Override
     public boolean close() {
+        if (!fControl.isDisposed()) {
+            fControl.removeControlListener(fControlListener);
+            fControl.getShell().removeControlListener(fControlListener);
+        }
         return super.close();
     }
 
     /**
-     * Get the time event filter dialog bounds
+     * Get the time event filter dialog location
      *
-     * @return The time event filter base point
-     * @since 4.0
+     * @return the filter dialog location
      */
-    public Point getFilterBounds() {
+    public Point getFilterLocation() {
         Rectangle bounds = fControl.getBounds();
-        return fControl.toDisplay(new Point(bounds.x + bounds.width - TimeEventFilterDialog.FIND_X_WIDTH_HINT + X_OFFSET, bounds.y + bounds.height + Y_OFFSET));
+        int width = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+        return fControl.toDisplay(new Point(bounds.x + bounds.width - width, bounds.y + bounds.height + Y_OFFSET));
     }
 
     /**
@@ -299,7 +301,7 @@ public class TimeEventFilterDialog extends Dialog {
                 return;
             }
             Point size = getInitialSize();
-            Point location = getFilterBounds();
+            Point location = getFilterLocation();
             getShell().setBounds(getConstrainedShellBounds(new Rectangle(location.x,
                     location.y, size.x, size.y)));
         }
