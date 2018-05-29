@@ -288,6 +288,24 @@ public interface ITimeGraphPresentationProvider {
      * @since 4.0
      */
     default @NonNull Map<String, String> getFilterInput(ITimeEvent event) {
-        return new HashMap<>();
+        Map<String, String> inputs = new HashMap<>();
+        ITimeGraphEntry entry = event.getEntry();
+
+        String stateTypeName = getStateTypeName(entry);
+        String entryName = entry.getName();
+        if (stateTypeName == null) {
+            stateTypeName = getStateTypeName();
+        }
+
+        if (!entryName.isEmpty()) {
+            inputs.put(stateTypeName, entry.getName());
+        }
+
+        String state = getEventName(event);
+        if (state != null) {
+            inputs.put(Messages.TmfTimeTipHandler_TRACE_STATE, state);
+        }
+
+        return inputs;
     }
 }
