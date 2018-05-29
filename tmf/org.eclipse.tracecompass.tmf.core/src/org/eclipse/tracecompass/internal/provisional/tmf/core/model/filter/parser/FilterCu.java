@@ -17,7 +17,6 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser.parse_return;
@@ -65,6 +64,7 @@ public class FilterCu {
             return null;
         }
         try {
+            regex.trim();
             ANTLRStringStream stream = new ANTLRStringStream(regex);
             FilterParserLexer lexer = new FilterParserLexer(stream);
             boolean[] invalid = new boolean[1];
@@ -78,30 +78,30 @@ public class FilterCu {
             parse_return parse = parser.parse();
 
             if (invalid[0]) {
-                System.err.println("invalid filter"); //$NON-NLS-1$
+                // Do nothing
                 return null;
             }
 
-            regex.trim();
             CommonTree tree = parse.getTree();
-            List<CommonTree> children = tree.getChildren();
             List<FilterExpressionCu> expressions = new ArrayList<>();
-            for (CommonTree child : children) {
-                switch (child.getToken().getType()) {
-                case FilterParserParser.EXP_NEG:
-                    String substring2 = regex.substring(1);
-                    return FilterNotCu.compile(substring2);
-                default:
-                    FilterExpressionCu compile = FilterExpressionCu.compile(child);
-                    if (compile == null) {
-                        return null;
-                    }
-                    expressions.add(compile);
-                    return new FilterCu(expressions);
-                }
+
+            List<CommonTree> children = new ArrayList<>();
+            if (!tree.isNil()) {
+                children.add(tree);
+            } else {
+                children.addAll(tree.getChildren());
             }
+
+            for (CommonTree child : children) {
+                FilterExpressionCu compile = FilterExpressionCu.compile(child);
+                if (compile == null) {
+                    return null;
+                }
+                expressions.add(compile);
+            }
+            return new FilterCu(expressions);
         } catch (RecognitionException e) {
-            System.err.println("invalid filter: " + NonNullUtils.nullToEmptyString(e.getMessage())); //$NON-NLS-1$
+            // Do nothing
         }
         return null;
     }

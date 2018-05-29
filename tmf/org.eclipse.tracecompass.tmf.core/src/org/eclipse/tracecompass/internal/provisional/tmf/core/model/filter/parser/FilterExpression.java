@@ -9,6 +9,7 @@
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
 import java.util.Map;
+import java.util.Queue;
 import java.util.function.Predicate;
 
 /**
@@ -20,38 +21,54 @@ import java.util.function.Predicate;
  */
 public class FilterExpression implements Predicate<Map<String, String>> {
 
-    private FilterSimpleExpression fLeftOperand;
-    private FilterSimpleExpression fRightOperand;
-    private String fLogicalOperator;
+    private Queue<Object> fElements;
 
     /**
      * Constructor
      *
-     * @param leftOperand
-     *            The left operand
-     * @param logicalOp
-     *            The logical operation
-     * @param rightOperand
-     *            The right operand
+     * @param elements
+     *            The list of element representing this experession
+     *
      */
-    public FilterExpression(FilterSimpleExpression leftOperand, String logicalOp, FilterSimpleExpression rightOperand) {
-        fLeftOperand = leftOperand;
-        fRightOperand = rightOperand;
-        fLogicalOperator = logicalOp;
+    public FilterExpression(Queue<Object> elements) {
+        fElements = elements;
     }
 
     @Override
-    public boolean  test(Map<String, String> data) {
-        boolean result = fLeftOperand.test(data);
+    public boolean test(Map<String, String> data) {
 
-        if (fLogicalOperator != null && !fLogicalOperator.isEmpty()) {
-            if (fLogicalOperator.equals(IFilterStrings.OR)) {
-                result = result || fRightOperand.test(data);
-            } else if (fLogicalOperator.equals(IFilterStrings.AND) && fRightOperand != null) {
-                result = result && fRightOperand.test(data);
-            }
+        if (fElements == null || fElements.isEmpty()) {
+            return false;
         }
 
+        int index = 0;
+        boolean result = false;
+        String operator = IFilterStrings.OR;
+        while (!fElements.isEmpty()) {
+            Object element = fElements.poll();
+
+            if (index % 2 == 0) {
+                if (element instanceof FilterSimpleExpression) {
+                    FilterSimpleExpression expression = (FilterSimpleExpression) element;
+                    result = handleOperator(result, operator, expression.test(data));
+                } else if (element instanceof FilterExpression) {
+                    FilterExpression expression = (FilterExpression) element;
+                    result = handleOperator(result, operator, expression.test(data));
+                } else {
+                    return false;
+                }
+            } else {
+                if (!(element instanceof String)) {
+                    return false;
+                }
+                operator = (String) element;
+            }
+            index++;
+        }
         return result;
+    }
+
+    private static boolean handleOperator(boolean left, String operator, boolean right) {
+        return operator.equals(IFilterStrings.OR) ? (left || right) : (left && right);
     }
 }

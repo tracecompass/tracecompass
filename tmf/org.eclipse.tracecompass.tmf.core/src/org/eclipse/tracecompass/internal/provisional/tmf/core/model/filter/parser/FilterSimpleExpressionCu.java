@@ -85,11 +85,14 @@ public class FilterSimpleExpressionCu {
         if (tree.getToken() == null) {
             return null;
         }
-        String separator = " "; //$NON-NLS-1$
 
+        int childCount = tree.getChildCount();
         switch (tree.getToken().getType()) {
         case FilterParserParser.CONSTANT:
-            return new FilterSimpleExpressionCu(IFilterStrings.WILDCARD, ConditionOperator.MATCHES, tree.getChild(0).getText());
+        case FilterParserParser.PAR_CONSTANT:
+            StringBuilder paragraph = new StringBuilder();
+            extractParagraph(tree, paragraph, 0, childCount);
+            return new FilterSimpleExpressionCu(IFilterStrings.WILDCARD, ConditionOperator.MATCHES, paragraph.toString().trim());
         case FilterParserParser.OPERATION:
             String left = tree.getChild(0).getText();
             BiPredicate<String, String> op = getConditionOperator(tree.getChild(1).getText());
@@ -101,49 +104,52 @@ public class FilterSimpleExpressionCu {
             String right1 = null;
             return new FilterSimpleExpressionCu(left1, op1, right1);
         case FilterParserParser.OPERATION2:
+        case FilterParserParser.OPERATION4:
+        case FilterParserParser.OPERATION5:
             StringBuilder builder = new StringBuilder();
-            int count = tree.getChildCount();
-            boolean stop = false;
-            int index;
-            for (index = 0; index < count && !stop; index++) {
-                Tree child = tree.getChild(index);
-                if (child.getType() != FilterParserParser.TEXT) {
-                    stop = true;
-                    continue;
-                }
-                builder.append(child.getText());
-                builder.append(separator);
-            }
-            index--;
+            int index = extractParagraph(tree, builder, 0, childCount);
             String left2 = builder.toString().trim();
             BiPredicate<String, String> op2 = getConditionOperator(tree.getChild(index++).getText());
-            String right2 = tree.getChild(index).getText();
+            builder = new StringBuilder();
+            extractParagraph(tree, builder, index, childCount);
+            String right2 = builder.toString().trim();
             return new FilterSimpleExpressionCu(left2, op2, right2);
         case FilterParserParser.OPERATION3:
             StringBuilder builder1 = new StringBuilder();
-            int count1 = tree.getChildCount();
-            boolean stop1 = false;
-            int index1;
-            for (index1 = 0; index1 < count1 && !stop1; index1++) {
-                Tree child = tree.getChild(index1);
-                if (child.getType() != FilterParserParser.TEXT) {
-                    stop1 = true;
-                    continue;
-                }
-                builder1.append(child.getText());
-                builder1.append(separator);
-            }
-            index1--;
+            int index1 = extractParagraph(tree, builder1, 0, childCount);
             String left3 = builder1.toString().trim();
             BiPredicate<String, String> op3 = getConditionOperator(tree.getChild(index1).getText());
             String right3 = null;
             return new FilterSimpleExpressionCu(left3, op3, right3);
-        case FilterParserParser.EXP_PAR:
-            return FilterSimpleExpressionCu.compile((CommonTree) tree.getChild(0));
+        case FilterParserParser.ROOT2:
+            if (childCount == 0 || (childCount == 2 && tree.getChild(1).getType() != FilterParserParser.CONSTANT)) {
+                return null;
+            }
+
+            boolean negate = tree.getChild(0).getText().equals(IFilterStrings.NOT);
+            CommonTree expression = (CommonTree) tree.getChild(childCount - 1);
+            FilterSimpleExpressionCu compiled = negate ? FilterSimpleExpressionNotCu.compile(expression) : FilterSimpleExpressionCu.compile(expression);
+            return compiled;
         default:
             break;
         }
         return null;
+    }
+
+    private static int extractParagraph(CommonTree tree, StringBuilder builder, int index, int count) {
+        String separator = " "; //$NON-NLS-1$
+        int i;
+        boolean stop = false;
+        for (i = index; i < count && !stop; i++) {
+            Tree child = tree.getChild(i);
+            if (child.getType() != FilterParserParser.TEXT) {
+                stop = true;
+                continue;
+            }
+            builder.append(child.getText());
+            builder.append(separator);
+        }
+        return --i;
     }
 
     /**

@@ -30,5 +30,6 @@ public interface IFilterStrings {
     static final String WILDCARD = "*";
     static final String OR = "||";
     static final String AND = "&&";
+    static final String CLOSE_PARENTHESIS = ")";
 
 }
