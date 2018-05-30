@@ -64,7 +64,6 @@ public class FilterCu {
             return null;
         }
         try {
-            regex.trim();
             ANTLRStringStream stream = new ANTLRStringStream(regex);
             FilterParserLexer lexer = new FilterParserLexer(stream);
             boolean[] invalid = new boolean[1];

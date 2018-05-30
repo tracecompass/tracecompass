@@ -8,6 +8,8 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -16,7 +18,6 @@ import java.util.regex.PatternSyntaxException;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
-import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
 
 /**
@@ -187,17 +188,17 @@ public class FilterSimpleExpressionCu {
      */
     protected enum ConditionOperator implements BiPredicate<String, String> {
         /** equal */
-        EQ((i, j) -> i.equals(j)),
+        EQ((i, j) -> equals(i, j)),
         /** not equal */
-        NE((i, j) -> !i.equals(j)),
+        NE((i, j) -> !equals(i, j)),
         /** Matches */
         MATCHES(matchFunc()),
         /** Contains*/
         CONTAINS((i, j) -> i.contains(j)),
         /** Less than */
-        LT((i, j) -> lessThanComparison(i, j)),
+        LT((i, j) -> numericalCompare(i, j) < 0),
         /** Greater than */
-        GT((i, j) -> greaterThanComparison(i, j)),
+        GT((i, j) -> numericalCompare(i, j) > 0),
         /** Field is present*/
         PRESENT((i, j) -> true);
 
@@ -213,32 +214,58 @@ public class FilterSimpleExpressionCu {
                     Pattern filterPattern = Pattern.compile(j);
                     return filterPattern.matcher(i).find();
                 } catch (PatternSyntaxException e) {
-                    Activator.logWarning("The regex syntax is invalid"); //$NON-NLS-1$
                     return false;
                 }
             };
         }
 
-        private static boolean greaterThanComparison(String i, String j) {
-            try {
-                long long1 = Long.parseLong(i);
-                long long2 = Long.parseLong(j);
-                return long1 > long2;
-            } catch (NumberFormatException e) {
-                Activator.logWarning("The search criteria is not a number"); //$NON-NLS-1$
+        private static boolean equals(String i, String j) {
+            if (Objects.equals(i, j)) {
+                return true;
+            }
+            Number number1 = toNumber(i);
+            if (number1 == null) {
                 return false;
             }
+            Number number2 = toNumber(j);
+            if (number2 == null) {
+                return false;
+            }
+            if (number1 instanceof Double || number2 instanceof Double
+                    || number1 instanceof Float || number2 instanceof Float) {
+                return number1.doubleValue() == number2.doubleValue();
+            }
+            return number1.longValue() == number2.longValue();
         }
 
-        private static boolean lessThanComparison(String i, String j) {
-            try {
-                long long1 = Long.parseLong(i);
-                long long2 = Long.parseLong(j);
-                return long1 < long2;
-            } catch (NumberFormatException e) {
-                Activator.logWarning("The search criteria is not a number"); //$NON-NLS-1$
-                return false;
+        private static int numericalCompare(String i, String j) {
+            Number number1 = toNumber(i);
+            if (number1 == null) {
+                // This does not mean that both inputs are equal
+                return 0;
             }
+            Number number2 = toNumber(j);
+            if (number2 == null) {
+                // This does not mean that both inputs are equal
+                return 0;
+            } else if (number1 instanceof Double || number2 instanceof Double
+                    || number1 instanceof Float || number2 instanceof Float) {
+                return Double.compare(number1.doubleValue(), number2.doubleValue());
+            }
+            return Long.compare(number1.longValue(), number2.longValue());
+        }
+
+        private static Number toNumber(String value) {
+            try {
+                return Long.decode(value);
+            } catch (NumberFormatException e) {
+            }
+
+            try {
+                return NumberFormat.getInstance().parse(value);
+            } catch (ParseException e) {
+            }
+            return null;
         }
 
         @Override
