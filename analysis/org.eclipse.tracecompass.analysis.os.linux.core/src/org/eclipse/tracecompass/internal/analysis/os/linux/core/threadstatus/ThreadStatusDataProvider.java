@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -424,7 +425,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
     }
 
     private Map<Long, Integer> getSelectedIdsToQuarks(SelectionTimeQueryFilter filter) {
-        Map<Long, Integer> map = new HashMap<>();
+        Map<Long, Integer> map = new LinkedHashMap<>();
         for (Long id : filter.getSelectedItems()) {
             Integer quark = fQuarkMap.get(id);
             if (quark != null) {
