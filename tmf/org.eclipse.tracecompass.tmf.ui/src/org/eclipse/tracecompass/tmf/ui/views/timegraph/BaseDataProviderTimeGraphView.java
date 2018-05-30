@@ -33,8 +33,6 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
-import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
@@ -429,12 +427,11 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         return linkList;
     }
 
-    @TmfSignalHandler
     @Override
-    public void traceClosed(TmfTraceClosedSignal signal) {
-        ITmfTrace parentTrace = signal.getTrace();
-        List<@NonNull TimeGraphEntry> entryList = getEntryList(parentTrace);
-        super.traceClosed(signal);
+    protected void resetView(ITmfTrace viewTrace) {
+        List<@NonNull TimeGraphEntry> entryList = getEntryList(viewTrace);
+        super.resetView(viewTrace);
+        // Remove the entries for this trace
         if (entryList != null) {
             synchronized (fEntries) {
                 for (TimeGraphEntry entry : entryList) {

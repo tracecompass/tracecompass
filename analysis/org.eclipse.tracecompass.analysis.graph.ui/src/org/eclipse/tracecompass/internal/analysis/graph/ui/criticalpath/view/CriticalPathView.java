@@ -197,8 +197,6 @@ public class CriticalPathView extends BaseDataProviderTimeGraphView {
             Collection<ITmfTrace> traces = TmfTraceManager.getTraceSetWithExperiment(getTrace());
             if (traces.contains(criticalPath.getTrace())) {
                 rebuild();
-            } else {
-                traces.forEach(this::resetView);
             }
         }
     }

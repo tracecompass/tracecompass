@@ -54,9 +54,13 @@ public class CriticalPathTest extends KernelTestBase {
     private static final int TID_NO = 338;
     private static final String TID = String.valueOf(TID_NO);
     private static final String PROCESS = "weston";
+    private static final int TID_NO2 = 340;
+    private static final String TID2 = String.valueOf(TID_NO2);
+    private static final String PROCESS2 = "weston-desktop-";
     private static final @NonNull String CP_ID = "org.eclipse.linuxtools.tmf.analysis.graph.ui.criticalpath.view.criticalpathview";
     private static final String CRIT_PATH_MAIN_ENTRY = "[" + PROCESS + "," + TID + "]";
     private static final String CRIT_PATH_OTHER_ENTRY = "[kworker/u16:0,6]";
+    private static final String CRIT_PATH_MAIN_ENTRY2 = "[" + PROCESS2 + "," + TID2 + "]";
 
     private static final String FOLLOW_FORWARD = "Follow critical path forward";
     private static final String FOLLOW_BACKWARD = "Follow critical path backward";
@@ -146,6 +150,27 @@ public class CriticalPathTest extends KernelTestBase {
         fBot.waitUntil(timeGraphIsReadyCondition);
         fBot.waitUntil(ConditionHelpers.timeGraphSelectionContains(timeGraphCp, 0, CRIT_PATH_MAIN_ENTRY));
 
+        // Follow another process and make sure the critical path changes
+        entry = timeGraphCfv.getEntry(trace.getName(), "systemd", "we", PROCESS, PROCESS2);
+        assertNotNull(entry);
+        entry.select();
+
+        menu = entry.contextMenu("Follow " + PROCESS2 + "/" + TID2);
+        assertEquals("Follow " + PROCESS2 + "/" + TID2, menu.getText());
+        menu.click();
+        fBot.waitUntil(new DefaultCondition() {
+
+            @Override
+            public boolean test() throws Exception {
+                SWTBotTimeGraphEntry[] entries = timeGraphCp.getEntries();
+                return CRIT_PATH_MAIN_ENTRY2.equals(entries[0].getEntries()[0].getText());
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return "Could not find " + CRIT_PATH_MAIN_ENTRY2 + " in Critical Path view";
+            }
+        });
     }
 
 }
