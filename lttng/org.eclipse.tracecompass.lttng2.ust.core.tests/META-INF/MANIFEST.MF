@@ -33,3 +33,4 @@ Export-Package: org.eclipse.tracecompass.lttng2.ust.core.tests,
  org.eclipse.tracecompass.lttng2.ust.core.tests.trace
 Import-Package: com.google.common.collect,
  org.eclipse.tracecompass.testtraces.ctf;version="1.0.0"
+Automatic-Module-Name: org.eclipse.tracecompass.lttng2.ust.core.tests

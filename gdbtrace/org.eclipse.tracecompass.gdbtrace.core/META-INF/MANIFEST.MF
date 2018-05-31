@@ -22,3 +22,4 @@ Export-Package: org.eclipse.tracecompass.internal.gdbtrace.core;x-friends:="org.
  org.eclipse.tracecompass.internal.gdbtrace.core.event;x-friends:="org.eclipse.tracecompass.gdbtrace.ui",
  org.eclipse.tracecompass.internal.gdbtrace.core.trace;x-friends:="org.eclipse.tracecompass.gdbtrace.ui"
 Import-Package: com.google.common.collect
+Automatic-Module-Name: org.eclipse.tracecompass.gdbtrace.core

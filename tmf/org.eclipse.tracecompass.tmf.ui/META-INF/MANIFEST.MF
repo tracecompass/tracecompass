@@ -131,3 +131,4 @@ Import-Package: com.google.common.annotations,
  com.google.gson.stream,
  org.eclipse.emf.common.util,
  org.eclipse.emf.ecore
+Automatic-Module-Name: org.eclipse.tracecompass.tmf.ui

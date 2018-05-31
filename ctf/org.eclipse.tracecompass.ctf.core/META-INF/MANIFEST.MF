@@ -40,3 +40,4 @@ Import-Package: com.google.common.base,
  com.google.common.collect,
  org.antlr.runtime;version="3.2.0",
  org.antlr.runtime.tree;version="3.2.0"
+Automatic-Module-Name: org.eclipse.tracecompass.ctf.core

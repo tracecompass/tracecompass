@@ -60,3 +60,4 @@ Export-Package: org.eclipse.tracecompass.tmf.core.tests,
 Import-Package: com.google.common.base,
  com.google.common.collect,
  com.google.common.primitives
+Automatic-Module-Name: org.eclipse.tracecompass.tmf.core.tests

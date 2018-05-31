@@ -38,3 +38,4 @@ Import-Package: com.google.common.annotations;version="15.0.0",
  com.google.common.io,
  org.apache.commons.lang3;version="3.1.0",
  org.apache.commons.lang3.builder;version="3.1.0"
+Automatic-Module-Name: org.eclipse.tracecompass.lttng2.ust.core

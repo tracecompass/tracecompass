@@ -12,3 +12,4 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.ui,
  org.eclipse.tracecompass.gdbtrace.ui
 Export-Package: org.eclipse.tracecompass.gdbtrace.ui.tests
+Automatic-Module-Name: org.eclipse.tracecompass.gdbtrace.ui.tests

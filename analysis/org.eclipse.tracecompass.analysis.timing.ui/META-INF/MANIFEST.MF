@@ -31,3 +31,4 @@ Export-Package: org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore,
  org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter;x-internal:=true,
  org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics;x-internal:=true,
  org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.table;x-internal:=true
+Automatic-Module-Name: org.eclipse.tracecompass.analysis.timing.ui

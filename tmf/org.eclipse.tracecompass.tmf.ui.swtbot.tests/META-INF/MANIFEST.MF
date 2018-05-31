@@ -52,3 +52,4 @@ Export-Package: org.eclipse.tracecompass.tmf.ui.swtbot.tests,
  org.eclipse.tracecompass.tmf.ui.swtbot.tests.viewers.events;x-internal:=true,
  org.eclipse.tracecompass.tmf.ui.swtbot.tests.views,
  org.eclipse.tracecompass.tmf.ui.swtbot.tests.wizards;x-friends:="org.eclipse.tracecompass.tmf.ctf.ui.swtbot.tests,org.eclipse.tracecompass.integration.swtbot.tests"
+Automatic-Module-Name: org.eclipse.tracecompass.tmf.ui.swtbot.tests

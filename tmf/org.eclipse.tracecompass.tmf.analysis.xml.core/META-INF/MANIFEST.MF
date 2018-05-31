@@ -39,3 +39,4 @@ Import-Package: com.google.common.base,
  org.apache.commons.io,
  org.apache.commons.lang3,
  org.eclipse.jface.preference
+Automatic-Module-Name: org.eclipse.tracecompass.tmf.analysis.xml.core

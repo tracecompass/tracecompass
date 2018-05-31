@@ -25,3 +25,4 @@ Import-Package: com.google.common.annotations,
  com.google.common.collect,
  com.google.common.hash,
  com.google.common.primitives
+Automatic-Module-Name: org.eclipse.tracecompass.analysis.timing.core

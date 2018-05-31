@@ -29,3 +29,4 @@ Import-Package: com.google.common.annotations,
  com.google.common.collect,
  org.apache.commons.lang3,
  org.swtchart
+Automatic-Module-Name: org.eclipse.tracecompass.tmf.chart.ui

@@ -39,3 +39,4 @@ Import-Package: org.apache.log4j,
 Export-Package: org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests,
  org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests.fetch
 Bundle-Activator: org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests.TmfRemoteUISWTBotTestPlugin
+Automatic-Module-Name: org.eclipse.tracecompass.tmf.remote.ui.swtbot.tests

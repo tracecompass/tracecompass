@@ -28,3 +28,4 @@ Import-Package: com.google.common.base,
  org.eclipse.tracecompass.analysis.os.linux.core.memory,
  org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory,
  org.swtchart
+Automatic-Module-Name: org.eclipse.tracecompass.lttng2.ust.ui

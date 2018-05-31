@@ -21,3 +21,4 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.remote.core.stubs.shells,
  org.eclipse.tracecompass.tmf.remote.core.tests.shell
 Import-Package: com.google.common.collect,
  com.google.common.primitives
+Automatic-Module-Name: org.eclipse.tracecompass.tmf.remote.core.tests

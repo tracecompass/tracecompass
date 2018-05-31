@@ -18,3 +18,4 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.chart.core.tests;x-interna
  org.eclipse.tracecompass.tmf.chart.core.tests.descriptor,
  org.eclipse.tracecompass.tmf.chart.core.tests.resolver,
  org.eclipse.tracecompass.tmf.chart.core.tests.stubs
+Automatic-Module-Name: org.eclipse.tracecompass.tmf.chart.core.tests

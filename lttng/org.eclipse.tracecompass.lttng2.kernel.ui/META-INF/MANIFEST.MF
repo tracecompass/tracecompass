@@ -30,3 +30,4 @@ Export-Package: org.eclipse.tracecompass.internal.lttng2.kernel.ui;x-internal:=t
  org.eclipse.tracecompass.internal.lttng2.kernel.ui.criticalpath;x-internal:=true,
  org.eclipse.tracecompass.internal.lttng2.kernel.ui.views;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.vm.vcpuview;x-internal:=true
+Automatic-Module-Name: org.eclipse.tracecompass.lttng2.kernel.ui

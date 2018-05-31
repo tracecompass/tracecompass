@@ -28,3 +28,4 @@ Export-Package: org.eclipse.tracecompass.tmf.analysis.xml.core.tests,
  org.eclipse.tracecompass.tmf.analysis.xml.core.tests.module,
  org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stateprovider,
  org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stubs
+Automatic-Module-Name: org.eclipse.tracecompass.tmf.analysis.xml.core.tests

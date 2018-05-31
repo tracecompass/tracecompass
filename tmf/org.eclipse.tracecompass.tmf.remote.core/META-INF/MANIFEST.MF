@@ -21,3 +21,4 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.remote.core;x-friends:="or
  org.eclipse.tracecompass.tmf.remote.core.shell
 Import-Package: com.google.common.base;version="12.0.0",
  com.google.common.collect;version="12.0.0"
+Automatic-Module-Name: org.eclipse.tracecompass.tmf.remote.core

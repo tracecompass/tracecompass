@@ -52,3 +52,4 @@ Export-Package: org.eclipse.tracecompass.analysis.os.linux.core.contextswitch,
  org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.statistics;x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui,org.eclipse.tracecompass.analysis.os.linux.core.tests",
  org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus;x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui",
  org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus;x-friends:="org.eclipse.tracecompass.analysis.os.linux.ui,org.eclipse.tracecompass.analysis.os.linux.core.tests"
+Automatic-Module-Name: org.eclipse.tracecompass.analysis.os.linux.core

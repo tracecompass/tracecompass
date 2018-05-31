@@ -21,3 +21,4 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
 Import-Package: org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus,
  org.eclipse.tracecompass.testtraces.ctf
 Export-Package: org.eclipse.tracecompass.analysis.os.linux.ui.tests.view.controlflow
+Automatic-Module-Name: org.eclipse.tracecompass.analysis.os.linux.ui.tests

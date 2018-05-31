@@ -13,3 +13,4 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
 Export-Package: org.eclipse.tracecompass.ctf.parser.tests
 Import-Package: org.antlr.runtime;version="3.2.0",
  org.antlr.runtime.tree;version="3.2.0"
+Automatic-Module-Name: org.eclipse.tracecompass.ctf.parser.tests

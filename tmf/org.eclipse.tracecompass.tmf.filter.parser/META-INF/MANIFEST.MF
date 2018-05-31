@@ -10,3 +10,4 @@ Import-Package: org.antlr.runtime,
  org.antlr.runtime.tree
 Export-Package: org.eclipse.tracecompass.tmf.filter.parser;x-friends:="org.eclipse.tracecompass.tmf.core",
  org.eclipse.tracecompass.tmf.filter.parser.error
+Automatic-Module-Name: org.eclipse.tracecompass.tmf.filter.parser

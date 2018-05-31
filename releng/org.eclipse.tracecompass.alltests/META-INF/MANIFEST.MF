@@ -61,3 +61,4 @@ Import-Package: org.apache.commons.lang3,
  org.apache.derby.jdbc,
  org.json
 Bundle-Activator: org.eclipse.tracecompass.alltests.Activator
+Automatic-Module-Name: org.eclipse.tracecompass.alltests

@@ -20,3 +20,4 @@ Require-Bundle: org.eclipse.ui,
 Export-Package: org.eclipse.tracecompass.internal.analysis.graph.ui;x-internal:=true,
  org.eclipse.tracecompass.internal.analysis.graph.ui.criticalpath.view;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui"
 Import-Package: org.apache.commons.lang3
+Automatic-Module-Name: org.eclipse.tracecompass.analysis.graph.ui

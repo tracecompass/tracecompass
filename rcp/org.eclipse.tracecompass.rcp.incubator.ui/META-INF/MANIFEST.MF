@@ -12,3 +12,4 @@ Require-Bundle: org.eclipse.equinox.p2.ui.sdk,
  org.eclipse.core.commands,
  org.eclipse.swt
 Export-Package: org.eclipse.tracecompass.internal.rcp.incubator.ui;x-internal:=true
+Automatic-Module-Name: org.eclipse.tracecompass.rcp.incubator.ui

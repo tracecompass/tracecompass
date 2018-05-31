@@ -35,3 +35,4 @@ Import-Package: com.google.common.base,
  com.google.common.collect,
  org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.testtraces.ctf
+Automatic-Module-Name: org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests

@@ -21,3 +21,4 @@ Export-Package: org.eclipse.tracecompass.internal.segmentstore.core;x-internal:=
 Import-Package: com.google.common.annotations,
  com.google.common.base,
  com.google.common.collect
+Automatic-Module-Name: org.eclipse.tracecompass.segmentstore.core
