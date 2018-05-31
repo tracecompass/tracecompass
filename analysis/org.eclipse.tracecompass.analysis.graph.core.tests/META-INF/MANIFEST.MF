@@ -21,3 +21,4 @@ Export-Package: org.eclipse.tracecompass.analysis.graph.core.tests,
  org.eclipse.tracecompass.analysis.graph.core.tests.graph,
  org.eclipse.tracecompass.analysis.graph.core.tests.stubs,
  org.eclipse.tracecompass.analysis.graph.core.tests.stubs.module
+Automatic-Module-Name: org.eclipse.tracecompass.analysis.graph.core.tests

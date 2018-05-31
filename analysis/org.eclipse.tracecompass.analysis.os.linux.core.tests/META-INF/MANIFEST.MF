@@ -35,3 +35,4 @@ Export-Package: org.eclipse.tracecompass.analysis.os.linux.core.tests,
  org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.kernel,
  org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace
 Bundle-Activator: org.eclipse.tracecompass.analysis.os.linux.core.tests.Activator
+Automatic-Module-Name: org.eclipse.tracecompass.analysis.os.linux.core.tests

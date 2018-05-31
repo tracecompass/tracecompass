@@ -25,3 +25,4 @@ Export-Package: org.eclipse.tracecompass.analysis.timing.core.tests,
  org.eclipse.tracecompass.analysis.timing.core.tests.segmentstore.statistics,
  org.eclipse.tracecompass.analysis.timing.core.tests.statistics
 Bundle-Activator: org.eclipse.tracecompass.analysis.timing.core.tests.Activator
+Automatic-Module-Name: org.eclipse.tracecompass.analysis.timing.core.tests

@@ -18,3 +18,4 @@ Bundle-ActivationPolicy: lazy
 Import-Package: org.junit.runners
 Export-Package: org.eclipse.tracecompass.tmf.chart.ui.tests,
  org.eclipse.tracecompass.tmf.chart.ui.tests.data
+Automatic-Module-Name: org.eclipse.tracecompass.tmf.chart.ui.tests

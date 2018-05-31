@@ -18,3 +18,4 @@ Export-Package: org.eclipse.tracecompass.examples.ui;x-internal:=true,
 Bundle-Vendor: %Bundle-Vendor
 Import-Package: com.google.common.collect,
  org.swtchart
+Automatic-Module-Name: org.eclipse.tracecompass.examples

@@ -26,3 +26,4 @@ Import-Package: com.google.common.annotations,
  com.google.common.base,
  com.google.common.cache,
  com.google.common.collect
+Automatic-Module-Name: org.eclipse.tracecompass.datastore.core

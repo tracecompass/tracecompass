@@ -19,3 +19,4 @@ Export-Package: org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.internal.common.core;x-internal:=true
 Import-Package: com.google.common.base,
  com.google.common.collect
+Automatic-Module-Name: org.eclipse.tracecompass.common.core

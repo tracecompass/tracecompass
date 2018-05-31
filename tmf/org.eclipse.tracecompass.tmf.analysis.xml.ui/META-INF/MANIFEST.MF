@@ -33,3 +33,4 @@ Import-Package: com.google.common.base,
  com.google.common.primitives,
  org.apache.commons.lang3,
  org.eclipse.ui.views.properties
+Automatic-Module-Name: org.eclipse.tracecompass.tmf.analysis.xml.ui

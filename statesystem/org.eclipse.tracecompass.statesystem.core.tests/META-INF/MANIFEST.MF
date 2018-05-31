@@ -25,3 +25,4 @@ Export-Package: org.eclipse.tracecompass.statesystem.core.tests,
 Import-Package: com.google.common.base,
  com.google.common.collect,
  org.apache.commons.io
+Automatic-Module-Name: org.eclipse.tracecompass.statesystem.core.tests

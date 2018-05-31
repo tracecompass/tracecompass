@@ -32,3 +32,4 @@ Import-Package: com.google.common.annotations;version="15.0.0",
  com.google.gson.annotations,
  com.google.gson.stream,
  org.apache.commons.lang3.builder;version="3.1.0"
+Automatic-Module-Name: org.eclipse.tracecompass.statesystem.core

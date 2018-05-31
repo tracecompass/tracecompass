@@ -16,3 +16,4 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
 Export-Package: org.eclipse.tracecompass.btf.core.tests,
  org.eclipse.tracecompass.btf.core.tests.trace,
  org.eclipse.tracecompass.btf.core.tests.utils
+Automatic-Module-Name: org.eclipse.tracecompass.btf.core.tests

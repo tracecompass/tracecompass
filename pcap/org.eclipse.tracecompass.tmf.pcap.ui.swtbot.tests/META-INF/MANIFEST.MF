@@ -24,3 +24,4 @@ Require-Bundle: org.apache.log4j,
  org.eclipse.tracecompass.tmf.pcap.ui,
  org.eclipse.tracecompass.tmf.ui.swtbot.tests,
  org.eclipse.tracecompass.tmf.ui.tests
+Automatic-Module-Name: org.eclipse.tracecompass.tmf.pcap.ui.swtbot.tests

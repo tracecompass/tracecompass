@@ -27,3 +27,4 @@ Export-Package: org.eclipse.tracecompass.internal.pcap.core;x-friends:="org.ecli
  org.eclipse.tracecompass.internal.pcap.core.util;x-friends:="org.eclipse.tracecompass.tmf.pcap.core"
 Import-Package: com.google.common.collect,
  com.google.common.math
+Automatic-Module-Name: org.eclipse.tracecompass.pcap.core

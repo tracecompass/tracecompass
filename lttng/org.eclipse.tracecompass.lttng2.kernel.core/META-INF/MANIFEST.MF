@@ -34,3 +34,4 @@ Export-Package: org.eclipse.tracecompass.internal.lttng2.kernel.core;x-friends:=
 Import-Package: com.google.common.cache,
  com.google.common.collect,
  com.google.common.hash
+Automatic-Module-Name: org.eclipse.tracecompass.lttng2.kernel.core

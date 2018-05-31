@@ -45,3 +45,4 @@ Export-Package: org.eclipse.tracecompass.internal.analysis.os.linux.ui;x-friends
    org.eclipse.tracecompass.analysis.os.linux.ui.tests,
    org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests,
    org.eclipse.tracecompass.lttng2.kernel.ui"
+Automatic-Module-Name: org.eclipse.tracecompass.analysis.os.linux.ui

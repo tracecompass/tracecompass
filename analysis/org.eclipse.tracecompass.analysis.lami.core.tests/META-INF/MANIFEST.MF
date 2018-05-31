@@ -19,3 +19,4 @@ Export-Package: org.eclipse.tracecompass.analysis.lami.core.tests,
  org.eclipse.tracecompass.analysis.lami.core.tests.shared.analysis
 Bundle-Activator: org.eclipse.tracecompass.analysis.lami.core.tests.Activator
 Import-Package: com.google.common.collect
+Automatic-Module-Name: org.eclipse.tracecompass.analysis.lami.core.tests

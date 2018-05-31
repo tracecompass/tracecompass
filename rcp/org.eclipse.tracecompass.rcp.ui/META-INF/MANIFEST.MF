@@ -21,3 +21,4 @@ Require-Bundle: org.eclipse.core.commands,
 Export-Package: org.eclipse.tracecompass.internal.tracing.rcp.ui;x-internal:=true,
  org.eclipse.tracecompass.internal.tracing.rcp.ui.cli;x-internal:=true,
  org.eclipse.tracecompass.internal.tracing.rcp.ui.messages;x-internal:=true
+Automatic-Module-Name: org.eclipse.tracecompass.rcp.ui

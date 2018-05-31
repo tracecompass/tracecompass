@@ -22,4 +22,5 @@ Import-Package: com.google.common.base,
  org.swtchart
 Export-Package: org.eclipse.tracecompass.analysis.counters.ui,
  org.eclipse.tracecompass.internal.analysis.counters.ui;x-internal:=true
+Automatic-Module-Name: org.eclipse.tracecompass.analysis.counters.ui
 

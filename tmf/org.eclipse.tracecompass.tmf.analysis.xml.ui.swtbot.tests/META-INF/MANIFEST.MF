@@ -36,3 +36,4 @@ Require-Bundle: org.apache.log4j,
  org.eclipse.tracecompass.tmf.ui.tests
 Import-Package: org.eclipse.tracecompass.testtraces.ctf,
  org.swtchart
+Automatic-Module-Name: org.eclipse.tracecompass.tmf.analysis.xml.ui.swtbot.tests

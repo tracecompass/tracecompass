@@ -27,3 +27,4 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.remote.ui;x-internal:=true
  org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch;x-friends:="org.eclipse.tracecompass.lttng2.control.ui",
  org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.model;x-friends:="org.eclipse.tracecompass.tmf.remote.ui.tests,org.eclipse.tracecompass.lttng2.control.ui",
  org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.preferences;x-internal:=true
+Automatic-Module-Name: org.eclipse.tracecompass.tmf.remote.ui

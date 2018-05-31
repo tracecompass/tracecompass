@@ -14,3 +14,4 @@ Export-Package: org.eclipse.tracecompass.lttng2.control.core.tests;x-friends:="o
  org.eclipse.tracecompass.lttng2.control.core.tests.model.impl;x-internal:=true,
  org.eclipse.tracecompass.lttng2.control.core.tests.relayd,
  org.eclipse.tracecompass.lttng2.control.core.tests.session
+Automatic-Module-Name: org.eclipse.tracecompass.lttng2.control.core.tests
