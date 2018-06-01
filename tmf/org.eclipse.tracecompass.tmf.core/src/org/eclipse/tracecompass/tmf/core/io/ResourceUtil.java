@@ -233,6 +233,39 @@ public class ResourceUtil {
     }
 
     /**
+     * Delete a broken symbolic link. Has no effect if the resource is not a
+     * symbolic link or if the target of the symbolic link exists.
+     *
+     * @param resource
+     *            the resource in the workspace.
+     * @throws CoreException
+     *             if an error occurs
+     */
+    public static void deleteIfBrokenSymbolicLink(@Nullable IResource resource) throws CoreException {
+        if (resource == null) {
+            return;
+        }
+        if (resource.isLinked()) {
+            IPath location = resource.getLocation();
+            if (location == null || !location.toFile().exists()) {
+                resource.delete(true, null);
+            }
+        } else {
+            URI uri = resource.getLocationURI();
+            if (uri != null) {
+                Path linkPath = Paths.get(uri);
+                if (Files.isSymbolicLink(linkPath) && !resource.exists()) {
+                    try {
+                        Files.delete(linkPath);
+                    } catch (Exception e) {
+                        // Do nothing.
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Returns the location path of the given resource. If the resource is file
      * system symbolic link then it will return the link target location.
      *
