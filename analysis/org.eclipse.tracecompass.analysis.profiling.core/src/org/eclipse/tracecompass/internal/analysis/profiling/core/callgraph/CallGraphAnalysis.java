@@ -198,7 +198,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      *            The call stack path
      * @param monitor
      *            The monitor
-     * @return Boolean
+     * @return true if completed successfully
      */
     @VisibleForTesting
     protected boolean iterateOverStateSystem(ITmfStateSystem ss, String[] threadsPattern, String[] processesPattern, String[] callStackPath, IProgressMonitor monitor) {
@@ -231,7 +231,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      *            sub-Attributes path
      * @param monitor
      *            The monitor
-     * @return Boolean
+     * @return true if completed successfully
      */
     private boolean iterateOverQuark(ITmfStateSystem stateSystem, int processId, int threadQuark, String[] subAttributePath, IProgressMonitor monitor) {
         String threadName = stateSystem.getAttributeName(threadQuark);
@@ -274,7 +274,9 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
                 curTime = interval.getEndTime() + 1;
             }
             fThreadNodes.add(init);
-        } catch (StateSystemDisposedException | TimeRangeException e) {
+        } catch (StateSystemDisposedException e) {
+            return false;
+        } catch (TimeRangeException e) {
             Activator.getInstance().logError(Messages.QueringStateSystemError, e);
             return false;
         }
