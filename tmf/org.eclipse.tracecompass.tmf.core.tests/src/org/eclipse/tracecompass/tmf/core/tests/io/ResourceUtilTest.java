@@ -461,6 +461,54 @@ public class ResourceUtilTest {
     }
 
     /**
+     * Test {@link ResourceUtil#deleteIfBrokenSymbolicLink(IResource)}
+     *
+     * @throws IOException
+     *             if an IO error occurs
+     * @throws CoreException
+     *             if core error occurs
+     */
+    @Test
+    public void testDeleteIfBrokenSymbolicLink() throws IOException, CoreException {
+        // Create file
+        IResource resource = createAndVerifyResource(TEST_FILE_NAME, true);
+        // No effect: resource is not a symbolic link
+        ResourceUtil.deleteIfBrokenSymbolicLink(resource);
+        assertTrue(resource.exists());
+        resource.delete(true, null);
+
+        IPath path = new Path(fTargetFile.getAbsolutePath());
+
+        // Create file system symbolic link to a file
+        boolean isSymLink = !IS_WINDOWS;
+        resource = createAndVerifyLink(path, SYMBOLIC_LINK_FILE_NAME, true, isSymLink);
+        // No effect: link target exists
+        ResourceUtil.deleteIfBrokenSymbolicLink(resource);
+        assertTrue(resource.exists());
+        // Broken link is deleted
+        fTargetFile.delete();
+        fTestFolder.refreshLocal(IResource.DEPTH_ONE, null);
+        ResourceUtil.deleteIfBrokenSymbolicLink(resource);
+        assertFalse(resource.exists());
+
+        // Re-create target file
+        fTargetFile = fTemporaryFolder.newFile(LINK_TARGET_FILE);
+
+        // Create Eclipse link to a file
+        resource = createAndVerifyLink(path, ECLIPSE_LINK_FILE_NAME, true, false);
+        // No effect: link target exists
+        ResourceUtil.deleteIfBrokenSymbolicLink(resource);
+        assertTrue(resource.exists());
+        // Broken link is deleted
+        fTargetFile.delete();
+        ResourceUtil.deleteIfBrokenSymbolicLink(resource);
+        assertFalse(resource.exists());
+
+        // Re-create target file
+        fTargetFile = fTemporaryFolder.newFile(LINK_TARGET_FILE);
+    }
+
+    /**
      * Test {@link ResourceUtil#getLocation(IResource)}
      *
      * Most test cases are handled in {@link #testCreateSymbolicLink()} when

@@ -659,6 +659,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
     private static void handleTraceDeleted(TmfTraceElement trace) {
         try {
             trace.preDelete(new NullProgressMonitor(), false);
+            ResourceUtil.deleteIfBrokenSymbolicLink(trace.getResource());
         } catch (CoreException e) {
             Activator.getDefault().logError("Error deleting trace " + trace.getName(), e); //$NON-NLS-1$
         }
