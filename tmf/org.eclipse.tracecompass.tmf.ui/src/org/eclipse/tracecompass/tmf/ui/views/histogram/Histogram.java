@@ -16,8 +16,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.histogram;
 
-import java.util.Objects;
-
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -60,6 +59,7 @@ import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphScale;
 
@@ -182,7 +182,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     /**
      * The histogram data model.
      */
-    protected final HistogramDataModel fDataModel;
+    protected final @NonNull HistogramDataModel fDataModel;
 
     /**
      * The histogram data model scaled to current resolution and screen width.
@@ -268,9 +268,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fParentView = view;
         fSendTimeAlignSignals = sendTimeAlignSignals;
         fColorScheme = new TimeGraphColorScheme();
-        fComposite = createWidget(parent);
         fDataModel = new HistogramDataModel();
         fDataModel.addHistogramListener(this);
+        fComposite = createWidget(parent);
         clear();
 
         fCanvas.addControlListener(this);
@@ -337,6 +337,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fTimeLineScale = new TimeGraphScale(canvasComposite, fColorScheme, SWT.BOTTOM);
         fTimeLineScale.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
         fTimeLineScale.setHeight(TIME_SCALE_HEIGHT);
+        fTimeLineScale.setTimeProvider(new HistogramTimeAdapter(fDataModel));
 
         return composite;
     }
@@ -611,16 +612,9 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                         synchronized (fDataModel) {
                             if (fScaledData != null) {
                                 fCanvas.redraw();
-                                HistogramTimeAdapter adapter = null;
-                                if (fTimeLineScale.getTimeProvider() instanceof HistogramTimeAdapter) {
-                                    adapter = (HistogramTimeAdapter) fTimeLineScale.getTimeProvider();
-                                } else {
-                                    adapter = new HistogramTimeAdapter(Objects.requireNonNull(fDataModel));
-                                    fTimeLineScale.setTimeProvider(adapter);
-                                }
+                                HistogramTimeAdapter adapter = (HistogramTimeAdapter) fTimeLineScale.getTimeProvider();
                                 adapter.setTimeSpace(canvasWidth);
                                 // Display histogram and update X-,Y-axis labels
-                                ((HistogramTimeAdapter) fTimeLineScale.getTimeProvider()).setTimeSpace(canvasWidth);
                                 long maxNbEvents = HistogramScaledData.hideLostEvents ? fScaledData.fMaxValue : fScaledData.fMaxCombinedValue;
                                 String old = fMaxNbEventsLabel.getText();
                                 fMaxNbEventsLabel.setText(Long.toString(maxNbEvents));
@@ -1034,7 +1028,11 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     }
 
     private void updateStatusLine(long startTime, long endTime, long cursorTime) {
-        TimeFormat timeFormat = fTimeLineScale.getTimeProvider().getTimeFormat().convert();
+        ITimeDataProvider timeProvider = fTimeLineScale.getTimeProvider();
+        if (timeProvider.getTime0() == timeProvider.getTime1()) {
+            return;
+        }
+        TimeFormat timeFormat = timeProvider.getTimeFormat().convert();
         boolean isCalendar = timeFormat == TimeFormat.CALENDAR;
 
         StringBuilder message = new StringBuilder();

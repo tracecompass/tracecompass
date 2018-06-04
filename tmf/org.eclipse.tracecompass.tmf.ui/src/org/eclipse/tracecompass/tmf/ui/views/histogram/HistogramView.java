@@ -691,7 +691,9 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
 
         // Clear the UI widgets
         fFullTraceHistogram.clear();
+        fFullTraceHistogram.fDataModel.setTrace(null);
         fTimeRangeHistogram.clear();
+        fTimeRangeHistogram.fDataModel.setTrace(null);
         fSelectionStartControl.setValue(Long.MIN_VALUE);
         fSelectionEndControl.setValue(Long.MIN_VALUE);
 
