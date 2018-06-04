@@ -423,6 +423,7 @@ public class HistogramDataModel implements IHistogramDataModel {
         Arrays.fill(fLostEventsBuckets, 0);
         fNbEvents = 0;
         fFirstBucketTime = 0;
+        fFirstEventTime = 0;
         fEndTime = 0;
         fSelectionBegin = 0;
         fSelectionEnd = 0;
