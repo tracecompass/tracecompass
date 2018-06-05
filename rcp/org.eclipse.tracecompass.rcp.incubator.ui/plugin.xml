@@ -16,7 +16,7 @@
                   style="push">
 	           <parameter
 	               name="org.eclipse.equinox.p2.ui.discovery.commands.RepositoryParameter"
-	               value="http://download.eclipse.org/tracecompass.incubator/master/repository/">
+	               value="http://download.eclipse.org/tracecompass.incubator/stable-4.0/repository/">
 	           </parameter>
             </command>
          </menu>
