@@ -119,7 +119,7 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      * @since 2.0
      */
     @Override
-    protected void refreshChildren() {
+    protected synchronized void refreshChildren() {
         /* Get the base path to put the resource to */
         IPath tracePath = getResource().getFullPath();
         IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();

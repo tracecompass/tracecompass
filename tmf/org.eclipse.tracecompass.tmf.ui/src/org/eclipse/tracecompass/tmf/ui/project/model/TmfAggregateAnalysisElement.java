@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -50,8 +50,9 @@ public class TmfAggregateAnalysisElement extends TmfAnalysisElement {
         fExperimentParent = experiment;
         fContainedAnalyses.add(module);
     }
+
     @Override
-    protected void refreshChildren() {
+    protected synchronized void refreshChildren() {
         // refresh all children analysis as well
         for (TmfAnalysisElement analysis : fContainedAnalyses) {
             analysis.refreshChildren();

@@ -172,7 +172,7 @@ public class TmfExperimentElement extends TmfCommonProjectElement implements IPr
      * @since 2.0
      */
     @Override
-    protected void refreshChildren() {
+    protected synchronized void refreshChildren() {
         /* Update the trace children of this experiment */
         // Get the children from the model
         Map<String, ITmfProjectModelElement> childrenMap = new HashMap<>();

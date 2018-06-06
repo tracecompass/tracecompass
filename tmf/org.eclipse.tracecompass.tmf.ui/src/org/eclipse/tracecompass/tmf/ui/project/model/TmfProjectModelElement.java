@@ -182,6 +182,8 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
      * Refresh the children of this model element, adding new children and
      * removing dangling children as necessary. The remaining children should
      * also refresh their own children sub-tree.
+     * <p>
+     * The method implementation must be thread-safe.
      *
      * @since 2.0
      */
