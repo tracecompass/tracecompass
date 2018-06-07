@@ -511,7 +511,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
 
         SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(getViewBot().bot());
         SWTBotTimeGraphEntry traceEntry = timeGraph.getEntry(LttngTraceGenerator.getName());
-        int originLength = traceEntry.getEntries().length;
+        SWTBotUtils.waitUntil(entry -> entry.getEntries().length == 225, traceEntry, () -> "Entries size expected:225 actual:" + traceEntry.getEntries().length);
 
         getViewBot().viewMenu(DYNAMIC_FILTER_CONFIGURE_LABEL).click();
         SWTBotShell shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT).activate();
@@ -535,12 +535,8 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
         TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, range.getStartTime(), range.getEndTime()));
         timeGraphIsReadyCondition(range);
 
-        timeGraph = new SWTBotTimeGraph(getViewBot().bot());
-        traceEntry = timeGraph.getEntry(LttngTraceGenerator.getName());
-
         /* Verify that number active entries changed */
-        assertTrue(traceEntry.getEntries().length > 0);
-        assertTrue(originLength > traceEntry.getEntries().length);
+        SWTBotUtils.waitUntil(entry -> entry.getEntries().length == 7, traceEntry, () -> "Entries size expected:7 actual:" + traceEntry.getEntries().length);
 
         getViewBot().viewMenu(DYNAMIC_FILTER_CONFIGURE_LABEL).click();
         shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT).activate();
