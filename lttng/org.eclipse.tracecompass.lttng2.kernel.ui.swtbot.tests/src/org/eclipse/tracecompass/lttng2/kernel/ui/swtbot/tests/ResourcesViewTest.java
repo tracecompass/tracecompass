@@ -45,6 +45,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
@@ -91,6 +92,7 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
     private static final @NonNull ITmfTimestamp CPU0_TIME3 = TmfTimestamp.fromNanos(1368000272652067404L);
     private static final @NonNull ITmfTimestamp CPU0_TIME4 = TmfTimestamp.fromNanos(1368000272652282152L);
     private static final @NonNull ITmfTimestamp CPU0_TIME5 = TmfTimestamp.fromNanos(1368000272652496900L);
+    private static final String CPU0_THREADS = "CPU 0 Threads";
     private static final int TOP_MARGIN = 1;
     private static final Point TOGGLE_SIZE = new Point(7, 8);
     private static final Point HIDE_SIZE = new Point(16, 16);
@@ -159,12 +161,17 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
     }
 
     private void testNextPreviousMarker(Runnable nextMarker, Runnable shiftNextMarker, Runnable previousMarker, Runnable shiftPreviousMarker) {
+        SWTBotView viewBot = getViewBot();
         /* set selection to trace start time */
         TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, START_TIME));
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME), START_TIME);
 
+        /* set focus on time graph */
+        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(viewBot.bot());
+        timeGraph.setFocus();
+
         /* select first item */
-        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.HOME);
+        timeGraph.getEntry(LttngTraceGenerator.getName()).select();
 
         /* click "Next Marker" 3 times */
         nextMarker.run();
@@ -209,8 +216,14 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, START_TIME));
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME), START_TIME);
 
+        /* set focus on time graph */
+        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(viewBot.bot());
+        timeGraph.setFocus();
+
         /* select first item */
-        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.HOME);
+        timeGraph.getEntry(LttngTraceGenerator.getName()).select();
+
+        assertTrue(viewBot.viewMenu(LOST_EVENTS).isChecked());
 
         /* check that "Next Marker" and "Previous Marker" are enabled */
         assertTrue(viewBot.toolbarButton(NEXT_MARKER).isEnabled());
@@ -243,8 +256,12 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, START_TIME));
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME), START_TIME);
 
+        /* set focus on time graph */
+        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(viewBot.bot());
+        timeGraph.setFocus();
+
         /* select first item */
-        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.HOME);
+        timeGraph.getEntry(LttngTraceGenerator.getName()).select();
 
         /* disable Lost Events navigation */
         viewBot.toolbarDropDownButton(NEXT_MARKER).menuItem(LOST_EVENTS).click();
@@ -276,9 +293,12 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, START_TIME));
         timeGraphIsReadyCondition(new TmfTimeRange(START_TIME, START_TIME), START_TIME);
 
+        /* set focus on time graph */
+        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(viewBot.bot());
+        timeGraph.setFocus();
+
         /* select first CPU resource */
-        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.HOME);
-        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.DOWN);
+        timeGraph.getEntry(LttngTraceGenerator.getName(), CPU0_THREADS).select();
 
         /* click "Select Next State Change" 2 times */
         viewBot.toolbarButton(SELECT_NEXT_STATE_CHANGE).click();
