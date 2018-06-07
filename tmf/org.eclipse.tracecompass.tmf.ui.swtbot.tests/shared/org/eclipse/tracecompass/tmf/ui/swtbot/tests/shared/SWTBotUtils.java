@@ -747,6 +747,12 @@ public final class SWTBotUtils {
         shell.bot().button("Yes").click();
         bot.waitUntil(Conditions.shellCloses(shell));
         bot.waitWhile(ConditionHelpers.treeItemHasChildren(tracesFolder));
+        try {
+            /* This ensures that the Clear workspace operation has completed */
+            ResourcesPlugin.getWorkspace().run(monitor -> {}, null);
+        } catch (CoreException e) {
+            // Ignore
+        }
     }
 
     /**
