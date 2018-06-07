@@ -404,8 +404,8 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
                 bookmarksFile.create(source, IResource.FORCE | IResource.HIDDEN, subMonitor.split(1));
             }
             file.createLink(bookmarksFile.getLocation(), IResource.REPLACE | IResource.HIDDEN, subMonitor.split(1));
-            file.setPersistentProperty(TmfCommonConstants.TRACETYPE, editorInputType);
         }
+        file.setPersistentProperty(TmfCommonConstants.TRACETYPE, editorInputType);
         return file;
     }
 
