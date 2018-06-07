@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.ITmfProjectModelElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.junit.AfterClass;
@@ -44,6 +45,7 @@ public class HttpTraceImportOperationTest {
     private static String fTestTrace1Url = "http://archive.eclipse.org/tracecompass/test-traces/tmf/syslog";
     private static String fTestTrace2Url = "http://archive.eclipse.org/tracecompass/test-traces/tmf/syslog_collapse";
     private static String fTraceArchiveUrl = "http://archive.eclipse.org/tracecompass/test-traces/tmf/syslogs.zip";
+    private static final String TEST_FOLDER = "Folder";
     private static List<String> fImportedTraceNameList;
 
     /**
@@ -58,11 +60,10 @@ public class HttpTraceImportOperationTest {
         IProject project = TmfProjectRegistry.createProject("Test Project", null, null);
         final TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
         TmfTraceFolder tracesFolder = checkNotNull(projectElement.getTracesFolder());
-        tracesFolder.getResource().getFolder("Folder").create(false, true, null);
+        tracesFolder.getResource().getFolder(TEST_FOLDER).create(false, true, null);
         tracesFolder.refresh();
-        fDestFolder = (TmfTraceFolder) tracesFolder.getChildren().stream()
-                .filter(element -> element.getName().equals("Folder")).findFirst().get();
-
+        WaitUtils.waitUntil(t -> t.getChild(TEST_FOLDER) != null, tracesFolder, "Test folder \"" + TEST_FOLDER + "\" doesn't exist", 20000);
+        fDestFolder = (TmfTraceFolder) tracesFolder.getChild(TEST_FOLDER);
         fImportedTraceNameList = new ArrayList<>();
         fImportedTraceNameList.add("syslog");
         fImportedTraceNameList.add("syslog_collapse");
