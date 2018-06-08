@@ -13,7 +13,6 @@
 package org.eclipse.tracecompass.integration.swtbot.tests.projectexplorer;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -199,9 +198,12 @@ public class ProjectExplorerRefreshTest {
         assertTrue(ustTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         assertTrue(experiment.contextMenu().menuItems().contains("Delete Supplementary Files..."));
         refresh(() -> tracesFolder.contextMenu().menu("Refresh").click());
-        assertFalse(kernelTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
-        assertFalse(ustTrace.contextMenu().menuItems().contains("Delete Supplementary Files..."));
-        assertFalse(experiment.contextMenu().menuItems().contains("Delete Supplementary Files..."));
+        SWTBotUtils.waitUntil(treeItem -> !treeItem.contextMenu().menuItems().contains("Delete Supplementary Files..."),
+                kernelTrace, "Supplementary Files did not get deleted");
+        SWTBotUtils.waitUntil(treeItem -> !treeItem.contextMenu().menuItems().contains("Delete Supplementary Files..."),
+                ustTrace, "Supplementary Files did not get deleted");
+        SWTBotUtils.waitUntil(treeItem -> !treeItem.contextMenu().menuItems().contains("Delete Supplementary Files..."),
+                experiment, "Supplementary Files did not get deleted");
     }
 
     /**
