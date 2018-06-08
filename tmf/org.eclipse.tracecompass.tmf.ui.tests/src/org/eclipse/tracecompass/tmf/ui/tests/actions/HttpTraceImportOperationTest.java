@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,8 +12,8 @@
 package org.eclipse.tracecompass.tmf.ui.tests.actions;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
@@ -59,6 +59,7 @@ public class HttpTraceImportOperationTest {
         final TmfProjectElement projectElement = TmfProjectRegistry.getProject(project, true);
         TmfTraceFolder tracesFolder = checkNotNull(projectElement.getTracesFolder());
         tracesFolder.getResource().getFolder("Folder").create(false, true, null);
+        tracesFolder.refresh();
         fDestFolder = (TmfTraceFolder) tracesFolder.getChildren().stream()
                 .filter(element -> element.getName().equals("Folder")).findFirst().get();
 
