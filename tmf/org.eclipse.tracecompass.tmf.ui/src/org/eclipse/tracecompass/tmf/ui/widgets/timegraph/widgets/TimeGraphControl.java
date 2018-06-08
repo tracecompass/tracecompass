@@ -146,6 +146,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
      */
     public static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
 
+    private static final int HIGHLIGHTED_BOUND_COLOR = 0xff3300ff;
+    private static final int HIGHLIGHTED_BOUND_WIDTH = 4;
     private static final int DRAG_MARGIN = 5;
 
     private static final int DRAG_NONE = 0;
@@ -2663,13 +2665,35 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
         }
 
+        //draw border line
+        Integer borderColorInt = (Integer) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.borderColor(), 0);
+        int arc = Math.min(drawRect.height + 1, drawRect.width) / 2;
+        int borderAlpha = borderColorInt & 0xff;
+        if (borderAlpha != 0) {
+            Color oldForeground = gc.getForeground();
+            int oldLineWidth = gc.getLineWidth();
+            int oldAlpha = gc.getAlpha();
+            String hexRGB = Integer.toHexString(borderColorInt);
+            Color borderColor = COLOR_REGISTRY.get(hexRGB);
+            if (borderColor == null) {
+                COLOR_REGISTRY.put(hexRGB, RGBAUtil.fromInt(borderColorInt).rgb);
+                borderColor = COLOR_REGISTRY.get(hexRGB);
+            }
+            gc.setForeground(borderColor);
+            gc.setAlpha(borderAlpha);
+            gc.setLineWidth(HIGHLIGHTED_BOUND_WIDTH);
+            gc.drawRoundRectangle(drawRect.x, drawRect.y, drawRect.width, drawRect.height , arc, arc);
+            gc.setForeground(oldForeground);
+            gc.setLineWidth(oldLineWidth);
+            gc.setAlpha(oldAlpha);
+        }
+
         boolean reallySelected = timeSelected && selected;
         // fill all rect area
         gc.setBackground(stateColor);
         boolean draw = visible || fBlendSubPixelEvents;
         int old = gc.getAlpha();
         int alpha = fillColor & 0xff;
-        int arc = Math.min(drawRect.height + 1, drawRect.width) / 2;
         if (draw) {
             gc.setAlpha(visible ? alpha : alpha / 2);
             if (arc >= 1) {
@@ -2708,6 +2732,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
             RGBAColor rgbaColor = new RGBAColor(oldRgbaColor.getRed(), oldRgbaColor.getGreen(), oldRgbaColor.getBlue(), Integer.divideUnsigned(oldRgbaColor.getAlpha(), DIMMED_ALPHA_COEFFICIENT));
             updatedStyles.put(ITimeEventStyleStrings.fillColor(), rgbaColor.toInt());
             updatedStyles.put(ITimeEventStyleStrings.annotated(), true);
+        }
+        if (event.isPropertyActive(IFilterProperty.BOUND)) {
+            updatedStyles.put(ITimeEventStyleStrings.borderColor(), HIGHLIGHTED_BOUND_COLOR);
+            updatedStyles.put(ITimeEventStyleStrings.annotated(), false);
         }
         return updatedStyles;
     }
