@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 @NonNullByDefault
 public class FollowThreadAction extends Action {
 
+    private static final String TID = " TID "; //$NON-NLS-1$
     private final TmfView fView;
     private final HostThread fHostThread;
     private final @Nullable String fThreadName;
@@ -68,7 +69,7 @@ public class FollowThreadAction extends Action {
     @Override
     public String getText() {
         if (fThreadName == null) {
-            return Messages.FollowThreadAction_follow + ' ' + fHostThread.getTid();
+            return Messages.FollowThreadAction_follow + TID + fHostThread.getTid();
         }
         return Messages.FollowThreadAction_follow + ' ' + fThreadName + '/' + fHostThread.getTid();
     }

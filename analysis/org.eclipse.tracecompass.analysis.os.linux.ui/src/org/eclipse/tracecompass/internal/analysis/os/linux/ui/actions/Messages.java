@@ -23,6 +23,10 @@ public class Messages extends NLS {
      */
     public static String FollowThreadAction_follow;
     /**
+     * Unfollow message
+     */
+    public static String FollowThreadAction_unfollow;
+    /**
      * Follow CPU message
      */
     public static String CpuSelectionAction_followCpu;
