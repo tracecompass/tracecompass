@@ -576,7 +576,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         public void doRun() {
             Sampling sampling = new Sampling(getZoomStartTime(), getZoomEndTime(), getResolution());
             try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStates")) { //$NON-NLS-1$
-                boolean isFilterActive = fTimeEventFilterDialog != null && fTimeEventFilterDialog.isFilterActive();
+                boolean isFilterActive = !getRegexes().values().isEmpty();
                 boolean isFilterCleared = !isFilterActive && getTimeGraphViewer().isTimeEventFilterActive();
                 getTimeGraphViewer().setTimeEventFilterApplied(isFilterActive);
 
