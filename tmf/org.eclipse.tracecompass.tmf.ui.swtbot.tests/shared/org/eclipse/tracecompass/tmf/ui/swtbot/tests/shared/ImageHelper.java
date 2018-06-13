@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Ericsson
+ * Copyright (c) 2015, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -18,9 +18,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.imageio.ImageIO;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -29,11 +32,10 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.Result;
-import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
-import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.results.VoidResult;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitTimeoutException;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -119,45 +121,25 @@ public final class ImageHelper {
      * @return the new image
      */
     public static ImageHelper waitForNewImage(Rectangle bounds, ImageHelper currentImage) {
-        SWTBot bot = new SWTBot();
-        ImageHelper[] newImage = new ImageHelper[1];
-        bot.waitUntil(new DefaultCondition() {
-            @Override
-            public boolean test() throws Exception {
-                return UIThreadRunnable.syncExec(new Result<Boolean>() {
-                    @Override
-                    public Boolean run() {
-                        newImage[0] = ImageHelper.grabImage(bounds);
-                        return !newImage[0].equals(currentImage);
-                    }
-                });
+        SWTBotUtils.waitUntil(arg -> {
+            return !ImageHelper.grabImage(bounds).equals(currentImage);
+        }, null, "Image at bounds " + bounds + " did not change");
+        AtomicReference<ImageHelper> newImage = new AtomicReference<>();
+        AtomicInteger count = new AtomicInteger();
+        SWTBotUtils.waitUntil(arg -> {
+            ImageHelper image = ImageHelper.grabImage(bounds);
+            if (image.equals(newImage.get())) {
+                count.incrementAndGet();
+            } else {
+                count.set(0);
+                newImage.set(image);
             }
-
-            @Override
-            public String getFailureMessage() {
-                return "Image at bounds " + bounds + " did not change";
-            }
-        });
-        bot.waitUntil(new DefaultCondition() {
-            @Override
-            public boolean test() throws Exception {
-                return UIThreadRunnable.syncExec(new Result<Boolean>() {
-                    @Override
-                    public Boolean run() {
-                        ImageHelper image = ImageHelper.grabImage(bounds);
-                        boolean sameImage = image.equals(newImage[0]);
-                        newImage[0] = image;
-                        return sameImage;
-                    }
-                });
-            }
-
-            @Override
-            public String getFailureMessage() {
-                return "Image at bounds " + bounds + " is not stable";
-            }
-        });
-        return newImage[0];
+            return count.get() > 8;
+        }, null, "Image at bounds " + bounds + " is not stable");
+        if (newImage.get().equals(currentImage)) {
+            throw new WaitTimeoutException("Image at bounds " + bounds + " did not change");
+        }
+        return newImage.get();
     }
 
     /**
@@ -336,31 +318,29 @@ public final class ImageHelper {
     }
 
     /**
-     * On Mac, RGB values that are captured with ImageHelper are affected by monitor
-     * color profiles. To account for this, we can draw the expected color in a
-     * simple shell and use that color as expected value instead.
+     * On some platforms, RGB values that are captured with ImageHelper are affected
+     * by monitor color profiles. To account for this, we can draw the expected
+     * color in a simple shell and use that color as expected value instead.
      *
      * @param original
      *            original color to adjust
      * @return adjusted color
      */
-    public static RGB adjustExpectedColor(RGB original) {
-        if (!SWTUtils.isMac()) {
-            return original;
-        }
-
+    public static synchronized RGB adjustExpectedColor(RGB original) {
         /* Create shell with desired color as background */
         boolean painted[] = new boolean[1];
         final Shell shell = UIThreadRunnable.syncExec(new Result<Shell>() {
             @Override
             public Shell run() {
-                Shell s = new Shell(Display.getDefault());
-                s.setSize(100, 100);
+                Shell s = new Shell(Display.getDefault(), SWT.ON_TOP);
+                s.setSize(16, 16);
                 Color color = new Color(Display.getDefault(), original);
                 s.setBackground(color);
                 s.addPaintListener(new PaintListener() {
                     @Override
                     public void paintControl(PaintEvent e) {
+                        e.gc.setBackground(color);
+                        e.gc.fillRectangle(0, 0, 16, 16);
                         painted[0] = true;
                     }
                 });
@@ -370,28 +350,36 @@ public final class ImageHelper {
         });
 
         /* Make sure the shell has been painted before getting the color */
-        new SWTBot().waitUntil(new DefaultCondition() {
+        SWTBotUtils.waitUntil(arg -> painted[0], null, "Shell was not painted");
 
-            @Override
-            public boolean test() throws Exception {
-                return painted[0];
+        /* Get the color, after waiting for it to stabilize */
+        AtomicReference<RGB> adjusted = new AtomicReference<>();
+        AtomicInteger count = new AtomicInteger();
+        SWTBotUtils.waitUntil(s -> {
+            RGB pixel = UIThreadRunnable.syncExec(new Result<RGB>() {
+                @Override
+                public RGB run() {
+                    shell.redraw();
+                    shell.update();
+                    return ImageHelper.grabImage(shell.getBounds()).getPixel(8, 8);
+                }
+            });
+            if (pixel.equals(adjusted.get())) {
+                count.incrementAndGet();
+            } else {
+                count.set(0);
+                adjusted.set(pixel);
             }
+            return count.get() > 8;
+        }, shell, "Color did not stabilize");
 
+        UIThreadRunnable.syncExec(new VoidResult() {
             @Override
-            public String getFailureMessage() {
-                return "Shell was not painted";
-            }
-        });
-
-        /* Get the color */
-        return UIThreadRunnable.syncExec(new Result<RGB>() {
-            @Override
-            public RGB run() {
-                shell.update();
-                RGB rgb = ImageHelper.grabImage(shell.getBounds()).getPixel(50, 50);
+            public void run() {
                 shell.close();
-                return rgb;
             }
         });
+
+        return adjusted.get();
     }
 }
