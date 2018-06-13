@@ -22,12 +22,15 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -90,12 +93,34 @@ public class TimeEventFilterDialog extends Dialog {
         getShell().setText(Messages.AbstractTimeGraphView_TimeEventFilterDialogTitle);
 
         Composite container = new Composite(parent, SWT.NONE);
-        GridLayout layout = new GridLayout(2, false);
+        GridLayout layout = new GridLayout(3, false);
         layout.horizontalSpacing = 0;
         layout.marginHeight = 0;
         layout.marginWidth = 0;
         container.setLayout(layout);
 
+        Composite labels = createCLabelsArea(container);
+        createFilterTextArea(parent, container,  labels);
+        createCloseButton(container);
+
+        // support close on escape button
+        getShell().addListener(SWT.Traverse, e -> {
+            if (e.detail == SWT.TRAVERSE_ESCAPE) {
+                clearFilter();
+            }
+        });
+
+        for (String label : fFilterRegexes) {
+            createCLabels(parent, labels, label);
+        }
+
+        fControl.addControlListener(fControlListener);
+        fControl.getShell().addControlListener(fControlListener);
+
+        return parent;
+    }
+
+    private static Composite createCLabelsArea(Composite container) {
         Composite labels = new Composite(container, SWT.NONE);
         GridData gd = new GridData(SWT.CENTER, SWT.CENTER, false, false);
         labels.setLayoutData(gd);
@@ -105,7 +130,10 @@ public class TimeEventFilterDialog extends Dialog {
         rl.marginLeft = 0;
         rl.marginRight = 0;
         labels.setLayout(rl);
+        return labels;
+    }
 
+    private Text createFilterTextArea(Composite parent, Composite container, Composite labels) {
         Text filterText = new Text(container, SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
         GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
         gridData.widthHint = FIND_X_WIDTH_HINT;
@@ -135,24 +163,13 @@ public class TimeEventFilterDialog extends Dialog {
                 }
             }
         });
+        return filterText;
+    }
 
-        // support close on escape button
-        getShell().addListener(SWT.Traverse, e -> {
-            if (e.detail == SWT.TRAVERSE_ESCAPE) {
-                fRegex = EMPTY_STRING;
-                fFilterRegexes.clear();
-                fView.restartZoomThread();
-            }
-        });
-
-        for (String label : fFilterRegexes) {
-            createCLabels(parent, labels, label);
-        }
-
-        fControl.addControlListener(fControlListener);
-        fControl.getShell().addControlListener(fControlListener);
-
-        return parent;
+    private void clearFilter() {
+        fRegex = EMPTY_STRING;
+        fFilterRegexes.clear();
+        fView.restartZoomThread();
     }
 
     private void handleEnterPressed(Composite parent, Composite labels, Text filterText) {
@@ -168,6 +185,22 @@ public class TimeEventFilterDialog extends Dialog {
 
             createCLabels(parent, labels, currentRegex);
         }
+    }
+
+    private Button createCloseButton(Composite composite) {
+        Button closeButton = new Button(composite, SWT.NONE);
+        closeButton.setToolTipText(Messages.TimeEventFilterDialog_CloseButton);
+        closeButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+        closeButton.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_DELETE));
+        closeButton.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                clearFilter();
+                close();
+            }
+        });
+        return closeButton;
     }
 
     private void createCLabels(Composite parent, Composite labels, String currentRegex) {
@@ -306,4 +339,5 @@ public class TimeEventFilterDialog extends Dialog {
                     location.y, size.x, size.y)));
         }
     }
+
 }

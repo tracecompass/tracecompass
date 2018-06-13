@@ -46,7 +46,13 @@ public class Messages extends NLS {
      * @since 4.0
      */
     public static String AbstractTimeGraphView_TimeEventFilterDialogTitle;
+
     public static String TimeGraphPresentationProvider_multipleStates;
+
+    /**
+     * @since 4.0
+     */
+    public static String TimeEventFilterDialog_CloseButton;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
