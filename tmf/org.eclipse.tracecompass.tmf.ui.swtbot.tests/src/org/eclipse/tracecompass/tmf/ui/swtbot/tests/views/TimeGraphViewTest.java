@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,14 +15,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
+import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.varia.NullAppender;
+import org.apache.log4j.SimpleLayout;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -63,8 +60,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Multiset.Entry;
 import com.google.common.collect.Multisets;
 
 /**
@@ -75,7 +70,8 @@ public class TimeGraphViewTest {
 
     private static final Logger fLogger = Logger.getRootLogger();
 
-    private static final RGB BLACK = new RGB(0, 0, 0);
+    private static final RGB HAIR = ImageHelper.adjustExpectedColor(new RGB(0, 64, 128));
+    private static final RGB LASER = ImageHelper.adjustExpectedColor(new RGB(255, 0, 0));
 
     private static final int MIN_FILE_SIZE = 1000;
 
@@ -151,7 +147,7 @@ public class TimeGraphViewTest {
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         fLogger.removeAllAppenders();
-        fLogger.addAppender(new NullAppender());
+        fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
     }
 
     /**
@@ -319,17 +315,12 @@ public class TimeGraphViewTest {
         resetTimeRange(bot);
 
         // Take another picture
-        ImageHelper skinny = ImageHelper.waitForNewImage(bounds, ref);
+        ImageHelper thick = ImageHelper.waitForNewImage(bounds, ref);
 
         // Compare with the original, they should be different
-        ImageHelper delta = ref.diff(skinny);
-
-        // collect top 3 so that we don't count single pixel errors due to text
-        // antialiasing
-        Set<RGB> changedValues = getTop3ColorSet(delta);
-
-        assertTrue("Color of \"\"LASER\"\" did not get change despite change of width, " +
-                Multisets.copyHighestCountFirst(delta.getHistogram()).entrySet(), changedValues.contains(new RGB(255, 255, 128)));
+        int refCount = ref.getHistogram().count(LASER);
+        int thickCount = thick.getHistogram().count(LASER);
+        assertTrue(String.format("Count of \"\"LASER\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", LASER, refCount, thickCount, Multisets.copyHighestCountFirst(thick.getHistogram())), thickCount > refCount);
 
         // reset all
         fViewBot.toolbarButton(SHOW_LEGEND).click();
@@ -341,13 +332,11 @@ public class TimeGraphViewTest {
         resetTimeRange(bot);
 
         // take a third picture
-        ImageHelper reset = ImageHelper.waitForNewImage(bounds, skinny);
+        ImageHelper reset = ImageHelper.waitForNewImage(bounds, thick);
 
         // Compare with the original, they should be the same
-        delta = ref.diff(reset);
-
-        Set<RGB> result = getFilteredColorSetOfImage(delta, 50);
-        assertEquals(Collections.singleton(BLACK), result);
+        int resetCount = reset.getHistogram().count(LASER);
+        assertEquals("Count of \"\"LASER\"\" did not get change despite reset of width", refCount, resetCount);
     }
 
     /**
@@ -355,10 +344,7 @@ public class TimeGraphViewTest {
      * there is not mock of the color picker yet
      *
      * TODO: mock color picker
-     *
-     * TODO: make stable
      */
-    @Ignore
     @Test
     public void testLegend() {
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
@@ -381,13 +367,10 @@ public class TimeGraphViewTest {
         // Take another picture
         ImageHelper skinny = ImageHelper.waitForNewImage(bounds, ref);
 
-        // Compare with the original, they should be different
-        ImageHelper delta = ref.diff(skinny);
-
-        Set<RGB> changedValues = getFilteredColorSetOfImage(delta, 0);
-
-        assertTrue("Color of \"HAIR\" did not get change despite change of width, " +
-                Multisets.copyHighestCountFirst(delta.getHistogram()), changedValues.contains(new RGB(255, 255, 129)));
+        /* Compare with the original, they should be different */
+        int refCount = ref.getHistogram().count(HAIR);
+        int skinnyCount = skinny.getHistogram().count(HAIR);
+        assertTrue(String.format("Count of \"\"HAIR\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", HAIR, refCount, skinnyCount, Multisets.copyHighestCountFirst(skinny.getHistogram())), skinnyCount < refCount);
 
         // reset all
         fViewBot.toolbarButton(SHOW_LEGEND).click();
@@ -402,10 +385,8 @@ public class TimeGraphViewTest {
         ImageHelper reset = ImageHelper.waitForNewImage(bounds, skinny);
 
         // Compare with the original, they should be the same
-        delta = ref.diff(reset);
-
-        Set<RGB> result = getFilteredColorSetOfImage(delta, 50);
-        assertEquals(Collections.singleton(BLACK), result);
+        int resetCount = reset.getHistogram().count(HAIR);
+        assertEquals("Count of \"HAIR\" did not get change despite reset of width", refCount, resetCount);
     }
 
     /**
@@ -452,10 +433,11 @@ public class TimeGraphViewTest {
         fViewBot.viewMenu(EXPORT_MENU).click();
         ImageHelper skinnyImage = ImageHelper.fromFile(skinny);
         bot.waitUntil(new FileWritten(skinny, MIN_FILE_SIZE));
+
         /* Compare with the original, they should be different */
-        ImageHelper delta = refImage.diff(skinnyImage);
-        Set<RGB> changedValues = getTop3ColorSet(delta);
-        assertTrue("Color of \"HAIR\" did not get change despite change of width, " + Multisets.copyHighestCountFirst(delta.getHistogram()), changedValues.contains(new RGB(255, 255, 129)));
+        int refCount = refImage.getHistogram().count(HAIR);
+        int skinnyCount = skinnyImage.getHistogram().count(HAIR);
+        assertTrue(String.format("Count of \"\"HAIR\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", HAIR, refCount, skinnyCount, Multisets.copyHighestCountFirst(skinnyImage.getHistogram())), skinnyCount < refCount);
 
         /* reset all */
         fViewBot.toolbarButton(SHOW_LEGEND).click();
@@ -473,54 +455,8 @@ public class TimeGraphViewTest {
         ImageHelper resetImage = ImageHelper.fromFile(reset);
 
         /* Compare with the original, they should be the same */
-        delta = refImage.diff(resetImage);
-        Set<RGB> result = getFilteredColorSetOfImage(delta, 20);
-        assertEquals(Collections.singleton(BLACK), result);
-    }
-
-    /**
-     * Image processing filter
-     *
-     * Takes as an input an image, counts the colors, and returns the top three
-     * colors.
-     *
-     * @param source
-     *            source image
-     * @return the set of RGBs
-     */
-    private static @NonNull Set<RGB> getTop3ColorSet(ImageHelper source) {
-        Set<Multiset.Entry<RGB>> histogramByCount = Multisets.copyHighestCountFirst(source.getHistogram()).entrySet();
-        return histogramByCount.stream().limit(3).map(Entry<RGB>::getElement).collect(Collectors.toSet());
-    }
-
-    /**
-     * Image processing filter
-     *
-     * Takes as an input an image, counts the colors, if the amount to colors is
-     * superior to the threshold and the colors are not too dark (but not black) add
-     * it to the set.
-     *
-     * Color checks done to avoid compression (jpg) artifacts.
-     *
-     * Thresholding done to avoid antialiasing artifacts.
-     *
-     * Counting done to have a reduced set.
-     *
-     *
-     * @param source
-     *            source image
-     * @param pixelThreshold
-     *            number of pixels minimum to have it register in the set
-     * @return the set of RGBs
-     */
-    private static Set<RGB> getFilteredColorSetOfImage(ImageHelper source, int pixelThreshold) {
-        Set<Multiset.Entry<RGB>> histogramByCount = Multisets.copyHighestCountFirst(source.getHistogram()).entrySet();
-        Set<RGB> result = StreamSupport.stream(histogramByCount.spliterator(), false)
-                .filter(entry -> entry.getCount() > pixelThreshold) // remove single pixel glitches
-                .map(entry -> entry.getElement())
-                .filter(rgb -> rgb.red > 3 || rgb.green > 3 || rgb.blue > 3 || rgb.equals(BLACK)) // discard antialiasing bugs
-                .collect(Collectors.toSet());
-        return result;
+        int resetCount = resetImage.getHistogram().count(HAIR);
+        assertEquals("Count of \"HAIR\" did not get change despite reset of width", refCount, resetCount);
     }
 
     private abstract class ConditionHelper implements ICondition {
