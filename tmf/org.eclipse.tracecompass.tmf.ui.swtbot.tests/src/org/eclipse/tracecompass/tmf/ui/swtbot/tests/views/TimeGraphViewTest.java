@@ -15,11 +15,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
@@ -79,7 +76,6 @@ import org.junit.runner.RunWith;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.Multiset.Entry;
 import com.google.common.collect.Multisets;
 
 /**
@@ -91,6 +87,7 @@ public class TimeGraphViewTest {
     private static final Logger fLogger = Logger.getRootLogger();
 
     private static final RGB HAIR = ImageHelper.adjustExpectedColor(new RGB(0, 64, 128));
+    private static final RGB HAT = ImageHelper.adjustExpectedColor(new RGB(0, 255, 0));
     private static final RGB LASER = ImageHelper.adjustExpectedColor(new RGB(255, 0, 0));
 
     private static final int MIN_FILE_SIZE = 1000;
@@ -584,22 +581,14 @@ public class TimeGraphViewTest {
 
         timegraph.setFocus();
         ImageHelper filtered = ImageHelper.waitForNewImage(bounds, ref);
-        ImageHelper delta = ref.diff(filtered);
 
-        Set<RGB> changedValues = getTop5ColorSet(delta);
-        Set<Float> changedHues = new HashSet<>();
-        for(RGB color : changedValues) {
-            changedHues.add(color.getHSB()[0]);
-        }
-
-        RGB desiredColor = new RGB(255, 255, 161);
-        Float desiredHue = desiredColor.getHSB()[0];
-        if(desiredHue > 360.0f) {
-            desiredHue = (float) (desiredHue % 360.0f);
-        }
-
-        assertTrue("Color diff do not match the expected one, " +
-                Multisets.copyHighestCountFirst(delta.getHistogram()).entrySet(), changedHues.contains(desiredHue));
+        /* Compare with the original, they should be different */
+        int refHatCount = ref.getHistogram().count(HAT);
+        int filteredHatCount = filtered.getHistogram().count(HAT);
+        int refHairCount = ref.getHistogram().count(HAIR);
+        int filteredHairCount = filtered.getHistogram().count(HAIR);
+        assertTrue("Count of \"HAT\" did not decrease to non-zero", filteredHatCount < refHatCount && filteredHatCount > 0);
+        assertTrue("Count of \"HAIR\" did not decrease to zero", filteredHairCount < refHairCount && filteredHairCount == 0);
 
         int count = getVisibleItems(timegraph);
 
@@ -611,7 +600,7 @@ public class TimeGraphViewTest {
 
         bot.waitWhile(fTimeGraphIsDirty);
         int newCount = getVisibleItems(timegraph);
-        assertTrue("Fewer entries should be visible here. Current value is " + + newCount + " previous was " + count, newCount < count);
+        assertTrue("Fewer entries should be visible here. Current value is " + newCount + " previous was " + count, newCount < count);
 
     }
 
@@ -631,21 +620,6 @@ public class TimeGraphViewTest {
                 return count;
             }
         });
-    }
-
-    /**
-     * Image processing filter
-     *
-     * Takes as an input an image, counts the colors, and returns the top three
-     * colors.
-     *
-     * @param source
-     *            source image
-     * @return the set of RGBs
-     */
-    private static @NonNull Set<RGB> getTop5ColorSet(ImageHelper source) {
-        Set<Multiset.Entry<RGB>> histogramByCount = Multisets.copyHighestCountFirst(source.getHistogram()).entrySet();
-        return histogramByCount.stream().limit(5).map(Entry<RGB>::getElement).collect(Collectors.toSet());
     }
 
     private abstract class ConditionHelper implements ICondition {

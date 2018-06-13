@@ -253,7 +253,7 @@ public final class ImageHelper {
             byte r = (byte) (local.red - otherPixel.red);
             byte g = (byte) (local.green - otherPixel.green);
             byte b = (byte) (local.blue - otherPixel.blue);
-            fBuffer[i] = 0xff << 24 | (r << 16) | (g << 8) | b;
+            fBuffer[i] = 0xff << 24 | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
         }
         return new ImageHelper(fBuffer, getBounds());
     }
