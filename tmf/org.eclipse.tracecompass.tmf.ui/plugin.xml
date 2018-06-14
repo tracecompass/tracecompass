@@ -1566,7 +1566,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement">
+                           value="org.eclipse.tracecompass.tmf.ui.project.model.TmfCommonProjectElement">
                      </instanceof>
                   </iterate>
                </and>

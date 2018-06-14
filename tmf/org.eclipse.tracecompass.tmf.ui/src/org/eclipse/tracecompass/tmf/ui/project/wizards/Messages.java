@@ -225,6 +225,13 @@ public class Messages extends NLS {
      */
     public static String SelectRootNodeWizardPage_TraceColumnHeader;
 
+    /**
+     * Trim trace title bar
+     *
+     * @since 4.0
+     */
+    public static String TrimTraceDialog_ExportTrimmedTrace;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.core.statesystem;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial.PartialHistoryBackend;
 import org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial.PartialStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -590,14 +592,32 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                     continue;
                 }
 
-                /* Load the statedump into the statesystem */
+                List<List<String>> paths = new ArrayList<>();
+                /* create quark list */
                 for (Entry<List<String>, ITmfStateInterval> attributeSnapshot : snapshot.getStates().entrySet()) {
                     List<String> attributePath = Objects.requireNonNull(attributeSnapshot.getKey());
-                    int quark = ssb.getQuarkAbsoluteAndAdd(attributePath.toArray(new String[attributePath.size()]));
-                    ITmfStateInterval interval = Objects.requireNonNull(attributeSnapshot.getValue());
-                    Object initialState = interval.getValue();
+                    ITmfStateInterval state = Objects.requireNonNull(attributeSnapshot.getValue());
+                    while (paths.size() <= state.getAttribute()) {
+                        paths.add(Collections.singletonList("Dummy" + paths.size())); //$NON-NLS-1$
+                    }
+                    paths.set(state.getAttribute(), attributePath);
+                }
+                /*
+                 * Populate quarks in order
+                 */
+                int i = 0;
+                for (List<String> attributePath : paths) {
+                    int quark = ((ITmfStateSystemBuilder) ss).getQuarkAbsoluteAndAdd(attributePath.toArray(new String[attributePath.size()]));
+                    if (i != quark) {
+                        Activator.logWarning("Quark for analysis " + getClass().getCanonicalName() + " not the same ( " + quark + " != " + i + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                    }
+                    i++;
+                }
 
-                    ssb.modifyAttribute(Math.max(interval.getStartTime(), ssb.getStartTime()), initialState, quark);
+                /* Load the statedump into the statesystem */
+                for (ITmfStateInterval interval : snapshot.getStates().values()) {
+                    Object initialState = interval.getValue();
+                    ssb.modifyAttribute(Math.max(interval.getStartTime(), ssb.getStartTime()), initialState, interval.getAttribute());
                 }
             }
         }
