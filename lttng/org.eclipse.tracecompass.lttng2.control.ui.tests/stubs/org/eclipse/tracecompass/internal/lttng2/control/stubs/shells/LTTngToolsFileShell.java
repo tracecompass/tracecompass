@@ -67,7 +67,7 @@ public class LTTngToolsFileShell extends TestCommandShell {
     private final static String LTTNG_WORKSPACE_PATTERN = "\\$\\{workspace\\}";
     private final static String SESSION_NAME_PATTERN = "\\$\\{sessionname\\}";
 
-    private final static String USER_HOME = System.getProperty("user.home");
+    private final static String USER_HOME = System.getProperty("user.home").replaceAll("/*$", "");
     private final static String WORKSPACE_HOME;
 
     private final static Pattern LTTNG_SAVE_MI_PATTERN = Pattern.compile("lttng\\s+--mi xml\\s+save\\s+-f");
