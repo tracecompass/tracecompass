@@ -13,7 +13,6 @@ import java.util.Iterator;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.analysis.profiling.core.callgraph.ICallGraphProvider;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
@@ -43,11 +42,7 @@ public class CallGraphStatisticsAnalysis extends AbstractSegmentStatisticsAnalys
             return null;
         }
         CallStackAnalysis csModule = iterator.next();
-        ICallGraphProvider callGraph = csModule.getCallGraph();
-        if (!(callGraph instanceof CallGraphAnalysis)) {
-            return null;
-        }
-        return (CallGraphAnalysis) callGraph;
+        return csModule;
     }
 
     @Override

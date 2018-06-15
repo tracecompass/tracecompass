@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.analysis.profiling.core.callstack;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 
@@ -21,4 +22,10 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
  */
 public interface IFlameChartProvider extends IAnalysisModule, ISegmentStoreProvider {
 
+    /**
+     * Get the callstacks series provided by this analysis.
+     *
+     * @return The callstack series or null if it is not available yet
+     */
+    @Nullable CallStackSeries getCallStackSeries();
 }

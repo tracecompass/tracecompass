@@ -173,9 +173,8 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
         // TODO:Look at updates while the state system's being built
         String[] threadsPattern = callstackModule.getThreadsPattern();
         String[] processesPattern = callstackModule.getProcessesPattern();
-        String[] callStackPath = callstackModule.getCallStackPath();
         ITmfStateSystem ss = callstackModule.getStateSystem();
-        if (ss == null || !iterateOverStateSystem(ss, threadsPattern, processesPattern, callStackPath, monitor)) {
+        if (ss == null || !iterateOverStateSystem(ss, threadsPattern, processesPattern, monitor)) {
             return false;
         }
         monitor.worked(1);
@@ -201,12 +200,12 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      * @return true if completed successfully
      */
     @VisibleForTesting
-    protected boolean iterateOverStateSystem(ITmfStateSystem ss, String[] threadsPattern, String[] processesPattern, String[] callStackPath, IProgressMonitor monitor) {
+    protected boolean iterateOverStateSystem(ITmfStateSystem ss, String[] threadsPattern, String[] processesPattern, IProgressMonitor monitor) {
         List<Integer> processQuarks = ss.getQuarks(processesPattern);
         for (int processQuark : processQuarks) {
             int processId = getProcessId(ss, processQuark, ss.getCurrentEndTime());
             for (int threadQuark : ss.getQuarks(processQuark, threadsPattern)) {
-                if (!iterateOverQuark(ss, processId, threadQuark, callStackPath, monitor)) {
+                if (!iterateOverQuark(ss, processId, threadQuark, monitor)) {
                     return false;
                 }
             }
@@ -233,7 +232,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      *            The monitor
      * @return true if completed successfully
      */
-    private boolean iterateOverQuark(ITmfStateSystem stateSystem, int processId, int threadQuark, String[] subAttributePath, IProgressMonitor monitor) {
+    private boolean iterateOverQuark(ITmfStateSystem stateSystem, int processId, int threadQuark, IProgressMonitor monitor) {
         String threadName = stateSystem.getAttributeName(threadQuark);
         long threadId = getProcessId(stateSystem, threadQuark, stateSystem.getStartTime());
         try {
@@ -245,7 +244,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
                 if (monitor.isCanceled()) {
                     return false;
                 }
-                int callStackQuark = stateSystem.optQuarkRelative(threadQuark, subAttributePath);
+                int callStackQuark = stateSystem.optQuarkRelative(threadQuark, CallStackAnalysis.CALL_STACK);
                 if (callStackQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
                     return false;
                 }

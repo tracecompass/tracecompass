@@ -119,7 +119,6 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
             @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
         long start = ss.getStartTime();
         long end = ss.getCurrentEndTime();
-        String[] callStackPath = getAnalysisModule().getCallStackPath();
 
         ImmutableList.Builder<CallStackEntryModel> builder = ImmutableList.builder();
         long traceId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
@@ -148,7 +147,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
             /* Create the threads under the process */
             List<Integer> threadQuarks = ss.getQuarks(processQuark, getAnalysisModule().getThreadsPattern());
             for (int threadQuark : threadQuarks) {
-                int callStackQuark = ss.optQuarkRelative(threadQuark, callStackPath);
+                int callStackQuark = ss.optQuarkRelative(threadQuark, CallStackAnalysis.CALL_STACK);
                 if (callStackQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
                     continue;
                 }

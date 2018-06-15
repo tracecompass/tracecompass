@@ -17,13 +17,15 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.datastore.core,
  org.eclipse.tracecompass.segmentstore.core,
  org.eclipse.tracecompass.analysis.timing.core
-Export-Package: org.eclipse.tracecompass.analysis.profiling.core.callgraph,
+Export-Package: org.eclipse.tracecompass.analysis.profiling.core.base,
+ org.eclipse.tracecompass.analysis.profiling.core.callgraph,
  org.eclipse.tracecompass.analysis.profiling.core.callstack,
  org.eclipse.tracecompass.internal.analysis.profiling.core;x-friends:="org.eclipse.tracecompass.analysis.profiling.core.tests,org.eclipse.tracecompass.analysis.profiling.ui",
  org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph;x-friends:="org.eclipse.tracecompass.analysis.profiling.core.tests,org.eclipse.tracecompass.analysis.profiling.ui",
  org.eclipse.tracecompass.internal.analysis.profiling.core.callstack;x-friends:="org.eclipse.tracecompass.analysis.profiling.core.tests,org.eclipse.tracecompass.analysis.profiling.ui",
  org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.provider;x-friends:="org.eclipse.tracecompass.analysis.profiling.core.tests,org.eclipse.tracecompass.analysis.profiling.ui"
 Import-Package: com.google.common.annotations,
+ com.google.common.base,
  com.google.common.cache,
  com.google.common.collect,
- com.google.common.base
+ org.apache.commons.lang3

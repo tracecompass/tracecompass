@@ -81,7 +81,9 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
      */
     public static final String PROCESSES = "Processes"; //$NON-NLS-1$
 
-    /** CallStack stack-attribute */
+    /** CallStack stack-attribute
+     * @deprecated Use {@link CallStackAnalysis#CALL_STACK} instead */
+    @Deprecated
     public static final String CALL_STACK = "CallStack"; //$NON-NLS-1$
 
     /**
@@ -142,7 +144,7 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
             int threadQuark = ss.getQuarkRelativeAndAdd(processQuark, threadName);
             ss.updateOngoingState(TmfStateValue.newValueLong(threadId), threadQuark);
 
-            int callStackQuark = ss.getQuarkRelativeAndAdd(threadQuark, CALL_STACK);
+            int callStackQuark = ss.getQuarkRelativeAndAdd(threadQuark, CallStackAnalysis.CALL_STACK);
             ss.pushAttribute(timestamp, functionEntryName.unboxValue(), callStackQuark);
             return;
         }
@@ -160,7 +162,7 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
             if (threadName == null) {
                 threadName = Long.toString(getThreadId(event));
             }
-            int quark = ss.getQuarkAbsoluteAndAdd(PROCESSES, processName, threadName, CALL_STACK);
+            int quark = ss.getQuarkAbsoluteAndAdd(PROCESSES, processName, threadName, CallStackAnalysis.CALL_STACK);
             ITmfStateValue poppedValue = ss.popAttribute(timestamp, quark);
             /*
              * Verify that the value we are popping matches the one in the event
