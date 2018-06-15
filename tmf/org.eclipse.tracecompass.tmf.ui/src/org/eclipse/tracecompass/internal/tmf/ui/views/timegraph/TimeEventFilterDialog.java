@@ -255,7 +255,11 @@ public class TimeEventFilterDialog extends Dialog {
 
     @Override
     protected Point getInitialLocation(Point initialSize) {
-        return getFilterLocation();
+        Point p = getFilterLocation();
+        if (p != null) {
+            return p;
+        }
+        return super.getInitialLocation(initialSize);
     }
 
     @Override
@@ -272,10 +276,13 @@ public class TimeEventFilterDialog extends Dialog {
      *
      * @return the filter dialog location
      */
-    public Point getFilterLocation() {
-        Rectangle bounds = fControl.getBounds();
-        int width = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
-        return fControl.toDisplay(new Point(bounds.x + bounds.width - width, bounds.y + bounds.height + Y_OFFSET));
+    @Nullable public Point getFilterLocation() {
+        if (!fControl.isDisposed()) {
+            Rectangle bounds = fControl.getBounds();
+            int width = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+            return fControl.toDisplay(new Point(bounds.x + bounds.width - width, bounds.y + bounds.height + Y_OFFSET));
+        }
+        return null;
     }
 
     /**
@@ -335,8 +342,10 @@ public class TimeEventFilterDialog extends Dialog {
             }
             Point size = getInitialSize();
             Point location = getFilterLocation();
-            getShell().setBounds(getConstrainedShellBounds(new Rectangle(location.x,
-                    location.y, size.x, size.y)));
+            if (location != null) {
+                getShell().setBounds(getConstrainedShellBounds(new Rectangle(location.x,
+                        location.y, size.x, size.y)));
+            }
         }
     }
 
