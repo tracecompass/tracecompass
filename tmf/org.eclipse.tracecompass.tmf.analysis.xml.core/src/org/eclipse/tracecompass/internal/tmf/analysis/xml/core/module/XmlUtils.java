@@ -50,17 +50,17 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.ITmfXmlSchemaParser;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.osgi.framework.Bundle;
+import org.osgi.service.prefs.BackingStoreException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -151,21 +151,25 @@ public class XmlUtils {
      * Load files status from preference store.
      */
     public static void loadFilesStatus() {
-        IPreferenceStore preferenceStore = Activator.getDefault().getCorePreferenceStore();
-        String joined = preferenceStore.getString(ENABLED_FILES_PREFERENCE_KEY);
-        fEnabledFiles = Sets.newHashSet(Splitter.on(ENABLED_FILES_SEP).omitEmptyStrings().split(joined));
+        IEclipsePreferences preferences = Activator.getDefault().getCorePreferenceStore();
+        String enabledFiles = preferences.get(ENABLED_FILES_PREFERENCE_KEY, null);
+        if (enabledFiles != null) {
+            fEnabledFiles = Sets.newHashSet(Splitter.on(ENABLED_FILES_SEP).omitEmptyStrings().split(enabledFiles));
+        } else {
+            fEnabledFiles = Sets.newHashSet();
+        }
     }
 
     /**
      * Save files status to preference store.
      */
     public static void saveFilesStatus() {
-        ScopedPreferenceStore preferenceStore = Activator.getDefault().getCorePreferenceStore();
-        String joined = Joiner.on(ENABLED_FILES_SEP).join(fEnabledFiles);
-        preferenceStore.setValue(ENABLED_FILES_PREFERENCE_KEY, joined);
+        IEclipsePreferences preferences = Activator.getDefault().getCorePreferenceStore();
+        String enabledFiles = Joiner.on(ENABLED_FILES_SEP).join(fEnabledFiles);
+        preferences.put(ENABLED_FILES_PREFERENCE_KEY, enabledFiles);
         try {
-            preferenceStore.save();
-        } catch (IOException e) {
+            preferences.flush();
+        } catch (BackingStoreException e) {
             Activator.logError(Messages.XmlUtils_ErrorSavingPreferences, e);
         }
     }

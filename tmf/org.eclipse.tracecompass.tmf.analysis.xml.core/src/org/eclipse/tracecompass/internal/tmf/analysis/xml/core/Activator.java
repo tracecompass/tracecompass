@@ -15,10 +15,10 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.ConfigurationScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlDataProviderManager;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -34,7 +34,7 @@ public class Activator extends Plugin {
     // The shared instance
     private static Activator fPlugin;
 
-    private ScopedPreferenceStore fCorePreferenceStore;
+    private IEclipsePreferences fCorePreferenceStore;
 
     /**
      * The constructor
@@ -64,9 +64,9 @@ public class Activator extends Plugin {
      * Returns a preference store for org.eclipse.tracecompass.tmf.analysis.xml.core preferences
      * @return the preference store
      */
-    public ScopedPreferenceStore getCorePreferenceStore() {
+    public IEclipsePreferences getCorePreferenceStore() {
         if (fCorePreferenceStore == null) {
-            fCorePreferenceStore = new ScopedPreferenceStore(ConfigurationScope.INSTANCE, PLUGIN_ID);
+            fCorePreferenceStore = InstanceScope.INSTANCE.getNode(PLUGIN_ID);
         }
         return fCorePreferenceStore;
     }

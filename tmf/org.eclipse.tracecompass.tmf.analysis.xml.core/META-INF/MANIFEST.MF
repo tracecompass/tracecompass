@@ -14,7 +14,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.datastore.core,
  org.eclipse.tracecompass.segmentstore.core,
  org.eclipse.tracecompass.analysis.timing.core,
- org.eclipse.ui.workbench,
  org.eclipse.core.commands,
  com.google.guava
 Export-Package: org.eclipse.tracecompass.internal.tmf.analysis.xml.core;x-friends:="org.eclipse.tracecompass.tmf.analysis.xml.core.tests",
@@ -37,6 +36,5 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.analysis.xml.core;x-friend
 Import-Package: com.google.common.base,
  com.google.common.collect,
  org.apache.commons.io,
- org.apache.commons.lang3,
- org.eclipse.jface.preference
+ org.apache.commons.lang3
 Automatic-Module-Name: org.eclipse.tracecompass.tmf.analysis.xml.core
