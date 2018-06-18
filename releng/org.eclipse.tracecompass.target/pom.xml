@@ -39,6 +39,11 @@
                     <classifier>tracecompass-e4.7</classifier>
                   </artifact>
                   <artifact>
+                    <file>tracecompass-e4.8.target</file>
+                    <type>target</type>
+                    <classifier>tracecompass-e4.8</classifier>
+                  </artifact>
+                  <artifact>
                     <file>tracecompass-eStaging.target</file>
                     <type>target</type>
                     <classifier>tracecompass-eStaging</classifier>
