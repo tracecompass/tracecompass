@@ -29,6 +29,9 @@ substring
 toString
  ()Ljava/lang/String;
  ()L1java/lang/String;
+trim
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
 valueOf
  (C)Ljava/lang/String;
  (C)L1java/lang/String;

@@ -509,7 +509,7 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
                 final String experimentName = fExperimentNameText.getText().trim();
 
                 // just safety guards
-                if ((root == null) || (experimentName == null)) {
+                if ((root == null) || (experimentName.isEmpty())) {
                     return true;
                 }
                 getContainer().run(true, true, new IRunnableWithProgress() {

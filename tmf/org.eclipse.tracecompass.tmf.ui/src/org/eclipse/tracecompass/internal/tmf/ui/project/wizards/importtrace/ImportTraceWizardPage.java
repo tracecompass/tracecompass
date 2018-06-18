@@ -1301,7 +1301,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 final TmfExperimentFolder root = fExperimentFolderElement;
                 final String experimentName = fExperimentNameText.getText().trim();
                 // just safety guards
-                if ((root == null) || (experimentName == null)) {
+                if ((root == null) || (experimentName.isEmpty())) {
                     return true;
                 }
                 if ((operationStatus[0] != null) && (operationStatus[0].isOK())) {
