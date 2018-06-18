@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g 2018-05-29 18:57:39
+// $ANTLR 3.5.2 org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g 2018-06-18 15:13:46
 
 /*******************************************************************************
  * Copyright (c) 2018 Ericsson
@@ -233,7 +233,7 @@ public class FilterParserParser extends Parser {
 			}
 
 			// AST REWRITE
-			// elements: root, root, SEPARATOR
+			// elements: SEPARATOR, root, root
 			// token labels: 
 			// rule labels: retval
 			// token list labels: 
@@ -251,12 +251,12 @@ public class FilterParserParser extends Parser {
 				root_1 = (CommonTree)adaptor.becomeRoot((CommonTree)adaptor.create(LOGICAL, "LOGICAL"), root_1);
 				adaptor.addChild(root_1, stream_root.nextTree());
 				// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:86:53: ( SEPARATOR root )*
-				while ( stream_root.hasNext()||stream_SEPARATOR.hasNext() ) {
+				while ( stream_SEPARATOR.hasNext()||stream_root.hasNext() ) {
 					adaptor.addChild(root_1, stream_SEPARATOR.nextNode());
 					adaptor.addChild(root_1, stream_root.nextTree());
 				}
-				stream_root.reset();
 				stream_SEPARATOR.reset();
+				stream_root.reset();
 
 				adaptor.addChild(root_0, root_1);
 				}
@@ -397,7 +397,7 @@ public class FilterParserParser extends Parser {
 					stream_23.add(close);
 
 					// AST REWRITE
-					// elements: start, close, parseRoot, OP_NEGATE
+					// elements: start, parseRoot, close, OP_NEGATE
 					// token labels: start, close
 					// rule labels: retval
 					// token list labels: 
@@ -778,7 +778,7 @@ public class FilterParserParser extends Parser {
 					stream_TEXT.add(text);
 
 					// AST REWRITE
-					// elements: text, key0, op
+					// elements: key0, text, op
 					// token labels: op, text
 					// rule labels: key0, retval
 					// token list labels: 
@@ -937,7 +937,7 @@ public class FilterParserParser extends Parser {
 					stream_21.add(char_literal28);
 
 					// AST REWRITE
-					// elements: key3, key4, OP
+					// elements: OP, key3, key4
 					// token labels: 
 					// rule labels: key3, key4, retval
 					// token list labels: 
