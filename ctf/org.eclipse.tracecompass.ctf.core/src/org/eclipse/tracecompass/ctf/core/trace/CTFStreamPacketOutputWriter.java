@@ -182,8 +182,10 @@ public class CTFStreamPacketOutputWriter {
                 IEventDefinition event = currentPacketReader.readNextEvent();
                 long timestampInCycles = event.getTimestamp();
                 if (!startIsSet) {
-                    // handle "P" and "I" framed timestamps. overwrite the timestamp if there is one
-                    // before the trim
+                    /*
+                     * handle "P" and "I" framed timestamps. overwrite the
+                     * timestamp if there is one before the trim
+                     */
                     ICompositeDefinition eventHeader = event.getEventHeader();
                     Definition def = null;
                     if (eventHeader != null) {
@@ -202,7 +204,7 @@ public class CTFStreamPacketOutputWriter {
                     startOffsetBits = currentPacketReader.getLocation();
                     startIsSet = true;
                 }
-                if (timestampInCycles > endTime) {
+                if (timestampInCycles > endTime + 1) {
                     endOffsetBits = currentPacketReader.getLocation();
                     break;
                 }
@@ -219,18 +221,21 @@ public class CTFStreamPacketOutputWriter {
             long initialLost)
             throws IOException, CTFException {
         ByteBuffer inBuffer = SafeMappedByteBuffer.map(source, MapMode.READ_ONLY, entry.getOffsetBytes(), bitsToBytes(entry.getContentSizeBits()));
-        int headerSize = (int) (tracePacketHeader == null ? 0 : tracePacketHeader.size());
-        int packetSize = (int) (headerSize + packetContext.size() + endOffsetBits - startOffsetBits);
-        byte[] toWrite = new byte[(int) bitsToBytes(packetSize)];
+        int headerSizeBits = (int) (tracePacketHeader == null ? 0 : tracePacketHeader.size());
+        int packetSizeBits = (int) (headerSizeBits + packetContext.size() + endOffsetBits - startOffsetBits);
+        int alignmentSize = Byte.SIZE;
+        int lastBitsOfBody = (int) (endOffsetBits % alignmentSize);
+        int contentSizeBits = (lastBitsOfBody != 0) ? (packetSizeBits - alignmentSize + lastBitsOfBody) : packetSizeBits;
+        byte[] toWrite = new byte[(int) bitsToBytes(packetSizeBits)];
         ByteBuffer buffer = ByteBuffer.wrap(toWrite);
-        byte[] header = new byte[(int) bitsToBytes(headerSize)];
+        byte[] header = new byte[(int) bitsToBytes(headerSizeBits)];
         byte[] body = new byte[(int) bitsToBytes(endOffsetBits - startOffsetBits)];
         inBuffer.get(header);
         inBuffer.position((int) bitsToBytes(startOffsetBits));
         inBuffer.get(body);
         buffer.put(header);
-        writeContext(startTime, packetContext, packetSize, initialLost, buffer);
-        buffer.position((int) bitsToBytes(headerSize + packetContext.size()));
+        writeContext(startTime, packetContext, contentSizeBits, (int) bitsToBytes(packetSizeBits) * Byte.SIZE, initialLost, buffer);
+        buffer.position((int) bitsToBytes(headerSizeBits + packetContext.size()));
         buffer.put(body);
         output.write(ByteBuffer.wrap(toWrite));
     }
@@ -239,7 +244,7 @@ public class CTFStreamPacketOutputWriter {
         return (long) Math.ceil(bits / (double) Byte.SIZE);
     }
 
-    private static void writeContext(long startTime, StructDefinition context, int newPacketSize, long initialLost, @NonNull ByteBuffer buffer) throws CTFException {
+    private static void writeContext(long startTime, StructDefinition context, int newContentSize, int newPacketSize, long initialLost, @NonNull ByteBuffer buffer) throws CTFException {
         BitBuffer bb = new BitBuffer(buffer);
         bb.position(buffer.position() * Byte.SIZE);
         for (String field : context.getFieldNames()) {
@@ -252,8 +257,10 @@ public class CTFStreamPacketOutputWriter {
             if (def instanceof SimpleDatatypeDefinition) {
                 SimpleDatatypeDefinition simpleDef = (SimpleDatatypeDefinition) def;
                 int size = (int) simpleDef.size();
-                if (field.equals(CTFStrings.PACKET_SIZE) || field.equals(CTFStrings.CONTENT_SIZE)) {
+                if (field.equals(CTFStrings.PACKET_SIZE)) {
                     bb.putLong(size, newPacketSize);
+                } else if (field.equals(CTFStrings.CONTENT_SIZE)) {
+                    bb.putLong(size, newContentSize);
                 } else if (field.equals(CTFStrings.TIMESTAMP_BEGIN)) {
                     bb.putLong(size, startTime);
                 } else if (field.equals(CTFStrings.EVENTS_DISCARDED)) {

@@ -262,7 +262,7 @@ public class CTFStreamInput implements IDefinitionScope {
 
             /* Basic validation */
             if (packetIndex.getContentSizeBits() > packetIndex.getPacketSizeBits()) {
-                throw new CTFException("Content size > packet size"); //$NON-NLS-1$
+                throw new CTFException("Content size (" + packetIndex.getContentSizeBits() + ") > packet size (" + packetIndex.getPacketSizeBits() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
 
             if (packetIndex.getPacketSizeBits() > ((size * Byte.SIZE - packetIndex.getOffsetBits()))) {
