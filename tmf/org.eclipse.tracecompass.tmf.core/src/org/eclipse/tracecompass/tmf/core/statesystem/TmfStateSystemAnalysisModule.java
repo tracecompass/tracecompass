@@ -581,7 +581,6 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
         }
         for (ITmfStateSystem ss : getStateSystems()) {
             if (ss instanceof ITmfStateSystemBuilder) {
-                ITmfStateSystemBuilder ssb = (ITmfStateSystemBuilder) ss;
                 StateSnapshot snapshot = StateSnapshot.read(path.toPath(), ss.getSSID());
                 if (snapshot == null || provider.getVersion() != snapshot.getVersion()) {
                     /*
@@ -617,7 +616,11 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                 /* Load the statedump into the statesystem */
                 for (ITmfStateInterval interval : snapshot.getStates().values()) {
                     Object initialState = interval.getValue();
-                    ssb.modifyAttribute(Math.max(interval.getStartTime(), ssb.getStartTime()), initialState, interval.getAttribute());
+                    int attribute = interval.getAttribute();
+                    provider.addFutureEvent(interval.getStartTime(), initialState, attribute);
+                    if(interval.getEndTime() > interval.getStartTime()) {
+                        provider.addFutureEvent(interval.getEndTime(), (Object) null, attribute);
+                    }
                 }
             }
         }

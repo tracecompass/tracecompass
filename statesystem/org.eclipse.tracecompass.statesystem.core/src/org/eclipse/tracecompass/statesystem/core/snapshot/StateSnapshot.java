@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.internal.statesystem.core.interval.json.TmfInter
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -115,6 +116,10 @@ public class StateSnapshot {
     @Since(1.0)
     private Collection<AttributeAndInterval> fAttributes = Collections.emptyList();
 
+    private final long fEndTime;
+
+    private long fStartTime;
+
     /**
      * Get the format version
      *
@@ -148,6 +153,42 @@ public class StateSnapshot {
     }
 
     /**
+     * Clamping constructor. Builds a snapshot from a given state system and
+     * timestamp.
+     *
+     * @param ss
+     *            The state system for which to build the state dump
+     * @param start
+     *            The timestamp at which to query the state to dump
+     *            @param end
+     *            The timestamp at which the
+     * @param version
+     *            Version of the snapshot
+     */
+    public StateSnapshot(ITmfStateSystem ss, long start, long end, int version) {
+        fStartTime = start;
+        fEndTime = end;
+        List<ITmfStateInterval> fullQuery;
+        fVersion = version;
+        fSsid = String.valueOf(ss.getSSID());
+        try {
+            fullQuery = ss.queryFullState(start);
+        } catch (StateSystemDisposedException e1) {
+            fVersion = -1;
+            return;
+        }
+
+        ImmutableList.Builder<@NonNull AttributeAndInterval> states = new ImmutableList.Builder<>();
+        for (int quark = 0; quark < ss.getNbAttributes(); quark++) {
+            String @NonNull [] fullAttributePathArray = ss.getFullAttributePathArray(quark);
+            ITmfStateInterval interval = fullQuery.get(quark);
+            interval = new TmfStateInterval(Math.max(interval.getStartTime(), fStartTime), interval.getEndTime()> fEndTime? -interval.getEndTime():interval.getEndTime(), interval.getAttribute(), interval.getValue());
+            states.add(new AttributeAndInterval(Arrays.asList(fullAttributePathArray), interval));
+        }
+        fAttributes = states.build();
+    }
+
+    /**
      * "Online" constructor. Builds a snapshot from a given state system and
      * timestamp.
      *
@@ -159,22 +200,7 @@ public class StateSnapshot {
      *            Version of the snapshot
      */
     public StateSnapshot(ITmfStateSystem ss, long timestamp, int version) {
-        List<ITmfStateInterval> fullQuery;
-        fVersion = version;
-        fSsid = String.valueOf(ss.getSSID());
-        try {
-            fullQuery = ss.queryFullState(timestamp);
-        } catch (StateSystemDisposedException e1) {
-            fVersion = -1;
-            return;
-        }
-
-        ImmutableList.Builder<@NonNull AttributeAndInterval> states = new ImmutableList.Builder<>();
-        for (int quark = 0; quark < ss.getNbAttributes(); quark++) {
-            String @NonNull [] fullAttributePathArray = ss.getFullAttributePathArray(quark);
-            states.add(new AttributeAndInterval(Arrays.asList(fullAttributePathArray), fullQuery.get(quark)));
-        }
-        fAttributes = states.build();
+        this(ss, timestamp, timestamp, version);
     }
 
     /**

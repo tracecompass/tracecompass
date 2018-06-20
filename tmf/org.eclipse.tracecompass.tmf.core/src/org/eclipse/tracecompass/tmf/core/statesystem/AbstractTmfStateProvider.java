@@ -12,6 +12,10 @@
 
 package org.eclipse.tracecompass.tmf.core.statesystem;
 
+import java.util.Comparator;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jdt.annotation.Nullable;
@@ -40,6 +44,22 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
 
+    private static final class InitialValue {
+        private final long fTime;
+        private final @Nullable Object fValue;
+        private final int fQuark;
+
+        public InitialValue(long time, @Nullable Object initialState, int quark) {
+            fTime = time;
+            fValue = initialState;
+            fQuark = quark;
+        }
+
+        public long getTime() {
+            return fTime;
+        }
+    }
+
     private static final int DEFAULT_EVENTS_QUEUE_SIZE = 127;
     private static final int DEFAULT_EVENTS_CHUNK_SIZE = 127;
 
@@ -65,6 +85,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         // threads
     };
 
+    private final Queue<InitialValue> fInitialValues = new PriorityQueue<>(Comparator.comparingLong(InitialValue::getTime));
 
     /**
      * Instantiate a new state provider plugin.
@@ -275,11 +296,34 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
                     continue;
                 }
                 currentEvent = event;
-                fSafeTime = event.getTimestamp().toNanos() - 1;
+                long currentTime = event.getTimestamp().toNanos();
+                fSafeTime = currentTime - 1;
+                ITmfStateSystemBuilder stateSystemBuilder = getStateSystemBuilder();
+                if (stateSystemBuilder == null) {
+                    return;
+                }
+                InitialValue initialValue = fInitialValues.peek();
+                while (initialValue != null && (currentTime > initialValue.fTime)) {
+                    initialValue = fInitialValues.poll();
+                    if (initialValue != null) {
+                        stateSystemBuilder.modifyAttribute(initialValue.fTime, initialValue.fValue, initialValue.fQuark);
+                    }
+                }
                 eventHandle(event);
                 event = fEventsQueue.take();
             }
             fDone = true;
+            /*
+             * flush remaining states
+             */
+            ITmfStateSystemBuilder stateSystemBuilder = getStateSystemBuilder();
+            if (stateSystemBuilder == null) {
+                return;
+            }
+            while (!fInitialValues.isEmpty()) {
+                InitialValue interval = fInitialValues.remove();
+                stateSystemBuilder.modifyAttribute(interval.fTime, interval.fValue, interval.fQuark);
+            }
             /* We've received the last event, clean up */
             done();
             closeStateSystem();
@@ -325,6 +369,11 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
             /* We've received the last event, clean up */
             closeStateSystem();
         }
+    }
+
+    @Override
+    public void addFutureEvent(long time, @Nullable Object initialState, int attribute) {
+        fInitialValues.add(new InitialValue(time, initialState, attribute));
     }
 
     // ------------------------------------------------------------------------

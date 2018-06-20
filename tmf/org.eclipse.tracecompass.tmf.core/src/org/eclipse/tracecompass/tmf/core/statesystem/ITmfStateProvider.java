@@ -138,4 +138,18 @@ public interface ITmfStateProvider {
     default @Nullable Throwable getFailureCause() {
         return null;
     }
+
+    /**
+     * Add future state. It will be added when it is safe to do so.
+     *
+     * @param time the time of the state
+     * @param initialState
+     *            the initial state
+     * @param attribute
+     *            the quark to set to initial state
+     * @since 4.0
+     */
+    default void addFutureEvent(long time, @Nullable Object initialState, int attribute) {
+        // Do nothing by default
+    }
 }

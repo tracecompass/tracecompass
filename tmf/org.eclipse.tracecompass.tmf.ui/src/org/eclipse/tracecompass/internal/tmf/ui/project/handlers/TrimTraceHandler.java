@@ -238,8 +238,9 @@ public class TrimTraceHandler extends AbstractHandler {
                     Iterable<ITmfStateSystem> sss = module.getStateSystems();
                     for (ITmfStateSystem ss : sss) {
                         Integer version = versions.get(ss.getSSID());
-                        if (snapshotTime <= ss.getCurrentEndTime() && version != null) {
-                            StateSnapshot snapshot = new StateSnapshot(ss, Math.max(snapshotTime, ss.getStartTime()), version);
+                        long currentEndTime = ss.getCurrentEndTime();
+                        if (snapshotTime <= currentEndTime && version != null) {
+                            StateSnapshot snapshot = new StateSnapshot(ss, Math.max(snapshotTime, ss.getStartTime()), Math.min(currentEndTime, tr.getEndTime().toNanos()), version);
                             snapshot.write(returnPath);
                         }
                     }
