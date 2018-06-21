@@ -271,6 +271,8 @@ public class CTFStreamInput implements IDefinitionScope {
             return packetIndex;
         } catch (IOException e) {
             throw new CTFException("Failed to create packet index entry", e); //$NON-NLS-1$
+        } catch (CTFException e) {
+            throw new CTFException("Cannot create packet entry at bit " + dataOffsetbits, e); //$NON-NLS-1$
         }
     }
 

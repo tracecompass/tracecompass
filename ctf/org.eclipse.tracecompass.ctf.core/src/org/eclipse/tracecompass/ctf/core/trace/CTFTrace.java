@@ -512,7 +512,7 @@ public class CTFTrace implements IDefinitionScope {
         }
 
         if (stream == null) {
-            throw new CTFException("Unexpected end of stream"); //$NON-NLS-1$
+            throw new CTFException("Unexpected end of stream " + fPath + " ( " + byteBuffer.position() + " / " + (byteBuffer.position() + byteBuffer.remaining()) + " )"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         }
 
         if (!(stream instanceof CTFStream)) {

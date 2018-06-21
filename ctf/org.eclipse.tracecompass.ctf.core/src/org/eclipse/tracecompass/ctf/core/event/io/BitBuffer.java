@@ -707,7 +707,7 @@ public final class BitBuffer {
     public void position(long newPosition) throws CTFException {
 
         if (newPosition > fBitCapacity) {
-            throw new CTFException("Out of bounds exception on a position move, attempting to access position: " + newPosition); //$NON-NLS-1$
+            throw new CTFException("Out of bounds exception on a position move, attempting to access position: " + newPosition + " / " + fBitCapacity); //$NON-NLS-1$ //$NON-NLS-2$
         }
         fPosition = newPosition;
     }

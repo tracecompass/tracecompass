@@ -291,29 +291,33 @@ public class CTFStreamInputReader implements AutoCloseable {
      */
     public CTFResponse readNextEvent() throws CTFException {
 
-        /*
-         * Change packet if needed
-         */
-        while (!fPacketReader.hasMoreEvents()) {
-            final ICTFPacketDescriptor prevPacket = fPacketReader.getCurrentPacket();
-            if (prevPacket == null) {
-                if (fLive) {
-                    goToNextPacket();
+        try {
+            /*
+             * Change packet if needed
+             */
+            while (!fPacketReader.hasMoreEvents()) {
+                final ICTFPacketDescriptor prevPacket = fPacketReader.getCurrentPacket();
+                if (prevPacket == null) {
+                    if (fLive) {
+                        goToNextPacket();
+                    }
+                    break;
                 }
-                break;
+                goToNextPacket();
             }
-            goToNextPacket();
-        }
 
-        /*
-         * If an event is available, read it.
-         */
-        if (fPacketReader.hasMoreEvents()) {
-            setCurrentEvent(fPacketReader.readNextEvent());
-            return CTFResponse.OK;
+            /*
+             * If an event is available, read it.
+             */
+            if (fPacketReader.hasMoreEvents()) {
+                setCurrentEvent(fPacketReader.readNextEvent());
+                return CTFResponse.OK;
+            }
+            this.setCurrentEvent(null);
+            return fLive ? CTFResponse.WAIT : CTFResponse.FINISH;
+        } catch (CTFException e) {
+            throw new CTFException("Trace read error " + fStreamInput.getFilename(), e); //$NON-NLS-1$
         }
-        this.setCurrentEvent(null);
-        return fLive ? CTFResponse.WAIT : CTFResponse.FINISH;
     }
 
     /**
@@ -337,7 +341,6 @@ public class CTFStreamInputReader implements AutoCloseable {
         }
         ICTFPacketDescriptor packet = getPacket();
         fPacketReader = getCurrentPacketReader(packet);
-
     }
 
     /**
