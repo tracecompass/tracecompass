@@ -16,8 +16,8 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tracecompass.internal.analysis.profiling.core.Activator;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.provider.Messages;
-import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
@@ -101,6 +101,8 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
     /** CallStack state system ID */
     private static final String ID = "org.eclipse.linuxtools.tmf.callstack"; //$NON-NLS-1$
 
+    private long fMissMatched = 0;
+
     /**
      * Default constructor
      *
@@ -161,16 +163,27 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
             int quark = ss.getQuarkAbsoluteAndAdd(PROCESSES, processName, threadName, CALL_STACK);
             ITmfStateValue poppedValue = ss.popAttribute(timestamp, quark);
             /*
-             * Verify that the value we are popping matches the one in the
-             * event field, unless the latter is undefined.
+             * Verify that the value we are popping matches the one in the event
+             * field, unless the latter is undefined.
              */
             if (!functionExitState.isNull() && !functionExitState.equals(poppedValue)) {
-                Activator.logWarning(NLS.bind(
-                        Messages.CallStackStateProvider_UnmatchedPoppedValue,
-                        functionExitState,
-                        poppedValue));
+                if (fMissMatched == 0) {
+                    Activator.getInstance().logWarning(NLS.bind(
+                            Messages.CallStackStateProvider_UnmatchedPoppedValue,
+                            functionExitState,
+                            poppedValue));
+                }
+                fMissMatched++;
             }
         }
+    }
+
+    @Override
+    public void done() {
+        if (fMissMatched > 0) {
+            Activator.getInstance().logWarning(NLS.bind(Messages.CallStackStateProvider_IncoherentCallstack, fMissMatched));
+        }
+        super.done();
     }
 
     /**

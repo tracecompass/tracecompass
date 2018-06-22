@@ -28,6 +28,11 @@ public class Messages extends NLS {
      */
     public static @Nullable String CallStackStateProvider_UnmatchedPoppedValue;
 
+    /**
+     * There have been issues with the callstack, show the amount of errors.
+     */
+    public static @Nullable String CallStackStateProvider_IncoherentCallstack;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
