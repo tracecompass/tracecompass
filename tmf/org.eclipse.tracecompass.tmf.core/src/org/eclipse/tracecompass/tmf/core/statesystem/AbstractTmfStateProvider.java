@@ -303,7 +303,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
                     return;
                 }
                 InitialValue initialValue = fInitialValues.peek();
-                while (initialValue != null && (currentTime > initialValue.fTime)) {
+                while (initialValue != null && (currentTime >= initialValue.fTime)) {
                     initialValue = fInitialValues.poll();
                     if (initialValue != null) {
                         stateSystemBuilder.modifyAttribute(initialValue.fTime, initialValue.fValue, initialValue.fQuark);

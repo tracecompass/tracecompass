@@ -69,14 +69,13 @@ public class UpdateTraceBoundsJob extends Job {
     @Override
     public IStatus run(IProgressMonitor monitor) {
         SubMonitor subMonitor = SubMonitor.convert(monitor, fTraceBoundsToUpdate.size());
-        TmfTraceElement tElement = null;
         while (!fTraceBoundsToUpdate.isEmpty()) {
-            tElement = fTraceBoundsToUpdate.remove();
             subMonitor.setTaskName(getName());
             if (subMonitor.isCanceled()) {
                 return Status.CANCEL_STATUS;
             }
 
+            TmfTraceElement tElement = fTraceBoundsToUpdate.remove();
             ITmfTimestamp start = tElement.getStartTime();
             ITmfTimestamp end = tElement.getEndTime();
             if (start != null && end != null) {

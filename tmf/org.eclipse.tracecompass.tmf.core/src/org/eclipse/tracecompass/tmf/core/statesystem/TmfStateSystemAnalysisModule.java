@@ -618,8 +618,8 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                     Object initialState = interval.getValue();
                     int attribute = interval.getAttribute();
                     provider.addFutureEvent(interval.getStartTime(), initialState, attribute);
-                    if(interval.getEndTime() > interval.getStartTime()) {
-                        provider.addFutureEvent(interval.getEndTime(), (Object) null, attribute);
+                    if (interval.getEndTime() != Long.MIN_VALUE) {
+                        provider.addFutureEvent(interval.getEndTime() + 1, (Object) null, attribute);
                     }
                 }
             }

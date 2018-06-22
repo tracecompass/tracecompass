@@ -182,7 +182,10 @@ public class StateSnapshot {
         for (int quark = 0; quark < ss.getNbAttributes(); quark++) {
             String @NonNull [] fullAttributePathArray = ss.getFullAttributePathArray(quark);
             ITmfStateInterval interval = fullQuery.get(quark);
-            interval = new TmfStateInterval(Math.max(interval.getStartTime(), fStartTime), interval.getEndTime()> fEndTime? -interval.getEndTime():interval.getEndTime(), interval.getAttribute(), interval.getValue());
+            long startTime = Math.max(interval.getStartTime(), fStartTime);
+            /* Negative end time is used to prevent insertion of null future state */
+            long endTime = interval.getEndTime() > fEndTime ? Long.MIN_VALUE : interval.getEndTime();
+            interval = new TmfStateInterval(startTime, endTime, interval.getAttribute(), interval.getValue());
             states.add(new AttributeAndInterval(Arrays.asList(fullAttributePathArray), interval));
         }
         fAttributes = states.build();
