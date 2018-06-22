@@ -66,10 +66,6 @@ public class CtfTmfTraceTrimmingTest {
 
     private static final Collection<CtfTestTrace> BLACKLISTED_TRACES = Arrays.asList(
             /*
-             * Unstable, TODO: investigate.
-             */
-            CtfTestTrace.DYNSCOPE,
-            /*
              * Ignore hello-lost, most of the trace range is lost events, so cutting would
              * give an empty trace.
              */
