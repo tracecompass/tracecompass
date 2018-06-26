@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -194,7 +194,7 @@ public interface ITimeEventStyleStrings {
     }
 
     /**
-     * The event is annotated. When this is set,
+     * The event is annotated. When this is set, the label will not be drawn and
      * {@link ITimeGraphPresentationProvider#postDrawEvent} will not be called
      *
      * @return the key to get the annotated value

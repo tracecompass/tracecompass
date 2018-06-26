@@ -15,10 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel.Type;
@@ -38,11 +34,9 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationPr
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NamedTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -55,9 +49,6 @@ import com.google.common.collect.ImmutableMap;
  */
 public class ResourcesPresentationProvider extends TimeGraphPresentationProvider {
 
-    private Color fColorWhite;
-    private Color fColorGray;
-    private Integer fAverageCharWidth;
     private static final int SEPARATOR_HEIGHT = 4;
     private static final int NUM_COLORS = 25;
     private static final float BRIGHTNESS = 0.8f;
@@ -213,19 +204,6 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
         return retMap;
     }
 
-    /**
-     * Returns the average character width, measured in pixels, of the font
-     * described by the receiver.
-     *
-     * @param gc
-     *            The graphic context
-     * @return the average character width of the font
-     */
-    @Deprecated
-    private static int getAverageCharWidth(GC gc) {
-        return gc.getFontMetrics().getAverageCharWidth();
-    }
-
     @Override
     public Map<String, Object> getSpecificEventStyle(ITimeEvent event) {
         Map<String, Object> map = new HashMap<>(super.getSpecificEventStyle(event));
@@ -247,31 +225,6 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             map.put(ITimeEventStyleStrings.heightFactor(), (float) model.getWeight(eventValue));
         }
         return map;
-    }
-
-    @Override
-    public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
-        if (fColorGray == null) {
-            fColorGray = gc.getDevice().getSystemColor(SWT.COLOR_GRAY);
-        }
-        if (fColorWhite == null) {
-            fColorWhite = gc.getDevice().getSystemColor(SWT.COLOR_WHITE);
-        }
-        if (fAverageCharWidth == null) {
-            fAverageCharWidth = getAverageCharWidth(gc);
-        }
-
-        if (bounds.width <= fAverageCharWidth || !(event instanceof NamedTimeEvent)) {
-            return;
-        }
-        NamedTimeEvent tcEvent = (NamedTimeEvent) event;
-        gc.setForeground(fColorWhite);
-
-        String label = tcEvent.getLabel();
-
-        Utils.drawText(gc, label, bounds.x, bounds.y, bounds.width, bounds.height, true, true);
-
-        gc.setForeground(fColorGray);
     }
 
     private static boolean isType(ITimeGraphEntry entry, Type type) {

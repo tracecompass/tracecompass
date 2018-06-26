@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Ericsson
+ * Copyright (c) 2009, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -53,6 +53,16 @@ public interface ITimeEvent extends IPropertyCollection, IElementResolver {
      * <p>
      */
     long getDuration();
+
+    /**
+     * Get the label of this event.
+     *
+     * @return the event's label, or null if it has none
+     * @since 4.0
+     */
+    default String getLabel() {
+        return null;
+    }
 
     /**
      * Split an event in two at the specified time and keep the part before the

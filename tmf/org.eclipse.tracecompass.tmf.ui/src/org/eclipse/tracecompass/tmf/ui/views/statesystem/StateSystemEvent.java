@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.statesystem;
 
+import java.util.Objects;
+
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
@@ -41,6 +43,11 @@ class StateSystemEvent extends TimeEvent {
      */
     public ITmfStateInterval getInterval() {
         return fInterval;
+    }
+
+    @Override
+    public String getLabel() {
+        return Objects.toString(fInterval.getValue(), null);
     }
 
     @Override

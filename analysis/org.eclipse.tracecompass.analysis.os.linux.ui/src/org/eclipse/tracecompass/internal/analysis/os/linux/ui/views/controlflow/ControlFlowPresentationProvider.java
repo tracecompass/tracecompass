@@ -19,9 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.registry.LinuxStyle;
@@ -38,7 +35,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleSt
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NamedTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -83,12 +79,6 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         STATE_LIST = ImmutableList.copyOf(STATE_MAP.values());
         STATE_TABLE = STATE_LIST.toArray(new StateItem[STATE_LIST.size()]);
     }
-
-    /**
-     * Average width of the characters used for state labels. Is computed in the
-     * first call to postDrawEvent(). Is null before that.
-     */
-    private Integer fAverageCharacterWidth = null;
 
     /**
      * Default constructor
@@ -167,32 +157,5 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
         }
 
         return retMap;
-    }
-
-    /**
-     * Returns the average character width, measured in pixels, of the font
-     * described by the receiver.
-     *
-     * @param gc
-     *            The graphic context
-     * @return the average character width of the font
-     */
-    @Deprecated
-    private static int getAverageCharWidth(GC gc) {
-        return gc.getFontMetrics().getAverageCharWidth();
-    }
-
-    @Override
-    public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
-        if (fAverageCharacterWidth == null) {
-            fAverageCharacterWidth = getAverageCharWidth(gc);
-        }
-        if (bounds.width <= fAverageCharacterWidth || !(event instanceof NamedTimeEvent)) {
-            // NamedTimeEvents are used only for the sys calls which we want.
-            return;
-        }
-        NamedTimeEvent controlFlowEvent = (NamedTimeEvent) event;
-        gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
-        Utils.drawText(gc, controlFlowEvent.getLabel(), bounds.x, bounds.y, bounds.width, bounds.height, true, true);
     }
 }

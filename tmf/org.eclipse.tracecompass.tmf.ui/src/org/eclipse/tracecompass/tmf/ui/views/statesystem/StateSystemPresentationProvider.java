@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,10 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.presentation.IPaletteProvider;
@@ -34,7 +31,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationPr
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 
 /**
  * Presentation Provider for the state system time graph view.
@@ -44,7 +40,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 class StateSystemPresentationProvider extends TimeGraphPresentationProvider {
 
     /** Number of colors used for State system time events */
-    public static final int NUM_COLORS = 18;
+    public static final int NUM_COLORS = 9;
 
     private static final StateItem[] STATE_TABLE = new StateItem[NUM_COLORS + 1];
 
@@ -52,13 +48,6 @@ class StateSystemPresentationProvider extends TimeGraphPresentationProvider {
         // Set the last one to grey.
         STATE_TABLE[NUM_COLORS] = new StateItem(new RGB(192, 192, 192));
     }
-
-    /**
-     * Minimum width of a displayed state below which we will not print any text
-     * into it. It corresponds to the average width of 1 char, plus the width of
-     * the ellipsis characters.
-     */
-    private Integer fMinimumBarWidth;
 
     private IPaletteProvider fPalette = new RotatingPaletteProvider.Builder().setNbColors(NUM_COLORS).build();
 
@@ -79,7 +68,7 @@ class StateSystemPresentationProvider extends TimeGraphPresentationProvider {
             StateSystemEvent stateSystemEvent = (StateSystemEvent) event;
             Object value = stateSystemEvent.getInterval().getValue();
             if (value != null) {
-                return Math.floorMod(value.hashCode() * 20, NUM_COLORS);
+                return Math.floorMod(value.hashCode(), NUM_COLORS);
             }
             // grey
             return NUM_COLORS;
@@ -145,27 +134,5 @@ class StateSystemPresentationProvider extends TimeGraphPresentationProvider {
         }
 
         return retMap;
-    }
-
-    @Override
-    public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
-        if (!(event instanceof StateSystemEvent)) {
-            return;
-        }
-
-        if (fMinimumBarWidth == null) {
-            fMinimumBarWidth = gc.getFontMetrics().getAverageCharWidth() + gc.stringExtent(Utils.ELLIPSIS).x;
-        }
-        Object value = ((StateSystemEvent) event).getInterval().getValue();
-        if (bounds.width <= fMinimumBarWidth || value == null) {
-            /*
-             * Don't print anything if we cannot at least show one character and
-             * ellipses.
-             */
-            return;
-        }
-
-        gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
-        Utils.drawText(gc, value.toString(), bounds.x, bounds.y, bounds.width, bounds.height, true, true);
     }
 }

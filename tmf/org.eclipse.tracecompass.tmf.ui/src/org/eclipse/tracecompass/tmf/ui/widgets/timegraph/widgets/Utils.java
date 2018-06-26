@@ -286,7 +286,7 @@ public class Utils {
      */
     public static Color getDistinctColor(RGB rgb) {
         /* Calculate the relative luminance of the color, high value is bright */
-        final int luminanceThreshold = 128;
+        final int luminanceThreshold = 160;
         /* Relative luminance (Y) coefficients as defined in ITU.R Rec. 709 */
         final double redCoefficient = 0.2126;
         final double greenCoefficient = 0.7152;

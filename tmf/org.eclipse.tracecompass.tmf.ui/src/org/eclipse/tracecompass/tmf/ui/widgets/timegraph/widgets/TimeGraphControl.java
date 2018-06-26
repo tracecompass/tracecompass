@@ -2669,6 +2669,12 @@ public class TimeGraphControl extends TimeGraphBaseControl
             gc.drawPoint(rect.x, rect.y - 2);
         }
         if (visible && !(boolean) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.annotated(), false)) {
+            String label = event.getLabel();
+            if (label != null && !label.isEmpty() && rect.width > rect.height) {
+                gc.setForeground(Utils.getDistinctColor(stateColor.getRGB()));
+                Utils.drawText(gc, label, drawRect.x, drawRect.y, drawRect.width, drawRect.height, true, true);
+                gc.setForeground(black);
+            }
             fTimeGraphProvider.postDrawEvent(event, drawRect, gc);
         }
         gc.setAlpha(old);

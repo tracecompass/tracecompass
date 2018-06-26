@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2017 Ericsson
+ * Copyright (c) 2013, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,10 +13,7 @@
 package org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.provider.CallStackEntryModel;
 import org.eclipse.tracecompass.internal.analysis.profiling.ui.views.flamechart.Messages;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
@@ -31,7 +28,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NamedTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 
 /**
  * Presentation provider for the Call Stack view, based on the generic TMF
@@ -50,12 +46,6 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
         STATE_TABLE[0] = new StateItem(State.MULTIPLE.rgb, State.MULTIPLE.toString());
     }
 
-    /**
-     * Minimum width of a displayed state below which we will not print any text
-     * into it. It corresponds to the average width of 1 char, plus the width of
-     * the ellipsis characters.
-     */
-    private @Nullable Integer fMinimumBarWidth;
     private IPaletteProvider fPalette = new RotatingPaletteProvider.Builder().setNbColors(NUM_COLORS).build();
 
     private enum State {
@@ -124,29 +114,5 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
             return ((NamedTimeEvent) event).getLabel();
         }
         return State.MULTIPLE.toString();
-    }
-
-    @Override
-    public void postDrawEvent(@Nullable ITimeEvent event, @Nullable Rectangle bounds, @Nullable GC gc) {
-        if (gc == null || bounds == null || !(event instanceof NamedTimeEvent)) {
-            return;
-        }
-
-        Integer minimumBarWidth = fMinimumBarWidth;
-        if (minimumBarWidth == null) {
-            minimumBarWidth = gc.getFontMetrics().getAverageCharWidth() + gc.stringExtent(Utils.ELLIPSIS).x;
-            fMinimumBarWidth = minimumBarWidth;
-        }
-        if (bounds.width <= minimumBarWidth) {
-            /*
-             * Don't print anything if we cannot at least show one character and
-             * ellipses.
-             */
-            return;
-        }
-
-        String label = ((NamedTimeEvent) event).getLabel();
-        gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
-        Utils.drawText(gc, label, bounds.x, bounds.y, bounds.width, bounds.height, true, true);
     }
 }
