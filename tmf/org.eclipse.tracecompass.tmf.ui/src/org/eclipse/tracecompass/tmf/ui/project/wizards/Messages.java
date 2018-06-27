@@ -228,7 +228,7 @@ public class Messages extends NLS {
     /**
      * Trim trace title bar
      *
-     * @since 4.0
+     * @since 4.1
      */
     public static String TrimTraceDialog_ExportTrimmedTrace;
 

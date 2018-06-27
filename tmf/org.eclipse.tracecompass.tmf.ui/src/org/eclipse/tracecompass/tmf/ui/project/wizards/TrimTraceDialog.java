@@ -38,7 +38,7 @@ import org.eclipse.ui.dialogs.SelectionStatusDialog;
  * Implementation of the Trim trace dialog box.
  * <p>
  *
- * @since 4.0
+ * @since 4.1
  */
 public class TrimTraceDialog extends SelectionStatusDialog {
 

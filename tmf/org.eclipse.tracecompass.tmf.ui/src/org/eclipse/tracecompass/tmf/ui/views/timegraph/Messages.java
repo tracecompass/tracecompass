@@ -50,7 +50,7 @@ public class Messages extends NLS {
     public static String TimeGraphPresentationProvider_multipleStates;
 
     /**
-     * @since 4.0
+     * @since 4.1
      */
     public static String TimeEventFilterDialog_CloseButton;
     static {

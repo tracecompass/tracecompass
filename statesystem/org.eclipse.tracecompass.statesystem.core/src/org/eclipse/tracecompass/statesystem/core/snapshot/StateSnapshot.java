@@ -164,6 +164,7 @@ public class StateSnapshot {
      *            The timestamp at which the
      * @param version
      *            Version of the snapshot
+     * @since 4.1
      */
     public StateSnapshot(ITmfStateSystem ss, long start, long end, int version) {
         fStartTime = start;
