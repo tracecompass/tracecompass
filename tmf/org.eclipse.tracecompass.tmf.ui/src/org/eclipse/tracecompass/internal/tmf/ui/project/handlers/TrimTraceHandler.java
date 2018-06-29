@@ -123,7 +123,7 @@ public class TrimTraceHandler extends AbstractHandler {
                     elems.add(Objects.requireNonNull(tempTraceElement.getName()));
                     tempTraceElement = tempTraceElement.getParent();
                 }
-                TraceTypeHelper traceType = TmfTraceType.getTraceType(traceElement.getTraceType());
+                TraceTypeHelper traceType = TmfTraceType.getTraceType(elementUnderTraceFolder.getTraceType());
                 String end = elems.remove(0);
                 elems = Lists.reverse(elems);
                 TmfTraceFolder tracesFolder = elementUnderTraceFolder.getProject().getTracesFolder();
