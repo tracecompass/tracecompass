@@ -316,6 +316,7 @@ public class TmfOpenTraceHelper {
                 for (int j = 0; j < i; j++) {
                     traces[j].dispose();
                 }
+                experiment.dispose();
                 return null;
             }
             cacheSize = Math.min(cacheSize, trace.getCacheSize());
