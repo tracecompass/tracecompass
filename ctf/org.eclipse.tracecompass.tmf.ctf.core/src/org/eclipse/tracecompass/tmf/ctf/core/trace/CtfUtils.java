@@ -26,7 +26,7 @@ public final class CtfUtils {
 
     /**
      * Convenience method to get the tracer name from the trace's metadata. The
-     * leading and trailing "" will be stripped from the returned string.
+     * leading and trailing '"' will be stripped from the returned string.
      *
      * @param trace
      *            The trace to query
@@ -37,7 +37,7 @@ public final class CtfUtils {
         if (str == null) {
             return null;
         }
-        /* Remove the "" at the start and end of the string */
+        /* Remove the '"' at the start and end of the string */
         return str.replaceAll("^\"|\"$", ""); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
@@ -54,6 +54,10 @@ public final class CtfUtils {
         if (str == null) {
             return -1;
         }
+
+        /* Remove the '"' at the start and end of the string (ex:"2") */
+        str = str.replaceAll("^\"|\"$", ""); //$NON-NLS-1$ //$NON-NLS-2$
+
         try {
             int ret = Integer.parseInt(str);
             return ret;
@@ -75,6 +79,8 @@ public final class CtfUtils {
         if (str == null) {
             return -1;
         }
+        /* Remove the '"' at the start and end of the string (ex:"9") */
+        str = str.replaceAll("^\"|\"$", ""); //$NON-NLS-1$ //$NON-NLS-2$
         try {
             int ret = Integer.parseInt(str);
             return ret;
