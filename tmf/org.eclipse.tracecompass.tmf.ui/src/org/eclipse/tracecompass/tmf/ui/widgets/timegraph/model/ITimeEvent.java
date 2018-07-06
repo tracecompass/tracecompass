@@ -58,7 +58,7 @@ public interface ITimeEvent extends IPropertyCollection, IElementResolver {
      * Get the label of this event.
      *
      * @return the event's label, or null if it has none
-     * @since 4.0
+     * @since 4.1
      */
     default String getLabel() {
         return null;
