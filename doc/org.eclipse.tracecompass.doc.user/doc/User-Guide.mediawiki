@@ -2141,7 +2141,7 @@ The following mouse actions are available:
 * '''Shift-left-click or drag''': Extend or shrink the selection range
 
 * '''left-drag horizontally''': select a time range or change the time range begin or end time
-* '''middle-drag or Ctrl-left-drag horizontally''': pan left or right
+* '''middle-drag or Ctrl-left-drag''': pan horizontally and/or vertically
 * '''right-drag horizontally''': [[#Zoom region|zoom region]]
 * '''click on a colored bar''': the associated process node is selected and the current time indicator is moved where the click happened
 * '''mouse wheel up/down''': scroll up or down

@@ -209,6 +209,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private int fDragButton;
     private int fDragX0 = 0;
     private int fDragX = 0;
+    private ITimeGraphEntry fDragEntry = null;
     private boolean fHasNamespaceFocus = false;
     /**
      * Used to preserve accuracy of modified selection
@@ -3054,6 +3055,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                     time1 = time0 + (fTime1bak - fTime0bak);
                 }
                 fTimeProvider.setStartFinishTimeNotify(time0, time1);
+                setElementPosition(fDragEntry, e.y);
             }
         } else if (DRAG_SPLIT_LINE == fDragState) {
             fDragX = e.x;
@@ -3202,6 +3204,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 fDragButton = e.button;
                 fDragX = e.x;
                 fDragX0 = fDragX;
+                fDragEntry = getExpandedElement(getItemIndexAtY(e.y));
                 fTime0bak = fTimeProvider.getTime0();
                 fTime1bak = fTimeProvider.getTime1();
                 updateCursor(e.x, e.stateMask);
@@ -3242,6 +3245,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             setCapture(false);
             if (e.button == fDragButton && DRAG_TRACE_ITEM == fDragState) {
                 fDragState = DRAG_NONE;
+                fDragEntry = null;
                 if (fDragX != fDragX0) {
                     fTimeProvider.notifyStartFinishTime();
                 }
