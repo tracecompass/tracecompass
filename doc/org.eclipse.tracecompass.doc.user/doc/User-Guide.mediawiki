@@ -595,7 +595,7 @@ Note that the directory for all supplementary files will be deleted, too. (see a
 
 Supplementary files are by definition trace specific files that accompany a trace. These file could be temporary files, persistent indexes or any other persistent data files created by the LTTng integration in Eclipse during parsing a trace. For the LTTng 2.0 trace viewer a persistent state history of the Linux Kernel is created and is stored under the name '''stateHistory.ht'''. The statistics for all traces are stored under '''statistics.ht'''. Other state systems may appear in the same folder as more custom views are added.
 
-All supplementary file are hidden from the user and are handled internally by the TMF. However, there is a possibility to delete the supplementary files so that there are recreated when opening a trace.
+All supplementary file are hidden from the user and are handled internally by the TMF. However, there is a possibility to delete the supplementary files so that they are recreated when opening a trace.
 
 To delete all supplementary files from one or many traces and experiments, select the relevant traces and experiments in the '''Project Explorer''' view and click the right mouse button. Then select the '''Delete Supplementary Files...''' menu item from the context-sensitive menu.
 
@@ -737,7 +737,7 @@ If an EMF model URI is available in the trace for the selected event, the item '
 
 It is possible to export the content of the trace to a text file based on the columns displayed in the events table. If a filter (see '''[[#Filtering| Filtering]]''') was defined prior exporting only events that match the filter will be exported to the file. To export the trace to text, press the right mouse button on the events table. A context-sensitive menu will show. Select the '''Export To Text...''' menu option. A file locater dialog will open. Fill in the file name and location and then press on '''OK'''. A window with a progress bar will open till the export is finished.
 
-''Note'':  The columns in the text file are separated by tabs.
+''Note'': The columns in the text file are separated by tabs.
 
 === Refreshing of Trace ===
 
@@ -994,38 +994,38 @@ The '''New Custom Text Parser''' wizard can be used to create a custom parser fo
 
 Fill out the first wizard page with the following information:
 
-* '''Category:''' Enter a category name for the trace type.
-* '''Trace type:''' Enter a name for the trace type, which is also the name of the custom parser. This will also be the default event type name.
-* '''Time Stamp format:''' Enter the date and time pattern that will be used to output the Time Stamp, or leave blank to use the default Time Format preference.<br>
+* '''Category''': Enter a category name for the trace type.
+* '''Trace type''': Enter a name for the trace type, which is also the name of the custom parser. This will also be the default event type name.
+* '''Time Stamp format''': Enter the date and time pattern that will be used to output the Time Stamp, or leave blank to use the default Time Format preference.<br>
 Note: information about date and time patterns can be found here: [http://archive.eclipse.org/tracecompass/doc/stable/org.eclipse.tracecompass.doc.user/reference/api/org/eclipse/tracecompass/tmf/core/timestamp/TmfTimestampFormat.html TmfTimestampFormat]
 
 Click the '''Add next line''', '''Add child line''' or '''Remove line''' buttons to create a new line of input or delete it. For each line of input, enter the following information:
 
-* '''Regular expression:''' Enter a regular expression that should match the input line in the log, using capturing groups to extract the data.<br>
+* '''Regular expression''': Enter a regular expression that should match the input line in the log, using capturing groups to extract the data.<br>
 Note: information about regular expression patterns can be found here: [http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html]
 
-* '''Cardinality:''' Enter the minimum and maximum number of lines matching this line's regular expression that must be found in the log. At least the minimum number of lines must be found before the parser will consider the next line. Child lines will always be considered first.
+* '''Cardinality''': Enter the minimum and maximum number of lines matching this line's regular expression that must be found in the log. At least the minimum number of lines must be found before the parser will consider the next line. Child lines will always be considered first.
 
-* '''Event type:''' Optionally enable this text field to enter an event type name that will override the default (trace type) when this line matches.
+* '''Event type''': Optionally enable this text field to enter an event type name that will override the default (trace type) when this line matches.
 
 <u>Important note:</u> The custom parsers identify a log entry when the first line's regular expression matches (Root Line n). Each subsequent text line in the log is attempted to be matched against the regular expression of the parser's input lines in the order that they are defined (Line n.*). Only the first matching input line will be used to process the captured data to be stored in the log entry. When a text line matches a Root Line's regular expression, a new log entry is started.
 
 Click the '''Add group''' or '''Remove group''' buttons to define the data extracted from the capturing groups in the line's regular expression. For each group, enter the following information:
 
-* '''Name combo:''' Select a name for the extracted data:
+* '''Name combo''': Select a name for the extracted data:
 ** '''Timestamp''': Select this option to identify the timestamp data. The input's data and time pattern must be entered in the format: text box.
 ** '''Event type''': Select this option to identify the event type name. This will override the default or line-specific event type name.
 ** '''Message''': Select this option to identify the main log entry's message. This is usually a group which could have text of greater length.
 ** '''Other''': Select this option to identify any non-standard data. The name must be entered in the name: text box.
 
-* '''Action combo:''' Select the action to be performed on the extracted data:
+* '''Action combo''': Select the action to be performed on the extracted data:
 ** '''Set''': Select this option to overwrite the data for the chosen name when there is a match for this group.
 ** '''Append''': Select this option to append to the data with the chosen name, if any, when there is a match for this group.
 ** '''Append with |''' : Select this option to append to the data with the chosen name, if any, when there is a match for this group, using a | separator between matches.
 
 The '''Preview input''' text box can be used to enter any log data that will be processed against the defined custom parser. When the wizard is invoked from a selected log file resource, this input will be automatically filled with the file contents.
 
-The '''Preview:''' text field of each capturing group and of the Time Stamp will be filled from the parsed data of the first matching log entry.
+The '''Preview''': text field of each capturing group and of the Time Stamp will be filled from the parsed data of the first matching log entry.
 
 In the '''Preview input''' text box, the matching entries are highlighted with different colors:
 
@@ -1046,9 +1046,9 @@ On this page, the list of default and custom data is shown, along with a preview
 
 The custom data output can be modified by the following options:
 
-* '''Visibility:''' Select or unselect the checkbox to display the custom data or hide it.
+* '''Visibility''': Select or unselect the checkbox to display the custom data or hide it.
 
-* '''Column order:''' Click '''Move before''' or '''Move after''' to change the display order of custom data.
+* '''Column order''': Click '''Move before''' or '''Move after''' to change the display order of custom data.
 
 The table at the bottom of the page shows a preview of the custom parser log table output according to the selected options, using the matching entries of the previous page's '''Preview input''' log data.
 
@@ -1065,40 +1065,40 @@ The '''New Custom XML Parser''' wizard can be used to create a custom parser for
 
 Fill out the first wizard page with the following information:
 
-* '''Category:''' Enter a category name for the trace type.
-* '''Trace type:''' Enter a name for the trace type, which is also the name of the custom parser. This will also be the default event type name.
-* '''Time Stamp format:''' Enter the date and time pattern that will be used to output the Time Stamp, or leave blank to use the default Time Format preference.<br>
+* '''Category''': Enter a category name for the trace type.
+* '''Trace type''': Enter a name for the trace type, which is also the name of the custom parser. This will also be the default event type name.
+* '''Time Stamp format''': Enter the date and time pattern that will be used to output the Time Stamp, or leave blank to use the default Time Format preference.<br>
 Note: information about date and time patterns can be found here: [http://archive.eclipse.org/tracecompass/doc/stable/org.eclipse.tracecompass.doc.user/reference/api/org/eclipse/tracecompass/tmf/core/timestamp/TmfTimestampFormat.html TmfTimestampFormat]
 
 Click the '''Add document element''' button to create a new document element and enter a name for the root-level document element of the XML file.
 
 Click the '''Add child''' button to create a new element of input to the document element or any other element. For each element, enter the following information:
 
-* '''Element name:''' Enter a name for the element that must match an element of the XML file.
-* '''Log entry:''' Select this checkbox to identify an element which represents a log entry. Each element with this name in the XML file will be parsed to a new log entry. At least one log entry element must be identified in the XML document. Log entry elements cannot be nested.
-* '''Name combo:''' Select a name for the extracted data:
+* '''Element name''': Enter a name for the element that must match an element of the XML file.
+* '''Log entry''': Select this checkbox to identify an element which represents a log entry. Each element with this name in the XML file will be parsed to a new log entry. At least one log entry element must be identified in the XML document. Log entry elements cannot be nested.
+* '''Name combo''': Select a name for the extracted data:
 ** '''Ignore''': Select this option to ignore the extracted element's data at this level. It is still possible to extract data from this element's child elements.
 ** '''Event type''': Select this option to identify the event type name. This will override the default or element-specific event type name.
 ** '''Timestamp''': Select this option to identify the timestamp data. The input's data and time pattern must be entered in the format: text box.
 ** '''Message''': Select this option to identify the main log entry's message. This is usually an input which could have text of greater length.
 ** '''Other''': Select this option to identify any non-standard data. The name must be entered in the name: text box. It does not have to match the element name.
-* '''Action combo:''' Select the action to be performed on the extracted data:
+* '''Action combo''': Select the action to be performed on the extracted data:
 ** '''Set''': Select this option to overwrite the data for the chosen name when there is a match for this element.
 ** '''Append''': Select this option to append to the data with the chosen name, if any, when there is a match for this element.
 ** '''Append with |''' : Select this option to append to the data with the chosen name, if any, when there is a match for this element, using a | separator between matches.
-* '''Event type:''' Optionally enable this text field to enter an event type name that will override the default (trace type) when this element is present.
+* '''Event type''': Optionally enable this text field to enter an event type name that will override the default (trace type) when this element is present.
 
 Note: An element's extracted data 'value' is a parsed string representation of all its attributes, children elements and their own values. To extract more specific information from an element, ignore its data value and extract the data from one or many of its attributes and children elements.
 
 Click the '''Add attribute''' button to create a new attribute input from the document element or any other element. For each attribute, enter the following information:
 
-* '''Attribute name:''' Enter a name for the attribute that must match an attribute of this element in the XML file.
-* '''Name combo:''' Select a name for the extracted data:
+* '''Attribute name''': Enter a name for the attribute that must match an attribute of this element in the XML file.
+* '''Name combo''': Select a name for the extracted data:
 ** '''Timestamp''': Select this option to identify the timestamp data. The input's data and time pattern must be entered in the format: text box.
 ** '''Event type''': Select this option to identify the event type name. This will override the default or element-specific event type name.
 ** '''Message''': Select this option to identify the main log entry's message. This is usually an input which could have text of greater length.
 ** '''Other''': Select this option to identify any non-standard data. The name must be entered in the name: text box. It does not have to match the element name.
-* '''Action combo:''' Select the action to be performed on the extracted data:
+* '''Action combo''': Select the action to be performed on the extracted data:
 ** '''Set''': Select this option to overwrite the data for the chosen name when there is a match for this element.
 ** '''Append''': Select this option to append to the data with the chosen name, if any, when there is a match for this element.
 ** '''Append with |''' : Select this option to append to the data with the chosen name, if any, when there is a match for this element, using a | separator between matches.
@@ -1111,7 +1111,7 @@ Click the '''Remove element''' or '''Remove attribute''' buttons to remove the e
 
 The '''Preview input''' text box can be used to enter any XML log data that will be processed against the defined custom parser. When the wizard is invoked from a selected log file resource, this input will be automatically filled with the file contents.
 
-The '''Preview:''' text field of each capturing element and attribute and of the Time Stamp will be filled from the parsed data of the first matching log entry. Also, when creating a new child element or attribute, its element or attribute name will be suggested if possible from the preview input data.
+The '''Preview''': text field of each capturing element and attribute and of the Time Stamp will be filled from the parsed data of the first matching log entry. Also, when creating a new child element or attribute, its element or attribute name will be suggested if possible from the preview input data.
 
 Click the '''Next >''' button to go to the second page of the wizard.
 
@@ -1121,8 +1121,8 @@ On this page, the list of default and custom data is shown, along with a preview
 
 The custom data output can be modified by the following options:
 
-* '''Visibility:''' Select or unselect the checkbox to display the custom data or hide it.
-* '''Column order:''' Click '''Move before''' or '''Move before''' to change the display order of custom data.
+* '''Visibility''': Select or unselect the checkbox to display the custom data or hide it.
+* '''Column order''': Click '''Move before''' or '''Move before''' to change the display order of custom data.
 
 The table at the bottom of the page shows a preview of the custom parser log table output according to the selected options, using the matching entries of the previous page's '''Preview input''' log data.
 
@@ -1223,23 +1223,23 @@ Trace Compass supports automatic alignment of the time axis for time-based views
 
 == Searching in Time Graph Views ==
 
-Search for an entry in a '''Time Graph view''', e.g. [[#Control_Flow_View | Control Flow View]] or [[#Resources_View | Resources View]], using the ''' Find ''' dialog. To use the dialog :
+Search for an entry in a '''Time Graph view''', e.g. [[#Control_Flow_View | Control Flow View]] or [[#Resources_View | Resources View]], using the ''' Find ''' dialog. To use the dialog:
 
 * Select the time graph view you want to search in
-* Press ''' Ctrl + F '''. The following screen will be shown :
+* Press ''' Ctrl + F '''. The following screen will be shown:
 
 [[Image:images/FindDialog.png]]
 
 * Enter the string to find in the ''' Find ''' text drop down and select the ''' Options ''' and ''' Direction ''' you need.
 * Press the ''' Find ''' button or ''' Enter ''' or ''' Alt + n '''. The next match in the selected time graph view will be selected.
 
-Various options are available in the ''' Options ''' group :
+Various options are available in the ''' Options ''' group:
 * ''' Case sensitive ''' makes the search case sensitive.
 * ''' Wrap search ''' restarts the search from the first index, depending of the direction, when no entry were found.
 * ''' Whole word ''' allows to search for whole words, delimited by spaces or special character, that are identical to the search text.
 * ''' Regular expression ''' specifies that the search text is a regular expression or not.
 
-The ''' Direction ''' group allows to select the search direction : ''' Forward ''' or ''' Backward '''.
+The ''' Direction ''' group allows to select the search direction: ''' Forward ''' or ''' Backward '''.
 
 ==== Filtering Time Events in Time Graph Views ====
 
@@ -1277,15 +1277,15 @@ The time event filtering uses its own ''' domain-specific language (DSL) '''. Va
 
 ''' Filter expressions ''' have the following pattern ''' '' field '' '' operator '' '' argument '' ''' in general. Several relational operators are available:
 
-* ''' == ''' test whether the value of the specified field is equal to the given argument . Example: '' TID == 5755 ''
-* ''' != ''' test whether the value of the specified field is not equal to the given argument . Example: '' TID != 5755 ''
-* ''' matches ''' test whether the value of the specified field matches to the given argument . Example: '' TID matches 5.*5$ ''
-* ''' contains ''' test whether the value of the specified field contains to the given argument . Example: '' TID contains 7 ''
-* ''' > ''' test whether the value of the specified field is greater than the given argument . Example: '' "SOFT IRQ" > 4 ''
-* ''' < ''' test whether the value of the specified field is less than the given argument . Example: '' "SOFT IRQ" < 4 ''
+* ''' == ''' test whether the value of the specified field is equal to the given argument. Example: '' TID == 5755 ''
+* ''' != ''' test whether the value of the specified field is not equal to the given argument. Example: '' TID != 5755 ''
+* ''' matches ''' test whether the value of the specified field matches to the given argument. Example: '' TID matches 5.*5$ ''
+* ''' contains ''' test whether the value of the specified field contains to the given argument. Example: '' TID contains 7 ''
+* ''' > ''' test whether the value of the specified field is greater than the given argument. Example: '' "SOFT IRQ" > 4 ''
+* ''' < ''' test whether the value of the specified field is less than the given argument. Example: '' "SOFT IRQ" < 4 ''
 
 
-''' Filter expressions ''' can have the following pattern ''' '' field '' '' operator '' '''. The available relational operators for this pattern is :
+''' Filter expressions ''' can have the following pattern ''' '' field '' '' operator '' '''. The available relational operators for this pattern is:
 
 * ''' present ''' test whether the specified field exist. Example: '' TID present ''
 
@@ -1617,7 +1617,7 @@ To enable all '''Tracepoints''' and all '''System calls (Syscall)''', select the
 
 [[Image:images/LTTng2EnableAllEventsDialog.png]]
 
-Upon successful operation, the domain '''Kernel''' will be created in the tree (if neccessary), the default channel with name "channel0" will be added under the domain (if necessary) as well as all a wildcard event '''*''' of type  '''TRACEPOINT''' under the channel and a wildcard event '''*''' of type '''SYSCALL''' . The channel and events will be '''ENABLED'''.
+Upon successful operation, the domain '''Kernel''' will be created in the tree (if neccessary), the default channel with name "channel0" will be added under the domain (if necessary) as well as all a wildcard event '''*''' of type  '''TRACEPOINT''' under the channel and a wildcard event '''*''' of type '''SYSCALL'''. The channel and events will be '''ENABLED'''.
 
 To enable '''Tracepoint''' events, first select the corresponding '''Select''' button, then select either all tracepoins (select '''All''') or select selectively one or more tracepoints in the displayed tree of tracepoints. You can also enter directly the name of the events you want to enable (comma separated list and wildcards are supported). Finally press '''Ok'''.
 
@@ -2409,7 +2409,7 @@ Then, by selecting '''Next Event''', it will show the next state transition and 
 
 [[Image:images/RV_infobox2.png|Shows the next state of the IRQ]]
 
-This view is also synchronized with the others : [[#Histogram_View | Histogram View]], [[#LTTng_Kernel_Events_Editor | Events Editor]], [[#Control_Flow_View | Control Flow View]], etc.
+This view is also synchronized with the others: [[#Histogram_View | Histogram View]], [[#LTTng_Kernel_Events_Editor | Events Editor]], [[#Control_Flow_View | Control Flow View]], etc.
 
 === Follow CPU ===
 It is possible to follow a CPU by right-clicking on its entry in the view, then selecting ''Follow CPU X'' where X is the number of the CPU. Following a CPU will filter the [[#LTTng CPU Usage View | CPU Usage View]] to display only usage for the selected CPU. To unfollow a CPU, one needs to right-click on any CPU entry and select ''Unfollow CPU''.
@@ -2593,7 +2593,7 @@ The Process Information is displayed on the left side of the view and shows all 
 
 === Relative Kernel Memory Chart ===
 
-The Relative Kernel Memory Chart on the right side of the view, plots the relative amount of memory that was allocated and deallocated during that period of time.
+The Relative Kernel Memory Chart on the right side of the view plots the relative amount of memory that was allocated and deallocated during that period of time.
 
 
 ==== Using the mouse ====
@@ -2856,7 +2856,7 @@ caller. This enables the user to find the most executed code path easily.
 The function name is visible on each Flame graph event if the size permits. Each box in the '''Flame Graph'''
 has the same color as the box representing the same function in the '''Call Stack'''.
 
-To open this view select a trace, expand it in the '''Project Explorer''' then expand the
+To open this view, select a trace, expand it in the '''Project Explorer''', then expand the
 '''Call Graph Analysis''' (the trace must be loaded) and open the '''Flame Graph'''.
 It's also possible to go in '''Window''' -> '''Show View''' -> '''Tracing''' then
 select '''Flame Graph''' in the list.
@@ -2874,7 +2874,7 @@ Hovering over a function will show a tooltip with the statistics on a per-functi
 (''worst-case'', ''best-case'', ''average'', ''total time'', ''standard deviation'', ''number of calls'') for that function.
 
 If one wishes to explore at a medium detail level between the "classic" flame graph view and the call stack view, a per-thread flame
-graph view is available by selection the coarser menu and clicking on '''Content Presentation''' then '''Per-thread'''. To return to
+graph view is available by selecting the coarser menu and clicking on '''Content Presentation''' then '''Per-thread'''. To return to
 the default mode, return to that menu and click on '''Aggregate Threads'''.
 
 === How to use a Flame Graph ===
@@ -2890,7 +2890,7 @@ It is recommended to have a kernel trace as well as a user space trace in an exp
 while using the '''Flame Graph''' as it will show what is causing the largest delays.
 When using the '''Flame Graph''' together with a call stack and a kernel trace,
 an example work flow would be to find the worst offender in terms of time taken for a function
-that seems to be taking too longThen, using the context menu '''Go to maximum''', one can navigate
+that seems to be taking too long. Then, using the context menu '''Go to maximum''', one can navigate
 to the maximum duration and see if the OS is, for example, preempting the function for too long,
 or if the issue is in the code being executed.
 
@@ -3510,7 +3510,7 @@ The full XML file for the example above would look like this:
 
 To debug the state system that was generated by the XML state provider, one could use the [[#State System Explorer View | State System Explorer View]], along with the events editor. By selecting an event, you can see what changes this event caused and the states of other attributes at the time.
 
-If there are corrections to make, you may modify the XML state provider file, and re-import it. To re-run the analysis, you must first delete the supplementary files by right-clicking on your trace, and selecting ''Delete supplementary files...''. Check you analysis's .ht file, so that the analysis will be run again when the trace is reopened. The supplementary file deletion will have closed the trace, so it needs to be opened again to use the newly imported analysis file.
+If there are corrections to make, you may modify the XML state provider file, and re-import it. To re-run the analysis, you must first delete the supplementary files by right-clicking on your trace, and selecting ''Delete supplementary files...''. Check your analysis' .ht file, so that the analysis will be run again when the trace is reopened. The supplementary file deletion will have closed the trace, so it needs to be opened again to use the newly imported analysis file.
 
 If modifications are made to the XML state provider after it has been "published", the '''version''' attribute of the '''xmlStateProvider''' element should be updated. This avoids having to delete each trace's supplementary file manually. If the saved state system used a previous version, it will automatically be rebuilt from the XML file.
 
@@ -3521,7 +3521,7 @@ We may have multiple instances (scenarios) of a running state machine within a p
 
 === The state system structure ===
 
-The pattern analysis generates a predefined attribute tree described as follows :
+The pattern analysis generates a predefined attribute tree described as follows:
 
 <pre>
 |- state machines
@@ -3582,7 +3582,7 @@ The structure of the state machine (FSM) is based on the SCXML structure. The fo
 
 The value of the '''target''' attribute corresponds to the 'id' of a state in the same FSM. Similarly, the value of the '''action''' attribute corresponds to the 'id' of an action element described in the XML file and is a reference to it. Multiple actions can be executed by separating their names by ':', like ''action1:action2''
 
-Conditions are used in the transitions to switch between the state of an FSM. They can be specified by setting the '''cond''' attribute in the transition and they correspond to a '''test''' element. Two types of conditions are allowed : '''Data condition''' and '''Time condition'''. It is possible to combine several conditions using a logical operator (OR, AND, ...).
+Conditions are used in the transitions to switch between the state of an FSM. They can be specified by setting the '''cond''' attribute in the transition and they correspond to a '''test''' element. Two types of conditions are allowed: '''Data condition''' and '''Time condition'''. It is possible to combine several conditions using a logical operator (OR, AND, ...).
 
 Data conditions tests the ongoing event information against the data in the state system or constant values. The following condition tests whether the current thread of the event is also the ongoing scenario thread.
 
@@ -3629,7 +3629,7 @@ Two types of time conditions are available:
 </test>
 </pre>
 
-Two types of actions are allowed :
+Two types of actions are allowed:
 * State changes update values of attributes into the state system. The following example set the value of the thread for the current scenario.
 
 <pre>
@@ -3771,7 +3771,7 @@ Here is the complete XML file by combining all the examples models above:
 
 Segments generated by the pattern analysis are used to populate latency views. A description of these views can be found in [[#Latency_Analyses | Latency Analyses]].
 
-The full XML analysis example described above will generate the following views :
+The full XML analysis example described above will generate the following views:
 
 * Latency Table
 
@@ -4181,7 +4181,7 @@ Alice kills the program, and immediately the server speeds up. She then goes to 
 
 To install features from the Trace Compass incubator, use the following update site URL: http://download.eclipse.org/tracecompass.incubator/master/repository/.
 
-If you're using the Trace Compass RCP, there's an easy method to install incubator feature see the [http://archive.eclipse.org/tracecompass/doc/stable/org.eclipse.tracecompass.rcp.doc.user/Trace-Compass-Incubator.html Trace Compass RCP documentation]
+If you're using the Trace Compass RCP, there's an easy method to install incubator features. See the [http://archive.eclipse.org/tracecompass/doc/stable/org.eclipse.tracecompass.rcp.doc.user/Trace-Compass-Incubator.html Trace Compass RCP documentation]
 
 = References =
 

@@ -236,7 +236,7 @@ It will need to implement:
 
 * validate (is the trace format valid?)
 
-* initTrace (called as the trace is opened
+* initTrace (called as the trace is opened)
 
 * seekEvent (go to a position in the trace and create a context)
 
@@ -285,7 +285,7 @@ object can implement the '''ITmfPersistentlyIndexable''' interface.
 
 === Trace Context ===
 
-The trace context will be a '''TmfContext'''
+The trace context will be a '''TmfContext'''.
 
 === Trace Location ===
 
@@ -1380,7 +1380,7 @@ in the array represents the quark of each attribute.
 
 In other cases, we might only be interested in the state of one particular
 attribute at one given timestamp. For these cases it's better to use a
-single query. For a single query. we need to pass both a timestamp and a
+single query. For a single query, we need to pass both a timestamp and a
 quark in parameter. The return value will be a single interval, representing
 the state that this particular attribute was at that time.
 
@@ -2034,7 +2034,7 @@ features to a specific attribute into a mipmap tree. It extends AbstractTmfState
 If a provider wants to add mipmapped attributes to its tree, it must extend
 AbstractTmfMipmapStateProvider and call modifyMipmapAttribute() in the event
 handler, specifying one or more mipmap features to compute. Then the structure
-of the attribute tree will be :
+of the attribute tree will be:
 
 <pre>
 |- <attribute>
@@ -2905,7 +2905,7 @@ The reference loader use the TMF Event Request Framework to request events from 
 
 When opening a trace (which is triggered by signal ''TmfTraceSelectedSignal'') or when opening the Sequence Diagram View after a trace had been opened previously, a TMF background request is initiated to index the trace and to fill in the first page of the sequence diagram. The purpose of the indexing is to store time ranges for pages with 10000 messages per page. This allows quickly to move to certain pages in a trace without having to re-parse from the beginning. The request is called indexing request.
 
-When switching pages, the a TMF foreground event request is initiated to retrieve the corresponding events from the experiment. It uses the time range stored in the index for the respective page.
+When switching pages, a TMF foreground event request is initiated to retrieve the corresponding events from the experiment. It uses the time range stored in the index for the respective page.
 
 A third type of event request is issued for finding specific data across pages. 
 
@@ -2927,7 +2927,7 @@ Besides acting on receiving signals, the reference loader is also sending signal
 
 The reference implementation is able to analyze traces from a single component that traces the interaction with other components. For example, a server node could have trace information about its interaction with client nodes. The server node could be traced and then analyzed using TMF and the Sequence Diagram Framework of TMF could used to visualize the interactions with the client nodes.<br>
 
-Note that combined traces of multiple components, that contain the trace information about the same interactions are not supported in the reference implementation!
+Note that combined traces of multiple components that contain the trace information about the same interactions are not supported in the reference implementation!
 
 === Trace Format ===
 
@@ -2996,7 +2996,7 @@ Before going further, the full specification of the CTF file format can be found
 
 For the purpose of the reader some basic description will be given. A CTF trace typically is made of several files all in the same folder.
 
-These files can be split into two types :
+These files can be split into two types:
 * Metadata
 * Event streams
 
@@ -3426,7 +3426,7 @@ The following interfaces can optionally be implemented by analysis modules if th
 
 Analyses are managed through the '''TmfAnalysisManager'''. The analysis manager is a singleton in the application and keeps track of all available analysis modules, with the help of '''IAnalysisModuleHelper'''. It can be queried to get the available analysis modules, either all of them or only those for a given tracetype. The helpers contain the non-trace specific information on an analysis module: its id, its name, the tracetypes it applies to, etc.
 
-When a trace is opened, the helpers for the applicable analysis create new instances of the analysis modules. The analysis are then kept in a field of the trace and can be executed automatically or on demand.
+When a trace is opened, the helpers for the applicable analysis create new instances of the analysis modules. The analyses are then kept in a field of the trace and can be executed automatically or on demand.
 
 The analysis is executed by calling the '''IAnalysisModule#schedule()''' method. This method makes sure the analysis is executed only once and, if it is already running, it won't start again. The analysis itself is run inside an Eclipse job that can be cancelled by the user or the application. The developer must consider the progress monitor that comes as a parameter of the '''executeAnalysis()''' method, to handle the proper cancellation of the processing. The '''IAnalysisModule#waitForCompletion()''' method will block the calling thread until the analysis is completed. The method will return whether the analysis was successfully completed or if it was cancelled.
 
@@ -3844,7 +3844,7 @@ Note for creating a command with parameters using the '''CommandInput''' class, 
 
 = Performance Tests =
 
-Performance testing allows to calculate some metrics (CPU time, Memory Usage, etc) that some part of the code takes during its execution. These metrics can then be used as is for information on the system's execution, or they can be compared either with other execution scenarios, or previous runs of the same scenario, for instance, after some optimization has been done on the code.
+Performance testing allows to calculate some metrics (CPU time, Memory Usage, etc.) that some part of the code takes during its execution. These metrics can then be used as is for information on the system's execution, or they can be compared either with other execution scenarios, or previous runs of the same scenario, for instance, after some optimization has been done on the code.
 
 For automatic performance metric computation, we use the ''org.eclipse.test.performance'' plugin, provided by the Eclipse Test Feature.
 
@@ -3967,7 +3967,7 @@ In the ''Arguments'' tab, in the box under ''VM Arguments'', add on separate lin
 
 The ''eclipse.perf.dbloc'' parameter is the url (or filename) of the derby database. The database is by default named ''perfDB'', with username and password ''guest''/''guest''. If the database does not exist, it will be created, initialized and populated.
 
-The ''eclipse.perf.config'' parameter identifies a '''variation''': It typically identifies the build on which is it run (commitId and/or build date, etc), the machine (host) on which it is run, the configuration of the system (for example Linux or Windows), the jvm etc. That parameter is a list of ';' separated key-value pairs. To be backward-compatible with the Eclipse Performance Tests Framework, the 4 keys mentioned above are mandatory, but any key-value pairs can be used.
+The ''eclipse.perf.config'' parameter identifies a '''variation''': It typically identifies the build on which is it run (commitId and/or build date, etc.), the machine (host) on which it is run, the configuration of the system (for example Linux or Windows), the jvm, etc. That parameter is a list of ';' separated key-value pairs. To be backward-compatible with the Eclipse Performance Tests Framework, the 4 keys mentioned above are mandatory, but any key-value pairs can be used.
 
 == ABC of performance testing ==
 
@@ -4690,7 +4690,7 @@ The resulting trace will have the following fields
 
 === Logging to track Object life cycles ===
 
-In order to log data so that a lifecycle of a given object can be followed, use TraceCompassLogUtils#traceObjectCreation and TraceCompassLogUtils#traceObjectCreation. The objects life cycles will be tracked and displayed.
+In order to log data so that a lifecycle of a given object can be followed, use TraceCompassLogUtils#traceObjectCreation and TraceCompassLogUtils#traceObjectDestruction. The objects life cycles will be tracked and displayed.
 
 === Logging to track Asynchronous operations ===
 
