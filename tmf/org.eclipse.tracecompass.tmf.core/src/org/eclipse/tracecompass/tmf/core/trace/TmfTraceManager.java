@@ -272,7 +272,7 @@ public final class TmfTraceManager {
         }
         List<@NonNull ITmfTrace> traces = trace.getChildren(ITmfTrace.class);
         if (!traces.isEmpty()) {
-            Iterable<ITmfTrace> iterable = checkNotNull(Iterables.concat(Iterables.transform(traces, t -> getTraceSet(t))));
+            Iterable<ITmfTrace> iterable = checkNotNull(Iterables.concat(Iterables.transform(traces, TmfTraceManager::getTraceSet)));
             return ImmutableSet.copyOf(iterable);
         }
         return ImmutableSet.of(trace);

@@ -324,10 +324,8 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
      */
     public ITmfTrace getTrace() {
         for (ITmfTrace trace : TmfTraceManager.getInstance().getOpenedTraces()) {
-            for (ITmfTrace t : TmfTraceManager.getTraceSetWithExperiment(trace)) {
-                if (getResource().equals(t.getResource())) {
-                    return t;
-                }
+            if (getResource().equals(trace.getResource())) {
+                return trace;
             }
         }
         return null;

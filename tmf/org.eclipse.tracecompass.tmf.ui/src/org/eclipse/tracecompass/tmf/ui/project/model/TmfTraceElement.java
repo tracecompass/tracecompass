@@ -442,6 +442,22 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
         return null;
     }
 
+    @Override
+    public ITmfTrace getTrace() {
+        ITmfProjectModelElement parent = getParent();
+        if (parent instanceof TmfExperimentElement) {
+            IResource resource = getElementUnderTraceFolder().getResource();
+            ITmfTrace experiment = ((TmfExperimentElement) parent).getTrace();
+            for (ITmfTrace trace : TmfTraceManager.getTraceSet(experiment)) {
+                if (resource.equals(trace.getResource())) {
+                    return trace;
+                }
+            }
+            return null;
+        }
+        return super.getTrace();
+    }
+
     /**
      * Get the trace properties of this traceElement if the corresponding trace
      * is opened in an editor

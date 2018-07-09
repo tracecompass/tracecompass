@@ -32,6 +32,7 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisOutput;
 import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource2;
@@ -118,9 +119,20 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
          * We can get a list of available outputs once the analysis is
          * instantiated when the trace is opened
          */
-        TmfCommonProjectElement parentTraceElement = getParent().getParent();
+        IResource parentTraceResource = getParent().getParent().getResource();
 
-        ITmfTrace trace = parentTraceElement.getTrace();
+        /*
+         * Find any trace instantiated with the same resource as the parent trace
+         */
+        ITmfTrace trace = null;
+        for (ITmfTrace openedTrace : TmfTraceManager.getInstance().getOpenedTraces()) {
+            for (ITmfTrace t : TmfTraceManager.getTraceSetWithExperiment(openedTrace)) {
+                if (parentTraceResource.equals(t.getResource())) {
+                    trace = t;
+                    break;
+                }
+            }
+        }
         if (trace == null) {
             deleteOutputs();
             return;

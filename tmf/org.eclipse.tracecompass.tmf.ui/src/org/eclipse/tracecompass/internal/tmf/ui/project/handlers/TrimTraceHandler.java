@@ -435,8 +435,9 @@ public class TrimTraceHandler extends AbstractHandler {
     @Override
     public @Nullable Object execute(@Nullable ExecutionEvent event) throws ExecutionException {
         ISelection selection = HandlerUtil.getCurrentSelectionChecked(event);
-        Object element = ((IStructuredSelection) selection).getFirstElement();
-        final TmfCommonProjectElement traceElem = (TmfCommonProjectElement) element;
+        Object firstElement = ((IStructuredSelection) selection).getFirstElement();
+        final TmfCommonProjectElement traceElem = (firstElement instanceof TmfTraceElement) ?
+                ((TmfTraceElement) firstElement).getElementUnderTraceFolder() : (TmfCommonProjectElement) firstElement;
 
         ITmfTrace trace = traceElem.getTrace();
 
