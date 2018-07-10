@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="tracecompass-e4.8" sequenceNumber="5">
+<?pde version="3.8"?><target name="tracecompass-e4.8" sequenceNumber="6">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.cdt.gnu.dsf.feature.group" version="0.0.0"/>
-<repository location="http://download.eclipse.org/tools/cdt/builds/9.5/cdt-9.5.0-photon-rc4"/>
+<repository location="http://download.eclipse.org/tools/cdt/builds/9.5/cdt-9.5.0-photon-rc4c/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.mylyn.wikitext_feature.feature.group" version="0.0.0"/>
@@ -11,7 +11,7 @@
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.linuxtools.dataviewers.feature.feature.group" version="0.0.0"/>
-<repository location="http://download.eclipse.org/linuxtools/update-photon-rc3"/>
+<repository location="http://download.eclipse.org/linuxtools/update-photon-rc4"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.swtbot.eclipse.feature.group" version="0.0.0"/>
@@ -24,7 +24,7 @@
 <unit id="org.eclipse.remote.ui" version="0.0.0"/>
 <unit id="org.eclipse.remote.jsch.core" version="0.0.0"/>
 <unit id="org.eclipse.remote.jsch.ui" version="0.0.0"/>
-<repository location="http://download.eclipse.org/tools/ptp/builds/remote/photon/milestones/M6"/>
+<repository location="http://download.eclipse.org/tools/ptp/builds/remote/3.0.0/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.tm.terminal.control" version="0.0.0"/>
@@ -76,11 +76,11 @@
 <unit id="org.eclipse.wst.xml.core" version="0.0.0"/>
 <unit id="org.eclipse.wst.xml.ui" version="0.0.0"/>
 <unit id="org.eclipse.wst.xsd.core" version="0.0.0"/>
-<repository location="http://download.eclipse.org/webtools/downloads/drops/R3.10.0/S-3.10.0.RC4-20180611164516/repository/"/>
+<repository location="http://download.eclipse.org/webtools/downloads/drops/R3.10.0/R-3.10.0-20180611164516/repository/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.xsd" version="0.0.0"/>
-<repository location="http://download.eclipse.org/modeling/emf/emf/builds/milestone/S201805310718"/>
+<repository location="http://download.eclipse.org/modeling/emf/emf/builds/release/2.14/"/>
 </location>
 </locations>
 <targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
