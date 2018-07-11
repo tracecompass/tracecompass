@@ -659,20 +659,47 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
 
         }
 
+        /**
+         * Constructor
+         *
+         * @param sp
+         *            The state provider used to build the state system
+         * @param timeRange
+         *            The requested time range for the request
+         * @param index
+         *            The event number at which to start the request
+         * @param nbRequested
+         *            The number of events requested
+         * @since 4.1
+         */
+        public StateSystemEventRequest(ITmfStateProvider sp, TmfTimeRange timeRange, int index, int nbRequested) {
+            super(ITmfEvent.class,
+                    timeRange,
+                    index,
+                    nbRequested,
+                    ITmfEventRequest.ExecutionType.BACKGROUND,
+                    TmfStateSystemAnalysisModule.this.getDependencyLevel());
+            sci = sp;
+            trace = sci.getTrace();
+
+        }
+
         @Override
         public void handleData(final ITmfEvent event) {
             super.handleData(event);
-            if (event.getTrace() == trace) {
+            processEvent(event, trace);
+        }
+
+        private void processEvent(final ITmfEvent event, ITmfTrace tmfTrace) {
+            if (event.getTrace() == tmfTrace) {
                 sci.processEvent(event);
-            } else if (trace instanceof TmfExperiment) {
+            } else if (tmfTrace instanceof TmfExperiment) {
                 /*
                  * If the request is for an experiment, check if the event is from one of the
                  * child trace
                  */
-                for (ITmfTrace childTrace : ((TmfExperiment) trace).getTraces()) {
-                    if (childTrace == event.getTrace()) {
-                        sci.processEvent(event);
-                    }
+                for (ITmfTrace childTrace : ((TmfExperiment) tmfTrace).getTraces()) {
+                    processEvent(event, childTrace);
                 }
             }
         }
