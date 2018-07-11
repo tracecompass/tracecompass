@@ -233,5 +233,8 @@ public class SWTBotTimeGraph extends AbstractSWTBotControl<TimeGraphControl> {
         notify(SWT.MouseMove, createMouseEvent(nameSpace, y, 1, SWT.BUTTON1, 1));
         notify(SWT.MouseUp, createMouseEvent(nameSpace, y, 1, SWT.BUTTON1, 1));
         notify(SWT.MouseMove, createMouseEvent(0, y, 0, SWT.NONE, 0));
+        notify(SWT.MouseExit);
+        notify(SWT.Deactivate);
+        notify(SWT.FocusOut);
     }
 }
