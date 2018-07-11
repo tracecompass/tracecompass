@@ -1449,6 +1449,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         if (fZoomThread != null) {
             fZoomThread.cancel();
         }
+        deactivateContextService();
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
         getSite().getPage().removePartListener(fPartListener);
         getSite().getPage().removePartListener(fPartListener2);
