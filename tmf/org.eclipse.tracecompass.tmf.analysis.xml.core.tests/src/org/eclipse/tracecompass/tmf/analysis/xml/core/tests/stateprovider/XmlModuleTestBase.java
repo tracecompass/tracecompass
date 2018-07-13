@@ -17,8 +17,9 @@ import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateProviderCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenAnalysisModule;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateSystemModule;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
@@ -77,8 +78,11 @@ public abstract class XmlModuleTestBase {
             fModule.setName(getName(element));
             break;
         case TmfXmlStrings.STATE_PROVIDER:
-            fModule = new XmlStateSystemModule();
-            ((XmlStateSystemModule) fModule).setXmlFile(getXmlFile().getFile().toPath());
+            String analysisId = element.getAttribute(TmfXmlStrings.ID);
+            TmfXmlStateProviderCu compile = TmfXmlStateProviderCu.compile(getXmlFile().getFile().toPath(), analysisId);
+            assertNotNull(compile);
+            fModule = new DataDrivenAnalysisModule(analysisId, compile);
+            fModule.setName(getName(element));
             break;
 
         default:

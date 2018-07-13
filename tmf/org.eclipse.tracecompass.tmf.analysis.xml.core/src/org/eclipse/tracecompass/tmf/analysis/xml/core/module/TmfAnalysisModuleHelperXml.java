@@ -50,7 +50,7 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
      * The types of analysis that can be XML-defined
      */
     public enum XmlAnalysisModuleType {
-        /** Analysis will be of type XmlStateSystemModule */
+        /** Analysis will be of type {@link DataDrivenAnalysisModule} */
         STATE_SYSTEM,
 
         /**

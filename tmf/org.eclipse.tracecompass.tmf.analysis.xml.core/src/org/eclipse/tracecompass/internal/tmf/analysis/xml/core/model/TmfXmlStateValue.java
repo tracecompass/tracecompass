@@ -18,9 +18,9 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenStateProvider;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -255,8 +255,8 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
             Set<TmfXmlMapEntry> group = null;
             if (fContainer instanceof XmlPatternStateProvider) {
                 group = ((XmlPatternStateProvider) fContainer).getMappingGroup(fMappingGroup);
-            } else if (fContainer instanceof XmlStateProvider) {
-                group = ((XmlStateProvider) fContainer).getMappingGroup(fMappingGroup);
+            } else if (fContainer instanceof DataDrivenStateProvider) {
+                Activator.logError("You should not get to this part of the code if the container is a DataDrivenStateProvider"); //$NON-NLS-1$
             }
             if (group != null) {
                 for (TmfXmlMapEntry entry : group) {

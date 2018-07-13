@@ -78,17 +78,6 @@ public interface ITmfXmlModelFactory {
     TmfXmlCondition createCondition(Element node, IXmlStateSystemContainer container);
 
     /**
-     * Create a new XML event handler
-     *
-     * @param node
-     *            The XML event handler element
-     * @param container
-     *            The state system container this state value belongs to
-     * @return The new XML event handler
-     */
-    TmfXmlEventHandler createEventHandler(Element node, IXmlStateSystemContainer container);
-
-    /**
      * Create a new XML state change
      *
      * @param node

@@ -11,16 +11,15 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stateprovider;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.nio.file.Paths;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.stateprovider.XmlStateProvider;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateProviderCu;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.junit.Test;
 
 /**
@@ -36,11 +35,10 @@ public class StateProviderTest extends XmlProviderTestBase {
     /**
      * Test an invalid instantiation
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testInvalidInput() {
-        ITmfTrace trace = getTrace();
-        assertNotNull(trace);
-        assertNotNull(new XmlStateProvider(trace, "Bla", Paths.get("")));
+        TmfXmlStateProviderCu compile = TmfXmlStateProviderCu.compile(Paths.get(""), "test");
+        assertNull(compile);
     }
 
     @Override
