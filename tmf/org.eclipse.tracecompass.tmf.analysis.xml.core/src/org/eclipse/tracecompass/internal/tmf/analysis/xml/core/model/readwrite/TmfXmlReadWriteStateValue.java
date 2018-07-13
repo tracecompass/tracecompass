@@ -392,9 +392,6 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         @Override
         public void incrementValue(ITmfEvent event, int quark, long timestamp, @Nullable TmfXmlScenarioInfo scenarioInfo) throws StateValueTypeException, TimeRangeException, AttributeNotFoundException {
             ITmfStateSystem ss = getSsContainer().getStateSystem();
-            if (ss == null) {
-                throw new IllegalStateException(ILLEGAL_STATE_EXCEPTION_MESSAGE);
-            }
             ITmfStateValue incrementValue = getValue(event, scenarioInfo);
             ITmfStateValue value = incrementByType(quark, ss, incrementValue);
             if (value != null) {

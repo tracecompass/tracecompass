@@ -15,10 +15,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenAction;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -97,17 +97,19 @@ public class TmfXmlAction implements ITmfXmlAction {
      */
     private class StateChange implements ITmfXmlAction {
 
-        private final TmfXmlStateChange fStateChange;
+        private final DataDrivenAction fStateChange;
+        private final IXmlStateSystemContainer fContainer;
 
         public StateChange(ITmfXmlModelFactory modelFactory, Element node, IXmlStateSystemContainer parent) {
             fStateChange = modelFactory.createStateChange(node, parent);
+            fContainer = parent;
         }
 
         @Override
         public void execute(@NonNull ITmfEvent event, TmfXmlScenarioInfo scenarioInfo) {
             try {
-                fStateChange.handleEvent(event, scenarioInfo);
-            } catch (StateValueTypeException | AttributeNotFoundException e) {
+                fStateChange.eventHandle(event, scenarioInfo, fContainer);
+            } catch (StateValueTypeException e) {
                 Activator.logError("Exception when executing action state change", e); //$NON-NLS-1$
             }
         }

@@ -9,15 +9,20 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.AnalysisCompilationData;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlLocationCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlMappingGroupCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlMapEntry;
@@ -49,8 +54,6 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
 
     private final @NonNull String fStateId;
 
-    /** Map for defined values */
-    private final Map<String, String> fDefinedValues = new HashMap<>();
     /** Map for attribute pools */
     private final Map<Integer, TmfAttributePool> fAttributePools = new HashMap<>();
 
@@ -67,6 +70,8 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
     private final ISegmentListener fListener;
 
     private final @NonNull TmfXmlScenarioHistoryBuilder fHistoryBuilder;
+
+    private final AnalysisCompilationData fAnalysisCompilationData;
 
     /**
      * @param trace
@@ -99,12 +104,34 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
             fStoredFields.put(element.getAttribute(TmfXmlStrings.ID), key.isEmpty() ? element.getAttribute(TmfXmlStrings.ID) : key);
         }
 
+        AnalysisCompilationData analysisData = new AnalysisCompilationData();
+        fAnalysisCompilationData = analysisData;
+
         /* parser for defined Values */
-        NodeList definedStateNodes = doc.getElementsByTagName(TmfXmlStrings.DEFINED_VALUE);
-        for (int i = 0; i < definedStateNodes.getLength(); i++) {
-            Element element = (Element) definedStateNodes.item(i);
-            fDefinedValues.put(element.getAttribute(TmfXmlStrings.NAME), element.getAttribute(TmfXmlStrings.VALUE));
+        List<@NonNull Element> childElements = TmfXmlUtils.getChildElements(doc, TmfXmlStrings.DEFINED_VALUE);
+        for (Element element : childElements) {
+            analysisData.addDefinedValue(element.getAttribute(TmfXmlStrings.NAME), element.getAttribute(TmfXmlStrings.VALUE));
         }
+
+        /* parser for the locations */
+        childElements = TmfXmlUtils.getChildElements(doc, TmfXmlStrings.LOCATION);
+        for (Element element : childElements) {
+            TmfXmlLocationCu.compile(analysisData, element);
+        }
+
+        /* parser for the mapping groups */
+        List<TmfXmlMappingGroupCu> mapGroups = new ArrayList<>();
+        childElements = TmfXmlUtils.getChildElements(doc, TmfXmlStrings.MAPPING_GROUP);
+        for (Element map : childElements) {
+            TmfXmlMappingGroupCu compile = TmfXmlMappingGroupCu.compile(analysisData, map);
+            if (compile == null) {
+                throw new NullPointerException("Problem compiling a mapping group"); //$NON-NLS-1$
+            }
+            mapGroups.add(compile);
+        }
+
+        // TODO: Replace usages of locations and mapping group to avoid having to do this legacy code
+        // FIXME: Redundant legacy code for locations and mapping groups
 
         ITmfXmlModelFactory modelFactory = TmfXmlReadWriteModelFactory.getInstance();
         /* parser for the locations */
@@ -121,16 +148,16 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
         fLocations = Collections.unmodifiableSet(locations);
 
         /* parser for the mapping groups */
-        final @NonNull Map<@NonNull String, @NonNull Set<@NonNull TmfXmlMapEntry>> mapGroups = new HashMap<>();
+        final @NonNull Map<@NonNull String, @NonNull Set<@NonNull TmfXmlMapEntry>> mapGroups2 = new HashMap<>();
         NodeList mapNodes = doc.getElementsByTagName(TmfXmlStrings.MAPPING_GROUP);
         for (int i = 0; i < mapNodes.getLength(); i++) {
             Element map = (Element) mapNodes.item(i);
             String id = map.getAttribute(TmfXmlStrings.ID);
 
-            Set<@NonNull TmfXmlMapEntry> entrySet = mapGroups.get(id);
+            Set<@NonNull TmfXmlMapEntry> entrySet = mapGroups2.get(id);
             if (entrySet == null) {
                 entrySet = new HashSet<>();
-                mapGroups.put(id, entrySet);
+                mapGroups2.put(id, entrySet);
             }
 
             NodeList entryNodes = map.getElementsByTagName(TmfXmlStrings.ENTRY);
@@ -143,7 +170,7 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
                 entrySet.add(entry);
             }
         }
-        fMappingGroups = Collections.unmodifiableMap(mapGroups);
+        fMappingGroups = Collections.unmodifiableMap(mapGroups2);
 
         /* parser for the event handlers */
         NodeList nodes = doc.getElementsByTagName(TmfXmlStrings.PATTERN_HANDLER);
@@ -168,7 +195,10 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
      * @return The actual value corresponding to this constant
      */
     public String getDefinedValue(String constant) {
-        return fDefinedValues.get(constant);
+        if (constant != null) {
+            return fAnalysisCompilationData.getStringValue(constant);
+        }
+        return null;
     }
 
     /**
@@ -201,7 +231,11 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
 
     @Override
     public ITmfStateSystem getStateSystem() {
-        return getStateSystemBuilder();
+        ITmfStateSystem ss = getStateSystemBuilder();
+        if (ss == null) {
+            throw new NullPointerException("The state system should not be requested at this point, it is null"); //$NON-NLS-1$
+        }
+        return ss;
     }
 
     @Override
@@ -247,7 +281,7 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
      *            The mapping group id
      * @return The set of {@link TmfXmlMapEntry}
      */
-    public @Nullable Set<@NonNull TmfXmlMapEntry> getMappingGroup(@NonNull String id) {
+    public @Nullable Set<@NonNull TmfXmlMapEntry> getLegacyMappingGroup(@NonNull String id) {
         return fMappingGroups.get(id);
     }
 
@@ -264,4 +298,10 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
         }
         return pool;
     }
+
+    @Override
+    public AnalysisCompilationData getAnalysisCompilationData() {
+        return fAnalysisCompilationData;
+    }
+
 }

@@ -254,7 +254,7 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
         try {
             Set<TmfXmlMapEntry> group = null;
             if (fContainer instanceof XmlPatternStateProvider) {
-                group = ((XmlPatternStateProvider) fContainer).getMappingGroup(fMappingGroup);
+                group = ((XmlPatternStateProvider) fContainer).getLegacyMappingGroup(fMappingGroup);
             } else if (fContainer instanceof DataDrivenStateProvider) {
                 Activator.logError("You should not get to this part of the code if the container is a DataDrivenStateProvider"); //$NON-NLS-1$
             }

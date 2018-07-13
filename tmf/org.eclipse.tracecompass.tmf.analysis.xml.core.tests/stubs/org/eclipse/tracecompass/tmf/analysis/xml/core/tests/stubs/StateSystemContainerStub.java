@@ -30,7 +30,7 @@ public class StateSystemContainerStub implements IXmlStateSystemContainer {
 
     @Override
     public ITmfStateSystem getStateSystem() {
-        return null;
+        throw new UnsupportedOperationException("No state system here...");
     }
 
     @Override

@@ -16,6 +16,8 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateChangeCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenAction;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateValue;
@@ -27,7 +29,6 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlMapEn
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternEventHandler;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternSegmentBuilder;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlState;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlStateChange;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlStateTransition;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlTimestampCondition;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlTransitionValidator;
@@ -78,8 +79,12 @@ public class TmfXmlReadWriteModelFactory implements ITmfXmlModelFactory {
     }
 
     @Override
-    public TmfXmlStateChange createStateChange(Element node, IXmlStateSystemContainer container) {
-        return new TmfXmlStateChange(this, node, container);
+    public DataDrivenAction createStateChange(Element node, IXmlStateSystemContainer container) {
+        TmfXmlStateChangeCu compile = TmfXmlStateChangeCu.compile(container.getAnalysisCompilationData(), node);
+        if (compile == null)  {
+            throw new NullPointerException("State change did not compile correctly"); //$NON-NLS-1$
+        }
+        return compile.generate();
     }
 
     @Override

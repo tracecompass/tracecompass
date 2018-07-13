@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenAction;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.w3c.dom.Element;
 
@@ -86,7 +87,7 @@ public interface ITmfXmlModelFactory {
      *            The state system container this state change belongs to
      * @return The new XML state change
      */
-    TmfXmlStateChange createStateChange(Element node, IXmlStateSystemContainer container);
+    DataDrivenAction createStateChange(Element node, IXmlStateSystemContainer container);
 
     /**
      * Create a new XML location
