@@ -44,14 +44,14 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
 
-    private static final class InitialValue {
+    private static final class FutureValue {
         private final long fTime;
         private final @Nullable Object fValue;
         private final int fQuark;
 
-        public InitialValue(long time, @Nullable Object initialState, int quark) {
+        public FutureValue(long time, @Nullable Object futureValue, int quark) {
             fTime = time;
-            fValue = initialState;
+            fValue = futureValue;
             fQuark = quark;
         }
 
@@ -85,7 +85,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         // threads
     };
 
-    private final Queue<InitialValue> fInitialValues = new PriorityQueue<>(Comparator.comparingLong(InitialValue::getTime));
+    private final Queue<FutureValue> fFutureValues = new PriorityQueue<>(Comparator.comparingLong(FutureValue::getTime));
 
     /**
      * Instantiate a new state provider plugin.
@@ -302,11 +302,11 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
                 if (stateSystemBuilder == null) {
                     return;
                 }
-                InitialValue initialValue = fInitialValues.peek();
-                while (initialValue != null && (currentTime >= initialValue.fTime)) {
-                    initialValue = fInitialValues.poll();
-                    if (initialValue != null) {
-                        stateSystemBuilder.modifyAttribute(initialValue.fTime, initialValue.fValue, initialValue.fQuark);
+                FutureValue futureValue = fFutureValues.peek();
+                while (futureValue != null && (currentTime >= futureValue.fTime)) {
+                    futureValue = fFutureValues.poll();
+                    if (futureValue != null) {
+                        stateSystemBuilder.modifyAttribute(futureValue.fTime, futureValue.fValue, futureValue.fQuark);
                     }
                 }
                 eventHandle(event);
@@ -320,8 +320,8 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
             if (stateSystemBuilder == null) {
                 return;
             }
-            while (!fInitialValues.isEmpty()) {
-                InitialValue interval = fInitialValues.remove();
+            while (!fFutureValues.isEmpty()) {
+                FutureValue interval = fFutureValues.remove();
                 stateSystemBuilder.modifyAttribute(interval.fTime, interval.fValue, interval.fQuark);
             }
             /* We've received the last event, clean up */
@@ -372,8 +372,8 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
     }
 
     @Override
-    public void addFutureEvent(long time, @Nullable Object initialState, int attribute) {
-        fInitialValues.add(new InitialValue(time, initialState, attribute));
+    public void addFutureEvent(long time, @Nullable Object futureValue, int attribute) {
+        fFutureValues.add(new FutureValue(time, futureValue, attribute));
     }
 
     // ------------------------------------------------------------------------

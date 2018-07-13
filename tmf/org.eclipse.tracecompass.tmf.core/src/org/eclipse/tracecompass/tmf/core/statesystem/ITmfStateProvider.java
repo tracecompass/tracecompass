@@ -140,16 +140,19 @@ public interface ITmfStateProvider {
     }
 
     /**
-     * Add future state. It will be added when it is safe to do so.
+     * Add future state. The value of the state will be changed at the requested
+     * time when it is safe to do so, ie when the analysis has reached this
+     * timestamp.
      *
-     * @param time the time of the state
-     * @param initialState
-     *            the initial state
+     * @param time
+     *            the time of the state
+     * @param futureValue
+     *            The value of the state
      * @param attribute
      *            the quark to set to initial state
      * @since 4.1
      */
-    default void addFutureEvent(long time, @Nullable Object initialState, int attribute) {
+    default void addFutureEvent(long time, @Nullable Object futureValue, int attribute) {
         // Do nothing by default
     }
 }
