@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -70,6 +71,7 @@ public class DataDrivenActionStateChange extends DataDrivenAction {
     private final boolean fUpdate;
     private final boolean fIncrement;
     private final StackAction fStackAction;
+    private final @Nullable DataDrivenValue fFutureTime;
 
     /**
      * Constructor
@@ -87,13 +89,17 @@ public class DataDrivenActionStateChange extends DataDrivenAction {
      *            and a new state will start at the time of the event.
      * @param stackAction
      *            The action to perform on a stack
+     * @param futureTime
+     *            The state value for the future time. If the state change happens
+     *            at the time of the event, this value should be null
      */
-    public DataDrivenActionStateChange(DataDrivenStateSystemPath leftOperand, DataDrivenValue rightOperand, boolean increment, boolean update, StackAction stackAction) {
+    public DataDrivenActionStateChange(DataDrivenStateSystemPath leftOperand, DataDrivenValue rightOperand, boolean increment, boolean update, StackAction stackAction, @Nullable DataDrivenValue futureTime) {
         fRightOperand = rightOperand;
         fLeftOperand = leftOperand;
         fUpdate = update;
         fIncrement = increment;
         fStackAction = stackAction;
+        fFutureTime = futureTime;
     }
 
     @Override
@@ -143,11 +149,24 @@ public class DataDrivenActionStateChange extends DataDrivenAction {
         if (fIncrement && assignVal != null) {
             assignVal = incrementByType(quark, ssb, assignVal);
         }
+        // Should this state change be done at a future time?
+        long scTime = timestamp;
+        if (fFutureTime != null) {
+            Object futureTimeObj = fFutureTime.getValue(event, ITmfStateSystem.ROOT_ATTRIBUTE, scenarioInfo, container);
+            if (futureTimeObj instanceof Number) {
+                scTime = ((Number) futureTimeObj).longValue();
+            }
+        }
+
         // If update is requested, do update and return
         if (fUpdate) {
             ssb.updateOngoingState(TmfXmlUtils.newTmfStateValueFromObject(assignVal), quark);
-        } else {
+        } else if (scTime == timestamp) {
             ssb.modifyAttribute(timestamp, assignVal, quark);
+        } else if (scTime > timestamp) {
+            container.addFutureState(scTime, assignVal, quark);
+        } else {
+            Activator.logWarning("No state change occurred for event " + event + " and state change " + this + ". The time of the change is invalid: " + scTime);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
         }
     }
 

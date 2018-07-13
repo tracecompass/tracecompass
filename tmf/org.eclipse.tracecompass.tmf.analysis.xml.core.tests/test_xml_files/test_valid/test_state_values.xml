@@ -80,6 +80,17 @@
 					<stateValue id="op" type="eventField" value="op" />
 				</stateValue>
 			</stateChange>
+			<stateChange>
+				<stateAttribute type="constant" value="future" />
+				<stateValue type="int" value="100" />
+			</stateChange>
+			<stateChange>
+				<stateAttribute type="constant" value="future" />
+				<stateValue type="int" value="101" />
+				<futureTime type="script" value="ts + 2" scriptEngine="nashorn">
+					<stateValue id="ts" type="eventField" value="timestamp" />
+				</futureTime>
+			</stateChange>
 		</eventHandler>
 		<eventHandler eventName="exit">
 			<stateChange>

@@ -222,4 +222,28 @@ public class TmfStateValueTest {
         XmlUtilsTest.verifyStateIntervals("testStateValueScript", ss, quark, expectedStarts, expectedValues);
 
     }
+
+    /**
+     * Test that a future state value changes the state at the appropriate time
+     *
+     * @throws StateSystemDisposedException
+     *             Exceptions thrown during state system verification
+     * @throws AttributeNotFoundException
+     *             Exceptions thrown during state system verification
+     */
+    @Test
+    public void testStateValueFuture() throws AttributeNotFoundException, StateSystemDisposedException {
+        DataDrivenAnalysisModule module = fModule;
+        assertNotNull(module);
+
+        ITmfStateSystem ss = module.getStateSystem();
+        assertNotNull(ss);
+
+        int quark = ss.getQuarkAbsolute("future");
+
+        final int[] expectedStarts = { 1, 3, 5, 7, 7 };
+        ITmfStateValue[] expectedValues = { TmfStateValue.newValueInt(100), TmfStateValue.newValueInt(101), TmfStateValue.newValueInt(100), TmfStateValue.newValueInt(101) };
+        XmlUtilsTest.verifyStateIntervals("testStateValueScript", ss, quark, expectedStarts, expectedValues);
+
+    }
 }

@@ -108,4 +108,9 @@ public class DataDrivenStateProvider extends AbstractTmfStateProvider implements
         return Objects.requireNonNull(fMappingGroups.get(id));
     }
 
+    @Override
+    public void addFutureState(long time, @Nullable Object state, int quark) {
+        this.addFutureEvent(time, state, quark);
+    }
+
 }

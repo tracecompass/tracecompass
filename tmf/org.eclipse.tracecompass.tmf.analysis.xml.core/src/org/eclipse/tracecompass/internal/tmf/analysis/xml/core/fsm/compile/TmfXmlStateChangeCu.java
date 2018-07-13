@@ -46,21 +46,27 @@ public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit 
         private boolean fIncrement;
         private boolean fUpdate;
         private StackAction fStackAction;
+        private @Nullable TmfXmlStateValueCu fFutureTime;
 
         public TmfXmlStateChangeAssignationCu(TmfXmlStateSystemPathCu path,
-                TmfXmlStateValueCu rightOperandCu, boolean increment, boolean update, StackAction stackAction) {
+                TmfXmlStateValueCu rightOperandCu, boolean increment, boolean update, StackAction stackAction, @Nullable TmfXmlStateValueCu futureTime) {
             fPath = path;
             fRightOperand = rightOperandCu;
             fIncrement = increment;
             fUpdate = update;
             fStackAction = stackAction;
+            fFutureTime = futureTime;
         }
 
         @Override
         public DataDrivenAction generate() {
             DataDrivenStateSystemPath path = fPath.generate();
             DataDrivenValue rightOperand = fRightOperand.generate();
-            return new DataDrivenActionStateChange(path, rightOperand, fIncrement, fUpdate, fStackAction);
+            DataDrivenValue futureTime = null;
+            if (fFutureTime != null) {
+                futureTime = fFutureTime.generate();
+            }
+            return new DataDrivenActionStateChange(path, rightOperand, fIncrement, fUpdate, fStackAction, futureTime);
         }
 
     }
@@ -165,6 +171,7 @@ public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit 
     private static @Nullable TmfXmlStateChangeCu compileAssignationChange(AnalysisCompilationData analysisContent, Element stateChange) {
         List<@NonNull Element> leftOperands = TmfXmlUtils.getChildElements(stateChange, TmfXmlStrings.STATE_ATTRIBUTE);
         List<@NonNull Element> rightOperands = TmfXmlUtils.getChildElements(stateChange, TmfXmlStrings.STATE_VALUE);
+        List<@NonNull Element> futureTimes = TmfXmlUtils.getChildElements(stateChange, TmfXmlStrings.FUTURE_TIME);
         if (rightOperands.size() != 1) {
             // TODO: Validation message here
             Activator.logError("There should only be one state Value in this state change"); //$NON-NLS-1$
@@ -174,6 +181,18 @@ public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit 
         TmfXmlStateSystemPathCu path = TmfXmlStateSystemPathCu.compile(analysisContent, leftOperands);
         if (path == null) {
             return null;
+        }
+        if (futureTimes.size() > 1) {
+            // TODO: Validation message here
+            Activator.logError("There should at most one future time for this state change"); //$NON-NLS-1$
+        }
+        Element futureTime = futureTimes.size() == 0 ? null : futureTimes.get(0);
+        TmfXmlStateValueCu futureTimeCu = null;
+        if (futureTime != null) {
+            futureTimeCu = TmfXmlStateValueCu.compileValue(analysisContent, futureTime);
+            if (futureTimeCu == null) {
+                return null;
+            }
         }
 
         TmfXmlStateValueCu rightOperandCu = TmfXmlStateValueCu.compileValue(analysisContent, rightOperand);
@@ -204,7 +223,7 @@ public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit 
             return null;
         }
 
-        return new TmfXmlStateChangeAssignationCu(path, rightOperandCu, increment, update, stackAction);
+        return new TmfXmlStateChangeAssignationCu(path, rightOperandCu, increment, update, stackAction, futureTimeCu);
     }
 
 }

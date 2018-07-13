@@ -109,4 +109,21 @@ public interface IAnalysisDataContainer {
         return quark;
     }
 
+    /**
+     * Add a future state to the state provider associated with this container.
+     * The state change will occur when the analysis has reached the specified
+     * time.
+     *
+     * @param time
+     *            The time at which to add the state. It has to be later than
+     *            the current time of the analysis
+     * @param state
+     *            The value the state will take at time
+     * @param quark
+     *            The quark for which to add the state change
+     */
+    default void addFutureState(long time, @Nullable Object state, int quark) {
+        throw new UnsupportedOperationException("Implementations should override this method"); //$NON-NLS-1$
+    }
+
 }
