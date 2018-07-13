@@ -147,7 +147,7 @@ public interface ITmfStateProvider {
      *            the initial state
      * @param attribute
      *            the quark to set to initial state
-     * @since 4.0
+     * @since 4.1
      */
     default void addFutureEvent(long time, @Nullable Object initialState, int attribute) {
         // Do nothing by default

@@ -107,7 +107,7 @@ public interface IYAppearance {
      * chart.
      *
      * @author Matthew Khouzam
-     * @since 4.0
+     * @since 4.1
      */
     public final class SymbolStyle {
 
@@ -193,7 +193,7 @@ public interface IYAppearance {
      * If the tick is {@link SymbolStyle#NONE}, no tick shall be displayed.
      *
      * @return the appearance
-     * @since 4.0
+     * @since 4.1
      */
     default String getSymbolStyle() {
         return SymbolStyle.NONE;
@@ -203,7 +203,7 @@ public interface IYAppearance {
      * Get the symbol size
      *
      * @return the size of the symbol in pixels
-     * @since 4.0
+     * @since 4.1
      */
     default int getSymbolSize() {
         return 3;
