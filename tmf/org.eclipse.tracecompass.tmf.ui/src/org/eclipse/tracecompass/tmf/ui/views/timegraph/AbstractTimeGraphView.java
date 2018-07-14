@@ -1187,8 +1187,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
             @Override
             public void run() {
-                Point point = timeGraphControl.toControl(timeGraphControl.getDisplay().getCursorLocation());
-                if (point.x > fTimeGraphViewer.getNameSpace()) {
+                int xCoord = timeGraphControl.toControl(timeGraphControl.getDisplay().getCursorLocation()).x;
+                if ((fTimeGraphViewer.getNameSpace() < xCoord) && (xCoord < timeGraphControl.getSize().x)) {
                     if (fTimeEventFilterDialog != null) {
                         fTimeEventFilterDialog.close();
                         fTimeEventFilterDialog = null;
