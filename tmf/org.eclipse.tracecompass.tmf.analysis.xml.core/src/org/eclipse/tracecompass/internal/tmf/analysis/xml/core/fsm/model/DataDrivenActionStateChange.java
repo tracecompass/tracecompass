@@ -9,10 +9,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model;
 
-import java.util.List;
-
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -68,7 +65,8 @@ public class DataDrivenActionStateChange extends DataDrivenAction {
     }
 
     private final DataDrivenValue fRightOperand;
-    private final List<DataDrivenValue> fLeftOperand;
+    private final DataDrivenStateSystemPath fLeftOperand;
+    // private final List<DataDrivenValue> fLeftOperand;
     private final boolean fUpdate;
     private final boolean fIncrement;
     private final StackAction fStackAction;
@@ -90,7 +88,7 @@ public class DataDrivenActionStateChange extends DataDrivenAction {
      * @param stackAction
      *            The action to perform on a stack
      */
-    public DataDrivenActionStateChange(List<DataDrivenValue> leftOperand, DataDrivenValue rightOperand, boolean increment, boolean update, StackAction stackAction) {
+    public DataDrivenActionStateChange(DataDrivenStateSystemPath leftOperand, DataDrivenValue rightOperand, boolean increment, boolean update, StackAction stackAction) {
         fRightOperand = rightOperand;
         fLeftOperand = leftOperand;
         fUpdate = update;
@@ -108,17 +106,9 @@ public class DataDrivenActionStateChange extends DataDrivenAction {
         ITmfStateSystemBuilder ssb = (ITmfStateSystemBuilder) stateSystem;
 
         // Get the quark that will be changed
-        for (DataDrivenValue val : fLeftOperand) {
-            Object value = val.getValue(event, quark, scenarioInfo, container);
-            if (value == null) {
-                Activator.logWarning("StateChange.handleEvent: A value is null: " + val); //$NON-NLS-1$
-                return;
-            }
-            quark = container.getQuarkRelativeAndAdd(quark, String.valueOf(value));
-            if (quark < 0) {
-                Activator.logWarning("The attribute quark is invalid for event " + event + ": " + fLeftOperand);  //$NON-NLS-1$//$NON-NLS-2$
-                return;
-            }
+        quark = fLeftOperand.getQuark(event, quark, scenarioInfo, container);
+        if (quark < 0) {
+            return;
         }
 
         // Get the value

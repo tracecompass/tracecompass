@@ -9,7 +9,6 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +20,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenActionStateChange;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenActionStateChange.StackAction;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenStateSystemPath;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.IBaseQuarkProvider;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValueConstant;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValueEventField;
@@ -47,6 +48,18 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
 
     private final Supplier<DataDrivenValue> fGenerator;
 
+    private static final String CURRENT_SCENARIO = "#CurrentScenario"; //$NON-NLS-1$
+
+    /**
+     * A state value representing the current scenario quark. This attribute is
+     * a sign that the base quark should be
+     * {@link IBaseQuarkProvider#CURRENT_SCENARIO_BASE_QUARK} and should not
+     * generate a state value
+     */
+    public static TmfXmlStateValueCu CURRENT_SCENARIO_QUARK = new TmfXmlStateValueCu(() -> {
+        throw new UnsupportedOperationException("This should never do anything"); //$NON-NLS-1$
+    });
+
     /**
      * Constructor
      *
@@ -62,23 +75,20 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
     /** The state value generator for query values */
     private static class StateValueQueryGenerator implements Supplier<DataDrivenValue> {
 
-        private final List<TmfXmlStateValueCu> fList;
+        private final TmfXmlStateSystemPathCu fPath;
         private final @Nullable String fMappingGroupId;
         private final Type fForcedType;
 
-        StateValueQueryGenerator(List<TmfXmlStateValueCu> list, @Nullable String mappingGroup, Type forcedType) {
-            fList = list;
+        StateValueQueryGenerator(TmfXmlStateSystemPathCu ssPath, @Nullable String mappingGroup, Type forcedType) {
+            fPath = ssPath;
             fMappingGroupId = mappingGroup;
             fForcedType = forcedType;
         }
 
         @Override
         public DataDrivenValue get() {
-            List<DataDrivenValue> generated = new ArrayList<>();
-            for (TmfXmlStateValueCu subValue : fList) {
-                generated.add(subValue.generate());
-            }
-            return new DataDrivenValueQuery(fMappingGroupId, fForcedType, generated);
+            DataDrivenStateSystemPath path = fPath.generate();
+            return new DataDrivenValueQuery(fMappingGroupId, fForcedType, path);
         }
 
     }
@@ -86,23 +96,20 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
     /** The value generator for stack peek values */
     private static class StateValueStackPeekGenerator implements Supplier<DataDrivenValue> {
 
-        private final List<TmfXmlStateValueCu> fList;
+        private final TmfXmlStateSystemPathCu fPath;
         private final @Nullable String fMappingGroupId;
         private final Type fForcedType;
 
-        StateValueStackPeekGenerator(List<TmfXmlStateValueCu> list, @Nullable String mappingGroup, Type forcedType) {
-            fList = list;
+        StateValueStackPeekGenerator(TmfXmlStateSystemPathCu path, @Nullable String mappingGroup, Type forcedType) {
+            fPath = path;
             fMappingGroupId = mappingGroup;
             fForcedType = forcedType;
         }
 
         @Override
         public DataDrivenValue get() {
-            List<DataDrivenValue> generated = new ArrayList<>();
-            for (TmfXmlStateValueCu subValue : fList) {
-                generated.add(subValue.generate());
-            }
-            return new DataDrivenValueStackPeek(fMappingGroupId, fForcedType, generated);
+            DataDrivenStateSystemPath path = fPath.generate();
+            return new DataDrivenValueStackPeek(fMappingGroupId, fForcedType, path);
         }
 
     }
@@ -139,9 +146,9 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
     }
 
     /**
-     * Compile a stateAttribute XML element. It returns a list since some attributes
-     * may link to location values that are replaced by the corresponding attribute
-     * values.
+     * Compile a stateAttribute XML element. It returns a list since some
+     * attributes may link to location values that are replaced by the
+     * corresponding attribute values.
      *
      * @param analysisData
      *            The analysis data already compiled
@@ -160,6 +167,9 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
                 // TODO: Validation message here
                 Activator.logError("The value of a constant attribute should not be null"); //$NON-NLS-1$
                 return null;
+            }
+            if (name.equals(CURRENT_SCENARIO)) {
+                return Collections.singletonList(CURRENT_SCENARIO_QUARK);
             }
             TmfXmlStateValueCu tmfXmlStateValueCu = new TmfXmlStateValueCu(() -> new DataDrivenValueConstant(null, forcedType, name));
             return Collections.singletonList(tmfXmlStateValueCu);
@@ -190,15 +200,11 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
         }
         case TmfXmlStrings.TYPE_QUERY: {
             List<Element> childElements = TmfXmlUtils.getChildElements(valueEl, TmfXmlStrings.STATE_ATTRIBUTE);
-            List<TmfXmlStateValueCu> subAttribs = new ArrayList<>();
-            for (Element subAttributeNode : childElements) {
-                List<TmfXmlStateValueCu> subAttrib = TmfXmlStateValueCu.compileAttribute(analysisData, subAttributeNode);
-                if (subAttrib == null) {
-                    return null;
-                }
-                subAttribs.addAll(subAttrib);
+            TmfXmlStateSystemPathCu path = TmfXmlStateSystemPathCu.compile(analysisData, childElements);
+            if (path == null) {
+                return null;
             }
-            return Collections.singletonList(new TmfXmlStateValueCu(new StateValueQueryGenerator(subAttribs, null, forcedType)));
+            return Collections.singletonList(new TmfXmlStateValueCu(new StateValueQueryGenerator(path, null, forcedType)));
         }
         case TmfXmlStrings.TYPE_EVENT_NAME:
             return Collections.singletonList(new TmfXmlStateValueCu(() -> new DataDrivenValueEventName(null)));
@@ -215,8 +221,8 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
     }
 
     /**
-     * Get the 'value' attribute of this element. It replaces defined values by the
-     * corresponding string
+     * Get the 'value' attribute of this element. It replaces defined values by
+     * the corresponding string
      */
     private static @Nullable String getValueString(AnalysisCompilationData analysisContent, Element attribute) {
         return analysisContent.getStringValue(attribute.getAttribute(TmfXmlStrings.VALUE));
@@ -236,11 +242,11 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
         String type = valueEl.getAttribute(TmfXmlStrings.TYPE);
 
         /*
-         * Stack peek will have a separate treatment here, as the state value may have
-         * sub attributes
+         * Stack peek will have a separate treatment here, as the state value
+         * may have sub attributes
          *
-         * FIXME: This case should not be supported this way, have a special type for
-         * stack peek and remove the peek stack action..
+         * FIXME: This case should not be supported this way, have a special
+         * type for stack peek and remove the peek stack action..
          */
         String stack = valueEl.getAttribute(TmfXmlStrings.ATTRIBUTE_STACK);
         StackAction stackAction = DataDrivenActionStateChange.StackAction.getTypeFromString(stack);
@@ -260,9 +266,9 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
         String mappingGroupId = (mapGroupAttrib.isEmpty() ? null : mapGroupAttrib);
 
         /*
-         * Forced type allows to convert the value to a certain type : For example, a
-         * process's TID in an event field may arrive with a LONG format but we want to
-         * store the data in an INT
+         * Forced type allows to convert the value to a certain type : For
+         * example, a process's TID in an event field may arrive with a LONG
+         * format but we want to store the data in an INT
          */
         String forcedTypeName = valueEl.getAttribute(TmfXmlStrings.FORCED_TYPE);
         ITmfStateValue.Type forcedType = forcedTypeName.isEmpty() ? ITmfStateValue.Type.NULL : TmfXmlUtils.getTmfStateValueByName(forcedTypeName);
@@ -327,15 +333,11 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
         }
         case TmfXmlStrings.TYPE_QUERY: {
             List<Element> childElements = TmfXmlUtils.getChildElements(valueEl, TmfXmlStrings.STATE_ATTRIBUTE);
-            List<TmfXmlStateValueCu> subAttribs = new ArrayList<>();
-            for (Element subAttributeNode : childElements) {
-                List<TmfXmlStateValueCu> subAttrib = TmfXmlStateValueCu.compileAttribute(analysisData, subAttributeNode);
-                if (subAttrib == null) {
-                    return null;
-                }
-                subAttribs.addAll(subAttrib);
+            TmfXmlStateSystemPathCu path = TmfXmlStateSystemPathCu.compile(analysisData, childElements);
+            if (path == null) {
+                return null;
             }
-            return new TmfXmlStateValueCu(new StateValueQueryGenerator(subAttribs, mappingGroupId, forcedType));
+            return new TmfXmlStateValueCu(new StateValueQueryGenerator(path, mappingGroupId, forcedType));
         }
         case TmfXmlStrings.TYPE_SCRIPT: {
             List<Element> childElements = TmfXmlUtils.getChildElements(valueEl, TmfXmlStrings.STATE_VALUE);
@@ -367,15 +369,11 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
                 // TODO: Validation message here
                 Activator.logWarning("Compiling state value: Stack peek should have children state attributes"); //$NON-NLS-1$
             }
-            List<TmfXmlStateValueCu> subAttribs = new ArrayList<>();
-            for (Element subAttributeNode : childElements) {
-                List<TmfXmlStateValueCu> subAttrib = TmfXmlStateValueCu.compileAttribute(analysisData, subAttributeNode);
-                if (subAttrib == null) {
-                    return null;
-                }
-                subAttribs.addAll(subAttrib);
+            TmfXmlStateSystemPathCu path = TmfXmlStateSystemPathCu.compile(analysisData, childElements);
+            if (path == null) {
+                return null;
             }
-            return new TmfXmlStateValueCu(new StateValueStackPeekGenerator(subAttribs, mappingGroupId, forcedType));
+            return new TmfXmlStateValueCu(new StateValueStackPeekGenerator(path, mappingGroupId, forcedType));
         }
         default:
             Activator.logError("Compiling state value: The XML element is not of the right type " + type); //$NON-NLS-1$
@@ -406,16 +404,16 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
     }
 
     /**
-     * Compile a list of state value compilation unit as a single query value, to
-     * support some use cases allowed by the XSD that could be well rewritten as a
-     * query stateValue
+     * Compile a list of state value compilation unit as a single query value,
+     * to support some use cases allowed by the XSD that could be well rewritten
+     * as a query stateValue
      *
-     * @param attributesCu
-     *            The list of value compilation units mapping the query
+     * @param path
+     *            The state system path compilation unit to query
      * @return The query value compilation unit
      */
-    public static TmfXmlStateValueCu compileAsQuery(List<TmfXmlStateValueCu> attributesCu) {
-        return new TmfXmlStateValueCu(new StateValueQueryGenerator(attributesCu, null, ITmfStateValue.Type.NULL));
+    public static TmfXmlStateValueCu compileAsQuery(TmfXmlStateSystemPathCu path) {
+        return new TmfXmlStateValueCu(new StateValueQueryGenerator(path, null, ITmfStateValue.Type.NULL));
     }
 
 }

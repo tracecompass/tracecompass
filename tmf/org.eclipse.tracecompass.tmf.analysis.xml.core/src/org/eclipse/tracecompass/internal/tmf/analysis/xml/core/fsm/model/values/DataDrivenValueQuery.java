@@ -9,11 +9,11 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values;
 
-import java.util.List;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenScenarioInfo;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenStateSystemPath;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  */
 public class DataDrivenValueQuery extends DataDrivenValue {
 
-    private final List<DataDrivenValue> fQuery;
+    private final DataDrivenStateSystemPath fQuery;
 
     /**
      * Constructor
@@ -40,39 +40,28 @@ public class DataDrivenValueQuery extends DataDrivenValue {
      * @param query
      *            The path of the query in the state system
      */
-    public DataDrivenValueQuery(@Nullable String mappingGroupId, ITmfStateValue.Type forcedType, List<DataDrivenValue> query) {
+    public DataDrivenValueQuery(@Nullable String mappingGroupId, ITmfStateValue.Type forcedType, DataDrivenStateSystemPath query) {
         super(mappingGroupId, forcedType);
         fQuery = query;
     }
 
     @Override
     protected @Nullable Object resolveValue(int quark, IAnalysisDataContainer container) {
-        return executeQuery(sv -> sv.resolveValue(quark, container), container);
+        return executeQuery(() -> fQuery.getQuark(null, ITmfStateSystem.ROOT_ATTRIBUTE, null, container), container);
     }
 
     @Override
     protected @Nullable Object resolveValue(ITmfEvent event, int quark, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
-        return executeQuery(sv -> sv.resolveValue(event, quark, scenarioInfo, container), container);
+        return executeQuery(() -> fQuery.getQuark(event, ITmfStateSystem.ROOT_ATTRIBUTE, scenarioInfo, container), container);
     }
 
-    private @Nullable Object executeQuery(Function<DataDrivenValue, @Nullable Object> function, IAnalysisDataContainer container) {
+    private static @Nullable Object executeQuery(Supplier<Integer> function, IAnalysisDataContainer container) {
         /* Query the state system for the value */
         Object value = null;
-        int quarkQuery = ITmfStateSystem.ROOT_ATTRIBUTE;
         ITmfStateSystem ss = container.getStateSystem();
 
-        for (DataDrivenValue path : fQuery) {
-            Object attribVal = function.apply(path);
-            if (attribVal == null) {
-                quarkQuery = IAnalysisDataContainer.ERROR_QUARK;
-                break;
-            }
-            quarkQuery = container.getQuarkRelativeAndAdd(quarkQuery, String.valueOf(attribVal));
-            if (quarkQuery < 0) {
-                /* the query is not valid, we stop the state change */
-                break;
-            }
-        }
+        @SuppressWarnings("null")
+        int quarkQuery = function.get();
         /*
          * the query can fail : for example, if a value is requested but has not been
          * set yet

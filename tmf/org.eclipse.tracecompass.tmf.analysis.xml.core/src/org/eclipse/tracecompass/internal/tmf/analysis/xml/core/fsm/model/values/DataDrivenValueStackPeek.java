@@ -9,12 +9,11 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values;
 
-import java.util.List;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenScenarioInfo;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenStateSystemPath;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenException;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -30,7 +29,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  */
 public class DataDrivenValueStackPeek extends DataDrivenValue {
 
-    private final List<DataDrivenValue> fValues;
+    private final DataDrivenStateSystemPath fPath;
 
     /**
      * Constructor
@@ -45,9 +44,9 @@ public class DataDrivenValueStackPeek extends DataDrivenValue {
      *            be empty if the queried quark already points to the right
      *            location.
      */
-    public DataDrivenValueStackPeek(@Nullable String mappingGroupId, ITmfStateValue.Type forcedType, List<DataDrivenValue> path) {
+    public DataDrivenValueStackPeek(@Nullable String mappingGroupId, ITmfStateValue.Type forcedType, DataDrivenStateSystemPath path) {
         super(mappingGroupId, forcedType);
-        fValues = path;
+        fPath = path;
     }
 
     @Override
@@ -60,21 +59,9 @@ public class DataDrivenValueStackPeek extends DataDrivenValue {
         final long ts = event.getTimestamp().toNanos();
         /* Query the state system for the value */
         Object value = null;
-        int quarkQuery = baseQuark;
         ITmfStateSystem ss = container.getStateSystem();
 
-        for (DataDrivenValue attribute : fValues) {
-            Object attribVal = attribute.resolveValue(event, quarkQuery, scenarioInfo, container);
-            if (attribVal == null) {
-                quarkQuery = IAnalysisDataContainer.ERROR_QUARK;
-                break;
-            }
-            quarkQuery = container.getQuarkRelativeAndAdd(quarkQuery, String.valueOf(attribVal));
-            if (quarkQuery < 0) {
-                /* the query is not valid, we stop the state change */
-                break;
-            }
-        }
+        int quarkQuery = fPath.getQuark(event, baseQuark, scenarioInfo, container);
         /*
          * the query can fail : for example, if a value is requested but has not been
          * set yet

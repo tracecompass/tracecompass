@@ -180,15 +180,11 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
             List<Element> attributes = TmfXmlUtils.getChildElements(conditionEl, TmfXmlStrings.STATE_ATTRIBUTE);
             if (!attributes.isEmpty()) {
                 // The first value is an array of state attributes
-                List<TmfXmlStateValueCu> attributesCu = new ArrayList<>();
-                for (Element stateAttributeEl : attributes) {
-                    List<TmfXmlStateValueCu> attrib = TmfXmlStateValueCu.compileAttribute(analysisData, stateAttributeEl);
-                    if (attrib == null) {
-                        return null;
-                    }
-                    attributesCu.addAll(attrib);
+                TmfXmlStateSystemPathCu path = TmfXmlStateSystemPathCu.compile(analysisData, attributes);
+                if (path == null) {
+                    return null;
                 }
-                firstValue = TmfXmlStateValueCu.compileAsQuery(attributesCu);
+                firstValue = TmfXmlStateValueCu.compileAsQuery(path);
             } else {
                 // The first value is an event field
                 attributes = TmfXmlUtils.getChildElements(conditionEl, TmfXmlStrings.ELEMENT_FIELD);

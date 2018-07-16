@@ -9,19 +9,18 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenActionStateChange;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenActionStateChange.StackAction;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenAction;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenActionConditional;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenActionStateChange;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenActionStateChange.StackAction;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenStateSystemPath;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
@@ -42,15 +41,15 @@ public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit 
     /** A state change assigning a value to a path in the state system */
     private static class TmfXmlStateChangeAssignationCu extends TmfXmlStateChangeCu {
 
-        private List<TmfXmlStateValueCu> fLeftOperands;
+        private TmfXmlStateSystemPathCu fPath;
         private TmfXmlStateValueCu fRightOperand;
         private boolean fIncrement;
         private boolean fUpdate;
         private StackAction fStackAction;
 
-        public TmfXmlStateChangeAssignationCu(List<TmfXmlStateValueCu> leftOperandsCu,
+        public TmfXmlStateChangeAssignationCu(TmfXmlStateSystemPathCu path,
                 TmfXmlStateValueCu rightOperandCu, boolean increment, boolean update, StackAction stackAction) {
-            fLeftOperands = leftOperandsCu;
+            fPath = path;
             fRightOperand = rightOperandCu;
             fIncrement = increment;
             fUpdate = update;
@@ -59,11 +58,9 @@ public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit 
 
         @Override
         public DataDrivenAction generate() {
-            List<DataDrivenValue> leftOperands = fLeftOperands.stream()
-                    .map(TmfXmlStateValueCu::generate)
-                    .collect(Collectors.toList());
+            DataDrivenStateSystemPath path = fPath.generate();
             DataDrivenValue rightOperand = fRightOperand.generate();
-            return new DataDrivenActionStateChange(leftOperands, rightOperand, fIncrement, fUpdate, fStackAction);
+            return new DataDrivenActionStateChange(path, rightOperand, fIncrement, fUpdate, fStackAction);
         }
 
     }
@@ -174,13 +171,9 @@ public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit 
         }
         Element rightOperand = rightOperands.get(0);
 
-        List<TmfXmlStateValueCu> leftOperandsCu = new ArrayList<>();
-        for (Element stateAttributeEl : leftOperands) {
-            List<TmfXmlStateValueCu> attrib = TmfXmlStateValueCu.compileAttribute(analysisContent, stateAttributeEl);
-            if (attrib == null) {
-                return null;
-            }
-            leftOperandsCu.addAll(attrib);
+        TmfXmlStateSystemPathCu path = TmfXmlStateSystemPathCu.compile(analysisContent, leftOperands);
+        if (path == null) {
+            return null;
         }
 
         TmfXmlStateValueCu rightOperandCu = TmfXmlStateValueCu.compileValue(analysisContent, rightOperand);
@@ -211,7 +204,7 @@ public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit 
             return null;
         }
 
-        return new TmfXmlStateChangeAssignationCu(leftOperandsCu, rightOperandCu, increment, update, stackAction);
+        return new TmfXmlStateChangeAssignationCu(path, rightOperandCu, increment, update, stackAction);
     }
 
 }

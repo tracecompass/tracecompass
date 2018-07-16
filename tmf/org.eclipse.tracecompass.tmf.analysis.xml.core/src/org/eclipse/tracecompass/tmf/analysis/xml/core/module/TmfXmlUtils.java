@@ -53,7 +53,7 @@ public final class TmfXmlUtils {
      *            The tag of the elements to return
      * @return The list of children {@link Element} of the parent
      */
-    public static List<@NonNull Element> getChildElements(Element parent, String elementTag) {
+    public static @NonNull List<@NonNull Element> getChildElements(Element parent, String elementTag) {
         /* get the state providers and find the corresponding one */
         NodeList nodes = parent.getElementsByTagName(elementTag);
         List<@NonNull Element> childElements = new ArrayList<>();
