@@ -15,13 +15,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.varia.NullAppender;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
@@ -29,7 +29,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -165,8 +164,12 @@ public class CtfTmfExperimentTrimmingTest {
         assertEquals("Experiment", dialogBot.text().getText());
         dialogBot.text().setText("Experiment-trimmed");
         dialogBot.button("OK").click();
-        WaitUtils.waitForJobs();
+        SWTBotEditor newExperiment = bot.editorByTitle("Experiment-trimmed");
+        newExperiment.setFocus();
         fNewExperiment = traceManager.getActiveTrace();
+        assertNotNull("No active trace", fNewExperiment);
+        assertEquals("Incorrect active trace", "Experiment-trimmed", fNewExperiment.getName());
+        WaitUtils.waitForJobs();
     }
 
     /**
@@ -223,13 +226,13 @@ public class CtfTmfExperimentTrimmingTest {
         final long newTraceStartTime = trimmedTrace.readStart().toNanos();
         final long newTraceEndTime = trimmedTrace.readEnd().toNanos();
 
-        assertTrue("Cut trace start time " + newTraceStartTime
+        assertTrue("Trimmed trace start time " + newTraceStartTime
                 + " is earlier than the requested " + fRequestedTraceCutRange.getStartTime(),
-                newTraceStartTime >= fOriginalExperiment.readStart().toNanos());
+                newTraceStartTime >= fRequestedTraceCutRange.getStartTime().toNanos());
 
-        assertTrue("Cut trace end time " + newTraceEndTime
+        assertTrue("Trimmed trace end time " + newTraceEndTime
                 + " is later than the requested " + fRequestedTraceCutRange.getEndTime(),
-                newTraceEndTime <= fOriginalExperiment.readEnd().toNanos());
+                newTraceEndTime <= fRequestedTraceCutRange.getEndTime().toNanos());
 
         /*
          * Verify that each trace event from the original trace in the given
@@ -242,23 +245,8 @@ public class CtfTmfExperimentTrimmingTest {
 
         int count = 0;
         while (traceCutRange.contains(initialEvent.getTimestamp())) {
-            assertNotNull("Initial trace doesn't appear to have events in range", initialEvent);
-            assertNotNull(fRequestedTraceCutRange + "\n" + "Expected event not present in trimmed trace: " + eventToString(initialEvent), trimmedEvent);
-
-            if (!eventsEquals(initialEvent, trimmedEvent)) {
-                /*
-                 * Skip the test for different events of the exact same
-                 * timestamp. The library does not guarantee in which order
-                 * events of the same timestamp are read.
-                 */
-                String comparator = eventToString(initialEvent) + "\n" + eventToString(trimmedEvent);
-                assertEquals(fRequestedTraceCutRange + "\n" + count + "\n" + comparator, initialEvent.getTimestamp(), trimmedEvent.getTimestamp());
-                /*
-                 * Display warnings
-                 */
-                System.err.println("The following events have the exact same timestamp, and may be read in any order:");
-                System.err.println(comparator);
-            }
+            assertNotNull("Expected event not present in trimmed trace: " + initialEvent+" at rank:" + count, trimmedEvent);
+            assertEquals("Timestamp mismatch at rank:" + count, initialEvent.getTimestamp(), trimmedEvent.getTimestamp());
 
             initialEvent = initialTrace.getNext(initialContext);
             trimmedEvent = trimmedTrace.getNext(trimmedContext);
@@ -266,24 +254,5 @@ public class CtfTmfExperimentTrimmingTest {
         }
 
         assertTrue("Trimmed trace is too small", count <= trimmedTrace.getNbEvents());
-    }
-
-    /**
-     * {@link TmfEvent#equals} checks the container trace, among other things.
-     * Here we want to compare events from different traces, so we have to
-     * implement our own equals().
-     */
-    private static boolean eventsEquals(ITmfEvent event1, ITmfEvent event2) {
-        return Objects.equals(event1.getTimestamp(), event2.getTimestamp())
-                && Objects.equals(event1.getType(), event2.getType())
-                && Objects.equals(event1.getContent(), event2.getContent());
-    }
-
-    private static String eventToString(ITmfEvent event) {
-        return new StringBuilder()
-                .append("Timestamp").append(event.getTimestamp())
-                .append("Type").append(event.getType())
-                .append("Content").append(event.getContent())
-                .toString();
     }
 }
