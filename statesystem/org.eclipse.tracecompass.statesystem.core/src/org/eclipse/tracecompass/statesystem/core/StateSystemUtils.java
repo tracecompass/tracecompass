@@ -97,6 +97,57 @@ public final class StateSystemUtils {
     }
 
     /**
+     * Convenience method to query the ongoing value (in the Transient state) of
+     * an attribute stack (created with pushAttribute()/popAttribute()). This
+     * will return the interval value that is currently at the top of the stack,
+     * or 'null' if that stack is currently empty. It works similarly to
+     * queryOngoing().
+     *
+     * To retrieve the other values in a stack, you can query the sub-attributes
+     * manually.
+     *
+     * @param ss
+     *            The state system to query
+     * @param stackAttributeQuark
+     *            The top-level stack-attribute (that was the target of
+     *            pushAttribute() at creation time)
+     * @return The value of the interval that was at the top of the stack, or
+     *         'null' if the stack was empty.
+     * @throws IndexOutOfBoundsException
+     *             If the stack-attribute quark is out of range
+     * @throws IllegalStateException
+     *             If the stack-attribute value is not valid (null or positive
+     *             integer) or does not have a corresponding sub-attribute
+     * @since 4.1
+     */
+    public static @Nullable Object queryOngoingStackTop(ITmfStateSystem ss, int stackAttributeQuark) {
+        @Nullable Object curStackStateValue = ss.queryOngoing(stackAttributeQuark);
+
+        if (curStackStateValue == null) {
+            /* There is nothing stored in this stack at this moment */
+            return null;
+        }
+        if (!(curStackStateValue instanceof Integer)) {
+            throw new IllegalStateException(ss.getSSID() + " Quark:" + stackAttributeQuark + ", expected Integer.class, value was " + curStackStateValue.getClass()); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        int curStackDepth = (int) curStackStateValue;
+        if (curStackDepth <= 0) {
+            /*
+             * This attribute is an integer attribute, but it doesn't seem like
+             * it's used as a stack-attribute...
+             */
+            throw new IllegalStateException(ss.getSSID() + " Quark:" + stackAttributeQuark + ", invalid Stack depth:" + curStackDepth);  //$NON-NLS-1$//$NON-NLS-2$
+        }
+
+        try {
+            int subAttribQuark = ss.getQuarkRelative(stackAttributeQuark, String.valueOf(curStackDepth));
+            return ss.queryOngoing(subAttribQuark);
+        } catch (AttributeNotFoundException e) {
+            throw new IllegalStateException(ss.getSSID() + " Quark:" + stackAttributeQuark + ", expected subAttribute '" + curStackDepth + "' not found"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        }
+    }
+
+    /**
      * Return a list of state intervals, containing the "history" of a given
      * attribute between timestamps t1 and t2. The list will be ordered by
      * ascending time.

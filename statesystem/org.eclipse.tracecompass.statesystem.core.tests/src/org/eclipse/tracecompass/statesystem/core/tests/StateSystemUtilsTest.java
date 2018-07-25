@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2016 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2018 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.statesystem.core.StateSystemUtils.QuarkIterator;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
+import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -431,5 +432,67 @@ public class StateSystemUtilsTest {
             assertNotNull("Iterator should have returned at least one interval", currInterval);
             assertEquals(ss.getStartTime(), currInterval.getStartTime());
         }
+    }
+
+    /**
+     * Test the querySingleStackTop() method.
+     *
+     * @throws StateSystemDisposedException if an exception occurs
+     * @throws AttributeNotFoundException if an exception occurs
+     */
+    @Test
+    public void testQuerySingleStackTop() throws StateSystemDisposedException, AttributeNotFoundException {
+        IStateHistoryBackend backend = StateHistoryBackendFactory.createInMemoryBackend(DUMMY_STRING, START_TIME);
+        ITmfStateSystemBuilder ss = StateSystemFactory.newStateSystem(backend);
+        int quark = ss.getQuarkAbsoluteAndAdd(DUMMY_STRING);
+        ss.pushAttribute(1100L, "A", quark);
+        ss.pushAttribute(1200L, "B", quark);
+        ss.popAttribute(1300L, quark);
+        ss.popAttribute(1400L, quark);
+        ss.closeHistory(1500L);
+
+        ITmfStateInterval interval = StateSystemUtils.querySingleStackTop(ss, 1000L, quark);
+        assertEquals(null, interval);
+        interval = StateSystemUtils.querySingleStackTop(ss, 1100L, quark);
+        assertNotNull(interval);
+        assertEquals("A", interval.getValue());
+        assertEquals(1100L, interval.getStartTime());
+        assertEquals(1399L, interval.getEndTime());
+        interval = StateSystemUtils.querySingleStackTop(ss, 1200L, quark);
+        assertNotNull(interval);
+        assertEquals("B", interval.getValue());
+        assertEquals(1200L, interval.getStartTime());
+        assertEquals(1299L, interval.getEndTime());
+        interval = StateSystemUtils.querySingleStackTop(ss, 1300L, quark);
+        assertNotNull(interval);
+        assertEquals("A", interval.getValue());
+        assertEquals(1100L, interval.getStartTime());
+        assertEquals(1399L, interval.getEndTime());
+        interval = StateSystemUtils.querySingleStackTop(ss, 1400L, quark);
+        assertEquals(null, interval);
+
+        ss.dispose();
+    }
+
+    /**
+     * Test the queryOngoingStackTop() method.
+     */
+    @Test
+    public void testQueryOngoingStackTop() {
+        IStateHistoryBackend backend = StateHistoryBackendFactory.createInMemoryBackend(DUMMY_STRING, START_TIME);
+        ITmfStateSystemBuilder ss = StateSystemFactory.newStateSystem(backend);
+        int quark = ss.getQuarkAbsoluteAndAdd(DUMMY_STRING);
+        assertEquals(null, StateSystemUtils.queryOngoingStackTop(ss, quark));
+        ss.pushAttribute(1100L, "A", quark);
+        assertEquals("A", StateSystemUtils.queryOngoingStackTop(ss, quark));
+        ss.pushAttribute(1200L, "B", quark);
+        assertEquals("B", StateSystemUtils.queryOngoingStackTop(ss, quark));
+        ss.popAttribute(1300L, quark);
+        assertEquals("A", StateSystemUtils.queryOngoingStackTop(ss, quark));
+        ss.popAttribute(1400L, quark);
+        assertEquals(null, StateSystemUtils.queryOngoingStackTop(ss, quark));
+        ss.closeHistory(1500L);
+
+        ss.dispose();
     }
 }
