@@ -131,12 +131,11 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                         if (entry.getParentId() != -1) {
                             if (uiEntry == null) {
                                 uiEntry = new TimeGraphEntry(entry);
-                                fEntries.put(dataProvider, entry.getId(), uiEntry);
-
                                 TimeGraphEntry parent = fEntries.get(dataProvider, entry.getParentId());
                                 if (parent != null) {
                                     parent.addChild(uiEntry);
                                 }
+                                fEntries.put(dataProvider, entry.getId(), uiEntry);
                             } else {
                                 uiEntry.updateModel(entry);
                             }
