@@ -235,7 +235,7 @@ public class CtfTmfTrace extends TmfTrace
              * that type in the TmfEventTypeManager
              */
             try (CtfIterator iter = fIteratorManager.getIterator(ctx)) {
-                if(iter == null) {
+                if (iter == null) {
                     throw new TmfTraceException("Failed to get CTF Iterator for path " + path); //$NON-NLS-1$
                 }
                 Set<@NonNull ITmfEventField> streamContextNames = new HashSet<>();
@@ -315,10 +315,11 @@ public class CtfTmfTrace extends TmfTrace
     @Override
     public IStatus validate(final IProject project, final String path) {
         boolean isMetadataFile = false;
+        String pluginId = Activator.PLUGIN_ID;
         try {
             isMetadataFile = Metadata.preValidate(path);
         } catch (final CTFException e) {
-            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString(), e); //$NON-NLS-1$
+            return new Status(IStatus.ERROR, pluginId, Messages.CtfTmfTrace_ReadingError + ": " + e.toString(), e); //$NON-NLS-1$
         }
 
         if (isMetadataFile) {
@@ -327,9 +328,9 @@ public class CtfTmfTrace extends TmfTrace
                 final CTFTrace trace = new CTFTrace(path);
                 if (!trace.majorIsSet()) {
                     if (isMetadataFile) {
-                        return new TraceValidationStatus(MIN_CONFIDENCE, IStatus.WARNING, Activator.PLUGIN_ID, Messages.CtfTmfTrace_MajorNotSet, null);
+                        return new TraceValidationStatus(MIN_CONFIDENCE, IStatus.WARNING, pluginId, Messages.CtfTmfTrace_MajorNotSet, null);
                     }
-                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_MajorNotSet);
+                    return new Status(IStatus.ERROR, pluginId, Messages.CtfTmfTrace_MajorNotSet);
                 }
 
                 // Validate using reader initialization
@@ -337,15 +338,23 @@ public class CtfTmfTrace extends TmfTrace
                     // do nothing
                 }
 
+                // Get contained event names
+                Collection<String> eventNames = new HashSet<>();
+                for (ICTFStream stream : trace.getStreams()) {
+                    for (IEventDeclaration ed : trace.getEventDeclarations(stream.getId())) {
+                        eventNames.add(ed.getName());
+                    }
+                }
+
                 // Trace is validated, return with confidence
-                return new CtfTraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID, trace.getEnvironment());
+                return new CtfTraceValidationStatus(CONFIDENCE, pluginId, trace.getEnvironment(), eventNames);
 
             } catch (final CTFException | BufferOverflowException e) {
                 // return warning since it's a CTF trace but with errors in it
-                return new TraceValidationStatus(MIN_CONFIDENCE, IStatus.WARNING, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError + ": " + e.toString(), e); //$NON-NLS-1$
+                return new TraceValidationStatus(MIN_CONFIDENCE, IStatus.WARNING, pluginId, Messages.CtfTmfTrace_ReadingError + ": " + e.toString(), e); //$NON-NLS-1$
             }
         }
-        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.CtfTmfTrace_ReadingError);
+        return new Status(IStatus.ERROR, pluginId, Messages.CtfTmfTrace_ReadingError);
     }
 
     @Override
@@ -561,7 +570,7 @@ public class CtfTmfTrace extends TmfTrace
     public Map<String, String> getProperties() {
         Map<String, String> properties = new HashMap<>();
         CTFTrace trace = fTrace;
-        if( trace == null) {
+        if (trace == null) {
             return properties;
         }
         properties.putAll(trace.getEnvironment());
@@ -613,7 +622,7 @@ public class CtfTmfTrace extends TmfTrace
      */
     public long timestampNanoToCycles(long nanos) {
         CTFTrace trace = fTrace;
-        if( trace != null) {
+        if (trace != null) {
             return trace.timestampNanoToCycles(nanos);
         }
         return 0;
