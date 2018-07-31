@@ -85,8 +85,8 @@ public class ImportAndReadKernelSmokeTest extends KernelTestBase {
         map.put("Context switch", Collections.emptySet());
         map.put("Kernel memory usage", Collections.emptySet());
         map.put("CPU usage", Collections.singleton("org.eclipse.tracecompass.analysis.os.linux.cpuusage"));
-        map.put("XML Futex Contention Analysis", Collections.emptySet());
-        map.put("XML IRQ Analysis", Collections.emptySet());
+        map.put("Futex Contention Analysis", Collections.emptySet());
+        map.put("IRQ Analysis", Collections.emptySet());
         EXPECTED_ANALYSES = map.entrySet();
     }
 

@@ -39,7 +39,7 @@
     <pattern version="0" id="lttng.analysis.irq">
         <head>
             <traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
-            <label value="XML IRQ Analysis"/>
+            <label value="IRQ Analysis"/>
             <viewLabelPrefix value="IRQ" />
         </head>
 

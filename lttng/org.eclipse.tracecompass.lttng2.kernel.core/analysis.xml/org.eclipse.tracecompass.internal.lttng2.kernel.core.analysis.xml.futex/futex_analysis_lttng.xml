@@ -97,7 +97,7 @@ TRYLOCK_PI	136		264
 <pattern version="0" id="lttng.analysis.futex">
 	<head>
 		<traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
-		<label value="XML Futex Contention Analysis" />
+		<label value="Futex Contention Analysis" />
 		<viewLabelPrefix value="Contention" />
 	</head>
 
