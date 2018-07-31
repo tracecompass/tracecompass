@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
  * TODO: Is that true? the reverse pyramid?
  *
  * @author Geneviève Bastien
+ * @since 1.1
  */
 public class CallStack {
 

@@ -41,7 +41,8 @@ import com.google.common.collect.ImmutableList;
  */
 public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule implements IFlameChartProvider {
 
-    /** CallStack stack-attribute */
+    /** CallStack stack-attribute
+     * @since 1.1*/
     public static final String CALL_STACK = "CallStack"; //$NON-NLS-1$
 
     private static final String[] DEFAULT_PROCESSES_PATTERN = new String[] { CallStackStateProvider.PROCESSES, "*" }; //$NON-NLS-1$
@@ -128,6 +129,7 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
      * analysis has another pattern hierarchy, this method should be overridden.
      *
      * @return The patterns for the different levels in the state system
+     * @since 1.1
      */
     protected List<String[]> getPatterns() {
         return fPatterns;
@@ -189,6 +191,7 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
      * @param trace
      *            The trace this analysis is run on
      * @return The host ID resolver
+     * @since 1.1
      */
     protected TraceHostIdResolver getCallStackHostResolver(ITmfTrace trace) {
         return new CallStackHostUtils.TraceHostIdResolver(trace);
@@ -199,6 +202,7 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
      * to use the name of the second attribute as the thread ID.
      *
      * @return The thread ID resolver
+     * @since 1.1
      */
     protected @Nullable IThreadIdResolver getCallStackTidResolver() {
         return new CallStackSeries.AttributeValueThreadResolver(1);
@@ -232,6 +236,7 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
      * Returns all the listeners
      *
      * @return latency listeners
+     * @since 1.1
      */
     protected Iterable<IAnalysisProgressListener> getListeners() {
         List<IAnalysisProgressListener> listeners = new ArrayList<>();
@@ -248,6 +253,7 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
      *
      * @param store
      *            The segment store to broadcast
+     * @since 1.1
      */
     protected void sendUpdate(final ISegmentStore<ISegment> store) {
         for (IAnalysisProgressListener listener : getListeners()) {

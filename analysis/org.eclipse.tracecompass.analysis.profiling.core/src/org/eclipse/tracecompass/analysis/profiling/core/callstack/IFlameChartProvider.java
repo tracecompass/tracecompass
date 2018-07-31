@@ -26,6 +26,9 @@ public interface IFlameChartProvider extends IAnalysisModule, ISegmentStoreProvi
      * Get the callstacks series provided by this analysis.
      *
      * @return The callstack series or null if it is not available yet
+     * @since 1.1
      */
-    @Nullable CallStackSeries getCallStackSeries();
+    default @Nullable CallStackSeries getCallStackSeries() {
+        return null;
+    }
 }

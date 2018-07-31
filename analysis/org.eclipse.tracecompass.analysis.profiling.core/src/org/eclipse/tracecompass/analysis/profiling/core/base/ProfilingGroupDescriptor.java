@@ -15,6 +15,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * A basic group descriptor implementation.
  *
  * @author Geneviève Bastien
+ * @since 1.1
  */
 public class ProfilingGroupDescriptor implements IProfilingGroupDescriptor {
 

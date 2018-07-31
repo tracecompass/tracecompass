@@ -86,6 +86,7 @@ import com.google.common.collect.Iterators;
  * by other types of flame chart providers, for instance, XML generated ones.
  *
  * @author Geneviève Bastien
+ * @since 1.1
  */
 public class CallStackSeries implements ISegmentStore<ISegment> {
 

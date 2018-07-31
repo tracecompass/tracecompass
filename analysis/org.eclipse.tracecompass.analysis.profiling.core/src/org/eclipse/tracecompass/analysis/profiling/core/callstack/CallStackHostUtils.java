@@ -29,6 +29,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * callstack analyses.
  *
  * @author Geneviève Bastien
+ * @since 1.1
  */
 public final class CallStackHostUtils {
 

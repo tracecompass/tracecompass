@@ -18,6 +18,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * A basic callstack element implementing the methods of the interface.
  *
  * @author Geneviève Bastien
+ * @since 1.1
  */
 public class ProfilingElement implements IProfilingElement {
 

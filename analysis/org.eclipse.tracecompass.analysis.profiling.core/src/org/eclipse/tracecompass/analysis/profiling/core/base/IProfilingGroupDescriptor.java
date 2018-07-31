@@ -55,6 +55,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * "[pid]" would be the symbol key group, used to resolve the symbols.
  *
  * @author Geneviève Bastien
+ * @since 1.1
  */
 public interface IProfilingGroupDescriptor {
 

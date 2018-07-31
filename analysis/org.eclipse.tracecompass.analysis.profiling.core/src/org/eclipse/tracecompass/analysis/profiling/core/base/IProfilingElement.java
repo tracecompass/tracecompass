@@ -23,6 +23,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * will be available only at the leaf elements.
  *
  * @author Geneviève Bastien
+ * @since 1.1
  */
 public interface IProfilingElement {
 
