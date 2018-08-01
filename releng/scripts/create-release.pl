@@ -30,7 +30,6 @@ sub debug($)
     my $what = shift;
     print STDERR "$what\n"  if $::gVerbose;
 }
-
 sub usage()
 {
     print <<USAGE;
@@ -39,20 +38,20 @@ sub usage()
     Creating milestone builds and storing the relevant artifacts and doc
     in the corresponding directory.
 
-    Note: to make a release, at least rc1 and rc4 have to be created.
+    Note: to make a release, at least rc1 and rc2 have to be created.
 
     where:
         -v:             verbose mode
         -h:             print usage
         simRelName:     name of simultaneous release (e.g. neon, oxygen)
         updateRelease:  number of update release 0-3
-        milestone:      m1, m2 .. m7, rc1 .. rc4 or release (at release time)
-        release nubmer: the actual release number (e.g. 2.3.0)
+        milestone:      m1, m2, m3, rc1, rc2 or release (at release time)
+        release nubmer: the actual release number (e.g. 4.1.0)
 
     Examples:
-        ./create-release.pl -v neon 0 m1 2.0.0
-        ./create-release.pl -v neon 0 rc1 2.0.0
-        ./create-release.pl -v neon 3 release 2.3.0
+        ./create-release.pl -v photon 0 m1 4.0.0
+        ./create-release.pl -v photon 0 rc1 4.0.0
+        ./create-release.pl -v photon 3 release 4.3.0
 USAGE
 exit;
 }
@@ -208,34 +207,6 @@ Bernd\
         from   => $::gMasterRepositoryDir,
         to     => $::gMilestoneDir,
         email  => $::gMileStoneEmailBase,
-        addon  => "Trace Compass $::gTraceCompassRelease/$::gSimReleaseNameUpperCase.$::gUpdateRelease M4 will be <TODO>\n".$::gGreeting,
-        reminder => $::gReminders
-    },
-    "m4" => {
-        from    => $::gMasterRepositoryDir,
-        to      => $::gMilestoneDir,
-        email   => $::gMileStoneEmailBase,
-        addon   => "Trace Compass $::gTraceCompassRelease/$::gSimReleaseNameUpperCase.$::gUpdateRelease M5 will be <TODO>\n".$::gGreeting,
-        reminder => $::gReminders
-    },
-    "m5" => {
-        from    => $::gMasterRepositoryDir,
-        to      => $::gMilestoneDir,
-        email   => $::gMileStoneEmailBase,
-        addon   => "Trace Compass $::gTraceCompassRelease/$::gSimReleaseNameUpperCase.$::gUpdateRelease M6 will be <TODO>\n".$::gGreeting,
-        reminder => $::gReminders
-    },
-    "m6" => {
-        from   => $::gMasterRepositoryDir,
-        to     => $::gMilestoneDir,
-        email  => $::gMileStoneEmailBase,
-        addon  => "Trace Compass $::gTraceCompassRelease/$::gSimReleaseNameUpperCase.$::gUpdateRelease M7 will be <TODO>\n".$::gGreeting,
-        reminder => $::gReminders
-    },
-    "m7" => {
-        from   => $::gMasterRepositoryDir,
-        to     => $::gMilestoneDir,
-        email  => $::gMileStoneEmailBase,
         addon  => "Trace Compass $::gTraceCompassRelease/$::gSimReleaseNameUpperCase.$::gUpdateRelease RC1 will be <TODO>\
 \
 Reminder: RC1 will be API and feature freeze for this release.\n".$::gGreeting,
@@ -257,6 +228,7 @@ $::gSimRelStableRcpDir\
 I've also created the release branch $::gStableBranchName.\
 \
 Trace Compass $::gTraceCompassRelease/$::gSimReleaseNameUpperCase.$::gUpdateRelease RC2 will be <TODO>\
+RC2 will be the final build for this release.\
 \
 Reminders:
   - RC1 is API and feature freeze for this release.
@@ -269,26 +241,6 @@ $::gGreeting",
 - Update and enable tracecompass-stable-release-nightly-new job on Hudson to build $::gStableBranchName branch\n",
     },
     "rc2" => {
-        from   => $::gSimRelStableRepositoryDir,
-        to     => $::gMilestoneDir,
-        email  => $::gMileStoneEmailBase,
-        addon  => "The corresponding RCP can be downloaded from:
-$::gSimRelStableRcpDir\
-$::gGreeting",
-        reminder => $::gReminders,
-    },
-    "rc3" => {
-        from   => $::gSimRelStableRepositoryDir,
-        to     => $::gMilestoneDir,
-        email  =>   $::gMileStoneEmailBase,
-        addon  => "The corresponding RCP can be downloaded from:
-$::gSimRelStableRcpDir\
-\
-RC4 will be the final build for this release.\
-$::gGreeting",
-        reminder => $::gReminders,
-    },
-    "rc4" => {
         from          => $::gSimRelStableRepositoryDir,
         to            => $::gMilestoneDir,
         fromArtifacts => $::gSimRelStableDir,
@@ -328,7 +280,7 @@ $::gGreeting",
 );
 
 ################################################################################
-# Validate milestone paramter and if relevant directories exists
+# Validate milestone parameter and if relevant directories exists
 ################################################################################
 if (!defined $::G_MILESTONES_HASH{$::gMilestone})
 {
