@@ -51,15 +51,17 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
 
     private static final Logger LOGGER = TraceCompassLog.getLogger(AbstractTmfStateProvider.class);
 
-    private static final class FutureValue {
+    private static final class FutureEvent {
         private final long fTime;
         private final @Nullable Object fValue;
         private final int fQuark;
+        private final FutureEventType fType;
 
-        public FutureValue(long time, @Nullable Object futureValue, int quark) {
+        public FutureEvent(long time, @Nullable Object futureValue, int quark, FutureEventType type) {
             fTime = time;
             fValue = futureValue;
             fQuark = quark;
+            fType = type;
         }
 
         public long getTime() {
@@ -92,7 +94,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
         // threads
     };
 
-    private final Queue<FutureValue> fFutureValues = new PriorityQueue<>(Comparator.comparingLong(FutureValue::getTime));
+    private final Queue<FutureEvent> fFutureEvents = new PriorityQueue<>(Comparator.comparingLong(FutureEvent::getTime));
 
     /**
      * Instantiate a new state provider plugin.
@@ -304,6 +306,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
                  * compile-time until Java 8 annotations...
                  */
                 ITmfEvent event = fEventsQueue.take();
+
                 /* This is a singleton, we want to do != instead of !x.equals */
                 while (event != END_EVENT) {
                     if (event == EMPTY_QUEUE_EVENT) {
@@ -318,14 +321,16 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
                     if (stateSystemBuilder == null) {
                         return;
                     }
-                    FutureValue futureValue = fFutureValues.peek();
-                    while (futureValue != null && (currentTime >= futureValue.fTime)) {
-                        futureValue = fFutureValues.poll();
-                        if (futureValue != null) {
-                            stateSystemBuilder.modifyAttribute(futureValue.fTime, futureValue.fValue, futureValue.fQuark);
+                    FutureEvent futureEvent = fFutureEvents.peek();
+                    while (futureEvent != null && (currentTime >= futureEvent.fTime)) {
+                        futureEvent = fFutureEvents.poll();
+                        if (futureEvent != null) {
+                            applyFutureEvent(futureEvent, stateSystemBuilder);
                         }
+                        futureEvent = fFutureEvents.peek();
                     }
                     eventHandle(event);
+
                     event = fEventsQueue.take();
                 }
                 fDone = true;
@@ -336,13 +341,37 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
                 if (stateSystemBuilder == null) {
                     return;
                 }
-                while (!fFutureValues.isEmpty()) {
-                    FutureValue interval = fFutureValues.remove();
-                    stateSystemBuilder.modifyAttribute(interval.fTime, interval.fValue, interval.fQuark);
+
+                while (!fFutureEvents.isEmpty()) {
+                    FutureEvent futureEvent = fFutureEvents.peek();
+                    while (futureEvent != null) {
+                        futureEvent = fFutureEvents.poll();
+                        if (futureEvent != null) {
+                            applyFutureEvent(futureEvent, stateSystemBuilder);
+                        }
+                        futureEvent = fFutureEvents.peek();
+                    }
                 }
                 /* We've received the last event, clean up */
                 done();
                 closeStateSystem();
+            }
+
+        }
+
+        private void applyFutureEvent(FutureEvent futureEvent, ITmfStateSystemBuilder stateSystemBuilder) {
+            switch (futureEvent.fType) {
+            case MODIFICATION:
+                stateSystemBuilder.modifyAttribute(futureEvent.fTime, futureEvent.fValue, futureEvent.fQuark);
+                break;
+            case PUSH:
+                stateSystemBuilder.pushAttribute(futureEvent.fTime, futureEvent.fValue, futureEvent.fQuark);
+                break;
+            case POP:
+                stateSystemBuilder.popAttributeObject(futureEvent.fTime, futureEvent.fQuark);
+                break;
+            default:
+                break;
             }
         }
 
@@ -390,7 +419,12 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
 
     @Override
     public void addFutureEvent(long time, @Nullable Object futureValue, int attribute) {
-        fFutureValues.add(new FutureValue(time, futureValue, attribute));
+        addFutureEvent(time, futureValue, attribute, FutureEventType.MODIFICATION);
+    }
+
+    @Override
+    public void addFutureEvent(long time, @Nullable Object futureValue, int attribute, FutureEventType type) {
+        fFutureEvents.add(new FutureEvent(time, futureValue, attribute, type));
     }
 
     // ------------------------------------------------------------------------

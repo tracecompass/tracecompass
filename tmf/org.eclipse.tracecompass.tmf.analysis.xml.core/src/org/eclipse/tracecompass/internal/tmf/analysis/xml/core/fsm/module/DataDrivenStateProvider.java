@@ -113,7 +113,7 @@ public class DataDrivenStateProvider extends AbstractTmfStateProvider implements
 
     @Override
     public void addFutureState(long time, @Nullable Object state, int quark) {
-        this.addFutureEvent(time, state, quark);
+        this.addFutureEvent(time, state, quark, FutureEventType.MODIFICATION);
     }
 
     @Override
