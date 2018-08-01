@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.cpuusage;
 
+import java.text.Format;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -19,10 +20,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageEntryModel;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.CpuUsageDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectedCpuQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
@@ -45,6 +46,8 @@ import com.google.common.collect.Iterables;
  */
 public class CpuUsageTreeViewer extends AbstractSelectTreeViewer {
 
+    private static final Format TIME_FORMATTER = new SubSecondTimeWithUnitFormat();
+
     /** Provides label for the CPU usage tree viewer cells */
     protected class CpuLabelProvider extends TreeLabelProvider {
 
@@ -63,7 +66,7 @@ public class CpuUsageTreeViewer extends AbstractSelectTreeViewer {
                 } else if (columnIndex == 2) {
                     return String.format(Messages.CpuUsageComposite_TextPercent, 100 * obj.getPercent());
                 } else if (columnIndex == 3) {
-                    return NLS.bind(Messages.CpuUsageComposite_TextTime, obj.getModel().getTime());
+                    return TIME_FORMATTER.format(obj.getModel().getTime());
                 }
             }
             return null;
