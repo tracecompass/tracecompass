@@ -203,4 +203,15 @@ public interface ITimeEventStyleStrings {
     static String annotated() {
         return ".annotated"; //$NON-NLS-1$
     }
+
+    /**
+     * Indicate that the item has a symbol style associated to it.
+     * Values associated to it are defined in {@link org.eclipse.tracecompass.tmf.core.presentation.IYAppearance.SymbolStyle}
+     *
+     * @return the key associated to the symbol style.
+     * @since 4.1
+     */
+    static String symbolStyle() {
+        return ".symbol.style"; //$NON-NLS-1$
+    }
 }

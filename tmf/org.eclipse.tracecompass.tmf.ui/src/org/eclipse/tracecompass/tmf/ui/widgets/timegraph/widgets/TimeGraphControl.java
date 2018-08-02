@@ -78,6 +78,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -90,7 +91,9 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.internal.tmf.ui.util.LineClipper;
+import org.eclipse.tracecompass.internal.tmf.ui.util.SymbolHelper;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
+import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
@@ -2180,6 +2183,52 @@ public class TimeGraphControl extends TimeGraphBaseControl
         rect.x = Math.max(nameSpace, Math.min(bounds.width, x0));
         rect.width = Math.max(1, Math.min(bounds.width, x1) - rect.x);
 
+        Map<String, Object> style = fTimeGraphProvider.getEventStyle(marker);
+        if (style != null && !style.isEmpty()) {
+            Object rgbaObj = style.get(ITimeEventStyleStrings.fillColor());
+            RGBA rgba = null;
+            if (rgbaObj instanceof Integer) {
+                rgba = RGBAUtil.fromInt((int) rgbaObj);
+            } else {
+                rgba = marker.getColor();
+            }
+            RGB rgb = rgba.rgb;
+            COLOR_REGISTRY.put(rgb.toString(), rgb);
+            Color color = COLOR_REGISTRY.get(rgb.toString());
+            Object symbolType = style.get(ITimeEventStyleStrings.symbolStyle());
+            if (symbolType != null) {
+                gc.setAlpha(rgba.alpha);
+                float heightFactor = (float) style.getOrDefault(ITimeEventStyleStrings.heightFactor(), 1.0f);
+                int symbolSize = (int) Math.ceil(rect.height * heightFactor);
+                switch (String.valueOf(symbolType)) {
+                case IYAppearance.SymbolStyle.CROSS:
+                    SymbolHelper.drawCross(gc, color, symbolSize, rect.x, rect.y + rect.height / 2);
+                    break;
+                case IYAppearance.SymbolStyle.PLUS:
+                    SymbolHelper.drawPlus(gc, color, symbolSize, rect.x, rect.y + rect.height / 2);
+                    break;
+                case IYAppearance.SymbolStyle.SQUARE:
+                    SymbolHelper.drawSquare(gc, color, symbolSize, rect.x, rect.y + rect.height / 2);
+                    break;
+                case IYAppearance.SymbolStyle.TRIANGLE:
+                    SymbolHelper.drawTriangle(gc, color, symbolSize, rect.x, rect.y + rect.height / 2);
+                    break;
+                case IYAppearance.SymbolStyle.INVERTED_TRIANGLE:
+                    SymbolHelper.drawInvertedTriangle(gc, color, symbolSize, rect.x, rect.y + rect.height / 2);
+                    break;
+                case IYAppearance.SymbolStyle.CIRCLE:
+                    SymbolHelper.drawCircle(gc, color, symbolSize, rect.x, rect.y + rect.height / 2);
+                    break;
+                default:
+                    SymbolHelper.drawDiamond(gc, color, symbolSize, rect.x, rect.y + rect.height / 2);
+                }
+                gc.setAlpha(OPAQUE);
+            }
+        }
+        oldDrawMarker(marker, gc, rect);
+    }
+
+    private void oldDrawMarker(IMarkerEvent marker, GC gc, Rectangle rect) {
         Color color = getColorScheme().getColor(marker.getColor());
         gc.setBackground(color);
         gc.setAlpha(color.getAlpha());
