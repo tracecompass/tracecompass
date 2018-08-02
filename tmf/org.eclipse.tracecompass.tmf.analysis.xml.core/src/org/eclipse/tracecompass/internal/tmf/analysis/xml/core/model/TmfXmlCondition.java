@@ -144,7 +144,7 @@ public class TmfXmlCondition implements ITmfXmlCondition {
             } else {
                 // No need to test if the childElements size is actually 2.
                 // The XSD validation do this check already.
-                conditionOperator = ConditionOperator.EQ;
+                conditionOperator = getConditionOperator(rootNode);
                 stateValues.add(modelFactory.createStateValue(NonNullUtils.checkNotNull(childElements.get(0)), container, new ArrayList<ITmfXmlStateAttribute>()));
                 stateValues.add(modelFactory.createStateValue(NonNullUtils.checkNotNull(childElements.get(1)), container, new ArrayList<ITmfXmlStateAttribute>()));
             }
@@ -302,7 +302,7 @@ public class TmfXmlCondition implements ITmfXmlCondition {
         /* Get the two values needed for the comparison */
         ITmfStateValue valuesXML1 = fStateValues.get(0).getValue(event, scenarioInfo);
         ITmfStateValue valuesXML2 = fStateValues.get(1).getValue(event, scenarioInfo);
-        return valuesXML1.equals(valuesXML2);
+        return compare(valuesXML1, valuesXML2, fConditionOperator);
     }
 
     @Override

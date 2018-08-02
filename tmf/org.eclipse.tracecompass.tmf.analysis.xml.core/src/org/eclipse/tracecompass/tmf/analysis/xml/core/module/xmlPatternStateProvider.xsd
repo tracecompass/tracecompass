@@ -255,6 +255,33 @@
 			</xs:sequence>
 
 		</xs:choice>
+
+		<xs:attribute name="operator" default="eq">
+			<xs:annotation>
+				<xs:documentation>Indicate that a comparison operation will be performed with the value</xs:documentation></xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="eq">
+						<xs:annotation>
+							<xs:documentation>The operation type is to check if two values are equal</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="ne">
+						<xs:annotation>
+							<xs:documentation>The operation type is to check if two values are not equal</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="ge">
+						<xs:annotation>
+							<xs:documentation>The operation type is to check if the first value is greater than or equal the second one</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="gt">
+						<xs:annotation>
+							<xs:documentation>The operation type is to check if the first value is greater than the second one</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="le">
+						<xs:annotation>
+							<xs:documentation>The operation type is to check if the first value is smaller than or equal the second one</xs:documentation></xs:annotation></xs:enumeration>
+					<xs:enumeration value="lt">
+						<xs:annotation>
+							<xs:documentation>The operation type is to check if the first value is smaller than the second one</xs:documentation></xs:annotation></xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="timeRangeSingleCondition">
