@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,7 +58,6 @@ public class TmfAggregateAnalysisElement extends TmfAnalysisElement {
         for (TmfAnalysisElement analysis : fContainedAnalyses) {
             analysis.refreshChildren();
         }
-        super.refreshChildren();
     }
 
     @Override
@@ -152,5 +152,30 @@ public class TmfAggregateAnalysisElement extends TmfAnalysisElement {
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean hasChildren() {
+        for (TmfAnalysisElement analysis : fContainedAnalyses) {
+            if (analysis.hasChildren()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public List<ITmfProjectModelElement> getChildren() {
+        for (TmfAnalysisElement analysis : fContainedAnalyses) {
+            if (analysis.hasChildren()) {
+                return analysis.getChildren();
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    public TmfViewsElement getParent() {
+        return fExperimentParent.getChildElementViews();
     }
 }
