@@ -88,9 +88,8 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
     public StateItem[] getStateTable() {
         if (STATE_TABLE[1] == null) {
             int i = 1;
-            String exec = State.EXEC.toString();
             for (RGBAColor color : fPalette.get()) {
-                STATE_TABLE[i] = new StateItem(RGBAUtil.fromRGBAColor(color).rgb, exec);
+                STATE_TABLE[i] = new StateItem(RGBAUtil.fromRGBAColor(color).rgb, color.toString());
                 i++;
             }
         }
