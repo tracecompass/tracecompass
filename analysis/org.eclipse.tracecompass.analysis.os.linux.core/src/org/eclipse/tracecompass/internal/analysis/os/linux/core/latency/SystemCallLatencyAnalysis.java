@@ -47,9 +47,11 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
      * The ID of this analysis
      */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.latency.syscall"; //$NON-NLS-1$
+    private static final String RET_FIELD = "ret"; //$NON-NLS-1$
+    private static final int VERSION = 2;
 
     private static final Collection<ISegmentAspect> BASE_ASPECTS =
-            ImmutableList.of(SyscallNameAspect.INSTANCE);
+            ImmutableList.of(SyscallNameAspect.INSTANCE, SyscallTidAspect.INSTANCE, SyscallRetAspect.INSTANCE);
 
     @Override
     public String getId() {
@@ -72,6 +74,11 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
     @Override
     public Iterable<ISegmentAspect> getSegmentAspects() {
         return BASE_ASPECTS;
+    }
+
+    @Override
+    protected int getVersion() {
+        return VERSION;
     }
 
     @Override
@@ -131,7 +138,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
                 long startTime = event.getTimestamp().toNanos();
                 String syscallName = eventName.substring(layout.eventSyscallEntryPrefix().length());
 
-                SystemCall.InitialInfo newSysCall = new SystemCall.InitialInfo(startTime, syscallName.intern());
+                SystemCall.InitialInfo newSysCall = new SystemCall.InitialInfo(startTime, syscallName.intern(), tid);
                 fOngoingSystemCalls.put(tid, newSysCall);
 
             } else if (eventName.startsWith(layout.eventSyscallExitPrefix())) {
@@ -157,7 +164,8 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
                 }
 
                 long endTime = event.getTimestamp().toNanos();
-                SystemCall syscall = new SystemCall(info, endTime);
+                Integer ret = event.getContent().getFieldValue(Integer.class, RET_FIELD);
+                SystemCall syscall = new SystemCall(info, endTime, ret == null ? -1 : ret);
                 getSegmentStore().add(syscall);
             }
         }
@@ -198,6 +206,58 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
                 return ((SystemCall) segment).getName();
             }
             return EMPTY_STRING;
+        }
+    }
+
+    private static final class SyscallTidAspect implements ISegmentAspect {
+        public static final ISegmentAspect INSTANCE = new SyscallTidAspect();
+
+        private SyscallTidAspect() { }
+
+        @Override
+        public String getHelpText() {
+            return checkNotNull(Messages.SegmentAspectHelpText_SystemCallTid);
+        }
+        @Override
+        public String getName() {
+            return checkNotNull(Messages.SegmentAspectName_SystemCallTid);
+        }
+        @Override
+        public @Nullable Comparator<?> getComparator() {
+            return null;
+        }
+        @Override
+        public @Nullable Integer resolve(ISegment segment) {
+            if (segment instanceof SystemCall) {
+                return ((SystemCall) segment).getTid();
+            }
+            return -1;
+        }
+    }
+
+    private static final class SyscallRetAspect implements ISegmentAspect {
+        public static final ISegmentAspect INSTANCE = new SyscallRetAspect();
+
+        private SyscallRetAspect() { }
+
+        @Override
+        public String getHelpText() {
+            return checkNotNull(Messages.SegmentAspectHelpText_SystemCallRet);
+        }
+        @Override
+        public String getName() {
+            return checkNotNull(Messages.SegmentAspectName_SystemCallRet);
+        }
+        @Override
+        public @Nullable Comparator<?> getComparator() {
+            return null;
+        }
+        @Override
+        public @Nullable Integer resolve(ISegment segment) {
+            if (segment instanceof SystemCall) {
+                return ((SystemCall) segment).getReturnValue();
+            }
+            return -1;
         }
     }
 

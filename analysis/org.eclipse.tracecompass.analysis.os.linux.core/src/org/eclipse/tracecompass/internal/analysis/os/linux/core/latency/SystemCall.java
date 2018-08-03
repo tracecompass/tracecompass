@@ -29,7 +29,7 @@ public final class SystemCall implements INamedSegment {
     /**
      * The reader for this segment class
      */
-    public static final IHTIntervalReader<ISegment> READER = buffer -> new SystemCall(buffer.getLong(), buffer.getLong(), buffer.getString());
+    public static final IHTIntervalReader<ISegment> READER = buffer -> new SystemCall(buffer.getLong(), buffer.getLong(), buffer.getString(), buffer.getInt(), buffer.getInt());
 
     /**
      * The subset of information that is available from the syscall entry event.
@@ -38,43 +38,56 @@ public final class SystemCall implements INamedSegment {
 
         private long fStartTime;
         private String fName;
+        private int fTid;
 
         /**
          * @param startTime
          *            Start time of the system call
          * @param name
          *            Name of the system call
+         * @param tid
+         *            The TID of the thread running this sytem call
          */
         public InitialInfo(
                 long startTime,
-                String name) {
+                String name,
+                int tid) {
             fStartTime = startTime;
             fName = name.intern();
+            fTid = tid;
         }
     }
 
     private final long fStartTime;
     private final long fEndTime;
     private final String fName;
+    private final int fTid;
+    private final int fRet;
 
     /**
      * @param info
      *            Initial information of the system call
      * @param endTime
      *            End time of the system call
+     * @param ret
+     *            The return value of the system call
      */
     public SystemCall(
             InitialInfo info,
-            long endTime) {
+            long endTime, int ret) {
         fStartTime = info.fStartTime;
         fName = info.fName;
         fEndTime = endTime;
+        fTid = info.fTid;
+        fRet = ret;
     }
 
-    private SystemCall(long startTime, long endTime, String name) {
+    private SystemCall(long startTime, long endTime, String name, int tid, int ret) {
         fStartTime = startTime;
         fEndTime = endTime;
         fName = name;
+        fTid = tid;
+        fRet = ret;
     }
 
     @Override
@@ -97,9 +110,27 @@ public final class SystemCall implements INamedSegment {
         return fName;
     }
 
+    /**
+     * Get the thread ID for this syscall
+     *
+     * @return The ID of the thread
+     */
+    public int getTid() {
+        return fTid;
+    }
+
+    /**
+     * Get the return value of the system call
+     *
+     * @return The return value of this syscall
+     */
+    public int getReturnValue() {
+        return fRet;
+    }
+
     @Override
     public int getSizeOnDisk() {
-        return 2 * Long.BYTES + SafeByteBufferFactory.getStringSizeInBuffer(fName);
+        return 2 * Long.BYTES + SafeByteBufferFactory.getStringSizeInBuffer(fName) + 2 * Integer.BYTES;
     }
 
     @Override
@@ -107,6 +138,8 @@ public final class SystemCall implements INamedSegment {
         buffer.putLong(fStartTime);
         buffer.putLong(fEndTime);
         buffer.putString(fName);
+        buffer.putInt(fTid);
+        buffer.putInt(fRet);
     }
 
     @Override

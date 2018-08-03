@@ -27,6 +27,18 @@ public class Messages extends NLS {
     /** System Call latency analysis aspect help text */
     public static @Nullable String SegmentAspectHelpText_SystemCall;
 
+    /** System Call latency analysis aspect name */
+    public static @Nullable String SegmentAspectName_SystemCallTid;
+
+    /** System Call latency analysis aspect help text */
+    public static @Nullable String SegmentAspectHelpText_SystemCallTid;
+
+    /** System Call latency analysis aspect name */
+    public static @Nullable String SegmentAspectName_SystemCallRet;
+
+    /** System Call latency analysis aspect help text */
+    public static @Nullable String SegmentAspectHelpText_SystemCallRet;
+
     static {
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
     }
