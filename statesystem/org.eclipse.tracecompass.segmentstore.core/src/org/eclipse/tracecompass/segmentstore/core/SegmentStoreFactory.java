@@ -139,9 +139,30 @@ public final class SegmentStoreFactory<E> {
      * @throws IOException
      *             Exceptions when creating the segment store
      * @since 2.0
+     * @deprecated Use the {@link #createOnDiskSegmentStore(Path, IHTIntervalReader, int)} instead
      */
+    @Deprecated
     public static <E extends ISegment> ISegmentStore<E> createOnDiskSegmentStore(Path segmentFile, IHTIntervalReader<E> segmentReader) throws IOException {
-        return new HistoryTreeSegmentStore<>(segmentFile, segmentReader);
+        return createOnDiskSegmentStore(segmentFile, segmentReader, 1);
+    }
+
+    /**
+     * SegmentStore factory method that creates a segment store on disk
+     *
+     * @param segmentFile
+     *            The file where to store the segments
+     * @param segmentReader
+     *            The factory to read the segments from a safe byte buffer
+     * @param version
+     *            The version number of the segment reader/writer
+     *
+     * @return an {@link ISegmentStore}
+     * @throws IOException
+     *             Exceptions when creating the segment store
+     * @since 2.1
+     */
+    public static <E extends ISegment> ISegmentStore<E> createOnDiskSegmentStore(Path segmentFile, IHTIntervalReader<E> segmentReader, int version) throws IOException {
+        return new HistoryTreeSegmentStore<>(segmentFile, segmentReader, version);
     }
 
     private static Set<@NonNull SegmentStoreType> getListOfFlags(SegmentStoreType... segmentTypes) {

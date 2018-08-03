@@ -404,14 +404,15 @@ public class SegmentTableTest {
     /**
      * Test table with an on-disk segment store that is lazy loaded in the table
      *
-     * @throws IOException
+     * @throws IOException Exception thrown by file
      */
     @Test
     public void onDiskSegStoreTest() throws IOException {
         Path segmentFile = Files.createTempFile("tmpSegStore", ".tmp");
+        assertNotNull(segmentFile);
         try {
             final int size = 1000000;
-            ISegmentStore<@NonNull BasicSegment> fixture = SegmentStoreFactory.createOnDiskSegmentStore(segmentFile, BasicSegment.BASIC_SEGMENT_READ_FACTORY);
+            ISegmentStore<@NonNull BasicSegment> fixture = SegmentStoreFactory.createOnDiskSegmentStore(segmentFile, BasicSegment.BASIC_SEGMENT_READ_FACTORY, 1);
             for (int i = 0; i < size; i++) {
                 fixture.add(new BasicSegment(i, 2 * i));
             }

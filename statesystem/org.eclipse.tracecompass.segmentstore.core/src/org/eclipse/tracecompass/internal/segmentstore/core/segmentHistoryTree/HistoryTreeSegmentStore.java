@@ -42,7 +42,6 @@ import com.google.common.collect.Iterables;
  */
 public class HistoryTreeSegmentStore<E extends ISegment> implements ISegmentStore<E> {
 
-    private static final int PROVIDER_VERSION = 1;
     // TODO: these values were taken from the state system implementation. Maybe
     // they are not adequate for segments stores. Do some benchmarks
     private static final int MAX_CHILDREN = 50;
@@ -64,12 +63,14 @@ public class HistoryTreeSegmentStore<E extends ISegment> implements ISegmentStor
      *            end in .ht)
      * @param factory
      *            Factory to read history tree objects from the backend
+     * @param version
+     *            The version number of the reader/writer
      * @throws IOException
      *             Thrown if we can't create the file for some reason
      */
     public HistoryTreeSegmentStore(Path newStateFile,
-            IHTIntervalReader<E> factory) throws IOException {
-        fSht = createHistoryTree(newStateFile, factory);
+            IHTIntervalReader<E> factory, int version) throws IOException {
+        fSht = createHistoryTree(newStateFile, factory, version);
     }
 
 
@@ -80,16 +81,18 @@ public class HistoryTreeSegmentStore<E extends ISegment> implements ISegmentStor
      *            Filename/location of the history we want to load
      * @param intervalReader
      *            Factory to read history tree objects from the backend
+     * @param version
+     *            The version number of the reader/writer
      * @return The new history tree
      * @throws IOException
      *             If we can't read the file, if it doesn't exist, is not
      *             recognized, or if the version of the file does not match the
      *             expected providerVersion.
      */
-    private SegmentHistoryTree<E> createHistoryTree(Path treeFile, IHTIntervalReader<@NonNull E> intervalReader) throws IOException {
+    private SegmentHistoryTree<E> createHistoryTree(Path treeFile, IHTIntervalReader<@NonNull E> intervalReader, int version) throws IOException {
         try {
             if (Files.exists(treeFile)) {
-                SegmentHistoryTree<E> sht = new SegmentHistoryTree<>(NonNullUtils.checkNotNull(treeFile.toFile()), PROVIDER_VERSION, intervalReader);
+                SegmentHistoryTree<E> sht = new SegmentHistoryTree<>(NonNullUtils.checkNotNull(treeFile.toFile()), version, intervalReader);
                 fFinishedBuilding = true;
                 return sht;
             }
@@ -103,7 +106,7 @@ public class HistoryTreeSegmentStore<E extends ISegment> implements ISegmentStor
         return new SegmentHistoryTree<>(NonNullUtils.checkNotNull(treeFile.toFile()),
                 BLOCK_SIZE,
                 MAX_CHILDREN,
-                PROVIDER_VERSION,
+                version,
                 0,
                 intervalReader);
     }

@@ -97,6 +97,20 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
     }
 
     /**
+     * Segment store analyses should provide a version number. This is relevant
+     * for on disk segment store. If the segment structure changes, ie the
+     * segments previously saved are not readable anymore by the reader method,
+     * then this version number should be incremented. If the version of the
+     * segment store on disk does not match that of the reader, then the segment
+     * store will be rebuilt.
+     *
+     * @return The version number of the segment store
+     */
+    protected int getVersion() {
+        return 1;
+    }
+
+    /**
      * Fills the segment store. This is the main method that children classes
      * need to implement to build the segment store. For example, if the
      * segments are found by parsing the events of a trace, the event request
@@ -198,7 +212,7 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
             // Compare the file creation time to determine if this analysis is
             // built from scratch or not
             FileTime origCreationTime = (Files.exists(file) ? NonNullUtils.checkNotNull(Files.readAttributes(file, BasicFileAttributes.class)).creationTime() : FileTime.fromMillis(0));
-            segmentStore = SegmentStoreFactory.createOnDiskSegmentStore(file, getSegmentReader());
+            segmentStore = SegmentStoreFactory.createOnDiskSegmentStore(file, getSegmentReader(), getVersion());
             FileTime creationTime = NonNullUtils.checkNotNull(Files.readAttributes(file, BasicFileAttributes.class)).creationTime();
             built = origCreationTime.equals(creationTime);
         } catch (IOException e) {

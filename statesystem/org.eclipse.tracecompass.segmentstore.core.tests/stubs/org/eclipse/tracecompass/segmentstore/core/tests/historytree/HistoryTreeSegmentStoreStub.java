@@ -43,7 +43,30 @@ public class HistoryTreeSegmentStoreStub<E extends ISegment> extends HistoryTree
     public HistoryTreeSegmentStoreStub(Path newStateFile,
             long startTime,
             IHTIntervalReader<E> factory) throws IOException {
-        super(newStateFile, factory);
+        super(newStateFile, factory, 1);
+    }
+
+    /**
+     * Constructor for new history files. Use this when creating a new history
+     * from scratch.
+     *
+     * @param newStateFile
+     *            The filename/location where to store the state history (Should
+     *            end in .ht)
+     * @param startTime
+     *            The earliest time stamp that will be stored in the history
+     * @param factory
+     *            Factory to read history tree objects from the backend
+     * @param version
+     *            Version of the segment store
+     * @throws IOException
+     *             Thrown if we can't create the file for some reason
+     */
+    public HistoryTreeSegmentStoreStub(Path newStateFile,
+            long startTime,
+            IHTIntervalReader<E> factory,
+            int version) throws IOException {
+        super(newStateFile, factory, version);
     }
 
 }
