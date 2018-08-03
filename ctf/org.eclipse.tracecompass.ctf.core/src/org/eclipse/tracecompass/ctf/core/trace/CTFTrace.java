@@ -36,6 +36,7 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.CTFStrings;
 import org.eclipse.tracecompass.ctf.core.event.CTFClock;
@@ -230,7 +231,7 @@ public class CTFTrace implements IDefinitionScope {
      *            The ID of the stream from which to read
      * @return The list of event declarations
      */
-    public Collection<IEventDeclaration> getEventDeclarations(Long streamId) {
+    public Collection<@Nullable IEventDeclaration> getEventDeclarations(Long streamId) {
         ICTFStream stream = fStreams.get(streamId);
         if (stream == null) {
             return null;

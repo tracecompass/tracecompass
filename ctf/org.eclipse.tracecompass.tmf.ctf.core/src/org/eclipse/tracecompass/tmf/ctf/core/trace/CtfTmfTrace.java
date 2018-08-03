@@ -342,7 +342,9 @@ public class CtfTmfTrace extends TmfTrace
                 Collection<String> eventNames = new HashSet<>();
                 for (ICTFStream stream : trace.getStreams()) {
                     for (IEventDeclaration ed : trace.getEventDeclarations(stream.getId())) {
-                        eventNames.add(ed.getName());
+                        if (ed != null) {
+                            eventNames.add(ed.getName());
+                        }
                     }
                 }
 
