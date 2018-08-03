@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2018 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
  *
@@ -69,6 +69,11 @@ public final class TmfStateInterval implements ITmfStateInterval {
     @Override
     public ITmfStateValue getStateValue() {
         return TmfStateValue.newValue(fValue);
+    }
+
+    @Override
+    public @Nullable Object getValue() {
+        return fValue;
     }
 
     @Override

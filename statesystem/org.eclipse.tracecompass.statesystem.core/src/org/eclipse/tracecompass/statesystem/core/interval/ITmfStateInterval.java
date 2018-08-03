@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -74,4 +74,67 @@ public interface ITmfStateInterval {
         return getStateValue().unboxValue();
     }
 
+    /**
+     * Retrieve this state interval's value as an int, or 0 if the value is
+     * null.
+     *
+     * @return the int value contained by this interval
+     * @throws ClassCastException
+     *             if the value is not an int
+     * @since 4.1
+     */
+    default int getValueInt() {
+        Object value = getValue();
+        if (value == null) {
+            return 0;
+        }
+        return (int) value;
+    }
+
+    /**
+     * Retrieve this state interval's value as a long, or 0L if the value is
+     * null.
+     *
+     * @return the long value contained by this interval
+     * @throws ClassCastException
+     *             if the value is not a long
+     * @since 4.1
+     */
+    default long getValueLong() {
+        Object value = getValue();
+        if (value == null) {
+            return 0;
+        }
+        return (long) value;
+    }
+
+    /**
+     * Retrieve this state interval's value as a double, or 0.0 if the value is
+     * null.
+     *
+     * @return the double value contained by this interval
+     * @throws ClassCastException
+     *             if the value is not a double
+     * @since 4.1
+     */
+    default double getValueDouble() {
+        Object value = getValue();
+        if (value == null) {
+            return 0.0;
+        }
+        return (double) value;
+    }
+
+    /**
+     * Retrieve this state interval's value as a String.
+     *
+     * @return the String value contained by this interval
+     * @throws ClassCastException
+     *             if the value is not a String
+     * @since 4.1
+     */
+    default String getValueString() {
+        Object value = getValue();
+        return (String) value;
+    }
 }
