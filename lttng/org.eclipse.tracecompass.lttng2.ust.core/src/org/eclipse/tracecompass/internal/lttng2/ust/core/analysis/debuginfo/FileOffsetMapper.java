@@ -223,7 +223,7 @@ public final class FileOffsetMapper {
                 "Build id", buildId)) { //$NON-NLS-1$
 
             if (!Files.exists((file.toPath()))) {
-                sl.addData("file not found", file.toPath());
+                sl.addData("file not found", file.toPath()); //$NON-NLS-1$
                 return null;
             }
             /*

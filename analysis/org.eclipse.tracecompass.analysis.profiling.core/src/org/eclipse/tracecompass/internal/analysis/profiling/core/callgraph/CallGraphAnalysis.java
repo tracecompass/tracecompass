@@ -153,7 +153,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
     protected Iterable<IAnalysisModule> getDependentAnalyses() {
         CallStackAnalysis callStackAnalysis = fCallStackAnalysis;
         if (callStackAnalysis == null) {
-            throw new NullPointerException("If the analysis is not set, this method should not be called");
+            throw new NullPointerException("If the analysis is not set, this method should not be called"); //$NON-NLS-1$
         }
         return Collections.singleton(callStackAnalysis);
     }
@@ -193,8 +193,6 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      *            The threads pattern
      * @param processesPattern
      *            The processes pattern
-     * @param callStackPath
-     *            The call stack path
      * @param monitor
      *            The monitor
      * @return true if completed successfully

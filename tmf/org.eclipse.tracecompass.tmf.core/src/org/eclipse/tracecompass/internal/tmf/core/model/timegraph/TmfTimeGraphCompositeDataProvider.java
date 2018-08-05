@@ -46,6 +46,15 @@ import com.google.common.collect.ImmutableList;
 public class TmfTimeGraphCompositeDataProvider<M extends ITimeGraphEntryModel, P extends ITimeGraphDataProvider<M>>
 extends TmfTreeCompositeDataProvider<M, P> implements ITimeGraphDataProvider<M> {
 
+    /**
+     * Constructor
+     *
+     * @param providers
+     *            a list of data providers. Each data provider should be
+     *            associated to a different trace.
+     * @param id
+     *            the provider's ID
+     */
     public TmfTimeGraphCompositeDataProvider(List<P> providers, String id) {
         super(providers, id);
     }

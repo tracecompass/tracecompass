@@ -404,7 +404,8 @@ public class SegmentTableTest {
     /**
      * Test table with an on-disk segment store that is lazy loaded in the table
      *
-     * @throws IOException Exception thrown by file
+     * @throws IOException
+     *             when creating the segment store
      */
     @Test
     public void onDiskSegStoreTest() throws IOException {

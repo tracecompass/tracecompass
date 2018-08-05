@@ -59,7 +59,7 @@ public interface ISymbolProvider {
      * symbol based on address only.
      *
      * A caller that has pid and timestamp information should call this method.
-     * {@link #getSymbolText(long)} should only be invoked by callers that do not
+     * {@link #getSymbol(long)} should only be invoked by callers that do not
      * have access to the pid and timestamp.
      *
      * @param pid

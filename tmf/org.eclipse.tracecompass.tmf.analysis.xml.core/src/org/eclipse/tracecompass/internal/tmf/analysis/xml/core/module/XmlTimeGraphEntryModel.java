@@ -256,8 +256,8 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
      *            entry start time
      * @param endTime
      *            entry end time
-     * @param entryElement
-     *            XML element
+     * @param path
+     *            XML element path
      * @param xmlId
      *            XML ID
      * @param xmlParentId

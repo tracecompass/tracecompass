@@ -81,6 +81,13 @@ public class CpuUsageView extends TmfChartView {
         return ctx.getData(key);
     }
 
+    /**
+     * Get CPUs from a trace
+     *
+     * @param trace
+     *            the trace
+     * @return the CPUs set
+     */
     protected static @NonNull Set<@NonNull Integer> getCpus(@NonNull ITmfTrace trace) {
         Set<@NonNull Integer> data = (Set<@NonNull Integer>) getData(trace, CpuUsageView.CPU_USAGE_FOLLOW_CPU);
         return data != null ? data : Collections.emptySet();

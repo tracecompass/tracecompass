@@ -20,6 +20,8 @@ import com.google.common.collect.ImmutableList;
  * Base implementation of {@link ITmfVirtualTableModel}.
  *
  * @author Yonni Chen
+ * @param <L>
+ *            the virtual table line type
  * @since 4.0
  */
 public class TmfVirtualTableModel<L extends VirtualTableLine> implements ITmfVirtualTableModel<L> {
