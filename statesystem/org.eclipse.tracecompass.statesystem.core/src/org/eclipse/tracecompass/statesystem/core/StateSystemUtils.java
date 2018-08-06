@@ -23,6 +23,7 @@ import java.util.Objects;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -334,6 +335,123 @@ public final class StateSystemUtils {
             /* Nothing to do */
         }
         return null;
+    }
+
+    /**
+     * "Offer" helper method for a FIFO queue. This is similar to
+     * {@link ITmfStateSystemBuilder#pushAttribute(long, Object, int)}, but it
+     * represents a queue. An element is added to the end of the queue as if it
+     * were a stack.
+     *
+     * To get the size of the queue later, use the following code:
+     *
+     * <pre>
+     * Integer size = (Integer) ss.queryOngoing(attributeQuark);
+     * if (size == null) {
+     *     size = 0;
+     * }
+     * </pre>
+     *
+     * @param ss
+     *            The state system
+     * @param t
+     *            Timestamp of the state change
+     * @param value
+     *            State value to add to the queue.
+     * @param attributeQuark
+     *            The base attribute to use as a queue. If it does not exist if
+     *            will be created (with depth = 1)
+     * @throws StateValueTypeException
+     *             If the attribute 'attributeQuark' already exists, but is not
+     *             of integer type.
+     * @since 4.1
+     */
+    public static void queueOfferAttribute(ITmfStateSystemBuilder ss, long t, Object value, int attributeQuark) {
+        ss.pushAttribute(t, value, attributeQuark);
+    }
+
+    /**
+     * Antagonist of
+     * {@link #queueOfferAttribute(ITmfStateSystemBuilder, long, Object, int)}.
+     * This is similar to
+     * {@link ITmfStateSystemBuilder#popAttributeObject(long, int)}, but it
+     * represents a FIFO queue. An element is effectively removed from the top
+     * of the queue by shifting everything towards the top and popping the last.
+     * An empty queue will return <code>null</code>
+     *
+     * @param ss
+     *            The state system
+     * @param t
+     *            Timestamp of the state change
+     * @param attributeQuark
+     *            Quark of the queue-attribute to pop
+     * @return The state value that was removed, or <code>null</code> if the
+     *         queue is empty
+     * @throws StateValueTypeException
+     *             If the target attribute already exists, but its state value
+     *             type is invalid (not an integer)
+     * @since 4.1
+     */
+    public static @Nullable Object queuePollAttribute(ITmfStateSystemBuilder ss, long t, int attributeQuark)
+            throws StateValueTypeException {
+        // Get children quarks
+        List<@NonNull Integer> subAttributes = ss.getSubAttributes(attributeQuark, false);
+        int size = subAttributes.size();
+
+        // Abort if there are no children
+        if (size == 0) {
+            return null;
+        }
+
+        // If there is only one child, do a simple pop
+        if (size == 1) {
+            return ss.popAttributeObject(t, attributeQuark);
+        }
+
+        // Otherwise, keep element that will be effectively removed
+        Object poppedValue = ss.queryOngoing(subAttributes.get(0));
+        // And go through elements starting from the top
+        for (int i = 0; i < (size - 1); ++i) {
+            int childQuark = subAttributes.get(i);
+            int nextChildQuark = subAttributes.get(i + 1);
+
+            // Get value from the next element
+            Object nextValue = ss.queryOngoing(nextChildQuark);
+
+            // And replace above value with that
+            ss.modifyAttribute(t, nextValue, childQuark);
+        }
+
+        // Pop last element (that was moved up)
+        ss.popAttributeObject(t, attributeQuark);
+
+        return poppedValue;
+    }
+
+    /**
+     * "Peek" helper method for a FIFO queue. This will return the element that
+     * is currently at the head of the queue without removing it, or
+     * <code>null</code> if that queue is currently empty. This works similarly
+     * to
+     * {@link StateSystemUtils#querySingleStackTop(ITmfStateSystem, long, int)}.
+     *
+     * @param ss
+     *            The state system
+     * @param t
+     *            Timestamp of the state change
+     * @param attributeQuark
+     *            Quark of the queue-attribute to peek (that was the target of
+     *            queueAddAttribute() at creation time)
+     * @return The state value at the head of the queue, or <code>null</code> if
+     *         the queue is empty.
+     * @since 4.1
+     */
+    public static @Nullable Object queuePeekAttribute(ITmfStateSystemBuilder ss, long t, int attributeQuark) {
+        List<@NonNull Integer> subAttributes = ss.getSubAttributes(attributeQuark, false);
+        if (subAttributes.size() == 0) {
+            return null;
+        }
+        return ss.queryOngoing(subAttributes.get(0));
     }
 
     /**

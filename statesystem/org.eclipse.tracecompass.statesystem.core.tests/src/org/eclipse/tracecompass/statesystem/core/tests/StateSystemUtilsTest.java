@@ -495,4 +495,91 @@ public class StateSystemUtilsTest {
 
         ss.dispose();
     }
+
+    /**
+     * Test the
+     * {@link StateSystemUtils#queueOfferAttribute(ITmfStateSystemBuilder, long, Object, int)},
+     * {@link StateSystemUtils#queuePollAttribute(ITmfStateSystemBuilder, long, int)},
+     * and
+     * {@link StateSystemUtils#queuePeekAttribute(ITmfStateSystemBuilder, long, int)}
+     * methods.
+     */
+    @Test
+    public void testQueueOfferPollPeek() {
+        try {
+            IStateHistoryBackend backend = StateHistoryBackendFactory.createInMemoryBackend(DUMMY_STRING, 1L);
+            ITmfStateSystemBuilder ss = StateSystemFactory.newStateSystem(backend);
+            assertNotNull(ss);
+
+            int quark;
+            Object value;
+            Integer size;
+            quark = ss.getQuarkAbsoluteAndAdd(DUMMY_STRING, "queue");
+
+            final String val1 = "0xABC";
+            final String val2 = "0xDEF";
+            final String val3 = "0xGHI";
+            final String val4 = "0xHOHOHO";
+            final String val5 = "Sylvestre";
+
+            // Add some elements first
+            StateSystemUtils.queueOfferAttribute(ss, 2, val1, quark);
+            StateSystemUtils.queueOfferAttribute(ss, 4, val2, quark);
+            StateSystemUtils.queueOfferAttribute(ss, 6, val3, quark);
+
+            // Check that the front is the first element that was added
+            value = StateSystemUtils.queuePeekAttribute(ss, 7, quark);
+            assertEquals(val1, value);
+
+            // Check that the front element gets removed
+            value = StateSystemUtils.queuePollAttribute(ss, 8, quark);
+            assertEquals(val1, value);
+
+            // Check that the front is now the second element that was added
+            value = StateSystemUtils.queuePeekAttribute(ss, 9, quark);
+            assertEquals(val2, value);
+
+            // And that the size was decremented
+            size = (Integer) ss.queryOngoing(quark);
+            assertEquals((Integer) 2, size);
+
+            // Check that we add to the end (like a stack push)
+            StateSystemUtils.queueOfferAttribute(ss, 12, val4, quark);
+            ITmfStateInterval top = StateSystemUtils.querySingleStackTop(ss, 14, quark);
+            assertNotNull(top);
+            value = top.getValue();
+            assertEquals(val4, value);
+
+            // Final remove order check
+            StateSystemUtils.queueOfferAttribute(ss, 15, val5, quark);
+
+            value = StateSystemUtils.queuePollAttribute(ss, 16, quark);
+            assertEquals(val2, value);
+
+            value = StateSystemUtils.queuePollAttribute(ss, 18, quark);
+            assertEquals(val3, value);
+
+            value = StateSystemUtils.queuePollAttribute(ss, 20, quark);
+            assertEquals(val4, value);
+
+            size = (Integer) ss.queryOngoing(quark);
+            assertEquals((Integer) 1, size);
+
+            value = StateSystemUtils.queuePollAttribute(ss, 27, quark);
+            assertEquals(val5, value);
+
+            // Check that the queue is empty (size attribute will be null
+            // because of popAttributeObject()'s implementation)
+            size = (Integer) ss.queryOngoing(quark);
+            assertNull(size);
+            value = StateSystemUtils.queuePollAttribute(ss, 29, quark);
+            assertNull(value);
+            value = StateSystemUtils.queuePeekAttribute(ss, 30, quark);
+            assertNull(value);
+
+            ss.closeHistory(30);
+        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
+            fail(e.getMessage());
+        }
+    }
 }
