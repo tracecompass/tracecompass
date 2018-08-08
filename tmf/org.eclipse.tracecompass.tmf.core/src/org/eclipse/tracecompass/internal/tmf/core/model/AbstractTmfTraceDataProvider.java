@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.IFilterStrings;
-import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.IRegexQuery;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.Multimap;
@@ -61,7 +61,7 @@ public abstract class AbstractTmfTraceDataProvider {
      *            The query filter holding the regexes
      * @return A map of time event filters predicate by property
      */
-    protected Map<Integer, Predicate<@NonNull Map<@NonNull String, @NonNull String>>> computeRegexPredicate(TimeGraphStateQueryFilter queryFilter) {
+    protected Map<Integer, Predicate<@NonNull Map<@NonNull String, @NonNull String>>> computeRegexPredicate(IRegexQuery queryFilter) {
         Multimap<@NonNull Integer, @NonNull String> regexes = queryFilter.getRegexes();
         Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         for (Map.Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {

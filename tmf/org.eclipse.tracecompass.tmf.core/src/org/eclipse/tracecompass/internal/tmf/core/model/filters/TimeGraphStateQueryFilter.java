@@ -25,7 +25,7 @@ import com.google.common.collect.Multimap;
  * @since 4.0
  *
  */
-public class TimeGraphStateQueryFilter extends SelectionTimeQueryFilter {
+public class TimeGraphStateQueryFilter extends SelectionTimeQueryFilter implements IRegexQuery {
 
     private Multimap<@NonNull Integer, @NonNull String> fRegexes;
 
@@ -69,13 +69,7 @@ public class TimeGraphStateQueryFilter extends SelectionTimeQueryFilter {
         fRegexes = regexes;
     }
 
-    /**
-     * Get the regexes use to filter the queried data. It is a multimap of filter
-     * strings by property. The data provider will use the filter strings to
-     * determine whether the property should be activated or not.
-     *
-     * @return The multimap of regexes by property.
-     */
+    @Override
     public Multimap<@NonNull Integer, @NonNull String> getRegexes() {
         return fRegexes;
     }

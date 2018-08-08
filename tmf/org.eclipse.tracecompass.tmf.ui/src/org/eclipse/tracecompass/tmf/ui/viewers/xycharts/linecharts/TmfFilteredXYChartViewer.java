@@ -15,8 +15,8 @@ import java.util.Collections;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.SelectionTimeQueryRegexFilter;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
-import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXYDataProvider;
@@ -103,7 +103,7 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
 
     @Override
     protected TimeQueryFilter createQueryFilter(long start, long end, int nb) {
-        return new SelectionTimeQueryFilter(start, end, nb, fSelectedIds);
+        return new SelectionTimeQueryRegexFilter(start, end, nb, fSelectedIds, getRegexes());
     }
 
     /**

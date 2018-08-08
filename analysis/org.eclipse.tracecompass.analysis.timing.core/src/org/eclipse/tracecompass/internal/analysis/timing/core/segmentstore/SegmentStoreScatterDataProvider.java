@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Predicate;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -29,6 +30,7 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreP
 import org.eclipse.tracecompass.internal.analysis.timing.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.TmfXyResponseFactory;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.IRegexQuery;
 import org.eclipse.tracecompass.internal.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -39,6 +41,7 @@ import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.SeriesModel;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
@@ -46,10 +49,10 @@ import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
@@ -57,6 +60,7 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 /**
@@ -96,7 +100,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         }
 
         @Override
-        public boolean apply(ISegment segment) {
+        public boolean test(ISegment segment) {
             if (!(segment instanceof INamedSegment)) {
                 return fSelectedTypes.contains(fPrefix + DEFAULT_CATEGORY);
             }
@@ -273,10 +277,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         }
         long start = filter.getStart();
         long end = filter.getEnd();
-        // The dot is drawn at segment start, so we filter only the segment that start
-        // within the range
-        final Predicate<ISegment> startInRangePredication = s -> s.getStart() >= start;
-        final Iterable<ISegment> intersectingElements = Iterables.filter(segStore.getIntersectingElements(start, end), startInRangePredication);
+        final Iterable<ISegment> intersectingElements = Iterables.filter(segStore.getIntersectingElements(start, end), s -> s.getStart() >= start);
 
         Set<String> segmentTypes = new HashSet<>();
         IAnalysisModule module = (provider instanceof IAnalysisModule) ? (IAnalysisModule) provider : null;
@@ -323,6 +324,12 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             return TmfXyResponseFactory.createFailedResponse(Objects.requireNonNull(Messages.SegmentStoreDataProvider_SegmentNotAvailable));
         }
 
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        if (filter instanceof IRegexQuery) {
+            IRegexQuery regexFilter = (IRegexQuery) filter;
+            predicates.putAll(computeRegexPredicate(regexFilter));
+        }
+
         long start = filter.getStart();
         long end = filter.getEnd();
         // The types in the tree do not contain the trace name for sake of readability, but
@@ -333,9 +340,11 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             // this would return an empty map even if we did the queries.
             return TmfXyResponseFactory.create(Objects.requireNonNull(Messages.SegmentStoreScatterGraphViewer_title), Collections.emptyMap(), true);
         }
-        Predicate<ISegment> predicate = new CheckSegmentType(prefix, types.keySet());
         long pixelSize = Math.max(1, (end - start) / filter.getTimesRequested().length);
-        final Iterable<ISegment> intersectingElements = Iterables.filter(segStore.getIntersectingElements(start, end, SegmentComparators.INTERVAL_START_COMPARATOR), predicate);
+        final Iterable<ISegment> intersectingElements = Iterables.filter(segStore.getIntersectingElements(start, end, SegmentComparators.INTERVAL_START_COMPARATOR), (segment) -> {
+            CheckSegmentType cs = new CheckSegmentType(prefix, types.keySet());
+            return cs.test(segment);
+        });
         final Iterable<ISegment> displayData = compactList(start, intersectingElements, pixelSize);
 
         IAnalysisModule module = (fProvider instanceof IAnalysisModule) ? (IAnalysisModule) fProvider : null;
@@ -354,7 +363,8 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
                 Activator.getInstance().logError("Series " + thisSeries + " should exist");  //$NON-NLS-1$//$NON-NLS-2$
                 continue;
             }
-            thisSeries.addPoint(segment.getStart(), segment.getLength());
+
+            addPoint(thisSeries, segment, predicates, monitor);
         }
 
         return TmfXyResponseFactory.create(Objects.requireNonNull(Messages.SegmentStoreScatterGraphViewer_title),
@@ -365,24 +375,93 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         return (segment instanceof INamedSegment) ? ((INamedSegment) segment).getName() : DEFAULT_CATEGORY;
     }
 
+    /**
+     * Filter the time graph state and add it to the state list
+     *
+     * @param stateList
+     *            The timegraph state list
+     * @param timeGraphState
+     *            The current timegraph state
+     * @param key
+     *            The timegraph entry model id
+     * @param predicates
+     *            The predicates used to filter the timegraph state. It is a map of
+     *            predicate by property. The value of the property is an integer
+     *            representing a bitmask associated to that property. The status of
+     *            each property will be set for the timegraph state according to the
+     *            associated predicate test result.
+     * @param monitor
+     *            The progress monitor
+     */
+    private void addPoint(Series series, ISegment segment, Map<Integer, Predicate<Map<String, String>>> predicates, @Nullable IProgressMonitor monitor) {
+
+        if (!predicates.isEmpty()) {
+
+            // Get the filter external input data
+            Map<@NonNull String, @NonNull String> input = getFilterInput(segment);
+
+            // Test each predicates and set the status of the property associated to the
+            // predicate
+            int mask = 0;
+            for (Map.Entry<Integer, Predicate<Map<String, String>>> mapEntry : predicates.entrySet()) {
+                Predicate<Map<String, String>> value = Objects.requireNonNull(mapEntry.getValue());
+                boolean status = value.test(input);
+                Integer property = Objects.requireNonNull(mapEntry.getKey());
+                if (status && property != IFilterProperty.DIMMED) {
+                    mask |= property;
+                } else if (!status && property == IFilterProperty.DIMMED) {
+                    mask |= IFilterProperty.DIMMED;
+                } else if (!status && property == IFilterProperty.EXCLUDE) {
+                    mask |= IFilterProperty.EXCLUDE;
+                } else if (status){
+                    mask |= property;
+                }
+            }
+            series.addPoint(segment.getStart(), segment.getLength(), mask);
+        } else {
+            series.addPoint(segment.getStart(), segment.getLength(), 0);
+        }
+    }
+
+    private Map<String, String> getFilterInput(ISegment segment) {
+        Map<String, String> map = new HashMap<>();
+        for(ISegmentAspect aspect : fProvider.getSegmentAspects()) {
+            Object resolve = aspect.resolve(segment);
+            if (resolve != null) {
+                map.put(aspect.getName(), String.valueOf(resolve));
+            }
+        }
+        return map;
+    }
+
     private static class Series {
         private final long fId;
         private final String fName;
         private final List<Long> fXValues = new ArrayList<>();
         private final List<Double> fYValues = new ArrayList<>();
+        private final List<Integer> fProperties = new ArrayList<>();
 
         public Series(long id, String name) {
             fId = id;
             fName = name;
         }
 
-        public void addPoint(long x, double y) {
+        public void addPoint(long x, double y, int properties) {
             fXValues.add(x);
             fYValues.add(y);
+            fProperties.add(properties);
         }
 
         public SeriesModel build() {
-            return new SeriesModel(fId, fName, Longs.toArray(fXValues), Doubles.toArray(fYValues));
+            return new SeriesModel(getId(), getName(), Longs.toArray(fXValues), Doubles.toArray(fYValues), Ints.toArray(fProperties));
+        }
+
+        private long getId() {
+            return fId;
+        }
+
+        private String getName() {
+            return fName;
         }
     }
 

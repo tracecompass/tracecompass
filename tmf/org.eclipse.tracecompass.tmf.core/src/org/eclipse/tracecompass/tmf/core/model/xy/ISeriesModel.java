@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.tmf.core.model.xy;
 
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
+
 /**
  * This represents a model for a series in a XY chart. I should be used to
  * describe a series of points. There should be the same number of values in the
@@ -47,4 +49,16 @@ public interface ISeriesModel {
      * @return An array of y values
      */
     double[] getData();
+
+    /**
+     * Get the array of properties for each data point in the series. There
+     * should be the same number of points in the properties as in the series.
+     * See {@link IFilterProperty} for some values that the properties can take.
+     *
+     * @return The values of the properties for each data point
+     * @since 4.2
+     */
+    default int[] getProperties() {
+        return new int[getXAxis().length];
+    }
 }

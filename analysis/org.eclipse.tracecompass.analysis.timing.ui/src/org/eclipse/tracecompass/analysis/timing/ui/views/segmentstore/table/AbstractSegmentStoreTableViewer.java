@@ -13,9 +13,18 @@
 
 package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.text.DecimalFormat;
 import java.text.Format;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Predicate;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -37,10 +46,15 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreP
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.table.Messages;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.table.SegmentStoreContentProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.IFilterStrings;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
+import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.ArrayListStore;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -56,6 +70,9 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.table.TmfSimpleTableViewer;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * Displays the segment store provider data in a column table
@@ -137,6 +154,8 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
      * Flag to create columns once
      */
     boolean fColumnsCreated = false;
+
+    private Collection<String> fGlobalFilter = Collections.emptySet();
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -300,8 +319,39 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         ISegmentStore<ISegment> segStore = provider.getSegmentStore();
         // If results are not null, then the segment of the provider is ready
         // and model can be updated
+
+        //FIXME Filtering should be done at the data provider level
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = computeRegexPredicate();
+        Predicate<ISegment> predicate = (segment) -> {
+            if (!predicates.isEmpty()) {
+
+                // Get the filter external input data
+                Map<@NonNull String, @NonNull String> input = getFilterInput(segment, provider);
+
+                // Test each predicates and set the status of the property associated to the
+                // predicate
+                boolean activateProperty = false;
+                for (Map.Entry<Integer, Predicate<Map<String, String>>> mapEntry : predicates.entrySet()) {
+                    Integer property = Objects.requireNonNull(mapEntry.getKey());
+                    Predicate<Map<String, String>> value = Objects.requireNonNull(mapEntry.getValue());
+                    if (property == IFilterProperty.DIMMED | property == IFilterProperty.EXCLUDE) {
+                        boolean status = value.test(input);
+                        activateProperty |= status;
+                    }
+                }
+                return activateProperty;
+            }
+            return true;
+        };
+
         if (segStore != null) {
-            updateModel(segStore);
+            if (predicates.isEmpty()) {
+                updateModel(segStore);
+                return;
+            }
+            Collection<ISegment> filtered = Collections2.filter(segStore, seg -> predicate.test(seg));
+            ISegmentStore<ISegment> filteredStore = new ArrayListStore<>(filtered.toArray(new ISegment[filtered.size()]));
+            updateModel(filteredStore);
             return;
         }
         // If results are null, then add completion listener and if the provider
@@ -314,6 +364,39 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         if (provider instanceof IAnalysisModule) {
             ((IAnalysisModule) provider).schedule();
         }
+    }
+
+    private static Map<String, String> getFilterInput(ISegment segment, ISegmentStoreProvider provider) {
+        Map<String, String> map = new HashMap<>();
+        for(ISegmentAspect aspect : provider.getSegmentAspects()) {
+            Object resolve = aspect.resolve(segment);
+            if (resolve != null) {
+                map.put(aspect.getName(), String.valueOf(resolve));
+            }
+        }
+        return map;
+    }
+
+    /**
+     * Compute the predicate for every property regexes
+     *
+     * @param queryFilter
+     *            The query filter holding the regexes
+     * @return A map of time event filters predicate by property
+     * @since 3.1
+     */
+    protected Map<Integer, Predicate<@NonNull Map<@NonNull String, @NonNull String>>> computeRegexPredicate() {
+        Multimap<@NonNull Integer, @NonNull String> regexes = getRegexes();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        for (Map.Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
+            String regex = IFilterStrings.mergeFilters(entry.getValue());
+            FilterCu cu = FilterCu.compile(regex);
+            Predicate<@NonNull Map<@NonNull String, @NonNull String>> predicate = cu != null ? cu.generate() : null;
+            if (predicate != null) {
+                predicates.put(entry.getKey(), predicate);
+            }
+        }
+        return predicates;
     }
 
     /**
@@ -422,6 +505,44 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
             }
             fTrace = null;
         }
+    }
+
+    /**
+     * Set or remove the global regex filter value
+     *
+     * @param signal
+     *                   the signal carrying the regex value
+     * @since 3.1
+     */
+    @TmfSignalHandler
+    public void regexFilterApplied(TmfFilterAppliedSignal signal) {
+        Collection<String> regex = signal.getFilter().getRegexes();
+        setGlobalRegexFilter(regex);
+        setData(getSegmentProvider());
+    }
+
+    private void setGlobalRegexFilter(Collection<String> regex) {
+        fGlobalFilter = regex;
+    }
+
+    /**
+     * This method build the multimap of regexes by property that will be used to
+     * filter the timegraph states
+     *
+     * Override this method to add other regexes with their properties. The data
+     * provider should handle everything after.
+     *
+     * @return The multimap of regexes by property
+     * @since 3.1
+     */
+    protected Multimap<@NonNull Integer, @NonNull String> getRegexes() {
+        Multimap<@NonNull Integer, @NonNull String> regexes = HashMultimap.create();
+
+        if (!fGlobalFilter.isEmpty()) {
+            regexes.putAll(IFilterProperty.DIMMED, checkNotNull(fGlobalFilter));
+        }
+
+        return regexes;
     }
 
     // ------------------------------------------------------------------------

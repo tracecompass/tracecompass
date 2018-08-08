@@ -26,7 +26,7 @@ public interface ISegmentStoreProvider {
      * Add a listener for the viewers
      *
      * @param listener
-     *            listener for each type of viewer
+     *                     listener for each type of viewer
      */
     void addListener(IAnalysisProgressListener listener);
 
@@ -34,7 +34,7 @@ public interface ISegmentStoreProvider {
      * Remove listener for the viewers
      *
      * @param listener
-     *            listener for each type of viewer
+     *                     listener for each type of viewer
      */
     void removeListener(IAnalysisProgressListener listener);
 

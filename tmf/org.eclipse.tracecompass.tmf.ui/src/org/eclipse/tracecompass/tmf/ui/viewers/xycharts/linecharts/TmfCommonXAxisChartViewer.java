@@ -9,7 +9,13 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,17 +26,22 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeQueryRegexFilter;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXYDataProvider;
@@ -45,6 +56,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfChartTimeStampFormat;
@@ -58,8 +70,10 @@ import org.swtchart.ISeriesSet;
 import org.swtchart.LineStyle;
 import org.swtchart.Range;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
+import com.google.common.collect.Multimap;
 
 /**
  * XY Chart viewer class implementation. All series in this viewer use the same
@@ -75,8 +89,9 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
     private static final String DIRTY_UNDERFLOW_ERROR = "Dirty underflow error"; //$NON-NLS-1$
 
     private static final Map<String, ILineSeries.PlotSymbolType> SYMBOL_MAP;
+    private static final ColorRegistry COLOR_REGISTRY = new ColorRegistry();
 
-    static{
+    static {
         ImmutableMap.Builder<String, ILineSeries.PlotSymbolType> builder = new Builder<>();
         builder.put(IYAppearance.SymbolStyle.NONE, ILineSeries.PlotSymbolType.NONE);
         builder.put(IYAppearance.SymbolStyle.CIRCLE, ILineSeries.PlotSymbolType.CIRCLE);
@@ -96,6 +111,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
 
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(TmfCommonXAxisChartViewer.class);
     private static final int DEFAULT_SERIES_WIDTH = 1;
+    private static final String DIMMED_SERIES_SUFFIX = ".dimmed"; //$NON-NLS-1$
 
     private final double fResolution;
     private final AtomicInteger fDirty = new AtomicInteger();
@@ -105,13 +121,15 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
     /** Used for testing **/
     private int fOverrideNbPoints = 0;
 
+    private Collection<@NonNull String> fGlobalFilter = Collections.emptyList();
+
     /**
      * Constructor
      *
      * @param parent
-     *            The parent composite
+     *                     The parent composite
      * @param settings
-     *            See {@link TmfXYChartSettings} to know what it contains
+     *                     See {@link TmfXYChartSettings} to know what it contains
      */
     public TmfCommonXAxisChartViewer(Composite parent, TmfXYChartSettings settings) {
         super(parent, settings.getTitle(), settings.getXLabel(), settings.getYLabel());
@@ -139,9 +157,9 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      * Force the number of points to a fixed value
      *
      * @param nbPoints
-     *            The number of points to display, cannot be negative. 0 means use
-     *            native resolution. any positive integer means that number of
-     *            points
+     *                     The number of points to display, cannot be negative. 0
+     *                     means use native resolution. any positive integer means
+     *                     that number of points
      */
     public synchronized void setNbPoints(int nbPoints) {
         if (nbPoints < 0) {
@@ -157,7 +175,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      * FIXME Make this abstract when incrementing the major version
      *
      * @param trace
-     *            The trace
+     *                  The trace
      * @return the data provider
      * @since 4.0
      */
@@ -182,17 +200,17 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      * provide the desired instance.
      *
      * @param start
-     *            The starting value
+     *                  The starting value
      * @param end
-     *            The ending value
+     *                  The ending value
      * @param nb
-     *            The number of entries
+     *                  The number of entries
      * @return An {@link TimeQueryFilter} instance that data provider will use to
      *         extract a model
      * @since 4.0
      */
     protected @NonNull TimeQueryFilter createQueryFilter(long start, long end, int nb) {
-        return new TimeQueryFilter(start, end, nb);
+        return new TimeQueryRegexFilter(getWindowStartTime(), getWindowEndTime(), nb, getRegexes());
     }
 
     /**
@@ -200,7 +218,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      * will be created by the presentation provider
      *
      * @param seriesName
-     *            The name of the series
+     *                       The name of the series
      * @return An {@link IYAppearance} instance for the series
      * @since 4.0
      */
@@ -282,7 +300,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                 }
                 try {
                     int numRequests = fNumRequests;
-                    if(numRequests == 0) {
+                    if (numRequests == 0) {
                         return;
                     }
                     TimeQueryFilter filter = createQueryFilter(getWindowStartTime(), getWindowEndTime(), numRequests);
@@ -311,11 +329,11 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
          * new values to be displayed.
          *
          * @param dataProvider
-         *            A data provider
+         *                         A data provider
          * @param filters
-         *            A query filter
+         *                         A query filter
          * @param monitor
-         *            A monitor for canceling task
+         *                         A monitor for canceling task
          */
         private void updateData(@NonNull ITmfXYDataProvider dataProvider, @NonNull TimeQueryFilter filters, IProgressMonitor monitor) {
             boolean isComplete = false;
@@ -378,20 +396,75 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                         long delta = getWindowEndTime() - getWindowStartTime();
                         if (delta > 0) {
                             for (ISeriesModel entry : seriesValues.getData().values()) {
-                                ISeries series = getSwtChart().getSeriesSet().getSeries(entry.getName());
-                                if (series == null) {
-                                    series = createSWTSeriesFromModel(entry);
-                                }
-                                series.setXSeries(extractXValuesToDisplay(entry.getXAxis()));
-                                /*
-                                 * Find the minimal and maximum values in this series
-                                 */
-                                for (double value : entry.getData()) {
+                                double[] extractXValuesToDisplay = extractXValuesToDisplay(entry.getXAxis());
+                                List<Double> dimmedX = new ArrayList<>(extractXValuesToDisplay.length);
+                                List<Double> dimmedY = new ArrayList<>(extractXValuesToDisplay.length);
+                                List<Double> brightX = new ArrayList<>(extractXValuesToDisplay.length);
+                                List<Double> brightY = new ArrayList<>(extractXValuesToDisplay.length);
+
+                                int[] propertiesArray = entry.getProperties();
+                                double[] data = entry.getData();
+                                for (int i = 0; i < extractXValuesToDisplay.length; i++) {
+                                    double value = data[i];
+                                    /*
+                                     * Find the minimal and maximum values in this series
+                                     */
                                     maxy = Math.max(maxy, value);
                                     miny = Math.min(miny, value);
+                                    int properties = (i < propertiesArray.length) ? propertiesArray[i] : 0;
+                                    if ((properties & IFilterProperty.EXCLUDE) == 0) {
+                                        if ((properties & IFilterProperty.DIMMED) == 0) {
+                                            brightX.add(extractXValuesToDisplay[i]);
+                                            brightY.add(value);
+                                        } else {
+                                            dimmedX.add(extractXValuesToDisplay[i]);
+                                            dimmedY.add(value);
+                                        }
+                                    }
+                                }
+                                double[] brightXArray = new double[brightX.size()];
+                                double[] brightYArray = new double[brightY.size()];
+                                for (int i = 0; i < brightX.size(); i++) {
+                                    brightXArray[i] = brightX.get(i);
+                                    brightYArray[i] = brightY.get(i);
+                                }
+                                double[] dimmedXArray = new double[dimmedX.size()];
+                                double[] dimmedYArray = new double[dimmedY.size()];
+                                for (int i = 0; i < dimmedX.size(); i++) {
+                                    dimmedXArray[i] = dimmedX.get(i);
+                                    dimmedYArray[i] = dimmedY.get(i);
                                 }
 
-                                series.setYSeries(entry.getData());
+                                // Create and fill the series
+                                ISeriesSet seriesSet = getSwtChart().getSeriesSet();
+                                ISeries series = seriesSet.getSeries(entry.getName());
+                                ISeries dimmedSeries = seriesSet.getSeries(entry.getName() + DIMMED_SERIES_SUFFIX);
+                                if (brightX.isEmpty()) {
+                                    // Remove the base series since there is
+                                    // nothing to show
+                                    if (series != null) {
+                                        seriesSet.deleteSeries(entry.getName());
+                                    }
+                                } else {
+                                    if (series == null) {
+                                        series = createSWTSeriesFromModel(entry);
+                                    }
+                                    series.setXSeries(brightXArray);
+                                    series.setYSeries(brightYArray);
+                                }
+                                if (dimmedX.isEmpty()) {
+                                    // Remove the base series since there is
+                                    // nothing to show
+                                    if (dimmedSeries != null) {
+                                        seriesSet.deleteSeries(entry.getName() + DIMMED_SERIES_SUFFIX);
+                                    }
+                                } else {
+                                    if (dimmedSeries == null) {
+                                        dimmedSeries = createDimmedSeriesFromModel(entry);
+                                    }
+                                    dimmedSeries.setXSeries(dimmedXArray);
+                                    dimmedSeries.setYSeries(dimmedYArray);
+                                }
                             }
                             maxy = maxy == DEFAULT_MAXY ? 1.0 : maxy;
                         } else {
@@ -454,7 +527,43 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
 
             String type = appearance.getType();
             RGBAColor rgb = appearance.getColor();
-            Color color = new Color(Display.getDefault(), rgb.getRed(), rgb.getGreen(), rgb.getBlue());
+            COLOR_REGISTRY.put(rgb.toString(), RGBAUtil.fromRGBAColor(rgb).rgb);
+            Color color = COLOR_REGISTRY.get(rgb.toString());
+            String symbolType = appearance.getSymbolStyle();
+
+            if (type.equals(IYAppearance.Type.BAR)) {
+                IBarSeries barSeries = (IBarSeries) seriesSet.createSeries(SeriesType.BAR, seriesName);
+                barSeries.enableStack(true);
+                barSeries.setBarColor(color);
+                barSeries.setBarPadding(0);
+                barSeries.setVisible(true);
+                return barSeries;
+            }
+
+            /**
+             * Default is line chart
+             */
+            ILineSeries lineSeries = (ILineSeries) seriesSet.createSeries(SeriesType.LINE, seriesName);
+            lineSeries.enableArea(IYAppearance.Type.AREA.equals(type));
+            lineSeries.setLineStyle(LineStyle.valueOf(appearance.getStyle()));
+            lineSeries.setSymbolType(SYMBOL_MAP.getOrDefault(symbolType, ILineSeries.PlotSymbolType.NONE));
+            lineSeries.setLineColor(color);
+            lineSeries.setSymbolColor(color);
+            lineSeries.setVisible(true);
+            lineSeries.setLineWidth(appearance.getWidth());
+            return lineSeries;
+        }
+
+        private @NonNull ISeries createDimmedSeriesFromModel(ISeriesModel yModel) {
+            ISeriesSet seriesSet = getSwtChart().getSeriesSet();
+
+            String seriesName = yModel.getName() + DIMMED_SERIES_SUFFIX;
+            IYAppearance appearance = getSeriesAppearance(yModel.getName());
+
+            String type = appearance.getType();
+            float[] rgb = appearance.getColor().getHSBA();
+            COLOR_REGISTRY.put(rgb.toString(), new RGBA(rgb[0], rgb[1] * 0.5f, rgb[2] * 0.5f, rgb[3]).rgb);
+            Color color = COLOR_REGISTRY.get(rgb.toString());
             String symbolType = appearance.getSymbolStyle();
 
             if (type.equals(IYAppearance.Type.BAR)) {
@@ -504,5 +613,43 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
         if (signal != null) {
             fXYPresentationProvider.remove(signal.getTrace());
         }
+    }
+
+    /**
+     * Set or remove the global regex filter value
+     *
+     * @param signal
+     *                   the signal carrying the regex value
+     * @since 4.2
+     */
+    @TmfSignalHandler
+    public void regexFilterApplied(TmfFilterAppliedSignal signal) {
+        Collection<@NonNull String> regex = signal.getFilter().getRegexes();
+        setGlobalRegexFilter(regex);
+        updateContent();
+    }
+
+    private void setGlobalRegexFilter(Collection<@NonNull String> regex) {
+        fGlobalFilter = regex;
+    }
+
+    /**
+     * This method build the multimap of regexes by property that will be used to
+     * filter the timegraph states
+     *
+     * Override this method to add other regexes with their properties. The data
+     * provider should handle everything after.
+     *
+     * @return The multimap of regexes by property
+     * @since 4.2
+     */
+    protected @NonNull Multimap<@NonNull Integer, @NonNull String> getRegexes() {
+        Multimap<@NonNull Integer, @NonNull String> regexes = HashMultimap.create();
+
+        if (fGlobalFilter != null && !fGlobalFilter.isEmpty()) {
+            regexes.putAll(IFilterProperty.DIMMED, checkNotNull(fGlobalFilter));
+        }
+
+        return regexes;
     }
 }
