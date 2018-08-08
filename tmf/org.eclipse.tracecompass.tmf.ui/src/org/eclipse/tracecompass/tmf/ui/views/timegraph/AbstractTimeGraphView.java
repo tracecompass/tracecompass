@@ -111,6 +111,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.util.TimeGraphStyleUtil;
 import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.TimeEventFilterDialog;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
+import org.eclipse.tracecompass.tmf.core.signal.TmfEventFilterAppliedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfMarkerEventSourceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -367,6 +368,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private IContextService fContextService;
 
     private List<IContextActivation> fActiveContexts = new ArrayList<>();
+
+    private String fGlobalFilter = null;
 
     // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------
@@ -2559,7 +2562,33 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             regexes.put(IFilterProperty.DIMMED, savedFilter);
         }
 
+        if (fGlobalFilter != null && !fGlobalFilter.isEmpty()) {
+            regexes.put(IFilterProperty.DIMMED, checkNotNull(fGlobalFilter));
+        }
         return regexes;
+    }
+
+    /**
+     * Set the global regex filter applied to the views
+     *
+     * @param regex
+     *                  The global regex to apply
+     * @since 4.1
+     */
+    protected void setGlobalRegexFilter(String regex) {
+        fGlobalFilter = regex;
+        globalFilterUpdated();
+    }
+
+    /**
+     * The global filter was updated and the view may need to act on this
+     * filter. By default, this method will restart the zoom thread so the time
+     * graph data will be refreshed.
+     *
+     * @since 4.1
+     */
+    protected void globalFilterUpdated() {
+        restartZoomThread();
     }
 
     /**
@@ -2742,4 +2771,20 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
     }
 
+    /**
+     * Set or remove the global regex filter value
+     *
+     * @param signal
+     *                   the signal carrying the regex value
+     * @since 4.1
+     */
+    @TmfSignalHandler
+    public void regexFilterApplied(TmfEventFilterAppliedSignal signal) {
+        String regex = signal.getFilter().getRegex();
+        if (!regex.isEmpty()) {
+            setGlobalRegexFilter(regex);
+        } else {
+            setGlobalRegexFilter(null);
+        }
+    }
 }

@@ -142,6 +142,7 @@ import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfModelLookup;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
 import org.eclipse.tracecompass.tmf.core.filter.FilterManager;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
+import org.eclipse.tracecompass.tmf.core.filter.TraceCompassFilter;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
@@ -2050,7 +2051,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      *            The filter that was just applied
      */
     protected void fireFilterApplied(final ITmfFilter filter) {
-        broadcast(new TmfEventFilterAppliedSignal(this, fTrace, filter));
+        if (filter == null) {
+            return;
+        }
+        broadcast(new TmfEventFilterAppliedSignal(this, fTrace, TraceCompassFilter.fromEventFilter(filter)));
     }
 
     /**
