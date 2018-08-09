@@ -24,13 +24,17 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
+import org.eclipse.tracecompass.tmf.core.model.IFilterableDataModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * An entry for use in the time graph views
  */
-public class TimeGraphEntry implements ITimeGraphEntry {
+public class TimeGraphEntry implements ITimeGraphEntry, IFilterableDataModel {
 
     /**
      * Class to describe on which time range and resolution the zoomed entry list is
@@ -447,6 +451,22 @@ public class TimeGraphEntry implements ITimeGraphEntry {
      */
     public ITimeGraphEntryModel getModel() {
         return fModel;
+    }
+
+    /**
+     * Get the metadata for this data model. The keys are the names of the
+     * metadata field or aspect. A field may have multiple values associated
+     * with it.
+     *
+     * @return A map of field names to values
+     * @since 4.1
+     */
+    @Override
+    public @NonNull Multimap<@NonNull String, @NonNull String> getMetadata() {
+        if (fModel instanceof IFilterableDataModel) {
+            return ((IFilterableDataModel) fModel).getMetadata();
+        }
+        return HashMultimap.create();
     }
 
     /**

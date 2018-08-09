@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.analysis.os.linux.core.execution.graph;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -64,6 +65,15 @@ public class OsWorker implements IGraphWorker {
         return fHostTid.getHost();
     }
 
+    @Override
+    public @NonNull Map<@NonNull String, @NonNull String> getWorkerInformation() {
+        int tid = fHostTid.getTid();
+        if (tid == -1) {
+            return Collections.emptyMap();
+        }
+        return Collections.singletonMap("tid", String.valueOf(tid)); //$NON-NLS-1$
+    }
+
     @SuppressWarnings("null")
     @Override
     public @NonNull Map<@NonNull String, @NonNull String> getWorkerInformation(long t) {
@@ -71,6 +81,8 @@ public class OsWorker implements IGraphWorker {
         if (tid == -1) {
             return Collections.emptyMap();
         }
+        Map<String, String> workerInfo = new HashMap<>();
+        workerInfo.put("tid", String.valueOf(tid)); //$NON-NLS-1$
         Optional<@Nullable KernelAnalysisModule> kam = TmfTraceManager.getInstance().getActiveTraceSet()
                 .stream()
                 .filter(trace -> trace.getHostId().equals(getHostId()))

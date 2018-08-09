@@ -30,7 +30,6 @@ import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge.EdgeType;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
 import org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathModule;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.graph.core.base.TmfGraphStatistics;
 import org.eclipse.tracecompass.internal.analysis.graph.core.base.TmfGraphVisitor;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
@@ -294,7 +293,7 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
             fHostEntries.computeIfAbsent(host, h -> new CriticalPathEntry(parentId, -1L, host, fStart, fEnd, sum, percent));
 
             long entryId = fWorkerToEntryId.computeIfAbsent(owner, w -> ATOMIC_LONG.getAndIncrement());
-            CriticalPathEntry entry = new CriticalPathEntry(entryId, parentId, NonNullUtils.nullToEmptyString(owner), fStart, fEnd, sum, percent);
+            CriticalPathEntry entry = new CriticalPathEntry(entryId, parentId, owner, fStart, fEnd, sum, percent);
 
             fWorkers.put(owner, entry);
         }

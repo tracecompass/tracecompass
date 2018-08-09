@@ -109,9 +109,11 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.markers.MarkerUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.util.TimeGraphStyleUtil;
 import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.TimeEventFilterDialog;
+import org.eclipse.tracecompass.tmf.core.model.IFilterableDataModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventFilterAppliedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfDataModelSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfMarkerEventSourceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -136,16 +138,19 @@ import org.eclipse.tracecompass.tmf.ui.views.ITmfPinnable;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.views.SaveImageUtil;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView.TraceEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphBookmarkListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphContentProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphSelectionListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphBookmarkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphContentProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphRangeUpdateEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphSelectionEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
@@ -158,6 +163,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sampling;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeFormat;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener;
@@ -370,6 +376,21 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private List<IContextActivation> fActiveContexts = new ArrayList<>();
 
     private String fGlobalFilter = null;
+
+    /** Listener that handles a click on an entry in the FusedVM View */
+    private final ITimeGraphSelectionListener fMetadataSelectionListener = new ITimeGraphSelectionListener() {
+
+        @Override
+        public void selectionChanged(TimeGraphSelectionEvent event) {
+            ITimeGraphEntry entry = event.getSelection();
+            if (entry instanceof IFilterableDataModel) {
+                Multimap<@NonNull String, @NonNull String> metadata = ((IFilterableDataModel) entry).getMetadata();
+                if (!metadata.isEmpty()) {
+                    broadcast(new TmfDataModelSelectedSignal(AbstractTimeGraphView.this, metadata));
+                }
+            }
+        }
+    };
 
     // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------
@@ -1164,39 +1185,41 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     @Override
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
-        fTimeGraphViewer = new TimeGraphViewer(parent, SWT.NONE);
+        TimeGraphViewer timeGraphViewer = new TimeGraphViewer(parent, SWT.NONE);
+        fTimeGraphViewer = timeGraphViewer;
         if (fLabelProvider != null) {
-            fTimeGraphViewer.setTimeGraphLabelProvider(fLabelProvider);
+            timeGraphViewer.setTimeGraphLabelProvider(fLabelProvider);
         }
         if (fLegendProvider != null) {
-            fTimeGraphViewer.setLegendProvider(fLegendProvider);
+            timeGraphViewer.setLegendProvider(fLegendProvider);
         }
         if (fColumns != null) {
-            fTimeGraphViewer.setColumns(fColumns);
+            timeGraphViewer.setColumns(fColumns);
             if (fColumnComparators != null) {
-                createColumnSelectionListener(fTimeGraphViewer.getTree());
+                createColumnSelectionListener(timeGraphViewer.getTree());
             }
         }
-        fTimeGraphViewer.setTimeGraphContentProvider(fTimeGraphContentProvider);
-        fTimeGraphViewer.setFilterContentProvider(fFilterContentProvider != null ? fFilterContentProvider : fTimeGraphContentProvider);
-        fTimeGraphViewer.setFilterLabelProvider(fFilterLabelProvider);
-        fTimeGraphViewer.setFilterColumns(fFilterColumns);
+        timeGraphViewer.setTimeGraphContentProvider(fTimeGraphContentProvider);
+        timeGraphViewer.setFilterContentProvider(fFilterContentProvider != null ? fFilterContentProvider : fTimeGraphContentProvider);
+        timeGraphViewer.setFilterLabelProvider(fFilterLabelProvider);
+        timeGraphViewer.setFilterColumns(fFilterColumns);
+        timeGraphViewer.addSelectionListener(fMetadataSelectionListener);
 
         ITimeGraphPresentationProvider presentationProvider = getPresentationProvider();
-        fTimeGraphViewer.setTimeGraphProvider(presentationProvider);
+        timeGraphViewer.setTimeGraphProvider(presentationProvider);
         presentationProvider.addColorListener(stateItems -> TimeGraphStyleUtil.loadValues(getPresentationProvider()));
         presentationProvider.refresh();
-        fTimeGraphViewer.setAutoExpandLevel(fAutoExpandLevel);
+        timeGraphViewer.setAutoExpandLevel(fAutoExpandLevel);
 
-        fTimeGraphViewer.setWeights(fWeight);
+        timeGraphViewer.setWeights(fWeight);
 
-        TimeGraphControl timeGraphControl = fTimeGraphViewer.getTimeGraphControl();
+        TimeGraphControl timeGraphControl = timeGraphViewer.getTimeGraphControl();
         Action timeEventFilterAction = new Action() {
 
             @Override
             public void run() {
                 int xCoord = timeGraphControl.toControl(timeGraphControl.getDisplay().getCursorLocation()).x;
-                if ((fTimeGraphViewer.getNameSpace() < xCoord) && (xCoord < timeGraphControl.getSize().x)) {
+                if ((timeGraphViewer.getNameSpace() < xCoord) && (xCoord < timeGraphControl.getSize().x)) {
                     if (fTimeEventFilterDialog != null) {
                         fTimeEventFilterDialog.close();
                         fTimeEventFilterDialog = null;
@@ -1210,7 +1233,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         fTimeEventFilterAction = timeEventFilterAction;
 
 
-        fTimeGraphViewer.addRangeListener(new ITimeGraphRangeListener() {
+        timeGraphViewer.addRangeListener(new ITimeGraphRangeListener() {
             @Override
             public void timeRangeUpdated(TimeGraphRangeUpdateEvent event) {
                 final long startTime = event.getStartTime();
@@ -1221,7 +1244,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             }
         });
 
-        fTimeGraphViewer.addTimeListener(new ITimeGraphTimeListener() {
+        timeGraphViewer.addTimeListener(new ITimeGraphTimeListener() {
             @Override
             public void timeSelected(TimeGraphTimeEvent event) {
                 ITmfTimestamp startTime = TmfTimestamp.fromNanos(event.getBeginTime());
@@ -1230,7 +1253,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             }
         });
 
-        fTimeGraphViewer.addBookmarkListener(new ITimeGraphBookmarkListener() {
+        timeGraphViewer.addBookmarkListener(new ITimeGraphBookmarkListener() {
             @Override
             public void bookmarkAdded(final TimeGraphBookmarkEvent event) {
                 try {
@@ -1314,7 +1337,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             }
         });
 
-        fTimeGraphViewer.setTimeFormat(TimeFormat.CALENDAR);
+        timeGraphViewer.setTimeFormat(TimeFormat.CALENDAR);
 
         IStatusLineManager statusLineManager = getViewSite().getActionBars().getStatusLineManager();
         timeGraphControl.setStatusLineManager(statusLineManager);
@@ -1330,7 +1353,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         // make selection available to other views
         IWorkbenchPartSite site = getSite();
-        site.setSelectionProvider(fTimeGraphViewer.getSelectionProvider());
+        site.setSelectionProvider(timeGraphViewer.getSelectionProvider());
 
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
 
@@ -2573,7 +2596,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *
      * @param regex
      *                  The global regex to apply
-     * @since 4.1
+     * @since 4.2
      */
     protected void setGlobalRegexFilter(String regex) {
         fGlobalFilter = regex;
@@ -2585,7 +2608,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * filter. By default, this method will restart the zoom thread so the time
      * graph data will be refreshed.
      *
-     * @since 4.1
+     * @since 4.2
      */
     protected void globalFilterUpdated() {
         restartZoomThread();
@@ -2776,7 +2799,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *
      * @param signal
      *                   the signal carrying the regex value
-     * @since 4.1
+     * @since 4.2
      */
     @TmfSignalHandler
     public void regexFilterApplied(TmfEventFilterAppliedSignal signal) {
@@ -2787,4 +2810,40 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             setGlobalRegexFilter(null);
         }
     }
+
+    /**
+     * Signal indicating a data model element was selected somewhere
+     *
+     * @param signal
+     *            the signal carrying the select data model metadata
+     * @since 4.2
+     */
+    @TmfSignalHandler
+    public void selectionChanged(TmfDataModelSelectedSignal signal) {
+        // Ignore signal from self
+        if (signal.getSource() == this) {
+            return;
+        }
+        Multimap<@NonNull String, @NonNull String> metadata = signal.getMetadata();
+        // See if the current selection intersects the metadata
+        ITimeGraphEntry selection = getTimeGraphViewer().getSelection();
+        if (selection instanceof IFilterableDataModel &&
+                IFilterableDataModel.commonIntersect(metadata, ((IFilterableDataModel)selection).getMetadata())) {
+            return;
+        }
+        // See if an entry intersects the metadata
+        List<TimeGraphEntry> traceEntries = getEntryList(getTrace());
+        if (traceEntries == null) {
+            return;
+        }
+        for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
+            Iterable<TimeGraphEntry> unfiltered = Utils.flatten(traceEntry);
+            for (TimeGraphEntry entry : unfiltered) {
+                if (IFilterableDataModel.commonIntersect(metadata, entry.getMetadata())) {
+                    getTimeGraphViewer().setSelection(entry, true);
+                }
+            }
+        }
+    }
+
 }

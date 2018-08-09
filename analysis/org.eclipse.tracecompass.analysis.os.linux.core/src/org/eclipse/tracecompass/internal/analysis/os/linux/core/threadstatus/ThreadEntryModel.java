@@ -10,14 +10,18 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.tmf.core.model.IFilterableDataModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * Thread Status entry model.
  *
  * @author Simon Delisle
  */
-public class ThreadEntryModel extends TimeGraphEntryModel {
+public class ThreadEntryModel extends TimeGraphEntryModel implements IFilterableDataModel {
 
     /**
      * {@link ThreadEntryModel} builder, we use this to be able to reassign
@@ -139,6 +143,7 @@ public class ThreadEntryModel extends TimeGraphEntryModel {
 
     private final int fThreadId;
     private final int fParentThreadId;
+    private final @NonNull Multimap<@NonNull String, @NonNull String> fAspects;
 
     /**
      * Constructor
@@ -162,6 +167,10 @@ public class ThreadEntryModel extends TimeGraphEntryModel {
         super(id, parentId, name, start, end);
         fThreadId = pid;
         fParentThreadId = ppid;
+        fAspects = HashMultimap.create();
+        fAspects.put("tid", String.valueOf(pid));
+        fAspects.put("ppid", String.valueOf(ppid));
+        fAspects.put("exec_name", String.valueOf(name));
     }
 
     /**
@@ -187,6 +196,11 @@ public class ThreadEntryModel extends TimeGraphEntryModel {
         return "<name=" + getName() + " id=" + getId() + " parentId=" + getParentId() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 + " start=" + getStartTime() + " end=" + getEndTime() //$NON-NLS-1$ //$NON-NLS-2$
                 + " TID=" + fThreadId + " PTID=" + fParentThreadId + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    }
+
+    @Override
+    public Multimap<@NonNull String, @NonNull String> getMetadata() {
+        return fAspects;
     }
 
 }
