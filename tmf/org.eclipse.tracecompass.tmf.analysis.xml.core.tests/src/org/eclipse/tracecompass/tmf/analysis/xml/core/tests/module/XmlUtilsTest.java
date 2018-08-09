@@ -54,6 +54,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.google.common.collect.ImmutableList;
+
 /**
  * Tests for the {@link XmlUtils} class
  *
@@ -183,7 +185,7 @@ public class XmlUtilsTest {
         assertTrue(XmlUtils.isAnalysisEnabled(destFile.getName()));
         assertTrue(XmlUtils.getEnabledFiles().containsKey(destFile.getName()));
 
-        XmlUtils.disableFile(destFile.getName());
+        XmlUtils.disableFiles(ImmutableList.of(destFile.getName()));
 
         /* Check that the file was marked as disabled */
         assertFalse(XmlUtils.isAnalysisEnabled(destFile.getName()));

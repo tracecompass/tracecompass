@@ -11,11 +11,15 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.preferences;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -25,6 +29,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -44,6 +49,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
@@ -52,7 +58,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlAnalysisModuleSource;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.ui.dialog.DirectoryDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfCommonProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
@@ -76,7 +82,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * This class implements a preference page for XML analyses
@@ -97,6 +107,9 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
     private Button fEditButton;
     private Label fInvalidFileLabel;
     private Label fEnabledFileLabel;
+
+    private static final String LINE_SEP = System.getProperty("line.separator"); //$NON-NLS-1$
+    private static final String ELEMENT_SEP = "-\t"; //$NON-NLS-1$
 
     @Override
     public void init(IWorkbench workbench) {
@@ -231,7 +244,7 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
         fDeleteButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                deleteAnalysis();
+                deleteAnalyses();
             }
         });
 
@@ -343,7 +356,9 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
             fInvalidFileLabel.setVisible(true);
             fEnabledFileLabel.setVisible(false);
             if (XmlUtils.isAnalysisEnabled(xmlName)) {
-                disableAnalysis(xmlName);
+                enableAndDisableAnalyses(
+                        Collections.emptyList(),
+                        ImmutableList.of(Objects.requireNonNull(xmlName)));
                 selection.setChecked(false);
             }
         }
@@ -371,52 +386,50 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
      * Apply change to items according to their checkboxes.
      */
     private void handleChecks() {
+        Map<@NonNull String, @NonNull File> listFiles = XmlUtils.listFiles();
+        Collection<String> filesToEnable = Lists.newArrayList();
+        Collection<String> filesToDisable = Lists.newArrayList();
+
         for (TableItem item : fAnalysesTable.getItems()) {
             String xmlName = XmlUtils.createXmlFileString(item.getText());
             // Only enable/disable if the checkbox status has changed
-            if (item.getChecked()) {
-                if (!XmlUtils.isAnalysisEnabled(xmlName)) {
-                    // Do not enable an invalid file
-                    if (isFileValid(xmlName)) {
-                        enableAnalysis(xmlName);
-                    } else {
-                        item.setChecked(false);
-                    }
+            if (item.getChecked() && !XmlUtils.isAnalysisEnabled(xmlName)) {
+                // Do not enable an invalid file
+                if (isFileValid(xmlName, listFiles)) {
+                    filesToEnable.add(xmlName);
+                } else {
+                    item.setChecked(false);
                 }
-            } else {
-                if (XmlUtils.isAnalysisEnabled(xmlName)) {
-                    disableAnalysis(xmlName);
-                }
+            } else if (XmlUtils.isAnalysisEnabled(xmlName)) {
+                filesToDisable.add(xmlName);
             }
             // Force update for selection handling
             if (fAnalysesTable.getSelectionCount() > 0) {
                 handleSelection(fAnalysesTable.getSelection()[0]);
             }
         }
+
+        // Apply changes
+        if (!(filesToEnable.isEmpty() && filesToDisable.isEmpty())) {
+            enableAndDisableAnalyses(filesToEnable, filesToDisable);
+        }
     }
 
     /**
-     * Enable an analysis in the table.
+     * Enable and disable analyses all at once.
      *
-     * @param xmlName
-     *            the corresponding xml file name, with extension
+     * @param toEnable
+     *            the list of xml file names (with extension) to enable
+     * @param toDisable
+     *            the list of xml file names (with extension) to disable
      */
-    private static void enableAnalysis(String xmlName) {
-        List<TmfCommonProjectElement> elements = deleteSupplementaryFile(xmlName);
-        XmlUtils.enableFile(xmlName);
-        XmlAnalysisModuleSource.notifyModuleChange();
-        refreshProject(elements);
-    }
-
-    /**
-     * Disable an analysis in the table, if needed.
-     *
-     * @param xmlName
-     *            the corresponding xml file name, with extension
-     */
-    private static void disableAnalysis(String xmlName) {
-        List<TmfCommonProjectElement> elements = deleteSupplementaryFile(xmlName);
-        XmlUtils.disableFile(xmlName);
+    private static void enableAndDisableAnalyses(Collection<String> toEnable, Collection<String> toDisable) {
+        Collection<String> toEnableOrDisable = new ArrayList<>(toEnable.size() + toDisable.size());
+        toEnableOrDisable.addAll(toEnable);
+        toEnableOrDisable.addAll(toDisable);
+        Collection<TmfCommonProjectElement> elements = deleteSupplementaryFiles(toEnableOrDisable);
+        XmlUtils.enableFiles(toEnable);
+        XmlUtils.disableFiles(toDisable);
         XmlAnalysisModuleSource.notifyModuleChange();
         refreshProject(elements);
     }
@@ -426,7 +439,7 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
      */
     private void importAnalysis() {
         FileDialog dialog = TmfFileDialogFactory.create(Display.getCurrent().getActiveShell(), SWT.OPEN | SWT.MULTI);
-        dialog.setText(Messages.ManageXMLAnalysisDialog_SelectFileImport);
+        dialog.setText(Messages.ManageXMLAnalysisDialog_SelectFilesImport);
         dialog.setFilterNames(new String[] { Messages.ManageXMLAnalysisDialog_ImportXmlFile + " (" + XML_FILTER_EXTENSION + ")" }); //$NON-NLS-1$ //$NON-NLS-2$
         dialog.setFilterExtensions(new String[] { XML_FILTER_EXTENSION });
         dialog.open();
@@ -434,15 +447,18 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
         if (!directoryPath.isEmpty()) {
             File directory = new File(directoryPath);
             String[] files = dialog.getFileNames();
-            boolean isFileImported = false;
+            Collection<String> filesToProcess = Lists.newArrayList();
             for (String fileName : files) {
                 File file = new File(directory, fileName);
                 if (loadXmlFile(file, true)) {
-                    isFileImported |= true;
+                    filesToProcess.add(file.getName());
                 }
             }
-            if (isFileImported) {
+            if (!filesToProcess.isEmpty()) {
                 fillAnalysesTable();
+                Collection<TmfCommonProjectElement> elements = deleteSupplementaryFiles(filesToProcess);
+                XmlAnalysisModuleSource.notifyModuleChange();
+                refreshProject(elements);
             }
         }
     }
@@ -459,15 +475,12 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
     private static boolean loadXmlFile(File file, boolean addFile) {
         IStatus status = XmlUtils.xmlValidate(file);
         if (status.isOK()) {
-            List<TmfCommonProjectElement> elements = deleteSupplementaryFile(file.getName());
             if (addFile) {
                 status = XmlUtils.addXmlFile(file);
             } else {
                 XmlUtils.updateXmlFile(file);
             }
             if (status.isOK()) {
-                XmlAnalysisModuleSource.notifyModuleChange();
-                refreshProject(elements);
                 return true;
             }
 
@@ -484,17 +497,19 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
      * Export analysis to new file.
      */
     private void exportAnalysis() {
-        FileDialog dialog = TmfFileDialogFactory.create(Display.getCurrent().getActiveShell(), SWT.SAVE);
         TableItem[] selection = fAnalysesTable.getSelection();
-        for (TableItem item : selection) {
-            String fileName = item.getText();
-            dialog.setText(NLS.bind(Messages.ManageXMLAnalysisDialog_SelectFileExport, fileName));
-            dialog.setFilterExtensions(new String[] { XML_FILTER_EXTENSION, TmfXmlStrings.WILDCARD });
-            String fileNameXml = XmlUtils.createXmlFileString(fileName);
-            dialog.setFileName(fileNameXml);
-            String path = dialog.open();
-            if (path != null && !XmlUtils.exportXmlFile(fileNameXml, path).isOK()) {
-                Activator.logError(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToExport, fileNameXml));
+        DirectoryDialog dialog = DirectoryDialogFactory.create(Display.getCurrent().getActiveShell(), SWT.SAVE);
+        dialog.setText(NLS.bind(Messages.ManageXMLAnalysisDialog_SelectDirectoryExport, selection.length));
+        String directoryPath = dialog.open();
+        if (directoryPath != null) {
+            File directory = new File(directoryPath);
+            for (TableItem item : selection) {
+                String fileName = item.getText();
+                String fileNameXml = XmlUtils.createXmlFileString(fileName);
+                String path = new File(directory, fileNameXml).getAbsolutePath();
+                if (!XmlUtils.exportXmlFile(fileNameXml, path).isOK()) {
+                    Activator.logError(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToExport, fileNameXml));
+                }
             }
         }
     }
@@ -503,10 +518,11 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
      * Edit analysis file(s) with built-in editor.
      */
     private void editAnalysis() {
+        Map<@NonNull String, @NonNull File> listFiles = XmlUtils.listFiles();
         for (TableItem item : fAnalysesTable.getSelection()) {
             String selection = XmlUtils.createXmlFileString(item.getText());
             @Nullable
-            File file = XmlUtils.listFiles().get(selection);
+            File file = listFiles.get(selection);
             if (file == null) {
                 Activator.logError(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToEdit, selection));
                 TraceUtils.displayErrorMsg(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToEdit, selection), NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToEdit, selection));
@@ -532,18 +548,27 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
     }
 
     /**
-     * Delete an analysis, remove the corresponding file, and close the editor, if
+     * Delete analyses, remove the corresponding files, and close the editors, if
      * opened.
      */
-    private void deleteAnalysis() {
+    private void deleteAnalyses() {
+        // Get list of files
+        TableItem[] selection = fAnalysesTable.getSelection();
+        List<String> filesToDeleteList = Lists.newArrayList();
+        for (TableItem item : selection) {
+            filesToDeleteList.add(ELEMENT_SEP + item.getText());
+        }
+        final String filesToDelete = Joiner.on(LINE_SEP).join(filesToDeleteList);
+
         boolean confirm = MessageDialog.openQuestion(
                 getShell(),
                 Messages.ManageXMLAnalysisDialog_DeleteFile,
-                Messages.ManageXMLAnalysisDialog_DeleteConfirmation);
+                Messages.ManageXMLAnalysisDialog_DeleteConfirmation + StringUtils.repeat(LINE_SEP, 2) + filesToDelete);
         if (confirm) {
             Set<IEditorReference> editorReferences = getEditorReferences();
-            List<TmfCommonProjectElement> elements = new ArrayList<>();
-            for (TableItem item : fAnalysesTable.getSelection()) {
+            Collection<String> toDeleteSupFiles = Lists.newArrayList();
+            Collection<String> toDeleteFiles = Lists.newArrayList();
+            for (TableItem item : selection) {
                 String itemTitle = XmlUtils.createXmlFileString(item.getText());
                 // If opened, close the editor before deleting the file
                 editorReferences.forEach(editorReference -> {
@@ -554,31 +579,34 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
                 // We do not need to re-open the elements of an analysis that was already
                 // disabled
                 if (XmlUtils.isAnalysisEnabled(itemTitle)) {
-                    elements.addAll(deleteSupplementaryFile(itemTitle));
+                    toDeleteSupFiles.add(itemTitle);
                 }
-                XmlUtils.deleteFile(itemTitle);
+                toDeleteFiles.add(itemTitle);
             }
-            fillAnalysesTable();
             fInvalidFileLabel.setVisible(false);
+            Collection<TmfCommonProjectElement> elements = deleteSupplementaryFiles(toDeleteSupFiles);
+            XmlUtils.deleteFiles(toDeleteFiles);
+            fillAnalysesTable();
             XmlAnalysisModuleSource.notifyModuleChange();
             refreshProject(elements);
         }
     }
 
     /**
-     * Delete the supplementary files associated with an XML analysis file.
+     * Delete the supplementary files associated with XML analysis files.
      *
-     * @param xmlFile
-     *            the xml analysis file (with extension)
+     * @param xmlFiles
+     *            the xml analysis files (with extension)
      * @return the list of elements that should be re-opened
      */
-    private static List<TmfCommonProjectElement> deleteSupplementaryFile(String xmlFile) {
-        // 1. Look for all traces that have this analysis
+    private static Collection<TmfCommonProjectElement> deleteSupplementaryFiles(Collection<String> xmlFiles) {
+        // 1. Look for all traces that have these analyses
         // 2. Close them if they are opened, but remember them
         // 3. Delete the related supplementary files
-        List<TmfCommonProjectElement> toReopen = new ArrayList<>();
+        Collection<TmfCommonProjectElement> toReopen = new ArrayList<>();
         List<IResource> resourceToDelete = new ArrayList<>();
-        List<String> ids = XmlUtils.getAnalysisIdsFromFile(xmlFile);
+        Set<String> ids = Sets.newHashSet();
+        xmlFiles.forEach(xmlFile -> ids.addAll(XmlUtils.getAnalysisIdsFromFile(xmlFile)));
         IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects(0);
         for (IProject project : projects) {
             TmfProjectElement pElement = TmfProjectRegistry.getProject(project);
@@ -631,12 +659,13 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
     }
 
     /**
-     * Refresh the selected project with the new XML file import.
+     * Refresh the selected project elements. This is useful after XML files
+     * importing/deletion/enabling/disabling.
      *
      * @param elements
      *            the elements to re-open
      */
-    private static void refreshProject(List<TmfCommonProjectElement> elements) {
+    private static void refreshProject(Collection<TmfCommonProjectElement> elements) {
         // Check if we are closing down
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         if (window == null) {
@@ -676,8 +705,21 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
      * @return true if valid, false otherwise
      */
     private static boolean isFileValid(String xmlName) {
-        Map<String, File> files = XmlUtils.listFiles();
-        File file = files.get(xmlName);
+        return isFileValid(xmlName, XmlUtils.listFiles());
+    }
+
+    /**
+     * Validate an XML file. This version is intended to be used when validating
+     * multiple files (i.e. when this is called multiple times).
+     *
+     * @param xmlName
+     *            the xml file, with extension
+     * @param listFiles
+     *            the XML files
+     * @return
+     */
+    private static boolean isFileValid(String xmlName, Map<@NonNull String, @NonNull File> listFiles) {
+        File file = listFiles.get(xmlName);
         return (file != null && XmlUtils.xmlValidate(file).isOK());
     }
 

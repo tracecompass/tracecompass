@@ -78,14 +78,14 @@ public class Messages extends NLS {
     public static String ManageXMLAnalysisDialog_ManageXmlAnalysesFiles;
 
     /**
-     * Select file to export message
+     * Select directory to export message
      */
-    public static String ManageXMLAnalysisDialog_SelectFileExport;
+    public static String ManageXMLAnalysisDialog_SelectDirectoryExport;
 
     /**
-     * Select file to import message
+     * Select files to import message
      */
-    public static String ManageXMLAnalysisDialog_SelectFileImport;
+    public static String ManageXMLAnalysisDialog_SelectFilesImport;
 
     /**
      * Invalid file message

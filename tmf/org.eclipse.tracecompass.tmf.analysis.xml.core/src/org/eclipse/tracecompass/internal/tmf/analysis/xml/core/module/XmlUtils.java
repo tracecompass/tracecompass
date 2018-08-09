@@ -390,47 +390,51 @@ public class XmlUtils {
     }
 
     /**
-     * Delete an XML analysis file
+     * Delete XML analysis files
      *
-     * @param name
-     *            The XML file to delete
+     * @param names
+     *            The XML files to delete
      */
-    public static void deleteFile(String name) {
+    public static void deleteFiles(Collection<String> names) {
         Map<String, File> files = listFiles();
-        File file = files.get(name);
-        if (file == null) {
-            return;
+        for (String name : names) {
+            File file = files.get(name);
+            if (file != null) {
+                removeXmlOutput(file.getAbsolutePath());
+                file.delete();
+            }
         }
-        removeXmlOutput(file.getAbsolutePath());
-        file.delete();
     }
 
     /**
-     * Enable an XML analysis file that already exists.
+     * Enable XML analysis files that already exist.
      *
-     * @param name
-     *            the name of the XML file to enable, with extension
+     * @param names
+     *            the names of the XML files to enable, with extension
      */
-    public static void enableFile(String name) {
-        File fileName = getXmlFilesPath().addTrailingSeparator().append(name).toFile();
-        preloadXmlAnalysesOutput(fileName);
-        fEnabledFiles.add(name);
+    public static void enableFiles(Collection<String> names) {
+        for (String name : names) {
+            File fileName = getXmlFilesPath().addTrailingSeparator().append(name).toFile();
+            preloadXmlAnalysesOutput(fileName);
+            fEnabledFiles.add(name);
+        }
     }
 
     /**
-     * Disable an XML analysis file without removing it.
+     * Disable XML analysis files without removing them.
      *
-     * @param name
-     *            the name of the XML file to disable, with extension
+     * @param names
+     *            the names of the XML files to disable, with extension
      */
-    public static void disableFile(String name) {
+    public static void disableFiles(Collection<String> names) {
         Map<String, File> files = listFiles();
-        File file = files.get(name);
-        if (file == null) {
-            return;
+        for (String name : names) {
+            File file = files.get(name);
+            if (file != null) {
+                removeXmlOutput(file.getAbsolutePath());
+                fEnabledFiles.remove(name);
+            }
         }
-        removeXmlOutput(file.getAbsolutePath());
-        fEnabledFiles.remove(name);
     }
 
     /**

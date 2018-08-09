@@ -41,6 +41,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlAnalysi
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.Activator;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
+import org.eclipse.tracecompass.tmf.ui.dialog.DirectoryDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
@@ -92,6 +93,8 @@ public class XMLAnalysesManagerPreferencePageTest {
     private static final @NonNull String UNCHECK_ALL = "Uncheck all";
     /** Workbench bot */
     private static SWTWorkbenchBot fBot;
+
+    private static final String TEMP_DIRECTORY = "/tmp";
 
     /**
      * Before Class for launch and setup
@@ -166,7 +169,7 @@ public class XMLAnalysesManagerPreferencePageTest {
         bot.button("Delete").click();
 
         // Check that the confirmation pop-up is displayed
-        SWTBotShell deleteShell = bot.shell("Delete XML file").activate();
+        SWTBotShell deleteShell = bot.shell("Delete XML file(s)").activate();
         deleteShell.bot().button("Yes").click();
 
         // Check that the files do not exist anymore
@@ -286,7 +289,7 @@ public class XMLAnalysesManagerPreferencePageTest {
             }
             tableBot.select(itemNames);
             bot.button("Delete").click();
-            SWTBotShell deleteShell = bot.shell("Delete XML file").activate();
+            SWTBotShell deleteShell = bot.shell("Delete XML file(s)").activate();
             deleteShell.bot().button("Yes").click();
         }
 
@@ -331,20 +334,21 @@ public class XMLAnalysesManagerPreferencePageTest {
     public void testExport() {
         // Import valid analysis file
         SWTBot bot = openXMLAnalysesPreferences().bot();
-        importAnalysis(bot, TEST_FILES_FOLDER + VALID_FILES_FOLDER + FILE_EXPORT + EXTENSION);
+        final String fileNameXml = FILE_EXPORT + EXTENSION;
+        importAnalysis(bot, TEST_FILES_FOLDER + VALID_FILES_FOLDER + fileNameXml);
 
-        // Setup target file
-        try {
-            File targetFile = File.createTempFile(FILE_EXPORT, EXTENSION);
-            TmfFileDialogFactory.setOverrideFiles(targetFile.getAbsolutePath());
-        } catch (IOException e) {
-            fail("Failed to export XML file " + FILE_EXPORT);
-        }
+        // Setup target folder
+        File targetDirectory = new File(TEMP_DIRECTORY);
+        DirectoryDialogFactory.setOverridePath(targetDirectory.getAbsolutePath());
 
         // Export
         SWTBotTable tableBot = bot.table(0);
         tableBot.select(FILE_EXPORT);
         bot.button("Export").click();
+
+        // Check that the file was created
+        File targetFile = new File(targetDirectory, fileNameXml);
+        assertTrue(targetFile.toString(), targetFile.exists());
 
         SWTBotUtils.pressOKishButtonInPreferences(bot);
     }

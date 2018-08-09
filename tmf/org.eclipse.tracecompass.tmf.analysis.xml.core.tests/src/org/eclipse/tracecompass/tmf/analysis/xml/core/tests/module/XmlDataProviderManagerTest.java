@@ -37,6 +37,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Element;
 
+import com.google.common.collect.ImmutableList;
+
 /**
  * Test the XML data provider manager
  *
@@ -65,8 +67,9 @@ public class XmlDataProviderManagerTest {
      * Clean
      */
     public void cleanUp() {
-        XmlUtils.deleteFile(TmfXmlTestFiles.EXPERIMENT.getFile().getName());
-        XmlUtils.deleteFile(TmfXmlTestFiles.STATE_VALUE_FILE.getFile().getName());
+        XmlUtils.deleteFiles(ImmutableList.of(
+                TmfXmlTestFiles.EXPERIMENT.getFile().getName(),
+                TmfXmlTestFiles.STATE_VALUE_FILE.getFile().getName()));
         XmlAnalysisModuleSource.notifyModuleChange();
     }
 
