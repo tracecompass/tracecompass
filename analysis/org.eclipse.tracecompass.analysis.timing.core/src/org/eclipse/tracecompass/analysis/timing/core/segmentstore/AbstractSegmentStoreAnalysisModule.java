@@ -105,6 +105,7 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
      * store will be rebuilt.
      *
      * @return The version number of the segment store
+     * @since 4.1
      */
     protected int getVersion() {
         return 1;
