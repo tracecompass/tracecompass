@@ -400,7 +400,7 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
                 } else {
                     item.setChecked(false);
                 }
-            } else if (XmlUtils.isAnalysisEnabled(xmlName)) {
+            } else if (!item.getChecked() && XmlUtils.isAnalysisEnabled(xmlName)) {
                 filesToDisable.add(xmlName);
             }
             // Force update for selection handling
