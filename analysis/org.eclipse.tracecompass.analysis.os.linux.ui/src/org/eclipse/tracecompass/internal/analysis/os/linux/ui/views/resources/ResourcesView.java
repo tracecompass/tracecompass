@@ -134,16 +134,6 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
         TimeGraphControl timeGraphControl = getTimeGraphViewer().getTimeGraphControl();
         final Menu timeEventMenu = eventMenuManager.createContextMenu(timeGraphControl);
 
-        timeGraphControl.addTimeGraphEntryMenuListener(event -> {
-            /*
-             * The TimeGraphControl will call the TimeGraphEntryMenuListener
-             * before the TimeEventMenuListener. We need to clear the menu
-             * for the case the selection was done on the namespace where
-             * the time event listener below won't be called afterwards.
-             */
-            timeGraphControl.setMenu(null);
-            event.doit = false;
-        });
         timeGraphControl.addTimeEventMenuListener(event -> {
             Menu menu = timeEventMenu;
             if (event.data instanceof TimeEvent) {
