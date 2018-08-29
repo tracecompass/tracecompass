@@ -94,7 +94,7 @@ public class LttngUstResponseBenchmark extends ViewsResponseTest {
      */
     @Test
     public void testWithQmlScene() throws SecurityException, IllegalArgumentException {
-        runTestWithTrace(CtfBenchmarkTrace.UST_QMLSCENE.getTracePath().toOSString(), TRACE_TYPE, Collections.singleton(FLAMECHART_VIEW_ID));
+        runTestWithTrace(CtfBenchmarkTrace.UST_QMLSCENE.getTracePath().toString(), TRACE_TYPE, Collections.singleton(FLAMECHART_VIEW_ID));
     }
 
 }

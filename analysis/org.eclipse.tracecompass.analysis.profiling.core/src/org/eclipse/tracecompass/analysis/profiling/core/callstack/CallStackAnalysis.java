@@ -30,6 +30,7 @@ import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -56,6 +57,8 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
 
     private @Nullable CallStackSeries fCallStacks = null;
     private final List<String[]> fPatterns;
+
+    private boolean fAutomaticCallgraph;
 
     /**
      * Abstract constructor (should only be called via the sub-classes'
@@ -145,7 +148,9 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
         if (!result) {
             return false;
         }
-        fCallGraphAnalysis.schedule();
+        if (fAutomaticCallgraph) {
+            fCallGraphAnalysis.schedule();
+        }
         return result;
     }
 
@@ -268,6 +273,22 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
      */
     public ICallGraphProvider getCallGraph() {
         return fCallGraphAnalysis;
+    }
+
+    /**
+     * Set whether the callgraph execution should be triggered automatically after
+     * building the callstack or if it should wait to be requested. This is used
+     * in benchmark to control when the callgraph module will be built.
+     *
+     * @param trigger
+     *            {@code true} means the callgraph analysis will be executed after
+     *            the callstack, {@code false} means it will be executed on demand
+     *            only.
+     * @since 1.1
+     */
+    @VisibleForTesting
+    public void triggerAutomatically(boolean trigger) {
+        fAutomaticCallgraph = trigger;
     }
 
 }

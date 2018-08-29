@@ -9,6 +9,9 @@
 
 package org.eclipse.tracecompass.lttng2.ust.core.tests.perf.cygprofile;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Objects;
@@ -17,6 +20,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
+import org.eclipse.tracecompass.analysis.profiling.core.callgraph.ICallGraphProvider;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfBenchmarkTrace;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CallGraphAnalysis;
@@ -75,7 +79,7 @@ public class CallStackAndGraphBenchmark {
     public static Iterable<Object[]> getParameters() {
         return Arrays.asList(new Object[][] {
                 { CtfTestTrace.CYG_PROFILE.name(), getPathFromCtfTestTrace(CtfTestTrace.CYG_PROFILE) },
-                { CtfBenchmarkTrace.UST_QMLSCENE.name(), CtfBenchmarkTrace.UST_QMLSCENE.getTracePath().toOSString() },
+                { CtfBenchmarkTrace.UST_QMLSCENE.name(), CtfBenchmarkTrace.UST_QMLSCENE.getTracePath().toString() },
         });
     }
 
@@ -112,16 +116,19 @@ public class CallStackAndGraphBenchmark {
                 trace = getTrace();
                 trace.traceOpened(new TmfTraceOpenedSignal(this, trace, null));
                 CallStackAnalysis callStackModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, CallStackAnalysis.class, LttngUstCallStackAnalysis.ID);
+                assertNotNull(callStackModule);
+                callStackModule.triggerAutomatically(false);
 
                 // Benchmark the call stack analysis
                 callStackBuildPm.start();
                 TmfTestHelper.executeAnalysis(callStackModule);
                 callStackBuildPm.stop();
 
-                CallGraphAnalysis callGraphModule = TmfTraceUtils.getAnalysisModuleOfClass(trace, CallGraphAnalysis.class, CallGraphAnalysis.ID);
+                ICallGraphProvider callGraphModule = callStackModule.getCallGraph();
+                assertTrue(callGraphModule instanceof CallGraphAnalysis);
                 // Benchmark the call graph analysis
                 callgraphBuildPm.start();
-                TmfTestHelper.executeAnalysis(callGraphModule);
+                TmfTestHelper.executeAnalysis((CallGraphAnalysis) callGraphModule);
                 callgraphBuildPm.stop();
 
                 /*

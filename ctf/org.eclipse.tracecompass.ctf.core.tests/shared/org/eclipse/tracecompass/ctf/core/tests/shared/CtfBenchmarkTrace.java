@@ -9,10 +9,10 @@
 
 package org.eclipse.tracecompass.ctf.core.tests.shared;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.ctf.core.tests.CtfCoreTestPlugin;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 
 /**
@@ -38,7 +38,7 @@ public enum CtfBenchmarkTrace {
      * Trace length: ~31 s
      * </pre>
      */
-    ALL_OS_ANALYSES("/os-events"),
+    ALL_OS_ANALYSES("os-events"),
 
     /**
      * A UST trace of the qmlscene program instrumented with -finstrument-functions.
@@ -51,7 +51,7 @@ public enum CtfBenchmarkTrace {
      * Trace length: ~10 s
      * </pre>
      */
-    UST_QMLSCENE("/qmlscene");
+    UST_QMLSCENE("qmlscene");
 
     private static final @NonNull String TRACE_PATH = "traces";
     private final String fTraceName;
@@ -65,13 +65,8 @@ public enum CtfBenchmarkTrace {
      *
      * @return The path for this trace
      */
-    public IPath getTracePath() {
-        IPath url = CtfCoreTestPlugin.getAbsolutePath(new Path(TRACE_PATH + fTraceName));
-        if (url == null) {
-            /* Project configuration problem? */
-            throw new IllegalStateException("Test trace not found");
-        }
-        return url;
+    public Path getTracePath() {
+        return FileSystems.getDefault().getPath("..", "..", "ctf", "org.eclipse.tracecompass.ctf.core.tests", TRACE_PATH, fTraceName);
     }
 
 }
