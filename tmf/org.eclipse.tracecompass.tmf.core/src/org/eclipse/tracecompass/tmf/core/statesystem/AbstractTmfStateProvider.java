@@ -236,7 +236,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
                 Thread.sleep(100);
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // do nothing
         }
     }
 

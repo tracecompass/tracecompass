@@ -909,6 +909,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     @Override
     public void keyReleased(final KeyEvent event) {
+        // do nothing
     }
 
     // ------------------------------------------------------------------------
@@ -917,6 +918,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     @Override
     public void mouseDoubleClick(final MouseEvent event) {
+        // do nothing
     }
 
     @Override

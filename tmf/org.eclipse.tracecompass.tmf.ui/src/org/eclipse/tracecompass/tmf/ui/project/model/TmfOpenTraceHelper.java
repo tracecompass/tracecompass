@@ -91,6 +91,7 @@ public class TmfOpenTraceHelper {
     private static final Set<TmfCommonProjectElement> fOpening = Collections.synchronizedSet(new HashSet<>());
 
     private TmfOpenTraceHelper() {
+        // do nothing
     }
 
 

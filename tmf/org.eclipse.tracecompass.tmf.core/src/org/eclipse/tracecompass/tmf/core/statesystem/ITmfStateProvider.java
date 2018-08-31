@@ -117,7 +117,9 @@ public interface ITmfStateProvider {
      * Callback when trace has been fully read
      * @since 2.1
      */
-    default void done() {}
+    default void done() {
+        // do nothing
+    }
 
     /**
      * Makes the state provider fail with a cause

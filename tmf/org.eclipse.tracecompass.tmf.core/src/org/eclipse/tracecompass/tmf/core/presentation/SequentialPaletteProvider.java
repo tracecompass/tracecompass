@@ -38,7 +38,6 @@ public class SequentialPaletteProvider implements IPaletteProvider {
     private final List<RGBAColor> fColors;
 
     private SequentialPaletteProvider() {
-        // Do nothing
         fColors = Collections.emptyList();
     }
 

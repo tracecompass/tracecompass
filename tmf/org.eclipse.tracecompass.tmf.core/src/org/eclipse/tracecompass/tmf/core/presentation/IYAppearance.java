@@ -52,7 +52,7 @@ public interface IYAppearance {
          * Constructor
          */
         private Type() {
-
+            // do nothing
         }
     }
 

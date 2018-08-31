@@ -2580,6 +2580,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @since 2.0
      */
     protected void fillTimeGraphEntryContextMenu(@NonNull IMenuManager menuManager) {
+        // do nothing
     }
 
     /**
@@ -2670,14 +2671,17 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         @Override
         public void partBroughtToTop(IWorkbenchPart part) {
+            // do nothing
         }
 
         @Override
         public void partClosed(IWorkbenchPart part) {
+            // do nothing
         }
 
         @Override
         public void partOpened(IWorkbenchPart part) {
+            // do nothing
         }
     }
 
@@ -2685,22 +2689,27 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         @Override
         public void partActivated(IWorkbenchPartReference partRef) {
+            // do nothing
         }
 
         @Override
         public void partBroughtToTop(IWorkbenchPartReference partRef) {
+            // do nothing
         }
 
         @Override
         public void partClosed(IWorkbenchPartReference partRef) {
+            // do nothing
         }
 
         @Override
         public void partDeactivated(IWorkbenchPartReference partRef) {
+            // do nothing
         }
 
         @Override
         public void partOpened(IWorkbenchPartReference partRef) {
+            // do nothing
         }
 
         @Override
@@ -2729,6 +2738,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         @Override
         public void partInputChanged(IWorkbenchPartReference partRef) {
+            // do nothing
         }
     }
 

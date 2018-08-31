@@ -199,7 +199,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
      *            The name of the modified parameter
      */
     protected void parameterChanged(String name) {
-
+        // do nothing
     }
 
     @Override
