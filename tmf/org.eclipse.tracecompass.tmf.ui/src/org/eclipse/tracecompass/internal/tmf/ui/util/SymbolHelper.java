@@ -74,8 +74,8 @@ public final class SymbolHelper {
         pts[0] = centerX - symbolSize;
         pts[1] = centerY + symbolSize / 3;
         pts[2] = centerX;
-        pts[3] = centerY + symbolSize;
-        pts[4] = centerX - symbolSize;
+        pts[3] = centerY - symbolSize;
+        pts[4] = centerX + symbolSize;
         pts[5] = centerY + symbolSize / 3;
         gc.fillPolygon(pts);
         gc.setBackground(oldColor);
@@ -103,7 +103,7 @@ public final class SymbolHelper {
         pts[1] = centerY - symbolSize / 3;
         pts[2] = centerX;
         pts[3] = centerY + symbolSize;
-        pts[4] = centerX - symbolSize;
+        pts[4] = centerX + symbolSize;
         pts[5] = centerY - symbolSize / 3;
         gc.fillPolygon(pts);
         gc.setBackground(oldColor);
