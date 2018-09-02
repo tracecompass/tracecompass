@@ -177,7 +177,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
         sc.setContent(innerComposite);
 
         createStatesGroup(innerComposite);
-        CreateLinkGroup(linkStates, innerComposite);
+        createLinkGroup(linkStates, innerComposite);
 
         sc.setMinSize(innerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
@@ -220,7 +220,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
         });
     }
 
-    private void CreateLinkGroup(Collection<StateItem> linkStates, Composite innerComposite) {
+    private void createLinkGroup(Collection<StateItem> linkStates, Composite innerComposite) {
         if (linkStates.isEmpty()) {
             return;
         }
