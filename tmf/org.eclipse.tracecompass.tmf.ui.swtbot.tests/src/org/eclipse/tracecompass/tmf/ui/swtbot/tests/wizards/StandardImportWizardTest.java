@@ -24,6 +24,7 @@ import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -64,6 +65,7 @@ public class StandardImportWizardTest extends AbstractStandardImportWizardTest {
      *             Exception
      */
     @Test
+    @Ignore
     public void testImportTimerange() throws Exception {
         openImportWizard();
         selectSyslog();
@@ -81,6 +83,7 @@ public class StandardImportWizardTest extends AbstractStandardImportWizardTest {
      *             Exception
      */
     @Test
+    @Ignore
     public void testImportTimerangeInvalidFormat() throws Exception {
         SWTWorkbenchBot bot = getSWTBot();
         openImportWizard();
@@ -99,6 +102,7 @@ public class StandardImportWizardTest extends AbstractStandardImportWizardTest {
      *             Exception
      */
     @Test
+    @Ignore
     public void testImportTimerangeInverseTime() throws Exception {
         openImportWizard();
         selectSyslog();

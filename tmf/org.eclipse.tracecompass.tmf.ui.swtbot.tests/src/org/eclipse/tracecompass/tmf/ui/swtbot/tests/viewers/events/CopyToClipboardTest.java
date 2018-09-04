@@ -49,6 +49,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -160,6 +161,7 @@ public class CopyToClipboardTest {
      * Test copy to clipboard with multiple selection
      */
     @Test
+    @Ignore
     public void testCopyMultipleSelection() {
         final SWTBotTable tableBot = fEditorBot.bot().table();
         tableBot.getTableItem(1).click();
@@ -174,6 +176,7 @@ public class CopyToClipboardTest {
      * Test copy to clipboard not enabled when selection includes search row
      */
     @Test
+    @Ignore
     public void testNoCopySearchRow() {
         final SWTBotTable tableBot = fEditorBot.bot().table();
         tableBot.getTableItem(1).click();

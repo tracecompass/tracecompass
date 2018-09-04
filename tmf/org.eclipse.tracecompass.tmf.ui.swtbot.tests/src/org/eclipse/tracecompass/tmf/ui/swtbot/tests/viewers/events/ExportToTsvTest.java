@@ -52,6 +52,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -210,6 +211,7 @@ public class ExportToTsvTest {
      *             File not found or such
      */
     @Test
+    @Ignore
     public void testExportWithFilter() throws IOException {
         SWTBotEditor editorBot = fEditorBot;
         assertNotNull(editorBot);
