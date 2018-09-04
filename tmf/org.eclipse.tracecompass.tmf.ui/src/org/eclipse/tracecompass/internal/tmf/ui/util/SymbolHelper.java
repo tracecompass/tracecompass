@@ -29,9 +29,9 @@ public final class SymbolHelper {
      * @param gc
      *            the graphics context to draw to
      * @param color
-     *            the color of the symbol (radius in pixels)
+     *            the color of the symbol
      * @param symbolSize
-     *            the size of the symbol
+     *            the size of the symbol (radius in pixels)
      * @param centerX
      *            the center point x coordinate
      * @param centerY
@@ -54,14 +54,14 @@ public final class SymbolHelper {
     }
 
     /**
-     * Draw a square
+     * Draw an isoceles triangle where the summit is facing upwards
      *
      * @param gc
      *            the graphics context to draw to
      * @param color
-     *            the color of the symbol (radius in pixels)
+     *            the color of the symbol
      * @param symbolSize
-     *            the size of the symbol
+     *            the size of the symbol (radius in pixels)
      * @param centerX
      *            the center point x coordinate
      * @param centerY
@@ -82,14 +82,14 @@ public final class SymbolHelper {
     }
 
     /**
-     * Draw a square
+     * Draw an isoceles triangle where the summit is facing downwards
      *
      * @param gc
      *            the graphics context to draw to
      * @param color
-     *            the color of the symbol (radius in pixels)
+     *            the color of the symbol
      * @param symbolSize
-     *            the size of the symbol
+     *            the size of the symbol (radius in pixels)
      * @param centerX
      *            the center point x coordinate
      * @param centerY
@@ -110,14 +110,14 @@ public final class SymbolHelper {
     }
 
     /**
-     * Draw a square
+     * Draw a plus
      *
      * @param gc
      *            the graphics context to draw to
      * @param color
-     *            the color of the symbol (radius in pixels)
+     *            the color of the symbol
      * @param symbolSize
-     *            the size of the symbol
+     *            the size of the symbol (radius in pixels)
      * @param centerX
      *            the center point x coordinate
      * @param centerY
@@ -136,14 +136,14 @@ public final class SymbolHelper {
     }
 
     /**
-     * Draw a square
+     * Draw a cross, an X symbol
      *
      * @param gc
      *            the graphics context to draw to
      * @param color
-     *            the color of the symbol (radius in pixels)
+     *            the color of the symbol
      * @param symbolSize
-     *            the size of the symbol
+     *            the size of the symbol (radius in pixels)
      * @param centerX
      *            the center point x coordinate
      * @param centerY
@@ -162,14 +162,14 @@ public final class SymbolHelper {
     }
 
     /**
-     * Draw a square
+     * Draw a diamond, a square rotated by 45 degrees
      *
      * @param gc
      *            the graphics context to draw to
      * @param color
-     *            the color of the symbol (radius in pixels)
+     *            the color of the symbol
      * @param symbolSize
-     *            the size of the symbol
+     *            the size of the symbol (radius in pixels)
      * @param centerX
      *            the center point x coordinate
      * @param centerY
@@ -192,14 +192,14 @@ public final class SymbolHelper {
     }
 
     /**
-     * Draw a square
+     * Draw a circle
      *
      * @param gc
      *            the graphics context to draw to
      * @param color
-     *            the color of the symbol (radius in pixels)
+     *            the color of the symbol
      * @param symbolSize
-     *            the size of the symbol
+     *            the size of the symbol (radius in pixels)
      * @param centerX
      *            the center point x coordinate
      * @param centerY
