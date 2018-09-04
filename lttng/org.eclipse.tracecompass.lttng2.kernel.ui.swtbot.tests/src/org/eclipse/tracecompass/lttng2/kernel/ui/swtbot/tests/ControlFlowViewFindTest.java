@@ -8,11 +8,14 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
+import org.junit.Ignore;
+
 /**
  * SWTBot test for Control Flow View Find dialog
  *
  * @author Jean-Christian Kouame
  */
+@Ignore
 public class ControlFlowViewFindTest extends FindDialogTestBase {
 
     private static final String TITLE = "Control Flow";
