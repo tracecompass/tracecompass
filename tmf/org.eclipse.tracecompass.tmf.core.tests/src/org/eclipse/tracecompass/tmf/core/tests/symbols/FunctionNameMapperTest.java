@@ -17,6 +17,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,8 +44,9 @@ public class FunctionNameMapperTest {
     public void testNmFile() {
         Path nmOutput = Paths.get("..", "..", "tmf", "org.eclipse.tracecompass.tmf.core.tests",
                 "testfiles", "callstack" , "nm-output-example");
-        assertTrue(Files.exists(nmOutput));
-        Map<Long, TmfResolvedSymbol> results = FunctionNameMapper.mapFromNmTextFile(nmOutput.toFile());
+        File file = nmOutput.toFile();
+        assertNotNull(file);
+        Map<Long, TmfResolvedSymbol> results = FunctionNameMapper.mapFromNmTextFile(file);
 
         assertNotNull(results);
         assertEquals(28, results.size());
@@ -65,8 +67,8 @@ public class FunctionNameMapperTest {
         assertSymbolString("_init", "4005d0", results);
         assertSymbolString("__init_array_end", "600e08", results);
         assertSymbolString("__init_array_start", "600df8", results);
-        assertSymbolString("_IO_stdin_used", "400880", results);
-        assertSymbolString("__JCR_LIST__", "600e10", results);
+        assertSymbolString("std::basic_filebuf<char, std::char_traits<char> >::~basic_filebuf()", "400880", results);
+        assertSymbolString("Average::getTotal(void)", "600e10", results);
         assertSymbolString("__libc_csu_fini", "400870", results);
         assertSymbolString("__libc_csu_init", "400800", results);
         assertSymbolString("main", "400756", results);
@@ -95,7 +97,9 @@ public class FunctionNameMapperTest {
         Path nmOutput = Paths.get("..", "..", "tmf", "org.eclipse.tracecompass.tmf.core.tests",
                 "testfiles", "callstack", "withsize-123.map");
         assertTrue(Files.exists(nmOutput));
-        Map<Long, TmfResolvedSymbol> results = FunctionNameMapper.mapFromSizedTextFile(nmOutput.toFile());
+        File file = nmOutput.toFile();
+        assertNotNull(file);
+        Map<Long, TmfResolvedSymbol> results = FunctionNameMapper.mapFromSizedTextFile(file);
 
         assertNotNull(results);
         assertEquals(2, results.size());
@@ -128,17 +132,20 @@ public class FunctionNameMapperTest {
         // Guess and nm output file
         Path path = Paths.get("..", "..", "tmf", "org.eclipse.tracecompass.tmf.core.tests",
                 "testfiles", "callstack", "nm-output-example");
-        assertTrue(Files.exists(path));
-        assertEquals("guess nm output", MappingType.NM, FunctionNameMapper.guessMappingType(path.toFile()));
+        File file = path.toFile();
+        assertNotNull(file);
+        assertEquals("guess nm output", MappingType.NM, FunctionNameMapper.guessMappingType(file));
 
         path = Paths.get("..", "..", "tmf", "org.eclipse.tracecompass.tmf.core.tests",
                 "testfiles", "callstack", "withsize-123.map");
-        assertTrue(Files.exists(path));
-        assertEquals("guess sized mapping", MappingType.MAP_WITH_SIZE, FunctionNameMapper.guessMappingType(path.toFile()));
+        file = path.toFile();
+        assertNotNull(file);
+        assertEquals("guess sized mapping", MappingType.MAP_WITH_SIZE, FunctionNameMapper.guessMappingType(file));
 
         path = Paths.get("..", "..", "tmf", "org.eclipse.tracecompass.tmf.core.tests",
                 "testfiles", "callstack", "emptyFile");
-        assertTrue(Files.exists(path));
-        assertEquals("guess sized mapping", MappingType.UNKNOWN, FunctionNameMapper.guessMappingType(path.toFile()));
+        file = path.toFile();
+        assertNotNull(file);
+        assertEquals("guess sized mapping", MappingType.UNKNOWN, FunctionNameMapper.guessMappingType(file));
     }
 }

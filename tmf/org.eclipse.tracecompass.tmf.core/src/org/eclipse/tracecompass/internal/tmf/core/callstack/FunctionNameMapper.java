@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2015, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,6 +10,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  *   Marc-Andre Laperle - Map from binary file
  *   Mikael Ferland - Improve validation for function name mapping from a text file
+ *   Viet-Hung Phan - Use CPPFILT for c++ symbols demangling
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.core.callstack;
@@ -33,6 +34,7 @@ import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.IBinaryParser;
 import org.eclipse.cdt.core.IBinaryParser.IBinaryFile;
 import org.eclipse.cdt.core.IBinaryParser.ISymbol;
+import org.eclipse.cdt.utils.CPPFilt;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ISafeRunnable;
@@ -56,22 +58,22 @@ public final class FunctionNameMapper {
     /**
      * Arbitrary value used to guess the mapping type, if one pattern has this more
      * hits than others, stop
-     */
+    */
     private static final int DIFF_LIMIT = 10;
     private static final Pattern REMOVE_ZEROS_PATTERN = Pattern.compile("^0+(?!$)"); //$NON-NLS-1$
     private static final Pattern NM_PATTERN = Pattern.compile("([0-9a-f]+)([\\s][a-zA-Z][\\s])(.+)"); //$NON-NLS-1$
     private static final Pattern MAP_WITH_SIZE_PATTERN = Pattern.compile("([0-9a-f]+)[\\s]([a-f0-9]+)[\\s](.+)"); //$NON-NLS-1$
 
     /**
-     * The type of mapping used in a file. Each type of mapping has its pattern and
-     * they may overlap
+     * The type of mapping used in a file. Each type of mapping has its pattern
+     * and they may overlap
      *
      * @author Geneviève Bastien
      */
     public enum MappingType {
         /**
-         * The format of the mapping is the same as the one generated with the nm
-         * command
+         * The format of the mapping is the same as the one generated with the
+         * nm command
          */
         NM,
         /**
@@ -107,9 +109,9 @@ public final class FunctionNameMapper {
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 Matcher matcher = NM_PATTERN.matcher(line);
                 if (matcher.find()) {
-                    long address = Long.parseUnsignedLong(stripLeadingZeros(matcher.group(1)), 16);
-                    String name = Objects.requireNonNull(matcher.group(3));
-                    map.put(address, new TmfResolvedSymbol(address, name));
+                    long address = Long.parseUnsignedLong(stripLeadingZeros(Objects.requireNonNull(matcher.group(1))), 16);
+                    String name = nameFromCppFilt(Objects.requireNonNull(matcher.group(3)));
+                    map.put(address, new TmfResolvedSymbol(address, Objects.requireNonNull(name)));
                 }
             }
         } catch (FileNotFoundException e) {
@@ -137,10 +139,10 @@ public final class FunctionNameMapper {
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 Matcher matcher = MAP_WITH_SIZE_PATTERN.matcher(line);
                 if (matcher.find()) {
-                    long address = Long.parseUnsignedLong(stripLeadingZeros(matcher.group(1)), 16);
-                    long size = Long.parseUnsignedLong(stripLeadingZeros(matcher.group(2)), 16);
-                    String name = Objects.requireNonNull(matcher.group(3));
-                    map.put(address, new TmfResolvedSizedSymbol(address, name, size));
+                    long address = Long.parseUnsignedLong(stripLeadingZeros(Objects.requireNonNull(matcher.group(1))), 16);
+                    long size = Long.parseUnsignedLong(stripLeadingZeros(Objects.requireNonNull(matcher.group(2))), 16);
+                    String name = nameFromCppFilt(Objects.requireNonNull(matcher.group(3)));
+                    map.put(address, new TmfResolvedSizedSymbol(address, Objects.requireNonNull(name), size));
                 }
             }
         } catch (FileNotFoundException e) {
@@ -153,13 +155,29 @@ public final class FunctionNameMapper {
     }
 
     /**
-     * Guesses the type of mapping in this file by parsing its line and finding the
-     * one with the most hits
+     * Use c++filt to decipher the c++ symbols
+     *
+     * @param symbol to be demangled
+     * @return if the demangler returns null, return the symbol as is
+     */
+    public static @Nullable String nameFromCppFilt(String symbol) {
+        try {
+            String functionName = new CPPFilt().getFunction(symbol);
+            return functionName != null ? functionName : symbol;
+        } catch (IOException e) {
+            Activator.logError("Error to instantiate the c++filt", e); //$NON-NLS-1$
+            return symbol;
+        }
+    }
+
+    /**
+     * Guesses the type of mapping in this file by parsing its line and finding
+     * the one with the most hits
      *
      * @param mappingFile
      *            The file containing the symbol mapping
-     * @return The most likely mapping type or {@link MappingType#UNKNOWN} if the
-     *         file corresponds to no known mapping
+     * @return The most likely mapping type or {@link MappingType#UNKNOWN} if
+     *         the file corresponds to no known mapping
      */
     public static MappingType guessMappingType(File mappingFile) {
         int nmHits = 0;
@@ -216,7 +234,7 @@ public final class FunctionNameMapper {
      * Strip the leading zeroes from the address
      */
     private static String stripLeadingZeros(String address) {
-        return REMOVE_ZEROS_PATTERN.matcher(address).replaceFirst(""); //$NON-NLS-1$
+        return Objects.requireNonNull(REMOVE_ZEROS_PATTERN.matcher(address).replaceFirst("")); //$NON-NLS-1$
     }
 
     private static IBinaryParser.@Nullable IBinaryObject getBinaryObject(File file) {
@@ -233,7 +251,7 @@ public final class FunctionNameMapper {
                     @Override
                     public void run() throws Exception {
                         IBinaryParser binaryParser = (IBinaryParser) run.createExecutableExtension("class"); //$NON-NLS-1$
-                        binaryParsers.add(binaryParser);
+                        binaryParsers.add(Objects.requireNonNull(binaryParser));
                     }
 
                     @Override
@@ -244,7 +262,9 @@ public final class FunctionNameMapper {
             }
         }
 
-        /* Find the maximum "hint" buffer size we'll need from all the parsers */
+        /*
+         * Find the maximum "hint" buffer size we'll need from all the parsers
+         */
         int hintBufferSize = 0;
         for (IBinaryParser parser : binaryParsers) {
             if (parser.getHintBufferSize() > hintBufferSize) {
