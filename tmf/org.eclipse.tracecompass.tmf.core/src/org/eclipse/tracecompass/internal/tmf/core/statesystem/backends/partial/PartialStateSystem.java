@@ -109,7 +109,7 @@ public class PartialStateSystem extends StateSystem {
         try {
             queryLock.lockInterruptibly();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // Do nothing
         }
     }
 
@@ -160,7 +160,7 @@ public class PartialStateSystem extends StateSystem {
         try {
             ssAssignedLatch.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // Do nothing
         }
     }
 

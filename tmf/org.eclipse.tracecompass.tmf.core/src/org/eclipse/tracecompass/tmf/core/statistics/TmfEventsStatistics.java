@@ -144,7 +144,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
         try {
             request.waitForCompletion();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // Do nothing
         }
     }
 

@@ -17,7 +17,6 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.util.List;
 
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
@@ -50,21 +49,17 @@ public class MinMipmapFeature extends TmfMipmapFeature {
     @Override
     protected ITmfStateValue computeMipmapValue(List<ITmfStateInterval> lowerIntervals, long startTime, long endTime) {
         ITmfStateValue minValue = null;
-        try {
-            for (ITmfStateInterval interval : lowerIntervals) {
-                ITmfStateValue value = interval.getStateValue();
-                if (value.getType() == Type.DOUBLE) {
-                    if (minValue == null || value.unboxDouble() < minValue.unboxDouble()) {
-                        minValue = value;
-                    }
-                } else {
-                    if (minValue == null || value.unboxLong() < minValue.unboxLong()) {
-                        minValue = value;
-                    }
+        for (ITmfStateInterval interval : lowerIntervals) {
+            ITmfStateValue value = interval.getStateValue();
+            if (value.getType() == Type.DOUBLE) {
+                if (minValue == null || value.unboxDouble() < minValue.unboxDouble()) {
+                    minValue = value;
+                }
+            } else {
+                if (minValue == null || value.unboxLong() < minValue.unboxLong()) {
+                    minValue = value;
                 }
             }
-        } catch (StateValueTypeException e) {
-            e.printStackTrace();
         }
         return checkNotNull(minValue);
     }

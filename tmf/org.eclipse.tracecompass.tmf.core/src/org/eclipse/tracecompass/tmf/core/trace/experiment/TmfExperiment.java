@@ -685,7 +685,7 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
                     try {
                         Thread.sleep(getStreamingInterval());
                     } catch (final InterruptedException e) {
-                        e.printStackTrace();
+                        // Do nothing
                     }
                 }
             }

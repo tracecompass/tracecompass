@@ -17,7 +17,6 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.util.List;
 
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
@@ -50,21 +49,17 @@ public class MaxMipmapFeature extends TmfMipmapFeature {
     @Override
     protected ITmfStateValue computeMipmapValue(List<ITmfStateInterval> lowerIntervals, long startTime, long endTime) {
         ITmfStateValue maxValue = null;
-        try {
-            for (ITmfStateInterval interval : lowerIntervals) {
-                ITmfStateValue value = interval.getStateValue();
-                if (value.getType() == Type.DOUBLE) {
-                    if (maxValue == null || value.unboxDouble() > maxValue.unboxDouble()) {
-                        maxValue = value;
-                    }
-                } else {
-                    if (maxValue == null || value.unboxLong() > maxValue.unboxLong()) {
-                        maxValue = value;
-                    }
+        for (ITmfStateInterval interval : lowerIntervals) {
+            ITmfStateValue value = interval.getStateValue();
+            if (value.getType() == Type.DOUBLE) {
+                if (maxValue == null || value.unboxDouble() > maxValue.unboxDouble()) {
+                    maxValue = value;
+                }
+            } else {
+                if (maxValue == null || value.unboxLong() > maxValue.unboxLong()) {
+                    maxValue = value;
                 }
             }
-        } catch (StateValueTypeException e) {
-            e.printStackTrace();
         }
         return checkNotNull(maxValue);
     }

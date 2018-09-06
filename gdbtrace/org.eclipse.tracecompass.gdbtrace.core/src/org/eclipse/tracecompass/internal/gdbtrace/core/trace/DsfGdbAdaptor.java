@@ -288,7 +288,7 @@ public class DsfGdbAdaptor {
         try {
             launchDGBPostMortemTrace();
         } catch (CoreException e) {
-            e.printStackTrace();
+            GdbTraceCorePlugin.logError(e.getMessage(), e);
         }
     }
 
@@ -349,7 +349,7 @@ public class DsfGdbAdaptor {
             try {
                 fLaunch.terminate();
             } catch (DebugException e) {
-                e.printStackTrace();
+                GdbTraceCorePlugin.logError(e.getMessage(), e);
             }
             fLaunch = null;
         }
@@ -903,7 +903,7 @@ public class DsfGdbAdaptor {
                 IDE.gotoMarker(editor, marker);
                 marker.delete();
             } catch (CoreException e) {
-                e.printStackTrace();
+                GdbTraceCorePlugin.logError(e.getMessage(), e);
             }
         }
     }

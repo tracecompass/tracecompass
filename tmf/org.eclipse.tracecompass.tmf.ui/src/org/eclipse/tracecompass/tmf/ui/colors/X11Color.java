@@ -52,7 +52,7 @@ public class X11Color {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Activator.getDefault().logError("Cannot read the file from URL", e); //$NON-NLS-1$
         }
     }
 

@@ -15,7 +15,6 @@ package org.eclipse.tracecompass.internal.tmf.core.statesystem.mipmap;
 import java.util.List;
 
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
@@ -53,18 +52,14 @@ public class AvgMipmapFeature extends TmfMipmapFeature {
             return TmfStateValue.newValueDouble(0.0);
         }
         double sum = 0.0;
-        try {
-            for (ITmfStateInterval interval : lowerIntervals) {
-                ITmfStateValue value = interval.getStateValue();
-                long duration = interval.getEndTime() - interval.getStartTime();
-                if (value.getType() == Type.DOUBLE) {
-                    sum += value.unboxDouble() * duration;
-                } else {
-                    sum += (double) value.unboxLong() * duration;
-                }
+        for (ITmfStateInterval interval : lowerIntervals) {
+            ITmfStateValue value = interval.getStateValue();
+            long duration = interval.getEndTime() - interval.getStartTime();
+            if (value.getType() == Type.DOUBLE) {
+                sum += value.unboxDouble() * duration;
+            } else {
+                sum += (double) value.unboxLong() * duration;
             }
-        } catch (StateValueTypeException e) {
-            e.printStackTrace();
         }
         double average = sum / range;
         ITmfStateValue avgValue = TmfStateValue.newValueDouble(average);

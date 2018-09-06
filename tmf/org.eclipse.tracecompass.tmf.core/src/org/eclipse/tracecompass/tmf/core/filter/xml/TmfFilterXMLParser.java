@@ -17,6 +17,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -55,7 +56,7 @@ public class TmfFilterXMLParser {
             fRoot = ((TmfFilterContentHandler) saxReader.getContentHandler()).getTree();
 
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            Activator.logError("Error to parse the configuration ", e);  //$NON-NLS-1$
         }
     }
 

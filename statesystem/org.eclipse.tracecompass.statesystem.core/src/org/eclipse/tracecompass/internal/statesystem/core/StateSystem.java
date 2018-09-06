@@ -134,7 +134,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
         try {
             finishedLatch.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // Do nothing
         }
     }
 
@@ -144,7 +144,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
         try {
             ret = finishedLatch.await(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // Do nothing
         }
         return ret;
     }

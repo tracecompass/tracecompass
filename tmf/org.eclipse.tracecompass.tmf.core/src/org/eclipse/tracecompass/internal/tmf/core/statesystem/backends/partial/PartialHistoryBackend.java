@@ -243,7 +243,7 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
         try {
             request.waitForCompletion();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // Do nothing
         }
 
         /*
@@ -280,7 +280,7 @@ public class PartialHistoryBackend implements IStateHistoryBackend {
         try {
             fCheckpointsReady.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // Do nothing
         }
     }
 

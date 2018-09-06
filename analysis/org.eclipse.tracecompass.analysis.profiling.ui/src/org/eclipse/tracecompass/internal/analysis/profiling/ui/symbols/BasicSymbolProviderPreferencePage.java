@@ -290,7 +290,7 @@ public class BasicSymbolProviderPreferencePage extends AbstractSymbolProviderPre
         try (FileInputStream input = new FileInputStream(fullPath)) {
             input.read(firstBytes);
         } catch (IOException e) {
-            e.printStackTrace();
+            Activator.getDefault().logError("Cannot read the file " + fullPath, e);  //$NON-NLS-1$//$NON-NLS-2$
         }
 
         // 2- Verify if the bytes correspond to a known magic number for binary

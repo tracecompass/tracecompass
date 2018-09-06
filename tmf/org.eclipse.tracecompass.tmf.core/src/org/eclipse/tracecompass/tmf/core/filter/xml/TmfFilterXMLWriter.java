@@ -25,6 +25,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
@@ -169,9 +170,9 @@ public class TmfFilterXMLWriter {
             StreamResult result =  new StreamResult(new File(uri));
             transformer.transform(source, result);
         } catch (TransformerConfigurationException e) {
-            e.printStackTrace();
+            Activator.logError("Error to transformer the configuration ", e);  //$NON-NLS-1$
         } catch (TransformerException e) {
-            e.printStackTrace();
+            Activator.logError("Got transformer exception ", e);  //$NON-NLS-1$
         }
     }
 

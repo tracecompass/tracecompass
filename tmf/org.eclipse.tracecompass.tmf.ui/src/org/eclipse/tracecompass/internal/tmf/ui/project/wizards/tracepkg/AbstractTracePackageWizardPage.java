@@ -12,14 +12,12 @@
 
 package org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -355,7 +353,7 @@ public abstract class AbstractTracePackageWizardPage extends WizardPage {
                     reason = childException.toString();
                 }
 
-                String stackMessage = getExceptionStackMessage(childException);
+                String stackMessage = ExceptionUtils.getStackTrace(childException);
                 if (stackMessage == null) {
                     stackMessage = reason;
                 }
@@ -390,21 +388,6 @@ public abstract class AbstractTracePackageWizardPage extends WizardPage {
         displayErrorDialog(message, exception);
     }
 
-    private static String getExceptionStackMessage(Throwable exception) {
-        String stackMessage = null;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baos);
-        exception.printStackTrace(ps);
-        ps.flush();
-        try {
-            baos.flush();
-            stackMessage = baos.toString();
-        } catch (IOException e) {
-        }
-
-        return stackMessage;
-    }
-
     private void displayErrorDialog(String message, Throwable exception) {
         if (exception == null) {
             final Status s = new Status(IStatus.ERROR, Activator.PLUGIN_ID, message);
@@ -418,7 +401,7 @@ public abstract class AbstractTracePackageWizardPage extends WizardPage {
             reason = exception.toString();
         }
 
-        String stackMessage = getExceptionStackMessage(exception);
+        String stackMessage = ExceptionUtils.getStackTrace(exception);
         if (stackMessage == null || stackMessage.isEmpty()) {
             stackMessage = reason;
         }

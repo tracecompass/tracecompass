@@ -145,7 +145,7 @@ public final class AttributeTree {
                 oos.writeObject(list);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Activator.getDefault().logError("Error writing the file " + file, e); //$NON-NLS-1$
         } finally {
             fLock.readLock().unlock();
         }
