@@ -51,7 +51,7 @@ public class TmfXmlStateTransition extends TmfXmlBasicTransition {
         }
         fTarget = target;
         String action = node.getAttribute(TmfXmlStrings.ACTION);
-        List<String> actions = action.equals(TmfXmlStrings.NULL) ? Collections.EMPTY_LIST : Arrays.asList(action.split(TmfXmlStrings.AND_SEPARATOR));
+        List<String> actions = action.equals(TmfXmlStrings.NULL) ? Collections.emptyList() : Arrays.asList(action.split(TmfXmlStrings.AND_SEPARATOR));
         fStoredFieldsToBeSaved = (node.getAttribute(TmfXmlStrings.SAVE_STORED_FIELDS).equals(TmfXmlStrings.EMPTY_STRING) ? false : Boolean.parseBoolean(node.getAttribute(TmfXmlStrings.SAVE_STORED_FIELDS)));
         fStoredFieldsToBeCleared = (node.getAttribute(TmfXmlStrings.CLEAR_STORED_FIELDS).equals(TmfXmlStrings.EMPTY_STRING) ? false : Boolean.parseBoolean(node.getAttribute(TmfXmlStrings.CLEAR_STORED_FIELDS)));
         fAction = new ArrayList<>();

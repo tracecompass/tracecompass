@@ -64,7 +64,7 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
     private @NonNull ITimeDataProvider fTimeProvider;
     private final Set<IMarkerAxisListener> fListeners = new LinkedHashSet<>();
     private Multimap<String, IMarkerEvent> fMarkers = LinkedHashMultimap.create();
-    private @NonNull List<String> fCategories = Collections.EMPTY_LIST;
+    private @NonNull List<String> fCategories = Collections.emptyList();
     private boolean fCollapsed = false;
 
     /**
@@ -141,7 +141,7 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
      */
     public void setMarkerCategories(List<String> categories) {
         if (categories == null) {
-            fCategories = Collections.EMPTY_LIST;
+            fCategories = Collections.emptyList();
         } else {
             fCategories = categories;
         }

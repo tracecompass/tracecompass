@@ -781,7 +781,7 @@ public class LamiAnalysis implements IOnDemandAnalysis {
                     JSONArray columnDescriptions = checkNotNull(tableClassObject.getJSONArray(LamiStrings.COLUMN_DESCRIPTIONS));
                     List<LamiTableEntryAspect> aspects = getAspectsFromColumnDescriptions(columnDescriptions);
 
-                    tableClass = new LamiTableClass(nullToEmptyString(Messages.LamiAnalysis_DefaultDynamicTableName), title, aspects, Collections.EMPTY_SET);
+                    tableClass = new LamiTableClass(nullToEmptyString(Messages.LamiAnalysis_DefaultDynamicTableName), title, aspects, Collections.emptySet());
                 }
 
                 /* Parse the "data", which is the array of rows */

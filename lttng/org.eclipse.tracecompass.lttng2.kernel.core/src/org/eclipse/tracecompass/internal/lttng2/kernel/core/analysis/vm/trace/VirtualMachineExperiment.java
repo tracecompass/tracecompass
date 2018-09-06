@@ -36,7 +36,7 @@ public class VirtualMachineExperiment extends TmfExperiment {
      * Default constructor. Needed by the extension point.
      */
     public VirtualMachineExperiment() {
-        this("", Collections.EMPTY_SET); //$NON-NLS-1$
+        this("", Collections.emptySet()); //$NON-NLS-1$
     }
 
     /**

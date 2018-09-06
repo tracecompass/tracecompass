@@ -322,7 +322,7 @@ public class LazyArrayListStore<@NonNull E extends ISegment> implements ISegment
                 iterable.trimToSize();
                 return iterable;
             }
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         } finally {
             fLock.unlock();
         }

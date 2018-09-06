@@ -845,7 +845,7 @@ public interface IKernelAnalysisEventLayout {
      * @since 2.1
      */
     default Collection<String> eventsNetworkSend() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     /**
@@ -856,7 +856,7 @@ public interface IKernelAnalysisEventLayout {
      * @since 2.1
      */
     default Collection<String> eventsNetworkReceive() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     /**
@@ -904,7 +904,7 @@ public interface IKernelAnalysisEventLayout {
      * @since 2.1
      */
     default Collection<String> eventsKVMEntry() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     /**
@@ -915,7 +915,7 @@ public interface IKernelAnalysisEventLayout {
      * @since 2.1
      */
     default Collection<String> eventsKVMExit() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     /**

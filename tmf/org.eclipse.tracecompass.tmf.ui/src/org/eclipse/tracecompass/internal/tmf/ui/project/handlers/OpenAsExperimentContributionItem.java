@@ -25,7 +25,7 @@ public class OpenAsExperimentContributionItem extends SelectElementTypeContribut
 
     @Override
     protected IContributionItem[] getContributionItems() {
-        return getContributionItems(Collections.EMPTY_SET, true);
+        return getContributionItems(Collections.emptySet(), true);
     }
 
     @Override

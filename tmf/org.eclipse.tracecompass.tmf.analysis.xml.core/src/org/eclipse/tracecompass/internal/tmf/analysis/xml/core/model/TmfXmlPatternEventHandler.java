@@ -59,7 +59,7 @@ public class TmfXmlPatternEventHandler {
     public TmfXmlPatternEventHandler(ITmfXmlModelFactory modelFactory, Element node, IXmlStateSystemContainer parent) {
         fParent = (XmlPatternStateProvider) parent;
         String initialFsm = node.getAttribute(TmfXmlStrings.INITIAL);
-        fInitialFsm = initialFsm.isEmpty() ? Collections.EMPTY_LIST : Arrays.asList(initialFsm.split(TmfXmlStrings.AND_SEPARATOR));
+        fInitialFsm = initialFsm.isEmpty() ? Collections.emptyList() : Arrays.asList(initialFsm.split(TmfXmlStrings.AND_SEPARATOR));
 
         Map<String, TmfXmlTransitionValidator> testMap = new HashMap<>();
         NodeList nodesTest = node.getElementsByTagName(TmfXmlStrings.TEST);

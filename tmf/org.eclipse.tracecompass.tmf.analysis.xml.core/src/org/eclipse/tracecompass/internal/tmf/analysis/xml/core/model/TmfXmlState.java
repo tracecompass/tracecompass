@@ -98,10 +98,10 @@ public class TmfXmlState {
         List<TmfXmlStateTransition> transitions = getTransitions(modelFactory, container, node);
 
         NodeList nodesOnentry = node.getElementsByTagName(TmfXmlStrings.ONENTRY);
-        List<String> onentryActions = nodesOnentry.getLength() > 0 ? Arrays.asList(((Element) nodesOnentry.item(0)).getAttribute(TmfXmlStrings.ACTION).split(TmfXmlStrings.AND_SEPARATOR)) : Collections.EMPTY_LIST;
+        List<String> onentryActions = nodesOnentry.getLength() > 0 ? Arrays.asList(((Element) nodesOnentry.item(0)).getAttribute(TmfXmlStrings.ACTION).split(TmfXmlStrings.AND_SEPARATOR)) : Collections.emptyList();
 
         NodeList nodesOnexit = node.getElementsByTagName(TmfXmlStrings.ONEXIT);
-        List<String> onexitActions = nodesOnexit.getLength() > 0 ? Arrays.asList(((Element) nodesOnexit.item(0)).getAttribute(TmfXmlStrings.ACTION).split(TmfXmlStrings.AND_SEPARATOR)) : Collections.EMPTY_LIST;
+        List<String> onexitActions = nodesOnexit.getLength() > 0 ? Arrays.asList(((Element) nodesOnexit.item(0)).getAttribute(TmfXmlStrings.ACTION).split(TmfXmlStrings.AND_SEPARATOR)) : Collections.emptyList();
 
         TmfXmlState state = new TmfXmlState(container, type, id, parent, transitions, new HashMap<>(), onentryActions, onexitActions);
         initState(state, modelFactory, container, node);

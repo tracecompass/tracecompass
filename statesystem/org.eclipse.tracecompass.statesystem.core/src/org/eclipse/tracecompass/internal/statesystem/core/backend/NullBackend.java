@@ -123,6 +123,6 @@ public class NullBackend implements IStateHistoryBackend {
     @Override
     public Iterable<@NonNull ITmfStateInterval> query2D(IntegerRangeCondition quarks,
             TimeRangeCondition times) throws TimeRangeException {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 }

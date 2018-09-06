@@ -88,7 +88,7 @@ public class ColorsViewTest {
 
         @Override
         public List<String> getValidChildren() {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         @Override

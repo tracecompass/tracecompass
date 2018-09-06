@@ -133,10 +133,10 @@ public class AnalysisEventFieldRequirementTest {
         req = new TmfAnalysisEventFieldRequirement("", ImmutableSet.of(EVENT1_FIELD1, EVENT1_FIELD2));
         assertTrue(req.test(trace));
 
-        req = new TmfAnalysisEventFieldRequirement(EVENT1, checkNotNull(Collections.EMPTY_LIST));
+        req = new TmfAnalysisEventFieldRequirement(EVENT1, checkNotNull(Collections.emptyList()));
         assertTrue(req.test(trace));
 
-        req = new TmfAnalysisEventFieldRequirement("", checkNotNull(Collections.EMPTY_LIST));
+        req = new TmfAnalysisEventFieldRequirement("", checkNotNull(Collections.emptyList()));
         assertTrue(req.test(trace));
     }
 
@@ -169,7 +169,7 @@ public class AnalysisEventFieldRequirementTest {
         assertFalse(req.test(trace));
 
         /* Test case that empty list of event fields behaves like Event Requirements */
-        req = new TmfAnalysisEventFieldRequirement(EVENT1, checkNotNull(Collections.EMPTY_LIST));
+        req = new TmfAnalysisEventFieldRequirement(EVENT1, checkNotNull(Collections.emptyList()));
         assertTrue(req.test(trace));
     }
 
@@ -202,7 +202,7 @@ public class AnalysisEventFieldRequirementTest {
         assertFalse(req.test(trace));
 
         /* Test case that empty list of event fields behaves like Event Requirements */
-        req = new TmfAnalysisEventFieldRequirement(EVENT1, checkNotNull(Collections.EMPTY_LIST), PriorityLevel.AT_LEAST_ONE);
+        req = new TmfAnalysisEventFieldRequirement(EVENT1, checkNotNull(Collections.emptyList()), PriorityLevel.AT_LEAST_ONE);
         assertTrue(req.test(trace));
     }
 
@@ -235,7 +235,7 @@ public class AnalysisEventFieldRequirementTest {
         assertTrue(req.test(trace));
 
         /* Test case that empty list of event fields behaves like Event Requirements */
-        req = new TmfAnalysisEventFieldRequirement(EVENT1, checkNotNull(Collections.EMPTY_LIST), PriorityLevel.ALL_OR_NOTHING);
+        req = new TmfAnalysisEventFieldRequirement(EVENT1, checkNotNull(Collections.emptyList()), PriorityLevel.ALL_OR_NOTHING);
         assertTrue(req.test(trace));
     }
 

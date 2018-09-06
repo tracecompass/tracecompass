@@ -79,7 +79,7 @@ public class KernelAnalysisModule extends TmfStateSystemAnalysisModule {
 //        eventReq.addValues(OPTIONAL_EVENTS, ValuePriorityLevel.OPTIONAL);
 //
 //        REQUIREMENTS = checkNotNull(ImmutableSet.of(domainReq, eventReq));
-        REQUIREMENTS = Collections.EMPTY_SET;
+        REQUIREMENTS = Collections.emptySet();
     }
 
     @Override

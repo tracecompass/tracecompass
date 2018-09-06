@@ -38,7 +38,7 @@ public interface IGraphWorker {
      * @since 2.0
      */
     default Map<String, String> getWorkerInformation() {
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     /**
@@ -52,7 +52,7 @@ public interface IGraphWorker {
      * @since 2.0
      */
     default Map<String, String> getWorkerInformation(long t) {
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
 }

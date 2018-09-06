@@ -118,7 +118,7 @@ public class OpenAsExperimentHandler extends AbstractHandler {
             TmfWorkspaceModifyOperation operation = new TmfWorkspaceModifyOperation() {
                 @Override
                 public void execute(IProgressMonitor monitor) throws CoreException {
-                    SelectTracesOperation selectTracesOperation = new SelectTracesOperation(experimentElement, traces.toArray(new @NonNull TmfTraceElement[traces.size()]), Collections.EMPTY_MAP);
+                    SelectTracesOperation selectTracesOperation = new SelectTracesOperation(experimentElement, traces.toArray(new @NonNull TmfTraceElement[traces.size()]), Collections.emptyMap());
                     selectTracesOperation.run(monitor);
                 }
             };

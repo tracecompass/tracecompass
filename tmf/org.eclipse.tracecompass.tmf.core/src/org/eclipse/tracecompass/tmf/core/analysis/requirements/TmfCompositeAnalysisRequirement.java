@@ -36,7 +36,7 @@ public class TmfCompositeAnalysisRequirement extends TmfAbstractAnalysisRequirem
      *            The level of this requirement
      */
     public TmfCompositeAnalysisRequirement(Collection<TmfAbstractAnalysisRequirement> subRequirements, PriorityLevel level) {
-        super(Collections.EMPTY_SET, level);
+        super(Collections.emptySet(), level);
         fSubReqs = ImmutableList.copyOf(subRequirements);
     }
 

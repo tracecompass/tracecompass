@@ -76,7 +76,7 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
         fFieldNames = ImmutableList.copyOf(declaration.getFieldsList());
         fDefinitions = definitions;
         if (fFieldNames.isEmpty()) {
-            fDefinitionsMap = Collections.EMPTY_MAP;
+            fDefinitionsMap = Collections.emptyMap();
         }
     }
 
@@ -108,7 +108,7 @@ public final class StructDefinition extends ScopedDefinition implements IComposi
         fFieldNames = ImmutableList.copyOf(fieldNames);
         fDefinitions = definitions;
         if (fFieldNames.isEmpty()) {
-            fDefinitionsMap = Collections.EMPTY_MAP;
+            fDefinitionsMap = Collections.emptyMap();
         }
     }
 

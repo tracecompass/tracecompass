@@ -54,7 +54,7 @@ import org.junit.Test;
 public class SyncTest {
 
     private TmfTraceStub t1, t2;
-    private @NonNull Collection<ITmfTrace> fTraces = Collections.EMPTY_LIST;
+    private @NonNull Collection<ITmfTrace> fTraces = Collections.emptyList();
 
     /**
      * Initializing the traces

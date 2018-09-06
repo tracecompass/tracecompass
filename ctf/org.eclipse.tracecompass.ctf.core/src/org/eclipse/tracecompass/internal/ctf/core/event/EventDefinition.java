@@ -120,7 +120,7 @@ public final class EventDefinition implements IDefinitionScope, IEventDefinition
         fEventContext = eventContext;
         fPacketContext = packetContext;
         fStreamContext = streamContext;
-        fPacketAttributes = packetDescriptor != null ? packetDescriptor.getAttributes() : Collections.EMPTY_MAP;
+        fPacketAttributes = packetDescriptor != null ? packetDescriptor.getAttributes() : Collections.emptyMap();
     }
 
     // ------------------------------------------------------------------------

@@ -333,13 +333,13 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
     private Map<String, String> getAnalysisProperties() {
         ITmfProjectModelElement parent = getParent();
         if (!(parent instanceof TmfViewsElement)) {
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         }
         parent = parent.getParent();
         if (parent instanceof TmfCommonProjectElement) {
             ITmfTrace trace = ((TmfCommonProjectElement) parent).getTrace();
             if (trace == null) {
-                return Collections.EMPTY_MAP;
+                return Collections.emptyMap();
             }
             IAnalysisModule module = trace.getAnalysisModule(fAnalysisHelper.getId());
             if (module instanceof ITmfPropertiesProvider) {
@@ -347,7 +347,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
             }
         }
 
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     private Map<String, String> getAnalysisHelperProperties() {
@@ -355,7 +355,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
             ITmfPropertiesProvider analysisProperties = (ITmfPropertiesProvider) fAnalysisHelper;
             return analysisProperties.getProperties();
         }
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     /**

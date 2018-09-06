@@ -79,7 +79,7 @@ public class TextTraceEventContent implements ITmfEventField {
     private TextTraceEventContent(@NonNull String fieldName) {
         fName = fieldName;
         fValue = null;
-        fFields = Collections.EMPTY_LIST;
+        fFields = Collections.emptyList();
     }
 
     // ------------------------------------------------------------------------

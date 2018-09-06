@@ -382,7 +382,7 @@ public class TransientState {
                 "quarks", quarks, //$NON-NLS-1$
                 "time", timeCondition)) { //$NON-NLS-1$
             if (!fIsActive) {
-                return Collections.EMPTY_LIST;
+                return Collections.emptyList();
             }
             long end = timeCondition.max();
             Collection<ITmfStateInterval> iterable = new ArrayList<>();

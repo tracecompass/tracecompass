@@ -39,7 +39,7 @@ public final class InputOutputInformationProvider {
     public static Collection<Disk> getDisks(InputOutputAnalysisModule module) {
         module.schedule();
         if (!module.waitForInitialization()) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {

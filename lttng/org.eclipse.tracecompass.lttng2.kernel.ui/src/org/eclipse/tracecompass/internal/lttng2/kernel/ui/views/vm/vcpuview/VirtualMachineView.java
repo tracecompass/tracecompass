@@ -367,12 +367,12 @@ public class VirtualMachineView extends AbstractTimeGraphView {
 
             ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(vmEntry.getExperiment(), VirtualMachineCpuAnalysis.ID);
             if (ssq == null) {
-                return Collections.EMPTY_LIST;
+                return Collections.emptyList();
             }
             final long realStart = Math.max(startTime, ssq.getStartTime());
             final long realEnd = Math.min(endTime, ssq.getCurrentEndTime() + 1);
             if (realEnd <= realStart) {
-                return Collections.EMPTY_LIST;
+                return Collections.emptyList();
             }
             quark = ssq.getQuarkRelative(quark, VmAttributes.STATUS);
             List<ITmfStateInterval> statusIntervals = StateSystemUtils.queryHistoryRange(ssq, quark, realStart, realEnd - 1, resolution, monitor);
@@ -475,7 +475,7 @@ public class VirtualMachineView extends AbstractTimeGraphView {
     @Override
     protected Iterable<ITmfTrace> getTracesToBuild(@Nullable ITmfTrace trace) {
         if (trace == null) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
         return Collections.singleton(trace);
     }

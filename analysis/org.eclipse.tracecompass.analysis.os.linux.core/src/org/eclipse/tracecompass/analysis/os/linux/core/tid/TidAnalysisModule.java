@@ -51,7 +51,7 @@ public class TidAnalysisModule extends TmfStateSystemAnalysisModule {
     public static final @NonNull String ID = "org.eclipse.tracecompass.analysis.os.linux.kernel.tid"; //$NON-NLS-1$
 
     /** The requirements as an immutable set */
-    private static final @NonNull Set<@NonNull TmfAbstractAnalysisRequirement> REQUIREMENTS = Collections.EMPTY_SET;
+    private static final @NonNull Set<@NonNull TmfAbstractAnalysisRequirement> REQUIREMENTS = Collections.emptySet();
 
     @Override
     public @NonNull Iterable<@NonNull TmfAbstractAnalysisRequirement> getAnalysisRequirements() {

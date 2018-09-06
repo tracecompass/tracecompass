@@ -113,7 +113,7 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
      */
 
     public StreamInputPacketIndexEntry(long dataOffsetBits, long fileSizeBytes) {
-        fAttributes = Collections.EMPTY_MAP;
+        fAttributes = Collections.emptyMap();
         fContentSizeBits = (fileSizeBytes * Byte.SIZE);
         fPacketSizeBits = (fileSizeBytes * Byte.SIZE);
         fOffsetBits = dataOffsetBits;

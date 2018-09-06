@@ -59,7 +59,7 @@ public class ControlFlowOptimizerTest {
     @Test
     public void testEmpty() {
         Function<Collection<ILinkEvent>, Map<Integer, Long>> oa = getOptimizationMethod();
-        Map<Integer, Long> result = oa.apply(Collections.EMPTY_LIST);
+        Map<Integer, Long> result = oa.apply(Collections.emptyList());
         assertNotNull(result);
         assertEquals(Collections.emptyMap(), result);
     }

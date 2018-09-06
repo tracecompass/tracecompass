@@ -80,7 +80,7 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
     public Iterable<TmfAbstractAnalysisRequirement> getAnalysisRequirements() {
         // TODO specify actual requirements once the requirement-checking is
         // implemented. This analysis needs "ip" and "vpid" contexts.
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     @Override
@@ -122,7 +122,7 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
         ITmfStateSystem ss = getStateSystem();
         if (ss == null) {
             /* State system might not yet be initialized */
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
 
         final @NonNull Set<UstDebugInfoBinaryFile> files = new TreeSet<>();

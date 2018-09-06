@@ -50,7 +50,7 @@ public class TmfEventMatchingTest {
     private static final @NonNull IProgressMonitor PROGRESS_MONITOR = new NullProgressMonitor();
     private TmfTraceStub fT1;
     private TmfTraceStub fT2;
-    private @NonNull Collection<@NonNull ITmfTrace> fTraces = Collections.EMPTY_LIST;
+    private @NonNull Collection<@NonNull ITmfTrace> fTraces = Collections.emptyList();
 
     private static class IntMatchingKey implements IEventMatchingKey {
 

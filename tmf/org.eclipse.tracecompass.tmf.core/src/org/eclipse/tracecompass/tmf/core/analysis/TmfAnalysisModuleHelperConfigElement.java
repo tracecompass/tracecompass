@@ -288,7 +288,7 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
             module.dispose();
             return requirements;
         }
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
 
     }
 

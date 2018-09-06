@@ -63,7 +63,7 @@ public class TmfXmlReadOnlyStateValue extends TmfXmlStateValue {
      */
     public TmfXmlReadOnlyStateValue(TmfXmlReadOnlyModelFactory modelFactory, Element node,
             IXmlStateSystemContainer container, String eventField) {
-        super(modelFactory, node, container, Collections.EMPTY_LIST, eventField);
+        super(modelFactory, node, container, Collections.emptyList(), eventField);
     }
 
 }

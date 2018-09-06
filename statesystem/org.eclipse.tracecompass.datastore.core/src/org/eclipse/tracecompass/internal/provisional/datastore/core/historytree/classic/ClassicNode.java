@@ -139,7 +139,7 @@ public class ClassicNode<E extends IHTInterval> extends HTNode<E> {
             try {
                 int nbChildren = getNbChildren();
                 if (nbChildren == 0) {
-                    return Collections.EMPTY_LIST;
+                    return Collections.emptyList();
                 }
 
                 long end = rc.max();

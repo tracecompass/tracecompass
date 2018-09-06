@@ -60,5 +60,5 @@ public class PatternSegmentFactoryStub {
     /**
      * The pattern segment TEST_3
      */
-    public static final @NonNull TmfXmlPatternSegment TEST_3 = new TmfXmlPatternSegment(TEST_2_START_EVENT.getTimestamp().getValue(), TEST_2_START_EVENT.getTimestamp().getValue(), ITmfTimestamp.NANOSECOND_SCALE, PATTERN_SEGMENT_PREFIX + "open", Collections.EMPTY_MAP);
+    public static final @NonNull TmfXmlPatternSegment TEST_3 = new TmfXmlPatternSegment(TEST_2_START_EVENT.getTimestamp().getValue(), TEST_2_START_EVENT.getTimestamp().getValue(), ITmfTimestamp.NANOSECOND_SCALE, PATTERN_SEGMENT_PREFIX + "open", Collections.emptyMap());
 }

@@ -189,12 +189,12 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
 
     @Override
     public Iterable<Class<? extends ITmfTrace>> getValidTraceTypes() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     @Override
     public Iterable<TmfAbstractAnalysisRequirement> getAnalysisRequirements() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     @Override

@@ -43,7 +43,7 @@ final class NullEventDefinition implements IEventDefinition {
 
     @Override
     public Map<String, Object> getPacketAttributes() {
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     @Override

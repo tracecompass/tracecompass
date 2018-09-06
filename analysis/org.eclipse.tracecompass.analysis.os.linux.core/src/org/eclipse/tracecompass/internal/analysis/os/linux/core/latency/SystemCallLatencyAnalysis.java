@@ -66,7 +66,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
         }
         IAnalysisModule module = trace.getAnalysisModule(TidAnalysisModule.ID);
         if (module == null) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
         return ImmutableSet.of(module);
     }

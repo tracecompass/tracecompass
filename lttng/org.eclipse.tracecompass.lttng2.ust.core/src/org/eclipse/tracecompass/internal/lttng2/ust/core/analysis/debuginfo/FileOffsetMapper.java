@@ -251,7 +251,7 @@ public final class FileOffsetMapper {
 
         if (output == null) {
             /* Command returned an error */
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
 
         /*

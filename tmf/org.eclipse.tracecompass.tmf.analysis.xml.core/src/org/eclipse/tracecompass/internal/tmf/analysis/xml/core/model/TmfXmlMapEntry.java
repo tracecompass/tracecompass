@@ -43,8 +43,8 @@ public class TmfXmlMapEntry {
         if (nodesSV.getLength() != 2) {
             throw new IllegalStateException("A map entry is composed of exactly 2 statevalues. Actual value is : " + nodesSV.getLength()); //$NON-NLS-1$
         }
-        fKey = modelFactory.createStateValue((Element) NonNullUtils.checkNotNull(nodesSV.item(0)), container, Collections.EMPTY_LIST);
-        fValue = modelFactory.createStateValue((Element) NonNullUtils.checkNotNull(nodesSV.item(1)), container, Collections.EMPTY_LIST);
+        fKey = modelFactory.createStateValue((Element) NonNullUtils.checkNotNull(nodesSV.item(0)), container, Collections.emptyList());
+        fValue = modelFactory.createStateValue((Element) NonNullUtils.checkNotNull(nodesSV.item(1)), container, Collections.emptyList());
     }
 
     /**

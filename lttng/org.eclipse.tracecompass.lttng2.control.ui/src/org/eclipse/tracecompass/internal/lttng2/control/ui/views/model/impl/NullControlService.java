@@ -51,7 +51,7 @@ class NullControlService implements ILttngControlService {
 
     @Override
     public List<String> getSessionNames(IProgressMonitor monitor) throws ExecutionException {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override
@@ -66,17 +66,17 @@ class NullControlService implements ILttngControlService {
 
     @Override
     public List<IBaseEventInfo> getKernelProvider(IProgressMonitor monitor) throws ExecutionException {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override
     public List<IUstProviderInfo> getUstProvider() throws ExecutionException {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override
     public List<IUstProviderInfo> getUstProvider(IProgressMonitor monitor) throws ExecutionException {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override
@@ -126,7 +126,7 @@ class NullControlService implements ILttngControlService {
 
     @Override
     public List<String> getContextList(IProgressMonitor monitor) throws ExecutionException {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override

@@ -323,7 +323,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
      * @return An iterable list of analysis this analyzes depends on.
      */
     protected Iterable<IAnalysisModule> getDependentAnalyses() {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     /**
@@ -593,7 +593,7 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
 
     @Override
     public Iterable<TmfAbstractAnalysisRequirement> getAnalysisRequirements() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     // ------------------------------------------------------------------------

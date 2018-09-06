@@ -9,8 +9,6 @@
 
 package org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.viewers;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -49,7 +47,7 @@ class LamiTableContentProvider implements ISortingLazyContentProvider {
      * Constructor.
      */
     public LamiTableContentProvider() {
-        fCurrentEntries = checkNotNull(Collections.EMPTY_LIST);
+        fCurrentEntries = Collections.emptyList();
     }
 
     @Override
@@ -65,7 +63,7 @@ class LamiTableContentProvider implements ISortingLazyContentProvider {
 
     @Override
     public void dispose() {
-        fCurrentEntries = checkNotNull(Collections.EMPTY_LIST);
+        fCurrentEntries = Collections.emptyList();
         fTableViewer = null;
         fComparator = null;
     }

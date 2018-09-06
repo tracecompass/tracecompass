@@ -112,7 +112,7 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
     private Map<@NonNull String, org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics<ISegment>> getPerTypeStats(long start, long end, IProgressMonitor monitor) {
         Iterable<@NonNull ISegment> store = getSegmentStore(start, end);
         if (monitor.isCanceled() || store == null) {
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         }
         return calculateTotalPerType(store, monitor);
     }

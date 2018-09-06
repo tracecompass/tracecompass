@@ -172,7 +172,7 @@ public class CtfTmfEvent extends TmfEvent
         fEvent = NullEventDefinition.INSTANCE;
         fChannel = ""; //$NON-NLS-1$
         fStream = null;
-        fPacketAttributes = Collections.EMPTY_MAP;
+        fPacketAttributes = Collections.emptyMap();
     }
 
     /**
@@ -191,7 +191,7 @@ public class CtfTmfEvent extends TmfEvent
         fEvent = NullEventDefinition.INSTANCE;
         fChannel = ""; //$NON-NLS-1$
         fStream = null;
-        fPacketAttributes = Collections.EMPTY_MAP;
+        fPacketAttributes = Collections.emptyMap();
     }
 
     // ------------------------------------------------------------------------
