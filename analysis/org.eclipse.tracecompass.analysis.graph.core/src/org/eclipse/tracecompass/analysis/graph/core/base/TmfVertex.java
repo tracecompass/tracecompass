@@ -62,7 +62,7 @@ public class TmfVertex implements Comparable<TmfVertex> {
             if (v2 == null) {
                 return -1;
             }
-            return v1.getTs() > v2.getTs() ? 1 : (v1.getTs() == v2.getTs() ? 0 : -1);
+            return Long.compare(v1.getTs(), v2.getTs());
         }
     };
 
@@ -78,7 +78,7 @@ public class TmfVertex implements Comparable<TmfVertex> {
             if (v2 == null) {
                 return 1;
             }
-            return v1.getTs() < v2.getTs() ? 1 : (v1.getTs() == v2.getTs() ? 0 : -1);
+            return Long.compare(v2.getTs(), v1.getTs());
         }
     };
 
