@@ -156,7 +156,7 @@ public class SystemCallLatencyTableAnalysisTest extends SegmentTableTest {
     protected void testTsv(String[] lines) {
         assertNotNull(lines);
         assertEquals("number of lines", 21, lines.length);
-        assertEquals("header", "Start Time\tEnd Time\tDuration\tSystem Call\tTid\tReturn value", lines[0]);
+        assertEquals("header", "Start Time\tEnd Time\tDuration\tSystem Call\tTID\tReturn value", lines[0]);
         // not a straight up string compare due to time zones. Kathmandu and
         // Eucla have 15 minute time zones.
         assertTrue("line 1 : " + lines[1], lines[1].matches("\\d\\d:\\d\\d:00\\.000\\s000\\s001\\t\\d\\d:\\d\\d:00.000 000 002\\t1\\tleftpad\\t10\\t1"));

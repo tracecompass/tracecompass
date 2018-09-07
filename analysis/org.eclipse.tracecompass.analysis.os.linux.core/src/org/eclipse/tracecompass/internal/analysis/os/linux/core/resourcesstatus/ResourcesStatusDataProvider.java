@@ -667,7 +667,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     private static void putCurrentThreadTooltip(ITmfStateSystem ss,
             Map<String, String> retMap, List<ITmfStateInterval> full, int tid) {
         String currentThread = String.valueOf(tid);
-        retMap.put(Attributes.CURRENT_THREAD, currentThread);
+        retMap.put(org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.Messages.AspectName_Tid, currentThread);
 
         int execNameQuark = ss.optQuarkAbsolute(Attributes.THREADS, currentThread, Attributes.EXEC_NAME);
         if (execNameQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {

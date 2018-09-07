@@ -27,7 +27,14 @@ public class Messages extends NLS {
     /** System Call latency analysis aspect help text */
     public static @Nullable String SegmentAspectHelpText_SystemCall;
 
-    /** System Call latency analysis aspect name */
+    /**
+     * System Call latency analysis aspect name
+     *
+     * @deprecated use
+     *             {@link org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.Messages#AspectName_Tid}
+     *             instead
+     */
+    @Deprecated
     public static @Nullable String SegmentAspectName_SystemCallTid;
 
     /** System Call latency analysis aspect help text */

@@ -153,7 +153,7 @@ public class CpuUsageTreeViewer extends AbstractSelectTreeViewer {
             columns.add(createColumn(Messages.CpuUsageComposite_ColumnProcess, Comparator.comparing(CpuUsageEntry::getName)));
 
             Comparator<CpuUsageEntry> tidCompare = Comparator.comparingInt(c -> c.getModel().getTid());
-            columns.add(createColumn(Messages.CpuUsageComposite_ColumnTID, tidCompare));
+            columns.add(createColumn(org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.Messages.AspectName_Tid, tidCompare));
 
             TmfTreeColumnData percentColumn = createColumn(Messages.CpuUsageComposite_ColumnPercent, Comparator.comparingDouble(CpuUsageEntry::getPercent));
             percentColumn.setPercentageProvider(data -> ((CpuUsageEntry) data).getPercent());

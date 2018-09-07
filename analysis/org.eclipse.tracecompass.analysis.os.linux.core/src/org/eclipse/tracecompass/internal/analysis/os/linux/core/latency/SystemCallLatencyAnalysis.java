@@ -220,7 +220,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
         }
         @Override
         public String getName() {
-            return checkNotNull(Messages.SegmentAspectName_SystemCallTid);
+            return checkNotNull(org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.Messages.AspectName_Tid);
         }
         @Override
         public @Nullable Comparator<?> getComparator() {
