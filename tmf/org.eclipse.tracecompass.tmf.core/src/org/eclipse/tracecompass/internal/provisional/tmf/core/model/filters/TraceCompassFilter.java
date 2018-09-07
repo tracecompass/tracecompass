@@ -11,10 +11,16 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.filter.TmfFilterHelper;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
  * A common class for all filters, either event filters or regexes
@@ -27,8 +33,10 @@ public class TraceCompassFilter {
     private final ITmfFilter fEventFilter;
     private final Collection<String> fRegex;
 
-    private TraceCompassFilter(ITmfFilter filter, Collection<String> regex) {
-        fEventFilter = filter;
+    private static final Map<ITmfTrace, TraceCompassFilter> FILTER_MAP = new WeakHashMap<>();
+
+private TraceCompassFilter(ITmfFilter filter, Collection<String> regex) {
+       fEventFilter = filter;
         fRegex = regex;
     }
 
@@ -37,10 +45,14 @@ public class TraceCompassFilter {
      *
      * @param filter
      *            The event filter from which to create this filter
+     * @param trace
+     *            The trace this filter applies to
      * @return A new filter
      */
-    public static TraceCompassFilter fromEventFilter(ITmfFilter filter) {
-        return new TraceCompassFilter(filter, Collections.singleton(TmfFilterHelper.getRegexFromFilter(filter)));
+    public synchronized static TraceCompassFilter fromEventFilter(ITmfFilter filter, ITmfTrace trace) {
+        TraceCompassFilter traceCompassFilter = new TraceCompassFilter(filter, Collections.singleton(TmfFilterHelper.getRegexFromFilter(filter)));
+        FILTER_MAP.put(trace, traceCompassFilter);
+        return traceCompassFilter;
     }
 
     /**
@@ -48,10 +60,15 @@ public class TraceCompassFilter {
      *
      * @param regex
      *            The regex from which to create the filter
+     * @param trace
+     *            The trace this filter applies to
      * @return A new filter
      */
-    public static TraceCompassFilter fromRegex(Collection<String> regex) {
-        return new TraceCompassFilter(TmfFilterHelper.buildFilterFromRegex(regex), regex);
+    public synchronized static TraceCompassFilter fromRegex(Collection<String> regex, ITmfTrace trace) {
+        ITmfFilter filter = TmfFilterHelper.buildFilterFromRegex(regex);
+        TraceCompassFilter traceCompassFilter = new TraceCompassFilter(filter, regex);
+        FILTER_MAP.put(trace, traceCompassFilter);
+        return traceCompassFilter;
     }
 
     /**
@@ -74,6 +91,28 @@ public class TraceCompassFilter {
      */
     public Collection<String> getRegexes() {
         return fRegex;
+    }
+
+    /**
+     * Remove filters for the closed trace
+     *
+     * @param signal
+     *            The trace closed signal
+     */
+    @TmfSignalHandler
+    public synchronized static void traceClosed(final TmfTraceClosedSignal signal) {
+        FILTER_MAP.remove(signal.getTrace());
+    }
+
+    /**
+     * Get the filter that is active for a given trace
+     *
+     * @param trace
+     *            The trace to get the filter for
+     * @return The filter to apply, or <code>null</code> if no filter is set
+     */
+    public static @Nullable TraceCompassFilter getFilterForTrace(ITmfTrace trace) {
+        return FILTER_MAP.get(trace);
     }
 
 }
