@@ -15,8 +15,10 @@ import java.util.Calendar;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.ImportTraceWizardPage;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.Messages;
@@ -24,7 +26,6 @@ import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -65,7 +66,6 @@ public class StandardImportWizardTest extends AbstractStandardImportWizardTest {
      *             Exception
      */
     @Test
-    @Ignore
     public void testImportTimerange() throws Exception {
         openImportWizard();
         selectSyslog();
@@ -83,7 +83,6 @@ public class StandardImportWizardTest extends AbstractStandardImportWizardTest {
      *             Exception
      */
     @Test
-    @Ignore
     public void testImportTimerangeInvalidFormat() throws Exception {
         SWTWorkbenchBot bot = getSWTBot();
         openImportWizard();
@@ -102,7 +101,6 @@ public class StandardImportWizardTest extends AbstractStandardImportWizardTest {
      *             Exception
      */
     @Test
-    @Ignore
     public void testImportTimerangeInverseTime() throws Exception {
         openImportWizard();
         selectSyslog();
@@ -128,7 +126,10 @@ public class StandardImportWizardTest extends AbstractStandardImportWizardTest {
     }
 
     private static void selectSyslog() throws Exception {
-        SWTWorkbenchBot bot = getSWTBot();
+        SWTWorkbenchBot workbenchBot = getSWTBot();
+        SWTBotShell shell = workbenchBot.shell("Trace Import");
+        shell.setFocus();
+        SWTBot bot = shell.bot();
         URL resource = TmfCoreTestPlugin.getDefault().getBundle().getResource(TEST_FOLDER_NAME);
         String path = FileLocator.toFileURL(resource).toURI().getPath();
         SWTBotImportWizardUtils.selectImportFromDirectory(bot, path);

@@ -19,10 +19,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -69,35 +70,50 @@ public class TestCustomXmlWizard extends AbstractCustomParserWizard {
      *             the xml file wasn't written, this is bad
      */
     @Test
-    @Ignore
     public void testNew() throws FileNotFoundException, IOException {
         File xmlFile = ResourcesPlugin.getWorkspace().getRoot().getLocation().append(".metadata/.plugins/org.eclipse.tracecompass.tmf.core/custom_xml_parsers.xml").toFile();
         SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotTreeItem treeNode = SWTBotUtils.selectTracesFolder(fBot, PROJECT_NAME);
         treeNode.contextMenu("Manage Custom Parsers...").click();
-        fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).activate();
-        fBot.radio("XML").click();
-        fBot.button("New...").click();
-        fBot.shell(CUSTOM_XML_PARSER_SHELL_TITLE).activate();
-        fBot.textWithLabel("Category:").setText(CATEGORY_NAME);
-        fBot.textWithLabel("Trace type:").setText(TRACETYPE_NAME);
-        fBot.textWithLabel("Time Stamp format:").setText("ss");
+        SWTBotShell shell = fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).activate();
+        shell.setFocus();
+        SWTBot bot = shell.bot();
+        bot.radio("XML").click();
+        bot.button("New...").click();
+        shell = bot.shell(CUSTOM_XML_PARSER_SHELL_TITLE).activate();
+        shell.setFocus();
+        bot = shell.bot();
+        bot.textWithLabel("Category:").setText(CATEGORY_NAME);
+        bot.textWithLabel("Trace type:").setText(TRACETYPE_NAME);
+        bot.textWithLabel("Time Stamp format:").setText("ss");
 
-        fBot.styledText().setText(XML_TRACE1);
-        fBot.buttonWithTooltip("Feeling lucky").click();
+        bot.styledText().setText(XML_TRACE1);
+        bot.buttonWithTooltip("Feeling lucky").click();
 
-        fBot.tree().getTreeItem(TRACE).getNode(EVENT).select();
-        fBot.checkBox("Log Entry").click();
-        fBot.button("Next >").click();
-        fBot.button("Finish").click();
+        bot.tree().getTreeItem(TRACE).getNode(EVENT).select();
+        bot.checkBox("Log Entry").click();
+        bot.button("Next >").click();
+        bot.button("Finish").click();
 
-        fBot.waitUntil(new CustomDefinitionHasContent(xmlFile, CATEGORY_NAME, TRACETYPE_NAME, EXPECTED_TEST_DEFINITION));
+        shell = fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).activate();
+        shell.setFocus();
+        bot = shell.bot();
+        bot.waitUntil(new CustomDefinitionHasContent(xmlFile, CATEGORY_NAME, TRACETYPE_NAME, EXPECTED_TEST_DEFINITION));
         String xmlPart = extractTestXml(xmlFile, CATEGORY_NAME, TRACETYPE_NAME);
         assertEquals(EXPECTED_TEST_DEFINITION, xmlPart);
-        fBot.list().select(CATEGORY_NAME + " : " + TRACETYPE_NAME);
-        fBot.button("Delete").click();
-        fBot.button("Yes").click();
-        fBot.button("Close").click();
+        bot.list().select(CATEGORY_NAME + " : " + TRACETYPE_NAME);
+        bot.button("Delete").click();
+
+        shell = fBot.shell("Delete Custom Parser").activate();
+        shell.setFocus();
+        bot = shell.bot();
+        bot.button("Yes").click();
+
+
+        shell = fBot.shell(MANAGE_CUSTOM_PARSERS_SHELL_TITLE).activate();
+        shell.setFocus();
+        bot = shell.bot();
+        bot.button("Close").click();
         fBot.waitUntil(new CustomDefinitionHasContent(xmlFile, CATEGORY_NAME, TRACETYPE_NAME, ""));
         xmlPart = extractTestXml(xmlFile, CATEGORY_NAME, TRACETYPE_NAME);
         assertEquals("", xmlPart);

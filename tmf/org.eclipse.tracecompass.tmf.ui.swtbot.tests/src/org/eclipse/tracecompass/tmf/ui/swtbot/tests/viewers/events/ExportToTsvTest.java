@@ -36,13 +36,12 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
-import org.eclipse.swtbot.swt.finder.keyboard.KeyboardFactory;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
@@ -52,7 +51,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -92,8 +90,6 @@ public class ExportToTsvTest {
     private static final String EVENT1_TEXT = "01:01:01.000 000 000\tHostA\tLoggerA\tSourceFile\t4\tMessage A";
     private static final String EVENT2_TEXT = "02:02:02.000 000 000\tHostB\tLoggerB\tSourceFile\t5\tMessage B";
     private static final String EVENT3_TEXT = "03:03:03.000 000 000\tHostC\tLoggerC\tSourceFile\t6\tMessage C";
-    @SuppressWarnings("null")
-    private static final Keyboard KEYBOARD = KeyboardFactory.getSWTKeyboard();
     private static final String TRACE_PROJECT_NAME = "test";
     private static final String TRACE_NAME = "syslog_collapse";
     private static final String TRACE_PATH = "testfiles/" + TRACE_NAME;
@@ -211,14 +207,14 @@ public class ExportToTsvTest {
      *             File not found or such
      */
     @Test
-    @Ignore
     public void testExportWithFilter() throws IOException {
         SWTBotEditor editorBot = fEditorBot;
         assertNotNull(editorBot);
         final SWTBotTable tableBot = editorBot.bot().table();
         tableBot.getTableItem(0).click(3);
-        KEYBOARD.typeText("LoggerA|LoggerB|LoggerC");
-        KEYBOARD.pressShortcut(Keystrokes.CTRL, Keystrokes.CR);
+        SWTBotText textBot = editorBot.bot().text();
+        textBot.typeText("LoggerA|LoggerB|LoggerC");
+        textBot.pressShortcut(Keystrokes.CTRL, Keystrokes.CR);
         fBot.waitUntil(Conditions.tableHasRows(tableBot, 6), 5000);
 
         tableBot.getTableItem(1).contextMenu(EXPORT_TO_TSV).click();
