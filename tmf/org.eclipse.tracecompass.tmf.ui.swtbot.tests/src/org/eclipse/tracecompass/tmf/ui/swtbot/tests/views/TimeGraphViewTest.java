@@ -225,7 +225,8 @@ public class TimeGraphViewTest {
         TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, smallerRange);
 
         TimeGraphViewStub view = getView();
-        // This is an oddity: the signals may be lost if a view is not initialized, so
+        // This is an oddity: the signals may be lost if a view is not
+        // initialized, so
         // they are send in the condition.
         //
         // NOTE: maybe use a shorter poll delay?
@@ -269,8 +270,8 @@ public class TimeGraphViewTest {
     }
 
     /**
-     * Clean up after a test, reset the views and reset the states of the timegraph
-     * by pressing reset on all the resets of the legend
+     * Clean up after a test, reset the views and reset the states of the
+     * timegraph by pressing reset on all the resets of the legend
      */
     @After
     public void after() {
@@ -356,8 +357,39 @@ public class TimeGraphViewTest {
     }
 
     /**
-     * Test the legend operation. Change sliders and reset, do not change colors as
-     * there is not mock of the color picker yet
+     * Test the event styling methods, should put a box around the events.
+     */
+    @Test
+    public void testEventStyling() {
+        SWTWorkbenchBot bot = new SWTWorkbenchBot();
+        resetTimeRange(bot);
+        Rectangle bounds = fBounds;
+        ImageHelper precollapse = ImageHelper.grabImage(bounds);
+        SWTBotTimeGraph tg = new SWTBotTimeGraph(fViewBot.bot());
+        tg.getEntry("Plumber guy").collapse();
+        TimeGraphViewStub view = getView();
+        // take a first saved picture, the original is pre-collapse
+        ImageHelper ref = ImageHelper.waitForNewImage(bounds, precollapse);
+        /*
+         * Regex, not a question
+         */
+        view.setFilterRegex("row?");
+        UIThreadRunnable.syncExec(() -> view.restartZoomThread());
+        // Take another picture/
+        ImageHelper highlighted = ImageHelper.waitForNewImage(bounds, ref);
+        view.setFilterRegex(null);
+        UIThreadRunnable.syncExec(() -> view.restartZoomThread());
+        // take a third picture
+        ImageHelper reset = ImageHelper.waitForNewImage(bounds, highlighted);
+        assertEquals(ref.getHistogram(), reset.getHistogram());
+        ImageHelper delta = highlighted.diff(reset);
+        tg.expandAll();
+        assertTrue("Some highlighting", delta.getHistogram().elementSet().size() > 1);
+    }
+
+    /**
+     * Test the legend operation. Change sliders and reset, do not change colors
+     * as there is not mock of the color picker yet
      *
      * TODO: mock color picker
      */
@@ -406,14 +438,15 @@ public class TimeGraphViewTest {
     }
 
     /**
-     * Test the legend and export operations. Resize states, take screenshots and
-     * compare, they should be different. then reset the sizes and compare, they
-     * should be the same.
+     * Test the legend and export operations. Resize states, take screenshots
+     * and compare, they should be different. then reset the sizes and compare,
+     * they should be the same.
      *
      * NOTE: This utterly fails in GTK3.
      *
      * @throws IOException
-     *             file not found, someone deleted files while the test is running
+     *             file not found, someone deleted files while the test is
+     *             running
      */
     @Test
     public void testExport() throws IOException {
@@ -455,7 +488,8 @@ public class TimeGraphViewTest {
         /* Compare with the original, they should be different */
         int refCount = refImage.getHistogram().count(HAIR);
         int skinnyCount = skinnyImage.getHistogram().count(HAIR);
-        assertTrue(String.format("Count of \"\"HAIR\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", HAIR, refCount, skinnyCount, Multisets.copyHighestCountFirst(skinnyImage.getHistogram())), skinnyCount < refCount);
+        assertTrue(String.format("Count of \"\"HAIR\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", HAIR, refCount, skinnyCount, Multisets.copyHighestCountFirst(skinnyImage.getHistogram())),
+                skinnyCount < refCount);
 
         /* reset all */
         fViewBot.toolbarButton(SHOW_LEGEND).click();
@@ -477,12 +511,11 @@ public class TimeGraphViewTest {
         assertEquals("Count of \"HAIR\" did not get change despite reset of width", refCount, resetCount);
     }
 
-    private static class PaletteIsPresent extends DefaultCondition  {
+    private static class PaletteIsPresent extends DefaultCondition {
 
         private String fFailureMessage;
         private List<RGB> fRgbs;
         private Rectangle fRect;
-
 
         public PaletteIsPresent(List<RGB> rgbs, Rectangle bounds) {
             fRgbs = rgbs;
@@ -512,7 +545,6 @@ public class TimeGraphViewTest {
         }
     }
 
-
     /**
      * Test time graph with color palettes
      */
@@ -530,7 +562,7 @@ public class TimeGraphViewTest {
                 return paletteBlue;
             }
         }));
-        List<RGB> rgbs = Lists.transform(paletteBlue.get(), a->RGBAUtil.fromInt(a.toInt()).rgb);
+        List<RGB> rgbs = Lists.transform(paletteBlue.get(), a -> RGBAUtil.fromInt(a.toInt()).rgb);
         fViewBot.bot().waitUntil(new PaletteIsPresent(rgbs, bounds));
 
         IPaletteProvider paletteGreen = SequentialPaletteProvider.create(new RGBAColor(0x23, 0xf3, 0x67, 0xff), 5);
@@ -540,7 +572,7 @@ public class TimeGraphViewTest {
                 return paletteGreen;
             }
         }));
-        rgbs = Lists.transform(paletteGreen.get(), a->RGBAUtil.fromInt(a.toInt()).rgb);
+        rgbs = Lists.transform(paletteGreen.get(), a -> RGBAUtil.fromInt(a.toInt()).rgb);
         fViewBot.bot().waitUntil(new PaletteIsPresent(rgbs, bounds));
 
         IPaletteProvider rotating = new QualitativePaletteProvider.Builder().setAttenuation(0.5f).setBrightness(1.0f).setNbColors(4).build();
@@ -550,7 +582,7 @@ public class TimeGraphViewTest {
                 return rotating;
             }
         }));
-        rgbs = Lists.transform(rotating.get(), a->RGBAUtil.fromInt(a.toInt()).rgb);
+        rgbs = Lists.transform(rotating.get(), a -> RGBAUtil.fromInt(a.toInt()).rgb);
         fViewBot.bot().waitUntil(new PaletteIsPresent(rgbs, bounds));
     }
 
@@ -572,7 +604,7 @@ public class TimeGraphViewTest {
         ImageHelper ref = ImageHelper.grabImage(bounds);
 
         timegraph.setFocus();
-        //Press '/' to open the filter dialog
+        // Press '/' to open the filter dialog
         timegraph.pressShortcut(KeyStroke.getInstance('/'));
 
         SWTBotShell dialogShell = viewBot.shell("Time Event Filter").activate();
