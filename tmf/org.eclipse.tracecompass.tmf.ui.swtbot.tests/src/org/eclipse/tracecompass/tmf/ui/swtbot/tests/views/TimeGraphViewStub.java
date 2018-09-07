@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.RGBA;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -32,6 +33,8 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
+
+import com.google.common.collect.Multimap;
 
 /**
  * Time graph stub.
@@ -75,6 +78,8 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
     private final @NonNull TimeGraphEntry fHead1;
     private final @NonNull TimeGraphEntry fRow4;
     private StubPresentationProvider fPresentationProvider;
+
+    private String fFilterRegex;
 
     /**
      * Constructor
@@ -142,6 +147,25 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
     }
 
     @Override
+    protected @NonNull Multimap<@NonNull Integer, @NonNull String> getRegexes() {
+        Multimap<@NonNull Integer, @NonNull String> regexes = super.getRegexes();
+        if (regexes.containsKey(IFilterProperty.BOUND) && (fFilterRegex == null || fFilterRegex.isEmpty())) {
+            regexes.removeAll(IFilterProperty.BOUND);
+        }
+        if (!regexes.containsKey(IFilterProperty.BOUND) && fFilterRegex != null && !fFilterRegex.isEmpty()) {
+            regexes.put(IFilterProperty.BOUND, fFilterRegex);
+        }
+        return regexes;
+    }
+
+    /**
+     * Set the regex to highlight on
+     */
+    public void setFilterRegex(String filterRegex) {
+        fFilterRegex = filterRegex;
+    }
+
+    @Override
     protected void buildEntryList(@NonNull ITmfTrace trace, @NonNull ITmfTrace parentTrace, @NonNull IProgressMonitor monitor) {
         List<@NonNull TimeGraphEntry> entryList = getEntryList(trace);
         if (entryList == null || entryList.isEmpty()) {
@@ -163,7 +187,7 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
      * Set the presentation provider
      *
      * @param presentaitonProvider
-     *                                 the presentation provider
+     *            the presentation provider
      */
     public void setPresentationProvider(StubPresentationProvider presentaitonProvider) {
         fPresentationProvider = presentaitonProvider;
