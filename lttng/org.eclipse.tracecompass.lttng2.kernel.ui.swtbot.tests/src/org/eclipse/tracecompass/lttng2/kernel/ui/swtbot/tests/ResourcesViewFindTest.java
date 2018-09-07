@@ -8,14 +8,11 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
-import org.junit.Ignore;
-
 /**
  * SWTBot test for Resources view Find dialog
  *
  * @author Jean-Christian Kouame
  */
-@Ignore
 public class ResourcesViewFindTest extends FindDialogTestBase {
 
     private static final String TITLE = "Resources";

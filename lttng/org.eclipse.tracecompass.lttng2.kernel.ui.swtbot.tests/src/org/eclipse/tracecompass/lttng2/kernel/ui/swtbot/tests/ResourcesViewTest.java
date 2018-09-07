@@ -27,8 +27,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
-import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
-import org.eclipse.swtbot.swt.finder.keyboard.KeyboardFactory;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
 import org.eclipse.swtbot.swt.finder.results.Result;
@@ -79,7 +77,6 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
     private static final String ADD_BOOKMARK_DIALOG = "Add Bookmark";
     private static final String LOST_EVENTS = "Lost Events";
     private static final String OK = "OK";
-    private static final Keyboard KEYBOARD = KeyboardFactory.getSWTKeyboard();
     private static final @NonNull ITmfTimestamp START_TIME = TmfTimestamp.fromNanos(1368000272650993664L);
     private static final @NonNull ITmfTimestamp LOST_EVENT_TIME1 = TmfTimestamp.fromNanos(1368000272681793477L);
     private static final @NonNull ITmfTimestamp LOST_EVENT_END1 = TmfTimestamp.fromNanos(1368000272681793477L + 7425331L);
@@ -140,11 +137,25 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
      */
     @Test
     public void testKeyboardSelectNextPreviousMarker() {
+        SWTBotView viewBot = getViewBot();
+        SWTBotCanvas canvas = viewBot.bot().canvas(1);
         testNextPreviousMarker(
-                () -> KEYBOARD.pressShortcut(KeyStroke.getInstance('.')),
-                () -> KEYBOARD.pressShortcut(Keystrokes.SHIFT, KeyStroke.getInstance('.')),
-                () -> KEYBOARD.pressShortcut(KeyStroke.getInstance(',')),
-                () -> KEYBOARD.pressShortcut(Keystrokes.SHIFT, KeyStroke.getInstance(',')));
+                () -> {
+                    canvas.setFocus();
+                    canvas.pressShortcut(KeyStroke.getInstance('.'));
+                },
+                () -> {
+                    canvas.setFocus();
+                    canvas.pressShortcut(Keystrokes.SHIFT, KeyStroke.getInstance('.'));
+                },
+                () -> {
+                    canvas.setFocus();
+                    canvas.pressShortcut(KeyStroke.getInstance(','));
+                },
+                () -> {
+                    canvas.setFocus();
+                    canvas.pressShortcut(Keystrokes.SHIFT, KeyStroke.getInstance(','));
+                });
     }
 
     /**

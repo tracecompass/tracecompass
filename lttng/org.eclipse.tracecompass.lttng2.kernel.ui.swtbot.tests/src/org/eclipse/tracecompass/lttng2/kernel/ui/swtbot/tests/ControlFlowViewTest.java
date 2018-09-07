@@ -24,9 +24,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
-import org.eclipse.swtbot.swt.finder.keyboard.KeyboardFactory;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCanvas;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -88,7 +87,6 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
     private static final String FOLLOW_CPU_FORWARD = "Follow CPU Forward";
     private static final String SELECT_PREVIOUS_STATE_CHANGE = "Select Previous State Change";
     private static final String SELECT_NEXT_STATE_CHANGE = "Select Next State Change";
-    private static final Keyboard KEYBOARD = KeyboardFactory.getSWTKeyboard();
     private static final @NonNull ITmfTimestamp START_TIME = TmfTimestamp.fromNanos(1368000272650993664L);
     private static final @NonNull ITmfTimestamp TID1_TIME1 = TmfTimestamp.fromNanos(1368000272651208412L);
     private static final @NonNull ITmfTimestamp TID1_TIME2 = TmfTimestamp.fromNanos(1368000272656147616L);
@@ -147,10 +145,25 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
      */
     @Test
     public void testKeyboardLeftRight() {
-        testNextPreviousEvent(() -> KEYBOARD.pressShortcut(Keystrokes.RIGHT),
-                () -> KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT),
-                () -> KEYBOARD.pressShortcut(Keystrokes.LEFT),
-                () -> KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT));
+        SWTBotView viewBot = getViewBot();
+        SWTBotCanvas canvas = viewBot.bot().canvas(1);
+        testNextPreviousEvent(
+                () -> {
+                    canvas.setFocus();
+                    canvas.pressShortcut(Keystrokes.RIGHT);
+                },
+                () -> {
+                    canvas.setFocus();
+                    canvas.pressShortcut(Keystrokes.SHIFT, Keystrokes.RIGHT);
+                },
+                () -> {
+                    canvas.setFocus();
+                    canvas.pressShortcut(Keystrokes.LEFT);
+                },
+                () -> {
+                    canvas.setFocus();
+                    canvas.pressShortcut(Keystrokes.SHIFT, Keystrokes.LEFT);
+                });
     }
 
     /**

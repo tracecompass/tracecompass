@@ -35,8 +35,6 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
-import org.eclipse.swtbot.swt.finder.keyboard.KeyboardFactory;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.results.StringResult;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
@@ -49,7 +47,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -64,7 +61,6 @@ public class CopyToClipboardTest {
     private static final String EVENT1_TEXT = "01:01:01.000 000 000\tHostA\tLoggerA\tSourceFile\t4\tMessage A" + LINE_SEPARATOR;
     private static final String EVENT2_TEXT = "02:02:02.000 000 000\tHostB\tLoggerB\tSourceFile\t5\tMessage B" + LINE_SEPARATOR;
     private static final String EVENT3_TEXT = "03:03:03.000 000 000\tHostC\tLoggerC\tSourceFile\t6\tMessage C" + LINE_SEPARATOR;
-    private static final Keyboard KEYBOARD = KeyboardFactory.getSWTKeyboard();
     private static final String TRACE_PROJECT_NAME = "test";
     private static final String TRACE_NAME = "syslog_collapse";
     private static final String TRACE_PATH = "testfiles/" + TRACE_NAME;
@@ -161,12 +157,11 @@ public class CopyToClipboardTest {
      * Test copy to clipboard with multiple selection
      */
     @Test
-    @Ignore
     public void testCopyMultipleSelection() {
         final SWTBotTable tableBot = fEditorBot.bot().table();
         tableBot.getTableItem(1).click();
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.DOWN);
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.DOWN);
+        tableBot.pressShortcut(Keystrokes.SHIFT, Keystrokes.DOWN);
+        tableBot.pressShortcut(Keystrokes.SHIFT, Keystrokes.DOWN);
 
         tableBot.contextMenu(COPY_TO_CLIPBOARD).click();
         assertClipboardContentsEquals(HEADER_TEXT + EVENT1_TEXT + EVENT2_TEXT + EVENT3_TEXT);
@@ -176,11 +171,10 @@ public class CopyToClipboardTest {
      * Test copy to clipboard not enabled when selection includes search row
      */
     @Test
-    @Ignore
     public void testNoCopySearchRow() {
         final SWTBotTable tableBot = fEditorBot.bot().table();
         tableBot.getTableItem(1).click();
-        KEYBOARD.pressShortcut(Keystrokes.SHIFT, Keystrokes.UP);
+        tableBot.pressShortcut(Keystrokes.SHIFT, Keystrokes.UP);
 
         assertContextMenuAbsent(tableBot, COPY_TO_CLIPBOARD);
     }

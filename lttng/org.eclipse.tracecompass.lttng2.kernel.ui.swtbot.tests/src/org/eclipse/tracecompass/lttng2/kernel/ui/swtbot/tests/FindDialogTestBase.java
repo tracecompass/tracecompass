@@ -23,14 +23,13 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.eclipse.swtbot.swt.finder.keyboard.Keyboard;
-import org.eclipse.swtbot.swt.finder.keyboard.KeyboardFactory;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCanvas;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
@@ -75,7 +74,6 @@ public abstract class FindDialogTestBase {
 
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
-    private static final Keyboard KEYBOARD = KeyboardFactory.getSWTKeyboard();
     private static final @NonNull ITmfTimestamp START_TIME = TmfTimestamp.create(1412670961211260539L, ITmfTimestamp.NANOSECOND_SCALE);
     private static final @NonNull String SPACE = " ";
     private static final String REGEX_PREFIX = "\\A";
@@ -144,10 +142,10 @@ public abstract class FindDialogTestBase {
         String title = getViewTitle();
         fViewBot = fBot.viewByTitle(title);
         fViewBot.show();
-        fViewBot.setFocus();
 
         TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, START_TIME));
         fBot.waitUntil(ConditionHelpers.timeGraphIsReadyCondition((AbstractTimeGraphView) fViewBot.getViewReference().getPart(false), new TmfTimeRange(START_TIME, START_TIME), START_TIME));
+        fViewBot.setFocus();
         openDialog(fViewBot);
 
         fFindText = getFindText();
@@ -158,17 +156,20 @@ public abstract class FindDialogTestBase {
      */
     @After
     public void after() {
+        SWTBotShell shell = getDialogShell();
         closeDialog(getDialogBot());
+        fBot.waitUntil(Conditions.shellCloses(shell));
         SWTBotUtils.closeSecondaryShells(fBot);
     }
 
     private static void openDialog(SWTBotView view) {
+        SWTBotCanvas canvas = view.bot().canvas(1);
         view.setFocus();
-        SWTBotUtils.pressShortcut(KEYBOARD, Keystrokes.HOME);
+        canvas.pressShortcut(Keystrokes.HOME);
         if (SWTUtils.isMac()) {
-            KEYBOARD.pressShortcut(Keystrokes.COMMAND, KeyStroke.getInstance('F'));
+            canvas.pressShortcut(Keystrokes.COMMAND, KeyStroke.getInstance('F'));
         } else {
-            KEYBOARD.pressShortcut(Keystrokes.CTRL, KeyStroke.getInstance('F'));
+            canvas.pressShortcut(Keystrokes.CTRL, KeyStroke.getInstance('F'));
         }
         fBot.shell(DIALOG_TITLE).activate();
     }
