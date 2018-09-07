@@ -10,6 +10,7 @@ package org.eclipse.tracecompass.tmf.core.tests.filter.parser;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
@@ -206,5 +207,11 @@ public class ElementResolverFilterTest {
         assertNotNull(cu);
         predicate = cu.generate();
         assertFalse(predicate.test(ELEMENT.computeData()));
+    }
+
+    @Test
+    public void testInvalid() {
+        FilterCu cu = FilterCu.compile("label = elementLabel");
+        assertNull(cu);
     }
 }

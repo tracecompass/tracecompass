@@ -19,6 +19,16 @@ import java.util.regex.PatternSyntaxException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
+import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAspectNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterContainsNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEqualsNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterOrNode;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
 
 /**
@@ -27,7 +37,7 @@ import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
  * @author Jean-Christian Kouame
  *
  */
-public class FilterSimpleExpressionCu {
+public class FilterSimpleExpressionCu implements IFilterCu {
 
     private final String fField;
     private final String fOperator;
@@ -201,13 +211,13 @@ public class FilterSimpleExpressionCu {
         NE((i, j) -> !equals(i, j)),
         /** Matches */
         MATCHES(matchFunc()),
-        /** Contains*/
+        /** Contains */
         CONTAINS((i, j) -> i.contains(j)),
         /** Less than */
         LT((i, j) -> numericalCompare(i, j) < 0),
         /** Greater than */
         GT((i, j) -> numericalCompare(i, j) > 0),
-        /** Field is present*/
+        /** Field is present */
         PRESENT((i, j) -> true);
 
         private final BiFunction<String, String, Boolean> fCmpFunction;
@@ -281,4 +291,90 @@ public class FilterSimpleExpressionCu {
             return Objects.requireNonNull(fCmpFunction.apply(arg0, arg1));
         }
     }
+
+    @Override
+    public ITmfFilterTreeNode getEventFilter(ITmfTrace trace) {
+        if (fField.equals(IFilterStrings.WILDCARD)) {
+            // Make a OR on all aspects
+            TmfFilterOrNode orNode = new TmfFilterOrNode(null);
+            for (ITmfEventAspect<?> aspect : trace.getEventAspects()) {
+                TmfFilterMatchesNode node = new TmfFilterMatchesNode(null);
+                node.setEventAspect(aspect);
+                node.setRegex(fValue);
+                orNode.addChild(node);
+            }
+            orNode.setNot(getNot());
+            return orNode;
+        }
+        // Find an event aspect corresponding to the field
+        ITmfEventAspect<?> filterAspect = null;
+        for (ITmfEventAspect<?> aspect : trace.getEventAspects()) {
+            if (aspect.getName().equals(fField)) {
+                filterAspect = aspect;
+                break;
+            }
+        }
+        if (filterAspect == null) {
+            // Fallback to a field aspect
+            filterAspect = TmfBaseAspects.getContentsAspect().forField(fField);
+        }
+        TmfFilterAspectNode conditionNode = createConditionNode();
+        conditionNode.setEventAspect(filterAspect);
+
+        return conditionNode;
+    }
+
+    private TmfFilterAspectNode createConditionNode() {
+        switch (fOperator) {
+        case IFilterStrings.EQUAL:
+            TmfFilterEqualsNode equalsNode = new TmfFilterEqualsNode(null);
+            equalsNode.setValue(fValue);
+            equalsNode.setNot(getNot());
+            return equalsNode;
+        case IFilterStrings.NOT_EQUAL:
+            TmfFilterEqualsNode notEqualsNode = new TmfFilterEqualsNode(null);
+            notEqualsNode.setValue(fValue);
+            notEqualsNode.setNot(!getNot());
+            return notEqualsNode;
+        case IFilterStrings.MATCHES:
+            TmfFilterMatchesNode matchesNode = new TmfFilterMatchesNode(null);
+            matchesNode.setRegex(fValue);
+            matchesNode.setNot(getNot());
+            return matchesNode;
+        case IFilterStrings.CONTAINS:
+            TmfFilterContainsNode containsNode = new TmfFilterContainsNode(null);
+            containsNode.setValue(fValue);
+            containsNode.setNot(getNot());
+            return containsNode;
+        case IFilterStrings.PRESENT:
+            TmfFilterMatchesNode presentNode = new TmfFilterMatchesNode(null);
+            presentNode.setRegex(".*"); //$NON-NLS-1$
+            presentNode.setNot(getNot());
+            return presentNode;
+        case IFilterStrings.GT:
+            TmfFilterCompareNode gtNode = new TmfFilterCompareNode(null);
+            gtNode.setResult(1);
+            gtNode.setValue(fValue);
+            gtNode.setNot(getNot());
+            return gtNode;
+        case IFilterStrings.LT:
+            TmfFilterCompareNode ltNode = new TmfFilterCompareNode(null);
+            ltNode.setResult(-1);
+            ltNode.setValue(fValue);
+            ltNode.setNot(getNot());
+            return ltNode;
+        default:
+            throw new IllegalArgumentException("FilterSimpleExpression: invalid comparison operator."); //$NON-NLS-1$
+        }
+    }
+
+    /**
+     * Get whether this Cu expression is a negation
+     *
+     * @return <code>true</code> if the expression is a negation
+     */
+    protected boolean getNot() {
+        return false;
+    }
+
 }

@@ -45,4 +45,10 @@ public class FilterSimpleExpressionNotCu extends FilterSimpleExpressionCu {
     public FilterSimpleExpression generate() {
         return new FilterSimpleExpressionNot(getField(), getConditionOperator(getOperator()), getValue());
     }
+
+    @Override
+    protected boolean getNot() {
+        return true;
+    }
+
 }

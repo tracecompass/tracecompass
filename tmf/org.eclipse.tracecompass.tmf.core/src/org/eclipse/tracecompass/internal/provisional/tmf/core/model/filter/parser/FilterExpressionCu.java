@@ -16,6 +16,15 @@ import java.util.Queue;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterContainsNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEqualsNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterOrNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterTreeNode;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
 
 /**
@@ -24,7 +33,7 @@ import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
  * @author Jean-Christian Kouame
  *
  */
-public class FilterExpressionCu {
+public class FilterExpressionCu implements IFilterCu {
 
     private List<Object> fElements;
 
@@ -63,7 +72,7 @@ public class FilterExpressionCu {
         }
 
         List<Object> elements = new ArrayList<>();
-        for (int i = 0; i<childCount; i++) {
+        for (int i = 0; i < childCount; i++) {
             if (i % 2 == 0) {
                 CommonTree nodeTree = (CommonTree) treeNode.getChild(i);
                 int subChildCount = nodeTree.getChildCount();
@@ -144,4 +153,90 @@ public class FilterExpressionCu {
         }
         return queue;
     }
+
+    @Override
+    public ITmfFilterTreeNode getEventFilter(ITmfTrace trace) {
+        int count = fElements.size();
+        ITmfFilterTreeNode prevNode = null;
+        String operator = IFilterStrings.OR;
+
+        for (int i = 0; i < count; i++) {
+            if (i % 2 == 0) {
+                Object element = fElements.get(i);
+                if (element instanceof IFilterCu) {
+
+                    ITmfFilterTreeNode node = ((IFilterCu) element).getEventFilter(trace);
+                    prevNode = mergeEventFilters(prevNode, operator, node);
+                } else {
+                    throw new IllegalStateException("Unknown element while getting the filter element queue"); //$NON-NLS-1$
+                }
+            } else {
+                Object op = fElements.get(i);
+                if (!(op instanceof String)) {
+                    throw new IllegalStateException("Element at position " + i + " should be a String"); //$NON-NLS-1$ //$NON-NLS-2$
+                }
+                operator = (String) op;
+            }
+        }
+        if (prevNode == null) {
+            throw new NullPointerException("The filter should not be null at this point"); //$NON-NLS-1$
+        }
+        if (getNot()) {
+            setFilterNot(prevNode);
+        }
+        return prevNode;
+    }
+
+    private static void setFilterNot(ITmfFilterTreeNode node) {
+        // TODO: Ideally all those classes would have a common parent class, but
+        // that would be API breaking
+        if (node instanceof TmfFilterOrNode) {
+            ((TmfFilterOrNode) node).setNot(true);
+        }
+        if (node instanceof TmfFilterAndNode) {
+            ((TmfFilterAndNode) node).setNot(true);
+        }
+        if (node instanceof TmfFilterContainsNode) {
+            ((TmfFilterContainsNode) node).setNot(true);
+        }
+        if (node instanceof TmfFilterEqualsNode) {
+            ((TmfFilterEqualsNode) node).setNot(true);
+        }
+        if (node instanceof TmfFilterCompareNode) {
+            ((TmfFilterCompareNode) node).setNot(true);
+        }
+        if (node instanceof TmfFilterMatchesNode) {
+            ((TmfFilterMatchesNode) node).setNot(true);
+        }
+    }
+
+    private ITmfFilterTreeNode mergeEventFilters(@Nullable ITmfFilterTreeNode prevNode, String operator, ITmfFilterTreeNode node) {
+        if (prevNode == null) {
+            return node;
+        }
+        TmfFilterTreeNode parentNode;
+        if (operator == IFilterStrings.OR) {
+            TmfFilterOrNode orNode = new TmfFilterOrNode(null);
+            orNode.setNot(getNot());
+            parentNode = orNode;
+        } else {
+            TmfFilterAndNode andNode = new TmfFilterAndNode(null);
+            andNode.setNot(getNot());
+            parentNode = andNode;
+        }
+        parentNode.addChild(prevNode);
+        parentNode.addChild(node);
+
+        return parentNode;
+    }
+
+    /**
+     * Get whether this Cu expression is a negation
+     *
+     * @return <code>true</code> if the expression is a negation
+     */
+    protected boolean getNot() {
+        return false;
+    }
+
 }

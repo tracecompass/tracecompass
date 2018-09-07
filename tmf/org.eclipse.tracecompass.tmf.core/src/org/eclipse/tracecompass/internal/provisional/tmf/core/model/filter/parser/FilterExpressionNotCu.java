@@ -39,9 +39,16 @@ public class FilterExpressionNotCu extends FilterExpressionCu {
         }
         return new FilterExpressionNotCu(cu.getElement());
     }
+
     @Override
     public FilterExpression generate() {
         Queue<Object> queue = getElementsQueue();
         return new FilterExpressionNot(queue);
     }
+
+    @Override
+    protected boolean getNot() {
+        return true;
+    }
+
 }

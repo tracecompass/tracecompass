@@ -65,7 +65,7 @@ private TraceCompassFilter(ITmfFilter filter, Collection<String> regex) {
      * @return A new filter
      */
     public synchronized static TraceCompassFilter fromRegex(Collection<String> regex, ITmfTrace trace) {
-        ITmfFilter filter = TmfFilterHelper.buildFilterFromRegex(regex);
+        ITmfFilter filter = TmfFilterHelper.buildFilterFromRegex(regex, trace);
         TraceCompassFilter traceCompassFilter = new TraceCompassFilter(filter, regex);
         FILTER_MAP.put(trace, traceCompassFilter);
         return traceCompassFilter;

@@ -19,6 +19,9 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterRootNode;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser.parse_return;
@@ -31,7 +34,7 @@ import com.google.common.collect.Iterables;
  * @author Jean-Christian Kouame
  *
  */
-public class FilterCu {
+public class FilterCu implements IFilterCu {
 
     List<FilterExpressionCu> fExpressions;
 
@@ -69,13 +72,21 @@ public class FilterCu {
             ANTLRStringStream stream = new ANTLRStringStream(regex);
             FilterParserLexer lexer = new FilterParserLexer(stream);
             boolean[] invalid = new boolean[1];
-            lexer.setErrorListener(e -> invalid[0] = e instanceof RecognitionException);
+            String[] exception = new String[1];
+            lexer.setErrorListener(e -> {
+                invalid[0] |= e instanceof RecognitionException;
+                exception[0] = e.getMessage();
+            });
 
             CommonTokenStream tokens = new CommonTokenStream();
             tokens.setTokenSource(lexer);
 
             FilterParserParser parser = new FilterParserParser(tokens);
-            parser.setErrorListener(e -> invalid[0] |= e instanceof RecognitionException);
+            parser.setErrorListener(e -> {
+                invalid[0] |= e instanceof RecognitionException;
+                exception[0] = e.getMessage();
+            });
+
             parse_return parse = parser.parse();
 
             if (invalid[0]) {
@@ -116,4 +127,24 @@ public class FilterCu {
         Iterable<FilterExpression> expressions = Objects.requireNonNull(Iterables.transform(fExpressions, exp -> exp.generate()));
         return new Filter(expressions);
     }
+
+    @Override
+    public ITmfFilterTreeNode getEventFilter(ITmfTrace trace) {
+        ITmfFilterTreeNode rootNode = new TmfFilterRootNode();
+        for (FilterExpressionCu expression : fExpressions) {
+            ITmfFilterTreeNode node = expression.getEventFilter(trace);
+            rootNode.addChild(node);
+        }
+        return rootNode;
+    }
+
+    /**
+     * Get whether this Cu expression is a negation
+     *
+     * @return <code>true</code> if the expression is a negation
+     */
+    protected boolean getNot() {
+        return false;
+    }
+
 }

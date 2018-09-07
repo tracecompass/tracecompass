@@ -53,4 +53,10 @@ public class FilterNotCu extends FilterCu {
         Iterable<FilterExpression> expressions = Objects.requireNonNull(Iterables.transform(fExpressions, exp -> exp.generate()));
         return new FilterNot(expressions);
     }
+
+    @Override
+    protected boolean getNot() {
+        return true;
+    }
+
 }

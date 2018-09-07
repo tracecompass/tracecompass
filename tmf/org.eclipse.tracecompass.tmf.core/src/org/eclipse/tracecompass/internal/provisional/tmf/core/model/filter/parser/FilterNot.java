@@ -32,4 +32,5 @@ public class FilterNot extends Filter {
     public boolean test(Map<String, String> data) {
         return !super.test(data);
     }
+
 }
