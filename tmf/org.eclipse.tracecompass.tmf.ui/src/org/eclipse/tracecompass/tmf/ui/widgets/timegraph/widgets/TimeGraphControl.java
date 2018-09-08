@@ -2226,6 +2226,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
                     SymbolHelper.drawDiamond(gc, color, symbolSize, rect.x, rect.y + rect.height / 2);
                 }
                 gc.setAlpha(OPAQUE);
+                if (marker.getDuration() == 0) {
+                    return;
+                }
             }
         }
         oldDrawMarker(marker, gc, rect);
