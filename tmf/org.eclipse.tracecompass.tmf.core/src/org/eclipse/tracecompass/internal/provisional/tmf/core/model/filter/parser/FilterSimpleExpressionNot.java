@@ -11,6 +11,8 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.pars
 import java.util.Map;
 import java.util.function.BiPredicate;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * This class represents a simple filter expression negation
  *
@@ -29,7 +31,7 @@ public class FilterSimpleExpressionNot extends FilterSimpleExpression {
      * @param value
      *            The value to test
      */
-    public FilterSimpleExpressionNot(String field, BiPredicate<String, String> operator, String value) {
+    public FilterSimpleExpressionNot(String field, BiPredicate<String, String> operator, @Nullable String value) {
         super(field, operator, value);
     }
 

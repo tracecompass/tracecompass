@@ -11,9 +11,11 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.pars
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 
 import org.antlr.runtime.tree.CommonTree;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
 
 /**
@@ -52,7 +54,7 @@ public class FilterExpressionCu {
      *            The root node used to build this compilation unit
      * @return a filter expression compilation unit
      */
-    public static FilterExpressionCu compile(CommonTree treeNode) {
+    public static @Nullable FilterExpressionCu compile(CommonTree treeNode) {
         int childCount = treeNode.getChildCount();
 
         // We can only have an odd number of parameter at this point
@@ -69,7 +71,7 @@ public class FilterExpressionCu {
                 if (nodeTree.getType() == FilterParserParser.ROOT1) {
                     boolean negate = nodeTree.getChild(0).getText().equals(IFilterStrings.NOT);
                     // The logical part is the penultimate child
-                    CommonTree logical = (CommonTree) nodeTree.getChild(subChildCount - 2);
+                    CommonTree logical = Objects.requireNonNull((CommonTree) nodeTree.getChild(subChildCount - 2));
                     FilterExpressionCu cu = negate ? FilterExpressionNotCu.compile(logical) : FilterExpressionCu.compile(logical);
 
                     if (cu == null) {
@@ -89,7 +91,7 @@ public class FilterExpressionCu {
             } else {
                 CommonTree opTree = (CommonTree) treeNode.getChild(i);
                 String op = opTree.getText();
-                elements.add(op);
+                elements.add(Objects.requireNonNull(op));
             }
         }
 
@@ -121,27 +123,21 @@ public class FilterExpressionCu {
                 if (element instanceof FilterSimpleExpressionCu) {
 
                     FilterSimpleExpression node = ((FilterSimpleExpressionCu) element).generate();
-                    if (node == null) {
-                        return null;
-                    }
 
                     queue.offer(node);
                 } else if (element instanceof FilterExpressionCu) {
 
                     FilterExpression node = ((FilterExpressionCu) element).generate();
-                    if (node == null) {
-                        return null;
-                    }
 
                     queue.offer(node);
 
                 } else {
-                    return null;
+                    throw new IllegalStateException("Unknown element while getting the filter element queue"); //$NON-NLS-1$
                 }
             } else {
                 Object op = fElements.get(i);
                 if (!(op instanceof String)) {
-                    return null;
+                    throw new IllegalStateException("Element at position " + i + " should be a String"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
                 queue.offer(op);
             }

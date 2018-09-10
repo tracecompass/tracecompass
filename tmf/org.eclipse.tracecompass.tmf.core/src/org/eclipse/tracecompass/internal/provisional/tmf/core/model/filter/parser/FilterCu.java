@@ -11,12 +11,14 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.pars
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser.parse_return;
@@ -59,7 +61,7 @@ public class FilterCu {
      *            The filter regex
      * @return The filter compilation unit
      */
-    public static FilterCu compile(String regex) {
+    public static @Nullable FilterCu compile(@Nullable String regex) {
         if (regex == null || regex.isEmpty()) {
             return null;
         }
@@ -111,7 +113,7 @@ public class FilterCu {
      * @return a filter item runtime object
      */
     public Predicate<Map<String, String>> generate() {
-        Iterable<FilterExpression> expressions = Iterables.transform(fExpressions, exp -> exp.generate());
+        Iterable<FilterExpression> expressions = Objects.requireNonNull(Iterables.transform(fExpressions, exp -> exp.generate()));
         return new Filter(expressions);
     }
 }

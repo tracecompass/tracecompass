@@ -18,6 +18,7 @@ import java.util.regex.PatternSyntaxException;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
 
 /**
@@ -28,9 +29,9 @@ import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
  */
 public class FilterSimpleExpressionCu {
 
-    private String fField;
-    private BiPredicate<String, String> fOperator;
-    private String fValue;
+    private final String fField;
+    private final BiPredicate<String, String> fOperator;
+    private final @Nullable String fValue;
 
     /**
      * Constructor
@@ -42,7 +43,7 @@ public class FilterSimpleExpressionCu {
      * @param value
      *            The value to to test
      */
-    public FilterSimpleExpressionCu(String field, BiPredicate<String, String> op, String value) {
+    public FilterSimpleExpressionCu(String field, BiPredicate<String, String> op, @Nullable String value) {
         fField = field;
         fOperator = op;
         fValue = value;
@@ -71,7 +72,7 @@ public class FilterSimpleExpressionCu {
      *
      * @return The value parameter
      */
-    protected String getValue() {
+    protected @Nullable String getValue() {
         return fValue;
     }
 
@@ -82,7 +83,7 @@ public class FilterSimpleExpressionCu {
      *            The input tree
      * @return The simple filter expression compilation unit
      */
-    public static FilterSimpleExpressionCu compile(CommonTree tree) {
+    public static @Nullable FilterSimpleExpressionCu compile(CommonTree tree) {
         if (tree.getToken() == null) {
             return null;
         }
@@ -95,13 +96,13 @@ public class FilterSimpleExpressionCu {
             extractParagraph(tree, paragraph, 0, childCount);
             return new FilterSimpleExpressionCu(IFilterStrings.WILDCARD, ConditionOperator.MATCHES, paragraph.toString().trim());
         case FilterParserParser.OPERATION:
-            String left = tree.getChild(0).getText();
-            BiPredicate<String, String> op = getConditionOperator(tree.getChild(1).getText());
+            String left = Objects.requireNonNull(tree.getChild(0).getText());
+            BiPredicate<String, String> op = getConditionOperator(Objects.requireNonNull(tree.getChild(1).getText()));
             String right = tree.getChild(2).getText();
             return new FilterSimpleExpressionCu(left, op, right);
         case FilterParserParser.OPERATION1:
-            String left1 = tree.getChild(0).getText();
-            BiPredicate<String, String> op1 = getConditionOperator(tree.getChild(1).getText());
+            String left1 = Objects.requireNonNull(tree.getChild(0).getText());
+            BiPredicate<String, String> op1 = getConditionOperator(Objects.requireNonNull(tree.getChild(1).getText()));
             String right1 = null;
             return new FilterSimpleExpressionCu(left1, op1, right1);
         case FilterParserParser.OPERATION2:
@@ -110,7 +111,7 @@ public class FilterSimpleExpressionCu {
             StringBuilder builder = new StringBuilder();
             int index = extractParagraph(tree, builder, 0, childCount);
             String left2 = builder.toString().trim();
-            BiPredicate<String, String> op2 = getConditionOperator(tree.getChild(index++).getText());
+            BiPredicate<String, String> op2 = getConditionOperator(Objects.requireNonNull(tree.getChild(index++).getText()));
             builder = new StringBuilder();
             extractParagraph(tree, builder, index, childCount);
             String right2 = builder.toString().trim();
@@ -119,7 +120,7 @@ public class FilterSimpleExpressionCu {
             StringBuilder builder1 = new StringBuilder();
             int index1 = extractParagraph(tree, builder1, 0, childCount);
             String left3 = builder1.toString().trim();
-            BiPredicate<String, String> op3 = getConditionOperator(tree.getChild(index1).getText());
+            BiPredicate<String, String> op3 = getConditionOperator(Objects.requireNonNull(tree.getChild(index1).getText()));
             String right3 = null;
             return new FilterSimpleExpressionCu(left3, op3, right3);
         case FilterParserParser.ROOT2:
@@ -128,7 +129,7 @@ public class FilterSimpleExpressionCu {
             }
 
             boolean negate = tree.getChild(0).getText().equals(IFilterStrings.NOT);
-            CommonTree expression = (CommonTree) tree.getChild(childCount - 1);
+            CommonTree expression = Objects.requireNonNull((CommonTree) tree.getChild(childCount - 1));
             FilterSimpleExpressionCu compiled = negate ? FilterSimpleExpressionNotCu.compile(expression) : FilterSimpleExpressionCu.compile(expression);
             return compiled;
         default:
@@ -255,7 +256,7 @@ public class FilterSimpleExpressionCu {
             return Long.compare(number1.longValue(), number2.longValue());
         }
 
-        private static Number toNumber(String value) {
+        private static @Nullable Number toNumber(String value) {
             try {
                 return Long.decode(value);
             } catch (NumberFormatException e) {

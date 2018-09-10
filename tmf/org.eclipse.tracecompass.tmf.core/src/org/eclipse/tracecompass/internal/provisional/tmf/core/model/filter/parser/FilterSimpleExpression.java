@@ -9,8 +9,11 @@
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
+
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.common.collect.Iterables;
 
@@ -22,9 +25,9 @@ import com.google.common.collect.Iterables;
  */
 public class FilterSimpleExpression implements Predicate<Map<String, String>> {
 
-    private String fField;
-    private BiPredicate<String, String> fOperator;
-    private String fValue;
+    private final String fField;
+    private final BiPredicate<String, String> fOperator;
+    private final @Nullable String fValue;
 
     /**
      * Constructor
@@ -36,7 +39,7 @@ public class FilterSimpleExpression implements Predicate<Map<String, String>> {
      * @param value
      *            The value to test
      */
-    public FilterSimpleExpression(String field, BiPredicate<String, String> operator, String value) {
+    public FilterSimpleExpression(String field, BiPredicate<String, String> operator, @Nullable String value) {
         fField = field;
         fOperator = operator;
         fValue = value;
@@ -44,7 +47,11 @@ public class FilterSimpleExpression implements Predicate<Map<String, String>> {
 
     @Override
     public boolean test(Map<String, String> data) {
-        return Iterables.any(data.entrySet(), entry -> (fField.equals("*") || entry.getKey().equals(fField) || entry.getKey().equals("> " + fField)) && fOperator.test(entry.getValue(), fValue)); //$NON-NLS-1$ //$NON-NLS-2$
+        String value = fValue;
+        return Iterables.any(data.entrySet(), entry -> (fField.equals("*") ||  //$NON-NLS-1$
+                Objects.requireNonNull(entry.getKey()).equals(fField) ||
+                Objects.requireNonNull(entry.getKey()).equals("> " + fField)) &&  //$NON-NLS-1$
+                (value == null || fOperator.test(entry.getValue(), value)));
     }
 
 }

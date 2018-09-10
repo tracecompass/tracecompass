@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Queue;
 
 import org.antlr.runtime.tree.CommonTree;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * This implements a filter expression compilation unit negation
@@ -31,8 +32,11 @@ public class FilterExpressionNotCu extends FilterExpressionCu {
         super(elements);
     }
 
-    public static FilterExpressionNotCu compile(CommonTree treeNode) {
+    public static @Nullable FilterExpressionNotCu compile(CommonTree treeNode) {
         FilterExpressionCu cu = FilterExpressionCu.compile(treeNode);
+        if (cu == null) {
+            return null;
+        }
         return new FilterExpressionNotCu(cu.getElement());
     }
     @Override

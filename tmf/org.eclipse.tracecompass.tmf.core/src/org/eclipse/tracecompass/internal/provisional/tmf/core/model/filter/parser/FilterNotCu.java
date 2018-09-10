@@ -9,6 +9,9 @@
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
 import java.util.List;
+import java.util.Objects;
+
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.common.collect.Iterables;
 
@@ -37,14 +40,17 @@ public class FilterNotCu extends FilterCu {
      *            The filter regex
      * @return The filter compilation unit
      */
-    public static FilterCu compile(String regex) {
+    public static @Nullable FilterCu compile(String regex) {
         FilterCu cu = FilterCu.compile(regex);
+        if (cu == null) {
+            return null;
+        }
         return new FilterNotCu(cu.getExpressions());
     }
 
     @Override
     public Filter generate() {
-        Iterable<FilterExpression> expressions = Iterables.transform(fExpressions, exp -> exp.generate());
+        Iterable<FilterExpression> expressions = Objects.requireNonNull(Iterables.transform(fExpressions, exp -> exp.generate()));
         return new FilterNot(expressions);
     }
 }

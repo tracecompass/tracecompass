@@ -21,7 +21,7 @@ import java.util.function.Predicate;
  */
 public class FilterExpression implements Predicate<Map<String, String>> {
 
-    private Queue<Object> fElements;
+    private final Queue<Object> fElements;
 
     /**
      * Constructor
@@ -37,7 +37,7 @@ public class FilterExpression implements Predicate<Map<String, String>> {
     @Override
     public boolean test(Map<String, String> data) {
 
-        if (fElements == null || fElements.isEmpty()) {
+        if (fElements.isEmpty()) {
             return false;
         }
 

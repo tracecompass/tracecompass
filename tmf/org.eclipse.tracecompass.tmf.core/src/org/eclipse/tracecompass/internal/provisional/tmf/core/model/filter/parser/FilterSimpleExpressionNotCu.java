@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.pars
 import java.util.function.BiPredicate;
 
 import org.antlr.runtime.tree.CommonTree;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * Compilation unit for a simple filter expression negation
@@ -30,12 +31,15 @@ public class FilterSimpleExpressionNotCu extends FilterSimpleExpressionCu {
      * @param value
      *            The value to to test
      */
-    public FilterSimpleExpressionNotCu(String field, BiPredicate<String, String> op, String value) {
+    public FilterSimpleExpressionNotCu(String field, BiPredicate<String, String> op, @Nullable String value) {
         super(field, op, value);
     }
 
-    public static FilterSimpleExpressionNotCu compile(CommonTree tree) {
+    public static @Nullable FilterSimpleExpressionNotCu compile(CommonTree tree) {
         FilterSimpleExpressionCu cu = FilterSimpleExpressionCu.compile(tree);
+        if (cu == null) {
+            return null;
+        }
         return new FilterSimpleExpressionNotCu(cu.getField(), cu.getOperator(), cu.getValue());
     }
 
