@@ -111,7 +111,9 @@ public class TmfFilterHelperTest {
     private static ITmfFilter getFilter(String regex) {
         ITmfTrace trace = STUB_TRACE;
         assertNotNull(trace);
-        return TmfFilterHelper.buildFilterFromRegex(Collections.singleton(regex), trace);
+        ITmfFilter filter = TmfFilterHelper.buildFilterFromRegex(Collections.singleton(regex), trace);
+        assertNotNull(filter);
+        return filter;
     }
 
     private static Predicate<Map<String, String>> getRegex(ITmfFilter filter, String expected) {
