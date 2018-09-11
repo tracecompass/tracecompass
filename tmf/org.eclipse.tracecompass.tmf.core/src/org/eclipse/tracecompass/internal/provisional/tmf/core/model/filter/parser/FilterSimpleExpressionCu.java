@@ -30,7 +30,7 @@ import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
 public class FilterSimpleExpressionCu {
 
     private final String fField;
-    private final BiPredicate<String, String> fOperator;
+    private final String fOperator;
     private final @Nullable String fValue;
 
     /**
@@ -43,7 +43,7 @@ public class FilterSimpleExpressionCu {
      * @param value
      *            The value to to test
      */
-    public FilterSimpleExpressionCu(String field, BiPredicate<String, String> op, @Nullable String value) {
+    public FilterSimpleExpressionCu(String field, String op, @Nullable String value) {
         fField = field;
         fOperator = op;
         fValue = value;
@@ -63,7 +63,7 @@ public class FilterSimpleExpressionCu {
      *
      * @return The filter operator
      */
-    protected BiPredicate<String, String> getOperator() {
+    protected String getOperator() {
         return fOperator;
     }
 
@@ -94,15 +94,15 @@ public class FilterSimpleExpressionCu {
         case FilterParserParser.PAR_CONSTANT:
             StringBuilder paragraph = new StringBuilder();
             extractParagraph(tree, paragraph, 0, childCount);
-            return new FilterSimpleExpressionCu(IFilterStrings.WILDCARD, ConditionOperator.MATCHES, paragraph.toString().trim());
+            return new FilterSimpleExpressionCu(IFilterStrings.WILDCARD, IFilterStrings.MATCHES, paragraph.toString().trim());
         case FilterParserParser.OPERATION:
             String left = Objects.requireNonNull(tree.getChild(0).getText());
-            BiPredicate<String, String> op = getConditionOperator(Objects.requireNonNull(tree.getChild(1).getText()));
+            String op = Objects.requireNonNull(tree.getChild(1).getText());
             String right = tree.getChild(2).getText();
             return new FilterSimpleExpressionCu(left, op, right);
         case FilterParserParser.OPERATION1:
             String left1 = Objects.requireNonNull(tree.getChild(0).getText());
-            BiPredicate<String, String> op1 = getConditionOperator(Objects.requireNonNull(tree.getChild(1).getText()));
+            String op1 = Objects.requireNonNull(tree.getChild(1).getText());
             String right1 = null;
             return new FilterSimpleExpressionCu(left1, op1, right1);
         case FilterParserParser.OPERATION2:
@@ -111,7 +111,7 @@ public class FilterSimpleExpressionCu {
             StringBuilder builder = new StringBuilder();
             int index = extractParagraph(tree, builder, 0, childCount);
             String left2 = builder.toString().trim();
-            BiPredicate<String, String> op2 = getConditionOperator(Objects.requireNonNull(tree.getChild(index++).getText()));
+            String op2 = Objects.requireNonNull(tree.getChild(index++).getText());
             builder = new StringBuilder();
             extractParagraph(tree, builder, index, childCount);
             String right2 = builder.toString().trim();
@@ -120,7 +120,7 @@ public class FilterSimpleExpressionCu {
             StringBuilder builder1 = new StringBuilder();
             int index1 = extractParagraph(tree, builder1, 0, childCount);
             String left3 = builder1.toString().trim();
-            BiPredicate<String, String> op3 = getConditionOperator(Objects.requireNonNull(tree.getChild(index1).getText()));
+            String op3 = Objects.requireNonNull(tree.getChild(index1).getText());
             String right3 = null;
             return new FilterSimpleExpressionCu(left3, op3, right3);
         case FilterParserParser.ROOT2:
@@ -160,10 +160,17 @@ public class FilterSimpleExpressionCu {
      * @return The filter simple expression
      */
     public FilterSimpleExpression generate() {
-        return new FilterSimpleExpression(fField, fOperator, fValue);
+        return new FilterSimpleExpression(fField, getConditionOperator(fOperator), fValue);
     }
 
-    private static BiPredicate<String, String> getConditionOperator(String equationType) {
+    /**
+     * Get the condition predicate for the operator
+     *
+     * @param equationType
+     *            The operator to convert to predicate
+     * @return The condition predicate
+     */
+    protected static BiPredicate<String, String> getConditionOperator(String equationType) {
         switch (equationType) {
         case IFilterStrings.EQUAL:
             return ConditionOperator.EQ;

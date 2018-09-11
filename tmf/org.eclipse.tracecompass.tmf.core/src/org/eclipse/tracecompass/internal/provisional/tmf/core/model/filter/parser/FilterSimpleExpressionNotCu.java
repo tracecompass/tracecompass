@@ -8,8 +8,6 @@
 *******************************************************************************/
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
-import java.util.function.BiPredicate;
-
 import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -31,7 +29,7 @@ public class FilterSimpleExpressionNotCu extends FilterSimpleExpressionCu {
      * @param value
      *            The value to to test
      */
-    public FilterSimpleExpressionNotCu(String field, BiPredicate<String, String> op, @Nullable String value) {
+    public FilterSimpleExpressionNotCu(String field, String op, @Nullable String value) {
         super(field, op, value);
     }
 
@@ -45,6 +43,6 @@ public class FilterSimpleExpressionNotCu extends FilterSimpleExpressionCu {
 
     @Override
     public FilterSimpleExpression generate() {
-        return new FilterSimpleExpressionNot(getField(), getOperator(), getValue());
+        return new FilterSimpleExpressionNot(getField(), getConditionOperator(getOperator()), getValue());
     }
 }
