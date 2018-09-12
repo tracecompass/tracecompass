@@ -15,10 +15,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
+import java.util.Map;
+import java.util.function.Predicate;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.IFilterStrings;
 import org.eclipse.tracecompass.internal.tmf.core.filter.TmfFilterHelper;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
@@ -36,6 +40,7 @@ import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEqualsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterOrNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterRootNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterTraceTypeNode;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -43,6 +48,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 
 /**
@@ -79,6 +85,10 @@ public class TmfFilterHelperTest {
     private TmfEvent fEvent2 = new TmfEvent(STUB_TRACE, 1, TmfTimestamp.fromNanos(2), EVENT_TYPE2, fContent2);
     private TmfEvent fEvent3 = new TmfEvent(STUB_TRACE, 2, TmfTimestamp.fromNanos(3), EVENT_TYPE3, fContent3);
 
+    private Map<String, String> fObjectMap1 = ImmutableMap.of(FIELD1_NAME, FIELD1_VALUE1, TmfBaseAspects.getEventTypeAspect().getName(), EVENT_NAME1);
+    private Map<String, String> fObjectMap2 = ImmutableMap.of(FIELD2_NAME, FIELD2_VALUE1, TmfBaseAspects.getEventTypeAspect().getName(), EVENT_NAME2);
+    private Map<String, String> fObjectMap3 = ImmutableMap.of(FIELD1_NAME, FIELD1_VALUE2, FIELD2_NAME, FIELD2_VALUE2, TmfBaseAspects.getEventTypeAspect().getName(), EVENT_NAME3);
+
     /**
      * Initialize the trace
      */
@@ -102,6 +112,15 @@ public class TmfFilterHelperTest {
         ITmfTrace trace = STUB_TRACE;
         assertNotNull(trace);
         return TmfFilterHelper.buildFilterFromRegex(Collections.singleton(regex), trace);
+    }
+
+    private static Predicate<Map<String, String>> getRegex(ITmfFilter filter, String expected) {
+        String regex = TmfFilterHelper.getRegexFromFilter(filter);
+        assertEquals(expected, regex);
+        FilterCu compile = FilterCu.compile(regex);
+        assertNotNull(compile);
+        Predicate<Map<String, String>> predicate = compile.generate();
+        return predicate;
     }
 
     /**
@@ -435,5 +454,232 @@ public class TmfFilterHelperTest {
         assertFalse(filter.matches(fEvent3));
     }
 
+    private static String notRegex(String string) {
+        return "!(" + string + ")";
+    }
+
+    /**
+     * Test converting a filter that does not support regex conversion
+     */
+    @Test
+    public void testInputFilterUnsupported() {
+        TmfFilterTraceTypeNode filter = new TmfFilterTraceTypeNode(null);
+
+        String regex = TmfFilterHelper.getRegexFromFilter(filter);
+        assertEquals("", regex);
+    }
+
+    /**
+     * Test converting a compare filter to regex
+     */
+    @Test
+    public void testInputFilterCompare() {
+        ITmfEventAspect<@NonNull Object> aspect = TmfBaseAspects.getContentsAspect().forField(FIELD2_NAME);
+        /* Test the greater than operator */
+        String expected = "\"" + FIELD2_NAME + "\" " + IFilterStrings.GT + " \"" + FIELD2_VALUE1 + "\"";
+        TmfFilterCompareNode compareFilter = new TmfFilterCompareNode(null);
+        compareFilter.setEventAspect(aspect);
+        compareFilter.setValue(FIELD2_VALUE1);
+        compareFilter.setResult(1);
+
+        Predicate<Map<String, String>> predicate = getRegex(compareFilter, expected);
+        assertFalse(predicate.test(fObjectMap1));
+        assertFalse(predicate.test(fObjectMap2));
+        assertTrue(predicate.test(fObjectMap3));
+
+        // Test the negation of this filter
+        compareFilter.setNot(true);
+        predicate = getRegex(compareFilter, notRegex(expected));
+        assertTrue(predicate.test(fObjectMap1));
+        assertTrue(predicate.test(fObjectMap2));
+        assertFalse(predicate.test(fObjectMap3));
+
+        /* Test the less than operator */
+        expected = "\"" + FIELD2_NAME + "\" " + IFilterStrings.LT + " \"" + FIELD2_VALUE2 + "\"";
+        compareFilter = new TmfFilterCompareNode(null);
+        compareFilter.setEventAspect(aspect);
+        compareFilter.setValue(FIELD2_VALUE2);
+        compareFilter.setResult(-1);
+
+        predicate = getRegex(compareFilter, expected);
+        assertFalse(predicate.test(fObjectMap1));
+        assertTrue(predicate.test(fObjectMap2));
+        assertFalse(predicate.test(fObjectMap3));
+
+        /* Test the less than operator */
+        expected = "\"" + FIELD2_NAME + "\" " + IFilterStrings.EQUAL + " \"" + FIELD2_VALUE1 + "\"";
+        compareFilter = new TmfFilterCompareNode(null);
+        compareFilter.setEventAspect(aspect);
+        compareFilter.setValue(FIELD2_VALUE1);
+        compareFilter.setResult(0);
+
+        predicate = getRegex(compareFilter, expected);
+        assertFalse(predicate.test(fObjectMap1));
+        assertTrue(predicate.test(fObjectMap2));
+        assertFalse(predicate.test(fObjectMap3));
+    }
+
+    /**
+     * Test converting a contains filter to regex
+     */
+    @Test
+    public void testInputFilterContains() {
+        ITmfEventAspect<@NonNull Object> aspect = TmfBaseAspects.getContentsAspect().forField(FIELD1_NAME);
+        /* Test the greater than operator */
+        String expected = "\"" + FIELD1_NAME + "\" " + IFilterStrings.CONTAINS + " \"other\"";
+        TmfFilterContainsNode containsFilter = new TmfFilterContainsNode(null);
+        containsFilter.setEventAspect(aspect);
+        containsFilter.setValue("other");
+
+        Predicate<Map<String, String>> predicate = getRegex(containsFilter, expected);
+        assertFalse(predicate.test(fObjectMap1));
+        assertFalse(predicate.test(fObjectMap2));
+        assertTrue(predicate.test(fObjectMap3));
+
+        // Test the negation
+        containsFilter.setNot(true);
+        predicate = getRegex(containsFilter, notRegex(expected));
+        assertTrue(predicate.test(fObjectMap1));
+        assertTrue(predicate.test(fObjectMap2));
+        assertFalse(predicate.test(fObjectMap3));
+    }
+
+    /**
+     * Test converting an equals filter to regex
+     */
+    @Test
+    public void testInputFilterEquals() {
+        ITmfEventAspect<@NonNull String> aspect = TmfBaseAspects.getEventTypeAspect();
+
+        /* Test the greater than operator */
+        String expected = "\"" + aspect.getName() + "\" " + IFilterStrings.EQUAL + " \"" + EVENT_NAME1 + "\"";
+        TmfFilterEqualsNode equalsFilter = new TmfFilterEqualsNode(null);
+        equalsFilter.setEventAspect(aspect);
+        equalsFilter.setValue(EVENT_NAME1);
+
+        Predicate<Map<String, String>> predicate = getRegex(equalsFilter, expected);
+        assertTrue(predicate.test(fObjectMap1));
+        assertFalse(predicate.test(fObjectMap2));
+        assertFalse(predicate.test(fObjectMap3));
+
+        equalsFilter.setNot(true);
+        expected = "\"" + aspect.getName() + "\" " + IFilterStrings.NOT_EQUAL + " \"" + EVENT_NAME1 + "\"";
+        predicate = getRegex(equalsFilter, expected);
+        assertFalse(predicate.test(fObjectMap1));
+        assertTrue(predicate.test(fObjectMap2));
+        assertTrue(predicate.test(fObjectMap3));
+    }
+
+    /**
+     * Test conversion of matches filters to regex
+     */
+    @Test
+    public void testInputFilterMatches() {
+        ITmfEventAspect<@NonNull Object> aspect = TmfBaseAspects.getContentsAspect().forField(FIELD1_NAME);
+        /* Test a simple match */
+        String expected = "\"" + FIELD1_NAME + "\" " + IFilterStrings.MATCHES + " \".*other.*\"";
+
+        TmfFilterMatchesNode matchesFilter = new TmfFilterMatchesNode(null);
+        matchesFilter.setEventAspect(aspect);
+        matchesFilter.setRegex(".*other.*");
+
+        Predicate<Map<String, String>> predicate = getRegex(matchesFilter, expected);
+        assertFalse(predicate.test(fObjectMap1));
+        assertFalse(predicate.test(fObjectMap2));
+        assertTrue(predicate.test(fObjectMap3));
+
+        /* Test the negation */
+        matchesFilter.setNot(true);
+        predicate = getRegex(matchesFilter, notRegex(expected));
+        assertTrue(predicate.test(fObjectMap1));
+        assertTrue(predicate.test(fObjectMap2));
+        assertFalse(predicate.test(fObjectMap3));
+
+        /* Test a wildcard regex, should match with the presence of the field */
+        expected = "\"" + FIELD1_NAME + "\" " + IFilterStrings.PRESENT;
+        matchesFilter.setRegex(".*");
+        matchesFilter.setNot(false);
+        predicate = getRegex(matchesFilter, expected);
+        assertTrue(predicate.test(fObjectMap1));
+        assertFalse(predicate.test(fObjectMap2));
+        assertTrue(predicate.test(fObjectMap3));
+
+        /* Test the negation of present */
+        matchesFilter.setNot(true);
+        predicate = getRegex(matchesFilter, notRegex(expected));
+        assertFalse(predicate.test(fObjectMap1));
+        assertTrue(predicate.test(fObjectMap2));
+        assertFalse(predicate.test(fObjectMap3));
+    }
+
+    /**
+     * Test conversion of and filters to regex
+     */
+    @Test
+    public void testInputFilterAnd() {
+        ITmfEventAspect<@NonNull Object> aspectF1 = TmfBaseAspects.getContentsAspect().forField(FIELD1_NAME);
+        ITmfEventAspect<@NonNull Object> aspectF2 = TmfBaseAspects.getContentsAspect().forField(FIELD2_NAME);
+
+        String expected = "\"" + FIELD1_NAME + "\" " + IFilterStrings.MATCHES + " \".*afield.*\" " + IFilterStrings.AND +
+                " \"" + FIELD2_NAME + "\" present";
+        TmfFilterMatchesNode matchesFilter1 = new TmfFilterMatchesNode(null);
+        matchesFilter1.setEventAspect(aspectF1);
+        matchesFilter1.setRegex(".*afield.*");
+
+        TmfFilterMatchesNode matchesFilter2 = new TmfFilterMatchesNode(null);
+        matchesFilter2.setEventAspect(aspectF2);
+        matchesFilter2.setRegex(".*");
+
+        TmfFilterAndNode andFilter = new TmfFilterAndNode(null);
+        andFilter.addChild(matchesFilter1);
+        andFilter.addChild(matchesFilter2);
+
+        Predicate<Map<String, String>> predicate = getRegex(andFilter, expected);
+        assertFalse(predicate.test(fObjectMap1));
+        assertFalse(predicate.test(fObjectMap2));
+        assertTrue(predicate.test(fObjectMap3));
+
+        /* Test the negation */
+        andFilter.setNot(true);
+        predicate = getRegex(andFilter, notRegex(expected));
+        assertTrue(predicate.test(fObjectMap1));
+        assertTrue(predicate.test(fObjectMap2));
+        assertFalse(predicate.test(fObjectMap3));
+    }
+
+    /**
+     * Test conversion of an or filter
+     */
+    @Test
+    public void testInputFilterOr() {
+        ITmfEventAspect<@NonNull Object> aspectF1 = TmfBaseAspects.getContentsAspect().forField(FIELD1_NAME);
+        ITmfEventAspect<@NonNull Object> aspectF2 = TmfBaseAspects.getContentsAspect().forField(FIELD2_NAME);
+
+        String expected = "\"" + FIELD1_NAME + "\" " + IFilterStrings.MATCHES + " \".*afield.*\" " + IFilterStrings.OR +
+                " \"" + FIELD2_NAME + "\" " + IFilterStrings.MATCHES + " \".*2.*\"";
+        TmfFilterMatchesNode matchesFilter1 = new TmfFilterMatchesNode(null);
+        matchesFilter1.setEventAspect(aspectF1);
+        matchesFilter1.setRegex(".*afield.*");
+
+        TmfFilterMatchesNode matchesFilter2 = new TmfFilterMatchesNode(null);
+        matchesFilter2.setEventAspect(aspectF2);
+        matchesFilter2.setRegex(".*2.*");
+
+        TmfFilterOrNode orFilter = new TmfFilterOrNode(null);
+        orFilter.addChild(matchesFilter1);
+        orFilter.addChild(matchesFilter2);
+
+        Predicate<Map<String, String>> predicate = getRegex(orFilter, expected);
+        assertTrue(predicate.test(fObjectMap1));
+        assertFalse(predicate.test(fObjectMap2));
+        assertTrue(predicate.test(fObjectMap3));
+
+        /* Test the negation */
+        orFilter.setNot(true);
+        predicate = getRegex(orFilter, notRegex(expected));
+        assertFalse(predicate.test(fObjectMap1));
+        assertTrue(predicate.test(fObjectMap2));
+        assertFalse(predicate.test(fObjectMap3));
+    }
 
 }
