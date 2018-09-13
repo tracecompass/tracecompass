@@ -725,7 +725,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             long endTime = eventList.get(eventList.size() - 1).getTime() + eventList.get(eventList.size() - 1).getDuration();
             eventList.clear();
 
-            //Replace unused events with null time events to fill gaps
+            // Replace unused events with null time events to fill gaps
             for (ITimeEvent event : filtered) {
                 if (prevTime < event.getTime()) {
                     NullTimeEvent nullTimeEvent = new NullTimeEvent(entry, prevTime, event.getTime() - prevTime);
@@ -735,7 +735,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 eventList.add(event);
                 prevTime = event.getTime() + event.getDuration();
             }
-            if (!eventList.isEmpty() && prevTime < endTime) {
+            if (prevTime < endTime) {
                 NullTimeEvent nullTimeEvent = new NullTimeEvent(entry, prevTime, endTime - prevTime);
                 nullTimeEvent.setProperty(IFilterProperty.DIMMED, true);
                 eventList.add(nullTimeEvent);
@@ -1370,14 +1370,17 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     /**
-     * Find which items are visible in the view
+     * Get the set of items that are currently visible in the view, according to
+     * the visible area height, the vertical scroll position and the expanded
+     * state of the items. A buffer of items above and below can be included.
      *
      * @param buffer
-     *            number of Items above and below border that we want to add to the
-     *            list
-     * @return a list of Items visible in the view with buffer above and below limit
+     *            number of items above and below the current visible area that
+     *            should be included
+     * @return a set of visible items in the view with buffer above and below
+     * @since 4.2
      */
-    private @NonNull Set<@NonNull TimeGraphEntry> getVisibleItems(int buffer) {
+    protected @NonNull Set<@NonNull TimeGraphEntry> getVisibleItems(int buffer) {
         TimeGraphControl timeGraphControl = fTimeGraphViewer.getTimeGraphControl();
         if (timeGraphControl.isDisposed()) {
             return Collections.emptySet();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016 Ericsson
+ * Copyright (c) 2015, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.ui.views.timegraph;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -24,14 +25,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
-import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.TimeEventFilterDialog;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -42,8 +41,11 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sampling;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
 /**
@@ -74,6 +76,8 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
 
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(AbstractStateSystemTimeGraphView.class);
 
+    private static final int DEFAULT_BUFFER_SIZE = 3;
+
     // ------------------------------------------------------------------------
     // Classes
     // ------------------------------------------------------------------------
@@ -97,13 +101,15 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     private class ZoomThreadByTime extends ZoomThread {
+        private final @NonNull Collection<@NonNull TimeGraphEntry> fVisibleEntries;
         private final @NonNull List<ITmfStateSystem> fZoomSSList;
         private boolean fClearZoomedLists;
 
-        public ZoomThreadByTime(@NonNull List<ITmfStateSystem> ssList, long startTime, long endTime, long resolution, boolean restart) {
+        public ZoomThreadByTime(@NonNull Collection<@NonNull TimeGraphEntry> entries, @NonNull List<ITmfStateSystem> ssList, long startTime, long endTime, long resolution, boolean restart) {
             super(startTime, endTime, resolution);
             fZoomSSList = ssList;
             fClearZoomedLists = !restart;
+            fVisibleEntries = entries;
         }
 
         @Override
@@ -154,6 +160,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
 
             TimeEventFilterDialog timeEventFilterDialog = getTimeEventFilterDialog();
             boolean isFilterActive = timeEventFilterDialog != null && timeEventFilterDialog.isFilterActive();
+            boolean isFilterCleared = !isFilterActive && getTimeGraphViewer().isTimeEventFilterActive();
             getTimeGraphViewer().setTimeEventFilterApplied(isFilterActive);
 
             boolean hasSavedFilter = timeEventFilterDialog != null && timeEventFilterDialog.hasActiveSavedFilters();
@@ -162,16 +169,17 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             if (fullRange) {
                 redraw();
             }
+            Sampling sampling = new Sampling(getZoomStartTime(), getZoomEndTime(), getResolution());
+            Iterable<@NonNull TimeGraphEntry> incorrectSample = Iterables.filter(fVisibleEntries, entry -> isFilterActive || isFilterCleared || !sampling.equals(entry.getSampling()));
+            /* Only keep entries that are a member or child of the ss entry list */
+            Iterable<@NonNull TimeGraphEntry> entries = Iterables.filter(incorrectSample, entry -> isMember(entry, entryList));
+            @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = computeRegexPredicate();
             queryFullStates(ss, start, end, resolution, monitor, new IQueryHandler() {
                 @Override
                 public void handle(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) {
                     try (TraceCompassLogUtils.ScopeLog scope = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStates");) { //$NON-NLS-1$
-                        if (!fullRange || isFilterActive) {
-                            for (TimeGraphEntry entry : entryList) {
-                                if (!monitor.isCanceled()) {
-                                    zoom(checkNotNull(entry), ss, fullStates, prevFullState, monitor);
-                                }
-                            }
+                        for (TimeGraphEntry entry : entries) {
+                            zoom(checkNotNull(entry), ss, fullStates, prevFullState, predicates, monitor);
                         }
                     }
                     /* Refresh the arrows when zooming */
@@ -182,37 +190,33 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                     try (TraceCompassLogUtils.ScopeLog linksLogger = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingMarkers")) { //$NON-NLS-1$
                         markers.addAll(getViewMarkerList(ss, fullStates, prevFullState, monitor));
                     }
+                    refresh();
                 }
             });
+            if (!monitor.isCanceled()) {
+                applyResults(() -> entries.forEach(entry -> {
+                    if (!predicates.isEmpty()) {
+                        /* Merge contiguous null events due to split query */
+                        List<ITimeEvent> eventList = Lists.newArrayList(entry.getTimeEventsIterator(getZoomStartTime(), getZoomEndTime(), getResolution()));
+                        doFilterEvents(entry, eventList, predicates);
+                        entry.setZoomedEventList(eventList);
+                    }
+                    entry.setSampling(sampling);
+                }));
+            }
             refresh();
         }
 
-        private void zoom(@NonNull TimeGraphEntry entry, ITmfStateSystem ss, @NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState, @NonNull IProgressMonitor monitor) {
+        private void zoom(@NonNull TimeGraphEntry entry, ITmfStateSystem ss, @NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState, @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates, @NonNull IProgressMonitor monitor) {
             List<ITimeEvent> eventList = getEventList(entry, ss, fullStates, prevFullState, monitor);
 
-            try {
-                @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = computeRegexPredicate();
-
-                if (eventList != null) {
-                    doFilterEvents(entry, eventList, predicates);
-                    applyResults(() -> {
-                        for (ITimeEvent event : eventList) {
-                            if (monitor.isCanceled()) {
-                                return;
-                            }
-                            entry.addZoomedEvent(event);
-                        }
-                    });
-                }
-                for (TimeGraphEntry child : entry.getChildren()) {
-                    if (monitor.isCanceled()) {
-                        TraceCompassLogUtils.traceInstant(LOGGER, Level.FINE, "TimeGraphView:ZoomThreadCanceled"); //$NON-NLS-1$
-                        return;
+            if (eventList != null && !monitor.isCanceled()) {
+                doFilterEvents(entry, eventList, predicates);
+                applyResults(() -> {
+                    for (ITimeEvent event : eventList) {
+                        entry.addZoomedEvent(event);
                     }
-                    zoom(child, ss, fullStates, prevFullState, monitor);
-                }
-            } catch (PatternSyntaxException e) {
-                Activator.getDefault().logInfo("Invalid regex"); //$NON-NLS-1$
+                });
             }
         }
 
@@ -233,9 +237,21 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
 
         private void clearZoomedList(TimeGraphEntry entry) {
             entry.setZoomedEventList(null);
+            entry.setSampling(null);
             for (TimeGraphEntry child : entry.getChildren()) {
                 clearZoomedList(child);
             }
+        }
+
+        private boolean isMember(TimeGraphEntry entry, List<TimeGraphEntry> ssEntryList) {
+            TimeGraphEntry ssEntry = entry;
+            while (ssEntry != null) {
+                if (ssEntryList.contains(ssEntry)) {
+                    return true;
+                }
+                ssEntry = ssEntry.getParent();
+            }
+            return false;
         }
     }
 
@@ -375,7 +391,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
         if (ssList.isEmpty()) {
             return null;
         }
-        return new ZoomThreadByTime(ssList, startTime, endTime, resolution, restart);
+        return new ZoomThreadByTime(getVisibleItems(DEFAULT_BUFFER_SIZE), ssList, startTime, endTime, resolution, restart);
     }
 
     /**
