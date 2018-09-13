@@ -85,4 +85,13 @@ public class TmfAnalysisOutputElement extends TmfProjectModelElement {
         /* Nothing to do */
     }
 
+    /**
+     * Get the {@link IAnalysisOutput} element.
+     *
+     * @return Get the {@link IAnalysisOutput} element
+     */
+    IAnalysisOutput getOutput() {
+        return fOutput;
+    }
+
 }
