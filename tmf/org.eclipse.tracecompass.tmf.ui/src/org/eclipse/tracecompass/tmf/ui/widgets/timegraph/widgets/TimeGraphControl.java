@@ -2069,6 +2069,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
         drawBackground(gc, bounds.x + nameSpace, bounds.y, bounds.width - nameSpace, bounds.height);
 
         for (int i = fTopIndex; i < fItemData.fExpandedItems.length; i++) {
+            if (fItemData.fExpandedItems[i].fItemHeight == 0) {
+                continue;
+            }
             Rectangle itemRect = getItemRect(bounds, i);
             if (itemRect.y >= bounds.y + bounds.height) {
                 break;
@@ -2284,6 +2287,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *            Graphics context
      */
     protected void drawItem(Item item, Rectangle bounds, ITimeDataProvider timeProvider, int i, int nameSpace, GC gc) {
+        if (fItemData.fExpandedItems[i].fItemHeight == 0) {
+            return;
+        }
         Rectangle itemRect = getItemRect(bounds, i);
         if (itemRect.y >= bounds.y + bounds.height) {
             return;
