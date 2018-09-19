@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 Ericsson
+ * 
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Prasanna Vadanan - SOMEIP Dissection and Implementation
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.pcap.core.protocol;
@@ -66,7 +67,15 @@ public enum TmfPcapProtocol {
      * a "payload packet". This is considered to be on layer 7 since its always
      * the most encapsulated packet if present.
      */
-    UNKNOWN(PcapProtocol.UNKNOWN);
+    UNKNOWN(PcapProtocol.UNKNOWN),
+    /**
+     *
+     */
+    SOMEIP(PcapProtocol.SOMEIP),
+    /**
+     *
+     */
+    SD(PcapProtocol.SD);
 
     private final String fName;
     private final String fShortName;
