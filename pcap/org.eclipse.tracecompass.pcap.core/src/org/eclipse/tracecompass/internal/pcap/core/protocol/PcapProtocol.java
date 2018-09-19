@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Prasanna Vadanan - SOMEIP Dissection and Implementation
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.pcap.core.protocol;
@@ -66,9 +67,15 @@ public enum PcapProtocol {
      * a "payload packet". This is considered to be on layer 7 since its always
      * the most encapsulated packet if present.
      */
-    UNKNOWN("Payload", "???", Layer.LAYER_7, false); //$NON-NLS-1$ //$NON-NLS-2$
-
-
+    UNKNOWN("Payload", "???", Layer.LAYER_7, false), //$NON-NLS-1$ //$NON-NLS-2$
+    /**
+     *
+     */
+    SOMEIP("SOME-IP", "SOME-IP", Layer.LAYER_7, true),//$NON-NLS-1$ //$NON-NLS-2$
+    /**
+     *
+     */
+    SD("SOME-IP/SD", "SOME-IP/SD", Layer.LAYER_7, true); //$NON-NLS-1$ //$NON-NLS-2$
     /**
      * Enum that lists constants related to protocols/layers.
      *
@@ -126,6 +133,8 @@ public enum PcapProtocol {
      * @return The long name of the protocol, as a string.
      */
     public String getName() {
+
+
         return fName;
     }
 
