@@ -364,7 +364,7 @@ public final class StateSystemUtils {
      * @throws StateValueTypeException
      *             If the attribute 'attributeQuark' already exists, but is not
      *             of integer type.
-     * @since 4.1
+     * @since 4.2
      */
     public static void queueOfferAttribute(ITmfStateSystemBuilder ss, long t, Object value, int attributeQuark) {
         ss.pushAttribute(t, value, attributeQuark);
@@ -390,7 +390,7 @@ public final class StateSystemUtils {
      * @throws StateValueTypeException
      *             If the target attribute already exists, but its state value
      *             type is invalid (not an integer)
-     * @since 4.1
+     * @since 4.2
      */
     public static @Nullable Object queuePollAttribute(ITmfStateSystemBuilder ss, long t, int attributeQuark)
             throws StateValueTypeException {
@@ -444,7 +444,7 @@ public final class StateSystemUtils {
      *            queueAddAttribute() at creation time)
      * @return The state value at the head of the queue, or <code>null</code> if
      *         the queue is empty.
-     * @since 4.1
+     * @since 4.2
      */
     public static @Nullable Object queuePeekAttribute(ITmfStateSystemBuilder ss, long t, int attributeQuark) {
         List<@NonNull Integer> subAttributes = ss.getSubAttributes(attributeQuark, false);
