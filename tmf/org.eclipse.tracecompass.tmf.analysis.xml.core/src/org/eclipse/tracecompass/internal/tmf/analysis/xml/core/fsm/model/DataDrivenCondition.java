@@ -25,7 +25,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * @author Geneviève Bastien
  * @author Florian Wininger
  */
-public abstract class DataDrivenCondition implements IDataDrivenRuntimeObject {
+public interface DataDrivenCondition extends IDataDrivenRuntimeObject {
 
     /**
      * Condition operators used to compare 2 values together
@@ -57,13 +57,36 @@ public abstract class DataDrivenCondition implements IDataDrivenRuntimeObject {
     }
 
     /**
+     * Condition operators used to determine the position of a value wrt to a given
+     * time range. It tests the operator with whether the value intersects a time
+     * range or not
+     */
+    public enum TimeRangeOperator implements Predicate<Boolean> {
+        /** value is inside the time range */
+        IN(i -> i),
+        /** Value is outside the time range */
+        OUT(i -> !i);
+
+        private final Function<Boolean, Boolean> fResultFunction;
+
+        private TimeRangeOperator(Function<Boolean, Boolean> cmpFunction) {
+            fResultFunction = cmpFunction;
+        }
+
+        @Override
+        public boolean test(Boolean t) {
+            return Objects.requireNonNull(fResultFunction.apply(t));
+        }
+    }
+
+    /**
      * A condition comparing 2 values together
      */
-    public static class DataDrivenComparisonCondition extends DataDrivenCondition {
+    public static class DataDrivenComparisonCondition implements DataDrivenCondition {
 
+        private final ConditionOperator fOperator;
         private final DataDrivenValue fFirstValue;
         private final DataDrivenValue fSecondValue;
-        private final ConditionOperator fOperator;
 
         /**
          * Constructor
@@ -100,9 +123,81 @@ public abstract class DataDrivenCondition implements IDataDrivenRuntimeObject {
     }
 
     /**
+     * A condition that verifies the relation of a time value with a given time range
+     */
+    public static class DataDrivenTimeRangeCondition implements DataDrivenCondition {
+
+        private final TimeRangeOperator fOperator;
+        private final long fBegin;
+        private final long fEnd;
+
+        /**
+         * Constructor
+         *
+         * @param operator
+         *            The operator linking a time value to the time range
+         * @param begin
+         *            The start of the time range
+         * @param end
+         *            The end of the time range
+         */
+        public DataDrivenTimeRangeCondition(TimeRangeOperator operator, long begin, long end) {
+            fOperator = operator;
+            fBegin = begin;
+            fEnd = end;
+        }
+
+        @Override
+        public boolean test(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
+            long ts = event.getTimestamp().toNanos();
+            return fOperator.test(ts >= fBegin && ts <= fEnd);
+        }
+
+    }
+
+    /**
+     * A condition that verifies the value of an elapsed time according to an
+     * operator
+     */
+    public static class DataDrivenElapsedTimeCondition implements DataDrivenCondition {
+
+        private final ConditionOperator fOperator;
+        private final String fReference;
+        private final long fValue;
+
+        /**
+         * Constructor
+         *
+         * @param operator
+         *            The operator to compare the elapsed time with
+         * @param reference
+         *            The reference state from which to start
+         * @param value
+         *            The value to compare elapsed time to
+         */
+        public DataDrivenElapsedTimeCondition(ConditionOperator operator, String reference, long value) {
+            fOperator = operator;
+            fReference = reference;
+            fValue = value;
+        }
+
+        @Override
+        public boolean test(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
+            long ts = event.getTimestamp().toNanos();
+            long referenceTs = scenarioInfo.getStateStartTime(container, fReference);
+            if (referenceTs < 0) {
+                // No elapsed time for the state, return false
+                return false;
+            }
+            return fOperator.test(Long.compare(ts - referenceTs, fValue));
+        }
+
+    }
+
+    /**
      * A condition negating another condition
      */
-    public static class TmfDdNotCondition extends DataDrivenCondition {
+    public static class TmfDdNotCondition implements DataDrivenCondition {
 
         private final DataDrivenCondition fCondition;
 
@@ -126,7 +221,7 @@ public abstract class DataDrivenCondition implements IDataDrivenRuntimeObject {
     /**
      * A condition verifying if all conditions are true
      */
-    public static class DataDrivenAndCondition extends DataDrivenCondition {
+    public static class DataDrivenAndCondition implements DataDrivenCondition {
 
         private final List<DataDrivenCondition> fConditions;
 
@@ -155,7 +250,7 @@ public abstract class DataDrivenCondition implements IDataDrivenRuntimeObject {
     /**
      * A condition verifying if any conditions are true
      */
-    public static class DataDrivenOrCondition extends DataDrivenCondition {
+    public static class DataDrivenOrCondition implements DataDrivenCondition {
 
         private final List<DataDrivenCondition> fConditions;
 
@@ -193,6 +288,6 @@ public abstract class DataDrivenCondition implements IDataDrivenRuntimeObject {
      * @return The result of this condition, so <code>true</code> if the condition
      *         validates, <code>false</code> otherwise
      */
-    public abstract boolean test(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container);
+    boolean test(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container);
 
 }

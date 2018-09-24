@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenAction;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.w3c.dom.Element;
 
@@ -76,7 +77,7 @@ public interface ITmfXmlModelFactory {
      *            The state system container this condition belongs to
      * @return The new XML condition
      */
-    TmfXmlCondition createCondition(Element node, IXmlStateSystemContainer container);
+    DataDrivenCondition createCondition(Element node, IXmlStateSystemContainer container);
 
     /**
      * Create a new XML state change
@@ -167,17 +168,6 @@ public interface ITmfXmlModelFactory {
      * @return The new XML {@link TmfXmlStateTransition}
      */
     TmfXmlStateTransition createStateTransition(Element node, IXmlStateSystemContainer container);
-
-    /**
-     * Create a new XML timestamp condition
-     *
-     * @param node
-     *            The XML timestamp condition element
-     * @param container
-     *            The state system container this timestamp condition belongs to
-     * @return The new {@link TmfXmlTimestampCondition}
-     */
-    TmfXmlTimestampCondition createTimestampsCondition(Element node, IXmlStateSystemContainer container);
 
     /**
      * Create a new pattern segment builder

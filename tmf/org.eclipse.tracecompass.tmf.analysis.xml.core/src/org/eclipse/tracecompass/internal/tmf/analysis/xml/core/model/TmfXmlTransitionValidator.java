@@ -9,15 +9,17 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * This Class implements a transition input tree in the XML-defined state
@@ -32,7 +34,7 @@ public class TmfXmlTransitionValidator implements ITmfXmlCondition {
 
     IXmlStateSystemContainer fParent;
     private final String fId;
-    private final ITmfXmlCondition fCondition;
+    private final DataDrivenCondition fCondition;
 
     /**
      * Constructor
@@ -49,8 +51,16 @@ public class TmfXmlTransitionValidator implements ITmfXmlCondition {
         fId = node.getAttribute(TmfXmlStrings.ID);
 
         List<@Nullable Element> childElements = XmlUtils.getChildElements(node);
-        Node child = NonNullUtils.checkNotNull(childElements.get(0));
-        fCondition = modelFactory.createCondition((Element) child, parent);
+        Element child = NonNullUtils.checkNotNull(childElements.get(0));
+        // Compile the child of the IF node
+        childElements = XmlUtils.getChildElements(child);
+        if (childElements.size() != 1) {
+            // TODO: Validation message here
+            Activator.logError("There should be only one element under this condition"); //$NON-NLS-1$
+            throw new NullPointerException("Can't compile the condition"); //$NON-NLS-1$
+        }
+        Element subCondition = Objects.requireNonNull(childElements.get(0));
+        fCondition = modelFactory.createCondition(subCondition, parent);
     }
 
     /**
@@ -64,6 +74,10 @@ public class TmfXmlTransitionValidator implements ITmfXmlCondition {
 
     @Override
     public boolean test(ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) {
-        return fCondition.test(event, scenarioInfo);
+        if (scenarioInfo == null) {
+            // Should never be null
+            return false;
+        }
+        return fCondition.test(event, scenarioInfo, fParent);
     }
 }

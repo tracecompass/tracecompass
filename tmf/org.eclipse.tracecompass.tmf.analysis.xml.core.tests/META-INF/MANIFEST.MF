@@ -15,7 +15,8 @@ Require-Bundle: org.junit,
  org.eclipse.tracecompass.tmf.ctf.core.tests,
  org.eclipse.tracecompass.statesystem.core,
  org.eclipse.tracecompass.segmentstore.core,
- org.eclipse.tracecompass.analysis.timing.core
+ org.eclipse.tracecompass.analysis.timing.core,
+ org.eclipse.tracecompass.datastore.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: com.google.common.base;version="15.0.0",

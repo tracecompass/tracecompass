@@ -91,11 +91,11 @@ public class TmfStateValueScenarioTest {
         List<Integer> subAttributes = ss.getSubAttributes(quark, false);
         assertEquals("Number of attribute pool children", 2, subAttributes.size());
 
-        final int[] expectedStarts = { 1, 2, 3, 5, 7, 7 };
-        ITmfStateValue[] expectedValues = { TmfStateValue.newValueString("op1"), TmfStateValue.newValueString("op2"), TmfStateValue.nullValue(), TmfStateValue.newValueString("op1"), TmfStateValue.nullValue() };
+        final int[] expectedStarts = { 1, 2, 3, 5, 7, 10, 14, 20, 20 };
+        ITmfStateValue[] expectedValues = { TmfStateValue.newValueString("op1"), TmfStateValue.newValueString("op2"), TmfStateValue.nullValue(), TmfStateValue.newValueString("op1"), TmfStateValue.nullValue(), TmfStateValue.newValueString("op1"), TmfStateValue.newValueString("op2"), TmfStateValue.nullValue() };
         XmlUtilsTest.verifyStateIntervals("testAttributePool", ss, subAttributes.get(0), expectedStarts, expectedValues);
 
-        final int[] expectedStarts2 = { 1, 2, 3, 4, 7 };
+        final int[] expectedStarts2 = { 1, 2, 3, 4, 20 };
         ITmfStateValue[] expectedValues2 = { TmfStateValue.nullValue(), TmfStateValue.newValueString("op1"), TmfStateValue.newValueString("op2"), TmfStateValue.nullValue() };
         XmlUtilsTest.verifyStateIntervals("testAttributePool", ss, subAttributes.get(1), expectedStarts2, expectedValues2);
 

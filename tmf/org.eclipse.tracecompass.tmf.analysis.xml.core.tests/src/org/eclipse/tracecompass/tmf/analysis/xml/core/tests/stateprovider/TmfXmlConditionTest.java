@@ -13,12 +13,17 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stateprovider;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenAnalysisModule;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
+import org.eclipse.tracecompass.segmentstore.core.ISegment;
+import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -37,9 +42,10 @@ import org.junit.Test;
 public class TmfXmlConditionTest {
 
     private static final @NonNull String testTrace2 = "test_traces/testTrace2.xml";
+    private static final @NonNull String testTrace4 = "test_traces/testTrace4.xml";
 
     /**
-     *
+     * Test basic conditions on a state provider analysis
      */
     @Test
     public void testConditionsValidation() {
@@ -96,6 +102,37 @@ public class TmfXmlConditionTest {
                 }
             }
         } catch (TmfAnalysisException | AttributeNotFoundException | StateSystemDisposedException e) {
+            fail(e.getMessage());
+        } finally {
+            module.dispose();
+            trace.dispose();
+        }
+    }
+
+    /**
+     * Test time range and elapsed validations
+     */
+    @Test
+    public void testConditionsPattern() {
+        ITmfTrace trace = XmlUtilsTest.initializeTrace(testTrace4);
+        XmlPatternAnalysis module = XmlUtilsTest.initializePatternModule(TmfXmlTestFiles.VALID_PATTERN_SIMPLE_FILE);
+        try {
+            module.setTrace(trace);
+
+            module.schedule();
+            module.waitForCompletion();
+
+            ISegmentStore<@NonNull ISegment> segmentStore = module.getSegmentStore();
+            assertNotNull(segmentStore);
+
+            assertEquals(1, segmentStore.size());
+            Iterator<@NonNull ISegment> elements = segmentStore.getIntersectingElements(6).iterator();
+            assertTrue(elements.hasNext());
+            ISegment next = elements.next();
+            assertEquals(5, next.getStart());
+            assertEquals(2, next.getLength());
+
+        } catch (TmfAnalysisException e) {
             fail(e.getMessage());
         } finally {
             module.dispose();

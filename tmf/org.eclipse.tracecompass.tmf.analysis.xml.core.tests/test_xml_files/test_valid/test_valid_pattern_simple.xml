@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+<!-- ***************************************************************************
+* Copyright (c) 2018 École Polytechnique de Montréal
+*
+* All rights reserved. This program and the accompanying materials are
+* made available under the terms of the Eclipse Public License v1.0 which
+* accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*************************************************************************** -->
+<pattern version="0" id="xml.core.tests.simple.pattern">
+	<head>
+		<traceType id="org.eclipse.linuxtools.tmf.core.tests.xmlstub" />
+		<label value="XML simple pattern test" />
+	</head>
+
+<!-- 		the pattern handler specifies the FSM that will be instanciated at the beginning of the analysis -->
+	<patternHandler initial="testTimeConditions">
+
+<!-- 		CONDITIONS -->
+		<test id="sameCpu">
+			<if>
+				<condition>
+					<stateAttribute type="constant" value="#CurrentScenario" />
+					<stateAttribute type="constant" value="cpu" />
+					<stateValue type="eventField" value="cpu" />
+				</condition>
+			</if>
+		</test>
+		<test id="timeRange">
+			<if>
+				<condition>
+					<timerange unit="ns">
+						<in begin="5" end="20" />
+					</timerange>
+				</condition>
+			</if>
+		</test>
+		<test id="smallExec">
+			<if>
+				<condition>
+					<elapsedTime unit="ns">
+						<less since="waitEnd" value="4" />
+					</elapsedTime>
+				</condition>
+			</if>
+		</test>
+
+<!-- 		ACTIONS -->
+<!-- 		Generate two segments -->
+		<action id="startEvent">
+<!-- 			Generate a pattern segment with the name 'test1'-->
+			<stateChange>
+				<stateAttribute type="constant" value="#CurrentScenario" />
+				<stateAttribute type="constant" value="cpu" />
+				<stateValue type="eventField" value="cpu" />
+			</stateChange>
+		</action>
+		<action id="doSegment">
+<!-- 			Generate a pattern segment with the name 'test2' and with three fields 'field1', 'field2' and 'field2'-->
+			<segment>
+				<segType>
+					<segName>
+						<stateValue type="query">
+						    <stateAttribute type="constant" value="CPUs" />
+						    <stateAttribute type="query" >
+							     <stateAttribute type="constant" value="#CurrentScenario" />
+							     <stateAttribute type="constant" value="cpu" />
+							</stateAttribute>
+						</stateValue>
+					</segName>
+				</segType>
+			</segment>
+		</action>
+
+<!-- 		FSMs -->
+
+<!-- 	test fsm
+		Declare a test FSM that that will generate two segments for each event received
+-->
+		<fsm id="testTimeConditions" multiple="true" initial="waitBegin">
+			<state id="waitBegin">
+				<!--  wait for an entry event within time range -->
+				<transition event="entry" cond="timeRange" target="waitEnd" action="startEvent" />
+			</state>
+			<state id="waitEnd">
+			    <!--  wait for exit, will create segment only longer than 5 -->
+				<transition event="exit" cond="sameCpu:smallExec" target="endTest" action="doSegment" />
+				<transition event="exit" target="end" />
+			</state>
+			<final id="endTest"/>
+		</fsm>
+	</patternHandler>
+</pattern>
+</tmfxml>

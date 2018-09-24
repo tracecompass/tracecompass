@@ -15,12 +15,16 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition.ConditionOperator;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition.TimeRangeOperator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.w3c.dom.Element;
 
 /**
@@ -47,6 +51,46 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
         @Override
         public DataDrivenCondition generate() {
             return new DataDrivenCondition.DataDrivenComparisonCondition(fFirstValue.generate(), fSecondValue.generate(), fOperator);
+        }
+
+    }
+
+    /** Compare time range */
+    private static class TmfXmlTimeRangeConditionCu extends TmfXmlConditionCu {
+
+        private final TimeRangeOperator fOperator;
+        private final long fBegin;
+        private final long fEnd;
+
+        TmfXmlTimeRangeConditionCu(TimeRangeOperator operator, long begin, long end) {
+            fOperator = operator;
+            fBegin = begin;
+            fEnd = end;
+        }
+
+        @Override
+        public DataDrivenCondition generate() {
+            return new DataDrivenCondition.DataDrivenTimeRangeCondition(fOperator, fBegin, fEnd);
+        }
+
+    }
+
+    /** Compare time range */
+    private static class TmfXmlElapsedTimeConditionCu extends TmfXmlConditionCu {
+
+        private final ConditionOperator fOperator;
+        private final String fReference;
+        private final long fValue;
+
+        TmfXmlElapsedTimeConditionCu(ConditionOperator operator, String reference, long end) {
+            fOperator = operator;
+            fReference = reference;
+            fValue = end;
+        }
+
+        @Override
+        public DataDrivenCondition generate() {
+            return new DataDrivenCondition.DataDrivenElapsedTimeCondition(fOperator, fReference, fValue);
         }
 
     }
@@ -119,7 +163,7 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
     public static @Nullable TmfXmlConditionCu compile(AnalysisCompilationData analysisData, Element conditionEl) {
         switch (conditionEl.getNodeName()) {
         case TmfXmlStrings.CONDITION:
-            return compileValueCondition(analysisData, conditionEl);
+            return compileSingleCondition(analysisData, conditionEl);
         case TmfXmlStrings.NOT: {
             List<@Nullable Element> childElements = XmlUtils.getChildElements(conditionEl);
             if (childElements.size() != 1) {
@@ -159,6 +203,119 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
             childConditions.add(condition);
         }
         return childConditions;
+    }
+
+    private static @Nullable TmfXmlConditionCu compileSingleCondition(AnalysisCompilationData analysisData, Element conditionEl) {
+        // Is the condition a comparison condition?
+        if (conditionEl.getElementsByTagName(TmfXmlStrings.STATE_VALUE).getLength() > 0) {
+            return compileValueCondition(analysisData, conditionEl);
+        }
+        // Compile a time range condition
+        List<Element> childElements = TmfXmlUtils.getChildElements(conditionEl, TmfXmlStrings.TIME_RANGE);
+        if (childElements.size() == 1) {
+            return compileTimeRangeCondition(childElements.get(0));
+        }
+        // Compile an elapsed time condition
+        childElements = TmfXmlUtils.getChildElements(conditionEl, TmfXmlStrings.ELAPSED_TIME);
+        if (childElements.size() == 1) {
+            return compileElapsedTimeCondition(childElements.get(0));
+        }
+        return null;
+    }
+
+    private static @Nullable TmfXmlConditionCu compileElapsedTimeCondition(Element element) {
+        String unit = element.getAttribute(TmfXmlStrings.UNIT);
+        List<@Nullable Element> childElements = XmlUtils.getChildElements(element);
+        if (childElements.size() != 1) {
+            Activator.logError("Invalid timestampsChecker declaration in XML : Only one timing condition is allowed"); //$NON-NLS-1$
+            return null;
+        }
+        final Element firstElement = NonNullUtils.checkNotNull(childElements.get(0));
+        String type = firstElement.getNodeName();
+        ConditionOperator operator;
+        switch (type) {
+        case TmfXmlStrings.LESS:
+            operator = ConditionOperator.LT;
+            break;
+        case TmfXmlStrings.EQUAL:
+            operator = ConditionOperator.EQ;
+            break;
+        case TmfXmlStrings.MORE:
+            operator = ConditionOperator.GT;
+            break;
+        default:
+            Activator.logError("ElapsedTimeChecker: Invalid operator: " + type); //$NON-NLS-1$
+            return null;
+        }
+        final String reference = firstElement.getAttribute(TmfXmlStrings.SINCE);
+        final String valueStr = firstElement.getAttribute(TmfXmlStrings.VALUE);
+        try {
+            long value = valueToNanoseconds(Long.parseLong(valueStr), unit);
+            return new TmfXmlElapsedTimeConditionCu(operator, reference, value);
+        } catch (NumberFormatException e) {
+            Activator.logError("Invalid value for elapsed time: " + e.getMessage()); //$NON-NLS-1$
+            return null;
+        }
+    }
+
+    private static @Nullable TmfXmlConditionCu compileTimeRangeCondition(Element element) {
+        String unit = element.getAttribute(TmfXmlStrings.UNIT);
+
+        List<@Nullable Element> childElements = NonNullUtils.checkNotNull(XmlUtils.getChildElements(element));
+        if (childElements.size() != 1) {
+            Activator.logError("Invalid timestampsChecker declaration in XML : Only one timing condition is allowed"); //$NON-NLS-1$
+            return null;
+        }
+        final Element firstElement = NonNullUtils.checkNotNull(childElements.get(0));
+        TimeRangeOperator operator;
+        String type = firstElement.getNodeName();
+        switch (type) {
+        case TmfXmlStrings.IN:
+            operator = TimeRangeOperator.IN;
+            break;
+        case TmfXmlStrings.OUT:
+            operator = TimeRangeOperator.OUT;
+            break;
+        default:
+            Activator.logError("TimeRangeChecker: Invalid operator: " + type); //$NON-NLS-1$
+            return null;
+        }
+
+        final String beginStr = firstElement.getAttribute(TmfXmlStrings.BEGIN);
+        final String endStr = firstElement.getAttribute(TmfXmlStrings.END);
+        try {
+            long begin = valueToNanoseconds(Long.parseLong(beginStr), unit);
+            long end = valueToNanoseconds(Long.parseLong(endStr), unit);
+
+            return new TmfXmlTimeRangeConditionCu(operator, begin, end);
+        } catch (NumberFormatException e) {
+            Activator.logError("Invalid value for time range: " + e.getMessage()); //$NON-NLS-1$
+            return null;
+        }
+    }
+
+    /**
+     * Normalize the value into a nanosecond time value
+     *
+     * @param timestamp
+     *            The timestamp value
+     * @param unit
+     *            The initial unit of the timestamp
+     * @return The value of the timestamp in nanoseconds
+     */
+    public static long valueToNanoseconds(long timestamp, String unit) {
+        switch (unit) {
+        case TmfXmlStrings.NS:
+            return timestamp;
+        case TmfXmlStrings.US:
+            return TmfTimestamp.create(timestamp, ITmfTimestamp.MICROSECOND_SCALE).toNanos();
+        case TmfXmlStrings.MS:
+            return TmfTimestamp.create(timestamp, ITmfTimestamp.MILLISECOND_SCALE).toNanos();
+        case TmfXmlStrings.S:
+            return TmfTimestamp.create(timestamp, ITmfTimestamp.SECOND_SCALE).toNanos();
+        default:
+            throw new IllegalArgumentException("The time unit is not yet supporting."); //$NON-NLS-1$
+        }
     }
 
     private static @Nullable TmfXmlConditionCu compileValueCondition(AnalysisCompilationData analysisData, Element conditionEl) {
