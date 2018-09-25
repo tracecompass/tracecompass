@@ -182,7 +182,7 @@ public class CTFTrace implements IDefinitionScope {
         }
 
         if (!fPath.isDirectory()) {
-            throw new CTFException("Path must be a valid directory"); //$NON-NLS-1$
+            throw new CTFException("Path must be a valid directory " + fPath); //$NON-NLS-1$
         }
 
         /* Open and parse the metadata file */
