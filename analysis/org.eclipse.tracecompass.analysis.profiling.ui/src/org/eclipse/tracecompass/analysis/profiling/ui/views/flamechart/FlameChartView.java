@@ -397,8 +397,8 @@ public class FlameChartView extends BaseDataProviderTimeGraphView {
      * @since 2.0
      */
     @Override
-    protected void refresh() {
-        super.refresh();
+    protected void rebuild() {
+        super.rebuild();
         updateConfigureSymbolsAction();
     }
 
