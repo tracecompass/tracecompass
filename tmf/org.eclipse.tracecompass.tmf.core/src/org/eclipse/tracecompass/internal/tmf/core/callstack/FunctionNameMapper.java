@@ -104,13 +104,20 @@ public final class FunctionNameMapper {
     public static @Nullable Map<@NonNull Long, @NonNull TmfResolvedSymbol> mapFromNmTextFile(File mappingFile) {
         Map<@NonNull Long, @NonNull TmfResolvedSymbol> map = new TreeMap<>();
 
+        CPPFilt cppFilt = null;
         try (FileReader fr = new FileReader(mappingFile);
                 BufferedReader reader = new BufferedReader(fr);) {
+            try {
+                cppFilt = new CPPFilt();
+            } catch (IOException e) {
+                Activator.logError("Error to instantiate the c++filt", e);  //$NON-NLS-1$
+            }
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 Matcher matcher = NM_PATTERN.matcher(line);
                 if (matcher.find()) {
                     long address = Long.parseUnsignedLong(stripLeadingZeros(Objects.requireNonNull(matcher.group(1))), 16);
-                    String name = nameFromCppFilt(Objects.requireNonNull(matcher.group(3)));
+                    String name = Objects.requireNonNull(matcher.group(3));
+                    name = (cppFilt == null) ? name : nameFromCppFilt(cppFilt, name);
                     map.put(address, new TmfResolvedSymbol(address, Objects.requireNonNull(name)));
                 }
             }
@@ -118,6 +125,10 @@ public final class FunctionNameMapper {
             return null;
         } catch (IOException e) {
             /* Stop reading the file at this point */
+        } finally {
+            if (cppFilt != null) {
+                cppFilt.dispose();
+            }
         }
 
         return map.isEmpty() ? null : ImmutableMap.copyOf(map);
@@ -134,14 +145,21 @@ public final class FunctionNameMapper {
     public static @Nullable Map<@NonNull Long, @NonNull TmfResolvedSymbol> mapFromSizedTextFile(File mappingFile) {
         Map<@NonNull Long, @NonNull TmfResolvedSymbol> map = new TreeMap<>();
 
+        CPPFilt cppFilt = null;
         try (FileReader fr = new FileReader(mappingFile);
                 BufferedReader reader = new BufferedReader(fr);) {
+            try {
+                cppFilt = new CPPFilt();
+            } catch (IOException e) {
+                Activator.logError("Error to instantiate the c++filt", e);  //$NON-NLS-1$
+            }
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 Matcher matcher = MAP_WITH_SIZE_PATTERN.matcher(line);
                 if (matcher.find()) {
                     long address = Long.parseUnsignedLong(stripLeadingZeros(Objects.requireNonNull(matcher.group(1))), 16);
                     long size = Long.parseUnsignedLong(stripLeadingZeros(Objects.requireNonNull(matcher.group(2))), 16);
-                    String name = nameFromCppFilt(Objects.requireNonNull(matcher.group(3)));
+                    String name = Objects.requireNonNull(matcher.group(3));
+                    name = (cppFilt == null) ? name : nameFromCppFilt(cppFilt, name);
                     map.put(address, new TmfResolvedSizedSymbol(address, Objects.requireNonNull(name), size));
                 }
             }
@@ -149,6 +167,10 @@ public final class FunctionNameMapper {
             return null;
         } catch (IOException e) {
             /* Stop reading the file at this point */
+        } finally {
+            if (cppFilt != null) {
+                cppFilt.dispose();
+            }
         }
 
         return map.isEmpty() ? null : ImmutableMap.copyOf(map);
@@ -156,16 +178,18 @@ public final class FunctionNameMapper {
 
     /**
      * Use c++filt to decipher the c++ symbols
+     * @param cppFilt
      *
-     * @param symbol to be demangled
+     * @param symbol
+     *            to be demangled
      * @return if the demangler returns null, return the symbol as is
      */
-    public static @Nullable String nameFromCppFilt(String symbol) {
+    public static @Nullable String nameFromCppFilt(CPPFilt cppFilt, String symbol) {
         try {
-            String functionName = new CPPFilt().getFunction(symbol);
+            String functionName = cppFilt.getFunction(symbol);
             return functionName != null ? functionName : symbol;
         } catch (IOException e) {
-            Activator.logError("Error to instantiate the c++filt", e); //$NON-NLS-1$
+            Activator.logError("Error getting function name from c++filt", e); //$NON-NLS-1$
             return symbol;
         }
     }
