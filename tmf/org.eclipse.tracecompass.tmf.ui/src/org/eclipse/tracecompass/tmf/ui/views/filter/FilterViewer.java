@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -39,7 +38,6 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
 import org.eclipse.swt.dnd.DropTarget;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -85,31 +83,44 @@ import org.eclipse.ui.PlatformUI;
 class FilterViewer extends Composite {
 
     private static class TraceTypeItem {
-        public String label;
-        public String traceTypeId;
+        private final String fLabel;
+        private final String fTraceTypeId;
 
         public TraceTypeItem(String label, String traceTypeId) {
-            this.label = label;
-            this.traceTypeId = traceTypeId;
+            fLabel = label;
+            fTraceTypeId = traceTypeId;
+        }
+
+        public String getLabel() {
+            return fLabel;
+        }
+
+        public String getTraceTypeId() {
+            return fTraceTypeId;
         }
     }
 
-    private static class AspectItem {
-        public String label;
-        public ITmfEventAspect<?> eventAspect;
-        public String traceTypeId;
+    private static class AspectItem extends TraceTypeItem {
+        private ITmfEventAspect<?> fEventAspect;
 
         public AspectItem(String label) {
-            this.label = label;
+            this(label, null, null);
         }
 
         public AspectItem(String label, ITmfEventAspect<?> eventAspect, String traceTypeId) {
-            this.label = label;
-            this.eventAspect = eventAspect;
-            this.traceTypeId = traceTypeId;
+            super(label, traceTypeId);
+            fEventAspect = eventAspect;
         }
-    }
 
+        public ITmfEventAspect<?> getEventAspect() {
+            return fEventAspect;
+        }
+
+        public void setEventAspect(ITmfEventAspect<?> eventAspect) {
+            fEventAspect = eventAspect;
+        }
+
+    }
     private TreeViewer fViewer;
 
     private Composite fComposite;
@@ -176,10 +187,10 @@ class FilterViewer extends Composite {
 
         int operations = DND.DROP_MOVE | DND.DROP_COPY;
         DragSource dragSource = new org.eclipse.swt.dnd.DragSource(fViewer.getTree(), operations);
-        dragSource.setTransfer(new Transfer[] { LocalSelectionTransfer.getTransfer() });
+        dragSource.setTransfer(LocalSelectionTransfer.getTransfer());
         dragSource.addDragListener(new FilterDragSourceAdapter(this));
         DropTarget dropTarget = new DropTarget(fViewer.getTree(), operations);
-        dropTarget.setTransfer(new Transfer[] { LocalSelectionTransfer.getTransfer() });
+        dropTarget.setTransfer(LocalSelectionTransfer.getTransfer());
         dropTarget.addDropListener(new FilterDropTargetAdapter(this));
     }
 
@@ -190,12 +201,7 @@ class FilterViewer extends Composite {
         // Adds root context menu
         fMenuManager = new MenuManager();
         fMenuManager.setRemoveAllWhenShown(true);
-        fMenuManager.addMenuListener(new IMenuListener() {
-            @Override
-            public void menuAboutToShow(IMenuManager manager) {
-                fillContextMenu(manager);
-            }
-        });
+        fMenuManager.addMenuListener(manager -> fillContextMenu(manager));
 
         // Context
         Menu contextMenu = fMenuManager.createContextMenu(fViewer.getTree());
@@ -457,37 +463,34 @@ class FilterViewer extends Composite {
             fTraceTypeCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
             fTraceTypeCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
             for (TraceTypeItem traceType : traceTypeList) {
-                fTraceTypeCombo.add(traceType.label);
+                fTraceTypeCombo.add(traceType.getLabel());
             }
             if (fAspectNode.getTraceTypeId() == null) {
                 fTraceTypeCombo.select(0);
-                fAspectNode.setTraceTypeId(traceTypeList.get(0).traceTypeId);
+                fAspectNode.setTraceTypeId(traceTypeList.get(0).getTraceTypeId());
             } else {
                 for (int i = 0; i < traceTypeList.size(); i++) {
                     TraceTypeItem traceType = traceTypeList.get(i);
-                    if (fAspectNode.getTraceTypeId().equals(traceType.traceTypeId)) {
+                    if (fAspectNode.getTraceTypeId().equals(traceType.getTraceTypeId())) {
                         fTraceTypeCombo.select(i);
                         break;
                     }
                 }
             }
-            fTraceTypeCombo.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    TraceTypeItem traceType = traceTypeList.get(fTraceTypeCombo.getSelectionIndex());
-                    fAspectNode.setTraceTypeId(traceType.traceTypeId);
-                    fAspectList = getAspectList(fAspectNode.getTraceTypeId());
-                    String text = fAspectCombo.getText();
-                    fAspectCombo.removeAll();
-                    for (AspectItem aspect : fAspectList) {
-                        fAspectCombo.add(aspect.label);
-                    }
-                    int index = Arrays.asList(fAspectCombo.getItems()).indexOf(text);
-                    if (index >= 0 && !text.isEmpty()) {
-                        fAspectCombo.select(index);
-                    }
-                    fViewer.refresh(fAspectNode);
+            fTraceTypeCombo.addModifyListener(e -> {
+                TraceTypeItem traceType = traceTypeList.get(fTraceTypeCombo.getSelectionIndex());
+                fAspectNode.setTraceTypeId(traceType.getTraceTypeId());
+                fAspectList = getAspectList(fAspectNode.getTraceTypeId());
+                String text = fAspectCombo.getText();
+                fAspectCombo.removeAll();
+                for (AspectItem aspect : fAspectList) {
+                    fAspectCombo.add(aspect.getLabel());
                 }
+                int index = Arrays.asList(fAspectCombo.getItems()).indexOf(text);
+                if (index >= 0 && !text.isEmpty()) {
+                    fAspectCombo.select(index);
+                }
+                fViewer.refresh(fAspectNode);
             });
 
             label = new Label(this, SWT.NONE);
@@ -499,48 +502,45 @@ class FilterViewer extends Composite {
             fAspectCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
             fAspectCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
             for (AspectItem aspect : fAspectList) {
-                fAspectCombo.add(aspect.label);
+                fAspectCombo.add(aspect.getLabel());
             }
             if (fAspectNode.getEventAspect() != null) {
                 for (int i = 0; i < fAspectList.size(); i++) {
                     AspectItem aspect = fAspectList.get(i);
-                    if (aspect.eventAspect != null &&
-                            fAspectNode.getEventAspect().getName().equals(aspect.eventAspect.getName()) &&
-                            (fAspectNode.getTraceTypeId().equals(aspect.traceTypeId) ||
+                    if (aspect.getEventAspect() != null &&
+                            fAspectNode.getEventAspect().getName().equals(aspect.getEventAspect().getName()) &&
+                            (fAspectNode.getTraceTypeId().equals(aspect.getTraceTypeId()) ||
                                     fAspectNode.getTraceTypeId().equals(TmfFilterAspectNode.BASE_ASPECT_ID))) {
                         fAspectCombo.select(i);
                         if (fAspectNode.getEventAspect() instanceof TmfEventFieldAspect) {
-                            aspect.eventAspect = fAspectNode.getEventAspect();
+                            aspect.setEventAspect(fAspectNode.getEventAspect());
                             createFieldControls((TmfEventFieldAspect) fAspectNode.getEventAspect(), aspect);
                         }
                         break;
                     }
                 }
             }
-            fAspectCombo.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    int selection = fAspectCombo.getSelectionIndex();
-                    AspectItem aspect = null;
-                    if (selection != -1) {
-                        aspect = fAspectList.get(fAspectCombo.getSelectionIndex());
-                        fAspectNode.setEventAspect(aspect.eventAspect);
-                    } else {
-                        fAspectNode.setEventAspect(null);
-                    }
-                    if (fAspectNode.getEventAspect() instanceof TmfEventFieldAspect) {
-                        TmfEventFieldAspect eventFieldAspect = (TmfEventFieldAspect) fAspectNode.getEventAspect();
-                        createFieldControls(eventFieldAspect, aspect);
-                        layout();
-                    } else if (fFieldLabel != null && fFieldText != null) {
-                        fFieldLabel.dispose();
-                        fFieldLabel = null;
-                        fFieldText.dispose();
-                        fFieldText = null;
-                        layout();
-                    }
-                    fViewer.refresh(fAspectNode);
+            fAspectCombo.addModifyListener(e -> {
+                int selection = fAspectCombo.getSelectionIndex();
+                AspectItem aspect = null;
+                if (selection != -1) {
+                    aspect = fAspectList.get(fAspectCombo.getSelectionIndex());
+                    fAspectNode.setEventAspect(aspect.getEventAspect());
+                } else {
+                    fAspectNode.setEventAspect(null);
                 }
+                if (fAspectNode.getEventAspect() instanceof TmfEventFieldAspect) {
+                    TmfEventFieldAspect eventFieldAspect = (TmfEventFieldAspect) fAspectNode.getEventAspect();
+                    createFieldControls(eventFieldAspect, aspect);
+                    layout();
+                } else if (fFieldLabel != null && fFieldText != null) {
+                    fFieldLabel.dispose();
+                    fFieldLabel = null;
+                    fFieldText.dispose();
+                    fFieldText = null;
+                    layout();
+                }
+                fViewer.refresh(fAspectNode);
             });
         }
 
@@ -584,18 +584,15 @@ class FilterViewer extends Composite {
                     fFieldText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
                 }
             });
-            fFieldText.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    if (!fFieldText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
-                        if (fFieldText.getText().isEmpty()) {
-                            fAspectNode.setEventAspect(eventFieldAspect.forField(null));
-                        } else {
-                            fAspectNode.setEventAspect(eventFieldAspect.forField(fFieldText.getText()));
-                        }
-                        aspect.eventAspect = fAspectNode.getEventAspect();
-                        fViewer.refresh(fAspectNode);
+            fFieldText.addModifyListener(e -> {
+                if (!fFieldText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                    if (fFieldText.getText().isEmpty()) {
+                        fAspectNode.setEventAspect(eventFieldAspect.forField(null));
+                    } else {
+                        fAspectNode.setEventAspect(eventFieldAspect.forField(fFieldText.getText()));
                     }
+                    aspect.setEventAspect(fAspectNode.getEventAspect());
+                    fViewer.refresh(fAspectNode);
                 }
             });
         }
@@ -637,7 +634,7 @@ class FilterViewer extends Composite {
                 aspectList.add(new AspectItem('[' + helper.getLabel() + ']'));
                 for (ITmfEventAspect<?> aspect : helper.getTrace().getEventAspects()) {
                     for (AspectItem baseAspect : aspectList) {
-                        if (aspect.equals(baseAspect.eventAspect)) {
+                        if (aspect.equals(baseAspect.getEventAspect())) {
                             aspectList.remove(baseAspect);
                             break;
                         }
@@ -686,13 +683,10 @@ class FilterViewer extends Composite {
                     fNameText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
                 }
             });
-            fNameText.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    if (!fNameText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
-                        fNode.setFilterName(fNameText.getText());
-                        fViewer.refresh(fNode);
-                    }
+            fNameText.addModifyListener(e -> {
+                if (!fNameText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                    fNode.setFilterName(fNameText.getText());
+                    fViewer.refresh(fNode);
                 }
             });
         }
@@ -718,15 +712,12 @@ class FilterViewer extends Composite {
             if (fNode.getTraceTypeId() != null) {
                 fTypeCombo.setText(fNode.getName());
             }
-            fTypeCombo.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    TraceTypeHelper helper = checkNotNull(fTraceTypeMap.get(fTypeCombo.getText()));
-                    fNode.setTraceTypeId(helper.getTraceTypeId());
-                    fNode.setTraceClass(helper.getTraceClass());
-                    fNode.setName(fTypeCombo.getText());
-                    fViewer.refresh(fNode);
-                }
+            fTypeCombo.addModifyListener(e -> {
+                TraceTypeHelper helper = checkNotNull(fTraceTypeMap.get(fTypeCombo.getText()));
+                fNode.setTraceTypeId(helper.getTraceTypeId());
+                fNode.setTraceClass(helper.getTraceClass());
+                fNode.setName(fTypeCombo.getText());
+                fViewer.refresh(fNode);
             });
         }
     }
