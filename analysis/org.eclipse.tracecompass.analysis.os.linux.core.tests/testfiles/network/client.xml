@@ -1,0 +1,45 @@
+<trace>
+<set_aspects>
+<field name="cpu" value="1" type="int" />
+</set_aspects>
+<event timestamp="15" name="packet_sent">
+<field name="cpu" value="1" type="int" />
+<field name="interface" value="eth0" type="string" />
+<field name="msgid" value="1" type="int" />
+</event>
+<event timestamp="20" name="packet_received">
+<field name="cpu" value="1" type="int" />
+<field name="interface" value="veth2345" type="string" />
+<field name="msgid" value="1" type="int" />
+</event>
+<event timestamp="25" name="packet_received">
+<field name="cpu" value="1" type="int" />
+<field name="interface" value="docker0" type="string" />
+<field name="msgid" value="1" type="int" />
+</event>
+<event timestamp="30" name="packet_sent">
+<field name="cpu" value="1" type="int" />
+<field name="interface" value="ens3" type="string" />
+<field name="msgid" value="1" type="int" />
+</event>
+<event timestamp="100" name="packet_received">
+<field name="cpu" value="1" type="int" />
+<field name="interface" value="ens3" type="string" />
+<field name="msgid" value="2" type="int" />
+</event>
+<event timestamp="105" name="packet_sent">
+<field name="cpu" value="1" type="int" />
+<field name="interface" value="docker0" type="string" />
+<field name="msgid" value="2" type="int" />
+</event>
+<event timestamp="110" name="packet_sent">
+<field name="cpu" value="1" type="int" />
+<field name="interface" value="veth2345" type="string" />
+<field name="msgid" value="2" type="int" />
+</event>
+<event timestamp="115" name="packet_received">
+<field name="cpu" value="1" type="int" />
+<field name="interface" value="eth0" type="string" />
+<field name="msgid" value="2" type="int" />
+</event>
+</trace>

@@ -19,6 +19,8 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.StubEventMatching;
+import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -72,6 +74,7 @@ public class Activator extends Plugin {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         PLUGIN = this;
+        TmfEventMatching.registerMatchObject(new StubEventMatching());
     }
 
     @Override

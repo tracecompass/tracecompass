@@ -9,7 +9,11 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace;
 
+import java.util.Collection;
+
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.DefaultEventLayout;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Class to extend to be able to set the event names for the os unit tests.
@@ -37,6 +41,16 @@ public class KernelEventLayoutStub extends DefaultEventLayout {
      */
     public static synchronized KernelEventLayoutStub getInstance() {
         return INSTANCE;
+    }
+
+    @Override
+    public Collection<String> eventsNetworkSend() {
+        return ImmutableList.of("packet_sent");
+    }
+
+    @Override
+    public Collection<String> eventsNetworkReceive() {
+        return ImmutableList.of("packet_received");
     }
 
 }

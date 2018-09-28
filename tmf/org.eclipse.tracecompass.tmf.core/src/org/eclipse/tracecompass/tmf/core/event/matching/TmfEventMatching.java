@@ -291,7 +291,24 @@ public class TmfEventMatching implements ITmfEventMatching {
                     dep = new TmfEventDependency(companionEvent, depEvent);
                     break;
                 case CAUSE:
-                    dep = new TmfEventDependency(depEvent, companionEvent);
+                    /*
+                     * If the companionEvent is from the same host, ignore this
+                     * match to respect causality. Put it back in the list, so
+                     * that it is available again for another match.
+                     *
+                     * FIXME: This happens because a packet may go through
+                     * several network interfaces in a machine before being
+                     * finally sent by the physical interface. With virtual
+                     * interfaces, sending and reception are not punctual
+                     * events, but has a duration. We should follow the event
+                     * through all its interfaces and maybe have a virtual event
+                     * to encompass the whole duration. More investigation needed
+                     */
+                    if (!companionEvent.getTrace().getHostId().equals(depEvent.getTrace().getHostId())) {
+                        dep = new TmfEventDependency(depEvent, companionEvent);
+                    } else {
+                        companionTbl.put(mTrace,  eventKey, companionEvent);
+                    }
                     break;
                 default:
                     break;
