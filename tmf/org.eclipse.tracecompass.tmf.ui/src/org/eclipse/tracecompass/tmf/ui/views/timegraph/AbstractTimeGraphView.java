@@ -735,6 +735,18 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 }
             });
         }
+        fillWithNullEvents(entry, eventList);
+    }
+
+    /**
+     * Fill the gaps between non-excluded events with null time events
+     *
+     * @param entry
+     *            The entry
+     * @param eventList
+     *            The entry event list
+     */
+    private void fillWithNullEvents(TimeGraphEntry entry, List<ITimeEvent> eventList) {
         List<ITimeEvent> filtered = new ArrayList<>();
         if (!eventList.isEmpty()
                 && getTimeEventFilterDialog() != null && getTimeEventFilterDialog().hasActiveSavedFilters()) {

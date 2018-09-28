@@ -20,11 +20,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
 import org.eclipse.tracecompass.tmf.core.model.IFilterableDataModel;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 
@@ -86,6 +90,7 @@ public class TimeGraphEntry implements ITimeGraphEntry, IFilterableDataModel {
 
     }
 
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(TimeGraphEntry.class);
     /** Entry's parent */
     private TimeGraphEntry fParent = null;
 
@@ -304,6 +309,52 @@ public class TimeGraphEntry implements ITimeGraphEntry, IFilterableDataModel {
             fZoomedEventList.add(event);
         }
         updateEntryBounds(event);
+    }
+
+    /**
+     * Update the list of zoomed time event. The update could insert time event
+     * in the past. This kind of update is necessary for background search for
+     * example where a previous list of zoomed event is computed using the
+     * current resolution followed by an update to that zoomed event list using
+     * resolution 1 to be able to search within data not available at the
+     * current zoom level.
+     *
+     * @param event
+     *            The time event to add to the zoomed event list
+     *
+     * @since 4.2
+     */
+    public void updateZoomedEvent(ITimeEvent event) {
+        try (TraceCompassLogUtils.ScopeLog poc = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINE, "UpdateZoomedEvent")) { //$NON-NLS-1$
+            int index = Collections.binarySearch(fZoomedEventList, event, (e1, e2) -> Long.compare(e1.getTime(), e2.getTime()));
+            if (index >= 0) {
+                ITimeEvent current = fZoomedEventList.get(index);
+                if (!(current instanceof NullTimeEvent)) {
+                    // The time event has been already added to the zoomed event list
+                    return;
+                }
+                if (current.getTime() == event.getTime()) {
+                    fZoomedEventList.set(index++, event);
+                } else if (current.getTime() < event.getTime()) {
+                    fZoomedEventList.set(index++, new NullTimeEvent(this, current.getTime(), event.getTime() - current.getTime()));
+                    fZoomedEventList.add(index++, event);
+                }
+                long eventEndTime = (event.getTime() + event.getDuration());
+                long currentEndTime = (current.getTime() + current.getDuration());
+                if (eventEndTime < currentEndTime) {
+                    fZoomedEventList.add(index, new NullTimeEvent(this, eventEndTime + 1, currentEndTime - eventEndTime));
+                }
+            } else {
+                index = -index + 1;
+                if (index < fZoomedEventList.size()) {
+                    fZoomedEventList.add(index, event);
+                } else {
+                    fZoomedEventList.add(event);
+                }
+            }
+
+            updateEntryBounds(event);
+        }
     }
 
     private void updateEntryBounds(ITimeEvent event) {

@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
@@ -35,6 +36,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.TimeEventFilterD
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
@@ -101,6 +103,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     }
 
     private class ZoomThreadByTime extends ZoomThread {
+        private static final int BG_SEARCH_RESOLUTION = 1;
         private final @NonNull Collection<@NonNull TimeGraphEntry> fVisibleEntries;
         private final @NonNull List<ITmfStateSystem> fZoomSSList;
         private boolean fClearZoomedLists;
@@ -174,12 +177,24 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             /* Only keep entries that are a member or child of the ss entry list */
             Iterable<@NonNull TimeGraphEntry> entries = Iterables.filter(incorrectSample, entry -> isMember(entry, entryList));
             @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = computeRegexPredicate();
+            // set gaps to null when there is no active filter
+            Map<TimeGraphEntry, List<ITimeEvent>> gaps = isFilterActive ? new HashMap<>() : null;
+            doZoom(ss, links, markers, resolution, monitor, start, end, sampling, entries, predicates, gaps);
+
+            if (isFilterActive && gaps != null && !gaps.isEmpty()) {
+                doBgSearch(ss, BG_SEARCH_RESOLUTION, monitor, gaps, predicates);
+            }
+        }
+
+        private void doZoom(final ITmfStateSystem ss, final List<ILinkEvent> links, final List<IMarkerEvent> markers, long resolution, final @NonNull IProgressMonitor monitor, final long start, final long end, Sampling sampling,
+                Iterable<@NonNull TimeGraphEntry> entries, Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates, Map<TimeGraphEntry, List<ITimeEvent>> gaps) {
             queryFullStates(ss, start, end, resolution, monitor, new IQueryHandler() {
                 @Override
                 public void handle(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) {
                     try (TraceCompassLogUtils.ScopeLog scope = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStates");) { //$NON-NLS-1$
+
                         for (TimeGraphEntry entry : entries) {
-                            zoom(checkNotNull(entry), ss, fullStates, prevFullState, predicates, monitor);
+                            zoom(checkNotNull(entry), ss, fullStates, prevFullState, predicates, monitor, gaps);
                         }
                     }
                     /* Refresh the arrows when zooming */
@@ -207,16 +222,77 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             refresh();
         }
 
-        private void zoom(@NonNull TimeGraphEntry entry, ITmfStateSystem ss, @NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState, @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates, @NonNull IProgressMonitor monitor) {
+        private void zoom(@NonNull TimeGraphEntry entry, ITmfStateSystem ss, @NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState,
+                Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates, @NonNull IProgressMonitor monitor, Map<TimeGraphEntry, List<ITimeEvent>> gaps) {
             List<ITimeEvent> eventList = getEventList(entry, ss, fullStates, prevFullState, monitor);
+
+            if (gaps != null) {
+                // gaps != null means that there is active filter
+                getEnventListGaps(entry, eventList, gaps);
+            }
 
             if (eventList != null && !monitor.isCanceled()) {
                 doFilterEvents(entry, eventList, predicates);
                 applyResults(() -> {
                     for (ITimeEvent event : eventList) {
-                        entry.addZoomedEvent(event);
+                            entry.addZoomedEvent(event);
                     }
                 });
+            }
+        }
+
+        private void doBgSearch(ITmfStateSystem ss, int resolution, @NonNull IProgressMonitor monitor, Map<TimeGraphEntry, List<ITimeEvent>> gaps, @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates) {
+            try (TraceCompassLogUtils.ScopeLog poc = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINE, "TimegraphBgSearch")) { //$NON-NLS-1$
+                for (Map.Entry<TimeGraphEntry, List<ITimeEvent>> entryGap : gaps.entrySet()) {
+                    List<ITimeEvent> gapEvents = entryGap.getValue();
+                    TimeGraphEntry entry = entryGap.getKey();
+                    for (ITimeEvent event : gapEvents) {
+
+                        // FIXME This will query for all entries while we are only
+                        // interested into one. This is an API limitation since we do
+                        // not know at this level what are the specific attributes
+                        // used to build a single entry. This query takes up to 90%
+                        // of the time take to do the background search
+                        queryFullStates(ss, event.getTime(), event.getTime() + event.getDuration(), resolution, monitor, new IQueryHandler() {
+
+                            @Override
+                            public void handle(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) {
+                                List<ITimeEvent> eventList = getEventList(Objects.requireNonNull(entry), ss, fullStates, prevFullState, monitor);
+
+                                TimeEventFilterDialog timeEventFilterDialog = getTimeEventFilterDialog();
+                                boolean hasActiveSavedFilters = timeEventFilterDialog.hasActiveSavedFilters();
+                                if (eventList != null && !eventList.isEmpty() && !monitor.isCanceled()) {
+                                    doFilterEvents(entry, eventList, predicates);
+                                    boolean dimmed = (event.getActiveProperties() & IFilterProperty.DIMMED) == 1;
+                                    boolean exclude = hasActiveSavedFilters;
+                                    for (ITimeEvent e : eventList) {
+
+                                        // if any underlying event is not dimmed,
+                                        // then set the related gap event dimmed
+                                        // property to false
+                                        if (dimmed && (e.getActiveProperties() & IFilterProperty.DIMMED) == 0) {
+                                            event.setProperty(IFilterProperty.DIMMED, false);
+                                            dimmed = false;
+                                        }
+
+                                        // if any underlying event is not excluded,
+                                        // then set the related gap event exclude
+                                        // status property to false and add them
+                                        // back to the zoom event list
+                                        if (exclude && (e.getActiveProperties() & IFilterProperty.EXCLUDE) == 0) {
+                                            event.setProperty(IFilterProperty.EXCLUDE, false);
+                                            applyResults(() -> {
+                                                entry.updateZoomedEvent(event);
+                                            });
+                                            exclude = false;
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    refresh();
+                }
             }
         }
 
@@ -279,6 +355,24 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
     // ------------------------------------------------------------------------
     // Internal
     // ------------------------------------------------------------------------
+
+    /**
+     *
+     * Gather the events list's gaps and add them to the map of gaps by entry.
+     * The default implementation do nothing and views that need to do
+     * background search need to provide their own implementation.
+     *
+     * @param entry
+     *            The entry to find gaps
+     * @param eventList
+     *            The event list
+     * @param gaps
+     *            The map of gaps by entry
+     * @since 4.2
+     */
+    protected void getEnventListGaps(@NonNull TimeGraphEntry entry, List<ITimeEvent> eventList, Map<TimeGraphEntry, List<ITimeEvent>> gaps) {
+        // Do nothing here. Must be implement buy subclasses that need this behavior
+    }
 
     /**
      * Gets the entry list for a state system. These entries, and their
