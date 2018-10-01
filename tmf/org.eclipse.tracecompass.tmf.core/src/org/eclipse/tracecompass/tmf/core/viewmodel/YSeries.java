@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.tmf.core.viewmodel;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -110,7 +111,7 @@ public class YSeries implements IYSeries {
         YSeries other = (YSeries) obj;
 
         return Objects.equals(fLabel, other.fLabel) &&
-                Objects.equals(fYValues, other.fYValues) &&
+                Arrays.equals(fYValues, other.fYValues) &&
                 Objects.equals(fColor, other.fColor) &&
                 Objects.equals(fType, other.fType) &&
                 Objects.equals(fStyle, other.fStyle) &&
