@@ -782,7 +782,7 @@ public class DsfGdbAdaptor {
         // get corresponding TP data
         String tmfEventRef;
         String tmfEventSrc;
-        MIBreakpointDMData bp = fTpInfo.get(rank);
+        MIBreakpointDMData bp = fTpInfo.get((int) rank);
         if (bp != null) {
             tmfEventRef = bp.getFileName() + ":" + bp.getLineNumber() + " :: " + bp.getFunctionName(); //$NON-NLS-1$ //$NON-NLS-2$
             tmfEventSrc = bp.getFileName() + " :: " + bp.getFunctionName() + ", line: " + bp.getLineNumber(); //$NON-NLS-1$ //$NON-NLS-2$
