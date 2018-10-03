@@ -98,7 +98,6 @@ public interface TmfXmlStrings {
      */
     static final String XML_LATENCY_OUTPUT_DATA = "xmlLatencyOutputData";
 
-
     // ------------------------------------------------------------------------
     // XML Structure for State Provider
     // ------------------------------------------------------------------------
@@ -214,12 +213,20 @@ public interface TmfXmlStrings {
 
     String PATTERN_HANDLER = "patternHandler";
 
-    /* XML synthetic event elements */
+    /* XML synthetic segment elements */
     String SEGMENT_NAME = "segName";
     String SEGMENT = "segment";
     String SEGMENT_TYPE = "segType";
     String SEGMENT_CONTENT = "segContent";
     String SEGMENT_FIELD = "segField";
+    /**
+     * @since 3.1
+     */
+    String SEGMENT_TIME = "segTime";
+    /**
+     * @since 3.1
+     */
+    String DURATION = "duration";
 
     String INITIAL = "initial";
     String TEST = "test";

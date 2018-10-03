@@ -24,18 +24,14 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.PatternAnalysisTestUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.module.XmlUtilsTest;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stateprovider.XmlModuleTestBase;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * Test the pattern analysis fsm
@@ -51,32 +47,6 @@ public class FsmTest {
     private static XmlPatternAnalysis fModule;
     private static XmlPatternAnalysis fModule2;
     private static ITmfTrace fTrace;
-
-    private static XmlPatternAnalysis createModule(@NonNull Element element, TmfXmlTestFiles file) {
-        XmlPatternAnalysis module = new XmlPatternAnalysis();
-        module.setXmlFile(file.getFile().toPath());
-        module.setName(XmlModuleTestBase.getName(element));
-        return module;
-    }
-
-    private static XmlPatternAnalysis initModule(TmfXmlTestFiles file) {
-        Document doc = file.getXmlDocument();
-        assertNotNull(doc);
-
-        /* get State Providers modules */
-        NodeList stateproviderNodes = doc.getElementsByTagName(TmfXmlStrings.PATTERN);
-
-        Element node = (Element) stateproviderNodes.item(0);
-        assertNotNull(node);
-
-        XmlPatternAnalysis module = createModule(node, file);
-
-        String moduleId = node.getAttribute(TmfXmlStrings.ID);
-        assertNotNull(moduleId);
-        module.setId(moduleId);
-
-        return module;
-    }
 
     /**
      * End the test suite
@@ -95,7 +65,7 @@ public class FsmTest {
     public static void before() {
         ITmfTrace trace = XmlUtilsTest.initializeTrace(TEST_TRACE);
         //Create first module
-        fModule = initModule(TEST_FILE_1);
+        fModule = PatternAnalysisTestUtils.initModule(TEST_FILE_1);
         try {
             fModule.setTrace(trace);
             fModule.schedule();
@@ -105,7 +75,7 @@ public class FsmTest {
         }
 
         //Create second module
-        fModule2 = initModule(TEST_FILE_2);
+        fModule2 = PatternAnalysisTestUtils.initModule(TEST_FILE_2);
         try {
             fModule2.setTrace(trace);
             fModule2.schedule();

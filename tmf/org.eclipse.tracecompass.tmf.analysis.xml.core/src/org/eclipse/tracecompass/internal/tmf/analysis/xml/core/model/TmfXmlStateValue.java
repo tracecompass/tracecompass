@@ -128,7 +128,7 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
         fPath = attributes;
         fContainer = container;
         fEventField = eventField;
-        if (!node.getNodeName().equals(TmfXmlStrings.STATE_VALUE)) {
+        if (!node.getNodeName().equals(TmfXmlStrings.STATE_VALUE) && !node.getNodeName().equals(TmfXmlStrings.BEGIN) && !node.getNodeName().equals(TmfXmlStrings.END) && !node.getNodeName().equals(TmfXmlStrings.DURATION)) {
             throw new IllegalArgumentException("TmfXmlStateValue constructor: Element is not a stateValue"); //$NON-NLS-1$
         }
 

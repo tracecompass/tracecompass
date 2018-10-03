@@ -50,6 +50,8 @@ public enum TmfXmlTestFiles {
     VALID_PATTERN_FILE("test_xml_files/test_valid/test_valid_pattern.xml"),
     /** A valid pattern file to test the pattern segment **/
     VALID_PATTERN_SEGMENT("test_xml_files/test_valid/test_pattern_segment.xml"),
+    /** A valid pattern with segment timestamp description **/
+    VALID_SEGMENT_TIMESTAMP_DESCRIPTION("test_xml_files/test_valid/test_segment_timestamp.xml"),
     /** A valid file for consuming fsm test */
     CONSUMING_FSM_TEST("test_xml_files/test_valid/test_consuming_fsm.xml"),
     /** A valid pattern file to test the initialState element */
