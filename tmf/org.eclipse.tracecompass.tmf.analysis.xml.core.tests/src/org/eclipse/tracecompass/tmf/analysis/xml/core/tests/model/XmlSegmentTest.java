@@ -80,7 +80,7 @@ public class XmlSegmentTest {
         @Nullable ISegmentStore<@NonNull ISegment> ss = module.getSegmentStore();
         assertNotNull(ss);
         assertEquals("Segment store size", 1, ss.size());
-        Object segment = ss.toArray()[0];
+        Object segment = ss.iterator().next();
         assertTrue(segment instanceof TmfXmlPatternSegment);
         XmlUtilsTest.testPatternSegmentData(PatternSegmentFactoryStub.TEST_3, (TmfXmlPatternSegment)segment);
     }

@@ -15,9 +15,12 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisModule;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
+import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory;
+import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory.SegmentStoreType;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
@@ -77,6 +80,16 @@ public class XmlPatternSegmentStoreModule extends AbstractSegmentStoreAnalysisMo
     @Override
     protected String getDataFileName() {
         return getId() + XmlPatternAnalysis.SEGMENT_STORE_EXTENSION;
+    }
+
+    @Override
+    protected @NonNull SegmentStoreType getSegmentStoreType() {
+        return SegmentStoreType.OnDisk;
+    }
+
+    @Override
+    protected @NonNull IHTIntervalReader<@NonNull ISegment> getSegmentReader() {
+        return TmfXmlPatternSegment.READER;
     }
 
     /**

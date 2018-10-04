@@ -16,6 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
+import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWriter;
+import org.eclipse.tracecompass.datastore.core.serialization.SafeByteBufferFactory;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.segmentstore.core.IContentSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.segment.interfaces.INamedSegment;
@@ -48,6 +52,45 @@ public class TmfXmlPatternSegment implements INamedSegment, IContentSegment {
     private final long fEnd;
     private final @NonNull String fSegmentName;
     private transient @NonNull Map<@NonNull String, @NonNull ITmfStateValue> fContent;
+
+    /**
+     * The reader for this segment class
+     */
+    public static final @NonNull IHTIntervalReader<@NonNull ISegment> READER = buffer -> {
+
+        long start = buffer.getLong();
+        long end = buffer.getLong();
+        int scale = buffer.getInt();
+        String segmentName = buffer.getString();
+        int contentSize = buffer.getInt();
+
+        final Map<@NonNull String, @NonNull ITmfStateValue> content = new HashMap<>();
+        for (int i = 0; i < contentSize; i++) {
+            String name = buffer.getString().intern();
+
+            Byte type = buffer.get();
+            ITmfStateValue value;
+            switch (type) {
+            case TYPE_NULL:
+                value = TmfStateValue.nullValue();
+                break;
+            case TYPE_INTEGER:
+                value = TmfStateValue.newValueInt(buffer.getInt());
+                break;
+            case TYPE_LONG:
+                value = TmfStateValue.newValueLong(buffer.getLong());
+                break;
+            case TYPE_STRING:
+                value = TmfStateValue.newValueString(buffer.getString().intern());
+                break;
+            default:
+                value = TmfStateValue.nullValue();
+                Activator.logError("Read segment failed : Invalid data, value will be set to null"); //$NON-NLS-1$
+            }
+            content.put(name, value);
+        }
+        return new TmfXmlPatternSegment(start, end, scale, segmentName, content);
+    };
 
     /**
      * Constructs an XML pattern segment
@@ -145,6 +188,69 @@ public class TmfXmlPatternSegment implements INamedSegment, IContentSegment {
                 .append(", fName=").append(getName()) //$NON-NLS-1$
                 .append(", fContent=").append(getContent()) //$NON-NLS-1$
                 .append("]").toString(); //$NON-NLS-1$
+    }
+
+    @Override
+    public void writeSegment(@NonNull ISafeByteBufferWriter buffer) {
+
+        buffer.putLong(fStart);
+        buffer.putLong(fEnd);
+        buffer.putInt(fScale);
+        buffer.putString(fSegmentName);
+        // Write the number of fields
+        buffer.putInt(fContent.size());
+
+        // Write the fields
+        for (Map.Entry<String, ITmfStateValue> entry : fContent.entrySet()) {
+            buffer.putString(entry.getKey());
+            final ITmfStateValue value = entry.getValue();
+            final byte type = getByteFromType(value.getType());
+            buffer.put(type);
+            switch (type) {
+            case TYPE_NULL:
+                break;
+            case TYPE_INTEGER:
+                buffer.putInt(value.unboxInt());
+                break;
+            case TYPE_LONG:
+                buffer.putLong(value.unboxLong());
+                break;
+            case TYPE_STRING:
+                final @NonNull String string = value.unboxStr();
+                buffer.putString(string);
+                break;
+            default:
+                Activator.logError("Write object failed : Invalid data"); //$NON-NLS-1$
+            }
+        }
+    }
+
+    @Override
+    public int getSizeOnDisk() {
+        int size = 2 * Long.BYTES + Integer.BYTES + SafeByteBufferFactory.getStringSizeInBuffer(fSegmentName) + Integer.BYTES;
+        for (Map.Entry<String, ITmfStateValue> entry : fContent.entrySet()) {
+            size += SafeByteBufferFactory.getStringSizeInBuffer(entry.getKey());
+            final ITmfStateValue value = entry.getValue();
+            final byte type = getByteFromType(value.getType());
+            size += Byte.BYTES;
+            switch (type) {
+            case TYPE_NULL:
+                break;
+            case TYPE_INTEGER:
+                size += Integer.BYTES;
+                break;
+            case TYPE_LONG:
+                size += Long.BYTES;
+                break;
+            case TYPE_STRING:
+                final @NonNull String string = value.unboxStr();
+                size += SafeByteBufferFactory.getStringSizeInBuffer(string);
+                break;
+            default:
+                Activator.logError("get segment size on disk failed : Invalid data"); //$NON-NLS-1$
+            }
+        }
+        return size;
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {

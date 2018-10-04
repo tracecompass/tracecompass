@@ -173,7 +173,7 @@ public class FsmTest {
         @Nullable ISegmentStore<@NonNull ISegment> ss = fModule2.getSegmentStore();
         assertNotNull("segment store exist", ss);
         assertTrue("Segment store not empty", ss.size() == 1);
-        Object item = ss.toArray()[0];
+        Object item = ss.iterator().next();
         assertTrue(item instanceof TmfXmlPatternSegment);
         assertTrue(((TmfXmlPatternSegment) item).getName().equals(TEST_SEGMENT_NEW));
 
