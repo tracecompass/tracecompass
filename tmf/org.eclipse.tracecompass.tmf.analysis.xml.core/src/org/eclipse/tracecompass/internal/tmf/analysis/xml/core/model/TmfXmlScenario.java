@@ -126,7 +126,8 @@ public class TmfXmlScenario {
         if (fScenarioInfo.getStatus().equals(ScenarioStatusType.PENDING)) {
             fScenarioInfo.setStatus(ScenarioStatusType.IN_PROGRESS);
             fHistoryBuilder.startScenario(fContainer, fScenarioInfo, event);
-        } else if (nextState.equals(fFsm.getAbandonStateId())) {
+        }
+        if (nextState.equals(fFsm.getAbandonStateId())) {
             fScenarioInfo.setStatus(ScenarioStatusType.ABANDONED);
             fHistoryBuilder.completeScenario(fContainer, fScenarioInfo, event);
         } else if (nextState.equals(fFsm.getFinalStateId())) {
