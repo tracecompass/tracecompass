@@ -8,6 +8,8 @@
  ******************************************************************************/
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -19,7 +21,6 @@ import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
-import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory;
 import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory.SegmentStoreType;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -37,7 +38,8 @@ public class XmlPatternSegmentStoreModule extends AbstractSegmentStoreAnalysisMo
      * Fake segment indicated that the last segment have been received
      */
     public static final @NonNull EndSegment END_SEGMENT = new EndSegment();
-    private final ISegmentStore<@NonNull ISegment> fSegments = SegmentStoreFactory.createSegmentStore();
+    private final List<@NonNull ISegment> fCachedSegments = new ArrayList<>();
+    private ISegmentStore<@NonNull ISegment> fFinalSegments;
     private final CountDownLatch fFinished = new CountDownLatch(1);
     private final @NonNull XmlPatternAnalysis fParent;
     private boolean fSegmentStoreCompleted;
@@ -62,12 +64,12 @@ public class XmlPatternSegmentStoreModule extends AbstractSegmentStoreAnalysisMo
             segments.close(true);
             return false;
         }
+        fFinalSegments = segments;
         if (waitForSegmentStoreCompletion()) {
-            segments.addAll(getSegments());
-            segments.close(false);
+            fFinalSegments.close(false);
             return true;
         }
-        segments.close(true);
+        fFinalSegments.close(true);
         return false;
     }
 
@@ -116,7 +118,15 @@ public class XmlPatternSegmentStoreModule extends AbstractSegmentStoreAnalysisMo
                 segmentStoreReady(true);
                 return;
             }
-            getSegments().add(segment);
+            if (fFinalSegments == null) {
+                getCachedSegments().add(segment);
+            } else {
+                if (!getCachedSegments().isEmpty()) {
+                    fFinalSegments.addAll(getCachedSegments());
+                    getCachedSegments().clear();
+                }
+                fFinalSegments.add(segment);
+            }
         }
     }
 
@@ -125,8 +135,8 @@ public class XmlPatternSegmentStoreModule extends AbstractSegmentStoreAnalysisMo
      *
      * @return The segment store
      */
-    private synchronized ISegmentStore<@NonNull ISegment> getSegments() {
-        return fSegments;
+    private synchronized List<@NonNull ISegment> getCachedSegments() {
+        return fCachedSegments;
     }
 
     /**
