@@ -556,6 +556,8 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
                         engine.put(stateValueID, value.unboxStr());
                         break;
                     case DOUBLE:
+                        engine.put(stateValueID, value.unboxDouble());
+                        break;
                     case CUSTOM:
                     case NULL:
                         engine.put(stateValueID, null);
