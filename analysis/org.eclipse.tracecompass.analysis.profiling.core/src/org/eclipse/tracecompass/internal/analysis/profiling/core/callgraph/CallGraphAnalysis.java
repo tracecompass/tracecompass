@@ -236,7 +236,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
         try {
             long curTime = stateSystem.getStartTime();
             long limit = stateSystem.getCurrentEndTime();
-            AbstractCalledFunction initSegment = CalledFunctionFactory.create(0, 0, 0, threadName, processId, null);
+            AbstractCalledFunction initSegment = CalledFunctionFactory.create(0, 0, -1, threadName, processId, null);
             ThreadNode init = new ThreadNode(initSegment, 0, threadId);
             while (curTime < limit) {
                 if (monitor.isCanceled()) {
@@ -395,7 +395,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      * @return the merged threadnodes
      */
     public Collection<ThreadNode> getFlameGraph() {
-        AbstractCalledFunction initSegment = CalledFunctionFactory.create(0, 0, 0, "", 0, null); //$NON-NLS-1$
+        AbstractCalledFunction initSegment = CalledFunctionFactory.create(0, 0, -1, "", 0, null); //$NON-NLS-1$
         ThreadNode init = new ThreadNode(initSegment, 0, 0);
         fThreadNodes.forEach(
                 tn -> tn.getChildren().forEach(

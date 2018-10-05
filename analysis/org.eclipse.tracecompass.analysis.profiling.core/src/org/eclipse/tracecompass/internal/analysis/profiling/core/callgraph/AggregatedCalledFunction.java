@@ -147,8 +147,10 @@ public class AggregatedCalledFunction implements Cloneable {
      */
     public synchronized void addChild(AbstractCalledFunction child, AggregatedCalledFunction aggregatedChild) {
         // Update the child's statistics with itself
-        fSelfTime -= aggregatedChild.getDuration();
-        aggregatedChild.getFunctionStatistics().update(child);
+        if (child.getDepth() >= 0) {
+            fSelfTime -= Math.min(aggregatedChild.getDuration(), fSelfTime);
+            aggregatedChild.getFunctionStatistics().update(child);
+        }
         AggregatedCalledFunction node = fChildren.get(aggregatedChild.getSymbol());
         if (node == null) {
             fChildren.put(aggregatedChild.getSymbol(), aggregatedChild);
