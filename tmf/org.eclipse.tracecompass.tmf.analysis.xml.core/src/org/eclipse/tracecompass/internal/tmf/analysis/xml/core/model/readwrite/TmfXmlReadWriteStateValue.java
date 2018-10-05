@@ -526,8 +526,20 @@ public class TmfXmlReadWriteStateValue extends TmfXmlStateValue {
         @Override
         public ITmfStateValue getValue(@Nullable ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo) throws AttributeNotFoundException {
             Object result = null;
-            ScriptEngineManager manager = new ScriptEngineManager();
-            ScriptEngine engine = manager.getEngineByName(fScriptEngine);
+            ScriptEngine engine = null;
+            IXmlStateSystemContainer xmlContainer = getSsContainer();
+            engine = xmlContainer.getScriptEngine(fScriptEngine);
+            if (engine == null) {
+                ScriptEngineManager manager = new ScriptEngineManager();
+                engine = manager.getEngineByName(fScriptEngine);
+                if (engine != null) {
+                    xmlContainer.setScriptengine(fScriptEngine, engine);
+                }
+            }
+
+            if (engine == null) {
+                return TmfStateValue.nullValue();
+            }
 
             for (TmfXmlStateValue stateValue : fChildStateValues) {
                 String stateValueID = stateValue.getID();

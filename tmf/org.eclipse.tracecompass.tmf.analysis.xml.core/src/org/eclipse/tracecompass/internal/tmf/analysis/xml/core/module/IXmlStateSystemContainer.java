@@ -63,5 +63,4 @@ public interface IXmlStateSystemContainer extends ITmfXmlTopLevelElement, IAnaly
     default DataDrivenMappingGroup getMappingGroup(String id) {
         throw new UnsupportedOperationException("This method should be overridden by child classes who need those"); //$NON-NLS-1$
     }
-
 }

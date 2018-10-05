@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.script.ScriptEngine;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
@@ -72,6 +74,8 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
     private final @NonNull TmfXmlScenarioHistoryBuilder fHistoryBuilder;
 
     private final AnalysisCompilationData fAnalysisCompilationData;
+
+    private Map<String, ScriptEngine> fScriptengine = new HashMap<>();
 
     /**
      * @param trace
@@ -304,4 +308,13 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
         return fAnalysisCompilationData;
     }
 
+    @Override
+    public void setScriptengine(String name, ScriptEngine engine) {
+        fScriptengine.put(name, engine);
+    }
+
+    @Override
+    public ScriptEngine getScriptEngine(String name) {
+        return fScriptengine.get(name);
+    }
 }

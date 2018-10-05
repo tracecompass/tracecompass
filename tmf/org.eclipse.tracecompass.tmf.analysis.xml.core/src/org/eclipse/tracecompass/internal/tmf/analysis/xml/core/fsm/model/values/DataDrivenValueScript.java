@@ -10,8 +10,8 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.Function;
 
 import javax.script.ScriptEngine;
@@ -65,18 +65,25 @@ public class DataDrivenValueScript extends DataDrivenValue {
 
     @Override
     protected @Nullable Object resolveValue(int quark, IAnalysisDataContainer container) {
-        return executeScript(sv -> sv.resolveValue(quark, container));
+        return executeScript(sv -> sv.resolveValue(quark, container), container);
     }
 
     @Override
     protected @Nullable Object resolveValue(ITmfEvent event, int quark, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
-        return executeScript(sv -> sv.resolveValue(event, quark, scenarioInfo, container));
+        return executeScript(sv -> sv.resolveValue(event, quark, scenarioInfo, container), container);
     }
 
-    private @Nullable Object executeScript(Function<DataDrivenValue, @Nullable Object> function) {
+    private @Nullable Object executeScript(Function<DataDrivenValue, @Nullable Object> function, IAnalysisDataContainer container) {
         Object result = null;
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName(fScriptEngine);
+        ScriptEngine engine = null;
+        engine = container.getScriptEngine(fScriptEngine);
+        if (engine == null) {
+            ScriptEngineManager manager = new ScriptEngineManager();
+            engine = manager.getEngineByName(fScriptEngine);
+            if (engine != null) {
+                container.setScriptengine(fScriptEngine, engine);
+            }
+        }
         if (engine == null) {
             Activator.logWarning("Unknown script engine: " + fScriptEngine); //$NON-NLS-1$
             return null;

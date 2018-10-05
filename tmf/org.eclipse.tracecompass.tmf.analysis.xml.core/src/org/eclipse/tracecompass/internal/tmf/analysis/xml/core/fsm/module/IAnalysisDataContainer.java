@@ -12,6 +12,8 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module;
 
+import javax.script.ScriptEngine;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenMappingGroup;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -126,4 +128,31 @@ public interface IAnalysisDataContainer {
         throw new UnsupportedOperationException("Implementations should override this method"); //$NON-NLS-1$
     }
 
+    /**
+     * Set the script engine by name. This method should only be implemented by
+     * analysis container. This avoid to create a new script engine every time
+     * we need to evaluate a new expression.
+     *
+     * @param name
+     *            the name of the script engine
+     *
+     * @param engine
+     *            The script engine use to evaluate expressions
+     */
+    default void setScriptengine(String name, ScriptEngine engine) {
+        // Do nothing. This method should be overridden by child classes who need those
+    }
+
+    /**
+     * Get the container script engine
+     *
+     * @param name
+     *            the name of the script engine
+     *
+     * @return The script engine used to evaluate expressions
+     */
+    default @Nullable ScriptEngine getScriptEngine(String name) {
+        // Return null as default value. This method should be overridden by child classes who need those
+        return null;
+    }
 }

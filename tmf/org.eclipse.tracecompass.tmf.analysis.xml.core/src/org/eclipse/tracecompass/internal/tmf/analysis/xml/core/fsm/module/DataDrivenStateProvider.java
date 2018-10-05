@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.script.ScriptEngine;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenEventHandler;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenMappingGroup;
@@ -37,6 +39,7 @@ public class DataDrivenStateProvider extends AbstractTmfStateProvider implements
 
     private final List<DataDrivenEventHandler> fEventHandlers;
     private final Map<String, DataDrivenMappingGroup> fMappingGroups = new HashMap<>();
+    private Map<String, ScriptEngine> fScriptengine = new HashMap<>();
     private final String fId;
     private final int fVersion;
 
@@ -113,4 +116,13 @@ public class DataDrivenStateProvider extends AbstractTmfStateProvider implements
         this.addFutureEvent(time, state, quark);
     }
 
+    @Override
+    public void setScriptengine(String name, ScriptEngine engine) {
+        fScriptengine.put(name, engine);
+    }
+
+    @Override
+    public @Nullable ScriptEngine getScriptEngine(String name) {
+        return fScriptengine.get(name);
+    }
 }
