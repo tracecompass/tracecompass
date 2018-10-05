@@ -243,25 +243,27 @@ public class TmfEventMatching implements ITmfEventMatching {
     public void matchEvent(ITmfEvent event, ITmfTrace trace, @NonNull IProgressMonitor monitor) {
         ITmfMatchEventDefinition def = null;
         Direction evType = null;
+        IEventMatchingKey eventKey = null;
         for (ITmfMatchEventDefinition oneDef : getEventDefinitions(event.getTrace())) {
             def = oneDef;
             evType = def.getDirection(event);
             if (evType != null) {
-                break;
+                /*
+                 * Make sure this definition generates an event key, maybe
+                 * another definition does
+                 */
+                eventKey = def.getEventKey(event);
+                if (eventKey != null) {
+                    break;
+                }
             }
 
         }
 
-        if (def == null || evType == null) {
+        if (def == null || evType == null || eventKey == null) {
             return;
         }
 
-        /* Get the event's unique fields */
-        IEventMatchingKey eventKey = def.getEventKey(event);
-
-        if (eventKey == null) {
-            return;
-        }
         Table<ITmfTrace, IEventMatchingKey, DependencyEvent> unmatchedTbl, companionTbl;
 
         /* Point to the appropriate table */

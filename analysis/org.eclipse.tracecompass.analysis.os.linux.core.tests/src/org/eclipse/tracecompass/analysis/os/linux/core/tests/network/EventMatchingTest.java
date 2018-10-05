@@ -22,9 +22,12 @@ import java.util.List;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.Activator;
+import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.StubEventMatching;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.matching.IEventMatchingKey;
 import org.eclipse.tracecompass.tmf.core.event.matching.IMatchProcessingUnit;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventDependency;
 import org.eclipse.tracecompass.tmf.core.event.matching.TmfEventMatching;
@@ -92,6 +95,52 @@ public class EventMatchingTest {
     public void testMatching() throws TmfTraceException {
         String trace1File = "client.xml";
         String trace2File = "server.xml";
+        testEventMatching(trace1File, trace2File);
+    }
+
+    private static void validateMatch(TmfEventDependency match, String source, String destination, long sourceTs, long destTs) {
+        String title = source + '(' + sourceTs + ") -> " + destination + '(' + destTs + ')';
+        assertNotNull(match);
+        assertEquals("Source: " + title, source, match.getSource().getTrace().getHostId());
+        assertEquals("Source ts: " + title, sourceTs, match.getSource().getTimestamp().getValue());
+        assertEquals("Destination: " + title, destination, match.getDestination().getTrace().getHostId());
+        assertEquals("Destination ts: " + title, destTs, match.getDestination().getTimestamp().getValue());
+    }
+
+    /**
+     * Testing the packet matching when multiple matches apply to a same event.
+     *
+     * @throws TmfTraceException
+     *             Exception thrown when initializing trace
+     */
+    @Test
+    public void testMatchingMultiMatchers() throws TmfTraceException {
+        String trace1File = "client.xml";
+        // This trace has another field name for matching, so StubEventMatching
+        // should not be able to match these events
+        String trace2File = "server2.xml";
+
+        // Register a second event matching class for the other field
+        TmfEventMatching.registerMatchObject(new StubEventMatching() {
+
+            @Override
+            public @Nullable IEventMatchingKey getEventKey(@Nullable ITmfEvent event) {
+                if (event == null) {
+                    return null;
+                }
+                Integer fieldValue = event.getContent().getFieldValue(Integer.class, "otherMsgField");
+                if (fieldValue == null) {
+                    return null;
+                }
+                return new StubEventKey(fieldValue);
+            }
+
+        });
+
+        testEventMatching(trace1File, trace2File);
+    }
+
+    private void testEventMatching(String trace1File, String trace2File) throws TmfTraceException {
         ITmfTrace trace1 = null;
         ITmfTrace trace2 = null;
         TmfExperiment experiment = null;
@@ -131,12 +180,4 @@ public class EventMatchingTest {
         }
     }
 
-    private static void validateMatch(TmfEventDependency match, String source, String destination, long sourceTs, long destTs) {
-        String title = source + '(' + sourceTs + ") -> " + destination + '(' + destTs + ')';
-        assertNotNull(match);
-        assertEquals("Source: " + title, source, match.getSource().getTrace().getHostId());
-        assertEquals("Source ts: " + title, sourceTs, match.getSource().getTimestamp().getValue());
-        assertEquals("Destination: " + title, destination, match.getDestination().getTrace().getHostId());
-        assertEquals("Destination ts: " + title, destTs, match.getDestination().getTimestamp().getValue());
-    }
 }

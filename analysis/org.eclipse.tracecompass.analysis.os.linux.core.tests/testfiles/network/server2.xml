@@ -1,0 +1,15 @@
+<trace>
+<set_aspects>
+<field name="cpu" value="1" type="int" />
+</set_aspects>
+<event timestamp="50" name="packet_received">
+<field name="cpu" value="1" type="int" />
+<field name="interface" value="eno1" type="string" />
+<field name="otherMsgField" value="1" type="int" />
+</event>
+<event timestamp="70" name="packet_sent">
+<field name="cpu" value="1" type="int" />
+<field name="interface" value="eno1" type="string" />
+<field name="otherMsgField" value="2" type="int" />
+</event>
+</trace>

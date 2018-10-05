@@ -25,7 +25,10 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  */
 public class StubEventMatching implements ITmfMatchEventDefinition {
 
-    private static class StubEventKey implements IEventMatchingKey {
+    /**
+     * The event key for this simple message ID matching field
+     */
+    protected static class StubEventKey implements IEventMatchingKey {
 
         private final int fMsgId;
 
