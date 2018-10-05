@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.DefaultEventLayout;
 
@@ -52,5 +53,27 @@ public class KernelEventLayoutStub extends DefaultEventLayout {
     public Collection<String> eventsNetworkReceive() {
         return ImmutableList.of("packet_received");
     }
+
+    @Override
+    public String eventIrqEntry() {
+        return "do_IRQ_entry";
+    }
+
+    @Override
+    public String eventIrqExit() {
+        return "do_IRQ_return";
+    }
+
+    @Override
+    public Collection<String> eventsNetworkReceiveEntry() {
+        return Collections.singleton("netif_receive_skb_internal_entry");
+    }
+
+    @Override
+    public Collection<String> eventsNetworkReceiveExit() {
+        return Collections.singleton("netif_receive_skb_internal_return");
+    }
+
+
 
 }

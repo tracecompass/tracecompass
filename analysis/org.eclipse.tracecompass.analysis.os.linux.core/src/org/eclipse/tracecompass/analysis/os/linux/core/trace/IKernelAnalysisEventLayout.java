@@ -928,4 +928,59 @@ public interface IKernelAnalysisEventLayout {
         return "power_cpu_frequency"; //$NON-NLS-1$
     }
 
+    /**
+     * Get the name of the kernel event marking the entry of the complete IRQ
+     * execution. This event is different from {@link #eventIrqHandlerEntry()}
+     * and {@link #eventSoftIrqEntry()}. The latter mark the entry to the
+     * hardware or software handler. Here this event is at a higher level and
+     * may encompass both harware and software IRQs.
+     *
+     * @return The name of the irq entry function
+     * @since 3.1
+     */
+    default String eventIrqEntry() {
+        return "do_IRQ_entry"; //$NON-NLS-1$
+    }
+
+    /**
+     * Get the name of the kernel event marking the exit of the complete IRQ
+     * execution. This event is different from {@link #eventIrqHandlerExit()}
+     * and {@link #eventSoftIrqExit()}. The latter mark the exit to the hardware
+     * or software handler. Here this event is at a higher level and may
+     * encompass both harware and software IRQs.
+     *
+     * @return The name of the irq exit function
+     * @since 3.1
+     */
+    default String eventIrqExit() {
+        return "do_IRQ_return"; //$NON-NLS-1$
+    }
+
+    /**
+     * Get the name of the kernel events marking the entry to a network packet
+     * reception context. The matching return events can be obtained with
+     * {@link #eventsNetworkReceiveExit()}. The packet reception context will
+     * typically include the packet reception, with one of
+     * {@link #eventsNetworkReceive()} events and the wakeup events caused by
+     * the reception.
+     *
+     * @return The list of events marking the beginning of a packet reception
+     *         phase
+     * @since 3.1
+     */
+    default Collection<String> eventsNetworkReceiveEntry() {
+        return Collections.emptySet();
+    }
+
+    /**
+     * Get the name of the kernel event marking the return of a network packet
+     * reception code.
+     *
+     * @return The list of events marking the end of a packet reception phase
+     * @since 3.1
+     */
+    default Collection<String> eventsNetworkReceiveExit() {
+        return Collections.emptySet();
+    }
+
 }

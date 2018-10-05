@@ -535,4 +535,15 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     public @NonNull Collection<@NonNull String> eventsKVMExit() {
         return KVM_EXIT_EVENTS;
     }
+
+    @Override
+    public Collection<String> eventsNetworkReceiveEntry() {
+        return Collections.singleton("netif_receive_skb_internal_entry");
+    }
+
+    @Override
+    public Collection<String> eventsNetworkReceiveExit() {
+        return Collections.singleton("netif_receive_skb_internal_return");
+    }
+
 }

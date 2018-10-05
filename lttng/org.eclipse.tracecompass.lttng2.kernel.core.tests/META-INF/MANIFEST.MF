@@ -24,7 +24,8 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.tracecompass.analysis.timing.core,
  org.eclipse.tracecompass.datastore.core,
  org.eclipse.tracecompass.segmentstore.core,
- org.eclipse.tracecompass.lttng2.common.core
+ org.eclipse.tracecompass.lttng2.common.core,
+ org.eclipse.tracecompass.analysis.graph.core.tests
 Export-Package: org.eclipse.tracecompass.lttng2.kernel.core.tests,
  org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.graph,
  org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.kernel;x-internal:=true,

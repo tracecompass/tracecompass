@@ -1,0 +1,84 @@
+<trace>
+<set_aspects>
+<field name="cpu" value="1" type="int" />
+</set_aspects>
+<event timestamp="5" name="sched_switch">
+<field name="cpu" value="1" type="int" />
+<field name="prev_comm" value="server" type="string" />
+<field name="prev_tid" value="100" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="1" type="long" />
+<field name="next_comm" value="other" type="string" />
+<field name="next_tid" value="101" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
+<event timestamp="18" name="do_IRQ_entry">
+<field name="cpu" value="1" type="int" />
+</event>
+<event timestamp="20" name="irq_handler_entry">
+<field name="cpu" value="1" type="int" />
+<field name="irq" value="15" type="long" />
+<field name="name" value="eth0" type="string" />
+</event>
+<event timestamp="22" name="softirq_raise">
+<field name="cpu" value="1" type="int" />
+<field name="vec" value="3" type="long" />
+</event>
+<event timestamp="25" name="irq_handler_exit">
+<field name="cpu" value="1" type="int" />
+<field name="irq" value="15" type="long" />
+<field name="ret" value="1" type="int" />
+</event>
+<event timestamp="30" name="softirq_entry">
+<field name="cpu" value="1" type="int" />
+<field name="vec" value="3" type="long" />
+</event>
+<event timestamp="31" name="netif_receive_skb_internal_entry">
+<field name="cpu" value="1" type="int" />
+</event>
+<event timestamp="33" name="packet_received">
+<field name="cpu" value="1" type="int" />
+<field name="msgid" value="1" type="int" />
+</event>
+<event timestamp="35" name="sched_wakeup">
+<field name="cpu" value="1" type="int" />
+<field name="comm" value="server" type="string" />
+<field name="tid" value="100" type="long" />
+<field name="prio" value="20" type="int" />
+<field name="target_cpu" value="0" type="int" />
+</event>
+<event timestamp="36" name="netif_receive_skb_internal_return">
+<field name="cpu" value="1" type="int" />
+</event>
+<event timestamp="38" name="softirq_exit">
+<field name="cpu" value="1" type="int" />
+<field name="vec" value="3" type="long" />
+</event>
+<event timestamp="39" name="do_IRQ_return">
+<field name="cpu" value="1" type="int" />
+</event>
+<event timestamp="40" name="sched_switch">
+<field name="cpu" value="1" type="int" />
+<field name="prev_comm" value="other" type="string" />
+<field name="prev_tid" value="101" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="0" type="long" />
+<field name="next_comm" value="server" type="string" />
+<field name="next_tid" value="100" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
+<event timestamp="45" name="packet_sent">
+<field name="cpu" value="1" type="int" />
+<field name="msgid" value="2" type="int" />
+</event>
+<event timestamp="55" name="sched_switch">
+<field name="cpu" value="1" type="int" />
+<field name="prev_comm" value="server" type="string" />
+<field name="prev_tid" value="100" type="long" />
+<field name="prev_prio" value="20" type="long" />
+<field name="prev_state" value="1" type="long" />
+<field name="next_comm" value="other" type="string" />
+<field name="next_tid" value="101" type="long" />
+<field name="next_prio" value="20" type="long" />
+</event>
+</trace>

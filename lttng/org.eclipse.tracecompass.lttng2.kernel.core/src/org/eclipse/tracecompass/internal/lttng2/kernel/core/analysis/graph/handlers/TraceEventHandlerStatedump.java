@@ -45,11 +45,16 @@ public class TraceEventHandlerStatedump extends BaseHandler {
     @Override
     public void handleEvent(ITmfEvent event) {
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
-        OsSystemModel system = getProvider().getSystem();
+
         String eventName = event.getName();
-        if (!eventName.equals(eventLayout.eventStatedumpProcessState())) {
-            return;
+        if (eventName.equals(eventLayout.eventStatedumpProcessState())) {
+            handleStatedumpProcessState(event, eventLayout);
         }
+
+    }
+
+    private void handleStatedumpProcessState(ITmfEvent event, IKernelAnalysisEventLayout eventLayout) {
+        OsSystemModel system = getProvider().getSystem();
         ITmfEventField content = event.getContent();
         Integer tid = content.getFieldValue(Integer.class, eventLayout.fieldTid());
         String name = EventField.getOrDefault(event, eventLayout.fieldName(), nullToEmptyString(Messages.TraceEventHandlerSched_UnknownThreadName));

@@ -15,10 +15,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsInterruptContext;
 import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider;
-import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsSystemModel;
 import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsExecutionGraphProvider.Context;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsInterruptContext;
+import org.eclipse.tracecompass.analysis.os.linux.core.execution.graph.OsSystemModel;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -47,6 +47,10 @@ public class EventContextHandler extends BaseHandler {
     private final Consumer<ITmfEvent> fIrqHandlerExit = event -> popInterruptContext(event, Context.IRQ);
     private final Consumer<ITmfEvent> fIpiEntry = event -> pushInterruptContext(event, Context.IPI);
     private final Consumer<ITmfEvent> fIpiExit = event -> popInterruptContext(event, Context.IPI);
+    private final Consumer<ITmfEvent> fCompleteHandlerEntry = event -> pushInterruptContext(event, Context.COMPLETE_IRQ);
+    private final Consumer<ITmfEvent> fCompleteHandlerExit = event -> popInterruptContext(event, Context.COMPLETE_IRQ);
+    private final Consumer<ITmfEvent> fPacketReceptionEntry = event -> pushInterruptContext(event, Context.PACKET_RECEPTION);
+    private final Consumer<ITmfEvent> fPacketReceptionExit = event -> popInterruptContext(event, Context.PACKET_RECEPTION);
 
     /**
      * Constructor
@@ -84,6 +88,14 @@ public class EventContextHandler extends BaseHandler {
         for (String ipiName : eventLayout.getIPIIrqVectorsEntries()) {
             fHandlers.put(ipiName, fIpiExit);
         }
+        fHandlers.put(eventLayout.eventIrqEntry(), fCompleteHandlerEntry);
+        fHandlers.put(eventLayout.eventIrqExit(), fCompleteHandlerExit);
+        for (String networkEvent : eventLayout.eventsNetworkReceiveEntry()) {
+            fHandlers.put(networkEvent, fPacketReceptionEntry);
+        }
+        for (String networkEvent : eventLayout.eventsNetworkReceiveExit()) {
+            fHandlers.put(networkEvent, fPacketReceptionExit);
+        }
     }
 
     private void pushInterruptContext(ITmfEvent event, Context ctx) {
@@ -105,4 +117,5 @@ public class EventContextHandler extends BaseHandler {
             system.popContextStack(event.getTrace().getHostId(), cpu);
         }
     }
+
 }
