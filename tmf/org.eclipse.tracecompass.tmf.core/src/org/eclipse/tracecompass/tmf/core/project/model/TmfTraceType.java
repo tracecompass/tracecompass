@@ -17,6 +17,7 @@ package org.eclipse.tracecompass.tmf.core.project.model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -496,6 +497,10 @@ public final class TmfTraceType {
             }
             int confidence = traceTypeHelper.validateWithConfidence(path);
             if (confidence >= 0) {
+                if (traceTypeHelper.getTraceTypeId().equals(traceTypeHint)) {
+                    // if the trace type hint is valid, return it immediately
+                    return Collections.singletonList(traceTypeHelper);
+                }
                 // insert in the tree map, ordered by confidence (highest confidence first) then name
                 Pair<Integer, TraceTypeHelper> element = new Pair<>(confidence, traceTypeHelper);
                 validCandidates.add(element);
@@ -513,29 +518,19 @@ public final class TmfTraceType {
         }
 
         if (validCandidates.size() != 1) {
-            List<Pair<Integer, TraceTypeHelper>> candidates = new ArrayList<>(validCandidates);
-            List<Pair<Integer, TraceTypeHelper>> reducedCandidates = reduce(candidates);
-            for (Pair<Integer, TraceTypeHelper> candidatePair : reducedCandidates) {
-                TraceTypeHelper candidate = candidatePair.getSecond();
-                if (candidate.getTraceTypeId().equals(traceTypeHint)) {
-                    returned.add(candidate);
-                    break;
+            List<Pair<Integer, TraceTypeHelper>> reducedCandidates = reduce(validCandidates);
+            if (reducedCandidates.size() == 0) {
+                throw new TmfTraceImportException("Error reducing trace type candidates"); //$NON-NLS-1$
+            } else if (reducedCandidates.size() == 1) {
+                // Don't select the trace type if it has the lowest confidence
+                if (reducedCandidates.get(0).getFirst() > 0) {
+                    returned.add(reducedCandidates.get(0).getSecond());
                 }
-            }
-            if (returned.size() == 0) {
-                if (reducedCandidates.size() == 0) {
-                    throw new TmfTraceImportException("Error reducing trace type candidates"); //$NON-NLS-1$
-                } else if (reducedCandidates.size() == 1) {
+            } else {
+                for (Pair<Integer, TraceTypeHelper> candidatePair : reducedCandidates) {
                     // Don't select the trace type if it has the lowest confidence
-                    if (reducedCandidates.get(0).getFirst() > 0) {
-                        returned.add(reducedCandidates.get(0).getSecond());
-                    }
-                } else {
-                    for (Pair<Integer, TraceTypeHelper> candidatePair : reducedCandidates) {
-                        // Don't select the trace type if it has the lowest confidence
-                        if (candidatePair.getFirst() > 0) {
-                            returned.add(candidatePair.getSecond());
-                        }
+                    if (candidatePair.getFirst() > 0) {
+                        returned.add(candidatePair.getSecond());
                     }
                 }
             }
@@ -548,7 +543,7 @@ public final class TmfTraceType {
         return returned;
     }
 
-    private static List<Pair<Integer, TraceTypeHelper>> reduce(List<Pair<Integer, TraceTypeHelper>> candidates) {
+    private static List<Pair<Integer, TraceTypeHelper>> reduce(Collection<Pair<Integer, TraceTypeHelper>> candidates) {
         List<Pair<Integer, TraceTypeHelper>> retVal = new ArrayList<>();
 
         // get all the tracetypes that are unique in that stage
@@ -564,7 +559,7 @@ public final class TmfTraceType {
     /*
      * Only return the leaves of the trace types. Ignore custom trace types.
      */
-    private static boolean isUnique(TraceTypeHelper trace, List<Pair<Integer, TraceTypeHelper>> set) {
+    private static boolean isUnique(TraceTypeHelper trace, Collection<Pair<Integer, TraceTypeHelper>> set) {
         if (trace.getTraceClass().equals(CustomTxtTrace.class) ||
                 trace.getTraceClass().equals(CustomXmlTrace.class)) {
             return true;
