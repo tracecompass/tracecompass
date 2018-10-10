@@ -77,7 +77,7 @@ public final class SymbolProviderUtils {
                 if (resolvedSymbol == null) {
                     resolvedSymbol = currentSymbol;
                 } else {
-                    resolvedSymbol = (Long.compareUnsigned(currentSymbol.getBaseAddress(), resolvedSymbol.getBaseAddress()) > 0 ? currentSymbol : resolvedSymbol);
+                    resolvedSymbol = (Long.compareUnsigned(currentSymbol.getBaseAddress(), resolvedSymbol.getBaseAddress()) >= 0 ? currentSymbol : resolvedSymbol);
                 }
             }
         }

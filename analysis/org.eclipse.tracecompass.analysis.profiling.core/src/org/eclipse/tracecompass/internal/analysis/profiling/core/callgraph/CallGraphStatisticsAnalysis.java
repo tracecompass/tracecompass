@@ -16,7 +16,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
-import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.SymbolAspect;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -47,7 +46,11 @@ public class CallGraphStatisticsAnalysis extends AbstractSegmentStatisticsAnalys
 
     @Override
     protected @Nullable String getSegmentType(@NonNull ISegment segment) {
-        return String.valueOf(SymbolAspect.SYMBOL_ASPECT.resolve(segment));
+        if (segment instanceof ICalledFunction) {
+            ICalledFunction calledFunction = (ICalledFunction) segment;
+            return String.valueOf(calledFunction.getSymbol());
+        }
+        return null;
     }
 
 
