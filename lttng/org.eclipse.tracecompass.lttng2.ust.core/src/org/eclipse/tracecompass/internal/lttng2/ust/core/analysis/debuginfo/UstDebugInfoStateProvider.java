@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.LinuxPidAspect;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst28EventLayout;
@@ -29,6 +30,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeExcept
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 
 import com.google.common.collect.ImmutableMap;
@@ -100,7 +102,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
     /**
      * Map of the latest statedump's timestamps, per VPID: Map<vpid, timestamp>
      */
-    private final Map<Long, Long> fLatestStatedumpStarts = new HashMap<>();
+    private final Map<Integer, Long> fLatestStatedumpStarts = new HashMap<>();
 
     /*
      * Store for data that is incomplete, for which we are waiting for some
@@ -197,7 +199,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
          * the analysis also needs the "ip" context, but the state provider part
          * does not.
          */
-        final Long vpid = event.getContent().getFieldValue(Long.class, fLayout.contextVpid());
+        Integer vpid = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), LinuxPidAspect.class, event);
         if (vpid == null) {
             return;
         }
@@ -335,7 +337,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
      * When a process does an exec, a new statedump is done and all previous
      * mappings are now invalid.
      */
-    private void handleStatedumpStart(ITmfEvent event, final Long vpid, final ITmfStateSystemBuilder ss) {
+    private void handleStatedumpStart(ITmfEvent event, final Integer vpid, final ITmfStateSystemBuilder ss) {
         long ts = event.getTimestamp().getValue();
         fLatestStatedumpStarts.put(vpid, ts);
 
@@ -358,7 +360,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
      *            Indicates if it comes from a statedump event, or a
      *            dlopen/lib:load event.
      */
-    private void handleBinInfo(ITmfEvent event, final Long vpid,
+    private void handleBinInfo(ITmfEvent event, final Integer vpid,
             final ITmfStateSystemBuilder ss, boolean statedump) {
         Long baddr = event.getContent().getFieldValue(Long.class, fLayout.fieldBaddr());
         Long memsz = event.getContent().getFieldValue(Long.class, fLayout.fieldMemsz());
@@ -400,7 +402,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
      *            Indicates if it comes from a statedump event, or a
      *            dlopen/lib:build_id event.
      */
-    private void handleBuildId(ITmfEvent event, final Long vpid,
+    private void handleBuildId(ITmfEvent event, final Integer vpid,
             final ITmfStateSystemBuilder ss, boolean statedump) {
         long[] buildIdArray = event.getContent().getFieldValue(long[].class, fLayout.fieldBuildId());
         Long baddr = event.getContent().getFieldValue(Long.class, fLayout.fieldBaddr());
@@ -432,7 +434,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
         processPendingBinInfo(p, ts, ss);
     }
 
-    private void handleDebugLink(ITmfEvent event, final Long vpid,
+    private void handleDebugLink(ITmfEvent event, final Integer vpid,
             final ITmfStateSystemBuilder ss, boolean statedump) {
         Long baddr = event.getContent().getFieldValue(Long.class, fLayout.fieldBaddr());
         String debugLink = event.getContent().getFieldValue(String.class, fLayout.fieldDebugLinkFilename());
@@ -458,7 +460,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
      *
      * Uses fields: Long baddr
      */
-    private void handleClose(ITmfEvent event, final Long vpid, final ITmfStateSystemBuilder ss) {
+    private void handleClose(ITmfEvent event, final Integer vpid, final ITmfStateSystemBuilder ss) {
         Long baddr = event.getContent().getFieldValue(Long.class, fLayout.fieldBaddr());
 
         if (baddr == null) {
@@ -500,7 +502,7 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
      *            if it is a dlopen/lib:load event.
      * @return The timestamp to use
      */
-    private long getBinInfoTimeStamp(ITmfEvent event, final Long vpid, boolean statedump) {
+    private long getBinInfoTimeStamp(ITmfEvent event, final Integer vpid, boolean statedump) {
         if (statedump) {
             Long statedumpStartTime = fLatestStatedumpStarts.get(vpid);
             if (statedumpStartTime != null) {
