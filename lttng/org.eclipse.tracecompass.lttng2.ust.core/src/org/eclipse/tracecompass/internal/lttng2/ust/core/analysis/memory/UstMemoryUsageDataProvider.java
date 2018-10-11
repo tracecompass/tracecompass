@@ -168,13 +168,15 @@ public class UstMemoryUsageDataProvider extends AbstractTreeCommonXDataProvider<
             int memoryAttribute = ss.optQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_MEMORY_ATTRIBUTE);
             int procNameQuark = ss.optQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_PROCNAME_ATTRIBUTE);
 
-            if (memoryAttribute != ITmfStateSystem.INVALID_ATTRIBUTE
-                    && procNameQuark != ITmfStateSystem.INVALID_ATTRIBUTE
-                    && procNameQuark < nameFullState.size()
-                    && (active == null || (memoryAttribute < active.size() && active.get(memoryAttribute).getEndTime() < end))) {
-                String name = String.valueOf(nameFullState.get(procNameQuark).getValue());
-                int tid = Integer.parseInt(ss.getAttributeName(quark));
+            String name = ss.getAttributeName(quark);
+            if (procNameQuark != ITmfStateSystem.INVALID_ATTRIBUTE && procNameQuark < nameFullState.size()) {
+                name = String.valueOf(nameFullState.get(procNameQuark).getValue());
+            }
 
+            if (memoryAttribute != ITmfStateSystem.INVALID_ATTRIBUTE
+                    && (active == null || (memoryAttribute < active.size() && active.get(memoryAttribute).getEndTime() < end))) {
+
+                int tid = Integer.parseInt(ss.getAttributeName(quark));
                 builder.add(new MemoryUsageTreeModel(getId(quark), rootId, tid, name));
             }
         }

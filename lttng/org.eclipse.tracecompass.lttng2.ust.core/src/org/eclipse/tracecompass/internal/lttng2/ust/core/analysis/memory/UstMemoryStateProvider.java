@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.LinuxTidAspect;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
@@ -53,11 +54,10 @@ import com.google.common.collect.ImmutableMap;
 public class UstMemoryStateProvider extends AbstractTmfStateProvider {
 
     /* Version of this state provider */
-    private static final int VERSION = 1;
+    private static final int VERSION = 2;
 
     private static final Long MINUS_ONE = Long.valueOf(-1);
     private static final Long ZERO = Long.valueOf(0);
-    private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
     private static final int MALLOC_INDEX = 1;
     private static final int FREE_INDEX = 2;
@@ -189,10 +189,10 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
         return tid.longValue();
     }
 
-    private String getProcname(ITmfEvent event) {
+    private @Nullable String getProcname(ITmfEvent event) {
         ITmfEventField field = event.getContent().getField(fLayout.contextProcname());
         if (field == null) {
-            return EMPTY_STRING;
+            return null;
         }
         return (String) field.getValue();
     }
@@ -220,7 +220,6 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
             ITmfStateValue prevMem = ss.queryOngoingState(tidMemQuark);
             /* First time we set this value */
             if (prevMem.isNull()) {
-                int procNameQuark = ss.getQuarkRelativeAndAdd(tidQuark, UstMemoryStrings.UST_MEMORY_PROCNAME_ATTRIBUTE);
                 String procName = getProcname(event);
                 /*
                  * No tid/procname for the event for the event, added to a
@@ -229,7 +228,10 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
                 if (tid.equals(MINUS_ONE)) {
                     procName = UstMemoryStrings.OTHERS;
                 }
-                ss.modifyAttribute(ts, procName, procNameQuark);
+                if (procName != null) {
+                    int procNameQuark = ss.getQuarkRelativeAndAdd(tidQuark, UstMemoryStrings.UST_MEMORY_PROCNAME_ATTRIBUTE);
+                    ss.modifyAttribute(ts, procName, procNameQuark);
+                }
                 prevMem = TmfStateValue.newValueLong(0);
             }
 
