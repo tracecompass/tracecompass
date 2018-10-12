@@ -68,18 +68,74 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
     private static final int POSIX_MEMALIGN_INDEX = 6;
 
     /** Map of a pointer to a memory zone to the size of the memory */
-    private final Map<Long, Long> fMemory = new HashMap<>();
+    private final Map<Long, MemoryAllocation> fMemory = new HashMap<>();
 
     private final @NonNull ILttngUstEventLayout fLayout;
     private final @NonNull Map<String, Integer> fEventNames;
+    private final @Nullable UstMemoryAnalysisModule fAnalysis;
+
+    /**
+     * Describe a memory allocation in details: timestamp, tid, and size
+     */
+    public static class MemoryAllocation {
+
+        private final long fTs;
+        private final Long fTid;
+        private final Long fSize;
+
+        /**
+         * Constructor
+         *
+         * @param ts
+         *            The timestamp
+         * @param tid
+         *            The thread ID
+         * @param size
+         *            The size of the allocation
+         */
+        public MemoryAllocation(long ts, Long tid, Long size) {
+            fTs = ts;
+            fTid = tid;
+            fSize = size;
+        }
+
+        /**
+         * Get the timestamp of this memory allocation
+         *
+         * @return The timestamp at which the allocation happened
+         */
+        public long getTs() {
+            return fTs;
+        }
+
+        /**
+         * Get the ID of the thread doing the allocation
+         *
+         * @return The thread ID
+         */
+        public Long getTid() {
+            return fTid;
+        }
+
+        /**
+         * Get the size of this memory allocation
+         *
+         * @return The size of allocation
+         */
+        public Long getSize() {
+            return fSize;
+        }
+    }
 
     /**
      * Constructor
      *
      * @param trace
      *            trace
+     * @param baseAnalysis
+     *            The analysis that created the state provider
      */
-    public UstMemoryStateProvider(@NonNull ITmfTrace trace) {
+    public UstMemoryStateProvider(@NonNull ITmfTrace trace, @Nullable UstMemoryAnalysisModule baseAnalysis) {
         super(trace, "Ust:Memory"); //$NON-NLS-1$
         if (!(trace instanceof LttngUstTrace)) {
             fLayout = ILttngUstEventLayout.DEFAULT_LAYOUT;
@@ -87,6 +143,7 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
             fLayout = ((LttngUstTrace) trace).getEventLayout();
         }
         fEventNames = buildEventNames(fLayout);
+        fAnalysis = baseAnalysis;
     }
 
     private static @NonNull Map<String, Integer> buildEventNames(ILttngUstEventLayout layout) {
@@ -172,7 +229,7 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
 
     @Override
     public ITmfStateProvider getNewInstance() {
-        return new UstMemoryStateProvider(getTrace());
+        return new UstMemoryStateProvider(getTrace(), fAnalysis);
     }
 
     @Override
@@ -210,13 +267,13 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
         Long memoryDiff = size;
         /* Size is 0, it means it was deleted */
         if (ZERO.equals(size)) {
-            Long memSize = fMemory.remove(ptr);
-            if (memSize == null) {
+            MemoryAllocation memAlloc = fMemory.remove(ptr);
+            if (memAlloc == null) {
                 return;
             }
-            memoryDiff = -memSize;
+            memoryDiff = -(memAlloc.getSize());
         } else {
-            fMemory.put(ptr, size);
+            fMemory.put(ptr, new MemoryAllocation(ts, tid, size));
         }
         try {
             int tidQuark = ss.getQuarkAbsoluteAndAdd(tid.toString());
@@ -245,6 +302,14 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
             ss.modifyAttribute(ts, prevMemValue, tidMemQuark);
         } catch (TimeRangeException | StateValueTypeException e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public void done() {
+        UstMemoryAnalysisModule analysis = fAnalysis;
+        if (analysis != null) {
+            analysis.setPotentialLeaks(fMemory);
         }
     }
 

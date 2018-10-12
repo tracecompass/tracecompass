@@ -19,8 +19,10 @@ import org.eclipse.osgi.util.NLS;
  * @author Guilliano Molaire
  */
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.messages"; //$NON-NLS-1$
 
+    /** The help text for unfreed memory tid aspect */
+    public static String SegmentAspectHelpText_PotentialLeakTid;
     /** Information regarding events loading prior to the analysis execution */
     public static String UstMemoryAnalysisModule_EventsLoadingInformation;
 
