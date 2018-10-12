@@ -98,7 +98,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         @Override
         public boolean apply(ISegment segment) {
             if (!(segment instanceof INamedSegment)) {
-                return false;
+                return fSelectedTypes.contains(fPrefix + DEFAULT_CATEGORY);
             }
             return fSelectedTypes.contains(fPrefix + ((INamedSegment) segment).getName());
         }
@@ -293,6 +293,11 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         Builder<TmfTreeDataModel> nodes = new ImmutableList.Builder<>();
         nodes.add(new TmfTreeDataModel(fTraceId, -1, String.valueOf(getTrace().getName())));
 
+        // There are segments, but no type, probably not named segments, so just add a category
+        if (segmentTypes.isEmpty() && intersectingElements.iterator().hasNext()) {
+            long seriesId = getUniqueId(DEFAULT_CATEGORY);
+            nodes.add(new TmfTreeDataModel(seriesId, fTraceId, DEFAULT_CATEGORY));
+        }
         for (String seriesName : segmentTypes) {
             long seriesId = getUniqueId(seriesName);
             nodes.add(new TmfTreeDataModel(seriesId, fTraceId, seriesName));
