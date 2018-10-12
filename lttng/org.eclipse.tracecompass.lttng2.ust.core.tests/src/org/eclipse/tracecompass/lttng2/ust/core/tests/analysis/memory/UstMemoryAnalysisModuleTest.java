@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.lttng2.ust.core.tests.analysis.memory;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryAnalysisModule;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
 import org.junit.Before;
 import org.junit.Ignore;

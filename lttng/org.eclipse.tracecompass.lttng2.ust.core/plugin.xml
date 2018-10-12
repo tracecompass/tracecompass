@@ -15,7 +15,7 @@
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <module
-            analysis_module="org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryAnalysisModule"
+            analysis_module="org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryAnalysisModule"
             icon="icons/memusage.png"
             id="org.eclipse.linuxtools.lttng2.ust.analysis.memory"
             name="Ust Memory">

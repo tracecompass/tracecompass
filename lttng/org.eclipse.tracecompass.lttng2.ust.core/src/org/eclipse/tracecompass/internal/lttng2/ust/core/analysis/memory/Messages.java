@@ -9,7 +9,7 @@
  * Contributors:
  *   Guilliano Molaire - Initial API and implementation
  *******************************************************************************/
-package org.eclipse.tracecompass.lttng2.ust.core.analysis.memory;
+package org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -17,10 +17,7 @@ import org.eclipse.osgi.util.NLS;
  * Message bundle for the ust memory analysis module
  *
  * @author Guilliano Molaire
- * @deprecated This class does not need to be API. It has been moved to
- *             {@link org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.Messages}
  */
-@Deprecated
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.messages"; //$NON-NLS-1$
 
@@ -32,8 +29,6 @@ public class Messages extends NLS {
 
     /**
      * Chart title
-     *
-     * @since 3.1
      */
     public static String MemoryUsageDataProvider_Title;
 
@@ -43,5 +38,6 @@ public class Messages extends NLS {
     }
 
     private Messages() {
+        // Do nothing
     }
 }
