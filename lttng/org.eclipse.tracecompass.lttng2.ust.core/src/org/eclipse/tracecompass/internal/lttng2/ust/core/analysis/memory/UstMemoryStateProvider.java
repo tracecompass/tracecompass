@@ -32,6 +32,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 import com.google.common.collect.ImmutableMap;
@@ -78,9 +79,13 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
      * @param trace
      *            trace
      */
-    public UstMemoryStateProvider(@NonNull LttngUstTrace trace) {
+    public UstMemoryStateProvider(@NonNull ITmfTrace trace) {
         super(trace, "Ust:Memory"); //$NON-NLS-1$
-        fLayout = trace.getEventLayout();
+        if (!(trace instanceof LttngUstTrace)) {
+            fLayout = ILttngUstEventLayout.DEFAULT_LAYOUT;
+        } else {
+            fLayout = ((LttngUstTrace) trace).getEventLayout();
+        }
         fEventNames = buildEventNames(fLayout);
     }
 

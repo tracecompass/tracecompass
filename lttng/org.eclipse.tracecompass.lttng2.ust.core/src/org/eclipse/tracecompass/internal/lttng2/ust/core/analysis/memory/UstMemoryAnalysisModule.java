@@ -20,13 +20,11 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryStateProvider;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.layout.ILttngUstEventLayout;
-import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisEventRequirement;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement.PriorityLevel;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisEventRequirement;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -55,28 +53,15 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule {
     }
 
     @Override
-    public boolean setTrace(ITmfTrace trace) throws TmfAnalysisException {
-        if (!(trace instanceof LttngUstTrace)) {
-            return false;
-        }
-        return super.setTrace(trace);
-    }
-
-    @Override
-    public LttngUstTrace getTrace() {
-        return (LttngUstTrace) super.getTrace();
-    }
-
-    @Override
     public Iterable<TmfAbstractAnalysisRequirement> getAnalysisRequirements() {
         Set<TmfAbstractAnalysisRequirement> requirements = fAnalysisRequirements;
         if (requirements == null) {
-            LttngUstTrace trace = getTrace();
+            ITmfTrace trace = getTrace();
             ILttngUstEventLayout layout;
-            if (trace == null) {
+            if (!(trace instanceof LttngUstTrace)) {
                 layout = ILttngUstEventLayout.DEFAULT_LAYOUT;
             } else {
-                layout = trace.getEventLayout();
+                layout = ((LttngUstTrace) trace).getEventLayout();
             }
 
             @NonNull Set<@NonNull String> requiredEvents = ImmutableSet.of(
