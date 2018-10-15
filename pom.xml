@@ -309,6 +309,7 @@
     <module>releng</module>
     <module>statesystem</module>
     <module>tmf</module>
+    <module>jsontrace</module>
   </modules>
 
   <build>
