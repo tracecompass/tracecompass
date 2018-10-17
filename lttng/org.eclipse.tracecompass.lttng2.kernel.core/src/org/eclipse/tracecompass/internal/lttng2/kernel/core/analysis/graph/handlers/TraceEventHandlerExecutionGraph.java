@@ -375,10 +375,8 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
             // create edge if wake up is caused by incoming packet
             OsWorker k = getOrCreateKernelWorker(event, cpu);
             TmfVertex tail = graph.getTail(k);
-            if (tail == null || !replaceIncomingNetworkEdge(tail, wupTarget)) {
-                // If the tail is null or there is no incoming network link to
-                // it, extend the source and link to target
-                extendAndLink(k, ts, wupTarget);
+            if (tail != null) {
+                replaceIncomingNetworkEdge(tail, wupTarget);
             }
         }
     }
