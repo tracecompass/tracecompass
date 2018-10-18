@@ -166,7 +166,8 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
             // check connectivity
             if (prev != null && prev.getVertexTo() != link.getVertexFrom()) {
                 anchor = copyLink(criticalPath, graph, anchor, prev.getVertexTo(), link.getVertexFrom(),
-                        prev.getVertexTo().getTs(), TmfEdge.EdgeType.DEFAULT, link.getLinkQualifier());
+                        Math.max(prev.getVertexTo().getTs(), link.getVertexFrom().getTs()),
+                        TmfEdge.EdgeType.DEFAULT, link.getLinkQualifier());
             }
             anchor = copyLink(criticalPath, graph, anchor, link.getVertexFrom(), link.getVertexTo(),
                     link.getVertexTo().getTs(), link.getType(), link.getLinkQualifier());
@@ -256,7 +257,15 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
             }
             if (incomingEdge != null) {
                 if (incomingEdge.getType() == TmfEdge.EdgeType.BLOCKED || incomingEdge.getType() == TmfEdge.EdgeType.NETWORK) {
-                    subPath.addAll(resolveBlockingBounded(incomingEdge, currentBound));
+                    List<TmfEdge> blockings = resolveBlockingBounded(incomingEdge, currentBound);
+                    if (blockings.isEmpty() && incomingEdge.getType() == TmfEdge.EdgeType.NETWORK) {
+                        // There's no explanation for the blocking, keep this
+                        // edge if it's network, let the algorithm stitch this
+                        // otherwise
+                        subPath.add(incomingEdge);
+                    } else {
+                        subPath.addAll(blockings);
+                    }
                 } else {
                     subPath.add(incomingEdge);
                 }
