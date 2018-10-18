@@ -38,6 +38,7 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
 import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -187,10 +188,10 @@ class FilterViewer extends Composite {
 
         int operations = DND.DROP_MOVE | DND.DROP_COPY;
         DragSource dragSource = new org.eclipse.swt.dnd.DragSource(fViewer.getTree(), operations);
-        dragSource.setTransfer(LocalSelectionTransfer.getTransfer());
+        dragSource.setTransfer(new Transfer[] { LocalSelectionTransfer.getTransfer() });
         dragSource.addDragListener(new FilterDragSourceAdapter(this));
         DropTarget dropTarget = new DropTarget(fViewer.getTree(), operations);
-        dropTarget.setTransfer(LocalSelectionTransfer.getTransfer());
+        dropTarget.setTransfer(new Transfer[] { LocalSelectionTransfer.getTransfer() });
         dropTarget.addDropListener(new FilterDropTargetAdapter(this));
     }
 
