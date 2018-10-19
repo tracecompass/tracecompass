@@ -162,7 +162,7 @@ public class TimeGraphScale extends TimeGraphBaseControl implements
         GC gc = new GC(parent.getDisplay());
         fDigitWidth = gc.getCharWidth('0');
         gc.dispose();
-        fAlign = (style & SWT.BOTTOM) == 0 ? SWT.TOP : style & SWT.BOTTOM;
+        fAlign = (style & SWT.BOTTOM) == 0 ? SWT.TOP : SWT.BOTTOM;
     }
 
     /**

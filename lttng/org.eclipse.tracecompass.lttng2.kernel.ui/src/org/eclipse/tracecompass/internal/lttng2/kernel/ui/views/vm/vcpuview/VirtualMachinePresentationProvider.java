@@ -173,7 +173,7 @@ public class VirtualMachinePresentationProvider extends TimeGraphPresentationPro
         if (bounds == null || gc == null || !(event instanceof TimeEvent)) {
             return;
         }
-        boolean visible = bounds.width == 0 ? false : true;
+        boolean visible = bounds.width != 0;
         if (!visible) {
             return;
         }
