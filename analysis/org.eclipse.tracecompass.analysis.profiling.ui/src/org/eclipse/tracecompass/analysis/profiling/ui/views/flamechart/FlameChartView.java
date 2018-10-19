@@ -437,13 +437,11 @@ public class FlameChartView extends BaseDataProviderTimeGraphView {
         if (state.getValue() == Integer.MIN_VALUE) {
             return new NullTimeEvent(entry, state.getStartTime(), state.getDuration());
         }
-        final int modulo = CallStackPresentationProvider.NUM_COLORS / 2;
-        int value = state.getValue() % modulo + modulo;
         String label = state.getLabel();
         if (label != null) {
-            return new NamedTimeEvent(entry, state.getStartTime(), state.getDuration(), value, label, state.getActiveProperties());
+            return new NamedTimeEvent(entry, state.getStartTime(), state.getDuration(), state.getValue(), label, state.getActiveProperties());
         }
-        return new TimeEvent(entry, state.getStartTime(), state.getDuration(), value, state.getActiveProperties());
+        return new TimeEvent(entry, state.getStartTime(), state.getDuration(), state.getValue(), state.getActiveProperties());
     }
 
     /**

@@ -23,8 +23,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
  */
 public class FlamegraphEvent extends TimeEvent {
 
-    private static final int MODULO = FlameGraphPresentationProvider.NUM_COLORS / 2;
-
     private final Object fSymbol;
     private final long fSelfTime;
     private final int fProcessId;
@@ -41,7 +39,7 @@ public class FlamegraphEvent extends TimeEvent {
      *            The function the event's presenting
      */
     public FlamegraphEvent(ITimeGraphEntry source, long beginTime, AggregatedCalledFunction aggregatedFunction) {
-        super(source, beginTime, aggregatedFunction.getDuration(), String.valueOf(aggregatedFunction.getSymbol()).hashCode() % MODULO + MODULO);
+        super(source, beginTime, aggregatedFunction.getDuration(), aggregatedFunction.getSymbol().hashCode());
         fSymbol = aggregatedFunction.getSymbol();
         fStatistics = aggregatedFunction.getFunctionStatistics();
         fProcessId = aggregatedFunction.getProcessId();

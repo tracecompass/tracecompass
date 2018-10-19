@@ -10,7 +10,6 @@ package org.eclipse.tracecompass.internal.analysis.profiling.ui.flamegraph;
 
 import java.text.Format;
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
@@ -70,9 +69,10 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
     public FlameGraphPresentationProvider() {
         fStateTable = new StateItem[NUM_COLORS + 1];
         fStateTable[0] = new StateItem(State.MULTIPLE.rgb, State.MULTIPLE.toString());
-        List<RGBAColor> rgbs = fPalette.get();
-        for (int i = 0; i < NUM_COLORS; i++) {
-            fStateTable[i + 1] = new StateItem(RGBAUtil.fromRGBAColor(rgbs.get(i)).rgb, State.EXEC.toString());
+        int i = 1;
+        for (RGBAColor color : fPalette.get()) {
+            fStateTable[i] = new StateItem(RGBAUtil.fromRGBAColor(color).rgb, color.toString());
+            i++;
         }
     }
 
