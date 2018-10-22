@@ -105,10 +105,7 @@ public class CtfTmfLostEvent extends CtfTmfEvent implements ITmfLostEvent {
         if (!getTimeRange().equals(other.getTimeRange())) {
             return false;
         }
-        if (getNbLostEvents() != other.getNbLostEvents()) {
-            return false;
-        }
-        return true;
+        return (getNbLostEvents() == other.getNbLostEvents());
     }
 
 }

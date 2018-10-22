@@ -453,11 +453,7 @@ public class ChartMakerDialog extends Dialog {
             return false;
         }
 
-        if (fSelectionYTable.getCheckedElements().length == 0) {
-            return false;
-        }
-
-        return true;
+        return (fSelectionYTable.getCheckedElements().length != 0);
     }
 
     private boolean checkIfSeriesPresent(ChartSeries test) {

@@ -102,10 +102,7 @@ public class CtfTmfCallsite extends TmfCallsite {
         if (!Objects.equals(fEventName, other.fEventName)) {
             return false;
         }
-        if (fInstructionPointer != other.fInstructionPointer) {
-            return false;
-        }
-        return true;
+        return (fInstructionPointer == other.fInstructionPointer);
     }
 
     @Override

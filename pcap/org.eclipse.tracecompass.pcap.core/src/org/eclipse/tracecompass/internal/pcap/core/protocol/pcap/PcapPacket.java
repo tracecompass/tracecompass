@@ -337,10 +337,7 @@ public class PcapPacket extends Packet {
         if (!Objects.equals(fPayload, other.fPayload)) {
             return false;
         }
-        if (fTimestamp != other.fTimestamp) {
-            return false;
-        }
-        return true;
+        return (fTimestamp == other.fTimestamp);
     }
 
     /**

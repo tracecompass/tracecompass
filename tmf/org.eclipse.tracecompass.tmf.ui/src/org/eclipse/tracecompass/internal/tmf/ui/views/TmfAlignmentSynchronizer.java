@@ -339,12 +339,7 @@ public class TmfAlignmentSynchronizer {
         if (operation1.fAlignmentInfo.getShell() != operation2.fAlignmentInfo.getShell()) {
             return false;
         }
-
-        if (isViewLocationNear(getViewLocation(operation1.fView), getViewLocation(operation2.fView))) {
-            return true;
-        }
-
-        return false;
+        return (isViewLocationNear(getViewLocation(operation1.fView), getViewLocation(operation2.fView)));
     }
 
     private static boolean isViewLocationNear(Point location1, Point location2) {

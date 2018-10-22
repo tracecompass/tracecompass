@@ -178,10 +178,7 @@ public class StringDeclaration extends Declaration {
             return false;
         }
         StringDeclaration other = (StringDeclaration) obj;
-        if (fEncoding != other.fEncoding) {
-            return false;
-        }
-        return true;
+        return (fEncoding == other.fEncoding);
     }
 
     @Override

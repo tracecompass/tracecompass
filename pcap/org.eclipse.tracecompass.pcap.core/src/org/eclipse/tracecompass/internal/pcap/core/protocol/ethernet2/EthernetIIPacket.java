@@ -274,10 +274,7 @@ public class EthernetIIPacket extends Packet {
         if (!Arrays.equals(fSourceMacAddress, other.fSourceMacAddress)) {
             return false;
         }
-        if (fType != other.fType) {
-            return false;
-        }
-        return true;
+        return (fType == other.fType);
     }
 
 }

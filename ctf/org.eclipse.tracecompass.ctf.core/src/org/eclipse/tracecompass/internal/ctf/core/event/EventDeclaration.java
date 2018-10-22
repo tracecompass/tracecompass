@@ -445,10 +445,7 @@ public class EventDeclaration implements IEventDeclaration {
         if (!Objects.equals(fStream, other.fStream)) {
             return false;
         }
-        if (!fCustomAttributes.equals(other.fCustomAttributes)) {
-            return false;
-        }
-        return true;
+        return (fCustomAttributes.equals(other.fCustomAttributes));
     }
 
     @Override

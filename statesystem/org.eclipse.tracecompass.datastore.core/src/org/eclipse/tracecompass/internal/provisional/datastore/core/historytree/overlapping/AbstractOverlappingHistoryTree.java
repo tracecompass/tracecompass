@@ -132,11 +132,9 @@ public abstract class AbstractOverlappingHistoryTree<E extends IHTInterval, N ex
     @Override
     @VisibleForTesting
     protected boolean verifyChildrenSpecific(N parent, int index, N child) {
-        if (parent.getChildStart(index) == child.getNodeStart()
-                && parent.getChildEnd(index) == child.getNodeEnd()) {
-            return true;
-        }
-        return false;
+        return (parent.getChildStart(index) == child.getNodeStart() &&
+                parent.getChildEnd(index) == child.getNodeEnd());
+
     }
 
     @Override

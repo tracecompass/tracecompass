@@ -476,10 +476,7 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
         if (fEncoding != other.fEncoding) {
             return false;
         }
-        if (fBase != other.fBase) {
-            return false;
-        }
-        return true;
+        return (fBase == other.fBase);
     }
 
     @Override
@@ -511,10 +508,7 @@ public final class IntegerDeclaration extends Declaration implements ISimpleData
         // no need for encoding
         // no need for clock
         // byte inversion is ok on byte order if the element is one byte long
-        if ((fLength != BYTE_ALIGN) && !fByteOrder.equals(other.fByteOrder)) {
-            return false;
-        }
-        return true;
+        return !((fLength != BYTE_ALIGN) && !fByteOrder.equals(other.fByteOrder));
     }
 
 }

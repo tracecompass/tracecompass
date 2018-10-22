@@ -83,10 +83,7 @@ public class LamiXYSeriesDescription {
         if (!fXAspect.equals(other.fXAspect)) {
             return false;
         }
-        if (!fYAspect.equals(other.fYAspect)) {
-            return false;
-        }
-        return true;
+        return (fYAspect.equals(other.fYAspect));
     }
 
 }

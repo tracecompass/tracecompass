@@ -281,9 +281,6 @@ public class SyncMessage extends BaseMessage implements ITimeRange {
 
     @Override
     public boolean positiveDistanceToPoint(int x, int y) {
-        if (getY() > y) {
-            return true;
-        }
-        return false;
+        return (getY() > y);
     }
 }

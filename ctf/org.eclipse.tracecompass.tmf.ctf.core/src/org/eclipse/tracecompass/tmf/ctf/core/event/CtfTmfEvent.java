@@ -408,10 +408,7 @@ public class CtfTmfEvent extends TmfEvent
         if (getCPU() != other.getCPU()) {
             return false;
         }
-        if (!getChannel().equals(other.getChannel())) {
-            return false;
-        }
-        return true;
+        return (getChannel().equals(other.getChannel()));
     }
 
 }

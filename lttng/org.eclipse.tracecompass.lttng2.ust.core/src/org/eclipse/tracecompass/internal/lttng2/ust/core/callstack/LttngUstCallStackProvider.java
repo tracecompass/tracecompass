@@ -125,10 +125,7 @@ public class LttngUstCallStackProvider extends CallStackStateProvider {
             return false;
         }
         Object tid = TmfTraceUtils.resolveEventAspectOfClassForEvent(event.getTrace(), LinuxTidAspect.class, event);
-        if (!(tid instanceof Integer)) {
-            return false;
-        }
-        return true;
+        return (tid instanceof Integer);
     }
 
     @Override

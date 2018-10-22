@@ -198,10 +198,7 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
         if (!Objects.equals(getType(), other.getType())) {
             return false;
         }
-        if (!Objects.equals(getContent(), other.getContent())) {
-            return false;
-        }
-        return true;
+        return (Objects.equals(getContent(), other.getContent()));
     }
 
     @Override

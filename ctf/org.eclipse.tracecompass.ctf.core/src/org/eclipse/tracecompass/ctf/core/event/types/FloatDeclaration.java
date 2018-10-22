@@ -214,10 +214,7 @@ public final class FloatDeclaration extends Declaration implements ISimpleDataty
         if (fExponent != other.fExponent) {
             return false;
         }
-        if (fMantissa != other.fMantissa) {
-            return false;
-        }
-        return true;
+        return (fMantissa == other.fMantissa);
     }
 
     @Override

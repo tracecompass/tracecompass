@@ -391,18 +391,9 @@ public abstract class BaseMessage extends GraphNode {
             }
 
             // Test if the point is in part 5 of the self message
-            if (GraphNode.contains(x, y + height - Metrics.MESSAGE_SELECTION_TOLERANCE / 2 + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT, Metrics.INTERNAL_MESSAGE_WIDTH / 2, Metrics.MESSAGE_SELECTION_TOLERANCE, xValue, yValue)) {
-                return true;
-            }
-
-            // false otherwise
-            return false;
+            return (GraphNode.contains(x, y + height - Metrics.MESSAGE_SELECTION_TOLERANCE / 2 + Metrics.SYNC_INTERNAL_MESSAGE_HEIGHT, Metrics.INTERNAL_MESSAGE_WIDTH / 2, Metrics.MESSAGE_SELECTION_TOLERANCE, xValue, yValue));
         }
-        if (GraphNode.contains(x, y - tempHeight, width, tempHeight, xValue, yValue)) {
-            return true;
-        }
-        // false otherwise
-        return false;
+        return GraphNode.contains(x, y - tempHeight, width, tempHeight, xValue, yValue);
     }
 
     /**

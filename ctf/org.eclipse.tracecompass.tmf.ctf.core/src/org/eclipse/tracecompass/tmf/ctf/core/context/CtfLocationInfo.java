@@ -88,10 +88,7 @@ public class CtfLocationInfo implements Comparable<CtfLocationInfo> {
         if (fIndex != other.fIndex) {
             return false;
         }
-        if (fTimestamp != other.fTimestamp) {
-            return false;
-        }
-        return true;
+        return (fTimestamp == other.fTimestamp);
     }
 
     @Override

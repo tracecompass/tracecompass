@@ -47,10 +47,7 @@ public class CustomXmlTraceContext extends TmfContext {
         if (!super.equals(obj)) {
             return false;
         }
-        if (!(obj instanceof CustomXmlTraceContext)) {
-            return false;
-        }
-        return true;
+        return ((obj instanceof CustomXmlTraceContext));
     }
 
 }

@@ -228,10 +228,7 @@ public abstract class TmfMipmapFeature implements ITmfMipmapFeature {
      * @return true if this level exists, false otherwise
      */
     protected boolean checkLevelExists(int level) {
-        if (level >= levelQuarks.size() || level < 0) {
-            return false;
-        }
-        return true;
+        return !(level >= levelQuarks.size() || level < 0);
     }
 
 }

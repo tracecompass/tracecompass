@@ -41,10 +41,7 @@ public interface IHTInterval extends ISerializableObject {
      * @return If it intersects or not
      */
     default boolean intersects(long timestamp) {
-        if (getStart() <= timestamp && timestamp <= getEnd()) {
-            return true;
-        }
-        return false;
+        return (getStart() <= timestamp && timestamp <= getEnd());
     }
 
 }

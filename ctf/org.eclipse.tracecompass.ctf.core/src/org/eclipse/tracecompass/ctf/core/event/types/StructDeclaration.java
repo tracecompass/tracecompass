@@ -376,11 +376,7 @@ public class StructDeclaration extends Declaration {
                 return false;
             }
         }
-
-        if (fMaxAlign != other.fMaxAlign) {
-            return false;
-        }
-        return true;
+        return (fMaxAlign == other.fMaxAlign);
     }
 
     @Override
@@ -405,11 +401,7 @@ public class StructDeclaration extends Declaration {
                 return false;
             }
         }
-
-        if (fMaxAlign != other.fMaxAlign) {
-            return false;
-        }
-        return true;
+        return (fMaxAlign == other.fMaxAlign);
     }
 
 }

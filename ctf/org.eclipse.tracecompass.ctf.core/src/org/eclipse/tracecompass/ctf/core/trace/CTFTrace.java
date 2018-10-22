@@ -915,10 +915,7 @@ class MetadataFileFilter implements FileFilter {
         if (pathname.isHidden()) {
             return false;
         }
-        if (pathname.getName().equals("metadata")) { //$NON-NLS-1$
-            return false;
-        }
-        return true;
+        return !(pathname.getName().equals("metadata"));
     }
 
 }

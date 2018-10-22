@@ -299,10 +299,7 @@ public class CustomEvent extends TmfEvent {
             return false;
         }
 
-        if (!Objects.equals(customEventType, other.customEventType)) {
-            return false;
-        }
-        return true;
+        return (Objects.equals(customEventType, other.customEventType));
     }
 
 }

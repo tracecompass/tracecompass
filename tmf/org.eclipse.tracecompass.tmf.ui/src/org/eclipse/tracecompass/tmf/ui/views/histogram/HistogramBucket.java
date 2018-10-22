@@ -156,10 +156,7 @@ public class HistogramBucket {
         if (fNbEvents != other.fNbEvents) {
             return false;
         }
-        if (fNbEvents != 0 && !Arrays.equals(fEvents, other.fEvents)) {
-            return false;
-        }
-        return true;
+        return !(fNbEvents != 0 && !Arrays.equals(fEvents, other.fEvents));
     }
 
     @Override

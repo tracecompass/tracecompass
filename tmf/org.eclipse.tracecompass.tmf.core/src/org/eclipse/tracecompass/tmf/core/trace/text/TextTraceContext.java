@@ -90,9 +90,6 @@ public class TextTraceContext extends TmfContext {
         } else if (!firstLineMatcher.equals(other.firstLineMatcher)) {
             return false;
         }
-        if (nextLineLocation != other.nextLineLocation) {
-            return false;
-        }
-        return true;
+        return (nextLineLocation == other.nextLineLocation);
     }
 }

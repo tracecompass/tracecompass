@@ -48,10 +48,7 @@ public abstract class TmfCpuAspect implements ITmfEventAspect<Integer> {
          * Consider all sub-instance of this type "equal", so that they get
          * merged in a single CPU column/aspect.
          */
-        if (other instanceof TmfCpuAspect) {
-            return true;
-        }
-        return false;
+        return (other instanceof TmfCpuAspect);
     }
 
     @Override

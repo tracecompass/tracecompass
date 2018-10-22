@@ -184,9 +184,6 @@ public class HotSpot extends GraphNode {
         int width = getWidth();
         int height = getHeight();
 
-        if (GraphNode.contains(x, y, width, height, xValue, yValue)) {
-            return true;
-        }
-        return false;
+        return (GraphNode.contains(x, y, width, height, xValue, yValue));
     }
 }

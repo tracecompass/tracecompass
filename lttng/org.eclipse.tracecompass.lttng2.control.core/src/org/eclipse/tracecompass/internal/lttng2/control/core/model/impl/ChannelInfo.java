@@ -296,10 +296,7 @@ public class ChannelInfo extends TraceInfo implements IChannelInfo {
         if (fNumberOfDiscardedEvents != other.fNumberOfDiscardedEvents) {
             return false;
         }
-        if (fNumberOfLostPackets != other.fNumberOfLostPackets) {
-            return false;
-        }
-        return true;
+        return (fNumberOfLostPackets == other.fNumberOfLostPackets);
     }
 
     @SuppressWarnings("nls")

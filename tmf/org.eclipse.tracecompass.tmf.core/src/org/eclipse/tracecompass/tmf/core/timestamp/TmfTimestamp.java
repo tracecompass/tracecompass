@@ -364,11 +364,8 @@ public abstract class TmfTimestamp implements ITmfTimestamp {
 
     @Override
     public boolean intersects(TmfTimeRange range) {
-        if (this.compareTo(range.getStartTime()) >= 0 &&
-                this.compareTo(range.getEndTime()) <= 0) {
-            return true;
-        }
-        return false;
+        return ((this.compareTo(range.getStartTime()) >= 0 &&
+                this.compareTo(range.getEndTime()) <= 0));
     }
 
     // ------------------------------------------------------------------------

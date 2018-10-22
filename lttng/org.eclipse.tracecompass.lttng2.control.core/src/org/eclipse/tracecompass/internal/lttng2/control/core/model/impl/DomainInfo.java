@@ -169,10 +169,7 @@ public class DomainInfo extends TraceInfo implements IDomainInfo {
         } else if (!fDomain.equals(other.fDomain)) {
             return false;
         }
-        if (fBufferType != other.fBufferType) {
-            return false;
-        }
-        return true;
+        return (fBufferType == other.fBufferType);
     }
 
     @Override

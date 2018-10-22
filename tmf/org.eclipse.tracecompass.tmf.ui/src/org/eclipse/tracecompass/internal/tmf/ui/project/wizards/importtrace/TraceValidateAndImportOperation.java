@@ -792,10 +792,7 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
 
     private static boolean isDirectoryTrace(TraceFileSystemElement fileSystemElement) {
         String path = fileSystemElement.getFileSystemObject().getAbsolutePath();
-        if (TmfTraceType.isDirectoryTrace(path)) {
-            return true;
-        }
-        return false;
+        return (TmfTraceType.isDirectoryTrace(path));
     }
 
     /**

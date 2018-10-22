@@ -274,10 +274,7 @@ public final class VirtualMachineViewEntry extends TimeGraphEntry {
 
     @Override
     public boolean hasTimeEvents() {
-        if (fType == Type.NULL) {
-            return false;
-        }
-        return true;
+        return (fType != Type.NULL);
     }
 
     /**

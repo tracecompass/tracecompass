@@ -357,9 +357,6 @@ public class CtfIterator extends CTFTraceReader
         if (!Objects.equals(fCurLocation, other.fCurLocation)) {
             return false;
         }
-        if (fCurRank != other.fCurRank) {
-            return false;
-        }
-        return true;
+        return (fCurRank == other.fCurRank);
     }
 }

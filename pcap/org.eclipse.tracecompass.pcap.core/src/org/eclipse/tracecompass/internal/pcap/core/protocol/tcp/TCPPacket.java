@@ -669,10 +669,7 @@ public class TCPPacket extends Packet {
         if (fUrgentPointer != other.fUrgentPointer) {
             return false;
         }
-        if (fWindowSize != other.fWindowSize) {
-            return false;
-        }
-        return true;
+        return (fWindowSize == other.fWindowSize) ;
     }
 
 }

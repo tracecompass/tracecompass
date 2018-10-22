@@ -645,10 +645,7 @@ public class TmfStatisticsViewer extends TmfViewer {
      * @return true if the viewer is listening to the trace, false otherwise
      */
     protected boolean isListeningTo(ITmfTrace trace) {
-        if (fProcessAll || trace == fTrace) {
-            return true;
-        }
-        return false;
+        return (fProcessAll || trace == fTrace);
     }
 
     /**

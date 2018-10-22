@@ -137,10 +137,8 @@ public class CTFCallsite {
         if (fIp != other.fIp) {
             return false;
         }
-        if (fLineNumber != other.fLineNumber) {
-            return false;
-        }
-        return true;
+
+        return (fLineNumber == other.fLineNumber);
     }
 
     @Override

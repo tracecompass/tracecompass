@@ -63,11 +63,7 @@ public class RunAnalysisHandler extends AbstractHandler {
          * plugin.xml should have done type verifications already
          */
         TmfOnDemandAnalysisElement elem = (TmfOnDemandAnalysisElement) element;
-        if (elem.getAnalysis() instanceof LamiAnalysis && elem.canRun()) {
-            return true;
-        }
-
-        return false;
+        return (elem.getAnalysis() instanceof LamiAnalysis && elem.canRun());
     }
 
     @Override

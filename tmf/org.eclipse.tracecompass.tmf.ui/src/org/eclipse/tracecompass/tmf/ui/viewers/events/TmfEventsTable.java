@@ -2760,10 +2760,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         if (column.getData(Key.ASPECT) == TmfMarginColumn.MARGIN_ASPECT) {
             return false;
         }
-        if (!column.getResizable() && column.getWidth() == 0) {
-            return false;
-        }
-        return true;
+        return !(!column.getResizable() && column.getWidth() == 0);
     }
 
     /**

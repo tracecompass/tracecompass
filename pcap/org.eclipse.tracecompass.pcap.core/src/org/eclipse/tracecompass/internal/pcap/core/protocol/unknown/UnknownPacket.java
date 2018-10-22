@@ -195,10 +195,7 @@ public class UnknownPacket extends Packet {
         if (!Objects.equals(fChildPacket, other.fChildPacket)) {
             return false;
         }
-        if (!fPayload.equals(other.fPayload)) {
-            return false;
-        }
-        return true;
+        return (fPayload.equals(other.fPayload));
     }
 
 }

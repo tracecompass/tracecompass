@@ -157,10 +157,7 @@ abstract class AbstractCalledFunction implements ICalledFunction {
         if (!Objects.equals(fParent, other.getParent())) {
             return false;
         }
-        if (!Objects.equals(getSymbol(), other.getSymbol())) {
-            return false;
-        }
-        return true;
+        return (Objects.equals(getSymbol(), other.getSymbol()));
     }
 
 }

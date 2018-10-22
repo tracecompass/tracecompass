@@ -322,11 +322,8 @@ public final class TmfStateSystemOperations {
                 interval.getStartTime() >= interval.getEndTime()) {
             return false;
         }
-        if (range.getFirst() <= interval.getStartTime() &&
-                range.getSecond() >= interval.getEndTime()) {
-            return true;
-        }
-        return false;
+        return (range.getFirst() <= interval.getStartTime() &&
+                range.getSecond() >= interval.getEndTime());
     }
 }
 

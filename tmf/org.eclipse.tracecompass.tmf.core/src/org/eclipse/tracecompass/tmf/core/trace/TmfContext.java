@@ -149,10 +149,7 @@ public class TmfContext implements ITmfContext {
         if (fRank != other.fRank) {
             return false;
         }
-        if (!Objects.equals(fLocation, other.fLocation)) {
-            return false;
-        }
-        return true;
+        return (Objects.equals(fLocation, other.fLocation));
     }
 
     @Override

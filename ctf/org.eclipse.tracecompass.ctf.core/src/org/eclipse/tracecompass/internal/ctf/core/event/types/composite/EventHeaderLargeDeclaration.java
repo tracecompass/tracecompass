@@ -250,10 +250,7 @@ public final class EventHeaderLargeDeclaration extends Declaration implements IE
             return false;
         }
         EventHeaderLargeDeclaration other = (EventHeaderLargeDeclaration) obj;
-        if (!fByteOrder.equals(other.fByteOrder)) {
-            return false;
-        }
-        return true;
+        return (fByteOrder.equals(other.fByteOrder));
     }
 
     @Override

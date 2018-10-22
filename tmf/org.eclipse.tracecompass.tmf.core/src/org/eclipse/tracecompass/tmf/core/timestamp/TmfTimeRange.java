@@ -159,10 +159,7 @@ public class TmfTimeRange {
         if (!fEndTime.equals(other.fEndTime)) {
             return false;
         }
-        if (!fStartTime.equals(other.fStartTime)) {
-            return false;
-        }
-        return true;
+        return (fStartTime.equals(other.fStartTime));
     }
 
     @Override

@@ -122,9 +122,6 @@ public class TmfContentFieldAspect implements ITmfEventAspect<Object> {
         if (!Arrays.equals(fFieldPath, other.fFieldPath)) {
             return false;
         }
-        if (!fHelpText.equals(other.fHelpText)) {
-            return false;
-        }
-        return true;
+        return (fHelpText.equals(other.fHelpText));
     }
 }

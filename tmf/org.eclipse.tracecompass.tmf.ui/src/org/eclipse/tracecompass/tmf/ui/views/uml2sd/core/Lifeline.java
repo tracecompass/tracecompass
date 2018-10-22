@@ -306,10 +306,7 @@ public class Lifeline extends GraphNode {
                 }
             }
         }
-        if (getNodeAt(xValue, yValue) != null) {
-            return true;
-        }
-        return false;
+        return (getNodeAt(xValue, yValue) != null);
     }
 
     /**
@@ -325,10 +322,7 @@ public class Lifeline extends GraphNode {
     public boolean isVisible(int vx, int vy, int vwidth, int vheight) {
         int x = getX();
         int width = getWidth();
-        if (((x >= vx) && (x <= vx + vwidth)) || ((x + width >= vx) && (x <= vx))) {
-            return true;
-        }
-        return false;
+        return (((x >= vx) && (x <= vx + vwidth)) || ((x + width >= vx) && (x <= vx)));
     }
 
     /**
@@ -488,10 +482,7 @@ public class Lifeline extends GraphNode {
 
     @Override
     public boolean positiveDistanceToPoint(int x, int y) {
-        if (getX() > x - Metrics.swimmingLaneWidth()) {
-            return true;
-        }
-        return false;
+        return (getX() > x - Metrics.swimmingLaneWidth());
     }
 
     @Override

@@ -120,10 +120,7 @@ public class BaseLoggerInfo extends TraceInfo implements IBaseLoggerInfo {
         if (fDomain != other.fDomain) {
             return false;
         }
-        if (fLogLevel != other.fLogLevel) {
-            return false;
-        }
-        return true;
+        return (fLogLevel == other.fLogLevel);
     }
 
     @SuppressWarnings("nls")

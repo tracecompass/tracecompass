@@ -111,10 +111,7 @@ public class TmfEventType implements ITmfEventType {
             return false;
         }
         final TmfEventType other = (TmfEventType) obj;
-        if (!fTypeId.equals(other.fTypeId)) {
-            return false;
-        }
-        return true;
+        return (fTypeId.equals(other.fTypeId));
     }
 
     @Override

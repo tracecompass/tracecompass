@@ -278,10 +278,7 @@ public class UDPPacket extends Packet {
         if (fSourcePort != other.fSourcePort) {
             return false;
         }
-        if (fTotalLength != other.fTotalLength) {
-            return false;
-        }
-        return true;
+        return (fTotalLength == other.fTotalLength);
     }
 
 }

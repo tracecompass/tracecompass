@@ -169,10 +169,7 @@ public final class ArrayDeclaration extends CompoundDeclaration {
         if (!fElemType.equals(other.fElemType)) {
             return false;
         }
-        if (fLength != other.fLength) {
-            return false;
-        }
-        return true;
+        return (fLength == other.fLength);
     }
 
     @Override
@@ -190,10 +187,7 @@ public final class ArrayDeclaration extends CompoundDeclaration {
         if (!fElemType.isBinaryEquivalent(other.fElemType)) {
             return false;
         }
-        if (fLength != other.fLength) {
-            return false;
-        }
-        return true;
+        return (fLength == other.fLength);
     }
 
 }

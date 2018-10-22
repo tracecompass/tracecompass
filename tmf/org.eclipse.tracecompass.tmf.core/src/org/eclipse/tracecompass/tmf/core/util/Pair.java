@@ -99,10 +99,7 @@ public class Pair<A, B> {
         if (!Objects.equals(other.fFirst, fFirst)) {
             return false;
         }
-        if (!Objects.equals(other.fSecond, fSecond)) {
-            return false;
-        }
-        return true;
+        return (Objects.equals(other.fSecond, fSecond));
     }
 
     @Override

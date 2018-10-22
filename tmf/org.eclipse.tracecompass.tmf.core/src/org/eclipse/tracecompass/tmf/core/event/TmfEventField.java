@@ -198,11 +198,7 @@ public class TmfEventField implements ITmfEventField {
         }
 
         /* Check that sub-fields are the same. */
-        if (!fFields.equals(other.fFields)) {
-            return false;
-        }
-
-        return true;
+        return (fFields.equals(other.fFields));
     }
 
     @Override

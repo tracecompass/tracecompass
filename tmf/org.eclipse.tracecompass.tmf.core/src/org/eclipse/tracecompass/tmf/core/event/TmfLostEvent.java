@@ -106,10 +106,7 @@ public class TmfLostEvent extends TmfEvent implements ITmfLostEvent {
         if (fNbLostEvents != other.fNbLostEvents) {
             return false;
         }
-        if (!Objects.equals(fTimeRange, other.fTimeRange)) {
-            return false;
-        }
-        return true;
+        return (Objects.equals(fTimeRange, other.fTimeRange));
     }
 
     @Override

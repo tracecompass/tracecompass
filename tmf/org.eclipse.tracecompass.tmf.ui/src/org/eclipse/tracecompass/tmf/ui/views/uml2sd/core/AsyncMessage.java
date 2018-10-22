@@ -259,10 +259,7 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
         double scalar = ((xB - xA) * (xC - xA) + (yB - yA) * (yC - yA)) / distAB;
         double distAC = Math.sqrt((xC - xA) * (xC - xA) + (yC - yA) * (yC - yA));
         double distToSegment = Math.sqrt(Math.abs(distAC * distAC - scalar * scalar));
-        if (distToSegment <= Metrics.MESSAGE_SELECTION_TOLERANCE) {
-            return true;
-        }
-        return false;
+        return (distToSegment <= Metrics.MESSAGE_SELECTION_TOLERANCE);
     }
 
     @Override
@@ -451,9 +448,6 @@ public class AsyncMessage extends BaseMessage implements ITimeRange {
     public boolean positiveDistanceToPoint(int x, int y) {
         int mY = getY();
         int mH = getHeight();
-        if ((mY > y) || (mY + mH > y)) {
-            return true;
-        }
-        return false;
+        return ((mY > y) || (mY + mH > y));
     }
 }

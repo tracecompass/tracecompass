@@ -117,10 +117,7 @@ public class EventInfo extends BaseEventInfo implements IEventInfo {
         if (fState != other.fState) {
             return false;
         }
-        if (fLogLevelType != other.fLogLevelType) {
-            return false;
-        }
-        return true;
+        return (fLogLevelType == other.fLogLevelType);
     }
 
     @SuppressWarnings("nls")

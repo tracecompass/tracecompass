@@ -94,10 +94,7 @@ public final class TmfExperimentLocation implements ITmfLocation {
             return false;
         }
         final TmfExperimentLocation other = (TmfExperimentLocation) obj;
-        if(!Objects.equals(fLocation, other.fLocation)){
-            return false;
-        }
-        return true;
+        return (Objects.equals(fLocation, other.fLocation));
     }
 
     @Override

@@ -207,10 +207,7 @@ public class VariantDeclaration extends Declaration {
         if (!Objects.equals(fFields, other.fFields)) {
             return false;
         }
-        if (!Objects.equals(fTag, other.fTag)) {
-            return false;
-        }
-        return true;
+        return (Objects.equals(fTag, other.fTag));
     }
 
     @Override

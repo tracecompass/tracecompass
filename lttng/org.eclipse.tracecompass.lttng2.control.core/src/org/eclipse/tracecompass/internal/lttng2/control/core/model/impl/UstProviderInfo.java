@@ -173,10 +173,7 @@ public class UstProviderInfo extends TraceInfo implements IUstProviderInfo {
         if (!fLoggers.equals(other.fLoggers)) {
             return false;
         }
-        if (fPid != other.fPid) {
-            return false;
-        }
-        return true;
+        return (fPid == other.fPid);
     }
 
     @SuppressWarnings("nls")

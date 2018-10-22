@@ -227,10 +227,7 @@ public final class EventHeaderCompactDeclaration extends Declaration implements 
             return false;
         }
         EventHeaderCompactDeclaration other = (EventHeaderCompactDeclaration) obj;
-        if (!fByteOrder.equals(other.fByteOrder)) {
-            return false;
-        }
-        return true;
+        return (fByteOrder.equals(other.fByteOrder));
     }
 
     @Override

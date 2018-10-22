@@ -47,12 +47,9 @@ public class TcpEventMatching implements ITmfMatchEventDefinition {
     private static boolean canMatchPacket(final ITmfEvent event) {
         /* Make sure all required fields are present to match with this event */
         ITmfEventField content = event.getContent();
-        if ((content.getFieldValue(Long.class, TcpEventStrings.SEQ) == null) ||
+        return !((content.getFieldValue(Long.class, TcpEventStrings.SEQ) == null) ||
                 (content.getFieldValue(Long.class, TcpEventStrings.ACKSEQ) == null) ||
-                (content.getFieldValue(Long.class, TcpEventStrings.FLAGS) == null)) {
-            return false;
-        }
-        return true;
+                (content.getFieldValue(Long.class, TcpEventStrings.FLAGS) == null));
     }
 
     /**

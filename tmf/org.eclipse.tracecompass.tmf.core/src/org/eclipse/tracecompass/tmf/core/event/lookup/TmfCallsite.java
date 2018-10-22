@@ -107,10 +107,7 @@ public class TmfCallsite implements ITmfCallsite {
             return false;
         }
 
-        if (fLineNumber != other.fLineNumber) {
-            return false;
-        }
-        return true;
+        return (fLineNumber == other.fLineNumber);
     }
 
     @Override

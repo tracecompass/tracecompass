@@ -180,10 +180,7 @@ public final class TmfLocationArray implements Comparable<TmfLocationArray> {
         if (!Arrays.equals(fLocations, other.fLocations)) {
             return false;
         }
-        if (!Arrays.equals(fRanks, other.fRanks)) {
-            return false;
-        }
-        return true;
+        return (Arrays.equals(fRanks, other.fRanks));
     }
 
     @Override

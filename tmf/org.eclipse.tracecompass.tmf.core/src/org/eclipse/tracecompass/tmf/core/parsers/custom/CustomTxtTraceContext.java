@@ -82,10 +82,7 @@ public class CustomTxtTraceContext extends TmfContext {
         if (!Objects.equals(inputLine, other.inputLine)) {
             return false;
         }
-        if (nextLineLocation != other.nextLineLocation) {
-            return false;
-        }
-        return true;
+        return (nextLineLocation == other.nextLineLocation);
     }
 
 }

@@ -25,8 +25,8 @@ import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFact
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

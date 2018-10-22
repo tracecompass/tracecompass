@@ -102,10 +102,7 @@ public class BasicExecutionOccurrence extends GraphNode {
             return true;
         }
 
-        if (getNodeAt(xValue, yValue) != null) {
-            return true;
-        }
-        return false;
+        return (getNodeAt(xValue, yValue) != null);
     }
 
     @Override
@@ -229,10 +226,7 @@ public class BasicExecutionOccurrence extends GraphNode {
 
     @Override
     public boolean positiveDistanceToPoint(int x, int y) {
-        if (getY() + getHeight() > y) {
-            return true;
-        }
-        return false;
+        return (getY() + getHeight() > y);
     }
 
     @Override

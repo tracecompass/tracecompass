@@ -88,10 +88,7 @@ public abstract class AbstractSegmentStoreAnalysisEventBasedModule extends Abstr
         }
 
         /* Do not process the results if the request was cancelled */
-        if (req.isCancelled() || req.isFailed()) {
-            return false;
-        }
-        return true;
+        return !(req.isCancelled() || req.isFailed());
     }
 
     /**

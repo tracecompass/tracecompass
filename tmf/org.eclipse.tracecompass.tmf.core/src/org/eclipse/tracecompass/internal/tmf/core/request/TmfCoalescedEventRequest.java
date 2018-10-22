@@ -138,13 +138,10 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
      * @return If the request is compatible, true or false
      */
     public boolean isCompatible(ITmfEventRequest request) {
-        if (request.getExecType() == getExecType() &&
+        return (request.getExecType() == getExecType() &&
                 request.getDependencyLevel() == getDependencyLevel() &&
-                ranksOverlap(request) &&
-                timeRangesOverlap(request)) {
-            return true;
-        }
-        return false;
+                        ranksOverlap(request) && timeRangesOverlap(request));
+
     }
 
     private boolean ranksOverlap(ITmfEventRequest request) {

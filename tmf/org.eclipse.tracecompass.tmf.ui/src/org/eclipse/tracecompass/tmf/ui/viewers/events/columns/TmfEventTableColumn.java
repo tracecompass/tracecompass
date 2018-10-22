@@ -123,10 +123,7 @@ public class TmfEventTableColumn {
             return false;
         }
         TmfEventTableColumn other = (TmfEventTableColumn) obj;
-        if (!fAspect.equals(other.fAspect)) {
-            /* Aspects can also define how they can be "equal" to one another */
-            return false;
-        }
-        return true;
+        /* Aspects can also define how they can be "equal" to one another */
+        return (fAspect.equals(other.fAspect));
     }
 }

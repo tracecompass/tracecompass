@@ -51,9 +51,6 @@ public class UnknownEndpoint extends ProtocolEndpoint {
 
     @Override
     public boolean equals(@Nullable Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        return false;
+        return (this == obj);
     }
 }

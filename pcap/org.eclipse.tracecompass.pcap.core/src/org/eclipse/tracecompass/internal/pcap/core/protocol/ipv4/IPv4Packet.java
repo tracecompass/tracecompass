@@ -617,9 +617,6 @@ public class IPv4Packet extends Packet {
         if (fTotalLength != other.fTotalLength) {
             return false;
         }
-        if (fVersion != other.fVersion) {
-            return false;
-        }
-        return true;
+        return (fVersion == other.fVersion);
     }
 }

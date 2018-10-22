@@ -174,10 +174,7 @@ public class SequenceDeclaration extends CompoundDeclaration {
         if (!fElemType.equals(other.fElemType)) {
             return false;
         }
-        if (!fLengthName.equals(other.fLengthName)) {
-            return false;
-        }
-        return true;
+        return (fLengthName.equals(other.fLengthName));
     }
 
     @Override
@@ -195,10 +192,7 @@ public class SequenceDeclaration extends CompoundDeclaration {
         if (!fElemType.isBinaryEquivalent(other.fElemType)) {
             return false;
         }
-        if (!fLengthName.equals(other.fLengthName)) {
-            return false;
-        }
-        return true;
+        return (fLengthName.equals(other.fLengthName));
     }
 
 }

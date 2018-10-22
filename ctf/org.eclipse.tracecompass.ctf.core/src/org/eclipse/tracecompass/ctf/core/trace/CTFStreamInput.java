@@ -403,9 +403,6 @@ public class CTFStreamInput implements IDefinitionScope {
             return false;
         }
         CTFStreamInput other = (CTFStreamInput) obj;
-        if (!fFile.equals(other.fFile)) {
-            return false;
-        }
-        return true;
+        return (fFile.equals(other.fFile));
     }
 }

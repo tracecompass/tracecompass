@@ -1174,10 +1174,7 @@ public class ScrollView extends Composite {
         if (px > (getContentsX() + getVisibleWidth())) {
             return false;
         }
-        if (py > (getContentsY() + getVisibleHeight())) {
-            return false;
-        }
-        return true;
+        return (py <= (getContentsY() + getVisibleHeight()));
     }
 
     /**
@@ -1201,10 +1198,7 @@ public class ScrollView extends Composite {
         if (xValue > vr) {
             return false;
         }
-        if (yValue > vb) {
-            return false;
-        }
-        return true;
+        return (yValue <= vb);
     }
 
     /**

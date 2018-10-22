@@ -62,9 +62,6 @@ public class CustomEventContent extends TmfEventField {
         if (!super.equals(obj)) {
             return false;
         }
-        if (!(obj instanceof CustomEventContent)) {
-            return false;
-        }
-        return true;
+        return ((obj instanceof CustomEventContent));
     }
 }
