@@ -25,7 +25,9 @@
   <name>Trace Compass Json trace Parent</name>
 
   <modules>
+    <module>org.eclipse.tracecompass.jsontrace</module>
     <module>org.eclipse.tracecompass.jsontrace.core</module>
+    <module>org.eclipse.tracecompass.jsontrace.core.test</module>
   </modules>
 
 </project>
