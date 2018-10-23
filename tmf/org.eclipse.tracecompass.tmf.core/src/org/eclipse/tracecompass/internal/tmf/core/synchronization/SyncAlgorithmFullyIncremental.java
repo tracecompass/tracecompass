@@ -497,8 +497,8 @@ public class SyncAlgorithmFullyIncremental extends SynchronizationAlgorithm {
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_quality, syncQuality);
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_alpha, fAlpha);
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_beta, fBeta);
-                fStats.put(Messages.SyncAlgorithmFullyIncremental_ub, (fUpperBoundList.size() == 0) ? Messages.SyncAlgorithmFullyIncremental_NA : fUpperBoundList.size());
-                fStats.put(Messages.SyncAlgorithmFullyIncremental_lb, (fLowerBoundList.size() == 0) ? Messages.SyncAlgorithmFullyIncremental_NA : fLowerBoundList.size());
+                fStats.put(Messages.SyncAlgorithmFullyIncremental_ub, (fUpperBoundList.isEmpty()) ? Messages.SyncAlgorithmFullyIncremental_NA : fUpperBoundList.size());
+                fStats.put(Messages.SyncAlgorithmFullyIncremental_lb, (fLowerBoundList.isEmpty()) ? Messages.SyncAlgorithmFullyIncremental_NA : fLowerBoundList.size());
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_accuracy, getAccuracy().doubleValue());
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_nbmatch, (fNbMatches == 0) ? Messages.SyncAlgorithmFullyIncremental_NA : fNbMatches);
                 fStats.put(Messages.SyncAlgorithmFullyIncremental_nbacc, (fNbAccurateMatches == 0) ? Messages.SyncAlgorithmFullyIncremental_NA : fNbAccurateMatches);

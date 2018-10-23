@@ -237,7 +237,7 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
                 return;
             }
 
-            if (fPendingCoalescedRequests.size() > 0) {
+            if (!fPendingCoalescedRequests.isEmpty()) {
                 Iterator<TmfCoalescedEventRequest> iter = fPendingCoalescedRequests.iterator();
                 while (iter.hasNext()) {
                     ExecutionType type = (isTimeout ? ExecutionType.BACKGROUND : ExecutionType.FOREGROUND);
@@ -587,7 +587,7 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
         if ((event.getTrace() == this)) {
             return true;
         }
-        if (fChildren.size() > 0) {
+        if (!fChildren.isEmpty()) {
             synchronized (fLock) {
                 List <TmfEventProvider> children = getChildren(TmfEventProvider.class);
                 for (TmfEventProvider child : children) {

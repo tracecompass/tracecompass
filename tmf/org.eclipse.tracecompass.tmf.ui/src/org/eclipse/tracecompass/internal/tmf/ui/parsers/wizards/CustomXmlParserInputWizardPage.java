@@ -543,7 +543,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
         @Override
         public boolean hasChildren(Object element) {
             CustomXmlInputElement inputElement = (CustomXmlInputElement) element;
-            return (inputElement.getChildElements() != null && inputElement.getChildElements().size() > 0);
+            return (inputElement.getChildElements() != null && !inputElement.getChildElements().isEmpty());
         }
 
         @Override
@@ -1654,9 +1654,9 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
             errors.addAll(validateElement(definition.rootInputElement));
 
-            if ((definition.rootInputElement.getAttributes() != null && definition.rootInputElement.getAttributes().size() != 0)
-                    || (definition.rootInputElement.getChildElements() != null && definition.rootInputElement.getChildElements().size() != 0)
-                    || errors.size() == 0) {
+            if ((definition.rootInputElement.getAttributes() != null && !definition.rootInputElement.getAttributes().isEmpty())
+                    || (definition.rootInputElement.getChildElements() != null && !definition.rootInputElement.getChildElements().isEmpty())
+                    || errors.isEmpty()) {
                 if (!logEntryFound) {
                     errors.add(Messages.CustomXmlParserInputWizardPage_missingLogEntryError);
                 }
@@ -1680,7 +1680,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             timeStampPreviewText.setText(Messages.CustomXmlParserInputWizardPage_noTimestampElementOrAttribute);
         }
 
-        if (errors.size() == 0) {
+        if (errors.isEmpty()) {
             setDescription(defaultDescription);
             setPageComplete(true);
         } else {

@@ -389,7 +389,7 @@ public final class SwtBarChart extends SwtXYChartViewer {
             }
 
             /* Don't draw if there's no selection */
-            if (getSelection().getPoints().size() == 0) {
+            if (getSelection().getPoints().isEmpty()) {
                 return;
             }
 

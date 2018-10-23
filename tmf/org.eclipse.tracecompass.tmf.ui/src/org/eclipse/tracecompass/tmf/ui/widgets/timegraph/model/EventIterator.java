@@ -78,7 +78,7 @@ public class EventIterator implements Iterator<@NonNull ITimeEvent> {
             List<ITimeEvent> zoomedEventList, long startTime, long endTime) {
         fEventList = eventList;
         fZoomedEventList = zoomedEventList;
-        if (zoomedEventList != null && zoomedEventList.size() > 0) {
+        if (zoomedEventList != null && !zoomedEventList.isEmpty()) {
             fZoomedStartTime = zoomedEventList.get(0).getTime();
             ITimeEvent lastEvent = zoomedEventList.get(zoomedEventList.size() - 1);
             fZoomedEndTime = lastEvent.getTime() + lastEvent.getDuration();

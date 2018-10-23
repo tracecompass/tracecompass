@@ -81,7 +81,7 @@ public class OpenAction extends Action {
 
             if (!executeCommand && element instanceof TmfExperimentElement) {
                 TmfExperimentElement experiment = (TmfExperimentElement) element;
-                executeCommand = (experiment.getTraces().size() > 0);
+                executeCommand = (!experiment.getTraces().isEmpty());
             }
 
             if (executeCommand) {

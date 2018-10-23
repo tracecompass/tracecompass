@@ -418,7 +418,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
             case MIStrings.CHANNELS:
                 ArrayList<IChannelInfo> channels = new ArrayList<>();
                 parseChannels(rawInfo.getChildNodes(), channels);
-                if (channels.size() > 0) {
+                if (!channels.isEmpty()) {
                     domain.setChannels(channels);
                 }
                 break;

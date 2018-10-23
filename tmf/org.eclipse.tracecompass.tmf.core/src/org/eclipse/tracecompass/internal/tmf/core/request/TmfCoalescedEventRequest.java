@@ -303,7 +303,7 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
         }
 
         // Secondly, check if all sub-requests are finished
-        if (fRequests.size() > 0) {
+        if (!fRequests.isEmpty()) {
             // If all sub requests are completed the coalesced request is
             // treated as completed, too.
             for (ITmfEventRequest request : fRequests) {
@@ -326,7 +326,7 @@ public class TmfCoalescedEventRequest extends TmfEventRequest {
         }
 
         // Secondly, check if all sub-requests are canceled
-        if (fRequests.size() > 0) {
+        if (!fRequests.isEmpty()) {
             // If all sub requests are canceled the coalesced request is
             // treated as completed, too.
             for (ITmfEventRequest request : fRequests) {

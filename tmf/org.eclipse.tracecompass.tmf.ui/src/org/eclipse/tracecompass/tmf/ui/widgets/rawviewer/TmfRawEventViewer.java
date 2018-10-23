@@ -361,7 +361,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 return;
             }
 
-            if (fLines.size() == 0) {
+            if (fLines.isEmpty()) {
                 setTopRank(0);
             } else if (fLines.size() < fNumVisibleLines) {
                 if (fBottomContext != null) {
@@ -405,7 +405,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             }
         }
         setTopRank(rank);
-        if (fLines.size() > 0 && fHoldSelection == 0) {
+        if (!fLines.isEmpty() && fHoldSelection == 0) {
             fSelectedLocation = fLines.get(0).location;
             refreshLineBackgrounds();
         }
@@ -458,7 +458,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         fTopLineIndex = 0;
         loadLineData();
         refreshTextArea();
-        if (fLines.size() == 0) {
+        if (fLines.isEmpty()) {
             fSlider.setSelection(0);
         } else {
             fSlider.setSelection((int) (SLIDER_MAX * fTrace.getLocationRatio(fLines.get(fTopLineIndex).location)));
@@ -483,7 +483,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
     private void loadLineData() {
         if (fTopLineIndex < 0) {
-            if (fLines.size() > 0 && fTrace.getLocationRatio(fLines.get(0).location) > 0) {
+            if (!fLines.isEmpty() && fTrace.getLocationRatio(fLines.get(0).location) > 0) {
                 double lastRatio = fTrace.getLocationRatio(fLines.get(fLines.size() - 1).location);
                 double firstRatio = fTrace.getLocationRatio(fLines.get(0).location);
                 double delta;
@@ -545,7 +545,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
         while (fLines.size() - fTopLineIndex < fNumVisibleLines) {
             if (fBottomContext == null) {
-                if (fLines.size() == 0) {
+                if (fLines.isEmpty()) {
                     fBottomContext = fTrace.seekEvent(0);
                 } else {
                     fBottomContext = fTrace.seekEvent(fLines.get(fLines.size() - 1).location);
@@ -768,7 +768,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
     @Override
     public void widgetSelected(SelectionEvent e) {
         fTextArea.setFocus();
-        if (fLines.size() == 0) {
+        if (fLines.isEmpty()) {
             return;
         }
         fHoldSelection++;
@@ -799,7 +799,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 double ratio = (double) fSlider.getSelection() / (SLIDER_MAX - fSlider.getThumb());
                 double delta = Math.pow(10, -15);
                 fLines.clear();
-                while (fLines.size() == 0) {
+                while (fLines.isEmpty()) {
                     setTopPosition(ratio);
                     if (ratio == 0.0) {
                         break;
@@ -825,7 +825,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 break;
             }
             case SWT.ARROW_UP: {
-                if (fLines.size() == 0) {
+                if (fLines.isEmpty()) {
                     break;
                 }
                 fTopLineIndex--;
@@ -847,7 +847,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 double ratio = 1.0;
                 double delta = Math.pow(10, -15);
                 fLines.clear();
-                while (fLines.size() == 0) {
+                while (fLines.isEmpty()) {
                     setTopPosition(ratio);
                     if (ratio == 0.0) {
                         break;
@@ -917,7 +917,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (fLines.size() == 0) {
+        if (fLines.isEmpty()) {
             return;
         }
         int caretOffset = fStyledText.getCaretOffset();
@@ -977,7 +977,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 if (previousLineAtCaretPosition > 0) {
                     break;
                 }
-                if (fLines.size() == 0) {
+                if (fLines.isEmpty()) {
                     break;
                 }
                 fHoldSelection++;
@@ -1016,7 +1016,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 if (previousCaretOffset > 0) {
                     break;
                 }
-                if (fLines.size() == 0) {
+                if (fLines.isEmpty()) {
                     break;
                 }
                 long topRank = fLines.get(fTopLineIndex).rank;
@@ -1056,7 +1056,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 double ratio = 1.0;
                 double delta = Math.pow(10, -15);
                 fLines.clear();
-                while (fLines.size() == 0) {
+                while (fLines.isEmpty()) {
                     setTopPosition(ratio);
                     if (ratio == 0.0) {
                         break;
@@ -1171,7 +1171,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
     @Override
     public void mouseScrolled(MouseEvent e) {
-        if (fLines.size() == 0 || e.count == 0) {
+        if (fLines.isEmpty() || e.count == 0) {
             return;
         }
         fHoldSelection++;

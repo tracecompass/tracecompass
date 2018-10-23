@@ -308,7 +308,7 @@ public class TmfEventsCache {
                     current = (start + end) / 2;
                 }
             }
-            startRank = fFilterIndex.size() > 0 ? fFilterIndex.get(current) : 0;
+            startRank = fFilterIndex.isEmpty() ? 0 : fFilterIndex.get(current);
         }
 
         final int index = current * fCacheSize;

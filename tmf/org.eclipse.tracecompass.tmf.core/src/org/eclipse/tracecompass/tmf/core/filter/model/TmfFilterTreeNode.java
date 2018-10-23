@@ -63,7 +63,7 @@ public abstract class TmfFilterTreeNode implements ITmfFilterTreeNode, Cloneable
 
     @Override
     public boolean hasChildren() {
-        return (children.size() > 0);
+        return (!children.isEmpty());
     }
 
     @Override

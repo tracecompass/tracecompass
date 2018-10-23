@@ -168,7 +168,7 @@ public abstract class BaseEnableEventHandler extends BaseControlViewHandler {
 
         final IEnableEventsDialog dialog = TraceControlDialogFactory.getInstance().getEnableEventsDialog();
         // If you don't have the Kernel tracer and no UST application there is not going to be any providers
-        if (providers.size() > 0) {
+        if (!providers.isEmpty()) {
             dialog.setTraceProviderGroup((TraceProviderGroup) providers.get(0));
         }
         dialog.setTraceDomainComponent(getDomain(param));

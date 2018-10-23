@@ -533,7 +533,7 @@ public class ChartMakerDialog extends Dialog {
     }
 
     private boolean tryResetXFilter() {
-        if (fSelectedSeries.size() != 0) {
+        if (!fSelectedSeries.isEmpty()) {
             return false;
         }
 
@@ -542,7 +542,7 @@ public class ChartMakerDialog extends Dialog {
     }
 
     private boolean tryResetYFilter() {
-        if (fSelectedSeries.size() != 0) {
+        if (!fSelectedSeries.isEmpty()) {
             return false;
         }
 
@@ -615,7 +615,7 @@ public class ChartMakerDialog extends Dialog {
             }
 
             /* Check if the series are compatible with the chart type */
-            if (fSelectedSeries.size() != 0 && !checkIfSeriesCompatible(checkNotNull(fType), type)) {
+            if (!fSelectedSeries.isEmpty() && !checkIfSeriesCompatible(checkNotNull(fType), type)) {
                 String warning = Messages.ChartMakerDialog_WarningConfirm;
                 String message = String.format(Messages.ChartMakerDialog_WarningIncompatibleSeries,
                         type.getType().toString().toLowerCase());
@@ -739,7 +739,7 @@ public class ChartMakerDialog extends Dialog {
             fSelectionYTable.refresh();
 
             /* Disable OK button if no series are made */
-            if (fSelectedSeries.size() == 0) {
+            if (fSelectedSeries.isEmpty()) {
                 getButton(IDialogConstants.OK_ID).setEnabled(false);
                 fWarningLabel.setVisible(false);
             }

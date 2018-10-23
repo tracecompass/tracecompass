@@ -62,10 +62,10 @@ public class TmfAnalysisEventRequirement extends TmfAbstractAnalysisRequirement 
         switch (getPriorityLevel()) {
         case ALL_OR_NOTHING:
             traceEvents.retainAll(values);
-            return (traceEvents.size() == 0 || traceEvents.size() == values.size());
+            return (traceEvents.isEmpty() || traceEvents.size() == values.size());
         case AT_LEAST_ONE:
             traceEvents.retainAll(values);
-            return traceEvents.size() > 0;
+            return !traceEvents.isEmpty();
         case MANDATORY:
             return traceEvents.containsAll(values);
         case OPTIONAL:

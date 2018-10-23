@@ -115,7 +115,7 @@ public final class CustomXmlInputElement {
     public void addChild(CustomXmlInputElement input) {
         if (getChildElements() == null) {
             fChildElements = new ArrayList<>(1);
-        } else if (getChildElements().size() > 0) {
+        } else if (!getChildElements().isEmpty()) {
             CustomXmlInputElement last = getChildElements().get(getChildElements().size() - 1);
             last.fNextElement = input;
         }

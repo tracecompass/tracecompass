@@ -84,13 +84,13 @@ public class TmfAnalysisEventFieldRequirement extends TmfAbstractAnalysisRequire
                 return traceEvents.keys().stream().allMatch(eventName -> {
                     Collection<@NonNull String> fields = new HashSet<>(traceEvents.get(eventName));
                     fields.retainAll(values);
-                    return (fields.size() == 0 || fields.size() == values.size());
+                    return (fields.isEmpty() || fields.size() == values.size());
                 });
             case AT_LEAST_ONE:
                 return traceEvents.keys().stream().allMatch(eventName -> {
                     Collection<@NonNull String> fields = new HashSet<>(traceEvents.get(eventName));
                     fields.retainAll(values);
-                    return fields.size() > 0;
+                    return !fields.isEmpty();
                 });
             case MANDATORY:
                 return traceEvents.keys().stream().allMatch(eventName -> {
@@ -109,10 +109,10 @@ public class TmfAnalysisEventFieldRequirement extends TmfAbstractAnalysisRequire
         switch(getPriorityLevel()) {
         case ALL_OR_NOTHING:
             fields.retainAll(values);
-            return (fields.size() == 0 || fields.size() == values.size());
+            return (fields.isEmpty() || fields.size() == values.size());
         case AT_LEAST_ONE:
             fields.retainAll(values);
-            return fields.size() > 0;
+            return !fields.isEmpty();
         case MANDATORY:
             return fields.containsAll(values);
         case OPTIONAL:

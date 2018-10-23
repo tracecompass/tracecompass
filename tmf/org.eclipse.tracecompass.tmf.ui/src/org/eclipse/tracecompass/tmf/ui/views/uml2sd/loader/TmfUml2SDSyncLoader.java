@@ -468,7 +468,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     public void selectionRangeUpdated(TmfSelectionRangeUpdatedSignal signal) {
         fLock.lock();
         try {
-            if ((signal.getSource() != this) && (fFrame != null) && (fCheckPoints.size() > 0)) {
+            if ((signal.getSource() != this) && (fFrame != null) && (!fCheckPoints.isEmpty())) {
                 fCurrentTime = signal.getBeginTime();
                 fIsSelect = true;
                 moveToMessage();
@@ -491,7 +491,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
     public void windowRangeUpdated(TmfWindowRangeUpdatedSignal signal) {
         fLock.lock();
         try {
-            if ((signal.getSource() != this) && (fFrame != null) && !fIsSignalSent && (fCheckPoints.size() > 0)) {
+            if ((signal.getSource() != this) && (fFrame != null) && !fIsSignalSent && (!fCheckPoints.isEmpty())) {
                 TmfTimeRange newTimeRange = signal.getCurrentRange();
 
                 fIsSelect = false;

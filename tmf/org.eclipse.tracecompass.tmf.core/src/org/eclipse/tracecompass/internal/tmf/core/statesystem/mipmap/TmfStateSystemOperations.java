@@ -63,7 +63,7 @@ public final class TmfStateSystemOperations {
         ITmfStateValue max = TmfStateValue.nullValue();
 
         List<ITmfStateInterval> intervals = queryAttributeRange(ss, t1, t2, quark, AbstractTmfMipmapStateProvider.MAX_STRING);
-        if (intervals.size() == 0) {
+        if (intervals.isEmpty()) {
             return TmfStateValue.nullValue();
         }
         for (ITmfStateInterval si : intervals) {
@@ -119,7 +119,7 @@ public final class TmfStateSystemOperations {
         ITmfStateValue min = TmfStateValue.nullValue();
 
         List<ITmfStateInterval> intervals = queryAttributeRange(ss, t1, t2, quark, AbstractTmfMipmapStateProvider.MIN_STRING);
-        if (intervals.size() == 0) {
+        if (intervals.isEmpty()) {
             return TmfStateValue.nullValue();
         }
         for (ITmfStateInterval si : intervals) {
@@ -173,7 +173,7 @@ public final class TmfStateSystemOperations {
             throws AttributeNotFoundException, TimeRangeException, StateValueTypeException {
         double avg = 0.0;
         List<ITmfStateInterval> intervals = queryAttributeRange(ss, t1, t2, quark, AbstractTmfMipmapStateProvider.AVG_STRING);
-        if (intervals.size() == 0) {
+        if (intervals.isEmpty()) {
             return 0;
         } else if (t1 == t2) {
             ITmfStateValue value = intervals.get(0).getStateValue();

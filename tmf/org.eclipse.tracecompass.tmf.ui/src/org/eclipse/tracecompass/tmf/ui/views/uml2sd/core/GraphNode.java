@@ -145,7 +145,7 @@ public abstract class GraphNode {
         if (fBackwardNodes != null) {
             bNodeList = fBackwardNodes.get(nodeToAdd.getArrayId());
         }
-        if (fNodeList != null && fNodeList.size() > 0) {
+        if (fNodeList != null && !fNodeList.isEmpty()) {
             // check if the nodes are added y ordered
             // if not, tag the list to sort it later (during draw)
             GraphNode node = fNodeList.get(fNodeList.size() - 1);

@@ -71,7 +71,7 @@ public class TmfProviderManager {
         List<TmfEventProvider> list = fProviders.get(eventType);
         if (list != null) {
             list.remove(provider);
-            if (list.size() == 0) {
+            if (list.isEmpty()) {
                 fProviders.remove(eventType);
             }
         }

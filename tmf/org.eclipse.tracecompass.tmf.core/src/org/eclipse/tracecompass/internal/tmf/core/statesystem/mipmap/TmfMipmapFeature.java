@@ -121,7 +121,7 @@ public abstract class TmfMipmapFeature implements ITmfMipmapFeature {
         try {
             /* get the lower-level interval list */
             List<ITmfStateInterval> lowerIntervals = intervals.get(level - 1);
-            if (lowerIntervals.size() == 0) {
+            if (lowerIntervals.isEmpty()) {
                 return;
             }
 

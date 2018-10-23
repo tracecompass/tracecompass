@@ -266,7 +266,7 @@ public class LoadDialog extends TitleAreaDialog implements ILoadDialog {
 
     private void enableRemoteButtons() {
         List<IFileStore> resources = fFileWidget.getResources();
-        boolean enabled = (resources != null) && (resources.size() > 0);
+        boolean enabled = (resources != null) && (!resources.isEmpty());
         Button okButton = getButton(IDialogConstants.OK_ID);
         if (okButton != null) {
             okButton.setEnabled(enabled);
@@ -301,7 +301,7 @@ public class LoadDialog extends TitleAreaDialog implements ILoadDialog {
         fIsForce = fForceButton.getSelection();
         if (fFileWidget != null) {
             fRemoteFiles = fFileWidget.getResources();
-            if (fRemoteFiles.size() > 0) {
+            if (!fRemoteFiles.isEmpty()) {
                 super.okPressed();
             }
             return;
@@ -314,7 +314,7 @@ public class LoadDialog extends TitleAreaDialog implements ILoadDialog {
                 stores.add(EFS.getLocalFileSystem().fromLocalFile((File) file));
             }
         }
-        if (stores.size() != 0) {
+        if (!stores.isEmpty()) {
             fLocalFiles = stores;
             super.okPressed();
         }

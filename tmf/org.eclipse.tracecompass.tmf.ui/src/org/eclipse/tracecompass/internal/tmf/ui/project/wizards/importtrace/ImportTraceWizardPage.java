@@ -1296,7 +1296,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
 
             // Only create experiment when option is selected and
             // if there has been at least one trace imported
-            if (((importOptionFlags & OPTION_CREATE_EXPERIMENT) != 0) && (traceResources.size() > 0)) {
+            if (((importOptionFlags & OPTION_CREATE_EXPERIMENT) != 0) && (!traceResources.isEmpty())) {
                 final IFolder[] experimentFolders = new IFolder[1];
                 final TmfExperimentFolder root = fExperimentFolderElement;
                 final String experimentName = fExperimentNameText.getText().trim();

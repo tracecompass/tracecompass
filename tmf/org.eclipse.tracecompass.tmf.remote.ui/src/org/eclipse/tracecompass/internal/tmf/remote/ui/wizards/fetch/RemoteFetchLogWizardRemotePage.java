@@ -385,7 +385,7 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
         }
         final List<RemoteImportConnectionNodeElement> remoteHosts = fProfile.getConnectionNodeElements();
 
-        if (remoteHosts.size() == 0) {
+        if (remoteHosts.isEmpty()) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, RemoteMessages.RemoteFetchLogWizardRemotePage_MissingConnectionInformation);
         }
 

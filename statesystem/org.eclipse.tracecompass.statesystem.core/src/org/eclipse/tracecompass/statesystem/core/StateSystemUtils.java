@@ -448,7 +448,7 @@ public final class StateSystemUtils {
      */
     public static @Nullable Object queuePeekAttribute(ITmfStateSystemBuilder ss, long t, int attributeQuark) {
         List<@NonNull Integer> subAttributes = ss.getSubAttributes(attributeQuark, false);
-        if (subAttributes.size() == 0) {
+        if (subAttributes.isEmpty()) {
             return null;
         }
         return ss.queryOngoing(subAttributes.get(0));

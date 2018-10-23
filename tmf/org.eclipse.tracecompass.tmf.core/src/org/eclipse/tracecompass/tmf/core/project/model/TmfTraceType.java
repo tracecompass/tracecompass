@@ -519,7 +519,7 @@ public final class TmfTraceType {
 
         if (validCandidates.size() != 1) {
             List<Pair<Integer, TraceTypeHelper>> reducedCandidates = reduce(validCandidates);
-            if (reducedCandidates.size() == 0) {
+            if (reducedCandidates.isEmpty()) {
                 throw new TmfTraceImportException("Error reducing trace type candidates"); //$NON-NLS-1$
             } else if (reducedCandidates.size() == 1) {
                 // Don't select the trace type if it has the lowest confidence

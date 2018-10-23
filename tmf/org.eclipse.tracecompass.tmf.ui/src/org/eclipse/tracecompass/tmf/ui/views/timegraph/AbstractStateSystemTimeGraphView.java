@@ -530,7 +530,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                 }
                 time = Math.min(end, time + resolution);
             }
-            if (fullStates.size() > 0) {
+            if (!fullStates.isEmpty()) {
                 handler.handle(fullStates, prevFullState);
             }
         } catch (StateSystemDisposedException e) {

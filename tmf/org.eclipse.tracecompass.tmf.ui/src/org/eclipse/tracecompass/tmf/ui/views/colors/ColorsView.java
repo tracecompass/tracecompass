@@ -366,7 +366,7 @@ public class ColorsView extends TmfView {
             if (pathName != null) {
                 ColorSetting[] colorSettings = ColorSettingsXML.load(pathName);
                 if (colorSettings.length > 0) {
-                    if (fColorSettings.size() > 0) {
+                    if (!fColorSettings.isEmpty()) {
                         boolean overwrite = MessageDialog.openQuestion(fShell,
                                 Messages.ColorsView_ImportOverwriteDialogTitle,
                                 Messages.ColorsView_ImportOverwriteDialogMessage1 +

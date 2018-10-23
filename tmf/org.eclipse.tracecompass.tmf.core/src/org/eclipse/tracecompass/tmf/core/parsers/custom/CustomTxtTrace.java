@@ -274,7 +274,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexabl
 
         final HashMap<InputLine, Integer> countMap = new HashMap<>();
         InputLine currentInput = null;
-        if (context.inputLine.childrenInputs != null && context.inputLine.childrenInputs.size() > 0) {
+        if (context.inputLine.childrenInputs != null && !context.inputLine.childrenInputs.isEmpty()) {
             currentInput = context.inputLine.childrenInputs.get(0);
             countMap.put(currentInput, 0);
         }
@@ -302,7 +302,7 @@ public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexabl
                 } else {
                     if (checkNotNull(countMap.get(currentInput)) >= currentInput.getMinCount()) {
                         final List<InputLine> nextInputs = currentInput.getNextInputs(countMap);
-                        if (nextInputs.size() == 0 || nextInputs.get(nextInputs.size() - 1).getMinCount() == 0) {
+                        if (nextInputs.isEmpty() || nextInputs.get(nextInputs.size() - 1).getMinCount() == 0) {
                             for (final InputLine input : getFirstLines()) {
                                 final Matcher matcher = input.getPattern().matcher(line);
                                 if (matcher.matches()) {
@@ -332,11 +332,11 @@ public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexabl
                                         iter.remove();
                                     }
                                 }
-                                if (currentInput.childrenInputs != null && currentInput.childrenInputs.size() > 0) {
+                                if (currentInput.childrenInputs != null && !currentInput.childrenInputs.isEmpty()) {
                                     currentInput = currentInput.childrenInputs.get(0);
                                     countMap.put(currentInput, 0);
                                 } else if (checkNotNull(countMap.get(currentInput)) >= currentInput.getMaxCount()) {
-                                    if (currentInput.getNextInputs(countMap).size() > 0) {
+                                    if (!currentInput.getNextInputs(countMap).isEmpty()) {
                                         currentInput = currentInput.getNextInputs(countMap).get(0);
                                         if (countMap.get(currentInput) == null) {
                                             countMap.put(currentInput, 0);
@@ -362,11 +362,11 @@ public class CustomTxtTrace extends TmfTrace implements ITmfPersistentlyIndexabl
                         if (matcher.matches()) {
                             event.processGroups(currentInput, matcher);
                             countMap.put(currentInput, checkNotNull(countMap.get(currentInput)) + 1);
-                            if (currentInput.childrenInputs != null && currentInput.childrenInputs.size() > 0) {
+                            if (currentInput.childrenInputs != null && !currentInput.childrenInputs.isEmpty()) {
                                 currentInput = currentInput.childrenInputs.get(0);
                                 countMap.put(currentInput, 0);
                             } else if (checkNotNull(countMap.get(currentInput)) >= currentInput.getMaxCount()) {
-                                if (currentInput.getNextInputs(countMap).size() > 0) {
+                                if (!currentInput.getNextInputs(countMap).isEmpty()) {
                                     currentInput = currentInput.getNextInputs(countMap).get(0);
                                     if (countMap.get(currentInput) == null) {
                                         countMap.put(currentInput, 0);

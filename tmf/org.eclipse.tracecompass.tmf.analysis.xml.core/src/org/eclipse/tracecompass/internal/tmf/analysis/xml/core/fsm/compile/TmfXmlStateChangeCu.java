@@ -152,7 +152,7 @@ public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit 
 
         // Compile the else element
         List<Element> elseElements = TmfXmlUtils.getChildElements(stateChange, TmfXmlStrings.ELSE);
-        if (elseElements.size() == 0) {
+        if (elseElements.isEmpty()) {
             return new TmfXmlConditionalStateChangeCu(condition, thenChange, null);
         }
         if (thenElements.size() != 1) {
@@ -186,7 +186,7 @@ public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit 
             // TODO: Validation message here
             Activator.logError("There should at most one future time for this state change"); //$NON-NLS-1$
         }
-        Element futureTime = futureTimes.size() == 0 ? null : futureTimes.get(0);
+        Element futureTime = futureTimes.isEmpty() ? null : futureTimes.get(0);
         TmfXmlStateValueCu futureTimeCu = null;
         if (futureTime != null) {
             futureTimeCu = TmfXmlStateValueCu.compileValue(analysisContent, futureTime);

@@ -121,7 +121,7 @@ public class SyncSpanningTree {
          * now, we take the first node alphabetically if the rootNode was not
          * set.
          */
-        if (fHosts.size() == 0) {
+        if (fHosts.isEmpty()) {
             return null;
         }
         if (fRootNode == null) {

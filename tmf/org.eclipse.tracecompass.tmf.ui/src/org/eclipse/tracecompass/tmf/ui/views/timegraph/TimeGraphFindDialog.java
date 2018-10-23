@@ -759,7 +759,7 @@ class TimeGraphFindDialog extends Dialog {
                 }
             } else {
                 if ("".equals(fFindField.getText())) { //$NON-NLS-1$
-                    if (fFindHistory.size() > 0) {
+                    if (!fFindHistory.isEmpty()) {
                         fFindField.setText(fFindHistory.get(0));
                     } else {
                         fFindField.setText(""); //$NON-NLS-1$

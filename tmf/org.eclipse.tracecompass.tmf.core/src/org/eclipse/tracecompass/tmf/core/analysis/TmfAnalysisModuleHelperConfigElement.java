@@ -188,7 +188,7 @@ public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelp
     }
 
     private static List<ApplicableClass> sortApplicableClasses(List<ApplicableClass> applicableClasses) {
-        if (applicableClasses.size() == 0) {
+        if (applicableClasses.isEmpty()) {
             return Collections.emptyList();
         }
         List<ApplicableClass> sorted = new ArrayList<>(applicableClasses.size());

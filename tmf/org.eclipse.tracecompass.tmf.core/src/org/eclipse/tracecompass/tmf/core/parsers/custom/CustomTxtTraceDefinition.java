@@ -248,7 +248,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
         public void addChild(InputLine input) {
             if (childrenInputs == null) {
                 childrenInputs = new ArrayList<>(1);
-            } else if (childrenInputs.size() > 0) {
+            } else if (!childrenInputs.isEmpty()) {
                 InputLine last = childrenInputs.get(childrenInputs.size() - 1);
                 last.nextInput = input;
             }

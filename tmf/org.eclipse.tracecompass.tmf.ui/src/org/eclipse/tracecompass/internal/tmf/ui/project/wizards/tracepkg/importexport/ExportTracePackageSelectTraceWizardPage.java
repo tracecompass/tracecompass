@@ -204,7 +204,7 @@ public class ExportTracePackageSelectTraceWizardPage extends WizardPage {
 
     @Override
     public boolean canFlipToNextPage() {
-        return getCheckedTraces().size() > 0;
+        return !getCheckedTraces().isEmpty();
     }
 
     private class ExportLabelProvider extends TmfNavigatorLabelProvider {

@@ -526,7 +526,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
         }
         manager.add(new Separator());
         manager.add(fDeleteAction);
-        fDeleteAction.setEnabled(items.size() > 0);
+        fDeleteAction.setEnabled(!items.isEmpty());
         manager.add(new Separator());
         manager.add(fCutAction);
         fCutAction.setEnabled(items.size() == 1);

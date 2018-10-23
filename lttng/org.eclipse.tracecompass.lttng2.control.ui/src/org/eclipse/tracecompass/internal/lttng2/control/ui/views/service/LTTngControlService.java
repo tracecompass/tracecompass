@@ -260,7 +260,7 @@ public class LTTngControlService implements ILttngControlService {
                 ArrayList<IChannelInfo> channels = new ArrayList<>();
                 index = parseDomain(result.getOutput(), index, channels, domainInfo);
 
-                if (channels.size() > 0) {
+                if (!channels.isEmpty()) {
                     // add domain
                     sessionInfo.addDomain(domainInfo);
 
@@ -281,7 +281,7 @@ public class LTTngControlService implements ILttngControlService {
                 ArrayList<IChannelInfo> channels = new ArrayList<>();
                 index = parseDomain(result.getOutput(), index, channels, domainInfo);
 
-                if (channels.size() > 0) {
+                if (!channels.isEmpty()) {
                     // add domain
                     sessionInfo.addDomain(domainInfo);
 
