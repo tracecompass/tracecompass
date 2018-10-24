@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
@@ -396,6 +397,8 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
                             TmfCoreTracer.traceAnalysis(TmfAbstractAnalysisModule.this.getId(), TmfAbstractAnalysisModule.this.getTrace(), "finished"); //$NON-NLS-1$
                         } catch (TmfAnalysisException e) {
                             Activator.logError("Error executing analysis with trace " + trace.getName(), e); //$NON-NLS-1$
+                        } catch (OperationCanceledException e) {
+                            // Analysis was canceled
                         } catch (Exception e) {
                             Activator.logError("Unexpected error executing analysis with trace " + trace.getName(), e); //$NON-NLS-1$
                             fail(e);
