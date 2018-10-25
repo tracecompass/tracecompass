@@ -244,7 +244,7 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
                 } else if (entry instanceof TmfGenericTreeEntry) {
                     return modelExtractor.apply(((TmfGenericTreeEntry<M>) entry).getModel());
                 }
-                throw new IllegalArgumentException();
+                return (E) (Comparable<E>) o -> 0;
             }
         };
     }
