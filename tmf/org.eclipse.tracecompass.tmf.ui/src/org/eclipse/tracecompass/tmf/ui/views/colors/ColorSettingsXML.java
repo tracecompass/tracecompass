@@ -188,13 +188,13 @@ public class ColorSettingsXML {
             case TICK_TAG:
                 tickColor = getRGBfromAttributes(attributes);
                 break;
+            case FILTER_TAG:
+                filterContentHandler = new TmfFilterContentHandler();
+                break;
             default:
                 if (filterContentHandler != null) {
                     filterContentHandler.startElement(uri, localName, qName, attributes);
                 }
-                break;
-            case FILTER_TAG:
-                filterContentHandler = new TmfFilterContentHandler();
                 break;
             }
 
