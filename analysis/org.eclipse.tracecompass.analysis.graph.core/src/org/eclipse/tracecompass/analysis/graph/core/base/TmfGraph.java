@@ -13,13 +13,14 @@
 
 package org.eclipse.tracecompass.analysis.graph.core.base;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -411,11 +412,11 @@ public class TmfGraph {
         if (start == null) {
             return;
         }
-        Stack<TmfVertex> stack = new Stack<>();
+        Deque<TmfVertex> stack = new ArrayDeque<>();
         HashSet<TmfVertex> visited = new HashSet<>();
         stack.add(start);
         while (!stack.isEmpty()) {
-            TmfVertex curr = stack.pop();
+            TmfVertex curr = stack.removeFirst();
             if (visited.contains(curr)) {
                 continue;
             }
@@ -429,12 +430,12 @@ public class TmfGraph {
                 // Only visit links up-right, guarantee to visit once only
                 TmfEdge edge = n.getEdge(EdgeDirection.OUTGOING_VERTICAL_EDGE);
                 if (edge != null) {
-                    stack.push(edge.getVertexTo());
+                    stack.addFirst(edge.getVertexTo());
                     visitor.visit(edge, false);
                 }
                 edge = n.getEdge(EdgeDirection.INCOMING_VERTICAL_EDGE);
                 if (edge != null) {
-                    stack.push(edge.getVertexFrom());
+                    stack.addFirst(edge.getVertexFrom());
                 }
                 edge = n.getEdge(EdgeDirection.OUTGOING_HORIZONTAL_EDGE);
                 if (edge != null) {

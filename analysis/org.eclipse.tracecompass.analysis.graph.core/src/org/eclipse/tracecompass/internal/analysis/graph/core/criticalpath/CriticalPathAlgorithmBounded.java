@@ -11,10 +11,11 @@ package org.eclipse.tracecompass.internal.analysis.graph.core.criticalpath;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.util.ArrayDeque;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.graph.core.base.IGraphWorker;
@@ -204,7 +205,7 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
 
         TmfVertex currentBound = bound.compareTo(blocking.getVertexFrom()) < 0 ? blocking.getVertexFrom() : bound;
 
-        Stack<TmfVertex> stack = new Stack<>();
+        Deque<TmfVertex> stack = new ArrayDeque<>();
         while (vertexFrom != null && vertexFrom.compareTo(currentBound) > 0) {
             /* shortcut for down link that goes beyond the blocking */
             TmfEdge inVerticalEdge = vertexFrom.getEdge(EdgeDirection.INCOMING_VERTICAL_EDGE);
@@ -253,7 +254,7 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
                     (incomingEdge == null ||
                             (incomingEdge.getType() != TmfEdge.EdgeType.BLOCKED &&
                             incomingEdge.getType() != TmfEdge.EdgeType.NETWORK))) {
-                stack.push(vertexFrom);
+                stack.addFirst(vertexFrom);
             }
             if (incomingEdge != null) {
                 if (incomingEdge.getType() == TmfEdge.EdgeType.BLOCKED || incomingEdge.getType() == TmfEdge.EdgeType.NETWORK) {
@@ -272,7 +273,7 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
                 vertexFrom = incomingEdge.getVertexFrom();
             } else {
                 if (!stack.isEmpty()) {
-                    TmfVertex v = stack.pop();
+                    TmfVertex v = stack.removeFirst();
                     /* rewind subpath */
                     while (!subPath.isEmpty() && subPath.getLast().getVertexFrom() != v) {
                         subPath.removeLast();

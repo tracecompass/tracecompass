@@ -12,16 +12,17 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.synchronization.graph;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -153,14 +154,14 @@ public class SyncGraph<V, E> {
      */
     public boolean isConnected() {
         HashSet<V> visited = new HashSet<>();
-        Stack<V> stack = new Stack<>();
+        Deque<V> stack = new ArrayDeque<>();
         stack.push(fVertices.iterator().next());
         while (!stack.isEmpty()) {
-            V node = stack.pop();
+            V node = stack.removeFirst();
             visited.add(node);
             for (Edge<V, E> edge : getAdjacentEdges(node)) {
                 if (!visited.contains(edge.getTo())) {
-                    stack.push(edge.getTo());
+                    stack.addFirst(edge.getTo());
                 }
             }
         }

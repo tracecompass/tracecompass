@@ -14,10 +14,11 @@
 
 package org.eclipse.tracecompass.tmf.core.filter.xml;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
-import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
@@ -58,14 +59,13 @@ public class TmfFilterContentHandler extends DefaultHandler {
     private static final String EVENT_FIELD_CONTENT = ":content:"; //$NON-NLS-1$
 
     private ITmfFilterTreeNode fRoot = null;
-    private Stack<ITmfFilterTreeNode> fFilterTreeStack = null;
+    private final Deque<ITmfFilterTreeNode> fFilterTreeStack = new ArrayDeque<>();
 
     /**
      * The default constructor
      */
     public TmfFilterContentHandler() {
         super();
-        fFilterTreeStack = new Stack<>();
     }
 
     /**
@@ -212,18 +212,20 @@ public class TmfFilterContentHandler extends DefaultHandler {
 
         }
 
-        fFilterTreeStack.push(node);
+        fFilterTreeStack.addFirst(node);
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        ITmfFilterTreeNode node = fFilterTreeStack.pop();
-
+        ITmfFilterTreeNode node = fFilterTreeStack.removeFirst();
+        ITmfFilterTreeNode last = fFilterTreeStack.peekFirst();
         if (fFilterTreeStack.isEmpty()) {
             fRoot = node;
-        } else if (fFilterTreeStack.lastElement() instanceof TmfFilterTreeNode &&
-                node instanceof TmfFilterTreeNode) {
-            fFilterTreeStack.lastElement().addChild(node);
+        } else {
+            if (last instanceof TmfFilterTreeNode &&
+                    node instanceof TmfFilterTreeNode) {
+                last.addChild(node);
+            }
         }
 
     }

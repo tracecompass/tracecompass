@@ -9,11 +9,12 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.core.execution.graph;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Stack;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -37,7 +38,7 @@ import com.google.common.collect.Table;
 public class OsSystemModel {
 
     private final Table<String, Integer, HostThread> fCurrentTids = HashBasedTable.create();
-    private final Table<String, Integer, Stack<OsInterruptContext>> fIntCtxStacks = HashBasedTable.create();
+    private final Table<String, Integer, Deque<OsInterruptContext>> fIntCtxStacks = HashBasedTable.create();
     private final Map<HostThread, OsWorker> fWorkerMap = new HashMap<>();
 
     /**
@@ -112,12 +113,12 @@ public class OsSystemModel {
      *            The interrupt context to push on the stack
      */
     public void pushContextStack(String hostId, Integer cpu, OsInterruptContext interruptCtx) {
-        Stack<OsInterruptContext> stack = fIntCtxStacks.get(hostId, cpu);
+        Deque<OsInterruptContext> stack = fIntCtxStacks.get(hostId, cpu);
         if (stack == null) {
-            stack = new Stack<>();
+            stack = new ArrayDeque<>();
             fIntCtxStacks.put(hostId, cpu, stack);
         }
-        stack.push(interruptCtx);
+        stack.addFirst(interruptCtx);
     }
 
     /**
@@ -132,15 +133,14 @@ public class OsSystemModel {
      * @return The latest interrupt context on the CPU of the host
      */
     public OsInterruptContext peekContextStack(String hostId, Integer cpu) {
-        Stack<@NonNull OsInterruptContext> stack = fIntCtxStacks.get(hostId, cpu);
+        Deque<@NonNull OsInterruptContext> stack = fIntCtxStacks.get(hostId, cpu);
         if (stack == null) {
             return OsInterruptContext.DEFAULT_CONTEXT;
         }
-        if (stack.empty()) {
+        if (stack.isEmpty()) {
             return OsInterruptContext.DEFAULT_CONTEXT;
         }
-        OsInterruptContext peek = Objects.requireNonNull(stack.peek());
-        return peek;
+        return Objects.requireNonNull(stack.peekFirst());
     }
 
     /**
@@ -155,14 +155,14 @@ public class OsSystemModel {
      * @return The latest interrupt context on the CPU of the host
      */
     public @Nullable OsInterruptContext popContextStack(String hostId, Integer cpu) {
-        Stack<OsInterruptContext> stack = fIntCtxStacks.get(hostId, cpu);
+        Deque<OsInterruptContext> stack = fIntCtxStacks.get(hostId, cpu);
         if (stack == null) {
             return null;
         }
-        if (stack.empty()) {
+        if (stack.isEmpty()) {
             return null;
         }
-        return stack.pop();
+        return stack.removeFirst();
     }
 
 }
