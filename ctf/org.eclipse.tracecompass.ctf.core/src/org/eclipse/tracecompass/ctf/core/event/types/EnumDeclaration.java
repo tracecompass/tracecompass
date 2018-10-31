@@ -238,7 +238,8 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      * @since 2.0
      */
     public boolean add(@Nullable String label) {
-        return add(fLastAdded.fFirst + 1, fLastAdded.fSecond + 1, label);
+        // add the item with a value of max(range)+1 for low and high to ensure no overlap
+        return add(fLastAdded.fSecond + 1, fLastAdded.fSecond + 1, label);
     }
 
     /**
