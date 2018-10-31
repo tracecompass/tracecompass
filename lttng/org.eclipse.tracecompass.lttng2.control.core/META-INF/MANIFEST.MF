@@ -11,7 +11,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.ctf.core,
  org.eclipse.tracecompass.tmf.core,
- org.eclipse.tracecompass.tmf.ctf.core
+ org.eclipse.tracecompass.tmf.ctf.core,
+ org.eclipse.tracecompass.common.core
 Export-Package: org.eclipse.tracecompass.internal.lttng2.control.core;x-friends:="org.eclipse.tracecompass.lttng2.control.core.tests,org.eclipse.tracecompass.lttng2.control.ui,org.eclipse.tracecompass.lttng2.control.ui.tests",
  org.eclipse.tracecompass.internal.lttng2.control.core.model;
   x-friends:="org.eclipse.tracecompass.lttng2.control.ui,

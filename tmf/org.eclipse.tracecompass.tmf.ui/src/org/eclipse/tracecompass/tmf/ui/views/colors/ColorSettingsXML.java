@@ -24,11 +24,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.tracecompass.common.core.xml.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.xml.TmfFilterContentHandler;
@@ -108,9 +108,7 @@ public class ColorSettingsXML {
                 }
             }
 
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-
-            Transformer transformer = transformerFactory.newTransformer();
+            Transformer transformer = XmlUtils.newSecureTransformer();
             DOMSource source = new DOMSource(document);
             StreamResult result = new StreamResult(new File(pathName));
             transformer.transform(source, result);

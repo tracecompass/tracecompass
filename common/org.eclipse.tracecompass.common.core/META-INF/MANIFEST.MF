@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 3.1.1.qualifier
+Bundle-Version: 3.2.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.common.core;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.internal.common.core.Activator
@@ -16,6 +16,7 @@ Export-Package: org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.common.core.log,
  org.eclipse.tracecompass.common.core.math,
  org.eclipse.tracecompass.common.core.process,
+ org.eclipse.tracecompass.common.core.xml,
  org.eclipse.tracecompass.internal.common.core;x-internal:=true
 Import-Package: com.google.common.base,
  com.google.common.collect

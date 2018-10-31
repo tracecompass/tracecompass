@@ -23,7 +23,6 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -38,6 +37,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.ModalContext;
+import org.eclipse.tracecompass.common.core.xml.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.AbstractTracePackageOperation;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.ITracePackageConstants;
@@ -121,7 +121,7 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
                 exportTrace(progressMonitor, tmfNode, tracePackageElement);
             }
 
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Transformer transformer = XmlUtils.newSecureTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4"); //$NON-NLS-1$ //$NON-NLS-2$
             DOMSource source = new DOMSource(doc);

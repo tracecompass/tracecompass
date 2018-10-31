@@ -24,7 +24,6 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -37,12 +36,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tracecompass.common.core.xml.XmlUtils;
 import org.eclipse.tracecompass.internal.lttng2.control.core.Activator;
-import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.ISessionInfo;
+import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceDomainType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEnablement;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceEventType;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.TraceLogLevel;
@@ -513,8 +513,7 @@ public final class SessionConfigGenerator {
      */
     private static void saveSessionConfig(Document document, String destination) throws TransformerException {
         /* Write the content into a XML file */
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
+        Transformer transformer = XmlUtils.newSecureTransformer();
 
         transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
         transformer.setOutputProperty(INDENT_AMOUNT_PROPERTY_NAME, INDENT_AMOUNT_PROPERTY_VALUE);

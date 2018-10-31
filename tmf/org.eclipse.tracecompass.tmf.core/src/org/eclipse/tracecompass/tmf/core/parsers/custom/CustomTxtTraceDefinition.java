@@ -37,13 +37,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.xml.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.w3c.dom.Document;
@@ -567,7 +567,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                 }
             }
 
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Transformer transformer = XmlUtils.newSecureTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 
             // initialize StreamResult with File object to save to file
@@ -930,7 +930,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
                 root.removeChild(definitionElement);
             }
 
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Transformer transformer = XmlUtils.newSecureTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 
             // initialize StreamResult with File object to save to file

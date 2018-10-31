@@ -21,10 +21,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.eclipse.tracecompass.common.core.xml.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
@@ -162,10 +162,8 @@ public class TmfFilterXMLWriter {
      * @param uri The new Filter XML path
      */
     public void saveTree(final String uri) {
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-
         try {
-            Transformer transformer = transformerFactory.newTransformer();
+            Transformer transformer = XmlUtils.newSecureTransformer();
             DOMSource source = new DOMSource(document);
             StreamResult result =  new StreamResult(new File(uri));
             transformer.transform(source, result);

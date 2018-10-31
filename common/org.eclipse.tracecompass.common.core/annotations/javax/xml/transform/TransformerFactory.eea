@@ -1,0 +1,4 @@
+class javax/xml/transform/TransformerFactory
+newTransformer
+ ()Ljavax/xml/transform/Transformer;
+ ()L1javax/xml/transform/Transformer;
