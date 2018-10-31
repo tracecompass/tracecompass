@@ -489,7 +489,9 @@ public class CTFTraceReader implements AutoCloseable {
         for (long i : fEventCountPerTraceFile) {
             numEvents += i;
         }
-
+        if (numEvents == 0) {
+            return;
+        }
         for (int j = 0; j < fEventCountPerTraceFile.length; j++) {
             CTFStreamInputReader se = fStreamInputReaders.get(j);
 
