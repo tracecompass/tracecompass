@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -45,15 +45,15 @@ public class TmfFilterAndNode extends TmfFilterTreeNode implements ITmfFilterWit
     public boolean matches(ITmfEvent event) {
         // Empty children
         if (getChildren().length == 0) {
-            return false ^ isNot();
+            return isNot();
         }
         for (ITmfFilterTreeNode node : getChildren()) {
-            if (! node.matches(event)) {
-                return false ^ isNot();
+            if (!node.matches(event)) {
+                return isNot();
             }
         }
         // All children match
-        return true ^ isNot();
+        return !isNot();
     }
 
     @Override
