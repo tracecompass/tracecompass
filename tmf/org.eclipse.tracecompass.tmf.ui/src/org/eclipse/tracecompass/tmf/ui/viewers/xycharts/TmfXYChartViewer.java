@@ -155,7 +155,9 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
         Color backgroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_BACKGROUND);
         fSwtChart.setBackground(backgroundColor);
         commonComposite.setBackground(backgroundColor);
-        fSwtChart.setForeground(fColorScheme.getColor(TimeGraphColorScheme.FOREGROUND));
+        backgroundColor = fColorScheme.getColor(TimeGraphColorScheme.BACKGROUND);
+        fSwtChart.setBackgroundInPlotArea(backgroundColor);
+        fSwtChart.setForeground(fColorScheme.getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
         fTimeScaleCtrl.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
         fTimeScaleCtrl.setHeight(DEFAULT_SCALE_HEIGHT);
         fSwtChart.getPlotArea().addMouseListener(new MouseAdapter() {

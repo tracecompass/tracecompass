@@ -17,10 +17,12 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Color theme used by the timegraph view
@@ -30,6 +32,14 @@ import org.eclipse.swt.widgets.Display;
  */
 @SuppressWarnings("javadoc")
 public class TimeGraphColorScheme {
+
+    // Theme Color IDs
+    private static final String THEME_BACKGROUND = "org.eclipse.tracecompass.tmf.ui.BACKGROUND"; //$NON-NLS-1$
+    private static final String THEME_FOREGROUND = "org.eclipse.tracecompass.tmf.ui.FOREGROUND"; //$NON-NLS-1$
+    private static final String THEME_BACKGROUND_SEL = "org.eclipse.tracecompass.tmf.ui.BACKGROUND_SEL"; //$NON-NLS-1$
+    private static final String THEME_FOREGROUND_SEL = "org.eclipse.tracecompass.tmf.ui.FOREGROUND_SEL"; //$NON-NLS-1$
+    private static final String THEME_TOOL_BACKGROUND = "org.eclipse.tracecompass.tmf.ui.TOOL_BACKGROUND"; //$NON-NLS-1$
+    private static final String THEME_TOOL_FOREGROUND = "org.eclipse.tracecompass.tmf.ui.TOOL_FOREGROUND"; //$NON-NLS-1$
 
     // elements color indices
     public static final int BLACK_STATE = 0;
@@ -179,6 +189,28 @@ public class TimeGraphColorScheme {
         }
     }
 
+    static class ThemeColor implements IColorProvider {
+
+        private int syscol;
+        private String themeColorName;
+
+        ThemeColor(int syscol, String themeColorName) {
+            this.syscol = syscol;
+            this.themeColorName = themeColorName;
+        }
+
+        @Override
+        public Color get() {
+            ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
+            Color c = colorRegistry.get(themeColorName);
+            if (c != null) {
+                org.eclipse.swt.graphics.RGB rgb = c.getRGB();
+                return new Color(null, rgb.red, rgb.green, rgb.blue);
+            }
+            return Utils.getSysColor(syscol);
+        }
+    }
+
     static class Mix implements IColorProvider {
         private IColorProvider cp1;
         private IColorProvider cp2;
@@ -246,14 +278,14 @@ public class TimeGraphColorScheme {
         new SysCol(SWT.COLOR_GREEN),
 
 
-        new SysCol(SWT.COLOR_LIST_BACKGROUND), // BACKGROUND
-        new SysCol(SWT.COLOR_LIST_FOREGROUND), // FOREGROUND
+        new ThemeColor(SWT.COLOR_LIST_BACKGROUND, THEME_BACKGROUND), // BACKGROUND
+        new ThemeColor(SWT.COLOR_LIST_FOREGROUND, THEME_FOREGROUND), // FOREGROUND
         new RGB(232, 242, 254), // BACKGROUND_SEL
-        new SysCol(SWT.COLOR_LIST_FOREGROUND), // FOREGROUND_SEL
-        new SysCol(SWT.COLOR_WIDGET_BACKGROUND), // BACKGROUND_SEL_NOFOCUS
-        new SysCol(SWT.COLOR_WIDGET_FOREGROUND), // FOREGROUND_SEL_NOFOCUS
-        new SysCol(SWT.COLOR_WIDGET_BACKGROUND), // TOOL_BACKGROUND
-        new SysCol(SWT.COLOR_WIDGET_DARK_SHADOW), // TOOL_FOREGROUND
+        new ThemeColor(SWT.COLOR_LIST_FOREGROUND, THEME_FOREGROUND_SEL), // FOREGROUND_SEL
+        new ThemeColor(SWT.COLOR_WIDGET_BACKGROUND, THEME_BACKGROUND_SEL), // BACKGROUND_SEL_NOFOCUS
+        new ThemeColor(SWT.COLOR_WIDGET_DARK_SHADOW, THEME_FOREGROUND_SEL), // BACKGROUND_SEL_NOFOCUS
+        new ThemeColor(SWT.COLOR_WIDGET_BACKGROUND, THEME_TOOL_BACKGROUND), // TOOL_BACKGROUND
+        new ThemeColor(SWT.COLOR_WIDGET_DARK_SHADOW, THEME_TOOL_FOREGROUND), // TOOL_FOREGROUND
 
         new SysCol(SWT.COLOR_GRAY), // FIX_COLOR
         new SysCol(SWT.COLOR_WHITE), // WHITE
@@ -291,12 +323,12 @@ public class TimeGraphColorScheme {
         new SysCol(SWT.COLOR_WIDGET_BACKGROUND), // LEGEND_BACKGROUND
         new SysCol(SWT.COLOR_WIDGET_DARK_SHADOW), // LEGEND_FOREGROUND
 
-        new Mix(new SysCol(SWT.COLOR_GRAY), new SysCol(SWT.COLOR_LIST_BACKGROUND)), // GR_BACKGROUND
-        new RGB(0, 0, 50),                                                          // GR_FOREGROUND
+        new Mix(new SysCol(SWT.COLOR_GRAY), new ThemeColor(SWT.COLOR_LIST_BACKGROUND, THEME_BACKGROUND)), // GR_BACKGROUND
+        new ThemeColor(SWT.COLOR_LIST_FOREGROUND, THEME_FOREGROUND), // GR_FOREGROUND
         new Mix(new SysCol(SWT.COLOR_GRAY), new RGB(232, 242, 254)),                // GR_BACKGROUND_SEL
-        new RGB(0, 0, 50),                                                          // GR_FOREGROUND_SEL
-        new Mix(new SysCol(SWT.COLOR_GRAY), new SysCol(SWT.COLOR_WIDGET_BACKGROUND)), // GR_BACKGROUND_SEL_NOFOCUS
-        new RGB(0, 0, 50),                                                          // GR_FOREGROUND_SEL_NOFOCUS
+        new ThemeColor(SWT.COLOR_LIST_FOREGROUND, THEME_FOREGROUND), // GR_FOREGROUND_SEL
+        new Mix(new SysCol(SWT.COLOR_GRAY), new ThemeColor(SWT.COLOR_LIST_BACKGROUND, THEME_BACKGROUND)), // GR_BACKGROUND_SEL_NOFOCUS
+        new ThemeColor(SWT.COLOR_LIST_FOREGROUND, THEME_FOREGROUND),// GR_FOREGROUND_SEL_NOFOCUS
 
         new Mix(new SysCol(SWT.COLOR_GRAY), new SysCol(SWT.COLOR_LIST_BACKGROUND), 1, 3), // LIGHT_LINE
 

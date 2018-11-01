@@ -470,7 +470,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     gc.drawImage(image, imageBounds.x, imageBounds.y + 1);
                 }
             }
-            gc.setForeground(item.getForeground(event.index));
+            Object o = item.getData(Key.IS_DEFAULT_FG_COLOR);
+            if (!(o instanceof Boolean) || !(Boolean) o) {
+                gc.setForeground(item.getForeground(event.index));
+            }
             gc.setFont(item.getFont(event.index));
             String text = item.getText(event.index);
             Rectangle textBounds = item.getTextBounds(event.index);
@@ -672,6 +675,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
          * @since 2.1
          */
         String INDEX = "$index"; //$NON-NLS-1$
+
+        /**
+         * Flag to indicate default FG color
+         * @since 4.2
+         */
+        String IS_DEFAULT_FG_COLOR = "$default_fc"; //$NON-NLS-1$
     }
 
     /**
@@ -1697,7 +1706,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             item.setForeground(colorSetting.getDimmedForegroundColor());
             item.setBackground(colorSetting.getDimmedBackgroundColor());
         } else {
-            item.setForeground(colorSetting.getForegroundColor());
+            Color fc = colorSetting.getForegroundColor();
+            item.setData(Key.IS_DEFAULT_FG_COLOR, fc == null);
+            item.setForeground(fc);
             item.setBackground(colorSetting.getBackgroundColor());
         }
         item.setFont(fFont);
@@ -2631,7 +2642,13 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * Create the resources.
      */
     private void createResources() {
-        fGrayColor = fResourceManager.createColor(ColorUtil.blend(fTable.getBackground().getRGB(), fTable.getForeground().getRGB()));
+        ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
+        Color c = colorRegistry.get("org.eclipse.tracecompass.tmf.ui.FOREGROUND");
+        if (c != null) {
+            fGrayColor = c;
+        } else {
+            fGrayColor = fResourceManager.createColor(ColorUtil.blend(fTable.getBackground().getRGB(), fTable.getForeground().getRGB()));
+        }
         fGreenColor = PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN);
     }
 

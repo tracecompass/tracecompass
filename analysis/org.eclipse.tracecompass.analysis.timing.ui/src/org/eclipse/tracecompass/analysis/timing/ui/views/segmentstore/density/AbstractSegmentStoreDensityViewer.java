@@ -47,6 +47,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.IImageSave;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
 import org.swtchart.IBarSeries;
@@ -70,6 +71,8 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
 
     private static final Format DENSITY_TIME_FORMATTER = new SubSecondTimeWithUnitFormat();
     private static final RGB BAR_COLOR = new RGB(0x42, 0x85, 0xf4);
+    /** The color scheme for the chart */
+    private TimeGraphColorScheme fColorScheme = new TimeGraphColorScheme();
     private final Chart fChart;
     private final MouseDragZoomProvider fDragZoomProvider;
     private final MouseSelectionProvider fDragProvider;
@@ -93,12 +96,24 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         super(parent);
         fListeners = new ArrayList<>();
         fChart = new Chart(parent, SWT.NONE);
+        Color backgroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_BACKGROUND);
+        fChart.setBackground(backgroundColor);
+        fChart.setBackgroundInPlotArea(backgroundColor);
+        parent.setBackground(backgroundColor);
+        Color foregroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_FOREGROUND);
+        fChart.setForeground(foregroundColor);
         fChart.getLegend().setVisible(false);
         fChart.getTitle().setVisible(false);
-        fChart.getAxisSet().getXAxis(0).getTitle().setText(nullToEmptyString(Messages.AbstractSegmentStoreDensityViewer_TimeAxisLabel));
-        fChart.getAxisSet().getYAxis(0).getTitle().setText(nullToEmptyString(Messages.AbstractSegmentStoreDensityViewer_CountAxisLabel));
-        fChart.getAxisSet().getXAxis(0).getGrid().setStyle(LineStyle.DOT);
-        fChart.getAxisSet().getYAxis(0).getGrid().setStyle(LineStyle.DOT);
+        IAxis xAxis = fChart.getAxisSet().getXAxis(0);
+        IAxis yAxis = fChart.getAxisSet().getYAxis(0);
+        xAxis.getTitle().setText(nullToEmptyString(Messages.AbstractSegmentStoreDensityViewer_TimeAxisLabel));
+        yAxis.getTitle().setText(nullToEmptyString(Messages.AbstractSegmentStoreDensityViewer_CountAxisLabel));
+        xAxis.getTitle().setForeground(foregroundColor);
+        yAxis.getTitle().setForeground(foregroundColor);
+        xAxis.getTick().setForeground(foregroundColor);
+        yAxis.getTick().setForeground(foregroundColor);
+        xAxis.getGrid().setStyle(LineStyle.DOT);
+        yAxis.getGrid().setStyle(LineStyle.DOT);
 
         fDragZoomProvider = new MouseDragZoomProvider(this);
         fDragZoomProvider.register();

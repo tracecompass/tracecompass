@@ -109,7 +109,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // Histogram colors
 
     // System colors, they do not need to be disposed
-    private final Color fBackgroundColor = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
     private final Color fSelectionForegroundColor = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
     private final Color fSelectionBackgroundColor = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 
@@ -739,7 +738,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             final int height = image.getBounds().height;
 
             // Clear the drawing area
-            imageGC.setBackground(fBackgroundColor);
+            imageGC.setBackground(fTimeLineScale.getColorScheme().getColor(TimeGraphColorScheme.BACKGROUND));
             imageGC.fillRectangle(0, 0, image.getBounds().width + 1, image.getBounds().height + 1);
 
             // Draw the histogram bars

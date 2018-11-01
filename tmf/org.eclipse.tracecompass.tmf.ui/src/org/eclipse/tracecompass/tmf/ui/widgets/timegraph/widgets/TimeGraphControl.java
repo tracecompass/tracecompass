@@ -1950,9 +1950,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
         // draw the background markers
         drawMarkers(bounds, fTimeProvider, fMarkers, false, nameSpace, gc);
 
-        // Draw the time event filter background is needed
-        drawHighlightBackground(bounds, nameSpace, gc);
-
         // draw the items
         drawItems(bounds, fTimeProvider, fItemData.fExpandedItems, fTopIndex, nameSpace, gc);
 
@@ -2033,17 +2030,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
 
         gc.setAlpha(OPAQUE);
-    }
-
-    private void drawHighlightBackground(Rectangle bounds, int nameSpace, GC gc) {
-        if (isFilterActive()) {
-            Rectangle rect = new Rectangle(bounds.x + nameSpace, bounds.y, bounds.width - nameSpace, bounds.height);
-            Color color = getColorScheme().getColor(new RGBA(255, 255, 255, 150));
-            gc.setBackground(color);
-            gc.setAlpha(color.getAlpha());
-            gc.fillRectangle(rect);
-            gc.setAlpha(255);
-        }
     }
 
     /**

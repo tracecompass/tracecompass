@@ -31,7 +31,8 @@ Require-Bundle: org.eclipse.core.expressions,
  org.eclipse.wst.xsd.core,
  org.apache.commons.io,
  com.google.guava,
- org.eclipse.tracecompass.tmf.filter.parser
+ org.eclipse.tracecompass.tmf.filter.parser,
+ org.eclipse.e4.ui.css.swt.theme
 Export-Package: org.eclipse.tracecompass.internal.tmf.ui;x-friends:="org.eclipse.tracecompass.tmf.ui.tests,org.eclipse.tracecompass.tmf.ctf.ui.tests",
  org.eclipse.tracecompass.internal.tmf.ui.commands;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.dialogs;x-internal:=true,

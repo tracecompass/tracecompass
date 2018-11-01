@@ -21,16 +21,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.linuxtools.dataviewers.piechart.PieChart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.model.TmfPieChartStatisticsModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 
 /**
  * Creates a viewer containing 2 pie charts, one for showing information about
@@ -112,6 +115,8 @@ public class TmfPieChartViewer extends Composite {
      */
     private TmfPieChartStatisticsModel fModel = null;
 
+    /** The color scheme for the chart */
+    private @NonNull TimeGraphColorScheme fColorScheme = new TimeGraphColorScheme();
     /**
      * @param parent
      *            The parent composite that will hold the viewer
@@ -121,6 +126,9 @@ public class TmfPieChartViewer extends Composite {
         fGlobalPCname = Messages.TmfStatisticsView_GlobalSelectionPieChartName;
         fTimeRangePCname = Messages.TmfStatisticsView_TimeRangeSelectionPieChartName;
         fOthersSliceName = Messages.TmfStatisticsView_PieChartOthersSliceName;
+        parent.addDisposeListener(e -> {
+            fColorScheme.dispose();
+        });
         initContent();
     }
 
@@ -203,10 +211,18 @@ public class TmfPieChartViewer extends Composite {
     synchronized void updateGlobalPieChart() {
         if (getGlobalPC() == null) {
             fGlobalPC = new PieChart(this, SWT.NONE);
+            Color backgroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_BACKGROUND);
+            Color foregroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_FOREGROUND);
             getGlobalPC().getTitle().setText(fGlobalPCname);
+            getGlobalPC().getTitle().setForeground(foregroundColor);
+            getGlobalPC().setBackground(backgroundColor);
+            getGlobalPC().setForeground(foregroundColor);
             getGlobalPC().getAxisSet().getXAxis(0).getTitle().setText(""); //Hide the title over the legend //$NON-NLS-1$
+            getGlobalPC().getAxisSet().getXAxis(0).getTitle().setForeground(foregroundColor);
             getGlobalPC().getLegend().setVisible(true);
             getGlobalPC().getLegend().setPosition(SWT.RIGHT);
+            getGlobalPC().getLegend().setBackground(backgroundColor);
+            getGlobalPC().getLegend().setForeground(foregroundColor);
             getGlobalPC().addListener(SWT.MouseMove, fMouseMoveListener);
             getGlobalPC().addMouseListener(fMouseClickListener);
         } else if (getGlobalPC().isDisposed() || fModel == null || fModel.getPieChartGlobalModel() == null) {
@@ -228,11 +244,19 @@ public class TmfPieChartViewer extends Composite {
      */
     synchronized void updateTimeRangeSelectionPieChart() {
         if (getTimeRangePC() == null) {
+            Color backgroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_BACKGROUND);
+            Color foregroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_FOREGROUND);
             fTimeRangePC = new PieChart(this, SWT.NONE);
+            fTimeRangePC.setBackground(backgroundColor);
+            fTimeRangePC.setForeground(foregroundColor);
             getTimeRangePC().getTitle().setText(fTimeRangePCname);
+            getTimeRangePC().getTitle().setForeground(foregroundColor);
             getTimeRangePC().getAxisSet().getXAxis(0).getTitle().setText(""); //Hide the title over the legend //$NON-NLS-1$
+            getTimeRangePC().getAxisSet().getXAxis(0).getTitle().setForeground(foregroundColor);
             getTimeRangePC().getLegend().setPosition(SWT.BOTTOM);
             getTimeRangePC().getLegend().setVisible(true);
+            getTimeRangePC().getLegend().setBackground(backgroundColor);
+            getTimeRangePC().getLegend().setForeground(foregroundColor);
             getTimeRangePC().addListener(SWT.MouseMove, fMouseMoveListener);
             getTimeRangePC().addMouseListener(fMouseClickListener);
         }

@@ -24,7 +24,6 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -39,6 +38,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.Messages;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
@@ -141,10 +141,8 @@ public class TimeEventFilterDialog extends Dialog {
         if (fRegex != null) {
             filterText.setText(fRegex);
         }
-        Color background = filterText.getBackground();
         filterText.addModifyListener(e -> {
             fRegex = filterText.getText();
-            filterText.setBackground(background);
             fView.restartZoomThread();
         });
 
@@ -175,7 +173,7 @@ public class TimeEventFilterDialog extends Dialog {
     private void handleEnterPressed(Composite parent, Composite labels, Text filterText) {
         String currentRegex = filterText.getText();
         if (currentRegex.isEmpty() || fFilterRegexes.size() == MAX_FILTER_REGEX_SIZE || fFilterRegexes.contains(currentRegex)) {
-            filterText.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY));
+            filterText.setBackground(fControl.getColorScheme().getColor(TimeGraphColorScheme.TOOL_BACKGROUND));
             return;
         }
         boolean added = fFilterRegexes.add(currentRegex);
@@ -207,7 +205,7 @@ public class TimeEventFilterDialog extends Dialog {
         CLabel filter = new CLabel(labels, SWT.NONE);
         filter.setText(currentRegex);
         filter.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_DELETE));
-        filter.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_YELLOW));
+        filter.setBackground(fControl.getColorScheme().getColor(TimeGraphColorScheme.TOOL_BACKGROUND));
         filter.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDown(MouseEvent e2) {

@@ -258,7 +258,7 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
             return;
         }
         // draw marker category
-        gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+        gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
         gc.setClipping(rect);
         int width = gc.textExtent(category).x + TEXT_MARGIN;
         int x = rect.x + EXPANDED.getBounds().width + HIDE.getBounds().width;

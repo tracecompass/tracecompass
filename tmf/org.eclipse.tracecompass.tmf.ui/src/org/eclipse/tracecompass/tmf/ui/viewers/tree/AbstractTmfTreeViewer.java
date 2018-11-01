@@ -147,12 +147,12 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
 
         @Override
         public Color getForeground(Object element, int columnIndex) {
-            return Display.getCurrent().getSystemColor(SWT.COLOR_LIST_FOREGROUND);
+            return null;
         }
 
         @Override
         public Color getBackground(Object element, int columnIndex) {
-            return Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+            return null;
         }
 
         @Override

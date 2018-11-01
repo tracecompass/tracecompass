@@ -24,6 +24,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -60,6 +61,7 @@ import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import org.eclipse.tracecompass.tmf.ui.views.filter.FilterDialog;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Color view implementation. This view provides support for managing color settings for filters.
@@ -79,6 +81,9 @@ public class ColorsView extends TmfView {
     private static final Image MOVE_DOWN_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/movedown_button.gif"); //$NON-NLS-1$
     private static final Image IMPORT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/import_button.gif"); //$NON-NLS-1$
     private static final Image EXPORT_IMAGE = Activator.getDefault().getImageFromPath("/icons/elcl16/export_button.gif"); //$NON-NLS-1$
+
+    private static final String THEME_BACKGROUND = "org.eclipse.tracecompass.tmf.ui.BACKGROUND"; //$NON-NLS-1$
+    private static final String THEME_FOREGROUND = "org.eclipse.tracecompass.tmf.ui.FOREGROUND"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Main data structures
@@ -274,10 +279,21 @@ public class ColorsView extends TmfView {
     private class AddAction extends Action {
         @Override
         public void run() {
+            Color fc = getThemeColor(THEME_FOREGROUND);
+            Color bc = getThemeColor(THEME_BACKGROUND);
+
+            if (fc == null) {
+                fc = Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND);
+            }
+
+            if (bc == null) {
+                bc = Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+            }
+
             ColorSetting colorSetting = new ColorSetting(
-                    checkNotNull(Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB()),
-                    checkNotNull(Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB()),
-                    checkNotNull(Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB()),
+                    checkNotNull(fc.getRGB()),
+                    checkNotNull(bc.getRGB()),
+                    checkNotNull(fc.getRGB()),
                     null);
             ColorSettingRow row = new ColorSettingRow(fListComposite, colorSetting);
             if (fSelectedRow == null) {
@@ -589,5 +605,11 @@ public class ColorsView extends TmfView {
             return fColorSetting;
         }
 
+    }
+
+    private static Color getThemeColor(String themeColorName) {
+        ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
+        Color c = colorRegistry.get(themeColorName);
+        return c;
     }
 }
