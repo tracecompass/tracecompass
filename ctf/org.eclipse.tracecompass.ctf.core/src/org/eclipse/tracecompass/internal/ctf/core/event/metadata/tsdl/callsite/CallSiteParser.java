@@ -37,7 +37,7 @@ public final class CallSiteParser implements ICommonTreeParser {
     /**
      * Instance of the parser
      */
-    public static CallSiteParser INSTANCE = new CallSiteParser();
+    public static final CallSiteParser INSTANCE = new CallSiteParser();
 
     private static final @NonNull String LINE = "line"; //$NON-NLS-1$
     private static final @NonNull String FILE = "file"; //$NON-NLS-1$
