@@ -10,14 +10,24 @@ package org.eclipse.tracecompass.tmf.ui.tracetype.preferences;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ColumnViewerEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
+import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerEditor;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
@@ -31,13 +41,18 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
+import org.eclipse.tracecompass.tmf.core.project.model.TraceTypePreferences;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.FilteredCheckboxTree;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TreePatternFilter;
 import org.eclipse.ui.dialogs.PatternFilter;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -52,8 +67,15 @@ public class TraceTypePreferencePageViewer {
     private static final int BUTTON_CHECK_SELECTED_ID = IDialogConstants.CLIENT_ID;
     private static final int BUTTON_UNCHECK_SELECTED_ID = IDialogConstants.CLIENT_ID + 1;
     private static final String[] FILTER_COLUMN_NAMES = new String[] {
-            "Trace Types" //$NON-NLS-1$
+            "Trace Types", //$NON-NLS-1$
+            "Initial Range Duration" //$NON-NLS-1$
     };
+    private static final String[] COLUMN_PROPERTIES = new String[] {
+            "NAME", //$NON-NLS-1$
+            "DURATION" //$NON-NLS-1$
+    };
+
+    private static final Set<String> EDITABLE = ImmutableSet.of(Objects.requireNonNull(FILTER_COLUMN_NAMES[1]));
 
     private boolean fIsEmpty;
     private FilteredCheckboxTree fTree;
@@ -62,6 +84,7 @@ public class TraceTypePreferencePageViewer {
     private ViewerComparator fComparator;
     private List<ViewerFilter> fFilters;
     private Iterable<@NonNull TraceTypeHelper> fEntries;
+    private TextCellEditor fCellEditor;
 
     /**
      * Constructor
@@ -138,25 +161,92 @@ public class TraceTypePreferencePageViewer {
         fTree = new FilteredCheckboxTree(parent, SWT.BORDER | SWT.MULTI, filter, true);
         fTree.setLayout(new GridLayout());
         fTree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        TreeViewer viewer = fTree.getViewer();
+        TextCellEditor[] editors = new TextCellEditor[FILTER_COLUMN_NAMES.length];
 
-        Tree tree = fTree.getViewer().getTree();
+        TreeViewerEditor.create(viewer, new ColumnViewerEditorActivationStrategy(viewer) {
+            @Override
+            protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
+                if (event.getSource() instanceof ViewerCell) {
+                    ViewerCell viewerCell = (ViewerCell) event.getSource();
+                    if (editors[viewerCell.getColumnIndex()] != null) {
+                        return event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION;
+                    }
+                }
+                return false;
+            }
+        }, ColumnViewerEditor.DEFAULT);
+        Tree tree = viewer.getTree();
+        fCellEditor = new TextCellEditor(tree, SWT.BORDER);
         tree.setHeaderVisible(true);
         for (String columnName : FILTER_COLUMN_NAMES) {
             TreeColumn column = new TreeColumn(tree, SWT.LEFT);
             column.setText(columnName);
         }
-
-        fTree.getViewer().setContentProvider(fContentProvider);
-        fTree.getViewer().setLabelProvider(fLabelProvider);
-        fTree.addCheckStateListener(new CheckStateListener());
-        fTree.getViewer().setComparator(fComparator);
-        if (fFilters != null) {
-            for (int i = 0; i != fFilters.size(); i++) {
-                fTree.getViewer().addFilter(fFilters.get(i));
+        for (int i = 0; i < FILTER_COLUMN_NAMES.length; i++) {
+            if (EDITABLE.contains(FILTER_COLUMN_NAMES[i])) {
+                editors[i] = fCellEditor;
             }
         }
-        fTree.getViewer().setInput(fEntries);
-        return (CheckboxTreeViewer) fTree.getViewer();
+        viewer.setContentProvider(fContentProvider);
+        viewer.setLabelProvider(fLabelProvider);
+        viewer.setColumnProperties(COLUMN_PROPERTIES);
+        viewer.setCellEditors(editors);
+        viewer.setCellModifier(new ICellModifier() {
+
+            @Override
+            public void modify(Object element, String property, Object value) {
+                if (element instanceof TreeItem) {
+                    TreeItem treeItem = (TreeItem) element;
+                    Object data = treeItem.getData();
+                    if (data instanceof TraceTypeHelper) {
+                        TraceTypeHelper helper = (TraceTypeHelper) data;
+                        if (property.equals(COLUMN_PROPERTIES[1])) {
+                            try {
+                                String text = value.toString().replaceAll("\\s", ""); //$NON-NLS-1$ //$NON-NLS-2$
+                                double doubleval = Double.parseDouble(text) * 1e9;
+                                TraceTypePreferences.setInitialTimeRange(helper.getTraceTypeId(), (long) doubleval);
+                                viewer.refresh();
+                            } catch (NumberFormatException e) {
+                                // ignore me
+                            }
+                        }
+
+                    }
+                }
+
+            }
+
+            @Override
+            public Object getValue(Object element, String property) {
+                if (element instanceof TraceTypeHelper) {
+                    TraceTypeHelper helper = (TraceTypeHelper) element;
+                    if (property.equals(COLUMN_PROPERTIES[1])) {
+                        String traceTypeId = helper.getTraceTypeId();
+                        return TmfTimestamp.fromNanos(TraceTypePreferences.getInitialTimeRange(traceTypeId, helper.getTrace().getInitialRangeOffset().toNanos())).toString(TmfTimestampFormat.getDefaulIntervalFormat());
+                    }
+                }
+                return element;
+            }
+
+            @Override
+            public boolean canModify(Object element, String property) {
+                if (element instanceof TraceTypeHelper) {
+                    return property.equals(COLUMN_PROPERTIES[1]);
+                }
+                return false;
+            }
+        });
+
+        fTree.addCheckStateListener(new CheckStateListener());
+        viewer.setComparator(fComparator);
+        if (fFilters != null) {
+            for (int i = 0; i != fFilters.size(); i++) {
+                viewer.addFilter(fFilters.get(i));
+            }
+        }
+        viewer.setInput(fEntries);
+        return (CheckboxTreeViewer) viewer;
     }
 
     /**
@@ -250,8 +340,15 @@ public class TraceTypePreferencePageViewer {
     public void performDefaults() {
         Object input = fTree.getViewer().getInput();
         if (input instanceof Iterable) {
-            ((Iterable<?>) input).forEach(element -> checkElementAndSubtree(element));
+            ((Iterable<?>) input).forEach(this::checkElementAndSubtree);
+            ((Iterable<?>) input).forEach(element -> {
+                if(element instanceof TraceTypeHelper) {
+                    TraceTypeHelper helper = (TraceTypeHelper) element;
+                    TraceTypePreferences.resetInitialTimeRange(helper.getTraceTypeId());
+                }
+            });
         }
+        fTree.getViewer().refresh();
         fTree.getViewer().expandAll();
     }
 

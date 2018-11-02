@@ -77,5 +77,6 @@ public class TraceTypeTreeContentProvider implements ITreeContentProvider {
 
     @Override
     public void dispose() {
+        // do nothing
     }
 }

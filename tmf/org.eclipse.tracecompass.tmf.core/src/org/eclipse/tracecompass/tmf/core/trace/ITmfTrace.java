@@ -34,6 +34,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
+import org.eclipse.tracecompass.tmf.core.project.model.TraceTypePreferences;
 import org.eclipse.tracecompass.tmf.core.synchronization.ITmfTimestampTransform;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -536,6 +537,7 @@ public interface ITmfTrace extends ITmfEventProvider {
      */
     public default TmfTimeRange getInitialTimeRange() {
         ITmfTimestamp startTime = getStartTime();
-        return new TmfTimeRange(startTime, TmfTimestamp.fromNanos(SaturatedArithmetic.add(startTime.toNanos(), getInitialRangeOffset().toNanos())));
-    }
+        String traceTypeId = getTraceTypeId();
+        long initialTimeRange = traceTypeId != null ? TraceTypePreferences.getInitialTimeRange(traceTypeId, getInitialRangeOffset().toNanos()) : getInitialRangeOffset().toNanos();
+        return new TmfTimeRange(startTime, TmfTimestamp.fromNanos(SaturatedArithmetic.add(startTime.toNanos(), initialTimeRange)));    }
 }

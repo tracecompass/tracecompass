@@ -13,6 +13,9 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
+import org.eclipse.tracecompass.tmf.core.project.model.TraceTypePreferences;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 
 /**
  * Trace type element label provider
@@ -27,10 +30,12 @@ public class TraceTypeLabelProvider implements ITableLabelProvider, ILabelProvid
 
     @Override
     public void addListener(ILabelProviderListener listener) {
+        // do nothing
     }
 
     @Override
     public void dispose() {
+        // do nothing
     }
 
     @Override
@@ -40,6 +45,7 @@ public class TraceTypeLabelProvider implements ITableLabelProvider, ILabelProvid
 
     @Override
     public void removeListener(ILabelProviderListener listener) {
+        // do nothing
     }
 
     @Override
@@ -51,7 +57,15 @@ public class TraceTypeLabelProvider implements ITableLabelProvider, ILabelProvid
     public String getColumnText(Object element, int columnIndex) {
         if (columnIndex == 0) {
             return getText(element);
+        } else if (columnIndex == 1) {
+            if (element instanceof TraceTypeHelper) {
+                TraceTypeHelper helper = (TraceTypeHelper) element;
+                String traceTypeId = helper.getTraceTypeId();
+                long initialTimeRange = TraceTypePreferences.getInitialTimeRange(traceTypeId, helper.getTrace().getInitialRangeOffset().toNanos());
+                return TmfTimestamp.fromNanos(initialTimeRange).toString(TmfTimestampFormat.getDefaulIntervalFormat());
+            }
         }
+
         return EMPTY_STRING;
     }
 
@@ -62,8 +76,6 @@ public class TraceTypeLabelProvider implements ITableLabelProvider, ILabelProvid
 
     @Override
     public String getText(Object element) {
-        return element instanceof TraceTypeHelper ?
-                ((TraceTypeHelper) element).getName() :
-                    element.toString();
+        return element instanceof TraceTypeHelper ? ((TraceTypeHelper) element).getName() : element.toString();
     }
 }

@@ -27,6 +27,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.project.model.TraceTypePreferences;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
@@ -806,9 +807,10 @@ public class TmfTraceManagerTest {
     }
 
     private static TmfTimeRange getInitialRange(ITmfTrace trace) {
+        long initialTimeRange = TraceTypePreferences.getInitialTimeRange(trace.getTraceTypeId(), trace.getInitialRangeOffset().toNanos());
         return new TmfTimeRange(
                 trace.getStartTime(),
-                calculateOffset(trace.getStartTime(), trace.getInitialRangeOffset()));
+                calculateOffset(trace.getStartTime(), TmfTimestamp.fromNanos(initialTimeRange)));
     }
 
     /**

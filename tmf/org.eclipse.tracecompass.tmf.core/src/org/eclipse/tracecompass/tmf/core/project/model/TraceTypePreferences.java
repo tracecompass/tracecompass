@@ -35,6 +35,8 @@ public final class TraceTypePreferences {
      */
     public static final String TRACE_TYPE_PREFERENCE_KEY = "org.eclipse.tracecompass.tmf.core.prefs.traceType"; //$NON-NLS-1$
 
+    private static final String INITIAL_TIME_RANGE_PREFERENCE_KEY = "org.eclipse.tracecompass.tmf.core.prefs.traceType.initial.range"; //$NON-NLS-1$
+
     /**
      * Initialize the trace type preferences
      */
@@ -82,6 +84,51 @@ public final class TraceTypePreferences {
     private static IEclipsePreferences getEclipsePreference() {
         IEclipsePreferences configurationPreferences = ConfigurationScope.INSTANCE.getNode(Activator.PLUGIN_ID);
         return configurationPreferences;
+    }
+
+    /**
+     * Get the Initial time range
+     *
+     * @param traceType
+     *            the trace type
+     * @param defaultValue
+     *            the default value
+     * @return the time range in ns
+     * @since 4.2
+     */
+    public static long getInitialTimeRange(String traceType, long defaultValue) {
+        IEclipsePreferences configurationPreferences = getEclipsePreference();
+        return configurationPreferences.getLong(getTracePreferenceKey(traceType), defaultValue);
+    }
+
+    /**
+     * Set the Initial time range
+     *
+     * @param traceType
+     *            the trace type
+     * @param value
+     *            the time range in ns
+     * @since 4.2
+     */
+    public static void setInitialTimeRange(String traceType, long value) {
+        IEclipsePreferences configurationPreferences = getEclipsePreference();
+        configurationPreferences.putLong(getTracePreferenceKey(traceType), value);
+    }
+
+    /**
+     * Reset to the default value the Initial time range
+     *
+     * @param traceType
+     *            the trace type
+     * @since 4.2
+     */
+    public static void resetInitialTimeRange(String traceType) {
+        IEclipsePreferences configurationPreferences = getEclipsePreference();
+        configurationPreferences.remove(getTracePreferenceKey(traceType));
+    }
+
+    private static String getTracePreferenceKey(String traceType) {
+        return TraceTypePreferences.INITIAL_TIME_RANGE_PREFERENCE_KEY + '.' + traceType;
     }
 
     /**
