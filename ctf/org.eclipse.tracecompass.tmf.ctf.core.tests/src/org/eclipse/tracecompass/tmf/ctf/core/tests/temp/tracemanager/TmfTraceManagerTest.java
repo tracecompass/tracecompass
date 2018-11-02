@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
@@ -816,6 +817,6 @@ public class TmfTraceManagerTest {
     private static @NonNull ITmfTimestamp calculateOffset(ITmfTimestamp initialTs, ITmfTimestamp offsetTs) {
         long start = initialTs.toNanos();
         long offset = offsetTs.toNanos();
-        return TmfTimestamp.fromNanos(start + offset);
+        return TmfTimestamp.fromNanos(SaturatedArithmetic.add(start, offset));
     }
 }
