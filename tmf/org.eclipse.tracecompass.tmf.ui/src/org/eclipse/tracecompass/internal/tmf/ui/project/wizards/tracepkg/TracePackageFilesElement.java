@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 public class TracePackageFilesElement extends TracePackageElement {
 
     private static final String TRACE_ICON_PATH = "icons/elcl16/trace.gif"; //$NON-NLS-1$
+    private static final String EXPERIMENT_ICON_PATH = "icons/elcl16/experiment.gif"; //$NON-NLS-1$
     private String fFileName;
     private final IResource fResource;
     private long fSize = -1;
@@ -87,11 +88,17 @@ public class TracePackageFilesElement extends TracePackageElement {
 
     @Override
     public String getText() {
+        if (getParent() instanceof TracePackageExperimentElement) {
+            return Messages.TracePackage_ExperimentElement;
+        }
         return Messages.TracePackage_TraceElement;
     }
 
     @Override
     public Image getImage() {
+        if (getParent() instanceof TracePackageExperimentElement) {
+            return Activator.getDefault().getImageFromImageRegistry(EXPERIMENT_ICON_PATH);
+        }
         return Activator.getDefault().getImageFromImageRegistry(TRACE_ICON_PATH);
     }
 

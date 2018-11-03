@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,9 +15,9 @@ package org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.import
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,13 +43,16 @@ import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Abstrac
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.ITracePackageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageBookmarkElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageElement;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageExperimentElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageFilesElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageSupplFileElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageSupplFilesElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageTraceElement;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfCommonProjectElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectModelElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.internal.wizards.datatransfer.ArchiveFileExportOperation;
 import org.w3c.dom.Document;
@@ -113,14 +116,20 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
             Element createElement = doc.createElement(ITracePackageConstants.TMF_EXPORT_ELEMENT);
             Node tmfNode = doc.appendChild(createElement);
 
+            List<TracePackageExperimentElement> experimentPackageElements = new ArrayList<>();
             for (TracePackageTraceElement tracePackageElement : fTraceExportElements) {
                 if (!isFilesChecked(tracePackageElement)) {
                     continue;
                 }
-
-                exportTrace(progressMonitor, tmfNode, tracePackageElement);
+                if (tracePackageElement instanceof TracePackageExperimentElement) {
+                    experimentPackageElements.add((TracePackageExperimentElement) tracePackageElement);
+                } else {
+                    exportTrace(progressMonitor, tmfNode, tracePackageElement);
+                }
             }
-
+            for (TracePackageExperimentElement experimentPackageElement : experimentPackageElements) {
+                exportExperiment(progressMonitor, tmfNode, experimentPackageElement);
+            }
             Transformer transformer = XmlUtils.newSecureTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -157,35 +166,49 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
     }
 
     private void exportTrace(IProgressMonitor monitor, Node tmfNode, TracePackageTraceElement tracePackageElement) throws InterruptedException, CoreException {
-        TmfTraceElement traceElement = tracePackageElement.getTraceElement();
-        Element traceXmlElement = tmfNode.getOwnerDocument().createElement(ITracePackageConstants.TRACE_ELEMENT);
-        traceXmlElement.setAttribute(ITracePackageConstants.TRACE_NAME_ATTRIB, traceElement.getResource().getName());
-        traceXmlElement.setAttribute(ITracePackageConstants.TRACE_TYPE_ATTRIB, traceElement.getTraceType());
-        Node traceNode = tmfNode.appendChild(traceXmlElement);
+        exportCommon(monitor, tmfNode, tracePackageElement, ITracePackageConstants.TRACE_ELEMENT);
+    }
+
+    private void exportExperiment(IProgressMonitor monitor, Node tmfNode, TracePackageExperimentElement experimentPackageElement) throws InterruptedException, CoreException {
+        Node expNode = exportCommon(monitor, tmfNode, experimentPackageElement, ITracePackageConstants.EXPERIMENT_ELEMENT);
+        TmfExperimentElement experimentElement = (TmfExperimentElement) experimentPackageElement.getTraceElement();
+        for (TmfTraceElement traceElement : experimentElement.getTraces()) {
+            Element expTraceXmlElement = expNode.getOwnerDocument().createElement(ITracePackageConstants.EXP_TRACE_ELEMENT);
+            expTraceXmlElement.setAttribute(ITracePackageConstants.TRACE_NAME_ATTRIB, traceElement.getElementPath());
+            expNode.appendChild(expTraceXmlElement);
+        }
+    }
+
+    private Node exportCommon(IProgressMonitor monitor, Node tmfNode, TracePackageTraceElement tracePackageElement, String elementString) throws InterruptedException, CoreException {
+        TmfCommonProjectElement commonElement = tracePackageElement.getTraceElement();
+        Element commonXmlElement = tmfNode.getOwnerDocument().createElement(elementString);
+        commonXmlElement.setAttribute(ITracePackageConstants.TRACE_NAME_ATTRIB, commonElement.getResource().getName());
+        commonXmlElement.setAttribute(ITracePackageConstants.TRACE_TYPE_ATTRIB, commonElement.getTraceType());
+        Node commonNode = tmfNode.appendChild(commonXmlElement);
 
         for (TracePackageElement element : tracePackageElement.getChildren()) {
             ModalContext.checkCanceled(monitor);
             if (!element.isChecked()) {
                 continue;
             }
-
             if (element instanceof TracePackageSupplFilesElement) {
-                exportSupplementaryFiles(monitor, traceNode, traceElement, (TracePackageSupplFilesElement) element);
+                exportSupplementaryFiles(monitor, commonNode, commonElement, (TracePackageSupplFilesElement) element);
             } else if (element instanceof TracePackageBookmarkElement) {
-                exportBookmarks(monitor, traceNode, (TracePackageBookmarkElement) element);
-            } else if (element instanceof TracePackageFilesElement) {
-                exportTraceFiles(monitor, traceNode, (TracePackageFilesElement) element);
+                exportBookmarks(monitor, commonNode, (TracePackageBookmarkElement) element);
+            } else if (element instanceof TracePackageFilesElement && commonElement instanceof TmfTraceElement) {
+                exportTraceFiles(monitor, commonNode, (TracePackageFilesElement) element);
             }
 
             monitor.worked(1);
         }
+        return commonNode;
     }
 
-    private void exportSupplementaryFiles(IProgressMonitor monitor, Node traceNode, TmfTraceElement traceElement, TracePackageSupplFilesElement element) throws InterruptedException, CoreException {
-        Document doc = traceNode.getOwnerDocument();
+    private void exportSupplementaryFiles(IProgressMonitor monitor, Node commonNode, TmfCommonProjectElement commonElement, TracePackageSupplFilesElement element) throws InterruptedException, CoreException {
+        Document doc = commonNode.getOwnerDocument();
         if (element.getChildren().length > 0) {
 
-            IPath projectPath = traceElement.getProject().getPath();
+            IPath projectPath = commonElement.getProject().getPath();
 
             for (TracePackageElement child : element.getChildren()) {
                 TracePackageSupplFileElement supplFile = (TracePackageSupplFileElement) child;
@@ -203,7 +226,7 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
                 Element suppFileElement = doc.createElement(ITracePackageConstants.SUPPLEMENTARY_FILE_ELEMENT);
 
                 suppFileElement.setAttribute(ITracePackageConstants.SUPPLEMENTARY_FILE_NAME_ATTRIB, relativeToExportFolder.toString());
-                traceNode.appendChild(suppFileElement);
+                commonNode.appendChild(suppFileElement);
             }
 
             IFolder suppFilesFolder = fExportFolder.getFolder(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER_NAME);
@@ -213,10 +236,10 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
 
     private void exportTraceFiles(IProgressMonitor monitor, Node traceNode, TracePackageFilesElement element) throws CoreException {
         Document doc = traceNode.getOwnerDocument();
-        TmfTraceElement traceElement = ((TracePackageTraceElement) element.getParent()).getTraceElement();
+        TmfCommonProjectElement traceElement = ((TracePackageTraceElement) element.getParent()).getTraceElement();
         IResource resource = traceElement.getResource();
 
-        final TmfTraceFolder tracesFolder = traceElement.getProject().getTracesFolder();
+        final TmfProjectModelElement tracesFolder = traceElement.getProject().getTracesFolder();
         if (tracesFolder == null) {
             return;
         }
@@ -235,7 +258,8 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
         fileElement.setAttribute(ITracePackageConstants.TRACE_FILE_NAME_ATTRIB, relativeToExportFolder.toString());
         traceNode.appendChild(fileElement);
 
-        // Always export the top-most folder containing the trace or the trace itself
+        // Always export the top-most folder containing the trace or the
+        // trace itself
         IResource exportedResource = fExportFolder.findMember(relativeToExportFolder.segment(0));
         fResources.add(exportedResource);
     }
@@ -253,24 +277,26 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
         // Note: The resources cannot be HIDDEN or else they are ignored by ArchiveFileExportOperation
         if (res instanceof IFolder) {
             IFolder folder = exportFolder.getFolder(res.getName());
-            folder.createLink(res.getLocationURI(), IResource.NONE, null);
+            folder.createLink(res.getLocationURI(), IResource.REPLACE, null);
             ret = folder;
         } else if (res instanceof IFile) {
             IFile file = exportFolder.getFile(res.getName());
-            file.createLink(res.getLocationURI(), IResource.NONE, null);
+            if (!file.exists()) {
+                file.createLink(res.getLocationURI(), IResource.NONE, null);
+            }
             ret = file;
         }
         return ret;
     }
 
-    private static void exportBookmarks(IProgressMonitor monitor, Node traceNode, TracePackageBookmarkElement element) throws CoreException, InterruptedException {
-        Document doc = traceNode.getOwnerDocument();
+    private static void exportBookmarks(IProgressMonitor monitor, Node commonNode, TracePackageBookmarkElement element) throws CoreException, InterruptedException {
+        Document doc = commonNode.getOwnerDocument();
         IFile bookmarksFile = ((TracePackageTraceElement) element.getParent()).getTraceElement().getBookmarksFile();
         if (bookmarksFile != null && bookmarksFile.exists()) {
             IMarker[] findMarkers = bookmarksFile.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO);
             if (findMarkers.length > 0) {
                 Element bookmarksXmlElement = doc.createElement(ITracePackageConstants.BOOKMARKS_ELEMENT);
-                Node bookmarksNode = traceNode.appendChild(bookmarksXmlElement);
+                Node bookmarksNode = commonNode.appendChild(bookmarksXmlElement);
 
                 for (IMarker marker : findMarkers) {
                     ModalContext.checkCanceled(monitor);
@@ -300,13 +326,7 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
     private IStatus exportToArchive(IProgressMonitor monitor, int totalWork) throws InvocationTargetException, InterruptedException {
         ArchiveFileExportOperation op = new ArchiveFileExportOperation(new ArrayList<>(fResources), getFileName());
         op.setCreateLeadupStructure(false);
-        //FIXME: Remove use of reflection when support for Eclipse 4.5 is dropped
-        try {
-            Method method = op.getClass().getMethod("setIncludeLinkedResources", boolean.class); //$NON-NLS-1$
-            method.invoke(op, true);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException e) {
-            // Ignored, setIncludeLinkedResources doesn't exist in Eclipse < 4.6
-        }
+        op.setIncludeLinkedResources(true);
         op.setUseCompression(fUseCompression);
         op.setUseTarFormat(fUseTar);
         op.run(SubMonitor.convert(monitor).newChild(totalWork / 2));

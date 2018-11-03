@@ -24,19 +24,15 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -50,12 +46,15 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.AbstractTracePackageWizardPage;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageBookmarkElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageElement;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageExperimentElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageFilesElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageLabelProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageSupplFileElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageSupplFilesElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageTraceElement;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfCommonProjectElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 
 /**
@@ -87,7 +86,7 @@ public class ExportTracePackageWizardPage extends AbstractTracePackageWizardPage
     private Button fZipFormatButton;
     private Button fTargzFormatButton;
     private Label fApproximateSizeLabel;
-    private List<TmfTraceElement> fSelectedTraces;
+    private List<TmfCommonProjectElement> fSelectedTraces;
 
     /**
      * Constructor for the export trace package wizard page
@@ -97,9 +96,9 @@ public class ExportTracePackageWizardPage extends AbstractTracePackageWizardPage
      * @param selectedTraces
      *            the selected traces from the selection
      */
-    public ExportTracePackageWizardPage(IStructuredSelection selection, List<TmfTraceElement> selectedTraces) {
+    public ExportTracePackageWizardPage(IStructuredSelection selection, List<TmfCommonProjectElement> selectedTraces) {
         super(PAGE_NAME, Messages.ExportTracePackageWizardPage_Title, Activator.getDefault().getImageDescripterFromPath(ICON_PATH), selection);
-        fSelectedTraces = selectedTraces;
+        fSelectedTraces = new ArrayList<>(selectedTraces);
     }
 
     /**
@@ -111,7 +110,7 @@ public class ExportTracePackageWizardPage extends AbstractTracePackageWizardPage
      */
     public void setSelectedTraces(List<TmfTraceElement> selectedTraces) {
         if (!fSelectedTraces.containsAll(selectedTraces) || !selectedTraces.containsAll(fSelectedTraces)) {
-            fSelectedTraces = selectedTraces;
+            fSelectedTraces = new ArrayList<>(selectedTraces);
             CheckboxTreeViewer elementViewer = getElementViewer();
             elementViewer.setInput(createElementViewerInput());
             elementViewer.expandToLevel(2);
@@ -178,12 +177,7 @@ public class ExportTracePackageWizardPage extends AbstractTracePackageWizardPage
     protected void createFilePathGroup(Composite parent, String label, int fileDialogStyle) {
         super.createFilePathGroup(parent, label, fileDialogStyle);
 
-        getFilePathCombo().addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                updatePageCompletion();
-            }
-        });
+        getFilePathCombo().addModifyListener(e -> updatePageCompletion());
     }
 
     private void createOptionsGroup(Composite parent) {
@@ -301,18 +295,23 @@ public class ExportTracePackageWizardPage extends AbstractTracePackageWizardPage
     @Override
     protected Object createElementViewerInput() {
         List<TracePackageTraceElement> traceElements = new ArrayList<>();
-        for (TmfTraceElement tmfTraceElement : fSelectedTraces) {
-            TracePackageTraceElement traceElement = new TracePackageTraceElement(null, tmfTraceElement);
+        for (TmfCommonProjectElement projectElement : fSelectedTraces) {
+            TracePackageTraceElement traceElement;
+            if (projectElement instanceof TmfExperimentElement) {
+                traceElement = new TracePackageExperimentElement(null, (TmfExperimentElement) projectElement);
+            } else {
+                traceElement = new TracePackageTraceElement(null, projectElement);
+            }
 
             // Trace files
-            TracePackageFilesElement filesElement = new TracePackageFilesElement(traceElement, tmfTraceElement.getResource());
+            TracePackageFilesElement filesElement = new TracePackageFilesElement(traceElement, projectElement.getResource());
             filesElement.setChecked(true);
 
             // Supplementary files
             try {
-                String supplementaryFolder = tmfTraceElement.getResource().getPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER);
+                String supplementaryFolder = projectElement.getResource().getPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER);
                 TracePackageSupplFilesElement suppFilesElement = new TracePackageSupplFilesElement(null);
-                IResource[] supplementaryResources = tmfTraceElement.getSupplementaryResources();
+                IResource[] supplementaryResources = projectElement.getSupplementaryResources();
                 for (IResource res : supplementaryResources) {
                     String name = supplementaryFolder == null ? res.getName() : res.getLocation().makeRelativeTo(new Path(supplementaryFolder)).toString();
                     new TracePackageSupplFileElement(res, name, suppFilesElement);
@@ -320,7 +319,7 @@ public class ExportTracePackageWizardPage extends AbstractTracePackageWizardPage
                 if (supplementaryFolder != null) {
                     // If the supplementary folder path is in a shadow project,
                     // the resources must be taken from the parent project.
-                    IFolder projectSupplementaryFolder = tmfTraceElement.getProject().getSupplementaryFolder();
+                    IFolder projectSupplementaryFolder = projectElement.getProject().getSupplementaryFolder();
                     IPath path = new Path(supplementaryFolder).append(TmfCommonConstants.TRACE_PROPERTIES_FOLDER);
                     IFolder propertiesFolder = projectSupplementaryFolder.getFolder(path.makeRelativeTo(projectSupplementaryFolder.getLocation()));
                     if (propertiesFolder.exists()) {
@@ -339,7 +338,7 @@ public class ExportTracePackageWizardPage extends AbstractTracePackageWizardPage
             }
 
             // Bookmarks
-            IFile bookmarksFile = tmfTraceElement.getBookmarksFile();
+            IFile bookmarksFile = projectElement.getBookmarksFile();
             if (bookmarksFile != null && bookmarksFile.exists()) {
                 IMarker[] findMarkers;
                 try {
@@ -442,13 +441,7 @@ public class ExportTracePackageWizardPage extends AbstractTracePackageWizardPage
         final TracePackageExportOperation exporter = new TracePackageExportOperation(traceExportElements, useCompression, useTar, fileName);
 
         try {
-            getContainer().run(true, true, new IRunnableWithProgress() {
-
-                @Override
-                public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-                    exporter.run(monitor);
-                }
-            });
+            getContainer().run(true, true, exporter::run);
 
             IStatus status = exporter.getStatus();
             if (status.getSeverity() == IStatus.ERROR) {
@@ -458,6 +451,7 @@ public class ExportTracePackageWizardPage extends AbstractTracePackageWizardPage
         } catch (InvocationTargetException e) {
             handleError(org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation, e);
         } catch (InterruptedException e) {
+            // Do nothing
         }
 
         return exporter.getStatus().getSeverity() == IStatus.OK;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -73,4 +73,14 @@ public interface ITracePackageConstants {
      * Element representing a single bookmark of a trace
      */
     public static final String BOOKMARK_ELEMENT = "bookmark"; //$NON-NLS-1$
+
+    /**
+     * Element representing a single experiment
+     */
+    public static final String EXPERIMENT_ELEMENT = "experiment"; //$NON-NLS-1$
+
+    /**
+     * Element representing an experiment trace
+     */
+    public static final String EXP_TRACE_ELEMENT = "exp-trace"; //$NON-NLS-1$
 }

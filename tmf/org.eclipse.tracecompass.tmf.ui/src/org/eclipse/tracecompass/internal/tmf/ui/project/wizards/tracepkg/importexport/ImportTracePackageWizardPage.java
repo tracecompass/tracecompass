@@ -47,9 +47,11 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.AbstractTracePackageOperation;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.AbstractTracePackageWizardPage;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageElement;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageExperimentElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageFilesElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageTraceElement;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
@@ -360,7 +362,7 @@ public class ImportTracePackageWizardPage extends AbstractTracePackageWizardPage
             }
 
             if (traceExists(traceElement)) {
-                int returnCode = promptForOverwrite(traceElement.getDestinationElementPath());
+                int returnCode = promptForOverwrite(traceElement);
                 // The return code is an index to a button in the dialog but the
                 // 'X' button in the window corner is not considered a button
                 // therefore it returns -1 and unfortunately, there is no
@@ -394,15 +396,23 @@ public class ImportTracePackageWizardPage extends AbstractTracePackageWizardPage
     }
 
     private boolean traceExists(TracePackageTraceElement traceElement) {
+        if (traceElement instanceof TracePackageExperimentElement) {
+            TmfExperimentFolder experimentsFolder = fTmfTraceFolder.getProject().getExperimentsFolder();
+            return experimentsFolder != null && experimentsFolder.getChild(traceElement.getImportName()) != null;
+        }
         IResource traceRes = fTmfTraceFolder.getResource().findMember(traceElement.getDestinationElementPath());
         return traceRes != null;
     }
 
-    private int promptForOverwrite(String traceName) {
+    private int promptForOverwrite(TracePackageTraceElement packageElement) {
+        String name = packageElement.getDestinationElementPath();
+        String dialogMessage = packageElement instanceof TracePackageExperimentElement ?
+                Messages.ImportTracePackageWizardPage_ExperimentAlreadyExists :
+                    Messages.ImportTracePackageWizardPage_TraceAlreadyExists;
         final MessageDialog dialog = new MessageDialog(getContainer().getShell(),
                 Messages.ImportTracePackageWizardPage_AlreadyExistsTitle,
                 null,
-                MessageFormat.format(Messages.ImportTracePackageWizardPage_AlreadyExists, traceName),
+                MessageFormat.format(dialogMessage, name),
                 MessageDialog.QUESTION, new String[] {
                         IDialogConstants.NO_TO_ALL_LABEL,
                         IDialogConstants.NO_LABEL,

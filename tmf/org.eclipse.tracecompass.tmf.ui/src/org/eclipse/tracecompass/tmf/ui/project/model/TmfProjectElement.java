@@ -44,9 +44,9 @@ public class TmfProjectElement extends TmfProjectModelElement {
     // Attributes
     // ------------------------------------------------------------------------
 
-    @Nullable private TmfTraceFolder fTraceFolder = null;
-    @Nullable private TmfExperimentFolder fExperimentFolder = null;
-    @Nullable private IFolder fSupplFolder = null;
+    private @Nullable TmfTraceFolder fTraceFolder = null;
+    private @Nullable TmfExperimentFolder fExperimentFolder = null;
+    private @Nullable IFolder fSupplFolder = null;
 
     // ------------------------------------------------------------------------
     // Constructor
