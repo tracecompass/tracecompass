@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -72,6 +73,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISaveablePart;
+import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -105,11 +107,31 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
     private Button fDeleteButton;
     private Button fExportButton;
     private Button fEditButton;
-    private Label fInvalidFileLabel;
-    private Label fEnabledFileLabel;
+    private Label fStatusLabel;
 
     private static final String LINE_SEP = System.getProperty("line.separator"); //$NON-NLS-1$
     private static final String ELEMENT_SEP = "-\t"; //$NON-NLS-1$
+
+    private static final IPropertyListener SAVE_EDITOR_LISTENER = new IPropertyListener() {
+        @Override
+        public void propertyChanged(Object source, int propId) {
+            if (source instanceof IEditorPart) {
+                IEditorPart editorPart = (IEditorPart) source;
+                if (ISaveablePart.PROP_DIRTY == propId && !editorPart.isDirty()) {
+                    // Editor is not dirty anymore, i.e. it was saved
+                    if (editorPart.getEditorInput() instanceof IURIEditorInput) {
+                        File file = URIUtil.toFile(((IURIEditorInput) editorPart.getEditorInput()).getURI());
+                        boolean success = loadXmlFile(file, false);
+                        if (success) {
+                            enableAndDisableAnalyses(Collections.singletonList(file.getName()), Collections.emptyList());
+                        } else {
+                            enableAndDisableAnalyses(Collections.emptyList(), Collections.singletonList(file.getName()));
+                        }
+                    }
+                }
+            }
+        }
+    };
 
     @Override
     public void init(IWorkbench workbench) {
@@ -171,7 +193,7 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
                     setButtonsEnabled(false);
                 } else {
                     setButtonsEnabled(true);
-                    handleSelection(fAnalysesTable.getSelection()[0]);
+                    handleSelection(fAnalysesTable.getSelection());
                 }
             }
         });
@@ -184,17 +206,8 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
      *            the parent composite
      */
     private void createLabels(Composite composite) {
-        fInvalidFileLabel = new Label(composite, SWT.ICON_ERROR);
-        fInvalidFileLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
-        fInvalidFileLabel.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_RED));
-        fInvalidFileLabel.setText(Messages.ManageXMLAnalysisDialog_FileValidationError);
-        fInvalidFileLabel.setVisible(false);
-
-        fEnabledFileLabel = new Label(composite, SWT.ICON_WORKING);
-        fEnabledFileLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
-        fEnabledFileLabel.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
-        fEnabledFileLabel.setText(Messages.ManageXMLAnalysisDialog_FileEnabled);
-        fEnabledFileLabel.setVisible(false);
+        fStatusLabel = new Label(composite, SWT.NONE);
+        fStatusLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     }
 
     /**
@@ -283,6 +296,7 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
                 for (TableItem selectedItem : fAnalysesTable.getSelection()) {
                     selectedItem.setChecked(true);
                 }
+                handleSelection(fAnalysesTable.getSelection());
             }
         });
 
@@ -292,6 +306,7 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
                 for (TableItem selectedItem : fAnalysesTable.getItems()) {
                     selectedItem.setChecked(true);
                 }
+                handleSelection(fAnalysesTable.getSelection());
             }
         });
 
@@ -347,20 +362,33 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
      * @param selection
      *            the selected table item
      */
-    private void handleSelection(TableItem selection) {
-        String xmlName = XmlUtils.createXmlFileString(selection.getText());
-        if (isFileValid(xmlName)) {
-            fInvalidFileLabel.setVisible(false);
-            fEnabledFileLabel.setVisible(XmlUtils.isAnalysisEnabled(xmlName));
-        } else {
-            fInvalidFileLabel.setVisible(true);
-            fEnabledFileLabel.setVisible(false);
-            if (XmlUtils.isAnalysisEnabled(xmlName)) {
-                enableAndDisableAnalyses(
-                        Collections.emptyList(),
-                        ImmutableList.of(Objects.requireNonNull(xmlName)));
-                selection.setChecked(false);
+    private void handleSelection(TableItem[] selection) {
+        for (TableItem selectedItem : selection) {
+            String xmlName = XmlUtils.createXmlFileString(selectedItem.getText());
+            if (isFileValid(xmlName)) {
+                if (selection.length == 1) {
+                    if (XmlUtils.isAnalysisEnabled(xmlName)) {
+                        fStatusLabel.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
+                        fStatusLabel.setText(Messages.ManageXMLAnalysisDialog_FileEnabled);
+                    } else {
+                        fStatusLabel.setText(""); //$NON-NLS-1$
+                    }
+                }
+            } else {
+                if (selection.length == 1) {
+                    fStatusLabel.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_RED));
+                    fStatusLabel.setText(Messages.ManageXMLAnalysisDialog_FileValidationError);
+                }
+                if (XmlUtils.isAnalysisEnabled(xmlName)) {
+                    enableAndDisableAnalyses(
+                            Collections.emptyList(),
+                            ImmutableList.of(Objects.requireNonNull(xmlName)));
+                }
+                selectedItem.setChecked(false);
             }
+        }
+        if (selection.length != 1) {
+            fStatusLabel.setText(""); //$NON-NLS-1$
         }
     }
 
@@ -403,16 +431,15 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
             } else if (!item.getChecked() && XmlUtils.isAnalysisEnabled(xmlName)) {
                 filesToDisable.add(xmlName);
             }
-            // Force update for selection handling
-            if (fAnalysesTable.getSelectionCount() > 0) {
-                handleSelection(fAnalysesTable.getSelection()[0]);
-            }
         }
 
         // Apply changes
         if (!(filesToEnable.isEmpty() && filesToDisable.isEmpty())) {
             enableAndDisableAnalyses(filesToEnable, filesToDisable);
         }
+
+        // Force update for selection handling
+        handleSelection(fAnalysesTable.getSelection());
     }
 
     /**
@@ -521,8 +548,7 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
         Map<@NonNull String, @NonNull File> listFiles = XmlUtils.listFiles();
         for (TableItem item : fAnalysesTable.getSelection()) {
             String selection = XmlUtils.createXmlFileString(item.getText());
-            @Nullable
-            File file = listFiles.get(selection);
+            @Nullable File file = listFiles.get(selection);
             if (file == null) {
                 Activator.logError(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToEdit, selection));
                 TraceUtils.displayErrorMsg(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToEdit, selection), NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToEdit, selection));
@@ -530,16 +556,9 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
             }
             try {
                 IEditorPart editorPart = IDE.openEditorOnFileStore(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), EFS.getStore(file.toURI()));
-                editorPart.addPropertyListener(new IPropertyListener() {
-                    @Override
-                    public void propertyChanged(Object source, int propId) {
-                        if (ISaveablePart.PROP_DIRTY == propId && !editorPart.isDirty()) {
-                            // Editor is not dirty anymore, i.e. it was saved
-                            loadXmlFile(file, false);
-                        }
-                    }
-                });
-                performOk();
+                // Remove listener first in case the editor was already opened
+                editorPart.removePropertyListener(SAVE_EDITOR_LISTENER);
+                editorPart.addPropertyListener(SAVE_EDITOR_LISTENER);
             } catch (CoreException e) {
                 Activator.logError(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToEdit, selection));
                 TraceUtils.displayErrorMsg(NLS.bind(Messages.ManageXMLAnalysisDialog_FailedToEdit, selection), e.getMessage());
@@ -583,10 +602,10 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
                 }
                 toDeleteFiles.add(itemTitle);
             }
-            fInvalidFileLabel.setVisible(false);
             Collection<TmfCommonProjectElement> elements = deleteSupplementaryFiles(toDeleteSupFiles);
             XmlUtils.deleteFiles(toDeleteFiles);
             fillAnalysesTable();
+            handleSelection(fAnalysesTable.getSelection());
             XmlAnalysisModuleSource.notifyModuleChange();
             refreshProject(elements);
         }

@@ -265,7 +265,7 @@ public class XMLAnalysesManagerPreferencePageTest {
         SWTBotTable tablebot = bot.table(0);
         SWTBotTableItem tableItem = tablebot.getTableItem(FILE_IMPORT_INVALID);
         tableItem.select();
-        assertTrue(bot.label("Invalid file").isVisible());
+        assertNotNull(bot.label("Invalid file"));
         assertFalse(tableItem.isChecked());
 
         SWTBotUtils.pressOKishButtonInPreferences(bot);
