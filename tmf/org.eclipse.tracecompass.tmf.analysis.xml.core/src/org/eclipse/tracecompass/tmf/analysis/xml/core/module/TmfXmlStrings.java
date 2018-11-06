@@ -220,11 +220,11 @@ public interface TmfXmlStrings {
     String SEGMENT_CONTENT = "segContent";
     String SEGMENT_FIELD = "segField";
     /**
-     * @since 3.1
+     * @since 3.2
      */
     String SEGMENT_TIME = "segTime";
     /**
-     * @since 3.1
+     * @since 3.2
      */
     String DURATION = "duration";
 
