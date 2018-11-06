@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation, Ericsson
+ * Copyright (c) 2005, 2018 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -267,6 +267,7 @@ public class SDView extends ViewPart implements IPartListener {
 
     @Override
     public void dispose() {
+        getSite().getPage().removePartListener(this);
         KeyBindingsManager.getInstance().remove(this.getSite().getId());
 
         /* Workaround for Bug 490400: Clear the action bars */
