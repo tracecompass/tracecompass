@@ -133,6 +133,7 @@ public class GetLoggerInfoDialog extends BaseGetInfoDialog implements IGetLogger
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
             }
         });
         // Create the log level group

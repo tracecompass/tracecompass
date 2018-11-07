@@ -180,6 +180,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
 
     @Override
     public void postDrawEntry(ITimeGraphEntry entry, Rectangle bounds, GC gc) {
+        // Do nothing
     }
 
     /**

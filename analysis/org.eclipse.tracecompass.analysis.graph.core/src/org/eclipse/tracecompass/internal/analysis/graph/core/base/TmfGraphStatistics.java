@@ -64,7 +64,7 @@ public class TmfGraphStatistics implements ITmfGraphVisitor {
 
     @Override
     public void visitHead(TmfVertex node) {
-
+        // Do nothing
     }
 
     @Override

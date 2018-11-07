@@ -38,9 +38,11 @@ public class Activator extends TraceCompassActivator {
 
     @Override
     protected void startActions() {
+        // Do nothing
     }
 
     @Override
     protected void stopActions() {
+        // Do nothing
     }
 }

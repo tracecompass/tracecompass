@@ -27,17 +27,17 @@ public class TmfGraphVisitor implements ITmfGraphVisitor {
 
     @Override
     public void visitHead(TmfVertex node) {
-
+        // Do nothing
     }
 
     @Override
     public void visit(TmfVertex node) {
-
+        // Do nothing
     }
 
     @Override
     public void visit(TmfEdge edge, boolean horizontal) {
-
+        // Do nothing
     }
 
 }

@@ -41,6 +41,7 @@ public final class SymbolAspect implements ISegmentAspect {
      * Constructor
      */
     public SymbolAspect() {
+        // Do nothing
     }
 
     @Override

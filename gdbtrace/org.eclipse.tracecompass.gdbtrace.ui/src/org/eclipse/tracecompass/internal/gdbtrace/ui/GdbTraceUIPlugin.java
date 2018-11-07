@@ -39,6 +39,7 @@ public class GdbTraceUIPlugin extends AbstractUIPlugin {
      * Constructor
      */
     public GdbTraceUIPlugin() {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------

@@ -69,6 +69,7 @@ public class MouseSelectionProvider extends BaseMouseProvider implements MouseLi
 
     @Override
     public void mouseDoubleClick(@Nullable MouseEvent e) {
+        // Do nothing
     }
 
     @Override

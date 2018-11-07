@@ -96,6 +96,7 @@ public class EventDeclaration implements IEventDeclaration {
      * accordingly.
      */
     public EventDeclaration() {
+        // Do nothing
     }
 
     /**

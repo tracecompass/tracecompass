@@ -57,10 +57,12 @@ public class SimpleTooltipProvider extends BaseMouseProvider implements MouseTra
 
     @Override
     public void mouseEnter(@Nullable MouseEvent e) {
+        // Do nothing
     }
 
     @Override
     public void mouseExit(@Nullable MouseEvent e) {
+        // Do nothing
     }
 
     @Override

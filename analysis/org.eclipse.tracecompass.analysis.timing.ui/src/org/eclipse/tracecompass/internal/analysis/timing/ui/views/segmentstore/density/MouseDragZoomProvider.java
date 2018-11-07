@@ -66,6 +66,7 @@ public class MouseDragZoomProvider extends BaseMouseProvider implements MouseLis
 
     @Override
     public void mouseDoubleClick(@Nullable MouseEvent e) {
+        // Do nothing
     }
 
     @Override

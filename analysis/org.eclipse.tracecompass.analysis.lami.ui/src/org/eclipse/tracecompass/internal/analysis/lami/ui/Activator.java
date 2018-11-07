@@ -44,6 +44,7 @@ public class Activator extends AbstractUIPlugin {
      * The constructor
      */
     public Activator() {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------
@@ -77,6 +78,7 @@ public class Activator extends AbstractUIPlugin {
 
     @Override
     protected void initializeImageRegistry(ImageRegistry reg) {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------

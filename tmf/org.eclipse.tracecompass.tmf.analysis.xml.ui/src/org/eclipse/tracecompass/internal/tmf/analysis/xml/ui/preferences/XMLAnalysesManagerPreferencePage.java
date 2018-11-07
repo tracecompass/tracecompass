@@ -135,7 +135,7 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
 
     @Override
     public void init(IWorkbench workbench) {
-
+        // Do nothing
     }
 
     @Override

@@ -86,42 +86,52 @@ class NullControlService implements ILttngControlService {
 
     @Override
     public void destroySession(String sessionName, IProgressMonitor monitor) throws ExecutionException {
+        // Do nothing
     }
 
     @Override
     public void startSession(String sessionName, IProgressMonitor monitor) throws ExecutionException {
+        // Do nothing
     }
 
     @Override
     public void stopSession(String sessionName, IProgressMonitor monitor) throws ExecutionException {
+        // Do nothing
     }
 
     @Override
     public void enableChannels(String sessionName, List<String> channelNames, TraceDomainType domain, IChannelInfo info, IProgressMonitor monitor) throws ExecutionException {
+        // Do nothing
     }
 
     @Override
     public void disableChannels(String sessionName, List<String> channelNames, TraceDomainType domain, IProgressMonitor monitor) throws ExecutionException {
+        // Do nothing
     }
 
     @Override
     public void enableEvents(String sessionName, String channelName, List<String> eventNames, TraceDomainType domain, String filterExpression, List<String> excludedEvents, IProgressMonitor monitor) throws ExecutionException {
+        // Do nothing
     }
 
     @Override
     public void enableSyscalls(String sessionName, String channelName, List<String> eventNames, IProgressMonitor monitor) throws ExecutionException {
+        // Do nothing
     }
 
     @Override
     public void enableProbe(String sessionName, String channelName, String eventName, boolean isFunction, String probe, IProgressMonitor monitor) throws ExecutionException {
+        // Do nothing
     }
 
     @Override
     public void enableLogLevel(String sessionName, String channelName, List<String> eventName, LogLevelType logLevelType, ITraceLogLevel level, String filterExpression, TraceDomainType domain, IProgressMonitor monitor) throws ExecutionException {
+        // Do nothing
     }
 
     @Override
     public void disableEvent(String sessionName, String channelName, List<String> eventNames, TraceDomainType domain, IProgressMonitor monitor) throws ExecutionException {
+        // Do nothing
     }
 
     @Override
@@ -131,21 +141,26 @@ class NullControlService implements ILttngControlService {
 
     @Override
     public void addContexts(String sessionName, String channelName, String eventName, TraceDomainType domain, List<String> contexts, IProgressMonitor monitor) throws ExecutionException {
+        // Do nothing
     }
 
     @Override
     public void recordSnapshot(String sessionName, IProgressMonitor monitor) throws ExecutionException {
+        // Do nothing
     }
 
     @Override
     public void runCommands(IProgressMonitor monitor, List<String> commands) throws ExecutionException {
+        // Do nothing
     }
 
     @Override
     public void loadSession(@Nullable String inputPath, boolean isForce, IProgressMonitor monitor) throws ExecutionException {
+        // Do nothing
     }
 
     @Override
     public void saveSession(String session, String outputPath, boolean isForce, IProgressMonitor monitor) throws ExecutionException {
+        // Do nothing
     }
 }

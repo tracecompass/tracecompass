@@ -64,6 +64,7 @@ public class ControlRemoteProfilesPreferencePage extends PreferencePage implemen
 
     @Override
     public void init(IWorkbench workbench) {
+        // Do nothing
     }
 
     @Override

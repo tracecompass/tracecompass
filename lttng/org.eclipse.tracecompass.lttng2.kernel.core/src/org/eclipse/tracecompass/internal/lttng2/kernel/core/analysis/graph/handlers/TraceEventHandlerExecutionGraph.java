@@ -85,6 +85,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
 
             @Override
             public void matchingEnded() {
+                // Do nothing
             }
 
             @Override
@@ -106,7 +107,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
 
             @Override
             public void init(Collection<ITmfTrace> fTraces) {
-
+                // Do nothing
             }
 
         };

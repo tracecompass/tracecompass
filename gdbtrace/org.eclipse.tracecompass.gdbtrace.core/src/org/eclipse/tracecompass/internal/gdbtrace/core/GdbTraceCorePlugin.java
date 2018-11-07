@@ -44,6 +44,7 @@ public class GdbTraceCorePlugin extends Plugin {
      * Constructor
      */
     public GdbTraceCorePlugin() {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------

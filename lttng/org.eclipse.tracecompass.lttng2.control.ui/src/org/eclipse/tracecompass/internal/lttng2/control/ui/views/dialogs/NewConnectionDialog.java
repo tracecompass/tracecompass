@@ -102,10 +102,12 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
 
         @Override
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+            // Do nothing
         }
 
         @Override
         public void dispose() {
+            // Do nothing
         }
 
         @Override

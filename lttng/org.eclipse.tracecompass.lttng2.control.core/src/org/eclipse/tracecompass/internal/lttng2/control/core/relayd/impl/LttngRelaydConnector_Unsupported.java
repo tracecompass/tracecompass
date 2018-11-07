@@ -71,6 +71,7 @@ public class LttngRelaydConnector_Unsupported implements ILttngRelaydConnector {
 
     @Override
     public void close() {
+        // Do nothing
     }
 
 }

@@ -140,6 +140,7 @@ public class BaseGetInfoDialog extends Dialog implements IBaseGetInfoDialog {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
             }
         });
 

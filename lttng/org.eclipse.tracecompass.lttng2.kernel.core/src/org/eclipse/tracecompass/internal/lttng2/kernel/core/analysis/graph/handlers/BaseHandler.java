@@ -149,6 +149,7 @@ public class BaseHandler extends AbstractTraceEventHandler {
 
     @Override
     public void handleEvent(ITmfEvent event) {
+        // Do nothing
     }
 
 }

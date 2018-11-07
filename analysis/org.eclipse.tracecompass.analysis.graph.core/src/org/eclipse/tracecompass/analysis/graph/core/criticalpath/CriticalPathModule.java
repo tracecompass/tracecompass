@@ -105,7 +105,7 @@ public class CriticalPathModule extends TmfAbstractAnalysisModule implements ICr
 
     @Override
     protected void canceling() {
-
+        // Do nothing
     }
 
     @Override

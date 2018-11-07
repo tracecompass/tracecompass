@@ -61,7 +61,7 @@ public class XmlAnalysisModuleSource implements IAnalysisModuleSource {
      * Constructor. It adds the new module listener to the analysis manager.
      */
     public XmlAnalysisModuleSource() {
-
+        // Do nothing
     }
 
     @Override

@@ -180,14 +180,17 @@ public class DsfGdbAdaptor {
 
         @Override
         public synchronized void launchesRemoved(ILaunch[] launches) {
+            // Do nothing
         }
 
         @Override
         public synchronized void launchesAdded(ILaunch[] launches) {
+            // Do nothing
         }
 
         @Override
         public synchronized void launchesChanged(ILaunch[] launches) {
+            // Do nothing
         }
 
         @Override

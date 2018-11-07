@@ -30,10 +30,12 @@ public class TraceControlContentProvider implements ITreeContentProvider {
 
     @Override
     public void dispose() {
+        // Do nothing
     }
 
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        // Do nothing
     }
 
     @Override

@@ -53,6 +53,7 @@ public class VariantDeclaration extends Declaration {
      * Constructor
      */
     public VariantDeclaration() {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------

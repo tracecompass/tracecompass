@@ -31,6 +31,7 @@ public class Activator extends AbstractUIPlugin {
      * The constructor
      */
     public Activator() {
+        // Do nothing
     }
 
     @Override

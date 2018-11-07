@@ -159,6 +159,7 @@ public class GetEventInfoDialog extends BaseGetInfoDialog implements IGetEventIn
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
             }
         });
 

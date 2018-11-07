@@ -84,6 +84,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
      * @param layout
      */
     private void addFastViews(IPageLayout layout) {
+        // Do nothing
     }
 
     /**
@@ -92,6 +93,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
      * @param layout
      */
     private void addViewShortcuts(IPageLayout layout) {
+        // Do nothing
     }
 
     /**
@@ -100,6 +102,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
      * @param layout
      */
     private void addPerspectiveShortcuts(IPageLayout layout) {
+        // Do nothing
     }
 
 }

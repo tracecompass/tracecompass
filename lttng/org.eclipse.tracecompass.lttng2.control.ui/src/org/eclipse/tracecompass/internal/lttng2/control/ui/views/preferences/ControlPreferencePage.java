@@ -59,6 +59,7 @@ public class ControlPreferencePage extends FieldEditorPreferencePage implements 
 
     @Override
     public void init(IWorkbench workbench) {
+        // Do nothing
     }
 
     @Override

@@ -63,6 +63,7 @@ public class Activator extends TraceCompassActivator {
 
     @Override
     protected void stopActions() {
+        // Do nothing
     }
 
 }
