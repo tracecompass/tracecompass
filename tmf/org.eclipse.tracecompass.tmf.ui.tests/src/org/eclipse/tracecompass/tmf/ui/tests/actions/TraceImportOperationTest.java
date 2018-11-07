@@ -54,6 +54,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.junit.AfterClass;
@@ -97,6 +98,7 @@ public class TraceImportOperationTest {
         if (fDestFolder != null) {
             fDestFolder.getProject().getResource().delete(true, null);
         }
+        WaitUtils.waitForJobs();
     }
 
     /**
@@ -108,7 +110,7 @@ public class TraceImportOperationTest {
     public void test() throws Exception {
         WorkspaceModifyOperation operation = new TraceImportOperation(fSourcePath, fDestFolder);
         PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
-        assertEquals(9, fDestFolder.getTraces().size());
+        WaitUtils.waitUntil(folder -> folder.getTraces().size() == 9, fDestFolder, () -> String.format("expected: 9 but was: %d", fDestFolder.getTraces().size()));
         validateImport(fSourcePath, fDestFolder, true);
     }
 
@@ -125,24 +127,25 @@ public class TraceImportOperationTest {
         createArchive(fSourcePath, archive);
 
         fTracesFolder.getResource().getFolder("skipFalse").create(false, true, null);
-        TmfTraceFolder destFolder = (TmfTraceFolder) fTracesFolder.getChild("skipFalse");
-        TraceImportOperation operation = new TraceImportOperation(sourceFolder.getLocation().toOSString(), destFolder);
+        TmfTraceFolder skipFalseFolder = (TmfTraceFolder) fTracesFolder.getChild("skipFalse");
+        TraceImportOperation operation = new TraceImportOperation(sourceFolder.getLocation().toOSString(), skipFalseFolder);
         operation.setSkipArchiveExtraction(false);
         PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
-        assertEquals(1, destFolder.getChildren().size());
-        assertTrue(destFolder.getChildren().get(0) instanceof TmfTraceFolder);
-        destFolder = (TmfTraceFolder) destFolder.getChildren().get(0);
+        WaitUtils.waitUntil(folder -> folder.getChildren().size() == 1, skipFalseFolder, () -> String.format("expected: 1 but was: %d", skipFalseFolder.getChildren().size()));
+        assertEquals(1, skipFalseFolder.getChildren().size());
+        assertTrue(skipFalseFolder.getChildren().get(0) instanceof TmfTraceFolder);
+        TmfTraceFolder destFolder = (TmfTraceFolder) skipFalseFolder.getChildren().get(0);
+        WaitUtils.waitUntil(folder -> folder.getTraces().size() == 9, destFolder, () -> String.format("expected: 9 but was: %d", destFolder.getTraces().size()));
         assertEquals("testfiles.zip", destFolder.getName());
-        assertEquals(9, destFolder.getTraces().size());
         validateImport(fSourcePath, destFolder, false);
 
         fTracesFolder.getResource().getFolder("skipTrue").create(false, true, null);
-        destFolder = (TmfTraceFolder) fTracesFolder.getChild("skipTrue");
-        operation = new TraceImportOperation(sourceFolder.getLocation().toOSString(), destFolder);
+        TmfTraceFolder skipTrueFolder = (TmfTraceFolder) fTracesFolder.getChild("skipTrue");
+        operation = new TraceImportOperation(sourceFolder.getLocation().toOSString(), skipTrueFolder);
         operation.setSkipArchiveExtraction(true);
         PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
-        assertEquals(0, destFolder.getTraces().size());
-        validateImport(sourceFolder.getLocation().toOSString(), destFolder, true);
+        WaitUtils.waitUntil(folder -> folder.getTraces().size() == 0, skipTrueFolder, () -> String.format("expected: 0 but was: %d", skipTrueFolder.getTraces().size()));
+        validateImport(sourceFolder.getLocation().toOSString(), skipTrueFolder, true);
     }
 
     /**
@@ -171,8 +174,7 @@ public class TraceImportOperationTest {
         TraceImportOperation operation = new TraceImportOperation(sourceFolder.getLocation().toOSString(), destFolder);
         operation.setFilteringTimeRange(startTimeRange, endTimeRange);
         PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
-
-        assertEquals(4, destFolder.getTraces().size());
+        WaitUtils.waitUntil(folder -> folder.getTraces().size() == 4, destFolder, () -> String.format("expected: 4 but was: %d", destFolder.getTraces().size()));
         validateImport(sourceFolder.getLocation().toOSString(), destFolder, true);
     }
 
