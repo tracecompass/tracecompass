@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 EfficiOS Inc. and others
+ * Copyright (c) 2015, 2018 EfficiOS Inc. and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.alltests.swtbot;
 
+import junit.extensions.RepeatedTest;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.TestSuite;
 
@@ -26,10 +27,8 @@ public class SWTBotStressTests extends TestSuite {
      * @return Test suite definition
      */
     public static TestSuite suite() {
-        TestSuite s = new TestSuite();
-        for (int i = 0; i < NB_RUNS; i++) {
-            s.addTest(new JUnit4TestAdapter(RunAllSWTBotTests.class));
-        }
+        TestSuite s = new TestSuite(String.format("Stress Test [%d runs]", NB_RUNS));
+        s.addTest(new RepeatedTest(new JUnit4TestAdapter(RunAllSWTBotTests.class), NB_RUNS));
         return s;
     }
 }
