@@ -381,7 +381,8 @@ public class TimeGraphViewTest {
         UIThreadRunnable.syncExec(() -> view.restartZoomThread());
         // take a third picture
         ImageHelper reset = ImageHelper.waitForNewImage(bounds, highlighted);
-        assertEquals(ref.getHistogram(), reset.getHistogram());
+        ImageHelper diff = ref.diff(reset);
+        assertTrue((double) diff.getHistogram().count(new RGB(0,0,0)) / diff.getHistogram().size() > 0.99);
         ImageHelper delta = highlighted.diff(reset);
         tg.expandAll();
         assertTrue("Some highlighting", delta.getHistogram().elementSet().size() > 1);
