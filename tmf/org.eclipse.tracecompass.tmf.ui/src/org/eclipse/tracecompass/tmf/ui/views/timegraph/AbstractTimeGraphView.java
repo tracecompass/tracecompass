@@ -103,6 +103,7 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLo
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.IFilterStrings;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerConfigXmlParser;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -112,7 +113,6 @@ import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.TimeEventFilterD
 import org.eclipse.tracecompass.tmf.core.model.IFilterableDataModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
-import org.eclipse.tracecompass.tmf.core.signal.TmfEventFilterAppliedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfDataModelSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfMarkerEventSourceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
@@ -2814,7 +2814,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @since 4.2
      */
     @TmfSignalHandler
-    public void regexFilterApplied(TmfEventFilterAppliedSignal signal) {
+    public void regexFilterApplied(TmfFilterAppliedSignal signal) {
         String regex = signal.getFilter().getRegex();
         if (!regex.isEmpty()) {
             setGlobalRegexFilter(regex);

@@ -495,8 +495,9 @@ public final class TmfTraceManager {
         if (trace == null) {
             return;
         }
+
         updateTraceContext(trace, builder ->
-                builder.setFilter(signal.getFilter().getEventFilter()));
+                builder.setFilter(signal.getEventFilter()));
     }
 
     /**

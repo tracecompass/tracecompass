@@ -1,30 +1,27 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2018 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *   Patrick Tasse - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.core.signal;
+package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
- * Signal indicating an event filter has been applied.
+ * Signal indicating a global filter has been applied.
  *
- * @author Patrick Tasse
+ * @author Geneviève Bastien
  */
-public class TmfEventFilterAppliedSignal extends TmfSignal {
+public class TmfFilterAppliedSignal extends TmfSignal {
 
     private final ITmfTrace fTrace;
-    private final ITmfFilter fEventFilter;
+    private final TraceCompassFilter fFilter;
 
     /**
      * Constructor for a new signal.
@@ -34,12 +31,12 @@ public class TmfEventFilterAppliedSignal extends TmfSignal {
      * @param trace
      *            The trace to which filter is applied
      * @param filter
-     *            The applied event filter or null
+     *            The filter to apply
      */
-    public TmfEventFilterAppliedSignal(Object source, ITmfTrace trace, @NonNull ITmfFilter filter) {
+    public TmfFilterAppliedSignal(Object source, ITmfTrace trace, @NonNull TraceCompassFilter filter) {
         super(source);
         fTrace = trace;
-        fEventFilter = filter;
+        fFilter = filter;
     }
 
     /**
@@ -52,16 +49,16 @@ public class TmfEventFilterAppliedSignal extends TmfSignal {
     }
 
     /**
-     * Get the event filter being applied
+     * Get the filter that is being applied
      *
-     * @return The filter
+     * @return The filter being applied
      */
-    public ITmfFilter getEventFilter() {
-        return fEventFilter;
+    public TraceCompassFilter getFilter() {
+        return fFilter;
     }
 
     @Override
     public String toString() {
-        return "[TmfEventFilterAppliedSignal (" + fTrace.getName() + " : " + fEventFilter + ")]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        return "[TmfEventFilterAppliedSignal (" + fTrace.getName() + " : " + fFilter + ")]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 }

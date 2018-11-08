@@ -7,15 +7,16 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.core.filter;
+package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.tmf.core.filter.TmfFilterHelper;
+import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 
 /**
  * A common class for all filters, either event filters or regexes
  *
- * @since 4.2
+ * @author Geneviève Bastien
  */
 @NonNullByDefault
 public class TraceCompassFilter {
