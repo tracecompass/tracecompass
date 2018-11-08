@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 École Polytechnique de Montréal
+ * Copyright (c) 2016, 2018 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,16 +9,21 @@
 
 package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics;
 
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
 import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProvider;
+import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics.Messages;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.segment.interfaces.INamedSegment;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -65,6 +70,14 @@ public class SegmentStoreStatisticsViewer extends AbstractSegmentsStatisticsView
                 return (ISegmentStoreProvider) m;
             }
 
+            @Override
+            public boolean setTrace(ITmfTrace trace) throws TmfAnalysisException {
+                ISegmentStoreProvider m = getSegmentProviderAnalysis(trace);
+                if (m instanceof IAnalysisModule) {
+                    setName(Objects.requireNonNull(NLS.bind(Messages.SegmentStoreStatisticsViewer_AnalysisName, ((IAnalysisModule) m).getName())));
+                }
+                return super.setTrace(trace);
+            }
         };
         return module;
     }

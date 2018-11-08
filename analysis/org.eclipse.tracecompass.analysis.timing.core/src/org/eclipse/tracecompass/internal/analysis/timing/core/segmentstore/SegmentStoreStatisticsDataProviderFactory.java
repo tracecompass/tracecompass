@@ -9,8 +9,11 @@
 
 package org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore;
 
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
 import org.eclipse.tracecompass.internal.tmf.core.model.tree.TmfTreeCompositeDataProvider;
@@ -80,6 +83,7 @@ public class SegmentStoreStatisticsDataProviderFactory implements IDataProviderF
 
         AbstractSegmentStatisticsAnalysis module = new GenericSegmentStatisticsAnalysis(secondaryId);
         try {
+            module.setName(Objects.requireNonNull(NLS.bind(Messages.SegmentStoreStatisticsDataProviderFactory_AnalysisName, m.getName())));
             module.setTrace(trace);
         } catch (TmfAnalysisException e) {
             module.dispose();

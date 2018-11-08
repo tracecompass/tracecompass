@@ -80,6 +80,7 @@ public class HistogramDataProviderTest {
     public void testHelloLost() throws TmfAnalysisException {
         CtfTmfTrace trace = CtfTmfTestTraceUtils.getTrace(CtfTestTrace.HELLO_LOST);
         TmfStatisticsModule module = new TmfStatisticsModule();
+        module.setName("Statistics");
         assertTrue("Statistics Analysis should apply to this trace", module.setTrace(trace));
         assertEquals("Statistics Analysis shouls be schedulable", Status.OK_STATUS, module.schedule());
         assertTrue("Statistics Analysis should run successfully", module.waitForCompletion());

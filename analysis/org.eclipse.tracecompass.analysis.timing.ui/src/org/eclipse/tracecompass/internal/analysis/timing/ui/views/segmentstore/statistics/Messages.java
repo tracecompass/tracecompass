@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016 Ericsson
+ * Copyright (c) 2015, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,7 +14,7 @@ package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.
 import org.eclipse.osgi.util.NLS;
 
 /**
- * Messages used in the LTTng kernel CPU usage view and viewers.
+ * Messages used in segment store statistics view and viewers.
  *
  * @author Bernd Hufmann
  */
@@ -39,11 +39,7 @@ public class Messages extends NLS {
     public static String SegmentStoreStatistics_AverageLabel;
     /** Name of count column */
     public static String SegmentStoreStatisticsViewer_Count;
-    /**
-     * Name of count column
-     *
-     * @since 1.1
-     */
+    /** Name of count column */
     public static String SegmentStoreStatisticsViewer_Total;
     /** Name of average column */
     public static String SegmentStoreStatisticsViewer_StandardDeviation;
@@ -51,6 +47,8 @@ public class Messages extends NLS {
     public static String SegmentStoreStatisticsViewer_GotoMinAction;
     /** Menu item for go to maximum duration */
     public static String SegmentStoreStatisticsViewer_GotoMaxAction;
+    /** Analysis module name */
+    public static String SegmentStoreStatisticsViewer_AnalysisName;
 
     static {
         // initialize resource bundle
