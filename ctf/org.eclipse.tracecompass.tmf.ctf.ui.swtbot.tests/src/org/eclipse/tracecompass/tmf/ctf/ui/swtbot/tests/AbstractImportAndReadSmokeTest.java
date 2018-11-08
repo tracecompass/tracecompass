@@ -93,8 +93,6 @@ public abstract class AbstractImportAndReadSmokeTest {
         fLogger.addAppender(new NullAppender());
         fBot = new SWTWorkbenchBot();
 
-        SWTBotUtils.closeView("welcome", fBot);
-
         SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
         WaitUtils.waitForJobs();

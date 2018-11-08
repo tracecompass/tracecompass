@@ -103,10 +103,6 @@ public class LamiChartViewerTest {
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         fLogger.removeAllAppenders();
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        SWTBotUtils.closeView("welcome", bot);
-        /* Switch perspectives */
-        SWTBotUtils.switchToTracingPerspective();
         /* Finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
 

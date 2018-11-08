@@ -95,9 +95,6 @@ public class TestTraceOffsetting {
         defaultPreferences.put(ITmfTimePreferencesConstants.TIME_ZONE, "GMT-05:00");
         TmfTimestampFormat.updateDefaultFormats();
 
-        SWTBotUtils.closeView("welcome", fBot);
-
-        SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
         fLocation = File.createTempFile("sample", ".xml");

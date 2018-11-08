@@ -99,9 +99,6 @@ public class CtfTmfExperimentTrimmingTest {
         fLogger.removeAllAppenders();
         fLogger.addAppender(new NullAppender());
 
-        SWTBotUtils.closeView("welcome", new SWTWorkbenchBot());
-
-        SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
     }

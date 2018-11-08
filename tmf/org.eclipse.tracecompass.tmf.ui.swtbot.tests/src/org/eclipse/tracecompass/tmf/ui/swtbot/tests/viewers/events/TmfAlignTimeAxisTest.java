@@ -40,6 +40,7 @@ import org.eclipse.tracecompass.tmf.ui.project.wizards.NewTmfProjectWizard;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotSash;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.TestingPerspectiveFactory;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.views.TimeGraphViewStub;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.histogram.HistogramView;
@@ -110,9 +111,6 @@ public class TmfAlignTimeAxisTest {
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout()));
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
 
-        SWTBotUtils.closeView("welcome", bot);
-
-        SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
         fLocation = File.createTempFile("sample", ".xml");
@@ -152,8 +150,8 @@ public class TmfAlignTimeAxisTest {
     public void after() {
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
         SWTBotUtils.activeEventsEditor(bot).close();
-        /* Switch back to Tracing perspective since several tests change the perspective */
-        SWTBotUtils.switchToTracingPerspective();
+        /* Switch back to Testing perspective since several tests change the perspective */
+        SWTBotUtils.switchToPerspective(TestingPerspectiveFactory.ID);
         SWTBotUtils.closeSecondaryShells(fBot);
     }
 

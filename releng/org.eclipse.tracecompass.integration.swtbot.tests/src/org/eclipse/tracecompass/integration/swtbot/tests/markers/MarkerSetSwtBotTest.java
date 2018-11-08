@@ -84,10 +84,7 @@ public class MarkerSetSwtBotTest {
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         fBot = new SWTWorkbenchBot();
 
-        SWTBotUtils.closeView("Welcome", fBot);
-
         SWTBotUtils.createProject(TRACE_PROJECT_NAME);
-        SWTBotUtils.switchToTracingPerspective();
         WaitUtils.waitForJobs();
 
         final CtfTestTrace cygProfile = CtfTestTrace.CYG_PROFILE;

@@ -439,8 +439,11 @@ public final class SWTBotUtils {
         /* Do not display the warning when many entries are selected in the tree viewer. */
         store.setValue(ITmfUIPreferences.HIDE_MANY_ENTRIES_SELECTED_TOGGLE, true);
 
-        // Switch to and reset Tracing perspective
-        switchToTracingPerspective();
+        // Close Welcome view
+        SWTBotUtils.closeView("welcome", new SWTWorkbenchBot());
+
+        // Switch to and reset Testing perspective
+        switchToPerspective(TestingPerspectiveFactory.ID);
     }
 
     private static void printEnvironment() {

@@ -98,12 +98,6 @@ public class CollapseEventsInTableTest {
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
         fBot = new SWTWorkbenchBot();
 
-        /* Close welcome view */
-        SWTBotUtils.closeView("Welcome", fBot);
-
-        /* Switch perspectives */
-        SWTBotUtils.switchToTracingPerspective();
-
         /* Finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
     }

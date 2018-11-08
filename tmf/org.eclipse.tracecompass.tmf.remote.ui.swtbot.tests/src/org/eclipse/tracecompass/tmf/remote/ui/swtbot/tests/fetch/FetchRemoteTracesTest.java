@@ -88,7 +88,6 @@ public class FetchRemoteTracesTest {
     private static final String TRACE_LOCATION;
     private static final String TRACE_TYPE_KERNEL = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
     private static final String TRACE_TYPE_SYSLOG = "org.eclipse.linuxtools.tmf.tests.stubs.trace.text.testsyslog";
-    private static final String WELCOME_NAME = "welcome";
 
     private static SWTWorkbenchBot fBot;
 
@@ -135,9 +134,6 @@ public class FetchRemoteTracesTest {
         fLogger.addAppender(new NullAppender());
         fBot = new SWTWorkbenchBot();
 
-        SWTBotUtils.closeView(WELCOME_NAME, fBot);
-
-        SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
 

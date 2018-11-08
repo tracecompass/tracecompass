@@ -177,9 +177,6 @@ public class FlameChartViewTest {
         sfLogger.addAppender(new ConsoleAppender(new SimpleLayout()));
         sfBot = new SWTWorkbenchBot();
 
-        SWTBotUtils.closeView("welcome", sfBot);
-
-        SWTBotUtils.switchToTracingPerspective();
         SWTBotUtils.closeView("Statistics", sfBot);
         /* finish waiting for eclipse to load */
         WaitUtils.waitForJobs();

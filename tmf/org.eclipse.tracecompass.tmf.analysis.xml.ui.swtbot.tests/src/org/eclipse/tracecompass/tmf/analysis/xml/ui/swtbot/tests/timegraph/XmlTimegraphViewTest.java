@@ -57,10 +57,6 @@ public class XmlTimegraphViewTest {
         Thread.currentThread().setName("SWTBotTest");
         /* set up for swtbot */
         SWTBotPreferences.TIMEOUT = 10000; /* 10 second timeout */
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        SWTBotUtils.closeView("welcome", bot);
-        /* Switch perspectives */
-        SWTBotUtils.switchToTracingPerspective();
         /* Finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
 

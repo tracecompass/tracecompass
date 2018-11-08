@@ -178,10 +178,6 @@ public class ProjectExplorerTracesFolderTest {
         fLogger.addAppender(new NullAppender());
         fBot = new SWTWorkbenchBot();
 
-        SWTBotUtils.closeView("Welcome", fBot);
-
-        SWTBotUtils.switchToTracingPerspective();
-
         /* Finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
         SWTBotUtils.createProject(TRACE_PROJECT_NAME);

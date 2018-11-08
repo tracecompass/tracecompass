@@ -108,9 +108,6 @@ public class XMLAnalysesManagerPreferencePageTest {
         fLogger.removeAllAppenders();
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
         fBot = new SWTWorkbenchBot();
-        SWTBotUtils.closeView("welcome", fBot);
-        /* Switch perspectives */
-        SWTBotUtils.switchToTracingPerspective();
     }
 
     /**

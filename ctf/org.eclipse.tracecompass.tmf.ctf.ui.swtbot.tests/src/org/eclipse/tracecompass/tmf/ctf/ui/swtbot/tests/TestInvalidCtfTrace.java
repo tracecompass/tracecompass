@@ -176,9 +176,6 @@ public class TestInvalidCtfTrace {
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout()));
         fBot = new SWTWorkbenchBot();
 
-        SWTBotUtils.closeView("welcome", fBot);
-
-        SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
         SWTBotUtils.createProject(PROJET_NAME);

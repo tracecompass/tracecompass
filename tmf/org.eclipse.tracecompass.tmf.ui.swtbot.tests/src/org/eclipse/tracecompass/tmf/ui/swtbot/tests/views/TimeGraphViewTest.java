@@ -146,21 +146,12 @@ public class TimeGraphViewTest {
         }
     };
 
-    private static void resetViews() {
-        SWTBotUtils.switchToTracingPerspective();
-
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        bot.closeAllEditors();
-        SWTBotUtils.closeView("welcome", bot);
-    }
-
     /**
      * Set up for test
      */
     @BeforeClass
     public static void beforeClass() {
         SWTBotUtils.initialize();
-        resetViews();
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         fLogger.removeAllAppenders();
@@ -300,7 +291,8 @@ public class TimeGraphViewTest {
      */
     @AfterClass
     public static void afterClass() {
-        resetViews();
+        SWTWorkbenchBot bot = new SWTWorkbenchBot();
+        bot.closeAllEditors();
         fLogger.removeAllAppenders();
     }
 

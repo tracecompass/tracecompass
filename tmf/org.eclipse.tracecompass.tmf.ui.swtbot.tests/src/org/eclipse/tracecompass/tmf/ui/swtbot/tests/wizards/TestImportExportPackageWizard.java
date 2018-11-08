@@ -71,7 +71,6 @@ public class TestImportExportPackageWizard {
     private static final String SAVE_IN_TAR_FORMAT = "Save in tar format";
     private static final String SELECT_ALL = "Select All";
     private static final String DESELECT_ALL = "Deselect All";
-    private static final String WELCOME_NAME = "welcome";
     private static final String SWT_BOT_THREAD_NAME = "SWTBot Thread";
     private static final String PROJECT_NAME = "Test";
     private static final String XMLSTUB_ID = "org.eclipse.linuxtools.tmf.core.tests.xmlstub";
@@ -110,9 +109,6 @@ public class TestImportExportPackageWizard {
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout()));
         fBot = new SWTWorkbenchBot();
 
-        SWTBotUtils.closeView(WELCOME_NAME, fBot);
-
-        SWTBotUtils.switchToTracingPerspective();
         /* finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
 

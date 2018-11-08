@@ -89,7 +89,6 @@ public abstract class AbstractStandardImportWizardTest {
     public void createProject() {
         /* Close welcome view */
         SWTBotUtils.closeView("Welcome", fBot);
-        SWTBotUtils.switchToTracingPerspective();
 
         SWTBotUtils.createProject(PROJECT_NAME);
     }

@@ -4,6 +4,11 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
+            class="org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.TestingPerspectiveFactory"
+            id="org.eclipse.tracecompass.tmf.ui.swtbot.tests.perspective"
+            name="Testing">
+      </perspective>
+      <perspective
             class="org.eclipse.tracecompass.tmf.ui.swtbot.tests.viewers.events.TmfAlignTimeAxisTest$AlignPerspectiveFactory2"
             id="org.eclipse.linuxtools.tmf.test.align.2"
             name="Align2">

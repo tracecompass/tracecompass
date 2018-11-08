@@ -101,9 +101,6 @@ public class TraceTypePreferencePageTest {
         fLogger.removeAllAppenders();
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
         fBot = new SWTWorkbenchBot();
-        SWTBotUtils.closeView("welcome", fBot);
-        /* Switch perspectives */
-        SWTBotUtils.switchToTracingPerspective();
         /* Create the trace project */
         SWTBotUtils.createProject(TRACE_PROJECT_NAME);
         /* Finish waiting for eclipse to load */
