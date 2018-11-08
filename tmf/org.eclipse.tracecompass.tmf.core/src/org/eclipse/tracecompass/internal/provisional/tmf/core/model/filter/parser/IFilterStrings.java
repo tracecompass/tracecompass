@@ -8,6 +8,12 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
+import java.util.Collection;
+import java.util.Objects;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
+
 /**
  * List of string used in the filter syntax
  *
@@ -31,5 +37,17 @@ public interface IFilterStrings {
     static final String OR = "||";
     static final String AND = "&&";
     static final String CLOSE_PARENTHESIS = ")";
+
+    /**
+     * Merge filter strings into one filter, joined with {@link #AND}.
+     *
+     * @param filters
+     *            The individual regexes to join
+     * @return A single string corresponding to the AND'ed filters
+     */
+    static String mergeFilters(Collection<String> filters) {
+        return Objects.requireNonNull(
+                Joiner.on(IFilterStrings.AND).skipNulls().join(Iterables.filter(filters, s -> !s.isEmpty())));
+    }
 
 }

@@ -12,7 +12,6 @@ package org.eclipse.tracecompass.internal.tmf.core.model;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -21,8 +20,6 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parse
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
 /**
@@ -68,7 +65,7 @@ public abstract class AbstractTmfTraceDataProvider {
         Multimap<@NonNull Integer, @NonNull String> regexes = queryFilter.getRegexes();
         Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         for (Map.Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
-            String regex = Joiner.on(IFilterStrings.AND).skipNulls().join(Iterables.filter(Objects.requireNonNull(entry.getValue()), s -> !s.isEmpty())); //$NON-NLS-1$
+            String regex = IFilterStrings.mergeFilters(entry.getValue());
             FilterCu cu = FilterCu.compile(regex);
             Predicate<@NonNull Map<@NonNull String, @NonNull String>> predicate = cu != null ? cu.generate() : null;
                 if (predicate != null) {

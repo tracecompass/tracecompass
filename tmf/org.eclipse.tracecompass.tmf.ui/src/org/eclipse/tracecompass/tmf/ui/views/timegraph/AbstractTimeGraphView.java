@@ -40,7 +40,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
@@ -184,7 +183,6 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -376,7 +374,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     private List<IContextActivation> fActiveContexts = new ArrayList<>();
 
-    private Collection<String> fGlobalFilter = null;
+    private Collection<@NonNull String> fGlobalFilter = null;
 
     /** Listener that handles a click on an entry in the FusedVM View */
     private final ITimeGraphSelectionListener fMetadataSelectionListener = new ITimeGraphSelectionListener() {
@@ -791,7 +789,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         Multimap<Integer, String> regexes = getRegexes();
         Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         for (Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
-            String regex = Joiner.on(IFilterStrings.AND).skipNulls().join(Iterables.filter(Objects.requireNonNull(entry.getValue()), s -> !s.isEmpty())); //$NON-NLS-1$
+            String regex = IFilterStrings.mergeFilters(entry.getValue());
             FilterCu cu = FilterCu.compile(regex);
             Predicate<@NonNull Map<@NonNull String, @NonNull String>> predicate = cu != null ? cu.generate() : null;
                 if (predicate != null) {
@@ -2598,10 +2596,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             regexes.put(IFilterProperty.DIMMED, savedFilter);
         }
 
-        Collection<String> globalFilter = fGlobalFilter;
+        Collection<@NonNull String> globalFilter = fGlobalFilter;
         if (globalFilter != null) {
             // The global regexes should be AND'ed
-            regexes.put(IFilterProperty.DIMMED, String.valueOf(StringUtils.join(globalFilter, IFilterStrings.AND)));
+            regexes.putAll(IFilterProperty.DIMMED, globalFilter);
         }
         return regexes;
     }
@@ -2612,7 +2610,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @param regexes
      *                  The global regex to apply
      */
-    private void setGlobalRegexFilter(Collection<String> regexes) {
+    private void setGlobalRegexFilter(Collection<@NonNull String> regexes) {
         fGlobalFilter = regexes;
         globalFilterUpdated();
     }
