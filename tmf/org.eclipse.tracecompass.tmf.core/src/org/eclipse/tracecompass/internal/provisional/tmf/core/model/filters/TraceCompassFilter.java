@@ -9,6 +9,9 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.tmf.core.filter.TmfFilterHelper;
 import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
@@ -22,9 +25,9 @@ import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
 public class TraceCompassFilter {
 
     private final ITmfFilter fEventFilter;
-    private final String fRegex;
+    private final Collection<String> fRegex;
 
-    private TraceCompassFilter(ITmfFilter filter, String regex) {
+    private TraceCompassFilter(ITmfFilter filter, Collection<String> regex) {
         fEventFilter = filter;
         fRegex = regex;
     }
@@ -37,7 +40,7 @@ public class TraceCompassFilter {
      * @return A new filter
      */
     public static TraceCompassFilter fromEventFilter(ITmfFilter filter) {
-        return new TraceCompassFilter(filter, TmfFilterHelper.getRegexFromFilter(filter));
+        return new TraceCompassFilter(filter, Collections.singleton(TmfFilterHelper.getRegexFromFilter(filter)));
     }
 
     /**
@@ -47,14 +50,14 @@ public class TraceCompassFilter {
      *            The regex from which to create the filter
      * @return A new filter
      */
-    public static TraceCompassFilter fromRegex(String regex) {
+    public static TraceCompassFilter fromRegex(Collection<String> regex) {
         return new TraceCompassFilter(TmfFilterHelper.buildFilterFromRegex(regex), regex);
     }
 
     /**
      * Get the event filter being applied. This filter should be applied on data
      * sources based on events. For other types of data sources, use the
-     * {@link #getRegex()} method to get the filter string.
+     * {@link #getRegexes()} method to get the filter string.
      *
      * @return The filter
      */
@@ -63,13 +66,13 @@ public class TraceCompassFilter {
     }
 
     /**
-     * Get the filter regex, that should be used to filter data from a source
+     * Get the filter regexes, that should be used to filter data from a source
      * that is not based on event. For event-based filters, use
      * {@link #getEventFilter()} instead
      *
      * @return The regex to filter anything that is not event-based
      */
-    public String getRegex() {
+    public Collection<String> getRegexes() {
         return fRegex;
     }
 

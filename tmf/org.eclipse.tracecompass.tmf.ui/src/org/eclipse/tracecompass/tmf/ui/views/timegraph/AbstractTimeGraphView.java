@@ -40,6 +40,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
@@ -375,7 +376,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     private List<IContextActivation> fActiveContexts = new ArrayList<>();
 
-    private String fGlobalFilter = null;
+    private Collection<String> fGlobalFilter = null;
 
     /** Listener that handles a click on an entry in the FusedVM View */
     private final ITimeGraphSelectionListener fMetadataSelectionListener = new ITimeGraphSelectionListener() {
@@ -2597,8 +2598,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             regexes.put(IFilterProperty.DIMMED, savedFilter);
         }
 
-        if (fGlobalFilter != null && !fGlobalFilter.isEmpty()) {
-            regexes.put(IFilterProperty.DIMMED, checkNotNull(fGlobalFilter));
+        Collection<String> globalFilter = fGlobalFilter;
+        if (globalFilter != null) {
+            // The global regexes should be AND'ed
+            regexes.put(IFilterProperty.DIMMED, String.valueOf(StringUtils.join(globalFilter, IFilterStrings.AND)));
         }
         return regexes;
     }
@@ -2606,12 +2609,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     /**
      * Set the global regex filter applied to the views
      *
-     * @param regex
+     * @param regexes
      *                  The global regex to apply
-     * @since 4.2
      */
-    protected void setGlobalRegexFilter(String regex) {
-        fGlobalFilter = regex;
+    private void setGlobalRegexFilter(Collection<String> regexes) {
+        fGlobalFilter = regexes;
         globalFilterUpdated();
     }
 
@@ -2619,10 +2621,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * The global filter was updated and the view may need to act on this
      * filter. By default, this method will restart the zoom thread so the time
      * graph data will be refreshed.
-     *
-     * @since 4.2
      */
-    protected void globalFilterUpdated() {
+    private void globalFilterUpdated() {
         restartZoomThread();
     }
 
@@ -2815,7 +2815,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     @TmfSignalHandler
     public void regexFilterApplied(TmfFilterAppliedSignal signal) {
-        String regex = signal.getFilter().getRegex();
+        Collection<@NonNull String> regex = signal.getFilter().getRegexes();
         if (!regex.isEmpty()) {
             setGlobalRegexFilter(regex);
         } else {

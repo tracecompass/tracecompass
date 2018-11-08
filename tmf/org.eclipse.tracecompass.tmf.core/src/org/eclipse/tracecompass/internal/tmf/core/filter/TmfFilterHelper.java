@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.filter;
 
+import java.util.Collection;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -38,11 +40,11 @@ public final class TmfFilterHelper {
     /**
      * Build an event filter from the regex string in parameter
      *
-     * @param regex
+     * @param regexes
      *            The filter regex
      * @return An event filter
      */
-    public static ITmfFilter buildFilterFromRegex(String regex) {
+    public static ITmfFilter buildFilterFromRegex(Collection<String> regexes) {
         // TODO: implement this
         return PASS_ALL;
     }

@@ -17,7 +17,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.datastore.core,
  org.eclipse.tracecompass.tmf.filter.parser
 Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.core.model.events;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
- org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;x-friends:="org.eclipse.tracecompass.tmf.ui.views,org.eclipse.tracecompass.tmf.core.tests",
+ org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;x-friends:="org.eclipse.tracecompass.tmf.ui,org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;x-friends:="org.eclipse.tracecompass.tmf.core.tests,org.eclipse.tracecompass.tmf.ui",
  org.eclipse.tracecompass.internal.provisional.tmf.core.model.table;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph;x-friends:="org.eclipse.tracecompass.analysis.os.linux.core,org.eclipse.tracecompass.analysis.os.linux.ui",
