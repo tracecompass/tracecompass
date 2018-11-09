@@ -26,6 +26,8 @@ import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge.EdgeType;
  */
 public class TmfVertex implements Comparable<TmfVertex> {
 
+    private static final String UNKNOWN_EDGE_DIRECTION_TYPE = "Unknown edge direction type : "; //$NON-NLS-1$
+
     private static long count = 0;
 
     /**
@@ -274,7 +276,7 @@ public class TmfVertex implements Comparable<TmfVertex> {
         case INCOMING_HORIZONTAL_EDGE:
             return fIncomingHorizontal;
         default:
-            throw new IllegalStateException("Unknown edge direction type : " + dir); //$NON-NLS-1$
+            throw new IllegalStateException(UNKNOWN_EDGE_DIRECTION_TYPE + dir);
         }
     }
 
@@ -300,7 +302,7 @@ public class TmfVertex implements Comparable<TmfVertex> {
             fIncomingHorizontal = null;
             break;
         default:
-            throw new IllegalStateException("Unknown edge direction type : " + dir); //$NON-NLS-1$
+            throw new IllegalStateException(UNKNOWN_EDGE_DIRECTION_TYPE + dir);
         }
     }
 
@@ -329,7 +331,7 @@ public class TmfVertex implements Comparable<TmfVertex> {
         case INCOMING_HORIZONTAL_EDGE:
             return edge.getVertexFrom();
         default:
-            throw new IllegalStateException("Unknown edge direction type : " + dir); //$NON-NLS-1$
+            throw new IllegalStateException(UNKNOWN_EDGE_DIRECTION_TYPE + dir);
         }
     }
 
@@ -338,7 +340,7 @@ public class TmfVertex implements Comparable<TmfVertex> {
         if (other == null) {
             return 1;
         }
-        return this.fTimestamp > other.fTimestamp ? 1 : (this.fTimestamp == other.fTimestamp ? 0 : -1);
+        return Long.compare(fTimestamp, other.fTimestamp);
     }
 
     @Override
