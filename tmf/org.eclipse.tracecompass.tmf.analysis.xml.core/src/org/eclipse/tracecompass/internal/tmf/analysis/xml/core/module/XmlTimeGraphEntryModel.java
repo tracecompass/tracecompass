@@ -48,7 +48,7 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
 
         private final long fId;
         private long fParentId;
-        private String fName = EMPTY_STRING;
+        private @NonNull List<@NonNull String> fLabels = Collections.singletonList(EMPTY_STRING);
         private final long fStart;
         private final long fEnd;
         private final @Nullable Element fElement;
@@ -64,7 +64,7 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
          *            unique entry model id
          * @param parentId
          *            parent's unique entry model id
-         * @param name
+         * @param labels
          *            default entry name
          * @param entryStart
          *            entry start time
@@ -79,11 +79,11 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
          * @param data
          *            The compilation data that comes with this entry
          */
-        public Builder(long id, long parentId, @NonNull String name, long entryStart, long entryEnd,
+        public Builder(long id, long parentId, @NonNull List<@NonNull String> labels, long entryStart, long entryEnd,
                 @Nullable Element entryElement, @NonNull ITmfStateSystem ss, int baseQuark, @NonNull AnalysisCompilationData data) {
             fId = id;
             fParentId = parentId;
-            fName = name;
+            fLabels = labels;
             fStart = entryStart;
             fEnd = entryEnd;
             fElement = entryElement;
@@ -102,7 +102,7 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
                 if (!elements.isEmpty()) {
                     String nameFromSs = getFirstValue(baseQuark, Objects.requireNonNull(elements.get(0)));
                     if (!nameFromSs.isEmpty()) {
-                        fName = nameFromSs;
+                        fLabels = Collections.singletonList(nameFromSs);
                     }
                 }
 
@@ -111,7 +111,7 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
                 if (!elements.isEmpty()) {
                     fXmlId = getFirstValue(baseQuark, Objects.requireNonNull(elements.get(0)));
                 } else {
-                    fXmlId = name;
+                    fXmlId = labels.get(0);
                 }
             }
         }
@@ -146,7 +146,12 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
 
         @Override
         public @NonNull String getName() {
-            return fName;
+            return fLabels.isEmpty() ? "" : fLabels.get(0); //$NON-NLS-1$
+        }
+
+        @Override
+        public @NonNull List<@NonNull String> getLabels() {
+            return fLabels;
         }
 
         @Override
@@ -202,7 +207,7 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
          *
          * @return a new {@link XmlTimeGraphEntryModel} instance.
          */
-        public XmlTimeGraphEntryModel build() {
+        public @NonNull XmlTimeGraphEntryModel build() {
             Element element = fElement;
             boolean showText = false;
             String path = null;
@@ -210,7 +215,7 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
                 showText = Boolean.parseBoolean(element.getAttribute(TmfXmlStrings.DISPLAY_TEXT));
                 path = element.getAttribute(TmfXmlStrings.PATH);
             }
-            return new XmlTimeGraphEntryModel(fId, fParentId, String.valueOf(fName), fStart, fEnd, path, fXmlId, fXmlParentId, showText);
+            return new XmlTimeGraphEntryModel(fId, fParentId, fLabels, fStart, fEnd, path, fXmlId, fXmlParentId, showText);
         }
 
         @Override
@@ -220,7 +225,7 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
 
         @Override
         public String toString() {
-            return fName + " - " + fXmlId + " - " + fXmlParentId + " - " + fId + " - " + fParentId; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            return fLabels + " - " + fXmlId + " - " + fXmlParentId + " - " + fId + " - " + fParentId; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         }
 
     }
@@ -246,9 +251,9 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
      *            entry end time
      * @return new instance
      */
-    public static XmlTimeGraphEntryModel create(long id, long parentId, @NonNull String name, long start, long end) {
+    public static XmlTimeGraphEntryModel create(long id, long parentId, @NonNull List<@NonNull String> name, long start, long end) {
         return new XmlTimeGraphEntryModel(id, parentId, name, start, end,
-                null, name, EMPTY_STRING, false);
+                null, name.get(0), EMPTY_STRING, false);
     }
 
     /**
@@ -256,8 +261,8 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
      *            unique entry model id
      * @param parentId
      *            parent's unique entry model id
-     * @param name
-     *            default entry name
+     * @param labels
+     *            default entry labels
      * @param startTime
      *            entry start time
      * @param endTime
@@ -271,9 +276,9 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
      * @param showText
      *            if the text should be shown for this entry or not.
      */
-    public XmlTimeGraphEntryModel(long id, long parentId, @NonNull String name, long startTime, long endTime,
+    public XmlTimeGraphEntryModel(long id, long parentId, @NonNull List<@NonNull String> labels, long startTime, long endTime,
             String path, @NonNull String xmlId, @NonNull String xmlParentId, boolean showText) {
-        super(id, parentId, name, startTime, endTime);
+        super(id, parentId, labels, startTime, endTime);
         fPath = path;
         fXmlId = xmlId;
         fXmlParentId = xmlParentId;

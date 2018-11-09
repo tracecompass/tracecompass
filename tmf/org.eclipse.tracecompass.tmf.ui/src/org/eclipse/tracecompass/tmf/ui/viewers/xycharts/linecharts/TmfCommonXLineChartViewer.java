@@ -433,7 +433,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
      */
     private void extractXYModelAndUpdateViewModel(ITmfCommonXAxisModel model) {
 
-        long[] xValuesRequested = model.getXAxis();
+        long[] xValuesRequested = model.getXValues();
         double[] xValuesToDisplay = new double[xValuesRequested.length];
         long offset = getTimeOffset();
 

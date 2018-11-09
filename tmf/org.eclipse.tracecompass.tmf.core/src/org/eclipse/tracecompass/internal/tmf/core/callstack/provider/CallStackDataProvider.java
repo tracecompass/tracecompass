@@ -121,7 +121,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
 
         ImmutableList.Builder<CallStackEntryModel> builder = ImmutableList.builder();
         long traceId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
-        builder.add(new CallStackEntryModel(traceId, -1, getTrace().getName(), start, end, CallStackEntryModel.TRACE, UNKNOWN_TID));
+        builder.add(new CallStackEntryModel(traceId, -1, Collections.singletonList(getTrace().getName()), start, end, CallStackEntryModel.TRACE, UNKNOWN_TID));
 
         List<Integer> processQuarks = ss.getQuarks(getAnalysisModule().getProcessesPattern());
         SubMonitor subMonitor = SubMonitor.convert(monitor, "CallStackDataProvider#fetchTree", processQuarks.size()); //$NON-NLS-1$
@@ -139,7 +139,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
                 String processName = ss.getAttributeName(processQuark);
                 Object processValue = fullEnd.get(processQuark).getValue();
                 pid = getThreadProcessId(processName, processValue);
-                builder.add(new CallStackEntryModel(threadParentId, traceId, processName, start, end,
+                builder.add(new CallStackEntryModel(threadParentId, traceId, Collections.singletonList(processName), start, end,
                         CallStackEntryModel.PROCESS, pid));
             }
 
@@ -182,7 +182,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         int threadId = getThreadProcessId(threadName, threadStateValue);
         ITmfStateInterval startInterval = fullStart.get(callStackQuark);
         long threadStart = startInterval.getValue() == null ? Long.min(startInterval.getEndTime() + 1, end) : start;
-        return new CallStackEntryModel(getId(threadQuark), processId, threadName, threadStart, threadEnd, CallStackEntryModel.THREAD, threadId);
+        return new CallStackEntryModel(getId(threadQuark), processId, Collections.singletonList(threadName), threadStart, threadEnd, CallStackEntryModel.THREAD, threadId);
     }
 
     private void createStackEntries(List<Integer> callStackAttributes, long start, long end, int pid,
@@ -190,7 +190,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         int level = 1;
         for (int stackLevelQuark : callStackAttributes) {
             long id = getId(stackLevelQuark);
-            builder.add(new CallStackEntryModel(id, callStackParent, threadName, start, end, level, pid));
+            builder.add(new CallStackEntryModel(id, callStackParent, Collections.singletonList(threadName), start, end, level, pid));
             fQuarkToPid.put(stackLevelQuark, pid);
             level++;
         }

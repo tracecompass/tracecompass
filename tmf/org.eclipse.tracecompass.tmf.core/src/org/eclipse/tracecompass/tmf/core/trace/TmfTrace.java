@@ -422,6 +422,11 @@ public abstract class TmfTrace extends TmfEventProvider implements ITmfTrace, IT
         return this.getName();
     }
 
+    @Override
+    public boolean isIndexing() {
+        return fIndexer.isIndexing();
+    }
+
     // ------------------------------------------------------------------------
     // Convenience setters
     // ------------------------------------------------------------------------

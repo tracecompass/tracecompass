@@ -99,16 +99,16 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
     protected List<TmfTreeDataModel> getTree(ITmfStateSystem ss, TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         List<TmfTreeDataModel> entries = new ArrayList<>();
         long rootId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
-        entries.add(new TmfTreeDataModel(rootId, -1, getTrace().getName()));
+        entries.add(new TmfTreeDataModel(rootId, -1, Collections.singletonList(getTrace().getName())));
 
-        addTreeViewerBranch(ss, rootId, CounterAnalysis.GROUPED_COUNTER_ASPECTS_ATTRIB, entries);
-        addTreeViewerBranch(ss, rootId, CounterAnalysis.UNGROUPED_COUNTER_ASPECTS_ATTRIB, entries);
+        addTreeViewerBranch(ss, rootId, Collections.singletonList(CounterAnalysis.GROUPED_COUNTER_ASPECTS_ATTRIB), entries);
+        addTreeViewerBranch(ss, rootId, Collections.singletonList(CounterAnalysis.UNGROUPED_COUNTER_ASPECTS_ATTRIB), entries);
 
         return entries;
     }
 
-    private void addTreeViewerBranch(ITmfStateSystem ss, long parentId, String branchName, List<TmfTreeDataModel> entries) {
-        int quark = ss.optQuarkAbsolute(branchName);
+    private void addTreeViewerBranch(ITmfStateSystem ss, long parentId, List<String> branchName, List<TmfTreeDataModel> entries) {
+        int quark = ss.optQuarkAbsolute(branchName.get(0));
         if (quark != ITmfStateSystem.INVALID_ATTRIBUTE && !ss.getSubAttributes(quark, false).isEmpty()) {
             long id = getId(quark);
             TmfTreeDataModel branch = new TmfTreeDataModel(id, parentId, branchName);
@@ -123,7 +123,7 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
     private void addTreeViewerEntries(ITmfStateSystem ss, long parentId, int quark, List<TmfTreeDataModel> entries) {
         for (int childQuark : ss.getSubAttributes(quark, false)) {
             long id = getId(childQuark);
-            TmfTreeDataModel childBranch = new TmfTreeDataModel(id, parentId, ss.getAttributeName(childQuark));
+            TmfTreeDataModel childBranch = new TmfTreeDataModel(id, parentId, Collections.singletonList(ss.getAttributeName(childQuark)));
             entries.add(childBranch);
             addTreeViewerEntries(ss, id, childQuark, entries);
         }

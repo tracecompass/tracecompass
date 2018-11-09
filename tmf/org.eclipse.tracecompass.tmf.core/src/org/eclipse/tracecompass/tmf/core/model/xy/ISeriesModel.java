@@ -37,17 +37,63 @@ public interface ISeriesModel {
     String getName();
 
     /**
+     * Get the X axis description
+     *
+     * @return X Axis description
+     * @since 4.3
+     */
+    @SuppressWarnings("nls")
+    default TmfXYAxis getXAxisDescription() {
+        return new TmfXYAxis("X Axis", "");
+    }
+
+    /**
+     * Get the Y axis description
+     *
+     * @return Y Axis description
+     * @since 4.3
+     */
+    @SuppressWarnings("nls")
+    default TmfXYAxis getYAxisDescription() {
+        return new TmfXYAxis("Y Axis", "");
+    }
+
+    /**
      * Get the X values
      *
      * @return The x values
+     * @since 4.3
      */
+    default long[] getXValues() {
+        return getXAxis();
+    }
+
+    /**
+     * Get the y values
+     *
+     * @return An array of y values
+     * @since 4.3
+     */
+    default double[] getYValues() {
+        return getData();
+    }
+
+    /**
+     * Get the X values
+     *
+     * @return The x values
+     * @deprecated Use getXValues instead
+     */
+    @Deprecated
     long[] getXAxis();
 
     /**
      * Get the y values
      *
      * @return An array of y values
+     * @deprecated Use getYValues instead
      */
+    @Deprecated
     double[] getData();
 
     /**

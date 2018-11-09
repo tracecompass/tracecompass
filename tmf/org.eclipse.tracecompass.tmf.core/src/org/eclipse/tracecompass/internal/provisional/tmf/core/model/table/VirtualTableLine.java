@@ -22,7 +22,7 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 public class VirtualTableLine implements IVirtualTableLine {
 
-    private List<String> fLineData;
+    private List<VirtualTableCell> fCells;
     private long findex;
 
     /**
@@ -31,12 +31,12 @@ public class VirtualTableLine implements IVirtualTableLine {
      * @param index
      *            Index for this line
      *
-     * @param lineData
+     * @param cellData
      *            Data for this line
      */
-    public VirtualTableLine(long index, List<String> lineData) {
+    public VirtualTableLine(long index, List<VirtualTableCell> cellData) {
         findex = index;
-        fLineData = lineData;
+        fCells = cellData;
     }
 
     @Override
@@ -45,8 +45,8 @@ public class VirtualTableLine implements IVirtualTableLine {
     }
 
     @Override
-    public List<String> getLine() {
-        return fLineData;
+    public List<VirtualTableCell> getCells() {
+        return fCells;
     }
 
     @Override
@@ -61,12 +61,12 @@ public class VirtualTableLine implements IVirtualTableLine {
             return false;
         }
         VirtualTableLine other = (VirtualTableLine) obj;
-        return fLineData.equals(other.getLine()) &&
+        return fCells.equals(other.getCells()) &&
                 findex == other.getIndex();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fLineData, findex);
+        return Objects.hash(fCells, findex);
     }
 }

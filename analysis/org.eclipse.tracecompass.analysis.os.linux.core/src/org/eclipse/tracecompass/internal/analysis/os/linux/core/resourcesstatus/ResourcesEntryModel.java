@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus;
 
+import java.util.List;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 
@@ -45,8 +47,8 @@ public class ResourcesEntryModel extends TimeGraphEntryModel {
      *            unique Entry ID
      * @param parentId
      *            parent ID
-     * @param name
-     *            entry name
+     * @param labels
+     *            entry labels
      * @param startTime
      *            start time for this entry
      * @param endTime
@@ -56,8 +58,8 @@ public class ResourcesEntryModel extends TimeGraphEntryModel {
      * @param type
      *            type of entry (GROUP / CPU / CURRENT_THREAD / IRQ / SOFT_IRQ)
      */
-    public ResourcesEntryModel(long id, long parentId, @NonNull String name, long startTime, long endTime, int resourceId, Type type) {
-        super(id, parentId, name, startTime, endTime, !name.isEmpty());
+    public ResourcesEntryModel(long id, long parentId, @NonNull List<@NonNull String> labels, long startTime, long endTime, int resourceId, Type type) {
+        super(id, parentId, labels, startTime, endTime, !labels.isEmpty());
         fResourceId = resourceId;
         fType = type;
     }

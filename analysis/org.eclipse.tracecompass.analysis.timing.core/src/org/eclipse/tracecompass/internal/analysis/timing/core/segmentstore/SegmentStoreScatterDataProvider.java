@@ -47,6 +47,7 @@ import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
+import org.eclipse.tracecompass.tmf.core.model.xy.TmfXYAxis;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
@@ -292,16 +293,16 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         }
 
         Builder<TmfTreeDataModel> nodes = new ImmutableList.Builder<>();
-        nodes.add(new TmfTreeDataModel(fTraceId, -1, String.valueOf(getTrace().getName())));
+        nodes.add(new TmfTreeDataModel(fTraceId, -1, Collections.singletonList(String.valueOf(getTrace().getName()))));
 
         // There are segments, but no type, probably not named segments, so just add a category
         if (segmentTypes.isEmpty() && intersectingElements.iterator().hasNext()) {
             long seriesId = getUniqueId(DEFAULT_CATEGORY);
-            nodes.add(new TmfTreeDataModel(seriesId, fTraceId, DEFAULT_CATEGORY));
+            nodes.add(new TmfTreeDataModel(seriesId, fTraceId, Collections.singletonList(DEFAULT_CATEGORY)));
         }
         for (String seriesName : segmentTypes) {
             long seriesId = getUniqueId(seriesName);
-            nodes.add(new TmfTreeDataModel(seriesId, fTraceId, seriesName));
+            nodes.add(new TmfTreeDataModel(seriesId, fTraceId, Collections.singletonList(seriesName)));
         }
 
         return new TmfModelResponse<>(nodes.build(), complete ? ITmfResponse.Status.COMPLETED : ITmfResponse.Status.RUNNING,
@@ -453,7 +454,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         }
 
         public SeriesModel build() {
-            return new SeriesModel(getId(), getName(), Longs.toArray(fXValues), Doubles.toArray(fYValues), Ints.toArray(fProperties));
+            return new SeriesModel(getId(), getName(), Longs.toArray(fXValues), Doubles.toArray(fYValues), new TmfXYAxis("X Axis", ""), new TmfXYAxis("Y Axis", ""), Ints.toArray(fProperties));
         }
 
         private long getId() {

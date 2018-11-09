@@ -137,7 +137,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         List<@NonNull ResourcesEntryModel> builder = new ArrayList<>();
 
         long traceId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
-        ResourcesEntryModel resourcesEntryModel = new ResourcesEntryModel(traceId, -1, getTrace().getName(), start, end, -1, Type.GROUP);
+        ResourcesEntryModel resourcesEntryModel = new ResourcesEntryModel(traceId, -1, Collections.singletonList(getTrace().getName()), start, end, -1, Type.GROUP);
         builder.add(resourcesEntryModel);
 
         for (Integer cpuQuark : ss.getQuarks(Attributes.CPUS, WILDCARD)) {
@@ -168,7 +168,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
 
             // Add a separator entry after each CPU entry
             long id = fSeparatorIds.computeIfAbsent(cpu, key -> getEntryId());
-            builder.add(new ResourcesEntryModel(id, traceId, SEPARATOR, start, end, cpu, Type.GROUP));
+            builder.add(new ResourcesEntryModel(id, traceId, Collections.singletonList(SEPARATOR), start, end, cpu, Type.GROUP));
 
             List<Integer> irqQuarks = ss.getQuarks(cpuQuark, Attributes.IRQS, WILDCARD);
             createInterrupt(ss, start, end, cpuEntry, irqQuarks, Type.IRQ, builder);
@@ -253,26 +253,26 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         }
     }
 
-    private static @NonNull String computeEntryName(Type type, int id) {
+    private static @NonNull List<@NonNull String> computeEntryName(Type type, int id) {
         if (type == Type.SOFT_IRQ) {
-            return type.toString() + ' ' + id + ' ' + SoftIrqLabelProvider.getSoftIrq(id);
+            return Collections.singletonList(type.toString() + ' ' + id + ' ' + SoftIrqLabelProvider.getSoftIrq(id));
         } else if (type == Type.CURRENT_THREAD) {
             String threadEntryName = NLS.bind(Messages.ThreadEntry, id);
             if (threadEntryName != null) {
-                return threadEntryName;
+                return Collections.singletonList(threadEntryName);
             }
         } else if (type == Type.CPU) {
             String cpuEntryName = NLS.bind(Messages.CpuEntry, id);
             if (cpuEntryName != null) {
-                return cpuEntryName;
+                return Collections.singletonList(cpuEntryName);
             }
         } else if (type == Type.FREQUENCY) {
             String cpuEntryName = NLS.bind(Messages.FrequencyEntry, id);
             if (cpuEntryName != null) {
-                return cpuEntryName;
+                return Collections.singletonList(cpuEntryName);
             }
         }
-        return type.toString() + ' ' + id;
+        return Collections.singletonList(type.toString() + ' ' + id);
     }
 
     @Override

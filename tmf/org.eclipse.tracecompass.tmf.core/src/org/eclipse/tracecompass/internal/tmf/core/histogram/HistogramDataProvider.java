@@ -91,11 +91,11 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
         }
         fModule.waitForInitialization();
         Builder<TmfTreeDataModel> builder = ImmutableList.builder();
-        builder.add(new TmfTreeDataModel(fTraceId, -1, getTrace().getName()));
-        builder.add(new TmfTreeDataModel(fTotalId, fTraceId, Objects.requireNonNull(Messages.HistogramDataProvider_Total)));
+        builder.add(new TmfTreeDataModel(fTraceId, -1, Collections.singletonList(getTrace().getName())));
+        builder.add(new TmfTreeDataModel(fTotalId, fTraceId, Collections.singletonList(Objects.requireNonNull(Messages.HistogramDataProvider_Total))));
         ITmfStateSystem eventsSs = Objects.requireNonNull(fModule.getStateSystem(TmfStatisticsEventTypesModule.ID));
         if (eventsSs.optQuarkAbsolute(Attributes.LOST_EVENTS) != ITmfStateSystem.INVALID_ATTRIBUTE) {
-            builder.add(new TmfTreeDataModel(fLostId, fTraceId, Objects.requireNonNull(Messages.HistogramDataProvider_Lost)));
+            builder.add(new TmfTreeDataModel(fLostId, fTraceId, Collections.singletonList(Objects.requireNonNull(Messages.HistogramDataProvider_Lost))));
         }
         if (eventsSs.waitUntilBuilt(0)) {
             TmfModelResponse<List<TmfTreeDataModel>> response = new TmfModelResponse<>(builder.build(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);

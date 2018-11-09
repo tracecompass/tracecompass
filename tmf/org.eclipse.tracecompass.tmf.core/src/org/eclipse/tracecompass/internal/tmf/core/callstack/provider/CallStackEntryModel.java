@@ -9,8 +9,10 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.callstack.provider;
 
+import java.util.List;
 import java.util.Objects;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 
@@ -44,8 +46,8 @@ public class CallStackEntryModel extends TimeGraphEntryModel {
      *            unique ID for this {@link CallStackEntryModel}
      * @param parentId
      *            parent's ID to build the tree
-     * @param name
-     *            entry's name
+     * @param labels
+     *            entry's labels
      * @param startTime
      *            entry's start time
      * @param endTime
@@ -57,8 +59,8 @@ public class CallStackEntryModel extends TimeGraphEntryModel {
      * @param pid
      *            entry's PID or TID if is a thread
      */
-    public CallStackEntryModel(long id, long parentId, String name, long startTime, long endTime, int stackLevel, int pid) {
-        super(id, parentId, name, startTime, endTime);
+    public CallStackEntryModel(long id, long parentId, @NonNull List<@NonNull String> labels, long startTime, long endTime, int stackLevel, int pid) {
+        super(id, parentId, labels, startTime, endTime);
         fStackLevel = stackLevel;
         fPid = pid;
     }

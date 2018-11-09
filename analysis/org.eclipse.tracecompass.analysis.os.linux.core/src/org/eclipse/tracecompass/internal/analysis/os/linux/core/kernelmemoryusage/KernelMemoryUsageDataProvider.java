@@ -253,7 +253,7 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
         List<Integer> threadQuarkList = ss.getSubAttributes(ITmfStateSystem.ROOT_ATTRIBUTE, false);
 
         long totalId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
-        nodes.add(new MemoryUsageTreeModel(totalId, -1, TOTAL_TID, getTrace().getName()));
+        nodes.add(new MemoryUsageTreeModel(totalId, -1, TOTAL_TID, Collections.singletonList(getTrace().getName())));
         for (Integer threadQuark : threadQuarkList) {
             if (active == null || active.get(threadQuark).getEndTime() < end) {
                 String tidString = ss.getAttributeName(threadQuark);
@@ -261,7 +261,7 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
 
                 // Ensure that we reuse the same id for a given quark.
                 long id = getId(threadQuark);
-                nodes.add(new MemoryUsageTreeModel(id, totalId, parseTid(tidString), procname));
+                nodes.add(new MemoryUsageTreeModel(id, totalId, parseTid(tidString), Collections.singletonList(procname)));
             }
         }
         return nodes;

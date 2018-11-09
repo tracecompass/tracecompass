@@ -34,7 +34,7 @@ public interface ITmfVirtualTableModel<L extends IVirtualTableLine> {
      *
      * @return The list of lines
      */
-    List<L> getData();
+    List<L> getLines();
 
     /**
      * Gets the index of the first table entry in the model
@@ -49,5 +49,5 @@ public interface ITmfVirtualTableModel<L extends IVirtualTableLine> {
      *
      * @return The total number of table entries that matches a filter
      */
-    long getNbTotalEntries();
+    long getSize();
 }

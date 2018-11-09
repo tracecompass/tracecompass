@@ -9,6 +9,9 @@
 
 package org.eclipse.tracecompass.analysis.timing.core.segmentstore;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
@@ -46,7 +49,25 @@ public class SegmentStoreStatisticsModel extends TmfTreeDataModel {
      *            model.
      */
     public SegmentStoreStatisticsModel(long id, long parentId, String name, IStatistics<ISegment> statistics) {
-        super(id, parentId, name);
+        this(id, parentId, Collections.singletonList(name), statistics);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param id
+     *            The id of the model
+     * @param parentId
+     *            The parent id of this model. If it has none, give <code>-1</code>.
+     * @param labels
+     *            The labels of this model
+     * @param statistics
+     *            the {@link IStatistics} who's values will be copied into this
+     *            model.
+     * @since 4.2
+     */
+    public SegmentStoreStatisticsModel(long id, long parentId, List<String> labels, IStatistics<ISegment> statistics) {
+        super(id, parentId, labels);
         fMin = statistics.getMin();
         fMax = statistics.getMax();
         fNbElements = statistics.getNbElements();

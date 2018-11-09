@@ -60,7 +60,13 @@ public class TmfCommonXAxisModel implements ITmfCommonXAxisModel {
     }
 
     @Override
+    @Deprecated
     public long[] getXAxis() {
+        return getXValues();
+    }
+
+    @Override
+    public long[] getXValues() {
         return fXValues;
     }
 
@@ -72,6 +78,11 @@ public class TmfCommonXAxisModel implements ITmfCommonXAxisModel {
     @Override
     public @NonNull Map<String, IYModel> getYData() {
         return fYSeries;
+    }
+
+    @Override
+    public boolean hasCommonXAxis() {
+        return true;
     }
 
     @Override

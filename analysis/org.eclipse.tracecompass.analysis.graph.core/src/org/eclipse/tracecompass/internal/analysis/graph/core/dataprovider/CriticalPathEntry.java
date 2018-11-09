@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.analysis.graph.core.dataprovider;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -52,7 +54,7 @@ public class CriticalPathEntry extends TimeGraphEntryModel implements IFilterabl
      */
     public CriticalPathEntry(long id, long parentId, IGraphWorker worker,
             long startTime, long endTime, Long sum, Double percent) {
-        super(id, parentId, String.valueOf(worker), startTime, endTime);
+        super(id, parentId, Collections.singletonList(String.valueOf(worker)), startTime, endTime);
         fSum = sum;
         fPercent = percent;
         fAspects.put("hostId", worker.getHostId());
@@ -68,8 +70,8 @@ public class CriticalPathEntry extends TimeGraphEntryModel implements IFilterabl
      *            unique entry ID
      * @param parentId
      *            entry's parent unique ID
-     * @param name
-     *            The entry name
+     * @param labels
+     *            The entry labels
      * @param startTime
      *            entry's start time
      * @param endTime
@@ -81,9 +83,9 @@ public class CriticalPathEntry extends TimeGraphEntryModel implements IFilterabl
      *            {@link TmfGraphStatistics} percentage for the associated
      *            {@link IGraphWorker}
      */
-    public CriticalPathEntry(long id, long parentId, @NonNull String name,
+    public CriticalPathEntry(long id, long parentId, @NonNull List<@NonNull String> labels,
             long startTime, long endTime, Long sum, Double percent) {
-        super(id, parentId, name, startTime, endTime);
+        super(id, parentId, labels, startTime, endTime);
         fSum = sum;
         fPercent = percent;
     }

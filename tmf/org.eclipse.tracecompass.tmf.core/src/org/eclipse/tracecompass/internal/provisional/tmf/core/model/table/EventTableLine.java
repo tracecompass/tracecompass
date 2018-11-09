@@ -41,7 +41,7 @@ public class EventTableLine extends VirtualTableLine {
      * @param repeatCount
      *            Number of times this line is repeated
      */
-    public EventTableLine(List<String> data, long index, ITmfTimestamp timestamp, long rank, long repeatCount) {
+    public EventTableLine(List<VirtualTableCell> data, long index, ITmfTimestamp timestamp, long rank, long repeatCount) {
         super(index, data);
         fTimestamp = timestamp;
         fRank = rank;
@@ -78,7 +78,7 @@ public class EventTableLine extends VirtualTableLine {
     @Override
     public String toString() {
         return "Index: " + getIndex() + //$NON-NLS-1$
-                ", Line: " + getLine() + //$NON-NLS-1$
+                ", Line: " + getCells() + //$NON-NLS-1$
                 ", Timestamp: " + fTimestamp + //$NON-NLS-1$
                 ", Rank: " + fRank + //$NON-NLS-1$
                 ", RepeatCount: " + fRepeatCount; //$NON-NLS-1$
@@ -101,6 +101,6 @@ public class EventTableLine extends VirtualTableLine {
 
     @Override
     public int hashCode() {
-        return Objects.hash(fTimestamp, fRank, fRepeatCount, getIndex(), getLine());
+        return Objects.hash(fTimestamp, fRank, fRepeatCount, getIndex(), getCells());
     }
 }

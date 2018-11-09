@@ -152,7 +152,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
                 long start = ss.getStartTime();
                 long end = ss.getCurrentEndTime();
                 long id = fBaseQuarkToId.row(ss).computeIfAbsent(ITmfStateSystem.ROOT_ATTRIBUTE, s -> sfAtomicId.getAndIncrement());
-                Builder ssEntry = new Builder(id, -1, traceName, start, end, null, ss, ITmfStateSystem.ROOT_ATTRIBUTE, fCompilationData);
+                Builder ssEntry = new Builder(id, -1, Collections.singletonList(traceName), start, end, null, ss, ITmfStateSystem.ROOT_ATTRIBUTE, fCompilationData);
                 entryList.add(ssEntry.build());
 
                 for (Element entry : fEntries) {
@@ -245,7 +245,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
             } else {
                 long id = fBaseQuarkToId.row(ss).computeIfAbsent(quark, s -> sfAtomicId.getAndIncrement());
                 currentEntry =  new Builder(id, parentEntry.getId(),
-                        ss.getAttributeName(quark), ss.getStartTime(), ss.getCurrentEndTime(), null, ss, quark, fCompilationData);
+                        Collections.singletonList(ss.getAttributeName(quark)), ss.getStartTime(), ss.getCurrentEndTime(), null, ss, quark, fCompilationData);
                 entryMap.put(currentEntry.getXmlId(), currentEntry);
             }
             /* Process the children entry of this entry */
@@ -270,7 +270,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
         long id = fBaseQuarkToId.row(ss).computeIfAbsent(quark, s -> sfAtomicId.getAndIncrement());
         if (displayQuark < 0) {
             return new Builder(id, parentEntry.getId(),
-                    String.format("Unknown display quark for %s", ss.getAttributeName(quark)), ss.getStartTime(), ss.getCurrentEndTime(), null, ss, quark, fCompilationData); //$NON-NLS-1$
+                    Collections.singletonList(String.format("Unknown display quark for %s", ss.getAttributeName(quark))), ss.getStartTime(), ss.getCurrentEndTime(), null, ss, quark, fCompilationData); //$NON-NLS-1$
         }
         fIDToDisplayQuark.put(id, new Pair<>(ss, displayQuark));
 
@@ -304,7 +304,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
         } catch (StateSystemDisposedException e) {
         }
 
-        return new Builder(id, parentEntry.getId(), ss.getAttributeName(quark), entryStart, entryEnd, entryElement, ss, quark, fCompilationData);
+        return new Builder(id, parentEntry.getId(), Collections.singletonList(ss.getAttributeName(quark)), entryStart, entryEnd, entryElement, ss, quark, fCompilationData);
     }
 
     /** Build a tree using getParentId() and getId() */

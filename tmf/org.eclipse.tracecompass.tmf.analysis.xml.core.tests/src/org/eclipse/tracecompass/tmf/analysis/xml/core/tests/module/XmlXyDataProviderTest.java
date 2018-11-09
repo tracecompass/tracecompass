@@ -144,7 +144,7 @@ public class XmlXyDataProviderTest {
             assertNotNull(row);
 
             String[] expectedData = split[1].split(",");
-            double[] actualData = row.getData();
+            double[] actualData = row.getYValues();
             for (int j = 0; j < expectedData.length; j++) {
                 assertTrue("Presence of data at position " + j + " for row " + rowName, actualData.length > j);
                 double expectedValue = Double.parseDouble(expectedData[j]);

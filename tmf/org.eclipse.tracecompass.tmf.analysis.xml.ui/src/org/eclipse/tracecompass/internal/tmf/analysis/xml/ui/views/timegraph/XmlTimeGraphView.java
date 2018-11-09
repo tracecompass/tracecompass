@@ -81,7 +81,7 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
 
     private static final Comparator<XmlTimeGraphEntryModel> XML_ENTRY_COMPARATOR = Comparator
             .comparing(XmlTimeGraphEntryModel::getPath, Comparator.nullsFirst(Comparator.naturalOrder()))
-            .thenComparing(XmlTimeGraphEntryModel::getName).thenComparingLong(XmlTimeGraphEntryModel::getStartTime);
+            .thenComparing((XmlTimeGraphEntryModel entry) -> entry.getName()).thenComparingLong(XmlTimeGraphEntryModel::getStartTime);
 
     private static final Comparator<ITimeGraphEntry> ENTRY_COMPARATOR = Comparator.comparing(x -> (XmlTimeGraphEntryModel) ((TimeGraphEntry) x).getModel(), XML_ENTRY_COMPARATOR);
 

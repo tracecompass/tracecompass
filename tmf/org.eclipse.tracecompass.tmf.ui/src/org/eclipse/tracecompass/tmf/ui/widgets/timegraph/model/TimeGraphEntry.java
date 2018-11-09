@@ -26,9 +26,9 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
-import org.eclipse.tracecompass.tmf.core.model.IFilterableDataModel;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
+import org.eclipse.tracecompass.tmf.core.model.IFilterableDataModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 
@@ -115,7 +115,7 @@ public class TimeGraphEntry implements ITimeGraphEntry, IFilterableDataModel {
      *            The end time of this entry
      */
     public TimeGraphEntry(String name, long startTime, long endTime) {
-        fModel = new TimeGraphEntryModel(-1, -1, name, startTime, endTime);
+        fModel = new TimeGraphEntryModel(-1, -1, Collections.singletonList(name), startTime, endTime);
     }
 
     /**
@@ -186,7 +186,7 @@ public class TimeGraphEntry implements ITimeGraphEntry, IFilterableDataModel {
          * Model is immutable, this is the only way to do this, consider not updating
          * name in the future?
          */
-        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), name, getStartTime(), getEndTime(), fModel.hasRowModel());
+        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), Collections.singletonList(name), getStartTime(), getEndTime(), fModel.hasRowModel());
     }
 
     @Override
@@ -372,7 +372,7 @@ public class TimeGraphEntry implements ITimeGraphEntry, IFilterableDataModel {
          * Model is immutable, this is the only way to do this, consider not updating
          * bounds in the future?
          */
-        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), getName(), newStart, newEnd, fModel.hasRowModel());
+        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), Collections.singletonList(getName()), newStart, newEnd, fModel.hasRowModel());
     }
 
     /**
@@ -460,7 +460,7 @@ public class TimeGraphEntry implements ITimeGraphEntry, IFilterableDataModel {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '(' + fModel.getName() + ')';
+        return getClass().getSimpleName() + '(' + fModel.getLabels() + ')';
     }
 
     /**

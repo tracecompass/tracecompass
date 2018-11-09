@@ -9,6 +9,9 @@
 
 package org.eclipse.tracecompass.tmf.core.model.timegraph;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 
 /**
@@ -37,10 +40,7 @@ public class TimeGraphEntryModel extends TmfTreeDataModel implements ITimeGraphE
      *            End time
      */
     public TimeGraphEntryModel(long id, long parentId, String name, long startTime, long endTime) {
-        super(id, parentId, name);
-        fStartTime = startTime;
-        fEndTime = endTime;
-        fHasRowModel = true;
+        this(id, parentId, Collections.singletonList(name), startTime, endTime, true);
     }
 
     /**
@@ -60,7 +60,47 @@ public class TimeGraphEntryModel extends TmfTreeDataModel implements ITimeGraphE
      *            true if the entry has a row model
      */
     public TimeGraphEntryModel(long id, long parentId, String name, long startTime, long endTime, boolean hasRowModel) {
-        super(id, parentId, name);
+        this(id, parentId, Collections.singletonList(name), startTime, endTime, hasRowModel);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param id
+     *            Entry ID
+     * @param parentId
+     *            Parent ID
+     * @param labels
+     *            Entry labels to be displayed
+     * @param startTime
+     *            Start time
+     * @param endTime
+     *            End time
+     * @since 4.3
+     */
+    public TimeGraphEntryModel(long id, long parentId, List<String> labels, long startTime, long endTime) {
+        this(id, parentId, labels, startTime, endTime, true);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param id
+     *            Entry ID
+     * @param parentId
+     *            Parent ID
+     * @param labels
+     *            Entry labels to be displayed
+     * @param startTime
+     *            Start time
+     * @param endTime
+     *            End time
+     * @param hasRowModel
+     *            true if the entry has a row model
+     * @since 4.3
+     */
+    public TimeGraphEntryModel(long id, long parentId, List<String> labels, long startTime, long endTime, boolean hasRowModel) {
+        super(id, parentId, labels);
         fStartTime = startTime;
         fEndTime = endTime;
         fHasRowModel = hasRowModel;
@@ -83,7 +123,7 @@ public class TimeGraphEntryModel extends TmfTreeDataModel implements ITimeGraphE
 
 @Override
     public String toString() {
-        return "<name=" + getName() + " id=" + getId() + " parentId=" + getParentId() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        return "<name=" + getLabels() + " id=" + getId() + " parentId=" + getParentId() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 + " start=" + fStartTime + " end=" + fEndTime + " hasRowModel=" + hasRowModel() + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 }

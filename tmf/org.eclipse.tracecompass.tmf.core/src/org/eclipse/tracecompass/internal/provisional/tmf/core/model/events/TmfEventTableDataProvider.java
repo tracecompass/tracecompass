@@ -30,6 +30,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfFi
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfVirtualTableDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfVirtualTableModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.TmfVirtualTableModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.VirtualTableCell;
 import org.eclipse.tracecompass.internal.tmf.core.filter.TmfCollapseFilter;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -132,7 +133,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
             synchronized (fAspectToIdMap) {
                 long id = fAspectToIdMap.computeIfAbsent(aspect, a -> fAtomicLong.getAndIncrement());
                 fIdToAspectMap.putIfAbsent(id, aspect);
-                model.add(new TmfEventTableColumnDataModel(id, -1, aspect.getName(), aspect.getHelpText(), aspect.isHiddenByDefault()));
+                model.add(new TmfEventTableColumnDataModel(id, -1, Collections.singletonList(aspect.getName()), aspect.getHelpText(), aspect.isHiddenByDefault()));
             }
         }
 
@@ -318,7 +319,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
                     int lastIndex = events.size() - 1;
                     EventTableLine prevLine = events.get(lastIndex);
                     long prevRepeatCount = prevLine.getRepeatCount();
-                    events.set(lastIndex, new EventTableLine(prevLine.getLine(), prevLine.getIndex(), prevLine.getTimestamp(), prevLine.getRank(), prevRepeatCount++));
+                    events.set(lastIndex, new EventTableLine(prevLine.getCells(), prevLine.getIndex(), prevLine.getTimestamp(), prevLine.getRank(), prevRepeatCount++));
                 }
 
                 if (searchFilter != null && ((!forwardSearch && getCurrentCount() == queryCount) || events.size() == queryCount)) {
@@ -369,7 +370,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
                     int lastIndex = events.size() - 1;
                     EventTableLine prevLine = events.get(lastIndex);
                     long prevRepeatCount = prevLine.getRepeatCount();
-                    events.set(lastIndex, new EventTableLine(prevLine.getLine(), prevLine.getIndex(), prevLine.getTimestamp(), prevLine.getRank(), prevRepeatCount++));
+                    events.set(lastIndex, new EventTableLine(prevLine.getCells(), prevLine.getIndex(), prevLine.getTimestamp(), prevLine.getRank(), prevRepeatCount++));
                 }
 
                 if ((searchFilter != null && !forwardSearch && getNbRead() == queryCount) || events.size() == queryCount) {
@@ -395,10 +396,11 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
      * @return A new event table line
      */
     private static EventTableLine buildEventTableLine(Map<Long, ITmfEventAspect<?>> aspects, ITmfEvent event, long lineIndex, long lineRank) {
-        List<String> entry = new ArrayList<>(aspects.size());
+        List<VirtualTableCell> entry = new ArrayList<>(aspects.size());
         for (Entry<Long, ITmfEventAspect<?>> aspectEntry : aspects.entrySet()) {
             Object aspectResolved = aspectEntry.getValue().resolve(event);
-            entry.add(aspectResolved == null ? StringUtils.EMPTY : String.valueOf(aspectResolved));
+            String cellContent = aspectResolved == null ? StringUtils.EMPTY : String.valueOf(aspectResolved);
+            entry.add(new VirtualTableCell(cellContent));
         }
         return new EventTableLine(entry, lineIndex, event.getTimestamp(), lineRank, 0);
     }

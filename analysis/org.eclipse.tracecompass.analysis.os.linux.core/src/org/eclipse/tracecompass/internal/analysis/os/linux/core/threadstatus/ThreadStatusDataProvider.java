@@ -177,7 +177,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
                 }
 
                 // update the trace Entry.
-                fTidToEntry.replaceValues(Integer.MIN_VALUE, Collections.singleton(new ThreadEntryModel.Builder(fTraceId, getTrace().getName(),
+                fTidToEntry.replaceValues(Integer.MIN_VALUE, Collections.singleton(new ThreadEntryModel.Builder(fTraceId, Collections.singletonList(getTrace().getName()),
                         ss.getStartTime(), end, Integer.MIN_VALUE, Integer.MIN_VALUE)));
 
                 for (Integer threadQuark : ss.getQuarks(Attributes.THREADS, WILDCARD)) {
@@ -231,7 +231,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
 
         if (entry == null) {
             long id = fAtomicLong.getAndIncrement();
-            entry = new ThreadEntryModel.Builder(id, execName, startTime, endTime, threadId, ppid);
+            entry = new ThreadEntryModel.Builder(id, Collections.singletonList(execName), startTime, endTime, threadId, ppid);
             fQuarkMap.put(id, threadQuark);
         } else {
             /*
@@ -240,7 +240,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
              */
             entry.setEndTime(endTime);
             entry.setPpid(ppid);
-            entry.setName(execName);
+            entry.setName(Collections.singletonList(execName));
         }
         fBuildMap.put(entryKey, entry);
         fTidToEntry.put(threadId, entry);

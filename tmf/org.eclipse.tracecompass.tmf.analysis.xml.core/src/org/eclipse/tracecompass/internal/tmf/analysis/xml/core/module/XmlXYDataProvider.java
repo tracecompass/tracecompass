@@ -360,7 +360,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         try {
             List<ITmfStateInterval> fullState = ss.queryFullState(ss.getCurrentEndTime());
             ImmutableList.Builder<ITmfTreeDataModel> builder = ImmutableList.builder();
-            builder.add(new TmfTreeDataModel(fTraceId, -1, getTrace().getName()));
+            builder.add(new TmfTreeDataModel(fTraceId, -1, Collections.singletonList(getTrace().getName())));
 
             for (int quark : quarks) {
                 String seriesName = ss.getAttributeName(quark);
@@ -377,7 +377,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
                     String uniqueName = fQuarkToString.computeIfAbsent(quark, q -> getUniqueNameFor(tempSeriesName));
                     // Check if an ID has already been created for this quark.
                     Long id = fIdToQuark.inverse().computeIfAbsent(quark, q -> ENTRY_IDS.getAndIncrement());
-                    builder.add(new TmfTreeDataModel(id, fTraceId, uniqueName));
+                    builder.add(new TmfTreeDataModel(id, fTraceId, Collections.singletonList(uniqueName)));
                 }
             }
 

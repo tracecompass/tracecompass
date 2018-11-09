@@ -161,7 +161,7 @@ public class UstMemoryUsageDataProvider extends AbstractTreeCommonXDataProvider<
 
         ImmutableList.Builder<MemoryUsageTreeModel> builder = ImmutableList.builder();
         long rootId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
-        builder.add(new MemoryUsageTreeModel(rootId, -1L, -1, getTrace().getName()));
+        builder.add(new MemoryUsageTreeModel(rootId, -1L, -1, Collections.singletonList(getTrace().getName())));
         for (int quark : tidQuarks) {
             int memoryAttribute = ss.optQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_MEMORY_ATTRIBUTE);
             int procNameQuark = ss.optQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_PROCNAME_ATTRIBUTE);
@@ -175,7 +175,7 @@ public class UstMemoryUsageDataProvider extends AbstractTreeCommonXDataProvider<
                     && (active == null || (memoryAttribute < active.size() && active.get(memoryAttribute).getEndTime() < end))) {
 
                 int tid = Integer.parseInt(ss.getAttributeName(quark));
-                builder.add(new MemoryUsageTreeModel(getId(quark), rootId, tid, name));
+                builder.add(new MemoryUsageTreeModel(getId(quark), rootId, tid, Collections.singletonList(name)));
             }
         }
 

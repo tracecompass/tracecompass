@@ -290,7 +290,7 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
             // create host entry
             String host = owner.getHostId();
             long parentId = fHostIdToEntryId.computeIfAbsent(host, h -> ATOMIC_LONG.getAndIncrement());
-            fHostEntries.computeIfAbsent(host, h -> new CriticalPathEntry(parentId, -1L, host, fStart, fEnd, sum, percent));
+            fHostEntries.computeIfAbsent(host, h -> new CriticalPathEntry(parentId, -1L, Collections.singletonList(host), fStart, fEnd, sum, percent));
 
             long entryId = fWorkerToEntryId.computeIfAbsent(owner, w -> ATOMIC_LONG.getAndIncrement());
             CriticalPathEntry entry = new CriticalPathEntry(entryId, parentId, owner, fStart, fEnd, sum, percent);

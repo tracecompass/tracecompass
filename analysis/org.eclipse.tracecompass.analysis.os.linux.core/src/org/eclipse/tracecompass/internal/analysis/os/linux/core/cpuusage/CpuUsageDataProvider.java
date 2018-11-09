@@ -197,7 +197,7 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
 
         long totalTime = cpuUsageMap.getOrDefault(KernelCpuUsageAnalysis.TOTAL, 0l);
         long totalId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
-        entryList.add(new CpuUsageEntryModel(totalId, -1, getTrace().getName(), TOTAL_SERIES_TID, totalTime));
+        entryList.add(new CpuUsageEntryModel(totalId, -1, Collections.singletonList(getTrace().getName()), TOTAL_SERIES_TID, totalTime));
 
         for (Entry<String, Long> entry : cpuUsageMap.entrySet()) {
             /*
@@ -213,7 +213,7 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
             if (strings.length > 1) {
                 int tid = Integer.parseInt(strings[1]);
                 if (tid != 0) {
-                    entryList.add(new CpuUsageEntryModel(getId(tid), totalId, getProcessName(tid, strings[1]), tid, entry.getValue()));
+                    entryList.add(new CpuUsageEntryModel(getId(tid), totalId, Collections.singletonList(getProcessName(tid, strings[1])), tid, entry.getValue()));
                 }
             }
         }

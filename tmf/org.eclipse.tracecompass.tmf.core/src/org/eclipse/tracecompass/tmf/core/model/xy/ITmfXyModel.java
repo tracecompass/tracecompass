@@ -37,6 +37,16 @@ public interface ITmfXyModel {
     @Nullable String getTitle();
 
     /**
+     * True if the x values of the series are common
+     *
+     * @return True if X values are common
+     * @since 4.3
+     */
+    default boolean hasCommonXAxis() {
+        return false;
+    }
+
+    /**
      * Get the collection of {@link ISeriesModel}
      *
      * @return the collection of series data.

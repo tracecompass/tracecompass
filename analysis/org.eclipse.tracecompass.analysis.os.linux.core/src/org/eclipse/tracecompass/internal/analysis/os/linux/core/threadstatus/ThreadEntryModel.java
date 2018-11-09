@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus;
 
+import java.util.List;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.model.IFilterableDataModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
@@ -30,7 +32,7 @@ public class ThreadEntryModel extends TimeGraphEntryModel implements IFilterable
      */
     public static final class Builder {
         private final long fId;
-        private @NonNull String fName;
+        private @NonNull List<@NonNull String> fLabels;
         private final long fStartTime;
         private long fEndTime;
         private final int fPid;
@@ -41,8 +43,8 @@ public class ThreadEntryModel extends TimeGraphEntryModel implements IFilterable
          *
          * @param id
          *            The unique ID for this Entry model for its trace
-         * @param name
-         *            the thread name
+         * @param labels
+         *            the thread labels
          * @param start
          *            the thread's start time
          * @param end
@@ -52,9 +54,9 @@ public class ThreadEntryModel extends TimeGraphEntryModel implements IFilterable
          * @param ppid
          *            the thread's PPID
          */
-        public Builder(long id, @NonNull String name, long start, long end, int pid, int ppid) {
+        public Builder(long id, @NonNull List<@NonNull String> labels, long start, long end, int pid, int ppid) {
             fId = id;
-            fName = name;
+            fLabels = labels;
             fStartTime = start;
             fEndTime = end;
             fPid = pid;
@@ -103,8 +105,8 @@ public class ThreadEntryModel extends TimeGraphEntryModel implements IFilterable
          * @param name
          *            the new name
          */
-        public void setName(@NonNull String name) {
-            fName = name;
+        public void setName(@NonNull List<@NonNull String> name) {
+            fLabels = name;
         }
 
         /**
@@ -137,7 +139,7 @@ public class ThreadEntryModel extends TimeGraphEntryModel implements IFilterable
          *         {@link NullPointerException} if the parent Id is not set.
          */
         public ThreadEntryModel build(long parentId) {
-            return new ThreadEntryModel(fId, parentId, fName, fStartTime, fEndTime, fPid, fPpid);
+            return new ThreadEntryModel(fId, parentId, fLabels, fStartTime, fEndTime, fPid, fPpid);
         }
     }
 
@@ -152,8 +154,8 @@ public class ThreadEntryModel extends TimeGraphEntryModel implements IFilterable
      *            The unique ID for this Entry model for its trace
      * @param parentId
      *            this Entry model's ID
-     * @param name
-     *            the thread name
+     * @param labels
+     *            the thread labels
      * @param start
      *            the thread's start time
      * @param end
@@ -163,14 +165,14 @@ public class ThreadEntryModel extends TimeGraphEntryModel implements IFilterable
      * @param ppid
      *            the thread's PPID
      */
-    public ThreadEntryModel(long id, long parentId, @NonNull String name, long start, long end, int pid, int ppid) {
-        super(id, parentId, name, start, end);
+    public ThreadEntryModel(long id, long parentId, @NonNull List<@NonNull String> labels, long start, long end, int pid, int ppid) {
+        super(id, parentId, labels, start, end);
         fThreadId = pid;
         fParentThreadId = ppid;
         fAspects = HashMultimap.create();
         fAspects.put("tid", String.valueOf(pid));
         fAspects.put("ppid", String.valueOf(ppid));
-        fAspects.put("exec_name", String.valueOf(name));
+        fAspects.put("exec_name", String.valueOf(labels));
     }
 
     /**
@@ -193,7 +195,7 @@ public class ThreadEntryModel extends TimeGraphEntryModel implements IFilterable
 
     @Override
     public @NonNull String toString() {
-        return "<name=" + getName() + " id=" + getId() + " parentId=" + getParentId() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        return "<name=" + getLabels() + " id=" + getId() + " parentId=" + getParentId() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 + " start=" + getStartTime() + " end=" + getEndTime() //$NON-NLS-1$ //$NON-NLS-2$
                 + " TID=" + fThreadId + " PTID=" + fParentThreadId + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }

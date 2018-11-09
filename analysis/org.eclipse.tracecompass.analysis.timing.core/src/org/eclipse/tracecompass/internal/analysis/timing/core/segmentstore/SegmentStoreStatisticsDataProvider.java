@@ -116,16 +116,16 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         }
 
         List<SegmentStoreStatisticsModel> list = new ArrayList<>();
-        list.add(new SegmentStoreStatisticsModel(fTraceId, -1, Objects.requireNonNull(getTrace().getName()), statsTotal));
+        list.add(new SegmentStoreStatisticsModel(fTraceId, -1, Collections.singletonList(Objects.requireNonNull(getTrace().getName())), statsTotal));
 
         /*
          * Add statistics for full duration.
          */
         long totalId = getUniqueId(TOTAL_PREFIX);
-        list.add(new SegmentStoreStatisticsModel(totalId, fTraceId, Objects.requireNonNull(Messages.SegmentStoreStatisticsDataProvider_Total), statsTotal));
+        list.add(new SegmentStoreStatisticsModel(totalId, fTraceId, Collections.singletonList(Objects.requireNonNull(Messages.SegmentStoreStatisticsDataProvider_Total)), statsTotal));
         Map<String, IStatistics<ISegment>> totalStats = fProvider.getStatsPerType();
         for (Entry<String, IStatistics<ISegment>> entry : totalStats.entrySet()) {
-            list.add(new SegmentStoreStatisticsModel(getUniqueId(TOTAL_PREFIX + entry.getKey()), totalId, entry.getKey(), entry.getValue()));
+            list.add(new SegmentStoreStatisticsModel(getUniqueId(TOTAL_PREFIX + entry.getKey()), totalId, Collections.singletonList(entry.getKey()), entry.getValue()));
         }
 
         /*
@@ -142,10 +142,10 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
             }
 
             long selectionId = getUniqueId(SELECTION_PREFIX);
-            list.add(new SegmentStoreStatisticsModel(selectionId, fTraceId, Objects.requireNonNull(Messages.SegmentStoreStatisticsDataProvider_Selection), statsForRange));
+            list.add(new SegmentStoreStatisticsModel(selectionId, fTraceId, Collections.singletonList(Objects.requireNonNull(Messages.SegmentStoreStatisticsDataProvider_Selection)), statsForRange));
             Map<String, IStatistics<ISegment>> selectionStats = fProvider.getStatsPerTypeForRange(start, end, nonNullMonitor);
             for (Entry<String, IStatistics<ISegment>> entry : selectionStats.entrySet()) {
-                list.add(new SegmentStoreStatisticsModel(getUniqueId(SELECTION_PREFIX + entry.getKey()), selectionId, entry.getKey(), entry.getValue()));
+                list.add(new SegmentStoreStatisticsModel(getUniqueId(SELECTION_PREFIX + entry.getKey()), selectionId, Collections.singletonList(entry.getKey()), entry.getValue()));
             }
         }
         return new TmfModelResponse<>(Collections.unmodifiableList(list), Status.COMPLETED, CommonStatusMessage.COMPLETED);
