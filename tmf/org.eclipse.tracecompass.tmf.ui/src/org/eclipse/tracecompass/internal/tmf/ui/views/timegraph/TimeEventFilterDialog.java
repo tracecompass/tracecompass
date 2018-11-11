@@ -157,7 +157,6 @@ public class TimeEventFilterDialog extends Dialog {
             public void keyPressed(KeyEvent e) {
                 if (e.character == SWT.CR) {
                     handleEnterPressed(parent, labels, filterText);
-                    fView.restartZoomThread();
                 }
             }
         });
