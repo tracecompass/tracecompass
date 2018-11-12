@@ -34,6 +34,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils.QuarkIterator;
@@ -50,8 +51,10 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphArrow;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -134,9 +137,11 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
     }
 
     @Override
-    public TmfModelResponse<List<ThreadEntryModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<@NonNull TmfTreeModel<@NonNull ThreadEntryModel>> fetchTree(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+        // TODO fix selection filter in filter()
+        TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(fetchParameters);
         if (fLastEnd == Long.MAX_VALUE) {
-            return new TmfModelResponse<>(filter(fTidToEntry, filter), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+            return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), filter(fTidToEntry, filter)), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
 
         fModule.waitForInitialization();
@@ -151,7 +156,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
          */
         synchronized (fBuildMap) {
             boolean complete = ss.waitUntilBuilt(0);
-            List<ThreadEntryModel> list = null;
+            List<ThreadEntryModel> list = Collections.emptyList();
             /* Don't query empty state system */
             if (ss.getNbAttributes() > 0 && ss.getStartTime() != Long.MIN_VALUE) {
                 long end = ss.getCurrentEndTime();
@@ -207,10 +212,10 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
             if (complete) {
                 fBuildMap.clear();
                 fLastEnd = Long.MAX_VALUE;
-                return new TmfModelResponse<>(list, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+                return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), list), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
             }
 
-            return new TmfModelResponse<>(list, ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
+            return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), list), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
         }
     }
 
@@ -363,7 +368,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
     }
 
     @Override
-    public TmfModelResponse<List<ITimeGraphRowModel>> fetchRowModel(SelectionTimeQueryFilter filter, IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<@NonNull TimeGraphModel> fetchRowModel(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, IProgressMonitor monitor) {
         ITmfStateSystem ss = fModule.getStateSystem();
         if (ss == null) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
@@ -371,6 +376,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
 
         TreeMultimap<Integer, ITmfStateInterval> intervals = TreeMultimap.create(Comparator.naturalOrder(),
                 Comparator.comparing(ITmfStateInterval::getStartTime));
+        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
         Map<Long, Integer> selectedIdsToQuarks = getSelectedIdsToQuarks(filter);
         Collection<Integer> stateAndSyscallQuarks = addSyscall(selectedIdsToQuarks.values(), ss);
         Collection<Long> times = getTimes(ss, filter);
@@ -391,7 +397,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
             TimeGraphStateQueryFilter timeEventFilter = (TimeGraphStateQueryFilter) filter;
             predicates.putAll(computeRegexPredicate(timeEventFilter));
         }
-        List<ITimeGraphRowModel> rows = new ArrayList<>();
+        @NonNull List<@NonNull ITimeGraphRowModel> rows = new ArrayList<>();
         for (Entry<Long, Integer> entry : selectedIdsToQuarks.entrySet()) {
             int quark = entry.getValue();
             NavigableSet<ITmfStateInterval> states = intervals.get(quark);
@@ -408,7 +414,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
             });
             rows.add(new TimeGraphRowModel(entry.getKey(), eventList));
         }
-        return new TmfModelResponse<>(rows, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        return new TmfModelResponse<>(new TimeGraphModel(rows), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
     private Map<Long, Integer> getSelectedIdsToQuarks(SelectionTimeQueryFilter filter) {
@@ -478,7 +484,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
     }
 
     @Override
-    public TmfModelResponse<List<ITimeGraphArrow>> fetchArrows(TimeQueryFilter filter, IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphArrow>> fetchArrows(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, IProgressMonitor monitor) {
         ITmfStateSystem ss = fModule.getStateSystem();
         if (ss == null) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
@@ -492,6 +498,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
                 Comparator.naturalOrder(),
                 Comparator.comparing(ITmfStateInterval::getStartTime));
         List<Integer> quarks = ss.getQuarks(Attributes.CPUS, WILDCARD, Attributes.CURRENT_THREAD);
+        TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(fetchParameters);
         Collection<Long> times = getTimes(ss, filter);
         try {
             /* Do the actual query */
@@ -604,7 +611,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
     }
 
     @Override
-    public TmfModelResponse<Map<String, String>> fetchTooltip(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         ITmfStateSystem ss = fModule.getStateSystem();
         if (ss == null) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
@@ -614,6 +621,10 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
         ITmfResponse.Status status = completed ? ITmfResponse.Status.COMPLETED : ITmfResponse.Status.RUNNING;
         String statusMessage = completed ? CommonStatusMessage.COMPLETED : CommonStatusMessage.RUNNING;
 
+        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
+        if (filter == null) {
+            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
+        }
         Integer quark = fQuarkMap.get(filter.getSelectedItems().iterator().next());
         if (quark == null) {
             return new TmfModelResponse<>(null, status, statusMessage);
@@ -635,6 +646,46 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
             /* Ignored */
         }
         return new TmfModelResponse<>(null, status, statusMessage);
+    }
+
+    @Deprecated
+    @Override
+    public TmfModelResponse<List<ThreadEntryModel>> fetchTree(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        TmfModelResponse<@NonNull TmfTreeModel<@NonNull ThreadEntryModel>> response = fetchTree(parameters, monitor);
+        TmfTreeModel<@NonNull ThreadEntryModel> model = response.getModel();
+        List<ThreadEntryModel> treeModel = null;
+        if (model != null) {
+            treeModel = model.getEntries();
+        }
+        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
+    }
+
+    @Deprecated
+    @Override
+    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphRowModel>> fetchRowModel(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
+        TmfModelResponse<@NonNull TimeGraphModel> response = fetchRowModel(parameters, monitor);
+        TimeGraphModel model = response.getModel();
+        List<@NonNull ITimeGraphRowModel> rows = null;
+        if (model != null) {
+            rows = model.getRows();
+        }
+        return new TmfModelResponse<>(rows, response.getStatus(), response.getStatusMessage());
+    }
+
+    @Deprecated
+    @Override
+    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphArrow>> fetchArrows(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        return fetchArrows(parameters, monitor);
+    }
+
+    @Deprecated
+    @Override
+    public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
+        return fetchTooltip(parameters, monitor);
     }
 
 }

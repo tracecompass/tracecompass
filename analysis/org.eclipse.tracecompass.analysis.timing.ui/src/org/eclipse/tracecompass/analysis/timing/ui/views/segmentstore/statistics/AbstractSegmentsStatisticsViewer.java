@@ -39,6 +39,7 @@ import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondT
 import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProvider;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics.Messages;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
@@ -46,6 +47,7 @@ import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.model.filters.FilterTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -398,13 +400,13 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
         }
 
         FilterTimeQueryFilter filter = new FilterTimeQueryFilter(start, end, 2, isSelection);
-        TmfModelResponse<List<SegmentStoreStatisticsModel>> response = provider.fetchTree(filter, null);
-        List<SegmentStoreStatisticsModel> model = response.getModel();
+        TmfModelResponse<TmfTreeModel<SegmentStoreStatisticsModel>> response = provider.fetchTree(FetchParametersUtils.filteredTimeQueryToMap(filter), null);
+        TmfTreeModel<SegmentStoreStatisticsModel> model = response.getModel();
         if (model == null) {
             return null;
         }
 
-        return modelToTree(trace.getName(), model);
+        return modelToTree(trace.getName(), model.getEntries());
     }
 
     /**

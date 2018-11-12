@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.tmf.core.model.filters;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
@@ -44,6 +45,22 @@ public class SelectedCpuQueryFilter extends SelectionTimeQueryFilter {
      */
     public SelectedCpuQueryFilter(long start, long end, int n, Collection<Long> selectedThreads, Set<Integer> cpu) {
         super(start, end, n, selectedThreads);
+        fCpus = ImmutableSet.copyOf(cpu);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param times
+     *            Sorted list of times to query.
+     * @param selectedThreads
+     *            The selected threads
+     * @param cpu
+     *            The set of CPU
+     * @since 4.3
+     */
+    public SelectedCpuQueryFilter(List<Long> times, Collection<Long> selectedThreads, Set<Integer> cpu) {
+        super(times, selectedThreads);
         fCpus = ImmutableSet.copyOf(cpu);
     }
 

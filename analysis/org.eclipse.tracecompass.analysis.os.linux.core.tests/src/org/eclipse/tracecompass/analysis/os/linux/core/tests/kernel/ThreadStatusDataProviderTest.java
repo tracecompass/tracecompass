@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.tests.Activator;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadEntryModel;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadStatusDataProvider;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
@@ -35,6 +36,8 @@ import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -83,18 +86,19 @@ public class ThreadStatusDataProviderTest {
     }
 
     private static Map<Long, String> assertAndGetTree(ThreadStatusDataProvider provider) throws IOException {
-        TmfModelResponse<List<ThreadEntryModel>> treeResponse = provider.fetchTree(new TimeQueryFilter(0, Long.MAX_VALUE, 2), null);
+        TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> treeResponse = provider.fetchTree(FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(0, Long.MAX_VALUE, 2)), null);
         assertNotNull(treeResponse);
         assertEquals(ITmfResponse.Status.COMPLETED, treeResponse.getStatus());
-        List<ThreadEntryModel> treeModel = treeResponse.getModel();
+        TmfTreeModel<@NonNull ThreadEntryModel> treeModel = treeResponse.getModel();
         assertNotNull(treeModel);
+        List<@NonNull ThreadEntryModel> treeEntries = treeModel.getEntries();
 
         List<String> expectedStrings = Files.readAllLines(Paths.get("testfiles/kernel_analysis/expectedThreadStatusTree"));
-        assertEquals(expectedStrings.size(), treeModel.size());
+        assertEquals(expectedStrings.size(), treeEntries.size());
         for (int i = 0; i < expectedStrings.size(); i++) {
             String expectedString = expectedStrings.get(i);
             String[] split = expectedString.split(",");
-            ThreadEntryModel threadEntry = treeModel.get(i);
+            ThreadEntryModel threadEntry = treeEntries.get(i);
 
             assertEquals(split[0], threadEntry.getName());
             assertEquals(Long.parseLong(split[1]), threadEntry.getStartTime());
@@ -103,27 +107,28 @@ public class ThreadStatusDataProviderTest {
             assertEquals(Integer.parseInt(split[4]), threadEntry.getParentThreadId());
         }
         Map<Long, String> map = new HashMap<>();
-        for (ThreadEntryModel threadModel : treeModel) {
+        for (ThreadEntryModel threadModel : treeEntries) {
             map.put(threadModel.getId(), threadModel.getName());
         }
         return map;
     }
 
     private static void assertRows(ThreadStatusDataProvider provider, Map<Long, String> idsToNames) throws IOException {
-        TmfModelResponse<List<ITimeGraphRowModel>> rowResponse = provider.fetchRowModel(new SelectionTimeQueryFilter(1, 80, 80, idsToNames.keySet()), null);
+        TmfModelResponse<TimeGraphModel> rowResponse = provider.fetchRowModel(FetchParametersUtils.selectionTimeQueryToMap(new SelectionTimeQueryFilter(1, 80, 80, idsToNames.keySet())), null);
         assertNotNull(rowResponse);
         assertEquals(ITmfResponse.Status.COMPLETED, rowResponse.getStatus());
-        List<ITimeGraphRowModel> rowModel = rowResponse.getModel();
+        TimeGraphModel rowModel = rowResponse.getModel();
         assertNotNull(rowModel);
+        List<@NonNull ITimeGraphRowModel> rows = rowModel.getRows();
         // ensure row order
-        rowModel.sort(Comparator.comparingLong(ITimeGraphRowModel::getEntryID));
+        rows.sort(Comparator.comparingLong(ITimeGraphRowModel::getEntryID));
 
         List<String> expectedStrings = Files.readAllLines(Paths.get("testfiles/kernel_analysis/expectedThreadStatusRows"));
-        assertEquals(expectedStrings.size(), rowModel.size());
+        assertEquals(expectedStrings.size(), rows.size());
         for (int i = 0; i < expectedStrings.size(); i++) {
             String expectedString = expectedStrings.get(i);
             String[] split = expectedString.split(":");
-            ITimeGraphRowModel row = rowModel.get(i);
+            ITimeGraphRowModel row = rows.get(i);
 
             assertEquals(split[0], idsToNames.get(row.getEntryID()));
 
@@ -143,7 +148,7 @@ public class ThreadStatusDataProviderTest {
     }
 
     private static void assertArrows(ThreadStatusDataProvider provider, Map<Long, String> idsToNames) throws IOException {
-        TmfModelResponse<List<ITimeGraphArrow>> arrowResponse = provider.fetchArrows(new TimeQueryFilter(1, 80, 80), null);
+        TmfModelResponse<List<ITimeGraphArrow>> arrowResponse = provider.fetchArrows(FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(1, 80, 80)), null);
         assertNotNull(arrowResponse);
         assertEquals(ITmfResponse.Status.COMPLETED, arrowResponse.getStatus());
         List<ITimeGraphArrow> arrows = arrowResponse.getModel();

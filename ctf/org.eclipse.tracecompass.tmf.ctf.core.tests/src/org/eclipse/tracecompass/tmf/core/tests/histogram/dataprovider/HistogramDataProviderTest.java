@@ -19,12 +19,14 @@ import java.util.Map;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.histogram.HistogramDataProvider;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.model.SeriesModel;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
@@ -96,16 +98,16 @@ public class HistogramDataProviderTest {
         assertTrue("Statistics Analysis should run successfully", module.waitForCompletion());
         try {
             HistogramDataProvider provider = new HistogramDataProvider(trace, module);
-            TmfModelResponse<@NonNull List<@NonNull TmfTreeDataModel>> treeResponse = provider.fetchTree(new TimeQueryFilter(START, END, 2), null);
+            TmfModelResponse<@NonNull TmfTreeModel<@NonNull TmfTreeDataModel>> treeResponse = provider.fetchTree(FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(START, END, 2)), null);
             assertEquals("Response Status should be COMPLETED, as we waited for the analysis to complete",
                     ITmfResponse.Status.COMPLETED, treeResponse.getStatus());
-            List<@NonNull TmfTreeDataModel> treeModel = treeResponse.getModel();
+            TmfTreeModel<@NonNull TmfTreeDataModel> treeModel = treeResponse.getModel();
             assertNotNull(treeModel);
-            assertEquals(EXPECTED_FULL_PATHS, getFullPaths(treeModel));
+            assertEquals(EXPECTED_FULL_PATHS, getFullPaths(treeModel.getEntries()));
 
-            List<Long> ids = Lists.transform(treeModel, TmfTreeDataModel::getId);
+            List<Long> ids = Lists.transform(treeModel.getEntries(), TmfTreeDataModel::getId);
             SelectionTimeQueryFilter selectionFilter = new SelectionTimeQueryFilter(START, END, 100, ids);
-            TmfModelResponse<@NonNull ITmfXyModel> xyResponse = provider.fetchXY(selectionFilter, null);
+            TmfModelResponse<@NonNull ITmfXyModel> xyResponse = provider.fetchXY(FetchParametersUtils.selectionTimeQueryToMap(selectionFilter), null);
             assertEquals("Response Status should be COMPLETED, as we waited for the analysis to complete",
                     ITmfResponse.Status.COMPLETED, xyResponse.getStatus());
             ITmfXyModel xyModel = xyResponse.getModel();

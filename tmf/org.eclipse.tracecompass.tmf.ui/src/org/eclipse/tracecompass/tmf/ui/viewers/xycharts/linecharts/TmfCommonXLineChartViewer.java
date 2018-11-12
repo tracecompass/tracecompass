@@ -37,6 +37,7 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfCommonXAxisModel;
@@ -504,7 +505,7 @@ public abstract class TmfCommonXLineChartViewer extends TmfXYChartViewer {
 
         boolean isComplete = false;
         do {
-            TmfModelResponse<ITmfXyModel> response = fXYDataProvider.fetchXY(filters, monitor);
+            TmfModelResponse<ITmfXyModel> response = fXYDataProvider.fetchXY(FetchParametersUtils.timeQueryToMap(filters), monitor);
             ITmfXyModel model = response.getModel();
             if (!(model instanceof ITmfCommonXAxisModel)) {
                 Activator.getDefault().logError("The model is of the wrong type: " + model); //$NON-NLS-1$

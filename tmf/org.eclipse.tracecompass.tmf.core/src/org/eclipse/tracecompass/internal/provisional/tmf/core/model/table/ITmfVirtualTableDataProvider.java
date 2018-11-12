@@ -9,9 +9,10 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.table;
 
+import java.util.Map;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.VirtualTableQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
@@ -34,8 +35,8 @@ public interface ITmfVirtualTableDataProvider<M extends ITmfTreeDataModel, L ext
      * This methods computes a virtual table model. Then, it returns a
      * {@link TmfModelResponse} that contains the model.
      *
-     * @param filter
-     *            A query filter that contains a list of desired columns, a starting
+     * @param fetchParameters
+     *            Query parameters that contains a list of desired columns, a starting
      *            index and a number of requested lines
      * @param monitor
      *            A ProgressMonitor to cancel task
@@ -43,5 +44,5 @@ public interface ITmfVirtualTableDataProvider<M extends ITmfTreeDataModel, L ext
      * @return A {@link TmfModelResponse} instance that encapsulate an
      *         {@link ITmfVirtualTableModel}
      */
-    TmfModelResponse<ITmfVirtualTableModel<L>> fetchLines(VirtualTableQueryFilter filter, @Nullable IProgressMonitor monitor);
+    TmfModelResponse<ITmfVirtualTableModel<L>> fetchLines(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor);
 }

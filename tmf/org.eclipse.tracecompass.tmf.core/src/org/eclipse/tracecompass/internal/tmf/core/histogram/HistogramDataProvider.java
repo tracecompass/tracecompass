@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -24,6 +25,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.TmfXyResponseFactory;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -32,6 +34,7 @@ import org.eclipse.tracecompass.tmf.core.model.YModel;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
@@ -66,7 +69,7 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
     private static final AtomicLong TRACE_IDS = new AtomicLong();
 
     private final TmfStatisticsModule fModule;
-    private @Nullable TmfModelResponse<List<TmfTreeDataModel>> fCached = null;
+    private @Nullable TmfModelResponse<TmfTreeModel<TmfTreeDataModel>> fCached = null;
     private final long fTraceId = TRACE_IDS.getAndIncrement();
     private final long fTotalId = TRACE_IDS.getAndIncrement();
     private final long fLostId = TRACE_IDS.getAndIncrement();
@@ -84,8 +87,28 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
         fModule = module;
     }
 
+    @Deprecated
     @Override
     public TmfModelResponse<List<TmfTreeDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        TmfModelResponse<TmfTreeModel<TmfTreeDataModel>> response = fetchTree(parameters, monitor);
+        TmfTreeModel<TmfTreeDataModel> model = response.getModel();
+        List<TmfTreeDataModel> treeModel = null;
+        if (model != null) {
+            treeModel = model.getEntries();
+        }
+        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
+    }
+
+    @Deprecated
+    @Override
+    public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        return fetchXY(parameters, monitor);
+    }
+
+    @Override
+    public TmfModelResponse<TmfTreeModel<TmfTreeDataModel>> fetchTree(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         if (fCached != null) {
             return fCached;
         }
@@ -98,22 +121,24 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
             builder.add(new TmfTreeDataModel(fLostId, fTraceId, Collections.singletonList(Objects.requireNonNull(Messages.HistogramDataProvider_Lost))));
         }
         if (eventsSs.waitUntilBuilt(0)) {
-            TmfModelResponse<List<TmfTreeDataModel>> response = new TmfModelResponse<>(builder.build(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+            TmfModelResponse<TmfTreeModel<TmfTreeDataModel>> response = new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), builder.build()), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
             fCached = response;
             return response;
         }
-        return new TmfModelResponse<>(builder.build(), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
+        return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), builder.build()), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
     }
 
     @Override
-    public @NonNull TmfModelResponse<ITmfXyModel> fetchXY(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<ITmfXyModel> fetchXY(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         fModule.waitForInitialization();
-        long[] xValues = filter.getTimesRequested();
-
-        if (!(filter instanceof SelectionTimeQueryFilter)) {
+        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
+        long[] xValues = new long[0];
+        if (filter == null) {
             return TmfXyResponseFactory.create(TITLE, xValues, Collections.emptyMap(), true);
         }
-        Collection<Long> selected = ((SelectionTimeQueryFilter) filter).getSelectedItems();
+        xValues = filter.getTimesRequested();
+
+        Collection<Long> selected = filter.getSelectedItems();
         int n = xValues.length;
         ImmutableMap.Builder<String, IYModel> builder = ImmutableMap.builder();
 

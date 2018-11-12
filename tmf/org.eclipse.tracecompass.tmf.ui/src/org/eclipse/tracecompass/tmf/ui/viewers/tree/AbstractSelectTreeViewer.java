@@ -45,12 +45,14 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -297,21 +299,21 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
                             return Status.OK_STATUS;
                         }
 
-                        TimeQueryFilter filter = getFilter(start, end, isSelection);
-                        if (filter == null) {
+                        Map<String, Object> parameters = getParameters(start, end, isSelection);
+                        if (parameters.isEmpty()) {
                             return Status.OK_STATUS;
                         }
 
                         boolean isComplete = false;
                         do {
-                            TmfModelResponse<@NonNull List<@NonNull ITmfTreeDataModel>> response;
+                            TmfModelResponse<@NonNull TmfTreeModel<@NonNull ITmfTreeDataModel>> response;
                             try (FlowScopeLog iterScope = new FlowScopeLogBuilder(LOGGER, Level.FINE, UPDATE_CONTENT_JOB_NAME + " query") //$NON-NLS-1$
                                     .setParentScope(scope).build()) {
 
-                                response = provider.fetchTree(filter, monitor);
-                                List<@NonNull ITmfTreeDataModel> model = response.getModel();
+                                response = provider.fetchTree(parameters, monitor);
+                                TmfTreeModel<@NonNull ITmfTreeDataModel> model = response.getModel();
                                 if (model != null) {
-                                    updateTree(trace, start, end, model);
+                                    updateTree(trace, start, end, model.getEntries());
                                 }
                             }
 
@@ -494,9 +496,28 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
      *            if the query is a selection
      * @return the resulting query filter
      * @since 4.0
+     * @deprecated Use getParameters instead
      */
+    @Deprecated
     protected @Nullable TimeQueryFilter getFilter(long start, long end, boolean isSelection) {
         return new TimeQueryFilter(Long.min(start, end), Long.max(start, end), 2);
+    }
+
+    /**
+     * Get the map to query the {@link ITmfTreeDataProvider} for the queried
+     * parameters
+     *
+     * @param start
+     *            query start time
+     * @param end
+     *            query end time
+     * @param isSelection
+     *            if the query is a selection
+     * @return the resulting query parameters
+     * @since 4.3
+     */
+    protected @NonNull Map<String, Object> getParameters(long start, long end, boolean isSelection) {
+        return FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(Long.min(start, end), Long.max(start, end), 2));
     }
 
     /**

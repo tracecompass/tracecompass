@@ -21,6 +21,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.registry.LinuxStyle;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphEntryModelWeighted;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
@@ -192,7 +193,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
     private static Map<String, String> getTooltip(ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider, long id, long hoverTime) {
         SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(Collections.singletonList(hoverTime), Collections.singleton(id));
-        TmfModelResponse<Map<String, String>> response = provider.fetchTooltip(filter, null);
+        TmfModelResponse<Map<String, String>> response = provider.fetchTooltip(FetchParametersUtils.selectionTimeQueryToMap(filter), null);
         Map<String, String> tooltip = response.getModel();
 
         if (tooltip == null) {

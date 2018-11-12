@@ -9,11 +9,14 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory;
 
 import java.util.Comparator;
+import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.memory.MemoryUsageTreeModel;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.FilterTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
@@ -86,9 +89,15 @@ public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
         setLabelProvider(new MemoryLabelProvider());
     }
 
+    @Deprecated
     @Override
     protected @Nullable TimeQueryFilter getFilter(long start, long end, boolean isSelection) {
         return new FilterTimeQueryFilter(Long.min(start, end), Long.max(start, end), 2, fFiltered);
+    }
+
+    @Override
+    protected @NonNull Map<String, Object> getParameters(long start, long end, boolean isSelection) {
+        return FetchParametersUtils.filteredTimeQueryToMap(new FilterTimeQueryFilter(Long.min(start, end), Long.max(start, end), 2, fFiltered));
     }
 
     @Override

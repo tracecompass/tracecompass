@@ -30,6 +30,7 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreP
 import org.eclipse.tracecompass.internal.analysis.timing.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.TmfXyResponseFactory;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.IRegexQuery;
 import org.eclipse.tracecompass.internal.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
@@ -45,6 +46,7 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.TmfXYAxis;
@@ -269,12 +271,16 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
      * @since 4.0
      */
     @Override
-    public TmfModelResponse<List<TmfTreeDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<TmfTreeModel<TmfTreeDataModel>> fetchTree(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         ISegmentStoreProvider provider = fProvider;
         ISegmentStore<ISegment> segStore = provider.getSegmentStore();
 
         if (segStore == null) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
+        }
+        TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(fetchParameters);
+        if (filter == null) {
+            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
         }
         long start = filter.getStart();
         long end = filter.getEnd();
@@ -305,12 +311,12 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             nodes.add(new TmfTreeDataModel(seriesId, fTraceId, Collections.singletonList(seriesName)));
         }
 
-        return new TmfModelResponse<>(nodes.build(), complete ? ITmfResponse.Status.COMPLETED : ITmfResponse.Status.RUNNING,
+        return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), nodes.build()), complete ? ITmfResponse.Status.COMPLETED : ITmfResponse.Status.RUNNING,
                 complete ? CommonStatusMessage.COMPLETED: CommonStatusMessage.RUNNING);
     }
 
     @Override
-    public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<ITmfXyModel> fetchXY(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         ISegmentStoreProvider provider = fProvider;
 
         // FIXME: There is no way to get the running status of a segment store analysis,
@@ -325,6 +331,13 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             return TmfXyResponseFactory.createFailedResponse(Objects.requireNonNull(Messages.SegmentStoreDataProvider_SegmentNotAvailable));
         }
 
+        // TODO Not sure if we should create SelectionTimeQuery here or later or COMPLETLY REMOVE QUERY FILTERS
+        TimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
+        if (filter == null) {
+            return TmfXyResponseFactory.createFailedResponse(CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
+        }
+
+        // TODO filter is never a IRegexQuery
         Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         if (filter instanceof IRegexQuery) {
             IRegexQuery regexFilter = (IRegexQuery) filter;
@@ -498,6 +511,26 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
     @Override
     public String getId() {
         return fId;
+    }
+
+    @Deprecated
+    @Override
+    public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        return fetchXY(parameters, monitor);
+    }
+
+    @Deprecated
+    @Override
+    public TmfModelResponse<List<TmfTreeDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        TmfModelResponse<TmfTreeModel<TmfTreeDataModel>> response = fetchTree(parameters, monitor);
+        TmfTreeModel<@NonNull TmfTreeDataModel> model = response.getModel();
+        List<TmfTreeDataModel> treeModel = null;
+        if (model != null) {
+            treeModel = model.getEntries();
+        }
+        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
     }
 
 }

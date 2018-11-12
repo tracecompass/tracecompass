@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathMod
 import org.eclipse.tracecompass.internal.analysis.graph.core.base.TmfGraphStatistics;
 import org.eclipse.tracecompass.internal.analysis.graph.core.base.TmfGraphVisitor;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
@@ -42,8 +43,10 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphArrow;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse.Status;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -113,8 +116,8 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
     }
 
     @Override
-    public synchronized @NonNull TmfModelResponse<@NonNull List<@NonNull CriticalPathEntry>> fetchTree(
-            @NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public synchronized @NonNull TmfModelResponse<@NonNull TmfTreeModel<@NonNull CriticalPathEntry>> fetchTree(
+            Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         TmfGraph graph = fCriticalPathModule.getCriticalPath();
         if (graph == null) {
             return new TmfModelResponse<>(null, Status.RUNNING, CommonStatusMessage.RUNNING);
@@ -126,7 +129,7 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
         }
 
         CriticalPathVisitor visitor = fHorizontalVisitorCache.getUnchecked(current);
-        return new TmfModelResponse<>(visitor.getEntries(), Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), visitor.getEntries()), Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
     /**
@@ -154,7 +157,7 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
     }
 
     @Override
-    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphRowModel>> fetchRowModel(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<@NonNull TimeGraphModel> fetchRowModel(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         IGraphWorker graphWorker = getCurrent();
         if (graphWorker == null) {
             return new TmfModelResponse<>(null, Status.COMPLETED, CommonStatusMessage.COMPLETED);
@@ -164,6 +167,10 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
             return new TmfModelResponse<>(null, Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
 
+        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
+        if (filter == null) {
+            return new TmfModelResponse<>(null, Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
+        }
         Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         if (filter instanceof TimeGraphStateQueryFilter) {
             TimeGraphStateQueryFilter timeEventFilter = (TimeGraphStateQueryFilter) filter;
@@ -190,7 +197,7 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
                 rowModels.add(new TimeGraphRowModel(id, filteredStates));
             }
         }
-        return new TmfModelResponse<>(rowModels, Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        return new TmfModelResponse<>(new TimeGraphModel(rowModels), Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
     private static final boolean overlaps(long start, long duration, long[] times) {
@@ -213,12 +220,20 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
     }
 
     @Override
-    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphArrow>> fetchArrows(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphArrow>> fetchArrows(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+        TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(fetchParameters);
+        if (filter == null) {
+            return new TmfModelResponse<>(null, Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
+        }
         return new TmfModelResponse<>(getLinkList(filter.getStart(), filter.getEnd()), Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
     @Override
-    public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
+        if (filter == null) {
+            return new TmfModelResponse<>(null, Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
+        }
         IGraphWorker worker = fWorkerToEntryId.inverse().get(filter.getSelectedItems().iterator().next());
         if (worker == null) {
             return new TmfModelResponse<>(null, Status.COMPLETED, CommonStatusMessage.COMPLETED);
@@ -405,6 +420,46 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
             break;
         }
         return 8;
+    }
+
+    @Deprecated
+    @Override
+    public TmfModelResponse<List<CriticalPathEntry>> fetchTree(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        TmfModelResponse<@NonNull TmfTreeModel<@NonNull CriticalPathEntry>> response = fetchTree(parameters, monitor);
+        TmfTreeModel<@NonNull CriticalPathEntry> model = response.getModel();
+        List<CriticalPathEntry> treeModel = null;
+        if (model != null) {
+            treeModel = model.getEntries();
+        }
+        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
+    }
+
+    @Deprecated
+    @Override
+    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphRowModel>> fetchRowModel(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
+        TmfModelResponse<@NonNull TimeGraphModel> response = fetchRowModel(parameters, monitor);
+        TimeGraphModel model = response.getModel();
+        List<@NonNull ITimeGraphRowModel> rows = null;
+        if (model != null) {
+            rows = model.getRows();
+        }
+        return new TmfModelResponse<>(rows, response.getStatus(), response.getStatusMessage());
+    }
+
+    @Deprecated
+    @Override
+    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphArrow>> fetchArrows(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        return fetchArrows(parameters, monitor);
+    }
+
+    @Deprecated
+    @Override
+    public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
+        return fetchTooltip(parameters, monitor);
     }
 
 }

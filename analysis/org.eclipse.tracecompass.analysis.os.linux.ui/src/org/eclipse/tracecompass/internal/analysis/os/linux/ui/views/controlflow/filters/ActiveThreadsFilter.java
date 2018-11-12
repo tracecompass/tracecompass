@@ -24,9 +24,11 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadEntryModel;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadStatusDataProvider;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.ControlFlowEntry;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -164,20 +166,21 @@ public class ActiveThreadsFilter extends ViewerFilter {
         long beginTS = winRange.getStartTime().getValue();
         long endTS = winRange.getEndTime().getValue();
 
-        Set<Long> cpus = new HashSet<>();
+        @NonNull Set<@NonNull Long> cpus = new HashSet<>();
         for (Range<Long> range : cpuRanges) {
             for (long cpu = range.lowerEndpoint(); cpu <= range.upperEndpoint(); cpu ++) {
                 cpus.add(cpu);
             }
         }
         TimeQueryFilter filter = new SelectionTimeQueryFilter(beginTS, endTS, 2, cpus);
-        TmfModelResponse<List<ThreadEntryModel>> response = threadStatusProvider.fetchTree(filter, null);
-        List<ThreadEntryModel> model = response.getModel();
+        TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> response = threadStatusProvider.fetchTree(FetchParametersUtils.timeQueryToMap(filter), null);
+        TmfTreeModel<@NonNull ThreadEntryModel> model = response.getModel();
 
         if (model == null) {
             return Collections.emptySet();
         }
-        return Sets.newHashSet(Iterables.transform(model, ThreadEntryModel::getId));
+        HashSet<Long> onCpuThreads = Sets.newHashSet(Iterables.transform(model.getEntries(), ThreadEntryModel::getId));
+        return onCpuThreads == null ? Collections.emptySet() : onCpuThreads;
     }
 
     private static @NonNull Set<Long> getActiveThreads(TmfTimeRange winRange, @NonNull ITmfTrace trace) {
@@ -193,13 +196,14 @@ public class ActiveThreadsFilter extends ViewerFilter {
         long endTS = winRange.getEndTime().getValue();
 
         TimeQueryFilter filter = new TimeQueryFilter(beginTS, endTS, 2);
-        TmfModelResponse<List<ThreadEntryModel>> response = threadStatusProvider.fetchTree(filter, null);
-        List<ThreadEntryModel> model = response.getModel();
+        TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> response = threadStatusProvider.fetchTree(FetchParametersUtils.timeQueryToMap(filter), null);
+        TmfTreeModel<@NonNull ThreadEntryModel> model = response.getModel();
 
         if (model == null) {
             return Collections.emptySet();
         }
-        return Sets.newHashSet(Iterables.transform(model, ThreadEntryModel::getId));
+        HashSet<Long> activeThreads = Sets.newHashSet(Iterables.transform(model.getEntries(), ThreadEntryModel::getId));
+        return activeThreads == null ? Collections.emptySet() : activeThreads;
     }
 
     /**

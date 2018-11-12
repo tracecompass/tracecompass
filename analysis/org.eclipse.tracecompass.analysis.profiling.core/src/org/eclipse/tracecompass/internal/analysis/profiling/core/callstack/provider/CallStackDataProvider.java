@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
 import org.eclipse.tracecompass.internal.tmf.core.model.timegraph.AbstractTimeGraphDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -36,8 +37,10 @@ import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
@@ -115,7 +118,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
     }
 
     @Override
-    protected List<CallStackEntryModel> getTree(ITmfStateSystem ss, TimeQueryFilter filter,
+    protected TmfTreeModel<@NonNull CallStackEntryModel> getTree(ITmfStateSystem ss, Map<String, Object> parameters,
             @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
         long start = ss.getStartTime();
         long end = ss.getCurrentEndTime();
@@ -168,7 +171,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
             subMonitor.worked(1);
         }
 
-        return builder.build();
+        return new TmfTreeModel<>(Collections.emptyList(), builder.build());
     }
 
     private CallStackEntryModel createThread(ITmfStateSystem ss, long start, long end, int threadQuark, long processId, int callStackQuark,
@@ -209,16 +212,20 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
     }
 
     @Override
-    protected List<ITimeGraphRowModel> getRowModel(ITmfStateSystem ss, SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor)
+    protected TimeGraphModel getRowModel(ITmfStateSystem ss, @NonNull Map<@NonNull String, @NonNull Object> parameters, @Nullable IProgressMonitor monitor)
             throws StateSystemDisposedException {
+        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(parameters);
+        if (filter == null) {
+            return null;
+        }
         Map<@NonNull Long, @NonNull Integer> entries = getSelectedEntries(filter);
         if (entries.size() == 1 && filter.getTimesRequested().length == 2) {
             // this is a request for a follow event.
             Entry<@NonNull Long, @NonNull Integer> entry = entries.entrySet().iterator().next();
             if (filter.getStart() == Long.MIN_VALUE) {
-                return getFollowEvent(ss, entry, filter.getEnd(), false);
+                return new TimeGraphModel(getFollowEvent(ss, entry, filter.getEnd(), false));
             } else if (filter.getEnd() == Long.MAX_VALUE) {
-                return getFollowEvent(ss, entry, filter.getStart(), true);
+                return new TimeGraphModel(getFollowEvent(ss, entry, filter.getStart(), true));
             }
         }
 
@@ -241,7 +248,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
             predicates.putAll(computeRegexPredicate(timeEventFilter));
         }
 
-        List<ITimeGraphRowModel> rows = new ArrayList<>();
+        @NonNull List<@NonNull ITimeGraphRowModel> rows = new ArrayList<>();
         for (Map.Entry<Long, Integer> entry : entries.entrySet()) {
             if (subMonitor.isCanceled()) {
                 return null;
@@ -257,7 +264,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
             rows.add(new TimeGraphRowModel(entry.getKey(), eventList));
         }
         subMonitor.worked(1);
-        return rows;
+        return new TimeGraphModel(rows);
     }
 
     private ITimeGraphState createTimeGraphState(ITmfStateInterval interval) {
@@ -272,8 +279,15 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         return new TimeGraphState(startTime, duration, Integer.MIN_VALUE);
     }
 
+    @Deprecated
     @Override
-    public TmfModelResponse<List<ITimeGraphArrow>> fetchArrows(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphArrow>> fetchArrows(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        return fetchArrows(parameters, monitor);
+    }
+
+    @Override
+    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphArrow>> fetchArrows(Map<String, Object> parameters, @Nullable IProgressMonitor monitor) {
         return new TmfModelResponse<>(null, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
@@ -341,8 +355,15 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         return null;
     }
 
+    @Deprecated
     @Override
-    public TmfModelResponse<Map<String, String>> fetchTooltip(SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
+        return fetchTooltip(parameters, monitor);
+    }
+
+    @Override
+    public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(Map<String, Object> parameters, @Nullable IProgressMonitor monitor) {
         return new TmfModelResponse<>(Collections.emptyMap(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 

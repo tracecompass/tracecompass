@@ -12,12 +12,14 @@ package org.eclipse.tracecompass.internal.tmf.core.model.xy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.model.TmfXyResponseFactory;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.tree.TmfTreeCompositeDataProvider;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
@@ -120,8 +122,15 @@ public class TmfTreeXYCompositeDataProvider<M extends ITmfTreeDataModel, P exten
         return new TmfTreeXYCompositeDataProvider<>(providers, title, providerId);
     }
 
+    @Deprecated
     @Override
     public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        return fetchXY(parameters, monitor);
+    }
+
+    @Override
+    public TmfModelResponse<ITmfXyModel> fetchXY(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         /**
          * <pre>
          * Response status according to the provider's reponse statuses:
@@ -134,7 +143,7 @@ public class TmfTreeXYCompositeDataProvider<M extends ITmfTreeDataModel, P exten
          */
         List<P> providers = getProviders();
         // Get all the responses
-        Collection<TmfModelResponse<ITmfXyModel>> responses = getXyResponses(filter, monitor, providers);
+        Collection<TmfModelResponse<ITmfXyModel>> responses = getXyResponses(fetchParameters, monitor, providers);
 
         if (monitor != null && monitor.isCanceled()) {
             return TmfXyResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
@@ -156,6 +165,10 @@ public class TmfTreeXYCompositeDataProvider<M extends ITmfTreeDataModel, P exten
                     series.putAll(model.getYData());
                 }
             });
+            TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(fetchParameters);
+            if (filter == null) {
+                return TmfXyResponseFactory.createFailedResponse(CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
+            }
             return TmfXyResponseFactory.create(fTitle, filter.getTimesRequested(), series.build(), isComplete);
         }
         ImmutableMap.Builder<String, ISeriesModel> series = ImmutableMap.builder();
@@ -178,10 +191,10 @@ public class TmfTreeXYCompositeDataProvider<M extends ITmfTreeDataModel, P exten
         return null;
     }
 
-    private Collection<TmfModelResponse<ITmfXyModel>> getXyResponses(TimeQueryFilter filter, @Nullable IProgressMonitor monitor, List<P> providers) {
+    private Collection<TmfModelResponse<ITmfXyModel>> getXyResponses(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor, List<P> providers) {
         List<TmfModelResponse<ITmfXyModel>> responses = new ArrayList<>();
         for (P dataProvider : providers) {
-            TmfModelResponse<ITmfXyModel> response = dataProvider.fetchXY(filter, monitor);
+            TmfModelResponse<ITmfXyModel> response = dataProvider.fetchXY(fetchParameters, monitor);
             responses.add(response);
 
             if (monitor != null && monitor.isCanceled()) {

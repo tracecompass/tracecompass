@@ -11,6 +11,8 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -22,6 +24,7 @@ import com.google.common.collect.ImmutableList;
  * @author Yonni Chen
  * @since 4.0
  */
+@NonNullByDefault
 public class VirtualTableQueryFilter {
 
     private final List<Long> fDesiredColumns;

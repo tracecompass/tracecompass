@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.tree.TmfTreeCompositeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
@@ -22,6 +24,7 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 
@@ -60,16 +63,16 @@ extends TmfTreeCompositeDataProvider<M, P> implements ITimeGraphDataProvider<M> 
     }
 
     @Override
-    public TmfModelResponse<List<ITimeGraphRowModel>> fetchRowModel(SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<TimeGraphModel> fetchRowModel(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         boolean isComplete = true;
         ImmutableList.Builder<ITimeGraphRowModel> series = ImmutableList.builder();
 
         for (P dataProvider : getProviders()) {
-            TmfModelResponse<List<ITimeGraphRowModel>> response = dataProvider.fetchRowModel(filter, monitor);
+            TmfModelResponse<TimeGraphModel> response = dataProvider.fetchRowModel(fetchParameters, monitor);
             isComplete &= response.getStatus() == ITmfResponse.Status.COMPLETED;
-            List<ITimeGraphRowModel> model = response.getModel();
+            TimeGraphModel model = response.getModel();
             if (model != null) {
-                series.addAll(model);
+                series.addAll(model.getRows());
             }
 
             if (monitor != null && monitor.isCanceled()) {
@@ -77,18 +80,18 @@ extends TmfTreeCompositeDataProvider<M, P> implements ITimeGraphDataProvider<M> 
             }
         }
         if (isComplete) {
-            return new TmfModelResponse<>(series.build(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+            return new TmfModelResponse<>(new TimeGraphModel(series.build()), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
-        return new TmfModelResponse<>(series.build(), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
+        return new TmfModelResponse<>(new TimeGraphModel(series.build()), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
     }
 
     @Override
-    public TmfModelResponse<List<ITimeGraphArrow>> fetchArrows(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<List<ITimeGraphArrow>> fetchArrows(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         boolean isComplete = true;
         ImmutableList.Builder<ITimeGraphArrow> series = ImmutableList.builder();
 
         for (P dataProvider : getProviders()) {
-            TmfModelResponse<List<ITimeGraphArrow>> response = dataProvider.fetchArrows(filter, monitor);
+            TmfModelResponse<List<ITimeGraphArrow>> response = dataProvider.fetchArrows(fetchParameters, monitor);
             isComplete &= response.getStatus() == ITmfResponse.Status.COMPLETED;
             List<ITimeGraphArrow> model = response.getModel();
             if (model != null) {
@@ -106,15 +109,42 @@ extends TmfTreeCompositeDataProvider<M, P> implements ITimeGraphDataProvider<M> 
     }
 
     @Override
-    public TmfModelResponse<Map<String, String>> fetchTooltip(SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<Map<String, String>> fetchTooltip(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         for (P dataProvider : getProviders()) {
-            TmfModelResponse<Map<String, String>> response = dataProvider.fetchTooltip(filter, monitor);
+            TmfModelResponse<Map<String, String>> response = dataProvider.fetchTooltip(fetchParameters, monitor);
             Map<String, String> tooltip = response.getModel();
             if (tooltip != null) {
                 return response;
             }
         }
         return new TmfModelResponse<>(null, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+    }
+
+    @Deprecated
+    @Override
+    public @NonNull TmfModelResponse<List<ITimeGraphRowModel>> fetchRowModel(SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
+        TmfModelResponse<@NonNull TimeGraphModel> response = fetchRowModel(parameters, monitor);
+        TimeGraphModel model = response.getModel();
+        List<@NonNull ITimeGraphRowModel> rows = null;
+        if (model != null) {
+            rows = model.getRows();
+        }
+        return new TmfModelResponse<>(rows, response.getStatus(), response.getStatusMessage());
+    }
+
+    @Deprecated
+    @Override
+    public TmfModelResponse<List<ITimeGraphArrow>> fetchArrows(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        return fetchArrows(parameters, monitor);
+    }
+
+    @Deprecated
+    @Override
+    public TmfModelResponse<Map<String, String>> fetchTooltip(SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
+        return fetchTooltip(parameters, monitor);
     }
 
 }

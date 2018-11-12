@@ -43,6 +43,7 @@ import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.provi
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.provider.CallStackEntryModel;
 import org.eclipse.tracecompass.internal.analysis.profiling.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.profiling.ui.views.flamechart.Messages;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
@@ -50,6 +51,7 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -475,10 +477,10 @@ public class FlameChartView extends BaseDataProviderTimeGraphView {
                 Map<Long, TimeGraphEntry> map = Maps.uniqueIndex(unfiltered, e -> e.getModel().getId());
                 // use time -1 as a lower bound for the end of Time events to be included.
                 SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(time - 1, time, 2, map.keySet());
-                TmfModelResponse<@NonNull List<@NonNull ITimeGraphRowModel>> response = traceEntry.getProvider().fetchRowModel(filter, null);
-                List<@NonNull ITimeGraphRowModel> model = response.getModel();
+                TmfModelResponse<@NonNull TimeGraphModel> response = traceEntry.getProvider().fetchRowModel(FetchParametersUtils.selectionTimeQueryToMap(filter), null);
+                TimeGraphModel model = response.getModel();
                 if (model != null) {
-                    for (ITimeGraphRowModel row : model) {
+                    for (ITimeGraphRowModel row : model.getRows()) {
                         syncToRow(row, time, map);
                     }
                 }
@@ -580,12 +582,12 @@ public class FlameChartView extends BaseDataProviderTimeGraphView {
                         ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = getProvider(callStackEntry);
                         long selectionBegin = viewer.getSelectionBegin();
                         SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(selectionBegin, Long.MAX_VALUE, 2, Collections.singleton(callStackEntry.getModel().getId()));
-                        TmfModelResponse<@NonNull List<@NonNull ITimeGraphRowModel>> response = provider.fetchRowModel(filter, null);
-                        List<@NonNull ITimeGraphRowModel> model = response.getModel();
-                        if (model == null || model.size() != 1) {
+                        TmfModelResponse<@NonNull TimeGraphModel> response = provider.fetchRowModel(FetchParametersUtils.selectionTimeQueryToMap(filter), null);
+                        TimeGraphModel model = response.getModel();
+                        if (model == null || model.getRows().size() != 1) {
                             return;
                         }
-                        List<@NonNull ITimeGraphState> row = model.get(0).getStates();
+                        List<@NonNull ITimeGraphState> row = model.getRows().get(0).getStates();
                         if (row.size() != 1) {
                             return;
                         }
@@ -632,12 +634,12 @@ public class FlameChartView extends BaseDataProviderTimeGraphView {
                         ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = getProvider(callStackEntry);
                         long selectionBegin = viewer.getSelectionBegin();
                         SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(Lists.newArrayList(Long.MIN_VALUE, selectionBegin), Collections.singleton(callStackEntry.getModel().getId()));
-                        TmfModelResponse<@NonNull List<@NonNull ITimeGraphRowModel>> response = provider.fetchRowModel(filter, null);
-                        List<@NonNull ITimeGraphRowModel> model = response.getModel();
-                        if (model == null || model.size() != 1) {
+                        TmfModelResponse<@NonNull TimeGraphModel> response = provider.fetchRowModel(FetchParametersUtils.selectionTimeQueryToMap(filter), null);
+                        TimeGraphModel model = response.getModel();
+                        if (model == null || model.getRows().size() != 1) {
                             return;
                         }
-                        List<@NonNull ITimeGraphState> row = model.get(0).getStates();
+                        List<@NonNull ITimeGraphState> row = model.getRows().get(0).getStates();
                         if (row.size() != 1) {
                             return;
                         }

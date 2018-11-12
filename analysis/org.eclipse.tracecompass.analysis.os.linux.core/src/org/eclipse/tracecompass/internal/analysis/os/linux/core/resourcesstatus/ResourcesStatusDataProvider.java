@@ -34,6 +34,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel.Type;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
 import org.eclipse.tracecompass.internal.tmf.core.model.timegraph.AbstractTimeGraphDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -45,8 +46,10 @@ import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -128,8 +131,8 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     }
 
     @Override
-    protected @NonNull List<@NonNull ResourcesEntryModel> getTree(@NonNull ITmfStateSystem ss,
-            @NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
+    protected TmfTreeModel<@NonNull ResourcesEntryModel> getTree(@NonNull ITmfStateSystem ss,
+            Map<String, Object> parameters, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
 
         long start = ss.getStartTime();
         long end = ss.getCurrentEndTime();
@@ -177,7 +180,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             createInterrupt(ss, start, end, cpuEntry, softIrqQuarks, Type.SOFT_IRQ, builder);
         }
 
-        return ImmutableList.copyOf(builder);
+        return new TmfTreeModel<>(Collections.emptyList(), ImmutableList.copyOf(builder));
     }
 
     private static long getCpuFrequency(@NonNull ITmfStateSystem ss, int cpuQuark, @NonNull String freqAttribute) throws StateSystemDisposedException {
@@ -276,11 +279,15 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     }
 
     @Override
-    public List<ITimeGraphRowModel> getRowModel(ITmfStateSystem ss, SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor)
+    public TimeGraphModel getRowModel(ITmfStateSystem ss, @NonNull Map<@NonNull String, @NonNull Object> parameters, @Nullable IProgressMonitor monitor)
             throws StateSystemDisposedException {
 
         TreeMultimap<Integer, ITmfStateInterval> intervals = TreeMultimap.create(Comparator.naturalOrder(),
                 Comparator.comparing(ITmfStateInterval::getStartTime));
+        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(parameters);
+        if (filter == null) {
+            return null;
+        }
         Map<@NonNull Long, @NonNull Integer> idsToQuark = getSelectedEntries(filter);
         /* Add the mapping for twin entries as they are not in the parent class BiMap */
         addTwinIrqIds(filter, idsToQuark);
@@ -300,7 +307,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             predicates.putAll(computeRegexPredicate(timeEventFilter));
         }
 
-        List<ITimeGraphRowModel> rows = new ArrayList<>();
+        @NonNull List<@NonNull ITimeGraphRowModel> rows = new ArrayList<>();
 
         for (Map.Entry<Long, Integer> idToQuark : idsToQuark.entrySet()) {
             if (monitor != null && monitor.isCanceled()) {
@@ -368,7 +375,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         synchronized (fExecNamesCache) {
             fExecNamesCache.clear();
         }
-        return rows;
+        return new TimeGraphModel(rows);
     }
 
     /**
@@ -488,8 +495,15 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         return list;
     }
 
+    @Deprecated
     @Override
-    public TmfModelResponse<List<ITimeGraphArrow>> fetchArrows(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphArrow>> fetchArrows(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        return fetchArrows(parameters, monitor);
+    }
+
+    @Override
+    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphArrow>> fetchArrows(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         return new TmfModelResponse<>(null, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
@@ -498,9 +512,20 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         return ID;
     }
 
+    @Deprecated
     @Override
-    public TmfModelResponse<Map<String, String>> fetchTooltip(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
+        return fetchTooltip(parameters, monitor);
+    }
+
+    @Override
+    public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         ITmfStateSystem ss = getAnalysisModule().getStateSystem();
+        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
+        if (filter == null) {
+            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
+        }
         Collection<@NonNull Integer> quarks = getSelectedEntries(filter).values();
 
         boolean isACopy = false;
@@ -669,8 +694,8 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     @Override
     public @NonNull Map<@NonNull String, @NonNull String> getFilterInput(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         Map<@NonNull String, @NonNull String> inputs = super.getFilterInput(filter, monitor);
-        TmfModelResponse<Map<String, String>> response = fetchTooltip(filter, monitor);
-        Map<@NonNull String, @NonNull String> model = response.getModel();
+        TmfModelResponse<Map<String, String>> response = fetchTooltip(FetchParametersUtils.selectionTimeQueryToMap(filter), monitor);
+        Map<String, String> model = response.getModel();
         if (model != null) {
             inputs.putAll(model);
         }

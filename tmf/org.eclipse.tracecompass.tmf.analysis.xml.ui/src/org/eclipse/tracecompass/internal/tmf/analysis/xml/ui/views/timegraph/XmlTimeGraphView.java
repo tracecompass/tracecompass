@@ -16,7 +16,6 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.timegraph;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -29,12 +28,14 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlTimeGra
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlTimeGraphEntryModel;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlDataProviderManager;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -241,7 +242,7 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
             return;
         }
         while (!complete && !subMonitor.isCanceled()) {
-            TmfModelResponse<List<XmlTimeGraphEntryModel>> response = provider.fetchTree(new TimeQueryFilter(0, Long.MAX_VALUE, 2), subMonitor);
+            TmfModelResponse<TmfTreeModel<@NonNull XmlTimeGraphEntryModel>> response = provider.fetchTree(FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(0, Long.MAX_VALUE, 2)), subMonitor);
             if (response.getStatus() == ITmfResponse.Status.FAILED) {
                 Activator.logError("XML Time Graph Data Provider failed: " + response.getStatusMessage()); //$NON-NLS-1$
                 return;
@@ -250,13 +251,13 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
             }
             complete = response.getStatus() == ITmfResponse.Status.COMPLETED;
 
-            List<XmlTimeGraphEntryModel> model = response.getModel();
+            TmfTreeModel<@NonNull XmlTimeGraphEntryModel> model = response.getModel();
             if (model != null) {
                 synchronized (fEntries) {
                     /*
                      * Ensure that all the entries exist and are up to date.
                      */
-                    for (XmlTimeGraphEntryModel entry : model) {
+                    for (XmlTimeGraphEntryModel entry : model.getEntries()) {
                         TimeGraphEntry tgEntry = fEntries.get(provider, entry.getId());
                         if (tgEntry == null) {
                             if (entry.getParentId() == -1) {

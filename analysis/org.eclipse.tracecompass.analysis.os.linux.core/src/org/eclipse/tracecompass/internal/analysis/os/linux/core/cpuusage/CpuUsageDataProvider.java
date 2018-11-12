@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
@@ -24,6 +26,8 @@ import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageEntryMod
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.KernelCpuUsageAnalysis;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelThreadInformationProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.dataprovider.DataProviderParameterUtils;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.xy.AbstractTreeCommonXDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -31,6 +35,7 @@ import org.eclipse.tracecompass.tmf.core.model.YModel;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectedCpuQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -59,6 +64,11 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
      * @since 2.4
      */
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageDataProvider"; //$NON-NLS-1$
+
+    /**
+     * Parameter key to extract cpus from the parameters map
+     */
+    public static final String CPUS_PARAMETER_KEY = "cpus"; //$NON-NLS-1$
 
     /**
      * The Fake Tid to identify the total entry.
@@ -106,8 +116,16 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
      * @since 2.5
      */
     @Override
-    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         Set<Integer> cpus = Collections.emptySet();
+
+        SelectionTimeQueryFilter filter = createCpuQuery(fetchParameters);
+        if (filter == null) {
+            filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
+            if (filter == null) {
+                return null;
+            }
+        }
 
         if (filter instanceof SelectedCpuQueryFilter) {
             cpus = ((SelectedCpuQueryFilter) filter).getSelectedCpus();
@@ -183,17 +201,18 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
      * @since 2.5
      */
     @Override
-    protected List<CpuUsageEntryModel> getTree(ITmfStateSystem ss, TimeQueryFilter filter, @Nullable IProgressMonitor monitor)
+    protected TmfTreeModel<CpuUsageEntryModel> getTree(ITmfStateSystem ss, Map<String, Object> parameters, @Nullable IProgressMonitor monitor)
             throws StateSystemDisposedException {
-        if (!(filter instanceof SelectedCpuQueryFilter)) {
-            return Collections.emptyList();
+        TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(parameters);
+        if (filter == null) {
+            return new TmfTreeModel<>(Collections.emptyList(), Collections.emptyList());
         }
 
-        SelectedCpuQueryFilter cpuQueryFilter = (SelectedCpuQueryFilter) filter;
         long end = filter.getEnd();
 
         List<CpuUsageEntryModel> entryList = new ArrayList<>();
-        Map<String, Long> cpuUsageMap = getAnalysisModule().getCpuUsageInRange(cpuQueryFilter.getSelectedCpus(), filter.getStart(), end);
+        Set<Integer> cpus = extractCpuSet(parameters);
+        Map<String, Long> cpuUsageMap = getAnalysisModule().getCpuUsageInRange(cpus, filter.getStart(), end);
 
         long totalTime = cpuUsageMap.getOrDefault(KernelCpuUsageAnalysis.TOTAL, 0l);
         long totalId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
@@ -217,7 +236,7 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
                 }
             }
         }
-        return entryList;
+        return new TmfTreeModel<>(Collections.emptyList(), entryList);
     }
 
     /*
@@ -239,6 +258,28 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
             return execName;
         }
         return defaultTidName;
+    }
+
+    private static @Nullable SelectedCpuQueryFilter createCpuQuery(Map<String, Object> parameters) {
+        List<Long> timeRequested = DataProviderParameterUtils.extractTimeRequested(parameters);
+        List<Long> selectedItems = DataProviderParameterUtils.extractSelectedItems(parameters);
+        Set<Integer> cpus = extractCpuSet(parameters);
+
+        if (timeRequested == null || selectedItems == null) {
+            return null;
+        }
+
+        return new SelectedCpuQueryFilter(timeRequested, selectedItems, cpus);
+    }
+
+    private static Set<Integer> extractCpuSet(Map<String, Object> parameters) {
+        Object cpus = parameters.get(CPUS_PARAMETER_KEY);
+        if (cpus instanceof Collection<?>) {
+            return ((Collection<?>) cpus).stream().filter(cpu -> cpu instanceof Integer)
+                    .map(cpu -> (Integer) cpu)
+                    .collect(Collectors.toSet());
+        }
+        return Collections.emptySet();
     }
 
     /**

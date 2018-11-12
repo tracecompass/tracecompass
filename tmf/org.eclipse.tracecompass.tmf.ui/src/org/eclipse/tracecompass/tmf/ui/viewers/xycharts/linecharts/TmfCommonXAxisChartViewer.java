@@ -38,6 +38,7 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeQueryRegexFilter;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
@@ -208,9 +209,29 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      * @return An {@link TimeQueryFilter} instance that data provider will use to
      *         extract a model
      * @since 4.0
+     * @deprecated Use createQueryParameters instead
      */
+    @Deprecated
     protected @NonNull TimeQueryFilter createQueryFilter(long start, long end, int nb) {
         return new TimeQueryRegexFilter(getWindowStartTime(), getWindowEndTime(), nb, getRegexes());
+    }
+
+    /**
+     * Create map of parameters that will be used by updateData method. If a
+     * viewer need a more specialized map than just the time requested it's its
+     * responsibility to override this method and provide the desired instance.
+     *
+     * @param start
+     *            The starting value
+     * @param end
+     *            The ending value
+     * @param nb
+     *            The number of entries
+     * @return Map of parameters
+     * @since 4.3
+     */
+    protected @NonNull Map<String, Object> createQueryParameters(long start, long end, int nb) {
+        return FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(start, end, nb));
     }
 
     /**
@@ -303,8 +324,8 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                     if (numRequests == 0) {
                         return;
                     }
-                    TimeQueryFilter filter = createQueryFilter(getWindowStartTime(), getWindowEndTime(), numRequests);
-                    updateData(dataProvider, filter, fMonitor);
+                    Map<String, Object> parameters = createQueryParameters(getWindowStartTime(), getWindowEndTime(), numRequests);
+                    updateData(dataProvider, parameters, fMonitor);
                 } finally {
                     /*
                      * fDirty should have been incremented before creating the thread, so we
@@ -330,15 +351,15 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
          *
          * @param dataProvider
          *                         A data provider
-         * @param filters
+         * @param parameters
          *                         A query filter
          * @param monitor
          *                         A monitor for canceling task
          */
-        private void updateData(@NonNull ITmfXYDataProvider dataProvider, @NonNull TimeQueryFilter filters, IProgressMonitor monitor) {
+        private void updateData(@NonNull ITmfXYDataProvider dataProvider, @NonNull Map<String, Object> parameters, IProgressMonitor monitor) {
             boolean isComplete = false;
             do {
-                TmfModelResponse<ITmfXyModel> response = dataProvider.fetchXY(filters, monitor);
+                TmfModelResponse<ITmfXyModel> response = dataProvider.fetchXY(parameters, monitor);
                 ITmfXyModel model = response.getModel();
                 if (model != null) {
                     updateDisplay(model, monitor);

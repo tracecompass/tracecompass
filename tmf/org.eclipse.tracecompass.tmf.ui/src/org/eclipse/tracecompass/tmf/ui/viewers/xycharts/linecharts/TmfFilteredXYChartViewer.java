@@ -11,12 +11,15 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.SelectionTimeQueryRegexFilter;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
+import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXYDataProvider;
@@ -101,9 +104,15 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
         super.traceClosed(signal);
     }
 
+    @Deprecated
     @Override
     protected TimeQueryFilter createQueryFilter(long start, long end, int nb) {
         return new SelectionTimeQueryRegexFilter(start, end, nb, fSelectedIds, getRegexes());
+    }
+
+    @Override
+    protected @NonNull Map<String, Object> createQueryParameters(long start, long end, int nb) {
+        return FetchParametersUtils.selectionTimeQueryToMap(new SelectionTimeQueryFilter(start, end, nb, fSelectedIds));
     }
 
     /**
