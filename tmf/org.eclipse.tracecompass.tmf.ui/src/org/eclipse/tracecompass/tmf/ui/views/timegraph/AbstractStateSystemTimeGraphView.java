@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -163,7 +164,6 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
 
             TimeEventFilterDialog timeEventFilterDialog = getTimeEventFilterDialog();
             boolean isFilterActive = timeEventFilterDialog != null && timeEventFilterDialog.isFilterActive();
-            boolean isFilterCleared = !isFilterActive && getTimeGraphViewer().isTimeEventFilterActive();
             getTimeGraphViewer().setTimeEventFilterApplied(isFilterActive);
 
             boolean hasSavedFilter = timeEventFilterDialog != null && timeEventFilterDialog.hasActiveSavedFilters();
@@ -172,11 +172,11 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             if (fullRange) {
                 redraw();
             }
-            Sampling sampling = new Sampling(getZoomStartTime(), getZoomEndTime(), getResolution());
-            Iterable<@NonNull TimeGraphEntry> incorrectSample = Iterables.filter(fVisibleEntries, entry -> isFilterActive || isFilterCleared || !sampling.equals(entry.getSampling()));
+            @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = computeRegexPredicate();
+            Sampling sampling = new Sampling(getZoomStartTime(), getZoomEndTime(), getResolution(), predicates);
+            Iterable<@NonNull TimeGraphEntry> incorrectSample = Iterables.filter(fVisibleEntries, entry -> !sampling.equals(entry.getSampling()));
             /* Only keep entries that are a member or child of the ss entry list */
             Iterable<@NonNull TimeGraphEntry> entries = Iterables.filter(incorrectSample, entry -> isMember(entry, entryList));
-            @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = computeRegexPredicate();
             // set gaps to null when there is no active filter
             Map<TimeGraphEntry, List<ITimeEvent>> gaps = isFilterActive ? new HashMap<>() : null;
             doZoom(ss, links, markers, resolution, monitor, start, end, sampling, entries, predicates, gaps);
@@ -194,7 +194,9 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                     try (TraceCompassLogUtils.ScopeLog scope = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStates");) { //$NON-NLS-1$
 
                         for (TimeGraphEntry entry : entries) {
-                            zoom(checkNotNull(entry), ss, fullStates, prevFullState, predicates, monitor, gaps);
+                            if (!sampling.equals(entry.getSampling())) {
+                                zoom(checkNotNull(entry), ss, fullStates, prevFullState, predicates, monitor, gaps);
+                            }
                         }
                     }
                     /* Refresh the arrows when zooming */
@@ -210,13 +212,17 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             });
             if (!monitor.isCanceled()) {
                 applyResults(() -> entries.forEach(entry -> {
-                    if (!predicates.isEmpty()) {
-                        /* Merge contiguous null events due to split query */
-                        List<ITimeEvent> eventList = Lists.newArrayList(entry.getTimeEventsIterator(getZoomStartTime(), getZoomEndTime(), getResolution()));
-                        doFilterEvents(entry, eventList, predicates);
-                        entry.setZoomedEventList(eventList);
+                    if (!sampling.equals(entry.getSampling())) {
+                        if (!predicates.isEmpty()) {
+                            /*
+                             * Merge contiguous null events due to split query
+                             */
+                            List<ITimeEvent> eventList = Lists.newArrayList(entry.getTimeEventsIterator(getZoomStartTime(), getZoomEndTime(), getResolution()));
+                            doFilterEvents(entry, eventList, predicates);
+                            entry.setZoomedEventList(eventList);
+                        }
+                        entry.setSampling(sampling);
                     }
-                    entry.setSampling(sampling);
                 }));
             }
             refresh();
@@ -243,56 +249,52 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
 
         private void doBgSearch(ITmfStateSystem ss, int resolution, @NonNull IProgressMonitor monitor, Map<TimeGraphEntry, List<ITimeEvent>> gaps, @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates) {
             try (TraceCompassLogUtils.ScopeLog poc = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINE, "TimegraphBgSearch")) { //$NON-NLS-1$
-                for (Map.Entry<TimeGraphEntry, List<ITimeEvent>> entryGap : gaps.entrySet()) {
-                    List<ITimeEvent> gapEvents = entryGap.getValue();
-                    TimeGraphEntry entry = entryGap.getKey();
-                    for (ITimeEvent event : gapEvents) {
 
-                        // FIXME This will query for all entries while we are only
-                        // interested into one. This is an API limitation since we do
-                        // not know at this level what are the specific attributes
-                        // used to build a single entry. This query takes up to 90%
-                        // of the time take to do the background search
-                        queryFullStates(ss, event.getTime(), event.getTime() + event.getDuration(), resolution, monitor, new IQueryHandler() {
+                TimeEventFilterDialog timeEventFilterDialog = getTimeEventFilterDialog();
+                boolean hasActiveSavedFilters = timeEventFilterDialog.hasActiveSavedFilters();
 
-                            @Override
-                            public void handle(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) {
+                for (Entry<TimeGraphEntry, List<ITimeEvent>> entryGaps: gaps.entrySet()) {
+                    for (ITimeEvent gap : entryGaps.getValue()) {
+                        long start = gap.getTime();
+                        long end = gap.getTime() + gap.getDuration();
+                        queryFullStates(ss, start, end, resolution, monitor, new IQueryHandler() {
+
+                        @Override
+                        public void handle(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) {
+                                TimeGraphEntry entry = entryGaps.getKey();
                                 List<ITimeEvent> eventList = getEventList(Objects.requireNonNull(entry), ss, fullStates, prevFullState, monitor);
 
-                                TimeEventFilterDialog timeEventFilterDialog = getTimeEventFilterDialog();
-                                boolean hasActiveSavedFilters = timeEventFilterDialog.hasActiveSavedFilters();
                                 if (eventList != null && !eventList.isEmpty() && !monitor.isCanceled()) {
                                     doFilterEvents(entry, eventList, predicates);
-                                    boolean dimmed = (event.getActiveProperties() & IFilterProperty.DIMMED) == 1;
-                                    boolean exclude = hasActiveSavedFilters;
-                                    for (ITimeEvent e : eventList) {
+                                    for (ITimeEvent event : eventList) {
+                                            if (!monitor.isCanceled()) {
+                                                // if any underlying event is not dimmed,
+                                                // then set the related gap event dimmed
+                                                // property to false
+                                                boolean dimmed = gap.isPropertyActive(IFilterProperty.DIMMED);
+                                                if (dimmed && !event.isPropertyActive(IFilterProperty.DIMMED)) {
+                                                    gap.setProperty(IFilterProperty.DIMMED, false);
+                                                }
 
-                                        // if any underlying event is not dimmed,
-                                        // then set the related gap event dimmed
-                                        // property to false
-                                        if (dimmed && (e.getActiveProperties() & IFilterProperty.DIMMED) == 0) {
-                                            event.setProperty(IFilterProperty.DIMMED, false);
-                                            dimmed = false;
-                                        }
-
-                                        // if any underlying event is not excluded,
-                                        // then set the related gap event exclude
-                                        // status property to false and add them
-                                        // back to the zoom event list
-                                        if (exclude && (e.getActiveProperties() & IFilterProperty.EXCLUDE) == 0) {
-                                            event.setProperty(IFilterProperty.EXCLUDE, false);
-                                            applyResults(() -> {
-                                                entry.updateZoomedEvent(event);
-                                            });
-                                            exclude = false;
-                                        }
+                                                // if any underlying event is not excluded,
+                                                // then set the related gap event exclude
+                                                // status property to false and add the gap
+                                                // back to the zoom event list
+                                                boolean exclude = gap.isPropertyActive(IFilterProperty.EXCLUDE);
+                                                if (hasActiveSavedFilters && exclude && !event.isPropertyActive(IFilterProperty.EXCLUDE)) {
+                                                    gap.setProperty(IFilterProperty.EXCLUDE, false);
+                                                    applyResults(() -> {
+                                                        entry.updateZoomedEvent(gap);
+                                                    });
+                                                }
+                                            }
                                     }
                                 }
+                                refresh();
                             }
-                        });
-                    }
-                    refresh();
+                    });
                 }
+            }
             }
         }
 
@@ -368,10 +370,10 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
      *            The event list
      * @param gaps
      *            The map of gaps by entry
-     * @since 4.2
+     * @since 4.3
      */
     protected void getEnventListGaps(@NonNull TimeGraphEntry entry, List<ITimeEvent> eventList, Map<TimeGraphEntry, List<ITimeEvent>> gaps) {
-        // Do nothing here. Must be implement buy subclasses that need this behavior
+        // Do nothing here. Must be implemented by subclasses that need this behavior
     }
 
     /**
