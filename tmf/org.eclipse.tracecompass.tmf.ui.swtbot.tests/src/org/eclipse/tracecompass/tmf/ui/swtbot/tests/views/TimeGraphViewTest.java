@@ -23,11 +23,14 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
@@ -62,6 +65,7 @@ import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ImageHelper;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
@@ -374,7 +378,7 @@ public class TimeGraphViewTest {
         // take a third picture
         ImageHelper reset = ImageHelper.waitForNewImage(bounds, highlighted);
         ImageHelper diff = ref.diff(reset);
-        assertTrue((double) diff.getHistogram().count(new RGB(0,0,0)) / diff.getHistogram().size() > 0.99);
+        assertTrue((double) diff.getHistogram().count(new RGB(0, 0, 0)) / diff.getHistogram().size() > 0.99);
         ImageHelper delta = highlighted.diff(reset);
         tg.expandAll();
         assertTrue("Some highlighting", delta.getHistogram().elementSet().size() > 1);
@@ -502,6 +506,79 @@ public class TimeGraphViewTest {
         /* Compare with the original, they should be the same */
         int resetCount = resetImage.getHistogram().count(HAIR);
         assertEquals("Count of \"HAIR\" did not get change despite reset of width", refCount, resetCount);
+    }
+
+    /**
+     * Test expand and collapes of a timegraph view
+     */
+    @Test
+    public void testExpandAndCollapse() {
+        String pg = "Plumber guy";
+        String hpc = "Hungry pie chart";
+        String element = "row2";
+        int totalItems = 16;
+
+        SWTWorkbenchBot bot = new SWTWorkbenchBot();
+        resetTimeRange(bot);
+        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
+        assertEquals(totalItems, getVisibleItems(timegraph));
+
+        SWTBotTimeGraphEntry[] entries = null;
+        entries = timegraph.getEntries();
+        assertNotNull(entries);
+        assertNotNull(timegraph.getEntry(hpc, element));
+
+        timegraph.collapseAll();
+        entries = timegraph.getEntries();
+        assertEquals(2, getVisibleItems(timegraph));
+
+        timegraph.getEntry(pg).select();
+        fireKey(timegraph, '+', true);
+        assertEquals(9, getVisibleItems(timegraph));
+
+        timegraph.getEntry(pg).select();
+        fireKey(timegraph, '-', true);
+        assertEquals(2, getVisibleItems(timegraph));
+
+        timegraph.getEntry(hpc).select();
+        fireKey(timegraph, '+', true);
+        assertEquals(9, getVisibleItems(timegraph));
+        assertNotNull(timegraph.getEntry(hpc, element));
+
+        timegraph.getEntry(pg).select();
+        fireKey(timegraph, '*', true);
+        timegraph.getEntry(hpc).select();
+        fireKey(timegraph, '*', true);
+        assertEquals(totalItems, getVisibleItems(timegraph));
+        assertNotNull(timegraph.getEntry(hpc, element));
+
+    }
+
+    private static void fireKey(SWTBotTimeGraph timegraph, char c, boolean inNs) {
+        Event event = new Event();
+        event.widget = timegraph.widget;
+        event.character = c;
+        event.doit = true;
+        UIThreadRunnable.syncExec(() -> {
+            resetMousePosition(timegraph, inNs, new MouseEvent(event));
+            timegraph.widget.keyPressed(new KeyEvent(event));
+        });
+        UIThreadRunnable.syncExec(() -> {
+            resetMousePosition(timegraph, inNs, new MouseEvent(event));
+            timegraph.widget.keyReleased(new KeyEvent(event));
+        });
+
+    }
+
+    private static void resetMousePosition(SWTBotTimeGraph timegraph, boolean inNs, MouseEvent mouseEvent) {
+        Rectangle rect = timegraph.widget.getBounds();
+        if (!inNs) {
+            mouseEvent.x = rect.width - 1;
+        } else {
+            mouseEvent.x = 1;
+        }
+        mouseEvent.y = rect.height / 2 + rect.y;
+        timegraph.widget.mouseMove(mouseEvent);
     }
 
     private static class PaletteIsPresent extends DefaultCondition {
