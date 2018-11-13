@@ -52,6 +52,11 @@ public class TmfAggregateAnalysisElement extends TmfAnalysisElement {
     }
 
     @Override
+    public void dispose() {
+        /* Nothing to do */
+    }
+
+    @Override
     protected synchronized void refreshChildren() {
         // refresh all children analysis as well
         for (TmfAnalysisElement analysis : fContainedAnalyses) {
