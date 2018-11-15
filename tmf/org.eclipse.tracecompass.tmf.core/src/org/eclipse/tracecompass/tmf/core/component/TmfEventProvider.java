@@ -614,10 +614,15 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
     }
 
     /**
-     * Clears all pending requests. Debug code.
+     * Cancels and clears all pending requests. Debug code.
      */
     private void  clearPendingRequests() {
-        fPendingCoalescedRequests.clear();
+        synchronized (fLock) {
+            for (TmfCoalescedEventRequest request : fPendingCoalescedRequests) {
+                request.cancel();
+            }
+            fPendingCoalescedRequests.clear();
+        }
     }
 
     /**
