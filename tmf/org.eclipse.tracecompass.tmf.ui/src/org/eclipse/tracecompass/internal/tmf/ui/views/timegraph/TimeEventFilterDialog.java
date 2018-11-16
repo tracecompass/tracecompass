@@ -127,7 +127,7 @@ public class TimeEventFilterDialog extends Dialog {
         RowLayout rl = new RowLayout(SWT.HORIZONTAL);
         rl.marginTop = 0;
         rl.marginBottom = 0;
-        rl.marginLeft = 0;
+        rl.marginLeft = 3;
         rl.marginRight = 0;
         labels.setLayout(rl);
         return labels;
@@ -201,7 +201,7 @@ public class TimeEventFilterDialog extends Dialog {
     }
 
     private void createCLabels(Composite parent, Composite labels, String currentRegex) {
-        CLabel filter = new CLabel(labels, SWT.NONE);
+        CLabel filter = new CLabel(labels, SWT.BORDER);
         filter.setText(currentRegex);
         filter.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_DELETE));
         filter.setBackground(fControl.getColorScheme().getColor(TimeGraphColorScheme.TOOL_BACKGROUND));
@@ -211,6 +211,7 @@ public class TimeEventFilterDialog extends Dialog {
                 deleteCLabel(parent, filter, e2);
             }
         });
+
         parent.layout();
         Rectangle bounds = parent.getShell().getBounds();
         Point size = parent.computeSize(SWT.DEFAULT, SWT.DEFAULT);
