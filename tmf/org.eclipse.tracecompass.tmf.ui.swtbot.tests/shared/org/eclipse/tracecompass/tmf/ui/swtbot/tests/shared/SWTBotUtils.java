@@ -1110,17 +1110,18 @@ public final class SWTBotUtils {
      * @return the preferences shell
      */
     public static SWTBotShell openPreferences(SWTBot bot, String text) {
+        SWTBotShell mainShell = focusMainWindow(bot.shells());
         if (SWTUtils.isMac()) {
             // On Mac, the Preferences menu item is under the application name.
             // For some reason, we can't access the application menu anymore so
             // we use the keyboard shortcut.
             try {
-                bot.activeShell().pressShortcut(KeyStroke.getInstance(IKeyLookup.COMMAND_NAME + "+"), KeyStroke.getInstance(","));
+                mainShell.pressShortcut(KeyStroke.getInstance(IKeyLookup.COMMAND_NAME + "+"), KeyStroke.getInstance(","));
             } catch (ParseException e) {
                 fail();
             }
         } else {
-            bot.menu(WINDOW_MENU).menu(PREFERENCES_MENU_ITEM).click();
+            mainShell.bot().menu(WINDOW_MENU).menu(PREFERENCES_MENU_ITEM).click();
         }
 
         if (text != null) {
