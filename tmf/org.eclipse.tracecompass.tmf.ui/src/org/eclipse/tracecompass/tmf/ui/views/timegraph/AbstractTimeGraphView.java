@@ -550,17 +550,18 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
 
         /**
-         * Applies the results of the ZoomThread calculations.
-         *
-         * Note: This method makes sure that only the results of the last created
-         * ZoomThread are applied.
+         * Applies the results of the ZoomThread calculations on the UI thread.
+         * <p>
+         * Note: This method makes sure that only the results of the last
+         * created ZoomThread are applied.
          *
          * @param runnable
          *            the code to run in order to apply the results
+         * @return true if the results were applied
          * @since 2.0
          */
-        protected void applyResults(Runnable runnable) {
-            AbstractTimeGraphView.this.applyResults(runnable);
+        protected boolean applyResults(Runnable runnable) {
+            return AbstractTimeGraphView.this.applyResults(runnable);
         }
 
         /**
@@ -584,21 +585,24 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     /**
-     * Applies the results of the ZoomThread calculations.
-     *
+     * Applies the results of the ZoomThread calculations on the UI thread.
+     * <p>
      * Note: This method makes sure that only the results of the last created
      * ZoomThread are applied.
      *
      * @param runnable
      *            the code to run in order to apply the results
+     * @return true if the results were applied
      * @since 3.1
      */
-    protected void applyResults(Runnable runnable) {
+    protected boolean applyResults(Runnable runnable) {
         synchronized (fZoomThreadResultLock) {
             if (Thread.currentThread() == fZoomThread) {
-                runnable.run();
+                Display.getDefault().asyncExec(runnable);
+                return true;
             }
         }
+        return false;
     }
 
     private class ZoomThreadByEntry extends ZoomThread {
@@ -647,14 +651,15 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 List<IMarkerEvent> markers = new ArrayList<>(getViewMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
                 /* Refresh the trace-specific markers when zooming */
                 markers.addAll(getTraceMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
-                applyResults(() -> {
+                if (applyResults(() -> {
                     if (links != null) {
                         fTimeGraphViewer.setLinks(links);
                     }
                     fTimeGraphViewer.setMarkerCategories(getMarkerCategories());
                     fTimeGraphViewer.setMarkers(markers);
+                })) {
                     refresh();
-                });
+                }
             }
         }
 
