@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Viet-Hung Phan - Support pcapNg
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.pcap.core.stream;
@@ -31,6 +32,7 @@ import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.pcap.PcapPacket;
 import org.eclipse.tracecompass.internal.pcap.core.trace.BadPcapFileException;
 import org.eclipse.tracecompass.internal.pcap.core.trace.PcapFile;
+import org.eclipse.tracecompass.internal.pcap.core.util.PcapHelper;
 
 /**
  * Class that parse an entire pcap file to build the different streams.
@@ -167,12 +169,11 @@ public class PacketStreamBuilder {
      *             When the PcapFile is not valid.
      */
     public synchronized void parsePcapFile(Path filePath) throws IOException, BadPcapFileException {
-        try (PcapFile pcapFile = new PcapFile(filePath);) {
-            while (pcapFile.hasNextPacket()) { // not eof
-                PcapPacket packet;
+        try (PcapFile pcapFile = PcapHelper.getPcapFile(filePath)) {
+            while (true) {
                 try {
-                    packet = pcapFile.parseNextPacket();
-                    if (packet == null) {
+                    PcapPacket packet = pcapFile.parseNextPacket();
+                    if (packet == null) { // end-of-file
                         return;
                     }
                     addPacketToStream(packet);
@@ -181,6 +182,5 @@ public class PacketStreamBuilder {
                 }
             }
         }
-
     }
 }

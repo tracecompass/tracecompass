@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Viet-Hung Phan - Support pcapNg
  *******************************************************************************/
 
 package org.eclipse.tracecompass.pcap.core.tests.protocol.pcap;
@@ -30,9 +31,11 @@ import java.util.TimeZone;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.pcap.PcapEndpoint;
+import org.eclipse.tracecompass.internal.pcap.core.protocol.pcap.PcapOldPacket;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.pcap.PcapPacket;
 import org.eclipse.tracecompass.internal.pcap.core.trace.BadPcapFileException;
 import org.eclipse.tracecompass.internal.pcap.core.trace.PcapFile;
+import org.eclipse.tracecompass.internal.pcap.core.trace.PcapOldFile;
 import org.eclipse.tracecompass.pcap.core.tests.shared.PcapTestTrace;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,6 +93,7 @@ public class PcapPacketTest {
                 );
     }
 
+    private ByteBuffer fHeader;
     private ByteBuffer fPayload;
 
     /**
@@ -97,10 +101,29 @@ public class PcapPacketTest {
      */
     @Before
     public void initialize() {
+        // Values copied from wireshark
+
+        fHeader = ByteBuffer.allocate(16);
+        fHeader.put((byte) 0x80);
+        fHeader.put((byte) 0x02);
+        fHeader.put((byte) 0xc9);
+        fHeader.put((byte) 0x42);
+        fHeader.put((byte) 0x5d);
+        fHeader.put((byte) 0xa7);
+        fHeader.put((byte) 0x0c);
+        fHeader.put((byte) 0x00);
+        fHeader.put((byte) 0x4b);
+        fHeader.put((byte) 0x00);
+        fHeader.put((byte) 0x00);
+        fHeader.put((byte) 0x00);
+        fHeader.put((byte) 0x4b);
+        fHeader.put((byte) 0x00);
+        fHeader.put((byte) 0x00);
+        fHeader.put((byte) 0x00);
+        fHeader.flip();
+
         fPayload = ByteBuffer.allocate(75);
         fPayload.order(ByteOrder.BIG_ENDIAN);
-
-        // Values copied from wireshark
 
         // Bytes 0x01-0x10
         fPayload.put((byte) 0x00);
@@ -203,8 +226,7 @@ public class PcapPacketTest {
     public void CompletePcapPacketTest() throws IOException, BadPcapFileException, BadPacketException {
         PcapTestTrace trace = PcapTestTrace.MOSTLY_UDP;
         assumeTrue(trace.exists());
-        try (PcapFile file = new PcapFile(trace.getPath());) {
-
+        try (PcapFile file = trace.getTrace()) {
             file.seekPacket(36);
             PcapPacket packet = file.parseNextPacket();
             if (packet == null) {
@@ -219,9 +241,9 @@ public class PcapPacketTest {
 
             // Abstract methods Testing
             assertTrue(packet.validate());
-            assertEquals(86567859, packet.hashCode());
-            assertFalse(packet.equals(null));
-            assertFalse(packet.equals(file.parseNextPacket()));
+            PcapOldPacket expected = new PcapOldPacket((PcapOldFile) file, fHeader, fPayload, 36L);
+            assertEquals(expected.hashCode(), packet.hashCode());
+            assertEquals(expected, packet);
 
             assertEquals(EXPECTED_FIELDS, packet.getFields());
             assertEquals(EXPECTED_TOSTRING, packet.toString());
@@ -236,7 +258,6 @@ public class PcapPacketTest {
                 fail("CompletePcapPacketTest has failed!");
                 return;
             }
-            assertEquals(fPayload, payload.flip());
 
             // Packet-specific methods Testing
             assertEquals(36, packet.getIndex());

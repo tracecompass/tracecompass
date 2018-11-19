@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Viet-Hung Phan - Support pcapNg
  *******************************************************************************/
 
 package org.eclipse.tracecompass.pcap.core.tests.protocol.ipv4;
@@ -155,13 +156,13 @@ public class IPv4PacketTest {
     public void CompleteIPv4PacketTest() throws IOException, BadPcapFileException, BadPacketException {
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
-        try (PcapFile dummy = new PcapFile(trace.getPath())) {
+        try (PcapFile file = trace.getTrace()) {
             ByteBuffer byteBuffer = fPacket;
             if (byteBuffer == null) {
                 fail("CompleteIPv4PacketTest has failed!");
                 return;
             }
-            IPv4Packet packet = new IPv4Packet(dummy, null, byteBuffer);
+            IPv4Packet packet = new IPv4Packet(file, null, byteBuffer);
 
             // Protocol Testing
             assertEquals(PcapProtocol.IPV4, packet.getProtocol());
@@ -171,9 +172,9 @@ public class IPv4PacketTest {
 
             // Abstract methods Testing
             assertTrue(packet.validate());
-            assertEquals(-222021887, packet.hashCode());
-            assertFalse(packet.equals(null));
-            assertEquals(new IPv4Packet(dummy, null, byteBuffer), packet);
+            IPv4Packet expected = new IPv4Packet(file, null, byteBuffer);
+            assertEquals(expected.hashCode(), packet.hashCode());
+            assertEquals(expected, packet);
 
             assertEquals(EXPECTED_FIELDS, packet.getFields());
             assertEquals(EXPECTED_TOSTRING, packet.toString());
@@ -205,7 +206,6 @@ public class IPv4PacketTest {
             assertEquals(160, packet.getTimeToLive());
             assertEquals(0xFE, packet.getIpDatagramProtocol());
             assertEquals(0x3344, packet.getHeaderChecksum());
-
         }
     }
 }

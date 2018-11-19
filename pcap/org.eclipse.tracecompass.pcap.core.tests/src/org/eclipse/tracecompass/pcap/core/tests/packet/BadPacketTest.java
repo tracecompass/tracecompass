@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Viet-Hung Phan - Support pcapNg
  *******************************************************************************/
 
 package org.eclipse.tracecompass.pcap.core.tests.packet;
@@ -28,10 +29,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * JUnit Class that tests if BadPacketExceptions are thrown correctly.
- *
+ * JUnit Class that tests if BadPacketExceptions are thrown correctly for a pcap file or a pcapNg file.
+ *  *
  * @author Vincent Perot
  */
+
 public class BadPacketTest {
 
     private ByteBuffer fEthernetPacket;
@@ -78,7 +80,8 @@ public class BadPacketTest {
     public void PacketExceptionTest() throws BadPacketException, IOException, BadPcapFileException {
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
-        try (PcapFile dummy = new PcapFile(trace.getPath())) {
+        // Get a right pcap/pcapNg trace
+        try (PcapFile dummy = trace.getTrace();) {
             ByteBuffer packet = fEthernetPacket;
             if (packet != null) {
                 new EthernetIIPacket(dummy, null, packet);

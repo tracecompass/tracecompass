@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -144,12 +144,9 @@ public class IPv4Packet extends Packet {
         }
 
         // Get payload if any.
-        if (packet.array().length - packet.position() > 0) {
-            byte[] array = new byte[packet.array().length - packet.position()];
-            packet.get(array);
-            ByteBuffer payload = ByteBuffer.wrap(array);
+        if (packet.remaining() > 0) {
+            ByteBuffer payload = packet.slice();
             payload.order(ByteOrder.BIG_ENDIAN);
-            payload.position(0);
             fPayload = payload;
         } else {
             fPayload = null;
@@ -491,7 +488,7 @@ public class IPv4Packet extends Packet {
         final ByteBuffer payload = fPayload;
         if (payload != null) {
             sb.append(" Len=") //$NON-NLS-1$
-            .append(payload.array().length);
+            .append(payload.limit());
         } else {
             sb.append(" Len=0"); //$NON-NLS-1$
         }
@@ -540,11 +537,8 @@ public class IPv4Packet extends Packet {
         result = prime * result + fIpDatagramProtocol;
         result = prime * result + (fMoreFragmentFlag ? 1231 : 1237);
         result = prime * result + Arrays.hashCode(fOptions);
-        final ByteBuffer payload = fPayload;
-        if (payload != null) {
-            result = prime * result + payload.hashCode();
-        } else {
-            result = prime * result;
+        if (child == null) {
+            result = prime * result + payloadHashCode(fPayload);
         }
         result = prime * result + (fReservedFlag ? 1231 : 1237);
         result = prime * result + fSourceIpAddress.hashCode();
@@ -602,7 +596,7 @@ public class IPv4Packet extends Packet {
         if (!Arrays.equals(fOptions, other.fOptions)) {
             return false;
         }
-        if (!Objects.equals(fPayload, other.fPayload)) {
+        if (fChildPacket == null && !payloadEquals(fPayload, other.fPayload)) {
             return false;
         }
         if (fReservedFlag != other.fReservedFlag) {

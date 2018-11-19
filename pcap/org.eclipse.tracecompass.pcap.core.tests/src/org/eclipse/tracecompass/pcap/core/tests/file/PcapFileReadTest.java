@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Viet-Hung Phan - Support pcapNg
  *******************************************************************************/
 
 package org.eclipse.tracecompass.pcap.core.tests.file;
@@ -32,10 +33,11 @@ import org.junit.Test;
  *
  * @author Vincent Perot
  */
+
 public class PcapFileReadTest {
 
     /**
-     * Test that verify that packets are well read and that no error happens in
+     * Test that verify that packets are well read for a pcap file or a pcapNg file and that no error happens in
      * file index.
      *
      * @throws BadPcapFileException
@@ -50,9 +52,8 @@ public class PcapFileReadTest {
 
         PcapTestTrace trace = PcapTestTrace.MOSTLY_UDP;
         assumeTrue(trace.exists());
-
-        try (PcapFile file = new PcapFile(trace.getPath());) {
-
+        // Get a right pcap/pcapNg trace
+        try (PcapFile file = trace.getTrace();) {
             PcapPacket packet = file.parseNextPacket();
             if (packet == null) {
                 fail("FileReadTest() failed!");
@@ -126,9 +127,9 @@ public class PcapFileReadTest {
 
             // Parse outside of file.
             file.seekPacket(99999999);
-            assertEquals(file.getTotalNbPackets(), file.getCurrentRank());
+            assertEquals(647, file.getCurrentRank());
             file.skipNextPacket(); // Should be a no-op
-            assertEquals(file.getTotalNbPackets(), file.getCurrentRank());
+            assertEquals(647, file.getCurrentRank());
             packet = file.parseNextPacket();
             assertNull(packet);
         }

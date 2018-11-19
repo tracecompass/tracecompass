@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Viet-Hung Phan - Support pcapNg
  *******************************************************************************/
 
 package org.eclipse.tracecompass.pcap.core.tests.protocol.udp;
@@ -107,13 +108,13 @@ public class UDPPacketTest {
     public void CompleteUDPPacketTest() throws IOException, BadPcapFileException, BadPacketException {
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
-        try (PcapFile dummy = new PcapFile(trace.getPath())) {
+        try (PcapFile file = trace.getTrace()) {
             ByteBuffer byteBuffer = fPacket;
             if (byteBuffer == null) {
                 fail("CompleteUDPPacketTest has failed!");
                 return;
             }
-            UDPPacket packet = new UDPPacket(dummy, null, byteBuffer);
+            UDPPacket packet = new UDPPacket(file, null, byteBuffer);
 
             // Protocol Testing
             assertEquals(PcapProtocol.UDP, packet.getProtocol());
@@ -123,9 +124,9 @@ public class UDPPacketTest {
 
             // Abstract methods Testing
             assertTrue(packet.validate());
-            assertEquals(473000225, packet.hashCode());
-            assertFalse(packet.equals(null));
-            assertEquals(new UDPPacket(dummy, null, byteBuffer), packet);
+            UDPPacket expected = new UDPPacket(file, null, byteBuffer);
+            assertEquals(expected.hashCode(), packet.hashCode());
+            assertEquals(expected, packet);
 
             assertEquals(EXPECTED_FIELDS, packet.getFields());
             assertEquals(EXPTECTED_TOSTRING, packet.toString());
@@ -145,7 +146,6 @@ public class UDPPacketTest {
             assertEquals(0x9ABB, packet.getDestinationPort());
             assertEquals(0xA1EC, packet.getTotalLength());
             assertEquals(0xFAAF, packet.getChecksum());
-
         }
     }
 }

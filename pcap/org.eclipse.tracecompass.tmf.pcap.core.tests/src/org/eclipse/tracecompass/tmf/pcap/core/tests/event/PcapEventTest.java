@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,14 +16,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.tracecompass.internal.pcap.core.trace.BadPcapFileException;
-import org.eclipse.tracecompass.internal.pcap.core.trace.PcapFile;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.event.PcapEvent;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.protocol.TmfPcapProtocol;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.trace.PcapTrace;
@@ -49,24 +46,18 @@ public class PcapEventTest {
     /**
      * Initialize the Packet and the EventField.
      *
-     * @throws BadPcapFileException
-     *             Thrown when the pcap file is erroneous.
-     * @throws IOException
-     *             Thrown when an IO error occurs.
      * @throws TmfTraceException
      *             Thrown when the trace is not valid.
      */
     @BeforeClass
-    public static void setUp() throws IOException, BadPcapFileException, TmfTraceException {
+    public static void setUp() throws TmfTraceException {
 
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
-        try (PcapFile pcap = new PcapFile(trace.getPath());) {
-            PcapTrace pcapTrace = new PcapTrace();
-            pcapTrace.initTrace(null, trace.getPath().toString(), PcapEvent.class);
-            fEvent = pcapTrace.parseEvent(new TmfContext(new TmfLongLocation(3), 3));
-            pcapTrace.dispose();
-        }
+        PcapTrace pcapTrace = new PcapTrace();
+        pcapTrace.initTrace(null, trace.getPath().toString(), PcapEvent.class);
+        fEvent = pcapTrace.parseEvent(new TmfContext(new TmfLongLocation(3), 3));
+        pcapTrace.dispose();
 
         // Initialize protocol list.
         List<TmfPcapProtocol> list = new ArrayList<>();

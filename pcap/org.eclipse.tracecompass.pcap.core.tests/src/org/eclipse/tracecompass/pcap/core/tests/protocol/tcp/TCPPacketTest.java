@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Viet-Hung Phan - Support pcapNg
  *******************************************************************************/
 
 package org.eclipse.tracecompass.pcap.core.tests.protocol.tcp;
@@ -154,13 +155,13 @@ public class TCPPacketTest {
     public void CompleteTCPPacketTest() throws BadPacketException, IOException, BadPcapFileException {
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
-        try (PcapFile dummy = new PcapFile(trace.getPath())) {
+        try (PcapFile file = trace.getTrace()) {
             ByteBuffer byteBuffer = fPacket;
             if (byteBuffer == null) {
                 fail("CompleteTCPPacketTest has failed!");
                 return;
             }
-            TCPPacket packet = new TCPPacket(dummy, null, byteBuffer);
+            TCPPacket packet = new TCPPacket(file, null, byteBuffer);
 
             // Protocol Testing
             assertEquals(PcapProtocol.TCP, packet.getProtocol());
@@ -170,9 +171,9 @@ public class TCPPacketTest {
 
             // Abstract methods Testing
             assertTrue(packet.validate());
-            assertEquals(-677046102, packet.hashCode());
-            assertFalse(packet.equals(null));
-            assertEquals(new TCPPacket(dummy, null, byteBuffer), packet);
+            TCPPacket expected = new TCPPacket(file, null, byteBuffer);
+            assertEquals(expected.hashCode(), packet.hashCode());
+            assertEquals(expected, packet);
 
             assertEquals(EXPECTED_FIELDS, packet.getFields());
             assertEquals(EXPECTED_TOSTRING, packet.toString());
@@ -207,7 +208,6 @@ public class TCPPacketTest {
             assertEquals(65518, packet.getChecksum());
             assertEquals(56780, packet.getUrgentPointer());
             assertTrue(Arrays.equals(packet.getOptions(), Arrays.copyOfRange(fPacket.array(), 20, 24)));
-
         }
     }
 }

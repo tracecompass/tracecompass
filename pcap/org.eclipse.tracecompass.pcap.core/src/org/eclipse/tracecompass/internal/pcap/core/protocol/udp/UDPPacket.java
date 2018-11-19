@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -78,13 +78,9 @@ public class UDPPacket extends Packet {
         fTotalLength = ConversionHelper.unsignedShortToInt(packet.getShort());
         fChecksum = ConversionHelper.unsignedShortToInt(packet.getShort());
 
-        if (packet.array().length - packet.position() > 0) {
-            byte[] array = new byte[packet.array().length - packet.position()];
-            packet.get(array);
-
-            ByteBuffer payload = ByteBuffer.wrap(array);
+        if (packet.remaining() > 0) {
+            ByteBuffer payload = packet.slice();
             payload.order(ByteOrder.BIG_ENDIAN);
-            payload.position(0);
             fPayload = payload;
         } else {
             fPayload = null;
@@ -240,11 +236,8 @@ public class UDPPacket extends Packet {
             result = prime * result;
         }
         result = prime * result + fDestinationPort;
-        final ByteBuffer payload = fPayload;
-        if (payload != null) {
-            result = prime * result + payload.hashCode();
-        } else {
-            result = prime * result;
+        if (child == null) {
+            result = prime * result + payloadHashCode(fPayload);
         }
         result = prime * result + fSourcePort;
         result = prime * result + fTotalLength;
@@ -272,7 +265,7 @@ public class UDPPacket extends Packet {
         if (fDestinationPort != other.fDestinationPort) {
             return false;
         }
-        if(!Objects.equals(fPayload, other.fPayload)){
+        if (fChildPacket == null && !payloadEquals(fPayload, other.fPayload)) {
             return false;
         }
         if (fSourcePort != other.fSourcePort) {

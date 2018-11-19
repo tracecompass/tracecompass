@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,6 +10,7 @@
  *   Vincent Perot - Initial API and implementation
  *   Alexandre Montplaisir - Update to new ITmfEventAspect API
  *   Patrick Tasse - Make pcap aspects singletons
+ *   Viet-Hung Phan - Support pcapNg
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.pcap.core.trace;
@@ -36,7 +37,9 @@ import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.pcap.PcapPacket;
 import org.eclipse.tracecompass.internal.pcap.core.trace.BadPcapFileException;
 import org.eclipse.tracecompass.internal.pcap.core.trace.PcapFile;
+import org.eclipse.tracecompass.internal.pcap.core.trace.PcapOldFile;
 import org.eclipse.tracecompass.internal.pcap.core.util.LinkTypeHelper;
+import org.eclipse.tracecompass.internal.pcap.core.util.PcapHelper;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.event.PcapEvent;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.event.aspect.PcapDestinationAspect;
@@ -45,8 +48,8 @@ import org.eclipse.tracecompass.internal.tmf.pcap.core.event.aspect.PcapReferenc
 import org.eclipse.tracecompass.internal.tmf.pcap.core.event.aspect.PcapSourceAspect;
 import org.eclipse.tracecompass.internal.tmf.pcap.core.util.PcapEventFactory;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
@@ -61,9 +64,7 @@ import com.google.common.collect.ImmutableMap;
 
 /**
  * Class that represents a TMF Pcap Trace. It is used to make the glue between
- * the Pcap parser and TMF.
- *
- * TODO handle fields in TmfEventType for the filter view.
+ * the Pcap/PcapNg parser and TMF.
  *
  * @author Vincent Perot
  */
@@ -72,19 +73,17 @@ public class PcapTrace extends TmfTrace implements ITmfPropertiesProvider {
     /** pcap trace type id as defined in plugin.xml */
     public static final String TRACE_TYPE_ID = "org.eclipse.linuxtools.tmf.pcap.core.pcaptrace"; //$NON-NLS-1$
 
-    private static final Collection<ITmfEventAspect<?>> PCAP_ASPECTS =
-            ImmutableList.of(
-                    TmfBaseAspects.getTimestampAspect(),
-                    PcapSourceAspect.INSTANCE,
-                    PcapDestinationAspect.INSTANCE,
-                    PcapReferenceAspect.INSTANCE,
-                    PcapProtocolAspect.INSTANCE,
-                    TmfBaseAspects.getContentsAspect()
-                    );
+    private static final Collection<ITmfEventAspect<?>> PCAP_ASPECTS = ImmutableList.of(
+            TmfBaseAspects.getTimestampAspect(),
+            PcapSourceAspect.INSTANCE,
+            PcapDestinationAspect.INSTANCE,
+            PcapReferenceAspect.INSTANCE,
+            PcapProtocolAspect.INSTANCE,
+            TmfBaseAspects.getContentsAspect());
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
     private static final int CONFIDENCE = 50;
-    private @Nullable PcapFile fPcapFile;
+    private @Nullable PcapFile fPcapFile = null;
     private @Nullable Map<String, String> fTraceProperties = null;
 
     @Override
@@ -99,6 +98,7 @@ public class PcapTrace extends TmfTrace implements ITmfPropertiesProvider {
     @Override
     public synchronized double getLocationRatio(@Nullable ITmfLocation location) {
         TmfLongLocation loc = (TmfLongLocation) location;
+
         PcapFile pcap = fPcapFile;
         if (loc == null || pcap == null) {
             return 0;
@@ -113,11 +113,10 @@ public class PcapTrace extends TmfTrace implements ITmfPropertiesProvider {
             Activator.logError(message, e);
             return 0;
         }
-
     }
 
     @Override
-    @NonNullByDefault({DefaultLocation.TYPE_ARGUMENT})
+    @NonNullByDefault({ DefaultLocation.TYPE_ARGUMENT })
     public synchronized void initTrace(@Nullable IResource resource, @Nullable String path, @Nullable Class<? extends ITmfEvent> type) throws TmfTraceException {
         super.initTrace(resource, path, type);
         if (path == null) {
@@ -125,7 +124,7 @@ public class PcapTrace extends TmfTrace implements ITmfPropertiesProvider {
         }
         Path filePath = checkNotNull(Paths.get(path));
         try {
-            fPcapFile = new PcapFile(filePath);
+            fPcapFile = PcapHelper.getPcapFile(filePath);
         } catch (IOException | BadPcapFileException e) {
             throw new TmfTraceException(e.getMessage(), e);
         }
@@ -145,6 +144,7 @@ public class PcapTrace extends TmfTrace implements ITmfPropertiesProvider {
         long rank = context.getRank();
         PcapPacket packet = null;
         PcapFile pcap = fPcapFile;
+
         if (pcap == null) {
             return null;
         }
@@ -179,6 +179,7 @@ public class PcapTrace extends TmfTrace implements ITmfPropertiesProvider {
     @Override
     public synchronized ITmfContext seekEvent(double ratio) {
         long position;
+
         PcapFile pcap = fPcapFile;
         if (pcap == null) {
             return new TmfContext(new TmfLongLocation(0), 0);
@@ -220,10 +221,13 @@ public class PcapTrace extends TmfTrace implements ITmfPropertiesProvider {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, EMPTY_STRING);
         }
         Path filePath = checkNotNull(Paths.get(path));
-        try (PcapFile file = new PcapFile(filePath)) {
+        // We don't use magic number here but the file suffix instead due to the file not open yet
+        try {
+            fPcapFile = PcapHelper.getPcapFile(filePath);
         } catch (IOException | BadPcapFileException e) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.toString());
         }
+
         return new TraceValidationStatus(CONFIDENCE, Activator.PLUGIN_ID);
     }
 
@@ -243,27 +247,29 @@ public class PcapTrace extends TmfTrace implements ITmfPropertiesProvider {
                 message = EMPTY_STRING;
             }
             Activator.logError(message, e);
-            return;
         }
     }
 
     @Override
     public synchronized Map<String, String> getProperties() {
+
         PcapFile pcap = fPcapFile;
         if (pcap == null) {
             return Collections.emptyMap();
         }
-
         if (fTraceProperties != null) {
             return fTraceProperties;
         }
 
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
         builder.put(nullToEmptyString(Messages.PcapTrace_Version), String.format("%d%c%d", pcap.getMajorVersion(), '.', pcap.getMinorVersion())); //$NON-NLS-1$
-        builder.put(nullToEmptyString(Messages.PcapTrace_TimeZoneCorrection), pcap.getTimeZoneCorrection() + " s"); //$NON-NLS-1$
-        builder.put(nullToEmptyString(Messages.PcapTrace_TimestampAccuracy), String.valueOf(pcap.getTimeAccuracy()));
-        builder.put(nullToEmptyString(Messages.PcapTrace_MaxSnapLength), pcap.getSnapLength() + " bytes"); //$NON-NLS-1$
-        builder.put(nullToEmptyString(Messages.PcapTrace_LinkLayerHeaderType), LinkTypeHelper.toString((int) pcap.getDataLinkType()) + " (" + pcap.getDataLinkType() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+        if (pcap instanceof PcapOldFile) {
+            PcapOldFile pcapOld = (PcapOldFile) pcap;
+            builder.put(nullToEmptyString(Messages.PcapTrace_TimeZoneCorrection), pcapOld.getTimeZoneCorrection() + " s"); //$NON-NLS-1$
+            builder.put(nullToEmptyString(Messages.PcapTrace_TimestampAccuracy), String.valueOf(pcapOld.getTimeAccuracy()));
+            builder.put(nullToEmptyString(Messages.PcapTrace_MaxSnapLength), pcapOld.getSnapShotLength() + " bytes"); //$NON-NLS-1$
+            builder.put(nullToEmptyString(Messages.PcapTrace_LinkLayerHeaderType), LinkTypeHelper.toString((int) pcapOld.getDataLinkType()) + " (" + pcapOld.getDataLinkType() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
         builder.put(nullToEmptyString(Messages.PcapTrace_FileEndianness), nullToEmptyString(pcap.getByteOrder().toString()));
 
         fTraceProperties = builder.build();

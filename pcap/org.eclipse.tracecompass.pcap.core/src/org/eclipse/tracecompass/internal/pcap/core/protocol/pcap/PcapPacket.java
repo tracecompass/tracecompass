@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,12 +8,12 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Viet-Hung Phan - Support pcapNg
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.pcap.core.protocol.pcap;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Map;
 import java.util.Objects;
 
@@ -24,7 +24,6 @@ import org.eclipse.tracecompass.internal.pcap.core.protocol.PcapProtocol;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.ethernet2.EthernetIIPacket;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.unknown.UnknownPacket;
 import org.eclipse.tracecompass.internal.pcap.core.trace.PcapFile;
-import org.eclipse.tracecompass.internal.pcap.core.trace.PcapFileValues;
 import org.eclipse.tracecompass.internal.pcap.core.util.ConversionHelper;
 import org.eclipse.tracecompass.internal.pcap.core.util.LinkTypeHelper;
 import org.eclipse.tracecompass.internal.pcap.core.util.PcapTimestampScale;
@@ -32,23 +31,21 @@ import org.eclipse.tracecompass.internal.pcap.core.util.PcapTimestampScale;
 import com.google.common.collect.ImmutableMap;
 
 /**
- * Class that represents a Pcap packet. This is the highest level of
- * encapsulation.
+ * Class that represents a Pcap/PcapNg packet. This is the highest level of
+ * encapsulation. This class will serves both pcap and pcapNg packet
  *
  * @author Vincent Perot
  */
-public class PcapPacket extends Packet {
 
-    private static final int TIMESTAMP_MICROSECOND_MAX = 1000000;
-    private static final int TIMESTAMP_NANOSECOND_MAX = 1000000000;
+public abstract class PcapPacket extends Packet {
 
-    private final @Nullable Packet fChildPacket;
-    private final @Nullable ByteBuffer fPayload;
+    private @Nullable Packet fChildPacket;
+    private @Nullable ByteBuffer fPayload;
 
-    private final long fTimestamp; // In microseconds
-    private final long fIncludedLength;
-    private final long fOriginalLength;
-    private final long fPacketIndex;
+    private long fTimestamp;
+    private long fIncludedLength;
+    private long fOriginalLength;
+    private long fPacketIndex;
 
     private @Nullable PcapEndpoint fSourceEndpoint;
     private @Nullable PcapEndpoint fDestinationEndpoint;
@@ -56,81 +53,13 @@ public class PcapPacket extends Packet {
     private @Nullable Map<String, String> fFields;
 
     /**
-     * Constructor of the Pcap Packet class.
+     * Constructor of the Pcap and PcapNg Packet class.
      *
      * @param file
      *            The file that contains this packet.
-     * @param parent
-     *            The parent packet of this packet (the encapsulating packet).
-     * @param header
-     *            The header of the packet.
-     * @param payload
-     *            The payload of this packet.
-     * @param index
-     *            The index of the packet in the file.
-     * @throws BadPacketException
-     *             Thrown when the Packet is erroneous.
      */
-    public PcapPacket(PcapFile file, @Nullable Packet parent, ByteBuffer header, @Nullable ByteBuffer payload, long index) throws BadPacketException {
-        super(file, parent, PcapProtocol.PCAP);
-
-        if (header.array().length < PcapFileValues.PACKET_HEADER_SIZE) {
-            fChildPacket = null;
-            throw new BadPacketException("The Pcap packet header is too small."); //$NON-NLS-1$
-        }
-
-        // The endpoints are lazy loaded. They are defined in the get*Endpoint()
-        // methods.
-        fSourceEndpoint = null;
-        fDestinationEndpoint = null;
-
-        fFields = null;
-
-        fPacketIndex = index;
-
-        // PcapPacket header in File endian
-        header.order(getPcapFile().getByteOrder());
-        header.position(0);
-        long timestampMostSignificant = ConversionHelper.unsignedIntToLong(header.getInt());
-        long timestampLeastSignificant = ConversionHelper.unsignedIntToLong(header.getInt());
-
-        switch (getTimestampScale()) {
-        case MICROSECOND:
-            if (timestampLeastSignificant > TIMESTAMP_MICROSECOND_MAX) {
-                fChildPacket = null;
-                throw new BadPacketException("The timestamp is erroneous."); //$NON-NLS-1$
-            }
-            fTimestamp = TIMESTAMP_MICROSECOND_MAX * timestampMostSignificant + timestampLeastSignificant;
-            break;
-        case NANOSECOND:
-            if (timestampLeastSignificant > TIMESTAMP_NANOSECOND_MAX) {
-                fChildPacket = null;
-                throw new BadPacketException("The timestamp is erroneous."); //$NON-NLS-1$
-            }
-            fTimestamp = TIMESTAMP_NANOSECOND_MAX * timestampMostSignificant + timestampLeastSignificant;
-            break;
-        default:
-            throw new IllegalArgumentException("The timestamp precision is not valid!"); //$NON-NLS-1$
-        }
-
-        fIncludedLength = ConversionHelper.unsignedIntToLong(header.getInt());
-        fOriginalLength = ConversionHelper.unsignedIntToLong(header.getInt());
-
-        // Set up payload
-        final ByteBuffer pcapPacket = payload;
-        if (pcapPacket == null) {
-            fChildPacket = null;
-            fPayload = null;
-            return;
-        }
-
-        pcapPacket.order(ByteOrder.BIG_ENDIAN);
-        pcapPacket.position(0);
-        fPayload = pcapPacket;
-
-        // Find Child Packet
-        fChildPacket = findChildPacket();
-
+    public PcapPacket(PcapFile file) {
+        super(file, null, PcapProtocol.PCAP);
     }
 
     @Override
@@ -138,9 +67,32 @@ public class PcapPacket extends Packet {
         return fChildPacket;
     }
 
+    /**
+     * Setter method that stores the child packet
+     *
+     * @param childPacket
+     *            The child of packet
+     */
+    public void setChildPacket(@Nullable Packet childPacket) {
+        fChildPacket = childPacket;
+    }
+
     @Override
     public @Nullable ByteBuffer getPayload() {
+        if (fPayload != null) {
+            fPayload.position(0);
+        }
         return fPayload;
+    }
+
+    /**
+     * Setter method that stores the packet payload data
+     *
+     * @param payLoad
+     *            The packet payload data
+     */
+    public void setPayload(ByteBuffer payLoad) {
+        fPayload = payLoad;
     }
 
     /**
@@ -154,6 +106,16 @@ public class PcapPacket extends Packet {
     }
 
     /**
+     * Setter method that stores the packet timestamp
+     *
+     * @param timeStamp
+     *            The packet timestamp
+     */
+    public void setTimeStamp(long timeStamp) {
+        fTimestamp = timeStamp;
+    }
+
+    /**
      * Getter method that returns the length in bytes of the packet that was
      * included in the {@link PcapFile}.
      *
@@ -164,12 +126,32 @@ public class PcapPacket extends Packet {
     }
 
     /**
+     * Setter method that stores the packet included length
+     *
+     * @param includedLength
+     *            The packet included length
+     */
+    public void setIncludedLength(long includedLength) {
+        fIncludedLength = includedLength;
+    }
+
+    /**
      * Getter method that returns the original length in bytes of the packet.
      *
      * @return The included length of the packet.
      */
     public long getOriginalLength() {
         return fOriginalLength;
+    }
+
+    /**
+     * Setter method that stores the packet original length
+     *
+     * @param originalLength
+     *            The packet original length
+     */
+    public void setOriginalLength(long originalLength) {
+        fOriginalLength = originalLength;
     }
 
     /**
@@ -188,6 +170,16 @@ public class PcapPacket extends Packet {
      */
     public long getIndex() {
         return fPacketIndex;
+    }
+
+    /**
+     * Setter method that stores the packet index
+     *
+     * @param packetIndex
+     *            The packet index
+     */
+    public void setIndex(long packetIndex) {
+        fPacketIndex = packetIndex;
     }
 
     @Override
@@ -212,16 +204,16 @@ public class PcapPacket extends Packet {
      */
     @Override
     protected @Nullable Packet findChildPacket() throws BadPacketException {
-        @Nullable
-        ByteBuffer payload = fPayload;
+        @Nullable ByteBuffer payload = fPayload;
         if (payload == null) {
             return null;
         }
 
-        switch ((int) getPcapFile().getDataLinkType()) {
+        // The link type
+        switch ((int) getDataLinkType()) {
         case LinkTypeHelper.LINKTYPE_ETHERNET:
             return new EthernetIIPacket(getPcapFile(), this, payload);
-        default: // TODO add more protocols
+        default:
             return new UnknownPacket(getPcapFile(), this, payload);
         }
     }
@@ -299,11 +291,8 @@ public class PcapPacket extends Packet {
         result = prime * result + (int) (fOriginalLength ^ (fOriginalLength >>> 32));
         result = prime * result + (int) (fPacketIndex ^ (fPacketIndex >>> 32));
 
-        ByteBuffer payload = fPayload;
-        if (payload == null) {
-            result = prime * result;
-        } else {
-            result = prime * result + payload.hashCode();
+        if (child == null) {
+            result = prime * result + payloadHashCode(fPayload);
         }
 
         result = prime * result + (int) (fTimestamp ^ (fTimestamp >>> 32));
@@ -334,7 +323,7 @@ public class PcapPacket extends Packet {
         if (fPacketIndex != other.fPacketIndex) {
             return false;
         }
-        if (!Objects.equals(fPayload, other.fPayload)) {
+        if (fChildPacket == null && !payloadEquals(fPayload, other.fPayload)) {
             return false;
         }
         return (fTimestamp == other.fTimestamp);
@@ -348,4 +337,12 @@ public class PcapPacket extends Packet {
     public PcapTimestampScale getTimestampScale() {
         return getPcapFile().getTimestampPrecision();
     }
+
+    /**
+     * Getter method for the data link type of the packet. This parameter is
+     * used to determine higher-level protocols (Ethernet, WLAN, SLL).
+     *
+     * @return The data link type of the packet.
+     */
+    public abstract long getDataLinkType();
 }

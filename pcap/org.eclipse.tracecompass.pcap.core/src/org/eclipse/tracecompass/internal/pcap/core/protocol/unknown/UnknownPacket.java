@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,10 +12,9 @@
 
 package org.eclipse.tracecompass.internal.pcap.core.protocol.unknown;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
@@ -90,7 +89,7 @@ public class UnknownPacket extends Packet {
 
     @Override
     public String toString() {
-        byte[] array = checkNotNull(fPayload.array());
+        byte[] array = Arrays.copyOfRange(fPayload.array(), fPayload.arrayOffset(), fPayload.arrayOffset() + fPayload.limit());
         String string = "Payload: " + ConversionHelper.bytesToHex(array, true); //$NON-NLS-1$
         final Packet child = fChildPacket;
         if (child != null) {
@@ -133,7 +132,7 @@ public class UnknownPacket extends Packet {
     public Map<String, String> getFields() {
         Map<String, String> map = fFields;
         if (map == null) {
-            byte[] array = checkNotNull(fPayload.array());
+            byte[] array = Arrays.copyOfRange(fPayload.array(), fPayload.arrayOffset(), fPayload.arrayOffset() + fPayload.limit());
 
             Builder<String, String> builder = ImmutableMap.<@NonNull String, @NonNull String> builder()
                     .put("Binary", ConversionHelper.bytesToHex(array, true)); //$NON-NLS-1$
@@ -151,12 +150,12 @@ public class UnknownPacket extends Packet {
 
     @Override
     public String getLocalSummaryString() {
-        return "Len: " + fPayload.array().length + " bytes"; //$NON-NLS-1$ //$NON-NLS-2$
+        return "Len: " + fPayload.limit() + " bytes"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override
     protected String getSignificationString() {
-        return "Data: " + fPayload.array().length + " bytes"; //$NON-NLS-1$ //$NON-NLS-2$
+        return "Data: " + fPayload.limit() + " bytes"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override
@@ -176,7 +175,9 @@ public class UnknownPacket extends Packet {
         if (child != null) {
             result += child.hashCode();
         }
-        result = prime * result + fPayload.hashCode();
+        if (child == null) {
+            result = prime * result + payloadHashCode(fPayload);
+        }
         return result;
     }
 
@@ -195,7 +196,10 @@ public class UnknownPacket extends Packet {
         if (!Objects.equals(fChildPacket, other.fChildPacket)) {
             return false;
         }
-        return (fPayload.equals(other.fPayload));
+        if (fChildPacket == null && !payloadEquals(fPayload, other.fPayload)) {
+            return false;
+        }
+        return true;
     }
 
 }
