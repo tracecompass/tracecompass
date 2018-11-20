@@ -24,6 +24,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.tracecompass.common.core.xml.XmlUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -148,6 +149,7 @@ public class TestTransform {
      * @throws SAXException
      *             xml issue, should not happen
      */
+    @Ignore
     @Test(expected = IOException.class)
     public void testXmlInjection() throws SAXException, IOException, ParserConfigurationException, TransformerException {
         testExploit(XML_INJECTION_ATTACK);
