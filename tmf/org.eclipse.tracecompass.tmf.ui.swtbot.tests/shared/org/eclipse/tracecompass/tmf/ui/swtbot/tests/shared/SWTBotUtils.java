@@ -210,6 +210,8 @@ public final class SWTBotUtils {
             return;
         }
 
+        focusMainWindow(bot.shells());
+
         final SWTBotView projectViewBot = bot.viewById(IPageLayout.ID_PROJECT_EXPLORER);
         projectViewBot.setFocus();
 
