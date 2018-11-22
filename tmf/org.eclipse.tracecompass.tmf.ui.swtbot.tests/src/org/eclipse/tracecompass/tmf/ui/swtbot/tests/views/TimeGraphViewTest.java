@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
@@ -138,6 +139,8 @@ public class TimeGraphViewTest {
 
     private Rectangle fBounds;
 
+    private SWTWorkbenchBot fBot;
+
     private final ICondition fTimeGraphIsDirty = new ConditionHelper() {
 
         @Override
@@ -172,13 +175,13 @@ public class TimeGraphViewTest {
      */
     @Before
     public void before() throws TmfTraceException {
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        bot.closeAllEditors();
-        for (SWTBotView viewBot : bot.views()) {
+        fBot = new SWTWorkbenchBot();
+        fBot.closeAllEditors();
+        for (SWTBotView viewBot : fBot.views()) {
             viewBot.close();
         }
         SWTBotUtils.openView(TimeGraphViewStub.ID);
-        fViewBot = bot.viewById(TimeGraphViewStub.ID);
+        fViewBot = fBot.viewById(TimeGraphViewStub.ID);
 
         fViewBot.show();
         fTrace = new TmfTraceStub() {
@@ -209,12 +212,12 @@ public class TimeGraphViewTest {
         // Wait for trace to be loaded
         fViewBot.bot().waitUntil(new TgConditionHelper(t -> tgBot.getEntries().length >= 2));
 
-        resetTimeRange(bot);
+        resetTimeRange();
         // Make sure the thumb is over 1 in size
-        bot.waitUntil(new TgConditionHelper(t -> fViewBot.bot().slider().getThumb() > 1));
+        fBot.waitUntil(new TgConditionHelper(t -> fViewBot.bot().slider().getThumb() > 1));
     }
 
-    private void resetTimeRange(SWTWorkbenchBot bot) {
+    private void resetTimeRange() {
         TmfTimeRange fullTimeRange = fTrace.getTimeRange();
         TmfTimeRange smallerRange = new TmfTimeRange(TmfTimestamp.fromNanos(20), TmfTimestamp.fromNanos(100));
         TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, smallerRange);
@@ -228,7 +231,7 @@ public class TimeGraphViewTest {
         //
         // Workflow: it should always fail at first and then a signal is sent.
         // it will either time out or work.
-        bot.waitUntil(new TgConditionHelper(t -> {
+        fBot.waitUntil(new TgConditionHelper(t -> {
             if (smallerRange.equals(view.getWindowRange())) {
                 return true;
             }
@@ -236,7 +239,7 @@ public class TimeGraphViewTest {
             return false;
         }));
         // same as above: re-run as much as you need.
-        bot.waitUntil(new TgConditionHelper(t -> {
+        fBot.waitUntil(new TgConditionHelper(t -> {
             if (fullTimeRange.equals(view.getWindowRange())) {
                 return true;
             }
@@ -273,8 +276,7 @@ public class TimeGraphViewTest {
 
         // reset all
         fViewBot.toolbarButton(SHOW_LEGEND).click();
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        SWTBotShell legendShell = bot.shell(LEGEND_NAME);
+        SWTBotShell legendShell = fBot.shell(LEGEND_NAME);
         SWTBot legendBot = legendShell.bot();
 
         for (int i = 0; i < StubPresentationProvider.STATES.length; i++) {
@@ -284,9 +286,9 @@ public class TimeGraphViewTest {
         TmfTraceStub trace = fTrace;
         assertNotNull(trace);
         TmfSignalManager.dispatchSignal(new TmfTraceClosedSignal(this, trace));
-        bot.waitUntil(Conditions.shellCloses(legendShell));
+        fBot.waitUntil(Conditions.shellCloses(legendShell));
         fViewBot.close();
-        bot.waitUntil(ConditionHelpers.ViewIsClosed(fViewBot));
+        fBot.waitUntil(ConditionHelpers.ViewIsClosed(fViewBot));
         fTrace.dispose();
     }
 
@@ -310,8 +312,7 @@ public class TimeGraphViewTest {
      */
     @Test
     public void testLegendArrow() {
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        resetTimeRange(bot);
+        resetTimeRange();
         Rectangle bounds = fBounds;
 
         ImageHelper ref = ImageHelper.grabImage(bounds);
@@ -319,13 +320,13 @@ public class TimeGraphViewTest {
         // Set the widths to 0.25
 
         fViewBot.toolbarButton(SHOW_LEGEND).click();
-        SWTBotShell legendShell = bot.shell(LEGEND_NAME);
+        SWTBotShell legendShell = fBot.shell(LEGEND_NAME);
         legendShell.activate();
         SWTBot legendBot = legendShell.bot();
         legendBot.scale(5).setValue(100);
         legendShell.bot().button(OK_BUTTON).click();
-        bot.waitUntil(Conditions.shellCloses(legendShell));
-        resetTimeRange(bot);
+        fBot.waitUntil(Conditions.shellCloses(legendShell));
+        resetTimeRange();
 
         // Take another picture
         ImageHelper thick = ImageHelper.waitForNewImage(bounds, ref);
@@ -337,12 +338,12 @@ public class TimeGraphViewTest {
 
         // reset all
         fViewBot.toolbarButton(SHOW_LEGEND).click();
-        legendShell = bot.shell(LEGEND_NAME);
+        legendShell = fBot.shell(LEGEND_NAME);
         legendBot = legendShell.bot();
         legendBot.button(5).click();
         legendBot.button(OK_BUTTON).click();
-        bot.waitUntil(Conditions.shellCloses(legendShell));
-        resetTimeRange(bot);
+        fBot.waitUntil(Conditions.shellCloses(legendShell));
+        resetTimeRange();
 
         // take a third picture
         ImageHelper reset = ImageHelper.waitForNewImage(bounds, thick);
@@ -357,8 +358,7 @@ public class TimeGraphViewTest {
      */
     @Test
     public void testEventStyling() {
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        resetTimeRange(bot);
+        resetTimeRange();
         Rectangle bounds = fBounds;
         ImageHelper precollapse = ImageHelper.grabImage(bounds);
         SWTBotTimeGraph tg = new SWTBotTimeGraph(fViewBot.bot());
@@ -392,8 +392,7 @@ public class TimeGraphViewTest {
      */
     @Test
     public void testLegend() {
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        resetTimeRange(bot);
+        resetTimeRange();
         Rectangle bounds = fBounds;
 
         ImageHelper ref = ImageHelper.grabImage(bounds);
@@ -401,13 +400,13 @@ public class TimeGraphViewTest {
         // Set the widths to 0.25
 
         fViewBot.toolbarButton(SHOW_LEGEND).click();
-        SWTBotShell legendShell = bot.shell(LEGEND_NAME);
+        SWTBotShell legendShell = fBot.shell(LEGEND_NAME);
         legendShell.activate();
         SWTBot legendBot = legendShell.bot();
         legendBot.scale(2).setValue(25);
         legendShell.bot().button(OK_BUTTON).click();
-        bot.waitUntil(Conditions.shellCloses(legendShell));
-        resetTimeRange(bot);
+        fBot.waitUntil(Conditions.shellCloses(legendShell));
+        resetTimeRange();
 
         // Take another picture
         ImageHelper skinny = ImageHelper.waitForNewImage(bounds, ref);
@@ -419,12 +418,12 @@ public class TimeGraphViewTest {
 
         // reset all
         fViewBot.toolbarButton(SHOW_LEGEND).click();
-        legendShell = bot.shell(LEGEND_NAME);
+        legendShell = fBot.shell(LEGEND_NAME);
         legendBot = legendShell.bot();
         legendBot.button(2).click();
         legendBot.button(OK_BUTTON).click();
-        bot.waitUntil(Conditions.shellCloses(legendShell));
-        resetTimeRange(bot);
+        fBot.waitUntil(Conditions.shellCloses(legendShell));
+        resetTimeRange();
 
         // take a third picture
         ImageHelper reset = ImageHelper.waitForNewImage(bounds, skinny);
@@ -448,8 +447,7 @@ public class TimeGraphViewTest {
     @Test
     public void testExport() throws IOException {
 
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        resetTimeRange(bot);
+        resetTimeRange();
         /*
          * Set up temp files
          */
@@ -464,23 +462,23 @@ public class TimeGraphViewTest {
         TmfFileDialogFactory.setOverrideFiles(ref.getAbsolutePath());
         fViewBot.viewMenu(EXPORT_MENU).click();
         ImageHelper refImage = ImageHelper.fromFile(ref);
-        bot.waitUntil(new FileWritten(ref, MIN_FILE_SIZE));
+        fBot.waitUntil(new FileWritten(ref, MIN_FILE_SIZE));
 
         /* Set the widths to skinny */
         fViewBot.toolbarButton(SHOW_LEGEND).click();
-        SWTBotShell legendShell = bot.shell(LEGEND_NAME);
+        SWTBotShell legendShell = fBot.shell(LEGEND_NAME);
         legendShell.activate();
         SWTBot legendBot = legendShell.bot();
         legendBot.scale(2).setValue(50);
         legendShell.bot().button(OK_BUTTON).click();
-        bot.waitUntil(Conditions.shellCloses(legendShell));
-        resetTimeRange(bot);
+        fBot.waitUntil(Conditions.shellCloses(legendShell));
+        resetTimeRange();
 
         /* Take another picture */
         TmfFileDialogFactory.setOverrideFiles(skinny.getAbsolutePath());
         fViewBot.viewMenu(EXPORT_MENU).click();
         ImageHelper skinnyImage = ImageHelper.fromFile(skinny);
-        bot.waitUntil(new FileWritten(skinny, MIN_FILE_SIZE));
+        fBot.waitUntil(new FileWritten(skinny, MIN_FILE_SIZE));
 
         /* Compare with the original, they should be different */
         int refCount = refImage.getHistogram().count(HAIR);
@@ -490,17 +488,17 @@ public class TimeGraphViewTest {
 
         /* reset all */
         fViewBot.toolbarButton(SHOW_LEGEND).click();
-        legendShell = bot.shell(LEGEND_NAME);
+        legendShell = fBot.shell(LEGEND_NAME);
         legendBot = legendShell.bot();
         legendBot.button(2).click();
         legendBot.button(OK_BUTTON).click();
-        bot.waitUntil(Conditions.shellCloses(legendShell));
-        resetTimeRange(bot);
+        fBot.waitUntil(Conditions.shellCloses(legendShell));
+        resetTimeRange();
 
         /* take a third picture */
         TmfFileDialogFactory.setOverrideFiles(reset.getAbsolutePath());
         fViewBot.viewMenu(EXPORT_MENU).click();
-        bot.waitUntil(new FileWritten(reset, MIN_FILE_SIZE));
+        fBot.waitUntil(new FileWritten(reset, MIN_FILE_SIZE));
         ImageHelper resetImage = ImageHelper.fromFile(reset);
 
         /* Compare with the original, they should be the same */
@@ -518,8 +516,7 @@ public class TimeGraphViewTest {
         String element = "row2";
         int totalItems = 16;
 
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        resetTimeRange(bot);
+        resetTimeRange();
         SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
         assertEquals(totalItems, getVisibleItems(timegraph));
 
@@ -533,39 +530,137 @@ public class TimeGraphViewTest {
         assertEquals(2, getVisibleItems(timegraph));
 
         timegraph.getEntry(pg).select();
-        fireKey(timegraph, '+', true);
+        fireKey(timegraph, true, '+');
         assertEquals(9, getVisibleItems(timegraph));
 
         timegraph.getEntry(pg).select();
-        fireKey(timegraph, '-', true);
+        fireKey(timegraph, true, '-');
         assertEquals(2, getVisibleItems(timegraph));
 
         timegraph.getEntry(hpc).select();
-        fireKey(timegraph, '+', true);
+        fireKey(timegraph, true, '+');
         assertEquals(9, getVisibleItems(timegraph));
         assertNotNull(timegraph.getEntry(hpc, element));
 
         timegraph.getEntry(pg).select();
-        fireKey(timegraph, '*', true);
+        fireKey(timegraph, true, '*');
         timegraph.getEntry(hpc).select();
-        fireKey(timegraph, '*', true);
+        fireKey(timegraph, true, '*');
         assertEquals(totalItems, getVisibleItems(timegraph));
         assertNotNull(timegraph.getEntry(hpc, element));
+    }
+
+    /**
+     * Test vertical zoom in and out
+     */
+    @Test
+    public void testVerticalZoom() {
+        resetTimeRange();
+        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
+        Rectangle bounds = fBounds;
+
+        ImageHelper ref = ImageHelper.grabImage(bounds);
+
+
+        fireKeyAndWait(timegraph, bounds, false, '+', SWT.CTRL);
+        fireKeyAndWait(timegraph, bounds, false, '-', SWT.CTRL);
+
+        ImageHelper bigSmall = ImageHelper.grabImage(bounds);
+
+        ImageHelper diff = ref.diff(bigSmall);
+        Multiset<RGB> histogram = diff.getHistogram();
+        assertEquals(histogram.toString(), 1, histogram.elementSet().size());
+
+        fireKeyAndWait(timegraph, bounds, false, '+', SWT.CTRL);
+        fireKeyAndWait(timegraph, bounds, false, '+', SWT.CTRL);
+
+        ImageHelper bigBig = ImageHelper.grabImage(bounds);
+        ImageHelper bigDiff = ref.diff(bigBig);
+        histogram = bigDiff.getHistogram();
+        assertTrue(histogram.toString(), histogram.elementSet().size() > 1);
+
+        fireKeyAndWait(timegraph, bounds, false, '+', SWT.CTRL);
+        fireKeyAndWait(timegraph, bounds, false, '-', SWT.CTRL);
+        fireKeyAndWait(timegraph, bounds, false, '0', SWT.CTRL);
+
+        ImageHelper bigSmallReset = ImageHelper.grabImage(bounds);
+        diff = ref.diff(bigSmallReset);
+        histogram = diff.getHistogram();
+        assertEquals(histogram.toString(), 1, histogram.elementSet().size());
+
+        fireKeyAndWait(timegraph, bounds, false, '-', SWT.CTRL);
+        fireKeyAndWait(timegraph, bounds, false, '-', SWT.CTRL);
+
+        ImageHelper smallSmall = ImageHelper.grabImage(bounds);
+        bigDiff = ref.diff(smallSmall);
+        histogram = bigDiff.getHistogram();
+        assertTrue(histogram.toString(), histogram.elementSet().size() > 1);
+
+        fireKeyAndWait(timegraph, bounds, false, '-', SWT.CTRL);
+        fireKeyAndWait(timegraph, bounds, false, '+', SWT.CTRL);
+        fireKeyAndWait(timegraph, bounds, false, '0', SWT.CTRL);
+
+        ImageHelper smallBigReset = ImageHelper.grabImage(bounds);
+        diff = ref.diff(smallBigReset);
+        histogram = diff.getHistogram();
+        assertEquals(histogram.toString(), 1, histogram.elementSet().size());
+    }
+
+    /**
+     * Test horizontal zoom, we can see a rounding error
+     */
+    @Test
+    public void testHorizontalZoom() {
+        resetTimeRange();
+        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
+
+        TimeGraphViewStub view = getView();
+
+        assertEquals(80, getDuration(view.getWindowRange()));
+        fireKey(timegraph, false, '+');
+        assertEquals(52, getDuration(view.getWindowRange()));
+        fireKey(timegraph, false, '+');
+        assertEquals(34, getDuration(view.getWindowRange()));
+        fireKey(timegraph, false, '-');
+        assertEquals(51, getDuration(view.getWindowRange()));
+        fireKey(timegraph, false, '-');
+        assertEquals(77, getDuration(view.getWindowRange()));
 
     }
 
-    private static void fireKey(SWTBotTimeGraph timegraph, char c, boolean inNs) {
+    private static long getDuration(TmfTimeRange refRange) {
+        return refRange.getEndTime().toNanos() - refRange.getStartTime().toNanos();
+    }
+
+    // Slow but safe
+    private static void fireKeyAndWait(SWTBotTimeGraph timegraph, Rectangle bounds, boolean inNameSpace, char c, int... modifiers) {
+        ImageHelper ref = ImageHelper.grabImage(bounds);
+        fireKey(timegraph, inNameSpace, c, modifiers);
+        ImageHelper.waitForNewImage(bounds, ref);
+    }
+
+    private static void fireKey(SWTBotTimeGraph timegraph, boolean inNameSpace, char c, int... modifiers) {
         Event event = new Event();
         event.widget = timegraph.widget;
         event.character = c;
         event.doit = true;
         UIThreadRunnable.syncExec(() -> {
-            resetMousePosition(timegraph, inNs, new MouseEvent(event));
-            timegraph.widget.keyPressed(new KeyEvent(event));
+            event.display = Display.getCurrent();
+            resetMousePosition(timegraph, inNameSpace, new MouseEvent(event));
+            KeyEvent e = new KeyEvent(event);
+            for (int modifier : modifiers) {
+                e.stateMask |= modifier;
+            }
+            timegraph.widget.keyPressed(e);
         });
         UIThreadRunnable.syncExec(() -> {
-            resetMousePosition(timegraph, inNs, new MouseEvent(event));
-            timegraph.widget.keyReleased(new KeyEvent(event));
+            event.display = Display.getCurrent();
+            resetMousePosition(timegraph, inNameSpace, new MouseEvent(event));
+            KeyEvent e = new KeyEvent(event);
+            for (int modifier : modifiers) {
+                e.stateMask |= modifier;
+            }
+            timegraph.widget.keyReleased(e);
         });
 
     }
@@ -621,8 +716,7 @@ public class TimeGraphViewTest {
     @Ignore
     @Test
     public void testPalettes() {
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        resetTimeRange(bot);
+        resetTimeRange();
         TimeGraphViewStub view = getView();
         Rectangle bounds = fBounds;
         IPaletteProvider paletteBlue = SequentialPaletteProvider.create(new RGBAColor(0x23, 0x67, 0xf3, 0xff), 5);
@@ -661,8 +755,8 @@ public class TimeGraphViewTest {
      */
     @Test
     public void testTimegraphEventFiltering() {
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        resetTimeRange(bot);
+        SWTWorkbenchBot bot = fBot;
+        resetTimeRange();
 
         SWTBot viewBot = fViewBot.bot();
         SWTBotTimeGraph timegraph = new SWTBotTimeGraph(viewBot);
