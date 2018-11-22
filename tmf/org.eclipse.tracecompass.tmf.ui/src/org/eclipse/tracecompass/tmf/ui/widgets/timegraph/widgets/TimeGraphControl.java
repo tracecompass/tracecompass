@@ -422,7 +422,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @since 2.3
      */
     public void setColumns(String[] columnNames) {
-        for (TreeColumn column : fTree.getColumns()) {
+        Tree tree = getTree();
+        for (TreeColumn column : tree.getColumns()) {
             column.dispose();
         }
         ControlListener controlListener = new ControlListener() {
@@ -440,7 +441,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
         };
         for (String columnName : columnNames) {
-            TreeColumn column = new TreeColumn(fTree, SWT.LEFT);
+            TreeColumn column = new TreeColumn(tree, SWT.LEFT);
             column.setMoveable(true);
             column.setText(columnName);
             column.pack();
@@ -2533,10 +2534,11 @@ public class TimeGraphControl extends TimeGraphBaseControl
         String name = fLabelProvider == null ? item.fName : fLabelProvider.getColumnText(item.fEntry, 0);
         Rectangle rect = Utils.clone(bounds);
         rect.y += (bounds.height - gc.stringExtent(name).y) / 2;
-        TreeColumn[] columns = fTree.getColumns();
+        Tree tree = getTree();
+        TreeColumn[] columns = tree.getColumns();
         int idealNameSpace = 0;
         for (int i = 0; i < columns.length; i++) {
-            int columnIndex = fTree.getColumnOrder()[i];
+            int columnIndex = tree.getColumnOrder()[i];
             TreeColumn column = columns[columnIndex];
             rect.width = column.getWidth();
             gc.setClipping(rect.x, bounds.y, Math.min(rect.width, bounds.x + bounds.width - rect.x - SNAP_WIDTH), bounds.height);
