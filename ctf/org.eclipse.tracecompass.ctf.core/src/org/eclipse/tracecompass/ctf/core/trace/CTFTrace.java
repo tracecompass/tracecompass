@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson, Ecole Polytechnique de Montreal and others
+ * Copyright (c) 2011, 2018 Ericsson, Ecole Polytechnique de Montreal and others
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -204,6 +204,9 @@ public class CTFTrace implements IDefinitionScope {
 
         /* List files not called metadata and not hidden. */
         File[] files = path.listFiles(METADATA_FILE_FILTER);
+        if (files == null) {
+            throw new CTFException("Trace (" + path.getPath() + ") cannot be read. Deleted or moved?"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
         Arrays.sort(files, METADATA_COMPARATOR);
 
         /* Try to open each file */
