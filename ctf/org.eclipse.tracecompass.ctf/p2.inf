@@ -1,5 +1,3 @@
 instructions.configure=\
 org.eclipse.equinox.p2.touchpoint.eclipse.addRepository(location:http${#58}//download.eclipse.org/tracecompass/master/repository,type:0,name:Trace Compass,enabled:false); \
 org.eclipse.equinox.p2.touchpoint.eclipse.addRepository(location:http${#58}//download.eclipse.org/tracecompass/master/repository,type:1,name:Trace Compass,enabled:false);
-
-update.matchExp=providedCapabilities.exists(pc | pc.namespace == 'org.eclipse.equinox.p2.iu' && (pc.name == 'org.eclipse.linuxtools.ctf.feature.group' || pc.name == 'org.eclipse.tracecompass.ctf.feature.group'))
