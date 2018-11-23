@@ -197,14 +197,18 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
 
     @Override
     protected @Nullable List<@NonNull ITimeEvent> getEventList(@NonNull TimeGraphEntry entry, long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor) {
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            return Collections.emptyList();
+        }
         List<@NonNull ITimeEvent> references = fEvents.get(entry.getName());
         List<@NonNull ITimeEvent> ret = new ArrayList<>();
         if (references != null) {
             for (ITimeEvent ref : references) {
                 if (ref instanceof NullTimeEvent) {
-                    ret.add(new NullTimeEvent(ref.getEntry(), ref.getTime() + getTrace().getStartTime().toNanos(), ref.getDuration()));
+                    ret.add(new NullTimeEvent(ref.getEntry(), ref.getTime() + trace.getStartTime().toNanos(), ref.getDuration()));
                 } else if (ref instanceof TimeEvent) {
-                    ret.add(new TimeEvent(ref.getEntry(), ref.getTime() + getTrace().getStartTime().toNanos(), ref.getDuration(), ((TimeEvent) ref).getValue()));
+                    ret.add(new TimeEvent(ref.getEntry(), ref.getTime() + trace.getStartTime().toNanos(), ref.getDuration(), ((TimeEvent) ref).getValue()));
                 }
             }
         }
