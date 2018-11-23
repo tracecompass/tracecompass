@@ -541,6 +541,16 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
                 if (headerHeight > 0) {
                     fTree.removePaintListener(this);
                     setHeaderHeight(headerHeight);
+                    /*
+                     * The +1 is a workaround for trees having issues displaying
+                     * headers when they have no items, no scroll bars and no
+                     * non-header area to display in. Affects GTK 3.18-3.22.
+                     *
+                     * See bug: 541427
+                     *
+                     * The setHeaderHeight can be explained by the block above.
+                     */
+                    setHeaderHeight(headerHeight + 1);
                 }
             }
         });
