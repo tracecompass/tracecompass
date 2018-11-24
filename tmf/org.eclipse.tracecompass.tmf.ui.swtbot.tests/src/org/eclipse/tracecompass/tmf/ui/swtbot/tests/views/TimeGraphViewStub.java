@@ -239,7 +239,13 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
         long start = trace.getStartTime().toNanos();
         return Arrays.<IMarkerEvent> asList(
                 (IMarkerEvent) new MarkerEvent(fHead1, 120 + start, 50, MARKER_GROUP, new RGBA(33, 33, 33, 33), "Wind", true),
-                (IMarkerEvent) new MarkerEvent(fRow4, 20 + start, 60, MARKER_GROUP, new RGBA(22, 33, 44, 22), "Speed", false));
+                (IMarkerEvent) new MarkerEvent(fRow4, 20 + start, 60, MARKER_GROUP, new RGBA(22, 33, 44, 22), "Speed", false),
+                (IMarkerEvent) new MarkerEvent(fRow2, 20 + start, 0, MARKER_GROUP, new RGBA(22, 33, 44, 22), "", false, 0),
+                (IMarkerEvent) new MarkerEvent(fRow2, 26 + start, 0, MARKER_GROUP, new RGBA(22, 33, 44, 22), "", false, 1),
+                (IMarkerEvent) new MarkerEvent(fRow2, 32 + start, 0, MARKER_GROUP, new RGBA(22, 33, 44, 22), "", false, 2),
+                (IMarkerEvent) new MarkerEvent(fRow2, 38 + start, 0, MARKER_GROUP, new RGBA(22, 33, 44, 22), "", false, 3),
+                (IMarkerEvent) new MarkerEvent(fRow2, 44 + start, 0, MARKER_GROUP, new RGBA(22, 33, 44, 22), "", false, 4),
+                (IMarkerEvent) new MarkerEvent(fRow2, 50 + start, 0, MARKER_GROUP, new RGBA(22, 33, 44, 22), "", false, 5));
     }
 
     /**
