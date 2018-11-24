@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.views;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -17,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
@@ -556,11 +558,11 @@ public class TimeGraphViewTest {
     @Test
     public void testVerticalZoom() {
         resetTimeRange();
+        int threshold = 10;
         SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
         Rectangle bounds = fBounds;
 
         ImageHelper ref = ImageHelper.grabImage(bounds);
-
 
         fireKeyAndWait(timegraph, bounds, false, '+', SWT.CTRL);
         fireKeyAndWait(timegraph, bounds, false, '-', SWT.CTRL);
@@ -568,16 +570,16 @@ public class TimeGraphViewTest {
         ImageHelper bigSmall = ImageHelper.grabImage(bounds);
 
         ImageHelper diff = ref.diff(bigSmall);
-        Multiset<RGB> histogram = diff.getHistogram();
-        assertEquals(histogram.toString(), 1, histogram.elementSet().size());
+        List<RGB> colors = filter(diff.getHistogram(), threshold);
+        assertEquals(colors.toString(), 1, colors.size());
 
         fireKeyAndWait(timegraph, bounds, false, '+', SWT.CTRL);
         fireKeyAndWait(timegraph, bounds, false, '+', SWT.CTRL);
 
         ImageHelper bigBig = ImageHelper.grabImage(bounds);
-        ImageHelper bigDiff = ref.diff(bigBig);
-        histogram = bigDiff.getHistogram();
-        assertTrue(histogram.toString(), histogram.elementSet().size() > 1);
+        diff = ref.diff(bigBig);
+        colors = filter(diff.getHistogram(), threshold);
+        assertNotEquals(colors.toString(), 1, colors.size());
 
         fireKeyAndWait(timegraph, bounds, false, '+', SWT.CTRL);
         fireKeyAndWait(timegraph, bounds, false, '-', SWT.CTRL);
@@ -585,16 +587,16 @@ public class TimeGraphViewTest {
 
         ImageHelper bigSmallReset = ImageHelper.grabImage(bounds);
         diff = ref.diff(bigSmallReset);
-        histogram = diff.getHistogram();
-        assertEquals(histogram.toString(), 1, histogram.elementSet().size());
+        colors = filter(diff.getHistogram(), threshold);
+        assertEquals(colors.toString(), 1, colors.size());
 
         fireKeyAndWait(timegraph, bounds, false, '-', SWT.CTRL);
         fireKeyAndWait(timegraph, bounds, false, '-', SWT.CTRL);
 
         ImageHelper smallSmall = ImageHelper.grabImage(bounds);
-        bigDiff = ref.diff(smallSmall);
-        histogram = bigDiff.getHistogram();
-        assertTrue(histogram.toString(), histogram.elementSet().size() > 1);
+        diff = ref.diff(smallSmall);
+        colors = filter(diff.getHistogram(), threshold);
+        assertNotEquals(colors.toString(), 1, colors.size());
 
         fireKeyAndWait(timegraph, bounds, false, '-', SWT.CTRL);
         fireKeyAndWait(timegraph, bounds, false, '+', SWT.CTRL);
@@ -602,8 +604,12 @@ public class TimeGraphViewTest {
 
         ImageHelper smallBigReset = ImageHelper.grabImage(bounds);
         diff = ref.diff(smallBigReset);
-        histogram = diff.getHistogram();
-        assertEquals(histogram.toString(), 1, histogram.elementSet().size());
+        colors = filter(diff.getHistogram(), threshold);
+        assertEquals(colors.toString(), 1, colors.size());
+    }
+
+    private static List<RGB> filter(Multiset<RGB> histogram, int threshold) {
+        return histogram.elementSet().stream().filter(e -> histogram.count(e) > threshold).collect(Collectors.toList());
     }
 
     /**
@@ -628,21 +634,87 @@ public class TimeGraphViewTest {
 
     }
 
+    /**
+     * Test name space navigation using the keyboard.
+     */
+    @Test
+    public void testKeyboardNamespaceNavigation() {
+        String pg = "Plumber guy";
+        resetTimeRange();
+        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
+        timegraph.getEntry(pg).select();
+        fireKey(timegraph, true, SWT.ARROW_DOWN);
+        assertEquals("[Hat1]", timegraph.selection().get(0).toString());
+        fireKey(timegraph, true, SWT.ARROW_DOWN);
+        assertEquals("[Hat2]", timegraph.selection().get(0).toString());
+        fireKey(timegraph, true, SWT.ARROW_DOWN);
+        assertEquals("[Head1]", timegraph.selection().get(0).toString());
+        fireKey(timegraph, true, SWT.ARROW_UP);
+        assertEquals("[Hat2]", timegraph.selection().get(0).toString());
+        fireKey(timegraph, true, SWT.ARROW_DOWN);
+        assertEquals("[Head1]", timegraph.selection().get(0).toString());
+        fireKey(timegraph, true, SWT.HOME);
+        assertEquals('[' + pg + ']', timegraph.selection().get(0).toString());
+        fireKey(timegraph, true, SWT.PAGE_DOWN);
+        assertNotEquals('[' + pg + ']', timegraph.selection().get(0).toString());
+        fireKey(timegraph, true, SWT.PAGE_UP);
+        assertEquals('[' + pg + ']', timegraph.selection().get(0).toString());
+        fireKey(timegraph, true, SWT.END);
+        assertEquals("[row7]", timegraph.selection().get(0).toString());
+        fireKey(timegraph, true, SWT.HOME);
+        assertEquals('[' + pg + ']', timegraph.selection().get(0).toString());
+    }
+
+    /**
+     * Test the enter key, which toggles expand/collapse.
+     */
+    @Test
+    public void testCollapseExpandUsingEnter() {
+        String pg = "Plumber guy";
+        resetTimeRange();
+        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
+        assertEquals(0, timegraph.selection().columnCount());
+        timegraph.getEntry(pg).select();
+
+        assertEquals(1, timegraph.selection().columnCount());
+        assertEquals(16, getVisibleItems(timegraph));
+
+        fireKey(timegraph, true, SWT.CR);
+        assertEquals(1, timegraph.selection().columnCount());
+        assertEquals('[' + pg + ']', timegraph.selection().get(0).toString());
+        assertEquals(9, getVisibleItems(timegraph));
+
+        fireKey(timegraph, true, SWT.CR);
+        assertEquals(1, timegraph.selection().columnCount());
+        assertEquals('[' + pg + ']', timegraph.selection().get(0).toString());
+        assertEquals(16, getVisibleItems(timegraph));
+
+        timegraph.getEntry(pg, "Hat1").select();
+        fireKey(timegraph,  true, SWT.CR);
+        assertEquals(1, timegraph.selection().columnCount());
+        assertEquals("[Hat1]", timegraph.selection().get(0).toString());
+        assertEquals(16, getVisibleItems(timegraph));
+    }
+
     private static long getDuration(TmfTimeRange refRange) {
         return refRange.getEndTime().toNanos() - refRange.getStartTime().toNanos();
     }
 
     // Slow but safe
-    private static void fireKeyAndWait(SWTBotTimeGraph timegraph, Rectangle bounds, boolean inNameSpace, char c, int... modifiers) {
+    private static void fireKeyAndWait(SWTBotTimeGraph timegraph, Rectangle bounds, boolean inNameSpace, int c, int... modifiers) {
         ImageHelper ref = ImageHelper.grabImage(bounds);
         fireKey(timegraph, inNameSpace, c, modifiers);
         ImageHelper.waitForNewImage(bounds, ref);
     }
 
-    private static void fireKey(SWTBotTimeGraph timegraph, boolean inNameSpace, char c, int... modifiers) {
+    private static void fireKey(SWTBotTimeGraph timegraph, boolean inNameSpace, int c, int... modifiers) {
         Event event = new Event();
         event.widget = timegraph.widget;
-        event.character = c;
+        if ((c & SWT.KEYCODE_BIT) == 0 && c != SWT.CR) {
+            event.character = (char) c;
+        } else {
+            event.keyCode = c;
+        }
         event.doit = true;
         UIThreadRunnable.syncExec(() -> {
             event.display = Display.getCurrent();
