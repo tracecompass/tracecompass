@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016 Ericsson
+ * Copyright (c) 2015, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -93,6 +93,9 @@ public class LostEventsMarkerEventSource implements IMarkerEventSource {
                 long nextStartTime = ss.querySingleState(end, lostEventsQuark).getEndTime() + 1;
                 end = Math.min(nextStartTime, ss.getCurrentEndTime());
                 List<ITmfStateInterval> intervals = StateSystemUtils.queryHistoryRange(ss, lostEventsQuark, start, end, resolution, monitor);
+                if (monitor.isCanceled()) {
+                    return Collections.emptyList();
+                }
                 for (ITmfStateInterval interval : intervals) {
                     if (interval.getStateValue().isNull()) {
                         continue;
