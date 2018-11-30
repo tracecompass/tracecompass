@@ -447,7 +447,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                                 }
                             }
                             if (!deletedTraces.isEmpty() || !changedTraces.isEmpty()) {
-                                Job.createSystem(monitor -> {
+                                Job.createSystem("TmfProjectRegistry.resourceChanged Job", monitor -> { //$NON-NLS-1$
                                     try {
                                         if (!deletedTraces.isEmpty()) {
                                             Display.getDefault().syncExec(() -> {
@@ -645,7 +645,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
          * Delete supplementary resources as an atomic workspace operation. To ensure no
          * dialog is shown to the user, run it in a job outside of the UI thread.
          */
-        Job.createSystem(monitor -> {
+        Job.createSystem("TmfProjectRegistry.deleteSupplementaryResources Job", monitor -> { //$NON-NLS-1$
             try {
                 ResourcesPlugin.getWorkspace().run((ICoreRunnable) (mon -> {
                     trace.deleteSupplementaryResources();
@@ -666,7 +666,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
     }
 
     private static void handleParentProjectOpen(IProject project) {
-        Job job = Job.createSystem(monitor -> {
+        Job job = Job.createSystem("TmfProjectRegistry.handleParentProjectOpen Job", monitor -> { //$NON-NLS-1$
             IProject shadowProject = TmfProjectModelHelper.getShadowProject(project);
             if (shadowProject != null && shadowProject.exists() && !shadowProject.isOpen()) {
                 try {
@@ -681,7 +681,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
     }
 
     private static void handleParentProjectRefresh(IProject project) {
-        Job job = Job.createSystem(monitor -> {
+        Job job = Job.createSystem("TmfProjectRegistry.handleParentProjectRefresh Job", monitor -> { //$NON-NLS-1$
             IWorkspace workspace = ResourcesPlugin.getWorkspace();
             IProject shadowProject = workspace.getRoot().getProject(TmfProjectModelHelper.getShadowProjectName(project.getName()));
             if (shadowProject.exists()) {
@@ -696,7 +696,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
     }
 
     private static void handleProjectMoved(IProject newProject) {
-        Job job = Job.createSystem(monitor -> {
+        Job job = Job.createSystem("TmfProjectRegistry.handleProjectMoved Job", monitor -> { //$NON-NLS-1$
             addTracingNature(newProject, monitor);
             IProject shadowProject = TmfProjectModelHelper.getShadowProject(newProject);
             String newShadowProjectName = TmfProjectModelHelper.getShadowProjectName(newProject.getName());
