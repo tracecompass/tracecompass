@@ -37,6 +37,9 @@
             <configuration>
               <excludes>
                 <plugin id="javax.xml"/>
+                <plugin id="javax.xml.bind"/>
+                <plugin id="javax.activation"/>
+                <plugin id="javax.xml.stream"/>
                 <plugin id="org.apache.commons.compress"/>
                 <plugin id="org.apache.commons.lang3"/>
                 <plugin id="org.apache.xerces"/>

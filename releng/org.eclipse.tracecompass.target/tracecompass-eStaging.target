@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="tracecompass-eStaging" sequenceNumber="111">
+<?pde version="3.8"?><target name="tracecompass-eStaging" sequenceNumber="112">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.cdt.gnu.dsf.feature.group" version="0.0.0"/>
@@ -45,7 +45,10 @@
 <unit id="org.json" version="0.0.0"/>
 <unit id="org.apache.derby" version="0.0.0"/>
 <unit id="org.hamcrest" version="0.0.0"/>
-<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/S20181120221132/repository"/>
+<unit id="javax.xml.bind" version="0.0.0"/>
+<unit id="javax.activation" version="0.0.0"/>
+<unit id="javax.xml.stream" version="0.0.0"/>
+<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/S20181128170323/repository"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.license.feature.group" version="0.0.0"/>
@@ -64,9 +67,7 @@
 <unit id="org.eclipse.swt.tools.spies" version="0.0.0"/>
 <unit id="org.eclipse.ui.trace" version="0.0.0"/>
 <unit id="org.eclipse.ui.views.log" version="0.0.0"/>
-<unit id="a.jre.javase" version="10.0.0"/>
-<unit id="config.a.jre.javase" version="10.0.0"/>
-<repository location="http://download.eclipse.org/eclipse/updates/4.10milestones/S-4.10M3-201811211800/"/>
+<repository location="http://download.eclipse.org/eclipse/updates/4.10milestones/S-4.10RC1-201811290330/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf" version="1.7.2"/>

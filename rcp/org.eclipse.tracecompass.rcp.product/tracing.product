@@ -25,7 +25,7 @@ http://www.eclipse.org/legal/epl-v10.html
    <launcherArgs>
       <programArgs>-data @noDefault
       </programArgs>
-      <programArgsLin>--launcher.GTK_version 2
+      <programArgsLin>--launcher.GTK_version 3
       </programArgsLin>
       <vmArgsLin>-Xms512m -Xmx1024m  -Dosgi.requiredJavaVersion=1.8
       </vmArgsLin>
@@ -219,6 +219,7 @@ Java and all Java-based trademarks are trademarks of Oracle Corporation in the U
    </features>
 
    <configurations>
+      <plugin id="org.apache.felix.scr" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />

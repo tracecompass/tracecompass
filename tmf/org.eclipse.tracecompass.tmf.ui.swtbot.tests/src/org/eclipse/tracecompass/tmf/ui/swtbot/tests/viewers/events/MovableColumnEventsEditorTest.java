@@ -42,6 +42,7 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -107,6 +108,7 @@ public class MovableColumnEventsEditorTest {
      * reordered, reopen it, check that its still reordered, close it, reset,
      * reopen check that its in the original order.
      */
+    @Ignore
     @Test
     public void testReorder() {
         SWTBotUtils.createProject(TRACE_PROJECT_NAME);

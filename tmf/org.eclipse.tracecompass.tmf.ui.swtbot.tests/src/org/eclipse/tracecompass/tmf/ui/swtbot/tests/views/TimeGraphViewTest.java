@@ -446,6 +446,7 @@ public class TimeGraphViewTest {
      *             file not found, someone deleted files while the test is
      *             running
      */
+    @Ignore
     @Test
     public void testExport() throws IOException {
 
