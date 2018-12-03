@@ -261,10 +261,13 @@ public class TmfProjectRegistryTest {
         fSomeProject.move(new Path(NEW_PROJECT_NAME), true, progressMonitor);
         IProject shadowProject = fWorkspaceRoot.getProject(NEW_SHADOW_PROJECT_NAME);
         WaitUtils.waitUntil(project -> project.exists(), shadowProject, "Shadow project did get moved");
+        // Wait for TmfProjectRegistry.handleProjectMoved Job that could
+        // fail if project is concurrently deleted by the test below
+        WaitUtils.waitForJobs();
 
         // Verify that after deletion of the parent project the shadow project is removed from the workspace
         IProject newProject = fWorkspaceRoot.getProject(NEW_PROJECT_NAME);
-        newProject.delete(false, true, progressMonitor);
+        newProject.delete(true, true, progressMonitor);
         shadowProject = fWorkspaceRoot.getProject(NEW_SHADOW_PROJECT_NAME);
         WaitUtils.waitUntil(project -> !project.exists(), shadowProject, "Shadow project did not get deleted");
     }

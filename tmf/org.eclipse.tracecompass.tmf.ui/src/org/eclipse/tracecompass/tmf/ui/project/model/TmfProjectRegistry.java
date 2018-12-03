@@ -203,6 +203,9 @@ public class TmfProjectRegistry implements IResourceChangeListener {
         WorkspaceModifyOperation action = new WorkspaceModifyOperation() {
             @Override
             protected void execute(IProgressMonitor progressMonitor) throws CoreException, InvocationTargetException, InterruptedException {
+                if (!project.exists()) {
+                    return;
+                }
                 if (!project.isOpen()) {
                     project.open(progressMonitor);
                 }
@@ -467,7 +470,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
                                     } catch (CoreException e) {
                                         Activator.getDefault().logError("Error handling resource change event for " + project.getName(), e); //$NON-NLS-1$
                                     }
-                                    if (parentProject != null) {
+                                    if (parentProject != null && parentProject.exists()) {
                                         new TmfProjectElement(parentProject.getName(), parentProject, null).refreshViewer();
                                     }
                                 }).schedule();
@@ -667,6 +670,9 @@ public class TmfProjectRegistry implements IResourceChangeListener {
 
     private static void handleParentProjectOpen(IProject project) {
         Job job = Job.createSystem("TmfProjectRegistry.handleParentProjectOpen Job", monitor -> { //$NON-NLS-1$
+            if (!project.exists() || !project.isOpen()) {
+                return;
+            }
             IProject shadowProject = TmfProjectModelHelper.getShadowProject(project);
             if (shadowProject != null && shadowProject.exists() && !shadowProject.isOpen()) {
                 try {
@@ -682,6 +688,9 @@ public class TmfProjectRegistry implements IResourceChangeListener {
 
     private static void handleParentProjectRefresh(IProject project) {
         Job job = Job.createSystem("TmfProjectRegistry.handleParentProjectRefresh Job", monitor -> { //$NON-NLS-1$
+            if (!project.exists() || !project.isOpen()) {
+                return;
+            }
             IWorkspace workspace = ResourcesPlugin.getWorkspace();
             IProject shadowProject = workspace.getRoot().getProject(TmfProjectModelHelper.getShadowProjectName(project.getName()));
             if (shadowProject.exists()) {
@@ -697,6 +706,9 @@ public class TmfProjectRegistry implements IResourceChangeListener {
 
     private static void handleProjectMoved(IProject newProject) {
         Job job = Job.createSystem("TmfProjectRegistry.handleProjectMoved Job", monitor -> { //$NON-NLS-1$
+            if (!newProject.exists() || !newProject.isOpen()) {
+                return;
+            }
             addTracingNature(newProject, monitor);
             IProject shadowProject = TmfProjectModelHelper.getShadowProject(newProject);
             String newShadowProjectName = TmfProjectModelHelper.getShadowProjectName(newProject.getName());
