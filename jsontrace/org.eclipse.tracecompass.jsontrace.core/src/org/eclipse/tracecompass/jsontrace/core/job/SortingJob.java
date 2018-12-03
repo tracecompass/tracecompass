@@ -199,7 +199,7 @@ public abstract class SortingJob extends Job {
 
             }
             subMonitor.subTask(Messages.SortingJob_merging);
-            PriorityQueue<PartiallyParsedEvent> evs = new PriorityQueue<>();
+            PriorityQueue<PartiallyParsedEvent> evs = new PriorityQueue<>(EVENT_COMPARATOR);
             List<BufferedInputStream> parsers = new ArrayList<>();
             int i = 0;
             for (File traceling : tracelings) {
