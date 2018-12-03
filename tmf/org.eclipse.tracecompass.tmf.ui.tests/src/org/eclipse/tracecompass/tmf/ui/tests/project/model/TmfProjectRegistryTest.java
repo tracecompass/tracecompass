@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -160,6 +160,10 @@ public class TmfProjectRegistryTest {
         WaitUtils.waitUntil(project -> project.isOpen(), fShadowSomeProject, "Shadow project did not get opened");
         // Bug 534157: Wait until open operation is done and project description is set
         WaitUtils.waitUntil(project -> fSomeProject.getLocation().isPrefixOf(project.getLocation()), fShadowSomeProject, "Shadow project location did not get set");
+        // Wait for TmfProjectRegistry.handleParentProjectOpen Job that could
+        // interfere with test by recreating Traces and Experiments folders
+        WaitUtils.waitForJobs();
+
         // Traces folder
         TmfTraceFolder traceFolder = projectElement.getTracesFolder();
         assertNotNull(traceFolder);
@@ -201,6 +205,10 @@ public class TmfProjectRegistryTest {
         // Delete Traces and Experiment directory
         traceFolder.getResource().delete(true, progressMonitor);
         expFolder.getResource().delete(true, progressMonitor);
+
+        // Wait for TmfProjectRegistry.resourceChanged Job that could
+        // interfere with test by closing traces and deleting resources
+        WaitUtils.waitForJobs();
 
         fSomeProject.refreshLocal(IResource.DEPTH_INFINITE, progressMonitor);
         projectElement.refresh();
