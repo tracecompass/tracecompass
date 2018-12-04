@@ -19,7 +19,7 @@
 
   <groupId>org.eclipse.tracecompass</groupId>
   <artifactId>org.eclipse.tracecompass</artifactId>
-  <version>4.1.0-SNAPSHOT</version>
+  <version>4.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Trace Compass Parent</name>
 
@@ -367,7 +367,7 @@
               <groupId>org.eclipse.tracecompass</groupId>
               <artifactId>org.eclipse.tracecompass.target</artifactId>
               <classifier>${target-platform}</classifier>
-              <version>4.1.0-SNAPSHOT</version>
+              <version>4.2.0-SNAPSHOT</version>
             </artifact>
           </target>
         </configuration>
