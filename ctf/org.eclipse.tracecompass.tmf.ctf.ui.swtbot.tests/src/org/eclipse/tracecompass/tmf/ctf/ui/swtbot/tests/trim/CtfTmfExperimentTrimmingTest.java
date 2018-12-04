@@ -70,7 +70,7 @@ public class CtfTmfExperimentTrimmingTest {
 
     /** Test timeout */
     @Rule
-    public TestRule globalTimeout = new Timeout(2, TimeUnit.MINUTES);
+    public TestRule globalTimeout = new Timeout(6, TimeUnit.MINUTES);
 
     private TmfTimeRange fRequestedTraceCutRange;
 
@@ -180,7 +180,9 @@ public class CtfTmfExperimentTrimmingTest {
         if (fOriginalExperiment != null) {
             fOriginalExperiment = null;
         }
-        new SWTWorkbenchBot().closeAllEditors();
+        SWTWorkbenchBot bot = new SWTWorkbenchBot();
+        bot.closeAllEditors();
+        SWTBotUtils.deleteProject(PROJECT_NAME, bot);
     }
 
     /**
