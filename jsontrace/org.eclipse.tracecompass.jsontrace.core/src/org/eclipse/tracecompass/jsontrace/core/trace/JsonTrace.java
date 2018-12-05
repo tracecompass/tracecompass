@@ -26,6 +26,8 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceKnownSize;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfPersistentlyIndexable;
+import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
+import org.eclipse.tracecompass.tmf.core.trace.indexer.TmfBTreeTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.core.trace.location.TmfLongLocation;
 
@@ -133,6 +135,11 @@ public abstract class JsonTrace extends TmfTrace
     @Override
     public int getCheckpointSize() {
         return CHECKPOINT_SIZE;
+    }
+
+    @Override
+    protected ITmfTraceIndexer createIndexer(int interval) {
+        return new TmfBTreeTraceIndexer(this, interval);
     }
 
     /**
