@@ -76,21 +76,23 @@ public abstract class JsonTrace extends TmfTrace
         if (NULL_LOCATION.equals(location)) {
             return context;
         }
-        try {
-            if (location == null) {
-                fFileInput.seek(1);
-            } else if (location.getLocationInfo() instanceof Long) {
-                fFileInput.seek((Long) location.getLocationInfo());
+        synchronized (this) {
+            try {
+                if (location == null) {
+                    fFileInput.seek(1);
+                } else if (location.getLocationInfo() instanceof Long) {
+                    fFileInput.seek((Long) location.getLocationInfo());
+                }
+                context.setLocation(new TmfLongLocation(fFileInput.getFilePointer()));
+                context.setRank(0);
+                return context;
+            } catch (final FileNotFoundException e) {
+                Activator.getInstance().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
+                return context;
+            } catch (final IOException e) {
+                Activator.getInstance().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
+                return context;
             }
-            context.setLocation(new TmfLongLocation(fFileInput.getFilePointer()));
-            context.setRank(0);
-            return context;
-        } catch (final FileNotFoundException e) {
-            Activator.getInstance().logError("Error seeking event. File not found: " + getPath(), e); //$NON-NLS-1$
-            return context;
-        } catch (final IOException e) {
-            Activator.getInstance().logError("Error seeking event. File: " + getPath(), e); //$NON-NLS-1$
-            return context;
         }
     }
 
@@ -109,7 +111,9 @@ public abstract class JsonTrace extends TmfTrace
     public ITmfLocation getCurrentLocation() {
         long temp = -1;
         try {
-            temp = fFileInput.getFilePointer();
+            synchronized (this) {
+                temp = fFileInput.getFilePointer();
+            }
         } catch (IOException e) {
             // swallow it for now
         }
@@ -198,30 +202,34 @@ public abstract class JsonTrace extends TmfTrace
 
     @Override
     public int size() {
-        RandomAccessFile fileInput = fFileInput;
-        if (fileInput == null) {
-            return 0;
-        }
         long length = 0;
-        try {
-            length = fileInput.length();
-        } catch (IOException e) {
-            // swallow it for now
+        synchronized (this) {
+            RandomAccessFile fileInput = fFileInput;
+            if (fileInput == null) {
+                return 0;
+            }
+            try {
+                length = fileInput.length();
+            } catch (IOException e) {
+                // swallow it for now
+            }
         }
         return length > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) length;
     }
 
     @Override
     public int progress() {
-        RandomAccessFile fileInput = fFileInput;
-        if (fileInput == null) {
-            return 0;
-        }
         long length = 0;
-        try {
-            length = fileInput.getFilePointer();
-        } catch (IOException e) {
-            // swallow it for now
+        synchronized (this) {
+            RandomAccessFile fileInput = fFileInput;
+            if (fileInput == null) {
+                return 0;
+            }
+            try {
+                length = fileInput.getFilePointer();
+            } catch (IOException e) {
+                // swallow it for now
+            }
         }
         return length > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) length;
     }
