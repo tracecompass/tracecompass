@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckable;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
@@ -106,10 +107,14 @@ public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
                 // Expand all to be able to store all checked elements
                 fCheckboxTreeViewer.expandAll();
                 fCheckboxTreeViewer.setCheckedElements(getCheckedElements());
+                // Collapse all can change selection
+                ISelection selection = fCheckboxTreeViewer.getSelection();
                 fCheckboxTreeViewer.collapseAll();
                 fCheckboxTreeViewer.getTree().setRedraw(true);
                 // Expand tree according to the saved expanded elements
                 fCheckboxTreeViewer.setExpandedElements(expandedElements.toArray());
+                // Restore the selection
+                fCheckboxTreeViewer.setSelection(selection);
                 return Status.OK_STATUS;
             }
         };
