@@ -2,6 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
+Bundle-Localization: plugin
+Bundle-ActivationPolicy: lazy
 Bundle-SymbolicName: org.eclipse.tracecompass.jsontrace.core;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Automatic-Module-Name: org.eclipse.tracecompass.jsontrace.core
