@@ -47,6 +47,7 @@
               <excludes>
                 <exclude>generated-sources/antlr3/org/eclipse/tracecompass/tmf/filter/parser/FilterParserLexer.java</exclude>
                 <exclude>generated-sources/antlr3/org/eclipse/tracecompass/tmf/filter/parser/FilterParserParser.java</exclude>
+                <exclude>generated-sources/antlr3/FilterParser.tokens</exclude>
               </excludes>
             </fileset>
           </filesets>
