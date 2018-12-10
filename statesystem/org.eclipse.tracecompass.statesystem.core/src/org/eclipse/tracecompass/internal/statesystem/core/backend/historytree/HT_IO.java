@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2018 Ericsson
  * Copyright (c) 2010, 2011 École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
  *
@@ -147,13 +147,16 @@ public class HT_IO {
 
         File historyTreeFile = config.getStateFile();
         if (newFile) {
-            boolean success1 = true;
             /* Create a new empty History Tree file */
             if (historyTreeFile.exists()) {
-                success1 = historyTreeFile.delete();
+                historyTreeFile.delete();
+                /* delete can fail as long as file no longer exists */
+                if (historyTreeFile.exists()) {
+                    throw new IOException("Cannot delete existing file at " + //$NON-NLS-1$
+                            historyTreeFile.getName());
+                }
             }
-            boolean success2 = historyTreeFile.createNewFile();
-            if (!(success1 && success2)) {
+            if (!(historyTreeFile.createNewFile())) {
                 /* It seems we do not have permission to create the new file */
                 throw new IOException("Cannot create new file at " + //$NON-NLS-1$
                         historyTreeFile.getName());
