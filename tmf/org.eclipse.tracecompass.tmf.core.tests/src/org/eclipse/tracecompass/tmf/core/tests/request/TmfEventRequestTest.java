@@ -41,7 +41,7 @@ import org.junit.rules.Timeout;
 public class TmfEventRequestTest {
 
     @Rule
-    public TestRule globalTimeout = new Timeout(20, TimeUnit.SECONDS);
+    public TestRule globalTimeout = new Timeout(1, TimeUnit.MINUTES);
 
     // ------------------------------------------------------------------------
     // Variables

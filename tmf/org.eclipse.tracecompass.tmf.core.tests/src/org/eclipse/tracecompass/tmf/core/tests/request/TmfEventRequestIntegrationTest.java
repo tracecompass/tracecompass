@@ -49,7 +49,7 @@ public class TmfEventRequestIntegrationTest {
      * may have happened
      */
      @Rule
-     public TestRule globalTimeout = new Timeout(120, TimeUnit.SECONDS);
+     public TestRule globalTimeout = new Timeout(2, TimeUnit.MINUTES);
 
     private static final TmfTestTrace TEST_TRACE = TmfTestTrace.A_TEST_10K;
 

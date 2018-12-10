@@ -52,7 +52,7 @@ public class AnalysisModuleTest {
 
     /** Test timeout */
     @Rule
-    public TestRule timeoutRule = new Timeout(30, TimeUnit.SECONDS);
+    public TestRule timeoutRule = new Timeout(1, TimeUnit.MINUTES);
 
     private static final @NonNull String MODULE_GENERIC_ID = "test.id";
     private static final @NonNull String MODULE_GENERIC_NAME = "Test analysis";

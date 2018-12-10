@@ -45,9 +45,9 @@ import org.junit.rules.Timeout;
  */
 public class CtfTmfLostEventStatisticsTest {
 
-    /** Time-out tests after 30 seconds */
+    /** Time-out tests after 1 minute */
     @Rule
-    public TestRule globalTimeout= new Timeout(30, TimeUnit.SECONDS);
+    public TestRule globalTimeout = new Timeout(1, TimeUnit.MINUTES);
 
     /**Test trace with lost events */
     private static final @NonNull CtfTestTrace lostEventsTrace = CtfTestTrace.HELLO_LOST;

@@ -48,8 +48,8 @@ import org.junit.rules.Timeout;
  */
 public class UstKernelSyncTest {
 
-    /** Time-out tests after 60 seconds */
-    @Rule public TestRule globalTimeout= new Timeout(60, TimeUnit.SECONDS);
+    /** Time-out tests after 1 minute */
+    @Rule public TestRule globalTimeout = new Timeout(1, TimeUnit.MINUTES);
 
     private static final @NonNull CtfTestTrace KERNEL_TRACE = CtfTestTrace.CONTEXT_SWITCHES_KERNEL;
     private static final @NonNull CtfTestTrace UST_TRACE = CtfTestTrace.CONTEXT_SWITCHES_UST;

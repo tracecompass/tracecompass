@@ -35,8 +35,8 @@ import org.junit.rules.Timeout;
  */
 public abstract class TmfStatisticsTest {
 
-    /** Time-out tests after 30 seconds */
-    @Rule public TestRule globalTimeout= new Timeout(30, TimeUnit.SECONDS);
+    /** Time-out tests after 1 minute */
+    @Rule public TestRule globalTimeout = new Timeout(1, TimeUnit.MINUTES);
 
     /** Test trace used for these tests */
     protected static final @NonNull CtfTestTrace testTrace = CtfTestTrace.KERNEL;
