@@ -16,18 +16,24 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -43,13 +49,16 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationPr
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sampling;
 
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Table;
 
 /**
  * An abstract time graph view where each entry's time event list is populated
@@ -60,6 +69,10 @@ import com.google.common.collect.Multimap;
  * @since 1.1
  */
 public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraphView {
+
+    private static final @NonNull Comparator<ITmfStateInterval> INTERVALS_COMPARATOR = Comparator.comparing(ITmfStateInterval::getStartTime).thenComparing(ITmfStateInterval::getEndTime);
+
+    private static final @NonNull Comparator<ITimeEvent> TIME_EVENT_COMPARATOR = Comparator.comparing(ITimeEvent::getTime).thenComparing(ITimeEvent::getDuration);
 
     // ------------------------------------------------------------------------
     // Constants
@@ -247,26 +260,51 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             }
         }
 
-        private void doBgSearch(ITmfStateSystem ss, int resolution, @NonNull IProgressMonitor monitor, Map<TimeGraphEntry, List<ITimeEvent>> gaps, @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates) {
+        private void doBgSearch(ITmfStateSystem ss, int resolution, @NonNull IProgressMonitor monitor, Map<TimeGraphEntry, List<ITimeEvent>> gaps,
+                @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates) {
             try (TraceCompassLogUtils.ScopeLog poc = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINE, "TimegraphBgSearch")) { //$NON-NLS-1$
 
                 TimeEventFilterDialog timeEventFilterDialog = getTimeEventFilterDialog();
                 boolean hasActiveSavedFilters = timeEventFilterDialog.hasActiveSavedFilters();
 
-                for (Entry<TimeGraphEntry, List<ITimeEvent>> entryGaps: gaps.entrySet()) {
-                    for (ITimeEvent gap : entryGaps.getValue()) {
-                        long start = gap.getTime();
-                        long end = gap.getTime() + gap.getDuration();
-                        queryFullStates(ss, start, end, resolution, monitor, new IQueryHandler() {
+                //Regroup the gaps by overlapping gaps
+                Table<ITimeGraphEntry, @NonNull Pair<Long, Long>, List<ITimeEvent>> gapsTable = regroupOverlappingGaps(gaps);
+
+                //Get the quarks per entry once
+                Map<ITimeGraphEntry, Collection<Integer>> quarksPerEntry = new HashMap<>();
+                for (ITimeGraphEntry entry : gapsTable.rowKeySet()) {
+                    Collection<Integer> quarks = getQuarksForEntry(entry, ss);
+                    quarksPerEntry.put(entry, quarks);
+                }
+
+                for (@NonNull Entry<Pair<Long, Long>, Map<ITimeGraphEntry, List<ITimeEvent>>> tableEntry : gapsTable.columnMap().entrySet()) {
+                    Map<ITimeGraphEntry, List<ITimeEvent>> row = tableEntry.getValue();
+                    List<Integer> quarks = new ArrayList<>();
+
+                    //Get the need quarks for this slot
+                    for (ITimeGraphEntry entry : row.keySet()) {
+                        Collection<Integer> entryQuarks = quarksPerEntry.get(entry);
+                        if (entryQuarks != null) {
+                            entryQuarks.forEach(quark -> quarks.add(quark));
+                        }
+                    }
+
+                    queryRangeStates(ss, tableEntry.getKey().getLeft(), tableEntry.getKey().getRight(), quarks, resolution, monitor, new IQueryHandler() {
 
                         @Override
                         public void handle(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) {
-                                TimeGraphEntry entry = entryGaps.getKey();
+                            for (Entry<ITimeGraphEntry, List<ITimeEvent>> entryGap : row.entrySet()) {
+                                List<ITimeEvent> gapEvents = entryGap.getValue();
+                                TimeGraphEntry entry = (TimeGraphEntry) entryGap.getKey();
                                 List<ITimeEvent> eventList = getEventList(Objects.requireNonNull(entry), ss, fullStates, prevFullState, monitor);
 
                                 if (eventList != null && !eventList.isEmpty() && !monitor.isCanceled()) {
                                     doFilterEvents(entry, eventList, predicates);
                                     for (ITimeEvent event : eventList) {
+                                        int pos = Collections.binarySearch(gapEvents, event, TimeGraphEntry.WITHIN_COMPARATOR);
+                                        // If the event is within a gap
+                                        if (pos >= 0) {
+                                            ITimeEvent gap = gapEvents.get(pos);
                                             if (!monitor.isCanceled()) {
                                                 // if any underlying event is not dimmed,
                                                 // then set the related gap event dimmed
@@ -280,21 +318,21 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                                                 // then set the related gap event exclude
                                                 // status property to false and add the gap
                                                 // back to the zoom event list
-                                                boolean exclude = gap.isPropertyActive(IFilterProperty.EXCLUDE);
-                                                if (hasActiveSavedFilters && exclude && !event.isPropertyActive(IFilterProperty.EXCLUDE)) {
+                                                if (hasActiveSavedFilters && !event.isPropertyActive(IFilterProperty.EXCLUDE)) {
                                                     gap.setProperty(IFilterProperty.EXCLUDE, false);
                                                     applyResults(() -> {
                                                         entry.updateZoomedEvent(gap);
                                                     });
                                                 }
                                             }
+                                        }
                                     }
                                 }
-                                refresh();
                             }
+                        }
                     });
+                    refresh();
                 }
-            }
             }
         }
 
@@ -331,6 +369,51 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             }
             return false;
         }
+    }
+
+    private static @NonNull Table<ITimeGraphEntry, @NonNull Pair<Long, Long>, List<ITimeEvent>> regroupOverlappingGaps(Map<? extends ITimeGraphEntry, List<ITimeEvent>> gapsMap) {
+
+        Table<ITimeGraphEntry, @NonNull Pair<Long, Long>, List<ITimeEvent>> gapsTable = HashBasedTable.create();
+        PriorityQueue<ITimeEvent> queue = new PriorityQueue<>(TIME_EVENT_COMPARATOR);
+        gapsMap.values().forEach(events -> queue.addAll(events));
+        Pair<Long, Long> previous = null;
+        while(!queue.isEmpty()) {
+            ITimeEvent event = Objects.requireNonNull(queue.poll());
+
+            ITimeGraphEntry entry = event.getEntry();
+
+            Pair<Long, Long> result = previous != null && event.getTime() < previous.getRight() && event.getTime() + event.getDuration() > previous.getLeft() ? previous : null;
+            if (result != null) {
+                Pair<Long, Long> merged = mergeInterval(result, event);
+                Map<ITimeGraphEntry, List<ITimeEvent>> column = new HashMap<>(gapsTable.column(result));
+                if (!result.equals(merged)) {
+                    gapsTable.columnKeySet().remove(result);
+                    result = merged;
+                    for (Entry<ITimeGraphEntry, List<ITimeEvent>> row : column.entrySet()) {
+                        gapsTable.put(row.getKey(), result, row.getValue());
+                    }
+                }
+            } else {
+                result = Objects.requireNonNull(Pair.of(event.getTime(), event.getTime() + event.getDuration()));
+            }
+
+            previous = result;
+            List<ITimeEvent> events = gapsTable.get(entry, result);
+            if (events == null) {
+                events = new ArrayList<>();
+                gapsTable.put(entry, result, events);
+            }
+            events.add(event);
+
+        }
+
+        return gapsTable;
+    }
+
+    private static @NonNull Pair<Long, Long> mergeInterval(Pair<Long, Long> source, ITimeEvent event) {
+        long left = Math.min(source.getLeft(), event.getTime());
+        long right = Math.max(source.getRight(), event.getTime() + event.getDuration());
+        return Objects.requireNonNull(Pair.of(left, right));
     }
 
     // ------------------------------------------------------------------------
@@ -374,6 +457,21 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
      */
     protected void getEnventListGaps(@NonNull TimeGraphEntry entry, List<ITimeEvent> eventList, Map<TimeGraphEntry, List<ITimeEvent>> gaps) {
         // Do nothing here. Must be implemented by subclasses that need this behavior
+    }
+
+    /**
+     * Get the list of attributes in given state system needed to build this
+     * specific entry
+     *
+     * @param entry
+     *            The entry to build
+     * @param ss
+     *            The related state system
+     * @return The list of attributes needed to build the entry
+     * @since 4.3
+     */
+    protected @NonNull Collection<@NonNull Integer> getQuarksForEntry(@NonNull ITimeGraphEntry entry, ITmfStateSystem ss) {
+        return IntStream.range(0, ss.getNbAttributes()).boxed().collect(Collectors.toList());
     }
 
     /**
@@ -538,6 +636,115 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
         } catch (StateSystemDisposedException e) {
             /* Ignored */
         }
+    }
+
+    /**
+     * Query the state system for a list of specific state and for the given
+     * time range.
+     *
+     * @param ss
+     *            The state system
+     * @param start
+     *            The start time
+     * @param end
+     *            The end time
+     * @param quarks
+     *            The list of quarks/state to query
+     * @param resolution
+     *            The resolution
+     * @param monitor
+     *            The progress monitor
+     * @param handler
+     *            The query handler
+     *
+     * @since 4.3
+     */
+    protected void queryRangeStates(ITmfStateSystem ss, long start, long end, @NonNull Collection<@NonNull Integer> quarks, long resolution,
+            @NonNull IProgressMonitor monitor, @NonNull IQueryHandler handler) {
+        if (end < start) {
+            /*
+             * We have an empty trace, the state system will be empty: nothing
+             * to do here.
+             */
+            return;
+        }
+
+        try {
+            Iterable<@NonNull ITmfStateInterval> intervals = ss.query2D(quarks, start, end);
+            Map<Integer, Integer> ptr = new HashMap<>();
+            Map<Integer, List<ITmfStateInterval>> itvs = new HashMap<>();
+            intervals.forEach(itv -> {
+                int key = itv.getAttribute();
+                List<ITmfStateInterval> set = itvs.get(key);
+                if (set == null) {
+                    set = new ArrayList<>();
+                    itvs.put(key, set);
+                    ptr.put(key, 0);
+                }
+                set.add(itv);
+            });
+
+            // Sort the intervals
+            for (Entry<Integer, List<ITmfStateInterval>> entry : itvs.entrySet()) {
+                entry.getValue().sort(INTERVALS_COMPARATOR);
+            }
+
+            List<List<ITmfStateInterval>> fullStates = new ArrayList<>();
+            List<ITmfStateInterval> prevFullState = null;
+
+            long time = start;
+            while (true) {
+                if (monitor.isCanceled()) {
+                    break;
+                }
+                int nbAttributes = ss.getNbAttributes();
+                List<ITmfStateInterval> fullState = getFullStateForTime(time, itvs, ptr, nbAttributes);
+                fullStates.add(fullState);
+                if (fullStates.size() * fullState.size() > MAX_INTERVALS) {
+                    handler.handle(fullStates, prevFullState);
+                    prevFullState = fullStates.get(fullStates.size() - 1);
+                    fullStates.clear();
+                }
+                if (time >= end) {
+                    break;
+                }
+                time = Math.min(end, time + resolution);
+            }
+            if (!fullStates.isEmpty()) {
+                handler.handle(fullStates, prevFullState);
+            }
+        } catch (StateSystemDisposedException e1) {
+            // Do nothing
+        }
+    }
+
+    private static List<ITmfStateInterval> getFullStateForTime(long time, @NonNull Map<@NonNull Integer, @NonNull List<@NonNull ITmfStateInterval>> itvs, @NonNull Map<@NonNull Integer, @NonNull Integer> ptr, int nbAttributes) {
+        List<ITmfStateInterval> fullState = new ArrayList<>();
+        for (int key = 0; key < nbAttributes; key++) {
+            fullState.add(null);
+        }
+
+        for (Entry<Integer, List<ITmfStateInterval>> entry : itvs.entrySet()) {
+            List<ITmfStateInterval> intervals = entry.getValue();
+
+            int key = Objects.requireNonNull(entry.getKey());
+            int index = Objects.requireNonNull(ptr.get(key));
+
+            ITmfStateInterval interval = Objects.requireNonNull(intervals.get(index));
+            while(!isBounded(time, interval) && ++index < intervals.size()) {
+                interval = Objects.requireNonNull(intervals.get(index));
+                ptr.put(key, index);
+            }
+
+            if (index < intervals.size()) {
+                fullState.set(key, interval);
+            }
+        }
+        return fullState;
+    }
+
+    private static boolean isBounded(long time, ITmfStateInterval interval) {
+        return interval.getStartTime() <= time && interval.getEndTime() >= time;
     }
 
     /**
