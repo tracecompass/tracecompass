@@ -8,4 +8,4 @@
  *******************************************************************************/
 
 @org.eclipse.jdt.annotation.NonNullByDefault
-package org.eclipse.tracecompass.jsontrace.core;
+package org.eclipse.tracecompass.internal.jsontrace.core;

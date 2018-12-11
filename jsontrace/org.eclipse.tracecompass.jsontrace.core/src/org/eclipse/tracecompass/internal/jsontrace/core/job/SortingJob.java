@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.jsontrace.core.job;
+package org.eclipse.tracecompass.internal.jsontrace.core.job;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -32,9 +32,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
-import org.eclipse.tracecompass.jsontrace.core.Activator;
-import org.eclipse.tracecompass.jsontrace.core.Messages;
-import org.eclipse.tracecompass.jsontrace.core.trace.JsonTrace;
+import org.eclipse.tracecompass.internal.jsontrace.core.Activator;
+import org.eclipse.tracecompass.internal.jsontrace.core.Messages;
+import org.eclipse.tracecompass.internal.provisional.jsontrace.core.trace.JsonTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 
