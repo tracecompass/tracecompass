@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.jsontrace.core;
+package org.eclipse.tracecompass.internal.jsontrace.core;
 
 import org.eclipse.tracecompass.common.core.TraceCompassActivator;
 

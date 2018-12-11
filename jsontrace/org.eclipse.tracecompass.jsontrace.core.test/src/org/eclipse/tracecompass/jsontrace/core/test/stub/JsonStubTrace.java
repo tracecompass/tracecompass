@@ -20,7 +20,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.tracecompass.jsontrace.core.trace.JsonTrace;
+import org.eclipse.tracecompass.internal.provisional.jsontrace.core.trace.JsonTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventType;

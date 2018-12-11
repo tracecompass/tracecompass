@@ -11,7 +11,7 @@ package org.eclipse.tracecompass.jsontrace.core.test.stub;
 
 import java.io.IOException;
 
-import org.eclipse.tracecompass.jsontrace.core.job.SortingJob;
+import org.eclipse.tracecompass.internal.jsontrace.core.job.SortingJob;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
