@@ -69,4 +69,14 @@ public class TmfThreadSelectedSignal extends TmfTraceModelSignal {
         return fHostThread.getHost();
     }
 
+    /**
+     * Get the host thread that was selected
+     *
+     * @return The HostThread object
+     * @since 3.1
+     */
+    public HostThread getHostThread() {
+        return fHostThread;
+    }
+
 }

@@ -297,8 +297,12 @@ public class TmfTraceContext implements ITraceContextSignalHandler {
          *            The value of the data
          * @return this {@code Builder} object
          */
-        public Builder setData(String key, Object value) {
-            this.data.put(key, value);
+        public Builder setData(String key, @Nullable Object value) {
+            if (value == null) {
+                data.remove(key);
+                return this;
+            }
+            data.put(key, value);
             return this;
         }
 
