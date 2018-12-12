@@ -15,11 +15,16 @@ package org.eclipse.tracecompass.tmf.core.statesystem;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.collect.BufferedBlockingQueue;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -43,6 +48,8 @@ import com.google.common.annotations.VisibleForTesting;
  * @author Alexandre Montplaisir
  */
 public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
+
+    private static final Logger LOGGER = TraceCompassLog.getLogger(AbstractTmfStateProvider.class);
 
     private static final class FutureValue {
         private final long fTime;
@@ -123,13 +130,16 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
                     formatError("queueSize", queueSize) + //$NON-NLS-1$
                     formatError("chunkSize", chunkSize)); //$NON-NLS-1$
         }
-        fTrace = trace;
-        fEventsQueue = new BufferedBlockingQueue<>(queueSize, chunkSize);
-        fStateSystemAssigned = false;
-        // set the safe time to before the trace start, the analysis has not yet
-        // started
-        fSafeTime = trace.getStartTime().toNanos() - 1;
-        fEventHandlerThread = new Thread(() -> SafeRunner.run(new EventProcessor()), id + " Event Handler"); //$NON-NLS-1$
+        try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "AbstractTmfStateProvider:creating object").setCategory(id).build()) { //$NON-NLS-1$
+            fTrace = trace;
+            fEventsQueue = new BufferedBlockingQueue<>(queueSize, chunkSize);
+            fStateSystemAssigned = false;
+            // set the safe time to before the trace start, the analysis has not
+            // yet
+            // started
+            fSafeTime = trace.getStartTime().toNanos() - 1;
+            fEventHandlerThread = new Thread(() -> SafeRunner.run(new EventProcessor(log)), id + " Event Handler"); //$NON-NLS-1$
+        }
     }
 
     private static String formatError(String name, int value) {
@@ -273,60 +283,67 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
      */
     private class EventProcessor implements ISafeRunnable {
 
+        private final FlowScopeLog fLog;
         private @Nullable ITmfEvent currentEvent;
         private boolean fDone = false;
 
+        public EventProcessor(FlowScopeLog log) {
+            fLog = log;
+        }
+
         @Override
         public void run() {
-            if (!fStateSystemAssigned) {
-                Activator.logError("Cannot run event manager without assigning a target state system first!"); //$NON-NLS-1$
-                return;
-            }
-
-            /*
-             * We never insert null in the queue. Cannot be checked at
-             * compile-time until Java 8 annotations...
-             */
-            ITmfEvent event = fEventsQueue.take();
-            /* This is a singleton, we want to do != instead of !x.equals */
-            while (event != END_EVENT) {
-                if (event == EMPTY_QUEUE_EVENT) {
-                    /* Synchronization event, should be ignored */
-                    event = fEventsQueue.take();
-                    continue;
+            try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "AbstractTmfStateProvider:running consumer").setParentScope(fLog).build()) { //$NON-NLS-1$
+                if (!fStateSystemAssigned) {
+                    Activator.logError("Cannot run event manager without assigning a target state system first!"); //$NON-NLS-1$
+                    return;
                 }
-                currentEvent = event;
-                long currentTime = event.getTimestamp().toNanos();
-                fSafeTime = currentTime - 1;
+
+                /*
+                 * We never insert null in the queue. Cannot be checked at
+                 * compile-time until Java 8 annotations...
+                 */
+                ITmfEvent event = fEventsQueue.take();
+                /* This is a singleton, we want to do != instead of !x.equals */
+                while (event != END_EVENT) {
+                    if (event == EMPTY_QUEUE_EVENT) {
+                        /* Synchronization event, should be ignored */
+                        event = fEventsQueue.take();
+                        continue;
+                    }
+                    currentEvent = event;
+                    long currentTime = event.getTimestamp().toNanos();
+                    fSafeTime = currentTime - 1;
+                    ITmfStateSystemBuilder stateSystemBuilder = getStateSystemBuilder();
+                    if (stateSystemBuilder == null) {
+                        return;
+                    }
+                    FutureValue futureValue = fFutureValues.peek();
+                    while (futureValue != null && (currentTime >= futureValue.fTime)) {
+                        futureValue = fFutureValues.poll();
+                        if (futureValue != null) {
+                            stateSystemBuilder.modifyAttribute(futureValue.fTime, futureValue.fValue, futureValue.fQuark);
+                        }
+                    }
+                    eventHandle(event);
+                    event = fEventsQueue.take();
+                }
+                fDone = true;
+                /*
+                 * flush remaining states
+                 */
                 ITmfStateSystemBuilder stateSystemBuilder = getStateSystemBuilder();
                 if (stateSystemBuilder == null) {
                     return;
                 }
-                FutureValue futureValue = fFutureValues.peek();
-                while (futureValue != null && (currentTime >= futureValue.fTime)) {
-                    futureValue = fFutureValues.poll();
-                    if (futureValue != null) {
-                        stateSystemBuilder.modifyAttribute(futureValue.fTime, futureValue.fValue, futureValue.fQuark);
-                    }
+                while (!fFutureValues.isEmpty()) {
+                    FutureValue interval = fFutureValues.remove();
+                    stateSystemBuilder.modifyAttribute(interval.fTime, interval.fValue, interval.fQuark);
                 }
-                eventHandle(event);
-                event = fEventsQueue.take();
+                /* We've received the last event, clean up */
+                done();
+                closeStateSystem();
             }
-            fDone = true;
-            /*
-             * flush remaining states
-             */
-            ITmfStateSystemBuilder stateSystemBuilder = getStateSystemBuilder();
-            if (stateSystemBuilder == null) {
-                return;
-            }
-            while (!fFutureValues.isEmpty()) {
-                FutureValue interval = fFutureValues.remove();
-                stateSystemBuilder.modifyAttribute(interval.fTime, interval.fValue, interval.fQuark);
-            }
-            /* We've received the last event, clean up */
-            done();
-            closeStateSystem();
         }
 
         private void closeStateSystem() {
