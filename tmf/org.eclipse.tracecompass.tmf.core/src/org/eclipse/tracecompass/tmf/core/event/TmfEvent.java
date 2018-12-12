@@ -204,8 +204,9 @@ public class TmfEvent extends PlatformObject implements ITmfEvent {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
+        ITmfTrace trace = fTrace;
         return getClass().getSimpleName() + " [fTimestamp=" + getTimestamp()
-                + ", fTrace=" + getTrace() + ", fRank=" + getRank()
+                + ", fTrace=" + (trace == null ? "null" : trace) + ", fRank=" + getRank()
                 +  ", fType=" + getType() + ", fContent=" + getContent()
                 + "]";
     }
