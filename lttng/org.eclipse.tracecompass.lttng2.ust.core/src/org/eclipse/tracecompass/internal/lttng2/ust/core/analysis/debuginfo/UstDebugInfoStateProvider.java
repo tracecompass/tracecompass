@@ -194,6 +194,13 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
 
     @Override
     protected void eventHandle(ITmfEvent event) {
+        // Should we handle this event?
+        String name = event.getName();
+        Integer index = fEventNames.get(name);
+        if (index == null) {
+            /* Untracked event type */
+            return;
+        }
         /*
          * We require the "vpid" context to build the state system. The rest of
          * the analysis also needs the "ip" context, but the state provider part
@@ -206,12 +213,6 @@ public class UstDebugInfoStateProvider extends AbstractTmfStateProvider {
 
         final @NonNull ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
 
-        String name = event.getName();
-        Integer index = fEventNames.get(name);
-        if (index == null) {
-            /* Untracked event type */
-            return;
-        }
         int intIndex = index.intValue();
 
         switch (intIndex) {

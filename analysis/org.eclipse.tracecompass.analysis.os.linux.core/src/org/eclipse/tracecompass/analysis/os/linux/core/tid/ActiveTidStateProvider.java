@@ -72,12 +72,15 @@ class ActiveTidStateProvider extends AbstractTmfStateProvider {
 
     @Override
     protected void eventHandle(@NonNull ITmfEvent event) {
-        Integer cpu = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
-        if (cpu == null) {
+        if (!event.getName().equals(fSchedSwitch)) {
             return;
         }
         ITmfStateSystemBuilder ssb = getStateSystemBuilder();
         if (ssb == null) {
+            return;
+        }
+        Integer cpu = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
+        if (cpu == null) {
             return;
         }
         Integer cpuQuark = fCpuNumToQuark.get(cpu);
@@ -86,9 +89,6 @@ class ActiveTidStateProvider extends AbstractTmfStateProvider {
             String cpuAttributeName = NonNullUtils.nullToEmptyString(cpu);
             cpuQuark = ssb.getQuarkAbsoluteAndAdd(cpuAttributeName);
             fCpuNumToQuark.put(cpu, cpuQuark);
-        }
-        if (!event.getName().equals(fSchedSwitch)) {
-            return;
         }
         try {
             int nextTid = ((Long) event.getContent().getField(fNextTid).getValue()).intValue();
