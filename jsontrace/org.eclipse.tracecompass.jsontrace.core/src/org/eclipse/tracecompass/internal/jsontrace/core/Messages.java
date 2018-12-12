@@ -17,7 +17,7 @@ import org.eclipse.osgi.util.NLS;
  * @author Katherine Nadeau
  */
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.jsontrace.core"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.jsontrace.core.messages"; //$NON-NLS-1$
 
     /**
      * Description
