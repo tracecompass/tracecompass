@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -34,13 +34,15 @@ public class TracePackageSupplFileElement extends TracePackageElement {
      * @param resource
      *            the resource representing this supplementary file in the
      *            workspace
+     * @param suppFileName
+     *            the supplementary file name
      * @param parent
      *            the parent element
      */
-    public TracePackageSupplFileElement(IResource resource, TracePackageElement parent) {
+    public TracePackageSupplFileElement(IResource resource, String suppFileName, TracePackageElement parent) {
         super(parent);
         fResource = resource;
-        fSuppFileName = null;
+        fSuppFileName = suppFileName;
     }
 
     /**
@@ -54,7 +56,7 @@ public class TracePackageSupplFileElement extends TracePackageElement {
      */
     public TracePackageSupplFileElement(String suppFileName, TracePackageElement parent) {
         super(parent);
-        this.fSuppFileName = suppFileName;
+        fSuppFileName = suppFileName;
         fResource = null;
     }
 
@@ -69,7 +71,7 @@ public class TracePackageSupplFileElement extends TracePackageElement {
 
     @Override
     public String getText() {
-        return fResource != null ? fResource.getName() : fSuppFileName;
+        return fSuppFileName;
     }
 
     @Override

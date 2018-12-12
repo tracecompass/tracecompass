@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,11 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -52,6 +55,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePa
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageSupplFileElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageSupplFilesElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageTraceElement;
+import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 
 /**
@@ -301,18 +305,37 @@ public class ExportTracePackageWizardPage extends AbstractTracePackageWizardPage
             TracePackageTraceElement traceElement = new TracePackageTraceElement(null, tmfTraceElement);
 
             // Trace files
-            List<TracePackageElement> children = new ArrayList<>();
             TracePackageFilesElement filesElement = new TracePackageFilesElement(traceElement, tmfTraceElement.getResource());
             filesElement.setChecked(true);
-            children.add(filesElement);
 
             // Supplementary files
-            IResource[] supplementaryResources = tmfTraceElement.getSupplementaryResources();
-            List<TracePackageElement> suppFilesChildren = new ArrayList<>();
-            TracePackageSupplFilesElement suppFilesElement = new TracePackageSupplFilesElement(traceElement);
-            children.add(suppFilesElement);
-            for (IResource res : supplementaryResources) {
-                suppFilesChildren.add(new TracePackageSupplFileElement(res, suppFilesElement));
+            try {
+                String supplementaryFolder = tmfTraceElement.getResource().getPersistentProperty(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER);
+                TracePackageSupplFilesElement suppFilesElement = new TracePackageSupplFilesElement(null);
+                IResource[] supplementaryResources = tmfTraceElement.getSupplementaryResources();
+                for (IResource res : supplementaryResources) {
+                    String name = supplementaryFolder == null ? res.getName() : res.getLocation().makeRelativeTo(new Path(supplementaryFolder)).toString();
+                    new TracePackageSupplFileElement(res, name, suppFilesElement);
+                }
+                if (supplementaryFolder != null) {
+                    // If the supplementary folder path is in a shadow project,
+                    // the resources must be taken from the parent project.
+                    IFolder projectSupplementaryFolder = tmfTraceElement.getProject().getSupplementaryFolder();
+                    IPath path = new Path(supplementaryFolder).append(TmfCommonConstants.TRACE_PROPERTIES_FOLDER);
+                    IFolder propertiesFolder = projectSupplementaryFolder.getFolder(path.makeRelativeTo(projectSupplementaryFolder.getLocation()));
+                    if (propertiesFolder.exists()) {
+                        for (IResource res : propertiesFolder.members()) {
+                            String name = res.getLocation().makeRelativeTo(new Path(supplementaryFolder)).toString();
+                            new TracePackageSupplFileElement(res, name, suppFilesElement);
+                        }
+                    }
+                }
+                if (suppFilesElement.getChildren().length > 0) {
+                    traceElement.addChild(suppFilesElement);
+                }
+            } catch (CoreException e) {
+                // Should not happen
+                Activator.getDefault().logError("Error finding supplementary files", e); //$NON-NLS-1$
             }
 
             // Bookmarks
@@ -322,7 +345,7 @@ public class ExportTracePackageWizardPage extends AbstractTracePackageWizardPage
                 try {
                     findMarkers = bookmarksFile.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO);
                     if (findMarkers.length > 0) {
-                        children.add(new TracePackageBookmarkElement(traceElement, null));
+                        new TracePackageBookmarkElement(traceElement, null);
                     }
                 } catch (CoreException e) {
                     // Should not happen since we just checked bookmarksFile.exists() but log it just in case
