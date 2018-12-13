@@ -856,6 +856,7 @@ public class FetchRemoteTracesTest {
 
         createProfile();
 
+        shell.activate();
         assertEquals(PROFILE_NAME, fBot.comboBoxWithLabel("Profile name:").getText());
         assertEquals(CONNECTION_NODE_TEXT, fBot.textWithLabel("Nodes:").getText());
 
