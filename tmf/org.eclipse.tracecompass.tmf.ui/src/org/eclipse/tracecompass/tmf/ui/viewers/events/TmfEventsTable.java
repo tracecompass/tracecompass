@@ -1901,6 +1901,10 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     newEditor.addFocusListener(new FocusAdapter() {
                         @Override
                         public void focusLost(final FocusEvent e) {
+                            // With GTK, focus gets lost during initialization, ignore
+                            if (!(boolean) newEditor.getData()) {
+                                return;
+                            }
                             final boolean changed = updateHeader(newEditor.getText());
                             if (changed) {
                                 applyHeader();
@@ -1928,8 +1932,16 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         }
                     });
                     newEditor.selectAll();
-                    newEditor.setFocus();
+                    /*
+                     * Put in the editor's data whether or not the editor has
+                     * been set to the table. This is to prevent a bug with gtk
+                     * initialization where focus is lost and the widget was
+                     * disposed
+                     */
+                    newEditor.setData(false);
                     tableEditor.setEditor(newEditor, item, columnIndex);
+                    newEditor.setData(true);
+                    newEditor.setFocus();
                 }
             }
 
@@ -2965,7 +2977,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 column.setResizable(resizable[i]);
                 if (column.getResizable() && width[i] > 0) {
                     column.setWidth(width[i]);
-                } else if (width[i] == 0){
+                } else if (width[i] == 0) {
                     column.setWidth(0);
                 }
             }
