@@ -167,7 +167,7 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
         validate(totalEntry.getNode(5), "set_tid_address", "2.300 µs", "2.300 µs", "2.300 µs", "---", "1");
         validate(totalEntry.getNode(7), "pipe", "27.900 µs", "29.700 µs", "28.800 µs", "---", "2");
         testToTsv(view);
-        SWTBotMenu menuBot = view.viewMenu().menu("Export to TSV");
+        SWTBotMenu menuBot = view.viewMenu().menu("Export to TSV...");
         assertTrue(menuBot.isEnabled());
         assertTrue(menuBot.isVisible());
 

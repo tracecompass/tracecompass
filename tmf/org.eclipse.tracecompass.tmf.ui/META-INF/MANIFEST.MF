@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 4.2.0.qualifier
+Bundle-Version: 4.3.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.tmf.ui;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.internal.tmf.ui.Activator
@@ -35,7 +35,7 @@ Require-Bundle: org.eclipse.core.expressions,
  org.eclipse.e4.ui.css.swt.theme,
  org.eclipse.ui.themes
 Export-Package: org.eclipse.tracecompass.internal.tmf.ui;x-friends:="org.eclipse.tracecompass.tmf.ui.tests,org.eclipse.tracecompass.tmf.ctf.ui.tests",
- org.eclipse.tracecompass.internal.tmf.ui.commands;x-internal:=true,
+ org.eclipse.tracecompass.internal.tmf.ui.commands;x-friends:="org.eclipse.tracecompass.analysis.timing.ui",
  org.eclipse.tracecompass.internal.tmf.ui.dialogs;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.editors;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.editors.handlers;x-internal:=true,

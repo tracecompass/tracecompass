@@ -457,7 +457,7 @@ public class SegmentTableTest {
         List<String> actionResult = Arrays.asList(lines);
         String absolutePath = TmfTraceManager.getTemporaryDirPath() + File.separator + "syscallLatencyTest.testWriteToTsv.tsv";
         TmfFileDialogFactory.setOverrideFiles(absolutePath);
-        SWTBotMenu menuBot = viewBot.viewMenu().menu("Export to TSV");
+        SWTBotMenu menuBot = viewBot.viewMenu().menu("Export to TSV...");
         try {
             assertTrue(menuBot.isEnabled());
             assertTrue(menuBot.isVisible());

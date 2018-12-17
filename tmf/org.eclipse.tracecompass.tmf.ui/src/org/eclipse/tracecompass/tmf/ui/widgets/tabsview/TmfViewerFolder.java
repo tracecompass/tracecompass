@@ -14,7 +14,10 @@ package org.eclipse.tracecompass.tmf.ui.widgets.tabsview;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.CTabFolder;
@@ -65,7 +68,7 @@ public class TmfViewerFolder extends Composite {
         super(parent, style);
         setLayout(new FillLayout());
 
-        fViewers = new HashMap<>();
+        fViewers = new LinkedHashMap<>();
         initFolder();
     }
 
@@ -137,6 +140,26 @@ public class TmfViewerFolder extends Composite {
      */
     public ITmfViewer getViewer(String viewerName) {
         return fViewers.get(viewerName);
+    }
+
+    /**
+     * Gets the current shown viewer
+     *
+     * @return the current shown viewer
+     *
+     * @since 4.3
+     */
+    public @Nullable ITmfViewer getViewer() {
+        int index = fFolder.getSelectionIndex();
+        fViewers.entrySet();
+        int i = 0;
+        for (Entry<String, ITmfViewer> entry : fViewers.entrySet()) {
+            if (i == index) {
+                return entry.getValue();
+            }
+            i++;
+        }
+        return null;
     }
 
     /**

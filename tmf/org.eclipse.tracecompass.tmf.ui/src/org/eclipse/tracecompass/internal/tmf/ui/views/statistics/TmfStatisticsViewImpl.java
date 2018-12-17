@@ -16,9 +16,14 @@
 
 package org.eclipse.tracecompass.internal.tmf.ui.views.statistics;
 
+import java.io.OutputStream;
+
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tracecompass.internal.tmf.ui.commands.ExportToTsvAction;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.TmfStatisticsViewer;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
@@ -59,6 +64,23 @@ public class TmfStatisticsViewImpl extends TmfView implements ITmfAllowMultiple 
      */
     private ITmfTrace fTrace;
 
+    private final Action fExportAction = new ExportToTsvAction() {
+        @Override
+        protected void exportToTsv(@Nullable OutputStream stream) {
+            ITmfViewer viewer = fStatsViewers.getViewer();
+            if (viewer instanceof TmfStatisticsViewer) {
+                ((TmfStatisticsViewer) viewer).exportToTsv(stream);
+            }
+        }
+
+        @Override
+        protected @Nullable Shell getShell() {
+            return getViewSite().getShell();
+        }
+
+    };
+
+
     /**
      * Constructor of a statistics view.
      *
@@ -91,6 +113,7 @@ public class TmfStatisticsViewImpl extends TmfView implements ITmfAllowMultiple 
         if (trace != null) {
             traceSelected(new TmfTraceSelectedSignal(this, trace));
         }
+        getViewSite().getActionBars().getMenuManager().add(fExportAction);
     }
 
     @Override
