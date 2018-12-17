@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -20,7 +19,6 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemFactory;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
-import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.junit.Test;
 
 /**
@@ -56,10 +54,6 @@ public class AggregatedCalledFunctionStatisticsTest {
             return super.iterateOverStateSystem(ss, threadsPattern, processesPattern, monitor);
         }
 
-        @Override
-        public @NonNull Iterable<@NonNull ISegmentAspect> getSegmentAspects() {
-            return Collections.EMPTY_LIST;
-        }
     }
 
     private static @NonNull ITmfStateSystemBuilder createFixture() {

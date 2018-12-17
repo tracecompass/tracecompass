@@ -20,14 +20,13 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.profiling.core.callgraph.ICallGraphProvider;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
+import org.eclipse.tracecompass.analysis.profiling.core.callstack.IFlameChartProvider;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.SymbolAspect;
 import org.eclipse.tracecompass.internal.analysis.timing.core.Activator;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
-import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory;
-import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory.SegmentStoreType;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
@@ -39,7 +38,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 /**
  * Call stack analysis used to create a segment for each call function from an
@@ -57,6 +55,9 @@ import com.google.common.collect.Lists;
  *         ...        ...
  * </pre>
  *
+ * FIXME: Remove the implemented ISegmentStoreProvider interface at next major
+ * API break
+ *
  * @author Sonia Farrah
  */
 public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISegmentStoreProvider, ICallGraphProvider {
@@ -69,16 +70,6 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-
-    /**
-     * Segment store
-     */
-    private final ISegmentStore<@NonNull ISegment> fStore;
-    /**
-     * This field will be set once the segment store is completed. Because the
-     * segment store to return must be either null or completed
-     */
-    private @Nullable ISegmentStore<@NonNull ISegment> fCompletedStore = null;
 
     /**
      * Listeners. {@link ListenerList}s are typed since 4.6 (Neon), type these when
@@ -108,7 +99,6 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      */
     protected CallGraphAnalysis() {
         super();
-        fStore = SegmentStoreFactory.createSegmentStore(SegmentStoreType.Fast);
         fCallStackAnalysis = null;
     }
 
@@ -120,7 +110,6 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      */
     public CallGraphAnalysis(CallStackAnalysis callStackAnalysis) {
         super();
-        fStore = SegmentStoreFactory.createSegmentStore(SegmentStoreType.Fast);
         fCallStackAnalysis = callStackAnalysis;
     }
 
@@ -144,7 +133,11 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
         return true;
     }
 
+    /**
+     * @deprecated Use the {@link IFlameChartProvider}'s segment store instead
+     */
     @Override
+    @Deprecated
     public @NonNull Iterable<@NonNull ISegmentAspect> getSegmentAspects() {
         return Collections.singletonList(SymbolAspect.SYMBOL_ASPECT);
     }
@@ -208,9 +201,6 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
                 }
             }
         }
-        // Set the completed store and send updates
-        fCompletedStore = fStore;
-        sendUpdate(fStore);
         return true;
     }
 
@@ -303,7 +293,6 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
      */
     private boolean findChildren(AbstractCalledFunction parentFunction, int depth, ITmfStateSystem ss,
             int maxQuark, AggregatedCalledFunction parent, int processId, IProgressMonitor monitor) {
-        fStore.add(parentFunction);
         long curTime = parentFunction.getStart();
         long limit = parentFunction.getEnd();
         ITmfStateInterval interval = null;
@@ -341,12 +330,20 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
         return true;
     }
 
+    /**
+     * @deprecated Use the {@link IFlameChartProvider}'s segment store instead
+     */
     @Override
+    @Deprecated
     public void addListener(@NonNull IAnalysisProgressListener listener) {
         fListeners.add(listener);
     }
 
+    /**
+     * @deprecated Use the {@link IFlameChartProvider}'s segment store instead
+     */
     @Override
+    @Deprecated
     public void removeListener(@NonNull IAnalysisProgressListener listener) {
         fListeners.remove(listener);
     }
@@ -356,28 +353,13 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
         // Do nothing
     }
 
+    /**
+     * @deprecated Use the {@link IFlameChartProvider}'s segment store instead
+     */
     @Override
+    @Deprecated
     public @Nullable ISegmentStore<@NonNull ISegment> getSegmentStore() {
-        return fCompletedStore;
-    }
-
-    /**
-     * Update listeners
-     *
-     * @param store
-     *            The segment store
-     */
-    protected void sendUpdate(final ISegmentStore<@NonNull ISegment> store) {
-        getListeners().forEach(listener -> listener.onComplete(this, store));
-    }
-
-    /**
-     * Get Listeners
-     *
-     * @return The listeners
-     */
-    protected Iterable<IAnalysisProgressListener> getListeners() {
-        return Lists.newArrayList(fListeners.iterator());
+        return null;
     }
 
     /**

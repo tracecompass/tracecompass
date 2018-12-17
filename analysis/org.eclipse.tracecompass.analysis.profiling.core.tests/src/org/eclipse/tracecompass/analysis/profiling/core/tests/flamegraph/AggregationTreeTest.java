@@ -13,28 +13,22 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.AggregatedCalledFunction;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CallGraphAnalysis;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.ThreadNode;
-import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemFactory;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
-import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.junit.Test;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Test the CallGraphAnalysis.This creates a virtual state system in each test
@@ -65,38 +59,9 @@ public class AggregationTreeTest {
      */
     private class CGAnalysis extends CallGraphAnalysis {
 
-        private final class HelloAspect implements ISegmentAspect {
-            @Override
-            public @NonNull String getName() {
-                return "aspect name";
-            }
-
-            @Override
-            public @NonNull String getHelpText() {
-                return "aspect help";
-            }
-
-            @Override
-            public @Nullable Comparator<?> getComparator() {
-                return null;
-            }
-
-            @Override
-            public @Nullable Object resolve(@NonNull ISegment segment) {
-                return "Hello";
-            }
-        }
-
         @Override
         protected boolean iterateOverStateSystem(ITmfStateSystem ss, String[] threadsPattern, String[] processesPattern, IProgressMonitor monitor) {
             return super.iterateOverStateSystem(ss, threadsPattern, processesPattern, monitor);
-        }
-
-        @Override
-        public @NonNull Iterable<@NonNull ISegmentAspect> getSegmentAspects() {
-            ImmutableList<@NonNull ISegmentAspect> aspectList = ImmutableList.of(new HelloAspect());
-            assertNotNull(aspectList);
-            return aspectList;
         }
 
     }
