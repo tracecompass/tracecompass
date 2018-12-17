@@ -315,8 +315,7 @@ public class TmfStatisticsViewer extends TmfViewer {
         if (viewerControl.isDisposed()) {
             return;
         }
-
-        Display.getDefault().asyncExec(new Runnable() {
+        TmfUiRefreshHandler.getInstance().queueUpdate(fTreeViewer, new Runnable() {
             @Override
             public void run() {
                 if (!viewerControl.isDisposed()) {
@@ -357,7 +356,7 @@ public class TmfStatisticsViewer extends TmfViewer {
 
         setPieChartsVisible(moreThanOne);
 
-        Display.getDefault().asyncExec(new Runnable() {
+        TmfUiRefreshHandler.getInstance().queueUpdate(fPieChartViewer, new Runnable() {
             @Override
             public void run() {
                 if (!viewerControl.isDisposed()) {
