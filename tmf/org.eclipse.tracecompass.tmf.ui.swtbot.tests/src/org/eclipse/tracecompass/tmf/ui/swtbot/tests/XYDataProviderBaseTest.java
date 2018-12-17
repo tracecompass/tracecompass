@@ -178,7 +178,7 @@ public abstract class XYDataProviderBaseTest {
         String mainSeriesName = getMainSeriesName();
         ISeries mainSeries = chart.getSeriesSet().getSeries(mainSeriesName);
         if (mainSeries == null) {
-            System.out.println("Main Series is currently null");
+            System.out.println("Main Series " + mainSeriesName + " not found in chart");
             return null;
         }
 
@@ -192,6 +192,10 @@ public abstract class XYDataProviderBaseTest {
         for (String other : otherSeries) {
             if (other != null) {
                 ISeries series = chart.getSeriesSet().getSeries(other);
+                if (series == null) {
+                    System.out.println("Series " + other + " not found in chart");
+                    return null;
+                }
 
                 /* X and Y Values shown in chart */
                 double[] xSeries = series.getXSeries();
