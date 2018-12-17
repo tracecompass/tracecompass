@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Ericsson
+ * Copyright (c) 2016, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -169,34 +169,42 @@ public final class WaitUtils {
     public static void waitUntil(IWaitCondition condition, long maxWait) {
         long waitStart = System.currentTimeMillis();
         Display display = Display.getCurrent();
-        try {
-            while (!condition.test()) {
-                if (System.currentTimeMillis() - waitStart > maxWait) {
-                    throw new WaitTimeoutException(condition.getFailureMessage()); //$NON-NLS-1$
+        Exception exception = null;
+        while (true) {
+            try {
+                if (condition.test()) {
+                    return;
                 }
+                exception = null;
+            } catch (Exception e) {
+                exception = e;
+            }
+            if (System.currentTimeMillis() - waitStart > maxWait) {
+                if (exception != null) {
+                    exception.printStackTrace();
+                    throw new WaitTimeoutException(condition.getFailureMessage() + "\n" + exception);
+                }
+                throw new WaitTimeoutException(condition.getFailureMessage()); //$NON-NLS-1$
+            }
 
-                if (display != null) {
-                    if (!display.readAndDispatch()) {
-                        // We do not use Display.sleep because it might never wake up
-                        // if there is no user interaction
-                        try {
-                            Thread.sleep(UI_THREAD_SLEEP_INTERVAL_MS);
-                        } catch (final InterruptedException e) {
-                            // Ignored
-                        }
-                    }
-                    display.update();
-                } else {
+            if (display != null) {
+                if (!display.readAndDispatch()) {
+                    // We do not use Display.sleep because it might never wake up
+                    // if there is no user interaction
                     try {
-                        Thread.sleep(SLEEP_INTERVAL_MS);
+                        Thread.sleep(UI_THREAD_SLEEP_INTERVAL_MS);
                     } catch (final InterruptedException e) {
                         // Ignored
                     }
                 }
+                display.update();
+            } else {
+                try {
+                    Thread.sleep(SLEEP_INTERVAL_MS);
+                } catch (final InterruptedException e) {
+                    // Ignored
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new WaitTimeoutException(condition.getFailureMessage() + "\n" + e);
         }
     }
 
