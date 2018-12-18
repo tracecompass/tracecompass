@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -34,6 +34,7 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
@@ -152,9 +153,11 @@ public class TestTraceOffsetting {
         final SWTBotTreeItem swtBotTreeItem = allItems[0];
         swtBotTreeItem.select();
         swtBotTreeItem.click(1);
-        swtBotTreeItem.pressShortcut(KeyStroke.getInstance('9'));
-        swtBotTreeItem.pressShortcut(KeyStroke.getInstance('9'));
-        swtBotTreeItem.pressShortcut(KeyStroke.getInstance('\n'));
+        // Press shortcuts on the cell editor
+        SWTBotText text = shell.bot().text(1);
+        text.pressShortcut(KeyStroke.getInstance('9'));
+        text.pressShortcut(KeyStroke.getInstance('9'));
+        text.pressShortcut(KeyStroke.getInstance('\n'));
         WaitUtils.waitForJobs();
         fBot.button("OK").click();
 
