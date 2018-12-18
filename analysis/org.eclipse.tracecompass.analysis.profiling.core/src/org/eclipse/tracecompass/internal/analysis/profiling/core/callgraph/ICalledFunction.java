@@ -9,8 +9,6 @@
 
 package org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph;
 
-import java.util.List;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.segment.interfaces.INamedSegment;
@@ -30,14 +28,6 @@ public interface ICalledFunction extends INamedSegment {
      *
      */
     Object getSymbol();
-
-    /**
-     * The functions called by this function
-     *
-     * @return The functions called by this function, in a {@link List} form.
-     *
-     */
-    List<ICalledFunction> getChildren();
 
     /**
      * The segment's parent

@@ -14,9 +14,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CalledFunction;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CalledFunctionFactory;
@@ -46,8 +44,6 @@ public class CalledFunctionTest {
         fHiFixture = hiFixture;
         ICalledFunction fixture42 = CalledFunctionFactory.create(400, 500, 1, 0x42, 0, fFixture);
         f42Fixture = fixture42;
-        fFixture.addChild(fixture42);
-        fFixture.addChild(hiFixture);
     }
 
     /**
@@ -101,66 +97,24 @@ public class CalledFunctionTest {
     }
 
     /**
-     * Cannot have a cycle
-     */
-    @Test(expected = IllegalArgumentException.class)
-    public void testAddChildSelf() {
-        assertNotNull(fFixture);
-        assertNotNull(f42Fixture);
-        assertNotNull(fHiFixture);
-        fFixture.addChild(fFixture);
-    }
-
-    /**
-     * Cannot have a cycle
-     */
-    @Test(expected = IllegalArgumentException.class)
-    public void testAddChildCycle1() {
-        assertNotNull(fFixture);
-        assertNotNull(fHiFixture);
-        assertNotNull(f42Fixture);
-        fHiFixture.addChild(f42Fixture);
-    }
-
-    /**
-     * Cannot have a cycle
-     */
-    @Test(expected = IllegalArgumentException.class)
-    public void testAddChildCycle2() {
-        ICalledFunction fixture42 = f42Fixture;
-        assertNotNull(fFixture);
-        assertNotNull(fixture42);
-        assertNotNull(fHiFixture);
-        fFixture.addChild(fixture42);
-        ((CalledFunction) fixture42).addChild(fFixture);
-    }
-
-    /**
-     * Cannot have a cycle
-     */
-    @Test(expected = IllegalArgumentException.class)
-    public void testAddChildCycle3() {
-        assertNotNull(fFixture);
-        assertNotNull(f42Fixture);
-        assertNotNull(fHiFixture);
-        ((CalledFunction) f42Fixture).addChild(fHiFixture);
-    }
-
-    /**
      * Ok to add like this
      */
     @Test
     public void testAddChildOk1() {
-        assertNotNull(fFixture);
-        CalledFunction newchild = (CalledFunction) CalledFunctionFactory.create(100, 200, 1, 0x64, 0, fFixture);
-        fFixture.addChild(newchild);
+        ICalledFunction fixture = fFixture;
         ICalledFunction hiFixture = fHiFixture;
         ICalledFunction fixture42 = f42Fixture;
+        assertNotNull(fixture);
         assertNotNull(hiFixture);
         assertNotNull(fixture42);
-        assertEquals(ImmutableList.of(fixture42, hiFixture, newchild), fFixture.getChildren());
-        assertEquals(Collections.emptyList(), fixture42.getChildren());
-        assertEquals(Collections.emptyList(), hiFixture.getChildren());
+        long fixtureST = fixture.getSelfTime();
+        long hiFixtureST = hiFixture.getSelfTime();
+        long fixture42ST = fixture42.getSelfTime();
+        CalledFunction newchild = (CalledFunction) CalledFunctionFactory.create(100, 200, 1, 0x64, 0, fFixture);
+        // Check self time at the end
+        assertEquals(fixtureST - newchild.getLength(), fixture.getSelfTime());
+        assertEquals(hiFixtureST, hiFixture.getSelfTime());
+        assertEquals(fixture42ST, fixture42.getSelfTime());
     }
 
     /**
@@ -168,16 +122,20 @@ public class CalledFunctionTest {
      */
     @Test
     public void testAddChildOk2() {
-        assertNotNull(fFixture);
-        CalledStringFunction newchild = CalledFunctionFactory.create(450, 490, 1, "OK", 0, f42Fixture);
+        ICalledFunction fixture = fFixture;
         ICalledFunction hiFixture = fHiFixture;
         ICalledFunction fixture42 = f42Fixture;
+        assertNotNull(fixture);
         assertNotNull(hiFixture);
         assertNotNull(fixture42);
-        ((CalledFunction) fixture42).addChild(newchild);
-        assertEquals(ImmutableList.of(fixture42, hiFixture), fFixture.getChildren());
-        assertEquals(ImmutableList.of(newchild), f42Fixture.getChildren());
-        assertEquals(Collections.emptyList(), fHiFixture.getChildren());
+        long fixtureST = fixture.getSelfTime();
+        long hiFixtureST = hiFixture.getSelfTime();
+        long fixture42ST = fixture42.getSelfTime();
+        CalledStringFunction newchild = CalledFunctionFactory.create(450, 490, 1, "OK", 0, f42Fixture);
+        // Check self time at the end
+        assertEquals(fixtureST, fixture.getSelfTime());
+        assertEquals(hiFixtureST, hiFixture.getSelfTime());
+        assertEquals(fixture42ST - newchild.getLength(), fixture42.getSelfTime());
     }
 
     /**
@@ -185,16 +143,20 @@ public class CalledFunctionTest {
      */
     @Test
     public void testAddChildOk3() {
-        assertNotNull(fFixture);
-        CalledStringFunction newchild = CalledFunctionFactory.create(450, 490, 1, "OK", 0, fHiFixture);
+        ICalledFunction fixture = fFixture;
         ICalledFunction hiFixture = fHiFixture;
         ICalledFunction fixture42 = f42Fixture;
+        assertNotNull(fixture);
         assertNotNull(hiFixture);
         assertNotNull(fixture42);
-        ((CalledStringFunction) hiFixture).addChild(newchild);
-        assertEquals(ImmutableList.of(fixture42, hiFixture), fFixture.getChildren());
-        assertEquals(ImmutableList.of(newchild), fHiFixture.getChildren());
-        assertEquals(Collections.emptyList(), f42Fixture.getChildren());
+        long fixtureST = fixture.getSelfTime();
+        long hiFixtureST = hiFixture.getSelfTime();
+        long fixture42ST = fixture42.getSelfTime();
+        CalledStringFunction newchild = CalledFunctionFactory.create(450, 490, 1, "OK", 0, fHiFixture);
+        // Check self time at the end
+        assertEquals(fixtureST, fixture.getSelfTime());
+        assertEquals(hiFixtureST - newchild.getLength(), hiFixture.getSelfTime());
+        assertEquals(fixture42ST, fixture42.getSelfTime());
     }
 
     /**
@@ -228,20 +190,6 @@ public class CalledFunctionTest {
         assertNotEquals(fFixture, fHiFixture);
         assertNotEquals(fFixture, null);
         assertNotEquals(fFixture, new ArrayList<>());
-    }
-
-    /**
-     * Test get children
-     */
-    @Test
-    public void testGetChildren() {
-        ICalledFunction fixture42 = f42Fixture;
-        ICalledFunction fixtureHi = fHiFixture;
-        assertNotNull(fixture42);
-        assertNotNull(fixtureHi);
-        assertEquals(ImmutableList.of(fixture42, fixtureHi), fFixture.getChildren());
-        assertEquals(Collections.emptyList(), fixture42.getChildren());
-        assertEquals(Collections.emptyList(), fixtureHi.getChildren());
     }
 
     /**
