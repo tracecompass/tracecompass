@@ -14,6 +14,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -26,6 +27,8 @@ import org.eclipse.tracecompass.ctf.core.tests.shared.CtfBenchmarkTrace;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CallGraphAnalysis;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.callstack.LttngUstCallStackAnalysis;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
+import org.eclipse.tracecompass.segmentstore.core.ISegment;
+import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -56,6 +59,7 @@ public class CallStackAndGraphBenchmark {
      */
     public static final String TEST_ID = "org.eclipse.tracecompass.lttng2.ust#CallStack#";
     private static final String TEST_CALLSTACK_BUILD = "Building Callstack (%s)";
+    private static final String TEST_CALLSTACK_PARSESEGSTORE = "Callstack segment store (%s)";
     private static final String TEST_CALLGRAPH_BUILD = "Building CallGraph (%s)";
 
     private static final int LOOP_COUNT = 25;
@@ -107,6 +111,8 @@ public class CallStackAndGraphBenchmark {
         Performance perf = Performance.getDefault();
         PerformanceMeter callStackBuildPm = Objects.requireNonNull(perf.createPerformanceMeter(TEST_ID + String.format(TEST_CALLSTACK_BUILD, fName)));
         perf.tagAsSummary(callStackBuildPm, String.format(TEST_CALLSTACK_BUILD, fName), Dimension.CPU_TIME);
+        PerformanceMeter callStackSegStorePm = Objects.requireNonNull(perf.createPerformanceMeter(TEST_ID + String.format(TEST_CALLSTACK_PARSESEGSTORE, fName)));
+        perf.tagAsSummary(callStackSegStorePm, String.format(TEST_CALLSTACK_PARSESEGSTORE, fName), Dimension.CPU_TIME);
         PerformanceMeter callgraphBuildPm = Objects.requireNonNull(perf.createPerformanceMeter(TEST_ID + String.format(TEST_CALLGRAPH_BUILD, fName)));
         perf.tagAsSummary(callgraphBuildPm, String.format(TEST_CALLGRAPH_BUILD, fName), Dimension.CPU_TIME);
 
@@ -123,6 +129,17 @@ public class CallStackAndGraphBenchmark {
                 callStackBuildPm.start();
                 TmfTestHelper.executeAnalysis(callStackModule);
                 callStackBuildPm.stop();
+
+                // Benchmark the segment store iteration
+                ISegmentStore<@NonNull ISegment> segmentStore = callStackModule.getSegmentStore();
+                assertNotNull(segmentStore);
+                callStackSegStorePm.start();
+                // Iterate through the whole segment store
+                Iterator<ISegment> iterator = segmentStore.iterator();
+                while (iterator.hasNext()) {
+                    iterator.next();
+                }
+                callStackSegStorePm.stop();
 
                 ICallGraphProvider callGraphModule = callStackModule.getCallGraph();
                 assertTrue(callGraphModule instanceof CallGraphAnalysis);
