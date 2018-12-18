@@ -321,7 +321,6 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
                 AggregatedCalledFunction childNode = new AggregatedCalledFunction(function, parent);
                 // Search for the children with the next quark.
                 findChildren(function, depth + 1, ss, maxQuark, childNode, processId, monitor);
-                parentFunction.addChild(function);
                 parent.addChild(function, childNode);
 
             }

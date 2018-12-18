@@ -9,9 +9,7 @@
 
 package org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -38,7 +36,6 @@ abstract class AbstractCalledFunction implements ICalledFunction {
     protected final long fStart;
     protected final long fEnd;
     protected final int fDepth;
-    private final List<ICalledFunction> fChildren = new ArrayList<>();
     private final @Nullable ICalledFunction fParent;
     protected long fSelfTime = 0;
     private final int fProcessId;
@@ -54,6 +51,9 @@ abstract class AbstractCalledFunction implements ICalledFunction {
         // It'll be modified once we add a child to it
         fSelfTime = fEnd - fStart;
         fProcessId = processId;
+        if (parent instanceof AbstractCalledFunction) {
+            ((AbstractCalledFunction) parent).addChild(this);
+        }
     }
 
     @Override
@@ -64,11 +64,6 @@ abstract class AbstractCalledFunction implements ICalledFunction {
     @Override
     public long getEnd() {
         return fEnd;
-    }
-
-    @Override
-    public List<ICalledFunction> getChildren() {
-        return fChildren;
     }
 
     @Override
@@ -89,11 +84,10 @@ abstract class AbstractCalledFunction implements ICalledFunction {
      * @param child
      *            The child to add to the segment's children
      */
-    public void addChild(ICalledFunction child) {
+    private void addChild(ICalledFunction child) {
         if (child.getParent() != this) {
             throw new IllegalArgumentException("Child parent not the same as child being added to."); //$NON-NLS-1$
         }
-        fChildren.add(child);
         fSelfTime -= child.getLength();
     }
 
