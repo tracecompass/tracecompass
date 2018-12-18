@@ -55,8 +55,12 @@ public class TmfTestHelper {
                 Class<?>[] argTypes = new Class[] { IProgressMonitor.class };
                 Method method = TmfAbstractAnalysisModule.class.getDeclaredMethod("executeAnalysis", argTypes);
                 method.setAccessible(true);
-                Object obj = method.invoke(module, new NullProgressMonitor());
-                return (Boolean) obj;
+                Boolean result = (Boolean) method.invoke(module, new NullProgressMonitor());
+                // Set the module as completed, to avoid another call creating a job
+                method = TmfAbstractAnalysisModule.class.getDeclaredMethod("setAnalysisCompleted", new Class[] { } );
+                method.setAccessible(true);
+                method.invoke(module);
+                return result;
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
                 fail(e.toString());
             }
