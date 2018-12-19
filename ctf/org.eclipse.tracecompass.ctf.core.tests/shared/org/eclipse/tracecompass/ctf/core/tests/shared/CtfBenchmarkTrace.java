@@ -51,7 +51,20 @@ public enum CtfBenchmarkTrace {
      * Trace length: ~10 s
      * </pre>
      */
-    UST_QMLSCENE("qmlscene");
+    UST_QMLSCENE("qmlscene"),
+
+    /**
+     * A UST trace of the vlc program instrumented with -finstrument-functions.
+     * This trace can be used to benchmark UST cyg-profile analyses
+     *
+     * <pre>
+     * Trace Size: 350 MB
+     * Tracer: lttng-ust 2.10
+     * Event count: 12 504 554
+     * Trace length: ~100 s
+     * </pre>
+     */
+    UST_VLC("vlc/vlc_ust");
 
     private static final @NonNull String TRACE_PATH = "traces";
     private final String fTraceName;
