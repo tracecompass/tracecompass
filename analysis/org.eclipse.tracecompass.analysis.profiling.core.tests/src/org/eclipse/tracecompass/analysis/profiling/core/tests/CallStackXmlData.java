@@ -17,10 +17,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
@@ -117,6 +119,19 @@ public class CallStackXmlData {
             fChildren = children;
         }
 
+        public long getDuration() {
+            return fEnd - fStart;
+        }
+
+        public long getSelfTime() {
+            // Remove the length of all children
+            long self = fEnd - fStart;
+            for (ExpectedFunction child : fChildren) {
+                self -= child.getDuration();
+            }
+            return self;
+        }
+
     }
 
     /**
@@ -209,7 +224,7 @@ public class CallStackXmlData {
     public List<IntervalInfo> toStateSystemInterval(String processPattern) {
         List<IntervalInfo> intervals = new ArrayList<>();
         for (ExpectedCallStackElement expected : CALLSTACK_RAW_DATA) {
-            Multimap<Integer, ITmfStateInterval> intervalsByDepth = LinkedHashMultimap.create();
+            Multimap<@NonNull Integer, @NonNull ITmfStateInterval> intervalsByDepth = Objects.requireNonNull(LinkedHashMultimap.create());
             Map<Integer, ITmfStateInterval> lastIntervals = new HashMap<>();
             for (ExpectedFunction expFunction : expected.fCalls) {
                 createIntervalsRecursive(expFunction, intervalsByDepth, lastIntervals, 1);
@@ -248,6 +263,110 @@ public class CallStackXmlData {
         for (ExpectedFunction expChild : expFunction.fChildren) {
             createIntervalsRecursive(expChild, intervals, lastIntervals, depth + 1);
         }
+    }
+
+    /**
+     * A data structure for unit tests that represents aggregated call graph
+     * data
+     */
+    public static class AggregateData {
+
+        private long fDuration = 0;
+        private long fSelfTime = 0;
+        private int fNbCalls = 0;
+        private Map<String, AggregateData> fChildren = new HashMap<>();
+
+        private void addCall(ExpectedFunction expFunction) {
+            fDuration += expFunction.getDuration();
+            fSelfTime += expFunction.getSelfTime();
+            fNbCalls++;
+        }
+
+        private void addChildren(Map<String, AggregateData> children) {
+            for (Entry<String, AggregateData> child : children.entrySet()) {
+                AggregateData aggregateData = fChildren.get(child.getKey());
+                AggregateData childData = child.getValue();
+                if (aggregateData == null) {
+                    fChildren.put(child.getKey(), childData);
+                } else {
+                    aggregateData.fDuration += childData.fDuration;
+                    aggregateData.fSelfTime += childData.fSelfTime;
+                    aggregateData.fNbCalls += childData.fNbCalls;
+                    aggregateData.addChildren(childData.fChildren);
+                }
+            }
+        }
+
+        /**
+         * Get the duration of this aggregated function
+         *
+         * @return The duration
+         */
+        public long getDuration() {
+            return fDuration;
+        }
+
+        /**
+         * Get the self time of this aggregated function
+         *
+         * @return The self time
+         */
+        public long getSelfTime() {
+            return fSelfTime;
+        }
+
+        /**
+         * Get the number of times this function is called
+         *
+         * @return Number of calls
+         */
+        public int getNbCalls() {
+            return fNbCalls;
+        }
+
+        /**
+         * Get the children of this function, where the key is the symbol
+         *
+         * @return The children
+         */
+        public Map<String, AggregateData> getChildren() {
+            return fChildren;
+        }
+
+    }
+
+    /**
+     * Get the expected callgraph, grouped per thread. The key of the map is the
+     * thread ID
+     *
+     * @return The expected callgraph
+     */
+    public Map<Integer, Map<String, AggregateData>> getExpectedCallGraph() {
+        Map<Integer, Map<String, AggregateData>> callgraph = new HashMap<>();
+        for (ExpectedCallStackElement expected : CALLSTACK_RAW_DATA) {
+            Map<String, AggregateData> aggregate = new HashMap<>();
+            for (ExpectedFunction expFunction : expected.fCalls) {
+                createCallGraphRecursive(expFunction, aggregate);
+            }
+            callgraph.put(expected.fTid, aggregate);
+        }
+        return callgraph;
+    }
+
+    private void createCallGraphRecursive(ExpectedFunction expFunction, Map<String, AggregateData> aggregate) {
+        AggregateData aggregateData = aggregate.get(expFunction.fFunction);
+        if (aggregateData == null) {
+            aggregateData = new AggregateData();
+            aggregate.put(expFunction.fFunction, aggregateData);
+        }
+        aggregateData.addCall(expFunction);
+
+        // Recursively visit the children
+        Map<String, AggregateData> childAggregate = new HashMap<>();
+        for (ExpectedFunction expChild : expFunction.fChildren) {
+            createCallGraphRecursive(expChild, childAggregate);
+        }
+        aggregateData.addChildren(childAggregate);
     }
 
 }
