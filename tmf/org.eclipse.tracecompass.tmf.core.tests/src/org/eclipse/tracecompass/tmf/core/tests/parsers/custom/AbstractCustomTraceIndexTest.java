@@ -171,8 +171,8 @@ public abstract class AbstractCustomTraceIndexTest {
             ITmfCheckpoint checkpoint = checkpoints.get(i);
             TmfContext context = new TmfContext(checkpoint.getLocation(), i * pageSize);
             ITmfEvent event = ((ITmfEventParser)fTrace).parseEvent(context);
-            assertTrue(context.getRank() == i * pageSize);
-            assertTrue((checkpoint.getTimestamp().compareTo(event.getTimestamp()) == 0));
+            assertEquals("Rank for checkpoint " + i, i * pageSize, context.getRank());
+            assertEquals("Timestamp for checkpoint " + i, checkpoint.getTimestamp(), event.getTimestamp());
         }
     }
 
