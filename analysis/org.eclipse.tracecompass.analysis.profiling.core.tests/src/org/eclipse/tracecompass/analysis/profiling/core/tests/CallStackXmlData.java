@@ -15,9 +15,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IPath;
@@ -27,6 +29,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.IntervalInfo;
 import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.StateIntervalStub;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -170,50 +173,6 @@ public class CallStackXmlData {
     }
 
     /**
-     * Class to group an attribute path and its intervals
-     *
-     * TODO: copy-pasted from LinuxTestCase, should be in state system then
-     */
-    public static class IntervalInfo {
-
-        private final String[] fAttributePath;
-        private final List<ITmfStateInterval> fIntervals;
-
-        /**
-         * Constructor
-         *
-         * @param intervals
-         *            The list of intervals for the full time range of the
-         *            attribute
-         * @param attributePath
-         *            The attribute path
-         */
-        public IntervalInfo(Collection<ITmfStateInterval> intervals, String... attributePath) {
-            fAttributePath = attributePath;
-            fIntervals = new ArrayList<>();
-            fIntervals.addAll(intervals);
-        }
-
-        /**
-         * Get the attribute path
-         *
-         * @return The attribute path
-         */
-        public String[] getAttributePath() {
-            return fAttributePath;
-        }
-
-        /**
-         * Get the list of intervals
-         *
-         * @return The list of intervals
-         */
-        public List<ITmfStateInterval> getIntervals() {
-            return fIntervals;
-        }
-    }
-
-    /**
      * Convert the callstack to the state system content
      *
      * @param processPattern
@@ -221,8 +180,8 @@ public class CallStackXmlData {
      * @return The list of interval infos, ie attribute paths and their
      *         corresponding intervals, that should be in the state system
      */
-    public List<IntervalInfo> toStateSystemInterval(String processPattern) {
-        List<IntervalInfo> intervals = new ArrayList<>();
+    public Set<IntervalInfo> toStateSystemInterval(String processPattern) {
+        Set<IntervalInfo> intervals = new HashSet<>();
         for (ExpectedCallStackElement expected : CALLSTACK_RAW_DATA) {
             Multimap<@NonNull Integer, @NonNull ITmfStateInterval> intervalsByDepth = Objects.requireNonNull(LinkedHashMultimap.create());
             Map<Integer, ITmfStateInterval> lastIntervals = new HashMap<>();
@@ -235,7 +194,7 @@ public class CallStackXmlData {
                 if (lastInterval.getValue().getEndTime() < END) {
                     intervalsByDepth.put(lastInterval.getKey(), new StateIntervalStub((int) lastInterval.getValue().getEndTime() + 1, (int) END, (Object) null));
                 }
-                intervals.add(new IntervalInfo(intervalsByDepth.get(lastInterval.getKey()),
+                intervals.add(new IntervalInfo(new ArrayList<>(intervalsByDepth.get(lastInterval.getKey())),
                         processPattern, String.valueOf(expected.fPid),
                         String.valueOf(expected.fTid),
                         CallStackAnalysis.CALL_STACK, String.valueOf(lastInterval.getKey())));

@@ -20,6 +20,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.IoOperationTy
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.StateValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.LinuxTestCase;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.IntervalInfo;
 import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.StateIntervalStub;
 import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.StateSystemTestUtils;
 

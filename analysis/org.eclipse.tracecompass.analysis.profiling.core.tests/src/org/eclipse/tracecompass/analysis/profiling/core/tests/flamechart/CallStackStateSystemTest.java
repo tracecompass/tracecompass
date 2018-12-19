@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.profiling.core.base.IProfilingGroupDescriptor;
@@ -23,11 +24,11 @@ import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnaly
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackSeries;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackStateProvider;
 import org.eclipse.tracecompass.analysis.profiling.core.tests.CallStackTestBase;
-import org.eclipse.tracecompass.analysis.profiling.core.tests.CallStackXmlData.IntervalInfo;
 import org.eclipse.tracecompass.analysis.profiling.core.tests.stubs.CallStackAnalysisStub;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.InstrumentedGroupDescriptor;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
+import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.IntervalInfo;
 import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.StateSystemTestUtils;
 import org.junit.Test;
 
@@ -114,11 +115,9 @@ public class CallStackStateSystemTest extends CallStackTestBase {
 
         }
 
-        List<@NonNull IntervalInfo> stateSystemIntervals = getTraceData().toStateSystemInterval(patterns.get(0)[0]);
+        Set<@NonNull IntervalInfo> stateSystemIntervals = getTraceData().toStateSystemInterval(patterns.get(0)[0]);
         assertEquals("Number of callstack data elements", stateSystemIntervals.size(), actualStackCount);
-        for (IntervalInfo info : stateSystemIntervals) {
-            StateSystemTestUtils.testIntervalForAttributes(ss, info.getIntervals(), info.getAttributePath());
-        }
+        StateSystemTestUtils.testIntervals(ss, stateSystemIntervals);
     }
 
 //    private void verifyProcess(ITmfStateSystem ss, int pid, CallStackSeries callstack, List<Integer> threadQuarks) throws AttributeNotFoundException {

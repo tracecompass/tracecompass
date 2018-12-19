@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -24,6 +25,7 @@ import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+
 import com.google.common.base.Objects;
 
 /**
@@ -130,6 +132,20 @@ public final class StateSystemTestUtils {
      */
     public static @NonNull String[] makeAttribute(@NonNull String... path) {
         return path;
+    }
+
+    /**
+     * Test a set of interval informations
+     *
+     * @param ss
+     *            The state system
+     * @param intervalInfos
+     *            A set of interval informations to test
+     */
+    public static void testIntervals(ITmfStateSystem ss, Set<IntervalInfo> intervalInfos) {
+        for (@NonNull IntervalInfo info : intervalInfos) {
+            testIntervalForAttributes(ss, info.getIntervals(), info.getAttributePath());
+        }
     }
 
 }

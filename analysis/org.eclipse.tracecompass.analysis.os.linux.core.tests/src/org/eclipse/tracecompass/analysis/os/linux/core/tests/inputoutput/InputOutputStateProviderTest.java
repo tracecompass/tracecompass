@@ -18,7 +18,6 @@ import java.util.Arrays;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.InputOutputAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.LinuxTestCase;
-import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.LinuxTestCase.IntervalInfo;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.LinuxTestCase.PunctualInfo;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.inputoutput.IoTestFactory;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.InputOutputStateProvider;
@@ -105,9 +104,7 @@ public class InputOutputStateProviderTest extends AbstractTestInputOutput {
         ITmfStateSystem ss = module.getStateSystem();
         assertNotNull(ss);
 
-        for (@NonNull IntervalInfo info : fTestCase.getTestIntervals()) {
-            StateSystemTestUtils.testIntervalForAttributes(ss, info.getIntervals(), info.getAttributePath());
-        }
+        StateSystemTestUtils.testIntervals(ss, fTestCase.getTestIntervals());
     }
 
     /**

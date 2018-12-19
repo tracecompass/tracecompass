@@ -13,7 +13,6 @@ import static org.junit.Assert.fail;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,7 +23,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.Activator;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.IntervalInfo;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 
@@ -36,47 +35,6 @@ import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 public class LinuxTestCase {
 
     private final String fTraceFile;
-
-    /**
-     * Class to group an attribute path and its intervals
-     */
-    public static class IntervalInfo {
-
-        private final String[] fAttributePath;
-        private final List<ITmfStateInterval> fIntervals;
-
-        /**
-         * Constructor
-         *
-         * @param intervals
-         *            The list of intervals for the full time range of the
-         *            attribute
-         * @param attributePath
-         *            The attribute path
-         */
-        public IntervalInfo(List<ITmfStateInterval> intervals, String... attributePath) {
-            fAttributePath = attributePath;
-            fIntervals = intervals;
-        }
-
-        /**
-         * Get the attribute path
-         *
-         * @return The attribute path
-         */
-        public String[] getAttributePath() {
-            return fAttributePath;
-        }
-
-        /**
-         * Get the list of intervals
-         *
-         * @return The list of intervals
-         */
-        public List<ITmfStateInterval> getIntervals() {
-            return fIntervals;
-        }
-    }
 
     /**
      * Class to group a timestamp with a map of attributes and their expected
