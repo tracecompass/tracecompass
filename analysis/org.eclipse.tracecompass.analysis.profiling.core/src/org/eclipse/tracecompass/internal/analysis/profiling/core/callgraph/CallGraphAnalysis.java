@@ -78,11 +78,6 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
     private final ListenerList fListeners = new ListenerList(ListenerList.IDENTITY);
 
     /**
-     * The Trace's root functions list
-     */
-    private final List<ICalledFunction> fRootFunctions = new ArrayList<>();
-
-    /**
      * The sub attributes of a certain thread
      */
     private List<Integer> fCurrentQuarks = Collections.emptyList();
@@ -250,7 +245,6 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
                     long intervalEnd = interval.getEndTime();
                     // Create the segment for the first call event.
                     AbstractCalledFunction rootFunction = CalledFunctionFactory.create(intervalStart, intervalEnd + 1, depth, stateValue, processId, null);
-                    fRootFunctions.add(rootFunction);
                     AggregatedCalledFunction firstNode = new AggregatedCalledFunction(rootFunction, fCurrentQuarks.size());
                     if (!findChildren(rootFunction, depth, stateSystem, fCurrentQuarks.size() + fCurrentQuarks.get(depth), firstNode, processId, monitor)) {
                         return false;
@@ -359,15 +353,6 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
     @Deprecated
     public @Nullable ISegmentStore<@NonNull ISegment> getSegmentStore() {
         return null;
-    }
-
-    /**
-     * The functions of the first level
-     *
-     * @return Functions of the first level
-     */
-    public List<ICalledFunction> getRootFunctions() {
-        return ImmutableList.copyOf(fRootFunctions);
     }
 
     /**
