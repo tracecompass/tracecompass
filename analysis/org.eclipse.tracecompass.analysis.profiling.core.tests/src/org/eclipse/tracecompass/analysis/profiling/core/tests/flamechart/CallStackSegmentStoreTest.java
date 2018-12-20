@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.profiling.core.tests.CallStackTestBase;
+import org.eclipse.tracecompass.analysis.profiling.core.tests.data.TestDataSmallCallStack;
 import org.eclipse.tracecompass.analysis.profiling.core.tests.stubs.CallStackAnalysisStub;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -31,6 +32,13 @@ import com.google.common.collect.Iterators;
  * @author Geneviève Bastien
  */
 public class CallStackSegmentStoreTest extends CallStackTestBase {
+
+    /**
+     * Constructor
+     */
+    public CallStackSegmentStoreTest() {
+        super(new TestDataSmallCallStack());
+    }
 
     /**
      * Test the callstack data using the callstack object

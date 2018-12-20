@@ -23,6 +23,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.statesystem.core.tests
 Export-Package: org.eclipse.tracecompass.analysis.profiling.core.tests,
  org.eclipse.tracecompass.analysis.profiling.core.tests.callgraph,
+ org.eclipse.tracecompass.analysis.profiling.core.tests.data,
  org.eclipse.tracecompass.analysis.profiling.core.tests.flamechart,
  org.eclipse.tracecompass.analysis.profiling.core.tests.flamegraph,
  org.eclipse.tracecompass.analysis.profiling.core.tests.stubs

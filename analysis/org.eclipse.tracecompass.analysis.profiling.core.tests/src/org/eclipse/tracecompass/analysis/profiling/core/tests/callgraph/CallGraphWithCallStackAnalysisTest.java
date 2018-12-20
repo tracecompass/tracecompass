@@ -14,6 +14,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -21,22 +22,54 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.profiling.core.callgraph.ICallGraphProvider;
 import org.eclipse.tracecompass.analysis.profiling.core.tests.CallStackTestBase;
-import org.eclipse.tracecompass.analysis.profiling.core.tests.CallStackXmlData.AggregateData;
+import org.eclipse.tracecompass.analysis.profiling.core.tests.data.CallStackTestData;
+import org.eclipse.tracecompass.analysis.profiling.core.tests.data.CallStackTestData.AggregateData;
+import org.eclipse.tracecompass.analysis.profiling.core.tests.data.TestDataBigCallStack;
+import org.eclipse.tracecompass.analysis.profiling.core.tests.data.TestDataSmallCallStack;
 import org.eclipse.tracecompass.analysis.profiling.core.tests.stubs.CallStackAnalysisStub;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.AggregatedCalledFunction;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CallGraphAnalysis;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.ThreadNode;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test the callgraph analysis with the call stack trace and module
  *
  * @author Geneviève Bastien
  */
+@RunWith(Parameterized.class)
 public class CallGraphWithCallStackAnalysisTest extends CallStackTestBase {
 
     /**
-     * Test the callgraph with a small trace
+     * Get the traces on which to run the benchmark
+     *
+     * @return The arrays of parameters
+     */
+    @Parameters(name = "{index}: {0}")
+    public static Iterable<Object[]> getParameters() {
+        return Arrays.asList(new Object[][] {
+                { "Small trace", new TestDataSmallCallStack() },
+                { "Big trace", new TestDataBigCallStack() },
+        });
+    }
+
+    /**
+     * Constructor
+     *
+     * @param name
+     *            The name of this test
+     * @param data
+     *            The test data
+     */
+    public CallGraphWithCallStackAnalysisTest(String name, CallStackTestData data) {
+        super(data);
+    }
+
+    /**
+     * Test the callgraph with the expected
      */
     @Test
     public void testCallGraph() {
