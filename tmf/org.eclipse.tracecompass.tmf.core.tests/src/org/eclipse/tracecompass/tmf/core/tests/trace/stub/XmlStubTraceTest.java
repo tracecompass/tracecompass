@@ -31,7 +31,9 @@ import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStubNs;
+import org.junit.After;
 import org.junit.Test;
 
 /**
@@ -50,6 +52,33 @@ public class XmlStubTraceTest {
     private static final String FIELD_A = "b";
     private static final String FIELD_B = "f";
 
+    private ITmfTrace fTestTrace = null;
+
+    /**
+     * Tear down the test
+     */
+    @After
+    public void tearDown() {
+        ITmfTrace trace = fTestTrace;
+        if (trace == null) {
+            return;
+        }
+        fTestTrace = null;
+        String directory = TmfTraceManager.getSupplementaryFileDir(trace);
+        try {
+            trace.dispose();
+        } finally {
+            File dir = new File(directory);
+            if (dir.exists()) {
+                File[] files = dir.listFiles();
+                for (File file : files) {
+                    file.delete();
+                }
+                dir.delete();
+            }
+        }
+    }
+
     /**
      * Test the
      * {@link TmfXmlTraceStubNs#validate(org.eclipse.core.resources.IProject, String)}
@@ -57,20 +86,18 @@ public class XmlStubTraceTest {
      */
     @Test
     public void testValidate() {
-        TmfXmlTraceStubNs trace = new TmfXmlTraceStubNs();
+        fTestTrace = new TmfXmlTraceStubNs();
         File[] invalidFiles = TmfCoreTestPlugin.getAbsoluteFilePath(INVALID_PATH).toFile().listFiles();
         assertTrue(invalidFiles.length > 0);
         for (File f : invalidFiles) {
-            assertTrue(!trace.validate(null, f.getAbsolutePath()).isOK());
+            assertTrue(!fTestTrace.validate(null, f.getAbsolutePath()).isOK());
         }
 
         File[] validFiles = TmfCoreTestPlugin.getAbsoluteFilePath(VALID_PATH).toFile().listFiles();
         assertTrue(validFiles.length > 0);
         for (File f : validFiles) {
-            assertTrue(trace.validate(null, f.getAbsolutePath()).isOK());
+            assertTrue(fTestTrace.validate(null, f.getAbsolutePath()).isOK());
         }
-
-        trace.dispose();
     }
 
     /**
@@ -79,10 +106,10 @@ public class XmlStubTraceTest {
      */
     @Test
     public void testDevelopmentTrace() {
-        TmfXmlTraceStubNs trace = TmfXmlTraceStubNs.setupTrace(TmfCoreTestPlugin.getAbsoluteFilePath(VALID_FILE));
+        fTestTrace = TmfXmlTraceStubNs.setupTrace(TmfCoreTestPlugin.getAbsoluteFilePath(VALID_FILE));
 
-        CustomEventRequest req = new CustomEventRequest(trace);
-        trace.sendRequest(req);
+        CustomEventRequest req = new CustomEventRequest(fTestTrace);
+        fTestTrace.sendRequest(req);
         try {
             req.waitForCompletion();
             if (req.isCancelled()) {
@@ -92,8 +119,6 @@ public class XmlStubTraceTest {
             fail(e.getMessage());
         }
         assertEquals(4, req.getCount());
-
-        trace.dispose();
     }
 
     /**
@@ -101,12 +126,12 @@ public class XmlStubTraceTest {
      */
     @Test
     public void testAspects() {
-        TmfXmlTraceStubNs trace = TmfXmlTraceStubNs.setupTrace(TmfCoreTestPlugin.getAbsoluteFilePath(VALID_FILE));
+        fTestTrace = TmfXmlTraceStubNs.setupTrace(TmfCoreTestPlugin.getAbsoluteFilePath(VALID_FILE));
 
         ITmfEventAspect<?> cpuAspect = null;
         ITmfEventAspect<?> testAspect = null;
         int aspectCount = 0;
-        for (ITmfEventAspect<?> aspect : trace.getEventAspects()) {
+        for (ITmfEventAspect<?> aspect : fTestTrace.getEventAspects()) {
             aspectCount++;
             if (aspect instanceof TmfCpuAspect) {
                 cpuAspect = aspect;
@@ -120,27 +145,26 @@ public class XmlStubTraceTest {
         assertNotNull(testAspect);
 
         ITmfContext ctx;
-        ctx = trace.seekEvent(0L);
+        ctx = fTestTrace.seekEvent(0L);
         assertNotNull(ctx);
-        ITmfEvent event = trace.getNext(ctx);
+        ITmfEvent event = fTestTrace.getNext(ctx);
         assertNotNull(event);
         assertEquals("Cpu aspect of event 1", 1, cpuAspect.resolve(event));
         assertEquals("Test aspect of event 1", "abc", testAspect.resolve(event));
-        event = trace.getNext(ctx);
+        event = fTestTrace.getNext(ctx);
         assertNotNull(event);
         assertEquals("Cpu aspect of event 2", 1, cpuAspect.resolve(event));
         assertEquals("Test aspect of event 2", "abc", testAspect.resolve(event));
-        event = trace.getNext(ctx);
+        event = fTestTrace.getNext(ctx);
         assertNotNull(event);
         assertEquals("Cpu aspect of event 3", 2, cpuAspect.resolve(event));
         assertEquals("Test aspect of event 3", "def", testAspect.resolve(event));
-        event = trace.getNext(ctx);
+        event = fTestTrace.getNext(ctx);
         assertNotNull(event);
         assertEquals("Cpu aspect of event 4", 1, cpuAspect.resolve(event));
         assertEquals("Test aspect of event 4", "def", testAspect.resolve(event));
 
         ctx.dispose();
-        trace.dispose();
     }
 
     private static IStatus testEvent(ITmfEvent event) {
