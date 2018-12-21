@@ -52,8 +52,8 @@ public class CallStackSegmentStoreTest extends CallStackTestBase {
         assertNotNull(segmentStore);
 
         Iterator<@NonNull ISegment> iterator = segmentStore.iterator();
-        assertEquals("Segment store iterator count", 18, Iterators.size(iterator));
-        assertEquals("Segment store size", 18, segmentStore.size());
+        assertEquals("Segment store iterator count", 21, Iterators.size(iterator));
+        assertEquals("Segment store size", 21, segmentStore.size());
         assertFalse(segmentStore.isEmpty());
     }
 

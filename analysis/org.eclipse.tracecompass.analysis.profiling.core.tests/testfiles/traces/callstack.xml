@@ -11,9 +11,9 @@
 * where 1e2 means at timestamp 1, entry of function named op2
 *   and 10x means at timestamp 10, exit of the function
 *
-* pid1 ___ tid2   1e1 +++++++++++++ 10x1 12e4+++++++++++ 20x
-*      |             3e2+++++++7x
-*      |               4e3++5x
+* pid1 ___ tid2   1e1 +++++++++++++ 10x1 12e4+++++++++++ 20x 22e4+++
+*      |             3e2+++++++7x                              24e2+
+*      |               4e3++5x                                  25e2
 *      |__ tid3      3e2 +++++++++++++++++++++++++++++++ 20x
 *                       5e3++6x  7e2++++++++13x
 * 
@@ -204,5 +204,20 @@
 <field name="op" type="string" value="op5" />
 <field name="pid" type="string" value="5" />
 <field name="tid" type="string" value="7" />
+</event>
+<event timestamp="22" name="entry">
+<field name="op" type="string" value="op4" />
+<field name="pid" type="string" value="1" />
+<field name="tid" type="string" value="2" />
+</event>
+<event timestamp="24" name="entry">
+<field name="op" type="string" value="op2" />
+<field name="pid" type="string" value="1" />
+<field name="tid" type="string" value="2" />
+</event>
+<event timestamp="25" name="entry">
+<field name="op" type="string" value="op2" />
+<field name="pid" type="string" value="1" />
+<field name="tid" type="string" value="2" />
 </event>
 </trace>

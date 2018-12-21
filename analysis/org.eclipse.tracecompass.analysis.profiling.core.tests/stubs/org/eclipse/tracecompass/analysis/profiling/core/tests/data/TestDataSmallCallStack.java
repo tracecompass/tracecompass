@@ -30,7 +30,7 @@ public class TestDataSmallCallStack extends CallStackTestData {
 
     private static final List<ExpectedCallStackElement> CALLSTACK_RAW_DATA = new ArrayList<>();
     private static final long START = 1L;
-    private static final long END = 20L;
+    private static final long END = 25L;
 
     static {
         // Prepare pid 1, tid 2
@@ -38,7 +38,11 @@ public class TestDataSmallCallStack extends CallStackTestData {
                 new ExpectedFunction(1, 10, "op1", ImmutableList.of(
                         new ExpectedFunction(3, 7, "op2", ImmutableList.of(
                                 new ExpectedFunction(4, 5, "op3", Collections.emptyList()))))),
-                new ExpectedFunction(12, 20, "op4", Collections.emptyList()))));
+                new ExpectedFunction(12, 20, "op4", Collections.emptyList()),
+                new ExpectedFunction(22, 26, "op4", ImmutableList.of(
+                        new ExpectedFunction(24, 26, "op2", ImmutableList.of(
+                                new ExpectedFunction(25, 26, "op2", Collections.emptyList())))))
+                )));
         // Prepare pid 1, tid 3
         CALLSTACK_RAW_DATA.add(new ExpectedCallStackElement(1, 3, ImmutableList.of(
                 new ExpectedFunction(3, 20, "op2", ImmutableList.of(
