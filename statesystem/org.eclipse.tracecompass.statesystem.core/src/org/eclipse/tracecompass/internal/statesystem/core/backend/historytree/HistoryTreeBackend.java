@@ -19,10 +19,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
+import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,6 +37,7 @@ import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+
 import com.google.common.annotations.VisibleForTesting;
 
 /**
@@ -278,7 +279,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
         checkValidTime(t);
 
         /* Queue is a stack of nodes containing nodes intersecting t */
-        Deque<Integer> queue = new LinkedList<>();
+        Deque<Integer> queue = new ArrayDeque<>();
 
         /* We start by reading the information in the root node */
         queue.add(getSHT().getRootNode().getSequenceNumber());
@@ -331,7 +332,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
             throws TimeRangeException, ClosedChannelException {
         checkValidTime(t);
 
-        Deque<Integer> queue = new LinkedList<>();
+        Deque<Integer> queue = new ArrayDeque<>();
         queue.add(getSHT().getRootNode().getSequenceNumber());
         HTInterval interval = null;
         while (interval == null && !queue.isEmpty()) {
@@ -348,13 +349,18 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
 
     @Override
     public Iterable<@NonNull ITmfStateInterval> query2D(IntegerRangeCondition quarks, TimeRangeCondition times) {
+        return query2D(quarks, times, false);
+    }
+
+    @Override
+    public Iterable<@NonNull ITmfStateInterval> query2D(IntegerRangeCondition quarks, TimeRangeCondition times, boolean reverse) {
         try (TraceCompassLogUtils.FlowScopeLog log = new TraceCompassLogUtils.FlowScopeLogBuilder(LOGGER, Level.FINER,
                 "HistoryTreeBackend:query2D:init", //$NON-NLS-1$
                 "ssid", getSSID(), //$NON-NLS-1$
                 "quarks", quarks, //$NON-NLS-1$
                 "timeCondition", times).build()) { //$NON-NLS-1$
             return () -> new Iterator<@NonNull ITmfStateInterval>() {
-                private final Deque<Integer> seqNumberQueue = new LinkedList<>(Collections.singleton(getSHT().getRootNode().getSequenceNumber()));
+                private final Deque<Integer> seqNumberQueue = new ArrayDeque<>(Collections.singleton(getSHT().getRootNode().getSequenceNumber()));
                 private Iterator<@NonNull HTInterval> intervalQueue = Collections.emptyIterator();
 
                 @Override
@@ -373,7 +379,7 @@ public class HistoryTreeBackend implements IStateHistoryBackend {
                             if (quarks.intersects(currentNode.getMinQuark(), currentNode.getMaxQuark()) && subTimes != null) {
                                 if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
                                     // Queue the relevant children nodes for BFS.
-                                    ((ParentNode) currentNode).queueNextChildren2D(quarks, subTimes, seqNumberQueue);
+                                    ((ParentNode) currentNode).queueNextChildren2D(quarks, subTimes, seqNumberQueue, reverse);
                                 }
                                 intervalQueue = currentNode.iterable2D(quarks, subTimes).iterator();
                             }

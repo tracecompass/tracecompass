@@ -202,4 +202,25 @@ public interface IStateHistoryBackend {
             throws TimeRangeException {
         throw new UnsupportedOperationException("This backend does not support 2D queries"); //$NON-NLS-1$
     }
+
+    /**
+     * Generalized 2D iterable query method. Iterates over intervals that match
+     * the conditions on quarks and times with no guaranteed order.
+     *
+     * @param quarkCondition
+     *            Condition on the quarks for returned intervals.
+     * @param timeCondition
+     *            Condition on the times for returned intervals
+     * @param reverse
+     *            A hint to tell whether the backend should be queried backward
+     *            or forward
+     * @return An un-ordered iterable over the queried intervals
+     * @throws TimeRangeException
+     *             if the time bounds are outside the range of the HistoryTree
+     * @since 4.2
+     */
+    default Iterable<@NonNull ITmfStateInterval> query2D(IntegerRangeCondition quarkCondition, TimeRangeCondition timeCondition, boolean reverse)
+            throws TimeRangeException {
+        return query2D(quarkCondition, timeCondition);
+    }
 }
