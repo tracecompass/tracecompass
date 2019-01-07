@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016 Ericsson
+ * Copyright (c) 2015, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -130,8 +131,7 @@ public class SystemCallLatencyTableAnalysisTest extends SegmentTableTest {
      */
     @Test
     public void testWithTrace() throws IOException {
-        String tracePath;
-        tracePath = FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).getPath();
+        String tracePath = FileUtils.toFile(FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL())).getAbsolutePath();
         SWTBotUtils.closeViewById(PRIMARY_VIEW_ID, fBot);
         SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotUtils.openTrace(PROJECT_NAME, tracePath, TRACE_TYPE);

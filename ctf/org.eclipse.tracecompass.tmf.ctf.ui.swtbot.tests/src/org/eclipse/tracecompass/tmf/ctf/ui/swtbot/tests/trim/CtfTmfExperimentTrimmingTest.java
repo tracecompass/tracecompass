@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.varia.NullAppender;
 import org.eclipse.core.runtime.FileLocator;
@@ -111,8 +112,7 @@ public class CtfTmfExperimentTrimmingTest {
      */
     @Before
     public void setup() throws IOException {
-        String file = FileLocator.toFileURL(CtfTestTrace.TRACE_EXPERIMENT.getTraceURL()).getPath();
-        File parentDir = new File(file);
+        File parentDir = FileUtils.toFile(FileLocator.toFileURL(CtfTestTrace.TRACE_EXPERIMENT.getTraceURL()));
         File[] traceFiles = parentDir.listFiles();
         ITmfTrace traceValidator = new CtfTmfTrace();
         SWTWorkbenchBot bot = new SWTWorkbenchBot();

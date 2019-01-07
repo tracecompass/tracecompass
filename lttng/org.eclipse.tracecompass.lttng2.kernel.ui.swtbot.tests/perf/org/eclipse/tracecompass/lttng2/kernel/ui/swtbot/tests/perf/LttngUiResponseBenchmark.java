@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 École Polytechnique de Montréal
+ * Copyright (c) 2016, 2018 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests.perf;
 import java.io.IOException;
 import java.util.EnumSet;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests.perf.views.UiResponseTest;
@@ -54,7 +55,7 @@ public class LttngUiResponseBenchmark extends UiResponseTest {
      */
     @Test
     public void testWithDjango() throws SecurityException, IllegalArgumentException, IOException {
-        runTestWithTrace(FileLocator.toFileURL(CtfTestTrace.DJANGO_CLIENT.getTraceURL()).getPath(), TRACE_TYPE, EnumSet.allOf(OsLinuxViews.class));
+        runTestWithTrace(FileUtils.toFile(FileLocator.toFileURL(CtfTestTrace.DJANGO_CLIENT.getTraceURL())).getAbsolutePath(), TRACE_TYPE, EnumSet.allOf(OsLinuxViews.class));
     }
 
     /**
@@ -72,7 +73,7 @@ public class LttngUiResponseBenchmark extends UiResponseTest {
      */
     @Test
     public void testWithManyThreads() throws SecurityException, IllegalArgumentException, IOException {
-        runTestWithTrace(FileLocator.toFileURL(CtfTestTrace.MANY_THREADS.getTraceURL()).getPath(), TRACE_TYPE, EnumSet.of(OsLinuxViews.CONTROL_FLOW, OsLinuxViews.RESOURCES, OsLinuxViews.CPU_USAGE, OsLinuxViews.DISK_IO_ACTIVITY));
+        runTestWithTrace(FileUtils.toFile(FileLocator.toFileURL(CtfTestTrace.MANY_THREADS.getTraceURL())).getAbsolutePath(), TRACE_TYPE, EnumSet.of(OsLinuxViews.CONTROL_FLOW, OsLinuxViews.RESOURCES, OsLinuxViews.CPU_USAGE, OsLinuxViews.DISK_IO_ACTIVITY));
     }
 
 }

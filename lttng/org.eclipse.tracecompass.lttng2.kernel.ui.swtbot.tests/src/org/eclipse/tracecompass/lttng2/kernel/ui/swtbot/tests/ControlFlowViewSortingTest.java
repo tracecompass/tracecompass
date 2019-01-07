@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,12 +13,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -117,12 +116,12 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
             defaultPreferences.put(ITmfTimePreferencesConstants.TIME_ZONE, "GMT-05:00");
             TmfTimestampFormat.updateDefaultFormats();
 
-            String tracePath = Paths.get(FileLocator.toFileURL(CtfTestTrace.SYNC_DEST.getTraceURL()).toURI()).toString();
+            String tracePath = FileUtils.toFile(FileLocator.toFileURL(CtfTestTrace.SYNC_DEST.getTraceURL())).getAbsolutePath();
             fViewBot = fBot.viewByTitle("Control Flow");
             fViewBot.show();
             SWTBotUtils.openTrace(TRACE_PROJECT_NAME, tracePath, KERNEL_TRACE_TYPE);
             fViewBot.setFocus();
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             fail();
         }
     }

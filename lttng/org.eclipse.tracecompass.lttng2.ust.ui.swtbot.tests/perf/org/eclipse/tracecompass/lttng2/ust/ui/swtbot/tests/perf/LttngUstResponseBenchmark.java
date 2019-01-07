@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 École Polytechnique de Montréal
+ * Copyright (c) 2016, 2018 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart.FlameChartView;
@@ -79,7 +80,7 @@ public class LttngUstResponseBenchmark extends ViewsResponseTest {
      */
     @Test
     public void testWithCygProfile() throws SecurityException, IllegalArgumentException, IOException {
-        runTestWithTrace(FileLocator.toFileURL(CtfTestTrace.CYG_PROFILE.getTraceURL()).getPath(), TRACE_TYPE, Collections.singleton(FLAMECHART_VIEW_ID));
+        runTestWithTrace(FileUtils.toFile(FileLocator.toFileURL(CtfTestTrace.CYG_PROFILE.getTraceURL())).getAbsolutePath(), TRACE_TYPE, Collections.singleton(FLAMECHART_VIEW_ID));
     }
 
     /**

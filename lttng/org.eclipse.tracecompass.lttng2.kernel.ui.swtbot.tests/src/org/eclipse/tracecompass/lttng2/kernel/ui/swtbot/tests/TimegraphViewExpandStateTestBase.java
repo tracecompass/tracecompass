@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
@@ -80,9 +81,9 @@ public abstract class TimegraphViewExpandStateTestBase {
         /* Finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
         /* Open traces */
-        String tracePath1 = FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).getPath();
+        String tracePath1 = FileUtils.toFile(FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL())).getAbsolutePath();
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, tracePath1, KERNEL_TRACE_TYPE);
-        String tracePath2 = FileLocator.toFileURL(CtfTestTrace.FLIPPING_ENDIANNESS.getTraceURL()).getPath();
+        String tracePath2 = FileUtils.toFile(FileLocator.toFileURL(CtfTestTrace.FLIPPING_ENDIANNESS.getTraceURL())).getAbsolutePath();
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, tracePath2, KERNEL_TRACE_TYPE);
     }
 

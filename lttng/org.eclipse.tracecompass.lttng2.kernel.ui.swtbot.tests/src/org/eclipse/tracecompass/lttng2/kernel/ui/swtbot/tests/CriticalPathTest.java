@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,9 +14,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -76,9 +75,9 @@ public class CriticalPathTest extends KernelTestBase {
     @Before
     public void before() {
         try {
-            String traceName = Paths.get(FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).toURI()).toString();
-            SWTBotUtils.openTrace(TRACE_PROJECT_NAME, traceName, KERNEL_TRACE_TYPE);
-        } catch (IOException | URISyntaxException e) {
+            String tracePath = FileUtils.toFile(FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL())).getAbsolutePath();
+            SWTBotUtils.openTrace(TRACE_PROJECT_NAME, tracePath, KERNEL_TRACE_TYPE);
+        } catch (IOException e) {
             fail(e.getMessage());
         }
         SWTBotUtils.activateEditor(fBot, "bug446190");

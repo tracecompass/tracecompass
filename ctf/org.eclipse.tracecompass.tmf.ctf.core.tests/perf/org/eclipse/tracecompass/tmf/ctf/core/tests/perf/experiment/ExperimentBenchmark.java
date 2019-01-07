@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.test.performance.Performance;
@@ -48,7 +49,7 @@ public class ExperimentBenchmark {
     private static final String TRACES_ROOT_PATH;
     static {
         try {
-            TRACES_ROOT_PATH = FileLocator.toFileURL(CtfTestTrace.TRACE_EXPERIMENT.getTraceURL()).getPath();
+            TRACES_ROOT_PATH = FileUtils.toFile(FileLocator.toFileURL(CtfTestTrace.TRACE_EXPERIMENT.getTraceURL())).getAbsolutePath();
         } catch (IOException e) {
             throw new IllegalStateException();
         }

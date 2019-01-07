@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.analysis.os.linux.core.tests.latency;
 
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.KernelEventLayoutStub;
@@ -29,7 +30,7 @@ class KernelCtfTraceStub extends CtfTmfTrace implements IKernelTrace {
     public static synchronized KernelCtfTraceStub getTrace(CtfTestTrace ctfTrace) {
         String tracePath;
         try {
-            tracePath = FileLocator.toFileURL(ctfTrace.getTraceURL()).getPath();
+            tracePath = FileUtils.toFile(FileLocator.toFileURL(ctfTrace.getTraceURL())).getAbsolutePath();
         } catch (IOException e) {
             throw new IllegalStateException();
         }
