@@ -41,6 +41,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.internal.util.ByteBufferTracker;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
@@ -86,6 +87,7 @@ import com.google.common.collect.Iterables;
  *
  * @author Geneviève Bastien
  */
+@SuppressWarnings("restriction")
 public abstract class TmfXmlTraceStub extends TmfTrace {
 
     private static final String DEVELOPMENT_TRACE_XSD = "TmfXmlDevelopmentTrace.xsd"; //$NON-NLS-1$
@@ -235,6 +237,13 @@ public abstract class TmfXmlTraceStub extends TmfTrace {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind(org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.Messages.TmfDevelopmentTrace_ValidationError, path), e);
         } catch (IOException e) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind(org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.Messages.TmfDevelopmentTrace_IoError, path), e);
+        } finally {
+            /**
+             * The Validator keeps a reference to the file resource when it fails. In Windows, this reference will
+             * prevent the deletion of the file. Running a GC will remove the reference. Use the ByteBufferTracker
+             * to trigger a GC before the deletion of a trace element.
+             */
+            ByteBufferTracker.setMarked();
         }
         return Status.OK_STATUS;
     }
