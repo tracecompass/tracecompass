@@ -294,7 +294,11 @@ public class HistoryTreeClassic implements IHistoryTree {
 
                 buffer.flip();
                 int res = fc.write(buffer);
-                assert (res <= TREE_HEADER_SIZE);
+
+                if (res > TREE_HEADER_SIZE) {
+                    throw new IOException("Tree header size = " + TREE_HEADER_SIZE + " but wrote " + res); //$NON-NLS-1$ //$NON-NLS-2$
+                }
+
                 /* done writing the file header */
 
             } catch (IOException e) {
@@ -302,7 +306,7 @@ public class HistoryTreeClassic implements IHistoryTree {
                  * If we were able to write so far, there should not be any
                  * problem at this point...
                  */
-                throw new RuntimeException("State system write error"); //$NON-NLS-1$
+                throw new RuntimeException("State system write error", e); //$NON-NLS-1$
             }
         }
     }
@@ -651,17 +655,16 @@ public class HistoryTreeClassic implements IHistoryTree {
     // ------------------------------------------------------------------------
 
     /* Only used for debugging, shouldn't be externalized */
-    @SuppressWarnings("nls")
     @Override
     public String toString() {
-        return "Information on the current tree:\n\n" + "Blocksize: "
-                + fConfig.getBlockSize() + "\n" + "Max nb. of children per node: "
-                + fConfig.getMaxChildren() + "\n" + "Number of nodes: " + fNodeCount
-                + "\n" + "Depth of the tree: " + fLatestBranch.size() + "\n"
-                + "Size of the treefile: " + getFileSize() + "\n"
-                + "Root node has sequence number: "
-                + fLatestBranch.get(0).getSequenceNumber() + "\n"
-                + "'Latest leaf' has sequence number: "
+        return "Information on the current tree:\n\n" + "Blocksize: " //$NON-NLS-1$ //$NON-NLS-2$
+                + fConfig.getBlockSize() + "\n" + "Max nb. of children per node: " //$NON-NLS-1$ //$NON-NLS-2$
+                + fConfig.getMaxChildren() + "\n" + "Number of nodes: " + fNodeCount //$NON-NLS-1$ //$NON-NLS-2$
+                + "\n" + "Depth of the tree: " + fLatestBranch.size() + "\n" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                + "Size of the treefile: " + getFileSize() + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+                + "Root node has sequence number: " //$NON-NLS-1$
+                + fLatestBranch.get(0).getSequenceNumber() + "\n" //$NON-NLS-1$
+                + "'Latest leaf' has sequence number: " //$NON-NLS-1$
                 + fLatestBranch.get(fLatestBranch.size() - 1).getSequenceNumber();
     }
 

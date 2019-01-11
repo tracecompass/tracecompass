@@ -20,6 +20,7 @@
 package org.eclipse.tracecompass.tmf.ui.views.histogram;
 
 import java.util.Collection;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
@@ -636,8 +637,7 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
      */
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
-        assert (signal != null);
-        fTrace = signal.getTrace();
+        fTrace = Objects.requireNonNull(signal).getTrace();
         loadTrace();
     }
 
@@ -648,8 +648,7 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
      */
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
-        assert (signal != null);
-        if (fTrace != signal.getTrace()) {
+        if (fTrace != Objects.requireNonNull(signal).getTrace()) {
             fTrace = signal.getTrace();
             loadTrace();
         }

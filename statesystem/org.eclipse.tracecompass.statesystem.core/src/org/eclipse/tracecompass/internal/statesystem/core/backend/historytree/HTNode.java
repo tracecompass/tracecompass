@@ -196,7 +196,9 @@ public abstract class HTNode {
         buffer.order(ByteOrder.LITTLE_ENDIAN);
         buffer.clear();
         int res = fc.read(buffer);
-        assert (res == config.getBlockSize());
+        if (res != config.getBlockSize()) {
+            throw new IOException("Expected " + config.getBlockSize() + " block size, but got " + res);  //$NON-NLS-1$//$NON-NLS-2$
+        }
         buffer.flip();
 
         /* Read the common header part */
@@ -393,8 +395,13 @@ public abstract class HTNode {
     public void addInterval(HTInterval newInterval) {
         fRwl.writeLock().lock();
         try {
-            /* Just in case, should be checked before even calling this function */
-            assert (newInterval.getSizeOnDisk() <= getNodeFreeSpace());
+            /*
+             * Just in case, should be checked before even calling this function
+             */
+            if (newInterval.getSizeOnDisk() > getNodeFreeSpace()) {
+                // Could be an IO exception, but that would change the API
+                throw new IllegalStateException("Insufficient disk space."); //$NON-NLS-1$
+            }
 
             /* Find the insert position to keep the list sorted */
             int index = 0;

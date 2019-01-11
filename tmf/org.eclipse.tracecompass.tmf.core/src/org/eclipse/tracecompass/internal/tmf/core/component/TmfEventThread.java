@@ -14,6 +14,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.component;
 
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
@@ -79,11 +80,9 @@ public class TmfEventThread implements Runnable {
      * @param request the request to process
      */
     public TmfEventThread(TmfEventProvider provider, ITmfEventRequest request) {
-        assert provider != null;
-        assert request  != null;
-        fProvider = provider;
-        fRequest  = request;
-        fExecType = request.getExecType();
+        fProvider = Objects.requireNonNull(provider);
+        fRequest  = Objects.requireNonNull(request);
+        fExecType = fRequest.getExecType();
         fThread   = null;
     }
 

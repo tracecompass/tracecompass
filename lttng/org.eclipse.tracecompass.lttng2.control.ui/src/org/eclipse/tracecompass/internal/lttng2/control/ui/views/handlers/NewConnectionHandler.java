@@ -70,7 +70,9 @@ public class NewConnectionHandler extends BaseControlViewHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        assert (fRoot != null);
+        if (fRoot == null) {
+            return false;
+        }
 
         IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         if (window == null) {
