@@ -137,6 +137,7 @@ public class GenerateTestValues {
             module.dispose();
             trace.dispose();
         }
+        System.out.println("wrote to: " + logFile.getAbsolutePath());
     }
 
 }
