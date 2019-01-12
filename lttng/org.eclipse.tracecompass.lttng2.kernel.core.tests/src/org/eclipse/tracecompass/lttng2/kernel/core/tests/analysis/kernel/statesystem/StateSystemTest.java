@@ -102,7 +102,7 @@ public abstract class StateSystemTest {
             quark = fixture.getQuarkAbsolute(Attributes.THREADS, "1432", Attributes.SYSTEM_CALL);
             interval = list.get(quark);
             valueStr = interval.getStateValue().unboxStr();
-            assertEquals("sys_poll", valueStr);
+            assertEquals("poll", valueStr);
 
         } catch (AttributeNotFoundException | StateSystemDisposedException e) {
             fail();

@@ -45,7 +45,14 @@ public class SysEntryHandler extends KernelEventHandler {
         int currentThreadNode = KernelEventHandlerUtils.getCurrentThreadNode(cpu, ss);
         int quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.SYSTEM_CALL);
         long timestamp = KernelEventHandlerUtils.getTimestamp(event);
-        ss.modifyAttribute(timestamp, event.getName(), quark);
+        String syscallName = event.getName();
+        IKernelAnalysisEventLayout layout = getLayout();
+        if (syscallName.startsWith(layout.eventCompatSyscallEntryPrefix())) {
+            syscallName = syscallName.substring(layout.eventCompatSyscallEntryPrefix().length());
+        } else if (syscallName.startsWith(layout.eventSyscallEntryPrefix())) {
+            syscallName = syscallName.substring(layout.eventSyscallEntryPrefix().length());
+        }
+        ss.modifyAttribute(timestamp, syscallName, quark);
 
         /* Put the process in system call mode */
         ss.modifyAttribute(timestamp, ProcessStatus.RUN_SYTEMCALL.getStateValue().unboxValue(), currentThreadNode);
