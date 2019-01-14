@@ -45,6 +45,7 @@ import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.operations.TmfWorkspaceModifyOperation;
+import org.eclipse.tracecompass.internal.util.ByteBufferTracker;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
@@ -310,6 +311,10 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
             }
 
             if (destTempFolder.exists() && !keepArchive) {
+                // Do a gc if the tracker got marked during trace validation
+                if (ByteBufferTracker.getAndReset()) {
+                    System.gc();
+                }
                 destTempFolder.delete(true, subMonitor.newChild(TOTAL_PROGRESS));
             }
 
