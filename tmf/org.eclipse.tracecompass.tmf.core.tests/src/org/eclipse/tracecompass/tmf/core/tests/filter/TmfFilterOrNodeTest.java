@@ -62,14 +62,27 @@ public class TmfFilterOrNodeTest extends TmfFilterTreeNodeTestBase {
 
     @Test
     public void testMatches() {
+        // Test no child with fnot=false
+        fFilter.setNot(false);
+        assertFalse(fFilter.matches(fEvent));
+        // Test no child with fnot=false
+        fFilter.setNot(true);
+        assertTrue(fFilter.matches(fEvent));
+
+        fFilter.setNot(false);
         fFilter.addChild(TRUE_NODE);
         fFilter.addChild(TRUE_NODE);
         assertTrue(fFilter.matches(fEvent));
+        fFilter.setNot(true);
+        assertFalse(fFilter.matches(fEvent));
 
         fFilter.replaceChild(0, FALSE_NODE);
-        assertTrue(fFilter.matches(fEvent));
+        assertFalse(fFilter.matches(fEvent));
 
+        fFilter.replaceChild(1, FALSE_NODE);
         fFilter.setNot(true);
+        assertTrue(fFilter.matches(fEvent));
+        fFilter.setNot(false);
         assertFalse(fFilter.matches(fEvent));
     }
 
@@ -90,4 +103,5 @@ public class TmfFilterOrNodeTest extends TmfFilterTreeNodeTestBase {
                 TmfFilterCompareNode.NODE_NAME));
         assertEquals("getValidChildren()", validChildren, new HashSet<>(fFilter.getValidChildren()));
     }
+
 }
