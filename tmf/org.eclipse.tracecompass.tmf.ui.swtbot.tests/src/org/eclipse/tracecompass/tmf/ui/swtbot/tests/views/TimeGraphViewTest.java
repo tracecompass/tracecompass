@@ -841,6 +841,8 @@ public class TimeGraphViewTest {
         ImageHelper ref = ImageHelper.grabImage(bounds);
 
         timegraph.setFocus();
+        // Move mouse to middle of the timegraph
+        timegraph.moveMouseToWidget();
         // Press '/' to open the filter dialog
         timegraph.pressShortcut(KeyStroke.getInstance('/'));
 

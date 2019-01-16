@@ -237,4 +237,9 @@ public class SWTBotTimeGraph extends AbstractSWTBotControl<TimeGraphControl> {
         notify(SWT.Deactivate);
         notify(SWT.FocusOut);
     }
+
+    @Override
+    public AbstractSWTBotControl<TimeGraphControl> moveMouseToWidget() {
+        return super.moveMouseToWidget();
+    }
 }
