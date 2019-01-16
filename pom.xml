@@ -506,6 +506,7 @@
             <product>org.eclipse.platform.ide</product>
             <argLine>${testArgLine} ${base.ui.test.vmargs} -Xms512m -Xmx1024m</argLine>
             <appArgLine>-consoleLog</appArgLine>
+            <trimStackTrace>false</trimStackTrace>
           </configuration>
         </plugin>
 
