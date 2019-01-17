@@ -127,18 +127,18 @@ public class ThreadStatusDataProviderTest {
 
             assertEquals(split[0], idsToNames.get(row.getEntryID()));
 
-            assertEqualsStates(split[1], row.getStates());
+            assertEqualsStates(split[1], row.getStates(), split[0]);
         }
     }
 
-    private static void assertEqualsStates(String string, @NonNull List<@NonNull ITimeGraphState> states) {
+    private static void assertEqualsStates(String string, @NonNull List<@NonNull ITimeGraphState> states, String element) {
         String[] stringStates = string.split(",");
         for (int i = 0; i < stringStates.length / 4; i++) {
             ITimeGraphState state = states.get(i);
-            assertEquals(Long.parseLong(stringStates[i * 4]), state.getStartTime());
-            assertEquals(Long.parseLong(stringStates[i * 4 + 1]), state.getDuration());
-            assertEquals(Long.parseLong(stringStates[i * 4 + 2]), state.getValue());
-            assertEquals(stringStates[i * 4 + 3], String.valueOf(state.getLabel()));
+            assertEquals(element + ": start time at position " + i, Long.parseLong(stringStates[i * 4]), state.getStartTime());
+            assertEquals(element + ": duration at position " + i, Long.parseLong(stringStates[i * 4 + 1]), state.getDuration());
+            assertEquals(element + ": value at position " + i, Long.parseLong(stringStates[i * 4 + 2]), state.getValue());
+            assertEquals(element + ": label at position " + i, stringStates[i * 4 + 3], String.valueOf(state.getLabel()));
         }
     }
 
