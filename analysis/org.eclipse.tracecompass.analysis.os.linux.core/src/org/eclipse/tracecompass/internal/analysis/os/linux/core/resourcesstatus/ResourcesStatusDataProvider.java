@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -32,8 +31,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
-import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
-import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel.Type;
@@ -92,12 +89,6 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     };
     private static final long FREQUENCY_MULTIPLIER = 1000;
 
-    /**
-     * Remove the "sys_" or "syscall_entry_" or similar from what we draw in the
-     * rectangle. This depends on the trace's event layout.
-     */
-    private final Function<@NonNull String, @NonNull String> fSyscallTrim;
-
     /** Map of attribute quark to its ResourcesEntryModel type */
     private final HashMap<Integer, Type> fEntryModelTypes = new HashMap<>();
 
@@ -134,13 +125,6 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
      */
     protected ResourcesStatusDataProvider(@NonNull ITmfTrace trace, @NonNull KernelAnalysisModule module) {
         super(trace, module);
-        if (trace instanceof IKernelTrace) {
-            IKernelAnalysisEventLayout layout = ((IKernelTrace) trace).getKernelEventLayout();
-            int beginIndex = layout.eventSyscallEntryPrefix().length();
-            fSyscallTrim = sysCall -> sysCall.substring(beginIndex);
-        } else {
-            fSyscallTrim = Function.identity();
-        }
     }
 
     @Override
@@ -477,7 +461,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
      *            sampled current thread intervals for the CPU
      * @return a List of intervals with the system call name label.
      */
-    private List<@NonNull ITimeGraphState> getSyscalls(@NonNull ITmfStateSystem ss, ITmfStateInterval syscallInterval,
+    private static List<@NonNull ITimeGraphState> getSyscalls(@NonNull ITmfStateSystem ss, ITmfStateInterval syscallInterval,
             @NonNull NavigableSet<ITmfStateInterval> currentThreadIntervals) throws StateSystemDisposedException {
         List<@NonNull ITimeGraphState> list = new ArrayList<>();
         for (ITmfStateInterval currentThread : currentThreadIntervals) {
@@ -493,8 +477,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                     if (syscallQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
                         Object syscallName = ss.querySingleState(start, syscallQuark).getValue();
                         if (syscallName instanceof String) {
-                            String label = fSyscallTrim.apply((String) syscallName);
-                            list.add(new TimeGraphState(start, duration, StateValues.CPU_STATUS_RUN_SYSCALL, label));
+                            list.add(new TimeGraphState(start, duration, StateValues.CPU_STATUS_RUN_SYSCALL, String.valueOf(syscallName)));
                             continue;
                         }
                     }

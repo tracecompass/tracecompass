@@ -14,6 +14,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.histogram;
 
+import java.util.Objects;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -196,8 +198,7 @@ public class FullTraceHistogram extends Histogram {
     public void paintControl(PaintEvent event) {
         super.paintControl(event);
 
-        Image image = (Image) fCanvas.getData(IMAGE_KEY);
-        assert image != null;
+        Image image = Objects.requireNonNull((Image) fCanvas.getData(IMAGE_KEY));
 
         Image rangeRectangleImage = new Image(image.getDevice(), image, SWT.IMAGE_COPY);
         GC rangeWindowGC = new GC(rangeRectangleImage);

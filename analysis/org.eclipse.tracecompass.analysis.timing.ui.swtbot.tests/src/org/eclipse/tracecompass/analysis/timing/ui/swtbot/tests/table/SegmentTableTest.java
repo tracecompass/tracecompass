@@ -408,9 +408,10 @@ public class SegmentTableTest {
     public void onDiskSegStoreTest() throws IOException {
         Path segmentFile = Files.createTempFile("tmpSegStore", ".tmp");
         assertNotNull(segmentFile);
+        ISegmentStore<@NonNull BasicSegment> fixture = null;
         try {
             final int size = 1000000;
-            ISegmentStore<@NonNull BasicSegment> fixture = SegmentStoreFactory.createOnDiskSegmentStore(segmentFile, BasicSegment.BASIC_SEGMENT_READ_FACTORY, 1);
+            fixture = SegmentStoreFactory.createOnDiskSegmentStore(segmentFile, BasicSegment.BASIC_SEGMENT_READ_FACTORY, 1);
             for (int i = 0; i < size; i++) {
                 fixture.add(new BasicSegment(i, 2 * i));
             }
@@ -424,7 +425,10 @@ public class SegmentTableTest {
             // FIXME: Should be 999,999, but sorting on disk does not work well yet
             fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "818,399", 0, 2));
         } finally {
-            Files.delete(segmentFile);
+            if (fixture != null) {
+                fixture.close(true);
+            }
+            Files.deleteIfExists(segmentFile);
         }
     }
 
@@ -457,7 +461,7 @@ public class SegmentTableTest {
         List<String> actionResult = Arrays.asList(lines);
         String absolutePath = TmfTraceManager.getTemporaryDirPath() + File.separator + "syscallLatencyTest.testWriteToTsv.tsv";
         TmfFileDialogFactory.setOverrideFiles(absolutePath);
-        SWTBotMenu menuBot = viewBot.viewMenu().menu("Export to TSV");
+        SWTBotMenu menuBot = viewBot.viewMenu().menu("Export to TSV...");
         try {
             assertTrue(menuBot.isEnabled());
             assertTrue(menuBot.isVisible());

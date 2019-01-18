@@ -15,6 +15,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics;
 
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
@@ -38,6 +40,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.tracecompass.internal.tmf.ui.commands.ExportToTsvUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.TmfPieChartViewer;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.model.TmfPieChartStatisticsModel;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfBaseColumnData;
@@ -824,5 +828,20 @@ public class TmfStatisticsViewer extends TmfViewer {
         if (job != null) {
             job.cancel();
         }
+    }
+
+    /**
+     * Export statistics to tsv file.
+     *
+     * @param stream
+     *              the output stream
+     */
+    public void exportToTsv(@Nullable OutputStream stream) {
+        TreeViewer statsViewer = fTreeViewer;
+        if (statsViewer == null) {
+            return;
+        }
+        Tree tree = statsViewer.getTree();
+        ExportToTsvUtils.exportTreeToTsv(tree, stream);
     }
 }

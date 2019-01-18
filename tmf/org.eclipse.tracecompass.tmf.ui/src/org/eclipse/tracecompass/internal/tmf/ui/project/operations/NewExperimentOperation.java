@@ -103,6 +103,7 @@ public class NewExperimentOperation implements IRunnableWithProgress {
             for (TmfTraceElement trace : fTraceElements) {
                 experimentElement.addTrace(trace, false);
             }
+            experimentElement.refreshTraceType();
             experimentElement.refresh();
             setStatus(Status.OK_STATUS);
         } catch (InterruptedException e) {

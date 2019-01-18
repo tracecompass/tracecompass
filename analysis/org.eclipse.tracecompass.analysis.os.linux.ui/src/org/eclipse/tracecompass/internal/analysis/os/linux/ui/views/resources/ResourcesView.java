@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
 import org.eclipse.tracecompass.analysis.os.linux.core.signals.TmfCpuSelectedSignal;
 import org.eclipse.tracecompass.analysis.os.linux.core.signals.TmfThreadSelectedSignal;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel;
@@ -66,8 +67,14 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
     public static final @NonNull String RESOURCES_FOLLOW_CPU = ID + ".FOLLOW_CPU"; //$NON-NLS-1$
 
     /**
-     * ID of the followed Current Thread in the map data in {@link TmfTraceContext}
+     * ID of the followed Current Thread in the map data in
+     * {@link TmfTraceContext}
+     *
+     * @deprecated Selected thread should be matched with its host. Use
+     *             {@link HostThread#SELECTED_HOST_THREAD_KEY} instead, with a
+     *             value of type {@link HostThread}
      */
+    @Deprecated
     public static final @NonNull String RESOURCES_FOLLOW_CURRENT_THREAD = ID + ".FOLLOW_CURRENT_THREAD"; //$NON-NLS-1$
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
@@ -198,9 +205,8 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
                     ITmfTrace trace = getTrace(resourcesEntry);
                     NamedTimeEvent event = (NamedTimeEvent) sSel.toArray()[1];
                     TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
-                    Integer data = (Integer) ctx.getData(RESOURCES_FOLLOW_CURRENT_THREAD);
-                    int tid = data != null ? data.intValue() : -1;
-                    if (tid >= 0) {
+                    HostThread data = (HostThread) ctx.getData(HostThread.SELECTED_HOST_THREAD_KEY);
+                    if (data != null) {
                         menuManager.add(new UnfollowThreadAction(ResourcesView.this));
                     } else {
                         menuManager.add(new FollowThreadAction(ResourcesView.this, null, event.getValue(), trace));
@@ -290,15 +296,16 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
      */
     @TmfSignalHandler
     public void listenToCurrentThread(TmfThreadSelectedSignal signal) {
-        int data = signal.getThreadId() >= 0 ? signal.getThreadId() : -1;
+        HostThread data = signal.getThreadId() >= 0 ? signal.getHostThread() : null;
         ITmfTrace trace = getTrace();
         if (trace == null) {
             return;
         }
+
         TmfTraceManager.getInstance().updateTraceContext(trace,
-                builder -> builder.setData(RESOURCES_FOLLOW_CURRENT_THREAD, data));
-        if (data >= 0) {
-            setFollowedThread("Current_thread==" + ((Integer) data).toString() + " || TID==" + ((Integer) data).toString()); //$NON-NLS-1$ //$NON-NLS-2$
+                builder -> builder.setData(HostThread.SELECTED_HOST_THREAD_KEY, data));
+        if (data != null) {
+            setFollowedThread("Current_thread==" + data.getTid() + " || TID==" + data.getTid()); //$NON-NLS-1$ //$NON-NLS-2$
         } else {
             removeFollowedThread();
         }

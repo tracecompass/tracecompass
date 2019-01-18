@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -36,6 +36,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.ITracePackageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageBookmarkElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageElement;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageExperimentElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageFilesElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageSupplFileElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageSupplFilesElement;
@@ -126,21 +127,43 @@ public class ManifestReader {
      */
     public static TracePackageElement[] loadElementsFromNode(Element rootElement) {
         List<TracePackageElement> packageElements = new ArrayList<>();
+        NodeList experimentElements = rootElement.getElementsByTagName(ITracePackageConstants.EXPERIMENT_ELEMENT);
+        loadTracesFomNodeList(packageElements, experimentElements);
         NodeList traceElements = rootElement.getElementsByTagName(ITracePackageConstants.TRACE_ELEMENT);
+        loadTracesFomNodeList(packageElements, traceElements);
+        return packageElements.toArray(EMPTY_ARRAY);
+    }
+
+    private static void loadTracesFomNodeList(List<TracePackageElement> packageElements, NodeList traceElements) {
         for (int i = 0; i < traceElements.getLength(); i++) {
             Node traceNode = traceElements.item(i);
             if (traceNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element traceElement = (Element) traceNode;
                 String traceName = traceElement.getAttribute(ITracePackageConstants.TRACE_NAME_ATTRIB);
                 String traceType = traceElement.getAttribute(ITracePackageConstants.TRACE_TYPE_ATTRIB);
-                TracePackageElement element = new TracePackageTraceElement(null, traceName, traceType);
-                NodeList fileElements = traceElement.getElementsByTagName(ITracePackageConstants.TRACE_FILE_ELEMENT);
-                for (int j = 0; j < fileElements.getLength(); j++) {
-                    Node fileNode = fileElements.item(j);
-                    if (fileNode.getNodeType() == Node.ELEMENT_NODE) {
-                        Element fileElement = (Element) fileNode;
-                        String fileName = fileElement.getAttribute(ITracePackageConstants.TRACE_FILE_NAME_ATTRIB);
-                        new TracePackageFilesElement(element, fileName);
+                TracePackageElement element;
+                if (traceNode.getNodeName().equals(ITracePackageConstants.EXPERIMENT_ELEMENT)) {
+                    element = new TracePackageExperimentElement(null, traceName, traceType);
+                    new TracePackageFilesElement(element, ""); //$NON-NLS-1$
+                    NodeList expTraces = traceElement.getElementsByTagName(ITracePackageConstants.EXP_TRACE_ELEMENT);
+                    for (int j = 0; j < expTraces.getLength(); j++) {
+                        Node expTraceNode = expTraces.item(j);
+                        if (expTraceNode.getNodeType() == Node.ELEMENT_NODE) {
+                            Element expTraceElement = (Element) expTraceNode;
+                            String expTrace = expTraceElement.getAttribute(ITracePackageConstants.TRACE_NAME_ATTRIB);
+                            ((TracePackageExperimentElement) element).addExpTrace(expTrace);
+                        }
+                    }
+                } else {
+                    element = new TracePackageTraceElement(null, traceName, traceType);
+                    NodeList fileElements = traceElement.getElementsByTagName(ITracePackageConstants.TRACE_FILE_ELEMENT);
+                    for (int j = 0; j < fileElements.getLength(); j++) {
+                        Node fileNode = fileElements.item(j);
+                        if (fileNode.getNodeType() == Node.ELEMENT_NODE) {
+                            Element fileElement = (Element) fileNode;
+                            String fileName = fileElement.getAttribute(ITracePackageConstants.TRACE_FILE_NAME_ATTRIB);
+                            new TracePackageFilesElement(element, fileName);
+                        }
                     }
                 }
 
@@ -183,11 +206,9 @@ public class ManifestReader {
                 if (!bookmarkAttribs.isEmpty()) {
                     new TracePackageBookmarkElement(element, bookmarkAttribs);
                 }
-
                 packageElements.add(element);
             }
         }
-        return packageElements.toArray(EMPTY_ARRAY);
     }
 
 }

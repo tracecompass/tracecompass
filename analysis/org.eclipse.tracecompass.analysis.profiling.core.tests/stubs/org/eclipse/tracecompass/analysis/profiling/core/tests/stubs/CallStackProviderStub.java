@@ -25,8 +25,13 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  */
 public class CallStackProviderStub extends CallStackStateProvider {
 
-    private static final String ENTRY = "entry";
-    private static final String EXIT = "exit";
+    /** Name of the entry event */
+    public static final String ENTRY = "entry";
+    /** Name of the exit event */
+    public static final String EXIT = "exit";
+    /** Name of the function name field */
+    public static final String FIELD_NAME = "op";
+    private static final ITmfStateValue NO_FUNC_EXIT = TmfStateValue.newValueString("unknown");
 
     /**
      * Constructor
@@ -57,7 +62,7 @@ public class CallStackProviderStub extends CallStackStateProvider {
     protected @Nullable ITmfStateValue functionEntry(@NonNull ITmfEvent event) {
         String name = event.getName();
         if (ENTRY.equals(name)) {
-            ITmfEventField field = event.getContent().getField("op");
+            ITmfEventField field = event.getContent().getField(FIELD_NAME);
             if (field != null) {
                 return TmfStateValue.newValueString((String) field.getValue());
             }
@@ -69,16 +74,29 @@ public class CallStackProviderStub extends CallStackStateProvider {
     protected @Nullable ITmfStateValue functionExit(@NonNull ITmfEvent event) {
         String name = event.getName();
         if (EXIT.equals(name)) {
-            ITmfEventField field = event.getContent().getField("op");
+            ITmfEventField field = event.getContent().getField(FIELD_NAME);
             if (field != null) {
                 return TmfStateValue.newValueString((String) field.getValue());
             }
+            // Field is null, but this is an exit, return something
+            return NO_FUNC_EXIT;
         }
         return null;
     }
 
     @Override
     protected int getProcessId(@NonNull ITmfEvent event) {
+        return getProcessIdFromEvent(event);
+    }
+
+    /**
+     * Get the TID from the event
+     *
+     * @param event
+     *            The event
+     * @return The tid
+     */
+    public static int getProcessIdFromEvent(@NonNull ITmfEvent event) {
         ITmfEventField field = event.getContent().getField("pid");
         if (field != null) {
             return Integer.parseInt((String) field.getValue());
@@ -88,6 +106,17 @@ public class CallStackProviderStub extends CallStackStateProvider {
 
     @Override
     protected long getThreadId(@NonNull ITmfEvent event) {
+        return getThreadIdFromEvent(event);
+    }
+
+    /**
+     * Get the TID from the event
+     *
+     * @param event
+     *            The event
+     * @return The tid
+     */
+    public static long getThreadIdFromEvent(@NonNull ITmfEvent event) {
         ITmfEventField field = event.getContent().getField("tid");
         if (field != null) {
             return Integer.parseInt((String) field.getValue());

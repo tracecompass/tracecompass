@@ -412,7 +412,7 @@ public class Metadata {
         private final byte fCtfMajorVersion;
         private final byte fCtfMinorVersion;
 
-        public MetadataPacketHeader(ByteBuffer headerByteBuffer) {
+        public MetadataPacketHeader(ByteBuffer headerByteBuffer) throws CTFException {
             /* Read from the ByteBuffer */
             fMagic = headerByteBuffer.getInt();
             byte[] uuidBytes = new byte[UUID_SIZE];

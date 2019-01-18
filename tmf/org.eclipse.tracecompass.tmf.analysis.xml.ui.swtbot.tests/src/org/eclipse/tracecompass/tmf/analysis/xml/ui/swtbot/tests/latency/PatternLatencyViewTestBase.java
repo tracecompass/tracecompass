@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Ericsson
+ * Copyright (c) 2016, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,6 +13,7 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
@@ -87,7 +88,7 @@ public abstract class PatternLatencyViewTestBase {
      */
     private static void openTrace() {
         try {
-            String tracePath = FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).getPath();
+            String tracePath = FileUtils.toFile(FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL())).getAbsolutePath();
             SWTBotUtils.createProject(PROJECT_NAME);
             SWTBotUtils.openTrace(PROJECT_NAME, tracePath, TRACE_TYPE);
             WaitUtils.waitForJobs();

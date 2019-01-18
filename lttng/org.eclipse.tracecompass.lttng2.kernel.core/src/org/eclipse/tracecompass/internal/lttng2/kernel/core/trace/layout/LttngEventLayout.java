@@ -546,4 +546,22 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
         return Collections.singleton("netif_receive_skb_internal_return");
     }
 
+    /**
+     * Get the PID context event
+     *
+     * @return The PID context event name
+     */
+    public String contextPid() {
+        return "context._pid";
+    }
+
+    /**
+     * Get the TID context event
+     *
+     * @return The TID context event name
+     */
+    public String contextTid() {
+        return "context._tid";
+    }
+
 }

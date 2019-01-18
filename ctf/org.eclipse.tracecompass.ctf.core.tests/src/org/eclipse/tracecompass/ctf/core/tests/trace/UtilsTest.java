@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.UUID;
 
+import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.internal.ctf.core.trace.Utils;
 import org.junit.Test;
 
@@ -23,16 +24,17 @@ import org.junit.Test;
  * The class <code>UtilsTest</code> contains tests for the class
  * {@link Utils}.
  *
- * @author ematkho
- * @version $Revision: 1.0 $
+ * @author Matthew Khouzam
  */
 public class UtilsTest {
 
     /**
      * Run the UUID makeUUID(byte[]) method test.
+     *  @throws CTFException
+     *             the data is not the right size
      */
     @Test
-    public void testMakeUUID() {
+    public void testMakeUUID() throws CTFException {
         int byteSize = 32;
         byte[] bytes = new byte[byteSize];
         for (int i = 0; i < byteSize; i++) {
@@ -45,9 +47,12 @@ public class UtilsTest {
 
     /**
      * Run the UUID makeUUID(byte[]) method test.
+     *
+     * @throws CTFException
+     *             the data is not the right size
      */
     @Test
-    public void testMakeUUID_2() {
+    public void testMakeUUID_2() throws CTFException {
         byte[] bytes = new byte[] { (byte) 1, (byte) 1, (byte) 0, (byte) 0,
                 (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 1, (byte) 1,
                 (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0 };
@@ -64,9 +69,12 @@ public class UtilsTest {
 
     /**
      * Run the UUID makeUUID(byte[]) method test.
+     *
+     * @throws CTFException
+     *             the data is not the right size
      */
     @Test
-    public void testMakeUUID_3() {
+    public void testMakeUUID_3() throws CTFException {
         byte[] bytes = new byte[] { (byte) 0, (byte) 0, (byte) 0, (byte) 0,
                 (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0,
                 (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0 };

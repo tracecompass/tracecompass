@@ -27,6 +27,8 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEven
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.internal.lttng2.common.core.trace.ILttngTrace;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.ContextPidAspect;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.ContextTidAspect;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng26EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng27EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout.Lttng28EventLayout;
@@ -119,11 +121,19 @@ public class LttngKernelTrace extends CtfTmfTrace implements IKernelTrace, ILttn
         /*
          * Add aspects
          */
+        fOriginTracer = getTracerFromEnv();
         ImmutableList.Builder<ITmfEventAspect<?>> builder = new Builder<>();
         builder.addAll(LTTNG_KERNEL_ASPECTS);
         builder.addAll(createCounterAspects(this));
+        ContextPidAspect pidAspect = ContextPidAspect.getAspect(this);
+        if (pidAspect != null) {
+            builder.add(pidAspect);
+        }
+        ContextTidAspect tidAspect = ContextTidAspect.getAspect(this);
+        if (tidAspect != null) {
+            builder.add(tidAspect);
+        }
         fAspects = builder.build();
-        fOriginTracer = getTracerFromEnv();
     }
 
     /**

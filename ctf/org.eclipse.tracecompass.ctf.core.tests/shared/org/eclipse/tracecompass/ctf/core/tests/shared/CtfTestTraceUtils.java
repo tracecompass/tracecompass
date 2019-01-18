@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson, EfficiOS Inc. and others
+ * Copyright (c) 2013, 2018 Ericsson, EfficiOS Inc. and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.ctf.core.tests.shared;
 
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.tracecompass.ctf.core.CTFException;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
@@ -38,7 +39,7 @@ public final class CtfTestTraceUtils {
     public static synchronized CTFTrace getTrace(CtfTestTrace trace) throws CTFException {
         String tracePath;
         try {
-            tracePath = FileLocator.toFileURL(trace.getTraceURL()).getPath();
+            tracePath = FileUtils.toFile(FileLocator.toFileURL(trace.getTraceURL())).getAbsolutePath();
         } catch (IOException e) {
             throw new IllegalStateException();
         }

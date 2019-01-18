@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Ericsson
+ * Copyright (c) 2016, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
@@ -148,8 +149,7 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
      */
     @Test
     public void testWithTrace() throws IOException, NoSuchMethodException, SecurityException, IllegalArgumentException {
-        String tracePath;
-        tracePath = FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).getPath();
+        String tracePath = FileUtils.toFile(FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL())).getAbsolutePath();
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
         SWTBotView view = bot.viewById(PRIMARY_VIEW_ID);
         SWTBotUtils.closeViewById(PRIMARY_VIEW_ID, fBot);
@@ -167,7 +167,7 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
         validate(totalEntry.getNode(5), "set_tid_address", "2.300 µs", "2.300 µs", "2.300 µs", "---", "1");
         validate(totalEntry.getNode(7), "pipe", "27.900 µs", "29.700 µs", "28.800 µs", "---", "2");
         testToTsv(view);
-        SWTBotMenu menuBot = view.viewMenu().menu("Export to TSV");
+        SWTBotMenu menuBot = view.viewMenu().menu("Export to TSV...");
         assertTrue(menuBot.isEnabled());
         assertTrue(menuBot.isVisible());
 

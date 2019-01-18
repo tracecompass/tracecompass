@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,6 +14,7 @@ import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.util.Collections;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
@@ -62,7 +63,7 @@ public class CountersViewBenchmark extends ViewsResponseTest {
      */
     @Test
     public void testKernelVM() throws IOException {
-        runTestWithTrace(FileLocator.toFileURL(CtfTestTrace.KERNEL_VM.getTraceURL()).getPath(),
+        runTestWithTrace(FileUtils.toFile(FileLocator.toFileURL(CtfTestTrace.KERNEL_VM.getTraceURL())).getAbsolutePath(),
                 TRACE_TYPE, Collections.singleton(CounterView.ID));
     }
 

@@ -66,6 +66,7 @@ public class CallStackAndGraphBenchmark {
 
     private final String fName;
     private final String fTestTrace;
+    private final int fLoopCount;
 
     private static String getPathFromCtfTestTrace(@NonNull CtfTestTrace testTrace) {
         CtfTmfTrace ctftrace = CtfTmfTestTraceUtils.getTrace(testTrace);
@@ -82,8 +83,9 @@ public class CallStackAndGraphBenchmark {
     @Parameters(name = "{index}: {0}")
     public static Iterable<Object[]> getParameters() {
         return Arrays.asList(new Object[][] {
-                { CtfTestTrace.CYG_PROFILE.name(), getPathFromCtfTestTrace(CtfTestTrace.CYG_PROFILE) },
-                { CtfBenchmarkTrace.UST_QMLSCENE.name(), CtfBenchmarkTrace.UST_QMLSCENE.getTracePath().toString() },
+                { CtfTestTrace.CYG_PROFILE.name(), getPathFromCtfTestTrace(CtfTestTrace.CYG_PROFILE), LOOP_COUNT },
+                { CtfBenchmarkTrace.UST_QMLSCENE.name(), CtfBenchmarkTrace.UST_QMLSCENE.getTracePath().toString(), LOOP_COUNT },
+                { CtfBenchmarkTrace.UST_VLC.name(), CtfBenchmarkTrace.UST_VLC.getTracePath().toString(), 5},
         });
     }
 
@@ -94,10 +96,13 @@ public class CallStackAndGraphBenchmark {
      *            The name of this test
      * @param tracePath
      *            The path to the trace to the trace to test
+     * @param loopCount
+     *            The number of times to run the benchmark
      */
-    public CallStackAndGraphBenchmark(String name, String tracePath) {
+    public CallStackAndGraphBenchmark(String name, String tracePath, int loopCount) {
         fName = name;
         fTestTrace = tracePath;
+        fLoopCount = loopCount;
     }
 
     /**
@@ -116,7 +121,7 @@ public class CallStackAndGraphBenchmark {
         PerformanceMeter callgraphBuildPm = Objects.requireNonNull(perf.createPerformanceMeter(TEST_ID + String.format(TEST_CALLGRAPH_BUILD, fName)));
         perf.tagAsSummary(callgraphBuildPm, String.format(TEST_CALLGRAPH_BUILD, fName), Dimension.CPU_TIME);
 
-        for (int i = 0; i < LOOP_COUNT; i++) {
+        for (int i = 0; i < fLoopCount; i++) {
             TmfTrace trace = null;
             try {
                 trace = getTrace();

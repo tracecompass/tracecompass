@@ -71,8 +71,8 @@ public class CtfTmfReadBoundsTest {
             assertEquals(1331668259554285979L, end.toNanos());
         } finally {
             traceWithOffset.dispose();
-            TmfTraceManager.deleteSupplementaryFiles(traceWithOffset);
             CtfTmfTestTraceUtils.dispose(CtfTestTrace.TRACE2);
+            TmfTraceManager.deleteSupplementaryFiles(traceWithOffset);
         }
     }
 

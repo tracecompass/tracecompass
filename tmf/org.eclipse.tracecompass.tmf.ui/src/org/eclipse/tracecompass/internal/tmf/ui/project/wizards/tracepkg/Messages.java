@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -34,6 +34,11 @@ public class Messages extends NLS {
     public static String TracePackage_TraceElement;
 
     /**
+     * Text for experiment in the element viewer
+     */
+    public static String TracePackage_ExperimentElement;
+
+    /**
      * Text for bookmarks in the element viewer
      */
     public static String TracePackage_Bookmarks;
@@ -42,6 +47,11 @@ public class Messages extends NLS {
      * Text for browse button in the wizard pages
      */
     public static String TracePackage_Browse;
+
+    /**
+     * Text for children trace
+     */
+    public static String TracePackage_childrenTrace;
 
     /**
      * Title for the file dialog

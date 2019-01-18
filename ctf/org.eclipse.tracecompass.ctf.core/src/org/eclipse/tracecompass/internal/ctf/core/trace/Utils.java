@@ -145,13 +145,16 @@ public final class Utils {
      * @param bytes
      *            Array of 16 bytes.
      * @return A UUID object.
+     * @throws CTFException
+     *             the byte buffer was the wrong size
      */
-    public static UUID makeUUID(byte bytes[]) {
+    public static UUID makeUUID(byte bytes[]) throws CTFException {
         long high = 0;
         long low = 0;
 
-        assert (bytes.length == Utils.UUID_LEN);
-
+        if (bytes.length < Utils.UUID_LEN) {
+            throw new CTFException("UUID byte field must be 16 bytes long"); //$NON-NLS-1$
+        }
         final int bitsPerByte = Byte.SIZE;
         int bitMask = (1 << bitsPerByte) - 1;
         for (int i = 0; i < bitsPerByte; i++) {
@@ -159,9 +162,7 @@ public final class Utils {
             high = (high << bitsPerByte) | (bytes[i] & bitMask);
         }
 
-        UUID uuid = new UUID(high, low);
-
-        return uuid;
+        return new UUID(high, low);
     }
 
 }

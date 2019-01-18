@@ -433,8 +433,6 @@ public class DsfGdbAdaptor {
                         new DataRequestMonitor<IDMContext[]>(executor, drm) {
                             @Override
                             protected void handleSuccess() {
-                                assert getData() != null;
-                                assert getData().length == 1;
                                 if (getData() == null || getData().length < 1) {
                                     drm.done();
                                     return;

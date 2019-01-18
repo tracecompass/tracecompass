@@ -14,9 +14,6 @@
 package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table;
 
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
@@ -26,16 +23,14 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.ExportToTsvAction;
+import org.eclipse.tracecompass.internal.tmf.ui.commands.ExportToTsvAction;
+import org.eclipse.tracecompass.internal.tmf.ui.commands.ExportToTsvUtils;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
 
 /**
  * View for displaying a segment store analysis in a table.
@@ -53,7 +48,6 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
         @Override
         protected void exportToTsv(@Nullable OutputStream stream) {
             AbstractSegmentStoreTableView.this.exportToTsv(stream);
-
         }
 
         @Override
@@ -152,38 +146,11 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
      */
     @VisibleForTesting
     protected void exportToTsv(@Nullable OutputStream stream) {
-        try (PrintWriter pw = new PrintWriter(stream)) {
-            AbstractSegmentStoreTableViewer segmentStoreViewer = getSegmentStoreViewer();
-            if (segmentStoreViewer == null) {
-                return;
-            }
-            Table table = segmentStoreViewer.getTableViewer().getTable();
-            int size = table.getItemCount();
-            List<String> columns = new ArrayList<>();
-            for (int i = 0; i < table.getColumnCount(); i++) {
-                TableColumn column = table.getColumn(i);
-                if (column == null) {
-                    return;
-                }
-                String columnName = String.valueOf(column.getText());
-                if (columnName.isEmpty() && i == table.getColumnCount() - 1) {
-                    // Linux GTK2 undocumented feature
-                    break;
-                }
-                columns.add(columnName);
-            }
-            pw.println(Joiner.on('\t').join(columns));
-            for (int i = 0; i < size; i++) {
-                TableItem item = table.getItem(i);
-                if (item == null) {
-                    continue;
-                }
-                List<String> data = new ArrayList<>();
-                for (int col = 0; col < columns.size(); col++) {
-                    data.add(String.valueOf(item.getText(col)));
-                }
-                pw.println(Joiner.on('\t').join(data));
-            }
+        AbstractSegmentStoreTableViewer segmentStoreViewer = getSegmentStoreViewer();
+        if (segmentStoreViewer == null) {
+            return;
         }
+        Table table = segmentStoreViewer.getTableViewer().getTable();
+        ExportToTsvUtils.exportTableToTsv(table, stream);
     }
 }

@@ -172,7 +172,9 @@ public class SynchronizationBackend {
 
             buffer.flip();
             int res = fc.write(buffer);
-            assert (res <= HEADER_SIZE);
+            if (res > HEADER_SIZE) {
+                throw new IOException("Wrote more data than the header size"); //$NON-NLS-1$
+            }
             /* done writing the file header */
 
             fc.position(HEADER_SIZE);

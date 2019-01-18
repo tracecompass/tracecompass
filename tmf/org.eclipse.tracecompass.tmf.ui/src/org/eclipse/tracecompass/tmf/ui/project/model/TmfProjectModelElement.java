@@ -25,12 +25,14 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.ICoreRunnable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.model.TmfProjectModelHelper;
@@ -41,6 +43,8 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.model.IWorkbenchAdapter;
+import org.eclipse.ui.model.WorkbenchAdapter;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 
@@ -53,7 +57,7 @@ import com.google.common.collect.ImmutableList;
  * @version 1.0
  * @author Francois Chouinard
  */
-public abstract class TmfProjectModelElement implements ITmfProjectModelElement {
+public abstract class TmfProjectModelElement implements ITmfProjectModelElement, IAdaptable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -323,4 +327,21 @@ public abstract class TmfProjectModelElement implements ITmfProjectModelElement 
         return getClass().getSimpleName() + '(' + getPath() + ')';
     }
 
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> @Nullable T getAdapter(Class<T> adapter) {
+        if (adapter.getClass().isInstance(this)) {
+            return (T)this;
+        }
+        if (IWorkbenchAdapter.class.isAssignableFrom(adapter)) {
+            return ((@Nullable T) new WorkbenchAdapter() {
+                @Override
+                public String getLabel(Object object) {
+                    return ((TmfProjectModelElement)object).getName();
+                }
+            });
+        }
+        return null;
+    }
 }

@@ -17,11 +17,13 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -60,16 +62,20 @@ public class TmfTraceManagerUtilityTest {
 
     /**
      * Test the {@link TmfTraceManager#getTemporaryDirPath} method.
+     * @throws URISyntaxException
+     *              in case of URI syntax error
      */
     @Test
-    public void testTemporaryDirPath() {
+    public void testTemporaryDirPath() throws URISyntaxException {
         String basePath = TmfTraceManager.getTemporaryDirPath();
         assertTrue(basePath.endsWith(TEMP_DIR_NAME));
 
         String property = System.getProperty("osgi.instance.area"); //$NON-NLS-1$
+        File dir = URIUtil.toFile(URIUtil.fromString(property));
+        String propertyToTest = dir.getAbsolutePath();
         if (property != null) {
-            basePath = basePath.substring(0, basePath.length() - TEMP_DIR_NAME.length());
-            assertTrue(property.contains(basePath));
+            basePath = basePath.substring(0, basePath.length() - TEMP_DIR_NAME.length() - 1);
+            assertTrue(propertyToTest.contains(basePath));
         }
     }
 

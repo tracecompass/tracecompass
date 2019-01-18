@@ -136,6 +136,7 @@ public class HttpTraceImportOperation extends WorkspaceModifyOperation {
 
         TraceValidateAndImportOperation validateAndImportOperation = new TraceValidateAndImportOperation(null, fileSystemElements, null, sourceContainerPath, destinationContainerPath, isArchive, importOptionFlags, fDestinationFolder, null, null, archiveFolderName, false);
         validateAndImportOperation.run(monitor);
+        provider.dispose();
 
         // Clean the temporary directory
         if (tempDestination.exists()) {

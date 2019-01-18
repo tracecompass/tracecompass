@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,17 +16,16 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfCommonProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfNavigatorLabelProvider;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 
 /**
- * An ExportTraceElement associated to a TmfTraceElement. This will be the
- * parent of other elements (events, supplementary files, bookmarks, etc).
+ * An TracePackageElement associated to a TmfTraceElement. This will be the
+ * parent of other elements (files, supplementary files, bookmarks, etc).
  *
  * @author Marc-Andre Laperle
  */
 public class TracePackageTraceElement extends TracePackageElement {
 
-    private final TmfTraceElement fTraceElement;
+    private final TmfCommonProjectElement fTraceElement;
     private String fImportName;
     private String fTraceType;
 
@@ -38,7 +37,7 @@ public class TracePackageTraceElement extends TracePackageElement {
      * @param traceElement
      *            the associated TmfTraceElement
      */
-    public TracePackageTraceElement(TracePackageElement parent, TmfTraceElement traceElement) {
+    public TracePackageTraceElement(TracePackageElement parent, TmfCommonProjectElement traceElement) {
         super(parent);
         fTraceElement = traceElement;
         fImportName = null;
@@ -123,7 +122,7 @@ public class TracePackageTraceElement extends TracePackageElement {
     /**
      * @return the associated TmfTraceElement
      */
-    public TmfTraceElement getTraceElement() {
+    public TmfCommonProjectElement getTraceElement() {
         return fTraceElement;
     }
 

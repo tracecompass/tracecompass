@@ -12,6 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
@@ -119,7 +120,7 @@ public abstract class FindDialogTestBase {
         /* Create the trace project */
         SWTBotUtils.createProject(TRACE_PROJECT_NAME);
         /* Open the trace */
-        String tracePath = FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL()).getPath();
+        String tracePath = FileUtils.toFile(FileLocator.toFileURL(CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL())).getAbsolutePath();
         SWTBotUtils.openTrace(TRACE_PROJECT_NAME, tracePath, KERNEL_TRACE_TYPE);
         /* Finish waiting for eclipse to load */
         SWTBotUtils.activateEditor(fBot, CtfTestTrace.ARM_64_BIT_HEADER.getTraceURL().getPath().replaceAll("/", ""));

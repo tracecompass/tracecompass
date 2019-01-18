@@ -14,6 +14,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
+import org.eclipse.tracecompass.analysis.profiling.core.tests.data.CallStackTestData;
 import org.eclipse.tracecompass.analysis.profiling.core.tests.stubs.CallStackAnalysisStub;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -27,15 +28,23 @@ import org.junit.Before;
  */
 public class CallStackTestBase {
 
-    private CallStackXmlData fTraceData;
+    private final CallStackTestData fTraceData;
     private CallStackAnalysisStub fModule;
+
+    /**
+     * Constructor, receives the callstack test data
+     *
+     * @param data The test data
+     */
+    public CallStackTestBase(CallStackTestData data) {
+        fTraceData = data;
+    }
 
     /**
      * Setup the trace for the tests
      */
     @Before
     public void setUp() {
-        fTraceData = new CallStackXmlData();
         ITmfTrace trace = fTraceData.getTrace();
 
         CallStackAnalysisStub module = TmfTraceUtils.getAnalysisModuleOfClass(trace, CallStackAnalysisStub.class, CallStackAnalysisStub.ID);
@@ -51,7 +60,7 @@ public class CallStackTestBase {
      */
     @After
     public void tearDown() {
-        CallStackXmlData traceData = fTraceData;
+        CallStackTestData traceData = fTraceData;
         if (traceData != null) {
             traceData.dispose();
         }
@@ -75,8 +84,8 @@ public class CallStackTestBase {
      *
      * @return The trace data used for this test
      */
-    public @NonNull CallStackXmlData getTraceData() {
-        CallStackXmlData traceData = fTraceData;
+    public @NonNull CallStackTestData getTraceData() {
+        CallStackTestData traceData = fTraceData;
         if (traceData == null) {
             throw new NullPointerException();
         }

@@ -24,15 +24,12 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
-import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
-import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.StateValues;
@@ -122,12 +119,6 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
             Comparator.comparing(ThreadEntryModel.Builder::getStartTime));
 
     /**
-     * Remove the "sys_" or "syscall_entry_" or similar from what we draw in the
-     * rectangle. This depends on the trace's event layout.
-     */
-    private final Function<@NonNull String, @NonNull String> fSyscallTrim;
-
-    /**
      * Constructor
      *
      * @param trace
@@ -140,13 +131,6 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
     public ThreadStatusDataProvider(@NonNull ITmfTrace trace, KernelAnalysisModule module) {
         super(trace);
         fModule = module;
-        if (trace instanceof IKernelTrace) {
-            IKernelAnalysisEventLayout layout = ((IKernelTrace) trace).getKernelEventLayout();
-            int beginIndex = layout.eventSyscallEntryPrefix().length();
-            fSyscallTrim = sysCall -> sysCall.substring(beginIndex);
-        } else {
-            fSyscallTrim = Function.identity();
-        }
     }
 
     @Override
@@ -471,7 +455,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
         return times;
     }
 
-    private @NonNull ITimeGraphState createTimeGraphState(ITmfStateInterval interval, NavigableSet<ITmfStateInterval> syscalls) {
+    private static @NonNull ITimeGraphState createTimeGraphState(ITmfStateInterval interval, NavigableSet<ITmfStateInterval> syscalls) {
         long startTime = interval.getStartTime();
         long duration = interval.getEndTime() - startTime + 1;
         Object status = interval.getValue();
@@ -484,7 +468,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
                 if (syscall != null) {
                     Object value = syscall.getValue();
                     if (value instanceof String) {
-                        return new TimeGraphState(startTime, duration, s, fSyscallTrim.apply((String) value));
+                        return new TimeGraphState(startTime, duration, s, String.valueOf(value));
                     }
                 }
             }

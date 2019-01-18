@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.profiling.core.tests.CallStackTestBase;
+import org.eclipse.tracecompass.analysis.profiling.core.tests.data.TestDataSmallCallStack;
 import org.eclipse.tracecompass.analysis.profiling.core.tests.stubs.CallStackAnalysisStub;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -33,6 +34,13 @@ import com.google.common.collect.Iterators;
 public class CallStackSegmentStoreTest extends CallStackTestBase {
 
     /**
+     * Constructor
+     */
+    public CallStackSegmentStoreTest() {
+        super(new TestDataSmallCallStack());
+    }
+
+    /**
      * Test the callstack data using the callstack object
      */
     @Test
@@ -44,8 +52,8 @@ public class CallStackSegmentStoreTest extends CallStackTestBase {
         assertNotNull(segmentStore);
 
         Iterator<@NonNull ISegment> iterator = segmentStore.iterator();
-        assertEquals("Segment store iterator count", 18, Iterators.size(iterator));
-        assertEquals("Segment store size", 18, segmentStore.size());
+        assertEquals("Segment store iterator count", 21, Iterators.size(iterator));
+        assertEquals("Segment store size", 21, segmentStore.size());
         assertFalse(segmentStore.isEmpty());
     }
 

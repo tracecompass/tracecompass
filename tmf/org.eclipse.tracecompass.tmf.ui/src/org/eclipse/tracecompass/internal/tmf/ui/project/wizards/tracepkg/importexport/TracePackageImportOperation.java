@@ -41,10 +41,13 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.operation.ModalContext;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.project.operations.NewExperimentOperation;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.AbstractTracePackageOperation;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageBookmarkElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageElement;
+import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageExperimentElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageFilesElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageSupplFileElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageSupplFilesElement;
@@ -55,6 +58,9 @@ import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfCommonProjectElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceTypeUIUtils;
@@ -72,6 +78,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
 
     private final TracePackageElement[] fImportTraceElements;
     private final TmfTraceFolder fTmfTraceFolder;
+    private final @NonNull TmfExperimentFolder fTmfExperimentFolder;
 
     /**
      * Constructs a new import operation
@@ -87,6 +94,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
         super(fileName);
         fImportTraceElements = importTraceElements;
         fTmfTraceFolder = tmfTraceFolder;
+        fTmfExperimentFolder = checkNotNull(tmfTraceFolder.getProject().getExperimentsFolder());
     }
 
     private class ImportProvider implements IImportStructureProvider {
@@ -181,33 +189,44 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
     private void doRun(IProgressMonitor progressMonitor) {
         try {
             setStatus(deleteExistingTraces(progressMonitor));
-            if (getStatus().getSeverity() != IStatus.OK) {
+            if (!getStatus().isOK()) {
                 return;
             }
 
-            TracePackageFilesElement traceFilesElement = null;
+            List<TracePackageExperimentElement> experimentPackageElements = new ArrayList<>();
             for (TracePackageElement packageElement : fImportTraceElements) {
+
                 TracePackageTraceElement traceElement = (TracePackageTraceElement) packageElement;
                 if (!isFilesChecked(packageElement)) {
                     continue;
                 }
-
+                if (packageElement instanceof TracePackageExperimentElement) {
+                    experimentPackageElements.add((TracePackageExperimentElement) packageElement);
+                    continue;
+                }
                 TracePackageElement[] children = traceElement.getChildren();
                 for (TracePackageElement element : children) {
                     ModalContext.checkCanceled(progressMonitor);
 
                     if (element instanceof TracePackageFilesElement) {
-                        traceFilesElement = (TracePackageFilesElement) element;
+                        TracePackageFilesElement traceFilesElement = (TracePackageFilesElement) element;
                         setStatus(importTraceFiles(traceFilesElement, traceElement, progressMonitor));
-
-                    } else if (element instanceof TracePackageSupplFilesElement) {
-                        TracePackageSupplFilesElement suppFilesElement = (TracePackageSupplFilesElement) element;
-                        setStatus(importSupplFiles(suppFilesElement, traceElement, progressMonitor));
                     }
 
-                    if (getStatus().getSeverity() != IStatus.OK) {
+                    if (!getStatus().isOK()) {
                         return;
                     }
+                }
+                setStatus(importSupplFiles(traceElement, progressMonitor));
+                if (!getStatus().isOK()) {
+                    return;
+                }
+            }
+            for (TracePackageExperimentElement experimentPackageElement : experimentPackageElements) {
+                ModalContext.checkCanceled(progressMonitor);
+                importExperiment(experimentPackageElement, progressMonitor);
+                if (!getStatus().isOK()) {
+                    return;
                 }
             }
 
@@ -238,15 +257,22 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
     /**
      * Return the matching TmfTraceElement for a given trace element.
      */
-    private TmfTraceElement getMatchingTraceElement(TracePackageTraceElement tracePackageElement) {
-        IPath tracePath = fTmfTraceFolder.getPath().append(tracePackageElement.getDestinationElementPath());
-        List<TmfTraceElement> traces = fTmfTraceFolder.getTraces();
-        for (TmfTraceElement t : traces) {
-            if (t.getPath().equals(tracePath)) {
-                return t;
+    private TmfCommonProjectElement getMatchingProjectElement(TracePackageTraceElement tracePackageElement) {
+        if (tracePackageElement instanceof TracePackageExperimentElement) {
+            for (TmfExperimentElement experiment : fTmfExperimentFolder.getExperiments()) {
+                if (experiment.getName().equals(tracePackageElement.getImportName())) {
+                    return experiment;
+                }
+            }
+        } else {
+            IPath tracePath = fTmfTraceFolder.getPath().append(tracePackageElement.getDestinationElementPath());
+            List<TmfTraceElement> traces = fTmfTraceFolder.getTraces();
+            for (TmfTraceElement t : traces) {
+                if (t.getPath().equals(tracePath)) {
+                    return t;
+                }
             }
         }
-
         return null;
     }
 
@@ -257,13 +283,17 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
                 continue;
             }
 
-            TmfTraceElement existingTrace = getMatchingTraceElement(traceElement);
-            if (existingTrace != null) {
-                try {
-                    existingTrace.delete(SubMonitor.convert(progressMonitor), true);
-                } catch (CoreException e) {
-                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation, e);
+            TmfCommonProjectElement projectElement = getMatchingProjectElement(traceElement);
+            try {
+                if (projectElement instanceof TmfExperimentElement) {
+                    Display.getDefault().syncExec(() -> projectElement.closeEditors());
+                    projectElement.deleteSupplementaryFolder();
+                    projectElement.getResource().delete(true, SubMonitor.convert(progressMonitor));
+                } else if (projectElement instanceof TmfTraceElement) {
+                    ((TmfTraceElement) projectElement).delete(SubMonitor.convert(progressMonitor), true);
                 }
+            } catch (CoreException e) {
+                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation, e);
             }
         }
 
@@ -276,16 +306,16 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
 
                 // Get element
                 IFile bookmarksFile = null;
-                TmfTraceElement tmfTraceElement = getMatchingTraceElement(traceElement);
-                if (tmfTraceElement != null) {
+                TmfCommonProjectElement projectElement = getMatchingProjectElement(traceElement);
+                if (projectElement != null) {
                     try {
-                        bookmarksFile = tmfTraceElement.createBookmarksFile(monitor);
+                        bookmarksFile = projectElement.createBookmarksFile(monitor);
 
                         // Make sure that if a bookmark is double-clicked first
                         // before opening the trace, it opens the right editor
 
                         // Get the editor id from the extension point
-                        String traceEditorId = tmfTraceElement.getEditorId();
+                        String traceEditorId = projectElement.getEditorId();
                         final String editorId = (traceEditorId != null) ? traceEditorId : TmfEventsEditor.ID;
                         IDE.setDefaultEditor(bookmarksFile, editorId);
 
@@ -345,7 +375,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
 
         IPath containerPath = fTmfTraceFolder.getPath();
         IStatus status = importFiles(getSpecifiedArchiveFile(), fileNameAndLabelPairs, containerPath, Path.EMPTY, monitor);
-        if (getStatus().getSeverity() != IStatus.OK) {
+        if (!getStatus().isOK()) {
             return status;
         }
 
@@ -395,30 +425,40 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
         return status;
     }
 
-    private IStatus importSupplFiles(TracePackageSupplFilesElement suppFilesElement, TracePackageTraceElement traceElement, IProgressMonitor monitor) {
+    private IStatus importSupplFiles(TracePackageTraceElement packageElement, IProgressMonitor monitor) {
         List<Pair<String, String>> fileNameAndLabelPairs = new ArrayList<>();
-        for (TracePackageElement child : suppFilesElement.getChildren()) {
-            if (child.isChecked()) {
-                TracePackageSupplFileElement supplFile = (TracePackageSupplFileElement) child;
-                fileNameAndLabelPairs.add(new Pair<>(checkNotNull(supplFile.getText()), checkNotNull(new Path(supplFile.getText()).lastSegment())));
+        for (TracePackageElement element : packageElement.getChildren()) {
+            if (element instanceof TracePackageSupplFilesElement) {
+                for (TracePackageElement child : element.getChildren()) {
+                    if (child.isChecked()) {
+                        TracePackageSupplFileElement supplFile = (TracePackageSupplFileElement) child;
+                        fileNameAndLabelPairs.add(new Pair<>(checkNotNull(supplFile.getText()), checkNotNull(new Path(supplFile.getText()).lastSegment())));
+                    }
+                }
             }
         }
 
         if (!fileNameAndLabelPairs.isEmpty()) {
-            TmfTraceElement existingTrace = getMatchingTraceElement(traceElement);
-            if (existingTrace != null) {
+            TmfCommonProjectElement projectElement = getMatchingProjectElement(packageElement);
+            if (projectElement != null) {
                 ArchiveFile archiveFile = getSpecifiedArchiveFile();
-                existingTrace.refreshSupplementaryFolder();
-                // Project/Traces/A/B -> A/B
-                final TmfTraceFolder tracesFolder = fTmfTraceFolder.getProject().getTracesFolder();
-                if (tracesFolder == null) {
-                    return new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation);
+                projectElement.refreshSupplementaryFolder();
+                IPath destinationContainerPath;
+                if (packageElement instanceof TracePackageExperimentElement) {
+                    destinationContainerPath = projectElement.getProject().getSupplementaryFolder().getFullPath();
+                } else {
+                    // Project/Traces/A/B -> A/B
+                    final TmfTraceFolder tracesFolder = fTmfTraceFolder.getProject().getTracesFolder();
+                    if (tracesFolder == null) {
+                        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation);
+                    }
+                    IPath traceFolderRelativePath = fTmfTraceFolder.getPath().makeRelativeTo(tracesFolder.getPath());
+                    // Project/.tracing/A/B/
+                    IFolder traceSupplementaryFolder = fTmfTraceFolder.getTraceSupplementaryFolder(traceFolderRelativePath.toString());
+                    destinationContainerPath = traceSupplementaryFolder.getFullPath();
                 }
-                IPath traceFolderRelativePath = fTmfTraceFolder.getPath().makeRelativeTo(tracesFolder.getPath());
-                // Project/.tracing/A/B/
-                IFolder traceSupplementaryFolder = fTmfTraceFolder.getTraceSupplementaryFolder(traceFolderRelativePath.toString());
-                IPath destinationContainerPath = traceSupplementaryFolder.getFullPath();
-                // Remove the .tracing segment at the beginnin so that a file in folder .tracing/A/B/ imports destinationContainerPath/A/B/
+                // Remove the .tracing segment at the beginning so that a file
+                // in folder .tracing/A/B/ imports to destinationContainerPath/A/B/
                 Path baseSourcePath = new Path(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER_NAME);
                 return importFiles(archiveFile, fileNameAndLabelPairs, destinationContainerPath, baseSourcePath, monitor);
             }
@@ -489,6 +529,37 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
         }
 
         return operation.getStatus();
+    }
+
+    private void importExperiment(TracePackageExperimentElement experimentPackageElement, IProgressMonitor progressMonitor) {
+        SubMonitor subMonitor = SubMonitor.convert(progressMonitor, 3);
+        String name = checkNotNull(experimentPackageElement.getImportName());
+        String experimentType = experimentPackageElement.getTraceType();
+        List<TmfTraceElement> traces = new ArrayList<>();
+        List<TmfTraceElement> traceElements = fTmfTraceFolder.getTraces();
+        boolean allFound = true;
+        for (String expTrace : experimentPackageElement.getExpTraces()) {
+            boolean found = false;
+            for (TmfTraceElement traceElement : traceElements) {
+                if (traceElement.getPath().makeRelativeTo(fTmfTraceFolder.getPath()).toString().equals(expTrace)) {
+                    traces.add(traceElement);
+                    found = true;
+                    break;
+                }
+            }
+            allFound &= found;
+        }
+        NewExperimentOperation newExperimentOperation = new NewExperimentOperation(fTmfExperimentFolder, name, experimentType, traces);
+        newExperimentOperation.run(subMonitor.split(1));
+        setStatus(newExperimentOperation.getStatus());
+        if (!getStatus().isOK()) {
+            return;
+        }
+        if (allFound) {
+            importBookmarks(newExperimentOperation.getExperimentFolder(), experimentPackageElement, subMonitor.split(1));
+            setStatus(importSupplFiles(experimentPackageElement, subMonitor.split(1)));
+        }
+        return;
     }
 
     @Override

@@ -25,7 +25,8 @@ Require-Bundle: org.eclipse.core.resources,
  org.eclipse.tracecompass.tmf.ctf.core,
  org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.lttng2.kernel.core
-Import-Package: org.eclipse.swt.graphics,
+Import-Package: org.apache.commons.io,
+ org.eclipse.swt.graphics,
  org.eclipse.tracecompass.analysis.counters.core,
  org.swtchart
 Automatic-Module-Name: org.eclipse.tracecompass.analysis.counters.ui.swtbot.tests

@@ -133,7 +133,7 @@ public abstract class ViewsResponseTest {
     protected void runTestWithTrace(String tracePath, String traceType, Collection<String> viewIDs) {
         closeAllViews(viewIDs);
         /* Open the trace */
-        String traceName = tracePath.substring(tracePath.lastIndexOf(File.separator, tracePath.length() - 2) + 1, tracePath.length() - 1);
+        String traceName = new File(tracePath).getName();
         SWTBotUtils.openTrace(PROJECT_NAME, tracePath, traceType);
 
         // Make sure all the analyses we'll need are done

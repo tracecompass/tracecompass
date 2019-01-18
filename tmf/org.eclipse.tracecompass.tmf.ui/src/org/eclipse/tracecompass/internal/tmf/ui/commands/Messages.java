@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.ui.commands;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 
 /**
@@ -26,7 +27,14 @@ public class Messages extends NLS {
     public static String OpenDirHandler_SelectTraceDirectory;
     /** Select trace file */
     public static String OpenFileHandler_SelectTraceFile;
-
+    /** Export to TSV message */
+    public static @Nullable String AbstractSegmentStoreTableView_exportToTsv;
+    /** Export to TSV tooltip */
+    public static @Nullable String ExportToTsvAction_exportToTsvToolTip;
+    /** Export to TSV tooltip */
+    public static @Nullable String AbstractSegmentStoreScatterView_Type;
+    /** Export to TSV tooltip */
+    public static @Nullable String AbstractSegmentStoreScatterView_Legend;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
