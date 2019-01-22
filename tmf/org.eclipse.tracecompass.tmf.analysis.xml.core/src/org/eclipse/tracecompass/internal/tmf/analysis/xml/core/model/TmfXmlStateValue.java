@@ -13,11 +13,11 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model;
 
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenMappingGroup;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenStateProvider;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
@@ -251,27 +251,16 @@ public abstract class TmfXmlStateValue implements ITmfXmlStateValue {
     }
 
     private ITmfStateValue getMappedValue(@Nullable ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo, ITmfStateValue value) {
-        try {
-            Set<TmfXmlMapEntry> group = null;
-            if (fContainer instanceof XmlPatternStateProvider) {
-                group = ((XmlPatternStateProvider) fContainer).getLegacyMappingGroup(fMappingGroup);
-            } else if (fContainer instanceof DataDrivenStateProvider) {
-                Activator.logError("You should not get to this part of the code if the container is a DataDrivenStateProvider"); //$NON-NLS-1$
-            }
-            if (group != null) {
-                for (TmfXmlMapEntry entry : group) {
-                    if (entry.getKey().getValue(event, scenarioInfo).equals(value)) {
-                        return entry.getValue().getValue(event, scenarioInfo);
-                    }
-                }
-            }
-            return value;
-        } catch (AttributeNotFoundException e) {
-            Activator.logError("Unable to map the state value"); //$NON-NLS-1$
-            // FIXME maybe we should return the raw state value instead of a
-            // null state value
-            return TmfStateValue.nullValue();
+        DataDrivenMappingGroup group = null;
+        if (!fMappingGroup.isEmpty() && fContainer instanceof XmlPatternStateProvider) {
+            group = ((XmlPatternStateProvider) fContainer).getMappingGroup(fMappingGroup);
+        } else if (fContainer instanceof DataDrivenStateProvider) {
+            Activator.logError("You should not get to this part of the code if the container is a DataDrivenStateProvider"); //$NON-NLS-1$
         }
+        if (group != null) {
+            return TmfStateValue.newValue(group.map(event, ITmfStateSystem.ROOT_ATTRIBUTE, scenarioInfo, fContainer, value.unboxValue()));
+        }
+        return value;
     }
 
     /**
