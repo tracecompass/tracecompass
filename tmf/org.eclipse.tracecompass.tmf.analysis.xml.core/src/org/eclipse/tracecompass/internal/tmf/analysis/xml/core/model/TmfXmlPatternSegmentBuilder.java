@@ -17,12 +17,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
@@ -51,9 +50,9 @@ public class TmfXmlPatternSegmentBuilder {
     private final IXmlStateSystemContainer fContainer;
     private final List<TmfXmlPatternSegmentField> fFields = new ArrayList<>();
     private final TmfXmlPatternSegmentType fSegmentType;
-    private @Nullable ITmfXmlStateValue fBegin;
-    private @Nullable ITmfXmlStateValue fEnd;
-    private @Nullable ITmfXmlStateValue fDuration;
+    private @Nullable DataDrivenValue fBegin;
+    private @Nullable DataDrivenValue fEnd;
+    private @Nullable DataDrivenValue fDuration;
 
     /**
      * @param modelFactory
@@ -86,15 +85,15 @@ public class TmfXmlPatternSegmentBuilder {
                 if (beginTimeElement == null) {
                     throw new IllegalArgumentException("Invalid xml segment description"); //$NON-NLS-1$
                 }
-                fBegin  = modelFactory.createStateValue(beginTimeElement, parent, new ArrayList<>());
+                fBegin  = modelFactory.createStateValue(beginTimeElement, parent);
 
                 NodeList nodesEndTime = fTimeElement.getElementsByTagName(TmfXmlStrings.END);
                 Element endTimeElement = (Element) nodesEndTime.item(0);
-                fEnd = endTimeElement == null ? null : modelFactory.createStateValue(endTimeElement, parent, new ArrayList<>());
+                fEnd = endTimeElement == null ? null : modelFactory.createStateValue(endTimeElement, parent);
 
                 NodeList nodesDuration = fTimeElement.getElementsByTagName(TmfXmlStrings.DURATION);
                 Element durationElement = (Element) nodesDuration.item(0);
-                fDuration  = durationElement == null ? null : modelFactory.createStateValue(durationElement, parent, new ArrayList<>());
+                fDuration  = durationElement == null ? null : modelFactory.createStateValue(durationElement, parent);
             }
         }
 
@@ -129,32 +128,20 @@ public class TmfXmlPatternSegmentBuilder {
         //Set the start time
         long startValue = start.toNanos();
         if (fBegin != null) {
-            try {
-                ITmfStateValue value = fBegin.getValue(event, scenarioInfo);
-                startValue = value.unboxLong();
-            } catch (AttributeNotFoundException e) {
-                Activator.logInfo("Impossible to get the xml begin time of the segment", e); //$NON-NLS-1$
-            }
+            Object value = fBegin.getValue(event, ITmfStateSystem.ROOT_ATTRIBUTE, scenarioInfo, fContainer);
+            startValue = (value instanceof Number) ? ((Number) value).longValue() : startValue;
         }
 
         //Set the end time
         long endValue = end.toNanos();
         if (fEnd != null) {
-            try {
-                ITmfStateValue value = fEnd.getValue(event, scenarioInfo);
-                long endLong = value.unboxLong();
-                endValue = endLong >= startValue ? endLong : endValue;
-            } catch (AttributeNotFoundException e) {
-                Activator.logInfo("Impossible to get the xml end time of the segment", e); //$NON-NLS-1$
-            }
+            Object value = fEnd.getValue(event, ITmfStateSystem.ROOT_ATTRIBUTE, scenarioInfo, fContainer);
+            long endLong = (value instanceof Number) ? ((Number) value).longValue() : endValue;
+            endValue = endLong >= startValue ? endLong : endValue;
         } else if (fDuration != null) {
-            try {
-                ITmfStateValue value = fDuration.getValue(event, scenarioInfo);
-                long durationLong = value.unboxLong();
-                endValue = durationLong + startValue >= startValue ? durationLong + startValue : endValue;
-            } catch (AttributeNotFoundException e) {
-                Activator.logInfo("Impossible to get the xml end time of the segment", e); //$NON-NLS-1$
-            }
+            Object value = fDuration.getValue(event, ITmfStateSystem.ROOT_ATTRIBUTE, scenarioInfo, fContainer);
+            long durationLong = (value instanceof Number) ? ((Number) value).longValue() : 0;
+            endValue = durationLong + startValue >= startValue ? durationLong + startValue : endValue;
         }
 
         String segmentName = getPatternSegmentName(event, scenarioInfo);
@@ -239,32 +226,9 @@ public class TmfXmlPatternSegmentBuilder {
         }
     }
 
-    private static void getNameFromXmlStateValue(ITmfEvent event, StringBuilder builder, ITmfXmlStateValue xmlStateValue, @Nullable TmfXmlScenarioInfo scenarioInfo) {
-        try {
-            ITmfStateValue value = xmlStateValue.getValue(event, scenarioInfo);
-            switch (value.getType()) {
-            case DOUBLE:
-                builder.append(value.unboxDouble());
-                break;
-            case INTEGER:
-                builder.append(value.unboxInt());
-                break;
-            case LONG:
-                builder.append(value.unboxLong());
-                break;
-            case NULL:
-                builder.append(UNKNOWN_STRING);
-                break;
-            case STRING:
-                builder.append(value.unboxStr());
-                break;
-            case CUSTOM:
-            default:
-                throw new StateValueTypeException("Invalid type of state value"); //$NON-NLS-1$
-            }
-        } catch (AttributeNotFoundException e) {
-            Activator.logInfo("Impossible to get the state value", e); //$NON-NLS-1$
-        }
+    private void getNameFromXmlStateValue(ITmfEvent event, StringBuilder builder, DataDrivenValue xmlStateValue, @Nullable TmfXmlScenarioInfo scenarioInfo) {
+        Object value = xmlStateValue.getValue(event, ITmfStateSystem.ROOT_ATTRIBUTE, scenarioInfo, fContainer);
+        builder.append(String.valueOf(value));
     }
 
     /**
@@ -278,7 +242,7 @@ public class TmfXmlPatternSegmentBuilder {
         private final String fName;
         private final String fType;
         private final @Nullable ITmfStateValue fStateValue;
-        private final @Nullable ITmfXmlStateValue fXmlStateValue;
+        private final @Nullable DataDrivenValue fXmlStateValue;
 
         /**
          * Constructor
@@ -300,7 +264,7 @@ public class TmfXmlPatternSegmentBuilder {
                 if (elementFieldStateValue == null) {
                     throw new IllegalArgumentException("The value of the field " + fName + " is missing"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
-                fXmlStateValue = fModelFactory.createStateValue(elementFieldStateValue, fContainer, new ArrayList<>());
+                fXmlStateValue = fModelFactory.createStateValue(elementFieldStateValue, fContainer);
             } else {
                 fStateValue = getStateValueFromConstant(constantValue, fType);
                 fXmlStateValue = null;
@@ -322,12 +286,8 @@ public class TmfXmlPatternSegmentBuilder {
             if (fStateValue != null) {
                 return fStateValue;
             }
-            try {
-                return checkNotNull(fXmlStateValue).getValue(event, scenarioInfo);
-            } catch (AttributeNotFoundException e) {
-                Activator.logError("Failed to get the state value", e); //$NON-NLS-1$
-            }
-            throw new IllegalStateException("Failed to get the value for the segment field " + fName); //$NON-NLS-1$
+            Object value = checkNotNull(fXmlStateValue).getValue(event, ITmfStateSystem.ROOT_ATTRIBUTE, scenarioInfo, fContainer);
+            return TmfStateValue.newValue(value);
         }
 
         /**
@@ -348,7 +308,7 @@ public class TmfXmlPatternSegmentBuilder {
      */
     private class TmfXmlPatternSegmentType {
         private final String fSegmentNameAttribute;
-        private final @Nullable ITmfXmlStateValue fNameStateValue;
+        private final @Nullable DataDrivenValue fNameStateValue;
 
         /**
          * Constructor
@@ -367,7 +327,7 @@ public class TmfXmlPatternSegmentBuilder {
                 if (elementSegmentNameStateValue == null) {
                     throw new IllegalArgumentException("Failed to get the segment name. A state value is needed."); //$NON-NLS-1$
                 }
-                fNameStateValue = fModelFactory.createStateValue(elementSegmentNameStateValue, fContainer, new ArrayList<>());
+                fNameStateValue = fModelFactory.createStateValue(elementSegmentNameStateValue, fContainer);
             }
         }
 

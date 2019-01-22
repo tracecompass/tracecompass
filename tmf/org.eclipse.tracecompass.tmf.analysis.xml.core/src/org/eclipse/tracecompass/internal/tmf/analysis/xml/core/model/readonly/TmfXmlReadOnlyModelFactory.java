@@ -12,17 +12,16 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readonly;
 
-import java.util.List;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlConditionCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateChangeCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateValueCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenAction;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlAction;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlFsm;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
@@ -63,20 +62,19 @@ public class TmfXmlReadOnlyModelFactory implements ITmfXmlModelFactory {
     }
 
     @Override
-    public ITmfXmlStateValue createStateValue(Element node, IXmlStateSystemContainer container, List<ITmfXmlStateAttribute> attributes) {
-        return new TmfXmlReadOnlyStateValue(this, node, container, attributes);
-    }
-
-    @Override
-    public ITmfXmlStateValue createStateValue(Element node, IXmlStateSystemContainer container, String eventField) {
-        return new TmfXmlReadOnlyStateValue(this, node, container, eventField);
+    public DataDrivenValue createStateValue(Element node, IXmlStateSystemContainer container) {
+        TmfXmlStateValueCu compile = TmfXmlStateValueCu.compileValue(container.getAnalysisCompilationData(), node);
+        if (compile == null)  {
+            throw new NullPointerException("State value did not compile correctly"); //$NON-NLS-1$
+        }
+        return compile.generate();
     }
 
     @Override
     public DataDrivenCondition createCondition(Element node, IXmlStateSystemContainer container) {
         TmfXmlConditionCu compile = TmfXmlConditionCu.compile(container.getAnalysisCompilationData(), node);
         if (compile == null)  {
-            throw new NullPointerException("Condition did not compile correctly"); //$NON-NLS-1$
+            throw new NullPointerException("Condition did not compile correctly " + container); //$NON-NLS-1$
         }
         return compile.generate();
     }
