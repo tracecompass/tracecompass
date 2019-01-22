@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2018 Ericsson
+ * Copyright (c) 2015, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -198,6 +198,7 @@ public class SDViewTest {
         SWTBotUtils.waitUntil(f -> f.getLifeline(1).isSelected(), frame, "Did not find lifeline");
 
         assertEquals(0, pagingProvider.currentPage());
+        viewBot.setFocus(); // Shell focus required to enable tool item shortcut
         viewBot.toolbarButton("Find... (" + findShortcut + ")").click();
         findDialogBot = fBot.shell("Sequence Diagram Find").bot();
         findDialogBot.comboBox().setText("1001");
