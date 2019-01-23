@@ -542,6 +542,12 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
 
         shell.bot().button(DIALOG_OK).click();
 
+        /*
+         * A zoom thread is started after applying the filter. Make sure that the time graph
+         * is ready before continuing with the test
+         */
+        timeGraphIsReadyCondition(range);
+
         /* Change window range to 50 us */
         range = new TmfTimeRange(START_TIME, START_TIME.normalize(50000L, ITmfTimestamp.NANOSECOND_SCALE));
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, range));
