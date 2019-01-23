@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,19 +13,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Arrays;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -40,7 +34,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlAnalysisModuleSource;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.Activator;
-import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.ui.dialog.DirectoryDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
@@ -63,11 +56,6 @@ public class XMLAnalysesManagerPreferencePageTest {
 
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
-    /** LTTng kernel trace type */
-    protected static final String KERNEL_TRACE_TYPE = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
-    /** Default project name */
-    protected static final String TRACE_PROJECT_NAME = "test";
-    private static final String TRACE_PATH = "testfiles/syslog_collapse";
     /** XML files */
     private static final String EXTENSION = "." + XmlUtils.XML_EXTENSION;
     private static final String TEST_FILES_FOLDER = "test_xml_files/";
@@ -115,26 +103,8 @@ public class XMLAnalysesManagerPreferencePageTest {
      */
     @Before
     public void before() {
-        /* Create the trace project */
-        SWTBotUtils.createProject(TRACE_PROJECT_NAME);
         /* Finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
-        /* set up test trace */
-        setUpTrace();
-    }
-
-    private static void setUpTrace() {
-        URL location = FileLocator.find(TmfCoreTestPlugin.getDefault().getBundle(), new Path(TRACE_PATH), null);
-        URI uri;
-        try {
-            uri = FileLocator.toFileURL(location).toURI();
-            File testFile = new File(uri);
-            SWTBotUtils.openTrace(TRACE_PROJECT_NAME, testFile.getAbsolutePath(), KERNEL_TRACE_TYPE);
-            assertNotNull(testFile);
-            assumeTrue(testFile.exists());
-        } catch (URISyntaxException | IOException e) {
-            fail("Failed to open the trace");
-        }
     }
 
     /**
@@ -153,7 +123,7 @@ public class XMLAnalysesManagerPreferencePageTest {
     public void testDelete() {
         // Import valid analysis file
         SWTBot bot = openXMLAnalysesPreferences().bot();
-        importAnalysis(bot, getRelativePaths(VALID_FILES_FOLDER, FILES_DELETE));
+        importAnalysis(bot, FILES_DELETE.length, getRelativePaths(VALID_FILES_FOLDER, FILES_DELETE));
 
         SWTBotTable tablebot = bot.table(0);
 
@@ -193,7 +163,7 @@ public class XMLAnalysesManagerPreferencePageTest {
     public void testImportValid() {
         // Import valid analysis file
         SWTBot bot = openXMLAnalysesPreferences().bot();
-        importAnalysis(bot, getRelativePaths(VALID_FILES_FOLDER, FILES_IMPORT_VALID));
+        importAnalysis(bot, FILES_IMPORT_VALID.length, getRelativePaths(VALID_FILES_FOLDER, FILES_IMPORT_VALID));
 
         // Check that the "enabled" label is displayed
         SWTBotTable tablebot = bot.table(0);
@@ -212,7 +182,7 @@ public class XMLAnalysesManagerPreferencePageTest {
     public void testImportInvalid() {
         // Import invalid analysis file
         SWTBot bot = openXMLAnalysesPreferences().bot();
-        importAnalysis(bot, TEST_FILES_FOLDER + INVALID_FILES_FOLDER + FILE_IMPORT_INVALID + EXTENSION);
+        importAnalysis(bot, 0, TEST_FILES_FOLDER + INVALID_FILES_FOLDER + FILE_IMPORT_INVALID + EXTENSION);
 
         // Check that the parsing error pop-up is displayed
         SWTBotShell popupShell = bot.shell("Import XML analysis file failed.").activate();
@@ -228,7 +198,7 @@ public class XMLAnalysesManagerPreferencePageTest {
     public void testEdit() {
         // Import valid analysis files
         SWTBot bot = openXMLAnalysesPreferences().bot();
-        importAnalysis(bot, getRelativePaths(VALID_FILES_FOLDER, FILES_EDIT));
+        importAnalysis(bot, FILES_EDIT.length, getRelativePaths(VALID_FILES_FOLDER, FILES_EDIT));
 
         // Open the editor
         SWTBotTable tablebot = bot.table(0);
@@ -292,7 +262,7 @@ public class XMLAnalysesManagerPreferencePageTest {
 
         // Import files
         int preRowCount = tableBot.rowCount();
-        importAnalysis(bot, getRelativePaths(VALID_FILES_FOLDER, FILES_BUTTONS));
+        importAnalysis(bot, FILES_BUTTONS.length, getRelativePaths(VALID_FILES_FOLDER, FILES_BUTTONS));
         int postRowCount = tableBot.rowCount();
         assertEquals(preRowCount + FILES_BUTTONS.length, postRowCount);
 
@@ -332,7 +302,7 @@ public class XMLAnalysesManagerPreferencePageTest {
         // Import valid analysis file
         SWTBot bot = openXMLAnalysesPreferences().bot();
         final String fileNameXml = FILE_EXPORT + EXTENSION;
-        importAnalysis(bot, TEST_FILES_FOLDER + VALID_FILES_FOLDER + fileNameXml);
+        importAnalysis(bot, 1, TEST_FILES_FOLDER + VALID_FILES_FOLDER + fileNameXml);
 
         // Setup target folder
         File targetDirectory = new File(TEMP_DIRECTORY);
@@ -351,12 +321,27 @@ public class XMLAnalysesManagerPreferencePageTest {
     }
 
     /**
-     * After each test, delete project
+     * After each test, delete all analyses
      */
     @After
     public void after() {
-        SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
         fBot.closeAllEditors();
+        SWTBot bot = openXMLAnalysesPreferences().bot();
+        SWTBotTable tableBot = bot.table(0);
+
+        // Delete existing analysis files, if any
+        int rowsCount = tableBot.rowCount();
+        if (rowsCount > 0) {
+            String[] itemNames = new String[rowsCount];
+            for (int i = 0; i < rowsCount; ++i) {
+                itemNames[i] = tableBot.getTableItem(i).getText();
+            }
+            tableBot.select(itemNames);
+            bot.button("Delete").click();
+            SWTBotShell deleteShell = bot.shell("Delete XML file(s)").activate();
+            deleteShell.bot().button("Yes").click();
+        }
+        SWTBotUtils.pressOKishButtonInPreferences(bot);
     }
 
     /**
@@ -375,14 +360,14 @@ public class XMLAnalysesManagerPreferencePageTest {
         return relativePaths;
     }
 
-    private static void importAnalysis(SWTBot bot, String... relativePaths) {
+    private static void importAnalysis(SWTBot bot, int expected, String... relativePaths) {
         String[] absolutePaths = new String[relativePaths.length];
         for (int i = 0; i < relativePaths.length; ++i) {
             absolutePaths[i] = Activator.getAbsolutePath(new Path(relativePaths[i])).toString();
         }
         TmfFileDialogFactory.setOverrideFiles(absolutePaths);
         bot.button("Import").click();
-        SWTBotUtils.waitUntil(tree -> tree.rowCount() > 0, bot.tree(0), "Failed to import analysis");
+        SWTBotUtils.waitUntil(table -> table.rowCount() == expected, bot.table(0), "Failed to import analysis");
     }
 
     private static SWTBotShell openXMLAnalysesPreferences() {
