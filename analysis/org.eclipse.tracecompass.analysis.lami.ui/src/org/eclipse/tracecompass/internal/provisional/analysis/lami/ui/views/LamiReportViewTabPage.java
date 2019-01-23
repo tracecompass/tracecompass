@@ -168,6 +168,15 @@ public final class LamiReportViewTabPage extends TmfComponent {
     // ------------------------------------------------------------------------
 
     /**
+     * Get the table viewer
+     *
+     * @return the table viewer
+     */
+    public LamiViewerControl getTableViewerControl() {
+        return fTableViewerControl;
+    }
+
+    /**
      * Get the SWT control associated with this tab page.
      *
      * @return The SWT control

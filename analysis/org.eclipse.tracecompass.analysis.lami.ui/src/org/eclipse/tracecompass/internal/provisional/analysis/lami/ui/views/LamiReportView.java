@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +26,15 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.analysis.lami.ui.Activator;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiAnalysisReport;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiResultTable;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.viewers.LamiTableViewer;
+import org.eclipse.tracecompass.internal.tmf.ui.commands.ExportToTsvAction;
+import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
+import org.eclipse.ui.IActionBars;
 
 /**
  * Base view showing output of Babeltrace scripts.
@@ -79,6 +85,28 @@ public final class LamiReportView extends TmfView {
         }
     }
 
+
+    private final Action fExportAction = new ExportToTsvAction() {
+        @Override
+        protected void exportToTsv(@Nullable OutputStream stream) {
+            LamiReportViewTabPage tabPage = getCurrentSelectedPage();
+            if (tabPage == null) {
+                return;
+            }
+            LamiViewerControl viewerControl = tabPage.getTableViewerControl();
+            TmfViewer viewer = viewerControl.getViewer();
+            if (viewer instanceof LamiTableViewer) {
+                ((LamiTableViewer) viewer).exportToTsv(stream);
+            }
+        }
+
+        @Override
+        protected @Nullable Shell getShell() {
+            return getViewSite().getShell();
+        }
+
+    };
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -125,10 +153,11 @@ public final class LamiReportView extends TmfView {
         toggleTableAction.setToolTipText(Messages.LamiReportView_ActivateTableAction_ButtonTooltip);
         toggleTableAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath("icons/table.gif")); //$NON-NLS-1$
 
-        IToolBarManager toolbarMgr = getViewSite().getActionBars().getToolBarManager();
+        IActionBars actionBars = getViewSite().getActionBars();
+        IToolBarManager toolbarMgr = actionBars.getToolBarManager();
         toolbarMgr.add(toggleTableAction);
 
-        IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
+        IMenuManager menuMgr = actionBars.getMenuManager();
 
         IAction newChartAction = new NewCustomChartAction();
         newChartAction.setText(Messages.LamiReportView_NewCustomChart);
@@ -149,6 +178,8 @@ public final class LamiReportView extends TmfView {
         menuMgr.add(newChartAction);
         menuMgr.add(new Separator());
         menuMgr.add(clearCustomViewsAction);
+        menuMgr.add(new Separator());
+        menuMgr.add(fExportAction);
 
         /* Select the first tab initially */
         CTabFolder tf = checkNotNull(fTabFolder);
