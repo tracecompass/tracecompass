@@ -56,6 +56,8 @@ public class XMLAnalysesManagerPreferencePageTest {
 
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
+    /** Default project name */
+    protected static final String TRACE_PROJECT_NAME = "xml-test";
     /** XML files */
     private static final String EXTENSION = "." + XmlUtils.XML_EXTENSION;
     private static final String TEST_FILES_FOLDER = "test_xml_files/";
@@ -83,6 +85,11 @@ public class XMLAnalysesManagerPreferencePageTest {
     private static SWTWorkbenchBot fBot;
 
     private static final String TEMP_DIRECTORY = "/tmp";
+    private static final String PROJECT_EXPLORER_VIEW_NAME = "Project Explorer";
+    private static final String MANAGE_XML_ANALYSES_COMMAND_NAME = "Manage XML analyses...";
+    private static final String MANAGE_XML_ANALYSES_PREF_TITLE = "Manage XML analyses files";
+    private static final String PREFERENCES_SHELL = "Preferences";
+    private static final String MANAGE_XML_ANALYSES_PREF_TITLE_FILTERED = "Manage XML analyses files (Filtered)";
 
     /**
      * Before Class for launch and setup
@@ -114,6 +121,29 @@ public class XMLAnalysesManagerPreferencePageTest {
     public void testPreferencePageMenuBar() {
         SWTBot bot = openXMLAnalysesPreferences().bot();
         SWTBotUtils.pressOKishButtonInPreferences(bot);
+    }
+
+    /**
+     * Test opening up the preference page from context menu of Traces folder
+     */
+    @Test
+    public void testPreferencePageContextMenu() {
+        SWTBotUtils.createProject(TRACE_PROJECT_NAME);
+        /* Finish waiting for eclipse to load */
+        WaitUtils.waitForJobs();
+
+        /* Open preferences page from context menu */
+        SWTBotTreeItem tracesFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
+        tracesFolder.contextMenu().menu(MANAGE_XML_ANALYSES_COMMAND_NAME).click();
+
+        SWTBotShell shell = SWTBotUtils.anyShellOf(fBot, PREFERENCES_SHELL, MANAGE_XML_ANALYSES_PREF_TITLE_FILTERED).activate();
+        SWTBot bot = shell.bot();
+
+        /* Close preference page*/
+        SWTBotUtils.pressOKishButtonInPreferences(bot);
+
+        SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
     }
 
     /**
@@ -371,7 +401,7 @@ public class XMLAnalysesManagerPreferencePageTest {
     }
 
     private static SWTBotShell openXMLAnalysesPreferences() {
-        SWTBotShell preferencesShell = SWTBotUtils.openPreferences(fBot, "Manage XML analyses files");
+        SWTBotShell preferencesShell = SWTBotUtils.openPreferences(fBot, MANAGE_XML_ANALYSES_PREF_TITLE);
         SWTBot bot = preferencesShell.bot();
         SWTBotTree tree = bot.tree(0);
         SWTBotTreeItem treeNode = tree.getTreeItem("Tracing");
