@@ -62,6 +62,7 @@ import org.eclipse.tracecompass.internal.tmf.chart.ui.data.DescriptorsInformatio
 import org.eclipse.tracecompass.internal.tmf.chart.ui.format.ChartDecimalUnitFormat;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.format.ChartTimeStampFormat;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.ui.viewers.IImageSave;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
@@ -81,7 +82,7 @@ import com.google.common.collect.Iterators;
  *
  * @author Gabriel-Andrew Pollo-Guilbert
  */
-public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer {
+public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer, IImageSave {
 
     // ------------------------------------------------------------------------
     // Constants
@@ -751,6 +752,11 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
         }
 
         return formatter;
+    }
+
+    @Override
+    public void saveImage(@Nullable String filename, int format) {
+        fChart.save(filename, format);
     }
 
     // ------------------------------------------------------------------------

@@ -13,11 +13,15 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -32,7 +36,9 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.L
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiResultTable;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.viewers.LamiTableViewer;
 import org.eclipse.tracecompass.internal.tmf.ui.commands.ExportToTsvAction;
+import org.eclipse.tracecompass.tmf.ui.viewers.IImageSave;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
+import org.eclipse.tracecompass.tmf.ui.views.SaveImageUtil;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import org.eclipse.ui.IActionBars;
 
@@ -49,6 +55,8 @@ public final class LamiReportView extends TmfView {
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+
+    private static final Separator SEPARATOR = new Separator();
 
     /** View ID */
     public static final String VIEW_ID = "org.eclipse.tracecompass.analysis.lami.views.reportview"; //$NON-NLS-1$
@@ -85,27 +93,86 @@ public final class LamiReportView extends TmfView {
         }
     }
 
-
-    private final Action fExportAction = new ExportToTsvAction() {
+    private final Action fExportTsvAction = new ExportToTsvAction() {
         @Override
         protected void exportToTsv(@Nullable OutputStream stream) {
-            LamiReportViewTabPage tabPage = getCurrentSelectedPage();
-            if (tabPage == null) {
-                return;
-            }
-            LamiViewerControl viewerControl = tabPage.getTableViewerControl();
-            TmfViewer viewer = viewerControl.getViewer();
+            TmfViewer viewer = getViewer();
             if (viewer instanceof LamiTableViewer) {
                 ((LamiTableViewer) viewer).exportToTsv(stream);
             }
+        }
+
+        private @Nullable TmfViewer getViewer() {
+            LamiReportViewTabPage tabPage = getCurrentSelectedPage();
+            if (tabPage == null) {
+                return null;
+            }
+            LamiViewerControl viewerControl = tabPage.getTableViewerControl();
+            TmfViewer viewer = viewerControl.getViewer();
+            return viewer;
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return (getViewer() instanceof LamiTableViewer);
         }
 
         @Override
         protected @Nullable Shell getShell() {
             return getViewSite().getShell();
         }
-
     };
+
+    private final Function<Integer, @Nullable IImageSave> fImageProvider = new Function<Integer, @Nullable IImageSave>() {
+
+        @Override
+        public @Nullable IImageSave apply(Integer index) {
+            LamiReportViewTabPage selectedPage = getCurrentSelectedPage();
+            if (selectedPage == null) {
+                return null;
+            }
+            List<LamiViewerControl> plots = selectedPage.getCustomGraphViewerControls();
+
+            if (index >= 0 && index < plots.size()) {
+                TmfViewer viewer = plots.get(index).getViewer();
+                if (viewer instanceof IImageSave) {
+                    return (IImageSave) viewer;
+                }
+            }
+            return null;
+        }
+    };
+
+    private List<Supplier<@Nullable IImageSave>> getSuppliers(){
+        List<Supplier<@Nullable IImageSave>> suppliers = new ArrayList<>();
+        LamiReportViewTabPage selectedPage = getCurrentSelectedPage();
+        if (selectedPage == null) {
+            return Collections.emptyList();
+        }
+        List<LamiViewerControl> plots = selectedPage.getCustomGraphViewerControls();
+        for(int i = 0; i < plots.size(); i++ ) {
+            IImageSave iis = fImageProvider.apply(i);
+            if(iis != null) {
+                suppliers.add(()->iis);
+            }
+        }
+        return suppliers;
+
+    }
+
+    private IAction fClearCustomViewsAction = new Action() {
+        @Override
+        public void run() {
+            LamiReportViewTabPage tabPage = getCurrentSelectedPage();
+            if (tabPage == null) {
+                return;
+            }
+            tabPage.clearAllCustomViewers();
+            tabPage.getControl().layout();
+        }
+    };
+
+    private IAction fNewChartAction = new NewCustomChartAction();
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -157,34 +224,49 @@ public final class LamiReportView extends TmfView {
         IToolBarManager toolbarMgr = actionBars.getToolBarManager();
         toolbarMgr.add(toggleTableAction);
 
+        fNewChartAction.setText(Messages.LamiReportView_NewCustomChart);
+
+        fClearCustomViewsAction.setText(Messages.LamiReportView_ClearAllCustomViews);
         IMenuManager menuMgr = actionBars.getMenuManager();
+        menuMgr.setRemoveAllWhenShown(true);
+        menuMgr.addMenuListener(new IMenuListener() {
 
-        IAction newChartAction = new NewCustomChartAction();
-        newChartAction.setText(Messages.LamiReportView_NewCustomChart);
-
-        IAction clearCustomViewsAction = new Action() {
             @Override
-            public void run() {
-                LamiReportViewTabPage tabPage = getCurrentSelectedPage();
-                if (tabPage == null) {
-                    return;
+            public void menuAboutToShow(@Nullable IMenuManager manager) {
+                if (manager != null) {
+                    populateMenu(manager);
                 }
-                tabPage.clearAllCustomViewers();
-                tabPage.getControl().layout();
             }
-        };
-        clearCustomViewsAction.setText(Messages.LamiReportView_ClearAllCustomViews);
-
-        menuMgr.add(newChartAction);
-        menuMgr.add(new Separator());
-        menuMgr.add(clearCustomViewsAction);
-        menuMgr.add(new Separator());
-        menuMgr.add(fExportAction);
+        });
+        populateMenu(menuMgr);
 
         /* Select the first tab initially */
         CTabFolder tf = checkNotNull(fTabFolder);
         if (tf.getItemCount() > 0) {
             tf.setSelection(0);
+        }
+
+    }
+
+    private void populateMenu(IMenuManager menuMgr) {
+        menuMgr.add(fNewChartAction);
+        menuMgr.add(SEPARATOR);
+        menuMgr.add(fClearCustomViewsAction);
+        menuMgr.add(SEPARATOR);
+        if(fExportTsvAction.isEnabled()) {
+            menuMgr.add(fExportTsvAction);
+        }
+        List<Supplier<@Nullable IImageSave>> suppliers = getSuppliers();
+        boolean isSingleton = suppliers.size()==1;
+        LamiReportViewTabPage currentSelectedPage = getCurrentSelectedPage();
+        if (currentSelectedPage != null) {
+            for (int index = 0; index < suppliers.size(); index++) {
+                String fileName = isSingleton ? currentSelectedPage.getName() : String.format("%s%02d", currentSelectedPage.getName(), index + 1); //$NON-NLS-1$
+                IAction action = SaveImageUtil.createSaveAction(fileName, suppliers.get(index));
+                String suffix = isSingleton ? "" : (" " + (index + 1)); //$NON-NLS-1$ //$NON-NLS-2$
+                action.setText(Messages.LamiReportView_ActivateTableAction_ExportChart + suffix + '…');
+                menuMgr.add(action);
+            }
         }
     }
 
@@ -205,7 +287,10 @@ public final class LamiReportView extends TmfView {
             return null;
         }
         int idx = tf.getSelectionIndex();
-        return fTabPages.get(idx);
+        if (idx != -1) {
+            return fTabPages.get(idx);
+        }
+        return null;
     }
 
 }

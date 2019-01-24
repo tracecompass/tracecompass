@@ -9,8 +9,10 @@
 
 package org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.window.Window;
@@ -51,7 +53,7 @@ public final class LamiReportViewTabPage extends TmfComponent {
 
     private final LamiResultTable fResultTable;
     private final LamiViewerControl fTableViewerControl;
-    private final Set<LamiViewerControl> fCustomGraphViewerControls = new LinkedHashSet<>();
+    private final List<LamiViewerControl> fCustomGraphViewerControls = new ArrayList<>();
     private final Composite fControl;
 
     private Set<Object> fSelection;
@@ -174,6 +176,14 @@ public final class LamiReportViewTabPage extends TmfComponent {
      */
     public LamiViewerControl getTableViewerControl() {
         return fTableViewerControl;
+    }
+
+    /**
+     * Get the custom graphs
+     * @return the Custom Graphs
+     */
+    public List<LamiViewerControl> getCustomGraphViewerControls() {
+        return Collections.unmodifiableList(fCustomGraphViewerControls);
     }
 
     /**
