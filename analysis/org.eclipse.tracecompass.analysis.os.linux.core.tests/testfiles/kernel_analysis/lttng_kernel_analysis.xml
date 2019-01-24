@@ -97,7 +97,7 @@
 <event timestamp="20" name="sched_switch">
 <field name="cpu" value="1" type="int" />
 <field name="prev_comm" value="tid11" type="string" />
-<field name="prev_tid" value="10" type="long" />
+<field name="prev_tid" value="11" type="long" />
 <field name="prev_prio" value="20" type="long" />
 <field name="prev_state" value="1" type="long" />
 <field name="next_comm" value="proc20" type="string" />

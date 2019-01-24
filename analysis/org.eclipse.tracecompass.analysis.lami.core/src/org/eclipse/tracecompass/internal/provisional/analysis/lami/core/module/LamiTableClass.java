@@ -41,7 +41,7 @@ public class LamiTableClass {
      * @param tableTitle
      *            The title of this table
      * @param columnAspects
-     *            The list of aspects representing the columsn of this table
+     *            The list of aspects representing the columns of this table
      * @param predefinedViews
      *            The pre-defined views of this analysis. Viewers will be
      *            created for these views by default.
