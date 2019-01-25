@@ -75,4 +75,37 @@ public class DataDrivenStateSystemPath implements IDataDrivenRuntimeObject {
         return quark;
     }
 
+    /**
+     * Get the quark in the system for this path by resolving each value along
+     * the path
+     *
+     * @param baseQuark
+     *            The original base quark, as obtained by the caller
+     * @param container
+     *            The analysis data container
+     * @return The quark when the path is resolved.
+     */
+    public int getQuark(int baseQuark, IAnalysisDataContainer container) {
+        int quark = fQuarkProvider.getBaseQuark(baseQuark, null);
+        for (DataDrivenValue val : fAttributes) {
+            Object value = val.getValue(null, quark, null, container);
+            if (value == null) {
+                Activator.logWarning("State system path, a value is null for " + val + " from quark " + quark); //$NON-NLS-1$ //$NON-NLS-2$
+                return ITmfStateSystem.INVALID_ATTRIBUTE;
+            }
+            ITmfStateSystem stateSystem = container.getStateSystem();
+            quark = stateSystem.optQuarkRelative(quark, String.valueOf(value));
+            if (quark < 0) {
+                Activator.logWarning("The attribute quark is invalid: " + fAttributes);  //$NON-NLS-1$
+                break;
+            }
+        }
+        return quark;
+    }
+
+    @Override
+    public String toString() {
+        return "DataDrivenStateSystemPath: " + fAttributes; //$NON-NLS-1$
+    }
+
 }
