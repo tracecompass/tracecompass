@@ -237,9 +237,15 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
         }
         for (int quark : quarks) {
             Builder currentEntry = parentEntry;
+
             /* Process the current entry, if specified */
             if (displayPath != null) {
                 currentEntry = processEntry(entryElement, displayPath, parentEntry, quark, ss, currentEnd);
+                entryMap.put(currentEntry.getXmlId(), currentEntry);
+            } else {
+                long id = fBaseQuarkToId.row(ss).computeIfAbsent(quark, s -> sfAtomicId.getAndIncrement());
+                currentEntry =  new Builder(id, parentEntry.getId(),
+                        ss.getAttributeName(quark), ss.getStartTime(), ss.getCurrentEndTime(), null, ss, quark, fCompilationData);
                 entryMap.put(currentEntry.getXmlId(), currentEntry);
             }
             /* Process the children entry of this entry */
@@ -248,8 +254,8 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
                 buildEntry(ss, subEntryEl, currentEntry, quark, regex, currentEnd, entryList);
             }
         }
+        // At this point, the parent has been set, so we can build the entries
         buildTree(entryMap, parentEntry.getId());
-        entryList.add(parentEntry.build());
         for (Builder b : entryMap.values()) {
             entryList.add(b.build());
         }
@@ -269,7 +275,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
         fIDToDisplayQuark.put(id, new Pair<>(ss, displayQuark));
 
         long entryStart = ss.getStartTime();
-        long entryEnd = currentEnd + 1;
+        long entryEnd = currentEnd;
 
         try {
 
@@ -293,7 +299,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
                 }
                 oneInterval = ss.querySingleState(ts, displayQuark);
             }
-            entryEnd = oneInterval.getEndTime() + 1;
+            entryEnd = Math.min(oneInterval.getEndTime() + 1, currentEnd);
 
         } catch (StateSystemDisposedException e) {
         }
@@ -361,6 +367,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
             predicates.putAll(computeRegexPredicate(timeEventFilter));
         }
 
+        long currentEndTime = ss.getCurrentEndTime();
         Map<Integer, ITimeGraphRowModel> quarkToRow = new HashMap<>(idToDisplayQuark.size());
         for (Entry<Integer, Long> entry : idToDisplayQuark.entrySet()) {
             quarkToRow.put(entry.getKey(), new TimeGraphRowModel(entry.getValue(), new ArrayList<>()));
@@ -372,7 +379,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
             ITimeGraphRowModel row = quarkToRow.get(interval.getAttribute());
             if (row != null) {
                 List<@NonNull ITimeGraphState> states = row.getStates();
-                ITimeGraphState timeGraphState = getStateFromInterval(interval);
+                ITimeGraphState timeGraphState = getStateFromInterval(interval, currentEndTime);
                 addToStateList(states, timeGraphState, row.getEntryID(), predicates, monitor);
             }
         }
@@ -382,9 +389,9 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
         return quarkToRow.values();
     }
 
-    private static @NonNull TimeGraphState getStateFromInterval(ITmfStateInterval statusInterval) {
+    private static @NonNull TimeGraphState getStateFromInterval(ITmfStateInterval statusInterval, long currentEndTime) {
         long time = statusInterval.getStartTime();
-        long duration = statusInterval.getEndTime() - time + 1;
+        long duration = Math.min(currentEndTime, statusInterval.getEndTime() + 1) - time;
         Object o = statusInterval.getValue();
         if (o instanceof Integer) {
             return new TimeGraphState(time, duration, ((Integer) o).intValue(), String.valueOf(o));

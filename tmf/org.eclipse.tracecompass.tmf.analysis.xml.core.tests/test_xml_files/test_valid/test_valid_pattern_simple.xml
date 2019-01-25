@@ -48,13 +48,23 @@
 		</test>
 
 <!-- 		ACTIONS -->
-<!-- 		Generate two segments -->
 		<action id="startEvent">
-<!-- 			Generate a pattern segment with the name 'test1'-->
 			<stateChange>
 				<stateAttribute type="constant" value="#CurrentScenario" />
 				<stateAttribute type="constant" value="cpu" />
 				<stateValue type="eventField" value="cpu" />
+			</stateChange>
+			<stateChange>
+				<stateAttribute type="constant" value="CPU" />
+				<stateAttribute type="eventField" value="cpu" />
+				<stateValue type="int" value="1" />
+			</stateChange>
+		</action>
+		<action id="incrementEvents">
+			<stateChange>
+				<stateAttribute type="constant" value="CPU" />
+				<stateAttribute type="eventField" value="cpu" />
+				<stateValue type="int" value="1" increment="true"/>
 			</stateChange>
 		</action>
 		<action id="doSegment">
@@ -73,6 +83,13 @@
 				</segType>
 			</segment>
 		</action>
+		<action id="resetCount">
+			<stateChange>
+				<stateAttribute type="constant" value="CPU" />
+				<stateAttribute type="eventField" value="cpu" />
+				<stateValue type="delete" />
+			</stateChange>
+		</action>
 
 <!-- 		FSMs -->
 
@@ -86,8 +103,9 @@
 			</state>
 			<state id="waitEnd">
 			    <!--  wait for exit, will create segment only longer than 5 -->
-				<transition event="exit" cond="sameCpu:smallExec" target="endTest" action="doSegment" />
-				<transition event="exit" target="end" />
+			    <transition event="action" cond="sameCpu" target="waitEnd" action="incrementEvents" />
+				<transition event="exit" cond="sameCpu:smallExec" target="endTest" action="doSegment:resetCount" />
+				<transition event="exit" cond="sameCpu" target="endTest" action="resetCount" />
 			</state>
 			<final id="endTest"/>
 		</fsm>
