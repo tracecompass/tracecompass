@@ -27,10 +27,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Messages;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.AnalysisCompilationData;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateSystemPathCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenStateSystemPath;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readonly.TmfXmlReadOnlyModelFactory;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.TmfXyResponseFactory;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -97,8 +97,9 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         private final ITmfAnalysisModuleWithStateSystems fStateSystemModule;
         private final String fPath;
         private final DisplayType fType;
+        private final AnalysisCompilationData fCompilationData;
 
-        public XmlXYEntry(ITmfAnalysisModuleWithStateSystems stateSystem, String path, Element entryElement) {
+        public XmlXYEntry(ITmfAnalysisModuleWithStateSystems stateSystem, String path, Element entryElement, AnalysisCompilationData compilationData) {
             fStateSystemModule = stateSystem;
             fPath = path;
             switch (entryElement.getAttribute(TmfXmlStrings.DISPLAY_TYPE)) {
@@ -110,6 +111,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
                 fType = DisplayType.ABSOLUTE;
                 break;
             }
+            fCompilationData = compilationData;
         }
 
         @Override
@@ -155,6 +157,11 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
             }
             return quarks;
         }
+
+        @Override
+        public @NonNull AnalysisCompilationData getAnalysisCompilationData() {
+            return fCompilationData;
+        }
     }
 
     private enum DisplayType {
@@ -162,17 +169,17 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
     }
 
     /** XML Model elements to use to create the series */
-    private final ITmfXmlStateAttribute fDisplay;
+    private final DataDrivenStateSystemPath fDisplay;
     private final XmlXYEntry fXmlEntry;
-    private final @Nullable ITmfXmlStateAttribute fSeriesNameAttrib;
+    private final @Nullable DataDrivenStateSystemPath fSeriesNameAttrib;
 
     /**
      * Constructor
      */
-    private XmlXYDataProvider(ITmfTrace trace, XmlXYEntry entry, ITmfXmlStateAttribute display, @Nullable ITmfXmlStateAttribute seriesName) {
+    private XmlXYDataProvider(ITmfTrace trace, XmlXYEntry entry, DataDrivenStateSystemPath displayPath, @Nullable DataDrivenStateSystemPath seriesName) {
         super(trace);
         fXmlEntry = entry;
-        fDisplay = display;
+        fDisplay = displayPath;
         fSeriesNameAttrib = seriesName;
     }
 
@@ -193,14 +200,14 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         if (ss == null) {
             return null;
         }
+        AnalysisCompilationData compilationData = new AnalysisCompilationData();
 
         /*
          * Initialize state attributes. There should be only one entry element for XY
          * charts.
          */
-        ITmfXmlModelFactory fFactory = TmfXmlReadOnlyModelFactory.getInstance();
         String path = entryElement.hasAttribute(TmfXmlStrings.PATH) ? entryElement.getAttribute(TmfXmlStrings.PATH) : TmfXmlStrings.WILDCARD;
-        XmlXYEntry entry = new XmlXYEntry(ss, path, entryElement);
+        XmlXYEntry entry = new XmlXYEntry(ss, path, entryElement, compilationData);
 
         /* Get the display element to use */
         List<@NonNull Element> displayElements = TmfXmlUtils.getChildElements(entryElement, TmfXmlStrings.DISPLAY_ELEMENT);
@@ -208,23 +215,29 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
             return null;
         }
         Element displayElement = displayElements.get(0);
-        ITmfXmlStateAttribute display = fFactory.createStateAttribute(displayElement, entry);
+        TmfXmlStateSystemPathCu display = TmfXmlStateSystemPathCu.compile(entry.getAnalysisCompilationData(), Collections.singletonList(displayElement));
+        if (display == null) {
+            return null;
+        }
 
         /* Get the series name element to use */
         List<Element> seriesNameElements = TmfXmlUtils.getChildElements(entryElement, TmfXmlStrings.NAME_ELEMENT);
-        ITmfXmlStateAttribute seriesName = null;
+        DataDrivenStateSystemPath seriesName = null;
         if (!seriesNameElements.isEmpty()) {
             Element seriesNameElement = seriesNameElements.get(0);
-            seriesName = fFactory.createStateAttribute(seriesNameElement, entry);
+            TmfXmlStateSystemPathCu seriesNameCu = TmfXmlStateSystemPathCu.compile(entry.getAnalysisCompilationData(), Collections.singletonList(seriesNameElement));
+            if (seriesNameCu != null) {
+                seriesName = seriesNameCu.generate();
+            }
         }
 
-        return new XmlXYDataProvider(trace, entry, display, seriesName);
+        return new XmlXYDataProvider(trace, entry, display.generate(), seriesName);
 
     }
 
     @Override
     public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        ITmfXmlStateAttribute display = fDisplay;
+        DataDrivenStateSystemPath display = fDisplay;
         XmlXYEntry entry = fXmlEntry;
         ITmfStateSystem ss = entry.getStateSystem();
 
@@ -247,7 +260,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
                 } else if (ss.getStartTime() <= time) {
                     List<@NonNull ITmfStateInterval> full = ss.queryFullState(time);
                     for (Entry<Integer, IYModel> series : map.entrySet()) {
-                        int attributeQuark = display.getAttributeQuark(series.getKey(), null);
+                        int attributeQuark = display.getQuark(series.getKey(), entry);
                         if (attributeQuark >= 0 && attributeQuark < full.size()) {
                             Object value = full.get(attributeQuark).getValue();
                             setYValue(i, series.getValue().getData(), extractValue(value), entry.getType());
@@ -344,7 +357,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         }
 
         ITmfStateSystem ss = fXmlEntry.getStateSystem();
-        ITmfXmlStateAttribute seriesNameAttrib = fSeriesNameAttrib;
+        DataDrivenStateSystemPath seriesNameAttrib = fSeriesNameAttrib;
 
         boolean isComplete = ss.waitUntilBuilt(0);
         // Get the quarks before the full states to ensure that the attributes will be present in the full state
@@ -359,7 +372,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
                 String seriesName = ss.getAttributeName(quark);
                 if (seriesNameAttrib != null) {
                     // Use the value of the series name attribute
-                    int seriesNameQuark = seriesNameAttrib.getAttributeQuark(quark, null);
+                    int seriesNameQuark = seriesNameAttrib.getQuark(quark, fXmlEntry);
                     Object value = fullState.get(seriesNameQuark).getValue();
                     if (value != null) {
                         seriesName = String.valueOf(value);

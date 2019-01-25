@@ -21,7 +21,6 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDri
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlAction;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlFsm;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
@@ -54,11 +53,6 @@ public class TmfXmlReadWriteModelFactory implements ITmfXmlModelFactory {
             fInstance = instance;
         }
         return instance;
-    }
-
-    @Override
-    public ITmfXmlStateAttribute createStateAttribute(Element attribute, IXmlStateSystemContainer container) {
-        return new TmfXmlReadWriteStateAttribute(this, attribute, container);
     }
 
     @Override

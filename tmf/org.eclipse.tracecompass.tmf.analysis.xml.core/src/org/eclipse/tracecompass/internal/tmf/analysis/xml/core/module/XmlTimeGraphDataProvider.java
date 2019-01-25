@@ -30,9 +30,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readonly.TmfXmlReadOnlyModelFactory;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.AnalysisCompilationData;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateSystemPathCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenStateSystemPath;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlTimeGraphEntryModel.Builder;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
@@ -79,7 +79,6 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
      * Provider unique ID.
      */
     public static final @NonNull String ID = "org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlTimeGraphDataProvider"; //$NON-NLS-1$
-    private static final ITmfXmlModelFactory fFactory = TmfXmlReadOnlyModelFactory.getInstance();
     private static final AtomicLong sfAtomicId = new AtomicLong();
     private static final @NonNull String SPLIT_STRING = "/"; //$NON-NLS-1$
 
@@ -91,6 +90,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
      */
     private final Table<ITmfStateSystem, Integer, Long> fBaseQuarkToId = HashBasedTable.create();
     private final Map<Long, Pair<ITmfStateSystem, Integer>> fIDToDisplayQuark = new HashMap<>();
+    private final @NonNull AnalysisCompilationData fCompilationData;
 
 
     /**
@@ -136,11 +136,12 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
         super(trace);
         fSs = stateSystems;
         fEntries = entries;
+        fCompilationData = new AnalysisCompilationData();
     }
 
     @Override
     public TmfModelResponse<@NonNull List<XmlTimeGraphEntryModel>> fetchTree(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        List<XmlTimeGraphEntryModel> builder = new ArrayList<>();
+        List<XmlTimeGraphEntryModel> entryList = new ArrayList<>();
         boolean isComplete = true;
 
         String traceName = String.valueOf(getTrace().getName());
@@ -151,21 +152,21 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
                 long start = ss.getStartTime();
                 long end = ss.getCurrentEndTime();
                 long id = fBaseQuarkToId.row(ss).computeIfAbsent(ITmfStateSystem.ROOT_ATTRIBUTE, s -> sfAtomicId.getAndIncrement());
-                Builder ssEntry = new Builder(id, -1, traceName, start, end, null, ss, ITmfStateSystem.ROOT_ATTRIBUTE);
-                builder.add(ssEntry.build());
+                Builder ssEntry = new Builder(id, -1, traceName, start, end, null, ss, ITmfStateSystem.ROOT_ATTRIBUTE, fCompilationData);
+                entryList.add(ssEntry.build());
 
                 for (Element entry : fEntries) {
-                    buildEntry(ss, entry, ssEntry, -1, StringUtils.EMPTY, end, builder);
+                    buildEntry(ss, entry, ssEntry, -1, StringUtils.EMPTY, end, entryList);
                 }
             }
         }
         Status status = isComplete ? Status.COMPLETED : Status.RUNNING;
         String msg = isComplete ? CommonStatusMessage.COMPLETED : CommonStatusMessage.RUNNING;
-        return new TmfModelResponse<>(builder, status, msg);
+        return new TmfModelResponse<>(entryList, status, msg);
     }
 
     private void buildEntry(ITmfStateSystem ssq, Element entryElement, @NonNull Builder parentEntry,
-            int prevBaseQuark, @NonNull String prevRegex, long currentEnd, List<XmlTimeGraphEntryModel> builder) {
+            int prevBaseQuark, @NonNull String prevRegex, long currentEnd, List<XmlTimeGraphEntryModel> entryList) {
         /* Get the attribute string to display */
         String path = entryElement.getAttribute(TmfXmlStrings.PATH);
         if (path.isEmpty()) {
@@ -225,42 +226,45 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
         }
 
         /* Process each quark */
-        Element displayElement = null;
+        DataDrivenStateSystemPath displayPath = null;
         Map<String, Builder> entryMap = new HashMap<>();
         if (!displayElements.isEmpty()) {
-            displayElement = displayElements.get(0);
+            Element displayElement = displayElements.get(0);
+            TmfXmlStateSystemPathCu displayCu = TmfXmlStateSystemPathCu.compile(parentEntry.getAnalysisCompilationData(), Collections.singletonList(displayElement));
+            if (displayCu != null) {
+                displayPath = displayCu.generate();
+            }
         }
         for (int quark : quarks) {
             Builder currentEntry = parentEntry;
             /* Process the current entry, if specified */
-            if (displayElement != null) {
-                currentEntry = processEntry(entryElement, displayElement, parentEntry, quark, ss, currentEnd);
+            if (displayPath != null) {
+                currentEntry = processEntry(entryElement, displayPath, parentEntry, quark, ss, currentEnd);
                 entryMap.put(currentEntry.getXmlId(), currentEntry);
             }
             /* Process the children entry of this entry */
             for (Element subEntryEl : entryElements) {
                 String regex = prevRegex.isEmpty() ? regexName : prevRegex + '/' + regexName;
-                buildEntry(ss, subEntryEl, currentEntry, quark, regex, currentEnd, builder);
+                buildEntry(ss, subEntryEl, currentEntry, quark, regex, currentEnd, entryList);
             }
         }
         buildTree(entryMap, parentEntry.getId());
-        builder.add(parentEntry.build());
+        entryList.add(parentEntry.build());
         for (Builder b : entryMap.values()) {
-            builder.add(b.build());
+            entryList.add(b.build());
         }
     }
 
-    private Builder processEntry(@NonNull Element entryElement, @NonNull Element displayEl,
+    private Builder processEntry(@NonNull Element entryElement, DataDrivenStateSystemPath displayPath,
             @NonNull Builder parentEntry, int quark, ITmfStateSystem ss, long currentEnd) {
         /*
          * Get the start time and end time of this entry from the display attribute
          */
-        ITmfXmlStateAttribute display = fFactory.createStateAttribute(displayEl, parentEntry);
-        int displayQuark = display.getAttributeQuark(quark, null);
+        int displayQuark = displayPath.getQuark(quark, parentEntry);
         long id = fBaseQuarkToId.row(ss).computeIfAbsent(quark, s -> sfAtomicId.getAndIncrement());
         if (displayQuark < 0) {
             return new Builder(id, parentEntry.getId(),
-                    String.format("Unknown display quark for %s", ss.getAttributeName(quark)), ss.getStartTime(), ss.getCurrentEndTime(), null, ss, quark); //$NON-NLS-1$
+                    String.format("Unknown display quark for %s", ss.getAttributeName(quark)), ss.getStartTime(), ss.getCurrentEndTime(), null, ss, quark, fCompilationData); //$NON-NLS-1$
         }
         fIDToDisplayQuark.put(id, new Pair<>(ss, displayQuark));
 
@@ -294,7 +298,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
         } catch (StateSystemDisposedException e) {
         }
 
-        return new Builder(id, parentEntry.getId(), ss.getAttributeName(quark), entryStart, entryEnd, entryElement, ss, quark);
+        return new Builder(id, parentEntry.getId(), ss.getAttributeName(quark), entryStart, entryEnd, entryElement, ss, quark, fCompilationData);
     }
 
     /** Build a tree using getParentId() and getId() */

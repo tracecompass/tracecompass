@@ -12,13 +12,15 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model;
 
-import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateSystemPathCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenStateSystemPath;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.w3c.dom.Element;
 
@@ -40,7 +42,7 @@ import org.w3c.dom.Element;
 public class TmfXmlLocation {
 
     /** Path in the State System */
-    private final List<ITmfXmlStateAttribute> fPath = new LinkedList<>();
+    private final DataDrivenStateSystemPath fPath;
 
     /** ID : name of the location */
     private final String fId;
@@ -61,14 +63,12 @@ public class TmfXmlLocation {
         fId = id;
         fContainer = container;
 
-        List<@Nullable Element> childElements = XmlUtils.getChildElements(location);
-        for (Element attribute : childElements) {
-            if (attribute == null) {
-                continue;
-            }
-            ITmfXmlStateAttribute xAttribute = modelFactory.createStateAttribute(attribute, fContainer);
-            fPath.add(xAttribute);
+        List<@NonNull Element> childElements = TmfXmlUtils.getChildElements(location, TmfXmlStrings.STATE_ATTRIBUTE);
+        TmfXmlStateSystemPathCu locationCu = TmfXmlStateSystemPathCu.compile(container.getAnalysisCompilationData(), childElements);
+        if (locationCu == null) {
+            throw new NullPointerException("Problem here, but next patch will remove it"); //$NON-NLS-1$
         }
+        fPath = locationCu.generate();
     }
 
     /**
@@ -97,13 +97,7 @@ public class TmfXmlLocation {
      */
     public int getLocationQuark(@Nullable ITmfEvent event, int startQuark, @Nullable TmfXmlScenarioInfo scenarioInfo) {
         int quark = startQuark;
-        for (ITmfXmlStateAttribute attrib : fPath) {
-            quark = attrib.getAttributeQuark(event, quark, scenarioInfo);
-            if (quark == IXmlStateSystemContainer.ERROR_QUARK) {
-                break;
-            }
-        }
-        return quark;
+        return fPath.getQuark(event, quark, scenarioInfo, fContainer);
     }
 
     /**
@@ -120,13 +114,7 @@ public class TmfXmlLocation {
      */
     public int getLocationQuark(int startQuark, @Nullable TmfXmlScenarioInfo scenarioInfo) {
         int quark = startQuark;
-        for (ITmfXmlStateAttribute attrib : fPath) {
-            quark = attrib.getAttributeQuark(quark, scenarioInfo);
-            if (quark == IXmlStateSystemContainer.ERROR_QUARK) {
-                break;
-            }
-        }
-        return quark;
+        return fPath.getQuark(quark, fContainer);
     }
 
     @Override

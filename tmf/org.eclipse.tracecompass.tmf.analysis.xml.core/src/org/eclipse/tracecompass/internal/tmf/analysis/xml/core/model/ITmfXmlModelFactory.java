@@ -29,17 +29,6 @@ import org.w3c.dom.Element;
 public interface ITmfXmlModelFactory {
 
     /**
-     * Create a new XML state attribute
-     *
-     * @param attribute
-     *            XML element of the attribute
-     * @param container
-     *            The state system container this state attribute belongs to
-     * @return The new state attribute
-     */
-    ITmfXmlStateAttribute createStateAttribute(Element attribute, IXmlStateSystemContainer container);
-
-    /**
      * Create a new state value where the value corresponds to a path of
      * {@link ITmfXmlStateAttribute}
      *
