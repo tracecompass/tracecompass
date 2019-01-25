@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2018 Ericsson, École Polytechnique de Montréal and others.
+ * Copyright (c) 2012, 2019 Ericsson, École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -812,7 +812,13 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
     @Override
     protected void zoomEntries(@NonNull Iterable<@NonNull TimeGraphEntry> entries, long zoomStartTime, long zoomEndTime, long resolution, @NonNull IProgressMonitor monitor) {
         super.zoomEntries(entries, zoomStartTime, zoomEndTime, resolution, monitor);
-        fActiveThreadsFilter.updateData(zoomStartTime, zoomEndTime);
+        if (monitor.isCanceled()) {
+            return;
+        }
+        Map<ITmfTrace, Set<Long>> data = fActiveThreadsFilter.computeData(zoomStartTime, zoomEndTime);
+        if (data != null) {
+            applyResults(() -> fActiveThreadsFilter.updateData(zoomStartTime, zoomEndTime, data));
+        }
     }
 
     private boolean syncToRow(ITimeGraphRowModel rowModel, long time, Map<Long, TimeGraphEntry> entryMap) {

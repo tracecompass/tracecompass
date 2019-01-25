@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2018 EfficiOS Inc., Ericsson
+ * Copyright (c) 2016, 2019 EfficiOS Inc., Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -203,34 +203,51 @@ public class ActiveThreadsFilter extends ViewerFilter {
     }
 
     /**
+     * Compute the filter internal data
+     *
+     * @param beginTS
+     *            start timestamp to update the filter for
+     * @param endTS
+     *            end timestamp to update the filter for
+     * @return map of filter data per trace, or null
+     */
+    public @Nullable Map<ITmfTrace, Set<Long>> computeData(long beginTS, long endTS) {
+        TmfTimeRange timeRange = new TmfTimeRange(TmfTimestamp.fromNanos(beginTS), TmfTimestamp.fromNanos(endTS));
+
+        ITmfTrace parentTrace = fTrace;
+        if (parentTrace == null || !fEnabled || (fCachedTimeRange != null && fCachedTimeRange.equals(timeRange))) {
+            return null;
+        }
+        Map<ITmfTrace, Set<Long>> data = new HashMap<>();
+        for (ITmfTrace trace : TmfTraceManager.getTraceSet(parentTrace)) {
+            if (fCpuRangesBasedFiltering) {
+                Set<Long> onCpusThreadForTimeRange = getOnCpuThreads(fCpuRanges, timeRange, trace);
+                data.put(trace, onCpusThreadForTimeRange);
+            } else {
+                Set<Long> activeThreadForTimeRange = getActiveThreads(timeRange, trace);
+                data.put(trace, activeThreadForTimeRange);
+            }
+        }
+        return data;
+    }
+
+    /**
      * Update the filter internal data
      *
      * @param beginTS
      *            start timestamp to update the filter for
      * @param endTS
      *            end timestamp to update the filter for
+     * @param data
+     *            map of filter data per trace
      */
-    public void updateData(long beginTS, long endTS) {
-
-        TmfTimeRange timeRange = new TmfTimeRange(TmfTimestamp.fromNanos(beginTS), TmfTimestamp.fromNanos(endTS));
-
-        ITmfTrace parentTrace = fTrace;
-        if (parentTrace == null) {
-            return;
-        }
-
-        if (fEnabled && (fCachedTimeRange == null || !fCachedTimeRange.equals(timeRange))) {
-            fCachedTimeRange = timeRange;
-            for (ITmfTrace trace : TmfTraceManager.getTraceSet(parentTrace)) {
-                /* Caching result for subsequent select() call for other entry */
-                if (fCpuRangesBasedFiltering) {
-                    Set<Long> onCpusThreadForTimeRange = getOnCpuThreads(fCpuRanges, timeRange, trace);
-                    fCachedOnCpusThreadForTimeRange.put(trace, onCpusThreadForTimeRange);
-                } else {
-                    Set<Long> activeThreadForTimeRange = getActiveThreads(timeRange, trace);
-                    fCachedActiveThreadForTimeRange.put(trace, activeThreadForTimeRange);
-                }
-            }
+    public void updateData(long beginTS, long endTS, @NonNull Map<ITmfTrace, Set<Long>> data) {
+        /* Caching result for subsequent select() call for other entry */
+        fCachedTimeRange = new TmfTimeRange(TmfTimestamp.fromNanos(beginTS), TmfTimestamp.fromNanos(endTS));
+        if (fCpuRangesBasedFiltering) {
+            fCachedOnCpusThreadForTimeRange = data;
+        } else {
+            fCachedActiveThreadForTimeRange = data;
         }
     }
 
