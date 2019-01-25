@@ -58,6 +58,18 @@ public interface IAnalysisDataContainer {
     DataDrivenMappingGroup getMappingGroup(String id);
 
     /**
+     * Return whether this container is read-only or if missing data should be
+     * added to it. It is used by methods like
+     * {@link #getQuarkAbsoluteAndAdd(String...)} and
+     * {@link #getQuarkRelativeAndAdd(int, String...)}
+     *
+     * @return Whether missing data should be added or not
+     */
+    default boolean isReadOnlyContainer() {
+        return true;
+    }
+
+    /**
      * Get an attribute pool starting at the requested quark
      *
      * @param startNodeQuark
@@ -83,7 +95,7 @@ public interface IAnalysisDataContainer {
     default int getQuarkAbsoluteAndAdd(String... path) {
         ITmfStateSystem stateSystem = getStateSystem();
         int quark = stateSystem.optQuarkAbsolute(path);
-        if (quark == ITmfStateSystem.INVALID_ATTRIBUTE && (stateSystem instanceof ITmfStateSystemBuilder)) {
+        if (quark == ITmfStateSystem.INVALID_ATTRIBUTE && !isReadOnlyContainer() && (stateSystem instanceof ITmfStateSystemBuilder)) {
             quark = ((ITmfStateSystemBuilder) stateSystem).getQuarkAbsoluteAndAdd(path);
         }
         return quark;
@@ -105,7 +117,7 @@ public interface IAnalysisDataContainer {
     default int getQuarkRelativeAndAdd(int startNodeQuark, String... path) {
         ITmfStateSystem stateSystem = getStateSystem();
         int quark = stateSystem.optQuarkRelative(startNodeQuark, path);
-        if (quark == ITmfStateSystem.INVALID_ATTRIBUTE && (stateSystem instanceof ITmfStateSystemBuilder)) {
+        if (quark == ITmfStateSystem.INVALID_ATTRIBUTE && !isReadOnlyContainer() && (stateSystem instanceof ITmfStateSystemBuilder)) {
             quark = ((ITmfStateSystemBuilder) stateSystem).getQuarkRelativeAndAdd(startNodeQuark, path);
         }
         return quark;

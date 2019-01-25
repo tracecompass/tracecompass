@@ -274,6 +274,11 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
     }
 
     @Override
+    public boolean isReadOnlyContainer() {
+        return false;
+    }
+
+    @Override
     public AnalysisCompilationData getAnalysisCompilationData() {
         return fAnalysisCompilationData;
     }

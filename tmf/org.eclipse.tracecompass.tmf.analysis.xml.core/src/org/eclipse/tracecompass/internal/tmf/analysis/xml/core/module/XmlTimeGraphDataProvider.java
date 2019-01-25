@@ -258,7 +258,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
         ITmfXmlStateAttribute display = fFactory.createStateAttribute(displayEl, parentEntry);
         int displayQuark = display.getAttributeQuark(quark, null);
         long id = fBaseQuarkToId.row(ss).computeIfAbsent(quark, s -> sfAtomicId.getAndIncrement());
-        if (displayQuark == IXmlStateSystemContainer.ERROR_QUARK) {
+        if (displayQuark < 0) {
             return new Builder(id, parentEntry.getId(),
                     String.format("Unknown display quark for %s", ss.getAttributeName(quark)), ss.getStartTime(), ss.getCurrentEndTime(), null, ss, quark); //$NON-NLS-1$
         }
