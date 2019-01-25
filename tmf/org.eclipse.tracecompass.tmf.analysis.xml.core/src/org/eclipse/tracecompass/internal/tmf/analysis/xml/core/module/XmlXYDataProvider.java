@@ -30,7 +30,6 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Messages;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.AnalysisCompilationData;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateSystemPathCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenStateSystemPath;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.TmfXyResponseFactory;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -128,11 +127,6 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
                 throw new NullPointerException("Analysis " + fStateSystemModule.getId() + " has no state system"); //$NON-NLS-1$ //$NON-NLS-2$
             }
             return stateSystems.next();
-        }
-
-        @Override
-        public @NonNull Iterable<@NonNull TmfXmlLocation> getLocations() {
-            return Collections.emptySet();
         }
 
         public DisplayType getType() {

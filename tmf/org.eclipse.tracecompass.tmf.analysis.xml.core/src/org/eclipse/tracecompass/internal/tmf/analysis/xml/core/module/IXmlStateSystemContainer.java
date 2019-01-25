@@ -16,7 +16,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.AnalysisCompilationData;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenMappingGroup;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
 
 /**
  * Interface that all XML defined objects who provide, use or contain state
@@ -37,13 +36,6 @@ public interface IXmlStateSystemContainer extends ITmfXmlTopLevelElement, IAnaly
      * be changed to something else -2? A quark can never be negative
      */
     int ERROR_QUARK = -1;
-
-    /**
-     * Get the list of locations defined in this top level XML element
-     *
-     * @return The list of {@link TmfXmlLocation}
-     */
-    @NonNull Iterable<@NonNull TmfXmlLocation> getLocations();
 
     /**
      * Get the compilation data for this analysis. This method should be overridden

@@ -63,17 +63,6 @@ public interface ITmfXmlModelFactory {
     DataDrivenAction createStateChange(Element node, IXmlStateSystemContainer container);
 
     /**
-     * Create a new XML location
-     *
-     * @param node
-     *            The XML location element
-     * @param container
-     *            The state system container this location belongs to
-     * @return The new XML location
-     */
-    TmfXmlLocation createLocation(Element node, IXmlStateSystemContainer container);
-
-    /**
      * Create a new XML pattern event handler
      *
      * @param node

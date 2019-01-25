@@ -10,13 +10,10 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.statepro
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.script.ScriptEngine;
 
@@ -28,7 +25,6 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXm
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlMappingGroupCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenMappingGroup;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternEventHandler;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioHistoryBuilder;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readwrite.TmfXmlReadWriteModelFactory;
@@ -59,9 +55,6 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
 
     /** Map for attribute pools */
     private final Map<Integer, TmfAttributePool> fAttributePools = new HashMap<>();
-
-    /** List of all Locations */
-    private final @NonNull Set<@NonNull TmfXmlLocation> fLocations;
 
     private final Map<@NonNull String, @NonNull DataDrivenMappingGroup> fMappingGroups = new HashMap<>();
 
@@ -140,22 +133,7 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
             fMappingGroups.put(group.getId(), group);
         }
 
-        // TODO: Replace usages of locations and mapping group to avoid having to do this legacy code
-        // FIXME: Redundant legacy code for locations and mapping groups
-
         ITmfXmlModelFactory modelFactory = TmfXmlReadWriteModelFactory.getInstance();
-        /* parser for the locations */
-        NodeList locationNodes = doc.getElementsByTagName(TmfXmlStrings.LOCATION);
-        final Set<@NonNull TmfXmlLocation> locations = new HashSet<>();
-        for (int i = 0; i < locationNodes.getLength(); i++) {
-            Element element = (Element) locationNodes.item(i);
-            if (element == null) {
-                continue;
-            }
-            TmfXmlLocation location = modelFactory.createLocation(element, this);
-            locations.add(location);
-        }
-        fLocations = Collections.unmodifiableSet(locations);
 
         /* parser for the event handlers */
         NodeList nodes = doc.getElementsByTagName(TmfXmlStrings.PATTERN_HANDLER);
@@ -221,11 +199,6 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
             throw new NullPointerException("The state system should not be requested at this point, it is null"); //$NON-NLS-1$
         }
         return ss;
-    }
-
-    @Override
-    public @NonNull Iterable<@NonNull TmfXmlLocation> getLocations() {
-        return fLocations;
     }
 
     @Override

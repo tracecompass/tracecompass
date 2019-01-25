@@ -23,7 +23,6 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlAction;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlFsm;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternEventHandler;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternSegmentBuilder;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlState;
@@ -80,11 +79,6 @@ public class TmfXmlReadWriteModelFactory implements ITmfXmlModelFactory {
             throw new NullPointerException("State change did not compile correctly"); //$NON-NLS-1$
         }
         return compile.generate();
-    }
-
-    @Override
-    public TmfXmlLocation createLocation(Element node, IXmlStateSystemContainer container) {
-        return new TmfXmlLocation(this, node, container);
     }
 
     @Override

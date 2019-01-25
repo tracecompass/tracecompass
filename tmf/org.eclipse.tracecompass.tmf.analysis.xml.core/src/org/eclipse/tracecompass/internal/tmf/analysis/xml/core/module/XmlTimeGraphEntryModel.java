@@ -18,7 +18,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.AnalysisCompilationData;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateSystemPathCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenStateSystemPath;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -168,11 +167,6 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
         @Override
         public String getAttributeValue(String name) {
             return name;
-        }
-
-        @Override
-        public Iterable<TmfXmlLocation> getLocations() {
-            return Collections.emptySet();
         }
 
         /**
