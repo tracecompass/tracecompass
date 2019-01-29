@@ -298,7 +298,11 @@ public class ExportTracePackageWizardPage extends AbstractTracePackageWizardPage
         for (TmfCommonProjectElement projectElement : fSelectedTraces) {
             TracePackageTraceElement traceElement;
             if (projectElement instanceof TmfExperimentElement) {
-                traceElement = new TracePackageExperimentElement(null, (TmfExperimentElement) projectElement);
+                TmfExperimentElement experimentElement = (TmfExperimentElement) projectElement;
+                traceElement = new TracePackageExperimentElement(null, experimentElement);
+                for (TmfTraceElement expTrace : experimentElement.getTraces()) {
+                    ((TracePackageExperimentElement) traceElement).addExpTrace(expTrace.getElementPath());
+                }
             } else {
                 traceElement = new TracePackageTraceElement(null, projectElement);
             }
