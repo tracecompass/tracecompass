@@ -27,6 +27,7 @@ public class AnalysisCompilationData {
     private final Map<String, TmfXmlLocationCu> fLocations = new HashMap<>();
     private final Map<String, String> fDefinedValues = new HashMap<>();
     private final Map<String, TmfXmlMappingGroupCu> fMappingGroups = new HashMap<>();
+    private final Map<String, TmfXmlConditionCu> fTests = new HashMap<>();
 
     /**
      * Add a location compilation unit with a given ID to the analysis data
@@ -116,5 +117,28 @@ public class AnalysisCompilationData {
      */
     public @Nullable TmfXmlMappingGroupCu getMappingGroup(String groupId) {
         return fMappingGroups.get(groupId);
+    }
+
+    /**
+     * Add a test compilation name with given id to the analysis data
+     *
+     * @param id
+     *            The identifier of the test
+     * @param condition
+     *            The condition compilation unit
+     */
+    public void addTest(String id, TmfXmlConditionCu condition) {
+        fTests.put(id, condition);
+    }
+
+    /**
+     * Get the test compilation unit for a given ID
+     *
+     * @param id
+     *            The ID of the test to retrieve
+     * @return The test compilation unit
+     */
+    public @Nullable TmfXmlConditionCu getTest(String id) {
+        return fTests.get(id);
     }
 }

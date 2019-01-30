@@ -153,6 +153,37 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
     public abstract DataDrivenCondition generate();
 
     /**
+     * Compile a test element, ie an element that contains a name
+     *
+     * @param analysisData
+     *            The analysis data already compiled
+     * @param namedEl
+     *            the XML element corresponding to the condition
+     * @return The condition ID
+     */
+    public static @Nullable String compileNamedCondition(AnalysisCompilationData analysisData, Element namedEl) {
+        String id = namedEl.getAttribute(TmfXmlStrings.ID);
+
+        List<@Nullable Element> childElements = XmlUtils.getChildElements(namedEl);
+        Element child = NonNullUtils.checkNotNull(childElements.get(0));
+        // Compile the child of the IF node
+        childElements = XmlUtils.getChildElements(child);
+        if (childElements.size() != 1) {
+            // TODO: Validation message here
+            Activator.logError("There should be only one element under this condition"); //$NON-NLS-1$
+            throw new NullPointerException("Can't compile the condition"); //$NON-NLS-1$
+        }
+        Element subCondition = Objects.requireNonNull(childElements.get(0));
+
+        TmfXmlConditionCu condition = compile(analysisData, subCondition);
+        if (condition == null) {
+            return null;
+        }
+        analysisData.addTest(id, condition);
+        return id;
+    }
+
+    /**
      * @param analysisData
      *            The analysis data already compiled
      * @param conditionEl

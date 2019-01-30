@@ -15,10 +15,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlConditionCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
@@ -41,7 +44,7 @@ public class TmfXmlPatternEventHandler {
     private final XmlPatternStateProvider fParent;
 
     private final List<String> fInitialFsm;
-    private final Map<String, TmfXmlTransitionValidator> fTestMap;
+    private final Map<String, DataDrivenCondition> fTestMap;
     private final Map<String, ITmfXmlAction> fActionMap;
     private final Map<String, TmfXmlFsm> fFsmMap = new LinkedHashMap<>();
     private final List<TmfXmlFsm> fActiveFsmList = new ArrayList<>();
@@ -61,7 +64,8 @@ public class TmfXmlPatternEventHandler {
         String initialFsm = node.getAttribute(TmfXmlStrings.INITIAL);
         fInitialFsm = initialFsm.isEmpty() ? Collections.emptyList() : Arrays.asList(initialFsm.split(TmfXmlStrings.AND_SEPARATOR));
 
-        Map<String, TmfXmlTransitionValidator> testMap = new HashMap<>();
+        Map<String, DataDrivenCondition> testMap = new HashMap<>();
+        // Compile the test conditions
         NodeList nodesTest = node.getElementsByTagName(TmfXmlStrings.TEST);
         /* load transition input */
         for (int i = 0; i < nodesTest.getLength(); i++) {
@@ -69,8 +73,9 @@ public class TmfXmlPatternEventHandler {
             if (element == null) {
                 throw new IllegalArgumentException();
             }
-            TmfXmlTransitionValidator test = modelFactory.createTransitionValidator(element, fParent);
-            testMap.put(test.getId(), test);
+            String testId = modelFactory.createTransitionValidator(element, fParent);
+            TmfXmlConditionCu test = Objects.requireNonNull(fParent.getAnalysisCompilationData().getTest(testId));
+            testMap.put(testId, test.generate());
         }
         fTestMap = Collections.unmodifiableMap(testMap);
 
@@ -128,7 +133,7 @@ public class TmfXmlPatternEventHandler {
      *
      * @return The tests in a map
      */
-    public Map<String, TmfXmlTransitionValidator> getTestMap() {
+    public Map<String, DataDrivenCondition> getTestMap() {
         return fTestMap;
     }
 
@@ -177,7 +182,7 @@ public class TmfXmlPatternEventHandler {
             }
         }
         for (TmfXmlFsm fsm : activeFsmList) {
-            fsm.handleEvent(event, fTestMap);
+            fsm.handleEvent(event, fTestMap, fParent);
         }
     }
 

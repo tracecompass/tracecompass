@@ -27,7 +27,6 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatte
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternSegmentBuilder;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlState;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlStateTransition;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlTransitionValidator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.w3c.dom.Element;
 
@@ -87,8 +86,12 @@ public class TmfXmlReadOnlyModelFactory implements ITmfXmlModelFactory {
     }
 
     @Override
-    public TmfXmlTransitionValidator createTransitionValidator(Element node, IXmlStateSystemContainer container) {
-        return new TmfXmlTransitionValidator(this, node, container);
+    public String createTransitionValidator(Element node, IXmlStateSystemContainer container) {
+        String id = TmfXmlConditionCu.compileNamedCondition(container.getAnalysisCompilationData(), node);
+        if (id == null)  {
+            throw new NullPointerException("Named ondition did not compile correctly"); //$NON-NLS-1$
+        }
+        return id;
     }
 
     @Override

@@ -20,6 +20,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -230,26 +232,29 @@ public class TmfXmlFsm {
      *            The list of possible transitions of the state machine
      * @param scenarioInfo
      *            The active scenario details.
+     * @param container
+     *            The data container
      * @return A pair containing the next state of the state machine and the
      *         actions to execute
      */
-    public @Nullable TmfXmlStateTransition next(ITmfEvent event, Map<String, TmfXmlTransitionValidator> tests, TmfXmlScenarioInfo scenarioInfo) {
+    public @Nullable TmfXmlStateTransition next(ITmfEvent event, Map<String, DataDrivenCondition> tests, TmfXmlScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
         boolean matched = false;
         TmfXmlStateTransition stateTransition = null;
         TmfXmlState state = fStatesMap.get(scenarioInfo.getActiveState());
         if (state == null) {
-            /** FIXME: This logging should be replaced by something the user will see, this is XML debugging information! */
+            /**
+             * FIXME: This logging should be replaced by something the user will
+             * see, this is XML debugging information!
+             */
             Activator.logError(NLS.bind(Messages.TmfXmlFsm_StateUndefined, scenarioInfo.getActiveState(), getId()));
             return null;
         }
         for (int i = 0; i < state.getTransitionList().size() && !matched; i++) {
             stateTransition = state.getTransitionList().get(i);
-            matched = stateTransition.test(event, scenarioInfo, tests);
+            matched = stateTransition.test(event, scenarioInfo, tests, container);
         }
         return matched ? stateTransition : null;
     }
-
-
 
     /**
      * Validate the preconditions of this fsm. If not validate, the fsm will
@@ -259,14 +264,15 @@ public class TmfXmlFsm {
      *            The current event
      * @param tests
      *            The transition inputs
+     * @param container
      * @return True if one of the precondition is validated, false otherwise
      */
-    private boolean validatePreconditions(ITmfEvent event, Map<String, TmfXmlTransitionValidator> tests) {
+    private boolean validatePreconditions(ITmfEvent event, Map<String, DataDrivenCondition> tests, IAnalysisDataContainer container) {
         if (fPreconditions.isEmpty()) {
             return true;
         }
         for (TmfXmlBasicTransition precondition : fPreconditions) {
-            if (precondition.test(event, null, tests)) {
+            if (precondition.test(event, null, tests, container)) {
                 return true;
             }
         }
@@ -280,11 +286,13 @@ public class TmfXmlFsm {
      *            The current event
      * @param testMap
      *            The transitions of the pattern
+     * @param container
+     *            The data container
      */
-    public void handleEvent(ITmfEvent event, Map<String, TmfXmlTransitionValidator> testMap) {
+    public void handleEvent(ITmfEvent event, Map<String, DataDrivenCondition> testMap, IAnalysisDataContainer container) {
         setEventConsumed(false);
-        boolean isValidInput = handleActiveScenarios(event, testMap);
-        handlePendingScenario(event, isValidInput);
+        boolean isValidInput = handleActiveScenarios(event, testMap, container);
+        handlePendingScenario(event, isValidInput, container);
     }
 
     /**
@@ -294,10 +302,13 @@ public class TmfXmlFsm {
      *            The ongoing event
      * @param testMap
      *            The map of transition
-     * @return True if the ongoing event validates the preconditions, false otherwise
+     * @param container
+     *            The data container
+     * @return True if the ongoing event validates the preconditions, false
+     *         otherwise
      */
-    private boolean handleActiveScenarios(ITmfEvent event, Map<String, TmfXmlTransitionValidator> testMap) {
-        if (!validatePreconditions(event, testMap)) {
+    private boolean handleActiveScenarios(ITmfEvent event, Map<String, DataDrivenCondition> testMap, IAnalysisDataContainer container) {
+        if (!validatePreconditions(event, testMap, container)) {
             return false;
         }
 
@@ -308,7 +319,7 @@ public class TmfXmlFsm {
             if (!scenario.isActive()) {
                 currentItr.remove();
             } else {
-                handleScenario(scenario, event);
+                handleScenario(scenario, event, container);
                 if (fConsuming && isEventConsumed()) {
                     return true;
                 }
@@ -326,14 +337,14 @@ public class TmfXmlFsm {
      * @param isInputValid
      *            Either the ongoing event validated the preconditions or not
      */
-    private void handlePendingScenario(ITmfEvent event, boolean isInputValid) {
+    private void handlePendingScenario(ITmfEvent event, boolean isInputValid, IAnalysisDataContainer container) {
         if (fConsuming && isEventConsumed()) {
             return;
         }
 
         TmfXmlScenario scenario = fPendingScenario;
         if ((fInitialStateId.equals(TmfXmlState.INITIAL_STATE_ID) || isInputValid) && scenario != null) {
-            handleScenario(scenario, event);
+            handleScenario(scenario, event, container);
             if (!scenario.isPending()) {
                 addActiveScenario(scenario);
                 fPendingScenario = null;
@@ -352,9 +363,9 @@ public class TmfXmlFsm {
         }
     }
 
-    private static void handleScenario(TmfXmlScenario scenario, ITmfEvent event) {
+    private static void handleScenario(TmfXmlScenario scenario, ITmfEvent event, IAnalysisDataContainer container) {
         if (scenario.isActive() || scenario.isPending()) {
-            scenario.handleEvent(event);
+            scenario.handleEvent(event, container);
         }
     }
 

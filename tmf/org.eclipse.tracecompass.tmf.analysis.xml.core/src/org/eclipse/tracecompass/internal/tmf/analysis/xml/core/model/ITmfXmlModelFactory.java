@@ -80,9 +80,9 @@ public interface ITmfXmlModelFactory {
      *            The XML test element
      * @param container
      *            The state system container this test belongs to
-     * @return The new {@link TmfXmlTransitionValidator}
+     * @return The ID of the new transition validation
      */
-    TmfXmlTransitionValidator createTransitionValidator(Element node, IXmlStateSystemContainer container);
+    String createTransitionValidator(Element node, IXmlStateSystemContainer container);
 
     /**
      * Create a new XML action
