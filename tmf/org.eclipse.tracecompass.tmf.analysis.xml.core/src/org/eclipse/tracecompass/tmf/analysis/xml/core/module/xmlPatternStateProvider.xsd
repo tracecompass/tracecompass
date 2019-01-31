@@ -370,38 +370,36 @@
 						information.
 					</xs:documentation>
 				</xs:annotation>
-	<xs:complexType>
-		<xs:sequence maxOccurs="1" minOccurs="0">
-			<xs:element maxOccurs="1" minOccurs="1" name="begin" type="stateValue">
-				<xs:annotation>
-					<xs:documentation>Declares the begin/start time of the segment.
-					</xs:documentation>
-				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence maxOccurs="1" minOccurs="0">
+						<xs:element maxOccurs="1" minOccurs="1" name="begin" type="stateValue">
+							<xs:annotation>
+								<xs:documentation>Declares the begin/start time of the segment.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:choice>
+							<xs:annotation>
+								<xs:documentation> The user have to choose to describe either the
+									end time or the duration of the segment
+								</xs:documentation>
+							</xs:annotation>
+							<xs:element maxOccurs="1" minOccurs="1" name="end" type="stateValue">
+								<xs:annotation>
+									<xs:documentation>Declares end time of the segment.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element maxOccurs="1" minOccurs="1" name="duration" type="stateValue">
+								<xs:annotation>
+									<xs:documentation>Declares the duration of the segment.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:choice>
+					</xs:sequence>
+				</xs:complexType>
 			</xs:element>
-			<xs:choice>
-				<xs:annotation>
-					<xs:documentation> The user have to choose to describe either the
-						end time or the duration of the segment
-					</xs:documentation>
-				</xs:annotation>
-				<xs:element maxOccurs="1" minOccurs="1" name="end"
-					type="stateValue">
-					<xs:annotation>
-						<xs:documentation>Declares end time of the segment.
-						</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element maxOccurs="1" minOccurs="1" name="duration"
-					type="stateValue">
-					<xs:annotation>
-						<xs:documentation>Declares the duration of the segment.
-						</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-			</xs:choice>
-		</xs:sequence>
-	</xs:complexType>
-</xs:element>
 			<xs:element minOccurs="0" name="segContent">
 				<xs:annotation>
 					<xs:documentation>Describes the content of the segment.</xs:documentation></xs:annotation>

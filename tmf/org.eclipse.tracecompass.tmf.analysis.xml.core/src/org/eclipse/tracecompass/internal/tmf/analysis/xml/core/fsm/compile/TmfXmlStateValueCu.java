@@ -31,6 +31,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValueScript;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValueSelf;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValueStackPeek;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValueTypedWrapper;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
@@ -89,6 +90,35 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
         public DataDrivenValue get() {
             DataDrivenStateSystemPath path = fPath.generate();
             return new DataDrivenValueQuery(fMappingGroupId, fForcedType, path);
+        }
+
+    }
+
+    /**
+     * A wrapper for values, to change or force a type
+     */
+    public static class ValueWrapperGenerator implements Supplier<DataDrivenValue> {
+
+        private final Type fType;
+        private final TmfXmlStateValueCu fValue;
+
+        /**
+         * Constructor
+         *
+         * @param valueCu
+         *            The value to wrap
+         * @param type
+         *            The type of the expected value
+         */
+        public ValueWrapperGenerator(TmfXmlStateValueCu valueCu, Type type) {
+            fType = type;
+            fValue = valueCu;
+        }
+
+        @Override
+        public DataDrivenValue get() {
+            DataDrivenValue value = fValue.generate();
+            return new DataDrivenValueTypedWrapper(value, fType);
         }
 
     }
@@ -277,6 +307,12 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
          */
         String forcedTypeName = valueEl.getAttribute(TmfXmlStrings.FORCED_TYPE);
         ITmfStateValue.Type forcedType = forcedTypeName.isEmpty() ? ITmfStateValue.Type.NULL : TmfXmlUtils.getTmfStateValueByName(forcedTypeName);
+        if (forcedType == null) {
+            // TODO: Validation message here
+            Activator.logError("The given type name \"" + forcedType //$NON-NLS-1$
+                    + "\" does not correspond to any ITmfStateValue.Type"); //$NON-NLS-1$
+            return null;
+        }
 
         switch (type) {
         case TmfXmlStrings.TYPE_INT: {
@@ -285,13 +321,14 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
                 Activator.logWarning("state value is type int but a mappingGroup is specified"); //$NON-NLS-1$
             }
             String value = getValueString(analysisData, valueEl);
-            try {
-                int intValue = Integer.parseInt(value);
-                return new TmfXmlStateValueCu(() -> new DataDrivenValueConstant(mappingGroupId, forcedType, intValue));
-            } catch (NumberFormatException e) {
-                Activator.logError("Compiling state value: value is not a parseable integer " + value); //$NON-NLS-1$
+            if (value == null) {
                 return null;
             }
+            Object intValue = convertValueToType(value, Type.INTEGER);
+            if (intValue == null) {
+                return null;
+            }
+            return new TmfXmlStateValueCu(() -> new DataDrivenValueConstant(mappingGroupId, forcedType, intValue));
         }
         case TmfXmlStrings.TYPE_LONG: {
             if (mappingGroup != null) {
@@ -299,13 +336,14 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
                 Activator.logWarning("state value is type long but a mappingGroup is specified"); //$NON-NLS-1$
             }
             String value = getValueString(analysisData, valueEl);
-            try {
-                long longValue = Long.parseLong(value);
-                return new TmfXmlStateValueCu(() -> new DataDrivenValueConstant(mappingGroupId, forcedType, longValue));
-            } catch (NumberFormatException e) {
-                Activator.logError("Compiling state value: value is not a parseable long " + value); //$NON-NLS-1$
+            if (value == null) {
                 return null;
             }
+            Object longValue = convertValueToType(value, Type.LONG);
+            if (longValue == null) {
+                return null;
+            }
+            return new TmfXmlStateValueCu(() -> new DataDrivenValueConstant(mappingGroupId, forcedType, longValue));
         }
         case TmfXmlStrings.TYPE_STRING: {
             String value = getValueString(analysisData, valueEl);
@@ -425,6 +463,107 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
      */
     public static TmfXmlStateValueCu compileAsQuery(TmfXmlStateSystemPathCu path) {
         return new TmfXmlStateValueCu(new StateValueQueryGenerator(path, null, ITmfStateValue.Type.NULL));
+    }
+
+    /**
+     * Compile a segment field element into a state value
+     *
+     * @param analysisData
+     *            The analysis data already compiled
+     * @param element
+     *            The XML element to compile
+     * @return The state value compilation unit
+     */
+    public static @Nullable TmfXmlStateValueCu compileSegmentField(AnalysisCompilationData analysisData, Element element) {
+        String typeStr = element.getAttribute(TmfXmlStrings.TYPE);
+        String name = element.getAttribute(TmfXmlStrings.NAME);
+        if (typeStr.isEmpty()) {
+            // TODO: Validation message here
+            Activator.logError("Segment field: missing 'type' attribute for field " + name); //$NON-NLS-1$
+            return null;
+        }
+        ITmfStateValue.Type type = TmfXmlUtils.getTmfStateValueByName(typeStr);
+        if (type == null) {
+            // TODO: Validation message here
+            Activator.logError("The given type name \"" + typeStr //$NON-NLS-1$
+                    + "\" does not correspond to any ITmfStateValue.Type"); //$NON-NLS-1$
+            return null;
+        }
+        String constantValue = getValueString(analysisData, element);
+        List<Element> childElements = TmfXmlUtils.getChildElements(element, TmfXmlStrings.STATE_VALUE);
+        if (type.equals(Type.NULL)) {
+            if (constantValue != null && !constantValue.isEmpty()) {
+                // TODO: Validation message here
+                Activator.logWarning("Segment field: type is null, the constant value will be ignored"); //$NON-NLS-1$
+            }
+            if (!childElements.isEmpty()) {
+                // TODO: Validation message here
+                Activator.logWarning("Segment field: type is null, the <stateValue> element will be ignored"); //$NON-NLS-1$
+            }
+            return new TmfXmlStateValueCu(() -> new DataDrivenValueConstant(null, type, null));
+        }
+        if (constantValue == null || constantValue.isEmpty()) {
+            // No constant field, look at the state value element
+            if (childElements.isEmpty()) {
+                // TODO: Validation message here
+                Activator.logError("Segment field: there should be either a 'value' attribute or <stateValue> element for type " + typeStr); //$NON-NLS-1$
+                return null;
+            }
+            if (childElements.size() > 1) {
+                // TODO: Validation message here
+                Activator.logWarning("Segment field: there should be only one <stateValue> element under the field"); //$NON-NLS-1$
+            }
+            TmfXmlStateValueCu valueCu = compileValue(analysisData, Objects.requireNonNull(childElements.get(0)));
+            if (valueCu == null) {
+                return null;
+            }
+            return new TmfXmlStateValueCu(new ValueWrapperGenerator(valueCu, type));
+        }
+        // Create a constant state value with forced type
+        if (!childElements.isEmpty()) {
+            // TODO: Validation message here
+            Activator.logWarning("Segment field: type is null, the <stateValue> element will be ignored"); //$NON-NLS-1$
+        }
+        Object value = convertValueToType(constantValue, type);
+        if (value == null) {
+            return null;
+        }
+        return new TmfXmlStateValueCu(() -> new DataDrivenValueConstant(null, type, value));
+    }
+
+    private static @Nullable Object convertValueToType(String value, Type type) {
+        switch (type) {
+        case DOUBLE:
+            try {
+                return Double.parseDouble(value);
+            } catch (NumberFormatException e) {
+                // TODO: Validation message here
+                Activator.logError("Compiling value: value is not a parseable double: " + value); //$NON-NLS-1$
+                return null;
+            }
+        case INTEGER:
+            try {
+                return Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                // TODO: Validation message here
+                Activator.logError("Compiling value: value is not a parseable integer: " + value); //$NON-NLS-1$
+                return null;
+            }
+        case LONG:
+            try {
+                return Long.parseLong(value);
+            } catch (NumberFormatException e) {
+                // TODO: Validation message here
+                Activator.logError("Compiling value: value is not a parseable integer: " + value); //$NON-NLS-1$
+                return null;
+            }
+        case NULL: // Fallthrough, nothing to convert
+        case STRING: // Fallthrough, nothing to convert
+        case CUSTOM: // Fallthrough, nothing to convert
+        default:
+            break;
+        }
+        return value;
     }
 
 }

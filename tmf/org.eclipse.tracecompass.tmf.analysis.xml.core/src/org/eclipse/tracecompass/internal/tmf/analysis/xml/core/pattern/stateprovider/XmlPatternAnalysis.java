@@ -25,7 +25,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternSegmentBuilder;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -296,8 +295,7 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
         @Override
         public @Nullable String resolve(ISegment segment) {
             if (segment instanceof TmfXmlPatternSegment) {
-                return ((TmfXmlPatternSegment) segment).getName()
-                        .substring(TmfXmlPatternSegmentBuilder.PATTERN_SEGMENT_NAME_PREFIX.length());
+                return ((TmfXmlPatternSegment) segment).getName();
             }
             return EMPTY_STRING;
         }

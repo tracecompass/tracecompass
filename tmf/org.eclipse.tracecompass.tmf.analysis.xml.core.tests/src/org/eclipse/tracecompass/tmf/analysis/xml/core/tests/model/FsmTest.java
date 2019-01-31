@@ -15,7 +15,6 @@ import static org.junit.Assert.fail;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternSegmentBuilder;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
@@ -41,7 +40,7 @@ import org.junit.Test;
 public class FsmTest {
     private static final int END_TIME = 7;
     private static final @NonNull String TEST_TRACE = "test_traces/testTrace4.xml";
-    private static final String TEST_SEGMENT_NEW = TmfXmlPatternSegmentBuilder.PATTERN_SEGMENT_NAME_PREFIX + "NEW";
+    private static final String TEST_SEGMENT_NEW = "NEW";
     private static final TmfXmlTestFiles TEST_FILE_1 = TmfXmlTestFiles.INITIAL_STATE_ELEMENT_TEST_FILE_1;
     private static final TmfXmlTestFiles TEST_FILE_2 = TmfXmlTestFiles.INITIAL_STATE_ELEMENT_TEST_FILE_2;
     private static XmlPatternAnalysis fModule;

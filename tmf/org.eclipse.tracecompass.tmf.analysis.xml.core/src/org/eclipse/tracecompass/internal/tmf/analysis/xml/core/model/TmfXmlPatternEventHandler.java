@@ -20,7 +20,11 @@ import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlActionCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlConditionCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenAction;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenActionResetStoredFields;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenActionUpdateStoredFields;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
@@ -40,12 +44,17 @@ import com.google.common.collect.ImmutableMap.Builder;
  */
 public class TmfXmlPatternEventHandler {
 
+    /** The save stored fields action label */
+    public static final String SAVE_STORED_FIELDS_STRING = "saveStoredFields"; //$NON-NLS-1$
+    /** The clear stored fields action label */
+    public static final String CLEAR_STORED_FIELDS_STRING = "clearStoredFields"; //$NON-NLS-1$
+
     /* list of states changes */
     private final XmlPatternStateProvider fParent;
 
     private final List<String> fInitialFsm;
     private final Map<String, DataDrivenCondition> fTestMap;
-    private final Map<String, ITmfXmlAction> fActionMap;
+    private final Map<String, DataDrivenAction> fActionMap;
     private final Map<String, TmfXmlFsm> fFsmMap = new LinkedHashMap<>();
     private final List<TmfXmlFsm> fActiveFsmList = new ArrayList<>();
 
@@ -79,7 +88,7 @@ public class TmfXmlPatternEventHandler {
         }
         fTestMap = Collections.unmodifiableMap(testMap);
 
-        @NonNull Builder<String, ITmfXmlAction> builder = ImmutableMap.builder();
+        @NonNull Builder<String, DataDrivenAction> builder = ImmutableMap.builder();
         NodeList nodesAction = node.getElementsByTagName(TmfXmlStrings.ACTION);
         /* load actions */
         for (int i = 0; i < nodesAction.getLength(); i++) {
@@ -87,11 +96,12 @@ public class TmfXmlPatternEventHandler {
             if (element == null) {
                 throw new IllegalArgumentException();
             }
-            TmfXmlAction action = modelFactory.createAction(element, fParent);
-            builder.put(action.getId(), action);
+            String actionId = modelFactory.createAction(element, fParent);
+            TmfXmlActionCu action = Objects.requireNonNull(fParent.getAnalysisCompilationData().getAction(actionId));
+            builder.put(actionId, action.generate());
         }
-        builder.put(TmfXmlStrings.CONSTANT_PREFIX + ITmfXmlAction.CLEAR_STORED_FIELDS_STRING, new ResetStoredFieldsAction(fParent));
-        builder.put(TmfXmlStrings.CONSTANT_PREFIX + ITmfXmlAction.SAVE_STORED_FIELDS_STRING, new UpdateStoredFieldsAction(fParent));
+        builder.put(TmfXmlStrings.CONSTANT_PREFIX + CLEAR_STORED_FIELDS_STRING, new DataDrivenActionResetStoredFields());
+        builder.put(TmfXmlStrings.CONSTANT_PREFIX + SAVE_STORED_FIELDS_STRING, new DataDrivenActionUpdateStoredFields());
         fActionMap = builder.build();
 
         NodeList nodesFsm = node.getElementsByTagName(TmfXmlStrings.FSM);
@@ -142,7 +152,7 @@ public class TmfXmlPatternEventHandler {
      *
      * @return The actions
      */
-    public Map<String, ITmfXmlAction> getActionMap() {
+    public Map<String, DataDrivenAction> getActionMap() {
         return fActionMap;
     }
 

@@ -125,7 +125,7 @@ public final class TmfXmlUtils {
      * @return The ITmfStateValue.Type
      * @since 2.3
      */
-     public static ITmfStateValue.@NonNull Type getTmfStateValueByName(@NonNull String typeName){
+     public static ITmfStateValue.@Nullable Type getTmfStateValueByName(@NonNull String typeName){
 
         ITmfStateValue.Type type;
         switch (typeName) {
@@ -148,8 +148,7 @@ public final class TmfXmlUtils {
             type = ITmfStateValue.Type.NULL;
             break;
         default:
-            throw new IllegalArgumentException("The given type name \"" + typeName  //$NON-NLS-1$
-                    + "\" does not correspond to any ITmfStateValue.Type"); //$NON-NLS-1$
+            return null;
         }
         return type;
     }

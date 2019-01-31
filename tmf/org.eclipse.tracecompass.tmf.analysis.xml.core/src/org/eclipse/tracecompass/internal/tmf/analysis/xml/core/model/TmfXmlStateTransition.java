@@ -25,8 +25,8 @@ import org.w3c.dom.Element;
  */
 public class TmfXmlStateTransition extends TmfXmlBasicTransition {
 
-    private static final String SAVED_STORED_FIELDS_ACTION_STRING = TmfXmlStrings.CONSTANT_PREFIX + ITmfXmlAction.SAVE_STORED_FIELDS_STRING;
-    private static final String CLEAR_STORED_FIELDS_ACTION_STRINGS = TmfXmlStrings.CONSTANT_PREFIX + ITmfXmlAction.CLEAR_STORED_FIELDS_STRING;
+    private static final String SAVED_STORED_FIELDS_ACTION_STRING = TmfXmlStrings.CONSTANT_PREFIX + TmfXmlPatternEventHandler.SAVE_STORED_FIELDS_STRING;
+    private static final String CLEAR_STORED_FIELDS_ACTION_STRINGS = TmfXmlStrings.CONSTANT_PREFIX + TmfXmlPatternEventHandler.CLEAR_STORED_FIELDS_STRING;
 
     private final String fTarget;
     private final List<String> fAction;

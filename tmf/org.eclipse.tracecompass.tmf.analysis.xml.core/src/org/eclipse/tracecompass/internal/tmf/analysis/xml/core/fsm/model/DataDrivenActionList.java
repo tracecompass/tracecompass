@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 École Polytechnique de Montréal
+ * Copyright (c) 2019 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,31 +9,35 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model;
 
+import java.util.List;
+
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
- * A data-driven action base class
+ * An action that executes a series of actions
  *
  * @author Geneviève Bastien
  */
-public interface DataDrivenAction extends IDataDrivenRuntimeObject {
+public class DataDrivenActionList implements DataDrivenAction {
+
+    private final List<DataDrivenAction> fActions;
 
     /**
-     * An empty action
-     */
-    public static final DataDrivenAction NO_ACTION = (e, x, c) -> { /* Nothing to do */ };
-
-    /**
-     * Handle the event
+     * Constructor
      *
-     * @param event
-     *            The event to handle
-     * @param scenarioInfo
-     *            The scenario info
-     * @param container
-     *            The analysis data container
+     * @param actions
+     *            The list of actions to execute
      */
-    void eventHandle(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container);
+    public DataDrivenActionList(List<DataDrivenAction> actions) {
+        fActions = actions;
+    }
+
+    @Override
+    public void eventHandle(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
+        for (DataDrivenAction action : fActions) {
+            action.eventHandle(event, scenarioInfo, container);
+        }
+    }
 
 }

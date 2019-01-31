@@ -93,7 +93,7 @@ public interface ITmfXmlModelFactory {
      *            The state system container this action belongs to
      * @return The new {@link TmfXmlAction}
      */
-    TmfXmlAction createAction(Element node, IXmlStateSystemContainer container);
+    String createAction(Element node, IXmlStateSystemContainer container);
 
     /**
      * Create a new XML FSM
@@ -129,16 +129,5 @@ public interface ITmfXmlModelFactory {
      * @return The new XML {@link TmfXmlStateTransition}
      */
     TmfXmlStateTransition createStateTransition(Element node, IXmlStateSystemContainer container);
-
-    /**
-     * Create a new pattern segment builder
-     *
-     * @param node
-     *            The XML pattern segment builder
-     * @param container
-     *            The state system container this pattern segment builder belongs to
-     * @return The new {@link TmfXmlPatternSegmentBuilder}
-     */
-    TmfXmlPatternSegmentBuilder createPatternSegmentBuilder(Element node, IXmlStateSystemContainer container);
 
 }

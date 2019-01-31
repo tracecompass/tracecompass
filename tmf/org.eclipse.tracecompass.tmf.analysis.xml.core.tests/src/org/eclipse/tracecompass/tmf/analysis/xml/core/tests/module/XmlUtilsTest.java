@@ -368,7 +368,6 @@ public class XmlUtilsTest {
     public static void testPatternSegmentData(TmfXmlPatternSegment expected, TmfXmlPatternSegment actual) {
         assertEquals("getStart", expected.getStart(), actual.getStart());
         assertEquals("getEnd", expected.getEnd(), actual.getEnd());
-        assertEquals("getScale", expected.getScale(), actual.getScale());
         assertEquals("getName", expected.getName(), actual.getName());
         assertNotNull("getContent", actual.getContent());
 

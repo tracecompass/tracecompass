@@ -155,6 +155,9 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
     /**
      * Compile a test element, ie an element that contains a name
      *
+     * TODO: Return the condition itself instead of the string when everything
+     * has moved to new code path
+     *
      * @param analysisData
      *            The analysis data already compiled
      * @param namedEl

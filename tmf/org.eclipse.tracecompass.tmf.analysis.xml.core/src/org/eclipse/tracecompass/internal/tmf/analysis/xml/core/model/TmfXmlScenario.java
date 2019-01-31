@@ -13,6 +13,7 @@ import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenAction;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioHistoryBuilder.ScenarioStatusType;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
@@ -115,9 +116,9 @@ public class TmfXmlScenario {
         // Processing the actions in the transition
         final List<String> actions = out.getAction();
         for (String actionId : actions) {
-            ITmfXmlAction action = fPatternHandler.getActionMap().get(actionId);
+            DataDrivenAction action = fPatternHandler.getActionMap().get(actionId);
             if (action != null) {
-                action.execute(event, fScenarioInfo);
+                action.eventHandle(event, fScenarioInfo, container);
             } else {
                 Activator.logError("Action " + actionId + " cannot be found."); //$NON-NLS-1$ //$NON-NLS-2$
                 return;
