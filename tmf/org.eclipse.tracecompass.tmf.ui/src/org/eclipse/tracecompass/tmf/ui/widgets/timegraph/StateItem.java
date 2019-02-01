@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2017 Ericsson
+ * Copyright (c) 2012, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -17,6 +17,7 @@ import java.util.Map;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -118,6 +119,19 @@ public class StateItem {
             int rbgVal = new RGBAColor(stateColor.red, stateColor.green, stateColor.blue).toInt();
             fStyleMap.put(ITimeEventStyleStrings.fillColor(), rbgVal);
         }
+    }
+
+    /**
+     * Returns the state height factor.
+     *
+     * @return Returns the state height factor.
+     * @since 4.3
+     */
+    public float getStateHeightFactor() {
+        Object itemType = fStyleMap.get(ITimeEventStyleStrings.itemTypeProperty());
+        float defaultStateWidth = ITimeEventStyleStrings.linkType().equals(itemType) ?
+                TimeGraphControl.DEFAULT_LINK_WIDTH : TimeGraphControl.DEFAULT_STATE_WIDTH;
+        return (float) fStyleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), defaultStateWidth);
     }
 
     /**

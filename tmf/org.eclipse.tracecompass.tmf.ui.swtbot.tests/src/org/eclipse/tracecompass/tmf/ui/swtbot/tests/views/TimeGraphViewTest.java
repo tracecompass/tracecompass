@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.views;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -46,6 +47,7 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -282,7 +284,10 @@ public class TimeGraphViewTest {
         SWTBot legendBot = legendShell.bot();
 
         for (int i = 0; i < StubPresentationProvider.STATES.length; i++) {
-            legendBot.button(i).click();
+            SWTBotButton resetButton = legendBot.button(i);
+            if (resetButton.isEnabled()) {
+                resetButton.click();
+            }
         }
         legendBot.button(OK_BUTTON).click();
         TmfTraceStub trace = fTrace;
@@ -325,7 +330,10 @@ public class TimeGraphViewTest {
         SWTBotShell legendShell = fBot.shell(LEGEND_NAME);
         legendShell.activate();
         SWTBot legendBot = legendShell.bot();
+        assertFalse(legendBot.button(5).isEnabled());
+        int defaultValue = legendBot.scale(5).getValue();
         legendBot.scale(5).setValue(100);
+        assertTrue(legendBot.button(5).isEnabled());
         legendShell.bot().button(OK_BUTTON).click();
         fBot.waitUntil(Conditions.shellCloses(legendShell));
         resetTimeRange();
@@ -342,7 +350,10 @@ public class TimeGraphViewTest {
         fViewBot.toolbarButton(SHOW_LEGEND).click();
         legendShell = fBot.shell(LEGEND_NAME);
         legendBot = legendShell.bot();
+        assertTrue(legendBot.button(5).isEnabled());
         legendBot.button(5).click();
+        assertEquals(defaultValue, legendBot.scale(5).getValue());
+        assertFalse(legendBot.button(5).isEnabled());
         legendBot.button(OK_BUTTON).click();
         fBot.waitUntil(Conditions.shellCloses(legendShell));
         resetTimeRange();
@@ -405,7 +416,10 @@ public class TimeGraphViewTest {
         SWTBotShell legendShell = fBot.shell(LEGEND_NAME);
         legendShell.activate();
         SWTBot legendBot = legendShell.bot();
+        assertFalse(legendBot.button(2).isEnabled());
+        int defaultValue = legendBot.scale(2).getValue();
         legendBot.scale(2).setValue(25);
+        assertTrue(legendBot.button(2).isEnabled());
         legendShell.bot().button(OK_BUTTON).click();
         fBot.waitUntil(Conditions.shellCloses(legendShell));
         resetTimeRange();
@@ -422,7 +436,10 @@ public class TimeGraphViewTest {
         fViewBot.toolbarButton(SHOW_LEGEND).click();
         legendShell = fBot.shell(LEGEND_NAME);
         legendBot = legendShell.bot();
+        assertTrue(legendBot.button(2).isEnabled());
         legendBot.button(2).click();
+        assertEquals(defaultValue, legendBot.scale(2).getValue());
+        assertFalse(legendBot.button(2).isEnabled());
         legendBot.button(OK_BUTTON).click();
         fBot.waitUntil(Conditions.shellCloses(legendShell));
         resetTimeRange();
