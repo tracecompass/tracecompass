@@ -36,10 +36,10 @@ import org.w3c.dom.Element;
  * @author Geneviève Bastien
  * @author Florian Wininger
  */
-public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit {
+public abstract class TmfXmlActionCu implements IDataDrivenCompilationUnit {
 
     /** A state change assigning a value to a path in the state system */
-    private static class TmfXmlStateChangeAssignationCu extends TmfXmlStateChangeCu {
+    private static class TmfXmlStateChangeAssignationCu extends TmfXmlActionCu {
 
         private TmfXmlStateSystemPathCu fPath;
         private TmfXmlStateValueCu fRightOperand;
@@ -72,13 +72,13 @@ public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit 
     }
 
     /** Conditional state change */
-    private static class TmfXmlConditionalStateChangeCu extends TmfXmlStateChangeCu {
+    private static class TmfXmlConditionalStateChangeCu extends TmfXmlActionCu {
 
         private final TmfXmlConditionCu fCondition;
-        private final TmfXmlStateChangeCu fThen;
-        private final @Nullable TmfXmlStateChangeCu fElse;
+        private final TmfXmlActionCu fThen;
+        private final @Nullable TmfXmlActionCu fElse;
 
-        public TmfXmlConditionalStateChangeCu(TmfXmlConditionCu condition, TmfXmlStateChangeCu thenChange, @Nullable TmfXmlStateChangeCu elseChange) {
+        public TmfXmlConditionalStateChangeCu(TmfXmlConditionCu condition, TmfXmlActionCu thenChange, @Nullable TmfXmlActionCu elseChange) {
             fCondition = condition;
             fThen = thenChange;
             fElse = elseChange;
@@ -107,7 +107,7 @@ public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit 
      * @return The state change compilation unit or <code>null</code> if there was a
      *         compilation error
      */
-    public static @Nullable TmfXmlStateChangeCu compile(AnalysisCompilationData analysisData, Element stateChange) {
+    public static @Nullable TmfXmlActionCu compile(AnalysisCompilationData analysisData, Element stateChange) {
         /*
          * child nodes is either a list of TmfXmlStateAttributes and TmfXmlStateValues,
          * or an if-then-else series of nodes.
@@ -124,7 +124,7 @@ public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit 
     }
 
     /** Compile a conditional state change */
-    private static @Nullable TmfXmlStateChangeCu compileConditionalChange(AnalysisCompilationData analysisData, Element stateChange, Element ifNode) {
+    private static @Nullable TmfXmlActionCu compileConditionalChange(AnalysisCompilationData analysisData, Element stateChange, Element ifNode) {
         // Compile the child of the IF node
         List<@Nullable Element> childElements = XmlUtils.getChildElements(ifNode);
         if (childElements.size() != 1) {
@@ -145,7 +145,7 @@ public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit 
             Activator.logError("Conditional State Change: There should be 1 and only 1 then element"); //$NON-NLS-1$
             return null;
         }
-        TmfXmlStateChangeCu thenChange = compile(analysisData, thenElements.get(0));
+        TmfXmlActionCu thenChange = compile(analysisData, thenElements.get(0));
         if (thenChange == null) {
             return null;
         }
@@ -160,7 +160,7 @@ public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit 
             Activator.logError("Conditional State Change: There should be at most 1 else element"); //$NON-NLS-1$
             return null;
         }
-        TmfXmlStateChangeCu elseChange = compile(analysisData, elseElements.get(0));
+        TmfXmlActionCu elseChange = compile(analysisData, elseElements.get(0));
         if (elseChange == null) {
             return null;
         }
@@ -168,7 +168,7 @@ public abstract class TmfXmlStateChangeCu implements IDataDrivenCompilationUnit 
     }
 
     /** Compile an assignation state change */
-    private static @Nullable TmfXmlStateChangeCu compileAssignationChange(AnalysisCompilationData analysisContent, Element stateChange) {
+    private static @Nullable TmfXmlActionCu compileAssignationChange(AnalysisCompilationData analysisContent, Element stateChange) {
         List<@NonNull Element> leftOperands = TmfXmlUtils.getChildElements(stateChange, TmfXmlStrings.STATE_ATTRIBUTE);
         List<@NonNull Element> rightOperands = TmfXmlUtils.getChildElements(stateChange, TmfXmlStrings.STATE_VALUE);
         List<@NonNull Element> futureTimes = TmfXmlUtils.getChildElements(stateChange, TmfXmlStrings.FUTURE_TIME);

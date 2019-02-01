@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
  */
 public class TmfXmlEventHandlerCu implements IDataDrivenCompilationUnit {
 
-    private final List<TmfXmlStateChangeCu> fStateChanges;
+    private final List<TmfXmlActionCu> fStateChanges;
     private final String fEventName;
 
     /**
@@ -42,7 +42,7 @@ public class TmfXmlEventHandlerCu implements IDataDrivenCompilationUnit {
      * @param stateChanges
      *            The list of state change compilation units
      */
-    TmfXmlEventHandlerCu(String eventName, List<TmfXmlStateChangeCu> stateChanges) {
+    TmfXmlEventHandlerCu(String eventName, List<TmfXmlActionCu> stateChanges) {
         fStateChanges = stateChanges;
         fEventName = eventName;
     }
@@ -50,7 +50,7 @@ public class TmfXmlEventHandlerCu implements IDataDrivenCompilationUnit {
     @Override
     public DataDrivenEventHandler generate() {
         List<DataDrivenAction> collect = fStateChanges.stream()
-                .map(TmfXmlStateChangeCu::generate)
+                .map(TmfXmlActionCu::generate)
                 .collect(Collectors.toList());
         return new DataDrivenEventHandler(fEventName, collect);
     }
@@ -68,11 +68,11 @@ public class TmfXmlEventHandlerCu implements IDataDrivenCompilationUnit {
     public static @Nullable TmfXmlEventHandlerCu compile(AnalysisCompilationData analysisData, Element eventHandler) {
         String eventName = eventHandler.getAttribute(TmfXmlStrings.HANDLER_EVENT_NAME);
 
-        List<TmfXmlStateChangeCu> stateChanges = new ArrayList<>();
+        List<TmfXmlActionCu> stateChanges = new ArrayList<>();
         List<@NonNull Element> childElements = TmfXmlUtils.getChildElements(eventHandler, TmfXmlStrings.STATE_CHANGE);
         /* load state changes */
         for (Element childElem : childElements) {
-            TmfXmlStateChangeCu compile = TmfXmlStateChangeCu.compile(analysisData, childElem);
+            TmfXmlActionCu compile = TmfXmlActionCu.compile(analysisData, childElem);
             if (compile == null) {
                 return null;
             }

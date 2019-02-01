@@ -15,7 +15,7 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readonly;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlConditionCu;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateChangeCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlActionCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateValueCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenAction;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
@@ -73,7 +73,7 @@ public class TmfXmlReadOnlyModelFactory implements ITmfXmlModelFactory {
 
     @Override
     public DataDrivenAction createStateChange(Element node, IXmlStateSystemContainer container) {
-        TmfXmlStateChangeCu compile = TmfXmlStateChangeCu.compile(container.getAnalysisCompilationData(), node);
+        TmfXmlActionCu compile = TmfXmlActionCu.compile(container.getAnalysisCompilationData(), node);
         if (compile == null)  {
             throw new NullPointerException("State change did not compile correctly"); //$NON-NLS-1$
         }

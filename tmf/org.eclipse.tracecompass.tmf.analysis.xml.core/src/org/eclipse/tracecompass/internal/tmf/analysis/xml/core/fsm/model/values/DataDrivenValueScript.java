@@ -111,4 +111,23 @@ public class DataDrivenValueScript extends DataDrivenValue {
         return "TmfXmlValueScript: " + fScript + " -> " + fValues; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), fValues, fScriptEngine, fScript);
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof DataDrivenValueScript)) {
+            return false;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        DataDrivenValueScript other = (DataDrivenValueScript) obj;
+        return Objects.equals(fValues, other.fValues) &&
+                Objects.equals(fScriptEngine, other.fScriptEngine) &&
+                Objects.equals(fScript, other.fScript);
+    }
+
 }

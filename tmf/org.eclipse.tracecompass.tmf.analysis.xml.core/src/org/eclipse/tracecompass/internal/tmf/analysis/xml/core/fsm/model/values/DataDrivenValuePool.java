@@ -23,12 +23,23 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
  *
  * @author Geneviève Bastien
  */
-public class DataDrivenValuePool extends DataDrivenValue {
+public final class DataDrivenValuePool extends DataDrivenValue {
+
+    private static final DataDrivenValuePool INSTANCE = new DataDrivenValuePool();
+
+    /**
+     * Get the instance of this value
+     *
+     * @return The instance of this state value
+     */
+    public static DataDrivenValuePool getInstance() {
+        return INSTANCE;
+    }
 
     /**
      * Constructor
      */
-    public DataDrivenValuePool() {
+    private DataDrivenValuePool() {
         super(null, ITmfStateValue.Type.NULL);
     }
 
@@ -52,6 +63,16 @@ public class DataDrivenValuePool extends DataDrivenValue {
     @Override
     public String toString() {
         return "DataDrivenValuePool"; //$NON-NLS-1$
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        return (obj == INSTANCE);
     }
 
 }

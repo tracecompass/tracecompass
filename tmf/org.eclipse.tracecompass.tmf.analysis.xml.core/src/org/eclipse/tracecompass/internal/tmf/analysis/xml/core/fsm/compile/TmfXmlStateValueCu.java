@@ -165,7 +165,7 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
             String name = getValueString(analysisData, valueEl);
             if (name == null || name.isEmpty()) {
                 // TODO: Validation message here
-                Activator.logError("The value of a constant attribute should not be null"); //$NON-NLS-1$
+                Activator.logError("The value of a constant attribute should not be empty"); //$NON-NLS-1$
                 return null;
             }
             if (name.equals(CURRENT_SCENARIO)) {
@@ -200,6 +200,11 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
         }
         case TmfXmlStrings.TYPE_QUERY: {
             List<Element> childElements = TmfXmlUtils.getChildElements(valueEl, TmfXmlStrings.STATE_ATTRIBUTE);
+            if (childElements.isEmpty()) {
+                // TODO: Validation message here
+                Activator.logError("A query state attribute should have children attributes"); //$NON-NLS-1$
+                return null;
+            }
             TmfXmlStateSystemPathCu path = TmfXmlStateSystemPathCu.compile(analysisData, childElements);
             if (path == null) {
                 return null;
@@ -208,12 +213,12 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
         }
         case TmfXmlStrings.TYPE_EVENT_NAME:
             return Collections.singletonList(new TmfXmlStateValueCu(() -> new DataDrivenValueEventName(null)));
-        case TmfXmlStrings.NULL:
+        case TmfXmlStrings.TYPE_NULL:
             return Collections.singletonList(new TmfXmlStateValueCu(() -> new DataDrivenValueConstant(null, forcedType, null)));
         case TmfXmlStrings.TYPE_SELF:
             return Collections.singletonList(new TmfXmlStateValueCu(() -> new DataDrivenValueSelf(forcedType)));
         case TmfXmlStrings.TYPE_POOL:
-            return Collections.singletonList(new TmfXmlStateValueCu(() -> new DataDrivenValuePool()));
+            return Collections.singletonList(new TmfXmlStateValueCu(() -> DataDrivenValuePool.getInstance()));
         default:
             Activator.logError("Compiling state value: The XML element is not of the right type " + type); //$NON-NLS-1$
         }
@@ -333,6 +338,11 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
         }
         case TmfXmlStrings.TYPE_QUERY: {
             List<Element> childElements = TmfXmlUtils.getChildElements(valueEl, TmfXmlStrings.STATE_ATTRIBUTE);
+            if (childElements.isEmpty()) {
+                // TODO: Validation message here
+                Activator.logError("A query state value should have children attributes"); //$NON-NLS-1$
+                return null;
+            }
             TmfXmlStateSystemPathCu path = TmfXmlStateSystemPathCu.compile(analysisData, childElements);
             if (path == null) {
                 return null;
@@ -353,6 +363,7 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
             }
             String script = getValueString(analysisData, valueEl);
             if (script == null) {
+                // TODO: Validation message here
                 Activator.logError("The script resolves to null"); //$NON-NLS-1$
                 return null;
             }

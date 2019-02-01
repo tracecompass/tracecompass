@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values;
 
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.IDataDrivenRuntimeObject;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenMappingGroup;
@@ -118,5 +120,21 @@ public abstract class DataDrivenValue implements IDataDrivenRuntimeObject {
     public String toString() {
         return "TmfXmlValue: " + getClass().getSimpleName(); //$NON-NLS-1$
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fMappingGroupId, fForcedType);
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof DataDrivenValue)) {
+            return false;
+        }
+        DataDrivenValue other = (DataDrivenValue) obj;
+        return Objects.equals(fMappingGroupId, other.fMappingGroupId) && Objects.equals(fForcedType, other.fForcedType);
+    }
+
+
 
 }

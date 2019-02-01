@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
@@ -106,6 +107,21 @@ public class DataDrivenStateSystemPath implements IDataDrivenRuntimeObject {
     @Override
     public String toString() {
         return "DataDrivenStateSystemPath: " + fAttributes; //$NON-NLS-1$
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), fAttributes, fQuarkProvider);
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof DataDrivenStateSystemPath)) {
+            return false;
+        }
+        DataDrivenStateSystemPath other = (DataDrivenStateSystemPath) obj;
+        return Objects.equals(fAttributes, other.fAttributes) &&
+                Objects.equals(fQuarkProvider, other.fQuarkProvider);
     }
 
 }

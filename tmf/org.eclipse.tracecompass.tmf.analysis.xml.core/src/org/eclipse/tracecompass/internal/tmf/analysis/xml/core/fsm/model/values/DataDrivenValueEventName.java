@@ -20,7 +20,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  *
  * @author Geneviève Bastien
  */
-public class DataDrivenValueEventName extends DataDrivenValue {
+public final class DataDrivenValueEventName extends DataDrivenValue {
 
     /**
      * Constructor
@@ -46,5 +46,18 @@ public class DataDrivenValueEventName extends DataDrivenValue {
     @Override
     public String toString() {
         return "DataDrivenValueEventName"; //$NON-NLS-1$
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof DataDrivenValueEventName)) {
+            return false;
+        }
+        return super.equals(obj);
     }
 }
