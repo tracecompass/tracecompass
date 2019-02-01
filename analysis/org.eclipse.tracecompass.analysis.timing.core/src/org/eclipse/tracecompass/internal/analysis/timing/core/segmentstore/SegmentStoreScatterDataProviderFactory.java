@@ -75,6 +75,7 @@ public class SegmentStoreScatterDataProviderFactory implements IDataProviderFact
                     .setDescription(Objects.requireNonNull(NLS.bind(Messages.SegmentStoreScatterGraphDataProvider_description, analysis.getHelpText())))
                     .setProviderType(ProviderType.TREE_TIME_XY);
                 descriptors.add(builder.build());
+                existingModules.add(analysis.getId());
             }
         }
         return descriptors;
