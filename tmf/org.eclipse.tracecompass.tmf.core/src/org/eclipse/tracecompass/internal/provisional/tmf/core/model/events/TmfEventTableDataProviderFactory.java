@@ -9,8 +9,15 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.events;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.tmf.core.model.DataProviderDescriptor;
+import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderDescriptor;
+import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderDescriptor.ProviderType;
 import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderFactory;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
@@ -25,9 +32,21 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  */
 public class TmfEventTableDataProviderFactory implements IDataProviderFactory {
 
+    private static final IDataProviderDescriptor DESCRIPTOR =
+            new DataProviderDescriptor.Builder()
+                        .setId(TmfEventTableDataProvider.ID)
+                        .setName(NonNullUtils.nullToEmptyString(Messages.EventsTableDataProvider_Title))
+                        .setDescription(NonNullUtils.nullToEmptyString(Messages.EventsTableDataProviderFactory_DescriptionText))
+                        .setProviderType(ProviderType.TREE_TIME_XY)
+                        .build();
+
     @Override
     public @Nullable ITmfTreeDataProvider<? extends ITmfTreeDataModel> createProvider(@NonNull ITmfTrace trace) {
         return new TmfEventTableDataProvider(trace);
     }
 
+    @Override
+    public Collection<IDataProviderDescriptor> getDescriptors(@NonNull ITmfTrace trace) {
+        return Collections.singleton(DESCRIPTOR);
+    }
 }
