@@ -45,4 +45,17 @@
 <field name="curState" type="string" value="BAD" />
 <field name="op" type="string" value="op1" />
 </event>
+<event timestamp="10" name="entry">
+<field name="cpu" type="int" value="1" />
+<field name="op" type="string" value="op1" />
+</event>
+<event timestamp="14" name="action">
+<field name="cpu" type="int" value="1" />
+<field name="op" type="string" value="op2" />
+</event>
+<event timestamp="20" name="exit">
+<field name="cpu" type="int" value="1" />
+<field name="curState" type="string" value="GOOD" />
+<field name="op" type="string" value="op1" />
+</event>
 </trace>

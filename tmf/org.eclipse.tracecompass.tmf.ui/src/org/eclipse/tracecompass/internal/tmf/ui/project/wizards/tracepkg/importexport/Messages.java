@@ -128,6 +128,16 @@ public class Messages extends NLS {
     public static String ImportTracePackageWizardPage_ExperimentAlreadyExists;
 
     /**
+     * Dialog text when an experiment and traces with the same name already exists
+     */
+    public static String ImportTracePackageWizardPage_ExperimentAndTraceAlreadyExist;
+
+    /**
+     * Dialog text when traces, in an experiment, with the same name already exists
+     */
+    public static String ImportTracePackageWizardPage_TraceFromExperimentAlreadyExist;
+
+    /**
      * Dialog title when a trace with the same name already exists
      */
     public static String ImportTracePackageWizardPage_AlreadyExistsTitle;

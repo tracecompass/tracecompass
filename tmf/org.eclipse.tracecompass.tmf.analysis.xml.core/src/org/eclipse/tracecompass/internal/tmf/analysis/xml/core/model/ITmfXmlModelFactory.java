@@ -12,10 +12,10 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model;
 
-import java.util.List;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenAction;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.w3c.dom.Element;
 
@@ -29,17 +29,6 @@ import org.w3c.dom.Element;
 public interface ITmfXmlModelFactory {
 
     /**
-     * Create a new XML state attribute
-     *
-     * @param attribute
-     *            XML element of the attribute
-     * @param container
-     *            The state system container this state attribute belongs to
-     * @return The new state attribute
-     */
-    ITmfXmlStateAttribute createStateAttribute(Element attribute, IXmlStateSystemContainer container);
-
-    /**
      * Create a new state value where the value corresponds to a path of
      * {@link ITmfXmlStateAttribute}
      *
@@ -47,25 +36,9 @@ public interface ITmfXmlModelFactory {
      *            The state value XML element
      * @param container
      *            The state system container this state value belongs to
-     * @param attributes
-     *            The attributes representing the path to this value
      * @return The new state value
      */
-    ITmfXmlStateValue createStateValue(Element node, IXmlStateSystemContainer container, List<ITmfXmlStateAttribute> attributes);
-
-    /**
-     * Create a new state value where the value corresponds to a field in an
-     * event
-     *
-     * @param node
-     *            The state value XML element
-     * @param container
-     *            The state system container this state value belongs to
-     * @param eventField
-     *            The event field where to get the value
-     * @return The new state value
-     */
-    ITmfXmlStateValue createStateValue(Element node, IXmlStateSystemContainer container, String eventField);
+    DataDrivenValue createStateValue(Element node, IXmlStateSystemContainer container);
 
     /**
      * Create a new XML condition
@@ -76,7 +49,7 @@ public interface ITmfXmlModelFactory {
      *            The state system container this condition belongs to
      * @return The new XML condition
      */
-    TmfXmlCondition createCondition(Element node, IXmlStateSystemContainer container);
+    DataDrivenCondition createCondition(Element node, IXmlStateSystemContainer container);
 
     /**
      * Create a new XML state change
@@ -88,17 +61,6 @@ public interface ITmfXmlModelFactory {
      * @return The new XML state change
      */
     DataDrivenAction createStateChange(Element node, IXmlStateSystemContainer container);
-
-    /**
-     * Create a new XML location
-     *
-     * @param node
-     *            The XML location element
-     * @param container
-     *            The state system container this location belongs to
-     * @return The new XML location
-     */
-    TmfXmlLocation createLocation(Element node, IXmlStateSystemContainer container);
 
     /**
      * Create a new XML pattern event handler
@@ -118,9 +80,9 @@ public interface ITmfXmlModelFactory {
      *            The XML test element
      * @param container
      *            The state system container this test belongs to
-     * @return The new {@link TmfXmlTransitionValidator}
+     * @return The ID of the new transition validation
      */
-    TmfXmlTransitionValidator createTransitionValidator(Element node, IXmlStateSystemContainer container);
+    String createTransitionValidator(Element node, IXmlStateSystemContainer container);
 
     /**
      * Create a new XML action
@@ -169,17 +131,6 @@ public interface ITmfXmlModelFactory {
     TmfXmlStateTransition createStateTransition(Element node, IXmlStateSystemContainer container);
 
     /**
-     * Create a new XML timestamp condition
-     *
-     * @param node
-     *            The XML timestamp condition element
-     * @param container
-     *            The state system container this timestamp condition belongs to
-     * @return The new {@link TmfXmlTimestampCondition}
-     */
-    TmfXmlTimestampCondition createTimestampsCondition(Element node, IXmlStateSystemContainer container);
-
-    /**
      * Create a new pattern segment builder
      *
      * @param node
@@ -190,14 +141,4 @@ public interface ITmfXmlModelFactory {
      */
     TmfXmlPatternSegmentBuilder createPatternSegmentBuilder(Element node, IXmlStateSystemContainer container);
 
-    /**
-     * Create a new pattern map entry
-     *
-     * @param node
-     *            The XML map entry element
-     * @param container
-     *            The state system container this state value handler belongs to
-     * @return The new {@link TmfXmlMapEntry}
-     */
-    TmfXmlMapEntry createMapEntry(Element node, IXmlStateSystemContainer container);
 }

@@ -16,7 +16,11 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -315,7 +319,7 @@ public class ImportTracePackageWizardPage extends AbstractTracePackageWizardPage
      * @return true on success
      */
     public boolean finish() {
-        if (!checkForOverwrite()) {
+        if (!checkForConflict()) {
             return false;
         }
 
@@ -346,23 +350,123 @@ public class ImportTracePackageWizardPage extends AbstractTracePackageWizardPage
         return importOperation.getStatus().getSeverity() == IStatus.OK;
     }
 
-    private boolean checkForOverwrite() {
-        TracePackageElement[] traceElements = (TracePackageElement[]) getElementViewer().getInput();
-        List<TracePackageTraceElement> noImportTraces = new ArrayList<>();
-        boolean noToAll = false;
-        for (TracePackageElement packageElement : traceElements) {
+    private boolean checkForConflict() {
+        TracePackageElement[] packageElements = (TracePackageElement[]) getElementViewer().getInput();
+        List<TracePackageExperimentElement> experimentElements = new ArrayList<>();
+        List<TracePackageTraceElement> traceElements = new ArrayList<>();
+        Map<TracePackageExperimentElement, List<TracePackageTraceElement>> experimentTracesMap = new HashMap<>();
+        // List of experiment to rename
+        List<TracePackageExperimentElement> experimentToRename = new ArrayList<>();
+        // Conflict traces that are not in an experiment
+        List<TracePackageTraceElement> unhandledTraces = new ArrayList<>();
+
+        // Process package element to separate experiments and traces
+        for (TracePackageElement packageElement : packageElements) {
             TracePackageTraceElement traceElement = (TracePackageTraceElement) packageElement;
-            if (!AbstractTracePackageOperation.isFilesChecked(traceElement)) {
-                continue;
+            if (AbstractTracePackageOperation.isFilesChecked(traceElement)) {
+                if (traceElement instanceof TracePackageExperimentElement) {
+                    TracePackageExperimentElement experimentElement = (TracePackageExperimentElement) traceElement;
+                    experimentElements.add(experimentElement);
+                    if (experimentExists(experimentElement)) {
+                        experimentToRename.add(experimentElement);
+                    }
+                } else {
+                    traceElements.add(traceElement);
+                }
             }
+        }
 
+        for (TracePackageTraceElement traceElement : traceElements) {
+            processTrace(experimentElements, traceElement, experimentTracesMap, unhandledTraces);
+        }
+
+        boolean result = true;
+        if (!experimentTracesMap.isEmpty() || !experimentToRename.isEmpty()) {
+            result &= handleExperimentConflict(experimentTracesMap, experimentToRename);
+        }
+
+        if (!unhandledTraces.isEmpty()) {
+            result &= handleTracesConflict(unhandledTraces);
+        }
+
+        return result;
+    }
+
+    private void processTrace(List<TracePackageExperimentElement> experimentElements, TracePackageTraceElement traceElement, Map<TracePackageExperimentElement, List<TracePackageTraceElement>> experimentTracesMap,
+            List<TracePackageTraceElement> unhandledTraces) {
+        boolean isAlone = traceExists(traceElement);
+        for (TracePackageExperimentElement experimentElement : experimentElements) {
+            List<String> tracesPath = experimentElement.getExpTraces();
+            if (traceExists(traceElement) && tracesPath.contains(traceElement.getDestinationElementPath())) {
+                isAlone = false;
+                List<TracePackageTraceElement> traces = experimentTracesMap.get(experimentElement);
+                if (traces == null) {
+                    traces = new ArrayList<>();
+                }
+                traces.add(traceElement);
+                experimentTracesMap.put(experimentElement, traces);
+            }
+        }
+
+        if (isAlone) {
+            unhandledTraces.add(traceElement);
+        }
+    }
+
+    private boolean handleExperimentConflict(Map<TracePackageExperimentElement, List<TracePackageTraceElement>> experimentTracesMap, List<TracePackageExperimentElement> experimentToRename) {
+        if (!experimentToRename.isEmpty() && experimentTracesMap.isEmpty()) {
+            for (TracePackageExperimentElement experimentElement : experimentToRename) {
+                int returnCode = promptForExperimentRename(experimentElement);
+                // The return code is an index to a button in the dialog but the
+                // 'X' button in the window corner is not considered a button
+                // therefore it returns -1 and unfortunately, there is no
+                // constant for that.
+                if (returnCode < 0) {
+                    return false;
+                }
+                final String[] response = new String[] { IDialogConstants.NO_LABEL, IDialogConstants.YES_LABEL };
+                if (response[returnCode].equals(IDialogConstants.NO_LABEL)) {
+                    uncheckExperimentElement(experimentElement, Collections.emptyList());
+                } else if (response[returnCode].equals(IDialogConstants.YES_LABEL)) {
+                    changeExperimentName(experimentElement);
+                }
+            }
+        } else {
+            for (Entry<TracePackageExperimentElement, List<TracePackageTraceElement>> experimentEntry : experimentTracesMap.entrySet()) {
+                int returnCode = promptForExperimentOverwrite(experimentEntry, experimentToRename);
+                // The return code is an index to a button in the dialog but the
+                // 'X' button in the window corner is not considered a button
+                // therefore it returns -1 and unfortunately, there is no
+                // constant for that.
+                if (returnCode < 0) {
+                    return false;
+                }
+                final String[] response = new String[] { IDialogConstants.NO_LABEL, IDialogConstants.YES_LABEL };
+                if (response[returnCode].equals(IDialogConstants.NO_LABEL)) {
+                    uncheckExperimentElement(experimentEntry.getKey(), experimentEntry.getValue());
+                }
+            }
+        }
+        return true;
+    }
+
+    private void changeExperimentName(TracePackageExperimentElement experimentElement) {
+        String currentName = experimentElement.getImportName();
+        int nameSuffixIndex = 2;
+        while (experimentExists(experimentElement)) {
+            String newName = currentName + " (" + nameSuffixIndex + ')'; //$NON-NLS-1$
+            experimentElement.setImportName(newName);
+            nameSuffixIndex++;
+        }
+    }
+
+    private boolean handleTracesConflict(List<TracePackageTraceElement> traceElements) {
+        boolean noToAll = false;
+        for (TracePackageTraceElement traceElement : traceElements) {
             if (noToAll) {
-                noImportTraces.add(traceElement);
-                continue;
-            }
-
-            if (traceExists(traceElement)) {
-                int returnCode = promptForOverwrite(traceElement);
+                uncheckTraceElement(traceElement);
+            } else {
+                int returnCode = promptForTraceOverwrite(traceElement);
                 // The return code is an index to a button in the dialog but the
                 // 'X' button in the window corner is not considered a button
                 // therefore it returns -1 and unfortunately, there is no
@@ -372,22 +476,11 @@ public class ImportTracePackageWizardPage extends AbstractTracePackageWizardPage
                 }
 
                 final String[] response = new String[] { IDialogConstants.NO_TO_ALL_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.YES_TO_ALL_LABEL, IDialogConstants.YES_LABEL };
-                if (response[returnCode].equals(IDialogConstants.YES_TO_ALL_LABEL)) {
-                    break;
-                } else if (response[returnCode].equals(IDialogConstants.NO_TO_ALL_LABEL)) {
+                if (response[returnCode].equals(IDialogConstants.NO_TO_ALL_LABEL)) {
                     noToAll = true;
-                    noImportTraces.add(traceElement);
+                    uncheckTraceElement(traceElement);
                 } else if (response[returnCode].equals(IDialogConstants.NO_LABEL)) {
-                    noImportTraces.add(traceElement);
-                }
-            }
-        }
-
-        // Unselect the traces that the user decided not to import
-        for (TracePackageTraceElement t : noImportTraces) {
-            for (TracePackageElement e : t.getChildren()) {
-                if (e instanceof TracePackageFilesElement) {
-                    ((TracePackageFilesElement) e).setChecked(false);
+                    uncheckTraceElement(traceElement);
                 }
             }
         }
@@ -395,29 +488,97 @@ public class ImportTracePackageWizardPage extends AbstractTracePackageWizardPage
         return true;
     }
 
-    private boolean traceExists(TracePackageTraceElement traceElement) {
-        if (traceElement instanceof TracePackageExperimentElement) {
-            TmfExperimentFolder experimentsFolder = fTmfTraceFolder.getProject().getExperimentsFolder();
-            return experimentsFolder != null && experimentsFolder.getChild(traceElement.getImportName()) != null;
+    private static void uncheckTraceElement(TracePackageTraceElement traceElement) {
+        for (TracePackageElement e : traceElement.getChildren()) {
+            if (e instanceof TracePackageFilesElement) {
+                ((TracePackageFilesElement) e).setChecked(false);
+            }
         }
+    }
+
+    private static void uncheckExperimentElement(TracePackageExperimentElement experimentElement, List<TracePackageTraceElement> expTraceElements) {
+        for (TracePackageElement e : experimentElement.getChildren()) {
+            if (e instanceof TracePackageFilesElement) {
+                ((TracePackageFilesElement) e).setChecked(false);
+            }
+        }
+
+        for (TracePackageTraceElement traceElement : expTraceElements) {
+            uncheckTraceElement(traceElement);
+        }
+    }
+
+    private boolean experimentExists(TracePackageExperimentElement experimentElement) {
+        TmfExperimentFolder experimentsFolder = fTmfTraceFolder.getProject().getExperimentsFolder();
+        return experimentsFolder != null && experimentsFolder.getChild(experimentElement.getImportName()) != null;
+    }
+
+    private boolean traceExists(TracePackageTraceElement traceElement) {
         IResource traceRes = fTmfTraceFolder.getResource().findMember(traceElement.getDestinationElementPath());
         return traceRes != null;
     }
 
-    private int promptForOverwrite(TracePackageTraceElement packageElement) {
+    private int promptForTraceOverwrite(TracePackageTraceElement packageElement) {
         String name = packageElement.getDestinationElementPath();
-        String dialogMessage = packageElement instanceof TracePackageExperimentElement ?
-                Messages.ImportTracePackageWizardPage_ExperimentAlreadyExists :
-                    Messages.ImportTracePackageWizardPage_TraceAlreadyExists;
         final MessageDialog dialog = new MessageDialog(getContainer().getShell(),
                 Messages.ImportTracePackageWizardPage_AlreadyExistsTitle,
                 null,
-                MessageFormat.format(dialogMessage, name),
+                MessageFormat.format(Messages.ImportTracePackageWizardPage_TraceAlreadyExists, name),
                 MessageDialog.QUESTION, new String[] {
                         IDialogConstants.NO_TO_ALL_LABEL,
                         IDialogConstants.NO_LABEL,
                         IDialogConstants.YES_TO_ALL_LABEL,
-                        IDialogConstants.YES_LABEL},
+                        IDialogConstants.YES_LABEL },
+                3) {
+            @Override
+            protected int getShellStyle() {
+                return super.getShellStyle() | SWT.SHEET;
+            }
+        };
+        return dialog.open();
+    }
+
+    private int promptForExperimentRename(TracePackageExperimentElement experimentElement) {
+        String dialogMessage = MessageFormat.format(Messages.ImportTracePackageWizardPage_ExperimentAlreadyExists, experimentElement.getImportName());
+        final MessageDialog dialog = new MessageDialog(getContainer().getShell(),
+                Messages.ImportTracePackageWizardPage_AlreadyExistsTitle,
+                null,
+                dialogMessage,
+                MessageDialog.QUESTION, new String[] {
+                        IDialogConstants.NO_LABEL,
+                        IDialogConstants.YES_LABEL },
+                3) {
+            @Override
+            protected int getShellStyle() {
+                return super.getShellStyle() | SWT.SHEET;
+            }
+        };
+        return dialog.open();
+    }
+
+    private int promptForExperimentOverwrite(Entry<TracePackageExperimentElement, List<TracePackageTraceElement>> experimentEntry, List<TracePackageExperimentElement> experimentToRename) {
+        List<TracePackageTraceElement> traceElements = experimentEntry.getValue();
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < traceElements.size(); i++) {
+            builder.append(traceElements.get(i).getImportName());
+            if (i < traceElements.size() - 1) {
+                builder.append(", "); //$NON-NLS-1$
+            }
+
+        }
+        String dialogMessage;
+        if (experimentToRename.contains(experimentEntry.getKey())) {
+            dialogMessage = MessageFormat.format(Messages.ImportTracePackageWizardPage_ExperimentAndTraceAlreadyExist, experimentEntry.getKey().getImportName(), builder.toString());
+        } else {
+            dialogMessage = MessageFormat.format(Messages.ImportTracePackageWizardPage_TraceFromExperimentAlreadyExist, experimentEntry.getKey().getImportName(), builder.toString());
+        }
+        final MessageDialog dialog = new MessageDialog(getContainer().getShell(),
+                Messages.ImportTracePackageWizardPage_AlreadyExistsTitle,
+                null,
+                dialogMessage,
+                MessageDialog.QUESTION, new String[] {
+                        IDialogConstants.NO_LABEL,
+                        IDialogConstants.YES_LABEL },
                 3) {
             @Override
             protected int getShellStyle() {

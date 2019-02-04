@@ -1,7 +1,7 @@
 proc10:1,80,6,null
-tid11:1,4,-2147483648,null,5,7,6,null,12,8,2,null,20,15,1,null,35,46,2,null
+tid11:1,4,-2147483648,null,5,7,6,null,12,8,2,null,20,15,1,null,35,5,2,null,40,5,3,open,45,36,2,null
 tid12:1,5,-2147483648,null,6,75,6,null
 proc20:1,9,-2147483648,null,10,10,6,null,20,10,2,null,30,40,1,null,70,10,2,null,80,1,5,null
-proc30:1,11,-2147483648,null,12,38,1,null,50,10,2,null,60,21,1,null
+proc30:1,11,-2147483648,null,12,38,1,null,50,5,2,null,55,5,3,exit,60,21,-2147483648,null
 tid21:1,24,-2147483648,null,25,5,5,null,30,20,2,null,50,10,5,null,60,10,2,null,70,10,1,null,80,1,2,null
 lttng-sessiond:1,34,-2147483648,null,35,46,1,null

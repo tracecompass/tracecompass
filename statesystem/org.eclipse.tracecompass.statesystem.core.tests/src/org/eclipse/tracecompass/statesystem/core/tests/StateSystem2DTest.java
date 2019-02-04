@@ -300,24 +300,41 @@ public class StateSystem2DTest {
     }
 
     /**
-     * Test Illegal time bounds exception
+     * Test the continuous 2D query method when start time > end time. Since
+     * this state system only has one node, it does not compare behavior between
+     * reverse and not reverse queries.
      *
+     * @throws AttributeNotFoundException
+     *             if the requested attribute simply did not exist in the
+     *             system.
      * @throws StateSystemDisposedException
-     *             ss was closed
+     *             If the query is sent after the state system has been disposed
      * @throws TimeRangeException
-     *             time was out of range
+     *             If the smallest time is before the state system start time.
      * @throws IndexOutOfBoundsException
-     *             queried an attribute that was out of bounds
+     *             If the smallest attribute is <0 or if the largest is >= to
+     *             the number of attributes.
      */
-    @Test(expected = IllegalArgumentException.class)
-    public void testIllegalBounds() throws IndexOutOfBoundsException, TimeRangeException, StateSystemDisposedException {
+    @Test
+    public void testReverse2DQuery() throws AttributeNotFoundException, IndexOutOfBoundsException, TimeRangeException, StateSystemDisposedException {
         ITmfStateSystem ss = fStateSystem;
         assertNotNull(ss);
+        long end = ss.getCurrentEndTime();
 
-        /* Test on a continuous query */
-        Iterable<@NonNull ITmfStateInterval> iterable = ss.query2D(Collections.emptyList(), 80L, 78L);
-        assertNotNull(iterable);
-        assertTrue(Iterables.isEmpty(iterable));
+        /* Make sure all and only the String intervals are returned */
+        int stringQuark = fStateSystem.getQuarkAbsolute(STRING_ATTRIBUTE);
+        Iterable<ITmfStateInterval> iterable = ss.query2D(Collections.singleton(stringQuark), end, START_TIME);
+        testContinuous(iterable, Collections.singleton(stringQuark), START_TIME, end, 5);
+
+        /* Make sure all and only the Integer intervals are returned */
+        int integerQuark = fStateSystem.getQuarkAbsolute(INTEGER_ATTRIBUTE);
+        iterable = ss.query2D(Collections.singleton(integerQuark), end, START_TIME);
+        testContinuous(iterable, Collections.singleton(integerQuark), START_TIME, end, 6);
+
+        /* Make sure all intervals are returned */
+        Collection<Integer> quarks = ImmutableList.of(stringQuark, integerQuark);
+        iterable = ss.query2D(quarks, end, START_TIME);
+        testContinuous(iterable, quarks, START_TIME, end, 11);
     }
 
 }

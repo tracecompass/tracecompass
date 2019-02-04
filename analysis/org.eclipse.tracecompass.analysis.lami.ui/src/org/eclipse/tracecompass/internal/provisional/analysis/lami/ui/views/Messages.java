@@ -25,6 +25,7 @@ public class Messages extends NLS {
 
     public static String LamiReportView_ActivateTableAction_ButtonName;
     public static String LamiReportView_ActivateTableAction_ButtonTooltip;
+    public static String LamiReportView_ActivateTableAction_ExportChart;
 
     public static String LamiReportView_ToggleAction_ButtonNamePrefix;
     public static String LamiReportView_ToggleAction_ButtonTooltip;

@@ -92,7 +92,7 @@ public class TmfStateValueTest {
 
         int quark = ss.getQuarkAbsolute("update", "0");
 
-        final int[] expectedStarts = { 1, 3, 5, 7, 7 };
+        final int[] expectedStarts = { 1, 3, 5, 7, 20 };
         ITmfStateValue[] expectedValues = { TmfStateValue.newValueString("GOOD"), TmfStateValue.nullValue(), TmfStateValue.newValueString("BAD"), TmfStateValue.nullValue() };
         XmlUtilsTest.verifyStateIntervals("testStateValueUpdate", ss, quark, expectedStarts, expectedValues);
 
@@ -117,7 +117,7 @@ public class TmfStateValueTest {
 
         int quark = ss.getQuarkAbsolute("modify", "0");
 
-        final int[] expectedStarts = { 1, 3, 5, 7, 7 };
+        final int[] expectedStarts = { 1, 3, 5, 7, 20 };
         ITmfStateValue[] expectedValues = { TmfStateValue.newValueString("UNKNOWN"), TmfStateValue.newValueString("GOOD"), TmfStateValue.newValueString("UNKNOWN"), TmfStateValue.newValueString("BAD") };
         XmlUtilsTest.verifyStateIntervals("testStateValueModify", ss, quark, expectedStarts, expectedValues);
 
@@ -144,8 +144,8 @@ public class TmfStateValueTest {
 
         int quark = ss.getQuarkAbsolute("stack");
 
-        final int[] expectedStarts = { 1, 2, 5, 7, 7 };
-        ITmfStateValue[] expectedValues = { TmfStateValue.newValueLong(1l), TmfStateValue.newValueLong(2l), TmfStateValue.newValueLong(5l), TmfStateValue.newValueLong(2l) };
+        final int[] expectedStarts = { 1, 2, 5, 7, 10, 20 };
+        ITmfStateValue[] expectedValues = { TmfStateValue.newValueLong(1l), TmfStateValue.newValueLong(2l), TmfStateValue.newValueLong(5l), TmfStateValue.newValueLong(2l), TmfStateValue.newValueLong(10l) };
         XmlUtilsTest.verifyStackStateIntervals("testStateValuePeek", ss, quark, expectedStarts, expectedValues);
     }
 
@@ -169,8 +169,8 @@ public class TmfStateValueTest {
 
         int quark = ss.getQuarkAbsolute("mapped");
 
-        final int[] expectedStarts = { 1, 3, 5, 7, 7 };
-        ITmfStateValue[] expectedValues = { TmfStateValue.newValueString("TRUE"), TmfStateValue.newValueString("FALSE"), TmfStateValue.newValueString("TRUE"), TmfStateValue.newValueString("FALSE") };
+        final int[] expectedStarts = { 1, 3, 5, 7, 10, 20, 20 };
+        ITmfStateValue[] expectedValues = { TmfStateValue.newValueString("TRUE"), TmfStateValue.newValueString("FALSE"), TmfStateValue.newValueString("TRUE"), TmfStateValue.newValueString("FALSE"), TmfStateValue.newValueString("TRUE"), TmfStateValue.newValueString("FALSE") };
         XmlUtilsTest.verifyStateIntervals("testMappingGroups", ss, quark, expectedStarts, expectedValues);
 
     }
@@ -193,7 +193,7 @@ public class TmfStateValueTest {
 
         int quark = ss.getQuarkAbsolute("hostID");
 
-        final int[] expectedStarts = { 1, 7 };
+        final int[] expectedStarts = { 1, 20 };
         ITmfStateValue[] expectedValues = { TmfStateValue.newValueString("testTrace4.xml") };
         XmlUtilsTest.verifyStateIntervals("testHostId", ss, quark, expectedStarts, expectedValues);
 
@@ -217,8 +217,8 @@ public class TmfStateValueTest {
 
         int quark = ss.getQuarkAbsolute("script");
 
-        final int[] expectedStarts = { 1, 3, 5, 7, 7 };
-        ITmfStateValue[] expectedValues = { TmfStateValue.newValueString("TRUE"), TmfStateValue.newValueString("FALSE"), TmfStateValue.newValueString("TRUE"), TmfStateValue.newValueString("FALSE") };
+        final int[] expectedStarts = { 1, 3, 5, 7, 10, 20, 20 };
+        ITmfStateValue[] expectedValues = { TmfStateValue.newValueString("TRUE"), TmfStateValue.newValueString("FALSE"), TmfStateValue.newValueString("TRUE"), TmfStateValue.newValueString("FALSE"), TmfStateValue.newValueString("TRUE"), TmfStateValue.newValueString("FALSE") };
         XmlUtilsTest.verifyStateIntervals("testStateValueScript", ss, quark, expectedStarts, expectedValues);
 
     }
@@ -241,8 +241,8 @@ public class TmfStateValueTest {
 
         int quark = ss.getQuarkAbsolute("future");
 
-        final int[] expectedStarts = { 1, 3, 5, 7, 7 };
-        ITmfStateValue[] expectedValues = { TmfStateValue.newValueInt(100), TmfStateValue.newValueInt(101), TmfStateValue.newValueInt(100), TmfStateValue.newValueInt(101) };
+        final int[] expectedStarts = { 1, 3, 5, 7, 10, 12, 20 };
+        ITmfStateValue[] expectedValues = { TmfStateValue.newValueInt(100), TmfStateValue.newValueInt(101), TmfStateValue.newValueInt(100), TmfStateValue.newValueInt(101), TmfStateValue.newValueInt(100), TmfStateValue.newValueInt(101) };
         XmlUtilsTest.verifyStateIntervals("testStateValueScript", ss, quark, expectedStarts, expectedValues);
 
     }

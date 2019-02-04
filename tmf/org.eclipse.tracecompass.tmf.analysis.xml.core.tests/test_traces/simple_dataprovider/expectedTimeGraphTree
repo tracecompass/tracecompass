@@ -1,0 +1,4 @@
+testTrace4.xml,1,20,null
+CPU,1,20,testTrace4.xml
+0,5,7,CPU
+1,10,20,CPU

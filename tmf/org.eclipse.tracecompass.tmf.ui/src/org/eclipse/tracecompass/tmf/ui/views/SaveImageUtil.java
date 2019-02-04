@@ -48,7 +48,7 @@ public final class SaveImageUtil {
             @Override
             public void run() {
                 IImageSave iImageSave = controlSupplier.get();
-                if(iImageSave == null) {
+                if (iImageSave == null) {
                     return;
                 }
                 FileDialog dialog = TmfFileDialogFactory.create(new Shell(), SWT.SAVE);
@@ -64,6 +64,15 @@ public final class SaveImageUtil {
                     int index = dialog.getFilterIndex();
                     iImageSave.saveImage(ret, filterTypes[index]);
                 }
+            }
+
+            @Override
+            public boolean isEnabled() {
+                IImageSave iImageSave = controlSupplier.get();
+                if (iImageSave == null) {
+                    return false;
+                }
+                return super.isEnabled();
             }
         };
         saveAction.setToolTipText(Messages.AbstractTimeGraphView_ExportImageToolTipText);

@@ -12,7 +12,11 @@ package org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -24,12 +28,10 @@ import org.eclipse.tracecompass.analysis.profiling.core.callstack.IFlameChartPro
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.SymbolAspect;
-import org.eclipse.tracecompass.internal.analysis.timing.core.Activator;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
@@ -72,15 +74,11 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
     // ------------------------------------------------------------------------
 
     /**
-     * Listeners. {@link ListenerList}s are typed since 4.6 (Neon), type these when
-     * support for 4.5 (Mars) is no longer required.
+     * Listeners. {@link ListenerList}s are typed since 4.6 (Neon), type these
+     * when support for 4.5 (Mars) is no longer required.
      */
     private final ListenerList fListeners = new ListenerList(ListenerList.IDENTITY);
 
-    /**
-     * The sub attributes of a certain thread
-     */
-    private List<Integer> fCurrentQuarks = Collections.emptyList();
     /**
      * The List of thread nodes. Each thread has a virtual node having the root
      * function as children
@@ -188,137 +186,393 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
     @VisibleForTesting
     protected boolean iterateOverStateSystem(ITmfStateSystem ss, String[] threadsPattern, String[] processesPattern, IProgressMonitor monitor) {
         List<Integer> processQuarks = ss.getQuarks(processesPattern);
+        Map<ThreadNode, List<Integer>> mainAttribs = new HashMap<>();
         for (int processQuark : processQuarks) {
             int processId = getProcessId(ss, processQuark, ss.getCurrentEndTime());
             for (int threadQuark : ss.getQuarks(processQuark, threadsPattern)) {
-                if (!iterateOverQuark(ss, processId, threadQuark, monitor)) {
-                    return false;
+                int callStackQuark = ss.optQuarkRelative(threadQuark, CallStackAnalysis.CALL_STACK);
+                if (callStackQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+                    continue;
                 }
+                List<Integer> subAttributes = ss.getSubAttributes(callStackQuark, false);
+                if (subAttributes.isEmpty()) {
+                    continue;
+                }
+                String threadName = ss.getAttributeName(threadQuark);
+                long threadId = getProcessId(ss, threadQuark, ss.getStartTime());
+                AbstractCalledFunction initSegment = CalledFunctionFactory.create(0, 0, -1, threadName, processId, null);
+                ThreadNode init = new ThreadNode(initSegment, 0, threadId);
+                fThreadNodes.add(init);
+                mainAttribs.put(init, subAttributes);
+
             }
         }
+        iterateOverCallStack2D(ss, mainAttribs, monitor);
         return true;
     }
 
-    /**
-     * Iterate over functions with the same quark, search for their callees then add
-     * them to the segment store
-     *
-     * @param stateSystem
-     *            The state system
-     * @param processId
-     *            The process ID of the traced application
-     * @param threadQuark
-     *            The thread quark
-     * @param subAttributePath
-     *            sub-Attributes path
-     * @param monitor
-     *            The monitor
-     * @return true if completed successfully
-     */
-    private boolean iterateOverQuark(ITmfStateSystem stateSystem, int processId, int threadQuark, IProgressMonitor monitor) {
-        String threadName = stateSystem.getAttributeName(threadQuark);
-        long threadId = getProcessId(stateSystem, threadQuark, stateSystem.getStartTime());
+    /** A class that represents a time range for an interval or function */
+    private static class CallgraphRange {
+        private final long fStart;
+        private final long fEnd;
+
+        public CallgraphRange(long start, long end) {
+            fStart = start;
+            fEnd = end;
+        }
+
+        /* Is there a common range with the other range */
+        public boolean overlap(CallgraphRange other) {
+            if (fStart <= other.fEnd && fEnd >= other.fStart) {
+                return true;
+            }
+            return false;
+        }
+
+        /* Do 2 time ranges overlap or are they contiguous */
+        public boolean overlapOrContiguous(CallgraphRange other) {
+            // Do these overlap
+            if (overlap(other)) {
+                return true;
+            }
+            // Are they contiguous
+            if (fStart - 1 == other.fEnd || fEnd + 1 == other.fStart) {
+                return true;
+            }
+            return false;
+        }
+
+        /* Is the other range fully included in this range */
+        public boolean includes(CallgraphRange other) {
+            return (fStart <= other.fStart && fEnd >= other.fEnd);
+        }
+
+        /* Is the interval fully included in this range */
+        public boolean includes(ITmfStateInterval interval) {
+            return (fStart <= interval.getStartTime() && fEnd >= interval.getEndTime());
+        }
+
+        /*
+         * Get the callgraph range that represents the intersection with the
+         * other range
+         */
+        public @Nullable CallgraphRange getIntersection(CallgraphRange other) {
+            if (fStart > other.fEnd || fEnd < other.fStart) {
+                return null;
+            }
+            return new CallgraphRange(Math.max(fStart, other.fStart), Math.min(fEnd, other.fEnd));
+        }
+
+        /*
+         * Return a range that is the union of this and the other range. It
+         * supposes that both ranges overlap or are contiguous
+         */
+        public CallgraphRange getUnion(CallgraphRange other) {
+            return new CallgraphRange(Math.min(fStart, other.fStart), Math.max(fEnd, other.fEnd));
+        }
+
+    }
+
+    /** A class that associates a range with a function */
+    private static class FunctionCall {
+        CallgraphRange fRange;
+        AbstractCalledFunction fFunc;
+
+        public FunctionCall(CallgraphRange range, AbstractCalledFunction function) {
+            fRange = range;
+            fFunc = function;
+        }
+    }
+
+    /** Represent a callgraph level in the algorithm */
+    private static class CallGraphLevel {
+
+        private final ThreadNode fThreadNode;
+        private final List<CallgraphRange> fRanges = new ArrayList<>();
+        private final Map<AggregatedCalledFunction, FunctionCall> fAggregated = new HashMap<>();
+        private final List<ITmfStateInterval> fOrphanedIntervals = new ArrayList<>();
+        private final @Nullable CallGraphLevel fParent;
+        private final int fDepth;
+        private @Nullable CallGraphLevel fChild = null;
+
+        public CallGraphLevel(ThreadNode threadNode, int depth, @Nullable CallGraphLevel parent) {
+            fThreadNode = threadNode;
+            fDepth = depth;
+            fParent = parent;
+        }
+
+        public void addInterval(ITmfStateInterval interval) {
+            fOrphanedIntervals.add(interval);
+        }
+
+        public void setChild(CallGraphLevel childLvl) {
+            fChild = childLvl;
+        }
+
+        public void setCovered(CallgraphRange newRange) {
+            // Try to get the biggest range including the new one from all the
+            // others
+            List<CallgraphRange> toRemove = new ArrayList<>();
+            CallgraphRange addRange = newRange;
+            for (CallgraphRange range : fRanges) {
+                if (newRange.overlapOrContiguous(range)) {
+                    addRange = addRange.getUnion(range);
+                    toRemove.add(range);
+                }
+            }
+            for (CallgraphRange range : toRemove) {
+                fRanges.remove(range);
+            }
+            fRanges.add(addRange);
+        }
+
+        private @Nullable AggregatedCalledFunction findAggregated(CallgraphRange range) {
+            for (Entry<AggregatedCalledFunction, FunctionCall> entry : fAggregated.entrySet()) {
+                if (entry.getValue().fRange.includes(range)) {
+                    return entry.getKey();
+                }
+            }
+            return null;
+        }
+
+        /* Find an aggregated call in the parent that spans this range */
+        public @Nullable AggregatedCalledFunction findParentAggregated(CallgraphRange range) {
+            CallGraphLevel parent = fParent;
+            if (parent == null) {
+                return fThreadNode;
+            }
+            return parent.findAggregated(range);
+        }
+
+        private boolean isRangeCovered(CallgraphRange range) {
+            for (CallgraphRange coveredRange : fRanges) {
+                if (coveredRange.includes(range)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /*
+         * Recursively adopt all children intervals. Return whether the range is
+         * fully covered or if there is still missing information
+         */
+        public boolean recursiveCoverChildren(CallgraphRange range, AbstractCalledFunction function, AggregatedCalledFunction aggregated) {
+            CallGraphLevel child = fChild;
+            // Last level, coverage complete
+            if (child == null) {
+                return true;
+            }
+            // Set child's already covered ranges (nulls) as covered
+            for (CallgraphRange childRange : child.fRanges) {
+                CallgraphRange covered = range.getIntersection(childRange);
+                if (covered != null) {
+                    setCovered(covered);
+                }
+            }
+            List<ITmfStateInterval> toRemove = new ArrayList<>();
+            // Look if any orphaned interval in the child is within range
+            for (ITmfStateInterval interval : child.fOrphanedIntervals) {
+                if (!range.includes(interval)) {
+                    continue;
+                }
+                /*
+                 * The interval is within range, process it
+                 *
+                 * Create a function and aggregated call site for it
+                 */
+                toRemove.add(interval);
+                CallgraphRange childRange = new CallgraphRange(interval.getStartTime(), interval.getEndTime());
+                AbstractCalledFunction childFunc = CalledFunctionFactory.create(childRange.fStart, childRange.fEnd + 1, fDepth + 1, Objects.requireNonNull(interval.getValue()), fThreadNode.getProcessId(), function);
+                AggregatedCalledFunction childAgg = new AggregatedCalledFunction(childFunc, aggregated);
+
+                /*
+                 * Recursively try to adopt intervals in the child
+                 *
+                 * Is the child fully covered ?
+                 */
+                if (child.recursiveCoverChildren(childRange, childFunc, childAgg)) {
+                    /*
+                     * Yes, add the child to the current aggregated call and set
+                     * this range as covered in both child and current level
+                     */
+                    aggregated.addChild(childFunc, childAgg);
+                    child.setCovered(childRange);
+                    setCovered(childRange);
+                } else {
+                    /* No, save the new aggregated call in the child */
+                    child.fAggregated.put(childAgg, new FunctionCall(childRange, childFunc));
+                }
+            }
+            // Remove orphaned intervals that found a parent
+            child.fOrphanedIntervals.removeAll(toRemove);
+            return isRangeCovered(range);
+        }
+
+        public void tryToCompleteParentCoverage(CallgraphRange range) {
+            CallGraphLevel parent = fParent;
+            if (parent == null) {
+                return;
+            }
+            parent.tryToCompleteCoverage(range, this);
+        }
+
+        private void tryToCompleteCoverage(CallgraphRange range, CallGraphLevel child) {
+            List<AggregatedCalledFunction> toRemove = new ArrayList<>();
+            /*
+             * Look at all the aggregated function to see those that overlap the
+             * current range, there could be many in case the range represents a
+             * null interval
+             */
+            for (Entry<AggregatedCalledFunction, FunctionCall> entry : fAggregated.entrySet()) {
+                CallgraphRange parentRange = entry.getValue().fRange;
+                if (parentRange.overlap(range)) {
+                    /*
+                     * This function overlaps the range, maybe the child
+                     * coverage is complete now
+                     */
+                    if (child.isRangeCovered(parentRange)) {
+                        /*
+                         * Function range fully covered in the child, add it to
+                         * its parent now and try to complete the parent
+                         */
+                        toRemove.add(entry.getKey());
+                        AggregatedCalledFunction parent = findParentAggregated(parentRange);
+                        if (parent == null) {
+                            // The parent was already covered, probably because
+                            // there were null values above, just ignore
+                            continue;
+                        }
+                        parent.addChild(entry.getValue().fFunc, entry.getKey());
+                        setCovered(parentRange);
+                        tryToCompleteParentCoverage(parentRange);
+                    }
+                }
+            }
+            for (AggregatedCalledFunction agg : toRemove) {
+                fAggregated.remove(agg);
+            }
+        }
+
+        public @Nullable FunctionCall getParentData(AggregatedCalledFunction parentCall) {
+            CallGraphLevel parent = fParent;
+            if (parent == null) {
+                return null;
+            }
+            return parent.fAggregated.get(parentCall);
+        }
+
+        public int getDepth() {
+            return fDepth;
+        }
+
+        public int getProcessId() {
+            return fThreadNode.getProcessId();
+        }
+
+    }
+
+    private static boolean iterateOverCallStack2D(ITmfStateSystem ss, Map<ThreadNode, List<Integer>> parentAttribs, IProgressMonitor monitor) {
         try {
-            long curTime = stateSystem.getStartTime();
-            long limit = stateSystem.getCurrentEndTime();
-            AbstractCalledFunction initSegment = CalledFunctionFactory.create(0, 0, -1, threadName, processId, null);
-            ThreadNode init = new ThreadNode(initSegment, 0, threadId);
-            while (curTime < limit) {
+            long start = ss.getStartTime();
+            long end = ss.getCurrentEndTime();
+
+            Map<Integer, CallGraphLevel> attribToLevel = new HashMap<>();
+            List<Integer> attributes = new ArrayList<>();
+
+            // Create the levels for all the thread nodes and attributes
+            for (Entry<ThreadNode, List<Integer>> entry : parentAttribs.entrySet()) {
+                ThreadNode threadNode = entry.getKey();
+                List<Integer> subAttributes = entry.getValue();
+                attributes.addAll(subAttributes);
+                CallGraphLevel prevLevel = null;
+                for (int i = 0; i < subAttributes.size(); i++) {
+                    CallGraphLevel level = new CallGraphLevel(threadNode, i, prevLevel);
+                    if (prevLevel != null) {
+                        prevLevel.setChild(level);
+                    }
+                    prevLevel = level;
+                    attribToLevel.put(subAttributes.get(i), level);
+                }
+            }
+
+            /*
+             * Do a 2D query, starting from the end of the state system, the
+             * intervals ending last (ie typically the ones of lower depth) will
+             * come first, though they are not sorted by end time per se, but as
+             * a general trend, the callstack will be parsed from the end.
+             */
+            for (ITmfStateInterval interval : ss.query2D(attributes, end, start)) {
                 if (monitor.isCanceled()) {
                     return false;
                 }
-                int callStackQuark = stateSystem.optQuarkRelative(threadQuark, CallStackAnalysis.CALL_STACK);
-                if (callStackQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
-                    return false;
-                }
-                fCurrentQuarks = stateSystem.getSubAttributes(callStackQuark, false);
-                if (fCurrentQuarks.isEmpty()) {
-                    return false;
-                }
-                final int depth = 0;
-                int quarkParent = fCurrentQuarks.get(depth);
-                ITmfStateInterval interval = stateSystem.querySingleState(curTime, quarkParent);
-                Object stateValue = interval.getValue();
-
-                if (stateValue != null) {
-                    long intervalStart = interval.getStartTime();
-                    long intervalEnd = interval.getEndTime();
-                    // Create the segment for the first call event.
-                    AbstractCalledFunction rootFunction = CalledFunctionFactory.create(intervalStart, intervalEnd + 1, depth, stateValue, processId, null);
-                    AggregatedCalledFunction firstNode = new AggregatedCalledFunction(rootFunction, fCurrentQuarks.size());
-                    if (!findChildren(rootFunction, depth, stateSystem, fCurrentQuarks.size() + fCurrentQuarks.get(depth), firstNode, processId, monitor)) {
-                        return false;
-                    }
-                    init.addChild(rootFunction, firstNode);
+                CallGraphLevel level = attribToLevel.get(interval.getAttribute());
+                if (level == null) {
+                    throw new NullPointerException("The level should not be null, we created it just before!"); //$NON-NLS-1$
                 }
 
-                curTime = interval.getEndTime() + 1;
-            }
-            fThreadNodes.add(init);
-        } catch (StateSystemDisposedException e) {
-            return false;
-        } catch (TimeRangeException e) {
-            Activator.getInstance().logError(Messages.QueringStateSystemError, e);
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Find the functions called by a parent function in a call stack then add
-     * segments for each child, updating the self times of each node
-     * accordingly.
-     *
-     * @param parentFunction
-     *            The segment of the stack call event(the parent) callStackQuark
-     * @param depth
-     *            The depth of the parent function
-     * @param ss
-     *            The quark of the segment parent ss The actual state system
-     * @param maxQuark
-     *            The last quark in the state system
-     * @param parent
-     *            A node in the aggregation tree
-     * @param processId
-     *            The process ID of the traced application
-     * @param monitor
-     *            The progress monitor The progress monitor TODO: if stack size
-     *            is an issue, convert to a stack instead of recursive function
-     */
-    private boolean findChildren(AbstractCalledFunction parentFunction, int depth, ITmfStateSystem ss,
-            int maxQuark, AggregatedCalledFunction parent, int processId, IProgressMonitor monitor) {
-        long curTime = parentFunction.getStart();
-        long limit = parentFunction.getEnd();
-        ITmfStateInterval interval = null;
-        while (curTime < limit) {
-            if (monitor.isCanceled()) {
-                return false;
-            }
-            try {
-                if (depth + 1 < fCurrentQuarks.size()) {
-                    interval = ss.querySingleState(curTime, fCurrentQuarks.get(depth + 1));
-                } else {
-                    return true;
-                }
-            } catch (StateSystemDisposedException e) {
-                Activator.getInstance().logError(Messages.QueringStateSystemError, e);
-                return false;
-            }
-            Object stateValue = interval.getValue();
-            if (stateValue != null) {
                 long intervalStart = interval.getStartTime();
                 long intervalEnd = interval.getEndTime();
-                if (intervalStart < parentFunction.getStart() || intervalEnd > limit) {
-                    return true;
-                }
-                AbstractCalledFunction function = CalledFunctionFactory.create(intervalStart, intervalEnd + 1, parentFunction.getDepth() + 1, stateValue, processId, parentFunction);
-                AggregatedCalledFunction childNode = new AggregatedCalledFunction(function, parent);
-                // Search for the children with the next quark.
-                findChildren(function, depth + 1, ss, maxQuark, childNode, processId, monitor);
-                parent.addChild(function, childNode);
+                CallgraphRange range = new CallgraphRange(intervalStart, intervalEnd);
+                Object value = interval.getValue();
+                /* Is the interval null ? */
+                if (value == null) {
+                    /*
+                     * Yes, there is no function to process at this level so we
+                     * set this range as covered
+                     */
+                    level.setCovered(range);
 
+                } else {
+                    /* No, this interval represents a called function */
+                    /*
+                     * Is there a parent aggregated site already for this
+                     * function ?
+                     */
+                    AggregatedCalledFunction parent = level.findParentAggregated(range);
+                    if (parent == null) {
+                        /* No, keep this interval for later and continue */
+                        level.addInterval(interval);
+                        continue;
+                    }
+                    /*
+                     * Yes, create the function and aggregated callsite from
+                     * this interval
+                     */
+                    FunctionCall parentData = level.getParentData(parent);
+                    AbstractCalledFunction function = CalledFunctionFactory.create(intervalStart, intervalEnd + 1, level.getDepth(), value, level.getProcessId(), (parentData == null) ? null : parentData.fFunc);
+                    AggregatedCalledFunction aggregated = new AggregatedCalledFunction(function, parent);
+                    /*
+                     * See if there are any children intervals to process and
+                     * add to this aggregated site
+                     */
+                    /*
+                     * Do we have all children information for this interval's
+                     * function ?
+                     */
+                    if (!level.recursiveCoverChildren(range, function, aggregated)) {
+                        /*
+                         * No, save this function to be completed later and
+                         * continue
+                         */
+                        level.fAggregated.put(aggregated, new FunctionCall(range, function));
+                        continue;
+                    }
+                    /*
+                     * Yes, add the current site to the parent and set this
+                     * range as covered for the current level
+                     */
+                    parent.addChild(function, aggregated);
+                    level.setCovered(range);
+                }
+
+                /*
+                 * See if we can complete the parent(s) with this new information
+                 */
+                level.tryToCompleteParentCoverage(range);
             }
-            curTime = interval.getEndTime() + 1;
+        } catch (StateSystemDisposedException e) {
+            return false;
         }
         return true;
     }

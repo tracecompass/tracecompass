@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree;
 
 import java.util.Collection;
+import java.util.Deque;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.IntegerRangeCondition;
@@ -125,7 +126,7 @@ public abstract class ParentNode extends HTNode {
      * @param queue
      *            queue of sequence numbers to add the relevant nodes too
      */
-    public abstract void queueNextChildren2D(IntegerRangeCondition quarks, TimeRangeCondition subTimes, Collection<Integer> queue);
+    public abstract void queueNextChildren2D(IntegerRangeCondition quarks, TimeRangeCondition subTimes, Deque<Integer> queue, boolean reverse);
 
     /**
      * Get the end time for this child, the last child's end time will be

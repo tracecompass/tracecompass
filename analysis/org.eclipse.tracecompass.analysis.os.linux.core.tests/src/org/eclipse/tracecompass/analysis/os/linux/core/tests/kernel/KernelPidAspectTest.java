@@ -116,11 +116,15 @@ public class KernelPidAspectTest {
         expected.add(20);
         expected.add(20);
         expected.add(null);
+        expected.add(10);
+        expected.add(10);
         expected.add(20);
         expected.add(30);
+        expected.add(30);
+        expected.add(30);
         expected.add(20);
-        List<Integer> pids = new ArrayList<>();
 
+        List<Integer> pids = new ArrayList<>();
         for (int i = 0; i < expected.size(); i++) {
             pids.add(resolveNextEvent(context));
         }

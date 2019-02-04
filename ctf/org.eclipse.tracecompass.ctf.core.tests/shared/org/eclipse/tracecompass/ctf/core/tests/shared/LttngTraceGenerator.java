@@ -172,7 +172,6 @@ public class LttngTraceGenerator {
             "ST: The game"
     };
 
-
     private static final String TRACES_DIRECTORY = "traces";
     private static final String TRACE_NAME = "synthetic-trace";
 
@@ -222,7 +221,7 @@ public class LttngTraceGenerator {
      */
     public static void generateLttngTrace(File file) {
         final int cpus = 25;
-        LttngTraceGenerator gt = new LttngTraceGenerator(2l * Integer.MAX_VALUE - 100, 500000, cpus);
+        LttngTraceGenerator gt = new LttngTraceGenerator(Integer.MAX_VALUE / 8L, 250000 / 8L, cpus);
         gt.writeTrace(file);
     }
 
@@ -392,7 +391,8 @@ public class LttngTraceGenerator {
 
                 @Override
                 public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    // If a file failed to delete, it's more useful to throw this instead
+                    // If a file failed to delete, it's more useful to throw
+                    // this instead
                     if (exc != null) {
                         throw exc;
                     }
@@ -421,15 +421,14 @@ public class LttngTraceGenerator {
     }
 
     private class EventWriter {
-        public static final int SIZE =
-                4 +  // timestamp
+        public static final int SIZE = 4 + // timestamp
                 16 + // prev_comm
-                4 +  // prev_tid
-                4 +  // prev_prio
-                4 +  // prev_state
+                4 + // prev_tid
+                4 + // prev_prio
+                4 + // prev_state
                 16 + // current_comm
-                4 +  // next_tid
-                4;   // next_prio
+                4 + // next_tid
+                4; // next_prio
         private final ByteBuffer data;
 
         public EventWriter(ByteBuffer bb) {
@@ -498,7 +497,7 @@ public class LttngTraceGenerator {
             data.putLong(tsEnd);
 
             // content_size 8
-            data.putLong((eventCount * EventWriter.SIZE + HEADER_SIZE)* 8);
+            data.putLong((eventCount * EventWriter.SIZE + HEADER_SIZE) * 8);
 
             // packet_size 8
             data.putLong((SIZE) * 8);
@@ -512,7 +511,5 @@ public class LttngTraceGenerator {
         }
 
     }
-
-
 
 }

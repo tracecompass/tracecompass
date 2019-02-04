@@ -14,9 +14,11 @@
 package org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.classic;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -280,16 +282,30 @@ public final class CoreNode extends ParentNode {
     }
 
     @Override
-    public void queueNextChildren2D(IntegerRangeCondition quarks, TimeRangeCondition times, Collection<Integer> queue) {
+    public void queueNextChildren2D(IntegerRangeCondition quarks, TimeRangeCondition times, Deque<Integer> queue, boolean reverse) {
         rwl.readLock().lock();
         try {
             /* Selectively search children */
+            /*
+             * Add all the nodes at the beginning of the queue for depth-first
+             * search, the 'reverse' will specify which to insert first
+             */
+            Deque<Integer> toAdd = new ArrayDeque<>();
             for (int child = 0; child < fNbChildren; child++) {
                 if (times.intersects(fChildStart[child], fChildEnd[child])
                         && quarks.intersects(fChildMin[child], fChildMax[child])) {
                     int potentialNextSeqNb = fChildren[child];
-                    queue.add(potentialNextSeqNb);
+                    // Add them in the add list in the reverse order, so the
+                    // order will be right in the final queue
+                    if (!reverse) {
+                        toAdd.addFirst(potentialNextSeqNb);
+                    } else {
+                        toAdd.add(potentialNextSeqNb);
+                    }
                 }
+            }
+            for (Integer seqNum : toAdd) {
+                queue.addFirst(seqNum);
             }
         } finally {
             rwl.readLock().unlock();

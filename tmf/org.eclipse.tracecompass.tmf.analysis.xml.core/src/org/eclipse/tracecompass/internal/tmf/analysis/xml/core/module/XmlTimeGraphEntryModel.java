@@ -15,10 +15,9 @@ import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readonly.TmfXmlReadOnlyModelFactory;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.AnalysisCompilationData;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateSystemPathCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenStateSystemPath;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -56,6 +55,7 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
         private @NonNull String fXmlId = EMPTY_STRING;
         private @NonNull String fXmlParentId = EMPTY_STRING;
         private final @NonNull ITmfStateSystem fSs;
+        private @NonNull AnalysisCompilationData fCompilationData;
 
         /**
          * Constructor
@@ -76,9 +76,11 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
          *            {@link ITmfStateSystem} from which this entry originates
          * @param baseQuark
          *            base quark for this entry in the XML structure
+         * @param data
+         *            The compilation data that comes with this entry
          */
         public Builder(long id, long parentId, @NonNull String name, long entryStart, long entryEnd,
-                @Nullable Element entryElement, @NonNull ITmfStateSystem ss, int baseQuark) {
+                @Nullable Element entryElement, @NonNull ITmfStateSystem ss, int baseQuark, @NonNull AnalysisCompilationData data) {
             fId = id;
             fParentId = parentId;
             fName = name;
@@ -86,6 +88,7 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
             fEnd = entryEnd;
             fElement = entryElement;
             fSs = ss;
+            fCompilationData = data;
 
             /* Get the parent if specified */
             if (entryElement != null) {
@@ -116,10 +119,13 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
         /** Return the state value of the first interval with a non-null value
          * @param baseQuark */
         private @NonNull String getFirstValue(int baseQuark, @NonNull Element stateAttribute) {
-            ITmfXmlModelFactory factory = TmfXmlReadOnlyModelFactory.getInstance();
-            ITmfXmlStateAttribute display = factory.createStateAttribute(stateAttribute, this);
-            int quark = display.getAttributeQuark(baseQuark, null);
-            if (quark != IXmlStateSystemContainer.ERROR_QUARK) {
+            TmfXmlStateSystemPathCu valueCu = TmfXmlStateSystemPathCu.compile(fCompilationData, Collections.singletonList(stateAttribute));
+            if (valueCu == null) {
+                return EMPTY_STRING;
+            }
+            DataDrivenStateSystemPath valuePath = valueCu.generate();
+            int quark = valuePath.getQuark(baseQuark, this);
+            if (quark >= 0) {
                 ITmfStateInterval firstInterval = StateSystemUtils.queryUntilNonNullValue(fSs, quark, getStartTime(), getEndTime());
                 if (firstInterval != null) {
                     return String.valueOf(firstInterval.getValue());
@@ -161,11 +167,6 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
         @Override
         public String getAttributeValue(String name) {
             return name;
-        }
-
-        @Override
-        public Iterable<TmfXmlLocation> getLocations() {
-            return Collections.emptySet();
         }
 
         /**
@@ -213,6 +214,11 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
         }
 
         @Override
+        public @NonNull AnalysisCompilationData getAnalysisCompilationData() {
+            return fCompilationData;
+        }
+
+        @Override
         public String toString() {
             return fName + " - " + fXmlId + " - " + fXmlParentId + " - " + fId + " - " + fParentId; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         }
@@ -240,7 +246,7 @@ public class XmlTimeGraphEntryModel extends TimeGraphEntryModel {
      *            entry end time
      * @return new instance
      */
-    public static XmlTimeGraphEntryModel create(long id, long parentId, String name, long start, long end) {
+    public static XmlTimeGraphEntryModel create(long id, long parentId, @NonNull String name, long start, long end) {
         return new XmlTimeGraphEntryModel(id, parentId, name, start, end,
                 null, name, EMPTY_STRING, false);
     }

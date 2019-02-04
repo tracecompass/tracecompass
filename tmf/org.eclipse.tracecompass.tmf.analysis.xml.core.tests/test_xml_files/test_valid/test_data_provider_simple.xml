@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ***************************************************************************
+* Copyright (c) 2019 École Polytechnique de Montréal
+*
+* All rights reserved. This program and the accompanying materials are
+* made available under the terms of the Eclipse Public License v1.0 which
+* accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*************************************************************************** -->
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+
+    <timeGraphView id="xml.core.tests.simple.pattern.timegraph">
+        <head>
+            <analysis id="xml.core.tests.simple.pattern" />
+            <label value="XML Simple Time Graph" />
+        </head>
+
+        <!-- Control Flow View -->
+        <entry path="CPU">
+            <display type="self" />
+            <entry path="*">
+                <display type="self" />
+            </entry>
+        </entry>
+    </timeGraphView>
+
+     <timeGraphView id="xml.core.tests.simple.pattern.timegraph2">
+        <head>
+            <analysis id="xml.core.tests.simple.pattern" />
+            <label value="XML Simple Time Graph 2" />
+        </head>
+
+        <!-- Control Flow View -->
+        <entry path="CPU">
+            <entry path="*">
+                <display type="self" />
+            </entry>
+        </entry>
+    </timeGraphView>
+
+    <xyView id="xml.core.tests.simple.pattern.xy">
+        <head>
+            <analysis id="xml.core.tests.simple.pattern" />
+            <label value="XML Simple XY chart" />
+        </head>
+
+        <entry path="CPU/*">
+            <display type="self" />
+            <name type="self" />
+        </entry>
+    </xyView>
+</tmfxml>

@@ -57,12 +57,16 @@ public class TmfFilterOrNode extends TmfFilterTreeNode {
 
     @Override
     public boolean matches(ITmfEvent event) {
+        // Empty children
+        if (getChildren().length == 0) {
+            return false ^ fNot;
+        }
         for (ITmfFilterTreeNode node : getChildren()) {
             if (node.matches(event)) {
                 return true ^ fNot;
             }
         }
-        return false & fNot;
+        return false ^ fNot;
     }
 
     @Override

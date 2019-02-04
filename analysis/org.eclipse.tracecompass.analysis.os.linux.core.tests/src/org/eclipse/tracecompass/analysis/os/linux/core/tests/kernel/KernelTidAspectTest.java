@@ -112,7 +112,11 @@ public class KernelTidAspectTest {
         expected.add(20);
         expected.add(20);
         expected.add(null);
+        expected.add(11);
+        expected.add(11);
         expected.add(21);
+        expected.add(30);
+        expected.add(30);
         expected.add(30);
         expected.add(21);
         List<Integer> tids = new ArrayList<>();

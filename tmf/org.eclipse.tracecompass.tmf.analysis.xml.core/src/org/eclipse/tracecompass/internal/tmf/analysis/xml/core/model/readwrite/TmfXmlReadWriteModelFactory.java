@@ -12,26 +12,21 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readwrite;
 
-import java.util.List;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlConditionCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateChangeCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateValueCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenAction;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateAttribute;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlStateValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlAction;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlCondition;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlFsm;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlMapEntry;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternEventHandler;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternSegmentBuilder;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlState;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlStateTransition;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlTimestampCondition;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlTransitionValidator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.w3c.dom.Element;
 
@@ -59,23 +54,21 @@ public class TmfXmlReadWriteModelFactory implements ITmfXmlModelFactory {
     }
 
     @Override
-    public ITmfXmlStateAttribute createStateAttribute(Element attribute, IXmlStateSystemContainer container) {
-        return new TmfXmlReadWriteStateAttribute(this, attribute, container);
+    public DataDrivenValue createStateValue(Element node, IXmlStateSystemContainer container) {
+        TmfXmlStateValueCu compile = TmfXmlStateValueCu.compileValue(container.getAnalysisCompilationData(), node);
+        if (compile == null)  {
+            throw new NullPointerException("State value did not compile correctly"); //$NON-NLS-1$
+        }
+        return compile.generate();
     }
 
     @Override
-    public ITmfXmlStateValue createStateValue(Element node, IXmlStateSystemContainer container, List<ITmfXmlStateAttribute> attributes) {
-        return new TmfXmlReadWriteStateValue(this, node, container, attributes);
-    }
-
-    @Override
-    public ITmfXmlStateValue createStateValue(Element node, IXmlStateSystemContainer container, String eventField) {
-        return new TmfXmlReadWriteStateValue(this, node, container, eventField);
-    }
-
-    @Override
-    public TmfXmlCondition createCondition(Element node, IXmlStateSystemContainer container) {
-        return TmfXmlCondition.create(this, node, container);
+    public DataDrivenCondition createCondition(Element node, IXmlStateSystemContainer container) {
+        TmfXmlConditionCu compile = TmfXmlConditionCu.compile(container.getAnalysisCompilationData(), node);
+        if (compile == null)  {
+            throw new NullPointerException("Condition did not compile correctly"); //$NON-NLS-1$
+        }
+        return compile.generate();
     }
 
     @Override
@@ -88,18 +81,17 @@ public class TmfXmlReadWriteModelFactory implements ITmfXmlModelFactory {
     }
 
     @Override
-    public TmfXmlLocation createLocation(Element node, IXmlStateSystemContainer container) {
-        return new TmfXmlLocation(this, node, container);
-    }
-
-    @Override
     public TmfXmlPatternEventHandler createPatternEventHandler(Element node, IXmlStateSystemContainer container) {
         return new TmfXmlPatternEventHandler(this, node, container);
     }
 
     @Override
-    public TmfXmlTransitionValidator createTransitionValidator(Element node, IXmlStateSystemContainer container) {
-        return new TmfXmlTransitionValidator(this, node, container);
+    public String createTransitionValidator(Element node, IXmlStateSystemContainer container) {
+        String id = TmfXmlConditionCu.compileNamedCondition(container.getAnalysisCompilationData(), node);
+        if (id == null)  {
+            throw new NullPointerException("Named ondition did not compile correctly"); //$NON-NLS-1$
+        }
+        return id;
     }
 
     @Override
@@ -123,17 +115,8 @@ public class TmfXmlReadWriteModelFactory implements ITmfXmlModelFactory {
     }
 
     @Override
-    public TmfXmlTimestampCondition createTimestampsCondition(Element node, IXmlStateSystemContainer container) {
-        return new TmfXmlTimestampCondition(this, node, container);
-    }
-
-    @Override
     public TmfXmlPatternSegmentBuilder createPatternSegmentBuilder(Element node, IXmlStateSystemContainer container) {
         return new TmfXmlPatternSegmentBuilder(this, node, container);
     }
 
-    @Override
-    public @NonNull TmfXmlMapEntry createMapEntry(@NonNull Element node, @NonNull IXmlStateSystemContainer container) {
-        return new TmfXmlMapEntry(this, node, container);
-    }
 }

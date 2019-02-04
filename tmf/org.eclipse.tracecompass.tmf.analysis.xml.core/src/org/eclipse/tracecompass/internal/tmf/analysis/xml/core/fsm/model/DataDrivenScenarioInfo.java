@@ -14,7 +14,10 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioHistoryBuilder.ScenarioStatusType;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
 
 /**
@@ -28,6 +31,9 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
  * @author Jean-Christian Kouame
  */
 public class DataDrivenScenarioInfo {
+
+    /** The string for start time */
+    private static final String START_TIME = "startTime"; //$NON-NLS-1$
 
     /**
      * A temporary dummy scenario
@@ -147,6 +153,33 @@ public class DataDrivenScenarioInfo {
         fPoolAttributes.entrySet().forEach(e -> {
             NonNullUtils.checkNotNull(e.getKey()).recycle(e.getValue(), ts);
         });
+    }
+
+    /**
+     * Get the start time of a state
+     *
+     * FIXME: For the first iteration (no data driven patterns yet), this method
+     * is here, but may move to a class responsible of scenario history, like
+     * current code
+     *
+     * @param container
+     *            The analysis data container
+     * @param state
+     *            The state for which to get the start time
+     * @return The start time of the requested state or <code>-1L</code> if this
+     *         state has not been reached
+     */
+    public long getStateStartTime(IAnalysisDataContainer container, String state) {
+        ITmfStateSystem stateSystem = container.getStateSystem();
+        int stateQuark = stateSystem.optQuarkRelative(fQuark, TmfXmlStrings.STATE, state, START_TIME);
+        if (stateQuark < 0) {
+            return -1L;
+        }
+        Object startTs = stateSystem.queryOngoing(stateQuark);
+        if (startTs instanceof Long) {
+            return (long) startTs;
+        }
+        return -1L;
     }
 
 }

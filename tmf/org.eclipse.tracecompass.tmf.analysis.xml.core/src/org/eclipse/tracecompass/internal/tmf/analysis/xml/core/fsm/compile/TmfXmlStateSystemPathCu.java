@@ -17,6 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenStateSystemPath;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.IBaseQuarkProvider;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValueSelf;
 import org.w3c.dom.Element;
 
 /**
@@ -47,8 +48,10 @@ public class TmfXmlStateSystemPathCu implements IDataDrivenCompilationUnit {
 
     @Override
     public DataDrivenStateSystemPath generate() {
+        // Ignore the self value in the path as it returns the quark itself
         List<DataDrivenValue> attributes = fAttributes.stream()
                 .map(TmfXmlStateValueCu::generate)
+                .filter(v -> (!(v instanceof DataDrivenValueSelf)))
                 .collect(Collectors.toList());
         return new DataDrivenStateSystemPath(attributes, fQuarkProvider);
     }

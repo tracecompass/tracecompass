@@ -487,6 +487,10 @@ public interface ITmfStateSystem {
      * timerange with no guaranteed order. There may be duplicates during State
      * System construction.
      *
+     * If start > end, iteration will start from the last nodes first, so while
+     * there is still no guarantee of order, in general, intervals finishing
+     * later should be returned first.
+     *
      * @param quarks
      *            a collection of quarks for which we want information
      * @param start

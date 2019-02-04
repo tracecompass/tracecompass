@@ -133,6 +133,12 @@
 <field name="next_tid" value="11" type="long" />
 <field name="next_prio" value="20" type="long" />
 </event>
+<event timestamp="40" name="sys_open">
+<field name="cpu" value="0" type="int" />
+</event>
+<event timestamp="45" name="exit_syscall">
+<field name="cpu" value="0" type="int" />
+</event>
 <event timestamp="50" name="sched_switch">
 <field name="cpu" value="1" type="int" />
 <field name="prev_comm" value="tid21" type="string" />
@@ -143,12 +149,23 @@
 <field name="next_tid" value="30" type="long" />
 <field name="next_prio" value="20" type="long" />
 </event>
+<event timestamp="55" name="sys_exit">
+<field name="cpu" value="1" type="int" />
+<field name="error_code" value="0" type="int" />
+</event>
+<!--  The sys_exit does not have a corresponding syscall exit, rather it's the thread terminating -->
+<event timestamp="57" name="sched_process_exit">
+<field name="cpu" value="1" type="int" />
+<field name="comm" value="proc30" type="string" />
+<field name="tid" value="30" type="long" />
+<field name="prio" value="20" type="int" />
+</event>
 <event timestamp="60" name="sched_switch">
 <field name="cpu" value="1" type="int" />
 <field name="prev_comm" value="proc30" type="string" />
 <field name="prev_tid" value="30" type="long" />
 <field name="prev_prio" value="20" type="long" />
-<field name="prev_state" value="1" type="long" />
+<field name="prev_state" value="64" type="long" />
 <field name="next_comm" value="tid21" type="string" />
 <field name="next_tid" value="21" type="long" />
 <field name="next_prio" value="20" type="long" />

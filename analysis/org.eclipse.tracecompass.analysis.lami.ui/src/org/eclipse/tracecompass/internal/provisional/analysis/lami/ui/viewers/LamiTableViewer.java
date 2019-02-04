@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.viewers;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,12 +27,14 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect.LamiTableEntryAspect;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiTableEntry;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportView;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.ui.views.LamiReportViewTabPage;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.signal.ChartSelectionUpdateSignal;
+import org.eclipse.tracecompass.internal.tmf.ui.commands.ExportToTsvUtils;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.ui.viewers.table.TmfSimpleTableViewer;
@@ -224,6 +227,21 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
                 cols[i].pack();
             }
         });
+    }
+
+    /**
+     * Export table to tsv file.
+     *
+     * @param stream
+     *              the output stream
+     */
+    public void exportToTsv(@Nullable OutputStream stream) {
+        TableViewer tableViewer = getTableViewer();
+        if (tableViewer == null) {
+            return;
+        }
+        Table table = tableViewer.getTable();
+        ExportToTsvUtils.exportTableToTsv(table, stream);
     }
 
     // ------------------------------------------------------------------------

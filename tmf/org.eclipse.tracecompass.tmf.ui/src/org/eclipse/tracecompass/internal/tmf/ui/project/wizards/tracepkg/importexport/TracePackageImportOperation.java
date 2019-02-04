@@ -22,7 +22,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -374,7 +376,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
         fileNameAndLabelPairs.add(new Pair<>(sourceName, destinationName));
 
         IPath containerPath = fTmfTraceFolder.getPath();
-        IStatus status = importFiles(getSpecifiedArchiveFile(), fileNameAndLabelPairs, containerPath, Path.EMPTY, monitor);
+        IStatus status = importFiles(getSpecifiedArchiveFile(), fileNameAndLabelPairs, containerPath, Path.EMPTY, Collections.emptyMap(), monitor);
         if (!getStatus().isOK()) {
             return status;
         }
@@ -427,11 +429,18 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
 
     private IStatus importSupplFiles(TracePackageTraceElement packageElement, IProgressMonitor monitor) {
         List<Pair<String, String>> fileNameAndLabelPairs = new ArrayList<>();
+        Map<String, String> suppFilesRename = new HashMap<>();
         for (TracePackageElement element : packageElement.getChildren()) {
             if (element instanceof TracePackageSupplFilesElement) {
                 for (TracePackageElement child : element.getChildren()) {
                     if (child.isChecked()) {
                         TracePackageSupplFileElement supplFile = (TracePackageSupplFileElement) child;
+                        if (packageElement instanceof TracePackageExperimentElement) {
+                            String oldExpName = getOldExpName(supplFile);
+                            if (!packageElement.getImportName().equals(oldExpName)) {
+                                suppFilesRename.put(supplFile.getText(), supplFile.getText().replace(oldExpName, packageElement.getImportName()));
+                            }
+                        }
                         fileNameAndLabelPairs.add(new Pair<>(checkNotNull(supplFile.getText()), checkNotNull(new Path(supplFile.getText()).lastSegment())));
                     }
                 }
@@ -460,14 +469,28 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
                 // Remove the .tracing segment at the beginning so that a file
                 // in folder .tracing/A/B/ imports to destinationContainerPath/A/B/
                 Path baseSourcePath = new Path(TmfCommonConstants.TRACE_SUPPLEMENTARY_FOLDER_NAME);
-                return importFiles(archiveFile, fileNameAndLabelPairs, destinationContainerPath, baseSourcePath, monitor);
+                return importFiles(archiveFile, fileNameAndLabelPairs, destinationContainerPath, baseSourcePath, suppFilesRename, monitor);
             }
         }
 
         return Status.OK_STATUS;
     }
 
-    private IStatus importFiles(ArchiveFile archiveFile, List<Pair<String, String>> fileNameAndLabelPairs, IPath destinationContainerPath, IPath baseSourcePath, IProgressMonitor monitor) {
+    private static String getOldExpName(TracePackageSupplFileElement supplFile) {
+        String[] split = supplFile.getText().split("/"); //$NON-NLS-1$
+        String oldExpName = null;
+        for (int i = 0; i < split.length; i++) {
+            // After .tracing is the experiment name
+            if (split[i].equals(".tracing")) { //$NON-NLS-1$
+                oldExpName = split[i + 1];
+                // Remove suffix "_exp"
+                oldExpName = oldExpName.substring(0, oldExpName.length() - 4);
+            }
+        }
+        return oldExpName;
+    }
+
+    private IStatus importFiles(ArchiveFile archiveFile, List<Pair<String, String>> fileNameAndLabelPairs, IPath destinationContainerPath, IPath baseSourcePath, @NonNull Map<String, String> filesRenameMap, IProgressMonitor monitor) {
         List<ArchiveProviderElement> objects = new ArrayList<>();
         Enumeration<@NonNull ?> entries = archiveFile.entries();
         while (entries.hasMoreElements()) {
@@ -491,6 +514,10 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
 
                 if (fileMatch || folderMatch) {
                     // .tracing/aaa/testtexttrace.txt/statistics.ht -> aaa/testtexttrace.txt/statistics.ht
+                    String newFilePath = filesRenameMap.get(entryName);
+                    if (newFilePath != null) {
+                        fullArchivePath = new Path(newFilePath);
+                    }
                     IPath destinationPath = fullArchivePath.makeRelativeTo(baseSourcePath);
 
                     // metadata    statistics.ht

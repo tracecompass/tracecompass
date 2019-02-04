@@ -109,7 +109,7 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
             }
 
             setResultElements(elements);
-
+            archiveFile.close();
         } catch (InterruptedException e) {
             setStatus(Status.CANCEL_STATUS);
         } catch (Exception e) {

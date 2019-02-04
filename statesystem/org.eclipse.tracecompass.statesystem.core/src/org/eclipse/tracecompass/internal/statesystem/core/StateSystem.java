@@ -623,7 +623,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
         }
 
         TimeRangeCondition timeCondition = TimeRangeCondition.forDiscreteRange(times);
-        return query2D(quarks, timeCondition);
+        return query2D(quarks, timeCondition, false);
     }
 
     @Override
@@ -633,11 +633,12 @@ public class StateSystem implements ITmfStateSystemBuilder {
             throw new StateSystemDisposedException();
         }
 
-        TimeRangeCondition timeCondition = TimeRangeCondition.forContinuousRange(start, end);
-        return query2D(quarks, timeCondition);
+        boolean reverse = (start > end) ? true : false;
+        TimeRangeCondition timeCondition = TimeRangeCondition.forContinuousRange(Math.min(start, end), Math.max(start, end));
+        return query2D(quarks, timeCondition, reverse);
     }
 
-    private Iterable<@NonNull ITmfStateInterval> query2D(@NonNull Collection<@NonNull Integer> quarks, TimeRangeCondition timeCondition)
+    private Iterable<@NonNull ITmfStateInterval> query2D(@NonNull Collection<@NonNull Integer> quarks, TimeRangeCondition timeCondition, boolean reverse)
             throws TimeRangeException, IndexOutOfBoundsException {
         if (timeCondition.min() < getStartTime()) {
             throw new TimeRangeException("Time conditions " + timeCondition.min() + " is lower than state system start time: " + getStartTime());  //$NON-NLS-1$ //$NON-NLS-2$
@@ -653,7 +654,7 @@ public class StateSystem implements ITmfStateSystemBuilder {
         }
 
         Iterable<@NonNull ITmfStateInterval> transStateIterable = transState.query2D(quarks, timeCondition);
-        Iterable<@NonNull ITmfStateInterval> backendIterable = backend.query2D(quarkCondition, timeCondition);
+        Iterable<@NonNull ITmfStateInterval> backendIterable = backend.query2D(quarkCondition, timeCondition, reverse);
 
         return Iterables.concat(transStateIterable, backendIterable);
     }

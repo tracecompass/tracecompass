@@ -16,6 +16,9 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenScenarioInfo;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.w3c.dom.Element;
@@ -63,17 +66,17 @@ public class TmfXmlBasicTransition {
      *            The map of test in the XML file
      * @return true if the transition is validate false if not
      */
-    public boolean test(ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo, Map<String, TmfXmlTransitionValidator> tests) {
+    public boolean test(ITmfEvent event, @Nullable TmfXmlScenarioInfo scenarioInfo, Map<String, DataDrivenCondition> tests, IAnalysisDataContainer container) {
         if (!validateEvent(event)) {
             return false;
         }
 
         for (String cond : fCond) {
-            TmfXmlTransitionValidator test = tests.get(cond);
+            DataDrivenCondition test = tests.get(cond);
             if (test == null) {
                 throw new IllegalStateException("Failed to find cond " + cond); //$NON-NLS-1$
             }
-            if (!test.test(event, scenarioInfo)) {
+            if (!test.test(event, scenarioInfo != null ? scenarioInfo : DataDrivenScenarioInfo.DUMMY_SCENARIO, container)) {
                 return false;
             }
         }

@@ -125,4 +125,9 @@ public class DataDrivenStateProvider extends AbstractTmfStateProvider implements
     public @Nullable ScriptEngine getScriptEngine(String name) {
         return fScriptengine.get(name);
     }
+
+    @Override
+    public boolean isReadOnlyContainer() {
+        return false;
+    }
 }

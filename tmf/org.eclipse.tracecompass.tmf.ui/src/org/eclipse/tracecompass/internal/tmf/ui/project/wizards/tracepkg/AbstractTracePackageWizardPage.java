@@ -126,6 +126,7 @@ public abstract class AbstractTracePackageWizardPage extends WizardPage {
                     }
                 }
 
+                maintainExperimentIntegrity(element);
 
                 updateApproximateSelectedSize();
                 updatePageCompletion();
@@ -157,7 +158,37 @@ public abstract class AbstractTracePackageWizardPage extends WizardPage {
                     maintainCheckIntegrity(parentElement);
                 }
             }
+
+            private void maintainExperimentIntegrity(final TracePackageElement element) {
+                TracePackageElement parent = element;
+                while (parent.getParent() != null) {
+                    parent = parent.getParent();
+                }
+                if (parent instanceof TracePackageExperimentElement && fElementViewer.getChecked(parent)) {
+                    TracePackageExperimentElement experiment = (TracePackageExperimentElement) parent;
+                    // Check all traces of the checked experiment
+                    for (String expTrace : experiment.getExpTraces()) {
+                        for (TracePackageElement root : (TracePackageElement[]) fElementViewer.getInput()) {
+                            if (!(root instanceof TracePackageExperimentElement) && root.getText().equals(expTrace)) {
+                                fElementViewer.setSubtreeChecked(root, true);
+                                break;
+                            }
+                        }
+                    }
+                } else if (!(parent instanceof TracePackageExperimentElement) && !fElementViewer.getChecked(parent)) {
+                    // Uncheck all experiments that contain unchecked trace
+                    for (TracePackageElement root : (TracePackageElement[]) fElementViewer.getInput()) {
+                        if (root instanceof TracePackageExperimentElement) {
+                            TracePackageExperimentElement experiment = (TracePackageExperimentElement) root;
+                            if (experiment.getExpTraces().contains(parent.getText())) {
+                                fElementViewer.setSubtreeChecked(experiment, false);
+                            }
+                        }
+                    }
+                }
+            }
         });
+
         GridData layoutData = new GridData(GridData.FILL_BOTH);
         fElementViewer.getTree().setLayoutData(layoutData);
         fElementViewer.setContentProvider(new TracePackageContentProvider());

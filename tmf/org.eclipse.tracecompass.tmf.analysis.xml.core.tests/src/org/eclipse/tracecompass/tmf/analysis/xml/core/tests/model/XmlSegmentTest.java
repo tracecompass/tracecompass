@@ -82,7 +82,7 @@ public class XmlSegmentTest {
         assertEquals("Segment store size", 1, ss.size());
         Object segment = ss.iterator().next();
         assertTrue(segment instanceof TmfXmlPatternSegment);
-        XmlUtilsTest.testPatternSegmentData(PatternSegmentFactoryStub.TEST_3, (TmfXmlPatternSegment)segment);
+        XmlUtilsTest.testPatternSegmentData(PatternSegmentFactoryStub.TEST_3, (TmfXmlPatternSegment) segment);
     }
 }
 

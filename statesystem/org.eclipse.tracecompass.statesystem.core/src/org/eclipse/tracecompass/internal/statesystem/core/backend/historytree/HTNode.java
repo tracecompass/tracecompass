@@ -506,7 +506,9 @@ public abstract class HTNode {
      */
     public HTInterval getRelevantInterval(int key, long t) throws TimeRangeException {
         fRwl.readLock().lock();
-        try {
+        try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINEST, "HTNode:singleQuery", //$NON-NLS-1$
+                "time", t, //$NON-NLS-1$
+                "attribute", key)) { //$NON-NLS-1$
             for (int i = getStartIndexFor(t); i < fIntervals.size(); i++) {
                 HTInterval curInterval = fIntervals.get(i);
                 if (curInterval.getAttribute() == key

@@ -8,10 +8,6 @@
  ******************************************************************************/
 package org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stubs;
 
-import java.util.HashSet;
-
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlLocation;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 
@@ -33,8 +29,4 @@ public class StateSystemContainerStub implements IXmlStateSystemContainer {
         throw new UnsupportedOperationException("No state system here...");
     }
 
-    @Override
-    public @NonNull Iterable<@NonNull TmfXmlLocation> getLocations() {
-        return new HashSet<>();
-    }
 }
