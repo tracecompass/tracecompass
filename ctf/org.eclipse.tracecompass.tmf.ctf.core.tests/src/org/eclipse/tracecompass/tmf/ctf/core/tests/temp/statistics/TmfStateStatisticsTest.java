@@ -25,8 +25,8 @@ import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsTotalsModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 /**
  * Unit tests for the {@link TmfStateStatistics}
@@ -35,16 +35,16 @@ import org.junit.Before;
  */
 public class TmfStateStatisticsTest extends TmfStatisticsTest {
 
-    private ITmfTrace fTrace;
+    private static ITmfTrace fTrace;
 
-    private TmfStatisticsTotalsModule fTotalsMod;
-    private TmfStatisticsEventTypesModule fEventTypesMod;
+    private static TmfStatisticsTotalsModule fTotalsMod;
+    private static TmfStatisticsEventTypesModule fEventTypesMod;
 
     /**
      * Test setup
      */
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         ITmfTrace trace = CtfTmfTestTraceUtils.getTrace(testTrace);
         fTrace = trace;
 
@@ -55,7 +55,7 @@ public class TmfStateStatisticsTest extends TmfStatisticsTest {
             fTotalsMod.setTrace(trace);
             fEventTypesMod.setTrace(trace);
         } catch (TmfAnalysisException e) {
-            fail();
+            fail(e.getMessage());
         }
 
         fTotalsMod.schedule();
@@ -74,8 +74,8 @@ public class TmfStateStatisticsTest extends TmfStatisticsTest {
     /**
      * Test cleanup
      */
-    @After
-    public void tearDown() {
+    @AfterClass
+    public static void tearDown() {
         fTotalsMod.dispose();
         fEventTypesMod.dispose();
         fTrace.dispose();
