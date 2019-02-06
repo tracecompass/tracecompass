@@ -37,7 +37,7 @@ public class TmfEventTableDataProviderFactory implements IDataProviderFactory {
                         .setId(TmfEventTableDataProvider.ID)
                         .setName(NonNullUtils.nullToEmptyString(Messages.EventsTableDataProvider_Title))
                         .setDescription(NonNullUtils.nullToEmptyString(Messages.EventsTableDataProviderFactory_DescriptionText))
-                        .setProviderType(ProviderType.TREE_TIME_XY)
+                        .setProviderType(ProviderType.TABLE)
                         .build();
 
     @Override
