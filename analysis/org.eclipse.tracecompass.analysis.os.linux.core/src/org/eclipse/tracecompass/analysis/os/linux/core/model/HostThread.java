@@ -31,7 +31,7 @@ public class HostThread {
     /**
      * The key for the trace context's currently selected host thread. The
      * corresponding data value should be of {@link HostThread} class
-     * @since 3.1
+     * @since 3.2
      */
     public static final String SELECTED_HOST_THREAD_KEY = "model.selectedThread"; //$NON-NLS-1$
 
