@@ -47,7 +47,7 @@ public class TmfExperimentCheckpointIndexTest {
     private static final TmfTestTrace TEST_TRACE1   = TmfTestTrace.O_TEST_10K;
     private static final TmfTestTrace TEST_TRACE2   = TmfTestTrace.E_TEST_10K;
     private static int          NB_EVENTS    = 20000;
-    private static int          BLOCK_SIZE   = 1000;
+    private static int          BLOCK_SIZE   = 2000;
     private static int          LAST_EVENT_RANK    = NB_EVENTS - 1;
     private static int          LAST_CHECKPOINT_RANK = LAST_EVENT_RANK / BLOCK_SIZE;
     private static int          NB_CHECKPOINTS    =  LAST_CHECKPOINT_RANK + 1;
