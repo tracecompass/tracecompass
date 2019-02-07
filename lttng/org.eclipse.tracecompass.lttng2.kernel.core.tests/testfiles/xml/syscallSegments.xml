@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+<!-- ***************************************************************************
+* Copyright (c) 2016 Ericsson
+*
+* All rights reserved. This program and the accompanying materials are
+* made available under the terms of the Eclipse Public License v1.0 which
+* accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*************************************************************************** -->
+<!-- This XML pattern is the XML version of the System call latency analysis
+for the kernel traces. It will produce the same output. This file can also
+be found in the unit tests of the TraceCompass's XML core test package -->
+
+	
+<pattern version="0" id="xml.syscall.cpu.time">
+	<head>
+		<traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
+		<label value="XML System Call CPU time" />
+	</head>
+
+<!-- 	The attribute initial specifies the FSMs that will be instanciated at the beginning of the analysis -->
+	<patternHandler initial="syscall">
+
+<!-- 	CONDITIONS -->
+
+<!-- 	Test if the current running thread PID is equal to the current scenario thread -->
+		<test id="thread_thread">
+			<if>
+				<condition>
+					<stateValue type="eventField" value="tid" />
+					<stateValue type="query">
+						<stateAttribute type="constant" value="#CurrentScenario" />
+						<stateAttribute type="constant" value="thread" />
+					</stateValue>
+				</condition>
+			</if>
+		</test>
+
+<!-- 		ACTIONS -->
+
+<!-- 	Generates three state changes in the state system -->
+		<action id="entering_syscall">
+<!-- 		Save the name of the system call executed under the current scenario path-->
+			<stateChange>
+				<stateAttribute type="constant" value="#CurrentScenario" />
+				<stateAttribute type="constant" value="tid" />
+				<stateValue type="eventField" value="tid"/>
+			</stateChange>
+			<stateChange>
+				<stateAttribute type="constant" value="#CurrentScenario" />
+				<stateAttribute type="constant" value="syscall" />
+				<stateValue type="script" value="str.substring(14)">
+					<stateValue id="str" type="eventName"/>
+				</stateValue>
+			</stateChange>
+<!-- 		Save the value of the CPU under the current scenario path -->
+			<stateChange>
+				<stateAttribute type="constant" value="Syscalls" />
+				<stateAttribute type="query">
+					<stateAttribute type="constant" value="#CurrentScenario" />
+					<stateAttribute type="constant" value="syscall" />
+				</stateAttribute> 
+				<stateAttribute type="pool"/>
+				<stateAttribute type="constant" value="CallStack"/>
+				<stateValue type="script" value="str.substring(14)" stack="push">
+					<stateValue id="str" type="eventName"/>
+				</stateValue>
+			</stateChange>
+			<stateChange>
+				<stateAttribute type="constant" value="Syscalls" />
+				<stateAttribute type="query">
+					<stateAttribute type="constant" value="#CurrentScenario" />
+					<stateAttribute type="constant" value="syscall" />
+				</stateAttribute> 
+				<stateAttribute type="pool"/>
+				<stateValue type="eventField" value="tid"/>
+			</stateChange>
+		</action>
+
+<!-- 	Generate a pattern segment -->
+		<action id="exiting_syscall">
+<!-- 		Generate a pattern segment with the name of the system call  of the current scenario-->
+			<stateChange>
+				<stateAttribute type="constant" value="Syscalls" />
+				<stateAttribute type="query">
+					<stateAttribute type="constant" value="#CurrentScenario" />
+					<stateAttribute type="constant" value="syscall" />
+				</stateAttribute> 
+				<stateAttribute type="pool"/>
+				<stateAttribute type="constant" value="CallStack"/>
+				<stateValue type="delete" stack="pop"/>
+			</stateChange>
+			<segment>
+				<segType>
+					<segName>
+						<stateValue type="query">
+							<stateAttribute type="constant" value="#CurrentScenario" />
+							<stateAttribute type="constant" value="syscall" />
+						</stateValue>
+					</segName>
+				</segType>
+			</segment>
+		</action>
+
+<!-- 		FSMs -->
+
+<!-- 	System call FSM
+		Declare an FSM to match all the system calls on thread 1311.
+		The FSM will generate pattern segments that will represent the system calls found
+-->
+		<fsm id="syscall" initial="wait_syscall_entry">
+			<state id="wait_syscall_entry">
+<!-- 				The state will stay here until we have a "syscall_entry_*" event -->
+				<transition event="syscall_entry_*" target="in_syscall" action="entering_syscall"/>
+			</state>
+			<state id="in_syscall" >
+<!-- 				The state will stay here until we have a "syscall_exit_*" event -->
+				<transition event="syscall_exit_*" cond="thread_thread" target="syscall_exit" action="exiting_syscall"/>
+			</state>
+<!-- 				The state will stay here forever -->
+			<final id="syscall_exit"/>
+		</fsm>
+	</patternHandler>
+</pattern>
+
+</tmfxml>

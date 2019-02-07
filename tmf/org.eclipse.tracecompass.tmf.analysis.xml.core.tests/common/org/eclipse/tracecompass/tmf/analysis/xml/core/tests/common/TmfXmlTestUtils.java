@@ -9,17 +9,26 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Paths;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateProviderCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValueConstant;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenAnalysisModule;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
+import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -68,6 +77,44 @@ public final class TmfXmlTestUtils {
             throw new NullPointerException("No element named " + elementName + " in " + xmlString);
         }
         return (Element) elements.item(0);
+    }
+
+    /**
+     * Get the XML analysis module in the file. It will return either a pattern
+     * or state provider, if there is one in the file
+     *
+     * @param xmlFilePath
+     *            The absolute file path to the XML file
+     * @param analysisId
+     *            The ID of the analysis to get
+     * @return The analysis module
+     */
+    public static TmfAbstractAnalysisModule getModuleInFile(String xmlFilePath, @NonNull String analysisId) {
+
+        // Look for a pattern element
+        Element element = TmfXmlUtils.getElementInFile(xmlFilePath, TmfXmlStrings.PATTERN, analysisId);
+
+        if (element != null) {
+            XmlPatternAnalysis module = new XmlPatternAnalysis();
+            module.setXmlFile(Paths.get(xmlFilePath));
+            module.setId(analysisId);
+            module.setName(analysisId);
+            return module;
+        }
+
+        // Look for a state provider
+        element = TmfXmlUtils.getElementInFile(xmlFilePath, TmfXmlStrings.STATE_PROVIDER, analysisId);
+
+        if (element != null) {
+            TmfXmlStateProviderCu compile = TmfXmlStateProviderCu.compile(Paths.get(xmlFilePath), analysisId);
+            assertNotNull(compile);
+            DataDrivenAnalysisModule module = new DataDrivenAnalysisModule(analysisId, compile);
+            module.setName(analysisId);
+            return module;
+        }
+
+        throw new NullPointerException("No module named " + analysisId + " in file " + xmlFilePath);
+
     }
 
 }
