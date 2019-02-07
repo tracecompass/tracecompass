@@ -17,6 +17,10 @@ import org.eclipse.osgi.util.NLS;
  */
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.messages"; //$NON-NLS-1$
+    /** State system property prefix */
+    public static String PatternAnalysis_StateSystemPrefix;
+    /** Segment store property prefix */
+    public static String PatternAnalysis_SegmentStorePrefix;
     /**
      * The string content
      */

@@ -20,6 +20,15 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.messages"; //$NON-NLS-1$
 
+    /** File size property title */
+    public static @Nullable String SegmentStoreAnalysis_PropertiesFileSize;
+    /**
+     * Analysis not executed property text
+     */
+    public static @Nullable String SegmentStoreAnalysis_PropertiesAnalysisNotExecuted;
+    /** Error getting file size property text */
+    public static @Nullable String SegmentStoreAnalysis_ErrorGettingFileSize;
+
     /**
      * XY series name
      */

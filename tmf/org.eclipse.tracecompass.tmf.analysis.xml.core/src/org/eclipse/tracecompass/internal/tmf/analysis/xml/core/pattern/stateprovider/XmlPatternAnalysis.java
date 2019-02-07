@@ -14,6 +14,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
@@ -340,4 +342,32 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
                 && fStateSystemModule.waitForCompletion(monitor)
                 && fSegmentStoreModule.waitForCompletion(monitor);
     }
+
+    // ------------------------------------------------------------------------
+    // ITmfPropertiesProvider
+    // ------------------------------------------------------------------------
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public @NonNull Map<@NonNull String, @NonNull String> getProperties() {
+        Map<@NonNull String, @NonNull String> properties = super.getProperties();
+
+        // Add the sub-modules' properties
+        TmfAbstractAnalysisModule module = fStateSystemModule;
+        if (module != null) {
+            for (Entry<String, String> entry : module.getProperties().entrySet()) {
+                properties.put(Objects.requireNonNull(Messages.PatternAnalysis_StateSystemPrefix + ' ' +entry.getKey()), entry.getValue());
+            }
+        }
+        module = fSegmentStoreModule;
+        if (module != null) {
+            for (Entry<String, String> entry : module.getProperties().entrySet()) {
+                properties.put(Objects.requireNonNull(Messages.PatternAnalysis_SegmentStorePrefix + ' ' +entry.getKey()), entry.getValue());
+            }
+        }
+        return properties;
+    }
+
 }
