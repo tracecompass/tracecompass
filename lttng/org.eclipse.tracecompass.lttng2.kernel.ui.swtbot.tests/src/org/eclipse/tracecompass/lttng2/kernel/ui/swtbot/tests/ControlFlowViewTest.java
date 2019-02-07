@@ -88,17 +88,17 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
     private static final String SELECT_PREVIOUS_STATE_CHANGE = "Select Previous State Change";
     private static final String SELECT_NEXT_STATE_CHANGE = "Select Next State Change";
     private static final @NonNull ITmfTimestamp START_TIME = TmfTimestamp.fromNanos(1368000272650993664L);
-    private static final @NonNull ITmfTimestamp TID1_TIME1 = TmfTimestamp.fromNanos(1368000272651208412L);
-    private static final @NonNull ITmfTimestamp TID1_TIME2 = TmfTimestamp.fromNanos(1368000272656147616L);
-    private static final @NonNull ITmfTimestamp TID1_TIME3 = TmfTimestamp.fromNanos(1368000272656362364L);
-    private static final @NonNull ITmfTimestamp TID1_TIME4 = TmfTimestamp.fromNanos(1368000272663234300L);
-    private static final @NonNull ITmfTimestamp TID1_TIME5 = TmfTimestamp.fromNanos(1368000272663449048L);
-    private static final @NonNull ITmfTimestamp TID1_TIME6 = TmfTimestamp.fromNanos(1368000272665596528L);
-    private static final @NonNull ITmfTimestamp TID2_TIME1 = TmfTimestamp.fromNanos(1368000272651852656L);
-    private static final @NonNull ITmfTimestamp TID2_TIME2 = TmfTimestamp.fromNanos(1368000272652067404L);
-    private static final @NonNull ITmfTimestamp TID2_TIME3 = TmfTimestamp.fromNanos(1368000272652282152L);
-    private static final @NonNull ITmfTimestamp TID2_TIME4 = TmfTimestamp.fromNanos(1368000272652496900L);
-    private static final @NonNull ITmfTimestamp TID5_TIME1 = TmfTimestamp.fromNanos(1368000272652496900L);
+    private static final @NonNull ITmfTimestamp TID1_TIME1 = TmfTimestamp.fromNanos(1368000272651208498L);
+    private static final @NonNull ITmfTimestamp TID1_TIME2 = TmfTimestamp.fromNanos(1368000272656149680L);
+    private static final @NonNull ITmfTimestamp TID1_TIME3 = TmfTimestamp.fromNanos(1368000272656364514L);
+    private static final @NonNull ITmfTimestamp TID1_TIME4 = TmfTimestamp.fromNanos(1368000272663239202L);
+    private static final @NonNull ITmfTimestamp TID1_TIME5 = TmfTimestamp.fromNanos(1368000272663454036L);
+    private static final @NonNull ITmfTimestamp TID1_TIME6 = TmfTimestamp.fromNanos(1368000272665602376L);
+    private static final @NonNull ITmfTimestamp TID2_TIME1 = TmfTimestamp.fromNanos(1368000272651853000L);
+    private static final @NonNull ITmfTimestamp TID2_TIME2 = TmfTimestamp.fromNanos(1368000272652067834L);
+    private static final @NonNull ITmfTimestamp TID2_TIME3 = TmfTimestamp.fromNanos(1368000272652282668L);
+    private static final @NonNull ITmfTimestamp TID2_TIME4 = TmfTimestamp.fromNanos(1368000272652497502L);
+    private static final @NonNull ITmfTimestamp TID5_TIME1 = TmfTimestamp.fromNanos(1368000272652497502L);
 
     @Override
     protected SWTBotView getViewBot() {
