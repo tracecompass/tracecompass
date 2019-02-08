@@ -11,11 +11,20 @@
 *************************************************************************** -->
 <pattern version="0" id="test.analysis.2">
 	<head>
-		<traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
+		<traceType id="org.eclipse.linuxtools.tmf.core.tests.xmlstub" />
 		<label value="XML test analysis 2" />
 	</head>
 
 	<patternHandler>
+
+	    <test id="curStateBad">
+			<if>
+				<condition>
+					<field name="curState" />
+					<stateValue type="string" value="BAD" />
+				</condition>
+			</if>
+		</test>
 
 		<action id="increment_counter_new">
 			<stateChange>
@@ -60,7 +69,8 @@
 		</fsm>
 
 		<fsm id="test1" multiple="false">
-			<precondition event="wrong_event" />
+		    <!-- There is only one such event, so it should pass the initial state, but go no further -->
+			<precondition event="exit" cond="curStateBad" />
 			<initialState>
 				<transition target="state_new" action="increment_counter_new"/>
 			</initialState>

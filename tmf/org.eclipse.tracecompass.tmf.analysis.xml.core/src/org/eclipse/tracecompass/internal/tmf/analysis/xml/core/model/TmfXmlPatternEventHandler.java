@@ -9,23 +9,21 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlActionCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlConditionCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlFsmStateCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenAction;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenActionResetStoredFields;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenActionUpdateStoredFields;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenFsm;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenFsmState;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenRuntimeData;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
@@ -52,11 +50,11 @@ public class TmfXmlPatternEventHandler {
     /* list of states changes */
     private final XmlPatternStateProvider fParent;
 
-    private final List<String> fInitialFsm;
+    private final List<DataDrivenFsm> fInitialFsm = new ArrayList<>();
     private final Map<String, DataDrivenCondition> fTestMap;
     private final Map<String, DataDrivenAction> fActionMap;
-    private final Map<String, TmfXmlFsm> fFsmMap = new LinkedHashMap<>();
-    private final List<TmfXmlFsm> fActiveFsmList = new ArrayList<>();
+    private final Map<String, DataDrivenFsm> fFsmMap = new HashMap<>();
+    private final List<DataDrivenFsm> fActiveFsmList = new ArrayList<>();
 
     /**
      * Constructor
@@ -70,8 +68,6 @@ public class TmfXmlPatternEventHandler {
      */
     public TmfXmlPatternEventHandler(ITmfXmlModelFactory modelFactory, Element node, IXmlStateSystemContainer parent) {
         fParent = (XmlPatternStateProvider) parent;
-        String initialFsm = node.getAttribute(TmfXmlStrings.INITIAL);
-        fInitialFsm = initialFsm.isEmpty() ? Collections.emptyList() : Arrays.asList(initialFsm.split(TmfXmlStrings.AND_SEPARATOR));
 
         Map<String, DataDrivenCondition> testMap = new HashMap<>();
         // Compile the test conditions
@@ -88,7 +84,8 @@ public class TmfXmlPatternEventHandler {
         }
         fTestMap = Collections.unmodifiableMap(testMap);
 
-        @NonNull Builder<String, DataDrivenAction> builder = ImmutableMap.builder();
+        @NonNull
+        Builder<String, DataDrivenAction> builder = ImmutableMap.builder();
         NodeList nodesAction = node.getElementsByTagName(TmfXmlStrings.ACTION);
         /* load actions */
         for (int i = 0; i < nodesAction.getLength(); i++) {
@@ -100,8 +97,6 @@ public class TmfXmlPatternEventHandler {
             TmfXmlActionCu action = Objects.requireNonNull(fParent.getAnalysisCompilationData().getAction(actionId));
             builder.put(actionId, action.generate());
         }
-        builder.put(TmfXmlStrings.CONSTANT_PREFIX + CLEAR_STORED_FIELDS_STRING, new DataDrivenActionResetStoredFields());
-        builder.put(TmfXmlStrings.CONSTANT_PREFIX + SAVE_STORED_FIELDS_STRING, new DataDrivenActionUpdateStoredFields());
         fActionMap = builder.build();
 
         NodeList nodesFsm = node.getElementsByTagName(TmfXmlStrings.FSM);
@@ -111,9 +106,25 @@ public class TmfXmlPatternEventHandler {
             if (element == null) {
                 throw new IllegalArgumentException();
             }
-            TmfXmlFsm fsm = modelFactory.createFsm(element, fParent);
-            fFsmMap.put(fsm.getId(), fsm);
+            String fsmId = Objects.requireNonNull(TmfXmlFsmStateCu.compileFsm(fParent.getAnalysisCompilationData(), element), "The FSM did not compile properly"); //$NON-NLS-1$
+            TmfXmlFsmStateCu fsmCu = Objects.requireNonNull(fParent.getAnalysisCompilationData().getFsm(fsmId));
+            DataDrivenFsmState fsm = fsmCu.generate();
+            if (!(fsm instanceof DataDrivenFsm)) {
+                throw new NullPointerException("fsm not of the right type"); //$NON-NLS-1$
+            }
+            fFsmMap.put(fsmId, (DataDrivenFsm) fsm);
         }
+
+        String initialFsm = node.getAttribute(TmfXmlStrings.INITIAL);
+        if (!initialFsm.isEmpty()) {
+            for (String initial : initialFsm.split(TmfXmlStrings.AND_SEPARATOR)) {
+                DataDrivenFsm fsm = fFsmMap.get(initial);
+                if (fsm != null) {
+                    fInitialFsm.add(fsm);
+                }
+            }
+        }
+
     }
 
     /**
@@ -121,20 +132,21 @@ public class TmfXmlPatternEventHandler {
      * single instance and this instance already exist, no new scenario is then
      * started. If the scenario is created we handle the current event directly.
      *
-     * @param fsmIds
-     *            The IDs of the fsm to start
+     * @param fsms
+     *            The FSMs to start
      * @param event
      *            The current event
      * @param force
      *            True to force the creation of the scenario, false otherwise
+     * @param executionData
+     *            The execution data
      */
-    public void startScenario(List<String> fsmIds, @Nullable ITmfEvent event, boolean force) {
-        for (String fsmId : fsmIds) {
-            TmfXmlFsm fsm = NonNullUtils.checkNotNull(fFsmMap.get(fsmId));
+    public void startScenario(List<DataDrivenFsm> fsms, ITmfEvent event, boolean force, DataDrivenRuntimeData executionData) {
+        for (DataDrivenFsm fsm : fsms) {
             if (!fActiveFsmList.contains(fsm)) {
                 fActiveFsmList.add(fsm);
             }
-            fsm.createScenario(event, this, force);
+            fsm.createScenario(event, force, executionData, fParent);
         }
     }
 
@@ -167,32 +179,33 @@ public class TmfXmlPatternEventHandler {
         /*
          * Order is important so cannot be parallelized
          */
-        final @NonNull List<@NonNull TmfXmlFsm> activeFsmList = fActiveFsmList;
-        final @NonNull Map<@NonNull String, @NonNull TmfXmlFsm> fsmMap = fFsmMap;
+        final List<DataDrivenFsm> activeFsmList = fActiveFsmList;
+        final Map<String, DataDrivenFsm> fsmMap = fFsmMap;
         if (activeFsmList.isEmpty()) {
-            List<String> fsmIds = fInitialFsm;
-            if (fsmIds.isEmpty()) {
-                fsmIds = new ArrayList<>();
-                for (TmfXmlFsm fsm : fsmMap.values()) {
-                    fsmIds.add(fsm.getId());
+            List<DataDrivenFsm> fsms = fInitialFsm;
+            if (fInitialFsm.isEmpty()) {
+                // Add all FSMs to the list to create scenarios
+                fsms = new ArrayList<>();
+                for (DataDrivenFsm fsm : fsmMap.values()) {
+                    fsms.add(fsm);
                 }
             }
-            if (!fsmIds.isEmpty()) {
-                startScenario(fsmIds, null, true);
+            if (!fsms.isEmpty()) {
+                startScenario(fsms, event, true, fParent.getExecutionData());
             }
         } else {
-            List<String> fsmToStart = new ArrayList<>();
-            for (Map.Entry<String, TmfXmlFsm> entry : fsmMap.entrySet()) {
-                if (entry.getValue().isNewScenarioAllowed()) {
-                    fsmToStart.add(entry.getKey());
+            List<DataDrivenFsm> fsmToStart = new ArrayList<>();
+            for (DataDrivenFsm fsm : fsmMap.values()) {
+                if (fsm.isNewScenarioAllowed(fParent.getExecutionData().getRuntimeForFsm(fsm))) {
+                    fsmToStart.add(fsm);
                 }
             }
             if (!fsmToStart.isEmpty()) {
-                startScenario(fsmToStart, null, false);
+                startScenario(fsmToStart, event, false, fParent.getExecutionData());
             }
         }
-        for (TmfXmlFsm fsm : activeFsmList) {
-            fsm.handleEvent(event, fTestMap, fParent);
+        for (DataDrivenFsm fsm : activeFsmList) {
+            fsm.handleEvent(event, fParent.getExecutionData(), fParent);
         }
     }
 
@@ -200,19 +213,9 @@ public class TmfXmlPatternEventHandler {
      * Abandon all the ongoing scenarios
      */
     public void dispose() {
-        for (TmfXmlFsm fsm : fActiveFsmList) {
-            fsm.dispose();
+        for (DataDrivenFsm fsm : fActiveFsmList) {
+            fsm.dispose(fParent.getExecutionData());
         }
     }
 
-    /**
-     * Get the fsm corresponding to the specified id
-     *
-     * @param fsmId
-     *            The id of the fsm
-     * @return The fsm found, null if nothing found
-     */
-    public @Nullable TmfXmlFsm getFsm(String fsmId) {
-        return fFsmMap.get(fsmId);
-    }
 }

@@ -8,12 +8,8 @@
  ******************************************************************************/
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model;
 
-import java.util.List;
-
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenAction;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenFsm;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenFsmState;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioHistoryBuilder.ScenarioStatusType;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
@@ -26,8 +22,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 public class TmfXmlScenario {
 
     private final IXmlStateSystemContainer fContainer;
-    private final TmfXmlFsm fFsm;
-    private TmfXmlPatternEventHandler fPatternHandler;
+    private final DataDrivenFsm fFsm;
     private TmfXmlScenarioInfo fScenarioInfo;
     TmfXmlScenarioHistoryBuilder fHistoryBuilder;
 
@@ -36,27 +31,20 @@ public class TmfXmlScenario {
      *
      * @param event
      *            The event at which this scenario is created
-     * @param patternHandler
-     *            The filter handler
-     * @param fsmId
-     *            the id of the fsm executed by this scenario
+     * @param fsm
+     *            the fsm executed by this scenario
+     * @param initialState
+     *            The initial state
      * @param container
      *            The state system container this scenario belongs to
-     * @param modelFactory
-     *            The model factory
      */
-    public TmfXmlScenario(@Nullable ITmfEvent event, TmfXmlPatternEventHandler patternHandler, String fsmId, IXmlStateSystemContainer container, ITmfXmlModelFactory modelFactory) {
-        TmfXmlFsm fsm = patternHandler.getFsm(fsmId);
-        if (fsm == null) {
-            throw new IllegalArgumentException(fsmId + "has not been declared."); //$NON-NLS-1$
-        }
+    public TmfXmlScenario(ITmfEvent event, DataDrivenFsm fsm, DataDrivenFsmState initialState, IXmlStateSystemContainer container) {
         fFsm = fsm;
         fContainer = container;
         fHistoryBuilder = ((XmlPatternStateProvider) container).getHistoryBuilder();
-        fPatternHandler = patternHandler;
-        int quark = fHistoryBuilder.assignScenarioQuark(fContainer, fsmId);
+        int quark = fHistoryBuilder.assignScenarioQuark(fContainer, fsm);
         int statusQuark = fHistoryBuilder.getScenarioStatusQuark(fContainer, quark);
-        fScenarioInfo = new TmfXmlScenarioInfo(fFsm.getInitialStateId(), ScenarioStatusType.PENDING, quark, statusQuark, fFsm);
+        fScenarioInfo = new TmfXmlScenarioInfo(initialState, ScenarioStatusType.PENDING, quark, statusQuark, fFsm);
         fHistoryBuilder.update(fContainer, fScenarioInfo, event);
     }
 
@@ -104,42 +92,28 @@ public class TmfXmlScenario {
      *            The ongoing event
      * @param container
      *            The data container
+     * @return Whether or not the event was consumed by this scenario
      */
-    public void handleEvent(ITmfEvent event, IAnalysisDataContainer container) {
+    public boolean handleEvent(ITmfEvent event, IAnalysisDataContainer container) {
 
-        TmfXmlStateTransition out = fFsm.next(event, fPatternHandler.getTestMap(), fScenarioInfo, container);
-        if (out == null) {
-            return;
+        DataDrivenFsmState activeState = fScenarioInfo.getActiveState();
+
+        DataDrivenFsmState nextState = activeState.takeTransition(event, fScenarioInfo, container);
+        if (nextState == null) {
+            return false;
         }
 
-        fFsm.setEventConsumed(true);
-        // Processing the actions in the transition
-        final List<String> actions = out.getAction();
-        for (String actionId : actions) {
-            DataDrivenAction action = fPatternHandler.getActionMap().get(actionId);
-            if (action != null) {
-                action.eventHandle(event, fScenarioInfo, container);
-            } else {
-                Activator.logError("Action " + actionId + " cannot be found."); //$NON-NLS-1$ //$NON-NLS-2$
-                return;
-            }
-        }
-
-        // Change the activeState
-        final @NonNull String nextState = out.getTarget();
         if (fScenarioInfo.getStatus().equals(ScenarioStatusType.PENDING)) {
             fScenarioInfo.setStatus(ScenarioStatusType.IN_PROGRESS);
             fHistoryBuilder.startScenario(fContainer, fScenarioInfo, event);
         }
-        if (nextState.equals(fFsm.getAbandonStateId())) {
-            fScenarioInfo.setStatus(ScenarioStatusType.ABANDONED);
-            fHistoryBuilder.completeScenario(fContainer, fScenarioInfo, event);
-        } else if (nextState.equals(fFsm.getFinalStateId())) {
+        if (nextState.isFinal()) {
             fScenarioInfo.setStatus(ScenarioStatusType.MATCHED);
             fHistoryBuilder.completeScenario(fContainer, fScenarioInfo, event);
         }
         fScenarioInfo.setActiveState(nextState);
         fHistoryBuilder.update(fContainer, fScenarioInfo, event);
+        return true;
     }
 
 }

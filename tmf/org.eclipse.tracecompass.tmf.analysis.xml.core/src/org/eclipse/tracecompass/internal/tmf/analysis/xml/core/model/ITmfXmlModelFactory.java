@@ -12,7 +12,6 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenAction;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
@@ -94,40 +93,5 @@ public interface ITmfXmlModelFactory {
      * @return The new {@link TmfXmlAction}
      */
     String createAction(Element node, IXmlStateSystemContainer container);
-
-    /**
-     * Create a new XML FSM
-     *
-     * @param node
-     *            The XML FSM element
-     * @param container
-     *            The state system container this FSM belongs to
-     * @return The new {@link TmfXmlFsm}
-     */
-    TmfXmlFsm createFsm(Element node, IXmlStateSystemContainer container);
-
-    /**
-     * Create a new XML state
-     *
-     * @param node
-     *            The XML state element
-     * @param container
-     *            The state system container this state belongs to
-     * @param parent
-     *            The parent state
-     * @return The new {@link TmfXmlState}
-     */
-    TmfXmlState createState(Element node, IXmlStateSystemContainer container, @Nullable TmfXmlState parent);
-
-    /**
-     * Create a new XML state transition
-     *
-     * @param node
-     *            The XML state transition element
-     * @param container
-     *            The state system container this state transition belongs to
-     * @return The new XML {@link TmfXmlStateTransition}
-     */
-    TmfXmlStateTransition createStateTransition(Element node, IXmlStateSystemContainer container);
 
 }

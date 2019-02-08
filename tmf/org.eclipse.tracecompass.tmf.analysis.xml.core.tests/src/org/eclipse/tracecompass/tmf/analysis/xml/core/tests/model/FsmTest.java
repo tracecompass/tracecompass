@@ -8,13 +8,13 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.tmf.analysis.xml.core.tests.model;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
@@ -52,9 +52,15 @@ public class FsmTest {
      */
     @AfterClass
     public static void tearDown() {
-        fModule.dispose();
-        fModule2.dispose();
-        fTrace.dispose();
+        if (fModule != null) {
+            fModule.dispose();
+        }
+        if (fModule2 != null) {
+            fModule2.dispose();
+        }
+        if (fTrace != null) {
+            fTrace.dispose();
+        }
     }
 
     /**
@@ -63,6 +69,7 @@ public class FsmTest {
     @BeforeClass
     public static void before() {
         ITmfTrace trace = XmlUtilsTest.initializeTrace(TEST_TRACE);
+        fTrace = trace;
         //Create first module
         fModule = PatternAnalysisTestUtils.initModule(TEST_FILE_1);
         try {
@@ -82,7 +89,6 @@ public class FsmTest {
         } catch (TmfAnalysisException e) {
             fail("Cannot execute analyses " + e.getMessage());
         }
-        fTrace = trace;
     }
 
     /**
@@ -102,7 +108,7 @@ public class FsmTest {
             quark = stateSystem.getQuarkAbsolute("fsm2");
             interval = stateSystem.querySingleState(END_TIME, quark);
             long count2 = interval.getStateValue().unboxLong();
-            assertTrue("Test the count value", count1 == count2);
+            assertEquals("Test the count value", count1, count2);
         } catch (AttributeNotFoundException | StateSystemDisposedException e) {
             fail("Failed to query the state system");
         }
@@ -135,35 +141,31 @@ public class FsmTest {
      * Execute one pattern, with the two types of initial state initialization,
      * then test that the new behavior is prioritized and that preconditions are
      * ignored with initialState element
+     *
+     * @throws AttributeNotFoundException
+     *             Exceptions thrown querying the state system
+     * @throws StateSystemDisposedException
+     *             Exceptions thrown querying the state system
      */
     @Test
-    public void testTwoInitialStates() {
-        //Test segment store
-        @Nullable ISegmentStore<@NonNull ISegment> ss = fModule2.getSegmentStore();
+    public void testTwoInitialStates() throws AttributeNotFoundException, StateSystemDisposedException {
+        // Test segment store
+        ISegmentStore<@NonNull ISegment> ss = fModule2.getSegmentStore();
         assertNotNull("segment store exist", ss);
         assertTrue("Segment store not empty", ss.size() == 1);
         Object item = ss.iterator().next();
         assertTrue(item instanceof TmfXmlPatternSegment);
         assertTrue(((TmfXmlPatternSegment) item).getName().equals(TEST_SEGMENT_NEW));
 
-        //Test state system
+        // Test state system
         ITmfStateSystem stateSystem = fModule2.getStateSystem(fModule2.getId());
         assertNotNull("state system exist", stateSystem);
-        int quark;
-        try {
-            quark = stateSystem.getQuarkAbsolute("count_new");
-            @NonNull ITmfStateInterval interval = stateSystem.querySingleState(END_TIME, quark);
-            int count = interval.getStateValue().unboxInt();
-            assertTrue("Test the count value", count > 0);
-        } catch (AttributeNotFoundException | StateSystemDisposedException e) {
-            fail("Failed to query the state system");
-        }
 
-        try {
-            quark = stateSystem.getQuarkAbsolute("precond");
-        } catch (AttributeNotFoundException e) {
-            return;
-        }
-        fail();
+        int quark = stateSystem.getQuarkAbsolute("count_new");
+        ITmfStateInterval interval = stateSystem.querySingleState(END_TIME, quark);
+        int count = interval.getStateValue().unboxInt();
+        assertTrue("Test the count value", count > 0);
+        quark = stateSystem.optQuarkAbsolute("precond");
+        assertEquals(ITmfStateSystem.INVALID_ATTRIBUTE, quark);
     }
 }

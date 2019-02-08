@@ -14,6 +14,7 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenFsm;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -204,12 +205,12 @@ public class TmfXmlScenarioHistoryBuilder {
      *
      * @param container
      *            The state system container this class use
-     * @param fsmId
+     * @param fsm
      *            Id of the fsm this scenario is associated to
      * @return The scenario quark
      */
-    public int assignScenarioQuark(IXmlStateSystemContainer container, String fsmId) {
-        TmfAttributePool pool = getPoolFor(container, fsmId);
+    public int assignScenarioQuark(IXmlStateSystemContainer container, DataDrivenFsm fsm) {
+        TmfAttributePool pool = getPoolFor(container, fsm.getId());
         return pool.getAvailable();
     }
 
@@ -358,7 +359,7 @@ public class TmfXmlScenarioHistoryBuilder {
         try {
             // save the status
             int attributeQuark = ss.getQuarkRelativeAndAdd(info.getQuark(), TmfXmlStrings.STATE);
-            ss.modifyAttribute(ts, info.getActiveState(), attributeQuark);
+            ss.modifyAttribute(ts, info.getActiveState().getId(), attributeQuark);
         } catch (StateValueTypeException e) {
             Activator.logError("failed to update scenario state"); //$NON-NLS-1$
         }
@@ -380,8 +381,8 @@ public class TmfXmlScenarioHistoryBuilder {
         try {
             int stateQuark = ss.getQuarkRelativeAndAdd(info.getQuark(), TmfXmlStrings.STATE);
             String activeState = ss.queryOngoingState(stateQuark).unboxStr();
-            if (activeState.compareTo(info.getActiveState()) != 0) {
-                int attributeQuark = ss.getQuarkRelativeAndAdd(stateQuark, info.getActiveState(), START_TIME);
+            if (activeState.compareTo(info.getActiveState().getId()) != 0) {
+                int attributeQuark = ss.getQuarkRelativeAndAdd(stateQuark, info.getActiveState().getId(), START_TIME);
                 ss.modifyAttribute(ts, ts, attributeQuark);
             }
         } catch (StateValueTypeException e) {
@@ -427,7 +428,7 @@ public class TmfXmlScenarioHistoryBuilder {
     public void completeScenario(final IXmlStateSystemContainer container, final TmfXmlScenarioInfo info, final @Nullable ITmfEvent event) {
         ITmfStateSystemBuilder ss = (ITmfStateSystemBuilder) container.getStateSystem();
         long ts = getTimestamp(event, ss);
-        TmfAttributePool pool = getPoolFor(container, info.getFsmId());
+        TmfAttributePool pool = getPoolFor(container, info.getFsm().getId());
         pool.recycle(info.getQuark(), ts);
         info.recycleAttributes(ts);
     }

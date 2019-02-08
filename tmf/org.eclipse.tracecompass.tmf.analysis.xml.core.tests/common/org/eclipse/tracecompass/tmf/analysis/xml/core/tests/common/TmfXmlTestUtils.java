@@ -14,6 +14,9 @@ import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -67,16 +70,43 @@ public final class TmfXmlTestUtils {
      *             Exception thrown by parser
      */
     public static Element getXmlElement(String elementName, String xmlString) throws SAXException, IOException, ParserConfigurationException {
+        List<Element> elements = getXmlElements(elementName, xmlString);
+        if (elements.size() == 0) {
+            throw new NullPointerException("No element named " + elementName + " in " + xmlString);
+        }
+        return elements.get(0);
+    }
+
+    /**
+     * Get an XML element from an XML string
+     *
+     * @param elementName
+     *            The name of the element to get
+     * @param xmlString
+     *            The XML String to parse
+     * @return The XML element corresponding for the name
+     * @throws SAXException
+     *             Exception thrown by parser
+     * @throws IOException
+     *             Exception thrown by parser
+     * @throws ParserConfigurationException
+     *             Exception thrown by parser
+     */
+    public static List<@NonNull Element> getXmlElements(String elementName, String xmlString) throws SAXException, IOException, ParserConfigurationException {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         InputSource src = new InputSource();
         src.setCharacterStream(new StringReader(xmlString));
 
         Document doc = builder.parse(src);
-        NodeList elements = doc.getElementsByTagName(elementName);
-        if (elements.getLength() == 0) {
-            throw new NullPointerException("No element named " + elementName + " in " + xmlString);
+        NodeList nodes = doc.getElementsByTagName(elementName);
+
+        List<@NonNull Element> elements = new ArrayList<>();
+
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element node = Objects.requireNonNull((Element) nodes.item(i));
+            elements.add(node);
         }
-        return (Element) elements.item(0);
+        return elements;
     }
 
     /**

@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.readwrite;
 
 import java.util.Objects;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlActionCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlConditionCu;
@@ -23,10 +22,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDri
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlFsm;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternEventHandler;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlState;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlStateTransition;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.w3c.dom.Element;
 
@@ -84,21 +80,6 @@ public class TmfXmlReadWriteModelFactory implements ITmfXmlModelFactory {
     @Override
     public String createAction(Element node, IXmlStateSystemContainer container) {
         return Objects.requireNonNull(TmfXmlActionCu.compileNamedAction(container.getAnalysisCompilationData(), node), "Named action did not compile correctly"); //$NON-NLS-1$
-    }
-
-    @Override
-    public TmfXmlFsm createFsm(Element node, IXmlStateSystemContainer container) {
-        return TmfXmlFsm.create(this, node, container);
-    }
-
-    @Override
-    public @NonNull TmfXmlState createState(Element node, IXmlStateSystemContainer container, @Nullable TmfXmlState parent) {
-        return TmfXmlState.create(this, node, container, parent);
-    }
-
-    @Override
-    public TmfXmlStateTransition createStateTransition(Element node, IXmlStateSystemContainer container) {
-        return new TmfXmlStateTransition(this, node, container);
     }
 
 }

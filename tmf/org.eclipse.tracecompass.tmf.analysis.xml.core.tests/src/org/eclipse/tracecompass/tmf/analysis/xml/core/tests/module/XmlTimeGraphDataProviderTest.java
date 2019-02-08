@@ -93,11 +93,14 @@ public class XmlTimeGraphDataProviderTest {
         ((TmfTrace) trace).traceOpened(signal);
         // The data provider manager uses opened traces from the manager
         TmfTraceManager.getInstance().traceOpened(signal);
+        return trace;
+    }
+
+    private static void runModule(ITmfTrace trace) {
         IAnalysisModule module = trace.getAnalysisModule(ANALYSIS_ID);
         assertNotNull(module);
         module.schedule();
         assertTrue(module.waitForCompletion());
-        return trace;
     }
 
     /**
@@ -112,6 +115,7 @@ public class XmlTimeGraphDataProviderTest {
         ITmfTrace trace = getTrace();
         assertNotNull(trace);
         try {
+            runModule(trace);
             // Get the view element from the file
             Element viewElement = TmfXmlUtils.getElementInFile(TmfXmlTestFiles.DATA_PROVIDER_SIMPLE_FILE.getPath().toOSString(), TmfXmlStrings.TIME_GRAPH_VIEW, TIME_GRAPH_VIEW_ID);
             assertNotNull(viewElement);
@@ -212,6 +216,7 @@ public class XmlTimeGraphDataProviderTest {
         ITmfTrace trace = getTrace();
         assertNotNull(trace);
         try {
+            runModule(trace);
             // Get the view element from the file
             Element viewElement = TmfXmlUtils.getElementInFile(TmfXmlTestFiles.DATA_PROVIDER_SIMPLE_FILE.getPath().toOSString(), TmfXmlStrings.TIME_GRAPH_VIEW, TIME_GRAPH_VIEW_ID2);
             assertNotNull(viewElement);

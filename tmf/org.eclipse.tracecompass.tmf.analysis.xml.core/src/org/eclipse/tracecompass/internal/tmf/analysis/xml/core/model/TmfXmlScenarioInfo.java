@@ -8,6 +8,8 @@
  ******************************************************************************/
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model;
 
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenFsm;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenFsmState;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenScenarioInfo;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioHistoryBuilder.ScenarioStatusType;
 
@@ -18,7 +20,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScena
  */
 public class TmfXmlScenarioInfo extends DataDrivenScenarioInfo {
 
-    private final TmfXmlFsm fFsm;
+    private final DataDrivenFsm fFsm;
 
     /**
      * Constructor
@@ -34,7 +36,7 @@ public class TmfXmlScenarioInfo extends DataDrivenScenarioInfo {
      * @param fsm
      *            The FSM this scenario is part of
      */
-    public TmfXmlScenarioInfo(String activeState, ScenarioStatusType status, int quark, int statusQuark, TmfXmlFsm fsm) {
+    public TmfXmlScenarioInfo(DataDrivenFsmState activeState, ScenarioStatusType status, int quark, int statusQuark, DataDrivenFsm fsm) {
         super(activeState, status, quark, statusQuark);
         fFsm = fsm;
     }
@@ -44,8 +46,8 @@ public class TmfXmlScenarioInfo extends DataDrivenScenarioInfo {
      *
      * @return The ID of the FSM
      */
-    public String getFsmId() {
-        return fFsm.getId();
+    public DataDrivenFsm getFsm() {
+        return fFsm;
     }
 
 }

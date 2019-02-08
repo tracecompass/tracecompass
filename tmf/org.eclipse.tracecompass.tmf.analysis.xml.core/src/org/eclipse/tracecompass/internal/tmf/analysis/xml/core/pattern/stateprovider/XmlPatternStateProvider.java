@@ -23,6 +23,7 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.AnalysisCompilationData;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlLocationCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlMappingGroupCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenRuntimeData;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenMappingGroup;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.ITmfXmlModelFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternEventHandler;
@@ -70,6 +71,8 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
     private final AnalysisCompilationData fAnalysisCompilationData;
 
     private Map<String, ScriptEngine> fScriptengine = new HashMap<>();
+
+    private final DataDrivenRuntimeData fExecutionData = new DataDrivenRuntimeData();
 
     /**
      * @param trace
@@ -270,4 +273,11 @@ public class XmlPatternStateProvider extends AbstractTmfStateProvider implements
     public DataDrivenMappingGroup getMappingGroup(String id) {
         return Objects.requireNonNull(fMappingGroups.get(id));
     }
+
+    @Override
+    public DataDrivenRuntimeData getExecutionData() {
+        return fExecutionData;
+    }
+
+
 }

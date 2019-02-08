@@ -24,14 +24,23 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
  *
  * @author Jean-Christian Kouame
  */
-public class DataDrivenActionUpdateStoredFields implements DataDrivenAction  {
+public final class DataDrivenActionUpdateStoredFields implements DataDrivenAction  {
+
+    private static final DataDrivenAction INSTANCE = new DataDrivenActionUpdateStoredFields();
+
+    /**
+     * Get the instance of this action
+     *
+     * @return The action
+     */
+    public static DataDrivenAction getInstance() {
+        return INSTANCE;
+    }
 
     /**
      * Constructor
-     *
-     * FIXME: Can this be a singleton? Find out when legacy code is gone
      */
-    public DataDrivenActionUpdateStoredFields() {
+    private DataDrivenActionUpdateStoredFields() {
         // Do nothing
     }
 

@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -26,6 +28,11 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * @author Florian Wininger
  */
 public interface DataDrivenCondition extends IDataDrivenRuntimeObject {
+
+    /**
+     * A condition that returns always true
+     */
+    public static final DataDrivenCondition TRUE_CONDITION = (e, s, c) -> true;
 
     /**
      * Condition operators used to compare 2 values together
@@ -57,9 +64,9 @@ public interface DataDrivenCondition extends IDataDrivenRuntimeObject {
     }
 
     /**
-     * Condition operators used to determine the position of a value wrt to a given
-     * time range. It tests the operator with whether the value intersects a time
-     * range or not
+     * Condition operators used to determine the position of a value wrt to a
+     * given time range. It tests the operator with whether the value intersects
+     * a time range or not
      */
     public enum TimeRangeOperator implements Predicate<Boolean> {
         /** value is inside the time range */
@@ -120,10 +127,32 @@ public interface DataDrivenCondition extends IDataDrivenRuntimeObject {
             return fOperator.test(cmpVal);
         }
 
+        @Override
+        public int hashCode() {
+            return Objects.hash(fOperator, fFirstValue, fSecondValue);
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (!(obj instanceof DataDrivenComparisonCondition)) {
+                return false;
+            }
+            DataDrivenComparisonCondition other = (DataDrivenComparisonCondition) obj;
+            return Objects.equals(fOperator, other.fOperator) &&
+                    Objects.equals(fFirstValue, other.fFirstValue) &&
+                    Objects.equals(fSecondValue, other.fSecondValue);
+        }
+
+        @Override
+        public String toString() {
+            return fFirstValue.toString() + ' ' + fOperator.toString() + ' ' + fSecondValue.toString();
+        }
+
     }
 
     /**
-     * A condition that verifies the relation of a time value with a given time range
+     * A condition that verifies the relation of a time value with a given time
+     * range
      */
     public static class DataDrivenTimeRangeCondition implements DataDrivenCondition {
 
@@ -151,6 +180,27 @@ public interface DataDrivenCondition extends IDataDrivenRuntimeObject {
         public boolean test(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
             long ts = event.getTimestamp().toNanos();
             return fOperator.test(ts >= fBegin && ts <= fEnd);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(fOperator, fBegin, fEnd);
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (!(obj instanceof DataDrivenTimeRangeCondition)) {
+                return false;
+            }
+            DataDrivenTimeRangeCondition other = (DataDrivenTimeRangeCondition) obj;
+            return Objects.equals(fOperator, other.fOperator) &&
+                    fBegin == other.fBegin &&
+                    fEnd == other.fEnd;
+        }
+
+        @Override
+        public String toString() {
+            return "Time range conditions: " + fOperator.toString() + ' ' + fBegin + ',' + fEnd; //$NON-NLS-1$
         }
 
     }
@@ -192,12 +242,33 @@ public interface DataDrivenCondition extends IDataDrivenRuntimeObject {
             return fOperator.test(Long.compare(ts - referenceTs, fValue));
         }
 
+        @Override
+        public int hashCode() {
+            return Objects.hash(fOperator, fReference, fValue);
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (!(obj instanceof DataDrivenElapsedTimeCondition)) {
+                return false;
+            }
+            DataDrivenElapsedTimeCondition other = (DataDrivenElapsedTimeCondition) obj;
+            return Objects.equals(fOperator, other.fOperator) &&
+                    Objects.equals(fReference, other.fReference) &&
+                    fValue == other.fValue;
+        }
+
+        @Override
+        public String toString() {
+            return "Elapsed time condition: " + fOperator.toString() + ' ' + fReference + ',' + fValue; //$NON-NLS-1$
+        }
+
     }
 
     /**
      * A condition negating another condition
      */
-    public static class TmfDdNotCondition implements DataDrivenCondition {
+    public static class DataDrivenNotCondition implements DataDrivenCondition {
 
         private final DataDrivenCondition fCondition;
 
@@ -207,13 +278,32 @@ public interface DataDrivenCondition extends IDataDrivenRuntimeObject {
          * @param condition
          *            The condition to verify
          */
-        public TmfDdNotCondition(DataDrivenCondition condition) {
+        public DataDrivenNotCondition(DataDrivenCondition condition) {
             fCondition = condition;
         }
 
         @Override
         public boolean test(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
             return !fCondition.test(event, scenarioInfo, container);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(DataDrivenNotCondition.class, fCondition);
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (!(obj instanceof DataDrivenNotCondition)) {
+                return false;
+            }
+            DataDrivenNotCondition other = (DataDrivenNotCondition) obj;
+            return Objects.equals(fCondition, other.fCondition);
+        }
+
+        @Override
+        public String toString() {
+            return "NOT: " + fCondition.toString(); //$NON-NLS-1$
         }
 
     }
@@ -245,6 +335,25 @@ public interface DataDrivenCondition extends IDataDrivenRuntimeObject {
             return true;
         }
 
+        @Override
+        public int hashCode() {
+            return Objects.hash(DataDrivenAndCondition.class, fConditions);
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (!(obj instanceof DataDrivenAndCondition)) {
+                return false;
+            }
+            DataDrivenAndCondition other = (DataDrivenAndCondition) obj;
+            return Objects.equals(fConditions, other.fConditions);
+        }
+
+        @Override
+        public String toString() {
+            return "AND: " + fConditions.toString(); //$NON-NLS-1$
+        }
+
     }
 
     /**
@@ -274,6 +383,79 @@ public interface DataDrivenCondition extends IDataDrivenRuntimeObject {
             return false;
         }
 
+        @Override
+        public int hashCode() {
+            return Objects.hash(DataDrivenOrCondition.class, fConditions);
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (!(obj instanceof DataDrivenOrCondition)) {
+                return false;
+            }
+            DataDrivenOrCondition other = (DataDrivenOrCondition) obj;
+            return Objects.equals(fConditions, other.fConditions);
+        }
+
+        @Override
+        public String toString() {
+            return "OR: " + fConditions.toString(); //$NON-NLS-1$
+        }
+
+    }
+
+    /**
+     * A condition that validates if a value corresponds to a regex pattern
+     */
+    public static class DataDrivenRegexCondition implements DataDrivenCondition {
+
+        private final Pattern fPattern;
+        private final DataDrivenValue fValue;
+
+        /**
+         * Constructor
+         *
+         * @param pattern
+         *            The regex pattern to match
+         * @param value
+         *            The value to match with the pattern
+         */
+        public DataDrivenRegexCondition(Pattern pattern, DataDrivenValue value) {
+            fPattern = pattern;
+            fValue = value;
+        }
+
+        @Override
+        public boolean test(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
+            Object value = fValue.getValue(event, ITmfStateSystem.ROOT_ATTRIBUTE, scenarioInfo, container);
+            if (value == null) {
+                return false;
+            }
+            return fPattern.matcher(String.valueOf(value)).matches();
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(String.valueOf(fPattern), fValue);
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (!(obj instanceof DataDrivenRegexCondition)) {
+                return false;
+            }
+            DataDrivenRegexCondition other = (DataDrivenRegexCondition) obj;
+            // Compare the equality of the pattern's string, as the pattern
+            // object are not equal if the string is equal
+            return Objects.equals(String.valueOf(fPattern), String.valueOf(other.fPattern)) &&
+                    Objects.equals(fValue, other.fValue);
+        }
+
+        @Override
+        public String toString() {
+            return fValue.toString() + " matches " + fPattern; //$NON-NLS-1$
+        }
+
     }
 
     /**
@@ -285,8 +467,8 @@ public interface DataDrivenCondition extends IDataDrivenRuntimeObject {
      *            The scenario info
      * @param container
      *            The analysis data container
-     * @return The result of this condition, so <code>true</code> if the condition
-     *         validates, <code>false</code> otherwise
+     * @return The result of this condition, so <code>true</code> if the
+     *         condition validates, <code>false</code> otherwise
      */
     boolean test(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container);
 

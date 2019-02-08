@@ -20,14 +20,23 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * This action will reset the value of each stored values to a null
  * {@link ITmfStateValue} in the state system
  */
-public class DataDrivenActionResetStoredFields implements DataDrivenAction {
+public final class DataDrivenActionResetStoredFields implements DataDrivenAction {
+
+    private static final DataDrivenAction INSTANCE = new DataDrivenActionResetStoredFields();
+
+    /**
+     * Get the instance of this action
+     *
+     * @return The action
+     */
+    public static DataDrivenAction getInstance() {
+        return INSTANCE;
+    }
 
     /**
      * Constructor
-     *
-     * FIXME: Can this be a singleton? Find out when legacy code is gone
      */
-    public DataDrivenActionResetStoredFields() {
+    private DataDrivenActionResetStoredFields() {
         // Nothing to do
     }
 
