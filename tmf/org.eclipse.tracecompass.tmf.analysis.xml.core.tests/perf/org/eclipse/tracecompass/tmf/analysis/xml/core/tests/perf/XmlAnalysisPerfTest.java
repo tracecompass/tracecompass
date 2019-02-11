@@ -31,7 +31,7 @@ import org.junit.Test;
  */
 public abstract class XmlAnalysisPerfTest {
 
-    private static final String TEST_ID = "org.eclipse.tracecompass.xml.analysis#%file#%trace";
+    private static final String TEST_ID = "org.eclipse.tracecompass.xml.analysis#XML analysis#%s (%s)";
 
     /**
      * Get the trace to run the analysis on. The test class will dispose of the
@@ -80,7 +80,7 @@ public abstract class XmlAnalysisPerfTest {
     @Test
     public void testAnalysisPerformance() throws TmfTraceException, TmfAnalysisException {
         Performance perf = Performance.getDefault();
-        PerformanceMeter pm = perf.createPerformanceMeter(TEST_ID.replace("%file", fAnalysisId).replace("%trace", fTestName));
+        PerformanceMeter pm = perf.createPerformanceMeter(String.format(TEST_ID, fAnalysisId, fTestName));
         perf.tagAsSummary(pm, "XML analysis: " + fAnalysisId + " " + fTestName, Dimension.CPU_TIME);
 
         for (int i = 0; i < fLoopCount; i++) {
