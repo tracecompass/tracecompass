@@ -23,6 +23,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlPatternCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateProviderCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValueConstant;
@@ -103,8 +104,7 @@ public final class TmfXmlTestUtils {
         List<@NonNull Element> elements = new ArrayList<>();
 
         for (int i = 0; i < nodes.getLength(); i++) {
-            Element node = Objects.requireNonNull((Element) nodes.item(i));
-            elements.add(node);
+            elements.add(Objects.requireNonNull((Element) nodes.item(i)));
         }
         return elements;
     }
@@ -125,9 +125,11 @@ public final class TmfXmlTestUtils {
         Element element = TmfXmlUtils.getElementInFile(xmlFilePath, TmfXmlStrings.PATTERN, analysisId);
 
         if (element != null) {
-            XmlPatternAnalysis module = new XmlPatternAnalysis();
-            module.setXmlFile(Paths.get(xmlFilePath));
-            module.setId(analysisId);
+            TmfXmlPatternCu patternCu = TmfXmlPatternCu.compile(element);
+            if (patternCu == null) {
+                return null;
+            }
+            XmlPatternAnalysis module = new XmlPatternAnalysis(analysisId, patternCu);
             module.setName(analysisId);
             return module;
         }

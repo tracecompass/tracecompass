@@ -7,10 +7,12 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model;
+package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenFsm;
 
 /**
  * Keep data that is useful during the execution of the analysis, but that will
@@ -26,6 +28,7 @@ public class DataDrivenRuntimeData {
     public static final DataDrivenRuntimeData DEFAULT = new DataDrivenRuntimeData();
 
     private final Map<DataDrivenFsm, DataDrivenRuntimeFsm> fFsmRuntime = new HashMap<>();
+    private DataDrivenScenarioHistoryBuilder fHistoryBuilder = new DataDrivenScenarioHistoryBuilder();
 
     /**
      * Get the runtime FSM for a fsm. Creates one if necessary
@@ -41,6 +44,15 @@ public class DataDrivenRuntimeData {
             fFsmRuntime.put(fsm, runtimeFsm);
         }
         return runtimeFsm;
+    }
+
+    /**
+     * Get the history builder for this analysis execution
+     *
+     * @return The scenario history builder
+     */
+    public DataDrivenScenarioHistoryBuilder getHistoryBuilder() {
+        return fHistoryBuilder;
     }
 
 }

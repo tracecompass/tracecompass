@@ -37,9 +37,9 @@ import org.w3c.dom.Element;
 public abstract class TmfXmlFsmStateCu implements IDataDrivenCompilationUnit {
 
     /**
-     * Represents an FSM state
+     * Represents an FSM
      */
-    private static class TmfXmlFsmCu extends TmfXmlFsmStateCu {
+    public static class TmfXmlFsmCu extends TmfXmlFsmStateCu {
 
         private final TmfXmlFsmStateCu fInitialState;
         private final Collection<TmfXmlFsmSimpleStateCu> fStates;
@@ -47,7 +47,25 @@ public abstract class TmfXmlFsmStateCu implements IDataDrivenCompilationUnit {
         private final boolean fConsuming;
         private final boolean fMultipleInstances;
 
-        public TmfXmlFsmCu(String id, TmfXmlFsmStateCu initialStateCu, Collection<TmfXmlFsmSimpleStateCu> states, boolean consuming, boolean instanceMultipleEnabled, TmfXmlConditionCu preCondition) {
+        /**
+         * Constructor
+         *
+         * @param id
+         *            The ID of this FSM
+         * @param initialStateCu
+         *            The initial state compilation unit
+         * @param states
+         *            The list of states
+         * @param consuming
+         *            Whether this fsm is consuming (ie, once a transition is
+         *            taken in one scenario, it won't be taken on others)
+         * @param instanceMultipleEnabled
+         *            Whether multiple scenarios of this FSM can be run in
+         *            parallel
+         * @param preCondition
+         *            The preconditions for this FSM
+         */
+        private TmfXmlFsmCu(String id, TmfXmlFsmStateCu initialStateCu, Collection<TmfXmlFsmSimpleStateCu> states, boolean consuming, boolean instanceMultipleEnabled, TmfXmlConditionCu preCondition) {
             super(id);
             fInitialState = initialStateCu;
             fStates = states;
@@ -57,7 +75,7 @@ public abstract class TmfXmlFsmStateCu implements IDataDrivenCompilationUnit {
         }
 
         @Override
-        public DataDrivenFsmState internalGenerate() {
+        public DataDrivenFsm generate() {
             Map<String, DataDrivenFsmSimpleState> states = fStates.stream()
                     .map(TmfXmlFsmSimpleStateCu::generate)
                     .collect(Collectors.toMap(DataDrivenFsmState::getId, state -> state));
@@ -77,7 +95,7 @@ public abstract class TmfXmlFsmStateCu implements IDataDrivenCompilationUnit {
         }
 
         @Override
-        public DataDrivenFsmSimpleState internalGenerate() {
+        public DataDrivenFsmSimpleState generate() {
             return DataDrivenFsmSimpleState.createFinalState(getId());
         }
 
@@ -103,25 +121,23 @@ public abstract class TmfXmlFsmStateCu implements IDataDrivenCompilationUnit {
         }
 
         @Override
-        public DataDrivenFsmSimpleState internalGenerate() {
+        public DataDrivenFsmSimpleState generate() {
             List<DataDrivenFsmStateTransition> transitions = fTransitions.stream()
                     .map(TmfXmlFsmStateTransitionCu::generate)
                     .collect(Collectors.toList());
             return new DataDrivenFsmSimpleState(getId(), transitions, fOnEntryActions.generate(), fOnExitActions.generate());
         }
 
-        @Override
-        public final DataDrivenFsmSimpleState generate() {
-            return (DataDrivenFsmSimpleState) super.generate();
-        }
     }
 
-    private @Nullable DataDrivenFsmState fState;
     private final String fId;
 
     private TmfXmlFsmStateCu(String id) {
         fId = id;
     }
+
+    @Override
+    public abstract DataDrivenFsmState generate();
 
     /**
      * Get the ID of this FSM state
@@ -131,24 +147,6 @@ public abstract class TmfXmlFsmStateCu implements IDataDrivenCompilationUnit {
     protected String getId() {
         return fId;
     }
-
-    @Override
-    public DataDrivenFsmState generate() {
-        DataDrivenFsmState state = fState;
-        if (state == null) {
-            state = internalGenerate();
-            fState = state;
-        }
-        return state;
-    }
-
-    /**
-     * Generate the fsm, so the base class can cache it, as a state may be
-     * referred at many places
-     *
-     * @return The generated FSM
-     */
-    protected abstract DataDrivenFsmState internalGenerate();
 
     /**
      * Compile a finite state machine from an XML element
@@ -161,7 +159,7 @@ public abstract class TmfXmlFsmStateCu implements IDataDrivenCompilationUnit {
      *            the XML element corresponding to the fsm
      * @return The FSM
      */
-    public static @Nullable String compileFsm(AnalysisCompilationData analysisData, Element element) {
+    public static @Nullable TmfXmlFsmCu compileFsm(AnalysisCompilationData analysisData, Element element) {
         String id = element.getAttribute(TmfXmlStrings.ID);
         if (id.isEmpty()) {
             // TODO: Validation message here
@@ -286,7 +284,7 @@ public abstract class TmfXmlFsmStateCu implements IDataDrivenCompilationUnit {
 
         TmfXmlFsmCu fsm = new TmfXmlFsmCu(id, initialStateCu, states.values(), consuming, instanceMultipleEnabled, preCondition);
         analysisData.addFsm(id, fsm);
-        return id;
+        return fsm;
     }
 
     private static @Nullable List<TmfXmlFsmStateTransitionCu> compileTransitionElements(AnalysisCompilationData analysisData, Element element, Map<String, TmfXmlFsmSimpleStateCu> states) {

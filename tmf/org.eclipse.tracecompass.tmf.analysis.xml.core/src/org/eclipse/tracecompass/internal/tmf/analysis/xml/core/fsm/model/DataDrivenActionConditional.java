@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime.DataDrivenScenarioInfo;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 

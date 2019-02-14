@@ -306,10 +306,10 @@ public abstract class TmfXmlActionCu implements IDataDrivenCompilationUnit {
      *            The analysis data already compiled
      * @param namedEl
      *            the XML element corresponding to the action
-     * @return The action ID, or <code>null</code> if there was compilation
+     * @return The action, or <code>null</code> if there was compilation
      *         errors
      */
-    public static @Nullable String compileNamedAction(AnalysisCompilationData analysisData, Element namedEl) {
+    public static @Nullable TmfXmlActionCu compileNamedAction(AnalysisCompilationData analysisData, Element namedEl) {
         String actionId = namedEl.getAttribute(TmfXmlStrings.ID);
         if (actionId.isEmpty()) {
             // TODO: Validation message here
@@ -347,15 +347,11 @@ public abstract class TmfXmlActionCu implements IDataDrivenCompilationUnit {
             case TmfXmlStrings.ACTION:
             {
                 // Compile the subaction
-                String subActionId = compileNamedAction(analysisData, nonNullChild);
-                if (subActionId == null) {
+                TmfXmlActionCu subAction = compileNamedAction(analysisData, nonNullChild);
+                if (subAction == null) {
                     return null;
                 }
-                TmfXmlActionCu action = analysisData.getAction(subActionId);
-                if (action == null) {
-                    return null;
-                }
-                actionList.add(action);
+                actionList.add(subAction);
             }
                 break;
             default:
@@ -365,7 +361,7 @@ public abstract class TmfXmlActionCu implements IDataDrivenCompilationUnit {
         }
         TmfXmlActionCu actionCu = createActionList(actionList);
         analysisData.addAction(actionId, actionCu);
-        return actionId;
+        return actionCu;
     }
 
     private static @Nullable TmfXmlActionCu compileSegmentAction(AnalysisCompilationData analysisData, Element node) {

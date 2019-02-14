@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime.DataDrivenScenarioInfo;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioInfo;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
@@ -62,14 +62,14 @@ public class DataDrivenFsmSimpleState extends DataDrivenFsmState {
     }
 
     @Override
-    public @Nullable DataDrivenFsmState takeTransition(ITmfEvent event, TmfXmlScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
+    public @Nullable DataDrivenFsmState takeTransition(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
         for (DataDrivenFsmStateTransition transition : fTransitions) {
             if (transition.canTake(event, scenarioInfo, container)) {
                 // We have a valid transition, start by executing the onExit actions
                 fOnExit.eventHandle(event, scenarioInfo, container);
                 // Take the transition and return the resulting state
                 String nextStateName = transition.take(event, scenarioInfo, container);
-                DataDrivenFsmSimpleState nextState = scenarioInfo.getFsm().getState(nextStateName);
+                DataDrivenFsmSimpleState nextState = Objects.requireNonNull(scenarioInfo.getFsm()).getState(nextStateName);
                 // Execute the onEntry actions of nextState
                 nextState.fOnEntry.eventHandle(event, scenarioInfo, container);
                 return nextState;

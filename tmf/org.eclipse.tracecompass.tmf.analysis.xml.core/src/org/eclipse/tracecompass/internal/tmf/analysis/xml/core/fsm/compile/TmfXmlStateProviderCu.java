@@ -62,7 +62,7 @@ public class TmfXmlStateProviderCu {
      * Generate a state provider from this compilation unit
      *
      * @param trace
-     *            The for which to generate the state provider
+     *            The trace for which to generate the state provider
      * @return The data-driven state provider
      */
     public DataDrivenStateProvider generate(ITmfTrace trace) {

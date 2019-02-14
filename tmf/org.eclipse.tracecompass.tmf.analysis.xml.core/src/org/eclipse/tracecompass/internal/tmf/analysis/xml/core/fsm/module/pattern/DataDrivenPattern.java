@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 École Polytechnique de Montréal
+ * Copyright (c) 2019 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -7,20 +7,22 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module;
+package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.pattern;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import javax.script.ScriptEngine;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenEventHandler;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenMappingGroup;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime.DataDrivenScenarioInfo;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenPatternEventHandler;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime.DataDrivenRuntimeData;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.ISegmentListener;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternSegmentStoreModule;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -31,20 +33,28 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool.QueueType;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
- * A state provider for data-driven analyses
+ * The main class for data driven pattern
+ *
+ * FIXME: This has a lot in common with DataDrivenStateProvider, something should
+ * be done about it
  *
  * @author Geneviève Bastien
+ * @author Jean-Christian Kouamé
  */
-public class DataDrivenStateProvider extends AbstractTmfStateProvider implements IAnalysisDataContainer {
+public class DataDrivenPattern extends AbstractTmfStateProvider implements IAnalysisDataContainer {
 
-    private final List<DataDrivenEventHandler> fEventHandlers;
+    private final DataDrivenPatternEventHandler fEventHandler;
     private final Map<String, DataDrivenMappingGroup> fMappingGroups = new HashMap<>();
-    private Map<String, ScriptEngine> fScriptengine = new HashMap<>();
-    private final String fId;
     private final int fVersion;
-
+    private final String fId;
+    private final Map<String, ScriptEngine> fScriptEngine = new HashMap<>();
     /** Map for attribute pools */
     private final Map<Integer, TmfAttributePool> fAttributePools = new HashMap<>();
+    private final ISegmentListener fListener;
+    private final Map<String, String> fStoredFields;
+
+    /* Runtime execution data */
+    private final DataDrivenRuntimeData fExecutionData = new DataDrivenRuntimeData();
 
     /**
      * Constructor
@@ -55,32 +65,22 @@ public class DataDrivenStateProvider extends AbstractTmfStateProvider implements
      *            The ID of the provider
      * @param version
      *            The version of this state provider
-     * @param eventHandlers
-     *            The handlers for the events
+     * @param patternHandler
+     *            The handler for the events
      * @param mappingGroups
      *            The mapping groups used in this analysis
+     * @param listener
+     *            The segment listener
+     * @param storedFields The map of stored fields to save
      */
-    public DataDrivenStateProvider(ITmfTrace trace, String providerId, int version, List<DataDrivenEventHandler> eventHandlers, Collection<DataDrivenMappingGroup> mappingGroups) {
+    public DataDrivenPattern(ITmfTrace trace, String providerId, int version, DataDrivenPatternEventHandler patternHandler, Collection<DataDrivenMappingGroup> mappingGroups, ISegmentListener listener, Map<String, String> storedFields) {
         super(trace, providerId);
-        fEventHandlers = eventHandlers;
+        fEventHandler = patternHandler;
         mappingGroups.forEach(mg -> fMappingGroups.put(mg.getId(), mg));
-        fId = providerId;
         fVersion = version;
-    }
-
-    @Override
-    public int getVersion() {
-        return fVersion;
-    }
-
-    @Override
-    public ITmfStateProvider getNewInstance() {
-        return new DataDrivenStateProvider(getTrace(), fId, fVersion, fEventHandlers, fMappingGroups.values());
-    }
-
-    @Override
-    protected void eventHandle(ITmfEvent event) {
-        fEventHandlers.forEach(handler -> handler.handleEvent(event, DataDrivenScenarioInfo.DUMMY_SCENARIO, this));
+        fId = providerId;
+        fListener = listener;
+        fStoredFields = storedFields;
     }
 
     @Override
@@ -112,22 +112,63 @@ public class DataDrivenStateProvider extends AbstractTmfStateProvider implements
     }
 
     @Override
-    public void addFutureState(long time, @Nullable Object state, int quark) {
-        this.addFutureEvent(time, state, quark);
+    public int getVersion() {
+        return fVersion;
+    }
+
+    @Override
+    public ITmfStateProvider getNewInstance() {
+        return new DataDrivenPattern(getTrace(), fId, fVersion, fEventHandler, fMappingGroups.values(), fListener, fStoredFields);
+    }
+
+    @Override
+    protected void eventHandle(ITmfEvent event) {
+        fEventHandler.handleEvent(event, this, fExecutionData);
     }
 
     @Override
     public void setScriptengine(String name, ScriptEngine engine) {
-        fScriptengine.put(name, engine);
+        fScriptEngine.put(name, engine);
     }
 
     @Override
     public @Nullable ScriptEngine getScriptEngine(String name) {
-        return fScriptengine.get(name);
+        return fScriptEngine.get(name);
     }
 
     @Override
     public boolean isReadOnlyContainer() {
         return false;
     }
+
+    @Override
+    public void dispose() {
+        waitForEmptyQueue();
+        fListener.onNewSegment(XmlPatternSegmentStoreModule.END_SEGMENT);
+        fEventHandler.dispose(fExecutionData);
+        super.dispose();
+    }
+
+    /**
+     * Get the segment listener
+     *
+     * FIXME: Remove this method
+     *
+     * @return The new segment listener
+     */
+    public ISegmentListener getListener() {
+        return fListener;
+    }
+
+    /**
+     * Get the stored fields for this pattern
+     *
+     * FIXME: These fields should be in the action itself, not in the pattern
+     *
+     * @return The stored fields
+     */
+    public Map<String, String> getStoredFields() {
+        return fStoredFields;
+    }
+
 }

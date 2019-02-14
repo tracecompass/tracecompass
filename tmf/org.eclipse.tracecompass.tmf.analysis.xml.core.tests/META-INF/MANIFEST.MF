@@ -21,13 +21,14 @@ Require-Bundle: org.junit,
  org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
-Import-Package: com.google.common.base;version="15.0.0",
+Import-Package: com.google.common.base,
  com.google.common.collect,
- org.apache.commons.lang3;version="3.1.0",
+ org.apache.commons.lang3,
  org.eclipse.tracecompass.testtraces.ctf,
  org.junit.runners
 Export-Package: org.eclipse.tracecompass.tmf.analysis.xml.core.tests,
  org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common;x-friends:="org.eclipse.tracecompass.tmf.analysis.xml.ui.tests,org.eclipse.tracecompass.tmf.analysis.xml.ui.swtbot.tests",
+ org.eclipse.tracecompass.tmf.analysis.xml.core.tests.fsm.compile,
  org.eclipse.tracecompass.tmf.analysis.xml.core.tests.model,
  org.eclipse.tracecompass.tmf.analysis.xml.core.tests.module,
  org.eclipse.tracecompass.tmf.analysis.xml.core.tests.perf,

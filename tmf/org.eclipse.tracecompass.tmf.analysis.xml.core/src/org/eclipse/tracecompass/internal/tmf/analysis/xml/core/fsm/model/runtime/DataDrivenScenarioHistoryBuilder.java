@@ -6,7 +6,7 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  ******************************************************************************/
-package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model;
+package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +15,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenFsm;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -32,8 +33,11 @@ import com.google.common.collect.ImmutableBiMap;
 /**
  * This class is responsible for creating scenarios, updating their status and
  * data, and saving the scenario data to the state system
+ *
+ * TODO: This class should have the responsibility of the "debug" mode, ie
+ * whether or not to save the scenario data in a state system
  */
-public class TmfXmlScenarioHistoryBuilder {
+public class DataDrivenScenarioHistoryBuilder {
 
     /** The string 'status' */
     public static final String STATUS = "status"; //$NON-NLS-1$
@@ -90,7 +94,7 @@ public class TmfXmlScenarioHistoryBuilder {
      *
      * @return The start time of the matching process for the specified scenario
      */
-    public long getStartTime(final IXmlStateSystemContainer container, final TmfXmlScenarioInfo info, final ITmfEvent event) {
+    public long getStartTime(IAnalysisDataContainer container, DataDrivenScenarioInfo info, ITmfEvent event) {
         ITmfStateSystemBuilder ss = (ITmfStateSystemBuilder) container.getStateSystem();
         long ts = getTimestamp(event, ss);
         try {
@@ -117,7 +121,7 @@ public class TmfXmlScenarioHistoryBuilder {
      * @param event
      *            The current event
      */
-    public void updateStoredFields(final IXmlStateSystemContainer container, final String attributeName, final ITmfStateValue value, final TmfXmlScenarioInfo info, final ITmfEvent event) {
+    public void updateStoredFields(IAnalysisDataContainer container, String attributeName, ITmfStateValue value, DataDrivenScenarioInfo info, ITmfEvent event) {
         ITmfStateSystemBuilder ss = (ITmfStateSystemBuilder) container.getStateSystem();
         long ts = getTimestamp(event, ss);
         try {
@@ -140,7 +144,7 @@ public class TmfXmlScenarioHistoryBuilder {
      * @param event
      *            The current event
      */
-    public void resetStoredFields(final IXmlStateSystemContainer container, final String attributeName, final TmfXmlScenarioInfo info, final ITmfEvent event) {
+    public void resetStoredFields(final IAnalysisDataContainer container, String attributeName, DataDrivenScenarioInfo info, ITmfEvent event) {
         ITmfStateSystemBuilder ss = (ITmfStateSystemBuilder) container.getStateSystem();
         long ts = getTimestamp(event, ss);
         try {
@@ -165,7 +169,7 @@ public class TmfXmlScenarioHistoryBuilder {
      *
      * @return The value of a special field saved into the state system
      */
-    public ITmfStateValue getStoredFieldValue(IXmlStateSystemContainer container, String attributeName, final TmfXmlScenarioInfo info, ITmfEvent event) {
+    public ITmfStateValue getStoredFieldValue(IAnalysisDataContainer container, String attributeName, DataDrivenScenarioInfo info, ITmfEvent event) {
         ITmfStateSystemBuilder ss = (ITmfStateSystemBuilder) container.getStateSystem();
         long ts = event.getTimestamp().toNanos();
         ITmfStateInterval state = null;
@@ -187,7 +191,7 @@ public class TmfXmlScenarioHistoryBuilder {
      *            The ID of the FSM
      * @return The attribute pool associated with this FSM
      */
-    protected TmfAttributePool getPoolFor(IXmlStateSystemContainer container, String fsmId) {
+    protected TmfAttributePool getPoolFor(IAnalysisDataContainer container, String fsmId) {
         TmfAttributePool pool = fFsmPools.get(fsmId);
         if (pool != null) {
             return pool;
@@ -209,7 +213,7 @@ public class TmfXmlScenarioHistoryBuilder {
      *            Id of the fsm this scenario is associated to
      * @return The scenario quark
      */
-    public int assignScenarioQuark(IXmlStateSystemContainer container, DataDrivenFsm fsm) {
+    public int assignScenarioQuark(IAnalysisDataContainer container, DataDrivenFsm fsm) {
         TmfAttributePool pool = getPoolFor(container, fsm.getId());
         return pool.getAvailable();
     }
@@ -223,7 +227,7 @@ public class TmfXmlScenarioHistoryBuilder {
      *            The scenario quark
      * @return The scenario quark
      */
-    public int getScenarioStatusQuark(IXmlStateSystemContainer container, int scenarioQuark) {
+    public int getScenarioStatusQuark(IAnalysisDataContainer container, int scenarioQuark) {
         ITmfStateSystemBuilder ss = (ITmfStateSystemBuilder) container.getStateSystem();
         return getQuarkRelativeAndAdd(ss, scenarioQuark, STATUS);
     }
@@ -242,7 +246,7 @@ public class TmfXmlScenarioHistoryBuilder {
      *
      * @return The start time for the specified state
      */
-    public long getSpecificStateStartTime(final IXmlStateSystemContainer container, final String stateName, final TmfXmlScenarioInfo info, final ITmfEvent event) {
+    public long getSpecificStateStartTime(IXmlStateSystemContainer container, String stateName, DataDrivenScenarioInfo info, ITmfEvent event) {
         long ts = event.getTimestamp().getValue();
         ITmfStateSystemBuilder ss = (ITmfStateSystemBuilder) container.getStateSystem();
         try {
@@ -308,13 +312,13 @@ public class TmfXmlScenarioHistoryBuilder {
      * @param event
      *            The current event
      */
-    public void update(final IXmlStateSystemContainer container, final TmfXmlScenarioInfo info, final @Nullable ITmfEvent event) {
+    public void update(IAnalysisDataContainer container, final DataDrivenScenarioInfo info, final @Nullable ITmfEvent event) {
         updateScenarioSpecificStateStartTime(event, container, info);
         updateScenarioState(event, container, info);
         updateScenarioStatus(event, container, info);
     }
 
-    private static void updateScenarioStatus(@Nullable ITmfEvent event, IXmlStateSystemContainer container, final TmfXmlScenarioInfo info) {
+    private static void updateScenarioStatus(@Nullable ITmfEvent event, IAnalysisDataContainer container, final DataDrivenScenarioInfo info) {
         ITmfStateSystemBuilder ss = (ITmfStateSystemBuilder) container.getStateSystem();
         long ts = getTimestamp(event, ss);
         ITmfStateValue value;
@@ -353,7 +357,7 @@ public class TmfXmlScenarioHistoryBuilder {
         throw new IllegalArgumentException("Event and state system cannot be null at the same time."); //$NON-NLS-1$
     }
 
-    private static void updateScenarioState(final @Nullable ITmfEvent event, final IXmlStateSystemContainer container, final TmfXmlScenarioInfo info) {
+    private static void updateScenarioState(@Nullable ITmfEvent event, IAnalysisDataContainer container, DataDrivenScenarioInfo info) {
         ITmfStateSystemBuilder ss = (ITmfStateSystemBuilder) container.getStateSystem();
         long ts = getTimestamp(event, ss);
         try {
@@ -375,7 +379,7 @@ public class TmfXmlScenarioHistoryBuilder {
      * @param info
      *            The scenario details
      */
-    private static void updateScenarioSpecificStateStartTime(final @Nullable ITmfEvent event, final IXmlStateSystemContainer container, final TmfXmlScenarioInfo info) {
+    private static void updateScenarioSpecificStateStartTime(@Nullable ITmfEvent event, IAnalysisDataContainer container, DataDrivenScenarioInfo info) {
         ITmfStateSystemBuilder ss = (ITmfStateSystemBuilder) container.getStateSystem();
         long ts = getTimestamp(event, ss);
         try {
@@ -401,7 +405,7 @@ public class TmfXmlScenarioHistoryBuilder {
      * @param event
      *            The active event
      */
-    public void startScenario(final IXmlStateSystemContainer container, final TmfXmlScenarioInfo info, final ITmfEvent event) {
+    public void startScenario(IAnalysisDataContainer container, DataDrivenScenarioInfo info, ITmfEvent event) {
         ITmfStateSystemBuilder ss = (ITmfStateSystemBuilder) container.getStateSystem();
         long ts = getTimestamp(event, ss);
         try {
@@ -425,10 +429,14 @@ public class TmfXmlScenarioHistoryBuilder {
      * @param event
      *            The active event
      */
-    public void completeScenario(final IXmlStateSystemContainer container, final TmfXmlScenarioInfo info, final @Nullable ITmfEvent event) {
+    public void completeScenario(IAnalysisDataContainer container, DataDrivenScenarioInfo info, @Nullable ITmfEvent event) {
         ITmfStateSystemBuilder ss = (ITmfStateSystemBuilder) container.getStateSystem();
         long ts = getTimestamp(event, ss);
-        TmfAttributePool pool = getPoolFor(container, info.getFsm().getId());
+        DataDrivenFsm fsm = info.getFsm();
+        if (fsm == null) {
+            return;
+        }
+        TmfAttributePool pool = getPoolFor(container, fsm.getId());
         pool.recycle(info.getQuark(), ts);
         info.recycleAttributes(ts);
     }

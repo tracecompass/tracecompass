@@ -6,25 +6,23 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  ******************************************************************************/
-package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model;
+package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime;
 
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenFsm;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenFsmState;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime.DataDrivenScenarioHistoryBuilder.ScenarioStatusType;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioHistoryBuilder.ScenarioStatusType;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
  * This Class implements a Scenario in the XML-defined state system
  */
-public class TmfXmlScenario {
+public class DataDrivenScenario {
 
-    private final IXmlStateSystemContainer fContainer;
+    private final IAnalysisDataContainer fContainer;
     private final DataDrivenFsm fFsm;
-    private TmfXmlScenarioInfo fScenarioInfo;
-    TmfXmlScenarioHistoryBuilder fHistoryBuilder;
+    private DataDrivenScenarioInfo fScenarioInfo;
+    DataDrivenScenarioHistoryBuilder fHistoryBuilder;
 
     /**
      * Constructor
@@ -37,14 +35,16 @@ public class TmfXmlScenario {
      *            The initial state
      * @param container
      *            The state system container this scenario belongs to
+     * @param executionData
+     *            The runtime execution data
      */
-    public TmfXmlScenario(ITmfEvent event, DataDrivenFsm fsm, DataDrivenFsmState initialState, IXmlStateSystemContainer container) {
+    public DataDrivenScenario(ITmfEvent event, DataDrivenFsm fsm, DataDrivenFsmState initialState, IAnalysisDataContainer container, DataDrivenRuntimeData executionData) {
         fFsm = fsm;
         fContainer = container;
-        fHistoryBuilder = ((XmlPatternStateProvider) container).getHistoryBuilder();
+        fHistoryBuilder = executionData.getHistoryBuilder();
         int quark = fHistoryBuilder.assignScenarioQuark(fContainer, fsm);
         int statusQuark = fHistoryBuilder.getScenarioStatusQuark(fContainer, quark);
-        fScenarioInfo = new TmfXmlScenarioInfo(initialState, ScenarioStatusType.PENDING, quark, statusQuark, fFsm);
+        fScenarioInfo = new DataDrivenScenarioInfo(initialState, ScenarioStatusType.PENDING, quark, statusQuark, fFsm);
         fHistoryBuilder.update(fContainer, fScenarioInfo, event);
     }
 
@@ -53,7 +53,7 @@ public class TmfXmlScenario {
      *
      * @return The scenario info
      */
-    public TmfXmlScenarioInfo getScenarioInfos() {
+    public DataDrivenScenarioInfo getScenarioInfos() {
         return fScenarioInfo;
     }
 

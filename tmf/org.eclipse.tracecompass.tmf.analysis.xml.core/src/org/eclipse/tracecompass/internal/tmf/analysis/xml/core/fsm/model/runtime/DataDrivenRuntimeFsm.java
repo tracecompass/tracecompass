@@ -7,13 +7,12 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model;
+package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenario;
 
 /**
  * This class contains runtime data for a given FSM, like the scenarios, etc
@@ -25,8 +24,8 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScena
 public class DataDrivenRuntimeFsm {
 
     private int fScenarioCount = 0;
-    private @Nullable TmfXmlScenario fPendingScenario = null;
-    private List<TmfXmlScenario> fActiveScenarios = new ArrayList<>();
+    private @Nullable DataDrivenScenario fPendingScenario = null;
+    private List<DataDrivenScenario> fActiveScenarios = new ArrayList<>();
 
     /**
      * Get the number of active scenarios
@@ -43,7 +42,7 @@ public class DataDrivenRuntimeFsm {
      * @return The pending scenario or <code>null</code> if no scenario is
      *         pending
      */
-    public @Nullable TmfXmlScenario getPendingScenario() {
+    public @Nullable DataDrivenScenario getPendingScenario() {
         return fPendingScenario;
     }
 
@@ -55,7 +54,7 @@ public class DataDrivenRuntimeFsm {
      * @param scenario
      *            The initial state for this scenario
      */
-    public void addPendingScenario(TmfXmlScenario scenario) {
+    public void addPendingScenario(DataDrivenScenario scenario) {
         if (fPendingScenario == null) {
             fScenarioCount++;
         }
@@ -67,7 +66,7 @@ public class DataDrivenRuntimeFsm {
      *
      * @return The list of active scenarios
      */
-    public List<TmfXmlScenario> getActiveScenarios() {
+    public List<DataDrivenScenario> getActiveScenarios() {
         return fActiveScenarios;
     }
 
@@ -77,7 +76,7 @@ public class DataDrivenRuntimeFsm {
      * @param scenario
      *            The scenario to remove
      */
-    public void removeScenario(TmfXmlScenario scenario) {
+    public void removeScenario(DataDrivenScenario scenario) {
         if (fActiveScenarios.remove(scenario)) {
             fScenarioCount--;
         }
@@ -87,7 +86,7 @@ public class DataDrivenRuntimeFsm {
      * Active the pending scenario. There will be no pending scenario after this
      */
     public synchronized void activatePending() {
-        TmfXmlScenario pendingScenario = fPendingScenario;
+        DataDrivenScenario pendingScenario = fPendingScenario;
         if (pendingScenario != null) {
             fPendingScenario = null;
             fActiveScenarios.add(pendingScenario);

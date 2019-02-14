@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlPatternCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateProviderCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenAnalysisModule;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
@@ -279,12 +280,14 @@ public class XmlUtilsTest {
         assertFalse(patternNodes.getLength() == 0);
 
         Element node = (Element) patternNodes.item(0);
-        XmlPatternAnalysis analysis = new XmlPatternAnalysis();
+
+        String id = node.getAttribute(TmfXmlStrings.ID);
+        TmfXmlPatternCu patternCu = TmfXmlPatternCu.compile(node);
+        assertNotNull(patternCu);
+        XmlPatternAnalysis analysis = new XmlPatternAnalysis(id, patternCu);
         String moduleId = node.getAttribute(TmfXmlStrings.ID);
         assertNotNull(moduleId);
         analysis.setId(moduleId);
-
-        analysis.setXmlFile(xmlAnalysisFile.getFile().toPath());
 
         return analysis;
     }

@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime.DataDrivenScenarioInfo;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioInfo;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
@@ -61,7 +61,7 @@ public class DataDrivenFsmStateTransition implements IDataDrivenRuntimeObject {
      * @return The first transition that can be taken out of this state, or
      *         <code>null</code> if no transition can be taken
      */
-    public boolean canTake(ITmfEvent event, TmfXmlScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
+    public boolean canTake(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
         return fEvents.test(event, scenarioInfo, container) && fCondition.test(event, scenarioInfo, container);
     }
 
@@ -76,7 +76,7 @@ public class DataDrivenFsmStateTransition implements IDataDrivenRuntimeObject {
      *            The container
      * @return The target state
      */
-    public String take(ITmfEvent event, TmfXmlScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
+    public String take(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
         for (DataDrivenAction action : fActions) {
             action.eventHandle(event, scenarioInfo, container);
         }

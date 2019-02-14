@@ -10,10 +10,8 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.statepro
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
-import java.nio.file.Path;
-
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlPatternCu;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 
@@ -26,34 +24,26 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModul
  */
 public class XmlPatternStateSystemModule extends TmfStateSystemAnalysisModule {
 
-    private @Nullable Path fXmlFile;
-    private final ISegmentListener fListener;
+    private final @NonNull ISegmentListener fListener;
+    private final TmfXmlPatternCu fPatternCu;
 
     /**
      * Constructor
      *
      * @param listener
      *            Listener for segments that will be created
+     * @param patternCu
+     *            The pattern compilation unit
      */
-    public XmlPatternStateSystemModule(ISegmentListener listener) {
+    public XmlPatternStateSystemModule(@NonNull ISegmentListener listener, TmfXmlPatternCu patternCu) {
         super();
         fListener = listener;
+        fPatternCu = patternCu;
     }
 
     @Override
     protected @NonNull ITmfStateProvider createStateProvider() {
-        String id = getId();
-        return new XmlPatternStateProvider(checkNotNull(getTrace()), id, fXmlFile, fListener);
-    }
-
-    /**
-     * Sets the file path of the XML file containing the state provider
-     *
-     * @param file
-     *            The full path to the XML file
-     */
-    public void setXmlFile(Path file) {
-        fXmlFile = file;
+        return fPatternCu.generate(checkNotNull(getTrace()), fListener);
     }
 
 }
