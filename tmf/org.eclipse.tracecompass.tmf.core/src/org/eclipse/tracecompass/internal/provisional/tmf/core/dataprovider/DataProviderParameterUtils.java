@@ -117,12 +117,18 @@ public class DataProviderParameterUtils {
                 return (List<Long>) listToTransform;
             } else if (listToTransform.stream().allMatch(e -> e instanceof Integer)) {
                 List<Long> list = new ArrayList<>();
-                for (Integer time : (List<Integer>) listToTransform) {
-                    list.add(time.longValue());
+                for (Integer element : (List<Integer>) listToTransform) {
+                    list.add(element.longValue());
                 }
                 return list;
             } else {
-                return null;
+                List<Long> list = new ArrayList<>();
+                for (Object element : listToTransform) {
+                    if (!(element instanceof Number)) {
+                        return null;
+                    }
+                    list.add(((Number) element).longValue());
+                }
             }
         }
         return Collections.emptyList();
