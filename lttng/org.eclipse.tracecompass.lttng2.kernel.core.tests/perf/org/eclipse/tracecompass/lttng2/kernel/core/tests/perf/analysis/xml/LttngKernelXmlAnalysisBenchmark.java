@@ -33,7 +33,7 @@ import org.junit.runners.Parameterized.Parameters;
  * @author Geneviève Bastien
  */
 @RunWith(Parameterized.class)
-public class LttngKernelXmlAnalysisPerfTest extends XmlAnalysisPerfTest {
+public class LttngKernelXmlAnalysisBenchmark extends XmlAnalysisPerfTest {
 
     /**
      * @return The arrays of parameters
@@ -64,7 +64,7 @@ public class LttngKernelXmlAnalysisPerfTest extends XmlAnalysisPerfTest {
      * @param testTrace
      *            The CTF test trace to use
      */
-    public LttngKernelXmlAnalysisPerfTest(String name, int loopCount, String xmlFileName, @NonNull String xmlAnalysisName, String testTrace) {
+    public LttngKernelXmlAnalysisBenchmark(String name, int loopCount, String xmlFileName, @NonNull String xmlAnalysisName, String testTrace) {
         super(name, Activator.getAbsoluteFilePath("testfiles/xml/" + xmlFileName).toOSString(), xmlAnalysisName, loopCount);
         fFileTracePath = testTrace;
     }
