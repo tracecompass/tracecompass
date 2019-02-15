@@ -11,7 +11,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.eclipse.tracecompass.common.core
+ org.eclipse.tracecompass.common.core,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Export-Package: org.eclipse.tracecompass.common.core.tests;x-friends:="org.eclipse.tracecompass.alltests",
  org.eclipse.tracecompass.common.core.tests.collect;x-internal:=true,
  org.eclipse.tracecompass.common.core.tests.format;x-internal:=true,

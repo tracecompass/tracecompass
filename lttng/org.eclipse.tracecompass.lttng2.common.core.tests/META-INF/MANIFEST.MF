@@ -10,6 +10,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.core.runtime,
- org.eclipse.tracecompass.lttng2.common.core;bundle-version="1.0.0"
+ org.eclipse.tracecompass.lttng2.common.core;bundle-version="1.0.0",
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Export-Package: org.eclipse.tracecompass.lttng2.common.core.tests
 Automatic-Module-Name: org.eclipse.tracecompass.lttng2.common.core.tests

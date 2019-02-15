@@ -9,7 +9,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.tracecompass.common.core,
  org.eclipse.tracecompass.tmf.core,
- org.eclipse.tracecompass.tmf.ui
+ org.eclipse.tracecompass.tmf.ui,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: org.eclipse.tracecompass.examples.ui;x-internal:=true,

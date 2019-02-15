@@ -20,7 +20,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.tmf.core,
  org.eclipse.tracecompass.tmf.core.tests,
  org.eclipse.tracecompass.analysis.timing.core,
- org.eclipse.tracecompass.statesystem.core.tests
+ org.eclipse.tracecompass.statesystem.core.tests,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Export-Package: org.eclipse.tracecompass.analysis.profiling.core.tests,
  org.eclipse.tracecompass.analysis.profiling.core.tests.callgraph,
  org.eclipse.tracecompass.analysis.profiling.core.tests.data,

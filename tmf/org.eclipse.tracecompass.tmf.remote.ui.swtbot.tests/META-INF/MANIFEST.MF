@@ -22,7 +22,8 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.swtbot.junit4_x,
  org.eclipse.swtbot.swt.finder,
  org.eclipse.tracecompass.tmf.ctf.core.tests,
- org.eclipse.tracecompass.tmf.ui.tests
+ org.eclipse.tracecompass.tmf.ui.tests,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Import-Package: org.apache.log4j,
  org.apache.log4j.varia,
  org.eclipse.swtbot.eclipse.finder,

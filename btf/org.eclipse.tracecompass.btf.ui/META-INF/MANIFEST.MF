@@ -16,7 +16,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface,
  org.eclipse.ui.ide,
  org.eclipse.tracecompass.btf.core,
- org.eclipse.tracecompass.tmf.analysis.xml.core
+ org.eclipse.tracecompass.tmf.analysis.xml.core,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Export-Package: org.eclipse.tracecompass.btf.ui
 Import-Package: com.google.common.collect
 Automatic-Module-Name: org.eclipse.tracecompass.btf.ui

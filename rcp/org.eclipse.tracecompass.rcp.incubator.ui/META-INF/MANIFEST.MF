@@ -10,6 +10,7 @@ Require-Bundle: org.eclipse.equinox.p2.ui.sdk,
  org.eclipse.equinox.p2.ui.discovery,
  org.eclipse.equinox.p2.discovery.compatibility,
  org.eclipse.core.commands,
- org.eclipse.swt
+ org.eclipse.swt,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Export-Package: org.eclipse.tracecompass.internal.rcp.incubator.ui;x-internal:=true
 Automatic-Module-Name: org.eclipse.tracecompass.rcp.incubator.ui

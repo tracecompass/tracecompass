@@ -7,7 +7,8 @@ Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.datastore.core.tests;singleton:=true
 Fragment-Host: org.eclipse.tracecompass.datastore.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.junit;bundle-version="4.0.0"
+Require-Bundle: org.junit;bundle-version="4.0.0",
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Export-Package: org.eclipse.tracecompass.internal.datastore.core.condition;x-internal:=true,
  org.eclipse.tracecompass.internal.datastore.core.historytree;x-internal:=true,
  org.eclipse.tracecompass.internal.datastore.core.serialization;x-internal:=true,

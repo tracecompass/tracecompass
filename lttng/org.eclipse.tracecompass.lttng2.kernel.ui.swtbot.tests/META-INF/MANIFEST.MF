@@ -33,7 +33,8 @@ Require-Bundle: org.apache.log4j,
  org.eclipse.tracecompass.analysis.graph.ui,
  org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests,
  org.eclipse.tracecompass.tmf.ui.tests,
- org.eclipse.tracecompass.common.core
+ org.eclipse.tracecompass.common.core,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Import-Package: com.google.common.collect,
  com.google.common.primitives,
  com.google.gson,

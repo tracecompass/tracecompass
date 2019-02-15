@@ -22,7 +22,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.analysis.timing.ui,
  org.swtchart,
  org.eclipse.tracecompass.segmentstore.core,
- org.eclipse.tracecompass.datastore.core
+ org.eclipse.tracecompass.datastore.core,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Export-Package: org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart,
  org.eclipse.tracecompass.internal.analysis.profiling.ui;x-internal:=true,
  org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph;x-friends:="org.eclipse.tracecompass.analysis.profiling.ui.swtbot.tests",

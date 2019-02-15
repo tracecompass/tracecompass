@@ -20,7 +20,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.tmf.remote.core,
  org.eclipse.ui,
  org.eclipse.ui.ide,
- org.eclipse.ui.views
+ org.eclipse.ui.views,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Export-Package: org.eclipse.tracecompass.internal.tmf.remote.ui;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.remote.ui.messages;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.remote.ui.preferences;x-internal:=true,

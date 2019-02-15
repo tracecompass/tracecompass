@@ -14,7 +14,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.tmf.ui,
  org.eclipse.tracecompass.tmf.core,
  org.eclipse.tracecompass.tmf.ctf.core,
- org.eclipse.tracecompass.analysis.counters.core
+ org.eclipse.tracecompass.analysis.counters.core,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Import-Package: com.google.common.base,
  com.google.common.collect,
  com.google.common.primitives,

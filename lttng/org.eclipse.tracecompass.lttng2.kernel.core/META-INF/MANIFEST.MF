@@ -18,7 +18,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.analysis.lami.core,
  org.eclipse.tracecompass.tmf.analysis.xml.core,
  org.eclipse.tracecompass.lttng2.common.core,
- org.eclipse.tracecompass.analysis.counters.core
+ org.eclipse.tracecompass.analysis.counters.core,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Export-Package: org.eclipse.tracecompass.internal.lttng2.kernel.core;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui,org.eclipse.tracecompass.lttng2.kernel.core.tests",
  org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui,org.eclipse.tracecompass.lttng2.kernel.core.tests",
  org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.handlers;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui,org.eclipse.tracecompass.lttng2.kernel.core.tests",

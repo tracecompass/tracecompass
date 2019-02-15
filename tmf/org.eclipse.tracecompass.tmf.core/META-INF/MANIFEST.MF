@@ -15,7 +15,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.statesystem.core;visibility:=reexport,
  org.eclipse.cdt.core,
  org.eclipse.tracecompass.datastore.core,
- org.eclipse.tracecompass.tmf.filter.parser
+ org.eclipse.tracecompass.tmf.filter.parser,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.core.model.events;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;x-friends:="org.eclipse.tracecompass.tmf.ui,org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;x-friends:="org.eclipse.tracecompass.tmf.core.tests,org.eclipse.tracecompass.tmf.ui",
