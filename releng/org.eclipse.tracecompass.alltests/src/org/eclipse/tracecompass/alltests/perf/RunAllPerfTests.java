@@ -29,6 +29,7 @@ import org.junit.runners.Suite;
     org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.analysis.syscall.SystemCallAnalysisBenchmark.class,
     org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.analysis.syscall.SystemCallAnalysisUsageBenchmark.class,
     org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.analysis.tid.TidAnalysisUsageBenchmark.class,
+    org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.analysis.xml.LttngKernelXmlAnalysisBenchmark.class,
     org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.analysis.StatisticsAnalysisBenchmark.class,
     org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.event.matching.EventMatchingBenchmark.class,
     org.eclipse.tracecompass.lttng2.kernel.core.tests.perf.event.matching.TraceSynchronizationBenchmark.class,
