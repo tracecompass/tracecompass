@@ -8,11 +8,17 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.inputoutput;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.IoOperationType;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.LinuxTestCase;
+import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -140,6 +146,114 @@ public class IoTestCase extends LinuxTestCase {
     }
 
     /**
+     * A class to contain disk activity information
+     */
+    public static class DiskActivity {
+        private static final String READ_NAME = "read";
+        private static final String WRITE_NAME = "write";
+
+        private final long fStartTime;
+        private final long fEndTime;
+        private final int fResolution;
+        private final double[] fActivity;
+        private final IoOperationType fType;
+        private final String fDiskName;
+
+        /**
+         * Constructor
+         *
+         * @param startTime
+         *            Start time of the request
+         * @param endTime
+         *            End time of the request
+         * @param res
+         *            Resolution of the request
+         * @param activity
+         *            Activity at different query time
+         * @param type
+         *            Activity type
+         * @param diskName
+         *            The name of the disk to test
+         */
+        public DiskActivity(long startTime, long endTime, int res, double[] activity, IoOperationType type, String diskName) {
+            fStartTime = startTime;
+            fEndTime = endTime;
+            fResolution = res;
+            fActivity = activity;
+            fType = type;
+            fDiskName = diskName;
+        }
+
+        /**
+         * Get the time query given the test parameters
+         *
+         * @return The time query filter
+         */
+        public TimeQueryFilter getTimeQuery() {
+            return new TimeQueryFilter(fStartTime, fEndTime, fResolution);
+        }
+
+        /**
+         * Get the time query to retrieve the data. It will query only one item,
+         * the one corresponding to what is being tested.
+         *
+         * @param model
+         *            The list of tree models available
+         * @return The query
+         */
+        public TimeQueryFilter getTimeQueryForModel(List<TmfTreeDataModel> model) {
+            long diskId = getDiskId(model);
+            long selectionId = -1;
+            for (TmfTreeDataModel oneModel : model) {
+                if (oneModel.getParentId() == diskId) {
+                    switch (fType) {
+                    case READ:
+                        if (oneModel.getName().equals(READ_NAME)) {
+                            selectionId = oneModel.getId();
+                        }
+                        break;
+                    case WRITE:
+                        if (oneModel.getName().equals(WRITE_NAME)) {
+                            selectionId = oneModel.getId();
+                        }
+                        break;
+                    default:
+                        throw new IllegalStateException("Unknown type");
+                    }
+                }
+                oneModel.getName();
+            }
+            if (selectionId == -1) {
+                throw new NoSuchElementException("Requested entry not found for " + fDiskName + ' ' + fType);
+            }
+            return new SelectionTimeQueryFilter(fStartTime, fEndTime, fResolution, Collections.singleton(selectionId));
+        }
+
+        private long getDiskId(List<TmfTreeDataModel> model) {
+            for (TmfTreeDataModel oneModel : model) {
+                if (fDiskName.equals(oneModel.getName())) {
+                    return oneModel.getId();
+                }
+            }
+            throw new NoSuchElementException("Disk not found " + fDiskName);
+        }
+
+        /**
+         * Get the activity of this test case
+         *
+         * @return The collection of values for the given time query
+         */
+        public double[] getActivity() {
+            return fActivity;
+        }
+
+        @Override
+        public String toString() {
+            return fDiskName + ' ' + fType + " time range: " + fStartTime + ',' + fEndTime;
+        }
+    }
+
+    /**
      * Get a collection of sector count information to test
      *
      * @return A collection of sector count information
@@ -155,6 +269,15 @@ public class IoTestCase extends LinuxTestCase {
      */
     public Map<Integer, DiskInfo> getDiskInfo() {
         return Collections.EMPTY_MAP;
+    }
+
+    /**
+     * Get a list of disk activity to request
+     *
+     * @return A list of disk activity to test
+     */
+    public Collection<DiskActivity> getDiskActivity() {
+        return Collections.emptyList();
     }
 
 }

@@ -151,4 +151,9 @@ public class LinuxTestCase {
         return Collections.EMPTY_SET;
     }
 
+    @Override
+    public String toString() {
+        return getTraceFileName();
+    }
+
 }

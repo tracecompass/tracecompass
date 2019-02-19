@@ -63,7 +63,7 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
     private static final class DiskBuilder {
 
         private static final int BYTES_PER_SECTOR = 512;
-        private static final double SECONDS_PER_NANOSECOND = 10E-9;
+        private static final double SECONDS_PER_NANOSECOND = 1E-9;
         private static final double RATIO = BYTES_PER_SECTOR / SECONDS_PER_NANOSECOND;
 
         private final long fId;
