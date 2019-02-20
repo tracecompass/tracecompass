@@ -115,7 +115,7 @@ public class TrimTraceHandler extends AbstractHandler {
 
         private static final @Nullable TraceToTrim create(TraceToTrim parent, TmfTraceElement traceElement) {
             TmfTraceElement elementUnderTraceFolder = traceElement.getElementUnderTraceFolder();
-            ITmfTrace trace = elementUnderTraceFolder.getTrace();
+            ITmfTrace trace = traceElement.getTrace();
             if (trace != null) {
                 List<String> elems = new ArrayList<>();
                 ITmfProjectModelElement tempTraceElement = elementUnderTraceFolder;

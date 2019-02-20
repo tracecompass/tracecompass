@@ -212,10 +212,7 @@ public class CtfTmfExperimentTrimmingTest {
         assertNotNull(trimmedTrace);
         ITmfContext trimmedContext = trimmedTrace.seekEvent(0);
         ITmfEvent trimmedEvent = trimmedTrace.getNext(trimmedContext);
-        if (trimmedEvent == null) {
-            // empty trace
-            return;
-        }
+        assertNotNull(trimmedEvent); // empty trace
 
         /*
          * Verify the bounds of the new trace are fine. The actual trace can be
