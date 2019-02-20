@@ -16,17 +16,21 @@ Require-Bundle: org.junit,
  org.eclipse.tracecompass.statesystem.core,
  org.eclipse.tracecompass.segmentstore.core,
  org.eclipse.tracecompass.analysis.timing.core,
- org.eclipse.tracecompass.datastore.core
+ org.eclipse.tracecompass.datastore.core,
+ org.eclipse.test.performance,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: com.google.common.base;version="15.0.0",
  com.google.common.collect,
+ org.apache.commons.lang3;version="3.1.0",
  org.eclipse.tracecompass.testtraces.ctf,
  org.junit.runners
 Export-Package: org.eclipse.tracecompass.tmf.analysis.xml.core.tests,
  org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common;x-friends:="org.eclipse.tracecompass.tmf.analysis.xml.ui.tests,org.eclipse.tracecompass.tmf.analysis.xml.ui.swtbot.tests",
  org.eclipse.tracecompass.tmf.analysis.xml.core.tests.model,
  org.eclipse.tracecompass.tmf.analysis.xml.core.tests.module,
+ org.eclipse.tracecompass.tmf.analysis.xml.core.tests.perf,
  org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stateprovider,
  org.eclipse.tracecompass.tmf.analysis.xml.core.tests.stubs
 Automatic-Module-Name: org.eclipse.tracecompass.tmf.analysis.xml.core.tests

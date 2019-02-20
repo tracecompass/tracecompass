@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2018 Ericsson.
+ * Copyright (c) 2009, 2019 Ericsson.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -58,11 +57,9 @@ import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.internal.tmf.ui.util.TimeGraphStyleUtil;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
-import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 
 import com.google.common.collect.Collections2;
 
@@ -293,11 +290,8 @@ public class TimeGraphLegend extends TitleAreaDialog {
             IPreferenceStore store = TimeGraphStyleUtil.getStore();
             TimeGraphStyleUtil.loadValue(fProvider, si);
             String name = si.getStateString();
-            RGBAColor rgbaColor = RGBAColor.fromString(store.getString(fillColorKey));
-            RGB rgb = rgbaColor == null ? new RGB(0, 0, 0) : RGBAUtil.fromRGBAColor(rgbaColor).rgb;
-            float width = store.getFloat(heightFactorKey);
             setLayout(GridLayoutFactory.swtDefaults().numColumns(4).create());
-            fBar = new Swatch(this, rgb);
+            fBar = new Swatch(this, si.getStateColor());
             fBar.setToolTipText(Messages.TimeGraphLegend_swatchClick);
             fBar.addMouseListener(new MouseAdapter() {
 
@@ -312,6 +306,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
                         fBar.setColor(color);
                         si.setStateColor(color);
                         fProvider.refresh();
+                        fReset.setEnabled(true);
                     }
                 }
             });
@@ -357,7 +352,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
             fScale = new Scale(this, SWT.NONE);
             fScale.setMaximum(100);
             fScale.setMinimum(1);
-            fScale.setSelection((int) (100 * width));
+            fScale.setSelection((int) (100 * si.getStateHeightFactor()));
             fScale.setToolTipText(Messages.TimeGraphLegend_widthTooltip);
             fScale.addSelectionListener(new SelectionListener() {
 
@@ -367,6 +362,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
                     store.setValue(heightFactorKey, newWidth);
                     si.getStyleMap().put(ITimeEventStyleStrings.heightFactor(), newWidth);
                     fProvider.refresh();
+                    fReset.setEnabled(true);
                 }
 
                 @Override
@@ -381,17 +377,12 @@ public class TimeGraphLegend extends TitleAreaDialog {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     si.reset();
-                    si.getStateColor();
-                    Map<String, Object> styleMap = si.getStyleMap();
-                    float resetWidth = (float) styleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), TimeGraphControl.DEFAULT_STATE_WIDTH);
-                    store.setValue(heightFactorKey, resetWidth);
-                    Object color = styleMap.getOrDefault(ITimeEventStyleStrings.fillColor(), 0.0);
-                    if (color instanceof Integer) {
-                        store.setValue(fillColorKey, new RGBAColor((int) color).toString());
-                    }
+                    store.setToDefault(heightFactorKey);
+                    store.setToDefault(fillColorKey);
                     fBar.setColor(si.getStateColor());
-                    fScale.setSelection((int) (100 * resetWidth));
+                    fScale.setSelection((int) (100 * si.getStateHeightFactor()));
                     fProvider.refresh();
+                    fReset.setEnabled(false);
                 }
 
                 @Override
@@ -402,6 +393,10 @@ public class TimeGraphLegend extends TitleAreaDialog {
             fReset.setToolTipText(Messages.TimeGraphLegend_resetTooltip);
             fReset.setImage(RESET_IMAGE.createImage());
             fReset.setLayoutData(GridDataFactory.swtDefaults().align(SWT.END, SWT.CENTER).create());
+            if (store.getString(fillColorKey).equals(store.getDefaultString(fillColorKey)) &&
+                    store.getFloat(heightFactorKey) == store.getDefaultFloat(heightFactorKey)) {
+                fReset.setEnabled(false);
+            }
         }
 
         @Override

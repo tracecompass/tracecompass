@@ -6,11 +6,12 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  ******************************************************************************/
-package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model;
+package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model;
 
 import java.util.Map.Entry;
 
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.IXmlStateSystemContainer;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioInfo;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
@@ -23,24 +24,31 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
  *
  * @author Jean-Christian Kouame
  */
-public class UpdateStoredFieldsAction implements ITmfXmlAction {
+public final class DataDrivenActionUpdateStoredFields implements DataDrivenAction  {
 
-    private final IXmlStateSystemContainer fParent;
+    private static final DataDrivenAction INSTANCE = new DataDrivenActionUpdateStoredFields();
+
+    /**
+     * Get the instance of this action
+     *
+     * @return The action
+     */
+    public static DataDrivenAction getInstance() {
+        return INSTANCE;
+    }
 
     /**
      * Constructor
-     *
-     * @param parent
-     *            The state system container this action belongs to
      */
-    public UpdateStoredFieldsAction(IXmlStateSystemContainer parent) {
-        fParent = parent;
+    private DataDrivenActionUpdateStoredFields() {
+        // Do nothing
     }
 
     @Override
-    public void execute(ITmfEvent event, TmfXmlScenarioInfo scenarioInfo) {
-        if (fParent instanceof XmlPatternStateProvider) {
-            for (Entry<String, String> entry : ((XmlPatternStateProvider) fParent).getStoredFields().entrySet()) {
+    public void eventHandle(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
+        if (container instanceof XmlPatternStateProvider && scenarioInfo instanceof TmfXmlScenarioInfo) {
+            XmlPatternStateProvider patternSp = (XmlPatternStateProvider) container;
+            for (Entry<String, String> entry : patternSp.getStoredFields().entrySet()) {
                 ITmfEventField eventField = event.getContent().getField(entry.getKey());
                 ITmfStateValue stateValue = null;
                 if (eventField != null) {
@@ -58,7 +66,7 @@ public class UpdateStoredFieldsAction implements ITmfXmlAction {
                     if (stateValue == null) {
                         throw new IllegalStateException("State value is null. Invalid type."); //$NON-NLS-1$
                     }
-                    ((XmlPatternStateProvider) fParent).getHistoryBuilder().updateStoredFields(fParent, alias, stateValue, scenarioInfo, event);
+                    patternSp.getHistoryBuilder().updateStoredFields(patternSp, alias, stateValue, (TmfXmlScenarioInfo) scenarioInfo, event);
                 }
             }
         }

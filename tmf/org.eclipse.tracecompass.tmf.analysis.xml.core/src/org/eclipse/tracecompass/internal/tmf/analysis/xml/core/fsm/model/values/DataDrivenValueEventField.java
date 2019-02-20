@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values;
 
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenScenarioInfo;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
@@ -86,6 +88,23 @@ public class DataDrivenValueEventField extends DataDrivenValue {
     @Override
     public String toString() {
         return "DataDrivenValueEventField: " + fFieldName; //$NON-NLS-1$
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), fFieldName);
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof DataDrivenValueEventField)) {
+            return false;
+        }
+        DataDrivenValueEventField other = (DataDrivenValueEventField) obj;
+        return Objects.equals(fFieldName, other.fFieldName);
     }
 
 }

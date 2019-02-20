@@ -33,7 +33,8 @@ Require-Bundle: org.eclipse.core.expressions,
  com.google.guava,
  org.eclipse.tracecompass.tmf.filter.parser,
  org.eclipse.e4.ui.css.swt.theme,
- org.eclipse.ui.themes
+ org.eclipse.ui.themes,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Export-Package: org.eclipse.tracecompass.internal.tmf.ui;x-friends:="org.eclipse.tracecompass.tmf.ui.tests,org.eclipse.tracecompass.tmf.ctf.ui.tests",
  org.eclipse.tracecompass.internal.tmf.ui.commands;x-friends:="org.eclipse.tracecompass.analysis.timing.ui",
  org.eclipse.tracecompass.internal.tmf.ui.dialogs;x-internal:=true,
@@ -66,7 +67,7 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.ui;x-friends:="org.eclipse
  org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model;x-friends:="org.eclipse.tracecompass.tmf.ui.tests",
  org.eclipse.tracecompass.internal.tmf.ui.viewers.timegraph.handlers;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.viewers.xycharts;x-internal:=true,
- org.eclipse.tracecompass.internal.tmf.ui.views;x-internal:=true,
+ org.eclipse.tracecompass.internal.tmf.ui.views;x-friends:="org.eclipse.tracecompass.tmf.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.tmf.ui.views.histogram;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.views.statistics;
   x-friends:="org.eclipse.tracecompass.tmf.pcap.ui,

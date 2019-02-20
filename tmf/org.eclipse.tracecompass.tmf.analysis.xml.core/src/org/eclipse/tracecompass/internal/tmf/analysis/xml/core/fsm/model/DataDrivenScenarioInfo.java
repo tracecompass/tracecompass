@@ -38,11 +38,11 @@ public class DataDrivenScenarioInfo {
     /**
      * A temporary dummy scenario
      */
-    public static final DataDrivenScenarioInfo DUMMY_SCENARIO = new DataDrivenScenarioInfo(StringUtils.EMPTY, ScenarioStatusType.PENDING, -1, -1);
+    public static final DataDrivenScenarioInfo DUMMY_SCENARIO = new DataDrivenScenarioInfo(DataDrivenFsmSimpleState.createFinalState(StringUtils.EMPTY), ScenarioStatusType.PENDING, -1, -1);
 
     private final int fQuark;
     private final int fStatusQuark;
-    private String fActiveState;
+    private DataDrivenFsmState fActiveState;
     private ScenarioStatusType fStatus;
     private final Map<@NonNull TmfAttributePool, Integer> fPoolAttributes = new HashMap<>();
 
@@ -58,7 +58,7 @@ public class DataDrivenScenarioInfo {
      * @param statusQuark
      *            The scenario status quark
      */
-    public DataDrivenScenarioInfo(String activeState, ScenarioStatusType status, int quark, int statusQuark) {
+    public DataDrivenScenarioInfo(DataDrivenFsmState activeState, ScenarioStatusType status, int quark, int statusQuark) {
         fActiveState = activeState;
         fQuark = quark;
         fStatus = status;
@@ -71,7 +71,7 @@ public class DataDrivenScenarioInfo {
      * @param activeState
      *            The active state
      */
-    public void setActiveState(String activeState) {
+    public void setActiveState(DataDrivenFsmState activeState) {
         fActiveState = activeState;
     }
 
@@ -99,7 +99,7 @@ public class DataDrivenScenarioInfo {
      *
      * @return The active state
      */
-    public String getActiveState() {
+    public DataDrivenFsmState getActiveState() {
         return fActiveState;
     }
 

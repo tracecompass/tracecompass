@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016 Ericsson
+ * Copyright (c) 2015, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -35,6 +36,7 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRootMenu;
+import org.eclipse.tracecompass.internal.tmf.ui.views.TmfAlignmentSynchronizer;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
 import org.eclipse.tracecompass.tmf.ui.project.wizards.NewTmfProjectWizard;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotSash;
@@ -67,7 +69,6 @@ public class TmfAlignTimeAxisTest {
     /**
      * wait for throttler (2x the throttler time)
      */
-    private static final int SYNC_DELAY = 1000;
     private static final String TRACE_START = "<trace>";
     private static final String EVENT_BEGIN = "<event timestamp=\"";
     private static final String EVENT_MIDDLE = " \" name=\"event\"><field name=\"field\" value=\"";
@@ -246,8 +247,12 @@ public class TmfAlignTimeAxisTest {
     private static void switchToPerspective(String id) {
         // switch to the proper perspective and wait for views to align
         SWTBotUtils.switchToPerspective(id);
-        WaitUtils.waitForJobs();
-        SWTBotUtils.delay(SYNC_DELAY);
+        // the PerspectiveSwitcher triggers a deferred layout
+        Display.getDefault().syncExec(() -> {});
+        // the TmfView control listener triggers a deferred alignment
+        Display.getDefault().syncExec(() -> {});
+        // the TmfAlignmentSynchronizer queues the alignment
+        SWTBotUtils.waitUntil(synchronizer -> !synchronizer.isBusy() , TmfAlignmentSynchronizer.getInstance(), "Alignment synchronizer is busy");
     }
 
     private static AbstractSWTBot<?> getAlignmentControl(String viewId) {
@@ -334,9 +339,8 @@ public class TmfAlignTimeAxisTest {
         } else if (control instanceof SWTBotTimeGraph) {
             ((SWTBotTimeGraph) control).setNameSpace(position);
         }
-        // wait for alignment
-        WaitUtils.waitForJobs();
-        SWTBotUtils.delay(SYNC_DELAY);
+        // the TmfAlignmentSynchronizer queues the alignment
+        SWTBotUtils.waitUntil(synchronizer -> !synchronizer.isBusy() , TmfAlignmentSynchronizer.getInstance(), "Alignment synchronizer is busy");
     }
 
     /**

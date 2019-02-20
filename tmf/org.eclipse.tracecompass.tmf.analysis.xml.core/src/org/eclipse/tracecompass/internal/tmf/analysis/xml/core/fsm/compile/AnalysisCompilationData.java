@@ -28,6 +28,8 @@ public class AnalysisCompilationData {
     private final Map<String, String> fDefinedValues = new HashMap<>();
     private final Map<String, TmfXmlMappingGroupCu> fMappingGroups = new HashMap<>();
     private final Map<String, TmfXmlConditionCu> fTests = new HashMap<>();
+    private final Map<String, TmfXmlActionCu> fActions = new HashMap<>();
+    private final Map<String, TmfXmlFsmStateCu> fFsms = new HashMap<>();
 
     /**
      * Add a location compilation unit with a given ID to the analysis data
@@ -141,4 +143,51 @@ public class AnalysisCompilationData {
     public @Nullable TmfXmlConditionCu getTest(String id) {
         return fTests.get(id);
     }
+
+    /**
+     * Add an action with given id to the analysis data
+     *
+     * @param id
+     *            The identifier of the action
+     * @param action
+     *            The action compilation unit
+     */
+    public void addAction(String id, TmfXmlActionCu action) {
+        fActions.put(id, action);
+    }
+
+    /**
+     * Get the action compilation unit for a given ID
+     *
+     * @param id
+     *            The ID of the action to retrieve
+     * @return The action compilation unit
+     */
+    public @Nullable TmfXmlActionCu getAction(String id) {
+        return fActions.get(id);
+    }
+
+    /**
+     * Add an FSM with given id to the analysis data
+     *
+     * @param id
+     *            The identifier of the fsm
+     * @param fsm
+     *            The FSM compilation unit
+     */
+    public void addFsm(String id, TmfXmlFsmStateCu fsm) {
+        fFsms.put(id, fsm);
+    }
+
+    /**
+     * Get the fsm compilation unit for a given ID
+     *
+     * @param id
+     *            The ID of the fsm to retrieve
+     * @return The fsm compilation unit
+     */
+    public @Nullable TmfXmlFsmStateCu getFsm(String id) {
+        return fFsms.get(id);
+    }
+
 }

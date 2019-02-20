@@ -25,7 +25,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.filesystem,
  org.eclipse.jface,
  org.eclipse.core.commands,
- org.eclipse.ui.workbench
+ org.eclipse.ui.workbench,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Export-Package: org.eclipse.tracecompass.internal.lttng2.control.ui;x-friends:="org.eclipse.tracecompass.lttng2.control.ui.tests",
  org.eclipse.tracecompass.internal.lttng2.control.ui.relayd;x-internal:=true,
  org.eclipse.tracecompass.internal.lttng2.control.ui.views;

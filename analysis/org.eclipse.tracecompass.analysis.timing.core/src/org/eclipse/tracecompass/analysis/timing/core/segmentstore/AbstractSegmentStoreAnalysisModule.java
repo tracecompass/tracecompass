@@ -8,8 +8,6 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.analysis.timing.core.segmentstore;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,14 +17,17 @@ import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
 import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.internal.analysis.timing.core.Activator;
+import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.Messages;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory;
@@ -197,7 +198,7 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
     }
 
     private @Nullable ISegmentStore<@NonNull ISegment> buildOnDiskSegmentStore(@Nullable String dataFileName, IProgressMonitor monitor) throws TmfAnalysisException {
-        ITmfTrace trace = checkNotNull(getTrace());
+        ITmfTrace trace = Objects.requireNonNull((getTrace()));
 
         String fileName = dataFileName;
         if (fileName == null) {
@@ -212,9 +213,9 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
         try {
             // Compare the file creation time to determine if this analysis is
             // built from scratch or not
-            FileTime origCreationTime = (Files.exists(file) ? NonNullUtils.checkNotNull(Files.readAttributes(file, BasicFileAttributes.class)).creationTime() : FileTime.fromMillis(0));
+            FileTime origCreationTime = (Files.exists(file) ? Objects.requireNonNull(Files.readAttributes(file, BasicFileAttributes.class)).creationTime() : FileTime.fromMillis(0));
             segmentStore = SegmentStoreFactory.createOnDiskSegmentStore(file, getSegmentReader(), getVersion());
-            FileTime creationTime = NonNullUtils.checkNotNull(Files.readAttributes(file, BasicFileAttributes.class)).creationTime();
+            FileTime creationTime = Objects.requireNonNull(Files.readAttributes(file, BasicFileAttributes.class)).creationTime();
             built = origCreationTime.equals(creationTime);
         } catch (IOException e) {
             try {
@@ -258,4 +259,40 @@ public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnal
             listener.onComplete(this, store);
         }
     }
+
+    // ------------------------------------------------------------------------
+    // ITmfPropertiesProvider
+    // ------------------------------------------------------------------------
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public @NonNull Map<@NonNull String, @NonNull String> getProperties() {
+        Map<@NonNull String, @NonNull String> properties = super.getProperties();
+
+        // Add the file size if available
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            return properties;
+        }
+
+        String fileName = getDataFileName();
+        /* See if the data file already exists on disk */
+        String dir = TmfTraceManager.getSupplementaryFileDir(trace);
+        final Path file = Paths.get(dir, fileName);
+
+        if (Files.exists(file)) {
+            try {
+                properties.put(Objects.requireNonNull(Messages.SegmentStoreAnalysis_PropertiesFileSize), Objects.requireNonNull(DataSizeWithUnitFormat.getInstance().format(Files.size(file))));
+            } catch (IOException e) {
+                properties.put(Objects.requireNonNull(Messages.SegmentStoreAnalysis_PropertiesFileSize), Objects.requireNonNull(Messages.SegmentStoreAnalysis_ErrorGettingFileSize));
+            }
+        } else {
+            properties.put(Objects.requireNonNull(Messages.SegmentStoreAnalysis_PropertiesFileSize), Objects.requireNonNull(Messages.SegmentStoreAnalysis_PropertiesAnalysisNotExecuted));
+        }
+
+        return properties;
+    }
+
 }

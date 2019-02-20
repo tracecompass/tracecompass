@@ -24,7 +24,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.lttng2.kernel.ui,
  org.eclipse.tracecompass.analysis.graph.ui,
  org.eclipse.tracecompass.analysis.graph.core,
- org.eclipse.tracecompass.analysis.os.linux.core
+ org.eclipse.tracecompass.analysis.os.linux.core,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Import-Package: com.google.common.collect
 Export-Package: org.eclipse.tracecompass.internal.lttng2.kernel.ui;x-internal:=true,
  org.eclipse.tracecompass.internal.lttng2.kernel.ui.criticalpath;x-internal:=true,

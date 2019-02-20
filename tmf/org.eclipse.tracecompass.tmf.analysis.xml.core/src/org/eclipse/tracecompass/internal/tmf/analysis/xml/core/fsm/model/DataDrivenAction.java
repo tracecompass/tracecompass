@@ -17,7 +17,12 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  *
  * @author Geneviève Bastien
  */
-public abstract class DataDrivenAction implements IDataDrivenRuntimeObject {
+public interface DataDrivenAction extends IDataDrivenRuntimeObject {
+
+    /**
+     * An empty action
+     */
+    public static final DataDrivenAction NO_ACTION = (e, x, c) -> { /* Nothing to do */ };
 
     /**
      * Handle the event
@@ -29,6 +34,6 @@ public abstract class DataDrivenAction implements IDataDrivenRuntimeObject {
      * @param container
      *            The analysis data container
      */
-    public abstract void eventHandle(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container);
+    void eventHandle(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container);
 
 }

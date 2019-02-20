@@ -18,8 +18,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -51,6 +53,7 @@ public class TimeGraphEntry implements ITimeGraphEntry, IFilterableDataModel {
         private final long fZoomStart;
         private final long fZoomEnd;
         private final long fResolution;
+        private final @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> fPredicates;
 
         /**
          * Constructor for a zoom sampling object
@@ -66,6 +69,27 @@ public class TimeGraphEntry implements ITimeGraphEntry, IFilterableDataModel {
             fZoomStart = zoomStart;
             fZoomEnd = zoomEnd;
             fResolution = resolution;
+            fPredicates = Collections.emptyMap();
+        }
+
+        /**
+         * Constructor for a zoom sampling object
+         *
+         * @param zoomStart
+         *            the start time of the zoom
+         * @param zoomEnd
+         *            the end time of the zoom
+         * @param resolution
+         *            the resolution of the zoom
+         * @param predicates
+         *            The active predicate applied to the view element
+         * @since 4.3
+         */
+        public Sampling(long zoomStart, long zoomEnd, long resolution, @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates) {
+            fZoomStart = zoomStart;
+            fZoomEnd = zoomEnd;
+            fResolution = resolution;
+            fPredicates = predicates;
         }
 
         @Override
@@ -83,12 +107,31 @@ public class TimeGraphEntry implements ITimeGraphEntry, IFilterableDataModel {
             }
             if (arg0 instanceof Sampling) {
                 Sampling other = (Sampling) arg0;
-                return fZoomStart == other.fZoomStart && fZoomEnd == other.fZoomEnd && fResolution == other.fResolution;
+                return fZoomStart == other.fZoomStart && fZoomEnd == other.fZoomEnd && fResolution == other.fResolution && fPredicates.equals(other.fPredicates);
             }
             return false;
         }
 
     }
+
+    /**
+     * Comparator to validate that an event e2 is within the event e1
+     *
+     * @since 4.3
+     */
+    public static Comparator<ITimeEvent> WITHIN_COMPARATOR = (e1, e2) -> {
+        int comp = Long.compare(e1.getTime(), e2.getTime());
+        if (comp > 0) {
+            return comp;
+        }
+
+        comp = Long.compare(e1.getTime() + e1.getDuration(), e2.getTime() + e2.getDuration());
+        if (comp < 0) {
+            return comp;
+        }
+
+        return 0;
+    };
 
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(TimeGraphEntry.class);
     /** Entry's parent */
@@ -326,7 +369,15 @@ public class TimeGraphEntry implements ITimeGraphEntry, IFilterableDataModel {
      */
     public void updateZoomedEvent(ITimeEvent event) {
         try (TraceCompassLogUtils.ScopeLog poc = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINE, "UpdateZoomedEvent")) { //$NON-NLS-1$
-            int index = Collections.binarySearch(fZoomedEventList, event, (e1, e2) -> Long.compare(e1.getTime(), e2.getTime()));
+
+            long start = fModel.getStartTime();
+            long end = fModel.getEndTime();
+
+            // If the entry has no time event, put a null time event to it
+            if (fZoomedEventList.isEmpty()) {
+                fZoomedEventList.add(new NullTimeEvent(this, start, end));
+            }
+            int index = Collections.binarySearch(fZoomedEventList, event, WITHIN_COMPARATOR);
             if (index >= 0) {
                 ITimeEvent current = fZoomedEventList.get(index);
                 if (!(current instanceof NullTimeEvent)) {
@@ -354,6 +405,18 @@ public class TimeGraphEntry implements ITimeGraphEntry, IFilterableDataModel {
             }
 
             updateEntryBounds(event);
+
+            // Put null time event at the beginning
+            long first = fZoomedEventList.isEmpty() ? start : fZoomedEventList.get(0).getTime();
+            if (start < first) {
+                fZoomedEventList.add(0, new NullTimeEvent(this, start, first - start));
+            }
+
+            // Put null time event at the end
+            long last = fZoomedEventList.isEmpty() ? end : fZoomedEventList.get(fZoomedEventList.size() - 1).getTime() + fZoomedEventList.get(fZoomedEventList.size() - 1).getDuration();
+            if (end > last) {
+                fZoomedEventList.add(new NullTimeEvent(this, last, end - last));
+            }
         }
     }
 

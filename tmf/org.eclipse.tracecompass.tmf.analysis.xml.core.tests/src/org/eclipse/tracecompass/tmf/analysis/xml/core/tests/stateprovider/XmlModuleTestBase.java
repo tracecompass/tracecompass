@@ -175,8 +175,9 @@ public abstract class XmlModuleTestBase {
             fail("Cannot set trace " + e.getMessage());
         } finally {
             trace.dispose();
+            fModule.dispose();
+            CtfTmfTestTraceUtils.dispose(getTrace());
         }
-        fModule.dispose();
-        CtfTmfTestTraceUtils.dispose(getTrace());
+
     }
 }

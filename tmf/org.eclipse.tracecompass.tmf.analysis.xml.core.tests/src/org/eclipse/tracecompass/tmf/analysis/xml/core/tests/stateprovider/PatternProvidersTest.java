@@ -23,6 +23,7 @@ import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.junit.Test;
 
@@ -65,6 +66,10 @@ public class PatternProvidersTest extends XmlProviderTestBase {
     @Test
     public void testSegmentStore() {
         TmfAbstractAnalysisModule module = getModule();
+        if (module instanceof ITmfAnalysisModuleWithStateSystems) {
+            // In this test, the module will be XmlPatternAnalysis which is an instance of ITmfAnalysisModuleWithStateSystems
+            assertTrue(((ITmfAnalysisModuleWithStateSystems) module).waitForInitialization());
+        }
         assertTrue(module.waitForCompletion());
         ISegmentStore<@NonNull ISegment> ss = ((ISegmentStoreProvider) module).getSegmentStore();
         assertNotNull(ss);

@@ -19,7 +19,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  *
  * @author Geneviève Bastien
  */
-public class DataDrivenActionConditional extends DataDrivenAction {
+public class DataDrivenActionConditional implements DataDrivenAction {
 
     private final DataDrivenCondition fCondition;
     private final DataDrivenAction fThenChange;

@@ -6,6 +6,7 @@ Bundle-Version: 1.0.2.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.tmf.filter.parser
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Import-Package: org.antlr.runtime,
  org.antlr.runtime.tree
 Export-Package: org.eclipse.tracecompass.tmf.filter.parser;x-friends:="org.eclipse.tracecompass.tmf.core",

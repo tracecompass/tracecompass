@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.tmf.chart.core,
  org.eclipse.tracecompass.tmf.chart.core.tests,
  org.eclipse.tracecompass.tmf.chart.ui,
- org.eclipse.tracecompass.common.core
+ org.eclipse.tracecompass.common.core,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: org.junit.runners

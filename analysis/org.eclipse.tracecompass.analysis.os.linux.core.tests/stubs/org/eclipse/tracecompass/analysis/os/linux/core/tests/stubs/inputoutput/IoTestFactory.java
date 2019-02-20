@@ -9,7 +9,10 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.inputoutput;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -43,6 +46,11 @@ public final class IoTestFactory {
 
     private IoTestFactory() {
 
+    }
+
+    private static double sectorsToSpeed(double sectors, long duration) {
+        double bytesPerNs = sectors * 512 / duration;
+        return bytesPerNs * 1E9;
     }
 
     /**
@@ -265,6 +273,32 @@ public final class IoTestFactory {
             Integer deviceId = Integer.parseInt(DEVICE_ID);
             map.put(deviceId, new DiskInfo("8,16", DEVICE_NAME, true));
             return map;
+        }
+
+        @Override
+        public Collection<DiskActivity> getDiskActivity() {
+            List<DiskActivity> values = new ArrayList<>();
+            // Reading, 2 points
+            double[] activities = { 0.0, sectorsToSpeed(256, 59) };
+            DiskActivity activity = new DiskActivity(1L, 60L, 2, activities, IoOperationType.READ, DEVICE_NAME);
+            values.add(activity);
+
+            // Reading interpolation
+            double[] activities2 = { 0.0, sectorsToSpeed(76.8, 8), sectorsToSpeed(179.2, 7) };
+            activity = new DiskActivity(45L, 60L, 3, activities2, IoOperationType.READ, DEVICE_NAME);
+            values.add(activity);
+
+            // Writing, 2 points
+            double[] activities3 = { 0.0, sectorsToSpeed(24, 59) };
+            activity = new DiskActivity(1L, 60L, 2, activities3, IoOperationType.WRITE, DEVICE_NAME);
+            values.add(activity);
+
+            // Writing, interpolation
+            double[] activities4 = { 0.0, sectorsToSpeed(4, 5), sectorsToSpeed(4, 5), 0.0, sectorsToSpeed((double) 8 / 6 + 8, 5) };
+            activity = new DiskActivity(10L, 30L, 5, activities4, IoOperationType.WRITE, DEVICE_NAME);
+            values.add(activity);
+
+            return values;
         }
 
     };

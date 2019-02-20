@@ -12,7 +12,6 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenAction;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenCondition;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
@@ -93,52 +92,6 @@ public interface ITmfXmlModelFactory {
      *            The state system container this action belongs to
      * @return The new {@link TmfXmlAction}
      */
-    TmfXmlAction createAction(Element node, IXmlStateSystemContainer container);
-
-    /**
-     * Create a new XML FSM
-     *
-     * @param node
-     *            The XML FSM element
-     * @param container
-     *            The state system container this FSM belongs to
-     * @return The new {@link TmfXmlFsm}
-     */
-    TmfXmlFsm createFsm(Element node, IXmlStateSystemContainer container);
-
-    /**
-     * Create a new XML state
-     *
-     * @param node
-     *            The XML state element
-     * @param container
-     *            The state system container this state belongs to
-     * @param parent
-     *            The parent state
-     * @return The new {@link TmfXmlState}
-     */
-    TmfXmlState createState(Element node, IXmlStateSystemContainer container, @Nullable TmfXmlState parent);
-
-    /**
-     * Create a new XML state transition
-     *
-     * @param node
-     *            The XML state transition element
-     * @param container
-     *            The state system container this state transition belongs to
-     * @return The new XML {@link TmfXmlStateTransition}
-     */
-    TmfXmlStateTransition createStateTransition(Element node, IXmlStateSystemContainer container);
-
-    /**
-     * Create a new pattern segment builder
-     *
-     * @param node
-     *            The XML pattern segment builder
-     * @param container
-     *            The state system container this pattern segment builder belongs to
-     * @return The new {@link TmfXmlPatternSegmentBuilder}
-     */
-    TmfXmlPatternSegmentBuilder createPatternSegmentBuilder(Element node, IXmlStateSystemContainer container);
+    String createAction(Element node, IXmlStateSystemContainer container);
 
 }

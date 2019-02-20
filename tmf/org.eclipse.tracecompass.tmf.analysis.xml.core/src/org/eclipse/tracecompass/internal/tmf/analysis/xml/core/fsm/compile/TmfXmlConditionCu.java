@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -34,6 +35,16 @@ import org.w3c.dom.Element;
  * @author Florian Wininger
  */
 public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
+
+
+    private static final TmfXmlConditionCu TRUE_CONDITION = new TmfXmlConditionCu() {
+
+        @Override
+        public DataDrivenCondition generate() {
+            return DataDrivenCondition.TRUE_CONDITION;
+        }
+
+    };
 
     /** Compararison condition */
     private static class TmfXmlCompareConditionCu extends TmfXmlConditionCu {
@@ -106,13 +117,31 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
 
         @Override
         public DataDrivenCondition generate() {
-            return new DataDrivenCondition.TmfDdNotCondition(fCondition.generate());
+            return new DataDrivenCondition.DataDrivenNotCondition(fCondition.generate());
+        }
+
+    }
+
+    /** Pattern matching condition */
+    static class TmfXmlRegexConditionCu extends TmfXmlConditionCu {
+
+        private final Pattern fPattern;
+        private final TmfXmlStateValueCu fValue;
+
+        TmfXmlRegexConditionCu(Pattern pattern, TmfXmlStateValueCu value) {
+            fPattern = pattern;
+            fValue = value;
+        }
+
+        @Override
+        public DataDrivenCondition generate() {
+            return new DataDrivenCondition.DataDrivenRegexCondition(fPattern, fValue.generate());
         }
 
     }
 
     /** AND condition */
-    private static class TmfXmlAndConditionCu extends TmfXmlConditionCu {
+    public static class TmfXmlAndConditionCu extends TmfXmlConditionCu {
 
         private final List<TmfXmlConditionCu> fConditions;
 
@@ -131,7 +160,7 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
     }
 
     /** OR condition */
-    private static class TmfXmlOrConditionCu extends TmfXmlConditionCu {
+    public static class TmfXmlOrConditionCu extends TmfXmlConditionCu {
 
         private final List<TmfXmlConditionCu> fConditions;
 
@@ -154,6 +183,9 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
 
     /**
      * Compile a test element, ie an element that contains a name
+     *
+     * TODO: Return the condition itself instead of the string when everything
+     * has moved to new code path
      *
      * @param analysisData
      *            The analysis data already compiled
@@ -361,7 +393,8 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
             }
             return new TmfXmlCompareConditionCu(firstValue, secondValue, conditionOperator);
         }
-        // Compile the case with first element being a stateAttribute or event field
+        // Compile the case with first element being a stateAttribute or event
+        // field
         if (childElements.size() == 1) {
             TmfXmlStateValueCu secondValue = TmfXmlStateValueCu.compileValue(analysisData, childElements.get(0));
             TmfXmlStateValueCu firstValue = null;
@@ -410,6 +443,36 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
         default:
             throw new IllegalArgumentException("TmfXmlCondition: invalid comparison operator."); //$NON-NLS-1$
         }
+    }
+
+    /**
+     * Create an OR condition from the list of conditions, or return the single
+     * condition if there is only one
+     *
+     * @param conditions
+     *            The list of conditions to OR
+     * @return And OR condition, or the single condition
+     */
+    public static TmfXmlConditionCu createOrCondition(List<TmfXmlConditionCu> conditions) {
+        if (conditions.isEmpty()) {
+            return TRUE_CONDITION;
+        }
+        return conditions.size() == 1 ? conditions.get(0) : new TmfXmlOrConditionCu(conditions);
+    }
+
+    /**
+     * Create an AND condition from the list of conditions, or return the single
+     * condition if there is only one
+     *
+     * @param conditions
+     *            The list of conditions to AND
+     * @return And AND condition, or the single condition
+     */
+    public static @Nullable TmfXmlConditionCu createAndCondition(List<TmfXmlConditionCu> conditions) {
+        if (conditions.isEmpty()) {
+            return TRUE_CONDITION;
+        }
+        return conditions.size() == 1 ? conditions.get(0) : new TmfXmlAndConditionCu(conditions);
     }
 
 }

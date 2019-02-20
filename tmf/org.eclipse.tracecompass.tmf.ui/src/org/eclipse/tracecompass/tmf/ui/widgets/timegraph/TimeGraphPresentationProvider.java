@@ -35,6 +35,8 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITmfTimeGraphDr
  */
 public class TimeGraphPresentationProvider implements ITimeGraphPresentationProvider2 {
 
+    private static final StateItem[] EMPTY_STATE_TABLE = new StateItem[0];
+
     private ITmfTimeGraphDrawingHelper fDrawingHelper;
     private final String fStateTypeName;
 
@@ -78,7 +80,7 @@ public class TimeGraphPresentationProvider implements ITimeGraphPresentationProv
 
     @Override
     public StateItem[] getStateTable() {
-        return null;
+        return EMPTY_STATE_TABLE;
     }
 
     @Override

@@ -12,7 +12,8 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.tracecompass.btf.core,
- org.eclipse.tracecompass.tmf.core
+ org.eclipse.tracecompass.tmf.core,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Export-Package: org.eclipse.tracecompass.btf.core.tests,
  org.eclipse.tracecompass.btf.core.tests.trace,
  org.eclipse.tracecompass.btf.core.tests.utils

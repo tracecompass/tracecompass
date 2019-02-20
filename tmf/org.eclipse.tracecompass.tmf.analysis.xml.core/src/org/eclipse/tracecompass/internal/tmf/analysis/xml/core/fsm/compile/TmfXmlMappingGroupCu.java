@@ -110,7 +110,7 @@ public class TmfXmlMappingGroupCu implements IDataDrivenCompilationUnit {
             TmfXmlStateValueCu valueSv = TmfXmlStateValueCu.compileValue(analysisData, svElements.get(1));
             if (valueSv == null) {
                 // TODO: Validation message here
-                Activator.logError("TmfXmlMappingGroupCu: Invalid key"); //$NON-NLS-1$
+                Activator.logError("TmfXmlMappingGroupCu: Invalid value"); //$NON-NLS-1$
                 return null;
             }
             TmfXmlMappingEntryCu mapEntry = new TmfXmlMappingEntryCu(keySv, valueSv);

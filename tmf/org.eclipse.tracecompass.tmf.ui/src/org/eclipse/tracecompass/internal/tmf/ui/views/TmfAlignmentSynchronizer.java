@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016 Ericsson
+ * Copyright (c) 2015, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -38,6 +38,8 @@ import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Receives various notifications for realignment and
@@ -127,6 +129,7 @@ public class TmfAlignmentSynchronizer {
     }
 
     private class AlignTask extends TimerTask {
+        private boolean fComplete = false;
 
         @Override
         public void run() {
@@ -141,6 +144,7 @@ public class TmfAlignmentSynchronizer {
                     performAllAlignments(fCopy);
                 }
             });
+            fComplete = true;
         }
     }
 
@@ -187,6 +191,22 @@ public class TmfAlignmentSynchronizer {
     @TmfSignalHandler
     public void timeViewAlignmentUpdated(TmfTimeViewAlignmentSignal signal) {
         queueAlignment(signal.getTimeViewAlignmentInfo(), signal.IsSynchronous());
+    }
+
+    /**
+     * Returns true if an alignment operation is pending or running, false
+     * otherwise.
+     *
+     * @return true if an alignment operation is pending or running, false
+     *         otherwise
+     */
+    @VisibleForTesting
+    public boolean isBusy() {
+        synchronized (fPendingOperations) {
+            TimerTask currentTask = fCurrentTask;
+            return !fPendingOperations.isEmpty() || (currentTask instanceof AlignTask &&
+                    !((AlignTask) currentTask).fComplete);
+        }
     }
 
     /**

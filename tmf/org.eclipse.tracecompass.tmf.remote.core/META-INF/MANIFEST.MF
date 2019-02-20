@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.commands,
  org.eclipse.remote.core;bundle-version="2.0.0",
  org.eclipse.remote.jsch.core,
- org.eclipse.tracecompass.common.core
+ org.eclipse.tracecompass.common.core,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Export-Package: org.eclipse.tracecompass.internal.tmf.remote.core;x-friends:="org.eclipse.tracecompass.tmf.remote.core.tests",
  org.eclipse.tracecompass.internal.tmf.remote.core.messages;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.remote.core.preferences;x-friends:="org.eclipse.tracecompass.tmf.remote.ui",

@@ -11,7 +11,7 @@
 *************************************************************************** -->
 <pattern version="0" id="test.analysis.1">
 	<head>
-		<traceType id="org.eclipse.linuxtools.lttng2.kernel.tracetype" />
+		<traceType id="org.eclipse.linuxtools.tmf.core.tests.xmlstub" />
 		<label value="XML test analysis 1" />
 	</head>
 

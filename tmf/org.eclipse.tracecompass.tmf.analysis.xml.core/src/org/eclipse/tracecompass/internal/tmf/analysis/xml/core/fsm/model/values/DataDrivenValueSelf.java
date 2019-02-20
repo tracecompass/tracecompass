@@ -44,4 +44,17 @@ public class DataDrivenValueSelf extends DataDrivenValue {
         return resolveValue(baseQuark, container);
     }
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof DataDrivenValueSelf)) {
+            return false;
+        }
+        return super.equals(obj);
+    }
+
 }

@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module;
 import javax.script.ScriptEngine;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenRuntimeData;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenMappingGroup;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -78,6 +79,18 @@ public interface IAnalysisDataContainer {
      */
     default @Nullable TmfAttributePool getAttributePool(int startNodeQuark) {
         return null;
+    }
+
+    /**
+     * Get the instance of the execution data for this analysis execution
+     *
+     * FIXME: This shouldn't be a default data, all implementations should have
+     * their own, while there is still legacy code, we'll keep the default
+     *
+     * @return The execution data instance
+     */
+    default DataDrivenRuntimeData getExecutionData() {
+        return DataDrivenRuntimeData.DEFAULT;
     }
 
     /**

@@ -25,7 +25,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * @author Geneviève Bastien
  * @author Florian Wininger
  */
-public class DataDrivenActionStateChange extends DataDrivenAction {
+public class DataDrivenActionStateChange implements DataDrivenAction {
 
     /**
      * An enumeration of possible actions on stack

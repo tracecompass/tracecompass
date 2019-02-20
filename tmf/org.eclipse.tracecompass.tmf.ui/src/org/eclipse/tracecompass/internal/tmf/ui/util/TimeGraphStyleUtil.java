@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2019 Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,13 +11,11 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 
 import com.google.common.base.Joiner;
 
@@ -50,32 +48,22 @@ public final class TimeGraphStyleUtil {
         IPreferenceStore store = getStore();
         String fillColorKey = getPreferenceName(presentationProvider, stateItem, ITimeEventStyleStrings.fillColor());
         String heightFactorKey = getPreferenceName(presentationProvider, stateItem, ITimeEventStyleStrings.heightFactor());
-
         Map<String, Object> styleMap = stateItem.getStyleMap();
-        RGB defaultRgb = stateItem.getStateColor();
 
-        String defaultString = store.getDefaultString(fillColorKey);
-        if (defaultString.isEmpty()) {
-            store.setDefault(fillColorKey, new RGBAColor(defaultRgb.red, defaultRgb.green, defaultRgb.blue, 255).toString());
+        String prefRgbColor = store.getString(fillColorKey);
+        if (!prefRgbColor.isEmpty()) {
+            RGBAColor prefRgba = RGBAColor.fromString(store.getString(fillColorKey));
+            if (prefRgba != null) {
+                styleMap.put(ITimeEventStyleStrings.fillColor(), prefRgba.toInt());
+            }
         }
-        String rgbColor = store.getString(fillColorKey);
 
-        if (store.getDefaultFloat(heightFactorKey) == 0.0f) {
-            float defaultHeightFactor = isLink(stateItem) ? TimeGraphControl.DEFAULT_LINK_WIDTH : TimeGraphControl.DEFAULT_STATE_WIDTH;
-            defaultHeightFactor = (float) styleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), defaultHeightFactor);
-            store.setDefault(heightFactorKey, defaultHeightFactor);
+        store.setDefault(heightFactorKey, -1.0f);
+        float prefHeightFactor = store.getFloat(heightFactorKey);
+        if (prefHeightFactor != -1.0f) {
+            styleMap.put(ITimeEventStyleStrings.heightFactor(), prefHeightFactor);
         }
-        float heightFactor = store.getFloat(heightFactorKey);
 
-        RGBAColor rgba = RGBAColor.fromString(rgbColor);
-        if (rgba != null) {
-            styleMap.put(ITimeEventStyleStrings.fillColor(), rgba.toInt());
-            styleMap.put(ITimeEventStyleStrings.heightFactor(), heightFactor);
-        }
-    }
-
-    private static boolean isLink(StateItem stateItem) {
-        return ITimeEventStyleStrings.linkType().equals(getItemProperty(stateItem));
     }
 
     private static @Nullable Object getItemProperty(StateItem stateItem) {

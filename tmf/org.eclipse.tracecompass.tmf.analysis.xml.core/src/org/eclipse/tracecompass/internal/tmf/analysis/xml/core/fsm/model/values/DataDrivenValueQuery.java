@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -75,6 +76,20 @@ public class DataDrivenValueQuery extends DataDrivenValue {
     @Override
     public String toString() {
         return "DataDrivenValueQuery: " + fQuery; //$NON-NLS-1$
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), fQuery);
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof DataDrivenValueQuery)) {
+            return false;
+        }
+        DataDrivenValueQuery other = (DataDrivenValueQuery) obj;
+        return Objects.equals(fQuery, other.fQuery);
     }
 
 }

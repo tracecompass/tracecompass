@@ -7,6 +7,7 @@ Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.ctf.parser
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: org.eclipse.tracecompass.ctf.parser;x-friends:="org.eclipse.tracecompass.ctf.core,org.eclipse.tracecompass.ctf.parser.tests"
+Require-Bundle: org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Import-Package: org.antlr.runtime;version="3.2.0",
  org.antlr.runtime.tree;version="3.2.0"
 Automatic-Module-Name: org.eclipse.tracecompass.ctf.parser

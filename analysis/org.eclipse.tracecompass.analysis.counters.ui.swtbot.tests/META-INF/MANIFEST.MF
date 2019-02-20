@@ -24,7 +24,8 @@ Require-Bundle: org.eclipse.core.resources,
  org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf,
  org.eclipse.tracecompass.tmf.ctf.core,
  org.eclipse.tracecompass.common.core,
- org.eclipse.tracecompass.lttng2.kernel.core
+ org.eclipse.tracecompass.lttng2.kernel.core,
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Import-Package: org.apache.commons.io,
  org.eclipse.swt.graphics,
  org.eclipse.tracecompass.analysis.counters.core,

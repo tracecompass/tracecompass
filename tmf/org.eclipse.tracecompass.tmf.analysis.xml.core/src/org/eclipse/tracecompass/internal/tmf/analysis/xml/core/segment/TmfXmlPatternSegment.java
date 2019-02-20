@@ -25,8 +25,6 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.segment.interfaces.INamedSegment;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 
 /**
  * This class implements an XML Pattern Segment. This type of segment has
@@ -47,7 +45,6 @@ public class TmfXmlPatternSegment implements INamedSegment, IContentSegment {
     private static final byte TYPE_STRING = 1;
     private static final byte TYPE_LONG = 2;
 
-    private final int fScale;
     private final long fStart;
     private final long fEnd;
     private final @NonNull String fSegmentName;
@@ -60,7 +57,8 @@ public class TmfXmlPatternSegment implements INamedSegment, IContentSegment {
 
         long start = buffer.getLong();
         long end = buffer.getLong();
-        int scale = buffer.getInt();
+        // Reading the now unused scale
+        buffer.getInt();
         String segmentName = buffer.getString();
         int contentSize = buffer.getInt();
 
@@ -89,7 +87,7 @@ public class TmfXmlPatternSegment implements INamedSegment, IContentSegment {
             }
             content.put(name, value);
         }
-        return new TmfXmlPatternSegment(start, end, scale, segmentName, content);
+        return new TmfXmlPatternSegment(start, end, segmentName, content);
     };
 
     /**
@@ -106,30 +104,11 @@ public class TmfXmlPatternSegment implements INamedSegment, IContentSegment {
      * @param fields
      *            Fields of the pattern segment
      */
-    public TmfXmlPatternSegment(long start, long end, int scale, String segmentName, @NonNull Map<@NonNull String, @NonNull ITmfStateValue> fields) {
+    public TmfXmlPatternSegment(long start, long end, String segmentName, @NonNull Map<@NonNull String, @NonNull ITmfStateValue> fields) {
         fStart = start;
         fEnd = end;
-        fScale = scale;
         fSegmentName = String.valueOf(segmentName);
         fContent = Collections.unmodifiableMap(fields);
-    }
-
-    /**
-     * Get the start timestamp of the segment
-     *
-     * @return The start timestamp
-     */
-    public @NonNull ITmfTimestamp getTimestampStart() {
-        return TmfTimestamp.create(fStart, fScale);
-    }
-
-    /**
-     * Get the end timestamp of this segment
-     *
-     * @return The end timestamp
-     */
-    public @NonNull ITmfTimestamp getTimestampEnd() {
-        return TmfTimestamp.create(fEnd, fScale);
     }
 
     /**
@@ -145,15 +124,6 @@ public class TmfXmlPatternSegment implements INamedSegment, IContentSegment {
     @Override
     public String getName() {
         return fSegmentName;
-    }
-
-    /**
-     * Get the timestamp scale of the pattern segment
-     *
-     * @return The timestamp scale
-     */
-    public int getScale() {
-        return fScale;
     }
 
     @Override
@@ -182,8 +152,8 @@ public class TmfXmlPatternSegment implements INamedSegment, IContentSegment {
     @Override
     public String toString() {
         return new StringBuilder(getClass().getSimpleName())
-                .append(", [fTimestampStart=").append(getTimestampStart()) //$NON-NLS-1$
-                .append(", fTimestampEnd=").append(getTimestampEnd()) //$NON-NLS-1$
+                .append(", [fTimestampStart=").append(getStart()) //$NON-NLS-1$
+                .append(", fTimestampEnd=").append(getEnd()) //$NON-NLS-1$
                 .append(", duration= ").append(getLength()) //$NON-NLS-1$
                 .append(", fName=").append(getName()) //$NON-NLS-1$
                 .append(", fContent=").append(getContent()) //$NON-NLS-1$
@@ -195,7 +165,9 @@ public class TmfXmlPatternSegment implements INamedSegment, IContentSegment {
 
         buffer.putLong(fStart);
         buffer.putLong(fEnd);
-        buffer.putInt(fScale);
+        // Legacy support, was scale
+        // FIXME: Ideally, we should version the writer and remove this value
+        buffer.putInt(0);
         buffer.putString(fSegmentName);
         // Write the number of fields
         buffer.putInt(fContent.size());

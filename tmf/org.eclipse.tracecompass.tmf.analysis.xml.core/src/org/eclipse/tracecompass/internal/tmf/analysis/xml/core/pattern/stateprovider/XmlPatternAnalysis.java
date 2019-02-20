@@ -14,6 +14,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
@@ -23,7 +25,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternSegmentBuilder;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -294,8 +295,7 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
         @Override
         public @Nullable String resolve(ISegment segment) {
             if (segment instanceof TmfXmlPatternSegment) {
-                return ((TmfXmlPatternSegment) segment).getName()
-                        .substring(TmfXmlPatternSegmentBuilder.PATTERN_SEGMENT_NAME_PREFIX.length());
+                return ((TmfXmlPatternSegment) segment).getName();
             }
             return EMPTY_STRING;
         }
@@ -340,4 +340,32 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
                 && fStateSystemModule.waitForCompletion(monitor)
                 && fSegmentStoreModule.waitForCompletion(monitor);
     }
+
+    // ------------------------------------------------------------------------
+    // ITmfPropertiesProvider
+    // ------------------------------------------------------------------------
+
+    /**
+     * @since 2.0
+     */
+    @Override
+    public @NonNull Map<@NonNull String, @NonNull String> getProperties() {
+        Map<@NonNull String, @NonNull String> properties = super.getProperties();
+
+        // Add the sub-modules' properties
+        TmfAbstractAnalysisModule module = fStateSystemModule;
+        if (module != null) {
+            for (Entry<String, String> entry : module.getProperties().entrySet()) {
+                properties.put(Objects.requireNonNull(Messages.PatternAnalysis_StateSystemPrefix + ' ' +entry.getKey()), entry.getValue());
+            }
+        }
+        module = fSegmentStoreModule;
+        if (module != null) {
+            for (Entry<String, String> entry : module.getProperties().entrySet()) {
+                properties.put(Objects.requireNonNull(Messages.PatternAnalysis_SegmentStorePrefix + ' ' +entry.getKey()), entry.getValue());
+            }
+        }
+        return properties;
+    }
+
 }

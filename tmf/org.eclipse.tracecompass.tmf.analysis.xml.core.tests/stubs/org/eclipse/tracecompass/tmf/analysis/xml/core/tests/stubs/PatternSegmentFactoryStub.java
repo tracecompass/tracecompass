@@ -17,7 +17,6 @@ import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
-import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 
@@ -50,15 +49,14 @@ public class PatternSegmentFactoryStub {
      * end event for pattern segment TEST_2
      */
     public static final @NonNull ITmfEvent TEST_2_END_EVENT = new TmfEvent(null, ITmfContext.UNKNOWN_RANK, TmfTimestamp.fromNanos(10), null, null);
-    private static final String PATTERN_SEGMENT_PREFIX = "seg_";
 
     /**
      * The pattern segment TEST_2
      */
-    public static final @NonNull TmfXmlPatternSegment TEST_2 = new TmfXmlPatternSegment(TEST_2_START_EVENT.getTimestamp().getValue(), TEST_2_END_EVENT.getTimestamp().getValue(), ITmfTimestamp.NANOSECOND_SCALE, PATTERN_SEGMENT_PREFIX + "test2", TEST_2_CONTENT);
+    public static final @NonNull TmfXmlPatternSegment TEST_2 = new TmfXmlPatternSegment(TEST_2_START_EVENT.getTimestamp().getValue(), TEST_2_END_EVENT.getTimestamp().getValue(), "test2", TEST_2_CONTENT);
 
     /**
      * The pattern segment TEST_3
      */
-    public static final @NonNull TmfXmlPatternSegment TEST_3 = new TmfXmlPatternSegment(TEST_2_START_EVENT.getTimestamp().getValue(), TEST_2_START_EVENT.getTimestamp().getValue(), ITmfTimestamp.NANOSECOND_SCALE, PATTERN_SEGMENT_PREFIX + "open", Collections.emptyMap());
+    public static final @NonNull TmfXmlPatternSegment TEST_3 = new TmfXmlPatternSegment(TEST_2_START_EVENT.getTimestamp().getValue(), TEST_2_START_EVENT.getTimestamp().getValue(), "open", Collections.emptyMap());
 }

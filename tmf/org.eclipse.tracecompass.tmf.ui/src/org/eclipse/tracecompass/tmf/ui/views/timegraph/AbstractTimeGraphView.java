@@ -771,6 +771,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 if (prevTime < event.getTime()) {
                     NullTimeEvent nullTimeEvent = new NullTimeEvent(entry, prevTime, event.getTime() - prevTime);
                     nullTimeEvent.setProperty(IFilterProperty.DIMMED, true);
+                    nullTimeEvent.setProperty(IFilterProperty.EXCLUDE, true);
                     eventList.add(nullTimeEvent);
                 }
                 eventList.add(event);
@@ -779,6 +780,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             if (prevTime < endTime) {
                 NullTimeEvent nullTimeEvent = new NullTimeEvent(entry, prevTime, endTime - prevTime);
                 nullTimeEvent.setProperty(IFilterProperty.DIMMED, true);
+                nullTimeEvent.setProperty(IFilterProperty.EXCLUDE, true);
                 eventList.add(nullTimeEvent);
             }
         }

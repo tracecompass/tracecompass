@@ -12,7 +12,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlPatternSegmentBuilder;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -41,7 +40,7 @@ public class XmlPatternLatencyStatisticsAnalysis extends AbstractSegmentStatisti
     protected @Nullable String getSegmentType(@NonNull ISegment segment) {
         if (segment instanceof TmfXmlPatternSegment) {
             TmfXmlPatternSegment patternSegment = (TmfXmlPatternSegment) segment;
-            return patternSegment.getName().substring(TmfXmlPatternSegmentBuilder.PATTERN_SEGMENT_NAME_PREFIX.length());
+            return patternSegment.getName();
         }
         return null;
     }

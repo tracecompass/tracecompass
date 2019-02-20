@@ -9,11 +9,14 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values;
 
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.IDataDrivenRuntimeObject;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenMappingGroup;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenScenarioInfo;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.IDataDrivenRuntimeObject;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
@@ -79,13 +82,14 @@ public abstract class DataDrivenValue implements IDataDrivenRuntimeObject {
      * Get the value this data-driven value resolves to, possibly using an event
      *
      * @param event
-     *            The event being handled. If there is no event is available, use
-     *            <code>null</code>.
+     *            The event being handled. If there is no event is available,
+     *            use <code>null</code>.
      * @param baseQuark
-     *            The quark for this value
+     *            The quark for this value. A value of
+     *            {@link ITmfStateSystem#ROOT_ATTRIBUTE} can be used
      * @param scenarioInfo
-     *            The active scenario details. The value should be null if there no
-     *            scenario.
+     *            The active scenario details. The value should be null if there
+     *            no scenario.
      * @param container
      *            The analysis data container
      * @return The value resolved for the event
@@ -118,5 +122,21 @@ public abstract class DataDrivenValue implements IDataDrivenRuntimeObject {
     public String toString() {
         return "TmfXmlValue: " + getClass().getSimpleName(); //$NON-NLS-1$
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fMappingGroupId, fForcedType);
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof DataDrivenValue)) {
+            return false;
+        }
+        DataDrivenValue other = (DataDrivenValue) obj;
+        return Objects.equals(fMappingGroupId, other.fMappingGroupId) && Objects.equals(fForcedType, other.fForcedType);
+    }
+
+
 
 }
