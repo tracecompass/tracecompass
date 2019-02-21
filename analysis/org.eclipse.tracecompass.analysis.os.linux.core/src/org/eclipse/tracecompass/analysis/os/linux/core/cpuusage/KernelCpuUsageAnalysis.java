@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
+import org.eclipse.tracecompass.analysis.os.linux.core.tid.TidAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.DefaultEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
@@ -119,8 +119,8 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
          * This analysis depends on the LTTng kernel analysis, so it's added to
          * dependent modules.
          */
-        Iterable<KernelAnalysisModule> kernelModules = TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysisModule.class);
-        for (KernelAnalysisModule kernelModule : kernelModules) {
+        Iterable<TidAnalysisModule> kernelModules = TmfTraceUtils.getAnalysisModulesOfClass(trace, TidAnalysisModule.class);
+        for (TidAnalysisModule kernelModule : kernelModules) {
             /* Only add the first one we find, if there is one */
             modules.add(kernelModule);
             break;
@@ -176,7 +176,7 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
         if (trace == null || cpuSs == null) {
             return map;
         }
-        ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystem(trace, KernelAnalysisModule.ID);
+        ITmfStateSystem kernelSs = TmfStateSystemAnalysisModule.getStateSystem(trace, TidAnalysisModule.ID);
         if (kernelSs == null) {
             return map;
         }
@@ -221,7 +221,7 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
                 long cpuTotal = 0;
 
                 /* Get the quark of the thread running on this CPU */
-                int currentThreadQuark = kernelSs.getQuarkAbsolute(Attributes.CPUS, curCpuName, Attributes.CURRENT_THREAD);
+                int currentThreadQuark = kernelSs.getQuarkAbsolute(curCpuName);
                 /* Get the currently running thread on this CPU */
                 int startThread = kernelStartState.get(currentThreadQuark).getStateValue().unboxInt();
                 int endThread = kernelEndState.get(currentThreadQuark).getStateValue().unboxInt();

@@ -29,7 +29,7 @@ import org.eclipse.test.performance.Performance;
 import org.eclipse.test.performance.PerformanceMeter;
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageEntryModel;
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.KernelCpuUsageAnalysis;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
+import org.eclipse.tracecompass.analysis.os.linux.core.tid.TidAnalysisModule;
 import org.eclipse.tracecompass.ctf.core.tests.shared.CtfBenchmarkTrace;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.CpuUsageDataProvider;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
@@ -110,7 +110,7 @@ public class CPUAnalysisBenchmark {
     private void initializeTrace(@NonNull String path, @NonNull LttngKernelTrace trace) throws TmfTraceException {
         trace.initTrace(null, path, CtfTmfEvent.class);
         trace.traceOpened(new TmfTraceOpenedSignal(this, trace, null));
-        IAnalysisModule module = trace.getAnalysisModule(KernelAnalysisModule.ID);
+        IAnalysisModule module = trace.getAnalysisModule(TidAnalysisModule.ID);
         assertNotNull(module);
         module.schedule();
         assertTrue(module.waitForCompletion());
