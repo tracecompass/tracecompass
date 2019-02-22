@@ -1,5 +1,5 @@
 {"events":[{"timestamp":4, "eventContent":{"description":"This is event 4"}},
   {"timestamp":2, "eventContent":{"description":"This is event 2"}},
   {"timestamp":1, "eventContent":{"description":"This is event 1"}},
-  {"timestamp":5, "eventContent":{"description":"This is event 5"}},
-  {"timestamp":3, "eventContent":{"description":"This is event 3"}}]}
+  {"timestamp":"5", "eventContent":{"description":"This is event 5"}},
+  {"timestamp":"3", "eventContent":{"description":"This is event 3"}}]}

@@ -75,13 +75,20 @@ public abstract class SortingJob extends Job {
                 if (end == -1) {
                     end = string.indexOf('}', index);
                 }
-                String number = string.substring(index, end).trim();
+                BigDecimal ts;
+                String number = string.substring(index, end).trim().replace("\"", "");
                 if (!number.isEmpty()) {
-                    // This may be a bit slow, it can be optimized if need be.
-                    fTs = new BigDecimal(number);
+                    try {
+                        // This may be a bit slow, it can be optimized if need be.
+                        ts = new BigDecimal(number);
+                    } catch (NumberFormatException e) {
+                        // Cannot be parsed as a number, set to -1
+                        ts = MINUS_ONE;
+                    }
                 } else {
-                    fTs = MINUS_ONE;
+                    ts = MINUS_ONE;
                 }
+                fTs = ts;
                 fPos = i;
             }
         }
