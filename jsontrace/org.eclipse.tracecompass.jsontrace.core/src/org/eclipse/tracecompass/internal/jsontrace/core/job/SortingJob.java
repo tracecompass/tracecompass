@@ -66,9 +66,9 @@ public abstract class SortingJob extends Job {
         public PartiallyParsedEvent(String key, String string, int i) {
             fLine = string;
             int indexOf = string.indexOf(key);
+            fPos = i;
             if (indexOf < 0) {
                 fTs = MINUS_ONE;
-                fPos = -1;
             } else {
                 int index = indexOf + key.length();
                 int end = string.indexOf(',', index);
@@ -89,7 +89,6 @@ public abstract class SortingJob extends Job {
                     ts = MINUS_ONE;
                 }
                 fTs = ts;
-                fPos = i;
             }
         }
 

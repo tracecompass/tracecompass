@@ -34,6 +34,7 @@ import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.core.trace.location.TmfLongLocation;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 /**
@@ -98,11 +99,19 @@ public class JsonStubTrace extends JsonTrace {
                     fFileInput.seek(locationInfo);
                 }
                 String nextJson = readNextEventString(() -> fFileInput.read());
-                if (nextJson != null) {
-                    JsonObject object = GSON.fromJson(nextJson, JsonObject.class);
-                    long timestamp = object.get(TIMESTAMP_KEY).getAsLong();
-                    return new TmfEvent(this, context.getRank(), TmfTimestamp.fromNanos(timestamp),
-                            new TmfEventType("JsonStubEvent", null), null); //$NON-NLS-1$
+                while (nextJson != null) {
+                    if (nextJson != null) {
+                        JsonObject object = GSON.fromJson(nextJson, JsonObject.class);
+                        // Ignore events with no timestamp, they are there just to make sure the traces
+                        // parses in those cases
+                        JsonElement tsElement = object.get(TIMESTAMP_KEY);
+                        if (tsElement != null) {
+                            long timestamp = tsElement.getAsLong();
+                            return new TmfEvent(this, context.getRank(), TmfTimestamp.fromNanos(timestamp),
+                                new TmfEventType("JsonStubEvent", null), null); //$NON-NLS-1$
+                        }
+                        nextJson = readNextEventString(() -> fFileInput.read());
+                    }
                 }
             } catch (IOException e) {
                 // Nothing to do
