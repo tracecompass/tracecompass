@@ -59,11 +59,11 @@ public class MemoryUsageTreeModel extends TmfTreeDataModel {
 
     @Override
     public boolean equals(@Nullable Object obj) {
-        if (!super.equals(obj)) {
+        if (obj == null || !super.equals(obj)) {
             // reference equality, nullness, getName, ID and parent ID
             return false;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
         MemoryUsageTreeModel other = (MemoryUsageTreeModel) obj;
