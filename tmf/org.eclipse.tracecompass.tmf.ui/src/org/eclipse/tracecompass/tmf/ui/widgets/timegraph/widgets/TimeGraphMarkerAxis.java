@@ -377,6 +377,10 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
             (double) (timeSpace - RIGHT_MARGIN) / (time1 - time0);
 
         int categoryIndex = Math.max((event.y - TOP_MARGIN) / HEIGHT, 0);
+        if (categoryIndex >= getVisibleCategories().size()) {
+            return null;
+        }
+
         String category = getVisibleCategories().get(categoryIndex);
 
         IMarkerEvent marker = null;
