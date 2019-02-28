@@ -11,7 +11,7 @@
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.linuxtools.dataviewers.feature.feature.group" version="0.0.0"/>
-<repository location="http://download.eclipse.org/linuxtools/update-2018-09-rc2"/>
+<repository location="http://download.eclipse.org/linuxtools/update-2018-09/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.swtbot.eclipse.feature.group" version="0.0.0"/>
@@ -45,7 +45,7 @@
 <unit id="org.json" version="0.0.0"/>
 <unit id="org.apache.derby" version="0.0.0"/>
 <unit id="org.hamcrest" version="0.0.0"/>
-<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20180905201904/repository"/>
+<repository location="https://download.eclipse.org/tools/orbit/downloads/drops/R20180905201904/repository"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.license.feature.group" version="0.0.0"/>
@@ -66,7 +66,7 @@
 <unit id="org.eclipse.ui.views.log" version="0.0.0"/>
 <unit id="a.jre.javase" version="10.0.0"/>
 <unit id="config.a.jre.javase" version="10.0.0"/>
-<repository location="http://download.eclipse.org/eclipse/updates/4.9/R-4.9-201809060745/"/>
+<repository location="http://download.eclipse.org/eclipse/updates/4.9/R-4.9-201809060745"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf" version="1.7.2"/>
