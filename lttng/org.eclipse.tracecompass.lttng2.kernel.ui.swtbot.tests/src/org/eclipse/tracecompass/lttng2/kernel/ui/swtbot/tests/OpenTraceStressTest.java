@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -121,8 +121,8 @@ public class OpenTraceStressTest {
             SWTBotUtils.openTrace(TRACE_PROJECT_NAME, path, TRACE_TYPE, false);
             SWTBotUtils.openTrace(TRACE_PROJECT_NAME, path, TRACE_TYPE, false);
             SWTBotUtils.openTrace(TRACE_PROJECT_NAME, path, TRACE_TYPE, false);
-            // Add little delay so that treads have a chance to start
-            SWTBotUtils.delay(1000);
+            // Wait for editor so that threads have a chance to start
+            workbenchbot.editorByTitle(fTestFile.getName());
             workbenchbot.closeAllEditors();
 
             if (!status.isOK()) {
