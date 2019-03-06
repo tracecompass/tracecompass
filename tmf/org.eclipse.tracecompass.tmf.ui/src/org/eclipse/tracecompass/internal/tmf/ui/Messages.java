@@ -186,6 +186,14 @@ public class Messages extends NLS {
     public static String TimeGraphLegend_swatchClick;
     public static String TimeGraphLegend_widthTooltip;
 
+    public static String TimeGraphTooltipHandler_DefaultMarkerName;
+
+    public static String TimeGraphTooltipHandler_EndTime;
+
+    public static String TimeGraphTooltipHandler_StartTime;
+
+    public static String TimeGraphTooltipHandler_Timestamp;
+
     public static String CustomTxtParserInputWizardPage_addChildLine;
     public static String CustomTxtParserInputWizardPage_addGroup;
     public static String CustomTxtParserInputWizardPage_addNextLine;
