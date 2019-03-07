@@ -73,6 +73,10 @@ public class TmfTracingPreferencePage extends FieldEditorPreferencePage implemen
         BooleanFieldEditor treeXyWarning = new BooleanFieldEditor(ITmfUIPreferences.HIDE_MANY_ENTRIES_SELECTED_TOGGLE,
                 Messages.TmfTracingPreferencePage_HideManyEntriesSelectedWarning, getFieldEditorParent());
         addField(treeXyWarning);
+
+        BooleanFieldEditor useBrowserTooltips = new BooleanFieldEditor(ITmfUIPreferences.USE_BROWSER_TOOLTIPS,
+                Messages.TmfTracingPreferencePage_UseBrowserTooltips, getFieldEditorParent());
+        addField(useBrowserTooltips);
     }
 
     @Override

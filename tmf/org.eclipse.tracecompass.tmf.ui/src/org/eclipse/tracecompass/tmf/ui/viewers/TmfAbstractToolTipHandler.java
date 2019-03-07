@@ -9,11 +9,25 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTError;
+import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -23,7 +37,15 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Slider;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.ITmfUIPreferences;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphTooltipHandler;
+
+import com.google.common.primitives.Longs;
 
 /**
  * Abstract tool tip handler.
@@ -32,11 +54,48 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphToolti
  * @author Loic Prieur-Drevon - extracted from {@link TimeGraphTooltipHandler}
  */
 public abstract class TmfAbstractToolTipHandler {
+    private static final int MAX_SHELL_WIDTH = 750;
+    private static final int MAX_SHELL_HEIGHT = 700;
     private static final int MOUSE_DEADZONE = 5;
+    private static final String TIME_PREFIX = "time://"; //$NON-NLS-1$
+    private static final Pattern TIME_PATTERN = Pattern.compile("\\s*time\\:\\/\\/(\\d+).*"); //$NON-NLS-1$
     private static final int OFFSET = 16;
+    private static Point fScrollBarSize = null;
     private Composite fTipComposite;
     private Shell fTipShell;
     private Rectangle fInitialDeadzone;
+    private Map<String, HyperLink> fModel = new HashMap<>();
+
+    private static synchronized boolean isBrowserAvailable(Composite parent) {
+        boolean isBrowserAvailable = Activator.getDefault().getPreferenceStore().getBoolean(ITmfUIPreferences.USE_BROWSER_TOOLTIPS);
+        if (isBrowserAvailable) {
+            try {
+                getScrollbarSize(parent);
+
+                Browser browser = new Browser(parent, SWT.NONE);
+                browser.dispose();
+                isBrowserAvailable = true;
+            } catch (SWTError er) {
+                isBrowserAvailable = false;
+            }
+        }
+        return isBrowserAvailable;
+    }
+
+    private static synchronized Point getScrollbarSize(Composite parent) {
+        if (fScrollBarSize == null) {
+            // Don't move these lines below the new Browser() line
+            Slider sliderV = new Slider(parent, SWT.VERTICAL);
+            Slider sliderH = new Slider(parent, SWT.HORIZONTAL);
+            int width = sliderV.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+            int height = sliderH.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+            Point scrollBarSize = new Point(width, height);
+            sliderV.dispose();
+            sliderH.dispose();
+            fScrollBarSize = scrollBarSize;
+        }
+        return fScrollBarSize;
+    }
 
     /**
      * Important note: this is being added to a display filter, this may leak,
@@ -100,16 +159,11 @@ public abstract class TmfAbstractToolTipHandler {
                 Control timeGraphControl = (Control) event.widget;
                 Point ptInDisplay = control.toDisplay(event.x, event.y);
                 fInitialDeadzone = new Rectangle(ptInDisplay.x - MOUSE_DEADZONE, ptInDisplay.y - MOUSE_DEADZONE, 2 * MOUSE_DEADZONE, 2 * MOUSE_DEADZONE);
-                createTooltipShell(timeGraphControl.getShell());
-                for (Control child : fTipComposite.getChildren()) {
-                    child.dispose();
-                }
-                fill(control, event, pt);
+                createTooltipShell(timeGraphControl.getShell(), control, event, pt);
                 if (fTipComposite.getChildren().length == 0) {
                     // avoid displaying empty tool tips.
                     return;
                 }
-                fTipShell.pack();
                 Point tipPosition = control.toDisplay(pt);
                 setHoverLocation(fTipShell, tipPosition);
                 fTipShell.setVisible(true);
@@ -121,12 +175,25 @@ public abstract class TmfAbstractToolTipHandler {
         });
     }
 
-    private void createTooltipShell(Shell parent) {
+    /**
+     * Create the tooltip shell.
+     *
+     * @param parent
+     *            the parent shell
+     * @param control
+     *            the underlying control
+     * @param event
+     *            the mouse event to react to
+     * @param pt
+     *            the mouse hover position in the control's coordinates
+     */
+    private void createTooltipShell(Shell parent, Control control, MouseEvent event, Point pt) {
         final Display display = parent.getDisplay();
         if (fTipShell != null && !fTipShell.isDisposed()) {
             fTipShell.dispose();
         }
-        fTipShell = new Shell(parent, SWT.ON_TOP | SWT.TOOL);
+        fModel.clear();
+        fTipShell = new Shell(parent, SWT.ON_TOP | SWT.TOOL | SWT.RESIZE | SWT.NO_SCROLL);
         // Deregister display filters on dispose
         fTipShell.addDisposeListener(e -> e.display.removeFilter(SWT.MouseMove, fListener));
         fTipShell.addDisposeListener(e -> e.display.removeFilter(SWT.FocusOut, fFocusLostListener));
@@ -135,15 +202,24 @@ public abstract class TmfAbstractToolTipHandler {
                 fTipShell.dispose();
             }
         });
-        GridLayout gridLayout = new GridLayout();
-        gridLayout.numColumns = 2;
-        gridLayout.marginWidth = 2;
-        gridLayout.marginHeight = 2;
-        fTipShell.setLayout(gridLayout);
+        fTipShell.setLayout(new FillLayout());
         fTipShell.setBackground(display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-        fTipComposite = new Composite(fTipShell, SWT.NONE);
-        fTipComposite.setLayout(new GridLayout(3, false));
-        setupControl(fTipComposite);
+
+        fTipComposite = new Composite(fTipShell, SWT.NO_FOCUS);
+        fTipComposite.setLayout(new FillLayout());
+        fill(control, event, pt);
+
+        ITooltipContent content = null;
+        if (isBrowserAvailable(fTipComposite)) {
+            content = new BrowserContent(fTipComposite);
+        } else {
+            content = new DefaultContent(fTipComposite);
+        }
+        content.setInput(fModel);
+        content.create();
+        Point p = content.computePreferredSize();
+        Rectangle t = fTipShell.computeTrim(0, 0, p.x, p.y);
+        fTipShell.setSize(Math.min(t.width, MAX_SHELL_WIDTH), Math.min(t.height, MAX_SHELL_HEIGHT));
     }
 
     private static void setHoverLocation(Shell shell, Point position) {
@@ -162,11 +238,6 @@ public abstract class TmfAbstractToolTipHandler {
         shell.setBounds(shellBounds);
     }
 
-    private void setupControl(Control control) {
-        control.setForeground(fTipShell.getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-        control.setBackground(fTipShell.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-    }
-
     /**
      * Getter for the current underlying tip {@link Composite}
      *
@@ -174,6 +245,23 @@ public abstract class TmfAbstractToolTipHandler {
      */
     protected Composite getTipComposite() {
         return fTipComposite;
+    }
+
+    /**
+     * Method to call to add tuples : name, value to the tooltip. It has
+     * the possibility to add a time value for creating a hyperlink in the
+     * tooltip.
+     *
+     * @param name
+     *            name of the line
+     * @param label
+     *            label to display representing the time or line value
+     * @param time
+     *            time in nanoseconds, if time value else null
+     * @since 5.0
+     */
+    protected void addItem(String name, String label, Long time) {
+        fModel.put(name, new HyperLink(label, time));
     }
 
     /**
@@ -185,17 +273,7 @@ public abstract class TmfAbstractToolTipHandler {
      *            line value
      */
     protected void addItem(String name, String value) {
-        Label nameLabel = new Label(fTipComposite, SWT.NO_FOCUS);
-        nameLabel.setText(name);
-        setupControl(nameLabel);
-        Label separator = new Label(fTipComposite, SWT.NO_FOCUS | SWT.SEPARATOR | SWT.VERTICAL);
-        GridData gd = new GridData(SWT.CENTER, SWT.CENTER, false, false);
-        gd.heightHint = nameLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
-        separator.setLayoutData(gd);
-        setupControl(separator);
-        Label valueLabel = new Label(fTipComposite, SWT.NO_FOCUS);
-        valueLabel.setText(value);
-        setupControl(valueLabel);
+        addItem(name, value, null);
     }
 
     /**
@@ -211,5 +289,272 @@ public abstract class TmfAbstractToolTipHandler {
      *            the mouse hover position in the control's coordinates
      */
     protected abstract void fill(Control control, MouseEvent event, Point pt);
+
+    // Stopgap interface
+    private static class HyperLink {
+        private String fLabel;
+        // TODO: use a real interface
+        private @Nullable Object fLink;
+
+        public HyperLink(String label, @Nullable Object link) {
+            fLabel = label;
+            fLink = link;
+        }
+
+        /**
+         * Get the label
+         *
+         * @return the label
+         */
+        public String getLabel() {
+            return fLabel;
+        }
+
+        /**
+         * Get the link
+         *
+         * @return the link, can be null
+         */
+        public Object getLink() {
+            return fLink;
+        }
+
+        @SuppressWarnings("nls")
+        @Override
+        public String toString() {
+            Object link = getLink();
+            String label = getLabel();
+            if (link == null) {
+                return label;
+            }
+            return "<a href=" + TIME_PREFIX + link + ">" + label + "</a>";
+        }
+    }
+
+    private interface ITooltipContent {
+        void create();
+        void setInput(Map<String, HyperLink> model);
+        Point computePreferredSize();
+
+        default void setupControl(Control control) {
+            control.setForeground(control.getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND));
+            control.setBackground(control.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+        }
+    }
+
+    private class BrowserContent extends AbstractContent {
+        private static final int MARGIN = 10;
+        private static final int CHAR_WIDTH = 9;
+        private static final int LINE_HEIGHT = 20;
+
+        public BrowserContent(Composite parent) {
+            super(parent);
+        }
+
+        @Override
+        public void create() {
+            Composite parent = getParent();
+            Map<String, HyperLink> model = getModel();
+            if (parent == null || model.size() == 0) {
+                return;
+            }
+            setupControl(parent);
+            ScrolledComposite scrolledComposite = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+            scrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+            scrolledComposite.setExpandVertical(true);
+            scrolledComposite.setExpandHorizontal(true);
+
+            Browser browser = new Browser(scrolledComposite, SWT.NONE);
+            browser.setJavascriptEnabled(false);
+            browser.addLocationListener(new LocationListener() {
+                @Override
+                public void changing(LocationEvent ev) {
+                    Matcher matcher = TIME_PATTERN.matcher(ev.location);
+                    if (matcher.find()) {
+                        String time = matcher.group(1);
+                        Long val = Longs.tryParse(time);
+                        if (val != null) {
+                            TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(ev.getSource(), TmfTimestamp.fromNanos(val)));
+                        }
+                        ev.doit = false;
+                    }
+                }
+                @Override
+                public void changed(LocationEvent ev) {
+                    // Ignore
+                }
+            });
+            setupControl(browser);
+
+            String toolTipHtml = toHtml();
+            browser.setText(toolTipHtml);
+            scrolledComposite.setContent(browser);
+            Point preferredSize = computePreferredSize();
+            Point scrollBarSize = getScrollbarSize(scrolledComposite);
+            scrolledComposite.setMinSize(Math.min(preferredSize.x > scrollBarSize.x ? preferredSize.x - scrollBarSize.x : preferredSize.x, MAX_SHELL_WIDTH - scrollBarSize.x), 0);
+        }
+
+        @Override
+        public Point computePreferredSize() {
+            Map<String, HyperLink> model = getModel();
+            int elementCount = model.size();
+            int longestString = 0;
+            int longestValueString = 0;
+            Set<String> rowKeySet = model.keySet();
+            for (String row : rowKeySet) {
+                longestString = Math.max(longestString, row.length() + 2);
+                HyperLink hyperlink = model.get(row);
+                longestValueString = Math.max(longestValueString, + (hyperlink == null ? 0 : hyperlink.getLabel().length()) + 2);
+            }
+            int w = (longestString + longestValueString) * CHAR_WIDTH + MARGIN;
+            int h = (elementCount + 1) * LINE_HEIGHT;
+            return new Point(w, h);
+        }
+
+        @SuppressWarnings("nls")
+        private String toHtml() {
+            Map<String, HyperLink> model = getModel();
+            StringBuilder toolTipContent = new StringBuilder();
+            toolTipContent.append("<head>\n" +
+                    "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
+                    "<style>\n" +
+                    ".collapsible {\n" +
+                    "  background-color: #777;\n" +
+                    "  color: white;\n" +
+                    "  cursor: pointer;\n" +
+                    "  padding: 0px;\n" +
+                    "  width: 100%;\n" +
+                    "  border: none;\n" +
+                    "  text-align: left;\n" +
+                    "  outline: none;\n" +
+                    "  font-size: 12px;\n" +
+                    "}\n" +
+                    "\n" +
+                    ".active, .collapsible:hover {\n" +
+                    "  background-color: #555;\n" +
+                    "}\n" +
+                    "\n" +
+                    ".content {\n" +
+                    "  padding: 0px 0px;\n" +
+                    "  display: block;\n" +
+                    "  overflow: hidden;\n" +
+                    "  background-color: #f1f1f1;\n" +
+                    "}\n" +
+                    ".tab {\n" +
+                    "  font-size: 14px;\n" +
+                    "}\n" +
+                    ".paddingBetweenCols {\n" +
+                    "  padding:px 10px 0px 10px;\n" +
+                    "}\n" +
+                    ".bodystyle {\n" +
+                    "  padding:0px 0px;\n" +
+                    "}\n" +
+                    "</style>\n" +
+                    "</head>");
+            toolTipContent.append("<body class=\"bodystyle\">"); //$NON-NLS-1$
+
+            Set<String> rowKeySet = model.keySet();
+            toolTipContent.append("<div class=\"content\">");
+            toolTipContent.append("<table class=\"tab\">");
+            for (String row : rowKeySet) {
+                HyperLink hyperlink = model.get(row);
+                String value = hyperlink == null ? "" : hyperlink.toString();  //$NON-NLS-1$
+                toolTipContent.append("<tr>");
+                toolTipContent.append("<td class=\"paddingBetweenCols\">");
+                toolTipContent.append(row);
+                toolTipContent.append("</td>");
+                toolTipContent.append("<td class=\"paddingBetweenCols\">");
+                toolTipContent.append(value);
+                toolTipContent.append("</td>");
+                toolTipContent.append("</tr>");
+            }
+            toolTipContent.append("</table></div>");
+            toolTipContent.append("</body>"); //$NON-NLS-1$
+            return toolTipContent.toString();
+        }
+    }
+
+    private class DefaultContent extends AbstractContent {
+        public DefaultContent(Composite parent) {
+            super(parent);
+        }
+
+        @Override
+        public void create() {
+            Composite parent = getParent();
+            Map<String, HyperLink> model = getModel();
+            if (parent == null || model.size() == 0) {
+                return;
+            }
+            setupControl(parent);
+            parent.setLayout(new GridLayout());
+
+            ScrolledComposite scrolledComposite = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+            scrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+            scrolledComposite.setExpandVertical(true);
+            scrolledComposite.setExpandHorizontal(true);
+            setupControl(scrolledComposite);
+
+            Composite composite = new Composite(scrolledComposite, SWT.NONE);
+            composite.setLayout(new GridLayout(3, false));
+            setupControl(composite);
+            Set<String> rowKeySet = model.keySet();
+            for (String key : rowKeySet) {
+                Label nameLabel = new Label(composite, SWT.NO_FOCUS);
+                nameLabel.setText(key);
+                setupControl(nameLabel);
+                Label separator = new Label(composite, SWT.NO_FOCUS | SWT.SEPARATOR | SWT.VERTICAL);
+                GridData gd = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+                gd.heightHint = nameLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+                separator.setLayoutData(gd);
+                setupControl(separator);
+                Label valueLabel = new Label(composite, SWT.NO_FOCUS);
+                HyperLink hyperlink = model.get(key);
+                String label = hyperlink == null ? "" : hyperlink.getLabel(); //$NON-NLS-1$
+                valueLabel.setText(label);
+                setupControl(valueLabel);
+            }
+            scrolledComposite.setContent(composite);
+            Point preferredSize = computePreferredSize();
+            Point scrollBarSize = getScrollbarSize(composite);
+            scrolledComposite.setMinSize(preferredSize.x > scrollBarSize.x ? preferredSize.x - scrollBarSize.x : preferredSize.x, preferredSize.y > scrollBarSize.y ? preferredSize.y - scrollBarSize.y : preferredSize.y);
+        }
+    }
+
+    private abstract class AbstractContent implements ITooltipContent {
+        private Composite fParent = null;
+        private Map<String, HyperLink> fContentModel = null;
+
+        public AbstractContent(Composite parent) {
+            fParent = parent;
+        }
+
+        @Override
+        public void setInput(Map<String, HyperLink> model) {
+            fContentModel = model;
+        }
+
+        @NonNull
+        protected Map<String, HyperLink> getModel() {
+            Map <String, HyperLink> model = fContentModel;
+            if (model == null) {
+                model = new HashMap<>();
+            }
+            return model;
+        }
+
+        @Override
+        public Point computePreferredSize() {
+            Composite parent = fParent;
+            if (parent == null) {
+                return new Point(0, 0);
+            }
+            return parent.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+        }
+
+        protected Composite getParent() {
+            return fParent;
+        }
+    }
 
 }

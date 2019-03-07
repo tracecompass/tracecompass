@@ -51,4 +51,9 @@ public interface ITmfUIPreferences {
      * Preference for hiding the Many Entries Selected MessageDialog
      */
     String HIDE_MANY_ENTRIES_SELECTED_TOGGLE = "HIDE_MANY_ENTRIES_SELECTED_TOGGLE"; //$NON-NLS-1$
+
+    /**
+     * Preference to use HTML Tooltips
+     */
+    String USE_BROWSER_TOOLTIPS = "USE_HTML_TOOLTIPS"; //$NON-NLS-1$
 }

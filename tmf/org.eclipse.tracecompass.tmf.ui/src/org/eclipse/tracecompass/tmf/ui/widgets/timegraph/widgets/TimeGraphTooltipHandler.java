@@ -72,8 +72,8 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
     public TimeGraphTooltipHandler(ITimeGraphPresentationProvider graphProv,
             ITimeDataProvider timeProv) {
 
-        this.fTimeGraphProvider = graphProv;
-        this.fTimeDataProvider = timeProv;
+        fTimeGraphProvider = graphProv;
+        fTimeDataProvider = timeProv;
     }
 
     /**
@@ -148,10 +148,10 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
         long timestamp = marker.getTime();
         long duration = marker.getDuration();
         if (duration == 0) {
-            addItem(MARKER_OFFSET + Messages.TimeGraphTooltipHandler_Timestamp, TmfTimestamp.fromNanos(timestamp).toString());
+            addItem(MARKER_OFFSET + Messages.TimeGraphTooltipHandler_Timestamp, TmfTimestamp.fromNanos(timestamp).toString(), timestamp);
         } else {
-            addItem(MARKER_OFFSET + Messages.TimeGraphTooltipHandler_StartTime, TmfTimestamp.fromNanos(timestamp).toString());
-            addItem(MARKER_OFFSET + Messages.TimeGraphTooltipHandler_EndTime, TmfTimestamp.fromNanos(timestamp + duration).toString());
+            addItem(MARKER_OFFSET + Messages.TimeGraphTooltipHandler_StartTime, TmfTimestamp.fromNanos(timestamp).toString(), timestamp);
+            addItem(MARKER_OFFSET + Messages.TimeGraphTooltipHandler_EndTime, TmfTimestamp.fromNanos(timestamp + duration).toString(), timestamp);
         }
         if (toolTips != null) {
             for (Entry<String, String> tooltip : toolTips.entrySet()) {
@@ -287,13 +287,14 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
                 }
                 if (tf == TimeFormat.CALENDAR) {
                     addItem(Messages.TmfTimeTipHandler_TRACE_DATE,
-                            eventStartTime > -1 ? FormatTimeUtils.formatDate(eventStartTime) : "?"); //$NON-NLS-1$
+                            eventStartTime > -1 ? FormatTimeUtils.formatDate(eventStartTime) : "?", //$NON-NLS-1$
+                            eventStartTime > -1 ? eventStartTime : null);
                 }
                 if (eventDuration > 0) {
-                    addItem(Messages.TmfTimeTipHandler_TRACE_START_TIME, startTime);
-                    addItem(Messages.TmfTimeTipHandler_TRACE_STOP_TIME, endTime);
+                    addItem(Messages.TmfTimeTipHandler_TRACE_START_TIME, startTime, eventStartTime);
+                    addItem(Messages.TmfTimeTipHandler_TRACE_STOP_TIME, endTime, eventEndTime);
                 } else {
-                    addItem(Messages.TmfTimeTipHandler_TRACE_EVENT_TIME, startTime);
+                    addItem(Messages.TmfTimeTipHandler_TRACE_EVENT_TIME, startTime, eventStartTime);
                 }
 
                 if (eventDuration > 0) {
@@ -344,14 +345,14 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
             Resolution res = Resolution.NANOSEC;
             TimeFormat tf = fTimeDataProvider.getTimeFormat().convert();
             if (tf == TimeFormat.CALENDAR) {
-                addItem(Messages.TmfTimeTipHandler_TRACE_DATE, FormatTimeUtils.formatDate(sourceTime));
+                addItem(Messages.TmfTimeTipHandler_TRACE_DATE, FormatTimeUtils.formatDate(sourceTime), sourceTime);
             }
             if (duration > 0) {
-                addItem(Messages.TmfTimeTipHandler_LINK_SOURCE_TIME, FormatTimeUtils.formatTime(sourceTime, tf, res));
-                addItem(Messages.TmfTimeTipHandler_LINK_TARGET_TIME, FormatTimeUtils.formatTime(targetTime, tf, res));
+                addItem(Messages.TmfTimeTipHandler_LINK_SOURCE_TIME, FormatTimeUtils.formatTime(sourceTime, tf, res), sourceTime);
+                addItem(Messages.TmfTimeTipHandler_LINK_TARGET_TIME, FormatTimeUtils.formatTime(targetTime, tf, res), targetTime);
                 addItem(Messages.TmfTimeTipHandler_DURATION, FormatTimeUtils.formatDelta(duration, tf, res));
             } else {
-                addItem(Messages.TmfTimeTipHandler_LINK_TIME, FormatTimeUtils.formatTime(sourceTime, tf, res));
+                addItem(Messages.TmfTimeTipHandler_LINK_TIME, FormatTimeUtils.formatTime(sourceTime, tf, res), sourceTime);
             }
         }
     }
