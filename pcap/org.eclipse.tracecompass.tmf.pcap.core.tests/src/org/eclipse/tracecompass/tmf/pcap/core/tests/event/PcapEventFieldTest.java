@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.packet.Packet;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.ipv4.IPv4Packet;
@@ -117,13 +118,12 @@ public class PcapEventFieldTest {
 
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
-        try (PcapFile dummy = new PcapFile(trace.getPath())) {
-            IPv4Packet packet = new IPv4Packet(dummy, null, bb);
+        try (PcapFile file = trace.getTrace()) {
+            IPv4Packet packet = new IPv4Packet(file, null, bb);
             ITmfEventField[] fieldArray = generatePacketFields(packet);
             fRegularField = new PcapEventField("Regular Field", EMPTY_STRING, fieldArray, packet);
             fRootField = new PcapRootEventField(fieldArray, packet);
         }
-
     }
 
     /**
@@ -218,8 +218,8 @@ public class PcapEventFieldTest {
         while (localPacket != null) {
             subfieldList.clear();
             for (Map.Entry<@NonNull String, @NonNull String> entry : localPacket.getFields().entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
+                @Nullable String key = entry.getKey();
+                @Nullable String value = entry.getValue();
                 subfieldList.add(new TmfEventField(key, value, null));
             }
             ITmfEventField[] subfieldArray = subfieldList.toArray(new ITmfEventField[subfieldList.size()]);

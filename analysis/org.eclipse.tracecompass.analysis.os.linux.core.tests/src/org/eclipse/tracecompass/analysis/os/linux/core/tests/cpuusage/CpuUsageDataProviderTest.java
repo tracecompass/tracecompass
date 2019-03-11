@@ -28,9 +28,9 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageEntryModel;
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.KernelCpuUsageAnalysis;
-import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.Activator;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.trace.TmfXmlKernelTraceStub;
+import org.eclipse.tracecompass.analysis.os.linux.core.tid.TidAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.CpuUsageDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.dataprovider.DataProviderParameterUtils;
@@ -96,7 +96,7 @@ public class CpuUsageDataProviderTest {
          * implemented
          */
         IAnalysisModule module = null;
-        for (IAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, KernelAnalysisModule.class)) {
+        for (IAnalysisModule mod : TmfTraceUtils.getAnalysisModulesOfClass(trace, TidAnalysisModule.class)) {
             module = mod;
         }
         assertNotNull(module);

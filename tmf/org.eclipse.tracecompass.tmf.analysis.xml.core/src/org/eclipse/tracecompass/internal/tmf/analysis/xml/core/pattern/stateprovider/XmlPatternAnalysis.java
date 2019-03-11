@@ -11,7 +11,6 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.statepro
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,6 +24,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlPatternCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -59,18 +59,24 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
     private static final String SEGMENT_STORE_SUFFIX = " segment store"; //$NON-NLS-1$
     private static final String STATE_SYSTEM_SUFFIX = " state system"; //$NON-NLS-1$
     private final CountDownLatch fInitialized = new CountDownLatch(1);
-    private XmlPatternStateSystemModule fStateSystemModule;
-    private XmlPatternSegmentStoreModule fSegmentStoreModule;
+    private final XmlPatternStateSystemModule fStateSystemModule;
+    private final XmlPatternSegmentStoreModule fSegmentStoreModule;
     private boolean fInitializationSucceeded;
     private String fViewLabelPrefix;
 
     /**
      * Constructor
+     *
+     * @param patternCu
+     *            The pattern compilation unit
+     * @param analysisid
+     *            The analysis ID
      */
-    public XmlPatternAnalysis() {
+    public XmlPatternAnalysis(@NonNull String analysisid, TmfXmlPatternCu patternCu) {
         super();
         fSegmentStoreModule = new XmlPatternSegmentStoreModule(this);
-        fStateSystemModule = new XmlPatternStateSystemModule(fSegmentStoreModule);
+        fStateSystemModule = new XmlPatternStateSystemModule(fSegmentStoreModule, patternCu);
+        setId(analysisid);
     }
 
     @Override
@@ -216,17 +222,6 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
          * calling schedule()!
          */
         return fSegmentStoreModule.setTrace(trace) && fStateSystemModule.setTrace(trace);
-    }
-
-    /**
-     * Sets the file path of the XML file and the id of pattern analysis in the
-     * file
-     *
-     * @param file
-     *            The full path to the XML file
-     */
-    public void setXmlFile(Path file) {
-        fStateSystemModule.setXmlFile(file);
     }
 
     /**

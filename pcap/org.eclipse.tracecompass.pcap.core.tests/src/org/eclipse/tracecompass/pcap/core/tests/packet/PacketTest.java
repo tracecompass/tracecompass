@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Viet-Hung Phan - Support pcapNg
  *******************************************************************************/
 
 package org.eclipse.tracecompass.pcap.core.tests.packet;
@@ -35,9 +36,10 @@ import org.junit.Test;
 
 /**
  * JUnit Class that tests the generic Packet class and its method.
- *
+ *  *
  * @author Vincent Perot
  */
+
 public class PacketTest {
 
     private ByteBuffer fEthernetPacket;
@@ -90,7 +92,8 @@ public class PacketTest {
     public void GenericPacketTest() throws BadPacketException, IOException, BadPcapFileException {
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
-        try (PcapFile dummy = new PcapFile(trace.getPath())) {
+        // Get a right pcap/pcapNg trace
+        try (PcapFile dummy = trace.getTrace();) {
             ByteBuffer byteBuffer = fEthernetPacket;
             if (byteBuffer == null) {
                 fail("GenericPacketTest has failed!");
@@ -118,7 +121,6 @@ public class PacketTest {
             }
             assertEquals(packet.getPayload(), child.getPayload());
             assertEquals(packet.getGlobalSummaryString(), "Source MAC: 10:f8:82:b3:44:78 , Destination MAC: 34:67:0c:d2:91:51");
-
         }
     }
 }

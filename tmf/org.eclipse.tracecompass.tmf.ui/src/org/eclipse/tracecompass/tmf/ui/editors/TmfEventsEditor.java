@@ -14,13 +14,11 @@
 package org.eclipse.tracecompass.tmf.ui.editors;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
@@ -45,7 +43,6 @@ import org.eclipse.tracecompass.internal.tmf.ui.editors.ITmfEventsEditorConstant
 import org.eclipse.tracecompass.internal.tmf.ui.editors.TmfTableColumnUtils;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
-import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
@@ -54,7 +51,6 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
-import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import org.eclipse.tracecompass.tmf.ui.project.model.Messages;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentFolder;
@@ -79,7 +75,6 @@ import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 /**
@@ -359,87 +354,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
      * @return The event table for the trace
      */
     private static @NonNull Iterable<ITmfEventAspect<?>> getTraceAspects(ITmfTrace trace) {
-        if (trace instanceof TmfExperiment) {
-            return getExperimentAspects((TmfExperiment) trace);
-        }
         return trace.getEventAspects();
-    }
-
-    /**
-     * Get the events table for an experiment. If all traces in the experiment
-     * are of the same type, use the same behavior as if it was one trace of
-     * that type.
-     *
-     * @param experiment
-     *            the experiment
-     * @param parent
-     *            the parent Composite
-     * @param cacheSize
-     *            the event table cache size
-     * @return An event table of the appropriate type
-     */
-    private static @NonNull Iterable<ITmfEventAspect<?>> getExperimentAspects(
-            final TmfExperiment experiment) {
-        List<ITmfTrace> traces = experiment.getTraces();
-        ImmutableSet.Builder<ITmfEventAspect<?>> builder = new ImmutableSet.Builder<>();
-
-        /* For experiments, we'll add a "trace name" aspect/column */
-        builder.add(TmfBaseAspects.getTraceNameAspect());
-
-        String commonTraceType = getCommonTraceType(experiment);
-        if (commonTraceType != null) {
-            /*
-             * All the traces in this experiment are of the same type, let's
-             * just use the normal table for that type.
-             */
-            builder.addAll(traces.get(0).getEventAspects());
-
-        } else {
-            /*
-             * There are different trace types in the experiment, so we are
-             * definitely using a TmfEventsTable. Aggregate the columns from all
-             * trace types.
-             */
-            for (ITmfTrace trace : traces) {
-                Iterable<ITmfEventAspect<?>> traceAspects = trace.getEventAspects();
-                builder.addAll(traceAspects);
-            }
-        }
-        return builder.build();
-    }
-
-    /**
-     * Check if an experiment contains traces of all the same type. If so,
-     * returns this type as a String. If not, returns null.
-     *
-     * @param experiment
-     *            The experiment
-     * @return The common trace type if there is one, or 'null' if there are
-     *         different types.
-     */
-    private static @Nullable String getCommonTraceType(TmfExperiment experiment) {
-        String commonTraceType = null;
-        try {
-            for (final ITmfTrace trace : experiment.getTraces()) {
-                final IResource resource = trace.getResource();
-                if (resource == null) {
-                    return null;
-                }
-
-                final String traceType = resource.getPersistentProperty(TmfCommonConstants.TRACETYPE);
-                if ((commonTraceType != null) && !commonTraceType.equals(traceType)) {
-                    return null;
-                }
-                commonTraceType = traceType;
-            }
-        } catch (CoreException e) {
-            /*
-             * One of the traces didn't advertise its type, we can't infer
-             * anything.
-             */
-            return null;
-        }
-        return commonTraceType;
     }
 
     @Override

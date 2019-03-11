@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -71,7 +71,7 @@ public class EthernetIIPacket extends Packet {
     public EthernetIIPacket(PcapFile file, @Nullable Packet parent, ByteBuffer packet) throws BadPacketException {
         super(file, parent, PcapProtocol.ETHERNET_II);
 
-        if (packet.array().length <= EthernetIIValues.ETHERNET_II_MIN_SIZE) {
+        if (packet.limit() <= EthernetIIValues.ETHERNET_II_MIN_SIZE) {
             throw new BadPacketException("An Ethernet II packet can't be smaller than 14 bytes."); //$NON-NLS-1$
         }
 
@@ -91,12 +91,9 @@ public class EthernetIIPacket extends Packet {
         fType = ConversionHelper.unsignedShortToInt(packet.getShort());
 
         // Get payload if it exists.
-        if (packet.array().length - packet.position() > 0) {
-            byte[] array = new byte[packet.array().length - packet.position()];
-            packet.get(array);
-            ByteBuffer payload = ByteBuffer.wrap(array);
+        if (packet.remaining() > 0) {
+            ByteBuffer payload = packet.slice();
             payload.order(ByteOrder.BIG_ENDIAN);
-            payload.position(0);
             fPayload = payload;
 
         } else {
@@ -238,11 +235,8 @@ public class EthernetIIPacket extends Packet {
             result = prime * result;
         }
         result = prime * result + Arrays.hashCode(fDestinationMacAddress);
-        final ByteBuffer payload = fPayload;
-        if (payload != null) {
-            result = prime * result + payload.hashCode();
-        } else {
-            result = prime * result;
+        if (child == null) {
+            result = prime * result + payloadHashCode(fPayload);
         }
         result = prime * result + Arrays.hashCode(fSourceMacAddress);
         result = prime * result + fType;
@@ -267,10 +261,9 @@ public class EthernetIIPacket extends Packet {
         if (!Arrays.equals(fDestinationMacAddress, other.fDestinationMacAddress)) {
             return false;
         }
-        if(!Objects.equals(fPayload, other.fPayload)) {
+        if (fChildPacket == null && !payloadEquals(fPayload, other.fPayload)) {
             return false;
         }
-
         if (!Arrays.equals(fSourceMacAddress, other.fSourceMacAddress)) {
             return false;
         }

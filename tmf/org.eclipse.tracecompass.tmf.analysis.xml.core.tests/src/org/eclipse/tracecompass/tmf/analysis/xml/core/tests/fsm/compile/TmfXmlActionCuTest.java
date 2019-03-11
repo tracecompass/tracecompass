@@ -250,14 +250,12 @@ public class TmfXmlActionCuTest {
 
         Element xmlElement = TmfXmlTestUtils.getXmlElement(TmfXmlStrings.ACTION, fExpected.getXmlString());
         assertNotNull(xmlElement);
-        String compiledAction = TmfXmlActionCu.compileNamedAction(data, xmlElement);
+        TmfXmlActionCu compiledAction = TmfXmlActionCu.compileNamedAction(data, xmlElement);
         if (fExpected.getResult() == null) {
             assertNull("Expected null action" + fExpected.getName(), compiledAction);
         } else {
             assertNotNull("Expected non null " + fExpected.getName(), compiledAction);
-            TmfXmlActionCu action = data.getAction(fExpected.getName());
-            assertNotNull(action);
-            assertEquals(fExpected.getName() + " generated", fExpected.getResult(), action.generate());
+            assertEquals(fExpected.getName() + " generated", fExpected.getResult(), compiledAction.generate());
         }
     }
 

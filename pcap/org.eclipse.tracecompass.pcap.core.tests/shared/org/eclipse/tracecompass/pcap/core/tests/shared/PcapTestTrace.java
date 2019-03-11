@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Vincent Perot - Initial API and implementation
+ *     Viet-Hung Phan - Support pcapNg
  *******************************************************************************/
 
 package org.eclipse.tracecompass.pcap.core.tests.shared;
@@ -19,12 +20,14 @@ import java.nio.file.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.pcap.core.trace.BadPcapFileException;
 import org.eclipse.tracecompass.internal.pcap.core.trace.PcapFile;
+import org.eclipse.tracecompass.internal.pcap.core.util.PcapHelper;
 
 /**
  * Here is the list of the available test traces for the Pcap parser.
  *
  * @author Vincent Perot
  */
+
 public enum PcapTestTrace {
 
     /** A bad pcap file. */
@@ -68,17 +71,17 @@ public enum PcapTestTrace {
     }
 
     /**
-     * Get a Pcap Trace instance of a test trace. Make sure to call
+     * Get a Pcap or PcapNg Trace instance of a test trace. Make sure to call
      * {@link #exists()} before calling this!
      *
-     * @return The PcapFile object
+     * @return The PcapOldFile or PcapNgFile object
      * @throws IOException
      *             Thrown when some IO error occurs.
      * @throws BadPcapFileException
      *             Thrown when the file is not a valid Pcap File.
      */
     public PcapFile getTrace() throws BadPcapFileException, IOException {
-        return new PcapFile(fPath);
+        return PcapHelper.getPcapFile(fPath);
     }
 
     /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Viet-Hung Phan - Support pcapNg
  *******************************************************************************/
 
 package org.eclipse.tracecompass.pcap.core.tests.protocol.unknown;
@@ -75,7 +76,8 @@ public class UnknownPacketTest {
     public void CompleteUnknownPacketTest() throws IOException, BadPcapFileException {
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
-        try (PcapFile dummy = new PcapFile(trace.getPath())) {
+        // Get a right pcap/pcapNg trace
+        try (PcapFile dummy = trace.getTrace();) {
             ByteBuffer byteBuffer = fPacket;
             if (byteBuffer == null) {
                 fail("CompleteUnknownPacketTest has failed!");
@@ -114,7 +116,6 @@ public class UnknownPacketTest {
 
             // Packet-specific methods Testing
             // None
-
         }
     }
 }

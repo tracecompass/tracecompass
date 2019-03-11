@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.tmf.analysis.xml.core.tests;
 import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlPatternCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternAnalysis;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
@@ -28,8 +29,10 @@ import org.w3c.dom.NodeList;
 public class PatternAnalysisTestUtils {
 
     private static XmlPatternAnalysis createModule(@NonNull Element element, TmfXmlTestFiles file) {
-        XmlPatternAnalysis module = new XmlPatternAnalysis();
-        module.setXmlFile(file.getFile().toPath());
+        String id = element.getAttribute(TmfXmlStrings.ID);
+        TmfXmlPatternCu patternCu = TmfXmlPatternCu.compile(element);
+        assertNotNull(patternCu);
+        XmlPatternAnalysis module = new XmlPatternAnalysis(id, patternCu);
         module.setName(XmlModuleTestBase.getName(element));
         return module;
     }

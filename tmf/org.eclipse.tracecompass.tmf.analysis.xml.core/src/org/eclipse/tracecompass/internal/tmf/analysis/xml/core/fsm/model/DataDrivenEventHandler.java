@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime.DataDrivenScenarioInfo;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenStateProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 

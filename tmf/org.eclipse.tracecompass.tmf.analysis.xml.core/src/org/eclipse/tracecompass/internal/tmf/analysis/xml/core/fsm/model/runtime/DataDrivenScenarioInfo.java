@@ -6,16 +6,20 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  ******************************************************************************/
-package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model;
+package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenFsm;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenFsmSimpleState;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenFsmState;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime.DataDrivenScenarioHistoryBuilder.ScenarioStatusType;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioHistoryBuilder.ScenarioStatusType;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
@@ -32,19 +36,20 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
  */
 public class DataDrivenScenarioInfo {
 
-    /** The string for start time */
-    private static final String START_TIME = "startTime"; //$NON-NLS-1$
-
     /**
      * A temporary dummy scenario
      */
-    public static final DataDrivenScenarioInfo DUMMY_SCENARIO = new DataDrivenScenarioInfo(DataDrivenFsmSimpleState.createFinalState(StringUtils.EMPTY), ScenarioStatusType.PENDING, -1, -1);
+    public static final DataDrivenScenarioInfo DUMMY_SCENARIO = new DataDrivenScenarioInfo(DataDrivenFsmSimpleState.createFinalState(StringUtils.EMPTY), ScenarioStatusType.PENDING, -1, -1, null);
+
+    /** The string for start time */
+    private static final String START_TIME = "startTime"; //$NON-NLS-1$
 
     private final int fQuark;
     private final int fStatusQuark;
     private DataDrivenFsmState fActiveState;
     private ScenarioStatusType fStatus;
     private final Map<@NonNull TmfAttributePool, Integer> fPoolAttributes = new HashMap<>();
+    private final @Nullable DataDrivenFsm fFsm;
 
     /**
      * Constructor
@@ -57,12 +62,15 @@ public class DataDrivenScenarioInfo {
      *            The scenario quark
      * @param statusQuark
      *            The scenario status quark
+     * @param fsm
+     *            The state machine this scenario info is for
      */
-    public DataDrivenScenarioInfo(DataDrivenFsmState activeState, ScenarioStatusType status, int quark, int statusQuark) {
+    public DataDrivenScenarioInfo(DataDrivenFsmState activeState, ScenarioStatusType status, int quark, int statusQuark, @Nullable DataDrivenFsm fsm) {
         fActiveState = activeState;
         fQuark = quark;
         fStatus = status;
         fStatusQuark = statusQuark;
+        fFsm = fsm;
     }
 
     /**
@@ -180,6 +188,17 @@ public class DataDrivenScenarioInfo {
             return (long) startTs;
         }
         return -1L;
+    }
+
+    /**
+     * Get the ID of the FSM this scenario is part of
+     *
+     * FIXME: Make this @NonNull when everything is a pattern
+     *
+     * @return The ID of the FSM
+     */
+    public @Nullable DataDrivenFsm getFsm() {
+        return fFsm;
     }
 
 }

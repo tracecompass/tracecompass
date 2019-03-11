@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,7 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Viet-Hung Phan - Support pcapNg
  *******************************************************************************/
 
 package org.eclipse.tracecompass.pcap.core.tests.protocol.ethernet2;
@@ -102,13 +103,14 @@ public class EthernetIIPacketTest {
     public void CompleteEthernetIIPacketTest() throws IOException, BadPcapFileException, BadPacketException {
         PcapTestTrace trace = PcapTestTrace.MOSTLY_TCP;
         assumeTrue(trace.exists());
-        try (PcapFile dummy = new PcapFile(trace.getPath())) {
-            ByteBuffer byteBuffer = fPacket;
+        try (PcapFile file = trace.getTrace()) {
+            ByteBuffer byteBuffer =  fPacket;
             if (byteBuffer == null) {
-                fail("CompleteEthernetIIPacketTest has failed!");
+                fail("GenericPacketTest has failed!");
                 return;
             }
-            EthernetIIPacket packet = new EthernetIIPacket(dummy, null, byteBuffer);
+
+            EthernetIIPacket packet = new EthernetIIPacket(file, null, byteBuffer);
 
             // Protocol Testing
             assertEquals(PcapProtocol.ETHERNET_II, packet.getProtocol());
@@ -118,9 +120,9 @@ public class EthernetIIPacketTest {
 
             // Abstract methods Testing
             assertTrue(packet.validate());
-            assertEquals(-653947816, packet.hashCode());
-            assertFalse(packet.equals(null));
-            assertEquals(new EthernetIIPacket(dummy, null, byteBuffer), packet);
+            EthernetIIPacket expected = new EthernetIIPacket(file, null, byteBuffer);
+            assertEquals(expected.hashCode(), packet.hashCode());
+            assertEquals(expected, packet);
 
             assertEquals(EXPECTED_FIELDS, packet.getFields());
             assertEquals(EXPECTED_TOSTRING, packet.toString());
@@ -139,7 +141,6 @@ public class EthernetIIPacketTest {
             assertTrue(Arrays.equals(packet.getSourceMacAddress(), Arrays.copyOfRange(fPacket.array(), EthernetIIValues.MAC_ADDRESS_SIZE, EthernetIIValues.MAC_ADDRESS_SIZE + EthernetIIValues.MAC_ADDRESS_SIZE)));
             assertTrue(Arrays.equals(packet.getDestinationMacAddress(), Arrays.copyOfRange(fPacket.array(), 0, 0 + EthernetIIValues.MAC_ADDRESS_SIZE)));
             assertEquals(0xA256, packet.getEthertype());
-
         }
     }
 }

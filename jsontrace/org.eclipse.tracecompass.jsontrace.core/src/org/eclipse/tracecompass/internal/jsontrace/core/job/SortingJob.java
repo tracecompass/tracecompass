@@ -66,23 +66,29 @@ public abstract class SortingJob extends Job {
         public PartiallyParsedEvent(String key, String string, int i) {
             fLine = string;
             int indexOf = string.indexOf(key);
+            fPos = i;
             if (indexOf < 0) {
                 fTs = MINUS_ONE;
-                fPos = -1;
             } else {
                 int index = indexOf + key.length();
                 int end = string.indexOf(',', index);
                 if (end == -1) {
                     end = string.indexOf('}', index);
                 }
-                String number = string.substring(index, end).trim();
+                BigDecimal ts;
+                String number = string.substring(index, end).trim().replace("\"", "");
                 if (!number.isEmpty()) {
-                    // This may be a bit slow, it can be optimized if need be.
-                    fTs = new BigDecimal(number);
+                    try {
+                        // This may be a bit slow, it can be optimized if need be.
+                        ts = new BigDecimal(number);
+                    } catch (NumberFormatException e) {
+                        // Cannot be parsed as a number, set to -1
+                        ts = MINUS_ONE;
+                    }
                 } else {
-                    fTs = MINUS_ONE;
+                    ts = MINUS_ONE;
                 }
-                fPos = i;
+                fTs = ts;
             }
         }
 

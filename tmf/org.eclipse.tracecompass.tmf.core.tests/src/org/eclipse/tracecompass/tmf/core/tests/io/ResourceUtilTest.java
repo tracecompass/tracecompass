@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -137,8 +137,8 @@ public class ResourceUtilTest {
      */
     @BeforeClass
     public static void beforeClass() throws IOException {
-        fTargetFile = fTemporaryFolder.newFile(LINK_TARGET_FILE);
-        fTargetFolder = fTemporaryFolder.newFolder(LINK_TARGET_FOLDER);
+        fTargetFile = fTemporaryFolder.newFile(LINK_TARGET_FILE).getCanonicalFile();
+        fTargetFolder = fTemporaryFolder.newFolder(LINK_TARGET_FOLDER).getCanonicalFile();
     }
 
     /**
@@ -163,7 +163,7 @@ public class ResourceUtilTest {
     }
 
     // Create a temporary folder manually because @ClassRule is done after the
-    // @Paramater method call
+    // @Parameters method call
     private static TemporaryFolder initStaticTemp() {
         try {
             return new TemporaryFolder() { { before(); } };
@@ -234,12 +234,12 @@ public class ResourceUtilTest {
         assertEquals(IS_WINDOWS, file6.isLinked());
 
         // Re-create target file
-        fTargetFile = fTemporaryFolder.newFile(LINK_TARGET_FILE);
+        fTargetFile = fTemporaryFolder.newFile(LINK_TARGET_FILE).getCanonicalFile();
 
         if (IS_LINUX) {
             // Link to file system symbolic link
             java.nio.file.Path targetPath = Paths.get(path.toOSString());
-            java.nio.file.Path linkPath = Paths.get(fTemporaryFolder.getRoot().getAbsolutePath(), LINK_TO_TARGET_FILE);
+            java.nio.file.Path linkPath = Paths.get(fTemporaryFolder.getRoot().getCanonicalPath(), LINK_TO_TARGET_FILE);
             // Create files system symbolic link
             Files.createSymbolicLink(linkPath, targetPath);
 
@@ -351,7 +351,7 @@ public class ResourceUtilTest {
         assertFalse(res.exists());
 
         // Re-create target file
-        fTargetFile = fTemporaryFolder.newFile(LINK_TARGET_FILE);
+        fTargetFile = fTemporaryFolder.newFile(LINK_TARGET_FILE).getCanonicalFile();
 
         // Create File System Link to a folder and break the link
         path = new Path(fTargetFolder.getAbsolutePath());
@@ -363,7 +363,7 @@ public class ResourceUtilTest {
         assertFalse(res.exists());
 
         // Re-create target folder
-        fTargetFolder = fTemporaryFolder.newFolder(LINK_TARGET_FOLDER);
+        fTargetFolder = fTemporaryFolder.newFolder(LINK_TARGET_FOLDER).getCanonicalFile();
 
         // Test with null resource
         ResourceUtil.deleteResource(null, null);
@@ -492,7 +492,7 @@ public class ResourceUtilTest {
         assertFalse(resource.exists());
 
         // Re-create target file
-        fTargetFile = fTemporaryFolder.newFile(LINK_TARGET_FILE);
+        fTargetFile = fTemporaryFolder.newFile(LINK_TARGET_FILE).getCanonicalFile();
 
         // Create Eclipse link to a file
         resource = createAndVerifyLink(path, ECLIPSE_LINK_FILE_NAME, true, false);
@@ -505,7 +505,7 @@ public class ResourceUtilTest {
         assertFalse(resource.exists());
 
         // Re-create target file
-        fTargetFile = fTemporaryFolder.newFile(LINK_TARGET_FILE);
+        fTargetFile = fTemporaryFolder.newFile(LINK_TARGET_FILE).getCanonicalFile();
     }
 
     /**

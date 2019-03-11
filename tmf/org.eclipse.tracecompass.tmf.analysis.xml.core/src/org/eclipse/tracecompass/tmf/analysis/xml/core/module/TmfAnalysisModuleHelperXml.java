@@ -20,6 +20,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlPatternCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlStateProviderCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenAnalysisModule;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.Messages;
@@ -211,11 +212,13 @@ public class TmfAnalysisModuleHelperXml implements IAnalysisModuleHelper, ITmfPr
             module.setName(getName());
             break;
         case PATTERN:
-            module = new XmlPatternAnalysis();
+            TmfXmlPatternCu patternCu = TmfXmlPatternCu.compile(fSourceFile.toPath(), analysisid);
+            if (patternCu == null) {
+                return null;
+            }
+            module = new XmlPatternAnalysis(analysisid, patternCu);
             module.setName(getName());
-            module.setId(analysisid);
             XmlPatternAnalysis paModule = (XmlPatternAnalysis) module;
-            paModule.setXmlFile(fSourceFile.toPath());
             paModule.setViewLabelPrefix(getViewLabelPrefix());
 
             break;

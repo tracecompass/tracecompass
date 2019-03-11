@@ -133,7 +133,7 @@ public class TmfAttributePool {
      */
     public synchronized void recycle(int quark, long ts) {
         if (!fQuarksInUse.remove(quark)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Quark " + quark + " is not in use at time " + ts); //$NON-NLS-1$ //$NON-NLS-2$
         }
         fSs.removeAttribute(ts, quark);
         fAvailableQuarks.add(quark);

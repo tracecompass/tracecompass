@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -278,6 +278,42 @@ public abstract class Packet {
 
     @Override
     public abstract int hashCode();
+
+    /**
+     * Returns a hash code based on the contents of the specified payload.
+     *
+     * @param payload
+     *            the payload whose hash value to compute
+     * @return a content-based hash code for <tt>payload</tt>
+     */
+    protected static int payloadHashCode(@Nullable ByteBuffer payload) {
+        if (payload == null) {
+            return 0;
+        }
+        return ByteBuffer.wrap(payload.array(), payload.arrayOffset(), payload.limit()).hashCode();
+    }
+
+    /**
+     * Returns <tt>true</tt> if the two specified payloads are <i>equal</i> to
+     * one another.
+     *
+     * @param payload
+     *            one payload to be tested for equality
+     * @param otherPayload
+     *            the other payload to be tested for equality
+     * @return <tt>true</tt> if the two payloads are equal
+     */
+    protected static boolean payloadEquals(@Nullable ByteBuffer payload, @Nullable ByteBuffer otherPayload) {
+        if (payload == null) {
+            return otherPayload == null;
+        }
+        if (otherPayload == null) {
+            return false;
+        }
+        ByteBuffer buffer = ByteBuffer.wrap(payload.array(), payload.arrayOffset(), payload.limit());
+        ByteBuffer otherBuffer = ByteBuffer.wrap(otherPayload.array(), otherPayload.arrayOffset(), otherPayload.limit());
+        return buffer.equals(otherBuffer);
+    }
 
     /**
      * Method that is used by child packet classes to verify if a bit is set.

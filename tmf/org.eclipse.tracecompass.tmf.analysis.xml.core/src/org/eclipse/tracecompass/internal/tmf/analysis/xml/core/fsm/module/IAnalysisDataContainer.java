@@ -15,8 +15,8 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module;
 import javax.script.ScriptEngine;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenRuntimeData;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenMappingGroup;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime.DataDrivenRuntimeData;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;

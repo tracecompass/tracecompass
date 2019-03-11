@@ -221,7 +221,7 @@ public class LttngTraceGenerator {
      */
     public static void generateLttngTrace(File file) {
         final int cpus = 25;
-        LttngTraceGenerator gt = new LttngTraceGenerator(Integer.MAX_VALUE / 8L, 250000 / 8L, cpus);
+        LttngTraceGenerator gt = new LttngTraceGenerator(Integer.MAX_VALUE / 12L, 250000 / 12L, cpus);
         gt.writeTrace(file);
     }
 

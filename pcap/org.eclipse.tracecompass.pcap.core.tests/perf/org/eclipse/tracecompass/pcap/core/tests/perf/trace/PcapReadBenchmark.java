@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -65,11 +65,10 @@ public class PcapReadBenchmark {
             try (PcapFile trace = testTrace.getTrace();) {
                 for (int i = 0; i < RUN_BETWEEN_COMMIT_COUNT; i++) {
                     trace.seekPacket(0);
-                    while (trace.hasNextPacket()) {
+                    while (true) {
                         Packet packet = trace.parseNextPacket();
                         if (packet == null) {
-                            fail("Test failed at iteration " + loop + '.' + i + ", at packet " + trace.getCurrentRank());
-                            return;
+                            break;
                         }
                         /* Do something with the packet because we are awesome */
                         packet.getPayload();

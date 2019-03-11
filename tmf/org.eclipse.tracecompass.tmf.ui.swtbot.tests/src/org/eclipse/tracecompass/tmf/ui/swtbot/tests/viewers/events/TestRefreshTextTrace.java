@@ -50,7 +50,7 @@ public class TestRefreshTextTrace {
     private static final String TIMESTAMP_FORMAT = "MMM dd HH:mm:ss";
 
     private static final long INITIAL_NB_EVENTS = 100;
-    private static final int NEW_EVENTS_PER_REFRESH = 40000;
+    private static final int NEW_EVENTS_PER_REFRESH = 2000;
     private static final int NB_REFRESH = 3;
     private static final long SECOND_TO_MILLISECOND = 1000;
     private static final long MICROSECOND_TO_NANOSECOND = 1000000;

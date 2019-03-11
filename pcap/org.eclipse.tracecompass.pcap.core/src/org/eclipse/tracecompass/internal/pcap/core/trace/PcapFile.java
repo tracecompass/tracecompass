@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,25 +8,23 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Viet-Hung Phan - Support pcapNg
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.pcap.core.trace;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.channels.SeekableByteChannel;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.TreeMap;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.pcap.core.packet.BadPacketException;
 import org.eclipse.tracecompass.internal.pcap.core.protocol.pcap.PcapPacket;
-import org.eclipse.tracecompass.internal.pcap.core.util.ConversionHelper;
 import org.eclipse.tracecompass.internal.pcap.core.util.PcapTimestampScale;
 
 /**
@@ -34,46 +32,33 @@ import org.eclipse.tracecompass.internal.pcap.core.util.PcapTimestampScale;
  *
  * @author Vincent Perot
  */
-public class PcapFile implements Closeable {
+public abstract class PcapFile implements Closeable {
 
-    // TODO add pcapng support.
-    // TODO Make parsing faster by buffering the data.
+    private long fCurrentRank = 0;
+    private long fTotalNumberPackets = -1;
 
-    private final Path fPcapFilePath;
-    private final ByteOrder fByteOrder;
-    private final SeekableByteChannel fFileChannel;
-    private final PcapTimestampScale fTimestampPrecision;
+    private FileChannel fFileChannel;
+    private Path fPcapFilePath;
+    private ByteOrder fByteOrder = ByteOrder.LITTLE_ENDIAN;
+    private int fMajorVersion;
+    private int fMinorVersion;
 
-    private final int fMajorVersion;
-    private final int fMinorVersion;
-    private final long fTimeAccuracy;
-    private final long fTimeZoneCorrection;
-    private final long fSnapshotLength;
-    private final long fDataLinkType;
-
-    private final TreeMap<Long, Long> fFileIndex;
-
-    private long fCurrentRank;
-    private long fTotalNumberPackets;
+    private TreeMap<Long, Long> fFileIndex = new TreeMap<>();
 
     /**
-     * Constructor of the PcapFile Class.
+     * Constructor of the PcapFile Class
      *
      * @param filePath
-     *            The path to the pcap file.
-     *
+     *            The path file of the pcap file
      * @throws BadPcapFileException
-     *             Thrown if the Pcap File is not valid.
+     *             Thrown if it is not a pcap/pcapNg file
      * @throws IOException
      *             Thrown if there is an IO error while reading the file.
+     *
      */
     public PcapFile(Path filePath) throws BadPcapFileException, IOException {
-
         fFileIndex = new TreeMap<>();
-        fCurrentRank = 0;
-        fTotalNumberPackets = -1;
         fPcapFilePath = filePath;
-
         // Check file validity
         if (Files.notExists(fPcapFilePath) || !Files.isRegularFile(fPcapFilePath) ||
                 Files.size(fPcapFilePath) < PcapFileValues.GLOBAL_HEADER_SIZE) {
@@ -85,58 +70,32 @@ public class PcapFile implements Closeable {
         }
 
         // File is not empty. Try to open.
-        fFileChannel = checkNotNull(Files.newByteChannel(fPcapFilePath));
-
-        // Parse the global header.
-        // Read the magic number (4 bytes) from the input stream
-        // and determine the mode (big endian or little endian)
-        ByteBuffer globalHeader = ByteBuffer.allocate(PcapFileValues.GLOBAL_HEADER_SIZE);
-        globalHeader.clear();
-        fFileChannel.read(globalHeader);
-        globalHeader.flip();
-        int magicNumber = globalHeader.getInt();
-
-        switch (magicNumber) {
-        case PcapFileValues.MAGIC_BIG_ENDIAN_MICRO: // file is big endian
-            fByteOrder = ByteOrder.BIG_ENDIAN;
-            fTimestampPrecision = PcapTimestampScale.MICROSECOND;
-            break;
-        case PcapFileValues.MAGIC_LITTLE_ENDIAN_MICRO: // file is little endian
-            fByteOrder = ByteOrder.LITTLE_ENDIAN;
-            fTimestampPrecision = PcapTimestampScale.MICROSECOND;
-            break;
-        case PcapFileValues.MAGIC_BIG_ENDIAN_NANO: // file is big endian
-            fByteOrder = ByteOrder.BIG_ENDIAN;
-            fTimestampPrecision = PcapTimestampScale.NANOSECOND;
-            break;
-        case PcapFileValues.MAGIC_LITTLE_ENDIAN_NANO: // file is little endian
-            fByteOrder = ByteOrder.LITTLE_ENDIAN;
-            fTimestampPrecision = PcapTimestampScale.NANOSECOND;
-            break;
-        default:
-            this.close();
-            throw new BadPcapFileException(String.format("%08x", magicNumber) + " is not a known magic number."); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-
-        // Put the rest of the buffer in file endian.
-        globalHeader.order(fByteOrder);
-
-        // Initialization of global header fields.
-        fMajorVersion = ConversionHelper.unsignedShortToInt(globalHeader.getShort());
-        fMinorVersion = ConversionHelper.unsignedShortToInt(globalHeader.getShort());
-        fTimeAccuracy = ConversionHelper.unsignedIntToLong(globalHeader.getInt());
-        fTimeZoneCorrection = ConversionHelper.unsignedIntToLong(globalHeader.getInt());
-        fSnapshotLength = ConversionHelper.unsignedIntToLong(globalHeader.getInt());
-        fDataLinkType = ConversionHelper.unsignedIntToLong(globalHeader.getInt());
-
-        fFileIndex.put(fCurrentRank, fFileChannel.position());
-
+        fFileChannel = Objects.requireNonNull(FileChannel.open(fPcapFilePath));
     }
 
     /**
-     * Method that allows the parsing of a packet at the current position.
+     * Method that allows the initialization of the parent data class for pcap
+     * and pcapNg
      *
-     * @return The parsed Pcap Packet.
+     * @param byteOrder
+     *            byte order
+     * @param majorVersion
+     *            major version
+     * @param minorVersion
+     *            minor version
+     */
+    public void init(ByteOrder byteOrder,
+            int majorVersion, int minorVersion) {
+        fByteOrder = byteOrder;
+        fMajorVersion = majorVersion;
+        fMinorVersion = minorVersion;
+    }
+
+    /**
+     * Method that allows the parsing of a pcap/pcapNg packet at the current
+     * position.
+     *
+     * @return The parsed Pcap/PcapNg Packet.
      * @throws IOException
      *             Thrown when there is an error while reading the file.
      * @throws BadPcapFileException
@@ -144,84 +103,19 @@ public class PcapFile implements Closeable {
      * @throws BadPacketException
      *             Thrown when the packet is erroneous.
      */
-    public synchronized @Nullable PcapPacket parseNextPacket() throws IOException, BadPcapFileException, BadPacketException {
-
-        // Parse the packet header
-        if (fFileChannel.size() - fFileChannel.position() == 0) {
-            return null;
-        }
-        if (fFileChannel.size() - fFileChannel.position() < PcapFileValues.PACKET_HEADER_SIZE) {
-            throw new BadPcapFileException("A pcap header is invalid."); //$NON-NLS-1$
-        }
-
-        ByteBuffer pcapPacketHeader = ByteBuffer.allocate(PcapFileValues.PACKET_HEADER_SIZE);
-        pcapPacketHeader.clear();
-        pcapPacketHeader.order(fByteOrder);
-
-        fFileChannel.read(pcapPacketHeader);
-
-        pcapPacketHeader.flip();
-        pcapPacketHeader.position(PcapFileValues.INCLUDED_LENGTH_POSITION);
-        long includedPacketLength = ConversionHelper.unsignedIntToLong(pcapPacketHeader.getInt());
-
-        if (fFileChannel.size() - fFileChannel.position() < includedPacketLength) {
-            throw new BadPcapFileException("A packet header is invalid."); //$NON-NLS-1$
-        }
-
-        if (includedPacketLength > Integer.MAX_VALUE) {
-            throw new BadPacketException("Packets that are bigger than 2^31-1 bytes are not supported."); //$NON-NLS-1$
-        }
-
-        ByteBuffer pcapPacketData = ByteBuffer.allocate((int) includedPacketLength);
-        pcapPacketData.clear();
-        pcapPacketHeader.order(ByteOrder.BIG_ENDIAN); // Not really needed.
-        fFileChannel.read(pcapPacketData);
-
-        pcapPacketData.flip();
-
-        fFileIndex.put(++fCurrentRank, fFileChannel.position());
-
-        return new PcapPacket(this, null, pcapPacketHeader, pcapPacketData, fCurrentRank - 1);
-
-    }
+    public abstract @Nullable PcapPacket parseNextPacket() throws IOException, BadPcapFileException, BadPacketException;
 
     /**
      * Method that allows to skip a packet at the current position.
+     *
+     * @return true if a packet was skipped, false if end-of-file was reached
      *
      * @throws IOException
      *             Thrown when there is an error while reading the file.
      * @throws BadPcapFileException
      *             Thrown when a packet header is invalid.
      */
-    public synchronized void skipNextPacket() throws IOException, BadPcapFileException {
-
-        // Parse the packet header
-        if (fFileChannel.size() - fFileChannel.position() == 0) {
-            return;
-        }
-        if (fFileChannel.size() - fFileChannel.position() < PcapFileValues.PACKET_HEADER_SIZE) {
-            throw new BadPcapFileException("A pcap header is invalid."); //$NON-NLS-1$
-        }
-
-        ByteBuffer pcapPacketHeader = ByteBuffer.allocate(PcapFileValues.PACKET_HEADER_SIZE);
-        pcapPacketHeader.clear();
-        pcapPacketHeader.order(fByteOrder);
-
-        fFileChannel.read(pcapPacketHeader);
-
-        pcapPacketHeader.flip();
-        pcapPacketHeader.position(PcapFileValues.INCLUDED_LENGTH_POSITION);
-        long includedPacketLength = ConversionHelper.unsignedIntToLong(pcapPacketHeader.getInt());
-
-        if (fFileChannel.size() - fFileChannel.position() < includedPacketLength) {
-            throw new BadPcapFileException("A packet header is invalid."); //$NON-NLS-1$
-        }
-
-        fFileChannel.position(fFileChannel.position() + includedPacketLength);
-
-        fFileIndex.put(++fCurrentRank, fFileChannel.position());
-
-    }
+    public abstract boolean skipNextPacket() throws IOException, BadPcapFileException;
 
     /**
      * Method that moves the position to the specified rank.
@@ -234,40 +128,65 @@ public class PcapFile implements Closeable {
      * @throws BadPcapFileException
      *             Thrown when a packet header is invalid.
      */
-    public synchronized void seekPacket(long rank) throws IOException, BadPcapFileException {
-
+    public void seekPacket(long rank) throws IOException, BadPcapFileException {
         // Verify argument
         if (rank < 0) {
             throw new IllegalArgumentException();
         }
 
-        Long positionInBytes = fFileIndex.get(rank);
+        TreeMap<Long, Long> fileIndex = getFileIndex();
+        Long positionInBytes = fileIndex.get(rank);
 
         if (positionInBytes != null) {
             // Index is known. Move to position.
-            fFileChannel.position(positionInBytes.longValue());
-            fCurrentRank = rank;
+            getFileChannel().position(positionInBytes.longValue());
+            setCurrentRank(rank);
         } else {
             // Index is unknown. Find the corresponding position.
             // Find closest index
-            fCurrentRank = fFileIndex.floorKey(rank);
-            // skip until wanted packet is found
-            do {
-                skipNextPacket();
-            } while (fCurrentRank != rank && hasNextPacket());
+            long floorRank = fileIndex.floorKey(rank);
+            setCurrentRank(floorRank);
+            positionInBytes = fileIndex.get(floorRank);
+            if (positionInBytes != null) {
+                getFileChannel().position(positionInBytes);
+                // skip until wanted packet is found
+                while (getCurrentRank() < rank && skipNextPacket()) {
+                    // Do nothing
+                }
+            }
         }
     }
 
     /**
-     * Method that indicates if there are packets remaining to read. It is an
-     * end of file indicator.
+     * Method that returns the ts precision of a pcap/pcapNg packet data
      *
-     * @return Whether the pcap still has packets or not.
-     * @throws IOException
-     *             If some IO error occurs.
+     * @return The ts precision of Pcap/PcapNg Packet.
      */
-    public synchronized boolean hasNextPacket() throws IOException {
-        return ((fFileChannel.size() - fFileChannel.position()) > 0);
+    public abstract PcapTimestampScale getTimestampPrecision();
+
+    /**
+     * Method that returns the total number of packets in the file.
+     *
+     * @return The total number of packets.
+     * @throws IOException
+     *             Thrown when some IO error occurs.
+     * @throws BadPcapFileException
+     *             Thrown when a packet header is invalid.
+     */
+    public synchronized long getTotalNbPackets() throws IOException, BadPcapFileException {
+        if (fTotalNumberPackets == -1) {
+            long rank = fCurrentRank;
+            fCurrentRank = fFileIndex.floorKey(rank);
+
+            // skip until end of file.
+            while (skipNextPacket()) {
+                // Do nothing;
+            }
+            fTotalNumberPackets = fCurrentRank;
+            fCurrentRank = rank;
+            seekPacket(rank);
+        }
+        return fTotalNumberPackets;
     }
 
     /**
@@ -298,43 +217,6 @@ public class PcapFile implements Closeable {
     }
 
     /**
-     * Getter method for the time accuracy of the file.
-     *
-     * @return The time accuracy of the file.
-     */
-    public long getTimeAccuracy() {
-        return fTimeAccuracy;
-    }
-
-    /**
-     * Getter method for the time zone correction of the file.
-     *
-     * @return The time zone correction of the file.
-     */
-    public long getTimeZoneCorrection() {
-        return fTimeZoneCorrection;
-    }
-
-    /**
-     * Getter method for the snapshot length of the file.
-     *
-     * @return The snapshot length of the file.
-     */
-    public long getSnapLength() {
-        return fSnapshotLength;
-    }
-
-    /**
-     * Getter method for the datalink type of the file. This parameter is used
-     * to determine higher-level protocols (Ethernet, WLAN, SLL).
-     *
-     * @return The datalink type of the file.
-     */
-    public long getDataLinkType() {
-        return fDataLinkType;
-    }
-
-    /**
      * Getter method for the path of the file.
      *
      * @return The path of the file.
@@ -344,52 +226,49 @@ public class PcapFile implements Closeable {
     }
 
     /**
-     * Method that returns the total number of packets in the file.
-     *
-     * @return The total number of packets.
-     * @throws IOException
-     *             Thrown when some IO error occurs.
-     * @throws BadPcapFileException
-     *             Thrown when a packet header is invalid.
-     */
-    public synchronized long getTotalNbPackets() throws IOException, BadPcapFileException {
-        if (fTotalNumberPackets == -1) {
-            long rank = fCurrentRank;
-            fCurrentRank = fFileIndex.floorKey(rank);
-
-            // skip until end of file.
-            while (hasNextPacket()) {
-                skipNextPacket();
-            }
-            fTotalNumberPackets = fCurrentRank;
-            fCurrentRank = rank;
-            seekPacket(rank);
-        }
-        return fTotalNumberPackets;
-    }
-
-    /**
      * Getter method that returns the current rank in the file (the packet
      * number).
      *
      * @return The current rank.
      */
-    public synchronized long getCurrentRank() {
+    public long getCurrentRank() {
         return fCurrentRank;
     }
 
     /**
-     * Getter method that returns the timestamp precision of the file.
+     * Setter method for the current rank value.
      *
-     * @return The the timestamp precision of the file.
+     * @param currentRank
+     *            The current packet number
      */
-    public PcapTimestampScale getTimestampPrecision() {
-        return fTimestampPrecision;
+    public void setCurrentRank(long currentRank) {
+        fCurrentRank = currentRank;
     }
 
+    /**
+     * Getter method that returns the current index of the file
+     *
+     * @return The current file index
+     */
+    public TreeMap<Long, Long> getFileIndex() {
+        return fFileIndex;
+    }
+
+    /**
+     * Method that closes the file.
+     *
+     */
     @Override
     public void close() throws IOException {
-        fFileChannel.close();
+        getFileChannel().close();
     }
 
+    /**
+     * Getter method that returns the file channel of the file.
+     *
+     * @return the file channel
+     */
+    public FileChannel getFileChannel() {
+        return fFileChannel;
+    }
 }

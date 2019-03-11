@@ -47,6 +47,8 @@ import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperiment
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfLocationArray;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
@@ -71,6 +73,7 @@ import org.eclipse.tracecompass.tmf.core.trace.indexer.TmfBTreeTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 
 /**
@@ -448,6 +451,70 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
     public ITmfLocation getCurrentLocation() {
         // never used
         return null;
+    }
+
+    @Override
+    public @NonNull Iterable<ITmfEventAspect<?>> getEventAspects() {
+        List<ITmfTrace> traces = getTraces();
+        ImmutableSet.Builder<ITmfEventAspect<?>> builder = new ImmutableSet.Builder<>();
+
+        /* For experiments, we'll add a "trace name" aspect/column */
+        builder.add(TmfBaseAspects.getTraceNameAspect());
+
+        String commonTraceType = getCommonTraceType();
+        if (commonTraceType != null) {
+            /*
+             * All the traces in this experiment are of the same type, let's
+             * just use the normal table for that type.
+             */
+            builder.addAll(traces.get(0).getEventAspects());
+
+        } else {
+            /*
+             * There are different trace types in the experiment, so we are
+             * definitely using a TmfEventsTable. Aggregate the columns from all
+             * trace types.
+             */
+            for (ITmfTrace trace : traces) {
+                Iterable<ITmfEventAspect<?>> traceAspects = trace.getEventAspects();
+                builder.addAll(traceAspects);
+            }
+        }
+        return builder.build();
+    }
+
+    /**
+     * Check if an experiment contains traces of all the same type. If so,
+     * returns this type as a String. If not, returns null.
+     *
+     * @param experiment
+     *            The experiment
+     * @return The common trace type if there is one, or 'null' if there are
+     *         different types.
+     */
+    private @Nullable String getCommonTraceType() {
+        String commonTraceType = null;
+        try {
+            for (final ITmfTrace trace : getTraces()) {
+                final IResource resource = trace.getResource();
+                if (resource == null) {
+                    return null;
+                }
+
+                final String traceType = resource.getPersistentProperty(TmfCommonConstants.TRACETYPE);
+                if ((commonTraceType != null) && !commonTraceType.equals(traceType)) {
+                    return null;
+                }
+                commonTraceType = traceType;
+            }
+        } catch (CoreException e) {
+            /*
+             * One of the traces didn't advertise its type, we can't infer
+             * anything.
+             */
+            return null;
+        }
+        return commonTraceType;
     }
 
     // ------------------------------------------------------------------------

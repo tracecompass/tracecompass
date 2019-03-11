@@ -10,9 +10,9 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model;
 
 import java.util.Map.Entry;
 
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime.DataDrivenScenarioInfo;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioInfo;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.pattern.DataDrivenPattern;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -46,8 +46,8 @@ public final class DataDrivenActionUpdateStoredFields implements DataDrivenActio
 
     @Override
     public void eventHandle(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
-        if (container instanceof XmlPatternStateProvider && scenarioInfo instanceof TmfXmlScenarioInfo) {
-            XmlPatternStateProvider patternSp = (XmlPatternStateProvider) container;
+        if (container instanceof DataDrivenPattern) {
+            DataDrivenPattern patternSp = (DataDrivenPattern) container;
             for (Entry<String, String> entry : patternSp.getStoredFields().entrySet()) {
                 ITmfEventField eventField = event.getContent().getField(entry.getKey());
                 ITmfStateValue stateValue = null;
@@ -66,7 +66,7 @@ public final class DataDrivenActionUpdateStoredFields implements DataDrivenActio
                     if (stateValue == null) {
                         throw new IllegalStateException("State value is null. Invalid type."); //$NON-NLS-1$
                     }
-                    patternSp.getHistoryBuilder().updateStoredFields(patternSp, alias, stateValue, (TmfXmlScenarioInfo) scenarioInfo, event);
+                    patternSp.getExecutionData().getHistoryBuilder().updateStoredFields(container, alias, stateValue, scenarioInfo, event);
                 }
             }
         }

@@ -16,10 +16,10 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime.DataDrivenScenarioInfo;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.values.DataDrivenValue;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenarioInfo;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.pattern.DataDrivenPattern;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
@@ -64,13 +64,13 @@ public class DataDrivenActionSegment implements DataDrivenAction {
 
     @Override
     public void eventHandle(ITmfEvent event, DataDrivenScenarioInfo scenarioInfo, IAnalysisDataContainer container) {
-        if (!(container instanceof XmlPatternStateProvider && scenarioInfo instanceof TmfXmlScenarioInfo)) {
+        if (!(container instanceof DataDrivenPattern)) {
             // This action should only be run with pattern state provider
             return;
         }
-        XmlPatternStateProvider provider = (XmlPatternStateProvider) container;
+        DataDrivenPattern provider = (DataDrivenPattern) container;
         // Get the default timestamp
-        long start = provider.getHistoryBuilder().getStartTime(provider, (TmfXmlScenarioInfo) scenarioInfo, event);
+        long start = provider.getExecutionData().getHistoryBuilder().getStartTime(container, scenarioInfo, event);
         long end = event.getTimestamp().toNanos();
 
         Object segmentName = fType.getValue(event, ITmfStateSystem.ROOT_ATTRIBUTE, scenarioInfo, container);

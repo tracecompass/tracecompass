@@ -44,7 +44,7 @@ public class CtfExperimentCheckpointIndexTest {
 
     private static final long START_TIME = 1331668247314038062L;
     private static final long END_TIME = 1363700770550261288L;
-    private static final int BLOCK_SIZE = 50000;
+    private static final int BLOCK_SIZE = 100000;
     private static final int LAST_EVENT_RANK = NB_EVENTS - 1;
     private static final int LAST_CHECKPOINT_RANK = LAST_EVENT_RANK / BLOCK_SIZE;
     private static final int NB_CHECKPOINTS = LAST_CHECKPOINT_RANK + 1;

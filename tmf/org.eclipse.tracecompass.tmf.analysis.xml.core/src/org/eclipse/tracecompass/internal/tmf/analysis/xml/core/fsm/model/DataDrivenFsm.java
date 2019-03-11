@@ -15,9 +15,11 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime.DataDrivenRuntimeData;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime.DataDrivenRuntimeFsm;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime.DataDrivenScenario;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime.DataDrivenScenarioInfo;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.model.TmfXmlScenario;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider.XmlPatternStateProvider;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
@@ -71,13 +73,13 @@ public class DataDrivenFsm extends DataDrivenFsmState {
      *            Whether to force the creation or create only if allowed
      * @param executionData
      *            The execution data
-     * @param parent
+     * @param container
      *            The parent analysis container
      */
-    public void createScenario(ITmfEvent event, boolean force, DataDrivenRuntimeData executionData, XmlPatternStateProvider parent) {
+    public void createScenario(ITmfEvent event, boolean force, DataDrivenRuntimeData executionData, IAnalysisDataContainer container) {
         DataDrivenRuntimeFsm runtimeFsm = executionData.getRuntimeForFsm(this);
         if (force || isNewScenarioAllowed(runtimeFsm)) {
-            runtimeFsm.addPendingScenario(new TmfXmlScenario(event, this, fInitial, parent));
+            runtimeFsm.addPendingScenario(new DataDrivenScenario(event, this, fInitial, container, executionData));
         }
     }
 
@@ -126,7 +128,7 @@ public class DataDrivenFsm extends DataDrivenFsmState {
             return;
         }
 
-        TmfXmlScenario scenario = runtimeFsm.getPendingScenario();
+        DataDrivenScenario scenario = runtimeFsm.getPendingScenario();
         if (scenario != null) {
             scenario.handleEvent(event, container);
             if (!scenario.isPending()) {
@@ -149,8 +151,8 @@ public class DataDrivenFsm extends DataDrivenFsmState {
     private boolean handleActiveScenarios(ITmfEvent event, DataDrivenRuntimeFsm runtimeFsm, IAnalysisDataContainer container) {
 
         boolean eventConsumed = false;
-        List<TmfXmlScenario> toRemove = new ArrayList<>();
-        for (TmfXmlScenario scenario : runtimeFsm.getActiveScenarios()) {
+        List<DataDrivenScenario> toRemove = new ArrayList<>();
+        for (DataDrivenScenario scenario : runtimeFsm.getActiveScenarios()) {
             // Remove inactive scenarios or handle the active ones.
             if (!scenario.isActive()) {
                 toRemove.add(scenario);
@@ -164,7 +166,7 @@ public class DataDrivenFsm extends DataDrivenFsmState {
             }
         }
         // Remove scenarios set to be removed
-        for (TmfXmlScenario scenario : toRemove) {
+        for (DataDrivenScenario scenario : toRemove) {
             runtimeFsm.removeScenario(scenario);
         }
 
@@ -179,7 +181,7 @@ public class DataDrivenFsm extends DataDrivenFsmState {
      *            The execution data
      */
     public void dispose(DataDrivenRuntimeData executionData) {
-        for (TmfXmlScenario scenario : executionData.getRuntimeForFsm(this).getActiveScenarios()) {
+        for (DataDrivenScenario scenario : executionData.getRuntimeForFsm(this).getActiveScenarios()) {
             if (scenario.isActive()) {
                 scenario.cancel();
             }

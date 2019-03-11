@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.Analy
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlActionCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlConditionCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlFsmStateCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlFsmStateCu.TmfXmlFsmCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenAction;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenActionResetStoredFields;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenActionSegment;
@@ -595,14 +596,12 @@ public class TmfXmlFsmCuTest {
         compileActionsAndTests(fExpected.getXmlString(), data);
         Element xmlElement = TmfXmlTestUtils.getXmlElement(TmfXmlStrings.FSM, fExpected.getXmlString());
         assertNotNull(xmlElement);
-        String compiledFsm = TmfXmlFsmStateCu.compileFsm(data, xmlElement);
+        TmfXmlFsmCu compiledFsm = TmfXmlFsmStateCu.compileFsm(data, xmlElement);
         if (fExpected.getResult() == null) {
             assertNull("Expected null action" + fExpected.getName(), compiledFsm);
         } else {
             assertNotNull("Expected non null " + fExpected.getName(), compiledFsm);
-            TmfXmlFsmStateCu fsm = data.getFsm(fExpected.getName());
-            assertNotNull(fsm);
-            assertEquals(fExpected.getName() + " generated", fExpected.getResult(), fsm.generate());
+            assertEquals(fExpected.getName() + " generated", fExpected.getResult(), compiledFsm.generate());
         }
     }
 

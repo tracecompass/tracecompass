@@ -118,7 +118,7 @@ public class CTFTraceGrowingTest {
             assertTrue(reader.advance());
             IEventDefinition currentEventDef = reader.getCurrentEventDef();
             assertNotNull(reader.getCurrentEventDef());
-            assertEquals(16518l, currentEventDef.getTimestamp());
+            assertEquals(16524l, currentEventDef.getTimestamp());
         }
     }
 
@@ -141,7 +141,7 @@ public class CTFTraceGrowingTest {
             assertTrue(reader.advance());
             IEventDefinition currentEventDef = reader.getCurrentEventDef();
             assertNotNull(currentEventDef);
-            assertEquals(223007L, currentEventDef.getTimestamp());
+            assertEquals(223096L, currentEventDef.getTimestamp());
         }
     }
 
@@ -169,7 +169,7 @@ public class CTFTraceGrowingTest {
             assertTrue(reader.advance());
             IEventDefinition currentEventDef = reader.getCurrentEventDef();
             assertNotNull(currentEventDef);
-            assertEquals(223007L, currentEventDef.getTimestamp());
+            assertEquals(223096L, currentEventDef.getTimestamp());
         }
     }
 

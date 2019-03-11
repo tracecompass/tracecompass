@@ -19,7 +19,7 @@ import org.eclipse.tracecompass.ctf.core.tests.shared.CtfBenchmarkTrace;
 import org.eclipse.tracecompass.lttng2.kernel.core.tests.Activator;
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.perf.XmlAnalysisPerfTest;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.perf.XmlAnalysisPerfBenchmark;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
@@ -33,7 +33,7 @@ import org.junit.runners.Parameterized.Parameters;
  * @author Geneviève Bastien
  */
 @RunWith(Parameterized.class)
-public class LttngKernelXmlAnalysisBenchmark extends XmlAnalysisPerfTest {
+public class LttngKernelXmlAnalysisBenchmark extends XmlAnalysisPerfBenchmark {
 
     /**
      * @return The arrays of parameters

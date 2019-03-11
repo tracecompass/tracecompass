@@ -29,7 +29,7 @@ import org.junit.Test;
  *
  * @author Geneviève Bastien
  */
-public abstract class XmlAnalysisPerfTest {
+public abstract class XmlAnalysisPerfBenchmark {
 
     private static final String TEST_ID = "org.eclipse.tracecompass.xml.analysis#XML analysis#%s (%s)";
 
@@ -62,7 +62,7 @@ public abstract class XmlAnalysisPerfTest {
      * @param loopCount
      *            The number of iterations
      */
-    public XmlAnalysisPerfTest(String testName, String absoluteFilePath, @NonNull String moduleId, int loopCount) {
+    public XmlAnalysisPerfBenchmark(String testName, String absoluteFilePath, @NonNull String moduleId, int loopCount) {
         fTestName = testName;
         fXmlFile = absoluteFilePath;
         fAnalysisId = moduleId;

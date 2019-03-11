@@ -191,9 +191,9 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
      *            The analysis data already compiled
      * @param namedEl
      *            the XML element corresponding to the condition
-     * @return The condition ID
+     * @return The condition
      */
-    public static @Nullable String compileNamedCondition(AnalysisCompilationData analysisData, Element namedEl) {
+    public static @Nullable TmfXmlConditionCu compileNamedCondition(AnalysisCompilationData analysisData, Element namedEl) {
         String id = namedEl.getAttribute(TmfXmlStrings.ID);
 
         List<@Nullable Element> childElements = XmlUtils.getChildElements(namedEl);
@@ -212,7 +212,7 @@ public abstract class TmfXmlConditionCu implements IDataDrivenCompilationUnit {
             return null;
         }
         analysisData.addTest(id, condition);
-        return id;
+        return condition;
     }
 
     /**
