@@ -121,7 +121,7 @@ public class TimeGraphEntryModel extends TmfTreeDataModel implements ITimeGraphE
         return fHasRowModel;
     }
 
-@Override
+    @Override
     public String toString() {
         return "<name=" + getLabels() + " id=" + getId() + " parentId=" + getParentId() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 + " start=" + fStartTime + " end=" + fEndTime + " hasRowModel=" + hasRowModel() + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$

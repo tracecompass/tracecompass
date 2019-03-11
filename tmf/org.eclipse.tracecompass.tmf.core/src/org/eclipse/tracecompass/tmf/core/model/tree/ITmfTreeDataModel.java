@@ -12,6 +12,9 @@ package org.eclipse.tracecompass.tmf.core.model.tree;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+
 /**
  * Model's interface that can be used to represent a hierarchical relationship,
  * for instance a tree
@@ -56,4 +59,15 @@ public interface ITmfTreeDataModel {
     default List<String> getLabels() {
         return Collections.singletonList(getName());
     }
+
+    /**
+     * Get the style associated with this model
+     *
+     * @return {@link OutputElementStyle} describing the style of this model
+     * @since 5.1
+     */
+    default @Nullable OutputElementStyle getStyle() {
+        return null;
+    }
+
 }

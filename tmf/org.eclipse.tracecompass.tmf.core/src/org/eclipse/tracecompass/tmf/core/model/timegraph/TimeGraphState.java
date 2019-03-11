@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017, 2018 Ericsson
+ * Copyright (c) 2017, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.TmfStrings;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -29,8 +30,10 @@ public class TimeGraphState implements ITimeGraphState {
     private final long fDuration;
     private final int fValue;
     private final @Nullable String fLabel;
+    private final @Nullable OutputElementStyle fStyle;
+
     /**
-     * A map of properties to activate or deactivate
+     * A bitmap of properties to activate or deactivate
      */
     private int fActiveProperties = 0;
 
@@ -49,6 +52,7 @@ public class TimeGraphState implements ITimeGraphState {
         fDuration = duration;
         fValue = value;
         fLabel = null;
+        fStyle = null;
     }
 
     /**
@@ -68,6 +72,28 @@ public class TimeGraphState implements ITimeGraphState {
         fDuration = duration;
         fValue = value;
         fLabel = label;
+        fStyle = null;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param time
+     *            Time
+     * @param duration
+     *            State duration
+     * @param label
+     *            State label
+     * @param style
+     *            Style
+     * @since 5.1
+     */
+    public TimeGraphState(long time, long duration, @Nullable String label, @Nullable OutputElementStyle style) {
+        fStartTime = time;
+        fDuration = duration;
+        fValue = Integer.MIN_VALUE;
+        fLabel = label;
+        fStyle = style;
     }
 
     @Override
@@ -88,6 +114,11 @@ public class TimeGraphState implements ITimeGraphState {
     @Override
     public @Nullable String getLabel() {
         return fLabel;
+    }
+
+    @Override
+    public @Nullable OutputElementStyle getStyle() {
+        return fStyle;
     }
 
     @Override

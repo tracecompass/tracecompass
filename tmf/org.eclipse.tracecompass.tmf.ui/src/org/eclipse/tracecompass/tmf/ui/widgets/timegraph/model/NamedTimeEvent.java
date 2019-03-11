@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017, 2018 Ericsson
+ * Copyright (c) 2017, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,6 +14,7 @@ import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
 
 /**
  * {@link TimeEvent} with a label.
@@ -63,6 +64,22 @@ public class NamedTimeEvent extends TimeEvent {
      */
     public NamedTimeEvent(TimeGraphEntry entry, long time, long duration, int value, String label, int activeProperties) {
         super(entry, time, duration, value, activeProperties);
+        fLabel = label.intern();
+    }
+
+    /**
+     * Constructor
+     *
+     * @param entry
+     *            The entry to which this time event is assigned
+     * @param label
+     *            This event's label
+     * @param stateModel
+     *            {@link ITimeGraphState} that represents this time event
+     * @since 5.1
+     */
+    public NamedTimeEvent(ITimeGraphEntry entry, String label, ITimeGraphState stateModel) {
+        super(entry, stateModel);
         fLabel = label.intern();
     }
 

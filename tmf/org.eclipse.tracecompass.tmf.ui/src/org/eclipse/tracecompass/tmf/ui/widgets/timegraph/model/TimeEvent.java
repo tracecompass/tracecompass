@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -17,8 +17,9 @@ import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 /**
@@ -32,18 +33,13 @@ public class TimeEvent implements ITimeEvent {
     /** TimeGraphEntry matching this time event */
     protected ITimeGraphEntry fEntry;
 
+    private final ITimeGraphState fModel;
+
     /** Beginning timestamp of this time event */
     protected long fTime;
 
     /** Duration of this time event */
     protected long fDuration;
-
-    private final int fValue;
-
-    /**
-     * A map of properties to activate or deactivate
-     */
-    private int fActiveProperties = 0;
 
     /**
      * Default value when no other value present
@@ -77,10 +73,7 @@ public class TimeEvent implements ITimeEvent {
      *            The status assigned to the event
      */
     public TimeEvent(ITimeGraphEntry entry, long time, long duration, int value) {
-        fEntry = entry;
-        fTime = time;
-        fDuration = duration;
-        fValue = value;
+        this(entry, new TimeGraphState(time, duration, value));
     }
 
     /**
@@ -95,17 +88,30 @@ public class TimeEvent implements ITimeEvent {
      * @param value
      *            The status assigned to the event
      * @param activeProperties
-     *            The active properties of the event reprensented by a bitmask
-     *            value. Each bit represents a property. Available properties could
-     *            be find in {@link IFilterProperty}.
+     *            The active properties of the event represented by a bitmask
+     *            value. Each bit represents a property. Available properties
+     *            could be find in {@link IFilterProperty}.
      * @since 4.0
      */
     public TimeEvent(ITimeGraphEntry entry, long time, long duration, int value, int activeProperties) {
+        this(entry, new TimeGraphState(time, duration, value));
+        fModel.setActiveProperties(activeProperties);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param stateModel
+     *            {@link ITimeGraphState} that represents this time event
+     * @param entry
+     *            The entry to which this time event is assigned
+     * @since 5.1
+     */
+    public TimeEvent(ITimeGraphEntry entry, ITimeGraphState stateModel) {
         fEntry = entry;
-        fTime = time;
-        fDuration = duration;
-        fValue = value;
-        fActiveProperties = activeProperties;
+        fTime = stateModel.getStartTime();
+        fDuration = stateModel.getDuration();
+        fModel = stateModel;
     }
 
     /**
@@ -114,7 +120,7 @@ public class TimeEvent implements ITimeEvent {
      * @return The integer matching this status
      */
     public int getValue() {
-        return fValue;
+        return fModel.getValue();
     }
 
     /**
@@ -123,7 +129,7 @@ public class TimeEvent implements ITimeEvent {
      * @return true if the event has a value
      */
     public boolean hasValue() {
-        return (fValue != NOVALUE);
+        return (getValue() != NOVALUE);
     }
 
     @Override
@@ -133,18 +139,28 @@ public class TimeEvent implements ITimeEvent {
 
     @Override
     public long getTime() {
-        return fTime;
+        return fModel.getStartTime();
     }
 
     @Override
     public long getDuration() {
-        return fDuration;
+        return fModel.getDuration();
+    }
+
+    /**
+     * Get the model associated with this time event
+     *
+     * @return State model
+     * @since 5.1
+     */
+    public ITimeGraphState getStateModel() {
+        return fModel;
     }
 
     @Override
     public ITimeEvent splitBefore(long splitTime) {
         return (splitTime > fTime ?
-                new TimeEvent(fEntry, fTime, Math.min(fDuration, splitTime - fTime), fValue) :
+                new TimeEvent(fEntry, fTime, Math.min(fDuration, splitTime - fTime), getValue(), getActiveProperties()) :
                 null);
     }
 
@@ -152,13 +168,13 @@ public class TimeEvent implements ITimeEvent {
     public ITimeEvent splitAfter(long splitTime) {
         return (splitTime < fTime + fDuration ?
                 new TimeEvent(fEntry, Math.max(fTime, splitTime), fDuration - Math.max(0, splitTime - fTime),
-                        fValue) :
+                        getValue(), getActiveProperties()) :
                 null);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fEntry, fTime, fDuration, fValue);
+        return Objects.hash(fEntry, fTime, fDuration, getValue(), getActiveProperties());
     }
 
     @Override
@@ -173,15 +189,16 @@ public class TimeEvent implements ITimeEvent {
             return false;
         }
         TimeEvent other = (TimeEvent) obj;
-        return Objects.equals(fEntry, other.fEntry) &&
-                Objects.equals(fTime, other.fTime) &&
-                Objects.equals(fDuration, other.fDuration) &&
-                Objects.equals(fValue, other.fValue);
+        return Objects.equals(fEntry, other.getEntry()) &&
+                Objects.equals(fTime, other.getTime()) &&
+                Objects.equals(fDuration, other.getDuration()) &&
+                Objects.equals(getValue(), other.getValue()) &&
+                Objects.equals(getActiveProperties(), other.getActiveProperties());
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " start=" + fTime + " end=" + (fTime + fDuration) + " duration=" + fDuration + (hasValue() ? (" value=" + fValue) : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+        return getClass().getSimpleName() + " start=" + fTime + " end=" + (fTime + fDuration) + " duration=" + fDuration + (hasValue() ? (" value=" + getValue()) : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
     }
 
     /**
@@ -189,7 +206,7 @@ public class TimeEvent implements ITimeEvent {
      */
     @Override
     public int getActiveProperties() {
-        return fActiveProperties;
+        return fModel.getActiveProperties();
     }
 
     /**
@@ -197,7 +214,7 @@ public class TimeEvent implements ITimeEvent {
      */
     @Override
     public void setActiveProperties(int activeProperties) {
-        fActiveProperties = activeProperties;
+        fModel.setActiveProperties(activeProperties);
     }
 
     /**
@@ -205,7 +222,6 @@ public class TimeEvent implements ITimeEvent {
      */
     @Override
     public @NonNull Multimap<@NonNull String, @NonNull Object> getMetadata() {
-        // TODO Implement
-        return HashMultimap.create();
+        return fModel.getMetadata();
     }
 }

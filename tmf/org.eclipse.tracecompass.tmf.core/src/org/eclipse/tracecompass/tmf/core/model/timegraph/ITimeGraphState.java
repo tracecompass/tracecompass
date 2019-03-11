@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017, 2018 Ericsson
+ * Copyright (c) 2017, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,8 +10,7 @@
 package org.eclipse.tracecompass.tmf.core.model.timegraph;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.IPropertyCollection;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 
 /**
  * Represents a time graph state.
@@ -36,7 +35,7 @@ public interface ITimeGraphState extends IElementResolver, IPropertyCollection {
     long getDuration();
 
     /**
-     * Get the state value
+     * Get the state value, may be unused if the state has a style
      *
      * @return State value
      */
@@ -48,5 +47,15 @@ public interface ITimeGraphState extends IElementResolver, IPropertyCollection {
      * @return Label
      */
     @Nullable String getLabel();
+
+    /**
+     * Get the style associated with this state
+     *
+     * @return {@link OutputElementStyle} describing the style of this state
+     * @since 5.1
+     */
+    default @Nullable OutputElementStyle getStyle() {
+        return null;
+    }
 
 }
