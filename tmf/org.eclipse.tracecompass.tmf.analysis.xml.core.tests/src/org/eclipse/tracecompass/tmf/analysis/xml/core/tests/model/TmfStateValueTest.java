@@ -245,5 +245,9 @@ public class TmfStateValueTest {
         ITmfStateValue[] expectedValues = { TmfStateValue.newValueInt(100), TmfStateValue.newValueInt(101), TmfStateValue.newValueInt(100), TmfStateValue.newValueInt(101), TmfStateValue.newValueInt(100), TmfStateValue.newValueInt(101) };
         XmlUtilsTest.verifyStateIntervals("testStateValueScript", ss, quark, expectedStarts, expectedValues);
 
+        // Verify also future time as strings
+        quark = ss.getQuarkAbsolute("futureStr");
+        XmlUtilsTest.verifyStateIntervals("testStateValueScript", ss, quark, expectedStarts, expectedValues);
+
     }
 }

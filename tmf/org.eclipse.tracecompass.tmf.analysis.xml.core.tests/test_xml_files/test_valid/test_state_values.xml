@@ -91,6 +91,17 @@
 					<stateValue id="ts" type="eventField" value="timestamp" />
 				</futureTime>
 			</stateChange>
+			<stateChange>
+				<stateAttribute type="constant" value="futureStr" />
+				<stateValue type="int" value="100" />
+			</stateChange>
+			<stateChange>
+				<stateAttribute type="constant" value="futureStr" />
+				<stateValue type="int" value="101" />
+				<futureTime type="script" value="ts + 2" scriptEngine="nashorn" forcedType="string" >
+					<stateValue id="ts" type="eventField" value="timestamp" />
+				</futureTime>
+			</stateChange>
 		</eventHandler>
 		<eventHandler eventName="exit">
 			<stateChange>

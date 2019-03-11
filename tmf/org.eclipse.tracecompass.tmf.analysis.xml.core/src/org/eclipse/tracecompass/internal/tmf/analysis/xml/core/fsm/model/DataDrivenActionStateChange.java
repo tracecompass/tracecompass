@@ -156,6 +156,18 @@ public class DataDrivenActionStateChange implements DataDrivenAction {
             Object futureTimeObj = fFutureTime.getValue(event, ITmfStateSystem.ROOT_ATTRIBUTE, scenarioInfo, container);
             if (futureTimeObj instanceof Number) {
                 scTime = ((Number) futureTimeObj).longValue();
+            } else {
+                try {
+                    // Try parsing the value
+                    scTime = Long.parseLong(String.valueOf(futureTimeObj));
+                } catch (NumberFormatException e) {
+                    try {
+                        // Maybe it's a double, XML scripts return double for instance
+                        scTime = Double.valueOf(Double.parseDouble(String.valueOf(futureTimeObj))).longValue();
+                    } catch (NumberFormatException e1) {
+                        // Cannot convert to number, ignore
+                    }
+                }
             }
         }
 
