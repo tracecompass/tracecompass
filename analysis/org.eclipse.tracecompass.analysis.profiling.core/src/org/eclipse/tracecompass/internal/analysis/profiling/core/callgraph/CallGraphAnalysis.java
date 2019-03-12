@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,8 +15,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -73,11 +73,7 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
     // Attributes
     // ------------------------------------------------------------------------
 
-    /**
-     * Listeners. {@link ListenerList}s are typed since 4.6 (Neon), type these
-     * when support for 4.5 (Mars) is no longer required.
-     */
-    private final ListenerList fListeners = new ListenerList(ListenerList.IDENTITY);
+    private final ListenerList<IAnalysisProgressListener> fListeners = new ListenerList<>(ListenerList.IDENTITY);
 
     /**
      * The List of thread nodes. Each thread has a virtual node having the root
