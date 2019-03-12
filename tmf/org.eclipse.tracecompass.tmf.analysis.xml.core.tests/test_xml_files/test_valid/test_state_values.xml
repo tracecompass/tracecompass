@@ -102,6 +102,22 @@
 					<stateValue id="ts" type="eventField" value="timestamp" />
 				</futureTime>
 			</stateChange>
+			<stateChange>
+				<stateAttribute type="constant" value="futureStack" />
+				<stateAttribute type="eventField" value="cpu" />
+				<stateValue type="eventField" value="op" stack="push" />
+				<futureTime type="script" value="ts + 1" scriptEngine="nashorn" >
+					<stateValue id="ts" type="eventField" value="timestamp" />
+				</futureTime>
+			</stateChange>
+			<stateChange>
+				<stateAttribute type="constant" value="futureStack" />
+				<stateAttribute type="eventField" value="cpu" />
+				<stateValue type="eventField" value="op" stack="pop" />
+				<futureTime type="script" value="ts + 6" scriptEngine="nashorn" >
+					<stateValue id="ts" type="eventField" value="timestamp" />
+				</futureTime>
+			</stateChange>
 		</eventHandler>
 		<eventHandler eventName="exit">
 			<stateChange>

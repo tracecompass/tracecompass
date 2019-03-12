@@ -19,6 +19,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDri
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.runtime.DataDrivenRuntimeData;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
+import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider.FutureEventType;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
 
 /**
@@ -148,8 +149,10 @@ public interface IAnalysisDataContainer {
      *            The value the state will take at time
      * @param quark
      *            The quark for which to add the state change
+     * @param type
+     *            The type of the future state to change
      */
-    default void addFutureState(long time, @Nullable Object state, int quark) {
+    default void addFutureState(long time, @Nullable Object state, int quark, FutureEventType type) {
         throw new UnsupportedOperationException("Implementations should override this method"); //$NON-NLS-1$
     }
 

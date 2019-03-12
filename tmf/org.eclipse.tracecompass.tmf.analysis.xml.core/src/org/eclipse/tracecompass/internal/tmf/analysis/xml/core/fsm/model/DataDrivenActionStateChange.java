@@ -19,6 +19,7 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider.FutureEventType;
 
 /**
  * An action that assigns a value to a path in a state system
@@ -122,13 +123,43 @@ public class DataDrivenActionStateChange implements DataDrivenAction {
         Object assignVal = fRightOperand.getValue(event, ITmfStateSystem.ROOT_ATTRIBUTE, scenarioInfo, container);
 
         long timestamp = event.getTimestamp().toNanos();
+        // Should this state change be done at a future time?
+        long scTime = timestamp;
+        if (fFutureTime != null) {
+            Object futureTimeObj = fFutureTime.getValue(event, ITmfStateSystem.ROOT_ATTRIBUTE, scenarioInfo, container);
+            if (futureTimeObj instanceof Number) {
+                scTime = ((Number) futureTimeObj).longValue();
+            } else {
+                try {
+                    // Try parsing the value
+                    scTime = Long.parseLong(String.valueOf(futureTimeObj));
+                } catch (NumberFormatException e) {
+                    try {
+                        // Maybe it's a double, XML scripts return double for
+                        // instance
+                        scTime = Double.valueOf(Double.parseDouble(String.valueOf(futureTimeObj))).longValue();
+                    } catch (NumberFormatException e1) {
+                        // Cannot convert to number, ignore
+                    }
+                }
+            }
+        }
+
         // Perform the stack action if applicable and return
         switch (fStackAction) {
         case POP:
-            ssb.popAttribute(timestamp, quark);
+            if (scTime > timestamp) {
+                container.addFutureState(scTime, assignVal, quark, FutureEventType.POP);
+            } else {
+                ssb.popAttribute(timestamp, quark);
+            }
             return;
         case PUSH:
-            ssb.pushAttribute(timestamp, assignVal, quark);
+            if (scTime > timestamp) {
+                container.addFutureState(scTime, assignVal, quark, FutureEventType.PUSH);
+            } else {
+                ssb.pushAttribute(timestamp, assignVal, quark);
+            }
             return;
         case POP_ALL:
             // The stack state will contain the number of elements on the stack
@@ -136,7 +167,11 @@ public class DataDrivenActionStateChange implements DataDrivenAction {
             if (stackDepth instanceof Integer) {
                 int nbElements = ((Integer) stackDepth).intValue();
                 for (int i = 0; i < nbElements; i++) {
-                    ssb.popAttribute(timestamp, quark);
+                    if (scTime > timestamp) {
+                        container.addFutureState(scTime, assignVal, quark, FutureEventType.POP);
+                    } else {
+                        ssb.popAttribute(timestamp, quark);
+                    }
                 }
             }
             return;
@@ -150,26 +185,6 @@ public class DataDrivenActionStateChange implements DataDrivenAction {
         if (fIncrement && assignVal != null) {
             assignVal = incrementByType(quark, ssb, assignVal);
         }
-        // Should this state change be done at a future time?
-        long scTime = timestamp;
-        if (fFutureTime != null) {
-            Object futureTimeObj = fFutureTime.getValue(event, ITmfStateSystem.ROOT_ATTRIBUTE, scenarioInfo, container);
-            if (futureTimeObj instanceof Number) {
-                scTime = ((Number) futureTimeObj).longValue();
-            } else {
-                try {
-                    // Try parsing the value
-                    scTime = Long.parseLong(String.valueOf(futureTimeObj));
-                } catch (NumberFormatException e) {
-                    try {
-                        // Maybe it's a double, XML scripts return double for instance
-                        scTime = Double.valueOf(Double.parseDouble(String.valueOf(futureTimeObj))).longValue();
-                    } catch (NumberFormatException e1) {
-                        // Cannot convert to number, ignore
-                    }
-                }
-            }
-        }
 
         // If update is requested, do update and return
         if (fUpdate) {
@@ -177,7 +192,7 @@ public class DataDrivenActionStateChange implements DataDrivenAction {
         } else if (scTime == timestamp) {
             ssb.modifyAttribute(timestamp, assignVal, quark);
         } else if (scTime > timestamp) {
-            container.addFutureState(scTime, assignVal, quark);
+            container.addFutureState(scTime, assignVal, quark, FutureEventType.MODIFICATION);
         } else {
             Activator.logWarning("No state change occurred for event " + event + " and state change " + this + ". The time of the change is invalid: " + scTime);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
         }
