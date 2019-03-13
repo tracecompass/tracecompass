@@ -22,7 +22,6 @@ import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
  * it is a compound data type that contains other datatypes in fields. they are
  * stored in an hashmap and indexed by names which are strings.
  *
- * @version 1.0
  * @author Matthew Khouzam
  * @author Simon Marchi
  */
@@ -65,27 +64,6 @@ public final class VariantDefinition extends ScopedDefinition {
         fFieldName = fieldName;
         fCurrentField = selectedField;
         fDefinition = fieldValue;
-    }
-
-    /**
-     * Constructor
-     *
-     * @param declaration
-     *            the parent declaration
-     * @param definitionScope
-     *            the parent scope
-     * @param selectedField
-     *            the selected field
-     * @param fieldName
-     *            the field name
-     * @param fieldValue
-     *            the field value
-     *            @deprecated use {@link VariantDefinition#VariantDefinition(VariantDeclaration, IDefinitionScope, EnumDefinition, String, String, Definition)} instead or trace splitting will break
-     */
-    @Deprecated
-    public VariantDefinition(@NonNull VariantDeclaration declaration,
-            IDefinitionScope definitionScope, String selectedField, @NonNull String fieldName, Definition fieldValue) {
-        this(declaration, definitionScope, new EnumDefinition(new EnumDeclaration(IntegerDeclaration.INT_8_DECL), null, fieldName, new IntegerDefinition(IntegerDeclaration.INT_8_DECL, null, fieldName, -1)), selectedField, fieldName, fieldValue);
     }
 
     // ------------------------------------------------------------------------
