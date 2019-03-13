@@ -115,19 +115,6 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
     }
 
     /**
-     * Get the quarks associated to the entries in the filter
-     *
-     * @param filter
-     *            {@link SelectionTimeQueryFilter}
-     * @return Set of quarks associated to the filter
-     * @deprecated use {@link #getSelectedEntries(SelectionTimeQueryFilter)} instead
-     */
-    @Deprecated
-    protected Set<Integer> getSelectedQuarks(SelectionTimeQueryFilter filter) {
-        return new HashSet<>(getSelectedEntries(filter).values());
-    }
-
-    /**
      * Get selected entries from the filter for this provider
      *
      * @param filter
