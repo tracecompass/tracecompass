@@ -32,29 +32,6 @@ public interface ITmfStatistics {
 
     /**
      * Run a histogram query on the statistics back-end. This means, return the
-     * total number of events in a series of 'nb' equal-sized ranges between 'start'
-     * and 'end'. As its name implies, this is typically used to fill the histogram
-     * data (where each range represents one pixel on the histogram).
-     *
-     * This method will block the caller until the results are returned, so it
-     * should not be called from a signal handler or from the UI thread.
-     *
-     * @param start
-     *            Start time of the query
-     * @param end
-     *            End time of the query
-     * @param nb
-     *            The number of ranges to separate the complete time range into. It
-     *            will be the size() of the returned array.
-     * @return The array representing the number of events found in each sub-range.
-     *
-     * @deprecated Use {@link ITmfStatistics#histogramQuery(long[])}
-     */
-    @Deprecated
-    List<@NonNull Long> histogramQuery(long start, long end, int nb);
-
-    /**
-     * Run a histogram query on the statistics back-end. This means, return the
      * total number of events in a series of 'timeRquested'. As its name implies,
      * this is typically used to fill the histogram data (where each range
      * represents one pixel on the histogram).
@@ -67,10 +44,7 @@ public interface ITmfStatistics {
      * @return The array representing the number of events found in each sub-range.
      * @since 4.0
      */
-    default List<@NonNull Long> histogramQuery(long[] timeRequested) {
-        int length = timeRequested.length;
-        return histogramQuery(timeRequested[0], timeRequested[length - 1], length);
-    }
+    List<@NonNull Long> histogramQuery(long[] timeRequested);
 
     /**
      * Return the total number of events in the trace.
