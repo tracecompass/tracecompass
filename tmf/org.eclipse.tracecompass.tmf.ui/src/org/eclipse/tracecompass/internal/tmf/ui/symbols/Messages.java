@@ -41,4 +41,8 @@ public class Messages extends NLS {
     public static String BasicSymbolProviderPrefPage_tabTitle;
     public static String BasicSymbolProviderPrefPage_invalidMappingFileDialogHeader;
     public static String BasicSymbolProviderPrefPage_invalidMappingFileMessage;
+
+    public static String SymbolProviderConfigDialog_loadingConfigurations;
+    public static String SymbolProviderConfigDialog_title;
+    public static String SymbolProviderConfigDialog_message;
 }

@@ -445,25 +445,6 @@ public class FlameChartView extends BaseDataProviderTimeGraphView {
     }
 
     /**
-     * Get the {@link CallStackDataProvider} from a {@link TimeGraphEntry}'s parent.
-     *
-     * @param entry
-     *            queried {@link TimeGraphEntry}.
-     * @return the {@link CallStackDataProvider}
-     * @since 3.3
-     *
-     * @deprecated Use BaseDataProviderTimeGraphView#getProvider instead
-     */
-    @Deprecated
-    public static CallStackDataProvider getProvider(TimeGraphEntry entry) {
-        ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = BaseDataProviderTimeGraphView.getProvider(entry);
-        if (provider instanceof CallStackDataProvider) {
-            return (CallStackDataProvider) provider;
-        }
-        throw new ClassCastException("The data provider is not an instance of CallStackDataProvider, current value is " + provider); //$NON-NLS-1$
-    }
-
-    /**
      * @since 1.2
      */
     @Override
