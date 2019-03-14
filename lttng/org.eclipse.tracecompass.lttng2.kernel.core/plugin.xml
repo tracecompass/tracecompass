@@ -11,24 +11,9 @@
             name="%tracetype.type.kernel"
             trace_type="org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace">
       </type>
-      <experiment
-            experiment_type="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.trace.VirtualMachineExperiment"
-            id="lttng2.analysis.vm.VirtualMachineExperiment"
-            name="Virtual Machine Experiment (Deprecated)">
-      </experiment>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
-      <module
-            analysis_module="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.module.VirtualMachineCpuAnalysis"
-            automatic="false"
-            id="org.eclipse.tracecompass.lttng2.analysis.vm.core.VirtualMachineAnalysisModule"
-            name="Virtual Machine Analysis (Deprecated)">
-            <tracetype
-                  applies="true"
-                  class="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.trace.VirtualMachineExperiment">
-            </tracetype>
-      </module>
       <module
             analysis_module="org.eclipse.tracecompass.analysis.counters.core.CounterAnalysis"
             automatic="true"

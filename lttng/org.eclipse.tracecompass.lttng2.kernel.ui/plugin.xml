@@ -11,17 +11,6 @@
       </perspective>
    </extension>
    <extension
-         point="org.eclipse.ui.views">
-      <view
-            allowMultiple="false"
-            category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.vm.vcpuview.VirtualMachineView"
-            id="org.eclipse.tracecompass.lttng2.analysis.vm.ui.vmview"
-            name="%vcpuview.name"
-            restorable="true">
-      </view>
-   </extension>
-   <extension
          point="org.eclipse.ui.navigator.navigatorContent">
       <commonWizard
             associatedExtensionId="org.eclipse.linuxtools.tmf.ui.navigator.content"
