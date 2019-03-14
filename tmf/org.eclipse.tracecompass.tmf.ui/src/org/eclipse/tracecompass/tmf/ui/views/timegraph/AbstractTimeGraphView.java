@@ -142,7 +142,6 @@ import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraph
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphBookmarkListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphContentProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphSelectionListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
@@ -855,8 +854,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * Getter for the presentation provider
      *
      * @return The time graph presentation provider
+     * @since 5.0
      */
-    protected ITimeGraphPresentationProvider2 getPresentationProvider() {
+    protected ITimeGraphPresentationProvider getPresentationProvider() {
         return fPresentation;
     }
 

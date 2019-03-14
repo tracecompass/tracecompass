@@ -105,7 +105,6 @@ import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphColorListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTreeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphViewerFilterListener;
@@ -309,10 +308,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
     public void setTimeGraphProvider(ITimeGraphPresentationProvider timeGraphProvider) {
         fTimeGraphProvider = timeGraphProvider;
 
-        if (timeGraphProvider instanceof ITimeGraphPresentationProvider2) {
-            ((ITimeGraphPresentationProvider2) timeGraphProvider).setDrawingHelper(this);
-            ((ITimeGraphPresentationProvider2) timeGraphProvider).addColorListener(this);
-        }
+       timeGraphProvider.setDrawingHelper(this);
+       timeGraphProvider.addColorListener(this);
 
         StateItem[] stateItems = fTimeGraphProvider.getStateTable();
         colorSettingsChanged(stateItems);

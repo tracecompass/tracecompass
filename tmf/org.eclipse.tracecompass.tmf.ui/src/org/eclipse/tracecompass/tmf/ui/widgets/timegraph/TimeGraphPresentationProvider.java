@@ -33,7 +33,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITmfTimeGraphDr
  * @since 3.4
  *
  */
-public class TimeGraphPresentationProvider implements ITimeGraphPresentationProvider2 {
+public class TimeGraphPresentationProvider implements ITimeGraphPresentationProvider {
 
     private static final StateItem[] EMPTY_STATE_TABLE = new StateItem[0];
 
