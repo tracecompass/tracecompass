@@ -106,6 +106,9 @@
          <defaultEditor
                id="org.eclipse.linuxtools.tmf.ui.editors.events.stub">
          </defaultEditor>
+         <perspective
+               id="org.eclipse.tracecompass.tmf.ui.swtbot.tests.perspective">
+         </perspective>
       </experiment>
    </extension>
 
