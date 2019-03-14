@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
 
@@ -79,7 +78,6 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
      */
     public static final String ID = "org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.scatter.dataprovider"; //$NON-NLS-1$
 
-    private static final Map<ISegmentStoreProvider, SegmentStoreScatterDataProvider> PROVIDER_MAP = new WeakHashMap<>();
     private static final String DEFAULT_CATEGORY = "default"; //$NON-NLS-1$
     private static final AtomicLong ENTRY_ID = new AtomicLong();
 
@@ -188,36 +186,6 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             }
             return false;
         }
-    }
-
-    /**
-     * Create an instance of {@link SegmentStoreScatterDataProvider}. Returns a null
-     * instance if the ISegmentStoreProvider is null. If the provider is an instance
-     * of {@link IAnalysisModule}, analysis is also scheduled.
-     *
-     * @param trace
-     *            A trace on which we are interested to fetch a model
-     * @param provider
-     *            A segment store provider.
-     * @return An instance of SegmentStoreDataProvider. Returns a null if the
-     *         ISegmentStoreProvider is null.
-     * @deprecated Use the
-     *             {@link SegmentStoreScatterDataProvider#create(ITmfTrace, String)}
-     *             method instead
-     */
-    @Deprecated
-    public static synchronized @Nullable SegmentStoreScatterDataProvider create(ITmfTrace trace, @Nullable ISegmentStoreProvider provider) {
-        if (provider == null) {
-            return null;
-        }
-
-        return PROVIDER_MAP.computeIfAbsent(provider, p -> {
-            if (p instanceof IAnalysisModule) {
-                ((IAnalysisModule) p).schedule();
-            }
-            return new SegmentStoreScatterDataProvider(trace, p, ""); //$NON-NLS-1$
-        });
-
     }
 
     /**
