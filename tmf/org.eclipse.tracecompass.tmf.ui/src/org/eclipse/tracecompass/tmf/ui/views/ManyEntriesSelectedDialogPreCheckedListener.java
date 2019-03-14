@@ -16,6 +16,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfUIPreferences;
+import org.eclipse.tracecompass.internal.tmf.ui.views.Messages;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.FilteredCheckboxTree;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.IPreCheckStateListener;
 

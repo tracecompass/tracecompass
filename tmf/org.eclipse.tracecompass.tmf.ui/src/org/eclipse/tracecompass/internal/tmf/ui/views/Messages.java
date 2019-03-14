@@ -7,18 +7,15 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.tmf.ui.views;
+package org.eclipse.tracecompass.internal.tmf.ui.views;
 
 import org.eclipse.osgi.util.NLS;
 
 /**
- * Messages for {@link ManyEntriesSelectedDialogPreCheckedListener}
- * @since 4.0
- * @deprecated move to internal
+ * Messages class
  */
-@Deprecated
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.tmf.ui.views.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.tmf.ui.views.messages"; //$NON-NLS-1$
     /**
      * Toggle message for the many entries selected dialog
      */
