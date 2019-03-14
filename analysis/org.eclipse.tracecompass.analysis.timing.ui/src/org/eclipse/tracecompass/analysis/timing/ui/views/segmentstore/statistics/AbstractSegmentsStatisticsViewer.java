@@ -33,16 +33,11 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreStatisticsModel;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
-import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
-import org.eclipse.tracecompass.analysis.timing.core.statistics.Statistics;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProvider;
-import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics.Messages;
-import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.model.filters.FilterTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
@@ -76,19 +71,6 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
     private @Nullable TmfAbstractAnalysisModule fModule;
     private MenuManager fTablePopupMenuManager;
     private @Nullable String fProviderId;
-
-    /**
-     * Constructor
-     *
-     * @param parent
-     *            the parent composite
-     * @deprecated use the constructor with data provider Id instead, to use the
-     *             data provider extension point
-     */
-    @Deprecated
-    public AbstractSegmentsStatisticsViewer(Composite parent) {
-        this(parent, null);
-    }
 
     /**
      * Constructor
@@ -153,63 +135,20 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
                 }
             }
 
-            // TODO remove this block when SegmentStoreStatisticsEntry is removed
-            if (element instanceof SegmentStoreStatisticsEntry) {
-                IStatistics<ISegment> statistics = ((SegmentStoreStatisticsEntry) element).getEntry();
-                if (statistics.getNbElements() > 0) {
-                    if (columnIndex == 1) {
-                        return toFormattedString(statistics.getMin());
-                    } else if (columnIndex == 2) {
-                        return String.valueOf(toFormattedString(statistics.getMax()));
-                    } else if (columnIndex == 3) {
-                        return String.valueOf(toFormattedString(statistics.getMean()));
-                    } else if (columnIndex == 4) {
-                        return String.valueOf(toFormattedString(statistics.getStdDev()));
-                    } else if (columnIndex == 5) {
-                        return String.valueOf(statistics.getNbElements());
-                    } else if (columnIndex == 6) {
-                        return String.valueOf(toFormattedString(statistics.getTotal()));
-                    }
-                }
-            }
             return ""; //$NON-NLS-1$
         }
-    }
-
-    /**
-     * Creates the statistics analysis module
-     *
-     * @return the statistics analysis module
-     * @deprecated Use a data provider factory and extension point instead
-     */
-    @Nullable
-    @Deprecated
-    protected TmfAbstractAnalysisModule createStatisticsAnalysiModule() {
-        return null;
-    }
-
-    /**
-     * Gets the statistics analysis module
-     *
-     * @return the statistics analysis module
-     * @deprecated Use a data provider factory and extension point instead
-     */
-    @Nullable
-    @Deprecated
-    public TmfAbstractAnalysisModule getStatisticsAnalysisModule() {
-        return fModule;
     }
 
     @Override
     protected ITmfTreeColumnDataProvider getColumnDataProvider() {
         return () -> ImmutableList.of(
                 createTmfTreeColumnData(Messages.SegmentStoreStatistics_LevelLabel, Comparator.comparing(TmfTreeViewerEntry::getName)),
-                createTmfTreeColumnData(Messages.SegmentStoreStatistics_Statistics_MinLabel, Comparator.comparing(keyExtractor(IStatistics<ISegment>::getMin, SegmentStoreStatisticsModel::getMin))),
-                createTmfTreeColumnData(Messages.SegmentStoreStatistics_MaxLabel, Comparator.comparing(keyExtractor(IStatistics<ISegment>::getMax, SegmentStoreStatisticsModel::getMax))),
-                createTmfTreeColumnData(Messages.SegmentStoreStatistics_AverageLabel, Comparator.comparing(keyExtractor(IStatistics<ISegment>::getMean, SegmentStoreStatisticsModel::getMean))),
-                createTmfTreeColumnData(Messages.SegmentStoreStatisticsViewer_StandardDeviation, Comparator.comparing(keyExtractor(IStatistics<ISegment>::getStdDev, SegmentStoreStatisticsModel::getStdDev))),
-                createTmfTreeColumnData(Messages.SegmentStoreStatisticsViewer_Count, Comparator.comparing(keyExtractor(IStatistics<ISegment>::getNbElements, SegmentStoreStatisticsModel::getNbElements))),
-                createTmfTreeColumnData(Messages.SegmentStoreStatisticsViewer_Total, Comparator.comparing(keyExtractor(IStatistics<ISegment>::getTotal, SegmentStoreStatisticsModel::getTotal))),
+                createTmfTreeColumnData(Messages.SegmentStoreStatistics_Statistics_MinLabel, Comparator.comparing(keyExtractor(SegmentStoreStatisticsModel::getMin))),
+                createTmfTreeColumnData(Messages.SegmentStoreStatistics_MaxLabel, Comparator.comparing(keyExtractor(SegmentStoreStatisticsModel::getMax))),
+                createTmfTreeColumnData(Messages.SegmentStoreStatistics_AverageLabel, Comparator.comparing(keyExtractor(SegmentStoreStatisticsModel::getMean))),
+                createTmfTreeColumnData(Messages.SegmentStoreStatisticsViewer_StandardDeviation, Comparator.comparing(keyExtractor(SegmentStoreStatisticsModel::getStdDev))),
+                createTmfTreeColumnData(Messages.SegmentStoreStatisticsViewer_Count, Comparator.comparing(keyExtractor(SegmentStoreStatisticsModel::getNbElements))),
+                createTmfTreeColumnData(Messages.SegmentStoreStatisticsViewer_Total, Comparator.comparing(keyExtractor(SegmentStoreStatisticsModel::getTotal))),
                 new TmfTreeColumnData("")); //$NON-NLS-1$
     }
 
@@ -234,37 +173,17 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
     }
 
     private static <E extends Comparable<E>, M extends SegmentStoreStatisticsModel> Function<TmfTreeViewerEntry, E>
-        keyExtractor(Function<IStatistics<@NonNull ISegment>, E> segExtractor, Function<M, E> modelExtractor) {
+        keyExtractor(Function<M, E> modelExtractor) {
         return new Function<TmfTreeViewerEntry, E>() {
 
             @Override
             public E apply(TmfTreeViewerEntry entry) {
-                if (entry instanceof SegmentStoreStatisticsEntry) {
-                    return segExtractor.apply(((SegmentStoreStatisticsEntry) entry).getEntry());
-                } else if (entry instanceof TmfGenericTreeEntry) {
+                if (entry instanceof TmfGenericTreeEntry) {
                     return modelExtractor.apply(((TmfGenericTreeEntry<M>) entry).getModel());
                 }
                 return (E) (Comparable<E>) o -> 0;
             }
         };
-    }
-
-    @Override
-    public void initializeDataSource(ITmfTrace trace) {
-        TmfAbstractAnalysisModule module = createStatisticsAnalysiModule();
-        if (module == null) {
-            return;
-        }
-        try {
-            module.setTrace(trace);
-            module.schedule();
-            if (fModule != null) {
-                fModule.dispose();
-            }
-            fModule = module;
-        } catch (TmfAnalysisException e) {
-            Activator.getDefault().logError("Error initializing statistics analysis module", e); //$NON-NLS-1$
-        }
     }
 
     /**
@@ -277,7 +196,7 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
      */
     protected void appendToTablePopupMenu(IMenuManager manager, IStructuredSelection sel) {
         Object element = sel.getFirstElement();
-        if ((element instanceof TmfGenericTreeEntry || element instanceof SegmentStoreStatisticsEntry) && !(element instanceof HiddenTreeViewerEntry) ) {
+        if (element instanceof TmfGenericTreeEntry) {
             IAction gotoStartTime = new Action(Messages.SegmentStoreStatisticsViewer_GotoMinAction) {
                 @Override
                 public void run() {
@@ -288,10 +207,7 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
                         start = model.getMinStart();
                         end = model.getMinEnd();
                     } else {
-                        // TODO remove this if / block when SegmentStoreStatisticsEntry is removed
-                        ISegment minObject = ((SegmentStoreStatisticsEntry) element).getEntry().getMinObject();
-                        start = minObject == null ? 0 : minObject.getStart();
-                        end = minObject == null ? 0 : minObject.getEnd();
+                        return;
                     }
                     broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentsStatisticsViewer.this, TmfTimestamp.fromNanos(start), TmfTimestamp.fromNanos(end), getTrace()));
                     updateContent(start, end, true);
@@ -308,10 +224,7 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
                         start = model.getMaxStart();
                         end = model.getMaxEnd();
                     } else {
-                        // TODO remove this if / block when SegmentStoreStatisticsEntry is removed
-                        ISegment maxObject = ((SegmentStoreStatisticsEntry) element).getEntry().getMaxObject();
-                        start = maxObject == null ? 0 : maxObject.getStart();
-                        end = maxObject == null ? 0 : maxObject.getEnd();
+                        return;
                     }
                     broadcast(new TmfSelectionRangeUpdatedSignal(AbstractSegmentsStatisticsViewer.this, TmfTimestamp.fromNanos(start), TmfTimestamp.fromNanos(end), getTrace()));
                     updateContent(start, end, true);
@@ -335,44 +248,6 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
          * The cast to long is needed because the formatter cannot truncate the number.
          */
         return String.format("%s", FORMATTER.format(value)); //$NON-NLS-1$
-    }
-
-    /**
-     * Class for defining an entry in the statistics tree.
-     *
-     * @deprecated use {@link SegmentStoreStatisticsDataProvider} and
-     *             {@link TmfGenericTreeEntry} encapsulating
-     *             {@link SegmentStoreStatisticsModel} instead, to keep
-     *             {@link IStatistics} and {@link ISegment}s in the back-end
-     */
-    @Deprecated
-    protected class SegmentStoreStatisticsEntry extends TmfTreeViewerEntry {
-
-        private final IStatistics<ISegment> fEntry;
-
-        /**
-         * Constructor
-         *
-         * @param name
-         *            name of entry
-         *
-         * @param entry
-         *            segment store statistics object
-         */
-        public SegmentStoreStatisticsEntry(String name, IStatistics<ISegment> entry) {
-            super(name);
-            fEntry = entry;
-        }
-
-        /**
-         * Gets the statistics object
-         *
-         * @return statistics object
-         */
-        public IStatistics<ISegment> getEntry() {
-            return fEntry;
-        }
-
     }
 
     @Override
@@ -485,27 +360,6 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
      */
     protected String getSelectionLabel() {
         return Objects.requireNonNull(Messages.AbstractSegmentStoreStatisticsViewer_selection);
-    }
-
-    /**
-     * Class to define a level in the tree that doesn't have any values.
-     *
-     * @deprecated use {@link SegmentStoreStatisticsDataProvider} and
-     *             {@link TmfGenericTreeEntry} encapsulating
-     *             {@link SegmentStoreStatisticsModel} instead, to keep
-     *             {@link IStatistics} and {@link ISegment}s in the back-end
-     */
-    @Deprecated
-    protected class HiddenTreeViewerEntry extends SegmentStoreStatisticsEntry {
-        /**
-         * Constructor
-         *
-         * @param name
-         *            the name of the level
-         */
-        public HiddenTreeViewerEntry(String name) {
-            super(name, new Statistics<>(ISegment::getLength));
-        }
     }
 
     /**

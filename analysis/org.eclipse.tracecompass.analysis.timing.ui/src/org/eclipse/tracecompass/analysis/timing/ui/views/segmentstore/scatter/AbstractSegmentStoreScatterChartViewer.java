@@ -14,11 +14,9 @@ import java.text.Format;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreScatterDataProvider;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter.SegmentStoreScatterGraphTooltipProvider;
-import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXYDataProvider;
@@ -93,29 +91,13 @@ public class AbstractSegmentStoreScatterChartViewer extends TmfFilteredXYChartVi
     @Override
     protected @Nullable ITmfXYDataProvider initializeDataProvider(ITmfTrace trace) {
         String analysisId = getAnalysisId();
-        /* Support legacy code, get the analysis ID of the segment store */
-        if (analysisId.isEmpty()) {
-            ISegmentStoreProvider segmentStoreProvider = getSegmentStoreProvider(trace);
-            if (!(segmentStoreProvider instanceof IAnalysisModule)) {
-                return null;
-            }
-            analysisId = ((IAnalysisModule) segmentStoreProvider).getId();
-        }
-        /* End support of legacy */
-        return DataProviderManager.getInstance().getDataProvider(trace, SegmentStoreScatterDataProvider.ID + ':' + analysisId, ITmfTreeXYDataProvider.class);
-    }
 
-    /**
-     * Returns the segment store provider
-     *
-     * @param trace
-     *            The trace to consider
-     * @return the segment store provider
-     * @deprecated This method is not used anymore as the analysisId is passed in the constructor
-     */
-    @Deprecated
-    protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace) {
-        return null;
+        if (analysisId.isEmpty()) {
+            /* Should not happen anymore since legacy code,
+             * that get the analysis ID of the segment store, is removed */
+            return null;
+        }
+        return DataProviderManager.getInstance().getDataProvider(trace, SegmentStoreScatterDataProvider.ID + ':' + analysisId, ITmfTreeXYDataProvider.class);
     }
 
     // ------------------------------------------------------------------------
