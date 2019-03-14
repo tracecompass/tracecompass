@@ -67,6 +67,7 @@ public abstract class TmfAbstractToolTipHandler {
     private Composite fTipComposite;
     private Shell fTipShell;
     private Rectangle fInitialDeadzone;
+    private MouseTrackAdapter fMouseTrackAdapter;
     private Table<String, String, HyperLink> fModel = HashBasedTable.create();
 
     private static synchronized boolean isBrowserAvailable(Composite parent) {
@@ -147,35 +148,54 @@ public abstract class TmfAbstractToolTipHandler {
      *            The control object to use
      */
     public void activateHoverHelp(final Control control) {
+        MouseTrackAdapter adapter = fMouseTrackAdapter;
+        if (adapter == null) {
+            adapter = new MouseTrackAdapter() {
+                @Override
+                public void mouseHover(MouseEvent event) {
+                    // Is application not in focus?
+                    // -OR- a mouse button is pressed
+                    if (Display.getDefault().getFocusControl() == null
+                            || (event.stateMask & SWT.BUTTON_MASK) != 0
+                            || (event.stateMask & SWT.KEY_MASK) != 0) {
+                        return;
+                    }
+                    Point pt = new Point(event.x, event.y);
+                    Control timeGraphControl = (Control) event.widget;
+                    Point ptInDisplay = control.toDisplay(event.x, event.y);
+                    fInitialDeadzone = new Rectangle(ptInDisplay.x - MOUSE_DEADZONE, ptInDisplay.y - MOUSE_DEADZONE, 2 * MOUSE_DEADZONE, 2 * MOUSE_DEADZONE);
+                    createTooltipShell(timeGraphControl.getShell(), control, event, pt);
+                    if (fTipComposite.getChildren().length == 0) {
+                        // avoid displaying empty tool tips.
+                        return;
+                    }
+                    Point tipPosition = control.toDisplay(pt);
+                    setHoverLocation(fTipShell, tipPosition);
+                    fTipShell.setVisible(true);
+                    // Register Display filters.
+                    Display display = Display.getDefault();
+                    display.addFilter(SWT.MouseMove, fListener);
+                    display.addFilter(SWT.FocusOut, fFocusLostListener);
+                }
+            };
+            control.addMouseTrackListener(adapter);
+            fMouseTrackAdapter = adapter;
+        }
+    }
 
-        control.addMouseTrackListener(new MouseTrackAdapter() {
-            @Override
-            public void mouseHover(MouseEvent event) {
-                // Is application not in focus?
-                // -OR- a mouse button is pressed
-                if (Display.getDefault().getFocusControl() == null
-                        || (event.stateMask & SWT.BUTTON_MASK) != 0
-                        || (event.stateMask & SWT.KEY_MASK) != 0) {
-                    return;
-                }
-                Point pt = new Point(event.x, event.y);
-                Control timeGraphControl = (Control) event.widget;
-                Point ptInDisplay = control.toDisplay(event.x, event.y);
-                fInitialDeadzone = new Rectangle(ptInDisplay.x - MOUSE_DEADZONE, ptInDisplay.y - MOUSE_DEADZONE, 2 * MOUSE_DEADZONE, 2 * MOUSE_DEADZONE);
-                createTooltipShell(timeGraphControl.getShell(), control, event, pt);
-                if (fTipComposite.getChildren().length == 0) {
-                    // avoid displaying empty tool tips.
-                    return;
-                }
-                Point tipPosition = control.toDisplay(pt);
-                setHoverLocation(fTipShell, tipPosition);
-                fTipShell.setVisible(true);
-                // Register Display filters.
-                Display display = Display.getDefault();
-                display.addFilter(SWT.MouseMove, fListener);
-                display.addFilter(SWT.FocusOut, fFocusLostListener);
-            }
-        });
+    /**
+     * Callback for the mouse-over tooltip to deactivate hoverhelp
+     *
+     * @param control
+     *            The control object to use
+     * @since 5.0
+     */
+    public void deactivateHoverHelp(final Control control) {
+        MouseTrackAdapter adapter = fMouseTrackAdapter;
+        if (adapter != null) {
+            control.removeMouseTrackListener(adapter);
+            fMouseTrackAdapter = null;
+        }
     }
 
     /**

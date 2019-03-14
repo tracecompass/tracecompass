@@ -13,16 +13,44 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xycharts;
 
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.ui.viewers.TmfAbstractToolTipHandler;
+import org.swtchart.Chart;
 import org.swtchart.IAxis;
+import org.swtchart.IAxisSet;
 
 /**
- * Tool tip provider for TMF chart viewer. It displays the x and y
- * value of the current mouse position.
+ * Tool tip provider for TMF chart viewer. It displays the x and y value of the
+ * current mouse position.
  *
  * @author Bernd Hufmann
  */
 public class TmfSimpleTooltipProvider extends TmfBaseProvider implements MouseTrackListener {
+
+    private final class XYToolTipHandler extends TmfAbstractToolTipHandler {
+        @Override
+        public void fill(Control control, MouseEvent event, Point pt) {
+            Chart chart = getChart();
+            IAxisSet axisSet = chart.getAxisSet();
+            IAxis xAxis = axisSet.getXAxis(0);
+            IAxis yAxis = axisSet.getYAxis(0);
+
+            double xCoordinate = xAxis.getDataCoordinate(pt.x);
+            double yCoordinate = yAxis.getDataCoordinate(pt.y);
+
+            ITmfChartTimeProvider viewer = getChartViewer();
+
+            ITmfTimestamp time = TmfTimestamp.fromNanos((long) xCoordinate + viewer.getTimeOffset());
+            /* set tooltip of current data point */
+            addItem(null,"x", time.toString(), time.toNanos()); //$NON-NLS-1$
+            addItem(null, "y", Double.toString(yCoordinate), null); //$NON-NLS-1$
+        }
+    }
+
+    private TmfAbstractToolTipHandler fTooltipHandler = new XYToolTipHandler();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -31,7 +59,7 @@ public class TmfSimpleTooltipProvider extends TmfBaseProvider implements MouseTr
      * Constructor for a tool tip provider.
      *
      * @param tmfChartViewer
-     *                  The parent chart viewer
+     *            The parent chart viewer
      */
     public TmfSimpleTooltipProvider(ITmfChartTimeProvider tmfChartViewer) {
         super(tmfChartViewer);
@@ -43,13 +71,13 @@ public class TmfSimpleTooltipProvider extends TmfBaseProvider implements MouseTr
     // ------------------------------------------------------------------------
     @Override
     public void register() {
-        getChart().getPlotArea().addMouseTrackListener(this);
+        fTooltipHandler.activateHoverHelp(getChart().getPlotArea());
     }
 
     @Override
     public void deregister() {
         if ((getChartViewer().getControl() != null) && !getChartViewer().getControl().isDisposed()) {
-            getChart().getPlotArea().removeMouseTrackListener(this);
+            fTooltipHandler.deactivateHoverHelp(getChart().getPlotArea());
         }
     }
 
@@ -71,25 +99,6 @@ public class TmfSimpleTooltipProvider extends TmfBaseProvider implements MouseTr
 
     @Override
     public void mouseHover(MouseEvent e) {
-        if (getChartViewer().getWindowDuration() == 0) {
-            return;
-        }
-
-        IAxis xAxis = getChart().getAxisSet().getXAxis(0);
-        IAxis yAxis = getChart().getAxisSet().getYAxis(0);
-
-        double xCoordinate = xAxis.getDataCoordinate(e.x);
-        double yCoordinate = yAxis.getDataCoordinate(e.y);
-
-        ITmfChartTimeProvider viewer = getChartViewer();
-
-        /* set tooltip of current data point */
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("x="); //$NON-NLS-1$
-        buffer.append(TmfTimestamp.fromNanos((long) xCoordinate + viewer.getTimeOffset()).toString());
-        buffer.append("\n"); //$NON-NLS-1$
-        buffer.append("y="); //$NON-NLS-1$
-        buffer.append((long) yCoordinate);
-        getChart().getPlotArea().setToolTipText(buffer.toString());
+        // do nothing
     }
 }
