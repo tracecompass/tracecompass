@@ -25,8 +25,8 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -39,14 +39,14 @@ public class TmfTraceUtilsSearchingTest {
     private static final @NonNull CtfTestTrace TEST_TRACE = CtfTestTrace.TRACE2;
     private static final long START_RANK = 500L;
 
-    private ITmfTrace fTrace;
-    private ITmfEvent fStartEvent;
+    private static ITmfTrace fTrace;
+    private static ITmfEvent fStartEvent;
 
     /**
      * Test setup
      */
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         fTrace = CtfTmfTestTraceUtils.getTrace(TEST_TRACE);
 
         ITmfContext ctx = fTrace.seekEvent(START_RANK);
@@ -57,8 +57,8 @@ public class TmfTraceUtilsSearchingTest {
     /**
      * Test cleanup
      */
-    @After
-    public void tearDown() {
+    @AfterClass
+    public static void tearDown() {
         if (fTrace != null) {
             fTrace.dispose();
         }
