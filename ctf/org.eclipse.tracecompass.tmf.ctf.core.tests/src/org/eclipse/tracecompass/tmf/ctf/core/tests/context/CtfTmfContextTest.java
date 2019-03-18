@@ -24,8 +24,8 @@ import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfTmfContext;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -42,7 +42,7 @@ public class CtfTmfContextTest {
                                                              */
     private static final long end = 1332170692664579801L; /* Trace end time */
 
-    private CtfTmfTrace trace;
+    private static CtfTmfTrace trace;
 
     private class SeekerThread extends Thread {
         long val;
@@ -55,16 +55,16 @@ public class CtfTmfContextTest {
     /**
      * Pre-test initialization
      */
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         trace = CtfTmfTestTraceUtils.getTrace(testTrace);
     }
 
     /**
      * Post-test clean-up.
      */
-    @After
-    public void tearDown() {
+    @AfterClass
+    public static void tearDown() {
         if (trace != null) {
             trace.dispose();
         }
