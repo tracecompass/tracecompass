@@ -11,6 +11,9 @@ package org.eclipse.tracecompass.tmf.core.model.filters;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 
@@ -59,6 +62,23 @@ public class SelectionTimeQueryFilter extends TimeQueryFilter
     @Override
     public Collection<Long> getSelectedItems() {
         return fItems;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        SelectionTimeQueryFilter other = (SelectionTimeQueryFilter) obj;
+        return fItems.equals(other.getSelectedItems());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), fItems);
     }
 
 }

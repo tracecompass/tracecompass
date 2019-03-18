@@ -129,6 +129,7 @@ public class DataProviderParameterUtils {
                     }
                     list.add(((Number) element).longValue());
                 }
+                return list;
             }
         }
         return Collections.emptyList();
