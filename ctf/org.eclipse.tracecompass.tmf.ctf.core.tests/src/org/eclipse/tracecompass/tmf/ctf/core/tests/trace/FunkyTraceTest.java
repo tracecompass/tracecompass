@@ -27,8 +27,8 @@ import org.eclipse.tracecompass.tmf.ctf.core.CtfEnumPair;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -54,7 +54,7 @@ public class FunkyTraceTest {
     private static final @NonNull CtfTestTrace testTrace = CtfTestTrace.FUNKY_TRACE;
     private static final double DELTA = 0.0000001;
 
-    private CtfTmfTrace fTrace;
+    private static CtfTmfTrace fTrace;
 
     // ------------------------------------------------------------------------
     // Setup
@@ -63,8 +63,8 @@ public class FunkyTraceTest {
     /**
      * Test setup
      */
-    @Before
-    public void setup() {
+    @BeforeClass
+    public static void setup() {
         fTrace = CtfTmfTestTraceUtils.getTrace(testTrace);
         fTrace.indexTrace(true);
     }
@@ -72,8 +72,8 @@ public class FunkyTraceTest {
     /**
      * Clean-up
      */
-    @After
-    public void tearDown() {
+    @AfterClass
+    public static void tearDown() {
         if (fTrace != null) {
             fTrace.dispose();
         }
