@@ -42,8 +42,8 @@ import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocationInfo;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -57,21 +57,21 @@ public class CtfTmfTraceTest {
 
     private static final @NonNull CtfTestTrace testTrace = CtfTestTrace.KERNEL;
 
-    private CtfTmfTrace fixture;
+    private static CtfTmfTrace fixture;
 
     /**
      * Perform pre-test initialization.
      */
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         fixture = CtfTmfTestTraceUtils.getTrace(testTrace);
     }
 
     /**
      * Perform post-test clean-up.
      */
-    @After
-    public void tearDown() {
+    @AfterClass
+    public static void tearDown() {
         if (fixture != null) {
             fixture.dispose();
         }
