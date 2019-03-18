@@ -43,9 +43,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -71,7 +69,7 @@ public class CopyToClipboardTest {
     private static File fTestFile = null;
 
     private static SWTWorkbenchBot fBot;
-    private SWTBotEditor fEditorBot;
+    private static SWTBotEditor fEditorBot;
 
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
@@ -106,6 +104,9 @@ public class CopyToClipboardTest {
         WaitUtils.waitForJobs();
 
         SWTBotUtils.createProject(TRACE_PROJECT_NAME);
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), TRACE_TYPE);
+        fEditorBot = SWTBotUtils.activateEditor(fBot, fTestFile.getName());
+
     }
 
     /**
@@ -114,25 +115,9 @@ public class CopyToClipboardTest {
     @AfterClass
     public static void afterClass() {
         SWTBotUtils.deleteProject(TRACE_PROJECT_NAME, fBot);
-        fLogger.removeAllAppenders();
-    }
-
-    /**
-     * Before Test
-     */
-    @Before
-    public void before() {
-        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fTestFile.getAbsolutePath(), TRACE_TYPE);
-        fEditorBot = SWTBotUtils.activateEditor(fBot, fTestFile.getName());
-    }
-
-    /**
-     * After Test
-     */
-    @After
-    public void after() {
         fBot.closeAllEditors();
         SWTBotUtils.closeSecondaryShells(fBot);
+        fLogger.removeAllAppenders();
     }
 
     /**
