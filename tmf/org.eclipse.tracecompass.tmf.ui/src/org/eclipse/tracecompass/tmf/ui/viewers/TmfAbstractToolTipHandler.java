@@ -408,9 +408,9 @@ public abstract class TmfAbstractToolTipHandler {
             int elementCount = model.size();
             int longestString = 0;
             int longestValueString = 0;
-            Set<String> rowKeySet = fModel.rowKeySet();
+            Set<String> rowKeySet = model.rowKeySet();
             for (String row : rowKeySet) {
-                Set<@NonNull Entry<String, HyperLink>> entrySet = fModel.row(row).entrySet();
+                Set<@NonNull Entry<String, HyperLink>> entrySet = model.row(row).entrySet();
                 for (Entry<String, HyperLink> entry : entrySet) {
                     longestString = Math.max(longestString, entry.getKey().length() + 2);
                     longestValueString = Math.max(longestValueString, + entry.getValue().getLabel().length() + 2);
@@ -422,7 +422,7 @@ public abstract class TmfAbstractToolTipHandler {
                 noCat -= (noCat > 0 ? 1 : 0);
             }
             int w = (longestString + longestValueString) * CHAR_WIDTH + 2 * 2 * MARGIN;
-            int h = elementCount * LINE_HEIGHT + noCat * LINE_HEIGHT + MARGIN;
+            int h = elementCount * LINE_HEIGHT + noCat * LINE_HEIGHT + 2 * MARGIN;
             return new Point(w, h);
         }
 
@@ -436,7 +436,7 @@ public abstract class TmfAbstractToolTipHandler {
                     ".collapsible {\n" +
                     "  background-color: #777;\n" +
                     "  color: white;\n" +
-                    "  cursor: pointer;\n" +
+//                    "  cursor: pointer;\n" + // Add when enabling JavaScript
                     "  padding: 0px;\n" +
                     "  width: 100%;\n" +
                     "  border: none;\n" +
@@ -459,7 +459,7 @@ public abstract class TmfAbstractToolTipHandler {
                     "  font-size: 14px;\n" +
                     "}\n" +
                     ".paddingBetweenCols {\n" +
-                    "  padding:px 10px 0px 10px;\n" +
+                    "  padding:0px 10px 0px 10px;\n" +
                     "}\n" +
                     ".bodystyle {\n" +
                     "  padding:0px 0px;\n" +
@@ -469,40 +469,44 @@ public abstract class TmfAbstractToolTipHandler {
             toolTipContent.append("<body class=\"bodystyle\">"); //$NON-NLS-1$
 
             Set<String> rowKeySet = model.rowKeySet();
-            toolTipContent.append("<div class=\"content\">");
-            toolTipContent.append("<table class=\"tab\">");
-            int rowNb = 0;
             for (String row : rowKeySet) {
-                toolTipContent.append("<tr>");
-                toolTipContent.append("<th/><th colspan=2/>");
-                toolTipContent.append("</tr>");
+                if (!row.equals(UNCATEGORIZED)) {
+                    toolTipContent.append("<button class=\"collapsible\">").append(row).append("</button>");
+                }
+                toolTipContent.append("<div class=\"content\">");
+                toolTipContent.append("<table class=\"tab\">");
                 Set<@NonNull Entry<String, HyperLink>> entrySet = model.row(row).entrySet();
-                toolTipContent.append("<tr>");
-                toolTipContent.append("<td rowspan=\"").append(entrySet.size()).append("\">");
-                toolTipContent.append(row);
-                toolTipContent.append("</td>");
-                boolean first = true;
                 for (Entry<String, HyperLink> entry : entrySet) {
-                    if (!first) {
-                        toolTipContent.append("<tr>");
-                    } else {
-                        first = false;
-                    }
+                    toolTipContent.append("<tr>");
                     toolTipContent.append("<td class=\"paddingBetweenCols\">");
                     toolTipContent.append(entry.getKey());
                     toolTipContent.append("</td>");
                     toolTipContent.append("<td class=\"paddingBetweenCols\">");
                     toolTipContent.append(entry.getValue());
                     toolTipContent.append("</td>");
+                    toolTipContent.append("</tr>");
                 }
-                toolTipContent.append("</tr>");
-                rowNb++;
-                if (rowNb > 4) {
-                    toolTipContent.append("<tr><td>... ").append(rowKeySet.size() - rowNb).append(" more ...</td></tr>");
-                    break;
-                }
+                toolTipContent.append("</table></div>");
             }
-            toolTipContent.append("</table></div>");
+            /* Add when enabling JavaScript
+            toolTipContent.append("\n" +
+                    "<script>\n" +
+                    "var coll = document.getElementsByClassName(\"collapsible\");\n" +
+                    "var i;\n" +
+                    "\n" +
+                    "for (i = 0; i < coll.length; i++) {\n" +
+                    "  coll[i].addEventListener(\"click\", function() {\n" +
+                    "    this.classList.toggle(\"active\");\n" +
+                    "    var content = this.nextElementSibling;\n" +
+                    "    if (content.style.display === \"block\") {\n" +
+                    "      content.style.display = \"none\";\n" +
+                    "    } else {\n" +
+                    "      content.style.display = \"block\";\n" +
+                    "    }\n" +
+                    "  });\n" +
+                    "}\n" +
+                    "</script>");
+            */
             toolTipContent.append("</body>"); //$NON-NLS-1$
             return toolTipContent.toString();
         }
