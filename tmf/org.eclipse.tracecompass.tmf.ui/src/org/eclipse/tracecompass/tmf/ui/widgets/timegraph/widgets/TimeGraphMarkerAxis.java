@@ -191,7 +191,9 @@ public class TimeGraphMarkerAxis extends TimeGraphBaseControl {
     public void setMarkers(List<IMarkerEvent> markers) {
         Multimap<String, IMarkerEvent> map = LinkedHashMultimap.create();
         for (IMarkerEvent marker : markers) {
-            map.put(marker.getCategory(), marker);
+            if (marker.getEntry() == null) {
+                map.put(marker.getCategory(), marker);
+            }
         }
         Display.getDefault().asyncExec(() -> {
             if (isDisposed()) {
