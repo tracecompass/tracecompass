@@ -9,8 +9,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,6 +44,8 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphTooltipHandler;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
 
 /**
@@ -59,12 +60,14 @@ public abstract class TmfAbstractToolTipHandler {
     private static final int MOUSE_DEADZONE = 5;
     private static final String TIME_PREFIX = "time://"; //$NON-NLS-1$
     private static final Pattern TIME_PATTERN = Pattern.compile("\\s*time\\:\\/\\/(\\d+).*"); //$NON-NLS-1$
+
+    private static final String UNCATEGORIZED = ""; //$NON-NLS-1$
     private static final int OFFSET = 16;
     private static Point fScrollBarSize = null;
     private Composite fTipComposite;
     private Shell fTipShell;
     private Rectangle fInitialDeadzone;
-    private Map<String, HyperLink> fModel = new HashMap<>();
+    private Table<String, String, HyperLink> fModel = HashBasedTable.create();
 
     private static synchronized boolean isBrowserAvailable(Composite parent) {
         boolean isBrowserAvailable = Activator.getDefault().getPreferenceStore().getBoolean(ITmfUIPreferences.USE_BROWSER_TOOLTIPS);
@@ -252,6 +255,8 @@ public abstract class TmfAbstractToolTipHandler {
      * the possibility to add a time value for creating a hyperlink in the
      * tooltip.
      *
+     * @param category
+     *            the category of the item (used for grouping)
      * @param name
      *            name of the line
      * @param label
@@ -260,8 +265,8 @@ public abstract class TmfAbstractToolTipHandler {
      *            time in nanoseconds, if time value else null
      * @since 5.0
      */
-    protected void addItem(String name, String label, Long time) {
-        fModel.put(name, new HyperLink(label, time));
+    protected void addItem(String category, String name, String label, Long time) {
+        fModel.put(category == null ? UNCATEGORIZED : category, name, new HyperLink(label, time));
     }
 
     /**
@@ -271,9 +276,12 @@ public abstract class TmfAbstractToolTipHandler {
      *            name of the line
      * @param value
      *            line value
+     * @deprecated use {@link #addItem(String, String, String, Long)} to
+     *             have categories and/or time
      */
+    @Deprecated
     protected void addItem(String name, String value) {
-        addItem(name, value, null);
+        addItem(null, name, value, null);
     }
 
     /**
@@ -333,7 +341,7 @@ public abstract class TmfAbstractToolTipHandler {
 
     private interface ITooltipContent {
         void create();
-        void setInput(Map<String, HyperLink> model);
+        void setInput(Table<String, String, HyperLink> model);
         Point computePreferredSize();
 
         default void setupControl(Control control) {
@@ -345,7 +353,7 @@ public abstract class TmfAbstractToolTipHandler {
     private class BrowserContent extends AbstractContent {
         private static final int MARGIN = 10;
         private static final int CHAR_WIDTH = 9;
-        private static final int LINE_HEIGHT = 20;
+        private static final int LINE_HEIGHT = 18;
 
         public BrowserContent(Composite parent) {
             super(parent);
@@ -354,7 +362,7 @@ public abstract class TmfAbstractToolTipHandler {
         @Override
         public void create() {
             Composite parent = getParent();
-            Map<String, HyperLink> model = getModel();
+            Table<String, String, HyperLink> model = getModel();
             if (parent == null || model.size() == 0) {
                 return;
             }
@@ -396,24 +404,31 @@ public abstract class TmfAbstractToolTipHandler {
 
         @Override
         public Point computePreferredSize() {
-            Map<String, HyperLink> model = getModel();
+            Table<String, String, HyperLink> model = getModel();
             int elementCount = model.size();
             int longestString = 0;
             int longestValueString = 0;
-            Set<String> rowKeySet = model.keySet();
+            Set<String> rowKeySet = fModel.rowKeySet();
             for (String row : rowKeySet) {
-                longestString = Math.max(longestString, row.length() + 2);
-                HyperLink hyperlink = model.get(row);
-                longestValueString = Math.max(longestValueString, + (hyperlink == null ? 0 : hyperlink.getLabel().length()) + 2);
+                Set<@NonNull Entry<String, HyperLink>> entrySet = fModel.row(row).entrySet();
+                for (Entry<String, HyperLink> entry : entrySet) {
+                    longestString = Math.max(longestString, entry.getKey().length() + 2);
+                    longestValueString = Math.max(longestValueString, + entry.getValue().getLabel().length() + 2);
+                }
             }
-            int w = (longestString + longestValueString) * CHAR_WIDTH + MARGIN;
-            int h = (elementCount + 1) * LINE_HEIGHT;
+            int noCat = rowKeySet.size();
+            if (model.containsRow(UNCATEGORIZED)) {
+                // don't count UNCATEGORIZED because it's not drawn as header
+                noCat -= (noCat > 0 ? 1 : 0);
+            }
+            int w = (longestString + longestValueString) * CHAR_WIDTH + 2 * 2 * MARGIN;
+            int h = elementCount * LINE_HEIGHT + noCat * LINE_HEIGHT + MARGIN;
             return new Point(w, h);
         }
 
         @SuppressWarnings("nls")
         private String toHtml() {
-            Map<String, HyperLink> model = getModel();
+            Table<String, String, HyperLink> model = getModel();
             StringBuilder toolTipContent = new StringBuilder();
             toolTipContent.append("<head>\n" +
                     "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
@@ -453,20 +468,39 @@ public abstract class TmfAbstractToolTipHandler {
                     "</head>");
             toolTipContent.append("<body class=\"bodystyle\">"); //$NON-NLS-1$
 
-            Set<String> rowKeySet = model.keySet();
+            Set<String> rowKeySet = model.rowKeySet();
             toolTipContent.append("<div class=\"content\">");
             toolTipContent.append("<table class=\"tab\">");
+            int rowNb = 0;
             for (String row : rowKeySet) {
-                HyperLink hyperlink = model.get(row);
-                String value = hyperlink == null ? "" : hyperlink.toString();  //$NON-NLS-1$
                 toolTipContent.append("<tr>");
-                toolTipContent.append("<td class=\"paddingBetweenCols\">");
+                toolTipContent.append("<th/><th colspan=2/>");
+                toolTipContent.append("</tr>");
+                Set<@NonNull Entry<String, HyperLink>> entrySet = model.row(row).entrySet();
+                toolTipContent.append("<tr>");
+                toolTipContent.append("<td rowspan=\"").append(entrySet.size()).append("\">");
                 toolTipContent.append(row);
                 toolTipContent.append("</td>");
-                toolTipContent.append("<td class=\"paddingBetweenCols\">");
-                toolTipContent.append(value);
-                toolTipContent.append("</td>");
+                boolean first = true;
+                for (Entry<String, HyperLink> entry : entrySet) {
+                    if (!first) {
+                        toolTipContent.append("<tr>");
+                    } else {
+                        first = false;
+                    }
+                    toolTipContent.append("<td class=\"paddingBetweenCols\">");
+                    toolTipContent.append(entry.getKey());
+                    toolTipContent.append("</td>");
+                    toolTipContent.append("<td class=\"paddingBetweenCols\">");
+                    toolTipContent.append(entry.getValue());
+                    toolTipContent.append("</td>");
+                }
                 toolTipContent.append("</tr>");
+                rowNb++;
+                if (rowNb > 4) {
+                    toolTipContent.append("<tr><td>... ").append(rowKeySet.size() - rowNb).append(" more ...</td></tr>");
+                    break;
+                }
             }
             toolTipContent.append("</table></div>");
             toolTipContent.append("</body>"); //$NON-NLS-1$
@@ -482,7 +516,7 @@ public abstract class TmfAbstractToolTipHandler {
         @Override
         public void create() {
             Composite parent = getParent();
-            Map<String, HyperLink> model = getModel();
+            Table<String, String, HyperLink> model = getModel();
             if (parent == null || model.size() == 0) {
                 return;
             }
@@ -498,21 +532,22 @@ public abstract class TmfAbstractToolTipHandler {
             Composite composite = new Composite(scrolledComposite, SWT.NONE);
             composite.setLayout(new GridLayout(3, false));
             setupControl(composite);
-            Set<String> rowKeySet = model.keySet();
-            for (String key : rowKeySet) {
-                Label nameLabel = new Label(composite, SWT.NO_FOCUS);
-                nameLabel.setText(key);
-                setupControl(nameLabel);
-                Label separator = new Label(composite, SWT.NO_FOCUS | SWT.SEPARATOR | SWT.VERTICAL);
-                GridData gd = new GridData(SWT.CENTER, SWT.CENTER, false, false);
-                gd.heightHint = nameLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
-                separator.setLayoutData(gd);
-                setupControl(separator);
-                Label valueLabel = new Label(composite, SWT.NO_FOCUS);
-                HyperLink hyperlink = model.get(key);
-                String label = hyperlink == null ? "" : hyperlink.getLabel(); //$NON-NLS-1$
-                valueLabel.setText(label);
-                setupControl(valueLabel);
+            Set<String> rowKeySet = model.rowKeySet();
+            for (String row : rowKeySet) {
+                Set<@NonNull Entry<String, HyperLink>> entrySet = model.row(row).entrySet();
+                for (Entry<String, HyperLink> entry : entrySet) {
+                    Label nameLabel = new Label(composite, SWT.NO_FOCUS);
+                    nameLabel.setText(entry.getKey());
+                    setupControl(nameLabel);
+                    Label separator = new Label(composite, SWT.NO_FOCUS | SWT.SEPARATOR | SWT.VERTICAL);
+                    GridData gd = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+                    gd.heightHint = nameLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+                    separator.setLayoutData(gd);
+                    setupControl(separator);
+                    Label valueLabel = new Label(composite, SWT.NO_FOCUS);
+                    valueLabel.setText(entry.getValue().getLabel());
+                    setupControl(valueLabel);
+                }
             }
             scrolledComposite.setContent(composite);
             Point preferredSize = computePreferredSize();
@@ -523,22 +558,22 @@ public abstract class TmfAbstractToolTipHandler {
 
     private abstract class AbstractContent implements ITooltipContent {
         private Composite fParent = null;
-        private Map<String, HyperLink> fContentModel = null;
+        private Table<String, String, HyperLink> fContentModel = null;
 
         public AbstractContent(Composite parent) {
             fParent = parent;
         }
 
         @Override
-        public void setInput(Map<String, HyperLink> model) {
+        public void setInput(Table<String, String, HyperLink> model) {
             fContentModel = model;
         }
 
         @NonNull
-        protected Map<String, HyperLink> getModel() {
-            Map <String, HyperLink> model = fContentModel;
+        protected Table<String, String, HyperLink> getModel() {
+            Table<String, String, HyperLink> model = fContentModel;
             if (model == null) {
-                model = new HashMap<>();
+                model = HashBasedTable.create();
             }
             return model;
         }
