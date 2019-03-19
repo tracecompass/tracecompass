@@ -16,16 +16,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.VirtualTableQueryFilter;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.FilterTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 
 /**
  * Utility class to deal with data providers parameters. It can be use to create
- * parameters map from the old filter's API or create filters with a map. It
- * also provide method to extract the most common parameters from a map.
+ * parameters map from the old filter's API or create filters with a map.
  *
  * @author Simon Delisle
  */
@@ -68,12 +67,7 @@ public class FetchParametersUtils {
      * @return A {@link VirtualTableQueryFilter} or null if the parameters are invalid
      */
     public static @Nullable VirtualTableQueryFilter createVirtualTableQueryFilter(Map<String, Object> parameters) {
-        Object columnRequestedObject = parameters.get(DataProviderParameterUtils.COLUMN_ID_KEY);
-        if (!(columnRequestedObject instanceof List<?>)) {
-            return null;
-        }
-
-        List<Long> columnRequested = DataProviderParameterUtils.transformToLongList((List<?>) columnRequestedObject);
+        List<Long> columnRequested = DataProviderParameterUtils.extractLongList(parameters, DataProviderParameterUtils.COLUMN_ID_KEY);
         if(columnRequested == null) {
             return null;
         }

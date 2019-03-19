@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.tmf.core.tests.dataprovider;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -22,7 +23,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.dataprovider.DataProviderParameterUtils;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -31,10 +32,10 @@ import org.junit.Test;
  *
  * @author Simon Delisle
  */
-@SuppressWarnings("restriction")
 @NonNullByDefault
 public class DataProviderParameterTest {
 
+    private static final String CUSTOM_KEY = "MyKey";
     private static Map<String, Object> fParameters = new HashMap<>();
     private List<?> fLongList = Arrays.asList(new Long(1), new Long(2), new Long(3));
     private List<?> fIntList = Arrays.asList(new Integer(1), new Integer(2), new Integer(3));
@@ -100,6 +101,33 @@ public class DataProviderParameterTest {
         fParameters.put(DataProviderParameterUtils.SELECTED_ITEMS_KEY, fWrongParameter);
         items = DataProviderParameterUtils.extractSelectedItems(fParameters);
         assertNull(items);
+    }
+
+    /**
+     * Test {@link DataProviderParameterUtils#extractLongList(Map, String)}
+     */
+    @Test
+    public void testExtractLongList() {
+        fParameters.put(CUSTOM_KEY, fLongList);
+        List<Long> longList = DataProviderParameterUtils.extractLongList(fParameters, CUSTOM_KEY);
+        assertNotNull(longList);
+        testLongList(longList);
+    }
+
+    /**
+     * Test {@link DataProviderParameterUtils#extractBoolean(Map, String)}
+     */
+    @Test
+    public void testExtractBoolean() {
+        fParameters.put(CUSTOM_KEY, new Boolean(true));
+        Boolean extractedBoolean = DataProviderParameterUtils.extractBoolean(fParameters, CUSTOM_KEY);
+        assertNotNull(extractedBoolean);
+        assertTrue(extractedBoolean);
+
+        fParameters.put(CUSTOM_KEY, new Boolean(false));
+        extractedBoolean = DataProviderParameterUtils.extractBoolean(fParameters, CUSTOM_KEY);
+        assertNotNull(extractedBoolean);
+        assertFalse(extractedBoolean);
     }
 
     private static void testLongList(List<?> listToTest) {
