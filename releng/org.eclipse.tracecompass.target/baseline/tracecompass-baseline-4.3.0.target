@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.8"?><target name="tracecompass-baseline-4.3.0" sequenceNumber="1">
+<locations>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.tracecompass.analysis.graph.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.analysis.graph.ui" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.analysis.lami.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.analysis.lami.ui" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.analysis.os.linux.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.analysis.os.linux.ui" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.analysis.profiling.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.analysis.profiling.ui" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.analysis.timing.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.analysis.timing.ui" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.btf.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.btf.ui" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.common.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.ctf.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.ctf.parser" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.datastore.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.gdbtrace.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.gdbtrace.ui" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.jsontrace.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.lttng2.common.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.lttng2.control.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.lttng2.control.ui" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.lttng2.kernel.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.lttng2.kernel.ui" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.lttng2.ust.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.lttng2.ust.ui" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.pcap.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.segmentstore.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.statesystem.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.tmf.analysis.xml.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.tmf.analysis.xml.ui" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.tmf.chart.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.tmf.chart.ui" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.tmf.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.tmf.ctf.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.tmf.filter.parser" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.tmf.pcap.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.tmf.pcap.ui" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.tmf.remote.core" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.tmf.remote.ui" version="0.0.0"/>
+<unit id="org.eclipse.tracecompass.tmf.ui" version="0.0.0"/>
+<repository location="http://download.eclipse.org/tracecompass/releases/4.3.0/repository/"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
+<unit id="org.eclipse.core.runtime" version="0.0.0"/>
+<repository location="http://download.eclipse.org/releases/2019-03"/>
+</location>
+</locations>
+</target>
