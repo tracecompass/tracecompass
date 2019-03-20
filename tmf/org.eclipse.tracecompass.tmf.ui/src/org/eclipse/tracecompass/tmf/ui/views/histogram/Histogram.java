@@ -44,6 +44,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.tracecompass.internal.tmf.ui.views.histogram.HistogramTimeAdapter;
@@ -54,6 +55,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampDelta;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
+import org.eclipse.tracecompass.tmf.ui.viewers.TmfAbstractToolTipHandler;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
@@ -235,6 +237,45 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     private TimeGraphScale fTimeLineScale;
     private TimeGraphColorScheme fColorScheme;
+    private TmfAbstractToolTipHandler fToolTipHandler = new TmfAbstractToolTipHandler() {
+
+        @Override
+        protected void fill(Control control, MouseEvent event, Point pt) {
+            if ((fDataModel.getNbEvents() != 0 || fDataModel.getStartTime() < fDataModel.getEndTime()) &&
+                    fScaledData != null && event.x >= 0 && event.x - fOffset < fScaledData.fWidth) {
+                fillTooltip(event.x - fOffset);
+            }
+            fCanvas.setToolTipText(null);
+        }
+
+        private void fillTooltip(final int index) {
+            long startTime = fScaledData.getBucketStartTime(index);
+            /*
+             * negative values are possible if time values came into the model
+             * in decreasing order
+             */
+            if (startTime < 0) {
+                startTime = 0;
+            }
+            final long endTime = fScaledData.getBucketEndTime(index);
+            final int nbEvents = (index >= 0) ? fScaledData.fData[index].getNbEvents() : 0;
+            int selectionBeginBucket = Math.min(fScaledData.fSelectionBeginBucket, fScaledData.fSelectionEndBucket);
+            int selectionEndBucket = Math.max(fScaledData.fSelectionBeginBucket, fScaledData.fSelectionEndBucket);
+            if (selectionBeginBucket <= index && index <= selectionEndBucket && fSelectionBegin != fSelectionEnd) {
+                long start = Math.abs(fSelectionEnd - fSelectionBegin);
+                TmfTimestampDelta delta = new TmfTimestampDelta(start, ITmfTimestamp.NANOSECOND_SCALE);
+                addItem(null, Messages.Histogram_selectionSpanToolTip, delta.toString(), null);
+            }
+            addItem(null, Messages.Histogram_bucketRangeToolTip, NLS.bind(Messages.Histogram_timeRange,
+                    TmfTimestamp.fromNanos(startTime).toString(),
+                    TmfTimestamp.fromNanos(endTime).toString()), startTime);
+            addItem(null, Messages.Histogram_eventCountToolTip, Long.toString(nbEvents), null);
+            if (!HistogramScaledData.hideLostEvents) {
+                final int nbLostEvents = (index >= 0) ? fScaledData.fLostEventsData[index] : 0;
+                addItem(null, Messages.Histogram_lostEventCountToolTip, Long.toString(nbLostEvents), null);
+            }
+        }
+    };
 
     // ------------------------------------------------------------------------
     // Construction
@@ -278,7 +319,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fCanvas.addMouseListener(this);
         fCanvas.addMouseTrackListener(this);
         fCanvas.addMouseMoveListener(this);
-
+        fToolTipHandler.activateHoverHelp(fCanvas);
         TmfSignalManager.register(this);
     }
 
@@ -986,46 +1027,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
 
     @Override
     public void mouseHover(final MouseEvent event) {
-        if ((fDataModel.getNbEvents() != 0 || fDataModel.getStartTime() < fDataModel.getEndTime()) &&
-                fScaledData != null && event.x >= 0 && event.x - fOffset < fScaledData.fWidth) {
-            final String tooltip = formatToolTipLabel(event.x - fOffset);
-            fCanvas.setToolTipText(tooltip);
-            return;
-        }
-        fCanvas.setToolTipText(null);
-    }
-
-    private String formatToolTipLabel(final int index) {
-        long startTime = fScaledData.getBucketStartTime(index);
-        /*
-         * negative values are possible if time values came into the model in
-         * decreasing order
-         */
-        if (startTime < 0) {
-            startTime = 0;
-        }
-        final long endTime = fScaledData.getBucketEndTime(index);
-        final int nbEvents = (index >= 0) ? fScaledData.fData[index].getNbEvents() : 0;
-        final String newLine = System.getProperty("line.separator"); //$NON-NLS-1$
-        final StringBuffer buffer = new StringBuffer();
-        int selectionBeginBucket = Math.min(fScaledData.fSelectionBeginBucket, fScaledData.fSelectionEndBucket);
-        int selectionEndBucket = Math.max(fScaledData.fSelectionBeginBucket, fScaledData.fSelectionEndBucket);
-        if (selectionBeginBucket <= index && index <= selectionEndBucket && fSelectionBegin != fSelectionEnd) {
-            TmfTimestampDelta delta = new TmfTimestampDelta(Math.abs(fSelectionEnd - fSelectionBegin), ITmfTimestamp.NANOSECOND_SCALE);
-            buffer.append(NLS.bind(Messages.Histogram_selectionSpanToolTip, delta.toString()));
-            buffer.append(newLine);
-        }
-        buffer.append(NLS.bind(Messages.Histogram_bucketRangeToolTip,
-                TmfTimestamp.fromNanos(startTime).toString(),
-                TmfTimestamp.fromNanos(endTime).toString()));
-        buffer.append(newLine);
-        buffer.append(NLS.bind(Messages.Histogram_eventCountToolTip, nbEvents));
-        if (!HistogramScaledData.hideLostEvents) {
-            final int nbLostEvents = (index >= 0) ? fScaledData.fLostEventsData[index] : 0;
-            buffer.append(newLine);
-            buffer.append(NLS.bind(Messages.Histogram_lostEventCountToolTip, nbLostEvents));
-        }
-        return buffer.toString();
+        // do nothing
     }
 
     private void updateStatusLine(long startTime, long endTime, long cursorTime) {
