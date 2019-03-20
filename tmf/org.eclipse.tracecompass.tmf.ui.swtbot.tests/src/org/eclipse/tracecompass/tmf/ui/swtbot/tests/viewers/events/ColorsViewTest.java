@@ -42,9 +42,7 @@ import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSetting;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSettingsManager;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorsView;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -183,37 +181,26 @@ public class ColorsViewTest {
             }
             braf.writeBytes(TRACE_END);
         }
-    }
-
-    /**
-     * Open a trace in an editor
-     */
-    @Before
-    public void beforeTest() {
+        /* Creating project and open the trace */
         SWTBotUtils.createProject(PROJECT_NAME);
         SWTBotTreeItem treeItem = SWTBotUtils.selectTracesFolder(fBot, PROJECT_NAME);
         assertNotNull(treeItem);
         SWTBotUtils.openTrace(PROJECT_NAME, fFileLocation.getAbsolutePath(), XMLSTUB_ID);
         SWTBotUtils.openView(ColorsView.ID);
+
     }
 
     /**
-     * Delete the file
+     * Delete the file and Close the editor
      */
     @AfterClass
     public static void cleanUp() {
         fLogger.removeAllAppenders();
         fFileLocation.delete();
-    }
-
-    /**
-     * Close the editor
-     */
-    @After
-    public void tearDown() {
         fBot.closeAllEditors();
         SWTBotUtils.deleteProject(PROJECT_NAME, fBot);
         SWTBotUtils.closeViewById(ColorsView.ID, fBot);
+
     }
 
     /**
