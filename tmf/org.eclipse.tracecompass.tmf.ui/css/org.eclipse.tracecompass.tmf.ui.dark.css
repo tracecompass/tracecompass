@@ -93,7 +93,7 @@ ColorDefinition#org-eclipse-tracecompass-tmf-ui-TOOL_FOREGROUND {
 	label: "Default tool foreground";
 }
 
-IEclipsePreferences#org-eclipse-ui-workbench:org-eclipse-ui-themes {
+IEclipsePreferences#org-eclipse-ui-workbench:org-eclipse-tracecompass-tmf-ui {
 	preferences:
 		'org.eclipse.tracecompass.tmf.ui.color.eventtable.highlight=0,128,0'
 }
