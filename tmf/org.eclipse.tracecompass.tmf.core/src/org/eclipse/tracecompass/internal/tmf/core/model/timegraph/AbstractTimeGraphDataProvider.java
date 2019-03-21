@@ -89,7 +89,7 @@ public abstract class AbstractTimeGraphDataProvider<A extends TmfStateSystemAnal
         }
 
         long currentEnd = ss.getCurrentEndTime();
-        //TODO not sure about this one
+        //TODO Converting the map to a filter to see if mandatory parameters are there. This should be handle differently.
         SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(parameters);
         if (filter == null) {
             return new TmfModelResponse<>(null, Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);

@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.SelectionTimeQueryRegexFilter;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
@@ -34,6 +35,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
 import org.swtchart.Chart;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 /**
@@ -112,7 +114,12 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
 
     @Override
     protected @NonNull Map<String, Object> createQueryParameters(long start, long end, int nb) {
-        return FetchParametersUtils.selectionTimeQueryToMap(new SelectionTimeQueryFilter(start, end, nb, fSelectedIds));
+        Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(new SelectionTimeQueryFilter(start, end, nb, fSelectedIds));
+        Multimap<@NonNull Integer, @NonNull String> regexesMap = getRegexes();
+        if (!regexesMap.isEmpty()) {
+            parameters.put(DataProviderParameterUtils.REGEX_FILTER_KEY, regexesMap.asMap());
+        }
+        return parameters;
     }
 
     /**

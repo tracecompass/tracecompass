@@ -10,12 +10,17 @@
 package org.eclipse.tracecompass.tmf.core.dataprovider;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * Utility class to deal with data providers parameters. Provides method to
@@ -56,6 +61,11 @@ public class DataProviderParameterUtils {
      * Table column IDs key
      */
     public static final String COLUMN_ID_KEY = "columnId"; //$NON-NLS-1$
+
+    /**
+     * Regex filter key
+     */
+    public static final String REGEX_FILTER_KEY = "regexFilter"; //$NON-NLS-1$
 
     private DataProviderParameterUtils() {
         // Private constructor
@@ -127,6 +137,29 @@ public class DataProviderParameterUtils {
      */
     public static @Nullable Boolean extractIsFiltered(Map<String, Object> parameters) {
         return extractBoolean(parameters, FILTERED_PARAMETER_KEY);
+    }
+
+    /**
+     * Helper to extract a Multimap of regexes from a map of parameters
+     *
+     * @param parameters
+     *            Map of parameters
+     * @return Multimap of regexes or null if there is no regex key in the map
+     *         of parameters
+     */
+    public static @Nullable Multimap<Integer, String> extractRegexFilter(Map<String, Object> parameters) {
+        Object regexesObject = parameters.get(REGEX_FILTER_KEY);
+        if (!(regexesObject instanceof Map<?, ?>)) {
+            return null;
+        }
+
+        Multimap<Integer, String> regexes = HashMultimap.create();
+        Map<Integer, Collection<String>> regexesMap = (Map<Integer, Collection<String>>) regexesObject;
+        for (Entry<Integer, Collection<String>> entry : regexesMap.entrySet()) {
+            regexes.putAll(entry.getKey(), entry.getValue());
+        }
+
+        return regexes;
     }
 
     /**

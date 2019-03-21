@@ -35,7 +35,6 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attribute
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
-import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils.QuarkIterator;
 import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
@@ -43,6 +42,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
@@ -66,6 +66,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
 
@@ -138,10 +139,8 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
 
     @Override
     public @NonNull TmfModelResponse<@NonNull TmfTreeModel<@NonNull ThreadEntryModel>> fetchTree(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
-        // TODO fix selection filter in filter()
-        TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(fetchParameters);
         if (fLastEnd == Long.MAX_VALUE) {
-            return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), filter(fTidToEntry, filter)), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+            return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), filter(fTidToEntry, fetchParameters)), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
 
         fModule.waitForInitialization();
@@ -156,7 +155,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
          */
         synchronized (fBuildMap) {
             boolean complete = ss.waitUntilBuilt(0);
-            List<ThreadEntryModel> list = Collections.emptyList();
+            @NonNull List<@NonNull ThreadEntryModel> list = Collections.emptyList();
             /* Don't query empty state system */
             if (ss.getNbAttributes() > 0 && ss.getStartTime() != Long.MIN_VALUE) {
                 long end = ss.getCurrentEndTime();
@@ -207,7 +206,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
 
                 fLastEnd = end;
 
-                list = filter(fTidToEntry, filter);
+                list = filter(fTidToEntry, fetchParameters);
             }
             if (complete) {
                 fBuildMap.clear();
@@ -281,8 +280,14 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
      *            time range to query
      * @return a list of the active threads
      */
-    private List<ThreadEntryModel> filter(TreeMultimap<Integer, ThreadEntryModel.Builder> tidToEntry, TimeQueryFilter filter) {
+    private @NonNull List<@NonNull ThreadEntryModel> filter(TreeMultimap<Integer, ThreadEntryModel.Builder> tidToEntry, @NonNull Map<@NonNull String, @NonNull Object> parameters) {
+        TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(parameters);
+        if (filter == null) {
+            return Collections.emptyList();
+        }
+
         // avoid putting everything as a child of the swapper thread.
+        // TODO server: Need to find a better way. Long.MAX_VALUE is not available in javascript for example
         if (filter.getEnd() == Long.MAX_VALUE) {
             ImmutableList.Builder<ThreadEntryModel> builder = ImmutableList.builder();
             for (ThreadEntryModel.Builder entryBuilder : tidToEntry.values()) {
@@ -300,8 +305,9 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
         if (start > end) {
             return Collections.emptyList();
         }
-        if (filter instanceof SelectionTimeQueryFilter) {
-            Set<Long> cpus = Sets.newHashSet(((SelectionTimeQueryFilter) filter).getSelectedItems());
+        List<@NonNull Long> selectedItems = DataProviderParameterUtils.extractSelectedItems(parameters);
+        if (selectedItems != null) {
+            Set<Long> cpus = Sets.newHashSet(selectedItems);
             List<@NonNull Integer> quarks = ss.getQuarks(Attributes.THREADS, WILDCARD, Attributes.CURRENT_CPU_RQ);
             Set<ThreadEntryModel> models = new HashSet<>();
             Map<Integer, Integer> rqToPidCache = new HashMap<>();
@@ -392,11 +398,12 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, String.valueOf(e.getMessage()));
         }
 
-        Map<@NonNull Integer, @NonNull Predicate< @NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
-        if (filter instanceof TimeGraphStateQueryFilter) {
-            TimeGraphStateQueryFilter timeEventFilter = (TimeGraphStateQueryFilter) filter;
-            predicates.putAll(computeRegexPredicate(timeEventFilter));
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Multimap<@NonNull Integer, @NonNull String> regexesMap = DataProviderParameterUtils.extractRegexFilter(fetchParameters);
+        if (regexesMap != null) {
+            predicates.putAll(computeRegexPredicate(regexesMap));
         }
+
         @NonNull List<@NonNull ITimeGraphRowModel> rows = new ArrayList<>();
         for (Entry<Long, Integer> entry : selectedIdsToQuarks.entrySet()) {
             int quark = entry.getValue();
@@ -621,6 +628,10 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
         ITmfResponse.Status status = completed ? ITmfResponse.Status.COMPLETED : ITmfResponse.Status.RUNNING;
         String statusMessage = completed ? CommonStatusMessage.COMPLETED : CommonStatusMessage.RUNNING;
 
+        // TODO server: Parameters validation should be handle separately. It
+        // can be either in the data provider itself or before calling it. It
+        // will avoid the creation of filters and the content of the map can be
+        // use directly.
         SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
         if (filter == null) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);

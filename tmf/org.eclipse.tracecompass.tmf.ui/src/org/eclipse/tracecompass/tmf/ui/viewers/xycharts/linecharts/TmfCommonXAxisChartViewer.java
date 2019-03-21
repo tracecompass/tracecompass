@@ -41,6 +41,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfF
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeQueryRegexFilter;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
@@ -231,7 +232,12 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      * @since 4.3
      */
     protected @NonNull Map<String, Object> createQueryParameters(long start, long end, int nb) {
-        return FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(start, end, nb));
+        Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(start, end, nb));
+        Multimap<@NonNull Integer, @NonNull String> regexesMap = getRegexes();
+        if (!regexesMap.isEmpty()) {
+            parameters.put(DataProviderParameterUtils.REGEX_FILTER_KEY, regexesMap.asMap());
+        }
+        return parameters;
     }
 
     /**

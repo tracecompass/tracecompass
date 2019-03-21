@@ -20,10 +20,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
-import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
+import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
@@ -286,9 +287,13 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
 
         for (Entry<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Collection<Long>> entry : providersToModelIds.asMap().entrySet()) {
             ITimeGraphDataProvider<? extends TimeGraphEntryModel> dataProvider = entry.getKey();
-            TimeGraphStateQueryFilter filter = new TimeGraphStateQueryFilter(times, entry.getValue(), getRegexes());
-            // Not the right filter type
-            TmfModelResponse<TimeGraphModel> response = dataProvider.fetchRowModel(FetchParametersUtils.selectionTimeQueryToMap(filter), monitor);
+            SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(times, entry.getValue());
+            Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
+            Multimap<@NonNull Integer, @NonNull String> regexesMap = getRegexes();
+            if (!regexesMap.isEmpty()) {
+                parameters.put(DataProviderParameterUtils.REGEX_FILTER_KEY, regexesMap.asMap());
+            }
+            TmfModelResponse<TimeGraphModel> response = dataProvider.fetchRowModel(parameters, monitor);
 
             TimeGraphModel model = response.getModel();
             if (model != null) {
