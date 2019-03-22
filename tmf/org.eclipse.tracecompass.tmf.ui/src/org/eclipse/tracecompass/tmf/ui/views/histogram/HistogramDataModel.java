@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2015 Ericsson
+ * Copyright (c) 2011, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -113,7 +113,7 @@ public class HistogramDataModel implements IHistogramDataModel {
     private long fTimeLimit;
 
     // Private listener lists
-    private final ListenerList fModelListeners;
+    private final ListenerList<IHistogramModelListener> fModelListeners;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -159,7 +159,7 @@ public class HistogramDataModel implements IHistogramDataModel {
         fNbBuckets = nbBuckets;
         fBuckets = new HistogramBucket[nbBuckets];
         fLostEventsBuckets = new long[nbBuckets];
-        fModelListeners = new ListenerList();
+        fModelListeners = new ListenerList<>();
         clear();
     }
 
@@ -185,9 +185,8 @@ public class HistogramDataModel implements IHistogramDataModel {
         fSelectionBegin = other.fSelectionBegin;
         fSelectionEnd = other.fSelectionEnd;
         fTimeLimit = other.fTimeLimit;
-        fModelListeners = new ListenerList();
-        Object[] listeners = other.fModelListeners.getListeners();
-        for (Object listener : listeners) {
+        fModelListeners = new ListenerList<>();
+        for (IHistogramModelListener listener : other.fModelListeners) {
             fModelListeners.add(listener);
         }
     }

@@ -14,20 +14,25 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfAbstractToolTipHandler;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
@@ -40,6 +45,8 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
  * @author Patrick Tasse
  */
 public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
+
+    private static final String MARKER_OFFSET = " "; //$NON-NLS-1$
 
     private static final String MIN_STRING = "< 0.01%"; //$NON-NLS-1$
 
@@ -90,7 +97,66 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
         }
         if (getTipComposite().getChildren().length == 0) {
             ITimeGraphEntry entry = timeGraphControl.getEntry(pt);
+            if (entry == null) {
+                return;
+            }
             fillValues(pt, timeGraphControl, entry);
+            Iterable<IMarkerEvent> markers = getMarkers(timeGraphControl, entry, pt);
+            for (IMarkerEvent marker : markers) {
+                fillValues(marker);
+            }
+        }
+    }
+
+    /**
+     * Get a list of markers intersecting a point
+     * @param timeGraphControl
+     *
+     * @param entry
+     *            the entry to observe, can be null
+     * @param pt
+     *            the point to look at
+     * @return the return value
+     */
+    private static Iterable<IMarkerEvent> getMarkers(TimeGraphControl timeGraphControl, ITimeGraphEntry entry, Point pt) {
+        List<IMarkerEvent> markers = timeGraphControl.getMarkers();
+        List<IMarkerEvent> retVal = new ArrayList<>();
+        if (markers != null) {
+            // Minimum of 5 pixels for the dead zone
+            int fuzz = 5;
+            long fuzzStart = timeGraphControl.getTimeAtX(pt.x - fuzz);
+            long fuzzEnd = timeGraphControl.getTimeAtX(pt.x + fuzz);
+            for (IMarkerEvent marker : markers) {
+                if (Objects.equals(marker.getEntry(), entry)) {
+                    long duration = marker.getDuration();
+                    long startTime = marker.getTime();
+                    long endTime = startTime + duration;
+                    if ((startTime < fuzzEnd) && (endTime > fuzzStart)) {
+                        retVal.add(marker);
+                    }
+                }
+            }
+        }
+        return retVal;
+    }
+
+    private void fillValues(IMarkerEvent marker) {
+        Map<String, String> toolTips = fTimeGraphProvider.getEventHoverToolTipInfo(marker);
+        String category = marker.getCategory();
+        String label = marker.getLabel();
+        addItem(category == null ? Messages.TimeGraphTooltipHandler_DefaultMarkerName : category, label == null ? "" : label); //$NON-NLS-1$
+        long timestamp = marker.getTime();
+        long duration = marker.getDuration();
+        if (duration == 0) {
+            addItem(MARKER_OFFSET + Messages.TimeGraphTooltipHandler_Timestamp, TmfTimestamp.fromNanos(timestamp).toString());
+        } else {
+            addItem(MARKER_OFFSET + Messages.TimeGraphTooltipHandler_StartTime, TmfTimestamp.fromNanos(timestamp).toString());
+            addItem(MARKER_OFFSET + Messages.TimeGraphTooltipHandler_EndTime, TmfTimestamp.fromNanos(timestamp + duration).toString());
+        }
+        if (toolTips != null) {
+            for (Entry<String, String> tooltip : toolTips.entrySet()) {
+                addItem(MARKER_OFFSET + tooltip.getKey(), tooltip.getValue()); // $NON-NLS-1$
+            }
         }
     }
 

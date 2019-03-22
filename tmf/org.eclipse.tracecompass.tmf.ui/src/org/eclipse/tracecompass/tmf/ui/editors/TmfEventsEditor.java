@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2010, 2019 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -91,7 +91,7 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
     private IFile fFile;
     private ITmfTrace fTrace;
     private Composite fParent;
-    private ListenerList fSelectionChangedListeners = new ListenerList();
+    private ListenerList<ISelectionChangedListener> fSelectionChangedListeners = new ListenerList<>();
     private boolean fTraceSelected;
     private IMarker fPendingGotoMarker;
 

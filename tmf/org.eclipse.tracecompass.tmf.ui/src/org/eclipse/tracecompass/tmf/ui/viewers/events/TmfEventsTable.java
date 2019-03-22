@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2018 Ericsson and others.
+ * Copyright (c) 2010, 2019 Ericsson and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -746,7 +746,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      *
      * @see #fireSelectionChanged
      */
-    private ListenerList selectionChangedListeners = new ListenerList();
+    private ListenerList<ISelectionChangedListener> fSelectionChangedListeners = new ListenerList<>();
 
     // Bookmark map <Rank, MarkerId>
     private Multimap<Long, Long> fBookmarksMap = HashMultimap.create();
@@ -3138,7 +3138,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
     @Override
     public void addSelectionChangedListener(ISelectionChangedListener listener) {
-        selectionChangedListeners.add(listener);
+        fSelectionChangedListeners.add(listener);
     }
 
     @Override
@@ -3157,7 +3157,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
     @Override
     public void removeSelectionChangedListener(ISelectionChangedListener listener) {
-        selectionChangedListeners.remove(listener);
+        fSelectionChangedListeners.remove(listener);
     }
 
     @Override
@@ -3176,7 +3176,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      * @see ISelectionChangedListener#selectionChanged
      */
     protected void fireSelectionChanged(final SelectionChangedEvent event) {
-        Object[] listeners = selectionChangedListeners.getListeners();
+        Object[] listeners = fSelectionChangedListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
             final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {

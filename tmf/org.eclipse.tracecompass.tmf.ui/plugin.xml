@@ -1340,6 +1340,11 @@
             id="org.eclipse.tracecompass.tmf.ui.timegraph.filter"
             name="%command.filter">
       </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
+            id="org.eclipse.tracecompass.tmf.ui.timegraph.zoom.selection"
+            name="%command.zoom.selection">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -1892,6 +1897,10 @@
             class="org.eclipse.tracecompass.internal.tmf.ui.viewers.timegraph.handlers.TimeGraphFilterHandler"
             commandId="org.eclipse.tracecompass.tmf.ui.timegraph.filter">
       </handler>
+      <handler
+            class="org.eclipse.tracecompass.internal.tmf.ui.viewers.timegraph.handlers.ZoomToSelectionHandler"
+            commandId="org.eclipse.tracecompass.tmf.ui.timegraph.zoom.selection">
+      </handler>
    </extension>
    <extension point="org.eclipse.ui.bindings">
       <key
@@ -1971,6 +1980,12 @@
             contextId="org.eclipse.tracecompass.tmf.ui.view.timegraph.context"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+D">
+      </key>
+      <key
+            commandId="org.eclipse.tracecompass.tmf.ui.timegraph.zoom.selection"
+            contextId="org.eclipse.tracecompass.tmf.ui.view.timegraph.context"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Z">
       </key>
    </extension>
    <extension

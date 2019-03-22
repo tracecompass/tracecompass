@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="tracecompass-e4.11" sequenceNumber="1">
+<?pde version="3.8"?><target name="tracecompass-e4.11" sequenceNumber="3">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.cdt.gnu.dsf.feature.group" version="0.0.0"/>
-<repository location="https://download.eclipse.org/tools/cdt/builds/9.7/cdt-9.7.0-simrel-2019-03-rc1"/>
+<repository location="https://download.eclipse.org/tools/cdt/releases/9.7/cdt-9.7.0/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.mylyn.wikitext_feature.feature.group" version="0.0.0"/>
@@ -11,7 +11,7 @@
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.linuxtools.dataviewers.feature.feature.group" version="0.0.0"/>
-<repository location="http://download.eclipse.org/linuxtools/update-2019-03-m3a"/>
+<repository location="http://download.eclipse.org/linuxtools/update-2019-03-rc2"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.swtbot.eclipse.feature.group" version="0.0.0"/>
@@ -67,7 +67,7 @@
 <unit id="org.eclipse.swt.tools.spies" version="0.0.0"/>
 <unit id="org.eclipse.ui.trace" version="0.0.0"/>
 <unit id="org.eclipse.ui.views.log" version="0.0.0"/>
-<repository location="http://download.eclipse.org/eclipse/updates/4.11milestones/S-4.11RC1-201903010040/"/>
+<repository location="https://download.eclipse.org/eclipse/updates/4.11/R-4.11-201903070500/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf" version="1.7.2"/>
@@ -77,11 +77,11 @@
 <unit id="org.eclipse.wst.xml.core" version="0.0.0"/>
 <unit id="org.eclipse.wst.xml.ui" version="0.0.0"/>
 <unit id="org.eclipse.wst.xsd.core" version="0.0.0"/>
-<repository location="https://download.eclipse.org/webtools/downloads/drops/R3.13.0/S-3.13.0.M3-20190221042828/repository/"/>
+<repository location="https://download.eclipse.org/webtools/downloads/drops/R3.13.0/I-latest/repository/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.xsd" version="0.0.0"/>
-<repository location="http://download.eclipse.org/modeling/emf/emf/builds/milestone/S201903030654"/>
+<repository location="https://download.eclipse.org/modeling/emf/emf/builds/release/2.17"/>
 </location>
 </locations>
 <targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>

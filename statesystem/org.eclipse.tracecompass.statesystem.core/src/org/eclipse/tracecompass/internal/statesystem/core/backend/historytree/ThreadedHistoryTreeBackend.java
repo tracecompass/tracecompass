@@ -220,7 +220,7 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
             }
             if (currentInterval.getAttribute() != -1) {
                 /* Make sure this is the "poison pill" we are waiting for */
-                throw new IllegalStateException();
+                throw new IllegalStateException(currentInterval.toString());
             }
             /*
              * We've been told we're done, let's write down everything and quit.

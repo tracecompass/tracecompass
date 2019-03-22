@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -62,7 +62,7 @@ public class TraceControlComponent implements ITraceControlComponent {
     /**
      * The list of listeners to be notified about changes.
      */
-    private final ListenerList fListeners = new ListenerList();
+    private final ListenerList<ITraceControlComponentChangedListener> fListeners = new ListenerList<>();
 
     // ------------------------------------------------------------------------
     // Constructors

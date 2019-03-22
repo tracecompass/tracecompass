@@ -23,8 +23,8 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -41,9 +41,9 @@ public class EventContextTest {
     /* We use test trace #2, kernel_vm, which has event contexts */
     private static final @NonNull CtfTestTrace testTrace = CtfTestTrace.KERNEL_VM;
 
-    private CtfTmfTrace fixture;
-    private long startTime;
-    private long endTime;
+    private static CtfTmfTrace fixture;
+    private static long startTime;
+    private static long endTime;
 
     // ------------------------------------------------------------------------
     // Class  methods
@@ -52,8 +52,8 @@ public class EventContextTest {
     /**
      * Perform pre-class initialization.
      */
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         fixture = CtfTmfTestTraceUtils.getTrace(testTrace);
         fixture.indexTrace(true);
 
@@ -64,8 +64,8 @@ public class EventContextTest {
     /**
      * Perform post-class clean-up.
      */
-    @After
-    public void tearDown() {
+    @AfterClass
+    public static void tearDown() {
         if (fixture != null) {
             fixture.dispose();
         }

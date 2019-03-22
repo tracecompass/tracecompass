@@ -140,6 +140,7 @@ public final class SWTBotUtils {
     private static final String PREFERENCES_SHELL = "Preferences";
     private static boolean fPrintedEnvironment = false;
     private static Logger log = Logger.getLogger(SWTBotUtils.class);
+    private static final int DELETE_PROJECT_TIMEOUT = 120000;
 
     private SWTBotUtils() {
 
@@ -256,7 +257,7 @@ public final class SWTBotUtils {
             public String getFailureMessage() {
                 return "Delete Resources shell did not close";
             }
-        });
+        }, DELETE_PROJECT_TIMEOUT);
     }
 
     /**

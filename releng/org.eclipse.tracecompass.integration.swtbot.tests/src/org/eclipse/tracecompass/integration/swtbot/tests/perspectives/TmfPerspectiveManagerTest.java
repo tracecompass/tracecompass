@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,7 +12,6 @@
 
 package org.eclipse.tracecompass.integration.swtbot.tests.perspectives;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -25,6 +24,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.ctf.core.tests.shared.LttngTraceGenerator;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
@@ -195,6 +195,20 @@ public class TmfPerspectiveManagerTest {
         assertActivePerspective("Resource");
     }
 
+    /**
+     * Test experiment with associated perspective
+     */
+    @Test
+    public void testExperiment() {
+        setSwitchToPerspectivePreference("Always");
+        SWTBotUtils.openTrace(TRACE_PROJECT_NAME, fKernelPath, KERNEL_TRACE_TYPE);
+        assertActivePerspective("LTTng Kernel");
+        SWTBotTreeItem tracesFolder = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
+        SWTBotTreeItem kernelTrace = SWTBotUtils.getTraceProjectItem(fBot, tracesFolder, "kernel");
+        kernelTrace.contextMenu().menu("Open As Experiment...", "Test trace", "Test experiment").click();
+        assertActivePerspective("Testing");
+    }
+
     private static void setSwitchToPerspectivePreference(String value) {
         SWTBotUtils.openPreferences(fBot);
         SWTBot shellBot = fBot.shell("Preferences").bot();
@@ -224,6 +238,7 @@ public class TmfPerspectiveManagerTest {
     }
 
     private static void assertActivePerspective(String perspective) {
-        assertEquals(perspective, new SWTWorkbenchBot().activePerspective().getLabel());
+        SWTBotUtils.waitUntil(bot -> bot.activePerspective().getLabel().equals(perspective), fBot,
+                () -> String.format("expected: %s, but was: %s", perspective, fBot.activePerspective().getLabel()));
     }
 }

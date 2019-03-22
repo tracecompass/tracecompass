@@ -31,7 +31,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventFactory;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -56,13 +56,13 @@ public class CtfTmfEventTest {
      */
 
     private static CtfTmfEvent nullEvent;
-    private CtfTmfEvent fixture;
+    private static CtfTmfEvent fixture;
 
     /**
      * Perform pre-test initialization.
      */
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         CtfTmfTrace trace = CtfTmfTestTraceUtils.getTrace(testTrace);
         try (CtfIterator tr = (CtfIterator) trace.createIterator();) {
             tr.advance();

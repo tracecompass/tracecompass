@@ -31,8 +31,8 @@ import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsEventTypesModul
 import org.eclipse.tracecompass.tmf.core.statistics.TmfStatisticsTotalsModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -52,14 +52,14 @@ public class CtfTmfLostEventStatisticsTest {
     /**Test trace with lost events */
     private static final @NonNull CtfTestTrace lostEventsTrace = CtfTestTrace.HELLO_LOST;
 
-    private ITmfTrace fTrace;
+    private static ITmfTrace fTrace;
 
     /** The statistics back-end object for the trace with lost events */
-    private ITmfStatistics fStats;
+    private static ITmfStatistics fStats;
 
     /* The two analysis modules needed for fStats */
-    private TmfStatisticsTotalsModule fTotalsMod;
-    private TmfStatisticsEventTypesModule fEventTypesMod;
+    private static TmfStatisticsTotalsModule fTotalsMod;
+    private static TmfStatisticsEventTypesModule fEventTypesMod;
 
     // ------------------------------------------------------------------------
     // Maintenance
@@ -68,8 +68,8 @@ public class CtfTmfLostEventStatisticsTest {
     /**
      * Test setup
      */
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         ITmfTrace trace = CtfTmfTestTraceUtils.getTrace(lostEventsTrace);
         fTrace = trace;
 
@@ -99,8 +99,8 @@ public class CtfTmfLostEventStatisticsTest {
     /**
      * Test cleanup
      */
-    @After
-    public void tearDown() {
+    @AfterClass
+    public static void tearDown() {
         fStats.dispose();
         fTotalsMod.dispose();
         fEventTypesMod.dispose();

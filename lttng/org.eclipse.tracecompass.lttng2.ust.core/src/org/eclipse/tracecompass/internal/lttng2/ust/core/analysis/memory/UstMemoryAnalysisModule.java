@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2016 École Polytechnique de Montréal and others
+ * Copyright (c) 2014, 2019 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -23,8 +23,8 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -40,8 +40,8 @@ import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement.PriorityLevel;
-import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisEventRequirement;
+import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -65,11 +65,7 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule implem
     /** The analysis's requirements. Only set after the trace is set. */
     private @Nullable Set<TmfAbstractAnalysisRequirement> fAnalysisRequirements;
 
-    /**
-     * Listeners. {@link ListenerList}s are typed since 4.6 (Neon), type these when
-     * support for 4.5 (Mars) is no longer required.
-     */
-    private final ListenerList fListeners = new ListenerList(ListenerList.IDENTITY);
+    private final ListenerList<IAnalysisProgressListener> fListeners = new ListenerList<>(ListenerList.IDENTITY);
 
     private @Nullable ISegmentStore<@NonNull ISegment> fSegmentStore = null;
 

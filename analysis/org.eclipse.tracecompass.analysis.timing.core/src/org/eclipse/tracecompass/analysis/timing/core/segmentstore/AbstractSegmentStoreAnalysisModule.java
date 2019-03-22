@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016 Ericsson
+ * Copyright (c) 2015, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -50,11 +50,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 public abstract class AbstractSegmentStoreAnalysisModule extends TmfAbstractAnalysisModule implements ISegmentStoreProvider {
 
     private static final String EXTENSION = ".ss"; //$NON-NLS-1$
-    /**
-     * {@link ListenerList}s are typed since 4.6 (Neon), type these when support for
-     * 4.5 (Mars) is no longer required.
-     */
-    private final ListenerList fListeners = new ListenerList(ListenerList.IDENTITY);
+    private final ListenerList<IAnalysisProgressListener> fListeners = new ListenerList<>(ListenerList.IDENTITY);
 
     private @Nullable ISegmentStore<ISegment> fSegmentStore;
 

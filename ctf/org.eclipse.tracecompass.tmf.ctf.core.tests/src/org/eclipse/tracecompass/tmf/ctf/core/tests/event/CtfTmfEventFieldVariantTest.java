@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.ctf.core.event.types.StructDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventField;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -56,13 +56,13 @@ public class CtfTmfEventFieldVariantTest {
     private static final @NonNull String VARIANT = "variant";
     private static final @NonNull String ROOT = "root";
 
-    private StructDeclaration fDeclaration;
+    private static StructDeclaration fDeclaration;
 
     /**
      * Create the declaration for the variant field
      */
-    @Before
-    public void createDeclaration() {
+    @BeforeClass
+    public static void createDeclaration() {
         /**
          * Create a variant field based on the following metadata
          *
