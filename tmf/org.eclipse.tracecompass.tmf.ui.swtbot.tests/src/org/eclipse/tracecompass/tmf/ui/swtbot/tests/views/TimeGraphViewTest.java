@@ -585,6 +585,7 @@ public class TimeGraphViewTest {
     @Test
     public void testVerticalZoom() {
         resetTimeRange();
+
         int threshold = 10;
         SWTBotTimeGraph timegraph = fTimeGraph;
         Rectangle bounds = fBounds;
@@ -597,6 +598,8 @@ public class TimeGraphViewTest {
         ImageHelper bigSmall = ImageHelper.grabImage(bounds);
 
         ImageHelper diff = ref.diff(bigSmall);
+        // 3% of the image
+        threshold = (int) (diff.getHistogram().size() * 0.03);
         List<RGB> colors = filter(diff.getHistogram(), threshold);
         assertEquals(colors.toString(), 1, colors.size());
 

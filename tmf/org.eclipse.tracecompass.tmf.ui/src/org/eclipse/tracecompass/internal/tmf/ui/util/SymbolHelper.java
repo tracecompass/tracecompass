@@ -128,6 +128,7 @@ public final class SymbolHelper {
         int prevLw = gc.getLineWidth();
         Color oldColor = gc.getForeground();
         gc.setForeground(color);
+        gc.setLineWidth(Math.max(2, symbolSize / 4));
         gc.drawLine(centerX - symbolSize, centerY, centerX + symbolSize, centerY);
         gc.drawLine(centerX, centerY - symbolSize, centerX, centerY + symbolSize);
         gc.setLineStyle(prevLs);
@@ -154,6 +155,7 @@ public final class SymbolHelper {
         int prevLw = gc.getLineWidth();
         Color oldColor = gc.getForeground();
         gc.setForeground(color);
+        gc.setLineWidth(Math.max(2, symbolSize / 4));
         gc.drawLine(centerX - symbolSize, centerY - symbolSize, centerX + symbolSize, centerY + symbolSize);
         gc.drawLine(centerX - symbolSize, centerY + symbolSize, centerX + symbolSize, centerY - symbolSize);
         gc.setLineStyle(prevLs);
