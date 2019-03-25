@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -46,6 +46,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -66,12 +67,16 @@ public class CtfTmfExperimentTrimmingTest {
 
     private static final String PROJECT_NAME = "Test";
 
+    private static final int NUM_TRACES = 4;
+
     /** The Log4j logger instance. */
     protected static final Logger fLogger = Logger.getRootLogger();
 
     /** Test timeout */
     @Rule
     public TestRule globalTimeout = new Timeout(6, TimeUnit.MINUTES);
+
+    private static SWTWorkbenchBot fBot;
 
     private TmfTimeRange fRequestedTraceCutRange;
 
@@ -90,9 +95,12 @@ public class CtfTmfExperimentTrimmingTest {
 
     /**
      * Setup before the test suite
+     *
+     * @throws IOException
+     *             failed to load the file
      */
     @BeforeClass
-    public static void beforeClass() {
+    public static void beforeClass() throws IOException {
         SWTBotUtils.initialize();
 
         /* set up for swtbot */
@@ -100,22 +108,10 @@ public class CtfTmfExperimentTrimmingTest {
         fLogger.removeAllAppenders();
         fLogger.addAppender(new NullAppender());
 
-        /* finish waiting for eclipse to load */
-        WaitUtils.waitForJobs();
-    }
-
-    /**
-     * Test setup
-     *
-     * @throws IOException
-     *             failed to load the file
-     */
-    @Before
-    public void setup() throws IOException {
         File parentDir = FileUtils.toFile(FileLocator.toFileURL(CtfTestTrace.TRACE_EXPERIMENT.getTraceURL()));
         File[] traceFiles = parentDir.listFiles();
         ITmfTrace traceValidator = new CtfTmfTrace();
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
+        fBot = new SWTWorkbenchBot();
         SWTBotUtils.createProject(PROJECT_NAME);
 
         int openedTraces = 0;
@@ -123,21 +119,38 @@ public class CtfTmfExperimentTrimmingTest {
             String absolutePath = traceFile.getAbsolutePath();
             if (traceValidator.validate(null, absolutePath).isOK()) {
                 SWTBotUtils.openTrace(PROJECT_NAME, absolutePath, TRACE_TYPE);
-                bot.closeAllEditors();
+                fBot.closeAllEditors();
                 openedTraces++;
-                if (openedTraces >= 16) {
+                if (openedTraces >= NUM_TRACES) {
                     break;
                 }
             }
         }
         traceValidator.dispose();
 
+        /* finish waiting for eclipse to load */
         WaitUtils.waitForJobs();
-        SWTBotTreeItem tracesFolder = SWTBotUtils.selectTracesFolder(bot, PROJECT_NAME);
+    }
+
+    /**
+     * Cleanup after the test suite
+     */
+    @AfterClass
+    public static void afterClass() {
+        SWTBotUtils.deleteProject(PROJECT_NAME, fBot);
+    }
+
+    /**
+     * Test setup
+     */
+    @Before
+    public void setup() {
+        WaitUtils.waitForJobs();
+        SWTBotTreeItem tracesFolder = SWTBotUtils.selectTracesFolder(fBot, PROJECT_NAME);
         tracesFolder.contextMenu().menu("Open As Experiment...", "Generic Experiment").click();
-        SWTBotUtils.activateEditor(bot, "Experiment");
-        SWTBotTreeItem project = SWTBotUtils.selectProject(bot, PROJECT_NAME);
-        SWTBotTreeItem experimentItem = SWTBotUtils.getTraceProjectItem(bot, project, "Experiments", "Experiment");
+        SWTBotUtils.activateEditor(fBot, "Experiment");
+        SWTBotTreeItem project = SWTBotUtils.selectProject(fBot, PROJECT_NAME);
+        SWTBotTreeItem experimentItem = SWTBotUtils.getTraceProjectItem(fBot, project, "Experiments", "Experiment");
         experimentItem.select();
         TmfTraceManager traceManager = TmfTraceManager.getInstance();
         ITmfTrace trace = traceManager.getActiveTrace();
@@ -156,12 +169,12 @@ public class CtfTmfExperimentTrimmingTest {
         assertTrue(experiment.getTimeRange().contains(traceCutRange));
         TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, requestedTraceCutStart, requestedTraceCutEnd, experiment));
         experimentItem.contextMenu("Export Time Selection as New Trace...").click();
-        SWTBotShell shell = bot.shell("Export trace section to...").activate();
+        SWTBotShell shell = fBot.shell("Export trace section to...").activate();
         SWTBot dialogBot = shell.bot();
         assertEquals("Experiment", dialogBot.text().getText());
         dialogBot.text().setText("Experiment-trimmed");
         dialogBot.button("OK").click();
-        SWTBotEditor newExperiment = bot.editorByTitle("Experiment-trimmed");
+        SWTBotEditor newExperiment = fBot.editorByTitle("Experiment-trimmed");
         newExperiment.setFocus();
         fNewExperiment = traceManager.getActiveTrace();
         assertNotNull("No active trace", fNewExperiment);
@@ -174,15 +187,10 @@ public class CtfTmfExperimentTrimmingTest {
      */
     @After
     public void tearDown() {
-        if (fNewExperiment != null) {
-            fNewExperiment = null;
-        }
-        if (fOriginalExperiment != null) {
-            fOriginalExperiment = null;
-        }
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        bot.closeAllEditors();
-        SWTBotUtils.deleteProject(PROJECT_NAME, bot);
+        fNewExperiment = null;
+        fOriginalExperiment = null;
+        fBot.closeAllEditors();
+        SWTBotUtils.clearTracesFolderUI(fBot, PROJECT_NAME);
     }
 
     /**
