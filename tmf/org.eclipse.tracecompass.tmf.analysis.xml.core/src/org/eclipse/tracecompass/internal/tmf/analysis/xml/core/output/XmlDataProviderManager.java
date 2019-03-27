@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  **********************************************************************/
 
-package org.eclipse.tracecompass.tmf.analysis.xml.core.module;
+package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,12 +16,15 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlTimeGraphDataProvider;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlTimeGraphEntryModel;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.AnalysisCompilationData;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlTimeGraphViewCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlXYDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.timegraph.TmfTimeGraphCompositeDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
+import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -40,20 +43,15 @@ import com.google.common.collect.Table;
  * extension points as there are possibly several instances of XML providers per
  * trace.
  *
- * @since 2.4
  * @author Loic Prieur-Drevon
- * @deprecated This class has moved to internal, use
- *             {@link org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.XmlDataProviderManager}
- *             instead
  */
-@Deprecated
 public class XmlDataProviderManager {
 
     private static @Nullable XmlDataProviderManager INSTANCE;
 
     private static final String ID_ATTRIBUTE = "id"; //$NON-NLS-1$
     private final Table<ITmfTrace, String, ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel>> fXyProviders = HashBasedTable.create();
-    private final Table<ITmfTrace, String, ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel>> fTimeGraphProviders = HashBasedTable.create();
+    private final Table<ITmfTrace, String, ITimeGraphDataProvider<@NonNull TimeGraphEntryModel>> fTimeGraphProviders = HashBasedTable.create();
 
     /**
      * Get the instance of the manager
@@ -61,10 +59,12 @@ public class XmlDataProviderManager {
      * @return the singleton instance
      */
     public static synchronized XmlDataProviderManager getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new XmlDataProviderManager();
+        XmlDataProviderManager instance = INSTANCE;
+        if (instance == null) {
+            instance = new XmlDataProviderManager();
+            INSTANCE = instance;
         }
-        return INSTANCE;
+        return instance;
     }
 
     /**
@@ -90,8 +90,8 @@ public class XmlDataProviderManager {
     }
 
     /**
-     * Create (if necessary) and get the {@link XmlXYDataProvider} for the
-     * specified trace and viewElement.
+     * Create (if necessary) and get the {@link XmlXYDataProvider} for the specified
+     * trace and viewElement.
      *
      * @param trace
      *            trace for which we are querying a provider
@@ -100,7 +100,7 @@ public class XmlDataProviderManager {
      * @return the unique instance of an XY provider for the queried parameters
      * @since 3.0
      */
-    public synchronized ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> getXyProvider(@NonNull ITmfTrace trace, @NonNull Element viewElement) {
+    public synchronized @Nullable ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> getXyProvider(ITmfTrace trace, Element viewElement) {
         if (!viewElement.hasAttribute(ID_ATTRIBUTE)) {
             return null;
         }
@@ -129,7 +129,7 @@ public class XmlDataProviderManager {
         return null;
     }
 
-    private ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> generateExperimentProviderXy(Collection<@NonNull ITmfTrace> traces, @NonNull Element viewElement) {
+    private @Nullable ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> generateExperimentProviderXy(Collection<@NonNull ITmfTrace> traces, Element viewElement) {
         List<@NonNull ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel>> providers = new ArrayList<>();
         for (ITmfTrace child : traces) {
             ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> childProvider = getXyProvider(child, viewElement);
@@ -146,8 +146,8 @@ public class XmlDataProviderManager {
     }
 
     /**
-     * Create (if necessary) and get the {@link XmlXYDataProvider} for the
-     * specified trace and viewElement.
+     * Create (if necessary) and get the {@link XmlXYDataProvider} for the specified
+     * trace and viewElement.
      *
      * @param trace
      *            trace for which we are querying a provider
@@ -156,12 +156,12 @@ public class XmlDataProviderManager {
      * @return the unique instance of an XY provider for the queried parameters
      * @since 3.0
      */
-    public synchronized @Nullable ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> getTimeGraphProvider(@NonNull ITmfTrace trace, @NonNull Element viewElement) {
+    public synchronized @Nullable ITimeGraphDataProvider<@NonNull TimeGraphEntryModel> getTimeGraphProvider(ITmfTrace trace, Element viewElement) {
         if (!viewElement.hasAttribute(ID_ATTRIBUTE)) {
             return null;
         }
         String viewId = viewElement.getAttribute(ID_ATTRIBUTE);
-        ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> provider = fTimeGraphProviders.get(trace, viewId);
+        ITimeGraphDataProvider<@NonNull TimeGraphEntryModel> provider = fTimeGraphProviders.get(trace, viewId);
         if (provider != null) {
             return provider;
         }
@@ -170,32 +170,35 @@ public class XmlDataProviderManager {
                 opened -> TmfTraceManager.getTraceSetWithExperiment(opened).contains(trace))) {
 
             // Create with the trace or experiment first
-            provider = XmlTimeGraphDataProvider.create(trace, viewElement);
-            if (provider == null) {
-                // Otherwise, see if it's an experiment and create a composite
-                // if that's the
-                // case
-                Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
-                if (traces.size() > 1) {
-                    // Try creating a composite only if there are many traces,
-                    // otherwise, the
-                    // previous call to create should have returned the data
-                    // provider
-                    provider = generateExperimentProviderTimeGraph(traces, viewElement);
+            TmfXmlTimeGraphViewCu tgViewCu = TmfXmlTimeGraphViewCu.compile(new AnalysisCompilationData(), viewElement);
+            if (tgViewCu != null) {
+                DataDrivenTimeGraphProviderFactory timeGraphFactory = tgViewCu.generate();
+                provider = timeGraphFactory.create(trace);
+
+                if (provider == null) {
+                    // Otherwise, see if it's an experiment and create a composite if that's the
+                    // case
+                    Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
+                    if (traces.size() > 1) {
+                        // Try creating a composite only if there are many traces, otherwise, the
+                        // previous call to create should have returned the data provider
+                        provider = generateExperimentProviderTimeGraph(traces, viewElement);
+                    }
                 }
+                if (provider != null) {
+                    fTimeGraphProviders.put(trace, viewId, provider);
+                }
+                return provider;
             }
-            if (provider != null) {
-                fTimeGraphProviders.put(trace, viewId, provider);
-            }
-            return provider;
+
         }
         return null;
     }
 
-    private @Nullable ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> generateExperimentProviderTimeGraph(Collection<@NonNull ITmfTrace> traces, @NonNull Element viewElement) {
-        List<@NonNull ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel>> providers = new ArrayList<>();
+    private @Nullable ITimeGraphDataProvider<@NonNull TimeGraphEntryModel> generateExperimentProviderTimeGraph(Collection<@NonNull ITmfTrace> traces, Element viewElement) {
+        List<@NonNull ITimeGraphDataProvider<@NonNull TimeGraphEntryModel>> providers = new ArrayList<>();
         for (ITmfTrace child : traces) {
-            ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> childProvider = getTimeGraphProvider(child, viewElement);
+            ITimeGraphDataProvider<@NonNull TimeGraphEntryModel> childProvider = getTimeGraphProvider(child, viewElement);
             if (childProvider != null) {
                 providers.add(childProvider);
             }
@@ -205,7 +208,7 @@ public class XmlDataProviderManager {
         } else if (providers.size() == 1) {
             return providers.get(0);
         }
-        return new TmfTimeGraphCompositeDataProvider<>(providers, XmlTimeGraphDataProvider.ID);
+        return new TmfTimeGraphCompositeDataProvider<>(providers, DataDrivenTimeGraphDataProvider.ID);
     }
 
     /**

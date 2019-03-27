@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlDataProviderManager;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.XmlDataProviderManager;
 import org.osgi.framework.BundleContext;
 
 /**
