@@ -292,7 +292,8 @@ public class CTFTraceReader implements AutoCloseable {
     private void populateStreamInputReaderHeap() throws CTFException {
         if (fStreamInputReaders.isEmpty()) {
             fPrio = new PriorityQueue<>(MIN_PRIO_SIZE,
-                    new StreamInputReaderTimestampComparator());
+                    new StreamInputReaderTimestampComparator()
+                    .thenComparing(reader-> reader.getStreamInput().getFilename()));
             return;
         }
 
@@ -302,7 +303,8 @@ public class CTFTraceReader implements AutoCloseable {
          */
         fPrio = new PriorityQueue<>(
                 Math.max(fStreamInputReaders.size() * 2, MIN_PRIO_SIZE),
-                new StreamInputReaderTimestampComparator());
+                new StreamInputReaderTimestampComparator()
+                .thenComparing(reader-> reader.getStreamInput().getFilename()));
 
         int pos = 0;
 
