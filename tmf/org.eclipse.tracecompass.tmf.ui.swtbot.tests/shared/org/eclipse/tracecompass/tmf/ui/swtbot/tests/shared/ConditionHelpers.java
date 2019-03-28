@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardContainer;
@@ -313,26 +314,32 @@ public final class ConditionHelpers {
     public static ICondition isTableCellFilled(final SWTBotTable table,
             final String content, final int row, final int column) {
         return new SWTBotTestCondition() {
+            String actual;
+            Exception exception;
             @Override
             public boolean test() throws Exception {
                 try {
-                    String cell = table.cell(row, column);
-                    if( cell == null ) {
+                    exception = null;
+                    actual = table.cell(row, column);
+                    if (actual == null) {
                         return false;
                     }
-                    return cell.contains(content);
+                    return actual.contains(content);
                 } catch (Exception e) {
+                    exception = e;
                 }
                 return false;
             }
 
             @Override
             public String getFailureMessage() {
-                String cell = table.cell(row, column);
-                if (cell == null) {
-                    return NLS.bind("Cell absent, expected: {0}", content);
+                if (exception != null) {
+                    return ExceptionUtils.getStackTrace(exception);
                 }
-                return NLS.bind("Cell content: {0} expected: {1}", cell, content);
+                if (actual == null) {
+                    return NLS.bind("Cell absent, expected: '{0}'", content);
+                }
+                return NLS.bind("Cell content: '{0}' expected: '{1}'", actual, content);
             }
         };
     }
