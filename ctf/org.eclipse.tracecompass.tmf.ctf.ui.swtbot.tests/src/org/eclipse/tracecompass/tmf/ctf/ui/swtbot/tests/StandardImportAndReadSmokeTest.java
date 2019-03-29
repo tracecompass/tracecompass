@@ -673,7 +673,7 @@ public class StandardImportAndReadSmokeTest extends AbstractImportAndReadSmokeTe
         final String archiveDestinationPath = workspacePath + File.separator + TRACE_PROJECT_NAME + File.separator + GENERATED_ARCHIVE_NAME;
         fBot.comboBox().setText(archiveDestinationPath);
         fBot.button("&Finish").click();
-        fBot.waitUntil(Conditions.shellCloses(activeShell));
+        fBot.waitUntil(Conditions.shellCloses(activeShell), IMPORT_TIME_OUT);
         return archiveDestinationPath;
     }
 
