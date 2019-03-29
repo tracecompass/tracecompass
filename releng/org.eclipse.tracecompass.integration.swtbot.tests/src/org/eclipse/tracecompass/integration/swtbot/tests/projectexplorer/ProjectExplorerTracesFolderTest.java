@@ -156,6 +156,8 @@ public class ProjectExplorerTracesFolderTest {
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
 
+    private static final long DISK_ACCESS_TIMEOUT = 120000L;
+
     private static String getPath(String relativePath) {
         return new Path(TEST_TRACES_PATH.getAbsolutePath()).append(relativePath).toOSString();
     }
@@ -221,7 +223,7 @@ public class ProjectExplorerTracesFolderTest {
         shellBot.radio("XML").click();
         shellBot.list().select(CUSTOM_XML_LOG.getTraceType());
         shellBot.button("Close").click();
-        shellBot.waitUntil(Conditions.shellCloses(shell));
+        shellBot.waitUntil(Conditions.shellCloses(shell), DISK_ACCESS_TIMEOUT);
     }
 
     /**
@@ -1427,7 +1429,7 @@ public class ProjectExplorerTracesFolderTest {
         final String FOLDER_NAME = "aaa";
         text.setText(FOLDER_NAME);
         shell.bot().button("OK").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), DISK_ACCESS_TIMEOUT);
 
         // Import (link) CTF trace to folder 'aaa'
         SWTBotTreeItem folderItem = SWTBotUtils.getTraceProjectItem(fBot, tracesFolderItem, FOLDER_NAME);
@@ -1452,7 +1454,7 @@ public class ProjectExplorerTracesFolderTest {
         text = shell.bot().textWithLabel("New Folder name:");
         text.setText(NEW_FOLDER_NAME);
         shell.bot().button("OK").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), DISK_ACCESS_TIMEOUT);
 
         // verify that trace reference have been updated after rename
         SWTBotTreeItem expTrace = SWTBotUtils.getTraceProjectItem(fBot, project, "Experiments", EXP_NAME, NEW_FOLDER_NAME + "/" + LTTNG_KERNEL_TRACE.getTraceName());
@@ -1613,7 +1615,7 @@ public class ProjectExplorerTracesFolderTest {
             importConfirmation = confirmationSuplier.get();
         }
 
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), DISK_ACCESS_TIMEOUT);
     }
 
     private static void checkTraceType(SWTBotTreeItem traceItem, String traceType) {

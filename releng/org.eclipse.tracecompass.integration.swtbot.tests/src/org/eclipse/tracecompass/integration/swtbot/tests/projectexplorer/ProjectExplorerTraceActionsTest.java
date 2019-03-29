@@ -99,6 +99,8 @@ public class ProjectExplorerTraceActionsTest {
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
 
+    private static final long DISK_ACCESS_TIMEOUT = 120000L;
+
     private static final File TEST_TRACES_PATH = new File(new Path(TmfTraceManager.getTemporaryDirPath()).append("testtraces").toOSString());
 
     private static String getPath(String relativePath) {
@@ -276,7 +278,7 @@ public class ProjectExplorerTraceActionsTest {
         SWTBotText text = shell.bot().textWithLabel("New Trace name:");
         text.setText(RENAMED_TRACE_NAME);
         shell.bot().button("OK").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), DISK_ACCESS_TIMEOUT);
         fBot.waitWhile(new ConditionHelpers.ActiveEventsEditor(fBot, null));
 
         SWTBotTreeItem copiedItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), RENAMED_TRACE_NAME);
@@ -302,7 +304,7 @@ public class ProjectExplorerTraceActionsTest {
         final String DELETE_TRACE_DIALOG_TITLE = "Confirm Delete";
         SWTBotShell shell = fBot.shell(DELETE_TRACE_DIALOG_TITLE).activate();
         shell.bot().button("Yes").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), DISK_ACCESS_TIMEOUT);
         fBot.waitWhile(new ConditionHelpers.ActiveEventsEditor(fBot, null));
         fBot.waitUntil(new TraceDeletedCondition());
     }
@@ -347,7 +349,7 @@ public class ProjectExplorerTraceActionsTest {
         final String DELETE_TRACE_DIALOG_TITLE = "Confirm Delete";
         SWTBotShell shell = fBot.shell(DELETE_TRACE_DIALOG_TITLE).activate();
         shell.bot().button("Yes").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), DISK_ACCESS_TIMEOUT);
         fBot.waitWhile(new ConditionHelpers.ActiveEventsEditor(fBot, null));
         fBot.waitUntil(new TraceDeletedCondition());
     }
@@ -471,7 +473,7 @@ public class ProjectExplorerTraceActionsTest {
         expTrace.contextMenu("Delete").click();
         SWTBotShell shell = fBot.shell("Confirm Delete").activate();
         shell.bot().button("Yes").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), DISK_ACCESS_TIMEOUT);
         fBot.waitWhile(new ConditionHelpers.ActiveEventsEditor(fBot, null));
 
         // ensure that it is properly deleted from places.
@@ -510,7 +512,7 @@ public class ProjectExplorerTraceActionsTest {
         expTrace.contextMenu().menu("Remove").click();
         SWTBotShell shell = fBot.shell("Confirm Remove").activate();
         shell.bot().button("Yes").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), DISK_ACCESS_TIMEOUT);
 
         // ensure that it is properly removed from the experiment.
         SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, "ExampleCustomTxt.log [0]");
@@ -622,7 +624,7 @@ public class ProjectExplorerTraceActionsTest {
         SWTBotText text = shell.bot().textWithLabel("New Trace name:");
         text.setText(RENAMED_TRACE_NAME);
         shell.bot().button("OK").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), DISK_ACCESS_TIMEOUT);
         fBot.waitWhile(new ConditionHelpers.ActiveEventsEditor(fBot, null));
 
         SWTBotTreeItem copiedItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), RENAMED_TRACE_NAME);
@@ -659,7 +661,7 @@ public class ProjectExplorerTraceActionsTest {
             text.setText(RENAMED_AS_NEW_TRACE_NAME);
         }
         shell.bot().button("OK").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), DISK_ACCESS_TIMEOUT);
     }
 
     private static void createExperimentCopy(SWTBotTreeItem expItem, boolean deepCopy) {
@@ -673,7 +675,7 @@ public class ProjectExplorerTraceActionsTest {
             shell.bot().checkBox(DEEP_COPY_OPTION).click();
         }
         shell.bot().button("OK").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), DISK_ACCESS_TIMEOUT);
     }
 
     private static void testStatisticsView() {
