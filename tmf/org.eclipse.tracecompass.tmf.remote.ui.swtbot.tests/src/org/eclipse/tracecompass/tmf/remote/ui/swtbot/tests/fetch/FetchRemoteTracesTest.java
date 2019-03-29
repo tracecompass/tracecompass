@@ -89,6 +89,8 @@ public class FetchRemoteTracesTest {
     private static final String TRACE_TYPE_KERNEL = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
     private static final String TRACE_TYPE_SYSLOG = "org.eclipse.linuxtools.tmf.tests.stubs.trace.text.testsyslog";
 
+    private static final long FETCH_TIME_OUT = 120000L;
+
     private static SWTWorkbenchBot fBot;
 
     /** The Log4j logger instance. */
@@ -308,7 +310,7 @@ public class FetchRemoteTracesTest {
         fBot.comboBox().setSelection("TestAllRecursive");
         fBot.button("Next >").click();
         fBot.button("Finish").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         TmfProjectElement project = TmfProjectRegistry.getProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME), true);
@@ -336,7 +338,7 @@ public class FetchRemoteTracesTest {
         fBot.comboBox().setSelection("TestAllRecursive");
         fBot.button("Next >").click();
         fBot.button("Finish").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         tracesFolderItem.contextMenu(FETCH_COMMAND_NAME).click();
@@ -348,7 +350,7 @@ public class FetchRemoteTracesTest {
         fBot.button("Rename").click();
         fBot.shell(CONFIRMATION_SHELL_NAME).activate();
         fBot.button("Rename All").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         TmfProjectElement project = TmfProjectRegistry.getProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME), true);
@@ -381,7 +383,7 @@ public class FetchRemoteTracesTest {
         fBot.comboBox().setSelection("TestAllRecursive");
         fBot.button("Next >").click();
         fBot.button("Finish").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         TmfProjectElement project = TmfProjectRegistry.getProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME), true);
@@ -401,7 +403,7 @@ public class FetchRemoteTracesTest {
         fBot.button("Overwrite").click();
         fBot.shell(CONFIRMATION_SHELL_NAME).activate();
         fBot.button("Overwrite All").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         fBot.waitUntil(new TraceCountCondition(project, 3));
@@ -432,7 +434,7 @@ public class FetchRemoteTracesTest {
         fBot.comboBox().setSelection("TestAllRecursive");
         fBot.button("Next >").click();
         fBot.button("Finish").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         TmfProjectElement project = TmfProjectRegistry.getProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME), true);
@@ -452,7 +454,7 @@ public class FetchRemoteTracesTest {
         fBot.button("Skip").click();
         fBot.shell(CONFIRMATION_SHELL_NAME).activate();
         fBot.button("Skip All").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         fBot.waitUntil(new TraceCountCondition(project, 3));
@@ -484,7 +486,7 @@ public class FetchRemoteTracesTest {
         fBot.comboBox().setSelection("TestAllRecursive");
         fBot.button("Next >").click();
         fBot.button("Finish").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         TmfProjectElement project = TmfProjectRegistry.getProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME), true);
@@ -501,7 +503,7 @@ public class FetchRemoteTracesTest {
         fBot.checkBox("Overwrite existing trace without warning").select();
         fBot.button("Next >").click();
         fBot.button("Finish").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         fBot.waitUntil(new TraceCountCondition(project, 3));
@@ -530,7 +532,7 @@ public class FetchRemoteTracesTest {
         SWTBotShell shell = fBot.shell(FETCH_SHELL_NAME).activate();
         fBot.comboBox().setSelection("TestAllRecursive");
         fBot.button("Finish").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         TmfProjectElement project = TmfProjectRegistry.getProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME), true);
@@ -558,7 +560,7 @@ public class FetchRemoteTracesTest {
         fBot.comboBox().setSelection("TestAllNonRecursive");
         fBot.button("Next >").click();
         fBot.button("Finish").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         TmfProjectElement project = TmfProjectRegistry.getProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME), true);
@@ -585,7 +587,7 @@ public class FetchRemoteTracesTest {
         fBot.comboBox().setSelection("TestSpecificRecursive");
         fBot.button("Next >").click();
         fBot.button("Finish").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         TmfProjectElement project = TmfProjectRegistry.getProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME), true);
@@ -612,7 +614,7 @@ public class FetchRemoteTracesTest {
         fBot.comboBox().setSelection("TestSpecificNonRecursive");
         fBot.button("Next >").click();
         fBot.button("Finish").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         TmfProjectElement project = TmfProjectRegistry.getProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME), true);
@@ -638,7 +640,7 @@ public class FetchRemoteTracesTest {
         fBot.comboBox().setSelection("TestSpecificMultiGroupRecursive");
         fBot.button("Next >").click();
         fBot.button("Finish").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         TmfProjectElement project = TmfProjectRegistry.getProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME), true);
@@ -666,7 +668,7 @@ public class FetchRemoteTracesTest {
         fBot.button("Next >").click();
         fBot.button("Finish").click();
         fBot.button("Cancel").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         /* Can't verify cancelled import, it depends on timing */
@@ -686,7 +688,7 @@ public class FetchRemoteTracesTest {
         fBot.comboBox().setSelection("TestMultiNode");
         fBot.button("Next >").click();
         fBot.button("Finish").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         TmfProjectElement project = TmfProjectRegistry.getProject(ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME), true);
@@ -714,7 +716,7 @@ public class FetchRemoteTracesTest {
         fBot.button("Finish").click();
         /* ErrorDialog is inhibited by the platform when running tests */
         fBot.button("Cancel").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
     }
 
@@ -746,7 +748,7 @@ public class FetchRemoteTracesTest {
         fBot.button("Cancel").click();
         /* ErrorDialog is inhibited by the platform when running tests */
         fBot.button("Cancel").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
     }
 
@@ -872,7 +874,7 @@ public class FetchRemoteTracesTest {
         selectionFunctor.run();
 
         fBot.button("Finish").click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), FETCH_TIME_OUT);
         WaitUtils.waitForJobs();
 
         verifyTracesFunctor.run();
