@@ -87,6 +87,8 @@ public class ControlViewTest {
     private static final String NODE_NAME = "myNode";
     private static final String PERSPECTIVE_ID = "org.eclipse.tracecompass.lttng2.control.ui.swtbot.tests.perspective";
 
+    private static final long IMPORT_TIME_OUT = 120000L;
+
     // ------------------------------------------------------------------------
     // Test data
     // ------------------------------------------------------------------------
@@ -672,7 +674,7 @@ public class ControlViewTest {
         SWTBotButton button = shell.bot().button(buttonName);
         shell.bot().waitUntil(Conditions.widgetIsEnabled(button));
         button.click();
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), IMPORT_TIME_OUT);
         WaitUtils.waitForJobs();
     }
 
