@@ -139,6 +139,8 @@ public class TimeGraphViewTest {
 
     private SWTBotView fViewBot;
 
+    private SWTBotTimeGraph fTimeGraph;
+
     private TmfTraceStub fTrace;
 
     private Rectangle fBounds;
@@ -207,14 +209,14 @@ public class TimeGraphViewTest {
         TmfTraceStub trace = fTrace;
         trace.initialize(null, "", ITmfEvent.class);
         assertNotNull(trace);
-        SWTBotTimeGraph tgBot = new SWTBotTimeGraph(fViewBot.bot());
+        fTimeGraph = new SWTBotTimeGraph(fViewBot.bot());
 
         // Wait for trace to be loaded
-        fViewBot.bot().waitUntil(new TgConditionHelper(t -> tgBot.getEntries().length == 0));
+        fViewBot.bot().waitUntil(new TgConditionHelper(t -> fTimeGraph.getEntries().length == 0));
         fBounds = getBounds();
         UIThreadRunnable.syncExec(() -> TmfSignalManager.dispatchSignal(new TmfTraceOpenedSignal(this, trace, null)));
         // Wait for trace to be loaded
-        fViewBot.bot().waitUntil(new TgConditionHelper(t -> tgBot.getEntries().length >= 2));
+        fViewBot.bot().waitUntil(new TgConditionHelper(t -> fTimeGraph.getEntries().length >= 2));
 
         resetTimeRange();
         // Make sure the thumb is over 1 in size
@@ -253,15 +255,15 @@ public class TimeGraphViewTest {
     }
 
     private Rectangle getBounds() {
-        Rectangle bounds = UIThreadRunnable.syncExec((Result<Rectangle>) () -> {
-            Control control = (Control) fViewBot.getWidget();
+        return UIThreadRunnable.syncExec((Result<Rectangle>) () -> {
+            Control control = fTimeGraph.widget;
             Rectangle ctrlRelativeBounds = control.getBounds();
-            Point res = control.toDisplay(new Point(0, 0));
+            Point res = control.toDisplay(new Point(fTimeGraph.getNameSpace(), 0));
+            ctrlRelativeBounds.width -= fTimeGraph.getNameSpace();
             ctrlRelativeBounds.x = res.x;
             ctrlRelativeBounds.y = res.y;
             return ctrlRelativeBounds;
         });
-        return bounds;
     }
 
     private TimeGraphViewStub getView() {
@@ -374,7 +376,7 @@ public class TimeGraphViewTest {
         resetTimeRange();
         Rectangle bounds = fBounds;
         ImageHelper precollapse = ImageHelper.grabImage(bounds);
-        SWTBotTimeGraph tg = new SWTBotTimeGraph(fViewBot.bot());
+        SWTBotTimeGraph tg = fTimeGraph;
         tg.getEntry("Plumber guy").collapse();
         TimeGraphViewStub view = getView();
         // take a first saved picture, the original is pre-collapse
@@ -537,7 +539,7 @@ public class TimeGraphViewTest {
         int totalItems = 16;
 
         resetTimeRange();
-        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
+        SWTBotTimeGraph timegraph = fTimeGraph;
         assertEquals(totalItems, getVisibleItems(timegraph));
 
         SWTBotTimeGraphEntry[] entries = null;
@@ -577,7 +579,7 @@ public class TimeGraphViewTest {
     public void testVerticalZoom() {
         resetTimeRange();
         int threshold = 10;
-        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
+        SWTBotTimeGraph timegraph = fTimeGraph;
         Rectangle bounds = fBounds;
 
         ImageHelper ref = ImageHelper.grabImage(bounds);
@@ -636,7 +638,7 @@ public class TimeGraphViewTest {
     @Test
     public void testHorizontalZoom() {
         resetTimeRange();
-        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
+        SWTBotTimeGraph timegraph = fTimeGraph;
 
         TimeGraphViewStub view = getView();
 
@@ -659,7 +661,7 @@ public class TimeGraphViewTest {
     public void testKeyboardNamespaceNavigation() {
         String pg = "Plumber guy";
         resetTimeRange();
-        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
+        SWTBotTimeGraph timegraph = fTimeGraph;
         timegraph.getEntry(pg).select();
         fireKey(timegraph, true, SWT.ARROW_DOWN);
         assertEquals("[Hat1]", timegraph.selection().get(0).toString());
@@ -690,7 +692,7 @@ public class TimeGraphViewTest {
     public void testCollapseExpandUsingEnter() {
         String pg = "Plumber guy";
         resetTimeRange();
-        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
+        SWTBotTimeGraph timegraph = fTimeGraph;
         assertEquals(0, timegraph.selection().columnCount());
         timegraph.getEntry(pg).select();
 
@@ -849,7 +851,7 @@ public class TimeGraphViewTest {
         resetTimeRange();
 
         SWTBot viewBot = fViewBot.bot();
-        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(viewBot);
+        SWTBotTimeGraph timegraph = fTimeGraph;
         assertTrue("timegraph visible", timegraph.isVisible());
         timegraph.setFocus();
 
