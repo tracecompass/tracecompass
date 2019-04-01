@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2009, 2019 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -51,6 +51,7 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
+import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -225,7 +226,39 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
             final ITmfTrace[] traces,
             final int indexPageSize,
             final @Nullable IResource resource) {
+        initExperiment(type, path, traces, indexPageSize, resource, TmfTraceType.DEFAULT_EXPERIMENT_TYPE);
+    }
 
+    /**
+     * Initialization of an experiment, taking the type, path, traces,
+     * indexPageSize, resource and trace type id
+     *
+     * @param type
+     *            the event type
+     * @param path
+     *            the experiment path
+     * @param traces
+     *            the experiment set of traces
+     * @param indexPageSize
+     *            the experiment index page size
+     * @param resource
+     *            the resource associated to the experiment
+     * @param traceTypeId
+     *            the trace type id
+     * @since 5.0
+     */
+    public void initExperiment(final Class<? extends ITmfEvent> type,
+            final String path,
+            final ITmfTrace[] traces,
+            final int indexPageSize,
+            final @Nullable IResource resource,
+            final String traceTypeId) {
+
+        try {
+            super.initTrace(resource, path, type, getName(), traceTypeId);
+        } catch (TmfTraceException e) {
+            Activator.logError("Error initializing experiment", e); //$NON-NLS-1$
+        }
         setCacheSize(indexPageSize);
         setStreamingInterval(0);
 
