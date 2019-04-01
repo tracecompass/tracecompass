@@ -55,6 +55,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceTypeUIUtils;
+import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.wizards.SWTBotImportWizardUtils;
@@ -91,6 +92,7 @@ public class ProjectExplorerTraceActionsTest {
     private static final String DEEP_COPY_OPTION = "Deep copy this experiment (each trace will be copied as a new trace)";
     private static final String RENAMED_EXP_DEEP_COPY = "expDeepCopy";
     private static final String RENAMED_EXP_NAME = "exp";
+    private static final String SYMBOLIC_FOLDER_NAME = "symbolic-link";
 
     private static File fTestFile = null;
 
@@ -579,9 +581,12 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void testCopySymbolicLinks() throws CoreException, TmfTraceImportException {
+        // Close editor from @Before since not needed
+        fBot.closeAllEditors();
+
         // Create File system symbolic link to traces
         importTraceAsSymlink();
-        SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
+        SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), SYMBOLIC_FOLDER_NAME, TRACE_NAME);
 
         // Copy the trace as link (default)
         createCopy(traceItem, true);
@@ -589,12 +594,12 @@ public class ProjectExplorerTraceActionsTest {
         createCopy(traceItem, false);
 
         fBot.closeAllEditors();
-        SWTBotTreeItem copiedItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), RENAMED_TRACE_NAME);
+        SWTBotTreeItem copiedItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), SYMBOLIC_FOLDER_NAME, RENAMED_TRACE_NAME);
         copiedItem.contextMenu().menu("Open").click();
-        SWTBotImportWizardUtils.testEventsTable(fBot, RENAMED_TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
-        SWTBotTreeItem copiedAsNewItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), RENAMED_AS_NEW_TRACE_NAME);
+        SWTBotImportWizardUtils.testEventsTable(fBot, SYMBOLIC_FOLDER_NAME + '/' + RENAMED_TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
+        SWTBotTreeItem copiedAsNewItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), SYMBOLIC_FOLDER_NAME, RENAMED_AS_NEW_TRACE_NAME);
         copiedAsNewItem.contextMenu().menu("Open").click();
-        SWTBotImportWizardUtils.testEventsTable(fBot, RENAMED_AS_NEW_TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
+        SWTBotImportWizardUtils.testEventsTable(fBot, SYMBOLIC_FOLDER_NAME + '/' + RENAMED_AS_NEW_TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
 
         // Make sure that the traces have the correct link status (linked or not)
         testLinkStatus(copiedItem, true);
@@ -611,13 +616,17 @@ public class ProjectExplorerTraceActionsTest {
      */
     @Test
     public void testRenameSymbolicLinks() throws CoreException, TmfTraceImportException {
+        // Close editor from @Before since not needed
+        fBot.closeAllEditors();
+
         // Create File system symbolic link to traces
         importTraceAsSymlink();
-        SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), TRACE_NAME);
+        SWTBotTreeItem traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), SYMBOLIC_FOLDER_NAME, TRACE_NAME);
         fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
         traceItem.doubleClick();
-        fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, TRACE_NAME));
+        fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, SYMBOLIC_FOLDER_NAME + '/' + TRACE_NAME));
 
+        traceItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), SYMBOLIC_FOLDER_NAME, TRACE_NAME);
         traceItem.contextMenu().menu("Rename...").click();
         final String RENAME_TRACE_DIALOG_TITLE = "Rename Trace";
         SWTBotShell shell = fBot.shell(RENAME_TRACE_DIALOG_TITLE).activate();
@@ -627,9 +636,9 @@ public class ProjectExplorerTraceActionsTest {
         fBot.waitUntil(Conditions.shellCloses(shell), DISK_ACCESS_TIMEOUT);
         fBot.waitWhile(new ConditionHelpers.ActiveEventsEditor(fBot, null));
 
-        SWTBotTreeItem copiedItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), RENAMED_TRACE_NAME);
+        SWTBotTreeItem copiedItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME), SYMBOLIC_FOLDER_NAME, RENAMED_TRACE_NAME);
         copiedItem.contextMenu().menu("Open").click();
-        SWTBotImportWizardUtils.testEventsTable(fBot, RENAMED_TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
+        SWTBotImportWizardUtils.testEventsTable(fBot, SYMBOLIC_FOLDER_NAME + '/' + RENAMED_TRACE_NAME, CUSTOM_TEXT_LOG.getNbEvents(), CUSTOM_TEXT_LOG.getFirstEventTimestamp());
 
         // Make sure that the traces have the correct link status
         testLinkStatus(copiedItem, true);
@@ -637,13 +646,17 @@ public class ProjectExplorerTraceActionsTest {
 
     private static void importTraceAsSymlink() throws TmfTraceImportException, CoreException {
         TraceTypeHelper helper = TmfTraceTypeUIUtils.selectTraceType(fTestFile.getAbsolutePath(), null, null);
-        boolean IS_WINDOWS = System.getProperty("os.name").contains("Windows") ? true : false; //$NON-NLS-1$ //$NON-NLS-2$
+        final boolean IS_WINDOWS = System.getProperty("os.name").contains("Windows"); //$NON-NLS-1$ //$NON-NLS-2$
         IProject project = TmfProjectRegistry.createProject(TRACE_PROJECT_NAME, null, new NullProgressMonitor());
         assertNotNull(project);
         TmfProjectElement projectElement = TmfProjectRegistry.getProject(project);
         TmfTraceFolder folder = projectElement.getTracesFolder();
         assertNotNull(folder);
-        IFile file = folder.getResource().getFile(fTestFile.getName());
+
+        IFolder subFolder = folder.getResource().getFolder(SYMBOLIC_FOLDER_NAME);
+        TraceUtils.createFolder(subFolder, new NullProgressMonitor());
+
+        IFile file = subFolder.getFile(fTestFile.getName());
         assertNotNull(file);
         ResourceUtil.createSymbolicLink(file, new Path(fTestFile.getAbsolutePath()), !IS_WINDOWS, null);
         folder.getResource().refreshLocal(IResource.DEPTH_INFINITE, null);
