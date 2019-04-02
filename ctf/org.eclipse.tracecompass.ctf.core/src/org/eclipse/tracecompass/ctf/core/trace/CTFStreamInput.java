@@ -37,7 +37,7 @@ import org.eclipse.tracecompass.internal.ctf.core.Activator;
 import org.eclipse.tracecompass.internal.ctf.core.SafeMappedByteBuffer;
 import org.eclipse.tracecompass.internal.ctf.core.trace.StreamInputPacketIndex;
 import org.eclipse.tracecompass.internal.ctf.core.trace.StreamInputPacketIndexEntry;
-import org.eclipse.tracecompass.internal.ctf.core.trace.Utils;
+import org.eclipse.tracecompass.internal.ctf.core.utils.Utils;
 
 /**
  * <b><u>StreamInput</u></b>

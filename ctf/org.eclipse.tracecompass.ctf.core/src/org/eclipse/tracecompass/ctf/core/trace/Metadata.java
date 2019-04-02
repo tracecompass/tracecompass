@@ -45,7 +45,7 @@ import org.eclipse.tracecompass.ctf.parser.CTFParser.parse_return;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.CtfAntlrException;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.IOStructGen;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ParseException;
-import org.eclipse.tracecompass.internal.ctf.core.trace.Utils;
+import org.eclipse.tracecompass.internal.ctf.core.utils.Utils;
 
 /**
  * The CTF trace metadata TSDL file

@@ -9,7 +9,7 @@
  *     Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.ctf.core.tests.trace;
+package org.eclipse.tracecompass.ctf.core.tests.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.UUID;
 
 import org.eclipse.tracecompass.ctf.core.CTFException;
-import org.eclipse.tracecompass.internal.ctf.core.trace.Utils;
+import org.eclipse.tracecompass.internal.ctf.core.utils.Utils;
 import org.junit.Test;
 
 /**

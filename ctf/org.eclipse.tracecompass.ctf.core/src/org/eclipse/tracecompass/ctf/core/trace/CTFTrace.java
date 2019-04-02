@@ -56,7 +56,7 @@ import org.eclipse.tracecompass.internal.ctf.core.SafeMappedByteBuffer;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.MetadataStrings;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ParseException;
 import org.eclipse.tracecompass.internal.ctf.core.trace.CTFStream;
-import org.eclipse.tracecompass.internal.ctf.core.trace.Utils;
+import org.eclipse.tracecompass.internal.ctf.core.utils.Utils;
 
 import com.google.common.collect.ImmutableMap;
 
