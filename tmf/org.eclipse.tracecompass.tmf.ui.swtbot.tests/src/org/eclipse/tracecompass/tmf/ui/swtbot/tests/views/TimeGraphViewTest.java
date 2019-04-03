@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017, 2018 Ericsson
+ * Copyright (c) 2017, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -95,9 +95,9 @@ public class TimeGraphViewTest {
 
     private static final Logger fLogger = Logger.getRootLogger();
 
-    private static final RGB HAIR = ImageHelper.adjustExpectedColor(new RGB(0, 64, 128));
-    private static final RGB HAT = ImageHelper.adjustExpectedColor(new RGB(0, 255, 0));
-    private static final RGB LASER = ImageHelper.adjustExpectedColor(new RGB(255, 0, 0));
+    private static RGB fHair;
+    private static RGB fHat;
+    private static RGB fLaser;
 
     private static final int MIN_FILE_SIZE = 1000;
 
@@ -169,6 +169,9 @@ public class TimeGraphViewTest {
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         fLogger.removeAllAppenders();
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
+        fHair = ImageHelper.adjustExpectedColor(new RGB(0, 64, 128));
+        fHat = ImageHelper.adjustExpectedColor(new RGB(0, 255, 0));
+        fLaser = ImageHelper.adjustExpectedColor(new RGB(255, 0, 0));
     }
 
     /**
@@ -344,9 +347,9 @@ public class TimeGraphViewTest {
         ImageHelper thick = ImageHelper.waitForNewImage(bounds, ref);
 
         // Compare with the original, they should be different
-        int refCount = ref.getHistogram().count(LASER);
-        int thickCount = thick.getHistogram().count(LASER);
-        assertTrue(String.format("Count of \"\"LASER\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", LASER, refCount, thickCount, Multisets.copyHighestCountFirst(thick.getHistogram())), thickCount > refCount);
+        int refCount = ref.getHistogram().count(fLaser);
+        int thickCount = thick.getHistogram().count(fLaser);
+        assertTrue(String.format("Count of \"\"LASER\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", fLaser, refCount, thickCount, Multisets.copyHighestCountFirst(thick.getHistogram())), thickCount > refCount);
 
         // reset all
         fViewBot.toolbarButton(SHOW_LEGEND).click();
@@ -364,7 +367,7 @@ public class TimeGraphViewTest {
         ImageHelper reset = ImageHelper.waitForNewImage(bounds, thick);
 
         // Compare with the original, they should be the same
-        int resetCount = reset.getHistogram().count(LASER);
+        int resetCount = reset.getHistogram().count(fLaser);
         assertEquals("Count of \"\"LASER\"\" did not get change despite reset of width", refCount, resetCount);
     }
 
@@ -430,9 +433,9 @@ public class TimeGraphViewTest {
         ImageHelper skinny = ImageHelper.waitForNewImage(bounds, ref);
 
         /* Compare with the original, they should be different */
-        int refCount = ref.getHistogram().count(HAIR);
-        int skinnyCount = skinny.getHistogram().count(HAIR);
-        assertTrue(String.format("Count of \"\"HAIR\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", HAIR, refCount, skinnyCount, Multisets.copyHighestCountFirst(skinny.getHistogram())), skinnyCount < refCount);
+        int refCount = ref.getHistogram().count(fHair);
+        int skinnyCount = skinny.getHistogram().count(fHair);
+        assertTrue(String.format("Count of \"\"HAIR\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", fHair, refCount, skinnyCount, Multisets.copyHighestCountFirst(skinny.getHistogram())), skinnyCount < refCount);
 
         // reset all
         fViewBot.toolbarButton(SHOW_LEGEND).click();
@@ -450,7 +453,7 @@ public class TimeGraphViewTest {
         ImageHelper reset = ImageHelper.waitForNewImage(bounds, skinny);
 
         // Compare with the original, they should be the same
-        int resetCount = reset.getHistogram().count(HAIR);
+        int resetCount = reset.getHistogram().count(fHair);
         assertEquals("Count of \"HAIR\" did not get change despite reset of width", refCount, resetCount);
     }
 
@@ -503,9 +506,9 @@ public class TimeGraphViewTest {
         fBot.waitUntil(new FileWritten(skinny, MIN_FILE_SIZE));
 
         /* Compare with the original, they should be different */
-        int refCount = refImage.getHistogram().count(HAIR);
-        int skinnyCount = skinnyImage.getHistogram().count(HAIR);
-        assertTrue(String.format("Count of \"\"HAIR\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", HAIR, refCount, skinnyCount, Multisets.copyHighestCountFirst(skinnyImage.getHistogram())),
+        int refCount = refImage.getHistogram().count(fHair);
+        int skinnyCount = skinnyImage.getHistogram().count(fHair);
+        assertTrue(String.format("Count of \"\"HAIR\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", fHair, refCount, skinnyCount, Multisets.copyHighestCountFirst(skinnyImage.getHistogram())),
                 skinnyCount < refCount);
 
         /* reset all */
@@ -524,7 +527,7 @@ public class TimeGraphViewTest {
         ImageHelper resetImage = ImageHelper.fromFile(reset);
 
         /* Compare with the original, they should be the same */
-        int resetCount = resetImage.getHistogram().count(HAIR);
+        int resetCount = resetImage.getHistogram().count(fHair);
         assertEquals("Count of \"HAIR\" did not get change despite reset of width", refCount, resetCount);
     }
 
@@ -875,10 +878,10 @@ public class TimeGraphViewTest {
         ImageHelper filtered = ImageHelper.waitForNewImage(bounds, ref);
 
         /* Compare with the original, they should be different */
-        int refHatCount = ref.getHistogram().count(HAT);
-        int filteredHatCount = filtered.getHistogram().count(HAT);
-        int refHairCount = ref.getHistogram().count(HAIR);
-        int filteredHairCount = filtered.getHistogram().count(HAIR);
+        int refHatCount = ref.getHistogram().count(fHat);
+        int filteredHatCount = filtered.getHistogram().count(fHat);
+        int refHairCount = ref.getHistogram().count(fHair);
+        int filteredHairCount = filtered.getHistogram().count(fHair);
         assertTrue("Count of \"HAT\" did not decrease to non-zero", filteredHatCount < refHatCount && filteredHatCount > 0);
         assertTrue("Count of \"HAIR\" did not decrease to zero", filteredHairCount < refHairCount && filteredHairCount == 0);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Ericsson
+ * Copyright (c) 2015, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -88,7 +88,7 @@ public class FilterColorEditorTest {
     private RGB fForeground;
     private RGB fBackground;
     private static RGB fHighlight;
-    private static RGB EXPECTED_GREEN;
+    private static RGB fGreen;
 
     /**
      * Test Class setup
@@ -122,7 +122,7 @@ public class FilterColorEditorTest {
 
         ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
         fHighlight = ImageHelper.adjustExpectedColor(colorRegistry.get(HIGHLIGHT_COLOR_DEFINITION_ID).getRGB());
-        EXPECTED_GREEN = ImageHelper.adjustExpectedColor(GREEN);
+        fGreen = ImageHelper.adjustExpectedColor(GREEN);
     }
 
     /**
@@ -316,18 +316,18 @@ public class FilterColorEditorTest {
         assertTrue(colorBefore.contains(fBackground));
         assertTrue(colorBefore.contains(fForeground));
         assertFalse(colorBefore.contains(fHighlight));
-        assertFalse(colorBefore.contains(EXPECTED_GREEN));
+        assertFalse(colorBefore.contains(fGreen));
 
         assertTrue(colorAfter.contains(fBackground));
         assertTrue(colorAfter.contains(fForeground));
         assertFalse(colorAfter.contains(fHighlight));
-        assertTrue(colorAfter.contains(EXPECTED_GREEN));
+        assertTrue(colorAfter.contains(fGreen));
 
         /*
          * Check that some background became green.
          */
         assertTrue(colorAfter.count(fBackground) < colorBefore.count(fBackground));
-        assertTrue(colorAfter.count(EXPECTED_GREEN) > colorBefore.count(EXPECTED_GREEN));
+        assertTrue(colorAfter.count(fGreen) > colorBefore.count(fGreen));
 
         // reset the highlight color preference
         colorRegistry.put(HIGHLIGHT_COLOR_DEFINITION_ID, fHighlight);
