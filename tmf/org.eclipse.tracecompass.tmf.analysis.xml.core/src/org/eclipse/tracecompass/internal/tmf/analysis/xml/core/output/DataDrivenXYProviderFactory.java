@@ -19,8 +19,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.IDataDrivenRuntimeObject;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -28,15 +28,12 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import com.google.common.collect.Iterables;
 
 /**
- * A factory for data driven time graphs. It describes the time graph but does
- * not apply it yet to a trace.
+ * Data provider factory for XY views
  *
  * @author Geneviève Bastien
- * @author Loic Prieur-Drevon
  */
-public class DataDrivenTimeGraphProviderFactory implements IDataDrivenRuntimeObject {
+public class DataDrivenXYProviderFactory implements IDataDrivenRuntimeObject {
 
-    private final List<DataDrivenPresentationState> fValues;
     private final List<DataDrivenOutputEntry> fEntries;
     private final Set<String> fAnalysisIds;
 
@@ -44,29 +41,16 @@ public class DataDrivenTimeGraphProviderFactory implements IDataDrivenRuntimeObj
      * Constructor
      *
      * @param entries
-     *            The entries for this time graph
+     *            The list of entries
      * @param analysisIds
-     *            The IDs of the analyses to build
-     * @param values
-     *            The values to use to display the labels and colors of this
-     *            time graph
+     *            The IDs of the analysis this view applies to
      */
-    public DataDrivenTimeGraphProviderFactory(List<DataDrivenOutputEntry> entries, Set<String> analysisIds, List<DataDrivenPresentationState> values) {
-        fValues = values;
+    public DataDrivenXYProviderFactory(List<DataDrivenOutputEntry> entries, Set<String> analysisIds) {
         fEntries = entries;
         fAnalysisIds = analysisIds;
     }
 
-    /**
-     * Create a data provider for a trace
-     *
-     * @param trace
-     *            The trace for which to create a provider
-     * @return A time graph data provider, or <code>null</code> if the data
-     *         provider cannot be built for this trace because it does not have
-     *         the proper analyses.
-     */
-    public @Nullable ITimeGraphDataProvider<TimeGraphEntryModel> create(ITmfTrace trace) {
+    public @Nullable ITmfTreeXYDataProvider<ITmfTreeDataModel> create(ITmfTrace trace) {
 
         Set<@NonNull ITmfAnalysisModuleWithStateSystems> stateSystemModules = new HashSet<>();
         List<ITmfStateSystem> sss = new ArrayList<>();
@@ -92,7 +76,7 @@ public class DataDrivenTimeGraphProviderFactory implements IDataDrivenRuntimeObj
                 module.getStateSystems().forEach(sss::add);
             }
         }
-        return (sss.isEmpty() ? null : new DataDrivenTimeGraphDataProvider(trace, sss, fEntries, fValues));
+        return (sss.isEmpty() ? null : new DataDrivenXYDataProvider(trace, sss, fEntries, null));
     }
 
 }

@@ -26,8 +26,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphEntry.IdGetter;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphEntry.QuarkCallback;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenOutputEntry.IdGetter;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenOutputEntry.QuarkCallback;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -70,7 +70,7 @@ public class DataDrivenTimeGraphDataProvider extends AbstractTmfTraceDataProvide
     private static final AtomicLong sfAtomicId = new AtomicLong();
 
     private final List<ITmfStateSystem> fSs;
-    private final List<DataDrivenTimeGraphEntry> fEntries;
+    private final List<DataDrivenOutputEntry> fEntries;
     private final List<DataDrivenPresentationState> fValues;
 
     /**
@@ -80,7 +80,7 @@ public class DataDrivenTimeGraphDataProvider extends AbstractTmfTraceDataProvide
     private final Map<Long, Pair<ITmfStateSystem, Integer>> fIDToDisplayQuark = new HashMap<>();
 
     private final IdGetter fIdGenerator = (ss, quark) -> fBaseQuarkToId.row(ss).computeIfAbsent(quark, s -> sfAtomicId.getAndIncrement());
-    private final QuarkCallback fQuarkCallback = (id, ss, quark) -> fIDToDisplayQuark.put(id, new Pair<>(ss, quark));
+    private final QuarkCallback fQuarkCallback = (id, ss, quark, dt) -> fIDToDisplayQuark.put(id, new Pair<>(ss, quark));
 
     /**
      * Constructor
@@ -94,7 +94,7 @@ public class DataDrivenTimeGraphDataProvider extends AbstractTmfTraceDataProvide
      * @param values
      *            The presentation values
      */
-    public DataDrivenTimeGraphDataProvider(ITmfTrace trace, List<ITmfStateSystem> stateSystems, List<DataDrivenTimeGraphEntry> entries, List<DataDrivenPresentationState> values) {
+    public DataDrivenTimeGraphDataProvider(ITmfTrace trace, List<ITmfStateSystem> stateSystems, List<DataDrivenOutputEntry> entries, List<DataDrivenPresentationState> values) {
         super(trace);
         fSs = stateSystems;
         fEntries = entries;
@@ -117,7 +117,7 @@ public class DataDrivenTimeGraphDataProvider extends AbstractTmfTraceDataProvide
                 TimeGraphEntryModel ssEntry = new TimeGraphEntryModel(id, -1, traceName, start, end);
                 entryList.add(ssEntry);
 
-                for (DataDrivenTimeGraphEntry entry : fEntries) {
+                for (DataDrivenOutputEntry entry : fEntries) {
                     entryList.addAll(entry.buildEntries(ss, ssEntry.getId(), getTrace(), -1, StringUtils.EMPTY, end, fIdGenerator, fQuarkCallback));
                 }
             }

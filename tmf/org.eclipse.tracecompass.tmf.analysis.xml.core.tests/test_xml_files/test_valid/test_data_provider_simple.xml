@@ -47,7 +47,6 @@
 
         <entry path="CPU/*">
             <display type="self" />
-            <name type="self" />
         </entry>
     </xyView>
     
@@ -59,7 +58,6 @@
 
         <entry path="CPU/*" displayType="delta">
             <display type="self" />
-            <name type="self" />
         </entry>
     </xyView>
 </tmfxml>

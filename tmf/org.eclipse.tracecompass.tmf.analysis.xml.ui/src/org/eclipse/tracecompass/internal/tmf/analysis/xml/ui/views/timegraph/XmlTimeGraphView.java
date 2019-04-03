@@ -26,8 +26,8 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphDataProvider;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphEntryModel;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.XmlDataProviderManager;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenOutputEntryModel;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
@@ -81,10 +81,10 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
-    private static final Comparator<DataDrivenTimeGraphEntryModel> XML_ENTRY_COMPARATOR = Comparator
-            .comparing(DataDrivenTimeGraphEntryModel::getName).thenComparingLong(DataDrivenTimeGraphEntryModel::getStartTime);
+    private static final Comparator<DataDrivenOutputEntryModel> XML_ENTRY_COMPARATOR = Comparator
+            .comparing(DataDrivenOutputEntryModel::getName).thenComparingLong(DataDrivenOutputEntryModel::getStartTime);
 
-    private static final Comparator<ITimeGraphEntry> ENTRY_COMPARATOR = Comparator.comparing(x -> (DataDrivenTimeGraphEntryModel) ((TimeGraphEntry) x).getModel(), XML_ENTRY_COMPARATOR);
+    private static final Comparator<ITimeGraphEntry> ENTRY_COMPARATOR = Comparator.comparing(x -> (DataDrivenOutputEntryModel) ((TimeGraphEntry) x).getModel(), XML_ENTRY_COMPARATOR);
 
     private final @NonNull XmlViewInfo fViewInfo = new XmlViewInfo(ID);
     private final Map<String, Integer> fStringValueMap = new HashMap<>();
@@ -187,8 +187,8 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
                 }
 
                 ITimeGraphEntryModel model = entry.getModel();
-                if (model instanceof DataDrivenTimeGraphEntryModel) {
-                    DataDrivenTimeGraphEntryModel xmlModel = (DataDrivenTimeGraphEntryModel) model;
+                if (model instanceof DataDrivenOutputEntryModel) {
+                    DataDrivenOutputEntryModel xmlModel = (DataDrivenOutputEntryModel) model;
                     if (DEFAULT_COLUMN_NAMES[columnIndex].equals(Messages.XmlTimeGraphView_ColumnId)) {
                         return xmlModel.getXmlId();
                     } else if (DEFAULT_COLUMN_NAMES[columnIndex].equals(Messages.XmlTimeGraphView_ColumnParentId)) {

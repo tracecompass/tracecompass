@@ -17,7 +17,8 @@ import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenStateSystemPath;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphEntry;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenOutputEntry;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenXYDataProvider.DisplayType;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.w3c.dom.Element;
@@ -27,9 +28,9 @@ import org.w3c.dom.Element;
  *
  * @author Geneviève Bastien
  */
-public class TmfXmlTimeGraphEntryCu implements IDataDrivenCompilationUnit {
+public class TmfXmlOutputEntryCu implements IDataDrivenCompilationUnit {
 
-    private final List<TmfXmlTimeGraphEntryCu> fChildrenEntries;
+    private final List<TmfXmlOutputEntryCu> fChildrenEntries;
     private final String fPath;
     private final @Nullable String fAnalysisId;
     private final boolean fDisplayText;
@@ -37,13 +38,15 @@ public class TmfXmlTimeGraphEntryCu implements IDataDrivenCompilationUnit {
     private final @Nullable TmfXmlStateSystemPathCu fIdCu;
     private final @Nullable TmfXmlStateSystemPathCu fParentCu;
     private final @Nullable TmfXmlStateSystemPathCu fNameCu;
+    private final DisplayType fDisplayType;
 
-    private TmfXmlTimeGraphEntryCu(List<TmfXmlTimeGraphEntryCu> childrenCu, String path,
+    private TmfXmlOutputEntryCu(List<TmfXmlOutputEntryCu> childrenCu, String path,
             @Nullable String analysisId, boolean displayText,
             @Nullable TmfXmlStateSystemPathCu displayCu,
             @Nullable TmfXmlStateSystemPathCu idCu,
             @Nullable TmfXmlStateSystemPathCu parentCu,
-            @Nullable TmfXmlStateSystemPathCu nameCu) {
+            @Nullable TmfXmlStateSystemPathCu nameCu,
+            DisplayType displayType) {
         fChildrenEntries = childrenCu;
         fPath = path;
         fAnalysisId = analysisId;
@@ -52,19 +55,20 @@ public class TmfXmlTimeGraphEntryCu implements IDataDrivenCompilationUnit {
         fIdCu = idCu;
         fParentCu = parentCu;
         fNameCu = nameCu;
+        fDisplayType = displayType;
     }
 
     @Override
-    public DataDrivenTimeGraphEntry generate() {
-        List<DataDrivenTimeGraphEntry> entries = fChildrenEntries.stream()
-                .map(TmfXmlTimeGraphEntryCu::generate)
+    public DataDrivenOutputEntry generate() {
+        List<DataDrivenOutputEntry> entries = fChildrenEntries.stream()
+                .map(TmfXmlOutputEntryCu::generate)
                 .collect(Collectors.toList());
         DataDrivenStateSystemPath display = fDisplayCu != null ? fDisplayCu.generate() : null;
         DataDrivenStateSystemPath id = fIdCu != null ? fIdCu.generate() : null;
         DataDrivenStateSystemPath parent = fParentCu != null ? fParentCu.generate() : null;
         DataDrivenStateSystemPath name = fNameCu != null ? fNameCu.generate() : null;
-        return new DataDrivenTimeGraphEntry(entries, fPath, fAnalysisId, fDisplayText,
-                display, id, parent, name);
+        return new DataDrivenOutputEntry(entries, fPath, fAnalysisId, fDisplayText,
+                display, id, parent, name, fDisplayType);
     }
 
     /**
@@ -77,7 +81,7 @@ public class TmfXmlTimeGraphEntryCu implements IDataDrivenCompilationUnit {
      * @return The time graph entry compilation unit or <code>null</code> if the
      *         entry did not compile properly.
      */
-    public static @Nullable TmfXmlTimeGraphEntryCu compile(AnalysisCompilationData compilationData, Element entryEl) {
+    public static @Nullable TmfXmlOutputEntryCu compile(AnalysisCompilationData compilationData, Element entryEl) {
 
         // Get the path in the state system
         String path = entryEl.getAttribute(TmfXmlStrings.PATH);
@@ -100,9 +104,9 @@ public class TmfXmlTimeGraphEntryCu implements IDataDrivenCompilationUnit {
         }
 
         // Compile children entries
-        List<TmfXmlTimeGraphEntryCu> childrenCu = new ArrayList<>();
+        List<TmfXmlOutputEntryCu> childrenCu = new ArrayList<>();
         for (Element childEl : entryElements) {
-            TmfXmlTimeGraphEntryCu childCu = compile(compilationData, childEl);
+            TmfXmlOutputEntryCu childCu = compile(compilationData, childEl);
             if (childCu != null) {
                 childrenCu.add(childCu);
             }
@@ -155,11 +159,17 @@ public class TmfXmlTimeGraphEntryCu implements IDataDrivenCompilationUnit {
             analysisId = null;
         }
 
-        // Get the state system to use to populate those entries, by default, it
-        // is the same as the parent
+        // Get whether to display the text, applies to time graphs
         boolean displayText = Boolean.parseBoolean(entryEl.getAttribute(TmfXmlStrings.DISPLAY_TEXT));
 
-        return new TmfXmlTimeGraphEntryCu(childrenCu, path, analysisId, displayText, displayCu, idCu, parentCu, nameCu);
+        // Get the type of display, applies to XY entries
+        String displayTypeStr = entryEl.getAttribute(TmfXmlStrings.DISPLAY_TYPE);
+        DisplayType displayType = DisplayType.ABSOLUTE;
+        if (displayTypeStr.equalsIgnoreCase(TmfXmlStrings.DISPLAY_TYPE_DELTA)) {
+            displayType = DisplayType.DELTA;
+        }
+
+        return new TmfXmlOutputEntryCu(childrenCu, path, analysisId, displayText, displayCu, idCu, parentCu, nameCu, displayType);
     }
 
 }
