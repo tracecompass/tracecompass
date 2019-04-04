@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Set;
 
@@ -577,7 +578,7 @@ public class CTFTraceReader implements AutoCloseable {
             if (other.fTrace != null) {
                 return false;
             }
-        } else if (!fTrace.equals(other.fTrace)) {
+        } else if (!Objects.equals(fTrace.getPath(), other.fTrace.getPath())) {
             return false;
         }
         return true;

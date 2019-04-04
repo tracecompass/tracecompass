@@ -24,6 +24,7 @@ import org.eclipse.tracecompass.ctf.core.trace.CTFStreamInputReader;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.CTFTraceReader;
 import org.eclipse.tracecompass.internal.tmf.ctf.core.Activator;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfLocation;
@@ -196,8 +197,8 @@ public class CtfIterator extends CTFTraceReader
         fCurLocation = new CtfLocation(ctfLocationData);
 
         /* Adjust the timestamp depending on the trace's offset */
-        long currTimestamp = ctfLocationData.getTimestamp();
-        final long offsetTimestamp = this.getCtfTmfTrace().timestampNanoToCycles(currTimestamp);
+        final long seekToTimestamp = ctfLocationData.getTimestamp();
+        final long offsetTimestamp = this.getCtfTmfTrace().timestampNanoToCycles(seekToTimestamp);
         try {
             if (offsetTimestamp < 0) {
                 ret = super.seek(0L);
@@ -213,28 +214,26 @@ public class CtfIterator extends CTFTraceReader
          * assign the location index correctly
          */
         long index = 0;
-        final CtfTmfEvent currentEvent = this.getCurrentEvent();
-        if (currentEvent != null) {
-            currTimestamp = currentEvent.getTimestamp().getValue();
-
-            for (long i = 0; i < ctfLocationData.getIndex(); i++) {
-                if (currTimestamp == currentEvent.getTimestamp().getValue()) {
-                    index++;
-                } else {
-                    index = 0;
-                }
-                this.advance();
+        ITmfEvent currentEvent = getCurrentEvent();
+        ret &= (currentEvent != null);
+        long offset = ctfLocationData.getIndex();
+        while (currentEvent != null && index < offset) {
+            if (seekToTimestamp >= Objects.requireNonNull(currentEvent).getTimestamp().getValue()) {
+                index++;
+            } else {
+                index = 0;
+                break;
             }
-        } else {
-            ret = false;
+            ret = advance();
+            currentEvent = getCurrentEvent();
         }
-        /* Seek the current location accordingly */
+        /* Update the current location accordingly */
         if (ret) {
-            fCurLocation = new CtfLocation(new CtfLocationInfo(getCurrentEvent().getTimestamp().getValue(), index));
+            long time = Objects.requireNonNull(currentEvent).getTimestamp().getValue();
+            fCurLocation = new CtfLocation(new CtfLocationInfo(time, time != seekToTimestamp ? 0 : index));
         } else {
             fCurLocation = NULL_LOCATION;
         }
-
         return ret;
     }
 
@@ -330,13 +329,7 @@ public class CtfIterator extends CTFTraceReader
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = (prime * result) + fTrace.hashCode();
-        result = (prime * result)
-                + ((fCurLocation == null) ? 0 : fCurLocation.hashCode());
-        result = (prime * result) + (int) (fCurRank ^ (fCurRank >>> 32));
-        return result;
+        return Objects.hash(super.hashCode(), fTrace, fCurLocation, fCurRank);
     }
 
     @Override
