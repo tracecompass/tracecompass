@@ -11,6 +11,9 @@
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.ui.views;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
@@ -18,6 +21,8 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -49,6 +54,9 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxi
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TriStateFilteredCheckboxTree;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.contexts.IContextActivation;
+import org.eclipse.ui.contexts.IContextService;
 
 /**
  * Base class to be used with a chart viewer {@link TmfXYChartViewer}.
@@ -61,6 +69,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, ITimeReset, ITmfPinnable, ITmfAllowMultiple {
 
     private static final int[] DEFAULT_WEIGHTS = {1, 3};
+    private static final String TMF_VIEW_UI_CONTEXT = "org.eclipse.tracecompass.tmf.ui.view.context"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -76,6 +85,9 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
     private String fOriginalTabLabel;
 
     private final Action fResetScaleAction = ResetUtil.createResetAction(this);
+
+    private List<IContextActivation> fActiveContexts = new ArrayList<>();
+    private IContextService fContextService;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -208,6 +220,24 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
 
         fOriginalTabLabel = getPartName();
         coupleSelectViewer();
+
+        IWorkbenchPartSite site = getSite();
+        fContextService = site.getWorkbenchWindow().getService(IContextService.class);
+
+        TmfXYChartViewer chartViewer = getChartViewer();
+        if (chartViewer != null) {
+            activateContextService();
+            chartViewer.getControl().addFocusListener(new FocusListener() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                    deactivateContextService();
+                }
+                @Override
+                public void focusGained(FocusEvent e) {
+                    activateContextService();
+                }
+            });
+        }
     }
 
     @Override
@@ -416,5 +446,25 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
             TriStateFilteredCheckboxTree checkboxTree = selectTree.getTriStateFilteredCheckboxTree();
             checkboxTree.addPreCheckStateListener(new ManyEntriesSelectedDialogPreCheckedListener(checkboxTree));
         }
+    }
+
+    private void activateContextService() {
+        if (fActiveContexts.isEmpty()) {
+            fActiveContexts.add(fContextService.activateContext(TMF_VIEW_UI_CONTEXT));
+        }
+    }
+
+    private void deactivateContextService() {
+        fContextService.deactivateContexts(fActiveContexts);
+        fActiveContexts.clear();
+    }
+
+    @Override
+    public <T> T getAdapter(Class<T> adapter) {
+        TmfXYChartViewer chart = getChartViewer();
+        if (chart != null) {
+            return chart.getAdapter(adapter);
+        }
+        return super.getAdapter(adapter);
     }
 }
