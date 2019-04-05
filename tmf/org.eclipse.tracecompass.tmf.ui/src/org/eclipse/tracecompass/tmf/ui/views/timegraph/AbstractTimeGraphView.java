@@ -109,6 +109,9 @@ import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.markers.MarkerUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.util.TimeGraphStyleUtil;
+import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfTimeNavigationProvider;
+import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfTimeZoomProvider;
+import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfZoomToSelectionProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.TimeEventFilterDialog;
 import org.eclipse.tracecompass.tmf.core.model.IFilterableDataModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
@@ -194,7 +197,8 @@ import com.google.common.collect.Multimap;
  */
 public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeAligned, ITmfAllowMultiple, ITmfPinnable, IResourceChangeListener{
 
-    private static final String CONTEXT = "org.eclipse.tracecompass.tmf.ui.view.timegraph.context"; //$NON-NLS-1$
+    private static final String TIMEGRAPH_UI_CONTEXT = "org.eclipse.tracecompass.tmf.ui.view.timegraph.context"; //$NON-NLS-1$
+    private static final String TMF_VIEW_UI_CONTEXT = "org.eclipse.tracecompass.tmf.ui.view.context"; //$NON-NLS-1$
 
     private static final String DIRTY_UNDERFLOW_ERROR = "Dirty underflow error"; //$NON-NLS-1$
 
@@ -1405,7 +1409,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     private void activateContextService() {
         if (fActiveContexts.isEmpty()) {
-            fActiveContexts.add(fContextService.activateContext(CONTEXT));
+            fActiveContexts.add(fContextService.activateContext(TIMEGRAPH_UI_CONTEXT));
+            fActiveContexts.add(fContextService.activateContext(TMF_VIEW_UI_CONTEXT));
         }
     }
 
@@ -2632,6 +2637,17 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         restartZoomThread();
     }
 
+    private @Nullable TimeGraphControl getTimeGraphControl() {
+        TimeGraphViewer viewer = getTimeGraphViewer();
+        if (viewer != null) {
+            TimeGraphControl control = viewer.getTimeGraphControl();
+            if (control != null) {
+                return control;
+            }
+        }
+        return null;
+    }
+
     /**
      * get the time event filter dialog
      *
@@ -2864,4 +2880,43 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getAdapter(Class<T> adapter) {
+        if (adapter == ITmfTimeNavigationProvider.class) {
+            ITmfTimeNavigationProvider n = left -> {
+                TimeGraphControl control = getTimeGraphControl();
+                if (control != null) {
+                    control.horizontalScroll(left);
+                }
+            };
+            return (T) n;
+        }
+        if (adapter == ITmfTimeZoomProvider.class) {
+            ITmfTimeZoomProvider z = zoomIn -> {
+                TimeGraphControl control = getTimeGraphControl();
+                if (control != null) {
+                    control.zoom(zoomIn);
+                }
+            };
+            return (T) z;
+        }
+        if (adapter == ITmfZoomToSelectionProvider.class ) {
+            return (T) getZoomToSelectionProvider();
+        }
+        return super.getAdapter(adapter);
+    }
+
+    private ITmfZoomToSelectionProvider getZoomToSelectionProvider() {
+        return () -> {
+            TimeGraphViewer viewer = getTimeGraphViewer();
+            if (viewer != null) {
+                long selBegin = viewer.getSelectionBegin();
+                long selEnd = viewer.getSelectionEnd();
+                if (selBegin != selEnd) {
+                    viewer.setStartFinishTimeNotify(selBegin, selEnd);
+                }
+            }
+        };
+    }
 }
