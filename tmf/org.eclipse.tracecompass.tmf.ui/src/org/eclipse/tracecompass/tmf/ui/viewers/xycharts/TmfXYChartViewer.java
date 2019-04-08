@@ -679,18 +679,23 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     }
 
     private ITmfTimeZoomProvider getTimeZoomProvider() {
-        return zoomIn -> {
-            Point cursorDisplayLocation = getDisplay().getCursorLocation();
-            Point cursorControlLocation = getSwtChart().getPlotArea().toControl(cursorDisplayLocation);
-            Point cursorParentLocation = getSwtChart().getPlotArea().getParent().toControl(cursorDisplayLocation);
-            Rectangle controlBounds = getSwtChart().getPlotArea().getBounds();
-            // check the X axis only
-            if (!controlBounds.contains(cursorParentLocation.x, controlBounds.y)) {
+        return (zoomIn, useMousePosition) -> {
+            Chart chart = getSwtChart();
+            if (chart == null) {
                 return;
             }
-            Chart c = getSwtChart();
-            if (c != null) {
-                TmfXyUiUtils.zoom(this, c, zoomIn, cursorControlLocation.x);
+            if (useMousePosition) {
+                Point cursorDisplayLocation = getDisplay().getCursorLocation();
+                Point cursorControlLocation = getSwtChart().getPlotArea().toControl(cursorDisplayLocation);
+                Point cursorParentLocation = getSwtChart().getPlotArea().getParent().toControl(cursorDisplayLocation);
+                Rectangle controlBounds = getSwtChart().getPlotArea().getBounds();
+                // check the X axis only
+                if (!controlBounds.contains(cursorParentLocation.x, controlBounds.y)) {
+                    return;
+                }
+                TmfXyUiUtils.zoom(this, chart, zoomIn, cursorControlLocation.x);
+            } else {
+                TmfXyUiUtils.zoom(this, chart, zoomIn);
             }
         };
     }

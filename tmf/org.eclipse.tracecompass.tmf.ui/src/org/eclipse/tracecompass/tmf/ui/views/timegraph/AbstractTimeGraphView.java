@@ -2884,27 +2884,41 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     @Override
     public <T> T getAdapter(Class<T> adapter) {
         if (adapter == ITmfTimeNavigationProvider.class) {
-            ITmfTimeNavigationProvider n = left -> {
-                TimeGraphControl control = getTimeGraphControl();
-                if (control != null) {
-                    control.horizontalScroll(left);
-                }
-            };
-            return (T) n;
+            return (T) getTimeNavigator();
         }
         if (adapter == ITmfTimeZoomProvider.class) {
-            ITmfTimeZoomProvider z = zoomIn -> {
-                TimeGraphControl control = getTimeGraphControl();
-                if (control != null) {
-                    control.zoom(zoomIn);
-                }
-            };
-            return (T) z;
+            return (T) getTimeZoomProvider();
         }
         if (adapter == ITmfZoomToSelectionProvider.class ) {
             return (T) getZoomToSelectionProvider();
         }
         return super.getAdapter(adapter);
+    }
+
+    private ITmfTimeNavigationProvider getTimeNavigator() {
+        return left -> {
+            TimeGraphControl control = getTimeGraphControl();
+            if (control != null) {
+                control.horizontalScroll(left);
+            }
+        };
+    }
+
+    private ITmfTimeZoomProvider getTimeZoomProvider() {
+        return (zoomIn, useMousePosition) -> {
+            TimeGraphControl control = getTimeGraphControl();
+            if (control != null) {
+                if (useMousePosition) {
+                    control.zoom(zoomIn);
+                } else {
+                    if (zoomIn) {
+                        control.zoomIn();
+                    } else {
+                        control.zoomOut();
+                    }
+                }
+            }
+        };
     }
 
     private ITmfZoomToSelectionProvider getZoomToSelectionProvider() {
@@ -2919,4 +2933,5 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             }
         };
     }
+
 }

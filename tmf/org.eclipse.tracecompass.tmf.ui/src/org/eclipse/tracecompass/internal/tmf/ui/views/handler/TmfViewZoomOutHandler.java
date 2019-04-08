@@ -24,7 +24,7 @@ public class TmfViewZoomOutHandler extends TmfViewBaseHandler {
     public void execute(TmfView view) {
         ITmfTimeZoomProvider zoomer = view.getAdapter(ITmfTimeZoomProvider.class);
         if (zoomer != null) {
-            zoomer.zoom(false);
+            zoomer.zoom(false, true);
         }
     }
 }

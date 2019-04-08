@@ -19,6 +19,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.FocusEvent;
@@ -33,6 +34,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Sash;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
+import org.eclipse.tracecompass.internal.tmf.ui.Messages;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.xycharts.TmfXyUiUtils;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
@@ -57,6 +62,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
+import org.swtchart.Chart;
 
 /**
  * Base class to be used with a chart viewer {@link TmfXYChartViewer}.
@@ -85,6 +91,8 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
     private String fOriginalTabLabel;
 
     private final Action fResetScaleAction = ResetUtil.createResetAction(this);
+    private Action fZoomInAction;
+    private Action fZoomOutAction;
 
     private List<IContextActivation> fActiveContexts = new ArrayList<>();
     private IContextService fContextService;
@@ -209,7 +217,13 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
             }
         });
         fSashForm.setWeights(DEFAULT_WEIGHTS);
-        getViewSite().getActionBars().getToolBarManager().appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fResetScaleAction);
+        fZoomInAction = getZoomInAction();
+        fZoomOutAction = getZoomOutAction();
+
+        IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
+        toolBarManager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fResetScaleAction);
+        toolBarManager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fZoomInAction);
+        toolBarManager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fZoomOutAction);
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         if (trace != null) {
             loadTrace();
@@ -466,5 +480,53 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
             return chart.getAdapter(adapter);
         }
         return super.getAdapter(adapter);
+    }
+
+    private Action getZoomInAction() {
+        Action zoomInAction = fZoomInAction;
+        if (zoomInAction == null) {
+            zoomInAction = new Action() {
+                @Override
+                public void run() {
+                    TmfXYChartViewer viewer = getChartViewer();
+                    if (viewer == null) {
+                        return;
+                    }
+                    Chart chart = viewer.getSwtChart();
+                    if (chart == null) {
+                        return;
+                    }
+                    TmfXyUiUtils.zoom(viewer, chart, true);
+                }
+            };
+            zoomInAction.setText(Messages.TmfTimeGraphViewer_ZoomInActionNameText);
+            zoomInAction.setToolTipText(Messages.TmfTimeGraphViewer_ZoomInActionToolTipText);
+            zoomInAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_ZOOM_IN_MENU));
+        }
+        return zoomInAction;
+    }
+
+    private Action getZoomOutAction() {
+        Action zoomOutAction = fZoomOutAction;
+        if (zoomOutAction == null) {
+            zoomOutAction = new Action() {
+                @Override
+                public void run() {
+                    TmfXYChartViewer viewer = getChartViewer();
+                    if (viewer == null) {
+                        return;
+                    }
+                    Chart chart = viewer.getSwtChart();
+                    if (chart == null) {
+                        return;
+                    }
+                    TmfXyUiUtils.zoom(viewer, chart, false);
+                }
+            };
+            zoomOutAction.setText(Messages.TmfTimeGraphViewer_ZoomOutActionNameText);
+            zoomOutAction.setToolTipText(Messages.TmfTimeGraphViewer_ZoomOutActionToolTipText);
+            zoomOutAction.setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_ZOOM_OUT_MENU));
+        }
+        return zoomOutAction;
     }
 }

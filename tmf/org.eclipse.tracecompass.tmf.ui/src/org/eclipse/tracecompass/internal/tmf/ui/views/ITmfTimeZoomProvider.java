@@ -17,10 +17,13 @@ package org.eclipse.tracecompass.internal.tmf.ui.views;
  */
 public interface ITmfTimeZoomProvider {
     /**
-     * Method to implement to zoom in or out from current position
+     * Method to implement to zoom in or out operation.
      *
      * @param zoomIn
-     *          true for zoom-in else for zoom-out
+     *            true for zoom-in else for zoom-out
+     * @param useMousePosition
+     *            true for zoom centered on mouse position, false for zoom
+     *            centered on the middle of current selection range
      */
-    void zoom(boolean zoomIn);
+    void zoom(boolean zoomIn, boolean useMousePosition);
 }

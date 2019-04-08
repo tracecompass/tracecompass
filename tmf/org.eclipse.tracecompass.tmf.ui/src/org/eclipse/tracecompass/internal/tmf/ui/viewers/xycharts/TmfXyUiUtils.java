@@ -30,6 +30,7 @@ public class TmfXyUiUtils {
     // ------------------------------------------------------------------------
     private static final long MIN_WINDOW_SIZE = 1;
     private static final double ZOOM_FACTOR_AT_X_POSITION = 0.8;
+    private static final double ZOOM_FACTOR_SELECTION_CENTERED = 1.5;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -120,6 +121,27 @@ public class TmfXyUiUtils {
     }
 
     /**
+     * Provides horizontal zooming for a given viewer based on current selection
+     * range. If selection range is visible, the zooming is centered on the
+     * middle of the selection range. If the selection range is not visible,
+     * then the zooming is centered on the window range.
+     *
+     * @param viewer
+     *            the chart time provider to use for zooming
+     * @param chart
+     *            the SwtChart reference to use the zooming
+     * @param zoomIn
+     *            true to zoom-in else to zoom-out
+     */
+    public static void zoom(ITmfChartTimeProvider viewer, Chart chart, boolean zoomIn) {
+        if (zoomIn) {
+            zoomIn(viewer, chart);
+        } else {
+            zoomOut(viewer, chart);
+        }
+    }
+
+    /**
      * Limits x data coordinate to window start and window end range for a given
      * viewer
      *
@@ -149,6 +171,65 @@ public class TmfXyUiUtils {
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
+    private static void zoomIn(ITmfChartTimeProvider viewer, Chart chart) {
+        IAxis xAxis = chart.getAxisSet().getXAxis(0);
+        if (xAxis == null) {
+            return;
+        }
+        long prevTime0 = viewer.getWindowStartTime();
+        long prevTime1 = viewer.getWindowEndTime();
+        long prevRange = prevTime1 - prevTime0;
+        if (prevRange == 0) {
+            return;
+        }
+        long selTime = (viewer.getSelectionEndTime() + viewer.getSelectionBeginTime()) / 2;
+        if (selTime < prevTime0 || selTime > prevTime1) {
+            selTime = (prevTime0 + prevTime1) / 2;
+        }
+        long time0 = selTime - (long) ((selTime - prevTime0) / ZOOM_FACTOR_SELECTION_CENTERED);
+        long time1 = selTime + (long) ((prevTime1 - selTime) / ZOOM_FACTOR_SELECTION_CENTERED);
+
+        if ((time1 - time0) < MIN_WINDOW_SIZE) {
+            time0 = selTime - (selTime - prevTime0) * MIN_WINDOW_SIZE / prevRange;
+            time1 = time0 + MIN_WINDOW_SIZE;
+        }
+
+        time0 = validateWindowStartTime(viewer, time0);
+        time1 = validateWindowEndTime(viewer, time0, time1);
+        viewer.updateWindow(time0, time1);
+        xAxis.setRange(new Range(time0 - viewer.getTimeOffset(),
+                time1 - viewer.getTimeOffset()));
+    }
+
+    private static void zoomOut(ITmfChartTimeProvider viewer, Chart chart) {
+        IAxis xAxis = chart.getAxisSet().getXAxis(0);
+        if (xAxis == null) {
+            return;
+        }
+
+        long prevTime0 = viewer.getWindowStartTime();
+        long prevTime1 = viewer.getWindowEndTime();
+        long selTime = (viewer.getSelectionEndTime() + viewer.getSelectionBeginTime()) / 2;
+        if (selTime < prevTime0 || selTime > prevTime1) {
+            selTime = (prevTime0 + prevTime1) / 2;
+        }
+        long newInterval;
+        long time0;
+        if (prevTime1 - prevTime0 <= 1) {
+            newInterval = 2;
+            time0 = selTime - 1;
+        } else {
+            newInterval = (long) Math.ceil((prevTime1 - prevTime0) * ZOOM_FACTOR_SELECTION_CENTERED);
+            time0 = selTime - (long) Math.ceil((selTime - prevTime0) * ZOOM_FACTOR_SELECTION_CENTERED);
+        }
+        /* snap to bounds if zooming out of range */
+        time0 = validateWindowStartTime(viewer, Math.max(MIN_WINDOW_SIZE, Math.min(time0, viewer.getEndTime() - newInterval)));
+        long time1 = validateWindowEndTime(viewer, time0, time0 + newInterval);
+        viewer.updateWindow(time0, time1);
+        xAxis.setRange(new Range(time0 - viewer.getTimeOffset(),
+                time1 - viewer.getTimeOffset()));
+    }
+
     private static long validateWindowStartTime(ITmfChartTimeProvider viewer, long start) {
         long realStart = start;
 
