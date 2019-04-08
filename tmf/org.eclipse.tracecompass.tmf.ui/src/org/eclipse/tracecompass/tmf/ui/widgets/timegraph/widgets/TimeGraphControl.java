@@ -2939,8 +2939,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
             if (fHasNamespaceFocus) {
                 ITimeGraphEntry entry = getSelectedTrace();
                 setExpandedState(entry, 0, true);
-            } else {
-                zoomIn();
             }
         } else if (e.character == '-' && ((e.stateMask & SWT.CTRL) == 0)) {
             if (fHasNamespaceFocus) {
@@ -2948,8 +2946,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 if ((entry != null) && entry.hasChildren()) {
                     setExpandedState(entry, -1, false);
                 }
-            } else {
-                zoomOut();
             }
         } else if ((e.character == '*') && ((e.stateMask & SWT.CTRL) == 0)) {
             if (fHasNamespaceFocus) {

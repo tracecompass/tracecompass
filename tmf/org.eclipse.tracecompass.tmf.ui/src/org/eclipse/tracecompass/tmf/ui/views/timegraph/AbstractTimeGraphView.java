@@ -2907,14 +2907,18 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private ITmfTimeZoomProvider getTimeZoomProvider() {
         return (zoomIn, useMousePosition) -> {
             TimeGraphControl control = getTimeGraphControl();
-            if (control != null) {
+            TimeGraphViewer viewer = getTimeGraphViewer();
+            if (control != null && viewer != null) {
                 if (useMousePosition) {
                     control.zoom(zoomIn);
                 } else {
-                    if (zoomIn) {
-                        control.zoomIn();
-                    } else {
-                        control.zoomOut();
+                    int xCoord = control.toControl(control.getDisplay().getCursorLocation()).x;
+                    if ((viewer.getNameSpace() <= xCoord) && (xCoord < control.getSize().x)) {
+                        if (zoomIn) {
+                            control.zoomIn();
+                        } else {
+                            control.zoomOut();
+                        }
                     }
                 }
             }

@@ -1332,6 +1332,16 @@
       </command>
       <command
             categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
+            id="org.eclipse.tracecompass.tmf.ui.command.zoomin.selection"
+            name="%command.zoomin.selection">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
+            id="org.eclipse.tracecompass.tmf.ui.command.zoomout.selection"
+            name="%command.zoomout.selection">
+      </command>
+      <command
+            categoryId="org.eclipse.linuxtools.tmf.ui.commands.category"
             id="org.eclipse.tracecompass.tmf.ui.timegraph.bookmark"
             name="%command.addbookmark">
       </command>
@@ -1890,6 +1900,14 @@
             commandId="org.eclipse.tracecompass.tmf.ui.command.zoomout">
       </handler>
       <handler
+            class="org.eclipse.tracecompass.internal.tmf.ui.views.handler.TmfViewSelectionZoomInHandler"
+            commandId="org.eclipse.tracecompass.tmf.ui.command.zoomin.selection">
+      </handler>
+      <handler
+            class="org.eclipse.tracecompass.internal.tmf.ui.views.handler.TmfViewSelectionZoomOutHandler"
+            commandId="org.eclipse.tracecompass.tmf.ui.command.zoomout.selection">
+      </handler>
+      <handler
             class="org.eclipse.tracecompass.internal.tmf.ui.viewers.timegraph.handlers.TimeGraphAddBookmarkHandler"
             commandId="org.eclipse.tracecompass.tmf.ui.timegraph.bookmark">
       </handler>
@@ -1968,6 +1986,24 @@
             contextId="org.eclipse.tracecompass.tmf.ui.view.context"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="S">
+      </key>
+      <key
+            commandId="org.eclipse.tracecompass.tmf.ui.command.zoomin.selection"
+            contextId="org.eclipse.tracecompass.tmf.ui.view.context"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="+">
+      </key>
+      <key
+            commandId="org.eclipse.tracecompass.tmf.ui.command.zoomin.selection"
+            contextId="org.eclipse.tracecompass.tmf.ui.view.context"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="=">
+      </key>
+      <key
+            commandId="org.eclipse.tracecompass.tmf.ui.command.zoomout.selection"
+            contextId="org.eclipse.tracecompass.tmf.ui.view.context"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="-">
       </key>
       <key
             commandId="org.eclipse.tracecompass.tmf.ui.timegraph.filter"

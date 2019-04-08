@@ -644,17 +644,37 @@ public class TimeGraphViewTest {
         SWTBotTimeGraph timegraph = fTimeGraph;
 
         TimeGraphViewStub view = getView();
+        timegraph.setFocus();
 
         assertEquals(80, getDuration(view.getWindowRange()));
-        fireKey(timegraph, false, '+');
-        assertEquals(52, getDuration(view.getWindowRange()));
-        fireKey(timegraph, false, '+');
-        assertEquals(34, getDuration(view.getWindowRange()));
-        fireKey(timegraph, false, '-');
-        assertEquals(51, getDuration(view.getWindowRange()));
-        fireKey(timegraph, false, '-');
-        assertEquals(77, getDuration(view.getWindowRange()));
+        fireKeyInGraph(timegraph, '=');
+        fViewBot.bot().waitUntil(new WindowRangeCondition(view, 52));
+        fireKeyInGraph(timegraph, '+');
+        fViewBot.bot().waitUntil(new WindowRangeCondition(view, 34));
+        fireKeyInGraph(timegraph, '-');
+        fViewBot.bot().waitUntil(new WindowRangeCondition(view, 51));
+        fireKeyInGraph(timegraph, '-');
+        fViewBot.bot().waitUntil(new WindowRangeCondition(view, 77));
+    }
 
+    private class WindowRangeCondition extends DefaultCondition {
+        TimeGraphViewStub fView;
+        long fExpectedRange;
+
+        public WindowRangeCondition(TimeGraphViewStub view, long expectedRange) {
+            fView = view;
+            fExpectedRange = expectedRange;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            return getDuration(fView.getWindowRange()) == fExpectedRange;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return "Expected window range (" + fExpectedRange + ") not achieved. Actual=" + getDuration(fView.getWindowRange());
+        }
     }
 
     /**
@@ -757,7 +777,17 @@ public class TimeGraphViewTest {
             }
             timegraph.widget.keyReleased(e);
         });
+    }
 
+    private static void fireKeyInGraph(SWTBotTimeGraph timegraph, char c, int... modifiers) {
+        timegraph.setFocus();
+        // Move mouse to middle of the timegraph
+        timegraph.moveMouseToWidget();
+        int mask = 0;
+        for (int modifier : modifiers) {
+            mask |= modifier;
+        }
+        timegraph.pressShortcut(mask, c);
     }
 
     private static void resetMousePosition(SWTBotTimeGraph timegraph, boolean inNs, MouseEvent mouseEvent) {

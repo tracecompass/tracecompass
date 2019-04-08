@@ -684,15 +684,15 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
             if (chart == null) {
                 return;
             }
+            Point cursorDisplayLocation = getDisplay().getCursorLocation();
+            Point cursorControlLocation = getSwtChart().getPlotArea().toControl(cursorDisplayLocation);
+            Point cursorParentLocation = getSwtChart().getPlotArea().getParent().toControl(cursorDisplayLocation);
+            Rectangle controlBounds = getSwtChart().getPlotArea().getBounds();
+            // check the X axis only
+            if (!controlBounds.contains(cursorParentLocation.x, controlBounds.y)) {
+                return;
+            }
             if (useMousePosition) {
-                Point cursorDisplayLocation = getDisplay().getCursorLocation();
-                Point cursorControlLocation = getSwtChart().getPlotArea().toControl(cursorDisplayLocation);
-                Point cursorParentLocation = getSwtChart().getPlotArea().getParent().toControl(cursorDisplayLocation);
-                Rectangle controlBounds = getSwtChart().getPlotArea().getBounds();
-                // check the X axis only
-                if (!controlBounds.contains(cursorParentLocation.x, controlBounds.y)) {
-                    return;
-                }
                 TmfXyUiUtils.zoom(this, chart, zoomIn, cursorControlLocation.x);
             } else {
                 TmfXyUiUtils.zoom(this, chart, zoomIn);
