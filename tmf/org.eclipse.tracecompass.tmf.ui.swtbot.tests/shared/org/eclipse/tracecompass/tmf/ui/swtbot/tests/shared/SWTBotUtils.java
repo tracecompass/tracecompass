@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2018 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -140,6 +140,7 @@ public final class SWTBotUtils {
     private static final String PREFERENCES_SHELL = "Preferences";
     private static boolean fPrintedEnvironment = false;
     private static Logger log = Logger.getLogger(SWTBotUtils.class);
+    private static final int ACTIVE_EDITOR_TIMEOUT = 120000;
     private static final int DELETE_PROJECT_TIMEOUT = 120000;
 
     private SWTBotUtils() {
@@ -1068,7 +1069,7 @@ public final class SWTBotUtils {
      */
     public static SWTBotEditor activeEventsEditor(final SWTWorkbenchBot workbenchBot) {
         ConditionHelpers.ActiveEventsEditor condition = new ConditionHelpers.ActiveEventsEditor(workbenchBot, null);
-        workbenchBot.waitUntil(condition);
+        workbenchBot.waitUntil(condition, ACTIVE_EDITOR_TIMEOUT);
         return condition.getActiveEditor();
     }
 
@@ -1085,7 +1086,7 @@ public final class SWTBotUtils {
      */
     public static SWTBotEditor activeEventsEditor(final SWTWorkbenchBot workbenchBot, String editorTitle) {
         ConditionHelpers.ActiveEventsEditor condition = new ConditionHelpers.ActiveEventsEditor(workbenchBot, editorTitle);
-        workbenchBot.waitUntil(condition);
+        workbenchBot.waitUntil(condition, ACTIVE_EDITOR_TIMEOUT);
         return condition.getActiveEditor();
     }
 

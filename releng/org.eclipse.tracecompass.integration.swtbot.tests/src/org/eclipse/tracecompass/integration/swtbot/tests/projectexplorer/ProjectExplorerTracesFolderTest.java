@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2016, 2018 Ericsson
+ * Copyright (c) 2016, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,8 +19,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.varia.NullAppender;
+import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -177,7 +178,7 @@ public class ProjectExplorerTracesFolderTest {
         SWTBotPreferences.TIMEOUT = 20000; /* 20 second timeout */
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         fLogger.removeAllAppenders();
-        fLogger.addAppender(new NullAppender());
+        fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
         fBot = new SWTWorkbenchBot();
 
         /* Finish waiting for eclipse to load */
@@ -834,7 +835,6 @@ public class ProjectExplorerTracesFolderTest {
 
         int optionFlags = ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE;
         importTrace(CUSTOM_TEXT_TRACE_TYPE, optionFlags, ImportConfirmation.SKIP_ALL, "");
-        verifyTrace(CUSTOM_TEXT_LOG, optionFlags);
 
         final TestTraceInfo[] TEXT_BASED_TRACEINFOS = new TestTraceInfo[] {
                 CUSTOM_TEXT_LOG,

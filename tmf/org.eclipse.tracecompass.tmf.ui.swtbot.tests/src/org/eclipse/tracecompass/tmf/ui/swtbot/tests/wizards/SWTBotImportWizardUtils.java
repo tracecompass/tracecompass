@@ -265,6 +265,7 @@ public final class SWTBotImportWizardUtils {
      */
     public static void testEventsTable(SWTWorkbenchBot bot, String editorName, long nbEvents, String firstEventStr) {
         SWTBotEditor editor = SWTBotUtils.activeEventsEditor(bot, editorName);
+        SWTBotUtils.waitUntil(part -> part.isActivePart(), editor, editor + " did not become the active part");
         bot.waitUntil(ConditionHelpers.numberOfEventsInTrace(TmfTraceManager.getInstance().getActiveTrace(), nbEvents));
 
         if (nbEvents == 0 || firstEventStr == null || firstEventStr.isEmpty()) {
