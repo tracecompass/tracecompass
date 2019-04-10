@@ -56,10 +56,12 @@ import org.eclipse.tracecompass.tmf.core.presentation.IPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.presentation.QualitativePaletteProvider;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.presentation.SequentialPaletteProvider;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
@@ -72,6 +74,7 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ImageHelper;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.ui.IWorkbenchPart;
@@ -136,6 +139,8 @@ public class TimeGraphViewTest {
      * Image after resetting
      */
     private static final String RESET_LOC = "reset";
+
+    private static final TmfTimeRange INITIAL_WINDOW_RANGE = new TmfTimeRange(TmfTimestamp.fromNanos(20), TmfTimestamp.fromNanos(100));
 
     private SWTBotView fViewBot;
 
@@ -228,8 +233,7 @@ public class TimeGraphViewTest {
 
     private void resetTimeRange() {
         TmfTimeRange fullTimeRange = fTrace.getTimeRange();
-        TmfTimeRange smallerRange = new TmfTimeRange(TmfTimestamp.fromNanos(20), TmfTimestamp.fromNanos(100));
-        TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, smallerRange);
+        TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, INITIAL_WINDOW_RANGE);
 
         TimeGraphViewStub view = getView();
         // This is an oddity: the signals may be lost if a view is not
@@ -241,7 +245,7 @@ public class TimeGraphViewTest {
         // Workflow: it should always fail at first and then a signal is sent.
         // it will either time out or work.
         fBot.waitUntil(new TgConditionHelper(t -> {
-            if (smallerRange.equals(view.getWindowRange())) {
+            if (INITIAL_WINDOW_RANGE.equals(view.getWindowRange())) {
                 return true;
             }
             TmfSignalManager.dispatchSignal(signal);
@@ -655,26 +659,17 @@ public class TimeGraphViewTest {
         fViewBot.bot().waitUntil(new WindowRangeCondition(view, 51));
         fireKeyInGraph(timegraph, '-');
         fViewBot.bot().waitUntil(new WindowRangeCondition(view, 77));
-    }
-
-    private class WindowRangeCondition extends DefaultCondition {
-        TimeGraphViewStub fView;
-        long fExpectedRange;
-
-        public WindowRangeCondition(TimeGraphViewStub view, long expectedRange) {
-            fView = view;
-            fExpectedRange = expectedRange;
-        }
-
-        @Override
-        public boolean test() throws Exception {
-            return getDuration(fView.getWindowRange()) == fExpectedRange;
-        }
-
-        @Override
-        public String getFailureMessage() {
-            return "Expected window range (" + fExpectedRange + ") not achieved. Actual=" + getDuration(fView.getWindowRange());
-        }
+        /*
+         *  Note that 'w' and 's' zooming is based on mouse position. Just check if
+         *  window range was increased or decreased to avoid inaccuracy due to
+         *  the mouse position in test environment.
+         */
+        long previousRange = getDuration(view.getWindowRange());
+        fireKeyInGraph(timegraph, 'w');
+        fViewBot.bot().waitUntil(new WindowRangeUpdatedCondition(view, previousRange, false));
+        previousRange = getDuration(view.getWindowRange());
+        fireKeyInGraph(timegraph, 's');
+        fViewBot.bot().waitUntil(new WindowRangeUpdatedCondition(view, previousRange, true));
     }
 
     /**
@@ -737,6 +732,52 @@ public class TimeGraphViewTest {
         assertEquals(1, timegraph.selection().columnCount());
         assertEquals("[Hat1]", timegraph.selection().get(0).toString());
         assertEquals(16, getVisibleItems(timegraph));
+    }
+
+    /**
+     * Test zoom to selection
+     */
+    @Test
+    public void testZoomToSelection() {
+        resetTimeRange();
+        SWTBotTimeGraph timegraph = fTimeGraph;
+
+        TimeGraphViewStub view = getView();
+        timegraph.setFocus();
+
+        assertEquals(80, getDuration(view.getWindowRange()));
+
+        /* set selection to trace start time */
+        ITmfTimestamp selStartTime = TmfTimestamp.fromNanos(30L);
+        ITmfTimestamp selEndTime = TmfTimestamp.fromNanos(80L);
+        TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, selStartTime, selEndTime));
+        timeGraphIsReadyCondition(new TmfTimeRange(selStartTime, selEndTime));
+        fireKeyInGraph(timegraph, 'z');
+        fViewBot.bot().waitUntil(new WindowRangeCondition(view, 50));
+    }
+
+    /**
+     * Test 'a' and 'd' navigation
+     */
+    @Test
+    public void testKeyboardNavigation() {
+        resetTimeRange();
+        SWTBotTimeGraph timegraph = fTimeGraph;
+
+        TimeGraphViewStub view = getView();
+        timegraph.setFocus();
+
+        assertEquals(80, getDuration(view.getWindowRange()));
+
+        TmfTimeRange updatedWindowRange = new TmfTimeRange(TmfTimestamp.fromNanos(40), TmfTimestamp.fromNanos(120));
+
+        // move to the right
+        fireKeyInGraph(timegraph, 'd');
+        fViewBot.bot().waitUntil(new TgConditionHelper(t -> updatedWindowRange.equals(view.getWindowRange())));
+
+        // move to the left
+        fireKeyInGraph(timegraph, 'a');
+        fViewBot.bot().waitUntil(new TgConditionHelper(t -> INITIAL_WINDOW_RANGE.equals(view.getWindowRange())));
     }
 
     private static long getDuration(TmfTimeRange refRange) {
@@ -947,6 +988,11 @@ public class TimeGraphViewTest {
         });
     }
 
+    private void timeGraphIsReadyCondition(@NonNull TmfTimeRange selectionRange) {
+        IWorkbenchPart part = fViewBot.getViewReference().getPart(false);
+        fBot.waitUntil(ConditionHelpers.timeGraphIsReadyCondition((AbstractTimeGraphView) part, selectionRange, selectionRange.getEndTime()));
+    }
+
     private abstract class ConditionHelper implements ICondition {
         @Override
         public final String getFailureMessage() {
@@ -1002,5 +1048,53 @@ public class TimeGraphViewTest {
             return fFile.length() >= fAmount;
         }
     }
+
+    private class WindowRangeCondition extends DefaultCondition {
+        TimeGraphViewStub fView;
+        long fExpectedRange;
+
+        public WindowRangeCondition(TimeGraphViewStub view, long expectedRange) {
+            fView = view;
+            fExpectedRange = expectedRange;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            return getDuration(fView.getWindowRange()) == fExpectedRange;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return "Expected window range (" + fExpectedRange + ") not achieved. Actual=" + getDuration(fView.getWindowRange());
+        }
+    }
+
+    private class WindowRangeUpdatedCondition extends DefaultCondition {
+        TimeGraphViewStub fView;
+        long fPreviousRange;
+        boolean fIsIncreased;
+
+        public WindowRangeUpdatedCondition(TimeGraphViewStub view, long previousRange, boolean increased) {
+            fView = view;
+            fPreviousRange = previousRange;
+            fIsIncreased = increased;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            long newRange = getDuration(fView.getWindowRange());
+            if (fIsIncreased) {
+                return newRange > fPreviousRange;
+            }
+            return newRange < fPreviousRange;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return "Window range didn't " + (fIsIncreased ? "increase" : "decrease") +
+                    " (previous: " + fPreviousRange + ", actual: " + getDuration(fView.getWindowRange()) + ")";
+        }
+    }
+
 
 }
