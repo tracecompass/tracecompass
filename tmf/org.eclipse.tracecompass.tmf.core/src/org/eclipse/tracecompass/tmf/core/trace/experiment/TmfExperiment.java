@@ -172,7 +172,7 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
             final ITmfTrace[] traces,
             final int indexPageSize,
             final @Nullable IResource resource) {
-        initExperiment(type, path, traces, indexPageSize, resource);
+        initExperiment(type, path, traces, indexPageSize, resource, TmfTraceType.DEFAULT_EXPERIMENT_TYPE);
     }
 
     @Override
@@ -208,29 +208,6 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
 
     /**
      * Initialization of an experiment, taking the type, path, traces,
-     * indexPageSize and resource
-     *
-     * @param type
-     *            the event type
-     * @param path
-     *            the experiment path
-     * @param traces
-     *            the experiment set of traces
-     * @param indexPageSize
-     *            the experiment index page size
-     * @param resource
-     *            the resource associated to the experiment
-     */
-    public void initExperiment(final Class<? extends ITmfEvent> type,
-            final String path,
-            final ITmfTrace[] traces,
-            final int indexPageSize,
-            final @Nullable IResource resource) {
-        initExperiment(type, path, traces, indexPageSize, resource, TmfTraceType.DEFAULT_EXPERIMENT_TYPE);
-    }
-
-    /**
-     * Initialization of an experiment, taking the type, path, traces,
      * indexPageSize, resource and trace type id
      *
      * @param type
@@ -253,12 +230,34 @@ public class TmfExperiment extends TmfTrace implements ITmfPersistentlyIndexable
             final int indexPageSize,
             final @Nullable IResource resource,
             final String traceTypeId) {
-
         try {
             super.initTrace(resource, path, type, getName(), traceTypeId);
         } catch (TmfTraceException e) {
             Activator.logError("Error initializing experiment", e); //$NON-NLS-1$
         }
+        initExperiment(type, path, traces, indexPageSize, resource);
+    }
+
+    /**
+     * Initialization of an experiment, taking the type, path, traces,
+     * indexPageSize and resource
+     *
+     * @param type
+     *            the event type
+     * @param path
+     *            the experiment path
+     * @param traces
+     *            the experiment set of traces
+     * @param indexPageSize
+     *            the experiment index page size
+     * @param resource
+     *            the resource associated to the experiment
+     */
+    public void initExperiment(final Class<? extends ITmfEvent> type,
+            final String path,
+            final ITmfTrace[] traces,
+            final int indexPageSize,
+            final @Nullable IResource resource) {
         setCacheSize(indexPageSize);
         setStreamingInterval(0);
 
