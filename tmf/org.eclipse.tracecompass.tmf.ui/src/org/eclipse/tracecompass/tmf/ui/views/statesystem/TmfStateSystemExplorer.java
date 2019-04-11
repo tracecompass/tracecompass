@@ -441,10 +441,12 @@ public class TmfStateSystemExplorer extends AbstractTimeGraphView {
 
             traceEntry.updateEndTime(end);
 
-            long resolution = Long.max(1, (end - start) / getDisplayWidth());
-            zoomEntries(Utils.flatten(traceEntry), start, end, resolution, monitor);
-            long selectionStart = TmfTraceManager.getInstance().getTraceContext(trace).getSelectionRange().getStartTime().toNanos();
-            updateFullstates(selectionStart, Collections.singletonList(traceEntry));
+            if (end - start >= 0) {
+                long resolution = Long.max(1, (end - start) / getDisplayWidth());
+                zoomEntries(Utils.flatten(traceEntry), start, end, resolution, monitor);
+                long selectionStart = TmfTraceManager.getInstance().getTraceContext(trace).getSelectionRange().getStartTime().toNanos();
+                updateFullstates(selectionStart, Collections.singletonList(traceEntry));
+            }
 
             if (monitor.isCanceled()) {
                 return;
