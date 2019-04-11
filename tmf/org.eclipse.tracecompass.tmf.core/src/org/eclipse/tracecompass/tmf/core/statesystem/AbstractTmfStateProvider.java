@@ -348,7 +348,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
 
         private void closeStateSystem() {
             ITmfEvent event = currentEvent;
-            final long endTime = (event == null) ? 0 : event.getTimestamp().toNanos();
+            final long endTime = (event == null) ? Long.MIN_VALUE : event.getTimestamp().toNanos();
 
             if (fSS != null) {
                 fSS.closeHistory(endTime);
