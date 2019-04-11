@@ -2188,17 +2188,30 @@ The following keyboard shortcuts are available:
 *'''Home''': selects the first process
 *'''End''': selects the last process
 *'''Enter''': toggles the expansion state of the current process in the tree
-*'''+''': Zoom-in horizontally
-*'''-''': Zoom-out horizontally
+*'''+''': Zoom-in centered to the selected time range (or window range if time selection is not visible)
+*'''-''': Zoom-out centered to the selected time range (or window range if time selection is not visible)
 *'''Ctrl + +''': Zoom-in vertically
 *'''Ctrl + -''': Zoom-out vertically
 *'''Ctrl + 0''': Reset the vertical zoom
 *'''Ctrl + F''': Search in the view. (see [[#Searching in Time Graph Views | Searching in Time Graph Views]])
+*'''G''': Toggles both vertical and horizontal gridlines
+*'''Z''': Zoom to current selected time range (if range is greater than 0)
+
+'''WASD Navigation'''
+
+Use WASD Navigation in conjunction with the mouse, where one hand changes the mouse
+position and the other hand uses the keyboard shortcuts to zoom or scroll.
+
+*'''W''': Zoom-in horizontally centered to the mouse position
+*'''S''': Zoom-out horizontally centered to the mouse position
+*'''A''': Scroll left by a quarter of the current window range
+*'''D''': Scroll right by a quarter of the current window range
+
 When the mouse cursor is over entries (left pane):
 *'''-''': Collapse selected entry
 *'''+''': Expand selected entry
 *'''*''': Expand selected entry to the level with at least one collapsed entry
-*'''g''': Toggles both vertical and horizontal gridlines
+
 
 '''Please note that the behavior of some shortcuts can slightly differ based on the operating system.'''
 
@@ -2557,12 +2570,29 @@ The CPU Usage chart is usable with the mouse. The following actions are set:
 
 * '''left-click''': select a time or time range begin time
 * '''Shift-left-click or drag''': Extend or shrink the selection range
-
 * '''left-drag horizontally''': select a time range or change the time range begin or end time
 * '''middle-drag or Ctrl-left-drag horizontally''': pan left or right
 * '''right-drag horizontally''': [[#Zoom region|zoom region]]
 * '''Shift-mouse wheel up/down''': scroll left or right
 * '''Ctrl-mouse wheel up/down''': zoom in or out horizontally
+
+==== Using the keyboard ====
+
+The following keyboard shortcuts are available, when the mouse cursor is over the graph (right pane):
+*'''+''': Zoom-in horizontally centered to the selected time range (or window range if time selection is not visible)
+*'''-''': Zoom-out horizontally centered to the selected time range (or window range if time selection is not visible)
+*'''Z''': Zoom to the current selection time range, if the selection range is greater than 0
+
+'''WASD Navigation'''
+
+Use WASD Navigation in conjunction with the mouse, where one hand changes the mouse
+position and the other hand uses the keyboard shortcuts to zoom or scroll.
+
+*'''W''': Zoom-in horizontally centered to the mouse position
+*'''S''': Zoom-out horizontally centered to the mouse position
+*'''A''': Scroll left by a quarter of the current window range
+*'''D''': Scroll right by a quarter of the current window range
+
 
 ==== Tooltips ====
 
@@ -2608,6 +2638,10 @@ The filter button: [[Image:images/filter_items.gif]] can be used to show only th
 
 The time range can be set to fully zoomed out by double-clicking the time axis or the home button.
 
+=== Navigation ===
+
+For navigation, see CPU Usage view's '''[[#Using_the_mouse_2 | Using the mouse]]''', '''[[#Using_the_keyboard_2 | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
+
 === Process Information ===
 
 The Process Information is displayed on the left side of the view and shows all threads that were executing on all available CPUs in the current time range. For each process, it shows in different columns the thread ID (TID) and the process name (Process).
@@ -2618,19 +2652,9 @@ The Process Information is displayed on the left side of the view and shows all 
 The Relative Kernel Memory Chart on the right side of the view plots the relative amount of memory that was allocated and deallocated during that period of time.
 
 
-==== Using the mouse ====
+==== Navigation ====
 
-The Relative Kernel Memory chart is usable with the mouse. The following actions are set:
-
-* '''left-click''': select a time or time range begin time
-* '''Shift-left-click or drag''': Extend or shrink the selection range
-
-* '''left-drag horizontally''': select a time range or change the time range begin or end time
-* '''middle-drag or Ctrl-left-drag horizontally''': pan left or right
-* '''right-drag horizontally''': [[#Zoom region|zoom region]]
-* '''Shift-mouse wheel up/down''': scroll left or right
-* '''Ctrl-mouse wheel up/down''': zoom in or out horizontally
-
+For navigation, see CPU Usage view's '''[[#Using_the_mouse_2 | Using the mouse]]''', '''[[#Using_the_keyboard_2 | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
 
 ==== Tooltips ====
 
@@ -2730,6 +2754,10 @@ Disk reads and writes can be selected in the tree on the left hand side.
 The time range can be reset by double-clicking the time axis or by clicking the reset button.
 
  [[Image:images/io/diskIoActivity.png| Disk I/O Activity Example]]
+
+==== Navigation ====
+
+For navigation, see CPU Usage view's '''[[#Using_the_mouse_2 | Using the mouse]]''', '''[[#Using_the_keyboard_2 | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
 
 == System Call Latency Analysis ==
 
@@ -3003,18 +3031,9 @@ The time range can be fully zoomed out by double-clicking the time axis or the h
 
 Please note this view will not show shared memory or stack memory usage.
 
-=== Using the mouse ===
+=== Navigation ===
 
-The Memory Usage chart is usable with the mouse. The following actions are set:
-
-* '''left-click''': select a time or time range begin time
-* '''Shift-left-click or drag''': Extend or shrink the selection range
-
-* '''left-drag horizontally''': select a time range or change the time range begin or end time
-* '''middle-drag or Ctrl-left-drag horizontally''': pan left or right
-* '''right-drag horizontally''': [[#Zoom region|zoom region]]
-* '''Shift-mouse wheel up/down''': scroll left or right
-* '''Ctrl-mouse wheel up/down''': zoom in or out horizontally
+For navigation, see CPU Usage view's '''[[#Using_the_mouse_2 | Using the mouse]]''', '''[[#Using_the_keyboard_2 | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
 
 === View Menu ===
 
@@ -4005,6 +4024,8 @@ A time aligned '''scatter chart''' of the latencies with respect to the current 
 
 [[Image:images/LatenciesScatter.png| Latency Scatter Chart example - System Call Latency vs Time]]
 
+For navigation, see CPU Usage view's '''[[#Using_the_mouse_2 | Using the mouse]]''', '''[[#Using_the_keyboard_2 | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
+
 
 * System Call Latency Statistics
 A view of the '''statistics''' of the latencies. These show the ''minimum'', ''maximum'', ''average'', ''standard deviation'', ''count'' and ''Total'' of the latencies when applicable. The view shows the total statistics for the whole trace also as the local statistics for a selection range. This tool is useful for finding the outliers on a per-category basis.
@@ -4021,9 +4042,6 @@ A '''density''' view, analyzing the current time range. This is useful to find g
 [[Image:images/LatenciesDensity.png| Latency Densities example - System Call Density]]
 
 Using the right mouse button to drag horizontally it will update the table and graph to show only the density for the selected durations. Durations outside the selection range will be filtered out. Using the toolbar button [[Image:images/zoomout_nav.gif]] the zoom range will be reset. 
-
-==== Using the keyboard ====
-*'''Ctrl + F''': Search in the view. (see [[#Searching in Time Graph Views | Searching in Time Graph Views]])
 
 = Counters Analysis =
 
