@@ -2564,6 +2564,15 @@ The Process Information is displayed on the left side of the view and shows all 
 The CPU Usage Chart on the right side of the view, plots the total time spent on all CPUs of all processes and the time of the selected process.
 
 
+==== Tooltips ====
+
+Hover the cursor over a line of the chart and a tooltip will pop up with the following information:
+* '''Time''': current time of mouse position
+* '''total''': The total CPU usage
+* '''<process>''': CPU usage of selected process
+
+[[Image:images/LTTng_CpuUsageViewToolTip.png]]
+
 ==== Using the mouse ====
 
 The CPU Usage chart is usable with the mouse. The following actions are set:
@@ -2594,25 +2603,39 @@ position and the other hand uses the keyboard shortcuts to zoom or scroll.
 *'''D''': Scroll right by a quarter of the current window range
 
 
-==== Tooltips ====
+==== Toolbar ====
 
-Hover the cursor over a line of the chart and a tooltip will pop up with the following information:
-* '''time''': current time of mouse position
-* '''Total''': The total CPU usage
+The view '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
 
+{|
+| [[Image:images/home_nav.gif]]
+| Reset the Time Scale to Default
+| Resets the zoom window to the full range.
+|-
+| [[Image:images/zoomin_nav.gif]]
+| Zoom In
+| Zooms in on the selection by 50%.
+|-
+| [[Image:images/zoomout_nav.gif]]
+| Zoom Out
+| Zooms out on the selection by 50%.
+|-
+| [[Image:images/unpinned_view.gif]]<br>[[Image:images/pin_view.gif]]
+| Pin/Unpin View
+| Pin or unpin the view. A pinned view is frozen with the trace selected at the time of pinning. When the unpin button is clicked the view synchronizes back to the active trace. The button's drop down menu can be used to quickly pin the view to any of the opened traces.
+|}
 
 ==== View Menu ====
 
 The CPU Usage View '''view menu''', located at the top right of the view, has shortcut buttons to perform common actions:
 
 {|
-|
-| Align Views
-| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the this view will disable this feature across all the views because it's a workspace preference
+| New CPU Usage view
+| Spawn a new CPU Usage view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
 |-
+| Align Views
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
 |}
-
-[[Image:images/LTTng_CpuUsageViewToolTip.png]]
 
 ==== CPU Filtering ====
 [[#Follow CPU | Follow a CPU]] will filter the CPU Usage View and will display only usage for the followed CPU.
@@ -2638,13 +2661,38 @@ The filter button: [[Image:images/filter_items.gif]] can be used to show only th
 
 The time range can be set to fully zoomed out by double-clicking the time axis or the home button.
 
+=== Process Information ===
+
+The Process Information is displayed on the left side of the view and shows all threads that were executing on all available CPUs in the current time range. For each process, it shows in different columns the thread ID (TID) and the process name (Process).
+
 === Navigation ===
 
 For navigation, see CPU Usage view's '''[[#Using_the_mouse_2 | Using the mouse]]''', '''[[#Using_the_keyboard_2 | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
 
-=== Process Information ===
+=== Toolbar ===
 
-The Process Information is displayed on the left side of the view and shows all threads that were executing on all available CPUs in the current time range. For each process, it shows in different columns the thread ID (TID) and the process name (Process).
+The view '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
+
+{|
+| [[Image:images/filter_items.gif]]
+| Filter active threads
+| Show only active threads
+|}
+
+For other toolbar buttons, see CPU Usage view's '''[[#Toolbar_3 | Toolbar]]'''.
+
+=== View Menu ===
+
+The Memory Usage View '''view menu''', located at the top right of the view, has shortcut buttons to perform common actions:
+
+{|
+| New Memory Usage view
+| Spawn a new Memory Usage view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
+|-
+| Align Views
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
+|}
+
 
 
 === Relative Kernel Memory Chart ===
@@ -2758,6 +2806,24 @@ The time range can be reset by double-clicking the time axis or by clicking the 
 ==== Navigation ====
 
 For navigation, see CPU Usage view's '''[[#Using_the_mouse_2 | Using the mouse]]''', '''[[#Using_the_keyboard_2 | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
+
+==== Toolbar ====
+
+The view '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions.
+
+For details about the see CPU Usage view's '''[[#Toolbar_3 | Toolbar]]'''.
+
+==== View Menu ====
+
+The Disk I/O View '''view menu''', located at the top right of the view, has shortcut buttons to perform common actions:
+
+{|
+| New Disk I/O Activity view
+| Spawn a new Disk I/O Activity view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
+|-
+| Align Views
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
+|}
 
 == System Call Latency Analysis ==
 
@@ -3035,15 +3101,23 @@ Please note this view will not show shared memory or stack memory usage.
 
 For navigation, see CPU Usage view's '''[[#Using_the_mouse_2 | Using the mouse]]''', '''[[#Using_the_keyboard_2 | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
 
+=== Toolbar ===
+
+The view '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions.
+
+For details about the see CPU Usage view's '''[[#Toolbar_3 | Toolbar]]'''.
+
+
 === View Menu ===
 
 The Memory Usage View '''view menu''', located at the top right of the view, has shortcut buttons to perform common actions:
 
 {|
-|
-| Align Views
-| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the this view will disable this feature across all the views because it's a workspace preference
+| New Memory Usage view
+| Spawn a new Memory Usage view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
 |-
+| Align Views
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
 |}
 
 [[Image:images/LTTng_CpuUsageViewToolTip.png]]
@@ -4026,6 +4100,7 @@ A time aligned '''scatter chart''' of the latencies with respect to the current 
 
 For navigation, see CPU Usage view's '''[[#Using_the_mouse_2 | Using the mouse]]''', '''[[#Using_the_keyboard_2 | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
 
+For the toolbar, see CPU Usage view's '''[[#Toolbar_3 | Toolbar]]'''.'
 
 * System Call Latency Statistics
 A view of the '''statistics''' of the latencies. These show the ''minimum'', ''maximum'', ''average'', ''standard deviation'', ''count'' and ''Total'' of the latencies when applicable. The view shows the total statistics for the whole trace also as the local statistics for a selection range. This tool is useful for finding the outliers on a per-category basis.
@@ -4078,6 +4153,34 @@ Second, the checkbox tree has a search bar which allows users to apply filters o
 [[Image:images/counters/FilteredTree1.png]] [[Image:images/counters/FilteredTree2.png]] [[Image:images/counters/FilteredTree3.png]] [[Image:images/counters/FilteredTree4.png]]
 
 Finally, the tree's checkboxes are remembered when switching from one trace to another.
+
+=== Navigation ===
+
+For navigation, see CPU Usage view's '''[[#Using_the_mouse_2 | Using the mouse]]''', '''[[#Using_the_keyboard_2 | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
+
+=== Toolbar ===
+
+The view '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
+
+{|
+| [[Image:images/counters/sigma.gif]]
+| Toggle cumulative or non-cumulative
+| Switch between cumulative or non-cumulative presentation
+|}
+
+For other toolbar buttons, see CPU Usage view's '''[[#Toolbar_3 | Toolbar]]'''.
+
+=== View Menu ===
+
+The Counters View '''view menu''', located at the top right of the view, has shortcut buttons to perform common actions:
+
+{|
+| New Counters view
+| Spawn a new Counters view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
+|-
+| Align Views
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
+|}
 
 = Java Logging =
 
