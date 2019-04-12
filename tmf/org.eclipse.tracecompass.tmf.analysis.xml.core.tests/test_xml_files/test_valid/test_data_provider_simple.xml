@@ -50,4 +50,16 @@
             <name type="self" />
         </entry>
     </xyView>
+    
+    <xyView id="xml.core.tests.simple.pattern.xy.delta">
+        <head>
+            <analysis id="xml.core.tests.simple.pattern" />
+            <label value="XML Simple XY chart with delta" />
+        </head>
+
+        <entry path="CPU/*" displayType="delta">
+            <display type="self" />
+            <name type="self" />
+        </entry>
+    </xyView>
 </tmfxml>
