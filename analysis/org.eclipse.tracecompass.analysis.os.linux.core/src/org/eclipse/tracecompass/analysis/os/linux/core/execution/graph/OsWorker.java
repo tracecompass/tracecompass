@@ -71,7 +71,7 @@ public class OsWorker implements IGraphWorker {
         if (tid == -1) {
             return Collections.emptyMap();
         }
-        return Collections.singletonMap("tid", String.valueOf(tid)); //$NON-NLS-1$
+        return Collections.singletonMap(Objects.requireNonNull(org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.Messages.AspectName_Tid), String.valueOf(tid)); //$NON-NLS-1$
     }
 
     @SuppressWarnings("null")

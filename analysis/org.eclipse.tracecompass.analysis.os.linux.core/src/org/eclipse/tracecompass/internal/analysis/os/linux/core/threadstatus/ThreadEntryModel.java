@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus;
 
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
@@ -168,7 +170,7 @@ public class ThreadEntryModel extends TimeGraphEntryModel implements IElementRes
         fThreadId = pid;
         fParentThreadId = ppid;
         fAspects = HashMultimap.create();
-        fAspects.put("tid", String.valueOf(pid));
+        fAspects.put(Objects.requireNonNull(org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.Messages.AspectName_Tid), String.valueOf(pid));
         fAspects.put("ppid", String.valueOf(ppid));
         fAspects.put("exec_name", String.valueOf(name));
     }

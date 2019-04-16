@@ -41,6 +41,7 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphStateFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
@@ -53,6 +54,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 
@@ -100,6 +102,9 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
      */
     private List<ITimeGraphArrow> fLinks;
 
+    /** Cache for entry metadata */
+    private final Map<Long, @NonNull Multimap<@NonNull String, @NonNull String>> fEntryMetadata = new HashMap<>();
+
     /**
      * Constructor
      *
@@ -127,6 +132,9 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
         }
 
         CriticalPathVisitor visitor = fHorizontalVisitorCache.getUnchecked(current);
+        for (CriticalPathEntry model : visitor.getEntries()) {
+            fEntryMetadata.put(model.getId(), model.getMetadata());
+        }
         return new TmfModelResponse<>(visitor.getEntries(), Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
@@ -406,6 +414,12 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
             break;
         }
         return 8;
+    }
+
+    @Override
+    public @NonNull Multimap<@NonNull String, @NonNull String> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
+        return ITimeGraphStateFilter.mergeMultimaps(ITimeGraphDataProvider.super.getFilterData(entryId, time, monitor),
+                fEntryMetadata.getOrDefault(entryId, ImmutableMultimap.of()));
     }
 
 }

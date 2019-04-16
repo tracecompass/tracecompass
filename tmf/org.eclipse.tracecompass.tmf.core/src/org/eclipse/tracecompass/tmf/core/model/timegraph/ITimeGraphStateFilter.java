@@ -166,4 +166,23 @@ public interface ITimeGraphStateFilter {
     default Multimap<String, String> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
         return ImmutableMultimap.of();
     }
+
+    /**
+     * Merge multiple multimaps into one. The resulting map is not immutable so
+     * callers can fill it with additional data.
+     *
+     * @param maps
+     *            The maps to merge
+     * @return A multimap that is the result of the merge of the maps in
+     *         arguments
+     * @since 5.0
+     */
+    @SafeVarargs
+    static Multimap<String, String> mergeMultimaps(Multimap<String, String>... maps) {
+        Multimap<@NonNull String, @NonNull String> data = HashMultimap.create();
+        for (Multimap<String, String> multimap : maps) {
+            data.putAll(multimap);
+        }
+        return data;
+    }
 }
