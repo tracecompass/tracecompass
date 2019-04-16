@@ -8,7 +8,7 @@
 *******************************************************************************/
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
-import java.util.Map;
+import com.google.common.collect.Multimap;
 
 /**
  * This class represents a filter expression negation
@@ -29,7 +29,7 @@ public class FilterNot extends Filter {
     }
 
     @Override
-    public boolean test(Map<String, String> data) {
+    public boolean test(Multimap<String, String> data) {
         return !super.test(data);
     }
 

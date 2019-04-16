@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
@@ -30,6 +31,9 @@ import org.eclipse.tracecompass.tmf.core.response.ITmfResponse.Status;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * Class to abstract {@link ITimeGraphDataProvider} methods and fields. Handles
@@ -87,6 +91,16 @@ public abstract class AbstractTimeGraphDataProvider<A extends TmfStateSystemAnal
         } catch (StateSystemDisposedException | TimeRangeException | IndexOutOfBoundsException e) {
             return new TmfModelResponse<>(null, Status.FAILED, String.valueOf(e.getMessage()));
         }
+    }
+
+    @Override
+    public @NonNull Multimap<@NonNull String, @NonNull String> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
+        Multimap<@NonNull String, @NonNull String> data = HashMultimap.create();
+        Multimap<@NonNull String, @NonNull String> inputs = ITimeGraphDataProvider.super.getFilterData(entryId, time, monitor);
+
+        data.putAll(inputs);
+        data.putAll(getEntryMetadata(entryId));
+        return data;
     }
 
     /**

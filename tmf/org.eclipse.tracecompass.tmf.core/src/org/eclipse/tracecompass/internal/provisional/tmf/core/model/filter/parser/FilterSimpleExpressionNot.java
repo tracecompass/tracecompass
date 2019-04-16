@@ -8,10 +8,11 @@
 *******************************************************************************/
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
-import java.util.Map;
 import java.util.function.BiPredicate;
 
 import org.eclipse.jdt.annotation.Nullable;
+
+import com.google.common.collect.Multimap;
 
 /**
  * This class represents a simple filter expression negation
@@ -36,7 +37,7 @@ public class FilterSimpleExpressionNot extends FilterSimpleExpression {
     }
 
     @Override
-    public boolean test(Map<String, String> data) {
+    public boolean test(Multimap<String, String> data) {
         return !super.test(data);
     }
 }

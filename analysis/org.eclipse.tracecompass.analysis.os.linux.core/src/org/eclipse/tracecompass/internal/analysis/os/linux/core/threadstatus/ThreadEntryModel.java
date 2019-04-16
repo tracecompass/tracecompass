@@ -10,7 +10,7 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.tmf.core.model.IFilterableDataModel;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 
 import com.google.common.collect.HashMultimap;
@@ -21,7 +21,7 @@ import com.google.common.collect.Multimap;
  *
  * @author Simon Delisle
  */
-public class ThreadEntryModel extends TimeGraphEntryModel implements IFilterableDataModel {
+public class ThreadEntryModel extends TimeGraphEntryModel implements IElementResolver {
 
     /**
      * {@link ThreadEntryModel} builder, we use this to be able to reassign

@@ -54,10 +54,12 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -292,7 +294,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             return TmfXyResponseFactory.createFailedResponse(Objects.requireNonNull(Messages.SegmentStoreDataProvider_SegmentNotAvailable));
         }
 
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         if (filter instanceof IRegexQuery) {
             IRegexQuery regexFilter = (IRegexQuery) filter;
             predicates.putAll(computeRegexPredicate(regexFilter));
@@ -361,18 +363,18 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
      * @param monitor
      *            The progress monitor
      */
-    private void addPoint(Series series, ISegment segment, Map<Integer, Predicate<Map<String, String>>> predicates, @Nullable IProgressMonitor monitor) {
+    private void addPoint(Series series, ISegment segment, Map<Integer, Predicate<Multimap<String, String>>> predicates, @Nullable IProgressMonitor monitor) {
 
         if (!predicates.isEmpty()) {
 
             // Get the filter external input data
-            Map<@NonNull String, @NonNull String> input = getFilterInput(segment);
+            Multimap<@NonNull String, @NonNull String> input = getFilterInput(segment);
 
             // Test each predicates and set the status of the property associated to the
             // predicate
             int mask = 0;
-            for (Map.Entry<Integer, Predicate<Map<String, String>>> mapEntry : predicates.entrySet()) {
-                Predicate<Map<String, String>> value = Objects.requireNonNull(mapEntry.getValue());
+            for (Map.Entry<Integer, Predicate<Multimap<String, String>>> mapEntry : predicates.entrySet()) {
+                Predicate<Multimap<String, String>> value = Objects.requireNonNull(mapEntry.getValue());
                 boolean status = value.test(input);
                 Integer property = Objects.requireNonNull(mapEntry.getKey());
                 if (status && property != IFilterProperty.DIMMED) {
@@ -391,8 +393,8 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         }
     }
 
-    private Map<String, String> getFilterInput(ISegment segment) {
-        Map<String, String> map = new HashMap<>();
+    private Multimap<String, String> getFilterInput(ISegment segment) {
+        Multimap<String, String> map = HashMultimap.create();
         for(ISegmentAspect aspect : fProvider.getSegmentAspects()) {
             Object resolve = aspect.resolve(segment);
             if (resolve != null) {

@@ -16,7 +16,6 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.tmf.core.model.IFilterableDataModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 
 import com.google.common.collect.HashMultimap;
@@ -28,7 +27,7 @@ import com.google.common.collect.Multimap;
  * @version 1.0
  * @author Patrick Tasse
  */
-public class TimeEvent implements ITimeEvent, IFilterableDataModel {
+public class TimeEvent implements ITimeEvent {
 
     /** TimeGraphEntry matching this time event */
     protected ITimeGraphEntry fEntry;

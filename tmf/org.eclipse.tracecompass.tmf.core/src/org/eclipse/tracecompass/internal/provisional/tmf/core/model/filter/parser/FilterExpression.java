@@ -8,9 +8,10 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
-import java.util.Map;
 import java.util.Queue;
 import java.util.function.Predicate;
+
+import com.google.common.collect.Multimap;
 
 /**
  * This class implement a filter expression that could be tested against an
@@ -19,7 +20,7 @@ import java.util.function.Predicate;
  * @author Jean-Christian Kouame
  *
  */
-public class FilterExpression implements Predicate<Map<String, String>> {
+public class FilterExpression implements Predicate<Multimap<String, String>> {
 
     private final Queue<Object> fElements;
 
@@ -35,7 +36,7 @@ public class FilterExpression implements Predicate<Map<String, String>> {
     }
 
     @Override
-    public boolean test(Map<String, String> data) {
+    public boolean test(Multimap<String, String> data) {
 
         if (fElements.isEmpty()) {
             return false;

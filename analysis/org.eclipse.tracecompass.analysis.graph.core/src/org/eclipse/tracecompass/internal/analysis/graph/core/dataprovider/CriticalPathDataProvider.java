@@ -53,6 +53,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 
 /**
@@ -164,7 +165,7 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
             return new TmfModelResponse<>(null, Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
 
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         if (filter instanceof TimeGraphStateQueryFilter) {
             TimeGraphStateQueryFilter timeEventFilter = (TimeGraphStateQueryFilter) filter;
             predicates.putAll(computeRegexPredicate(timeEventFilter));
@@ -184,7 +185,7 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
                     if (overlaps(state.getStartTime(), state.getDuration(), filter.getTimesRequested())) {
                         // Reset the properties for this state before filtering
                         state.setActiveProperties(0);
-                        addToStateList(filteredStates, state, id, predicates, monitor);
+                        applyFilterAndAddState(filteredStates, state, id, predicates, monitor);
                     }
                 }
                 rowModels.add(new TimeGraphRowModel(id, filteredStates));

@@ -20,6 +20,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
+
 /**
  * Implements timegraph state filtering support. This interface provide default
  * method to provide the inputs and do the filtering.
@@ -46,7 +50,9 @@ public interface ITimeGraphStateFilter {
      *            associated predicate test result.
      * @param monitor
      *            The progress monitor
+     * @deprecated Use the {@link #applyFilterAndAddState(List, ITimeGraphState, Long, Multimap, Map, IProgressMonitor)} instead
      */
+    @Deprecated
     default void addToStateList(List<ITimeGraphState> stateList, ITimeGraphState timeGraphState, Long key, Map<Integer, Predicate<Map<String, String>>> predicates, @Nullable IProgressMonitor monitor) {
 
         if (!predicates.isEmpty()) {
@@ -80,6 +86,57 @@ public interface ITimeGraphStateFilter {
     }
 
     /**
+     * Filter the time graph state and add it to the state list
+     *
+     * @param stateList
+     *            The timegraph state list
+     * @param timeGraphState
+     *            The current timegraph state
+     * @param key
+     *            The timegraph entry model id
+     * @param predicates
+     *            The predicates used to filter the timegraph state. It is a map
+     *            of predicate by property. The value of the property is an
+     *            integer representing a bitmask associated to that property.
+     *            The status of each property will be set for the timegraph
+     *            state according to the associated predicate test result.
+     * @param monitor
+     *            The progress monitor
+     * @since 5.0
+     */
+    default void applyFilterAndAddState(List<ITimeGraphState> stateList, ITimeGraphState timeGraphState, Long key, Map<Integer, Predicate<Multimap<String, String>>> predicates, @Nullable IProgressMonitor monitor) {
+
+        if (!predicates.isEmpty()) {
+            // Get the filter external input data
+            long startTime = timeGraphState.getStartTime();
+            Multimap<@NonNull String, @NonNull String> input = HashMultimap.create();
+            input.putAll(getFilterData(key, startTime, monitor));
+            input.putAll(timeGraphState.getMetadata());
+
+            // Test each predicates and set the status of the property associated to the
+            // predicate
+            for (Map.Entry<Integer, Predicate<Multimap<String, String>>> mapEntry : predicates.entrySet()) {
+                Predicate<Multimap<String, String>> value = Objects.requireNonNull(mapEntry.getValue());
+                boolean status = value.test(input);
+                Integer property = Objects.requireNonNull(mapEntry.getKey());
+                if (property == IFilterProperty.DIMMED || property == IFilterProperty.EXCLUDE) {
+                    timeGraphState.setProperty(property, !status);
+                } else {
+                    timeGraphState.setProperty(property, status);
+                }
+            }
+        }
+
+        if (timeGraphState.isPropertyActive(IFilterProperty.EXCLUDE)) {
+            TimeGraphState timeGraphState2 = new TimeGraphState(timeGraphState.getStartTime(), timeGraphState.getDuration(), Integer.MIN_VALUE);
+            timeGraphState2.setActiveProperties(timeGraphState.getActiveProperties());
+            stateList.add(timeGraphState2);
+        } else {
+            stateList.add(timeGraphState);
+        }
+    }
+
+    /**
      * Get input data used for filtering
      *
      * @param filter
@@ -87,8 +144,26 @@ public interface ITimeGraphStateFilter {
      * @param monitor
      *            The progress monitor
      * @return The map of input data
+     * @deprecated Use the {@link #getFilterData(long, long, IProgressMonitor)} instead
      */
+    @Deprecated
     default Map<String, String> getFilterInput(SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         return new HashMap<>();
+    }
+
+    /**
+     * Get input data used for filtering
+     *
+     * @param entryId
+     *            The ID of the entry
+     * @param time
+     *            The time at which to get data
+     * @param monitor
+     *            The progress monitor
+     * @return The map of input data
+     * @since 5.0
+     */
+    default Multimap<String, String> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
+        return ImmutableMultimap.of();
     }
 }

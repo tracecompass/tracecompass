@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
@@ -53,8 +54,10 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.primitives.Ints;
 
@@ -294,7 +297,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             intervals.put(interval.getAttribute(), interval);
         }
 
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         if (filter instanceof TimeGraphStateQueryFilter) {
             TimeGraphStateQueryFilter timeEventFilter = (TimeGraphStateQueryFilter) filter;
             predicates.putAll(computeRegexPredicate(timeEventFilter));
@@ -320,11 +323,11 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                     if (type == Type.CPU && s == StateValues.CPU_STATUS_RUN_SYSCALL) {
                         // add events for all the sampled current threads.
                         List<@NonNull ITimeGraphState> syscalls = getSyscalls(ss, interval, intervals.get(currentThreadQuark));
-                        syscalls.forEach(timeGraphState -> addToStateList(eventList, timeGraphState, key, predicates, monitor));
+                        syscalls.forEach(timeGraphState -> applyFilterAndAddState(eventList, timeGraphState, key, predicates, monitor));
                     } else if (type == Type.CPU && s == StateValues.CPU_STATUS_RUN_USERMODE) {
                         // add events for all the sampled current threads.
                         List<@NonNull TimeGraphState> currentThreads = getCurrentThreads(ss, interval, intervals.get(currentThreadQuark));
-                        currentThreads.forEach(timeGraphState -> addToStateList(eventList, timeGraphState, key, predicates, monitor));
+                        currentThreads.forEach(timeGraphState -> applyFilterAndAddState(eventList, timeGraphState, key, predicates, monitor));
                     } else if (type == Type.CURRENT_THREAD && s != 0) {
                         String execName = null;
                         synchronized (fExecNamesCache) {
@@ -344,23 +347,23 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                             }
                         }
                         TimeGraphState timeGraphState = new TimeGraphState(startTime, duration, s, execName != null ? execName + ' ' + '(' + String.valueOf(s) + ')' : String.valueOf(s));
-                        addToStateList(eventList, timeGraphState, key, predicates, monitor);
+                        applyFilterAndAddState(eventList, timeGraphState, key, predicates, monitor);
                     } else if (type == Type.CURRENT_THREAD) {
                         // add null state when current thread is 0
                         ITimeGraphState timeGraphState = new TimeGraphState(startTime, duration, Integer.MIN_VALUE);
-                        addToStateList(eventList, timeGraphState, key, predicates, monitor);
+                        applyFilterAndAddState(eventList, timeGraphState, key, predicates, monitor);
                     } else {
                         TimeGraphState timeGraphState = new TimeGraphState(startTime, duration, s);
-                        addToStateList(eventList, timeGraphState, key, predicates, monitor);
+                        applyFilterAndAddState(eventList, timeGraphState, key, predicates, monitor);
                     }
                 } else if ((status instanceof Long) && (type == Type.FREQUENCY)) {
                     long s = (long) status;
                     // The value needs to fit in an integer
                     TimeGraphState timeGraphState = new TimeGraphState(startTime, duration, (int) (s / FREQUENCY_MULTIPLIER), String.valueOf(FREQUENCY_FORMATTER.format(s)));
-                    addToStateList(eventList, timeGraphState, key, predicates, monitor);
+                    applyFilterAndAddState(eventList, timeGraphState, key, predicates, monitor);
                 } else {
                     ITimeGraphState timeGraphState = new TimeGraphState(startTime, duration, Integer.MIN_VALUE);
-                    addToStateList(eventList, timeGraphState, key, predicates, monitor);
+                    applyFilterAndAddState(eventList, timeGraphState, key, predicates, monitor);
                 }
             }
             rows.add(new TimeGraphRowModel(idToQuark.getKey(), eventList));
@@ -667,13 +670,18 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     }
 
     @Override
-    public @NonNull Map<@NonNull String, @NonNull String> getFilterInput(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        Map<@NonNull String, @NonNull String> inputs = super.getFilterInput(filter, monitor);
+    public @NonNull Multimap<@NonNull String, @NonNull String> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
+        Multimap<@NonNull String, @NonNull String> data = HashMultimap.create();
+        data.putAll(super.getFilterData(entryId, time, monitor));
+
+        SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(Collections.singletonList(time), Collections.singleton(Objects.requireNonNull(entryId)));
         TmfModelResponse<Map<String, String>> response = fetchTooltip(filter, monitor);
         Map<@NonNull String, @NonNull String> model = response.getModel();
         if (model != null) {
-            inputs.putAll(model);
+            for (Entry<String, String> entry : model.entrySet()) {
+                data.put(entry.getKey(), entry.getValue());
+            }
         }
-        return inputs;
+        return data;
     }
 }

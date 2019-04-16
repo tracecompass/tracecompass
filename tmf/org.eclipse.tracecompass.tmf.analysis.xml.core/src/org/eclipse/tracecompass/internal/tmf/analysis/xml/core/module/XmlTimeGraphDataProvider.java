@@ -63,6 +63,7 @@ import org.w3c.dom.Element;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
 
 /**
@@ -361,7 +362,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
 
     private @NonNull Collection<@NonNull ITimeGraphRowModel> createRows(ITmfStateSystem ss, Map<Integer, Long> idToDisplayQuark,
             long[] timesRequested, SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         if (filter instanceof TimeGraphStateQueryFilter) {
             TimeGraphStateQueryFilter timeEventFilter = (TimeGraphStateQueryFilter) filter;
             predicates.putAll(computeRegexPredicate(timeEventFilter));
@@ -380,7 +381,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
             if (row != null) {
                 List<@NonNull ITimeGraphState> states = row.getStates();
                 ITimeGraphState timeGraphState = getStateFromInterval(interval, currentEndTime);
-                addToStateList(states, timeGraphState, row.getEntryID(), predicates, monitor);
+                applyFilterAndAddState(states, timeGraphState, row.getEntryID(), predicates, monitor);
             }
         }
         for (ITimeGraphRowModel model : quarkToRow.values()) {

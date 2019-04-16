@@ -50,6 +50,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
 
 /**
@@ -154,7 +155,7 @@ public class DataDrivenTimeGraphDataProvider extends AbstractTmfTraceDataProvide
 
     private Collection<ITimeGraphRowModel> createRows(ITmfStateSystem ss, Map<Integer, Long> idToDisplayQuark,
             long[] timesRequested, SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         if (filter instanceof TimeGraphStateQueryFilter) {
             TimeGraphStateQueryFilter timeEventFilter = (TimeGraphStateQueryFilter) filter;
             predicates.putAll(computeRegexPredicate(timeEventFilter));
@@ -173,7 +174,7 @@ public class DataDrivenTimeGraphDataProvider extends AbstractTmfTraceDataProvide
             if (row != null) {
                 List<@NonNull ITimeGraphState> states = row.getStates();
                 ITimeGraphState timeGraphState = getStateFromInterval(interval, currentEndTime);
-                addToStateList(states, timeGraphState, row.getEntryID(), predicates, monitor);
+                applyFilterAndAddState(states, timeGraphState, row.getEntryID(), predicates, monitor);
             }
         }
         for (ITimeGraphRowModel model : quarkToRow.values()) {

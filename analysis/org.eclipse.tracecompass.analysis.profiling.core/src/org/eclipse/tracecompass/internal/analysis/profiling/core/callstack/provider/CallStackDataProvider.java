@@ -51,6 +51,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
 
 /**
  * Call Stack Data Provider
@@ -235,7 +236,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         }
         subMonitor.worked(1);
 
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         if (filter instanceof TimeGraphStateQueryFilter) {
             TimeGraphStateQueryFilter timeEventFilter = (TimeGraphStateQueryFilter) filter;
             predicates.putAll(computeRegexPredicate(timeEventFilter));
@@ -251,7 +252,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
             List<ITimeGraphState> eventList = new ArrayList<>(states.size());
             states.forEach(state -> {
                 ITimeGraphState timeGraphState = createTimeGraphState(state);
-                addToStateList(eventList, timeGraphState, key, predicates, monitor);
+                applyFilterAndAddState(eventList, timeGraphState, key, predicates, monitor);
             });
             eventList.sort(Comparator.comparingLong(ITimeGraphState::getStartTime));
             rows.add(new TimeGraphRowModel(entry.getKey(), eventList));

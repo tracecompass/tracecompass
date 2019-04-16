@@ -31,6 +31,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
@@ -40,6 +41,8 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * Class to abstract {@link ITmfTreeDataProvider} methods and fields. Handles
@@ -69,6 +72,7 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
     private final ReentrantReadWriteLock fLock = new ReentrantReadWriteLock(false);
     private final BiMap<Long, Integer> fIdToQuark = HashBiMap.create();
     private @Nullable TmfModelResponse<List<M>> fCached;
+    private final Map<Long, Multimap<String, String>> fEntryMetadata = new HashMap<>();
 
     /**
      * Constructor
@@ -190,6 +194,11 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
             /* Don't query empty state system */
             if (ss.getNbAttributes() > 0 && ss.getStartTime() != Long.MIN_VALUE) {
                 tree = getTree(ss, filter, monitor);
+                for (M model : tree) {
+                    if (model instanceof IElementResolver) {
+                        fEntryMetadata.put(model.getId(), ((IElementResolver) model).getMetadata());
+                    }
+                }
             }
             if (complete) {
                 TmfModelResponse<List<M>> response = new TmfModelResponse<>(tree,
@@ -205,6 +214,18 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
         } finally {
             fLock.writeLock().unlock();
         }
+    }
+
+    /**
+     * Get the metadata of an entry by ID. This method returns an empty multimap
+     * if there is no metadata
+     *
+     * @param entryId
+     *            The ID of the entry
+     * @return The metadata map for the entry
+     */
+    protected Multimap<String, String> getEntryMetadata(Long entryId) {
+        return fEntryMetadata.getOrDefault(entryId, ImmutableMultimap.of());
     }
 
     /**

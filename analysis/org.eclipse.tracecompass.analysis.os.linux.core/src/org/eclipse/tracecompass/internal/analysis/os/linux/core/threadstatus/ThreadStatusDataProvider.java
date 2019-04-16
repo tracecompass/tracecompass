@@ -63,6 +63,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
 
@@ -386,7 +387,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, String.valueOf(e.getMessage()));
         }
 
-        Map<@NonNull Integer, @NonNull Predicate< @NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate< @NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         if (filter instanceof TimeGraphStateQueryFilter) {
             TimeGraphStateQueryFilter timeEventFilter = (TimeGraphStateQueryFilter) filter;
             predicates.putAll(computeRegexPredicate(timeEventFilter));
@@ -404,7 +405,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
             states.forEach(i -> {
                 ITimeGraphState timegraphState = createTimeGraphState(i, syscalls);
                 Long key = Objects.requireNonNull(entry.getKey());
-                addToStateList(eventList, timegraphState, key, predicates, monitor);
+                applyFilterAndAddState(eventList, timegraphState, key, predicates, monitor);
             });
             rows.add(new TimeGraphRowModel(entry.getKey(), eventList));
         }

@@ -113,7 +113,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfTimeNavigationProvider
 import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfTimeZoomProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfZoomToSelectionProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.TimeEventFilterDialog;
-import org.eclipse.tracecompass.tmf.core.model.IFilterableDataModel;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
 import org.eclipse.tracecompass.tmf.core.signal.TmfDataModelSelectedSignal;
@@ -186,6 +186,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
@@ -385,8 +386,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         @Override
         public void selectionChanged(TimeGraphSelectionEvent event) {
             ITimeGraphEntry entry = event.getSelection();
-            if (entry instanceof IFilterableDataModel) {
-                Multimap<@NonNull String, @NonNull String> metadata = ((IFilterableDataModel) entry).getMetadata();
+            if (entry instanceof IElementResolver) {
+                Multimap<@NonNull String, @NonNull String> metadata = ((IElementResolver) entry).getMetadata();
                 if (!metadata.isEmpty()) {
                     broadcast(new TmfDataModelSelectedSignal(AbstractTimeGraphView.this, metadata));
                 }
@@ -794,7 +795,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *
      * @return A map of time event filters predicate by property
      * @since 4.0
+     * @deprecated Use {@link #generateRegexPredicate()}
      */
+    @Deprecated
     @NonNullByDefault
     protected Map<Integer, Predicate<Map<String, String>>> computeRegexPredicate() {
         Multimap<Integer, String> regexes = getRegexes();
@@ -802,7 +805,32 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         for (Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
             String regex = IFilterStrings.mergeFilters(entry.getValue());
             FilterCu cu = FilterCu.compile(regex);
-            Predicate<@NonNull Map<@NonNull String, @NonNull String>> predicate = cu != null ? cu.generate() : null;
+            Predicate<@NonNull Map<@NonNull String, @NonNull String>> predicate = cu != null ? multiToMapPredicate(cu.generate()) : null;
+                if (predicate != null) {
+                    predicates.put(entry.getKey(), predicate);
+                }
+        }
+        return predicates;
+    }
+
+    private static Predicate<@NonNull Map<@NonNull String, @NonNull String>> multiToMapPredicate(@NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>> predicate) {
+        return map -> predicate.test(Objects.requireNonNull(ImmutableMultimap.copyOf(map.entrySet())));
+    }
+
+    /**
+     * Generate the predicate for every property from the regexes
+     *
+     * @return A map of predicate by property
+     * @since 5.0
+     */
+    @NonNullByDefault
+    protected Map<Integer, Predicate<Multimap<String, String>>> generateRegexPredicate() {
+        Multimap<Integer, String> regexes = getRegexes();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        for (Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
+            String regex = IFilterStrings.mergeFilters(entry.getValue());
+            FilterCu cu = FilterCu.compile(regex);
+            Predicate<@NonNull Multimap<@NonNull String, @NonNull String>> predicate = cu != null ? cu.generate() : null;
                 if (predicate != null) {
                     predicates.put(entry.getKey(), predicate);
                 }
@@ -2861,8 +2889,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         Multimap<@NonNull String, @NonNull String> metadata = signal.getMetadata();
         // See if the current selection intersects the metadata
         ITimeGraphEntry selection = getTimeGraphViewer().getSelection();
-        if (selection instanceof IFilterableDataModel &&
-                IFilterableDataModel.commonIntersect(metadata, ((IFilterableDataModel)selection).getMetadata())) {
+        if (selection instanceof IElementResolver &&
+                IElementResolver.commonIntersect(metadata, ((IElementResolver)selection).getMetadata())) {
             return;
         }
         // See if an entry intersects the metadata
@@ -2873,7 +2901,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
             Iterable<TimeGraphEntry> unfiltered = Utils.flatten(traceEntry);
             for (TimeGraphEntry entry : unfiltered) {
-                if (IFilterableDataModel.commonIntersect(metadata, entry.getMetadata())) {
+                if (IElementResolver.commonIntersect(metadata, entry.getMetadata())) {
                     getTimeGraphViewer().setSelection(entry, true);
                 }
             }
