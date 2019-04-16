@@ -23,6 +23,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageEntryModel;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.CpuUsageDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectedCpuQueryFilter;
@@ -153,7 +154,7 @@ public class CpuUsageTreeViewer extends AbstractSelectTreeViewer {
             columns.add(createColumn(Messages.CpuUsageComposite_ColumnProcess, Comparator.comparing(CpuUsageEntry::getName)));
 
             Comparator<CpuUsageEntry> tidCompare = Comparator.comparingInt(c -> c.getModel().getTid());
-            columns.add(createColumn(org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.Messages.AspectName_Tid, tidCompare));
+            columns.add(createColumn(OsStrings.tid(), tidCompare));
 
             TmfTreeColumnData percentColumn = createColumn(Messages.CpuUsageComposite_ColumnPercent, Comparator.comparingDouble(CpuUsageEntry::getPercent));
             percentColumn.setPercentageProvider(data -> ((CpuUsageEntry) data).getPercent());

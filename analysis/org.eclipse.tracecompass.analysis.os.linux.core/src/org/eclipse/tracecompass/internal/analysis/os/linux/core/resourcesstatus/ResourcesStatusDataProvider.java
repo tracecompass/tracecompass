@@ -32,6 +32,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
 import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel.Type;
@@ -653,7 +654,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     private static void putCurrentThreadTooltip(ITmfStateSystem ss,
             Map<String, String> retMap, List<ITmfStateInterval> full, int tid) {
         String currentThread = String.valueOf(tid);
-        retMap.put(org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.Messages.AspectName_Tid, currentThread);
+        retMap.put(OsStrings.tid(), currentThread);
 
         int execNameQuark = ss.optQuarkAbsolute(Attributes.THREADS, currentThread, Attributes.EXEC_NAME);
         if (execNameQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
