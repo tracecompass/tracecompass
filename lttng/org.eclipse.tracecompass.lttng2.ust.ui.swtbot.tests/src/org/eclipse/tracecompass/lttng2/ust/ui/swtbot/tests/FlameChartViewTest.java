@@ -202,6 +202,7 @@ public class FlameChartViewTest {
         final File file = new File(CtfTmfTestTraceUtils.getTrace(cygProfile).getPath());
         CtfTmfTestTraceUtils.dispose(cygProfile);
         SWTBotUtils.openTrace(PROJECT_NAME, file.getAbsolutePath(), UST_ID);
+        SWTBotUtils.activateEditor(sfBot, file.getName());
         SWTBotUtils.openView(FlameChartView.ID);
         WaitUtils.waitForJobs();
         final SWTBotView viewBot = sfBot.viewById(FlameChartView.ID);
