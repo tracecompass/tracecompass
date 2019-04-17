@@ -1747,6 +1747,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         fEditorFile = TmfTraceManager.getInstance().getTraceEditorFile(trace);
         synchronized (fEntryListMap) {
             fEntryList = fEntryListMap.get(fTrace);
+            loadingTrace(trace);
             if (fEntryList == null) {
                 rebuild();
             } else {
@@ -1819,6 +1820,26 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     protected void synchingToTime(long time) {
 
+    }
+
+    /**
+     * Method called when the view is being loaded with a trace, ie when a trace
+     * becomes active in the view because it was opened, selected, pinned, etc.
+     * When this is called, the trace is already loaded in the base class, but
+     * it has not been redrawn or entries built yet. Implementing classes can
+     * add any logic here for a specific trace.
+     *
+     * Unlike the {@link #resetView(ITmfTrace)} method, this one is called even
+     * if entries already exist for the trace. And if entries need to be
+     * rebuilt, both {@link #resetView(ITmfTrace)} and this method will be
+     * called
+     *
+     * @param trace
+     *            The trace that is being loaded
+     * @since 5.1
+     */
+    protected void loadingTrace(@NonNull ITmfTrace trace) {
+        // To be implemented by children classes
     }
 
     /**
