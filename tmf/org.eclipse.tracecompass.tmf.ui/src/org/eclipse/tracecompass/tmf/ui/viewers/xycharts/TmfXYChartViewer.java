@@ -19,6 +19,7 @@ import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -131,6 +132,14 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
         commonComposite.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0).margins(0, 0).create());
         commonComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
         fSwtChart = new Chart(commonComposite, SWT.NONE) {
+            @Override
+            public void addFocusListener(FocusListener listener) {
+                fSwtChart.getPlotArea().addFocusListener(listener);
+            }
+            @Override
+            public void removeFocusListener(FocusListener listener) {
+                fSwtChart.getPlotArea().removeFocusListener(listener);
+            }
             @Override
             public boolean setFocus() {
                 return fSwtChart.getPlotArea().setFocus();

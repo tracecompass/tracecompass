@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -240,7 +240,6 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
 
         TmfXYChartViewer chartViewer = getChartViewer();
         if (chartViewer != null) {
-            activateContextService();
             chartViewer.getControl().addFocusListener(new FocusListener() {
                 @Override
                 public void focusLost(FocusEvent e) {
