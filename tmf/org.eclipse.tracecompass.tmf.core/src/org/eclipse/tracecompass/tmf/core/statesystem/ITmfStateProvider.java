@@ -33,7 +33,7 @@ public interface ITmfStateProvider {
      * Different future event type on the state system
      *
      * @author Katherine Nadeau
-     * @since 4.3
+     * @since 5.0
      */
     public enum FutureEventType {
         /**
@@ -192,7 +192,7 @@ public interface ITmfStateProvider {
      *            the quark to set to initial state
      * @param type
      *            the type of event to apply to the state system
-     * @since 4.3
+     * @since 5.0
      */
     default void addFutureEvent(long time, @Nullable Object futureValue, int attribute, FutureEventType type) {
         // Do nothing by default
