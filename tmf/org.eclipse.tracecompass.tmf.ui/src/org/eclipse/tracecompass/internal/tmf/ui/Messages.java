@@ -350,23 +350,6 @@ public class Messages extends NLS {
     public static String TmfView_UnpinActionText;
     public static String TmfView_ResetScaleActionNameText;
 
-    public static String CallStackPresentationProvider_Process;
-    public static String CallStackPresentationProvider_Thread;
-    public static String CallStackView_FunctionColumn;
-    public static String CallStackView_PidTidColumn;
-    public static String CallStackView_DepthColumn;
-    public static String CallStackView_EntryTimeColumn;
-    public static String CallStackView_ExitTimeColumn;
-    public static String CallStackView_DurationColumn;
-    public static String CallStackView_ThreadColumn;
-    public static String CallStackView_StackInfoNotAvailable;
-    public static String CallStackView_SortByThreadName;
-    public static String CallStackView_SortByThreadId;
-    public static String CallStackView_SortByThreadTime;
-
-    public static String CallStackView_ConfigureSymbolProvidersText;
-    public static String CallStackView_ConfigureSymbolProvidersTooltip;
-
     public static String CopyToClipboardOperation_TaskName;
     public static String CopyToClipboardOperation_OutOfMemoryErrorTitle;
     public static String CopyToClipboardOperation_OutOfMemoryErrorMessage;
