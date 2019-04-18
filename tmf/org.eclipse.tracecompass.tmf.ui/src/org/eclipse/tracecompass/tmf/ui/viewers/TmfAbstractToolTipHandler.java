@@ -9,10 +9,17 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -43,6 +50,8 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphTooltipHandler;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -69,6 +78,7 @@ public abstract class TmfAbstractToolTipHandler {
     private Rectangle fInitialDeadzone;
     private MouseTrackAdapter fMouseTrackAdapter;
     private Table<String, String, HyperLink> fModel = HashBasedTable.create();
+    private final DocumentBuilderFactory fDocumentBuilderFactory = DocumentBuilderFactory.newInstance();
 
     private static synchronized boolean isBrowserAvailable(Composite parent) {
         boolean isBrowserAvailable = Activator.getDefault().getPreferenceStore().getBoolean(ITmfUIPreferences.USE_BROWSER_TOOLTIPS);
@@ -374,6 +384,7 @@ public abstract class TmfAbstractToolTipHandler {
         private static final int MARGIN = 10;
         private static final int CHAR_WIDTH = 9;
         private static final int LINE_HEIGHT = 18;
+        private DocumentBuilder fDocumentBuilder;
 
         public BrowserContent(Composite parent) {
             super(parent);
@@ -432,8 +443,18 @@ public abstract class TmfAbstractToolTipHandler {
             for (String row : rowKeySet) {
                 Set<@NonNull Entry<String, HyperLink>> entrySet = model.row(row).entrySet();
                 for (Entry<String, HyperLink> entry : entrySet) {
-                    longestString = Math.max(longestString, entry.getKey().length() + 2);
-                    longestValueString = Math.max(longestValueString, + entry.getValue().getLabel().length() + 2);
+                    int len;
+                    try (ByteArrayInputStream stream = new ByteArrayInputStream(entry.getKey().getBytes(StandardCharsets.UTF_8))) {
+                        if (fDocumentBuilder == null) {
+                            fDocumentBuilder = fDocumentBuilderFactory.newDocumentBuilder();
+                        }
+                        Document doc = fDocumentBuilder.parse(stream);
+                        len = doc.getFirstChild().getTextContent().length() + 2;
+                    } catch (SAXException | IOException | ParserConfigurationException e) {
+                        len = entry.getKey().length() + 2;
+                    }
+                    longestString = Math.max(longestString, len);
+                    longestValueString = Math.max(longestValueString, +entry.getValue().getLabel().length() + 2);
                 }
             }
             int noCat = rowKeySet.size();

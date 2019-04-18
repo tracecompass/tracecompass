@@ -18,7 +18,10 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.ITmfUIPreferences;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
+import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfAbstractToolTipHandler;
@@ -40,6 +43,8 @@ import org.swtchart.ISeries;
 public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implements MouseTrackListener {
 
     private final class XYToolTipHandler extends TmfAbstractToolTipHandler {
+        private static final String HTML_COLOR_TOOLTIP = "<span style=\"color:%s;\">%s</span>"; //$NON-NLS-1$
+
         @Override
         public void fill(Control control, MouseEvent event, Point pt) {
             if (getChartViewer().getWindowDuration() != 0) {
@@ -70,7 +75,11 @@ public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implemen
                     }
                 }
 
-                /* set tooltip of closest data point */
+                TmfCommonXAxisChartViewer viewer = null;
+                ITmfChartTimeProvider timeProvider = getChartViewer();
+                if (timeProvider instanceof TmfCommonXAxisChartViewer) {
+                    viewer = (TmfCommonXAxisChartViewer) timeProvider;
+                }
                 ITmfTimestamp time = TmfTimestamp.fromNanos((long) xCoordinate + getChartViewer().getTimeOffset());
                 addItem(null, Messages.TmfCommonXLineChartTooltipProvider_time, time.toString(), time.toNanos());
 
@@ -81,7 +90,12 @@ public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implemen
                      * Make sure the series values and the value at index exist
                      */
                     if (isValid(index, serie)) {
-                        addItem(null, serie.getId(), String.format("%12.2f", yS[index]), null);
+                        String key = serie.getId();
+                        if (key != null && viewer != null && Activator.getDefault().getPreferenceStore().getBoolean(ITmfUIPreferences.USE_BROWSER_TOOLTIPS)) {
+                            IYAppearance appearance = viewer.getSeriesAppearance(key);
+                            key = String.format(HTML_COLOR_TOOLTIP, appearance.getColor(), key);
+                        }
+                        addItem(null, key, String.format("%12.2f", yS[index]), null); //$NON-NLS-1$
                     }
                 }
             }
