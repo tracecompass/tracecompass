@@ -596,7 +596,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
 
         if (!cpuList.isEmpty()) {
             Collections.sort(cpuList, (s1, s2) -> Integer.compare(Integer.parseInt(s1), Integer.parseInt(s2)));
-            retMap.put(Messages.ResourcesStatusDataProvider_attributeCpuName, String.join(", ", cpuList)); //$NON-NLS-1$
+            retMap.put(OsStrings.cpu(), String.join(", ", cpuList)); //$NON-NLS-1$
         }
     }
 

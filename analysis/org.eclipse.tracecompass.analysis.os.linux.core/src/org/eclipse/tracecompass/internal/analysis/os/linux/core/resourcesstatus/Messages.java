@@ -47,8 +47,6 @@ class Messages extends NLS {
     public static String CpuEntry;
     /** Frequency entry */
     public static String FrequencyEntry;
-    /** cpu name */
-    public static String ResourcesStatusDataProvider_attributeCpuName;
     /** irq name */
     public static String ResourcesStatusDataProvider_attributeIrqName;
     /** soft irq name */

@@ -10,14 +10,19 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
+
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * {@link TimeGraphEntryModel} for the Resources Status data provider.
  *
  * @author Loic Prieur-Drevon
  */
-public class ResourcesEntryModel extends TimeGraphEntryModel {
+public class ResourcesEntryModel extends TimeGraphEntryModel implements IElementResolver {
 
     /** Type of entry */
     public enum Type {
@@ -37,6 +42,8 @@ public class ResourcesEntryModel extends TimeGraphEntryModel {
 
     private final int fResourceId;
     private final Type fType;
+
+    private final @NonNull Multimap<@NonNull String, @NonNull String> fAspects;
 
     /**
      * Constructor
@@ -60,6 +67,20 @@ public class ResourcesEntryModel extends TimeGraphEntryModel {
         super(id, parentId, name, startTime, endTime, !name.isEmpty());
         fResourceId = resourceId;
         fType = type;
+        switch (type) {
+        case CPU: // resourceID is CPU, fall-through
+        case CURRENT_THREAD: // resourceID is CPU, fall-through
+        case FREQUENCY: // resourceID is CPU, fall-through
+            fAspects = ImmutableMultimap.of(OsStrings.cpu(), String.valueOf(resourceId));
+            break;
+        case IRQ:
+        case SOFT_IRQ: // Fall-through
+        case GROUP: // Fall-through
+        default:
+            fAspects = ImmutableMultimap.of();
+            break;
+
+        }
     }
 
     /**
@@ -79,4 +100,10 @@ public class ResourcesEntryModel extends TimeGraphEntryModel {
     public Type getType() {
         return fType;
     }
+
+    @Override
+    public @NonNull Multimap<@NonNull String, @NonNull String> getMetadata() {
+        return fAspects;
+    }
+
 }
