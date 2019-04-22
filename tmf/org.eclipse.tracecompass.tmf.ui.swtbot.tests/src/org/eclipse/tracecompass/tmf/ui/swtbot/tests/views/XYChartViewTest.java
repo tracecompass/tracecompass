@@ -245,6 +245,26 @@ public class XYChartViewTest {
         fViewBot.bot().waitUntil(new SeriesCondition(fXyViewer, getDuration(range)));
     }
 
+    /**
+     * Test 'a' and 'd' navigation
+     */
+    @Test
+    public void testKeyboardNavigation() {
+        SWTBotSwtChart xyChart = new SWTBotSwtChart(fViewBot.bot());
+        xyChart.setFocus();
+        assertEquals(80, fXyViewer.getWindowDuration());
+
+        TmfTimeRange updatedWindowRange = new TmfTimeRange(TmfTimestamp.fromNanos(40), TmfTimestamp.fromNanos(120));
+
+        // move to the right
+        fireKeyInGraph(xyChart, 'd');
+        fViewBot.bot().waitUntil(new SeriesCondition(fXyViewer, getDuration(updatedWindowRange)));
+
+        // move to the left
+        fireKeyInGraph(xyChart, 'a');
+        fViewBot.bot().waitUntil(new SeriesCondition(fXyViewer, getDuration(INITIAL_WINDOW_RANGE)));
+    }
+
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
