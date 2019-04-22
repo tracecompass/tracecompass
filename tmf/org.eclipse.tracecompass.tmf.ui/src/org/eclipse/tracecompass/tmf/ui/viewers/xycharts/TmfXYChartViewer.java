@@ -144,6 +144,10 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
             public boolean setFocus() {
                 return fSwtChart.getPlotArea().setFocus();
             }
+            @Override
+            public boolean forceFocus() {
+                return fSwtChart.getPlotArea().forceFocus();
+            }
         };
         fSwtChart.getAxisSet().getXAxis(0).getGrid().setStyle(LineStyle.NONE);
         ((IPlotArea) fSwtChart.getPlotArea()).addCustomPaintListener(new ICustomPaintListener() {
