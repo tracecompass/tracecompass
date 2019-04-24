@@ -187,6 +187,7 @@ import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableMultimap.Builder;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
@@ -814,7 +815,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     private static Predicate<@NonNull Map<@NonNull String, @NonNull String>> multiToMapPredicate(@NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>> predicate) {
-        return map -> predicate.test(Objects.requireNonNull(ImmutableMultimap.copyOf(map.entrySet())));
+        return map -> {
+            Builder<@NonNull String, @NonNull String> builder = ImmutableMultimap.builder();
+            map.forEach((key, value) -> builder.put(key, value));
+            return predicate.test(Objects.requireNonNull(builder.build()));
+        };
     }
 
     /**

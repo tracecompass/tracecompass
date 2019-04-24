@@ -74,6 +74,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableMultimap.Builder;
 import com.google.common.collect.Multimap;
 
 /**
@@ -401,14 +402,11 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         return predicates;
     }
 
-    private static Predicate<@NonNull Map<@NonNull String, @NonNull String>> multiToMapPredicate(@NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>> predicate) {
-        return new Predicate<@NonNull Map<@NonNull String, @NonNull String>> () {
-
-            @Override
-            public boolean test(@NonNull Map<@NonNull String, @NonNull String> arg0) {
-                return predicate.test(ImmutableMultimap.copyOf(arg0.entrySet()));
-            }
-
+    private static Predicate<@NonNull Map<@NonNull String, @NonNull String>> multiToMapPredicate(Predicate<@NonNull Multimap<@NonNull String, @NonNull String>> predicate) {
+        return map -> {
+            Builder<@NonNull String, @NonNull String> builder = ImmutableMultimap.builder();
+            map.forEach((key, value) -> builder.put(key, value));
+            return predicate.test(Objects.requireNonNull(builder.build()));
         };
     }
 
