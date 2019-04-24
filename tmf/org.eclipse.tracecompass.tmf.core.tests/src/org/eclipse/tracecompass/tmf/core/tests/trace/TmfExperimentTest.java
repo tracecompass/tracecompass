@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 Ericsson
+ * Copyright (c) 2009, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -992,7 +992,9 @@ public class TmfExperimentTest {
     }
 
     private static abstract class TestTrace extends TmfXmlTraceStubNs implements ITmfPropertiesProvider {
-
+        public TestTrace(@NonNull String name) {
+            setName(name);
+        }
     }
 
     /**
@@ -1007,7 +1009,7 @@ public class TmfExperimentTest {
         long offset = 1000;
         String clockOffset = "clock_offset";
 
-        ITmfTrace t1 = new TestTrace() {
+        ITmfTrace t1 = new TestTrace("t1") {
             @Override
             public @NonNull String getHostId() {
                 return hostId;
@@ -1018,7 +1020,7 @@ public class TmfExperimentTest {
             }
         };
 
-        ITmfTrace t2 = new TestTrace() {
+        ITmfTrace t2 = new TestTrace("t2") {
             @Override
             public @NonNull String getHostId() {
                 return hostId;
@@ -1028,7 +1030,6 @@ public class TmfExperimentTest {
                 return ImmutableMap.of(clockOffset, String.valueOf(minOffset + offset));
             }
         };
-
         TmfExperiment exp = new TmfExperimentStub(EXPERIMENT, new ITmfTrace[] { t1, t2 }, BLOCK_SIZE);
 
         try {
@@ -1059,7 +1060,7 @@ public class TmfExperimentTest {
         ITmfTimestampTransform tt2 = TimestampTransformFactory.createLinear(2.0, -offset / 2);
         ITmfTimestampTransform tt3 = TimestampTransformFactory.createWithOffset(offset);
 
-        ITmfTrace t1 = new TestTrace() {
+        ITmfTrace t1 = new TestTrace("t1") {
             @Override
             public @NonNull String getHostId() {
                 return hostId;
@@ -1072,7 +1073,7 @@ public class TmfExperimentTest {
         };
         t1.setTimestampTransform(tt1);
 
-        ITmfTrace t2 = new TestTrace() {
+        ITmfTrace t2 = new TestTrace("t2") {
             @Override
             public @NonNull String getHostId() {
                 return hostId;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2019 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.tmf.core.tests.trace.stub;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -86,18 +87,19 @@ public class XmlStubTraceTest {
      */
     @Test
     public void testValidate() {
-        fTestTrace = new TmfXmlTraceStubNs();
+        ITmfTrace trace = new TmfXmlTraceStubNs();
         File[] invalidFiles = TmfCoreTestPlugin.getAbsoluteFilePath(INVALID_PATH).toFile().listFiles();
         assertTrue(invalidFiles.length > 0);
         for (File f : invalidFiles) {
-            assertTrue(!fTestTrace.validate(null, f.getAbsolutePath()).isOK());
+            assertFalse(trace.validate(null, f.getAbsolutePath()).isOK());
         }
 
         File[] validFiles = TmfCoreTestPlugin.getAbsoluteFilePath(VALID_PATH).toFile().listFiles();
         assertTrue(validFiles.length > 0);
         for (File f : validFiles) {
-            assertTrue(fTestTrace.validate(null, f.getAbsolutePath()).isOK());
+            assertTrue(trace.validate(null, f.getAbsolutePath()).isOK());
         }
+        trace.dispose();
     }
 
     /**
