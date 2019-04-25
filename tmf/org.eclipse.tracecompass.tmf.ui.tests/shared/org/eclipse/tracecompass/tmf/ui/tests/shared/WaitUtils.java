@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2018 Ericsson
+ * Copyright (c) 2016, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -182,9 +182,9 @@ public final class WaitUtils {
             if (System.currentTimeMillis() - waitStart > maxWait) {
                 if (exception != null) {
                     exception.printStackTrace();
-                    throw new WaitTimeoutException(condition.getFailureMessage() + "\n" + exception);
+                    throw new WaitTimeoutException("Timeout after " + maxWait + " ms: " + condition.getFailureMessage() + "\n" + exception);
                 }
-                throw new WaitTimeoutException(condition.getFailureMessage()); //$NON-NLS-1$
+                throw new WaitTimeoutException("Timeout after " + maxWait + " ms: " + condition.getFailureMessage()); //$NON-NLS-1$
             }
 
             if (display != null) {

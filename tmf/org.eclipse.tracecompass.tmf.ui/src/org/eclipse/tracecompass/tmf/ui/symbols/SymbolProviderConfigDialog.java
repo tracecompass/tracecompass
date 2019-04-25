@@ -33,6 +33,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.tracecompass.internal.tmf.ui.symbols.Messages;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
@@ -48,10 +49,7 @@ import org.eclipse.ui.PlatformUI;
  *
  * @author Robert Kiss
  * @since 2.0
- * @deprecated Use the class with same name in the
- *             org.eclipse.tracecompass.analysis.profiling.ui plugin
  */
-@Deprecated
 public class SymbolProviderConfigDialog extends TitleAreaDialog implements IPreferencePageContainer {
 
     private ISymbolProviderPreferencePage[] fPreferencePages;

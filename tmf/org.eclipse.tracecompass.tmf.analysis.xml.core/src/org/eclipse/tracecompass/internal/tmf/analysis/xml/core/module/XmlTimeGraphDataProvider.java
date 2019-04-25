@@ -375,7 +375,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
 
     private @NonNull Collection<@NonNull ITimeGraphRowModel> createRows(ITmfStateSystem ss, Map<Integer, Long> idToDisplayQuark,
             long[] timesRequested, @NonNull Map<@NonNull String, @NonNull Object> parameters, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         Multimap<@NonNull Integer, @NonNull String> regexesMap = DataProviderParameterUtils.extractRegexFilter(parameters);
         if (regexesMap != null) {
             predicates.putAll(computeRegexPredicate(regexesMap));
@@ -394,7 +394,7 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
             if (row != null) {
                 List<@NonNull ITimeGraphState> states = row.getStates();
                 ITimeGraphState timeGraphState = getStateFromInterval(interval, currentEndTime);
-                addToStateList(states, timeGraphState, row.getEntryID(), predicates, monitor);
+                applyFilterAndAddState(states, timeGraphState, row.getEntryID(), predicates, monitor);
             }
         }
         for (ITimeGraphRowModel model : quarkToRow.values()) {

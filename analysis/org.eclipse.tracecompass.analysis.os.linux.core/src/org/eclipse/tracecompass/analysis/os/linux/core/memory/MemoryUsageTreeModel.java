@@ -60,7 +60,7 @@ public class MemoryUsageTreeModel extends TmfTreeDataModel {
      *            The TID of the process
      * @param labels
      *            The thread's labels
-     * @since 3.2
+     * @since 4.0
      */
     public MemoryUsageTreeModel(long id, long parentId, int tid, List<String> labels) {
         super(id, parentId, labels);

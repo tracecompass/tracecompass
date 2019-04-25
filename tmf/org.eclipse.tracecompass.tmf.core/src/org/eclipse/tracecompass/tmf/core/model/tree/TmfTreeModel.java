@@ -17,7 +17,7 @@ import java.util.List;
  * @author Simon Delisle
  * @param <T>
  *            Tree data model extending {@link ITmfTreeDataModel}
- * @since 4.3
+ * @since 5.0
  */
 public class TmfTreeModel<T extends ITmfTreeDataModel> {
     private List<String> fHeaders;

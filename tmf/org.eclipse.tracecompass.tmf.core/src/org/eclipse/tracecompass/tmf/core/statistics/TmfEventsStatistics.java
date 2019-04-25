@@ -67,21 +67,6 @@ public class TmfEventsStatistics implements ITmfStatistics {
         cancelOngoingRequests();
     }
 
-    @Deprecated
-    @Override
-    public List<@NonNull Long> histogramQuery(long start, long end, int nb) {
-        final long[] borders = new long[nb];
-        final long increment = (end - start) / nb;
-
-        long curTime = start;
-        for (int i = 0; i < nb; i++) {
-            borders[i] = curTime;
-            curTime += increment;
-        }
-
-        return histogramQuery(borders);
-    }
-
     @Override
     public List<@NonNull Long> histogramQuery(long[] timeRequested) {
         HistogramQueryRequest req = new HistogramQueryRequest(timeRequested, timeRequested[timeRequested.length - 1]);

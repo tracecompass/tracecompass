@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.function.Predicate;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -48,8 +47,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 
 /**
  * Test the {@link TmfFilterHelper} class to convert event filter to/from
@@ -85,9 +85,9 @@ public class TmfFilterHelperTest {
     private TmfEvent fEvent2 = new TmfEvent(STUB_TRACE, 1, TmfTimestamp.fromNanos(2), EVENT_TYPE2, fContent2);
     private TmfEvent fEvent3 = new TmfEvent(STUB_TRACE, 2, TmfTimestamp.fromNanos(3), EVENT_TYPE3, fContent3);
 
-    private Map<String, String> fObjectMap1 = ImmutableMap.of(FIELD1_NAME, FIELD1_VALUE1, TmfBaseAspects.getEventTypeAspect().getName(), EVENT_NAME1);
-    private Map<String, String> fObjectMap2 = ImmutableMap.of(FIELD2_NAME, FIELD2_VALUE1, TmfBaseAspects.getEventTypeAspect().getName(), EVENT_NAME2);
-    private Map<String, String> fObjectMap3 = ImmutableMap.of(FIELD1_NAME, FIELD1_VALUE2, FIELD2_NAME, FIELD2_VALUE2, TmfBaseAspects.getEventTypeAspect().getName(), EVENT_NAME3);
+    private Multimap<String, String> fObjectMap1 = ImmutableMultimap.of(FIELD1_NAME, FIELD1_VALUE1, TmfBaseAspects.getEventTypeAspect().getName(), EVENT_NAME1);
+    private Multimap<String, String> fObjectMap2 = ImmutableMultimap.of(FIELD2_NAME, FIELD2_VALUE1, TmfBaseAspects.getEventTypeAspect().getName(), EVENT_NAME2);
+    private Multimap<String, String> fObjectMap3 = ImmutableMultimap.of(FIELD1_NAME, FIELD1_VALUE2, FIELD2_NAME, FIELD2_VALUE2, TmfBaseAspects.getEventTypeAspect().getName(), EVENT_NAME3);
 
     /**
      * Initialize the trace
@@ -116,12 +116,12 @@ public class TmfFilterHelperTest {
         return filter;
     }
 
-    private static Predicate<Map<String, String>> getRegex(ITmfFilter filter, String expected) {
+    private static Predicate<Multimap<String, String>> getRegex(ITmfFilter filter, String expected) {
         String regex = TmfFilterHelper.getRegexFromFilter(filter);
         assertEquals(expected, regex);
         FilterCu compile = FilterCu.compile(regex);
         assertNotNull(compile);
-        Predicate<Map<String, String>> predicate = compile.generate();
+        Predicate<Multimap<String, String>> predicate = compile.generate();
         return predicate;
     }
 
@@ -484,7 +484,7 @@ public class TmfFilterHelperTest {
         compareFilter.setValue(FIELD2_VALUE1);
         compareFilter.setResult(1);
 
-        Predicate<Map<String, String>> predicate = getRegex(compareFilter, expected);
+        Predicate<Multimap<String, String>> predicate = getRegex(compareFilter, expected);
         assertFalse(predicate.test(fObjectMap1));
         assertFalse(predicate.test(fObjectMap2));
         assertTrue(predicate.test(fObjectMap3));
@@ -533,7 +533,7 @@ public class TmfFilterHelperTest {
         containsFilter.setEventAspect(aspect);
         containsFilter.setValue("other");
 
-        Predicate<Map<String, String>> predicate = getRegex(containsFilter, expected);
+        Predicate<Multimap<String, String>> predicate = getRegex(containsFilter, expected);
         assertFalse(predicate.test(fObjectMap1));
         assertFalse(predicate.test(fObjectMap2));
         assertTrue(predicate.test(fObjectMap3));
@@ -559,7 +559,7 @@ public class TmfFilterHelperTest {
         equalsFilter.setEventAspect(aspect);
         equalsFilter.setValue(EVENT_NAME1);
 
-        Predicate<Map<String, String>> predicate = getRegex(equalsFilter, expected);
+        Predicate<Multimap<String, String>> predicate = getRegex(equalsFilter, expected);
         assertTrue(predicate.test(fObjectMap1));
         assertFalse(predicate.test(fObjectMap2));
         assertFalse(predicate.test(fObjectMap3));
@@ -585,7 +585,7 @@ public class TmfFilterHelperTest {
         matchesFilter.setEventAspect(aspect);
         matchesFilter.setRegex(".*other.*");
 
-        Predicate<Map<String, String>> predicate = getRegex(matchesFilter, expected);
+        Predicate<Multimap<String, String>> predicate = getRegex(matchesFilter, expected);
         assertFalse(predicate.test(fObjectMap1));
         assertFalse(predicate.test(fObjectMap2));
         assertTrue(predicate.test(fObjectMap3));
@@ -636,7 +636,7 @@ public class TmfFilterHelperTest {
         andFilter.addChild(matchesFilter1);
         andFilter.addChild(matchesFilter2);
 
-        Predicate<Map<String, String>> predicate = getRegex(andFilter, expected);
+        Predicate<Multimap<String, String>> predicate = getRegex(andFilter, expected);
         assertFalse(predicate.test(fObjectMap1));
         assertFalse(predicate.test(fObjectMap2));
         assertTrue(predicate.test(fObjectMap3));
@@ -671,7 +671,7 @@ public class TmfFilterHelperTest {
         orFilter.addChild(matchesFilter1);
         orFilter.addChild(matchesFilter2);
 
-        Predicate<Map<String, String>> predicate = getRegex(orFilter, expected);
+        Predicate<Multimap<String, String>> predicate = getRegex(orFilter, expected);
         assertTrue(predicate.test(fObjectMap1));
         assertFalse(predicate.test(fObjectMap2));
         assertTrue(predicate.test(fObjectMap3));

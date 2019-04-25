@@ -40,7 +40,7 @@ public interface ISeriesModel {
      * Get the X axis description
      *
      * @return X Axis description
-     * @since 4.3
+     * @since 5.0
      */
     @SuppressWarnings("nls")
     default TmfXYAxis getXAxisDescription() {
@@ -51,7 +51,7 @@ public interface ISeriesModel {
      * Get the Y axis description
      *
      * @return Y Axis description
-     * @since 4.3
+     * @since 5.0
      */
     @SuppressWarnings("nls")
     default TmfXYAxis getYAxisDescription() {
@@ -62,7 +62,7 @@ public interface ISeriesModel {
      * Get the X values
      *
      * @return The x values
-     * @since 4.3
+     * @since 5.0
      */
     default long[] getXValues() {
         return getXAxis();
@@ -72,7 +72,7 @@ public interface ISeriesModel {
      * Get the y values
      *
      * @return An array of y values
-     * @since 4.3
+     * @since 5.0
      */
     default double[] getYValues() {
         return getData();

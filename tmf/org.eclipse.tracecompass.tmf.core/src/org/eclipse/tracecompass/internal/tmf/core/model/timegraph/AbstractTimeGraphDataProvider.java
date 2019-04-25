@@ -28,12 +28,15 @@ import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphStateFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse.Status;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+
+import com.google.common.collect.Multimap;
 
 /**
  * Class to abstract {@link ITimeGraphDataProvider} methods and fields. Handles
@@ -109,6 +112,12 @@ public abstract class AbstractTimeGraphDataProvider<A extends TmfStateSystemAnal
         } catch (StateSystemDisposedException | TimeRangeException | IndexOutOfBoundsException e) {
             return new TmfModelResponse<>(null, Status.FAILED, String.valueOf(e.getMessage()));
         }
+    }
+
+    @Override
+    public @NonNull Multimap<@NonNull String, @NonNull String> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
+        return ITimeGraphStateFilter.mergeMultimaps(ITimeGraphDataProvider.super.getFilterData(entryId, time, monitor),
+                getEntryMetadata(entryId));
     }
 
     /**

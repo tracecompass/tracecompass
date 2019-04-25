@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,6 +11,7 @@
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts;
 
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.xycharts.TmfXyUiUtils;
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
 
@@ -71,19 +72,7 @@ public abstract class TmfBaseProvider {
      *          end if x > end
      */
     protected long limitXDataCoordinate(double x) {
-        ITmfChartTimeProvider viewer = getChartViewer();
-        long windowStartTime = viewer.getWindowStartTime() - viewer.getTimeOffset();
-        long windowEndTime = viewer.getWindowEndTime() - viewer.getTimeOffset();
-
-        if (x < windowStartTime) {
-            return windowStartTime;
-        }
-
-        if (x > windowEndTime) {
-            return windowEndTime;
-        }
-
-        return (long) x;
+        return TmfXyUiUtils.limitXDataCoordinate(getChartViewer(), x);
     }
 
     /**

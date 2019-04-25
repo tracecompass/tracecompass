@@ -58,7 +58,7 @@ public class CpuUsageEntryModel extends TmfTreeDataModel {
      *            The process's labels
      * @param time
      *            The total amount of time spent on CPU
-     * @since 3.2
+     * @since 4.0
      */
     public CpuUsageEntryModel(long id, long parentId, List<String> labels, int tid, long time) {
         super(id, parentId, labels);

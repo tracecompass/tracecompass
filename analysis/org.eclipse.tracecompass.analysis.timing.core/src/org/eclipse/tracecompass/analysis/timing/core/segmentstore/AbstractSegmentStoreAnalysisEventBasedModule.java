@@ -11,7 +11,6 @@ package org.eclipse.tracecompass.analysis.timing.core.segmentstore;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -32,21 +31,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 public abstract class AbstractSegmentStoreAnalysisEventBasedModule extends AbstractSegmentStoreAnalysisModule {
 
     private @Nullable ITmfEventRequest fOngoingRequest = null;
-
-    /**
-     * Returns the analysis request for creating the segment store
-     *
-     * @param segmentStore
-     *            a segment store to fill
-     * @return the segment store analysis request implementation
-     * @deprecated Use the
-     *             {@link #createAnalysisRequest(ISegmentStore, IProgressMonitor)}
-     *             method instead
-     */
-    @Deprecated
-    protected AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> segmentStore) {
-        return createAnalysisRequest(segmentStore, new NullProgressMonitor());
-    }
 
     /**
      * Returns the analysis request for creating the segment store

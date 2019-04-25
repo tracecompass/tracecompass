@@ -32,8 +32,8 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,11 +61,11 @@ public class TmfSchedulerTest {
     // Attributes
     // ------------------------------------------------------------------------
 
-    private CtfTmfTrace fixture;
+    private static CtfTmfTrace fixture;
 
-    private long fStartTime;
-    private long fEndTime;
-    private TmfTimeRange fForegroundTimeRange;
+    private static long fStartTime;
+    private static long fEndTime;
+    private static TmfTimeRange fForegroundTimeRange;
 
     private final List<String> fOrderList = new ArrayList<>();
     private int fForegroundId = 0;
@@ -74,8 +74,8 @@ public class TmfSchedulerTest {
     /**
      * Perform pre-test initialization.
      */
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         fixture = CtfTmfTestTraceUtils.getTrace(testTrace);
         fixture.indexTrace(true);
         fStartTime = fixture.getStartTime().toNanos();
@@ -90,8 +90,8 @@ public class TmfSchedulerTest {
     /**
      * Perform post-test clean-up.
      */
-    @After
-    public void tearDown() {
+    @AfterClass
+    public static void tearDown() {
         if (fixture != null) {
             fixture.dispose();
         }

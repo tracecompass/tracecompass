@@ -2188,17 +2188,30 @@ The following keyboard shortcuts are available:
 *'''Home''': selects the first process
 *'''End''': selects the last process
 *'''Enter''': toggles the expansion state of the current process in the tree
-*'''+''': Zoom-in horizontally
-*'''-''': Zoom-out horizontally
+*'''+''': Zoom-in centered to the selected time range (or window range if time selection is not visible)
+*'''-''': Zoom-out centered to the selected time range (or window range if time selection is not visible)
 *'''Ctrl + +''': Zoom-in vertically
 *'''Ctrl + -''': Zoom-out vertically
 *'''Ctrl + 0''': Reset the vertical zoom
 *'''Ctrl + F''': Search in the view. (see [[#Searching in Time Graph Views | Searching in Time Graph Views]])
+*'''G''': Toggles both vertical and horizontal gridlines
+*'''Z''': Zoom to current selected time range (if range is greater than 0)
+
+'''WASD Navigation'''
+
+Use WASD Navigation in conjunction with the mouse, where one hand changes the mouse
+position and the other hand uses the keyboard shortcuts to zoom or scroll.
+
+*'''W''': Zoom-in horizontally centered to the mouse position
+*'''S''': Zoom-out horizontally centered to the mouse position
+*'''A''': Scroll left by a quarter of the current window range
+*'''D''': Scroll right by a quarter of the current window range
+
 When the mouse cursor is over entries (left pane):
 *'''-''': Collapse selected entry
 *'''+''': Expand selected entry
 *'''*''': Expand selected entry to the level with at least one collapsed entry
-*'''g''': Toggles both vertical and horizontal gridlines
+
 
 '''Please note that the behavior of some shortcuts can slightly differ based on the operating system.'''
 
@@ -2551,38 +2564,78 @@ The Process Information is displayed on the left side of the view and shows all 
 The CPU Usage Chart on the right side of the view, plots the total time spent on all CPUs of all processes and the time of the selected process.
 
 
+==== Tooltips ====
+
+Hover the cursor over a line of the chart and a tooltip will pop up with the following information:
+* '''Time''': current time of mouse position
+* '''total''': The total CPU usage
+* '''<process>''': CPU usage of selected process
+
+[[Image:images/LTTng_CpuUsageViewToolTip.png]]
+
 ==== Using the mouse ====
 
 The CPU Usage chart is usable with the mouse. The following actions are set:
 
 * '''left-click''': select a time or time range begin time
 * '''Shift-left-click or drag''': Extend or shrink the selection range
-
 * '''left-drag horizontally''': select a time range or change the time range begin or end time
 * '''middle-drag or Ctrl-left-drag horizontally''': pan left or right
 * '''right-drag horizontally''': [[#Zoom region|zoom region]]
 * '''Shift-mouse wheel up/down''': scroll left or right
 * '''Ctrl-mouse wheel up/down''': zoom in or out horizontally
 
-==== Tooltips ====
+==== Using the keyboard ====
 
-Hover the cursor over a line of the chart and a tooltip will pop up with the following information:
-* '''time''': current time of mouse position
-* '''Total''': The total CPU usage
+The following keyboard shortcuts are available, when the mouse cursor is over the graph (right pane):
+*'''+''': Zoom-in horizontally centered to the selected time range (or window range if time selection is not visible)
+*'''-''': Zoom-out horizontally centered to the selected time range (or window range if time selection is not visible)
+*'''Z''': Zoom to the current selection time range, if the selection range is greater than 0
 
+'''WASD Navigation'''
+
+Use WASD Navigation in conjunction with the mouse, where one hand changes the mouse
+position and the other hand uses the keyboard shortcuts to zoom or scroll.
+
+*'''W''': Zoom-in horizontally centered to the mouse position
+*'''S''': Zoom-out horizontally centered to the mouse position
+*'''A''': Scroll left by a quarter of the current window range
+*'''D''': Scroll right by a quarter of the current window range
+
+
+==== Toolbar ====
+
+The view '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
+
+{|
+| [[Image:images/home_nav.gif]]
+| Reset the Time Scale to Default
+| Resets the zoom window to the full range.
+|-
+| [[Image:images/zoomin_nav.gif]]
+| Zoom In
+| Zooms in on the selection by 50%.
+|-
+| [[Image:images/zoomout_nav.gif]]
+| Zoom Out
+| Zooms out on the selection by 50%.
+|-
+| [[Image:images/unpinned_view.gif]]<br>[[Image:images/pin_view.gif]]
+| Pin/Unpin View
+| Pin or unpin the view. A pinned view is frozen with the trace selected at the time of pinning. When the unpin button is clicked the view synchronizes back to the active trace. The button's drop down menu can be used to quickly pin the view to any of the opened traces.
+|}
 
 ==== View Menu ====
 
 The CPU Usage View '''view menu''', located at the top right of the view, has shortcut buttons to perform common actions:
 
 {|
-|
-| Align Views
-| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the this view will disable this feature across all the views because it's a workspace preference
+| New CPU Usage view
+| Spawn a new CPU Usage view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
 |-
+| Align Views
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
 |}
-
-[[Image:images/LTTng_CpuUsageViewToolTip.png]]
 
 ==== CPU Filtering ====
 [[#Follow CPU | Follow a CPU]] will filter the CPU Usage View and will display only usage for the followed CPU.
@@ -2612,25 +2665,44 @@ The time range can be set to fully zoomed out by double-clicking the time axis o
 
 The Process Information is displayed on the left side of the view and shows all threads that were executing on all available CPUs in the current time range. For each process, it shows in different columns the thread ID (TID) and the process name (Process).
 
+=== Navigation ===
+
+For navigation, see CPU Usage view's '''[[#Using_the_mouse_2 | Using the mouse]]''', '''[[#Using_the_keyboard_2 | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
+
+=== Toolbar ===
+
+The view '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
+
+{|
+| [[Image:images/filter_items.gif]]
+| Filter active threads
+| Show only active threads
+|}
+
+For other toolbar buttons, see CPU Usage view's '''[[#Toolbar_3 | Toolbar]]'''.
+
+=== View Menu ===
+
+The Memory Usage View '''view menu''', located at the top right of the view, has shortcut buttons to perform common actions:
+
+{|
+| New Memory Usage view
+| Spawn a new Memory Usage view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
+|-
+| Align Views
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
+|}
+
+
 
 === Relative Kernel Memory Chart ===
 
 The Relative Kernel Memory Chart on the right side of the view plots the relative amount of memory that was allocated and deallocated during that period of time.
 
 
-==== Using the mouse ====
+==== Navigation ====
 
-The Relative Kernel Memory chart is usable with the mouse. The following actions are set:
-
-* '''left-click''': select a time or time range begin time
-* '''Shift-left-click or drag''': Extend or shrink the selection range
-
-* '''left-drag horizontally''': select a time range or change the time range begin or end time
-* '''middle-drag or Ctrl-left-drag horizontally''': pan left or right
-* '''right-drag horizontally''': [[#Zoom region|zoom region]]
-* '''Shift-mouse wheel up/down''': scroll left or right
-* '''Ctrl-mouse wheel up/down''': zoom in or out horizontally
-
+For navigation, see CPU Usage view's '''[[#Using_the_mouse_2 | Using the mouse]]''', '''[[#Using_the_keyboard_2 | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
 
 ==== Tooltips ====
 
@@ -2730,6 +2802,28 @@ Disk reads and writes can be selected in the tree on the left hand side.
 The time range can be reset by double-clicking the time axis or by clicking the reset button.
 
  [[Image:images/io/diskIoActivity.png| Disk I/O Activity Example]]
+
+==== Navigation ====
+
+For navigation, see CPU Usage view's '''[[#Using_the_mouse_2 | Using the mouse]]''', '''[[#Using_the_keyboard_2 | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
+
+==== Toolbar ====
+
+The view '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions.
+
+For details about the see CPU Usage view's '''[[#Toolbar_3 | Toolbar]]'''.
+
+==== View Menu ====
+
+The Disk I/O View '''view menu''', located at the top right of the view, has shortcut buttons to perform common actions:
+
+{|
+| New Disk I/O Activity view
+| Spawn a new Disk I/O Activity view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
+|-
+| Align Views
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
+|}
 
 == System Call Latency Analysis ==
 
@@ -3003,28 +3097,27 @@ The time range can be fully zoomed out by double-clicking the time axis or the h
 
 Please note this view will not show shared memory or stack memory usage.
 
-=== Using the mouse ===
+=== Navigation ===
 
-The Memory Usage chart is usable with the mouse. The following actions are set:
+For navigation, see CPU Usage view's '''[[#Using_the_mouse_2 | Using the mouse]]''', '''[[#Using_the_keyboard_2 | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
 
-* '''left-click''': select a time or time range begin time
-* '''Shift-left-click or drag''': Extend or shrink the selection range
+=== Toolbar ===
 
-* '''left-drag horizontally''': select a time range or change the time range begin or end time
-* '''middle-drag or Ctrl-left-drag horizontally''': pan left or right
-* '''right-drag horizontally''': [[#Zoom region|zoom region]]
-* '''Shift-mouse wheel up/down''': scroll left or right
-* '''Ctrl-mouse wheel up/down''': zoom in or out horizontally
+The view '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions.
+
+For details about the see CPU Usage view's '''[[#Toolbar_3 | Toolbar]]'''.
+
 
 === View Menu ===
 
 The Memory Usage View '''view menu''', located at the top right of the view, has shortcut buttons to perform common actions:
 
 {|
-|
-| Align Views
-| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in the this view will disable this feature across all the views because it's a workspace preference
+| New Memory Usage view
+| Spawn a new Memory Usage view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
 |-
+| Align Views
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
 |}
 
 [[Image:images/LTTng_CpuUsageViewToolTip.png]]
@@ -4005,6 +4098,9 @@ A time aligned '''scatter chart''' of the latencies with respect to the current 
 
 [[Image:images/LatenciesScatter.png| Latency Scatter Chart example - System Call Latency vs Time]]
 
+For navigation, see CPU Usage view's '''[[#Using_the_mouse_2 | Using the mouse]]''', '''[[#Using_the_keyboard_2 | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
+
+For the toolbar, see CPU Usage view's '''[[#Toolbar_3 | Toolbar]]'''.'
 
 * System Call Latency Statistics
 A view of the '''statistics''' of the latencies. These show the ''minimum'', ''maximum'', ''average'', ''standard deviation'', ''count'' and ''Total'' of the latencies when applicable. The view shows the total statistics for the whole trace also as the local statistics for a selection range. This tool is useful for finding the outliers on a per-category basis.
@@ -4021,87 +4117,6 @@ A '''density''' view, analyzing the current time range. This is useful to find g
 [[Image:images/LatenciesDensity.png| Latency Densities example - System Call Density]]
 
 Using the right mouse button to drag horizontally it will update the table and graph to show only the density for the selected durations. Durations outside the selection range will be filtered out. Using the toolbar button [[Image:images/zoomout_nav.gif]] the zoom range will be reset. 
-
-= Virtual Machine Analysis =
-
-''Note'': The Virtual Machine Analysis is now deprecated and has moved to the Trace Compass Incubator where it is undergoing active development. The analyses that were previously in Trace Compass are now available as part of the "Virtual Machine And Container Analysis" feature of the Incubator.
-
-Please refer to [[#Trace Compass Incubator | Trace Compass Incubator documentation]] to install incubator features.
-
-Virtual environments are usually composed of host machines, who each run an hypervisor program on which one or many guests can be run. Tracing a guest machine alone can often yield some strange results as from its point of view, it has full use of the resources, but in reality, most resources are shared with the host and other guests.
-
-To better understand what is happening in such an environment, it is necessary to trace all the machines involved, guests and hosts, and correlate this information in an experiment that will display a complete view of the virtualized environment.
-
-== Virtual Machine Experiment ==
-
-A trace has to be taken for each machine, guest and host, in the virtualized environment. The host trace is the most important to have, as missing guests will only give an incomplete view of the system, but missing hosts usually won't allow to identify the hypervisor, nor determine when a guest is preempted from the host CPUs. The virtual machine analysis only makes sense if the host trace is available.
-
-Once all the traces are imported in Trace Compass, they can be [[#Creating an Experiment | added to an experiment]]. The type of the experiment should by set to '''Virtual Machine Experiment''' by clicking on the right mouse button over the experiment name, then selecting '''Select Experiment Type...'''.
-
-[[Image:images/vmAnalysis/VM_experiment.png | Virtual Machine Experiment]]
-
-Depending on the hypervisor used, traces might need to be [[#Trace synchronization | synchronized]] so that they have the same time reference and their events can be correctly correlated.
-
-== Virtual CPU View ==
-
-The Virtual CPU view shows the status of CPUs and threads on guests augmented with the preemption and hypervisor data we get from the host.
-
-In the image below, we see for the virtual CPU status that it has a few more states than the CPUs in the [[#Resources View | Resources View]]: in red and purple respectively, when the virtual CPU is running hypervisor code and when the CPU is preempted on the host.
-
-The entries for each thread of the machine corresponds to the one from the [[#Control flow | Control Flow View]], augmented with the data from the Virtual CPU, so that we see that even though it is running from the guest's point of view, it is actually not running when the Virtual CPU it runs on is in preempted or hypervisor mode.
-
-[[Image:images/vmAnalysis/VM_CPU_view.png | Virtual CPU view]]
-
-==== Using the keyboard ====
-*'''Ctrl + F''': Search in the view. (see [[#Searching in Time Graph Views | Searching in Time Graph Views]])
-
-== Hypervisor-specific Tracing ==
-
-In order to be able to correlate data from the guests and hosts traces, each hypervisor supported by Trace Compass requires some specific events, that are sometimes not available in the default installation of the tracer.
-
-The following sections describe how to obtain traces for each hypervisor.
-
-=== Qemu/KVM ===
-
-The Qemu/KVM hypervisor require extra tracepoints not yet shipped in LTTng for both guests and hosts, as well as compilation with the full kernel source tree on the host, to have access to kvm_entry/kvm_exit events on x86.
-
-Obtain the source code with extra tracepoints, along with lttng-modules
-
-    # git clone https://github.com/giraldeau/lttng-modules.git
-    # cd lttng-modules
-
-Checkout the addons branch, compile and install lttng-modules as per the lttng-modules documentation.
-
-    # git checkout addons
-    # make
-    # sudo make modules_install
-    # sudo depmod -a
-
-On the host, to have complete kvm tracepoints support, the make command has to include the full kernel tree. So first, you'll need to obtain the kernel source tree. See your distribution's documentation on how to get it. This will compile extra modules, including lttng-probe-kvm-x86, which we need.
-
-    # make KERNELDIR=/path/to/kernel/dir
-
-The lttng addons modules must be inserted manually for the virtual machine extra tracepoints to be available:
-
-    # sudo modprobe lttng-addons
-    # sudo modprobe lttng-vmsync-host # on the host
-    # sudo modprobe lttng-vmsync-guest # on the guest
-
-The following tracepoints will be available
-
-    # sudo lttng list -k
-    Kernel events:
-    -------------
-      ...
-      kvm_entry (loglevel: TRACE_EMERG (0)) (type: tracepoint)
-      kvm_exit (loglevel: TRACE_EMERG (0)) (type: tracepoint)
-      vmsync_gh_guest (loglevel: TRACE_EMERG (0)) (type: tracepoint) # on the guest
-      vmsync_hg_guest (loglevel: TRACE_EMERG (0)) (type: tracepoint) # on the guest
-      vmsync_gh_host (loglevel: TRACE_EMERG (0)) (type: tracepoint) # on the host
-      vmsync_hg_host (loglevel: TRACE_EMERG (0)) (type: tracepoint) # on the host
-      ...
-
-Host and guests can now be traced together and their traces added to an experiment. Because each guest has a different clock than the host, it is necessary to synchronize the traces together. Unfortunately, automatic synchronization with the virtual machine events is not completely implemented yet, so another kind of synchronization needs to be done, with TCP packets for instance. See section on [[#Trace synchronization | trace synchronization]] for information on how to obtain synchronizable traces.
 
 = Counters Analysis =
 
@@ -4138,6 +4153,34 @@ Second, the checkbox tree has a search bar which allows users to apply filters o
 [[Image:images/counters/FilteredTree1.png]] [[Image:images/counters/FilteredTree2.png]] [[Image:images/counters/FilteredTree3.png]] [[Image:images/counters/FilteredTree4.png]]
 
 Finally, the tree's checkboxes are remembered when switching from one trace to another.
+
+=== Navigation ===
+
+For navigation, see CPU Usage view's '''[[#Using_the_mouse_2 | Using the mouse]]''', '''[[#Using_the_keyboard_2 | Using the keyboard]]''' and '''[[#Zoom_region | Zoom region]]'''.
+
+=== Toolbar ===
+
+The view '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
+
+{|
+| [[Image:images/counters/sigma.gif]]
+| Toggle cumulative or non-cumulative
+| Switch between cumulative or non-cumulative presentation
+|}
+
+For other toolbar buttons, see CPU Usage view's '''[[#Toolbar_3 | Toolbar]]'''.
+
+=== View Menu ===
+
+The Counters View '''view menu''', located at the top right of the view, has shortcut buttons to perform common actions:
+
+{|
+| New Counters view
+| Spawn a new Counters view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
+|-
+| Align Views
+| Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
+|}
 
 = Java Logging =
 

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2018 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2013, 2019 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,22 +13,29 @@
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.xycharts.TmfXYChartTimeAdapter;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.xycharts.TmfXyUiUtils;
+import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfTimeNavigationProvider;
+import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfTimeZoomProvider;
+import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfZoomToSelectionProvider;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
@@ -63,7 +70,7 @@ import com.google.common.annotations.VisibleForTesting;
  *
  * @author Bernd Hufmann
  */
-public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChartTimeProvider, IImageSave {
+public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChartTimeProvider, IImageSave, IAdaptable {
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -126,8 +133,20 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
         commonComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
         fSwtChart = new Chart(commonComposite, SWT.NONE) {
             @Override
+            public void addFocusListener(FocusListener listener) {
+                fSwtChart.getPlotArea().addFocusListener(listener);
+            }
+            @Override
+            public void removeFocusListener(FocusListener listener) {
+                fSwtChart.getPlotArea().removeFocusListener(listener);
+            }
+            @Override
             public boolean setFocus() {
                 return fSwtChart.getPlotArea().setFocus();
+            }
+            @Override
+            public boolean forceFocus() {
+                return fSwtChart.getPlotArea().forceFocus();
             }
         };
         fSwtChart.getAxisSet().getXAxis(0).getGrid().setStyle(LineStyle.NONE);
@@ -480,6 +499,27 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     }
 
     // ------------------------------------------------------------------------
+    // IAdaptable Interface
+    // ------------------------------------------------------------------------
+    /**
+     * @since 5.0
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getAdapter(Class<T> adapter) {
+        if (adapter == ITmfTimeNavigationProvider.class) {
+            return (T) getTimeNavigator();
+        }
+        if (adapter == ITmfTimeZoomProvider.class) {
+            return (T) getTimeZoomProvider();
+        }
+        if (adapter == ITmfZoomToSelectionProvider.class ) {
+            return (T) getZoomToSelectionProvider();
+        }
+        return null;
+    }
+
+    // ------------------------------------------------------------------------
     // Helper Methods
     // ------------------------------------------------------------------------
 
@@ -650,4 +690,46 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
 
         fStatusLineManager.setMessage(message.toString());
     }
+
+    private ITmfTimeZoomProvider getTimeZoomProvider() {
+        return (zoomIn, useMousePosition) -> {
+            Chart chart = getSwtChart();
+            if (chart == null) {
+                return;
+            }
+            Point cursorDisplayLocation = getDisplay().getCursorLocation();
+            Point cursorControlLocation = getSwtChart().getPlotArea().toControl(cursorDisplayLocation);
+            Point cursorParentLocation = getSwtChart().getPlotArea().getParent().toControl(cursorDisplayLocation);
+            Rectangle controlBounds = getSwtChart().getPlotArea().getBounds();
+            // check the X axis only
+            if (!controlBounds.contains(cursorParentLocation.x, controlBounds.y)) {
+                return;
+            }
+            if (useMousePosition) {
+                TmfXyUiUtils.zoom(this, chart, zoomIn, cursorControlLocation.x);
+            } else {
+                TmfXyUiUtils.zoom(this, chart, zoomIn);
+            }
+        };
+    }
+
+    private ITmfTimeNavigationProvider getTimeNavigator() {
+        return left -> {
+            Chart chart = getSwtChart();
+            if (chart != null) {
+                TmfXyUiUtils.horizontalScroll(this, chart, left);
+            }
+        };
+    }
+
+    private ITmfZoomToSelectionProvider getZoomToSelectionProvider() {
+        return () -> {
+            long selBegin = getSelectionBeginTime();
+            long selEnd = getSelectionEndTime();
+            if (selBegin != selEnd) {
+                updateWindow(selBegin, selEnd);
+            }
+        };
+    }
+
 }

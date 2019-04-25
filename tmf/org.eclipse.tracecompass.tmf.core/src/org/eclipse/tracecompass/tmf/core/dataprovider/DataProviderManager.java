@@ -176,7 +176,7 @@ public class DataProviderManager {
      * @param trace
      *            queried trace
      * @return list of the available providers for this trace / experiment
-     * @since 4.3
+     * @since 5.0
      */
     public List<IDataProviderDescriptor> getAvailableProviders(@Nullable ITmfTrace trace) {
         if (trace == null) {

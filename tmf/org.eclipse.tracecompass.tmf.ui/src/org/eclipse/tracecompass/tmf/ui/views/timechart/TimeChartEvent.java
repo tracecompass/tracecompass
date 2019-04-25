@@ -15,11 +15,15 @@ package org.eclipse.tracecompass.tmf.ui.views.timechart;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSettingsManager;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
+
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * Event in the time chart view
@@ -385,5 +389,10 @@ public class TimeChartEvent implements ITimeEvent {
                 previous = range;
             }
         }
+    }
+
+    @Override
+    public @NonNull Multimap<@NonNull String, @NonNull String> getMetadata() {
+        return ImmutableMultimap.of();
     }
 }

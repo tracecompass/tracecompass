@@ -210,17 +210,13 @@ public final class ThreadedHistoryTreeBackend extends HistoryTreeBackend
     public void run() {
         try {
             HTInterval currentInterval = intervalQueue.blockingPeek();
-            while (currentInterval.getStartTime() != Long.MIN_VALUE) {
+            while (currentInterval.getStartTime() != Long.MIN_VALUE || currentInterval.getAttribute() != -1) {
                 /* Send the interval to the History Tree */
                 getSHT().insertInterval(currentInterval);
                 /* Actually remove the interval from the queue */
                 // FIXME Replace with remove() once it is implemented.
                 intervalQueue.take();
                 currentInterval = intervalQueue.blockingPeek();
-            }
-            if (currentInterval.getAttribute() != -1) {
-                /* Make sure this is the "poison pill" we are waiting for */
-                throw new IllegalStateException(currentInterval.toString());
             }
             /*
              * We've been told we're done, let's write down everything and quit.

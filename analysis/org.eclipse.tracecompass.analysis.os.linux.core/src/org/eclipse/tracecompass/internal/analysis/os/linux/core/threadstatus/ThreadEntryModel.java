@@ -12,7 +12,8 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.tmf.core.model.IFilterableDataModel;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 
 import com.google.common.collect.HashMultimap;
@@ -23,7 +24,7 @@ import com.google.common.collect.Multimap;
  *
  * @author Simon Delisle
  */
-public class ThreadEntryModel extends TimeGraphEntryModel implements IFilterableDataModel {
+public class ThreadEntryModel extends TimeGraphEntryModel implements IElementResolver {
 
     /**
      * {@link ThreadEntryModel} builder, we use this to be able to reassign
@@ -170,8 +171,8 @@ public class ThreadEntryModel extends TimeGraphEntryModel implements IFilterable
         fThreadId = pid;
         fParentThreadId = ppid;
         fAspects = HashMultimap.create();
-        fAspects.put("tid", String.valueOf(pid));
-        fAspects.put("ppid", String.valueOf(ppid));
+        fAspects.put(OsStrings.tid(), String.valueOf(pid));
+        fAspects.put(OsStrings.pid(), String.valueOf(ppid));
         fAspects.put("exec_name", String.valueOf(labels));
     }
 

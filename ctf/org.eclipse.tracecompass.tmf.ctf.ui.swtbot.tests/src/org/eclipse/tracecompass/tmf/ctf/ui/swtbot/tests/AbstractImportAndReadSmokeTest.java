@@ -82,6 +82,9 @@ public abstract class AbstractImportAndReadSmokeTest {
     /** The Log4j logger instance. */
     protected static final Logger fLogger = Logger.getRootLogger();
 
+    /** Timeout to wait for import operation */
+    protected static final long IMPORT_TIME_OUT = 180000L;
+
     /** Test Class setup */
     @BeforeClass
     public static void init() {
@@ -174,7 +177,7 @@ public abstract class AbstractImportAndReadSmokeTest {
             SWTBotButton button = shell2.bot().button("Overwrite All");
             button.click();
         }
-        fBot.waitUntil(Conditions.shellCloses(shell));
+        fBot.waitUntil(Conditions.shellCloses(shell), IMPORT_TIME_OUT);
         WaitUtils.waitForJobs();
     }
 

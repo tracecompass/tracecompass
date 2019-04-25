@@ -545,7 +545,7 @@ public interface ITmfTrace extends ITmfEventProvider {
      * Get the indexing status of trace
      *
      * @return True if the trace is still being indexed, false if not
-     * @since 4.3
+     * @since 5.0
      */
     public default boolean isIndexing() {
         return false;

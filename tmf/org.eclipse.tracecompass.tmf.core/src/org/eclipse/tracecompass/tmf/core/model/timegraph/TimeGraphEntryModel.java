@@ -76,7 +76,7 @@ public class TimeGraphEntryModel extends TmfTreeDataModel implements ITimeGraphE
      *            Start time
      * @param endTime
      *            End time
-     * @since 4.3
+     * @since 5.0
      */
     public TimeGraphEntryModel(long id, long parentId, List<String> labels, long startTime, long endTime) {
         this(id, parentId, labels, startTime, endTime, true);
@@ -97,7 +97,7 @@ public class TimeGraphEntryModel extends TmfTreeDataModel implements ITimeGraphE
      *            End time
      * @param hasRowModel
      *            true if the entry has a row model
-     * @since 4.3
+     * @since 5.0
      */
     public TimeGraphEntryModel(long id, long parentId, List<String> labels, long startTime, long endTime, boolean hasRowModel) {
         super(id, parentId, labels);

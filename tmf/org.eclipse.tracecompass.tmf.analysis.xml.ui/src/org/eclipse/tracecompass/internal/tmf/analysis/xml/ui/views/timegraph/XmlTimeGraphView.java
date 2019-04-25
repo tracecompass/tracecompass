@@ -24,17 +24,18 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlTimeGraphDataProvider;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlTimeGraphEntryModel;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphDataProvider;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphEntryModel;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.XmlDataProviderManager;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlDataProviderManager;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
@@ -61,6 +62,7 @@ import org.w3c.dom.Element;
  */
 public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
 
+
     /** View ID. */
     public static final @NonNull String ID = "org.eclipse.linuxtools.tmf.analysis.xml.ui.views.timegraph"; //$NON-NLS-1$
 
@@ -80,11 +82,10 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
-    private static final Comparator<XmlTimeGraphEntryModel> XML_ENTRY_COMPARATOR = Comparator
-            .comparing(XmlTimeGraphEntryModel::getPath, Comparator.nullsFirst(Comparator.naturalOrder()))
-            .thenComparing((XmlTimeGraphEntryModel entry) -> entry.getName()).thenComparingLong(XmlTimeGraphEntryModel::getStartTime);
+    private static final Comparator<DataDrivenTimeGraphEntryModel> XML_ENTRY_COMPARATOR = Comparator
+            .comparing(DataDrivenTimeGraphEntryModel::getName).thenComparingLong(DataDrivenTimeGraphEntryModel::getStartTime);
 
-    private static final Comparator<ITimeGraphEntry> ENTRY_COMPARATOR = Comparator.comparing(x -> (XmlTimeGraphEntryModel) ((TimeGraphEntry) x).getModel(), XML_ENTRY_COMPARATOR);
+    private static final Comparator<ITimeGraphEntry> ENTRY_COMPARATOR = Comparator.comparing(x -> (DataDrivenTimeGraphEntryModel) ((TimeGraphEntry) x).getModel(), XML_ENTRY_COMPARATOR);
 
     private final @NonNull XmlViewInfo fViewInfo = new XmlViewInfo(ID);
     private final Map<String, Integer> fStringValueMap = new HashMap<>();
@@ -99,7 +100,7 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
      * Default constructor
      */
     public XmlTimeGraphView() {
-        super(ID, new XmlPresentationProvider(ID), XmlTimeGraphDataProvider.ID);
+        super(ID, new XmlPresentationProvider(ID), DataDrivenTimeGraphDataProvider.ID);
         setWeight(fWeight);
         setTreeColumns(DEFAULT_COLUMN_NAMES);
         setTreeLabelProvider(new XmlTreeLabelProvider());
@@ -187,8 +188,8 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
                 }
 
                 ITimeGraphEntryModel model = entry.getModel();
-                if (model instanceof XmlTimeGraphEntryModel) {
-                    XmlTimeGraphEntryModel xmlModel = (XmlTimeGraphEntryModel) model;
+                if (model instanceof DataDrivenTimeGraphEntryModel) {
+                    DataDrivenTimeGraphEntryModel xmlModel = (DataDrivenTimeGraphEntryModel) model;
                     if (DEFAULT_COLUMN_NAMES[columnIndex].equals(Messages.XmlTimeGraphView_ColumnId)) {
                         return xmlModel.getXmlId();
                     } else if (DEFAULT_COLUMN_NAMES[columnIndex].equals(Messages.XmlTimeGraphView_ColumnParentId)) {
@@ -237,12 +238,12 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
 
         SubMonitor subMonitor = SubMonitor.convert(monitor);
         boolean complete = false;
-        ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> provider = XmlDataProviderManager.getInstance().getTimeGraphProvider(trace, viewElement);
+        ITimeGraphDataProvider<@NonNull TimeGraphEntryModel> provider = XmlDataProviderManager.getInstance().getTimeGraphProvider(trace, viewElement);
         if (provider == null) {
             return;
         }
         while (!complete && !subMonitor.isCanceled()) {
-            TmfModelResponse<TmfTreeModel<@NonNull XmlTimeGraphEntryModel>> response = provider.fetchTree(FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(0, Long.MAX_VALUE, 2)), subMonitor);
+            TmfModelResponse<TmfTreeModel<@NonNull TimeGraphEntryModel>> response = provider.fetchTree(FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(0, Long.MAX_VALUE, 2)), subMonitor);
             if (response.getStatus() == ITmfResponse.Status.FAILED) {
                 Activator.logError("XML Time Graph Data Provider failed: " + response.getStatusMessage()); //$NON-NLS-1$
                 return;
@@ -251,13 +252,13 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
             }
             complete = response.getStatus() == ITmfResponse.Status.COMPLETED;
 
-            TmfTreeModel<@NonNull XmlTimeGraphEntryModel> model = response.getModel();
+            TmfTreeModel<@NonNull TimeGraphEntryModel> model = response.getModel();
             if (model != null) {
                 synchronized (fEntries) {
                     /*
                      * Ensure that all the entries exist and are up to date.
                      */
-                    for (XmlTimeGraphEntryModel entry : model.getEntries()) {
+                    for (TimeGraphEntryModel entry : model.getEntries()) {
                         TimeGraphEntry tgEntry = fEntries.get(provider, entry.getId());
                         if (tgEntry == null) {
                             if (entry.getParentId() == -1) {

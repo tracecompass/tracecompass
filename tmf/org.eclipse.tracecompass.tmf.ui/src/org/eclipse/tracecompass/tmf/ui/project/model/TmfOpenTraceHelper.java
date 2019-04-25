@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2018 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2013, 2019 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -326,7 +326,7 @@ public class TmfOpenTraceHelper {
         }
 
         // Create the experiment
-        experiment.initExperiment(ITmfEvent.class, experimentElement.getName(), traces, cacheSize, experimentElement.getResource());
+        experiment.initExperiment(ITmfEvent.class, experimentElement.getName(), traces, cacheSize, experimentElement.getResource(), experimentElement.getTraceType());
 
         return experiment;
     }

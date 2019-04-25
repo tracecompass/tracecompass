@@ -514,7 +514,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
      * @param isSelection
      *            if the query is a selection
      * @return the resulting query parameters
-     * @since 4.3
+     * @since 5.0
      */
     protected @NonNull Map<String, Object> getParameters(long start, long end, boolean isSelection) {
         return FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(Long.min(start, end), Long.max(start, end), 2));

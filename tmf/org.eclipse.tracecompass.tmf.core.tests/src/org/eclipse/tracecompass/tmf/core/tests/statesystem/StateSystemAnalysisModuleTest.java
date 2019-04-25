@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -26,10 +27,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.StateIntervalStub;
+import org.eclipse.tracecompass.statesystem.core.tests.shared.utils.StateSystemTestUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
+import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider.FutureEventType;
 import org.eclipse.tracecompass.tmf.core.statesystem.Messages;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.tests.TmfCoreTestPlugin;
@@ -45,6 +50,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Test the {@link TmfStateSystemAnalysisModule} class
@@ -150,7 +157,7 @@ public class StateSystemAnalysisModuleTest {
     private static final String CRUCIAL_FIELD = "crucialInfo";
 
     private static void setupDependentAnalysisHandler(CyclicBarrier barrier) {
-        TestStateSystemProvider.setEventHandler((ss, event) -> {
+        TestStateSystemProvider.setEventHandler((ss, provider, event) -> {
             try {
                 /* Wait before processing the current event */
                 barrier.await();
@@ -454,6 +461,57 @@ public class StateSystemAnalysisModuleTest {
             assertFalse(module.waitForCompletion());
         } finally {
             module.dispose();
+        }
+    }
+
+    /**
+     * Test adding future values to the state system
+     */
+    @Test
+    public void testFutureEvents() {
+        String futureVal = "futureVal";
+        String futureStack = "futureStack";
+        int oneValue = 100;
+        String stack1 = "stack1";
+        String stack2 = "stack2";
+        try {
+            TestStateSystemProvider.setEventHandler((ss, provider, event) -> {
+                // Add future events
+                if (event.getTimestamp().toNanos() == 1) {
+                    // initialize a value quark and modify it in future
+                    int valueQuark = ss.getQuarkAbsoluteAndAdd(futureVal);
+                    ss.modifyAttribute(event.getTimestamp().toNanos(), oneValue, valueQuark);
+                    provider.addFutureEvent(5, null, valueQuark, FutureEventType.MODIFICATION);
+
+                    // Initialize a stack and modify it in future
+                    int stackQuark = ss.getQuarkAbsoluteAndAdd(futureStack);
+                    ss.pushAttribute(event.getTimestamp().toNanos(), stack1, stackQuark);
+                    provider.addFutureEvent(4, stack2, stackQuark, FutureEventType.PUSH);
+                    provider.addFutureEvent(7, stack2, stackQuark, FutureEventType.POP);
+                    provider.addFutureEvent(8, stack1, stackQuark, FutureEventType.POP);
+                }
+                return true;
+
+            });
+
+            TestStateSystemModule module = fModule;
+            module.schedule();
+            assertTrue(module.waitForCompletion());
+
+            ITmfStateSystem ss = module.getStateSystem();
+            assertNotNull(ss);
+
+            List<@NonNull ITmfStateInterval> expected = ImmutableList.of(new StateIntervalStub(1, 4, oneValue), new StateIntervalStub(5, 10, (Object) null));
+            StateSystemTestUtils.testIntervalForAttributes(ss, expected, futureVal);
+
+            expected = ImmutableList.of(new StateIntervalStub(1, 7, stack1), new StateIntervalStub(8, 10, (Object) null));
+            StateSystemTestUtils.testIntervalForAttributes(ss, expected, futureStack, "1");
+
+            expected = ImmutableList.of( new StateIntervalStub(1, 3, (Object) null),
+                    new StateIntervalStub(4, 6, stack2), new StateIntervalStub(7, 10, (Object) null));
+            StateSystemTestUtils.testIntervalForAttributes(ss, expected, futureStack, "2");
+        } finally {
+            TestStateSystemProvider.setEventHandler(null);
         }
     }
 }

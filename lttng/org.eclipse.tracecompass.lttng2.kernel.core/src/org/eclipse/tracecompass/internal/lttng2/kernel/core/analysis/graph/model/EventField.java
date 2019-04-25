@@ -21,72 +21,8 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
  */
 public class EventField {
 
-    /**
-     * Get int field
-     *
-     * @param event
-     *            the event
-     * @param name
-     *            the field name
-     * @return the long value
-     * @deprecated Use the {@link ITmfEventField#getFieldValue(Class, String...)} with class Integer.class instead
-     */
-    @Deprecated
-    public static Integer getInt(ITmfEvent event, String name) {
-        ITmfEventField field = NonNullUtils.checkNotNull(event.getContent().getField(name));
-        Object value = field.getValue();
-        if (value instanceof Long) {
-            return NonNullUtils.checkNotNull(((Long) value).intValue());
-        }
-        return NonNullUtils.checkNotNull((Integer) value);
-    }
-
-    /**
-     * Get long field
-     *
-     * @param event
-     *            the event
-     * @param name
-     *            the field name
-     * @return the long value
-     * @deprecated Use the {@link ITmfEventField#getFieldValue(Class, String...)} with class Long.class instead
-     */
-    @Deprecated
-    public static Long getLong(ITmfEvent event, String name) {
-        ITmfEventField field = NonNullUtils.checkNotNull(event.getContent().getField(name));
-        return NonNullUtils.checkNotNull((Long) field.getValue());
-    }
-
-    /**
-     * Get string field
-     *
-     * @param event
-     *            the event
-     * @param name
-     *            the field name
-     * @return the string value
-     * @deprecated Use the {@link ITmfEventField#getFieldValue(Class, String...)} with class String.class instead
-     */
-    @Deprecated
-    public static String getString(ITmfEvent event, String name) {
-        ITmfEventField field = NonNullUtils.checkNotNull(event.getContent().getField(name));
-        return NonNullUtils.checkNotNull((String) field.getValue());
-    }
-
-    /**
-     * Get float field
-     *
-     * @param event
-     *            the event
-     * @param name
-     *            the field name
-     * @return the float value
-     * @deprecated Use the {@link ITmfEventField#getFieldValue(Class, String...)} with class Double.class instead
-     */
-    @Deprecated
-    public static double getFloat(ITmfEvent event, String name) {
-        ITmfEventField field = NonNullUtils.checkNotNull(event.getContent().getField(name));
-        return NonNullUtils.checkNotNull((Double) field.getValue());
+    private EventField() {
+        // Empty constructor
     }
 
     /**

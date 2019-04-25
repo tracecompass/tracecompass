@@ -21,6 +21,7 @@ import org.eclipse.tracecompass.analysis.graph.core.base.IGraphWorker;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelThreadInformationProvider;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.execution.graph.Messages;
@@ -71,7 +72,7 @@ public class OsWorker implements IGraphWorker {
         if (tid == -1) {
             return Collections.emptyMap();
         }
-        return Collections.singletonMap("tid", String.valueOf(tid)); //$NON-NLS-1$
+        return Collections.singletonMap(OsStrings.tid(), String.valueOf(tid));
     }
 
     @SuppressWarnings("null")

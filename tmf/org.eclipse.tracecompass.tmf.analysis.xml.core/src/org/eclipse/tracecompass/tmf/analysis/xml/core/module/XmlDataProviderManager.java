@@ -42,7 +42,11 @@ import com.google.common.collect.Table;
  *
  * @since 2.4
  * @author Loic Prieur-Drevon
+ * @deprecated This class has moved to internal, use
+ *             {@link org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.XmlDataProviderManager}
+ *             instead
  */
+@Deprecated
 public class XmlDataProviderManager {
 
     private static @Nullable XmlDataProviderManager INSTANCE;
@@ -86,8 +90,8 @@ public class XmlDataProviderManager {
     }
 
     /**
-     * Create (if necessary) and get the {@link XmlXYDataProvider} for the specified
-     * trace and viewElement.
+     * Create (if necessary) and get the {@link XmlXYDataProvider} for the
+     * specified trace and viewElement.
      *
      * @param trace
      *            trace for which we are querying a provider
@@ -142,8 +146,8 @@ public class XmlDataProviderManager {
     }
 
     /**
-     * Create (if necessary) and get the {@link XmlXYDataProvider} for the specified
-     * trace and viewElement.
+     * Create (if necessary) and get the {@link XmlXYDataProvider} for the
+     * specified trace and viewElement.
      *
      * @param trace
      *            trace for which we are querying a provider
@@ -168,12 +172,15 @@ public class XmlDataProviderManager {
             // Create with the trace or experiment first
             provider = XmlTimeGraphDataProvider.create(trace, viewElement);
             if (provider == null) {
-                // Otherwise, see if it's an experiment and create a composite if that's the
+                // Otherwise, see if it's an experiment and create a composite
+                // if that's the
                 // case
                 Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
                 if (traces.size() > 1) {
-                    // Try creating a composite only if there are many traces, otherwise, the
-                    // previous call to create should have returned the data provider
+                    // Try creating a composite only if there are many traces,
+                    // otherwise, the
+                    // previous call to create should have returned the data
+                    // provider
                     provider = generateExperimentProviderTimeGraph(traces, viewElement);
                 }
             }

@@ -50,7 +50,7 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
      *            The parent id of this model. If it has none, give <code>-1</code>.
      * @param labels
      *            The name of this model
-     * @since 4.3
+     * @since 5.0
      */
     public TmfTreeDataModel(long id, long parentId, List<String> labels) {
         fId = id;

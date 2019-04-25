@@ -18,7 +18,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  *
  * @author Loic Prieur-Drevon
  * @author Bernd Hufmann
- * @since 4.3
+ * @since 5.0
  */
 @NonNullByDefault
 public interface IDataProviderDescriptor {

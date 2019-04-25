@@ -51,6 +51,7 @@ import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider.FutureEventType;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTraceCompleteness;
@@ -617,9 +618,9 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
                 for (ITmfStateInterval interval : snapshot.getStates().values()) {
                     Object initialState = interval.getValue();
                     int attribute = interval.getAttribute();
-                    provider.addFutureEvent(interval.getStartTime(), initialState, attribute);
+                    provider.addFutureEvent(interval.getStartTime(), initialState, attribute, FutureEventType.MODIFICATION);
                     if (interval.getEndTime() != Long.MIN_VALUE) {
-                        provider.addFutureEvent(interval.getEndTime() + 1, (Object) null, attribute);
+                        provider.addFutureEvent(interval.getEndTime() + 1, (Object) null, attribute, FutureEventType.MODIFICATION);
                     }
                 }
             }

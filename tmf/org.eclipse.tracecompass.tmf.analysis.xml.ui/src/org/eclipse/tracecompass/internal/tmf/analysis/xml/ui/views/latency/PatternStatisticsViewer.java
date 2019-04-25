@@ -46,12 +46,13 @@ public class PatternStatisticsViewer extends AbstractSegmentsStatisticsViewer {
      *            The analysis ID
      */
     public void updateViewer(String analysisId) {
+        setProviderId(XmlPatternLatencyStatisticsDataProviderFactory.ID + ':' + analysisId);
+
         ITmfTrace trace = getTrace();
         if (trace == null) {
             return;
         }
         if (analysisId != null) {
-            setProviderId(XmlPatternLatencyStatisticsDataProviderFactory.ID + ':' + analysisId);
             initializeDataSource(trace);
             Display.getDefault().asyncExec(() -> {
                 if (!trace.equals(getTrace())) {

@@ -30,17 +30,17 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.SWT;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
-import org.eclipse.tracecompass.tmf.core.model.IFilterableDataModel;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 
 /**
  * An entry for use in the time graph views
  */
-public class TimeGraphEntry implements ITimeGraphEntry, IFilterableDataModel {
+public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
 
     /**
      * Class to describe on which time range and resolution the zoomed entry list is
@@ -577,10 +577,10 @@ public class TimeGraphEntry implements ITimeGraphEntry, IFilterableDataModel {
      */
     @Override
     public @NonNull Multimap<@NonNull String, @NonNull String> getMetadata() {
-        if (fModel instanceof IFilterableDataModel) {
-            return ((IFilterableDataModel) fModel).getMetadata();
+        if (fModel instanceof IElementResolver) {
+            return ((IElementResolver) fModel).getMetadata();
         }
-        return HashMultimap.create();
+        return ImmutableMultimap.of();
     }
 
     /**
@@ -611,5 +611,14 @@ public class TimeGraphEntry implements ITimeGraphEntry, IFilterableDataModel {
             }
         }
         return false;
+    }
+
+    @Deprecated
+    @Override
+    public @NonNull Map<@NonNull String, @NonNull String> computeData() {
+        if (fModel instanceof IElementResolver) {
+            return ((IElementResolver) fModel).computeData();
+        }
+        return Collections.emptyMap();
     }
 }

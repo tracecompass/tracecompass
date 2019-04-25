@@ -243,7 +243,28 @@ public class TmfStateValueTest {
 
         final int[] expectedStarts = { 1, 3, 5, 7, 10, 12, 20 };
         ITmfStateValue[] expectedValues = { TmfStateValue.newValueInt(100), TmfStateValue.newValueInt(101), TmfStateValue.newValueInt(100), TmfStateValue.newValueInt(101), TmfStateValue.newValueInt(100), TmfStateValue.newValueInt(101) };
-        XmlUtilsTest.verifyStateIntervals("testStateValueScript", ss, quark, expectedStarts, expectedValues);
+        XmlUtilsTest.verifyStateIntervals("future value modification", ss, quark, expectedStarts, expectedValues);
+
+        // Verify also future time as strings
+        quark = ss.getQuarkAbsolute("futureStr");
+        XmlUtilsTest.verifyStateIntervals("future time as string", ss, quark, expectedStarts, expectedValues);
+
+        // Test the future stack of CPU 0
+        quark = ss.getQuarkAbsolute("futureStack", "0", "1");
+        final int[] expected01Starts = { 1, 2, 11, 20 };
+        ITmfStateValue[] expected01Values = { TmfStateValue.nullValue(), TmfStateValue.newValueString("op1"), TmfStateValue.nullValue() };
+        XmlUtilsTest.verifyStateIntervals("future stack CPU 0, level 1", ss, quark, expected01Starts, expected01Values);
+
+        quark = ss.getQuarkAbsolute("futureStack", "0", "2");
+        final int[] expected02Starts = { 1, 6, 7, 20 };
+        ITmfStateValue[] expected02Values = { TmfStateValue.nullValue(), TmfStateValue.newValueString("op1"), TmfStateValue.nullValue() };
+        XmlUtilsTest.verifyStateIntervals("future stack CPU 0, level 2", ss, quark, expected02Starts, expected02Values);
+
+        // Test the future stack of CPU 1
+        quark = ss.getQuarkAbsolute("futureStack", "1", "1");
+        final int[] expected11Starts = { 1, 3, 8, 11, 16, 20 };
+        ITmfStateValue[] expected11Values = { TmfStateValue.nullValue(), TmfStateValue.newValueString("op1"), TmfStateValue.nullValue(), TmfStateValue.newValueString("op1"), TmfStateValue.nullValue() };
+        XmlUtilsTest.verifyStateIntervals("future stack CPU 1, level 1", ss, quark, expected11Starts, expected11Values);
 
     }
 }

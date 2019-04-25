@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017, 2018 Ericsson
+ * Copyright (c) 2017, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -56,10 +56,12 @@ import org.eclipse.tracecompass.tmf.core.presentation.IPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.presentation.QualitativePaletteProvider;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.presentation.SequentialPaletteProvider;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
@@ -72,6 +74,7 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ImageHelper;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.ui.IWorkbenchPart;
@@ -95,9 +98,9 @@ public class TimeGraphViewTest {
 
     private static final Logger fLogger = Logger.getRootLogger();
 
-    private static final RGB HAIR = ImageHelper.adjustExpectedColor(new RGB(0, 64, 128));
-    private static final RGB HAT = ImageHelper.adjustExpectedColor(new RGB(0, 255, 0));
-    private static final RGB LASER = ImageHelper.adjustExpectedColor(new RGB(255, 0, 0));
+    private static RGB fHair;
+    private static RGB fHat;
+    private static RGB fLaser;
 
     private static final int MIN_FILE_SIZE = 1000;
 
@@ -137,7 +140,11 @@ public class TimeGraphViewTest {
      */
     private static final String RESET_LOC = "reset";
 
+    private static final TmfTimeRange INITIAL_WINDOW_RANGE = new TmfTimeRange(TmfTimestamp.fromNanos(20), TmfTimestamp.fromNanos(100));
+
     private SWTBotView fViewBot;
+
+    private SWTBotTimeGraph fTimeGraph;
 
     private TmfTraceStub fTrace;
 
@@ -167,6 +174,9 @@ public class TimeGraphViewTest {
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         fLogger.removeAllAppenders();
         fLogger.addAppender(new ConsoleAppender(new SimpleLayout(), ConsoleAppender.SYSTEM_OUT));
+        fHair = ImageHelper.adjustExpectedColor(new RGB(0, 64, 128));
+        fHat = ImageHelper.adjustExpectedColor(new RGB(0, 255, 0));
+        fLaser = ImageHelper.adjustExpectedColor(new RGB(255, 0, 0));
     }
 
     /**
@@ -207,14 +217,14 @@ public class TimeGraphViewTest {
         TmfTraceStub trace = fTrace;
         trace.initialize(null, "", ITmfEvent.class);
         assertNotNull(trace);
-        SWTBotTimeGraph tgBot = new SWTBotTimeGraph(fViewBot.bot());
+        fTimeGraph = new SWTBotTimeGraph(fViewBot.bot());
 
         // Wait for trace to be loaded
-        fViewBot.bot().waitUntil(new TgConditionHelper(t -> tgBot.getEntries().length == 0));
+        fViewBot.bot().waitUntil(new TgConditionHelper(t -> fTimeGraph.getEntries().length == 0));
         fBounds = getBounds();
         UIThreadRunnable.syncExec(() -> TmfSignalManager.dispatchSignal(new TmfTraceOpenedSignal(this, trace, null)));
         // Wait for trace to be loaded
-        fViewBot.bot().waitUntil(new TgConditionHelper(t -> tgBot.getEntries().length >= 2));
+        fViewBot.bot().waitUntil(new TgConditionHelper(t -> fTimeGraph.getEntries().length >= 2));
 
         resetTimeRange();
         // Make sure the thumb is over 1 in size
@@ -223,8 +233,7 @@ public class TimeGraphViewTest {
 
     private void resetTimeRange() {
         TmfTimeRange fullTimeRange = fTrace.getTimeRange();
-        TmfTimeRange smallerRange = new TmfTimeRange(TmfTimestamp.fromNanos(20), TmfTimestamp.fromNanos(100));
-        TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, smallerRange);
+        TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, INITIAL_WINDOW_RANGE);
 
         TimeGraphViewStub view = getView();
         // This is an oddity: the signals may be lost if a view is not
@@ -236,7 +245,7 @@ public class TimeGraphViewTest {
         // Workflow: it should always fail at first and then a signal is sent.
         // it will either time out or work.
         fBot.waitUntil(new TgConditionHelper(t -> {
-            if (smallerRange.equals(view.getWindowRange())) {
+            if (INITIAL_WINDOW_RANGE.equals(view.getWindowRange())) {
                 return true;
             }
             TmfSignalManager.dispatchSignal(signal);
@@ -253,15 +262,15 @@ public class TimeGraphViewTest {
     }
 
     private Rectangle getBounds() {
-        Rectangle bounds = UIThreadRunnable.syncExec((Result<Rectangle>) () -> {
-            Control control = (Control) fViewBot.getWidget();
+        return UIThreadRunnable.syncExec((Result<Rectangle>) () -> {
+            Control control = fTimeGraph.widget;
             Rectangle ctrlRelativeBounds = control.getBounds();
-            Point res = control.toDisplay(new Point(0, 0));
+            Point res = control.toDisplay(new Point(fTimeGraph.getNameSpace(), 0));
+            ctrlRelativeBounds.width -= fTimeGraph.getNameSpace();
             ctrlRelativeBounds.x = res.x;
             ctrlRelativeBounds.y = res.y;
             return ctrlRelativeBounds;
         });
-        return bounds;
     }
 
     private TimeGraphViewStub getView() {
@@ -342,9 +351,9 @@ public class TimeGraphViewTest {
         ImageHelper thick = ImageHelper.waitForNewImage(bounds, ref);
 
         // Compare with the original, they should be different
-        int refCount = ref.getHistogram().count(LASER);
-        int thickCount = thick.getHistogram().count(LASER);
-        assertTrue(String.format("Count of \"\"LASER\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", LASER, refCount, thickCount, Multisets.copyHighestCountFirst(thick.getHistogram())), thickCount > refCount);
+        int refCount = ref.getHistogram().count(fLaser);
+        int thickCount = thick.getHistogram().count(fLaser);
+        assertTrue(String.format("Count of \"\"LASER\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", fLaser, refCount, thickCount, Multisets.copyHighestCountFirst(thick.getHistogram())), thickCount > refCount);
 
         // reset all
         fViewBot.toolbarButton(SHOW_LEGEND).click();
@@ -362,7 +371,7 @@ public class TimeGraphViewTest {
         ImageHelper reset = ImageHelper.waitForNewImage(bounds, thick);
 
         // Compare with the original, they should be the same
-        int resetCount = reset.getHistogram().count(LASER);
+        int resetCount = reset.getHistogram().count(fLaser);
         assertEquals("Count of \"\"LASER\"\" did not get change despite reset of width", refCount, resetCount);
     }
 
@@ -374,7 +383,7 @@ public class TimeGraphViewTest {
         resetTimeRange();
         Rectangle bounds = fBounds;
         ImageHelper precollapse = ImageHelper.grabImage(bounds);
-        SWTBotTimeGraph tg = new SWTBotTimeGraph(fViewBot.bot());
+        SWTBotTimeGraph tg = fTimeGraph;
         tg.getEntry("Plumber guy").collapse();
         TimeGraphViewStub view = getView();
         // take a first saved picture, the original is pre-collapse
@@ -428,9 +437,9 @@ public class TimeGraphViewTest {
         ImageHelper skinny = ImageHelper.waitForNewImage(bounds, ref);
 
         /* Compare with the original, they should be different */
-        int refCount = ref.getHistogram().count(HAIR);
-        int skinnyCount = skinny.getHistogram().count(HAIR);
-        assertTrue(String.format("Count of \"\"HAIR\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", HAIR, refCount, skinnyCount, Multisets.copyHighestCountFirst(skinny.getHistogram())), skinnyCount < refCount);
+        int refCount = ref.getHistogram().count(fHair);
+        int skinnyCount = skinny.getHistogram().count(fHair);
+        assertTrue(String.format("Count of \"\"HAIR\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", fHair, refCount, skinnyCount, Multisets.copyHighestCountFirst(skinny.getHistogram())), skinnyCount < refCount);
 
         // reset all
         fViewBot.toolbarButton(SHOW_LEGEND).click();
@@ -448,7 +457,7 @@ public class TimeGraphViewTest {
         ImageHelper reset = ImageHelper.waitForNewImage(bounds, skinny);
 
         // Compare with the original, they should be the same
-        int resetCount = reset.getHistogram().count(HAIR);
+        int resetCount = reset.getHistogram().count(fHair);
         assertEquals("Count of \"HAIR\" did not get change despite reset of width", refCount, resetCount);
     }
 
@@ -501,9 +510,9 @@ public class TimeGraphViewTest {
         fBot.waitUntil(new FileWritten(skinny, MIN_FILE_SIZE));
 
         /* Compare with the original, they should be different */
-        int refCount = refImage.getHistogram().count(HAIR);
-        int skinnyCount = skinnyImage.getHistogram().count(HAIR);
-        assertTrue(String.format("Count of \"\"HAIR\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", HAIR, refCount, skinnyCount, Multisets.copyHighestCountFirst(skinnyImage.getHistogram())),
+        int refCount = refImage.getHistogram().count(fHair);
+        int skinnyCount = skinnyImage.getHistogram().count(fHair);
+        assertTrue(String.format("Count of \"\"HAIR\"\" (%s) did not get change despite change of width before: %d after:%d histogram:%s", fHair, refCount, skinnyCount, Multisets.copyHighestCountFirst(skinnyImage.getHistogram())),
                 skinnyCount < refCount);
 
         /* reset all */
@@ -522,7 +531,7 @@ public class TimeGraphViewTest {
         ImageHelper resetImage = ImageHelper.fromFile(reset);
 
         /* Compare with the original, they should be the same */
-        int resetCount = resetImage.getHistogram().count(HAIR);
+        int resetCount = resetImage.getHistogram().count(fHair);
         assertEquals("Count of \"HAIR\" did not get change despite reset of width", refCount, resetCount);
     }
 
@@ -537,7 +546,7 @@ public class TimeGraphViewTest {
         int totalItems = 16;
 
         resetTimeRange();
-        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
+        SWTBotTimeGraph timegraph = fTimeGraph;
         assertEquals(totalItems, getVisibleItems(timegraph));
 
         SWTBotTimeGraphEntry[] entries = null;
@@ -577,7 +586,7 @@ public class TimeGraphViewTest {
     public void testVerticalZoom() {
         resetTimeRange();
         int threshold = 10;
-        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
+        SWTBotTimeGraph timegraph = fTimeGraph;
         Rectangle bounds = fBounds;
 
         ImageHelper ref = ImageHelper.grabImage(bounds);
@@ -636,20 +645,31 @@ public class TimeGraphViewTest {
     @Test
     public void testHorizontalZoom() {
         resetTimeRange();
-        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
+        SWTBotTimeGraph timegraph = fTimeGraph;
 
         TimeGraphViewStub view = getView();
+        timegraph.setFocus();
 
         assertEquals(80, getDuration(view.getWindowRange()));
-        fireKey(timegraph, false, '+');
-        assertEquals(52, getDuration(view.getWindowRange()));
-        fireKey(timegraph, false, '+');
-        assertEquals(34, getDuration(view.getWindowRange()));
-        fireKey(timegraph, false, '-');
-        assertEquals(51, getDuration(view.getWindowRange()));
-        fireKey(timegraph, false, '-');
-        assertEquals(77, getDuration(view.getWindowRange()));
-
+        fireKeyInGraph(timegraph, '=');
+        fViewBot.bot().waitUntil(new WindowRangeCondition(view, 52));
+        fireKeyInGraph(timegraph, '+');
+        fViewBot.bot().waitUntil(new WindowRangeCondition(view, 34));
+        fireKeyInGraph(timegraph, '-');
+        fViewBot.bot().waitUntil(new WindowRangeCondition(view, 51));
+        fireKeyInGraph(timegraph, '-');
+        fViewBot.bot().waitUntil(new WindowRangeCondition(view, 77));
+        /*
+         *  Note that 'w' and 's' zooming is based on mouse position. Just check if
+         *  window range was increased or decreased to avoid inaccuracy due to
+         *  the mouse position in test environment.
+         */
+        long previousRange = getDuration(view.getWindowRange());
+        fireKeyInGraph(timegraph, 'w');
+        fViewBot.bot().waitUntil(new WindowRangeUpdatedCondition(view, previousRange, false));
+        previousRange = getDuration(view.getWindowRange());
+        fireKeyInGraph(timegraph, 's');
+        fViewBot.bot().waitUntil(new WindowRangeUpdatedCondition(view, previousRange, true));
     }
 
     /**
@@ -659,7 +679,7 @@ public class TimeGraphViewTest {
     public void testKeyboardNamespaceNavigation() {
         String pg = "Plumber guy";
         resetTimeRange();
-        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
+        SWTBotTimeGraph timegraph = fTimeGraph;
         timegraph.getEntry(pg).select();
         fireKey(timegraph, true, SWT.ARROW_DOWN);
         assertEquals("[Hat1]", timegraph.selection().get(0).toString());
@@ -690,7 +710,7 @@ public class TimeGraphViewTest {
     public void testCollapseExpandUsingEnter() {
         String pg = "Plumber guy";
         resetTimeRange();
-        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(fViewBot.bot());
+        SWTBotTimeGraph timegraph = fTimeGraph;
         assertEquals(0, timegraph.selection().columnCount());
         timegraph.getEntry(pg).select();
 
@@ -712,6 +732,52 @@ public class TimeGraphViewTest {
         assertEquals(1, timegraph.selection().columnCount());
         assertEquals("[Hat1]", timegraph.selection().get(0).toString());
         assertEquals(16, getVisibleItems(timegraph));
+    }
+
+    /**
+     * Test zoom to selection
+     */
+    @Test
+    public void testZoomToSelection() {
+        resetTimeRange();
+        SWTBotTimeGraph timegraph = fTimeGraph;
+
+        TimeGraphViewStub view = getView();
+        timegraph.setFocus();
+
+        assertEquals(80, getDuration(view.getWindowRange()));
+
+        /* set selection to trace start time */
+        ITmfTimestamp selStartTime = TmfTimestamp.fromNanos(30L);
+        ITmfTimestamp selEndTime = TmfTimestamp.fromNanos(80L);
+        TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, selStartTime, selEndTime));
+        timeGraphIsReadyCondition(new TmfTimeRange(selStartTime, selEndTime));
+        fireKeyInGraph(timegraph, 'z');
+        fViewBot.bot().waitUntil(new WindowRangeCondition(view, 50));
+    }
+
+    /**
+     * Test 'a' and 'd' navigation
+     */
+    @Test
+    public void testKeyboardNavigation() {
+        resetTimeRange();
+        SWTBotTimeGraph timegraph = fTimeGraph;
+
+        TimeGraphViewStub view = getView();
+        timegraph.setFocus();
+
+        assertEquals(80, getDuration(view.getWindowRange()));
+
+        TmfTimeRange updatedWindowRange = new TmfTimeRange(TmfTimestamp.fromNanos(40), TmfTimestamp.fromNanos(120));
+
+        // move to the right
+        fireKeyInGraph(timegraph, 'd');
+        fViewBot.bot().waitUntil(new TgConditionHelper(t -> updatedWindowRange.equals(view.getWindowRange())));
+
+        // move to the left
+        fireKeyInGraph(timegraph, 'a');
+        fViewBot.bot().waitUntil(new TgConditionHelper(t -> INITIAL_WINDOW_RANGE.equals(view.getWindowRange())));
     }
 
     private static long getDuration(TmfTimeRange refRange) {
@@ -752,7 +818,17 @@ public class TimeGraphViewTest {
             }
             timegraph.widget.keyReleased(e);
         });
+    }
 
+    private static void fireKeyInGraph(SWTBotTimeGraph timegraph, char c, int... modifiers) {
+        timegraph.setFocus();
+        // Move mouse to middle of the timegraph
+        timegraph.moveMouseToWidget();
+        int mask = 0;
+        for (int modifier : modifiers) {
+            mask |= modifier;
+        }
+        timegraph.pressShortcut(mask, c);
     }
 
     private static void resetMousePosition(SWTBotTimeGraph timegraph, boolean inNs, MouseEvent mouseEvent) {
@@ -849,7 +925,7 @@ public class TimeGraphViewTest {
         resetTimeRange();
 
         SWTBot viewBot = fViewBot.bot();
-        SWTBotTimeGraph timegraph = new SWTBotTimeGraph(viewBot);
+        SWTBotTimeGraph timegraph = fTimeGraph;
         assertTrue("timegraph visible", timegraph.isVisible());
         timegraph.setFocus();
 
@@ -873,10 +949,10 @@ public class TimeGraphViewTest {
         ImageHelper filtered = ImageHelper.waitForNewImage(bounds, ref);
 
         /* Compare with the original, they should be different */
-        int refHatCount = ref.getHistogram().count(HAT);
-        int filteredHatCount = filtered.getHistogram().count(HAT);
-        int refHairCount = ref.getHistogram().count(HAIR);
-        int filteredHairCount = filtered.getHistogram().count(HAIR);
+        int refHatCount = ref.getHistogram().count(fHat);
+        int filteredHatCount = filtered.getHistogram().count(fHat);
+        int refHairCount = ref.getHistogram().count(fHair);
+        int filteredHairCount = filtered.getHistogram().count(fHair);
         assertTrue("Count of \"HAT\" did not decrease to non-zero", filteredHatCount < refHatCount && filteredHatCount > 0);
         assertTrue("Count of \"HAIR\" did not decrease to zero", filteredHairCount < refHairCount && filteredHairCount == 0);
 
@@ -910,6 +986,11 @@ public class TimeGraphViewTest {
                 return count;
             }
         });
+    }
+
+    private void timeGraphIsReadyCondition(@NonNull TmfTimeRange selectionRange) {
+        IWorkbenchPart part = fViewBot.getViewReference().getPart(false);
+        fBot.waitUntil(ConditionHelpers.timeGraphIsReadyCondition((AbstractTimeGraphView) part, selectionRange, selectionRange.getEndTime()));
     }
 
     private abstract class ConditionHelper implements ICondition {
@@ -967,5 +1048,53 @@ public class TimeGraphViewTest {
             return fFile.length() >= fAmount;
         }
     }
+
+    private class WindowRangeCondition extends DefaultCondition {
+        TimeGraphViewStub fView;
+        long fExpectedRange;
+
+        public WindowRangeCondition(TimeGraphViewStub view, long expectedRange) {
+            fView = view;
+            fExpectedRange = expectedRange;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            return getDuration(fView.getWindowRange()) == fExpectedRange;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return "Expected window range (" + fExpectedRange + ") not achieved. Actual=" + getDuration(fView.getWindowRange());
+        }
+    }
+
+    private class WindowRangeUpdatedCondition extends DefaultCondition {
+        TimeGraphViewStub fView;
+        long fPreviousRange;
+        boolean fIsIncreased;
+
+        public WindowRangeUpdatedCondition(TimeGraphViewStub view, long previousRange, boolean increased) {
+            fView = view;
+            fPreviousRange = previousRange;
+            fIsIncreased = increased;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            long newRange = getDuration(fView.getWindowRange());
+            if (fIsIncreased) {
+                return newRange > fPreviousRange;
+            }
+            return newRange < fPreviousRange;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return "Window range didn't " + (fIsIncreased ? "increase" : "decrease") +
+                    " (previous: " + fPreviousRange + ", actual: " + getDuration(fView.getWindowRange()) + ")";
+        }
+    }
+
 
 }

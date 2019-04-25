@@ -60,12 +60,12 @@ public abstract class AbstractTmfTraceDataProvider {
      *            Multimap holding the regexes
      * @return A map of time event filters predicate by property
      */
-    protected Map<Integer, Predicate<@NonNull Map<@NonNull String, @NonNull String>>> computeRegexPredicate(Multimap<Integer, String> regexes) {
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+    protected Map<Integer, Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> computeRegexPredicate(Multimap<Integer, String> regexes) {
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         for (Map.Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
             String regex = IFilterStrings.mergeFilters(entry.getValue());
             FilterCu cu = FilterCu.compile(regex);
-            Predicate<@NonNull Map<@NonNull String, @NonNull String>> predicate = cu != null ? cu.generate() : null;
+            Predicate<@NonNull Multimap<@NonNull String, @NonNull String>> predicate = cu != null ? cu.generate() : null;
                 if (predicate != null) {
                     predicates.put(entry.getKey(), predicate);
                 }

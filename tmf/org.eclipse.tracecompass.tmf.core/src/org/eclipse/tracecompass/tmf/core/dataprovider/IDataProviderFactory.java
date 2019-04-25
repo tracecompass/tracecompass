@@ -70,7 +70,7 @@ public interface IDataProviderFactory {
      *            trace whose support for this data provider we want to determine
      * @return a collection of {@link IDataProviderDescriptor} if this trace supports this
      *         provider, else empty list
-     * @since 4.3
+     * @since 5.0
      */
     default @NonNull Collection<IDataProviderDescriptor> getDescriptors(@NonNull ITmfTrace trace) {
         return Collections.emptyList();

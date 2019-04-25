@@ -109,8 +109,11 @@ import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.markers.MarkerUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.util.TimeGraphStyleUtil;
+import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfTimeNavigationProvider;
+import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfTimeZoomProvider;
+import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfZoomToSelectionProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.TimeEventFilterDialog;
-import org.eclipse.tracecompass.tmf.core.model.IFilterableDataModel;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
 import org.eclipse.tracecompass.tmf.core.signal.TmfDataModelSelectedSignal;
@@ -142,7 +145,6 @@ import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraph
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphBookmarkListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphContentProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider2;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphSelectionListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
@@ -184,6 +186,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
@@ -195,7 +198,8 @@ import com.google.common.collect.Multimap;
  */
 public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeAligned, ITmfAllowMultiple, ITmfPinnable, IResourceChangeListener{
 
-    private static final String CONTEXT = "org.eclipse.tracecompass.tmf.ui.view.timegraph.context"; //$NON-NLS-1$
+    private static final String TIMEGRAPH_UI_CONTEXT = "org.eclipse.tracecompass.tmf.ui.view.timegraph.context"; //$NON-NLS-1$
+    private static final String TMF_VIEW_UI_CONTEXT = "org.eclipse.tracecompass.tmf.ui.view.context"; //$NON-NLS-1$
 
     private static final String DIRTY_UNDERFLOW_ERROR = "Dirty underflow error"; //$NON-NLS-1$
 
@@ -382,8 +386,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         @Override
         public void selectionChanged(TimeGraphSelectionEvent event) {
             ITimeGraphEntry entry = event.getSelection();
-            if (entry instanceof IFilterableDataModel) {
-                Multimap<@NonNull String, @NonNull String> metadata = ((IFilterableDataModel) entry).getMetadata();
+            if (entry instanceof IElementResolver) {
+                Multimap<@NonNull String, @NonNull String> metadata = ((IElementResolver) entry).getMetadata();
                 if (!metadata.isEmpty()) {
                     broadcast(new TmfDataModelSelectedSignal(AbstractTimeGraphView.this, metadata));
                 }
@@ -791,7 +795,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *
      * @return A map of time event filters predicate by property
      * @since 4.0
+     * @deprecated Use {@link #generateRegexPredicate()}
      */
+    @Deprecated
     @NonNullByDefault
     protected Map<Integer, Predicate<Map<String, String>>> computeRegexPredicate() {
         Multimap<Integer, String> regexes = getRegexes();
@@ -799,7 +805,32 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         for (Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
             String regex = IFilterStrings.mergeFilters(entry.getValue());
             FilterCu cu = FilterCu.compile(regex);
-            Predicate<@NonNull Map<@NonNull String, @NonNull String>> predicate = cu != null ? cu.generate() : null;
+            Predicate<@NonNull Map<@NonNull String, @NonNull String>> predicate = cu != null ? multiToMapPredicate(cu.generate()) : null;
+                if (predicate != null) {
+                    predicates.put(entry.getKey(), predicate);
+                }
+        }
+        return predicates;
+    }
+
+    private static Predicate<@NonNull Map<@NonNull String, @NonNull String>> multiToMapPredicate(@NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>> predicate) {
+        return map -> predicate.test(Objects.requireNonNull(ImmutableMultimap.copyOf(map.entrySet())));
+    }
+
+    /**
+     * Generate the predicate for every property from the regexes
+     *
+     * @return A map of predicate by property
+     * @since 5.0
+     */
+    @NonNullByDefault
+    protected Map<Integer, Predicate<Multimap<String, String>>> generateRegexPredicate() {
+        Multimap<Integer, String> regexes = getRegexes();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        for (Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
+            String regex = IFilterStrings.mergeFilters(entry.getValue());
+            FilterCu cu = FilterCu.compile(regex);
+            Predicate<@NonNull Multimap<@NonNull String, @NonNull String>> predicate = cu != null ? cu.generate() : null;
                 if (predicate != null) {
                     predicates.put(entry.getKey(), predicate);
                 }
@@ -855,8 +886,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * Getter for the presentation provider
      *
      * @return The time graph presentation provider
+     * @since 5.0
      */
-    protected ITimeGraphPresentationProvider2 getPresentationProvider() {
+    protected ITimeGraphPresentationProvider getPresentationProvider() {
         return fPresentation;
     }
 
@@ -1405,7 +1437,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     private void activateContextService() {
         if (fActiveContexts.isEmpty()) {
-            fActiveContexts.add(fContextService.activateContext(CONTEXT));
+            fActiveContexts.add(fContextService.activateContext(TIMEGRAPH_UI_CONTEXT));
+            fActiveContexts.add(fContextService.activateContext(TMF_VIEW_UI_CONTEXT));
         }
     }
 
@@ -2632,6 +2665,17 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         restartZoomThread();
     }
 
+    private @Nullable TimeGraphControl getTimeGraphControl() {
+        TimeGraphViewer viewer = getTimeGraphViewer();
+        if (viewer != null) {
+            TimeGraphControl control = viewer.getTimeGraphControl();
+            if (control != null) {
+                return control;
+            }
+        }
+        return null;
+    }
+
     /**
      * get the time event filter dialog
      *
@@ -2845,8 +2889,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         Multimap<@NonNull String, @NonNull String> metadata = signal.getMetadata();
         // See if the current selection intersects the metadata
         ITimeGraphEntry selection = getTimeGraphViewer().getSelection();
-        if (selection instanceof IFilterableDataModel &&
-                IFilterableDataModel.commonIntersect(metadata, ((IFilterableDataModel)selection).getMetadata())) {
+        if (selection instanceof IElementResolver &&
+                IElementResolver.commonIntersect(metadata, ((IElementResolver)selection).getMetadata())) {
             return;
         }
         // See if an entry intersects the metadata
@@ -2857,11 +2901,69 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
             Iterable<TimeGraphEntry> unfiltered = Utils.flatten(traceEntry);
             for (TimeGraphEntry entry : unfiltered) {
-                if (IFilterableDataModel.commonIntersect(metadata, entry.getMetadata())) {
+                if (IElementResolver.commonIntersect(metadata, entry.getMetadata())) {
                     getTimeGraphViewer().setSelection(entry, true);
                 }
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getAdapter(Class<T> adapter) {
+        if (adapter == ITmfTimeNavigationProvider.class) {
+            return (T) getTimeNavigator();
+        }
+        if (adapter == ITmfTimeZoomProvider.class) {
+            return (T) getTimeZoomProvider();
+        }
+        if (adapter == ITmfZoomToSelectionProvider.class ) {
+            return (T) getZoomToSelectionProvider();
+        }
+        return super.getAdapter(adapter);
+    }
+
+    private ITmfTimeNavigationProvider getTimeNavigator() {
+        return left -> {
+            TimeGraphControl control = getTimeGraphControl();
+            if (control != null) {
+                control.horizontalScroll(left);
+            }
+        };
+    }
+
+    private ITmfTimeZoomProvider getTimeZoomProvider() {
+        return (zoomIn, useMousePosition) -> {
+            TimeGraphControl control = getTimeGraphControl();
+            TimeGraphViewer viewer = getTimeGraphViewer();
+            if (control != null && viewer != null) {
+                if (useMousePosition) {
+                    control.zoom(zoomIn);
+                } else {
+                    int xCoord = control.toControl(control.getDisplay().getCursorLocation()).x;
+                    if ((viewer.getNameSpace() <= xCoord) && (xCoord < control.getSize().x)) {
+                        if (zoomIn) {
+                            control.zoomIn();
+                        } else {
+                            control.zoomOut();
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    private ITmfZoomToSelectionProvider getZoomToSelectionProvider() {
+        return () -> {
+            TimeGraphViewer viewer = getTimeGraphViewer();
+            if (viewer != null) {
+                long selBegin = viewer.getSelectionBegin();
+                long selEnd = viewer.getSelectionEnd();
+                if (selBegin != selEnd) {
+                    viewer.setStartFinishTimeNotify(selBegin, selEnd);
+                }
+            }
+        };
     }
 
 }

@@ -127,7 +127,7 @@ public class SeriesModel implements ISeriesModel {
      * @param properties
      *            The properties values for this series. Some priority values
      *            are available in {@link IFilterProperty}
-     * @since 4.3
+     * @since 5.0
      */
     public SeriesModel(long id, String name, long[] xValues, double[] yValues, TmfXYAxis xAxis, TmfXYAxis yAxis, int[] properties) {
         fId = id;

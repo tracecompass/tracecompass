@@ -70,7 +70,7 @@ public final class CommonStatusMessage {
      * A possible detailed message for a
      * {@link org.eclipse.tracecompass.tmf.core.response.ITmfResponse.Status#FAILED}
      * status
-     * @since 4.3
+     * @since 5.0
      */
     public static final String INCORRECT_QUERY_PARAMETERS = Objects.requireNonNull(Messages.CommonStatusMessage_IncorrectQueryParameters);
 

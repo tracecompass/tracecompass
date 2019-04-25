@@ -12,6 +12,8 @@ package org.eclipse.tracecompass.tmf.core.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
+
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
@@ -20,7 +22,11 @@ import com.google.common.collect.Multimap;
  * additional metadata that can be used to filter them
  *
  * @since 4.2
+ * @deprecated This interface is now totally included in
+ *             {@link IElementResolver}. One may just change the implemented
+ *             interface, the methods have the same names.
  */
+@Deprecated
 public interface IFilterableDataModel {
 
     /**

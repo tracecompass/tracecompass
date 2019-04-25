@@ -16,7 +16,7 @@ import java.util.Map.Entry;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.graph.core.base.IGraphWorker;
 import org.eclipse.tracecompass.internal.analysis.graph.core.base.TmfGraphStatistics;
-import org.eclipse.tracecompass.tmf.core.model.IFilterableDataModel;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 
 import com.google.common.collect.HashMultimap;
@@ -27,7 +27,7 @@ import com.google.common.collect.Multimap;
  *
  * @author Loic Prieur-Drevon
  */
-public class CriticalPathEntry extends TimeGraphEntryModel implements IFilterableDataModel {
+public class CriticalPathEntry extends TimeGraphEntryModel implements IElementResolver {
     private final Long fSum;
     private final Double fPercent;
     private final @NonNull Multimap<@NonNull String, @NonNull String> fAspects = HashMultimap.create();

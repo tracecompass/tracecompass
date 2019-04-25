@@ -33,6 +33,12 @@
             name="Time Graph Stub"
             restorable="true">
       </view>
+      <view
+            class="org.eclipse.tracecompass.tmf.ui.swtbot.tests.views.XYChartViewStub"
+            id="org.eclipse.tracecompass.tmf.ui.swtbot.tests.views.xychart.stub"
+            name="XY Chart View Stub"
+            restorable="true">
+      </view>
    </extension>
 
 </plugin>

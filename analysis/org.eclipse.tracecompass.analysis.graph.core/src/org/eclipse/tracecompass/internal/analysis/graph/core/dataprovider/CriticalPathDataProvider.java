@@ -42,6 +42,7 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphStateFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphRowModel;
@@ -56,6 +57,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 
@@ -103,6 +105,9 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
      */
     private List<ITimeGraphArrow> fLinks;
 
+    /** Cache for entry metadata */
+    private final Map<Long, @NonNull Multimap<@NonNull String, @NonNull String>> fEntryMetadata = new HashMap<>();
+
     /**
      * Constructor
      *
@@ -130,6 +135,9 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
         }
 
         CriticalPathVisitor visitor = fHorizontalVisitorCache.getUnchecked(current);
+        for (CriticalPathEntry model : visitor.getEntries()) {
+            fEntryMetadata.put(model.getId(), model.getMetadata());
+        }
         return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), visitor.getEntries()), Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
@@ -176,7 +184,7 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
         if (filter == null) {
             return new TmfModelResponse<>(null, Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
         }
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         Multimap<@NonNull Integer, @NonNull String> regexesMap = DataProviderParameterUtils.extractRegexFilter(fetchParameters);
         if (regexesMap != null) {
             predicates.putAll(computeRegexPredicate(regexesMap));
@@ -196,7 +204,7 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
                     if (overlaps(state.getStartTime(), state.getDuration(), filter.getTimesRequested())) {
                         // Reset the properties for this state before filtering
                         state.setActiveProperties(0);
-                        addToStateList(filteredStates, state, id, predicates, monitor);
+                        applyFilterAndAddState(filteredStates, state, id, predicates, monitor);
                     }
                 }
                 rowModels.add(new TimeGraphRowModel(id, filteredStates));
@@ -469,6 +477,12 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
     public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
         return fetchTooltip(parameters, monitor);
+    }
+
+    @Override
+    public @NonNull Multimap<@NonNull String, @NonNull String> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
+        return ITimeGraphStateFilter.mergeMultimaps(ITimeGraphDataProvider.super.getFilterData(entryId, time, monitor),
+                fEntryMetadata.getOrDefault(entryId, ImmutableMultimap.of()));
     }
 
 }

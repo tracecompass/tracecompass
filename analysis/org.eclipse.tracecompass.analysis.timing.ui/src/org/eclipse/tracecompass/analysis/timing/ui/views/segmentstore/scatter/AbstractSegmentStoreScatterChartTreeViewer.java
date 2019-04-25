@@ -86,20 +86,6 @@ public class AbstractSegmentStoreScatterChartTreeViewer extends AbstractSelectTr
      *
      * @param parent
      *            The parent composite
-     * @deprecated Use the
-     *             {@link #AbstractSegmentStoreScatterChartTreeViewer(Composite, String)}
-     *             constructor instead
-     */
-    @Deprecated
-    public AbstractSegmentStoreScatterChartTreeViewer(Composite parent) {
-        this(parent, ""); //$NON-NLS-1$
-    }
-
-    /**
-     * Constructor
-     *
-     * @param parent
-     *            The parent composite
      * @param analysisId
      *            The ID of the analysis to show in this viewer
      */
@@ -120,29 +106,12 @@ public class AbstractSegmentStoreScatterChartTreeViewer extends AbstractSelectTr
         return fAnalysisId;
     }
 
-    /**
-     * Returns the segment store provider
-     *
-     * @param trace
-     *            The trace to consider
-     * @return the segment store provider
-     * @deprecated This method is not used anymore as the analysisId is passed in the constructor
-     */
-    @Deprecated
-    protected @Nullable ISegmentStoreProvider getSegmentStoreProvider(ITmfTrace trace) {
-        return null;
-    }
-
     @Override
     protected @Nullable ITmfTreeDataProvider<@NonNull ITmfTreeDataModel> getProvider(@NonNull ITmfTrace trace) {
         String analysisId = getAnalysisId();
         /* Support legacy code, get the analysis ID of the segment store */
         if (analysisId.isEmpty()) {
-            ISegmentStoreProvider segmentStoreProvider = getSegmentStoreProvider(trace);
-            if (!(segmentStoreProvider instanceof IAnalysisModule)) {
-                return null;
-            }
-            analysisId = ((IAnalysisModule) segmentStoreProvider).getId();
+            return null;
         }
         /* End support of legacy */
         // TODO: Find another mechanism to update the view rather than listeners, so

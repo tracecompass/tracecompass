@@ -51,7 +51,7 @@ public interface ITmfTreeDataModel {
      * simplify things.
      *
      * @return the model name
-     * @since 4.3
+     * @since 5.0
      */
     default List<String> getLabels() {
         return Collections.singletonList(getName());

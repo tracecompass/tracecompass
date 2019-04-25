@@ -263,9 +263,15 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
                         int attributeQuark = display.getQuark(series.getKey(), entry);
                         if (attributeQuark >= 0 && attributeQuark < full.size()) {
                             Object value = full.get(attributeQuark).getValue();
-                            setYValue(i, series.getValue().getData(), extractValue(value), entry.getType());
+                            series.getValue().getData()[i] = extractValue(value);
                         }
                     }
+                }
+            }
+            // Update the series value if delta is requested
+            for (Entry<Integer, IYModel> series : map.entrySet()) {
+                if (entry.getType().equals(DisplayType.DELTA)) {
+                    getSeriesDelta(series.getValue().getData());
                 }
             }
         } catch (StateSystemDisposedException e) {
@@ -298,24 +304,17 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         }
     }
 
-    private static void setYValue(int index, double[] y, double value, DisplayType type) {
-        if (type.equals(DisplayType.DELTA)) {
-            y[index] = value;
-            /*
-             * At the first timestamp, the delta value should be 0 since we do not have the
-             * previous values
-             */
-            double prevValue = value;
-            if (index > 0) {
-                prevValue = y[index - 1];
-            }
-            y[index] = value - prevValue;
-        } else {
-            /* ABSOLUTE by default */
-            y[index] = value;
+    private static void getSeriesDelta(double[] data) {
+        double prevData = data[0];
+        data[0] = 0;
+        for (int i = 1; i < data.length; i++) {
+            double current = data[i];
+            // Update value by subtracting previous value
+            data[i] = current - prevData;
+            prevData = current;
         }
+        data[0] = data[1];
     }
-
     private static double extractValue(@Nullable Object val) {
         if (val instanceof Number) {
             return ((Number) val).doubleValue();

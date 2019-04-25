@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 4.3.0.qualifier
+Bundle-Version: 5.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.tmf.ui;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.internal.tmf.ui.Activator
@@ -99,7 +99,6 @@ Export-Package: org.eclipse.tracecompass.internal.tmf.ui;x-friends:="org.eclipse
  org.eclipse.tracecompass.tmf.ui.viewers.xycharts.barcharts,
  org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts,
  org.eclipse.tracecompass.tmf.ui.views,
- org.eclipse.tracecompass.tmf.ui.views.callstack,
  org.eclipse.tracecompass.tmf.ui.views.colors,
  org.eclipse.tracecompass.tmf.ui.views.distribution.model,
  org.eclipse.tracecompass.tmf.ui.views.filter,

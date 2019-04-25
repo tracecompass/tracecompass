@@ -360,22 +360,6 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
     }
 
     /**
-     * Returns the file resource used to store bookmarks after creating it if
-     * necessary. If the trace resource is a file, it is returned directly. If the
-     * trace resource is a folder, a linked file is returned. The file will be
-     * created if it does not exist.
-     *
-     * @return the bookmarks file
-     * @throws CoreException
-     *             if the bookmarks file cannot be created
-     * @deprecated Use {@link #createBookmarksFile(IProgressMonitor)} instead.
-     */
-    @Deprecated
-    public IFile createBookmarksFile() throws CoreException {
-        return createBookmarksFile(new NullProgressMonitor());
-    }
-
-    /**
      * Actually returns the bookmark file or creates it in the project element's
      * folder
      *
@@ -405,26 +389,6 @@ public abstract class TmfCommonProjectElement extends TmfProjectModelElement {
         }
         file.setPersistentProperty(TmfCommonConstants.TRACETYPE, editorInputType);
         return file;
-    }
-
-    /**
-     * Actually returns the bookmark file or creates it in the project element's
-     * folder
-     *
-     * @param bookmarksFolder
-     *            Folder where to put the bookmark file
-     * @param editorInputType
-     *            The editor input type to set (trace or experiment)
-     * @return The bookmark file
-     * @throws CoreException
-     *             if the bookmarks file cannot be created
-     * @deprecated Use
-     *             {@link #createBookmarksFile(IFolder, String, IProgressMonitor)}
-     *             instead.
-     */
-    @Deprecated
-    protected IFile createBookmarksFile(IFolder bookmarksFolder, String editorInputType) throws CoreException {
-        return createBookmarksFile(bookmarksFolder, editorInputType, new NullProgressMonitor());
     }
 
     /**

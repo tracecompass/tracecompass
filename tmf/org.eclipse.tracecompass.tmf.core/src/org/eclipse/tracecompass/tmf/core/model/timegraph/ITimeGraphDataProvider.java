@@ -76,7 +76,7 @@ public interface ITimeGraphDataProvider<M extends ITimeGraphEntryModel> extends 
      *
      * @return A {@link TmfModelResponse} that encapsulate a
      *         {@link TimeGraphModel}
-     * @since 4.3
+     * @since 5.0
      */
     default TmfModelResponse<TimeGraphModel> fetchRowModel(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
@@ -117,7 +117,7 @@ public interface ITimeGraphDataProvider<M extends ITimeGraphEntryModel> extends 
      *
      * @return A {@link TmfModelResponse} that encapsulate a
      *         {@link ITimeGraphArrow}
-     * @since 4.3
+     * @since 5.0
      */
     default TmfModelResponse<List<ITimeGraphArrow>> fetchArrows(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(fetchParameters);
@@ -154,7 +154,7 @@ public interface ITimeGraphDataProvider<M extends ITimeGraphEntryModel> extends 
      *            Progress monitor
      *
      * @return A {@link TmfModelResponse} that encapsulate a map of Tooltips
-     * @since 4.3
+     * @since 5.0
      */
     default TmfModelResponse<Map<String, String>> fetchTooltip(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);

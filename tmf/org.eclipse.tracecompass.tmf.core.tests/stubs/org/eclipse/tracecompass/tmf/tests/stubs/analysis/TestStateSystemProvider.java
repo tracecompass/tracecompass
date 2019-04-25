@@ -44,17 +44,20 @@ public class TestStateSystemProvider extends AbstractTmfStateProvider {
          *
          * @param ss
          *            The state system builder
+         * @param provider
+         *            The state provider
          * @param event
          *            The event to handler
-         * @return <code>true</code> if everything went fine, or <code>false</code> to cancel
+         * @return <code>true</code> if everything went fine, or
+         *         <code>false</code> to cancel
          */
-        boolean eventHandle(@NonNull ITmfStateSystemBuilder ss, ITmfEvent event);
+        boolean eventHandle(@NonNull ITmfStateSystemBuilder ss, AbstractTmfStateProvider provider, ITmfEvent event);
     }
 
     private static final int VERSION = 1;
     private static final String fString = "[]";
     private static int fCount = 0;
-    private static final @NonNull TestStateProviderHandler DEFAULT_HANDLER = (ss, event) -> {
+    private static final @NonNull TestStateProviderHandler DEFAULT_HANDLER = (ss, provider, event) -> {
         /* Just need something to fill the state system */
         if (fString.equals(event.getContent().getValue())) {
             try {
@@ -124,7 +127,7 @@ public class TestStateSystemProvider extends AbstractTmfStateProvider {
     @Override
     protected void eventHandle(ITmfEvent event) {
         ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
-        sfHandler.eventHandle(ss, event);
+        sfHandler.eventHandle(ss, this, event);
     }
 
     @Override

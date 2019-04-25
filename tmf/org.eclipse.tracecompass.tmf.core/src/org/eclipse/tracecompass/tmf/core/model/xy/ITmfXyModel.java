@@ -40,7 +40,7 @@ public interface ITmfXyModel {
      * True if the x values of the series are common
      *
      * @return True if X values are common
-     * @since 4.3
+     * @since 5.0
      */
     default boolean hasCommonXAxis() {
         return false;

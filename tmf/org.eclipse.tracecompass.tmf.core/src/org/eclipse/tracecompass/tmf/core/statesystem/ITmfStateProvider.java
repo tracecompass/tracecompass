@@ -30,6 +30,27 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 public interface ITmfStateProvider {
 
     /**
+     * Different future event type on the state system
+     *
+     * @author Katherine Nadeau
+     * @since 5.0
+     */
+    public enum FutureEventType {
+        /**
+         * Modify attribute event
+         */
+        MODIFICATION,
+        /**
+         * push value to a stack
+         */
+        PUSH,
+        /**
+         * Pop from a stack
+         */
+        POP;
+    }
+
+    /**
      * Event handler plugins should provide a version number. This is used to
      * determine if a potential existing file can be re-opened later (if the
      * versions in the file and in the viewer match), or if the file should be
@@ -149,12 +170,31 @@ public interface ITmfStateProvider {
      * @param time
      *            the time of the state
      * @param futureValue
-     *            The value of the state
+     *            the value of the state
      * @param attribute
      *            the quark to set to initial state
      * @since 4.1
      */
     default void addFutureEvent(long time, @Nullable Object futureValue, int attribute) {
+        addFutureEvent(time, futureValue, attribute, FutureEventType.MODIFICATION);
+    }
+
+    /**
+     * Add future state. The value of the state will be changed at the requested
+     * time when it is safe to do so, ie when the analysis has reached this
+     * timestamp.
+     *
+     * @param time
+     *            the time of the state
+     * @param futureValue
+     *            the value of the state
+     * @param attribute
+     *            the quark to set to initial state
+     * @param type
+     *            the type of event to apply to the state system
+     * @since 5.0
+     */
+    default void addFutureEvent(long time, @Nullable Object futureValue, int attribute, FutureEventType type) {
         // Do nothing by default
     }
 }

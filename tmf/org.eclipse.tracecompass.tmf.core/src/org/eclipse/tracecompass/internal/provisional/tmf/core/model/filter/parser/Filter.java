@@ -8,8 +8,9 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
-import java.util.Map;
 import java.util.function.Predicate;
+
+import com.google.common.collect.Multimap;
 
 /**
  * Item filter runtime object
@@ -17,7 +18,7 @@ import java.util.function.Predicate;
  * @author Jean-Christian Kouame
  *
  */
-public class Filter implements Predicate<Map<String, String>> {
+public class Filter implements Predicate<Multimap<String, String>> {
 
     private Iterable<FilterExpression> fExpressions;
 
@@ -32,7 +33,7 @@ public class Filter implements Predicate<Map<String, String>> {
     }
 
     @Override
-    public boolean test(Map<String, String> data) {
+    public boolean test(Multimap<String, String> data) {
         for (FilterExpression expression : fExpressions) {
             if (!expression.test(data)) {
                 return false;

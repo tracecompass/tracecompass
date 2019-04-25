@@ -8,7 +8,6 @@
 *******************************************************************************/
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
@@ -16,6 +15,7 @@ import java.util.function.Predicate;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 
 /**
  * This class represents a simple filter expression
@@ -23,7 +23,7 @@ import com.google.common.collect.Iterables;
  * @author Jean-Christian Kouame
  *
  */
-public class FilterSimpleExpression implements Predicate<Map<String, String>> {
+public class FilterSimpleExpression implements Predicate<Multimap<String, String>> {
 
     private final String fField;
     private final BiPredicate<String, String> fOperator;
@@ -46,9 +46,9 @@ public class FilterSimpleExpression implements Predicate<Map<String, String>> {
     }
 
     @Override
-    public boolean test(Map<String, String> data) {
+    public boolean test(Multimap<String, String> data) {
         String value = fValue;
-        return Iterables.any(data.entrySet(), entry -> (fField.equals("*") ||  //$NON-NLS-1$
+        return Iterables.any(data.entries(), entry -> (fField.equals("*") ||  //$NON-NLS-1$
                 Objects.requireNonNull(entry.getKey()).equals(fField) ||
                 Objects.requireNonNull(entry.getKey()).equals("> " + fField)) &&  //$NON-NLS-1$
                 (value == null || fOperator.test(entry.getValue(), value)));

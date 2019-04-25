@@ -229,7 +229,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      * @param nb
      *            The number of entries
      * @return Map of parameters
-     * @since 4.3
+     * @since 5.0
      */
     protected @NonNull Map<String, Object> createQueryParameters(long start, long end, int nb) {
         Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(start, end, nb));

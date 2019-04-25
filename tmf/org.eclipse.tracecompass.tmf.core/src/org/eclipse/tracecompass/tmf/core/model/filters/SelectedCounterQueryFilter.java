@@ -56,7 +56,7 @@ public class SelectedCounterQueryFilter extends SelectionTimeQueryFilter impleme
      * @param isCumulative
      *            To know if we want to fetch model as cumulative or
      *            differential. Give true if cumulative, false either
-     * @since 4.3
+     * @since 5.0
      */
     public SelectedCounterQueryFilter(List<Long> times, Collection<Long> ids, boolean isCumulative) {
         super(times, ids);

@@ -20,6 +20,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IPropertyCollection;
 
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
+
 /**
  * Interface for time events, for use in the timegraph view
  *
@@ -98,5 +101,14 @@ public interface ITimeEvent extends IPropertyCollection, IElementResolver {
         }
 
         return data;
+    }
+
+    /**
+     * @since 5.0
+     */
+    @Override
+    default @NonNull Multimap<@NonNull String, @NonNull String> getMetadata() {
+        String entryName = getEntry().getName();
+        return (entryName != null) ? ImmutableMultimap.of(IElementResolver.ENTRY_NAME_KEY, entryName) : ImmutableMultimap.of();
     }
 }

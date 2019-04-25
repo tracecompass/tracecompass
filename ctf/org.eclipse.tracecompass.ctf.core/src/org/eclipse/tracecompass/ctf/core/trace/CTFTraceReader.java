@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Set;
 
@@ -292,7 +293,8 @@ public class CTFTraceReader implements AutoCloseable {
     private void populateStreamInputReaderHeap() throws CTFException {
         if (fStreamInputReaders.isEmpty()) {
             fPrio = new PriorityQueue<>(MIN_PRIO_SIZE,
-                    new StreamInputReaderTimestampComparator());
+                    new StreamInputReaderTimestampComparator()
+                    .thenComparing(reader-> reader.getStreamInput().getFilename()));
             return;
         }
 
@@ -302,7 +304,8 @@ public class CTFTraceReader implements AutoCloseable {
          */
         fPrio = new PriorityQueue<>(
                 Math.max(fStreamInputReaders.size() * 2, MIN_PRIO_SIZE),
-                new StreamInputReaderTimestampComparator());
+                new StreamInputReaderTimestampComparator()
+                .thenComparing(reader-> reader.getStreamInput().getFilename()));
 
         int pos = 0;
 
@@ -575,7 +578,7 @@ public class CTFTraceReader implements AutoCloseable {
             if (other.fTrace != null) {
                 return false;
             }
-        } else if (!fTrace.equals(other.fTrace)) {
+        } else if (!Objects.equals(fTrace.getPath(), other.fTrace.getPath())) {
             return false;
         }
         return true;

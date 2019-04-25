@@ -50,6 +50,7 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphStateFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphRowModel;
@@ -62,6 +63,7 @@ import org.eclipse.tracecompass.tmf.core.util.Pair;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
@@ -121,6 +123,9 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
      */
     private final TreeMultimap<Integer, ThreadEntryModel.Builder> fTidToEntry = TreeMultimap.create(Comparator.naturalOrder(),
             Comparator.comparing(ThreadEntryModel.Builder::getStartTime));
+
+    /** Cache for entry metadata */
+    private final Map<Long, @NonNull Multimap<@NonNull String, @NonNull String>> fEntryMetadata = new HashMap<>();
 
     /**
      * Constructor
@@ -208,6 +213,11 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
 
                 list = filter(fTidToEntry, fetchParameters);
             }
+
+            for (ThreadEntryModel model : list) {
+                fEntryMetadata.put(model.getId(), model.getMetadata());
+            }
+
             if (complete) {
                 fBuildMap.clear();
                 fLastEnd = Long.MAX_VALUE;
@@ -398,7 +408,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, String.valueOf(e.getMessage()));
         }
 
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate< @NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         Multimap<@NonNull Integer, @NonNull String> regexesMap = DataProviderParameterUtils.extractRegexFilter(fetchParameters);
         if (regexesMap != null) {
             predicates.putAll(computeRegexPredicate(regexesMap));
@@ -417,7 +427,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
             states.forEach(i -> {
                 ITimeGraphState timegraphState = createTimeGraphState(i, syscalls);
                 Long key = Objects.requireNonNull(entry.getKey());
-                addToStateList(eventList, timegraphState, key, predicates, monitor);
+                applyFilterAndAddState(eventList, timegraphState, key, predicates, monitor);
             });
             rows.add(new TimeGraphRowModel(entry.getKey(), eventList));
         }
@@ -697,6 +707,12 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
     public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
         return fetchTooltip(parameters, monitor);
+    }
+
+    @Override
+    public @NonNull Multimap<@NonNull String, @NonNull String> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
+        return ITimeGraphStateFilter.mergeMultimaps(ITimeGraphDataProvider.super.getFilterData(entryId, time, monitor),
+                fEntryMetadata.getOrDefault(entryId, ImmutableMultimap.of()));
     }
 
 }

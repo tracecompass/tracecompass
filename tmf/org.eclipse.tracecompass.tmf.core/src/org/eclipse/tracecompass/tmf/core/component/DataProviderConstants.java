@@ -14,7 +14,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * Class with constants used in data providers
  *
  * @author Bernd Hufmann
- * @since 4.3
+ * @since 5.0
  */
 @NonNullByDefault
 public class DataProviderConstants {

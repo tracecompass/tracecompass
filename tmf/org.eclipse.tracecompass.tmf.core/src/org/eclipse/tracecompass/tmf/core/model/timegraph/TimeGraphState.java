@@ -14,6 +14,9 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
 /**
  * Implementation of {@link ITimeGraphState}
  *
@@ -87,8 +90,8 @@ public class TimeGraphState implements ITimeGraphState {
     }
 
     @Override
-    public Map<String, String> computeData() {
-        Map<String, String> toTest = new HashMap<>();
+    public Multimap<String, String> getMetadata() {
+        Multimap<String, String> toTest = HashMultimap.create();
         String label = getLabel();
         if (label != null) {
             toTest.put(IElementResolver.LABEL_KEY, label);
@@ -104,5 +107,16 @@ public class TimeGraphState implements ITimeGraphState {
     @Override
     public void setActiveProperties(int activeProperties) {
         fActiveProperties = activeProperties;
+    }
+
+    @Deprecated
+    @Override
+    public Map<String, String> computeData() {
+        Map<String, String> toTest = new HashMap<>();
+        String label = getLabel();
+        if (label != null) {
+            toTest.put(IElementResolver.LABEL_KEY, label);
+        }
+        return toTest;
     }
 }

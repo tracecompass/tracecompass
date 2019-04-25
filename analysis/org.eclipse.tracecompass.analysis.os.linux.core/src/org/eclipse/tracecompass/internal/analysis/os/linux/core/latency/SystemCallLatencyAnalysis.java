@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelTidAspect;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
 import org.eclipse.tracecompass.analysis.os.linux.core.tid.TidAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
@@ -220,7 +221,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
         }
         @Override
         public String getName() {
-            return checkNotNull(org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.Messages.AspectName_Tid);
+            return OsStrings.tid();
         }
         @Override
         public @Nullable Comparator<?> getComparator() {

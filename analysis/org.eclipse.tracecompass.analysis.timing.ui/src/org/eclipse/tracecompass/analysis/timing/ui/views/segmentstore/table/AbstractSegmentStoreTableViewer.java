@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -72,6 +73,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.table.TmfSimpleTableViewer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 
 /**
@@ -380,21 +382,52 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     /**
      * Compute the predicate for every property regexes
      *
-     * @param queryFilter
-     *            The query filter holding the regexes
      * @return A map of time event filters predicate by property
      * @since 3.1
+     * @deprecated Use {@link #generateRegexPredicate()}
      */
+    @Deprecated
     protected Map<Integer, Predicate<@NonNull Map<@NonNull String, @NonNull String>>> computeRegexPredicate() {
         Multimap<@NonNull Integer, @NonNull String> regexes = getRegexes();
         Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         for (Map.Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
             String regex = IFilterStrings.mergeFilters(entry.getValue());
             FilterCu cu = FilterCu.compile(regex);
-            Predicate<@NonNull Map<@NonNull String, @NonNull String>> predicate = cu != null ? cu.generate() : null;
+            Predicate<@NonNull Map<@NonNull String, @NonNull String>> predicate = cu != null ? multiToMapPredicate(cu.generate()) : null;
             if (predicate != null) {
                 predicates.put(entry.getKey(), predicate);
             }
+        }
+        return predicates;
+    }
+
+    private static Predicate<@NonNull Map<@NonNull String, @NonNull String>> multiToMapPredicate(@NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>> predicate) {
+        return new Predicate<@NonNull Map<@NonNull String, @NonNull String>> () {
+
+            @Override
+            public boolean test(@NonNull Map<@NonNull String, @NonNull String> arg0) {
+                return predicate.test(ImmutableMultimap.copyOf(arg0.entrySet()));
+            }
+
+        };
+    }
+
+    /**
+     * Generate the predicate for every property from the regexes
+     *
+     * @return A map of predicate by property
+     * @since 4.0
+     */
+    protected Map<Integer, Predicate<Multimap<String, String>>> generateRegexPredicate() {
+        Multimap<Integer, String> regexes = getRegexes();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        for (Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
+            String regex = IFilterStrings.mergeFilters(entry.getValue());
+            FilterCu cu = FilterCu.compile(regex);
+            Predicate<@NonNull Multimap<@NonNull String, @NonNull String>> predicate = cu != null ? cu.generate() : null;
+                if (predicate != null) {
+                    predicates.put(entry.getKey(), predicate);
+                }
         }
         return predicates;
     }

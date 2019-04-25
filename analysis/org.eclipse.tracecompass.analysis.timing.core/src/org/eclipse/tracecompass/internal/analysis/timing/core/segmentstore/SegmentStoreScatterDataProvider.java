@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
 
@@ -58,6 +57,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
@@ -83,7 +83,6 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
      */
     public static final String ID = "org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.scatter.dataprovider"; //$NON-NLS-1$
 
-    private static final Map<ISegmentStoreProvider, SegmentStoreScatterDataProvider> PROVIDER_MAP = new WeakHashMap<>();
     private static final String DEFAULT_CATEGORY = "default"; //$NON-NLS-1$
     private static final AtomicLong ENTRY_ID = new AtomicLong();
 
@@ -192,36 +191,6 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             }
             return false;
         }
-    }
-
-    /**
-     * Create an instance of {@link SegmentStoreScatterDataProvider}. Returns a null
-     * instance if the ISegmentStoreProvider is null. If the provider is an instance
-     * of {@link IAnalysisModule}, analysis is also scheduled.
-     *
-     * @param trace
-     *            A trace on which we are interested to fetch a model
-     * @param provider
-     *            A segment store provider.
-     * @return An instance of SegmentStoreDataProvider. Returns a null if the
-     *         ISegmentStoreProvider is null.
-     * @deprecated Use the
-     *             {@link SegmentStoreScatterDataProvider#create(ITmfTrace, String)}
-     *             method instead
-     */
-    @Deprecated
-    public static synchronized @Nullable SegmentStoreScatterDataProvider create(ITmfTrace trace, @Nullable ISegmentStoreProvider provider) {
-        if (provider == null) {
-            return null;
-        }
-
-        return PROVIDER_MAP.computeIfAbsent(provider, p -> {
-            if (p instanceof IAnalysisModule) {
-                ((IAnalysisModule) p).schedule();
-            }
-            return new SegmentStoreScatterDataProvider(trace, p, ""); //$NON-NLS-1$
-        });
-
     }
 
     /**
@@ -344,7 +313,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             }
         }
 
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
         Multimap<@NonNull Integer, @NonNull String> regexesMap = DataProviderParameterUtils.extractRegexFilter(fetchParameters);
         if (regexesMap != null) {
             predicates.putAll(computeRegexPredicate(regexesMap));
@@ -413,18 +382,18 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
      * @param monitor
      *            The progress monitor
      */
-    private void addPoint(Series series, ISegment segment, Map<Integer, Predicate<Map<String, String>>> predicates, @Nullable IProgressMonitor monitor) {
+    private void addPoint(Series series, ISegment segment, Map<Integer, Predicate<Multimap<String, String>>> predicates, @Nullable IProgressMonitor monitor) {
 
         if (!predicates.isEmpty()) {
 
             // Get the filter external input data
-            Map<@NonNull String, @NonNull String> input = getFilterInput(segment);
+            Multimap<@NonNull String, @NonNull String> input = getFilterInput(segment);
 
             // Test each predicates and set the status of the property associated to the
             // predicate
             int mask = 0;
-            for (Map.Entry<Integer, Predicate<Map<String, String>>> mapEntry : predicates.entrySet()) {
-                Predicate<Map<String, String>> value = Objects.requireNonNull(mapEntry.getValue());
+            for (Map.Entry<Integer, Predicate<Multimap<String, String>>> mapEntry : predicates.entrySet()) {
+                Predicate<Multimap<String, String>> value = Objects.requireNonNull(mapEntry.getValue());
                 boolean status = value.test(input);
                 Integer property = Objects.requireNonNull(mapEntry.getKey());
                 if (status && property != IFilterProperty.DIMMED) {
@@ -443,8 +412,8 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         }
     }
 
-    private Map<String, String> getFilterInput(ISegment segment) {
-        Map<String, String> map = new HashMap<>();
+    private Multimap<String, String> getFilterInput(ISegment segment) {
+        Multimap<String, String> map = HashMultimap.create();
         for(ISegmentAspect aspect : fProvider.getSegmentAspects()) {
             Object resolve = aspect.resolve(segment);
             if (resolve != null) {

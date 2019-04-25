@@ -27,7 +27,7 @@ import com.google.common.collect.Multimap;
  * extract the most common parameters from a map.
  *
  * @author Simon Delisle
- * @since 4.3
+ * @since 5.0
  */
 @NonNullByDefault
 public class DataProviderParameterUtils {

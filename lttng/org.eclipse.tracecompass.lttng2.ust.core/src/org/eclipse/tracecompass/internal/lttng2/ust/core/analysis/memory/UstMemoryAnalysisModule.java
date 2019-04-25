@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory.UstMemoryStateProvider.MemoryAllocation;
@@ -82,7 +83,7 @@ public class UstMemoryAnalysisModule extends TmfStateSystemAnalysisModule implem
         }
         @Override
         public String getName() {
-            return checkNotNull(org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.Messages.AspectName_Tid);
+            return OsStrings.tid();
         }
         @Override
         public @Nullable Comparator<?> getComparator() {

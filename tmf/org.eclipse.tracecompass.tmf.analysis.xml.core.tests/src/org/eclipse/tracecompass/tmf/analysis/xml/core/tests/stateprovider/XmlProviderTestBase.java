@@ -87,6 +87,7 @@ public abstract class XmlProviderTestBase {
         try {
             fModule.setTrace(trace);
             fModule.schedule();
+            fModule.waitForCompletion();
         } catch (TmfAnalysisException e) {
             fail("Cannot set trace " + e.getMessage());
         }
@@ -137,6 +138,7 @@ public abstract class XmlProviderTestBase {
     @Test
     public void testStateSystem() {
         assertTrue(fModule instanceof ITmfAnalysisModuleWithStateSystems);
+        assertTrue(((ITmfAnalysisModuleWithStateSystems) fModule).waitForInitialization());
         assertTrue(fModule.waitForCompletion(new NullProgressMonitor()));
         ITmfStateSystem ss = ((ITmfAnalysisModuleWithStateSystems) fModule).getStateSystem(fModule.getId());
         assertNotNull(ss);

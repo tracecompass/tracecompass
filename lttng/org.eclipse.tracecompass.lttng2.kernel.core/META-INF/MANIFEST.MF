@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 2.3.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.lttng2.kernel.core;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.internal.lttng2.kernel.core.Activator
@@ -24,11 +24,6 @@ Export-Package: org.eclipse.tracecompass.internal.lttng2.kernel.core;x-friends:=
  org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui,org.eclipse.tracecompass.lttng2.kernel.core.tests",
  org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.handlers;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui,org.eclipse.tracecompass.lttng2.kernel.core.tests",
  org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui,org.eclipse.tracecompass.lttng2.kernel.core.tests",
- org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm;x-friends:="org.eclipse.tracecompass.lttng2.kernel.core.tests,org.eclipse.tracecompass.lttng2.kernel.ui",
- org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model;x-friends:="org.eclipse.tracecompass.lttng2.kernel.core.tests,org.eclipse.tracecompass.lttng2.kernel.ui",
- org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.model.qemukvm;x-friends:="org.eclipse.tracecompass.lttng2.kernel.core.tests,org.eclipse.tracecompass.lttng2.kernel.ui",
- org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.module;x-friends:="org.eclipse.tracecompass.lttng2.kernel.core.tests,org.eclipse.tracecompass.lttng2.kernel.ui",
- org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.trace;x-friends:="org.eclipse.tracecompass.lttng2.kernel.ui,org.eclipse.tracecompass.lttng2.kernel.core.tests",
  org.eclipse.tracecompass.internal.lttng2.kernel.core.event.matching;x-friends:="org.eclipse.tracecompass.lttng2.kernel.core.tests",
  org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout;x-friends:="org.eclipse.tracecompass.lttng2.kernel.core.tests,org.eclipse.tracecompass.lttng2.kernel.ui",
  org.eclipse.tracecompass.lttng2.kernel.core.trace

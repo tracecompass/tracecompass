@@ -25,10 +25,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlAnalysisModuleSource;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.XmlDataProviderManager;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlDataProviderManager;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
@@ -62,6 +62,7 @@ public class XmlXyDataProviderTest {
 
     private static final @NonNull String ANALYSIS_ID = "xml.core.tests.simple.pattern";
     private static final @NonNull String XY_VIEW_ID = "xml.core.tests.simple.pattern.xy";
+    private static final @NonNull String XY_VIEW_ID_DELTA = "xml.core.tests.simple.pattern.xy.delta";
     private static final @NonNull IProgressMonitor MONITOR = new NullProgressMonitor();
 
     /**
@@ -125,6 +126,38 @@ public class XmlXyDataProviderTest {
             Map<Long, String> tree = assertAndGetTree(xyProvider, trace, expectedStrings);
 
             expectedStrings = Files.readAllLines(Paths.get("test_traces/simple_dataprovider/expectedXYData"));
+            assertRows(xyProvider, tree, expectedStrings);
+
+        } finally {
+            trace.dispose();
+            TmfTraceManager.getInstance().traceClosed(new TmfTraceClosedSignal(this, trace));
+        }
+
+    }
+
+    /**
+     * Test getting the XML XY data provider for one trace, with an analysis that
+     * applies to a trace, and requesting relative values (delta) for the y axis.
+     *
+     * @throws IOException
+     *             Exception thrown by analyses
+     */
+    @Test
+    public void testXYDataProviderDelta() throws IOException {
+        ITmfTrace trace = getTrace();
+        assertNotNull(trace);
+        try {
+            runModule(trace);
+            // Get the view element from the file
+            Element viewElement = TmfXmlUtils.getElementInFile(TmfXmlTestFiles.DATA_PROVIDER_SIMPLE_FILE.getPath().toOSString(), TmfXmlStrings.XY_VIEW, XY_VIEW_ID_DELTA);
+            assertNotNull(viewElement);
+            ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> xyProvider = XmlDataProviderManager.getInstance().getXyProvider(trace, viewElement);
+            assertNotNull(xyProvider);
+
+            List<String> expectedStrings = Files.readAllLines(Paths.get("test_traces/simple_dataprovider/expectedXYTree"));
+            Map<Long, String> tree = assertAndGetTree(xyProvider, trace, expectedStrings);
+
+            expectedStrings = Files.readAllLines(Paths.get("test_traces/simple_dataprovider/expectedXYDataDelta"));
             assertRows(xyProvider, tree, expectedStrings);
 
         } finally {

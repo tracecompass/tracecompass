@@ -54,7 +54,7 @@ public class Messages extends NLS {
     /**
      * Detailed message for failed status cause by incorrect query parameters
      *
-     * @since 4.3
+     * @since 5.0
      */
     public static @Nullable String CommonStatusMessage_IncorrectQueryParameters;
 

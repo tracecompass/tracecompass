@@ -95,42 +95,6 @@ public class TmfStateStatistics implements ITmfStatistics {
         fTypesStats.dispose();
     }
 
-    @Deprecated
-    @Override
-    public List<@NonNull Long> histogramQuery(final long start, final long end, final int nb) {
-        final List<@NonNull Long> list = new ArrayList<>();
-        final long increment = (end - start) / nb;
-
-        if (fTotalsStats.isCancelled()) {
-            return list;
-        }
-
-        /*
-         * We will do one state system query per "border", and save the
-         * differences between each border.
-         */
-        long prevTotal = (start == fTotalsStats.getStartTime()) ? 0 : getEventCountAt(start);
-        long curTime = start + increment;
-
-        for (int i = 0; i < nb - 1; i++) {
-            long curTotal = getEventCountAt(curTime);
-            long count = curTotal - prevTotal;
-            list.add(count);
-
-            curTime += increment;
-            prevTotal = curTotal;
-        }
-
-        /*
-         * For the last bucket, we'll stretch its end time to the end time of
-         * the requested range, in case it got truncated down.
-         */
-        long curTotal = getEventCountAt(end);
-        list.add(curTotal - prevTotal);
-
-        return list;
-    }
-
     @Override
     public List<@NonNull Long> histogramQuery(long[] timeRequested) {
         final List<@NonNull Long> list = new ArrayList<>();

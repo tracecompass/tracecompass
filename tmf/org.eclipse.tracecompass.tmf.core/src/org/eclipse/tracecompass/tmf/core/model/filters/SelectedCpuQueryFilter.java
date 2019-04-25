@@ -57,7 +57,7 @@ public class SelectedCpuQueryFilter extends SelectionTimeQueryFilter {
      *            The selected threads
      * @param cpu
      *            The set of CPU
-     * @since 4.3
+     * @since 5.0
      */
     public SelectedCpuQueryFilter(List<Long> times, Collection<Long> selectedThreads, Set<Integer> cpu) {
         super(times, selectedThreads);

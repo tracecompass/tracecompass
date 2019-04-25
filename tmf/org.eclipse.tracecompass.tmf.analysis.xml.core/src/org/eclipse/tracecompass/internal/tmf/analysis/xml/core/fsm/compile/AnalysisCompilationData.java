@@ -24,6 +24,11 @@ import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
  */
 public class AnalysisCompilationData {
 
+    /**
+     * An empty compilation data object that can be used when no data is required
+     */
+    public static final AnalysisCompilationData EMPTY_DATA = new AnalysisCompilationData();
+
     private final Map<String, TmfXmlLocationCu> fLocations = new HashMap<>();
     private final Map<String, String> fDefinedValues = new HashMap<>();
     private final Map<String, TmfXmlMappingGroupCu> fMappingGroups = new HashMap<>();

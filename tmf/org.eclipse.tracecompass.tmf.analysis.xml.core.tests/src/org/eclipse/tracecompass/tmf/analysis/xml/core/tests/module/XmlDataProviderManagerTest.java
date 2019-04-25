@@ -17,15 +17,15 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenAnalysisModule;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlAnalysisModuleSource;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlTimeGraphEntryModel;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.XmlDataProviderManager;
 import org.eclipse.tracecompass.internal.tmf.core.model.timegraph.TmfTimeGraphCompositeDataProvider;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlDataProviderManager;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -91,7 +91,7 @@ public class XmlDataProviderManagerTest {
             // Get the view element from the file
             Element viewElement = TmfXmlUtils.getElementInFile(TmfXmlTestFiles.STATE_VALUE_FILE.getPath().toOSString(), TmfXmlStrings.TIME_GRAPH_VIEW, TRACE_VIEW_ID);
             assertNotNull(viewElement);
-            ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> timeGraphProvider = XmlDataProviderManager.getInstance().getTimeGraphProvider(trace, viewElement);
+            ITimeGraphDataProvider<@NonNull TimeGraphEntryModel> timeGraphProvider = XmlDataProviderManager.getInstance().getTimeGraphProvider(trace, viewElement);
             assertNotNull(timeGraphProvider);
 
         } finally {
@@ -121,7 +121,7 @@ public class XmlDataProviderManagerTest {
             // Get the view element from the file
             Element viewElement = TmfXmlUtils.getElementInFile(TmfXmlTestFiles.EXPERIMENT.getPath().toOSString(), TmfXmlStrings.TIME_GRAPH_VIEW, EXPERIMENT_VIEW_ID);
             assertNotNull(viewElement);
-            ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> timeGraphProvider = XmlDataProviderManager.getInstance().getTimeGraphProvider(trace, viewElement);
+            ITimeGraphDataProvider<@NonNull TimeGraphEntryModel> timeGraphProvider = XmlDataProviderManager.getInstance().getTimeGraphProvider(trace, viewElement);
             assertNull(timeGraphProvider);
 
         } finally {
@@ -165,7 +165,7 @@ public class XmlDataProviderManagerTest {
             // Get the view element from the file
             Element viewElement = TmfXmlUtils.getElementInFile(TmfXmlTestFiles.STATE_VALUE_FILE.getPath().toOSString(), TmfXmlStrings.TIME_GRAPH_VIEW, TRACE_VIEW_ID);
             assertNotNull(viewElement);
-            ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> timeGraphProvider = XmlDataProviderManager.getInstance().getTimeGraphProvider(experiment, viewElement);
+            ITimeGraphDataProvider<@NonNull TimeGraphEntryModel> timeGraphProvider = XmlDataProviderManager.getInstance().getTimeGraphProvider(experiment, viewElement);
             assertNotNull(timeGraphProvider);
             assertTrue(timeGraphProvider instanceof TmfTimeGraphCompositeDataProvider);
 
@@ -216,7 +216,7 @@ public class XmlDataProviderManagerTest {
             // Get the view element from the file
             Element viewElement = TmfXmlUtils.getElementInFile(TmfXmlTestFiles.EXPERIMENT.getPath().toOSString(), TmfXmlStrings.TIME_GRAPH_VIEW, EXPERIMENT_VIEW_ID);
             assertNotNull(viewElement);
-            ITimeGraphDataProvider<@NonNull XmlTimeGraphEntryModel> timeGraphProvider = XmlDataProviderManager.getInstance().getTimeGraphProvider(experiment, viewElement);
+            ITimeGraphDataProvider<@NonNull TimeGraphEntryModel> timeGraphProvider = XmlDataProviderManager.getInstance().getTimeGraphProvider(experiment, viewElement);
             assertNotNull(timeGraphProvider);
             assertFalse(timeGraphProvider instanceof TmfTimeGraphCompositeDataProvider);
 

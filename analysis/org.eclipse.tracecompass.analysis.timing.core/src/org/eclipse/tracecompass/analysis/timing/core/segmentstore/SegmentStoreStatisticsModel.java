@@ -64,7 +64,7 @@ public class SegmentStoreStatisticsModel extends TmfTreeDataModel {
      * @param statistics
      *            the {@link IStatistics} who's values will be copied into this
      *            model.
-     * @since 4.2
+     * @since 5.0
      */
     public SegmentStoreStatisticsModel(long id, long parentId, List<String> labels, IStatistics<ISegment> statistics) {
         super(id, parentId, labels);

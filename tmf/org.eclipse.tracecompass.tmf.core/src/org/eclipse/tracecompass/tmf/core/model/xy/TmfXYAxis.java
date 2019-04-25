@@ -17,7 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * Represent a XY Axis model
  *
  * @author Simon Delisle
- * @since 4.3
+ * @since 5.0
  */
 public class TmfXYAxis {
     private String fLabel;

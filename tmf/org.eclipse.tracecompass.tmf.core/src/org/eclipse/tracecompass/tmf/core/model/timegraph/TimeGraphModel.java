@@ -15,7 +15,7 @@ import java.util.List;
  * Represent an entire Time Graph model
  *
  * @author Simon Delisle
- * @since 4.3
+ * @since 5.0
  */
 public class TimeGraphModel {
     private List<ITimeGraphRowModel> fRows;

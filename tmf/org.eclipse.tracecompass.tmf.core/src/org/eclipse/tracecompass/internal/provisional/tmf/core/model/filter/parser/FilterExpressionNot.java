@@ -8,8 +8,9 @@
 *******************************************************************************/
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
-import java.util.Map;
 import java.util.Queue;
+
+import com.google.common.collect.Multimap;
 
 /**
  * This class implement a filter expression negation that could be tested against an
@@ -32,7 +33,7 @@ public class FilterExpressionNot extends FilterExpression {
     }
 
     @Override
-    public boolean test(Map<String, String> data) {
+    public boolean test(Multimap<String, String> data) {
         return !super.test(data);
     }
 }

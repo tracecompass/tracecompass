@@ -51,12 +51,14 @@ public class PatternScatterGraphViewer extends AbstractSegmentStoreScatterChartV
      *            The analysis ID
      */
     public void updateViewer(String analysisId) {
+        if (analysisId != null) {
+            fAnalysisId = analysisId;
+        }
         ITmfTrace trace = getTrace();
         if (trace == null) {
             return;
         }
         if (analysisId != null) {
-            fAnalysisId = analysisId;
             initializeDataProvider(trace);
         }
     }
