@@ -208,7 +208,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
          * @param provider
          *            reference to the provider for this trace and view
          */
-        public TraceEntry(TimeGraphEntryModel model, @NonNull ITmfTrace trace,
+        public TraceEntry(@NonNull TimeGraphEntryModel model, @NonNull ITmfTrace trace,
                 @NonNull ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider) {
             super(model);
             fTrace = trace;

@@ -38,7 +38,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.FollowThre
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.UnfollowCpuAction;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.UnfollowThreadAction;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
@@ -118,8 +118,8 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
                 /* sort trace entries alphabetically */
                 return o1.getName().compareTo(o2.getName());
             } else if (o1 instanceof TimeGraphEntry && o2 instanceof TimeGraphEntry) {
-                ITimeGraphEntryModel model1 = ((TimeGraphEntry) o1).getModel();
-                ITimeGraphEntryModel model2 = ((TimeGraphEntry) o2).getModel();
+                ITmfTreeDataModel model1 = ((TimeGraphEntry) o1).getEntryModel();
+                ITmfTreeDataModel model2 = ((TimeGraphEntry) o2).getEntryModel();
                 /* sort resource entries by their defined order */
                 if (model1 instanceof ResourcesEntryModel && model2 instanceof ResourcesEntryModel) {
                     return COMPARATOR.compare((ResourcesEntryModel) model1, (ResourcesEntryModel) model2);
@@ -168,7 +168,7 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
             IStructuredSelection sSel = (IStructuredSelection) selection;
             if (sSel.getFirstElement() instanceof TimeGraphEntry) {
                 TimeGraphEntry resourcesEntry = (TimeGraphEntry) sSel.getFirstElement();
-                ITimeGraphEntryModel model = resourcesEntry.getModel();
+                ITmfTreeDataModel model = resourcesEntry.getEntryModel();
                 if (model instanceof ResourcesEntryModel) {
                     ResourcesEntryModel resourcesModel = (ResourcesEntryModel) model;
                     Type type = resourcesModel.getType();
@@ -200,7 +200,7 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
             IStructuredSelection sSel = (IStructuredSelection) selection;
             if (sSel.getFirstElement() instanceof TimeGraphEntry) {
                 TimeGraphEntry resourcesEntry = (TimeGraphEntry) sSel.getFirstElement();
-                ITimeGraphEntryModel model = resourcesEntry.getModel();
+                ITmfTreeDataModel model = resourcesEntry.getEntryModel();
                 if (sSel.toArray()[1] instanceof NamedTimeEvent && ((ResourcesEntryModel) model).getType() == Type.CURRENT_THREAD) {
                     ITmfTrace trace = getTrace(resourcesEntry);
                     NamedTimeEvent event = (NamedTimeEvent) sSel.toArray()[1];

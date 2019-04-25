@@ -182,7 +182,7 @@ public class CriticalPathPresentationProvider extends TimeGraphPresentationProvi
         }
         ITimeGraphEntry entry = event.getEntry();
         if (entry instanceof TimeGraphEntry) {
-            long id = ((TimeGraphEntry) entry).getModel().getId();
+            long id = ((TimeGraphEntry) entry).getEntryModel().getId();
             ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = BaseDataProviderTimeGraphView.getProvider((TimeGraphEntry) entry);
             SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(Collections.singletonList(hoverTime), Collections.singleton(id));
             TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> tooltipResponse = provider.fetchTooltip(filter, null);

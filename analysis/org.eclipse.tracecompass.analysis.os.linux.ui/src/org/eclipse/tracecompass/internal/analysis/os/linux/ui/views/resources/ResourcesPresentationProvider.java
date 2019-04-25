@@ -23,8 +23,8 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.ui.registry.LinuxStyl
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphEntryModelWeighted;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.presentation.RotatingPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
@@ -95,9 +95,9 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
         }
         ITimeGraphEntry entry = event.getEntry();
         if (entry instanceof TimeGraphEntry
-                && ((TimeGraphEntry) entry).getModel() instanceof ResourcesEntryModel) {
+                && ((TimeGraphEntry) entry).getEntryModel() instanceof ResourcesEntryModel) {
             int value = event.getValue();
-            ResourcesEntryModel resourcesModel = (ResourcesEntryModel) ((TimeGraphEntry) entry).getModel();
+            ResourcesEntryModel resourcesModel = (ResourcesEntryModel) ((TimeGraphEntry) entry).getEntryModel();
             Type type = resourcesModel.getType();
             switch (type) {
             case CPU:
@@ -171,7 +171,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
         ITimeGraphEntry entry = event.getEntry();
 
         if (event instanceof TimeEvent && ((TimeEvent) event).hasValue() && entry instanceof TimeGraphEntry) {
-            ITimeGraphEntryModel model = ((TimeGraphEntry) entry).getModel();
+            ITmfTreeDataModel model = ((TimeGraphEntry) entry).getEntryModel();
 
             TimeEvent tcEvent = (TimeEvent) event;
 
@@ -218,8 +218,8 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
             map.put(ITimeEventStyleStrings.label(), String.valueOf(threadEventValue));
 
         } else if (event.getEntry() instanceof TimeGraphEntry &&
-                ((TimeGraphEntry) event.getEntry()).getModel() instanceof ITimeGraphEntryModelWeighted) {
-            ITimeGraphEntryModelWeighted model = (ITimeGraphEntryModelWeighted) ((TimeGraphEntry) event.getEntry()).getModel();
+                ((TimeGraphEntry) event.getEntry()).getEntryModel() instanceof ITimeGraphEntryModelWeighted) {
+            ITimeGraphEntryModelWeighted model = (ITimeGraphEntryModelWeighted) ((TimeGraphEntry) event.getEntry()).getEntryModel();
             int eventValue = ((TimeEvent) event).getValue();
 
             map.put(ITimeEventStyleStrings.heightFactor(), (float) model.getWeight(eventValue));
@@ -229,7 +229,7 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
 
     private static boolean isType(ITimeGraphEntry entry, Type type) {
         if (entry instanceof TimeGraphEntry) {
-            ITimeGraphEntryModel model = ((TimeGraphEntry) entry).getModel();
+            ITmfTreeDataModel model = ((TimeGraphEntry) entry).getEntryModel();
             if (model instanceof ResourcesEntryModel) {
                 return (((ResourcesEntryModel) model).getType().equals(type));
             }

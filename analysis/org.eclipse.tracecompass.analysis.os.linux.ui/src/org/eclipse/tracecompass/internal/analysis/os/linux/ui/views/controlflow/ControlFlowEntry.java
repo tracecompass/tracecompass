@@ -59,7 +59,7 @@ public class ControlFlowEntry extends TimeGraphEntry {
      * @param model
      *            the {@link ThreadEntryModel} to compose this entry
      */
-    public ControlFlowEntry(ThreadEntryModel model) {
+    public ControlFlowEntry(@NonNull ThreadEntryModel model) {
         super(model);
         fSchedulingPosition = Long.MAX_VALUE;
     }
@@ -70,7 +70,7 @@ public class ControlFlowEntry extends TimeGraphEntry {
      * @return The TID
      */
     public int getThreadId() {
-        return ((ThreadEntryModel) getModel()).getThreadId();
+        return ((ThreadEntryModel) getEntryModel()).getThreadId();
     }
 
     /**
@@ -79,7 +79,7 @@ public class ControlFlowEntry extends TimeGraphEntry {
      * @return The "PTID"
      */
     public int getParentThreadId() {
-        return ((ThreadEntryModel) getModel()).getParentThreadId();
+        return ((ThreadEntryModel) getEntryModel()).getParentThreadId();
     }
 
     @Override

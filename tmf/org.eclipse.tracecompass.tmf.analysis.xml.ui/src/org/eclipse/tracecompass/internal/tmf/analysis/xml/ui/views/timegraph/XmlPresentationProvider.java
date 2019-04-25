@@ -13,7 +13,6 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.timegraph;
 
-import com.google.common.primitives.Ints;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +28,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenOutputEntryModel;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -39,6 +38,8 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.w3c.dom.Element;
+
+import com.google.common.primitives.Ints;
 
 /**
  * Presentation provider for the XML view, based on the generic TMF presentation
@@ -95,7 +96,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
             TimeGraphEntry entry = (TimeGraphEntry) event.getEntry();
             int value = tcEvent.getValue();
 
-            ITimeGraphEntryModel model = entry.getModel();
+            ITmfTreeDataModel model = entry.getEntryModel();
             if (model instanceof DataDrivenOutputEntryModel) {
                 // Draw state only if state is already known
                 Integer index = stateIndex.get(value);
@@ -117,7 +118,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
         if (event instanceof TimeEvent && ((TimeEvent) event).hasValue()) {
             TimeEvent tcEvent = (TimeEvent) event;
 
-            DataDrivenOutputEntryModel model = (DataDrivenOutputEntryModel) ((TimeGraphEntry) event.getEntry()).getModel();
+            DataDrivenOutputEntryModel model = (DataDrivenOutputEntryModel) ((TimeGraphEntry) event.getEntry()).getEntryModel();
             int value = tcEvent.getValue();
 
             if (model.getDisplayQuark() >= 0) {
@@ -156,7 +157,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
     @Override
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
         // Is there text to show
-        DataDrivenOutputEntryModel entry = (DataDrivenOutputEntryModel) ((TimeGraphEntry) event.getEntry()).getModel();
+        DataDrivenOutputEntryModel entry = (DataDrivenOutputEntryModel) ((TimeGraphEntry) event.getEntry()).getEntryModel();
         if (!entry.showText()) {
             return;
         }

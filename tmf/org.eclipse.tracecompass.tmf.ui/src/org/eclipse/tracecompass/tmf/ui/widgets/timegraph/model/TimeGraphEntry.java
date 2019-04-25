@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -145,7 +146,9 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
     private Comparator<ITimeGraphEntry> fComparator;
     private Sampling fSampling;
 
-    private TimeGraphEntryModel fModel;
+    private @NonNull ITmfTreeDataModel fModel;
+    private long fStartTime;
+    private long fEndTime;
 
     /**
      * Constructor
@@ -158,7 +161,8 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
      *            The end time of this entry
      */
     public TimeGraphEntry(String name, long startTime, long endTime) {
-        fModel = new TimeGraphEntryModel(-1, -1, name, startTime, endTime);
+        this(new TimeGraphEntryModel(-1, -1, name, startTime, endTime));
+
     }
 
     /**
@@ -168,8 +172,28 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
      *            Time graph model
      * @since 4.0
      */
-    public TimeGraphEntry(TimeGraphEntryModel model) {
+    public TimeGraphEntry(@NonNull TimeGraphEntryModel model) {
         fModel = model;
+        fStartTime = model.getStartTime();
+        fEndTime = model.getEndTime();
+    }
+
+    /**
+     * Constructor
+     *
+     * @param model
+     *            Time graph model
+     * @since 5.0
+     */
+    public TimeGraphEntry(@NonNull ITmfTreeDataModel model) {
+        fModel = model;
+        if (model instanceof TimeGraphEntryModel) {
+            this.updateModel((TimeGraphEntryModel) model);
+        } else {
+            // Initialize the time range to positive longs
+            fStartTime = 0;
+            fEndTime = Long.MAX_VALUE;
+        }
     }
 
     // ---------------------------------------------
@@ -215,7 +239,7 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
 
     @Override
     public String getName() {
-        return fModel.getName();
+        return getEntryModel().getName();
     }
 
     /**
@@ -223,23 +247,25 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
      *
      * @param name
      *            the updated entry name
+     * @Deprecated The name should not be set through this method
      */
+    @Deprecated
     public void setName(String name) {
         /*
          * Model is immutable, this is the only way to do this, consider not updating
          * name in the future?
          */
-        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), name, getStartTime(), getEndTime(), fModel.hasRowModel());
+        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), name, getStartTime(), getEndTime(), fModel instanceof ITimeGraphEntryModel ? ((TimeGraphEntryModel) fModel).hasRowModel() : true);
     }
 
     @Override
     public long getStartTime() {
-        return fModel.getStartTime();
+        return fStartTime;
     }
 
     @Override
     public long getEndTime() {
-        return fModel.getEndTime();
+        return fEndTime;
     }
 
     /**
@@ -253,12 +279,12 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
          * Model is immutable, this is the only way to do this, consider not updating
          * end time in the future?
          */
-        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), fModel.getName(), fModel.getStartTime(), Long.max(getEndTime(), endTime), fModel.hasRowModel());
+        fEndTime = endTime;
     }
 
     @Override
     public boolean hasTimeEvents() {
-        return fModel.hasRowModel();
+        return fModel instanceof ITimeGraphEntryModel ? ((ITimeGraphEntryModel) fModel).hasRowModel() : true;
     }
 
     @Override
@@ -370,8 +396,8 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
     public void updateZoomedEvent(ITimeEvent event) {
         try (TraceCompassLogUtils.ScopeLog poc = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINE, "UpdateZoomedEvent")) { //$NON-NLS-1$
 
-            long start = fModel.getStartTime();
-            long end = fModel.getEndTime();
+            long start = getStartTime();
+            long end = getEndTime();
 
             // If the entry has no time event, put a null time event to it
             if (fZoomedEventList.isEmpty()) {
@@ -426,16 +452,17 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
             return;
         }
         long start = event.getTime();
-        long newStart = fModel.getStartTime() == SWT.DEFAULT ? start : Long.min(start, fModel.getStartTime());
+        long newStart = getStartTime() == SWT.DEFAULT ? start : Long.min(start, getStartTime());
 
         long end = start + event.getDuration();
-        long newEnd = fModel.getEndTime() == SWT.DEFAULT ? end : Long.max(end, fModel.getEndTime());
+        long newEnd = getEndTime() == SWT.DEFAULT ? end : Long.max(end, getEndTime());
 
         /*
          * Model is immutable, this is the only way to do this, consider not updating
          * bounds in the future?
          */
-        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), getName(), newStart, newEnd, fModel.hasRowModel());
+        fStartTime = newStart;
+        fEndTime = newEnd;
     }
 
     /**
@@ -562,8 +589,22 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
      *
      * @return The underlying time graph entry model
      * @since 4.0
+     * @deprecated Use the {@link #getEntryModel()} instead
      */
+    @Deprecated
     public ITimeGraphEntryModel getModel() {
+        ITmfTreeDataModel model = fModel;
+        return model instanceof ITimeGraphEntryModel ? (ITimeGraphEntryModel) model :
+            new TimeGraphEntryModel(model.getId(), model.getParentId(), getName(), getStartTime(), getEndTime());
+    }
+
+    /**
+     * Getter for the underlying time graph entry model
+     *
+     * @return The underlying time graph entry model
+     * @since 5.0
+     */
+    public @NonNull ITmfTreeDataModel getEntryModel() {
         return fModel;
     }
 
@@ -591,6 +632,22 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
      * @since 4.0
      */
     public void updateModel(@NonNull TimeGraphEntryModel model) {
+        if (fModel.getId() != model.getId()) {
+            throw new IllegalArgumentException("TimeGraphEntry should be updated with a TimeGraphEntryModel with the same id."); //$NON-NLS-1$
+        }
+        fModel = model;
+        fStartTime = model.getStartTime();
+        fEndTime = model.getEndTime();
+    }
+
+    /**
+     * Update the underlying model.
+     *
+     * @param model
+     *            new model for this TimeGraphEntry.
+     * @since 5.0
+     */
+    public void updateModel(@NonNull ITmfTreeDataModel model) {
         if (fModel.getId() != model.getId()) {
             throw new IllegalArgumentException("TimeGraphEntry should be updated with a TimeGraphEntryModel with the same id."); //$NON-NLS-1$
         }

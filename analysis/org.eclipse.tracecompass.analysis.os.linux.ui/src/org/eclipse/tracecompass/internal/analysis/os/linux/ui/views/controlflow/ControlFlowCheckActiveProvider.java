@@ -84,7 +84,7 @@ public final class ControlFlowCheckActiveProvider implements ITimeGraphEntryActi
             }
 
             Set<Long> ids = getActiveIds(cfe, range);
-            return ids.contains(cfe.getModel().getId());
+            return ids.contains(cfe.getEntryModel().getId());
         }
 
         return false;

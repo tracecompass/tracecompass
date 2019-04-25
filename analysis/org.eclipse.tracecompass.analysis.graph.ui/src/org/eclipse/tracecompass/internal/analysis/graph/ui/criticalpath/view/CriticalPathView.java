@@ -29,8 +29,8 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfStartAnalysisSignal;
@@ -89,7 +89,7 @@ public class CriticalPathView extends BaseDataProviderTimeGraphView {
                 return StringUtils.EMPTY;
             }
             TimeGraphEntry entry = (TimeGraphEntry) element;
-            ITimeGraphEntryModel model = entry.getModel();
+            ITmfTreeDataModel model = entry.getEntryModel();
             if (columnIndex == 0) {
                 return entry.getName();
             } else if (columnIndex == 1 && model instanceof CriticalPathEntry) {
@@ -107,8 +107,8 @@ public class CriticalPathView extends BaseDataProviderTimeGraphView {
         @Override
         public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
             if ((o1 instanceof TimeGraphEntry) && (o2 instanceof TimeGraphEntry)) {
-                ITimeGraphEntryModel model1 = ((TimeGraphEntry) o1).getModel();
-                ITimeGraphEntryModel model2 = ((TimeGraphEntry) o2).getModel();
+                ITmfTreeDataModel model1 = ((TimeGraphEntry) o1).getEntryModel();
+                ITmfTreeDataModel model2 = ((TimeGraphEntry) o2).getEntryModel();
                 if (model1 instanceof CriticalPathEntry && model2 instanceof CriticalPathEntry) {
                     return Long.compare(((CriticalPathEntry) model2).getSum(), ((CriticalPathEntry) model1).getSum());
                 }
@@ -155,7 +155,7 @@ public class CriticalPathView extends BaseDataProviderTimeGraphView {
         Table<ITimeGraphDataProvider<?>, Long, TimeGraphEntry> table = HashBasedTable.create();
         for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
             for (TimeGraphEntry entry : Utils.flatten(traceEntry)) {
-                table.put(traceEntry.getProvider(), entry.getModel().getId(), entry);
+                table.put(traceEntry.getProvider(), entry.getEntryModel().getId(), entry);
             }
         }
 

@@ -762,14 +762,14 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
      */
     private static void addEntriesToHierarchicalTree(Iterable<TimeGraphEntry> entryList, TimeGraphEntry traceEntry) {
         traceEntry.clearChildren();
-        Map<Long, TimeGraphEntry> map = Maps.uniqueIndex(entryList, entry -> entry.getModel().getId());
+        Map<Long, TimeGraphEntry> map = Maps.uniqueIndex(entryList, entry -> entry.getEntryModel().getId());
         for (TimeGraphEntry e : entryList) {
             // reset children tree prior to rebuild
             e.clearChildren();
             e.setParent(null);
         }
         for (TimeGraphEntry entry : entryList) {
-            TimeGraphEntry parent = map.get(entry.getModel().getParentId());
+            TimeGraphEntry parent = map.get(entry.getEntryModel().getParentId());
             /*
              * Associate the parent entry only if their time overlap. A child entry may
              * start before its parent, for example at the beginning of the trace if a
@@ -793,7 +793,7 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
         }
         for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
             Iterable<TimeGraphEntry> unfiltered = Utils.flatten(traceEntry);
-            Map<Long, TimeGraphEntry> map = Maps.uniqueIndex(unfiltered, e -> e.getModel().getId());
+            Map<Long, TimeGraphEntry> map = Maps.uniqueIndex(unfiltered, e -> e.getEntryModel().getId());
             // use time -1 as a lower bound for the end of Time events to be included.
             SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(time - 1, time, 2, map.keySet());
             TmfModelResponse<@NonNull List<@NonNull ITimeGraphRowModel>> response = traceEntry.getProvider().fetchRowModel(filter, null);

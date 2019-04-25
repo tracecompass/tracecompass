@@ -33,9 +33,9 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -94,7 +94,7 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
                     .compare(obj1, obj2);
         }
     });
-    private static final Comparator<ITimeGraphEntry> ENTRY_COMPARATOR = Comparator.comparing(x -> (TimeGraphEntryModel) ((TimeGraphEntry) x).getModel(), XML_ENTRY_COMPARATOR);
+    private static final Comparator<ITimeGraphEntry> ENTRY_COMPARATOR = Comparator.comparing(x -> (TimeGraphEntryModel) ((TimeGraphEntry) x).getEntryModel(), XML_ENTRY_COMPARATOR);
 
     private final @NonNull XmlViewInfo fViewInfo = new XmlViewInfo(ID);
     private final Map<String, Integer> fStringValueMap = new HashMap<>();
@@ -196,7 +196,7 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
                     return entry.getName();
                 }
 
-                ITimeGraphEntryModel model = entry.getModel();
+                ITmfTreeDataModel model = entry.getEntryModel();
                 if (model instanceof DataDrivenOutputEntryModel) {
                     DataDrivenOutputEntryModel xmlModel = (DataDrivenOutputEntryModel) model;
                     if (DEFAULT_COLUMN_NAMES[columnIndex].equals(Messages.XmlTimeGraphView_ColumnId)) {
@@ -290,7 +290,7 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
                  * set the correct child / parent relation
                  */
                 for (TimeGraphEntry child : fEntries.row(provider).values()) {
-                    TimeGraphEntry parent = fEntries.get(provider, child.getModel().getParentId());
+                    TimeGraphEntry parent = fEntries.get(provider, child.getEntryModel().getParentId());
                     if (parent != null) {
                         parent.addChild(child);
                     }

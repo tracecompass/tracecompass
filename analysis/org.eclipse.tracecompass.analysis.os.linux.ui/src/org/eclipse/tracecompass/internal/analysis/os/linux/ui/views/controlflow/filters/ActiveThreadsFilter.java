@@ -135,9 +135,9 @@ public class ActiveThreadsFilter extends ViewerFilter {
         Set<Long> activeThreadForTimeRange = fCachedActiveThreadForTimeRange.get(trace);
 
         /* Check if on CPU */
-        if (fCpuRangesBasedFiltering && (onCpusThreadForTimeRange != null) && onCpusThreadForTimeRange.contains(cfe.getModel().getId())) {
+        if (fCpuRangesBasedFiltering && (onCpusThreadForTimeRange != null) && onCpusThreadForTimeRange.contains(cfe.getEntryModel().getId())) {
             return true;
-        } else if ((activeThreadForTimeRange != null) && activeThreadForTimeRange.contains(cfe.getModel().getId())) {
+        } else if ((activeThreadForTimeRange != null) && activeThreadForTimeRange.contains(cfe.getEntryModel().getId())) {
             return true;
         }
 
