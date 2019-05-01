@@ -26,6 +26,7 @@ import com.google.common.collect.Multimap;
  * @author Loic Prieur-Drevon
  */
 public class CriticalPathEntry extends TimeGraphEntryModel implements IElementResolver {
+
     private final Long fSum;
     private final Double fPercent;
     private final @NonNull Multimap<@NonNull String, @NonNull String> fAspects = HashMultimap.create();
@@ -109,6 +110,12 @@ public class CriticalPathEntry extends TimeGraphEntryModel implements IElementRe
     @Override
     public @NonNull Multimap<@NonNull String, @NonNull String> getMetadata() {
         return fAspects;
+    }
+
+    @Override
+    public boolean hasRowModel() {
+        // parent level entries do not have row models
+        return getParentId() != -1L;
     }
 
 }

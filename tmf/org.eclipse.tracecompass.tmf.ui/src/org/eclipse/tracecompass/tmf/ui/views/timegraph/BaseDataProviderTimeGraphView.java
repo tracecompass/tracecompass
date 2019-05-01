@@ -146,6 +146,8 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                             if (uiEntry != null) {
                                 uiEntry.updateModel(entry);
                             } else {
+                                // Do not assume that parentless entries are
+                                // trace entries
                                 uiEntry = new TraceEntry(entry, trace, dataProvider);
                                 fEntries.put(dataProvider, entry.getId(), uiEntry);
                                 addToEntryList(parentTrace, Collections.singletonList(uiEntry));
@@ -180,8 +182,9 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
     }
 
     /**
-     * Class to encapsulate a {@link TimeGraphEntryModel} for the trace level and
-     * the relevant data provider
+     * Class to represent a parent entry, for which we keep a link to the trace
+     * and data provider to avoid having to do so for its children. This type of
+     * entry is otherwise not different from any other time graph entry.
      *
      * @author Loic Prieur-Drevon
      * @since 3.3
@@ -205,11 +208,6 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             super(model);
             fTrace = trace;
             fProvider = provider;
-        }
-
-        @Override
-        public boolean hasTimeEvents() {
-            return false;
         }
 
         /**
@@ -387,10 +385,10 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      * @since 3.3
      */
     protected TimeEvent createTimeEvent(TimeGraphEntry entry, ITimeGraphState state) {
-        if (state.getValue() == Integer.MIN_VALUE) {
+        String label = state.getLabel();
+        if (state.getValue() == Integer.MIN_VALUE && label == null) {
             return new NullTimeEvent(entry, state.getStartTime(), state.getDuration());
         }
-        String label = state.getLabel();
         if (label != null) {
             return new NamedTimeEvent(entry, state.getStartTime(), state.getDuration(), state.getValue(), label, state.getActiveProperties());
         }
