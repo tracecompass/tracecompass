@@ -50,6 +50,14 @@ public class DataDrivenXYProviderFactory implements IDataDrivenRuntimeObject {
         fAnalysisIds = analysisIds;
     }
 
+    /**
+     * Create an XY data provider for a trace
+     *
+     * @param trace
+     *            The trace for which to create the data provider
+     * @return The XY data provider or <code>null</code> if no such provider is
+     *         available for that trace
+     */
     public @Nullable ITmfTreeXYDataProvider<ITmfTreeDataModel> create(ITmfTrace trace) {
 
         Set<@NonNull ITmfAnalysisModuleWithStateSystems> stateSystemModules = new HashSet<>();

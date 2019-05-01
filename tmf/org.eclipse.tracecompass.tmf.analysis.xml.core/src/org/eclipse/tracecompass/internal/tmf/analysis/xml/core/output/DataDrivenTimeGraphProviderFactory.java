@@ -92,7 +92,22 @@ public class DataDrivenTimeGraphProviderFactory implements IDataDrivenRuntimeObj
                 module.getStateSystems().forEach(sss::add);
             }
         }
-        return (sss.isEmpty() ? null : new DataDrivenTimeGraphDataProvider(trace, sss, fEntries, fValues));
+        return (sss.isEmpty() ? null : new DataDrivenTimeGraphDataProvider(trace, sss, fEntries, fValues, null));
+    }
+
+    /**
+     * Create a data provider with state systems already available
+     *
+     * @param trace
+     *            The trace this data provider is associated with
+     * @param stateSystems
+     *            The state systems to use
+     * @param id
+     *            The ID of the data provider to create
+     * @return The data provider
+     */
+    public ITimeGraphDataProvider<TimeGraphEntryModel> create(ITmfTrace trace, List<ITmfStateSystem> stateSystems, String id) {
+        return new DataDrivenTimeGraphDataProvider(trace, stateSystems, fEntries, fValues, id);
     }
 
 }

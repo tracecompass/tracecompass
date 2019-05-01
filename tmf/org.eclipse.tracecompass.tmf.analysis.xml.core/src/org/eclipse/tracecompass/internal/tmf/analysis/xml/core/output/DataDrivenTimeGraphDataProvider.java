@@ -81,6 +81,7 @@ public class DataDrivenTimeGraphDataProvider extends AbstractTmfTraceDataProvide
 
     private final IdGetter fIdGenerator = (ss, quark) -> fBaseQuarkToId.row(ss).computeIfAbsent(quark, s -> sfAtomicId.getAndIncrement());
     private final QuarkCallback fQuarkCallback = (id, ss, quark, dt) -> fIDToDisplayQuark.put(id, new Pair<>(ss, quark));
+    private final String fId;
 
     /**
      * Constructor
@@ -93,12 +94,15 @@ public class DataDrivenTimeGraphDataProvider extends AbstractTmfTraceDataProvide
      *            The entries
      * @param values
      *            The presentation values
+     * @param id
+     *            The ID of the data provider
      */
-    public DataDrivenTimeGraphDataProvider(ITmfTrace trace, List<ITmfStateSystem> stateSystems, List<DataDrivenOutputEntry> entries, List<DataDrivenPresentationState> values) {
+    public DataDrivenTimeGraphDataProvider(ITmfTrace trace, List<ITmfStateSystem> stateSystems, List<DataDrivenOutputEntry> entries, List<DataDrivenPresentationState> values, @Nullable String id) {
         super(trace);
         fSs = stateSystems;
         fEntries = entries;
         fValues = values;
+        fId = (id == null) ? ID : id;
     }
 
     @Override
@@ -129,7 +133,7 @@ public class DataDrivenTimeGraphDataProvider extends AbstractTmfTraceDataProvide
 
     @Override
     public @NonNull String getId() {
-        return ID;
+        return fId;
     }
 
     @Override

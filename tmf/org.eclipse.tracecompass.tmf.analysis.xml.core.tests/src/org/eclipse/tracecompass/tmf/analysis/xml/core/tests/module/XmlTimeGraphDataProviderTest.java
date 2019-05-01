@@ -21,13 +21,19 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.AnalysisCompilationData;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlTimeGraphViewCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlAnalysisModuleSource;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphDataProvider;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphProviderFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.XmlDataProviderManager;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
@@ -42,14 +48,17 @@ import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Element;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 /**
  * Test the XML time graph data provider with a simple test
@@ -230,6 +239,44 @@ public class XmlTimeGraphDataProviderTest {
             // The CPU entry does not have entries
             expectedStrings.remove(0);
             assertRows(timeGraphProvider, tree, expectedStrings);
+
+        } finally {
+            trace.dispose();
+            TmfTraceManager.getInstance().traceClosed(new TmfTraceClosedSignal(this, trace));
+        }
+
+    }
+
+    /**
+     * Test the {@link DataDrivenTimeGraphProviderFactory} class
+     */
+    @Test
+    public void testFactory() {
+        ITmfTrace trace = getTrace();
+        assertNotNull(trace);
+        try {
+            runModule(trace);
+            // Get the view element from the file
+            Element viewElement = TmfXmlUtils.getElementInFile(TmfXmlTestFiles.DATA_PROVIDER_SIMPLE_FILE.getPath().toOSString(), TmfXmlStrings.TIME_GRAPH_VIEW, TIME_GRAPH_VIEW_ID);
+            assertNotNull(viewElement);
+
+            TmfXmlTimeGraphViewCu tgViewCu = TmfXmlTimeGraphViewCu.compile(new AnalysisCompilationData(), viewElement);
+            assertNotNull(tgViewCu);
+            DataDrivenTimeGraphProviderFactory timeGraphFactory = tgViewCu.generate();
+
+            // Test the factory with a simple trace
+            ITimeGraphDataProvider<@NonNull TimeGraphEntryModel> provider = timeGraphFactory.create(trace);
+            assertNotNull(provider);
+            assertEquals(DataDrivenTimeGraphDataProvider.ID, provider.getId());
+
+            // Test the factory with an ID and state system
+            ITmfAnalysisModuleWithStateSystems module = TmfTraceUtils.getAnalysisModuleOfClass(trace, ITmfAnalysisModuleWithStateSystems.class, ANALYSIS_ID);
+            assertNotNull(module);
+            Iterable<@NonNull ITmfStateSystem> stateSystems = module.getStateSystems();
+            assertNotNull(stateSystems);
+            provider = timeGraphFactory.create(trace, Objects.requireNonNull(Lists.newArrayList(stateSystems)), ANALYSIS_ID);
+            assertNotNull(provider);
+            assertEquals(ANALYSIS_ID, provider.getId());
 
         } finally {
             trace.dispose();
