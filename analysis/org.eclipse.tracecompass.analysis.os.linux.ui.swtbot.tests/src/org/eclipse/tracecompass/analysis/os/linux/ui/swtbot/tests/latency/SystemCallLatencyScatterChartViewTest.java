@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Ericsson
+ * Copyright (c) 2016, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -15,8 +15,6 @@ package org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests.latency;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
@@ -61,25 +59,14 @@ public class SystemCallLatencyScatterChartViewTest extends XYDataProviderBaseTes
      * should be empty.
      *
      * TODO: Test the data
-     *
-     * @throws NoSuchMethodException
-     *             Reflection exception should not happen
-     * @throws SecurityException
-     *             Reflection exception should not happen
-     * @throws IllegalAccessException
-     *             Reflection exception should not happen
-     * @throws IllegalArgumentException
-     *             Reflection exception should not happen
-     * @throws InvocationTargetException
-     *             Reflection exception should not happen
      */
     @Test
-    public void testWithTrace() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    public void testWithTrace() {
         // Wait for analysis to finish.
         WaitUtils.waitForJobs();
-        IViewPart viewSite = getSWTBotView().getViewReference().getView(true);
-        assertTrue(viewSite instanceof SystemCallLatencyScatterView);
-        final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewSite);
+        IViewPart viewPart = getSWTBotView().getViewReference().getView(true);
+        assertTrue(viewPart instanceof SystemCallLatencyScatterView);
+        final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewPart);
         assertNotNull(chartViewer);
         fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
 

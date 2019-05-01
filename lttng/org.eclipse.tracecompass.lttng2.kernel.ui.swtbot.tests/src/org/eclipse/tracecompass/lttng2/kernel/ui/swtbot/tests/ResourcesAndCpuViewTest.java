@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Ericsson
+ * Copyright (c) 2016, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,8 +12,6 @@ package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.RGB;
@@ -129,23 +127,12 @@ public class ResourcesAndCpuViewTest extends XYDataProviderBaseTest {
 
     /**
      * Simple test to check the CPU Usage view after getting signals.
-     *
-     * @throws NoSuchMethodException
-     *             Reflection exception should not happen
-     * @throws SecurityException
-     *             Reflection exception should not happen
-     * @throws IllegalAccessException
-     *             Reflection exception should not happen
-     * @throws IllegalArgumentException
-     *             Reflection exception should not happen
-     * @throws InvocationTargetException
-     *             Reflection exception should not happen
      */
     @Test
-    public void testCpuView() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        IViewPart viewSite = getSWTBotView().getViewReference().getView(true);
-        assertTrue(viewSite instanceof CpuUsageView);
-        final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewSite);
+    public void testCpuView() {
+        IViewPart viewPart = getSWTBotView().getViewReference().getView(true);
+        assertTrue(viewPart instanceof CpuUsageView);
+        final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewPart);
         assertNotNull(chartViewer);
         fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
 
@@ -214,26 +201,15 @@ public class ResourcesAndCpuViewTest extends XYDataProviderBaseTest {
     /**
      * Test that the reset time range button resets the time range for both the CPU
      * view and the Resources view.
-     *
-     * @throws NoSuchMethodException
-     *             Reflection exception should not happen
-     * @throws SecurityException
-     *             Reflection exception should not happen
-     * @throws IllegalAccessException
-     *             Reflection exception should not happen
-     * @throws IllegalArgumentException
-     *             Reflection exception should not happen
-     * @throws InvocationTargetException
-     *             Reflection exception should not happen
      */
     @Test
-    public void testResetTimeRange() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    public void testResetTimeRange() {
         ITmfTrace activeTrace = TmfTraceManager.getInstance().getActiveTrace();
         assertNotNull(activeTrace);
 
-        IViewPart viewSite = getSWTBotView().getViewReference().getView(true);
-        assertTrue(viewSite instanceof CpuUsageView);
-        final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewSite);
+        IViewPart viewPart = getSWTBotView().getViewReference().getView(true);
+        assertTrue(viewPart instanceof CpuUsageView);
+        final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewPart);
         assertNotNull(chartViewer);
 
         IWorkbenchPart part = fResourcesViewBot.getViewReference().getPart(false);

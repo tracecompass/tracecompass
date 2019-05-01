@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,8 +12,6 @@ package org.eclipse.tracecompass.analysis.counters.ui.swtbot.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Widget;
@@ -37,7 +35,7 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
-import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IViewPart;
 import org.junit.Test;
 
 /**
@@ -130,20 +128,9 @@ public class CounterViewPinAndCloneTest extends XYDataProviderBaseTest {
 
     /**
      * Test the behavior with two traces.
-     *
-     * @throws NoSuchMethodException
-     *             Reflection exception should not happen
-     * @throws SecurityException
-     *             Reflection exception should not happen
-     * @throws IllegalAccessException
-     *             Reflection exception should not happen
-     * @throws IllegalArgumentException
-     *             Reflection exception should not happen
-     * @throws InvocationTargetException
-     *             Reflection exception should not happen
      */
     @Test
-    public void testPinTwoTraces() throws InvocationTargetException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException {
+    public void testPinTwoTraces() {
         SWTBotView originalViewBot = getSWTBotView();
 
         ITmfTrace activeTrace = TmfTraceManager.getInstance().getActiveTrace();
@@ -200,10 +187,9 @@ public class CounterViewPinAndCloneTest extends XYDataProviderBaseTest {
         SWTBotUtils.activateEditor(fBot, kernelTestTrace.getName());
         assertOriginalViewTitle(PINNED_TO_TRACE_COUNTERS_VIEW_TITLE);
 
-        IWorkbenchPart part = originalViewBot.getViewReference().getPart(false);
-        assertTrue(part instanceof TmfChartView);
-        TmfChartView viewSite = (TmfChartView) part;
-        final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewSite);
+        IViewPart viewPart = originalViewBot.getViewReference().getView(false);
+        assertTrue(viewPart instanceof TmfChartView);
+        final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewPart);
         assertNotNull(chartViewer);
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, RANGE, kernelTrace));
 
@@ -231,20 +217,9 @@ public class CounterViewPinAndCloneTest extends XYDataProviderBaseTest {
 
     /**
      * Test the cloning feature.
-     *
-     * @throws NoSuchMethodException
-     *             Reflection exception should not happen
-     * @throws SecurityException
-     *             Reflection exception should not happen
-     * @throws IllegalAccessException
-     *             Reflection exception should not happen
-     * @throws IllegalArgumentException
-     *             Reflection exception should not happen
-     * @throws InvocationTargetException
-     *             Reflection exception should not happen
      */
     @Test
-    public void testCloneSingleTrace() throws InvocationTargetException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException {
+    public void testCloneSingleTrace() {
         SWTBotView originalViewBot = getSWTBotView();
         SWTBotMenu cloneMenu = originalViewBot.viewMenu().menu(NEW_COUNTER_STACK_MENU);
 
@@ -276,10 +251,9 @@ public class CounterViewPinAndCloneTest extends XYDataProviderBaseTest {
 
         // Assert that the cloned trace's window range did not change
         SWTBotUtils.activateEditor(fBot, cloneTrace.getName() + CLONED_TRACE_SUFFIX);
-        IWorkbenchPart part = clonedView.getViewReference().getPart(false);
-        assertTrue(part instanceof TmfChartView);
-        TmfChartView viewSite = (TmfChartView) part;
-        final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewSite);
+        IViewPart viewPart = clonedView.getViewReference().getView(false);
+        assertTrue(viewPart instanceof TmfChartView);
+        final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewPart);
         assertNotNull(chartViewer);
 
         fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));

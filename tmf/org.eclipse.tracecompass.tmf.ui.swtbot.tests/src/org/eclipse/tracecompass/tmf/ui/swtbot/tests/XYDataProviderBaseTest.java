@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017, 2018 Ericsson
+ * Copyright (c) 2017, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,8 +14,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -216,32 +214,17 @@ public abstract class XYDataProviderBaseTest {
     }
 
     /**
-     * Gets the ChartViewer from a IViewPart
+     * Gets the ChartViewer from a TmfChartView
      *
-     * @param viewSite
+     * @param viewPart
      *            The IViewPart
      * @return The ChartViewer from the IViewPart
-     *
-     * @throws NoSuchMethodException
-     *             Reflection exception should not happen
-     * @throws SecurityException
-     *             Reflection exception should not happen
-     * @throws IllegalAccessException
-     *             Reflection exception should not happen
-     * @throws IllegalArgumentException
-     *             Reflection exception should not happen
-     * @throws InvocationTargetException
-     *             Reflection exception should not happen
      */
-    protected static TmfXYChartViewer getChartViewer(IViewPart viewSite)
-            throws NoSuchMethodException, SecurityException, IllegalAccessException,
-            IllegalArgumentException, InvocationTargetException {
-
-        TmfChartView chartView = (TmfChartView) viewSite;
-        Method viewer = TmfChartView.class.getDeclaredMethod("getChartViewer");
-        viewer.setAccessible(true);
-        TmfXYChartViewer chartViewer = (TmfXYChartViewer) viewer.invoke(chartView);
-        return chartViewer;
+    protected static TmfXYChartViewer getChartViewer(IViewPart viewPart) {
+        if (viewPart instanceof TmfChartView) {
+            return ((TmfChartView) viewPart).getChartViewer();
+        }
+        return null;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,7 +14,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -72,16 +71,6 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
      * should not be any activity. Then, we move to a time range where there are
      * write activity. Afterward, we test the zoom
      *
-     * @throws NoSuchMethodException
-     *             Reflection exception should not happen
-     * @throws SecurityException
-     *             Reflection exception should not happen
-     * @throws IllegalAccessException
-     *             Reflection exception should not happen
-     * @throws IllegalArgumentException
-     *             Reflection exception should not happen
-     * @throws InvocationTargetException
-     *             Reflection exception should not happen
      * @throws URISyntaxException
      *             if this URL is not formatted strictly according to to RFC2396 and
      *             cannot be converted to a URI.
@@ -89,12 +78,12 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
      *             if an error occurs during the conversion
      */
     @Test
-    public void testDiskView() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, URISyntaxException, IOException {
+    public void testDiskView() throws URISyntaxException, IOException {
         // Wait for analysis to finish.
         WaitUtils.waitForJobs();
-        IViewPart viewSite = getSWTBotView().getViewReference().getView(true);
-        assertTrue(viewSite instanceof DiskIOActivityView);
-        final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewSite);
+        IViewPart viewPart = getSWTBotView().getViewReference().getView(true);
+        assertTrue(viewPart instanceof DiskIOActivityView);
+        final TmfCommonXAxisChartViewer chartViewer = (TmfCommonXAxisChartViewer) getChartViewer(viewPart);
         assertNotNull(chartViewer);
         fBot.waitUntil(ConditionHelpers.xyViewerIsReadyCondition(chartViewer));
 

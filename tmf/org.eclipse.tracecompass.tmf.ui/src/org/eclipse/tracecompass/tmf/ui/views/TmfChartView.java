@@ -117,8 +117,9 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
      * Returns the TMF XY chart viewer implementation.
      *
      * @return the TMF XY chart viewer {@link TmfXYChartViewer}
+     * @since 5.0
      */
-    protected TmfXYChartViewer getChartViewer() {
+    public TmfXYChartViewer getChartViewer() {
         return fChartViewer;
     }
 
@@ -126,9 +127,9 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
      * Returns the left TMF viewer implementation.
      *
      * @return the left TMF viewer {@link TmfViewer}
-     * @since 3.1
+     * @since 5.0
      */
-    protected TmfViewer getLeftChildViewer() {
+    public TmfViewer getLeftChildViewer() {
         return fTmfViewer;
     }
 

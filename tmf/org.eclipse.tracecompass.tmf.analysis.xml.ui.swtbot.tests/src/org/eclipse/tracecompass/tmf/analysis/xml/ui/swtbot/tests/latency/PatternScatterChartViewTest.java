@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,15 +14,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
-import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
-import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternScatterGraphView;
@@ -30,9 +24,6 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
-import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IViewReference;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.swtchart.Chart;
@@ -52,45 +43,20 @@ public class PatternScatterChartViewTest extends PatternLatencyViewTestBase {
     private static final String VIEW_TITLE = "Latency vs Time";
     private Chart fScatterChart;
 
-    private TmfXYChartViewer getChartViewer() throws NoSuchMethodException, SecurityException, IllegalAccessException,
-            IllegalArgumentException, InvocationTargetException {
+    private TmfXYChartViewer getChartViewer() {
         SWTBotView viewBot = fBot.viewById(VIEW_ID);
-        final IViewReference viewReference = viewBot.getViewReference();
-        IViewPart viewPart = UIThreadRunnable.syncExec(new Result<IViewPart>() {
-            @Override
-            public IViewPart run() {
-                return viewReference.getView(true);
-            }
-        });
-        assertNotNull(viewPart);
-        assertTrue("Could not instanciate view", viewPart instanceof PatternScatterGraphView);
-        TmfChartView chartView = (TmfChartView) viewPart;
-        Method viewer = TmfChartView.class.getDeclaredMethod("getChartViewer");
-        viewer.setAccessible(true);
-        TmfXYChartViewer chartViewer = (TmfXYChartViewer) viewer.invoke(chartView);
-
-        fScatterChart = viewBot.bot().widget(WidgetOfType.widgetOfType(Chart.class));
-        assertNotNull(fScatterChart);
+        PatternScatterGraphView viewPart = (PatternScatterGraphView) viewBot.getViewReference().getView(true);
+        TmfXYChartViewer chartViewer = viewPart.getChartViewer();
+        fScatterChart = chartViewer.getSwtChart();
         return chartViewer;
     }
 
     /**
      * Test the pattern latency scatter graph. This method test if the chart has one
      * series and the series has data
-     *
-     * @throws NoSuchMethodException
-     *             Reflection exception should not happen
-     * @throws SecurityException
-     *             Reflection exception should not happen
-     * @throws IllegalAccessException
-     *             Reflection exception should not happen
-     * @throws IllegalArgumentException
-     *             Reflection exception should not happen
-     * @throws InvocationTargetException
-     *             Reflection exception should not happen
      */
     @Test
-    public void testWithTrace() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    public void testWithTrace() {
 
         // Get the chart viewer and wait for the view to be ready
         WaitUtils.waitForJobs();
