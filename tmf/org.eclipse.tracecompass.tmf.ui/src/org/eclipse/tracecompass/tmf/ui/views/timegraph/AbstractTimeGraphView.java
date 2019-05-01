@@ -2658,7 +2658,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     private void setGlobalRegexFilter(Collection<@NonNull String> regexes) {
         fGlobalFilter = regexes;
-        globalFilterUpdated();
+        // Make sure the update is done in the UI thread
+        Display.getDefault().asyncExec(() -> globalFilterUpdated());
     }
 
     /**
