@@ -49,13 +49,11 @@ import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
-import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
@@ -391,7 +389,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         if (!predicates.isEmpty()) {
 
             // Get the filter external input data
-            Multimap<@NonNull String, @NonNull String> input = getFilterInput(segment);
+            Multimap<@NonNull String, @NonNull String> input = ISegmentStoreProvider.getFilterInput(fProvider, segment);
 
             // Test each predicates and set the status of the property associated to the
             // predicate
@@ -414,17 +412,6 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         } else {
             series.addPoint(segment.getStart(), segment.getLength(), 0);
         }
-    }
-
-    private Multimap<String, String> getFilterInput(ISegment segment) {
-        Multimap<String, String> map = HashMultimap.create();
-        for(ISegmentAspect aspect : fProvider.getSegmentAspects()) {
-            Object resolve = aspect.resolve(segment);
-            if (resolve != null) {
-                map.put(aspect.getName(), String.valueOf(resolve));
-            }
-        }
-        return map;
     }
 
     private static class Series {
