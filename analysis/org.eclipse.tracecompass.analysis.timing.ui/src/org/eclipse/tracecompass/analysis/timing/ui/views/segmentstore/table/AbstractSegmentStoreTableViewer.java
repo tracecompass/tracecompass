@@ -337,7 +337,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
                 for (Map.Entry<Integer, Predicate<Map<String, String>>> mapEntry : predicates.entrySet()) {
                     Integer property = Objects.requireNonNull(mapEntry.getKey());
                     Predicate<Map<String, String>> value = Objects.requireNonNull(mapEntry.getValue());
-                    if (property == IFilterProperty.DIMMED | property == IFilterProperty.EXCLUDE) {
+                    if (property == IFilterProperty.DIMMED || property == IFilterProperty.EXCLUDE) {
                         boolean status = value.test(input);
                         activateProperty |= status;
                     }
