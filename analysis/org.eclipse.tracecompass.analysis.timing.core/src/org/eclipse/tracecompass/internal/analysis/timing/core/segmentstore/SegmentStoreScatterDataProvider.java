@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
@@ -39,6 +40,7 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.SeriesModel;
+import org.eclipse.tracecompass.tmf.core.model.SeriesModel.SeriesModelBuilder;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
@@ -46,9 +48,9 @@ import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
+import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
-import org.eclipse.tracecompass.tmf.core.model.xy.TmfXYAxis;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
@@ -61,7 +63,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
@@ -356,8 +357,13 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             addPoint(thisSeries, segment, predicates, monitor);
         }
 
+        Map<String, ISeriesModel> seriesModelMap = new HashMap<>();
+        for (Entry<String, Series> entry : types.entrySet()) {
+            SeriesModel seriesModel = entry.getValue().build();
+            seriesModelMap.put(Long.toString(seriesModel.getId()), seriesModel);
+        }
         return TmfXyResponseFactory.create(Objects.requireNonNull(Messages.SegmentStoreScatterGraphViewer_title),
-                Maps.transformValues(types, Series::build), complete);
+                seriesModelMap, complete);
     }
 
     private static String getSegmentName(ISegment segment) {
@@ -442,7 +448,9 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         }
 
         public SeriesModel build() {
-            return new SeriesModel(getId(), getName(), Longs.toArray(fXValues), Doubles.toArray(fYValues), new TmfXYAxis("X Axis", ""), new TmfXYAxis("Y Axis", ""), Ints.toArray(fProperties));
+            SeriesModelBuilder builder = new SeriesModel.SeriesModelBuilder(getId(), getName(), Longs.toArray(fXValues), Doubles.toArray(fYValues));
+            builder.setProperties(Ints.toArray(fProperties)).build();
+            return builder.setProperties(Ints.toArray(fProperties)).build();
         }
 
         private long getId() {

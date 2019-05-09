@@ -23,6 +23,27 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 public interface ISeriesModel {
 
     /**
+     * Series data type
+     *
+     * @author Simon Delisle
+     * @since 5.0
+     */
+    public enum DisplayType {
+        /**
+         * Line
+         */
+        LINE,
+        /**
+         * Scatter
+         */
+        SCATTER,
+        /**
+         * Area
+         */
+        AREA
+    }
+
+    /**
      * Get the unique ID for the entry associated to this series.
      *
      * @return the unique ID.
@@ -76,6 +97,16 @@ public interface ISeriesModel {
      */
     default double[] getYValues() {
         return getData();
+    }
+
+    /**
+     * Get the display type
+     *
+     * @return Type of display (eg. line, scatter, ...)
+     * @since 5.0
+     */
+    default DisplayType getDisplayType() {
+        return DisplayType.LINE;
     }
 
     /**

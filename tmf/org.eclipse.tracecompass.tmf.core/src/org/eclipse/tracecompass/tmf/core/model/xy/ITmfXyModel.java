@@ -49,7 +49,8 @@ public interface ITmfXyModel {
     /**
      * Get the collection of {@link ISeriesModel}
      *
-     * @return the collection of series data.
+     * @return Map of series data where the key is the unique id of the
+     *         associated series
      */
     Map<String, ISeriesModel> getData();
 

@@ -149,14 +149,14 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
             double[] y = new double[n];
             Arrays.setAll(y, values::get);
             String totalName = getTrace().getName() + '/' + Messages.HistogramDataProvider_Total;
-            builder.put(totalName, new YModel(fTotalId, totalName, y));
+            builder.put(Long.toString(fTotalId), new YModel(fTotalId, totalName, y));
         }
 
         ITmfStateSystem eventsSs = fModule.getStateSystem(TmfStatisticsEventTypesModule.ID);
         if (selected.contains(fLostId) && eventsSs != null) {
             try {
                 YModel series = getLostEvents(eventsSs, xValues);
-                builder.put(series.getName(), series);
+                builder.put(Long.toString(series.getId()), series);
             } catch (StateSystemDisposedException e) {
                 return TmfXyResponseFactory.createFailedResponse(CommonStatusMessage.STATE_SYSTEM_FAILED);
             }

@@ -69,6 +69,9 @@ public class SeriesModel implements ISeriesModel {
     @SerializedName("yAxis")
     private final TmfXYAxis fYAxis;
 
+    @SerializedName("dataType")
+    private final DisplayType fDisplayType;
+
     @SerializedName("properties")
     private final int[] fProperties;
 
@@ -86,7 +89,7 @@ public class SeriesModel implements ISeriesModel {
      * @since 4.2
      */
     public SeriesModel(long id, String name, long[] xValues, double[] yValues) {
-        this(id, name, xValues, yValues, new TmfXYAxis(DEFAULT_XAXIS_NAME, DEFAULT_XAXIS_UNIT), new TmfXYAxis(DEFAULT_YAXIS_NAME, DEFAULT_YAXIS_UNIT), new int[xValues.length]);
+        this(id, name, xValues, yValues, new TmfXYAxis(DEFAULT_XAXIS_NAME, DEFAULT_XAXIS_UNIT), new TmfXYAxis(DEFAULT_YAXIS_NAME, DEFAULT_YAXIS_UNIT), DisplayType.LINE, new int[xValues.length]);
     }
 
     /**
@@ -104,9 +107,11 @@ public class SeriesModel implements ISeriesModel {
      *            The properties values for this series. Some priority values
      *            are available in {@link IFilterProperty}
      * @since 4.2
+     * @deprecated Use {@link SeriesModelBuilder}
      */
+    @Deprecated
     public SeriesModel(long id, String name, long[] xValues, double[] yValues, int[] properties) {
-        this(id, name, xValues, yValues, new TmfXYAxis(DEFAULT_XAXIS_NAME, DEFAULT_XAXIS_UNIT), new TmfXYAxis(DEFAULT_YAXIS_NAME, DEFAULT_YAXIS_UNIT), properties);
+        this(id, name, xValues, yValues, new TmfXYAxis(DEFAULT_XAXIS_NAME, DEFAULT_XAXIS_UNIT), new TmfXYAxis(DEFAULT_YAXIS_NAME, DEFAULT_YAXIS_UNIT), DisplayType.LINE, properties);
     }
 
     /**
@@ -124,18 +129,20 @@ public class SeriesModel implements ISeriesModel {
      *            X Axis description
      * @param yAxis
      *            Y Axis description
+     * @param displayType
+     *            Display type
      * @param properties
      *            The properties values for this series. Some priority values
      *            are available in {@link IFilterProperty}
-     * @since 5.0
      */
-    public SeriesModel(long id, String name, long[] xValues, double[] yValues, TmfXYAxis xAxis, TmfXYAxis yAxis, int[] properties) {
+    private SeriesModel(long id, String name, long[] xValues, double[] yValues, TmfXYAxis xAxis, TmfXYAxis yAxis, DisplayType displayType, int[] properties) {
         fId = id;
         fName = name;
         fXValues = xValues;
         fYValues = yValues;
         fXAxis = xAxis;
         fYAxis = yAxis;
+        fDisplayType = displayType;
         fProperties = properties;
     }
 
@@ -167,6 +174,11 @@ public class SeriesModel implements ISeriesModel {
     @Override
     public TmfXYAxis getYAxisDescription() {
         return fYAxis;
+    }
+
+    @Override
+    public DisplayType getDisplayType() {
+        return fDisplayType;
     }
 
     @Override
@@ -209,5 +221,102 @@ public class SeriesModel implements ISeriesModel {
     @Override
     public int hashCode() {
         return Objects.hash(fId, fName, fXValues, fYValues, fXAxis, fYAxis);
+    }
+
+    /**
+     * Series model builder
+     *
+     * @author Simon Delisle
+     * @since 5.0
+     */
+    public static class SeriesModelBuilder {
+        private final long id;
+        private final String name;
+        private final long[] xValues;
+        private final double[] yValues;
+        private @Nullable TmfXYAxis xAxis;
+        private @Nullable TmfXYAxis yAxis;
+        private @Nullable DisplayType displayType;
+        private int @Nullable [] properties;
+
+        /**
+         * Constructor
+         *
+         * @param id
+         *            The unique ID of the associated entry
+         * @param name
+         *            The name of the series
+         * @param xValues
+         *            The x values of this series
+         * @param yValues
+         *            The y values of this series
+         */
+        public SeriesModelBuilder(long id, String name, long[] xValues, double[] yValues) {
+            this.id = id;
+            this.name = name;
+            this.xValues = xValues;
+            this.yValues = yValues;
+        }
+
+        /**
+         * Add X axis description
+         *
+         * @param axis
+         *            Axis description
+         * @return {@link SeriesModelBuilder}
+         */
+        public SeriesModelBuilder xAxisDescription(TmfXYAxis axis) {
+            this.xAxis = axis;
+            return this;
+        }
+
+        /**
+         * Add Y axis description
+         *
+         * @param axis
+         *            Axis description
+         * @return {@link SeriesModelBuilder}
+         */
+        public SeriesModelBuilder yAxisDescription(TmfXYAxis axis) {
+            this.yAxis = axis;
+            return this;
+        }
+
+        /**
+         * Set the display type
+         *
+         * @param type
+         *            Display type
+         * @return {@link SeriesModelBuilder}
+         */
+        public SeriesModelBuilder seriesDisplayType(DisplayType type) {
+            this.displayType = type;
+            return this;
+        }
+
+        /**
+         * Set the properties
+         *
+         * @param properties
+         *            Properties
+         * @return {@link SeriesModelBuilder}
+         */
+        public SeriesModelBuilder setProperties(int[] properties) {
+            this.properties = properties;
+            return this;
+        }
+
+        /**
+         * Build a {@link SeriesModel}
+         *
+         * @return {@link SeriesModel}
+         */
+        public SeriesModel build() {
+            return new SeriesModel(id, name, xValues, yValues,
+                    xAxis != null ? xAxis : new TmfXYAxis(DEFAULT_XAXIS_NAME, DEFAULT_XAXIS_UNIT),
+                    yAxis != null ? yAxis : new TmfXYAxis(DEFAULT_YAXIS_NAME, DEFAULT_YAXIS_UNIT),
+                    displayType != null ? displayType : DisplayType.LINE,
+                    properties != null ? properties : new int[xValues.length]);
+        }
     }
 }

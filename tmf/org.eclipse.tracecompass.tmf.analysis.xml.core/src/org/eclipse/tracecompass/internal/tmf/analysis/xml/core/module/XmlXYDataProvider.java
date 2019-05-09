@@ -279,7 +279,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         }
 
         boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
-        return TmfXyResponseFactory.create(TITLE, xValues, Maps.uniqueIndex(map.values(), IYModel::getName), complete);
+        return TmfXyResponseFactory.create(TITLE, xValues, Maps.uniqueIndex(map.values(), yModel -> Long.toString(yModel.getId())), complete);
     }
 
     private Map<Integer, IYModel> initSeries(Map<String, Object> parameters) {

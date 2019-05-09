@@ -19,6 +19,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -179,7 +180,15 @@ public class XmlXyDataProviderTest {
             String expectedString = expectedStrings.get(i);
             String[] split = expectedString.split(":");
             String rowName = split[0];
-            ISeriesModel row = data.get(rowName);
+            String rowId = null;
+            for (Entry<Long, String> entry : tree.entrySet()) {
+                if (entry.getValue().equals(rowName)) {
+                    rowId = Long.toString(entry.getKey());
+                    break;
+                }
+            }
+            assertNotNull(rowId);
+            ISeriesModel row = data.get(rowId);
             assertNotNull(row);
 
             String[] expectedData = split[1].split(",");
