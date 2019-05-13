@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -96,7 +97,9 @@ public final class ControlFlowCheckActiveProvider implements ITimeGraphEntryActi
             return fActive;
         }
         TimeQueryFilter filter = new TimeQueryFilter(range.getStartTime().toNanos(), range.getEndTime().toNanos(), 2);
-        TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> response = ((ThreadStatusDataProvider) dataProvider).fetchTree(FetchParametersUtils.timeQueryToMap(filter), null);
+        Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        parameters.put(ThreadStatusDataProvider.ACTIVE_THREAD_FILTER_KEY, true);
+        TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> response = ((ThreadStatusDataProvider) dataProvider).fetchTree(parameters, null);
         TmfTreeModel<@NonNull ThreadEntryModel> model = response.getModel();
         if (model == null) {
             // query must have failed, return empty and don't invalidate the cache.

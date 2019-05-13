@@ -173,7 +173,9 @@ public class ActiveThreadsFilter extends ViewerFilter {
             }
         }
         TimeQueryFilter filter = new SelectionTimeQueryFilter(beginTS, endTS, 2, cpus);
-        TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> response = threadStatusProvider.fetchTree(FetchParametersUtils.timeQueryToMap(filter), null);
+        Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        parameters.put(ThreadStatusDataProvider.ACTIVE_THREAD_FILTER_KEY, true);
+        TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> response = threadStatusProvider.fetchTree(parameters, null);
         TmfTreeModel<@NonNull ThreadEntryModel> model = response.getModel();
 
         if (model == null) {
@@ -196,7 +198,9 @@ public class ActiveThreadsFilter extends ViewerFilter {
         long endTS = winRange.getEndTime().getValue();
 
         TimeQueryFilter filter = new TimeQueryFilter(beginTS, endTS, 2);
-        TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> response = threadStatusProvider.fetchTree(FetchParametersUtils.timeQueryToMap(filter), null);
+        Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        parameters.put(ThreadStatusDataProvider.ACTIVE_THREAD_FILTER_KEY, true);
+        TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> response = threadStatusProvider.fetchTree(parameters, null);
         TmfTreeModel<@NonNull ThreadEntryModel> model = response.getModel();
 
         if (model == null) {

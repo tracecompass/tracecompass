@@ -89,6 +89,12 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
      */
     public static final @NonNull String CPU = "cpu"; //$NON-NLS-1$
 
+    /**
+     * Parameter key used when the thread tree should be filtered by active
+     * thread
+     */
+    public static final @NonNull String ACTIVE_THREAD_FILTER_KEY = "active_thread_filter_key"; //$NON-NLS-1$
+
     private static final String WILDCARD = "*"; //$NON-NLS-1$
     private static final Set<Integer> ACTIVE_STATES = ImmutableSet.of(StateValues.PROCESS_STATUS_RUN_USERMODE,
             StateValues.PROCESS_STATUS_RUN_SYSCALL, StateValues.PROCESS_STATUS_INTERRUPTED);
@@ -297,8 +303,8 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
         }
 
         // avoid putting everything as a child of the swapper thread.
-        // TODO server: Need to find a better way. Long.MAX_VALUE is not available in javascript for example
-        if (filter.getEnd() == Long.MAX_VALUE) {
+        Boolean isActiveFilter = DataProviderParameterUtils.extractBoolean(parameters, ACTIVE_THREAD_FILTER_KEY);
+        if (isActiveFilter == null || !isActiveFilter) {
             ImmutableList.Builder<ThreadEntryModel> builder = ImmutableList.builder();
             for (ThreadEntryModel.Builder entryBuilder : tidToEntry.values()) {
                 builder.add(build(entryBuilder));
