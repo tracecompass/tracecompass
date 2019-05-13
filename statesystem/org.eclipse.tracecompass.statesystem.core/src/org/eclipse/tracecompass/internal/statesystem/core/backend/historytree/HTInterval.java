@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2012, 2019 Ericsson, École Polytechnique de Montréal
  * Copyright (c) 2010, 2011 Alexandre Montplaisir <alexandre.montplaisir@gmail.com>
  *
  * All rights reserved. This program and the accompanying materials are
@@ -51,10 +51,10 @@ public final class HTInterval implements ITmfStateInterval {
     private static final byte TYPE_DOUBLE = 3;
     private static final byte TYPE_CUSTOM = 20;
 
-    private final long start;
-    private final long end;
-    private final int attribute;
-    private final @Nullable Object sv;
+    private final long fStart;
+    private final long fDuration;
+    private final int fAttribute;
+    private final @Nullable Object fStateValue;
 
     /** Number of bytes used by this interval when it is written to disk */
     private final int fSizeOnDisk;
@@ -80,34 +80,34 @@ public final class HTInterval implements ITmfStateInterval {
             throw new TimeRangeException("Start:" + intervalStart + ", End:" + intervalEnd); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        this.start = intervalStart;
-        this.end = intervalEnd;
-        this.attribute = attribute;
-        this.sv = (value instanceof TmfStateValue) ? ((ITmfStateValue) value).unboxValue() : value;
-        this.fSizeOnDisk = computeSizeOnDisk(sv);
+        fStart = intervalStart;
+        fDuration = intervalEnd - intervalStart;
+        fAttribute = attribute;
+        fStateValue = (value instanceof TmfStateValue) ? ((ITmfStateValue) value).unboxValue() : value;
+        fSizeOnDisk = computeSizeOnDisk(fStateValue);
     }
 
     /**
      * Compute how much space (in bytes) an interval will take in its serialized
      * form on disk. This is dependent on its state value.
      */
-    private static int computeSizeOnDisk(Object sv) {
+    private int computeSizeOnDisk(Object stateValue) {
         /*
-         * Minimum size is 2x long (start and end), 1x int (attribute) and 1x
+         * Minimum size is 1x long (start), a value determined by HTVarInt (duration), 1x int (attribute) and 1x
          * byte (value type).
          */
-        int minSize = Long.BYTES + Long.BYTES + Integer.BYTES + Byte.BYTES;
+        int minSize = Long.BYTES + HTVarInt.getEncodedLengthLong(fDuration) + Integer.BYTES + Byte.BYTES;
 
-        if (sv == null) {
+        if (stateValue == null) {
             return minSize;
-        } else if (sv instanceof Integer) {
+        } else if (stateValue instanceof Integer) {
             return (minSize + Integer.BYTES);
-        } else if (sv instanceof Long) {
+        } else if (stateValue instanceof Long) {
             return (minSize + Long.BYTES);
-        } else if (sv instanceof Double) {
+        } else if (stateValue instanceof Double) {
             return (minSize + Double.BYTES);
-        } else if (sv instanceof String) {
-            String str = (String) sv;
+        } else if (stateValue instanceof String) {
+            String str = (String) stateValue;
             int strLength = str.getBytes(CHARSET).length;
 
             if (strLength > Short.MAX_VALUE) {
@@ -118,9 +118,9 @@ public final class HTInterval implements ITmfStateInterval {
              * String's length + 3 (2 bytes for size, 1 byte for \0 at the end)
              */
             return (minSize + strLength + 3);
-        } else if (sv instanceof CustomStateValue) {
+        } else if (stateValue instanceof CustomStateValue) {
             /* Length of serialized value (short) + state value */
-            return (minSize + Short.BYTES + ((CustomStateValue) sv).getSerializedSize());
+            return (minSize + Short.BYTES + ((CustomStateValue) stateValue).getSerializedSize());
         }
         /*
          * It's very important that we know how to write the state value in the
@@ -141,11 +141,11 @@ public final class HTInterval implements ITmfStateInterval {
             throw new TimeRangeException("Start:" + intervalStart + ", End:" + intervalEnd); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        this.start = intervalStart;
-        this.end = intervalEnd;
-        this.attribute = attribute;
-        this.sv = value;
-        this.fSizeOnDisk = size;
+        fStart = intervalStart;
+        fDuration = intervalEnd - intervalStart;
+        fAttribute = attribute;
+        fStateValue = value;
+        fSizeOnDisk = size;
     }
 
     /**
@@ -175,7 +175,7 @@ public final class HTInterval implements ITmfStateInterval {
         int posStart = buffer.position();
         /* Read the Data Section entry */
         long intervalStart = buffer.getLong();
-        long intervalEnd = buffer.getLong();
+        long intervalEnd = HTVarInt.readLong(buffer) + intervalStart;
         int attribute = buffer.getInt();
 
         /* Read the 'type' of the value, then react accordingly */
@@ -254,12 +254,12 @@ public final class HTInterval implements ITmfStateInterval {
      *            The already-allocated ByteBuffer corresponding to a SHT Node
      */
     public void writeInterval(ByteBuffer buffer) {
-        buffer.putLong(start);
-        buffer.putLong(end);
-        buffer.putInt(attribute);
+        buffer.putLong(fStart);
+        HTVarInt.writeLong(buffer, fDuration);
+        buffer.putInt(fAttribute);
 
-        if (sv != null) {
-            @NonNull Object value = sv;
+        if (fStateValue != null) {
+            @NonNull Object value = fStateValue;
             if (value instanceof Integer) {
                 buffer.put(TYPE_INTEGER);
                 buffer.putInt((int) value);
@@ -297,32 +297,32 @@ public final class HTInterval implements ITmfStateInterval {
 
     @Override
     public long getStartTime() {
-        return start;
+        return fStart;
     }
 
     @Override
     public long getEndTime() {
-        return end;
+        return fStart + fDuration;
     }
 
     @Override
     public int getAttribute() {
-        return attribute;
+        return fAttribute;
     }
 
     @Override
     public ITmfStateValue getStateValue() {
-        return TmfStateValue.newValue(sv);
+        return TmfStateValue.newValue(fStateValue);
     }
 
     @Override
     public Object getValue() {
-        return sv;
+        return fStateValue;
     }
 
     @Override
     public boolean intersects(long timestamp) {
-        return (start <= timestamp && end >= timestamp);
+        return (fStart <= timestamp && (fStart + fDuration) >= timestamp);
     }
 
     /**
@@ -346,15 +346,15 @@ public final class HTInterval implements ITmfStateInterval {
             return false;
         }
         HTInterval other = (HTInterval) obj;
-        return (start == other.start &&
-                end == other.end &&
-                attribute == other.attribute &&
-                Objects.equals(sv, other.sv));
+        return (fStart == other.fStart &&
+                fDuration == other.fDuration &&
+                fAttribute == other.fAttribute &&
+                Objects.equals(fStateValue, other.fStateValue));
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(start, end, attribute, sv);
+        return Objects.hash(fStart, fDuration, fAttribute, fStateValue);
     }
 
     @Override
@@ -362,16 +362,16 @@ public final class HTInterval implements ITmfStateInterval {
         /* Only for debug, should not be externalized */
         StringBuilder sb = new StringBuilder();
         sb.append('[');
-        sb.append(start);
+        sb.append(fStart);
         sb.append(", "); //$NON-NLS-1$
-        sb.append(end);
+        sb.append(fStart + fDuration);
         sb.append(']');
 
         sb.append(", attribute = "); //$NON-NLS-1$
-        sb.append(attribute);
+        sb.append(fAttribute);
 
         sb.append(", value = "); //$NON-NLS-1$
-        sb.append(String.valueOf(sv));
+        sb.append(String.valueOf(fStateValue));
 
         return sb.toString();
     }
