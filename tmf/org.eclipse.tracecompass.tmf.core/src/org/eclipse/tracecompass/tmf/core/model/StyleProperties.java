@@ -275,6 +275,53 @@ public final class StyleProperties {
         String LIGHTER = "lighter"; //$NON-NLS-1$
     }
 
+    // Annotation
+
+    /**
+     * Symbol type as a string. Possible values: {@link SymbolType}.
+     * <p>
+     * Default: @link {@link SymbolType#NONE}
+     */
+    public static final String SYMBOL_TYPE = "symbol-type"; //$NON-NLS-1$
+
+    /**
+     * Symbol type values.
+     */
+    public interface SymbolType {
+        /**
+         * None
+         */
+        String NONE = "none"; //$NON-NLS-1$
+        /**
+         * Diamond
+         */
+        String DIAMOND = "diamond"; //$NON-NLS-1$
+        /**
+         * Circle
+         */
+        String CIRCLE = "circle"; //$NON-NLS-1$
+        /**
+         * Square
+         */
+        String SQUARE = "square"; //$NON-NLS-1$
+        /**
+         * Triangle
+         */
+        String TRIANGLE = "triangle"; //$NON-NLS-1$
+        /**
+         * Inverted triangle
+         */
+        String INVERTED_TRIANGLE = "inverted-triangle"; //$NON-NLS-1$
+        /**
+         * Cross
+         */
+        String CROSS = "cross"; //$NON-NLS-1$
+        /**
+         * Plus
+         */
+        String PLUS = "plus"; //$NON-NLS-1$
+    }
+
     // General properties
 
     /**
