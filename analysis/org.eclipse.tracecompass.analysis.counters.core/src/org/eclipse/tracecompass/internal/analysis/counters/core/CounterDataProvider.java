@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.counters.core.CounterAnalysis;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.xy.AbstractTreeCommonXDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -140,7 +141,9 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
     @Override
     protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters,
             @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
-        if (fetchParameters.get(CUMULATIVE_PARAMETER_KEY) != null) {
+        // Check if the parameters contain timeRequested and selectedItems
+        // isCumulative will be compute later
+        if (FetchParametersUtils.createSelectionTimeQuery(fetchParameters) != null) {
             return internalFetch(ss, fetchParameters, monitor);
         }
         return Collections.emptyMap();
@@ -190,12 +193,11 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
             return null;
         }
 
-        Object isCumulative = parameters.get(CUMULATIVE_PARAMETER_KEY);
-        if (isCumulative instanceof Boolean) {
-            return new SelectedCounterQueryFilter(timeRequested, selectedItems, (boolean) isCumulative);
-        }
-
-        return null;
+        Boolean isCumulativeParameter = DataProviderParameterUtils.extractBoolean(parameters, CUMULATIVE_PARAMETER_KEY);
+        // If the cumulative parameter is not present in the parameters use
+        // "false" as default value
+        boolean isCumulative = isCumulativeParameter != null && isCumulativeParameter;
+        return new SelectedCounterQueryFilter(timeRequested, selectedItems, isCumulative);
     }
 
     /**
