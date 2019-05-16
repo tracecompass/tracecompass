@@ -25,9 +25,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenOutputEntryModel;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphDataProvider;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.XmlDataProviderManager;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenOutputEntryModel;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
@@ -81,9 +81,19 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
-    private static final Comparator<DataDrivenOutputEntryModel> XML_ENTRY_COMPARATOR = Comparator
-            .comparing(DataDrivenOutputEntryModel::getName).thenComparingLong(DataDrivenOutputEntryModel::getStartTime);
-
+    private static final Comparator<DataDrivenOutputEntryModel> XML_ENTRY_COMPARATOR = ((DataDrivenOutputEntryModel obj1, DataDrivenOutputEntryModel obj2) -> {
+        try {
+            return Comparator
+                    .comparing((DataDrivenOutputEntryModel obj) -> Long.decode(obj.getName()))
+                    .thenComparingLong(DataDrivenOutputEntryModel::getStartTime)
+                    .compare(obj1, obj2);
+        } catch (NumberFormatException nfe) {
+            return Comparator
+                    .comparing(DataDrivenOutputEntryModel::getName)
+                    .thenComparingLong(DataDrivenOutputEntryModel::getStartTime)
+                    .compare(obj1, obj2);
+        }
+    });
     private static final Comparator<ITimeGraphEntry> ENTRY_COMPARATOR = Comparator.comparing(x -> (DataDrivenOutputEntryModel) ((TimeGraphEntry) x).getModel(), XML_ENTRY_COMPARATOR);
 
     private final @NonNull XmlViewInfo fViewInfo = new XmlViewInfo(ID);
