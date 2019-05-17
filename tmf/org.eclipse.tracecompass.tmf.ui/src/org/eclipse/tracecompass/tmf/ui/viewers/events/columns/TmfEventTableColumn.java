@@ -12,6 +12,9 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.events.columns;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
@@ -38,7 +41,8 @@ public class TmfEventTableColumn {
     // Fields
     // ------------------------------------------------------------------------
 
-    private final ITmfEventAspect<?> fAspect;
+    private static final String EMPTY_STRING = ""; //$NON-NLS-1$
+    private final List<ITmfEventAspect<?>> fAspects = new ArrayList<>();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -52,7 +56,21 @@ public class TmfEventTableColumn {
      *            column.
      */
     public TmfEventTableColumn(ITmfEventAspect<?> aspect) {
-        fAspect = aspect;
+        fAspects.add(aspect);
+    }
+
+    // ------------------------------------------------------------------------
+    // adders
+    // ------------------------------------------------------------------------
+    /**
+     * Add another Aspect with the same name
+     *
+     * @param duplicate
+     *            the aspect with the same name
+     * @since 5.0
+     */
+    public void addDuplicate(ITmfEventAspect<?> duplicate) {
+        fAspects.add(duplicate);
     }
 
     // ------------------------------------------------------------------------
@@ -65,7 +83,7 @@ public class TmfEventTableColumn {
      * @return The column's title
      */
     public String getHeaderName() {
-        return fAspect.getName();
+        return fAspects.get(0).getName();
     }
 
     /**
@@ -74,7 +92,7 @@ public class TmfEventTableColumn {
      * @return The header's tooltip
      */
     public @Nullable String getHeaderTooltip() {
-        return fAspect.getHelpText();
+        return fAspects.get(0).getHelpText();
     }
 
     /**
@@ -87,7 +105,13 @@ public class TmfEventTableColumn {
      * @return The string to display in the column for this event
      */
     public String getItemString(ITmfEvent event) {
-        return NonNullUtils.nullToEmptyString(fAspect.resolve(event));
+        for (ITmfEventAspect<?> aspect : fAspects) {
+            String eventString = NonNullUtils.nullToEmptyString(aspect.resolve(event));
+            if (!eventString.isEmpty()) {
+                return eventString;
+            }
+        }
+        return EMPTY_STRING;
     }
 
     /**
@@ -96,7 +120,7 @@ public class TmfEventTableColumn {
      * @return The event aspect
      */
     public ITmfEventAspect<?> getEventAspect() {
-        return fAspect;
+        return fAspects.get(0);
     }
 
     // ------------------------------------------------------------------------
@@ -107,7 +131,7 @@ public class TmfEventTableColumn {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + fAspect.hashCode();
+        result = prime * result + fAspects.get(0).hashCode();
         return result;
     }
 
@@ -124,6 +148,6 @@ public class TmfEventTableColumn {
         }
         TmfEventTableColumn other = (TmfEventTableColumn) obj;
         /* Aspects can also define how they can be "equal" to one another */
-        return (fAspect.equals(other.fAspect));
+        return (fAspects.get(0).equals(other.fAspects.get(0)));
     }
 }
