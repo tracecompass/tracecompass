@@ -2254,6 +2254,12 @@ The tooltip indicates:
 * the pointed state date and start/stop times
 * the pointed state duration (seconds)
 
+A browser based tooltip is available that allows users to use hyperlink navigation or to copy text. To enable the feature select
+
+'''Window'''->'''Preferences'''->'''Tracing''' then checking '''Use browser based tooltips'''. It is known to be unstable on older platforms, if this instability is encountered, please submit your bug here: [https://bugs.eclipse.org/bugs/show_bug.cgi?id=547563]
+
+[[Image:images/tooltippref.png]]
+
 ==== Dynamics Filters ====
 
 Dynamic filters are filters that are processed and applied each time the control flow view visible time range changes.
