@@ -61,7 +61,7 @@ public class Messages extends NLS {
     public static String Histogram_bucketRangeToolTip;
     /**
      * Tool tip formatter for time range
-     * @since 4.3
+     * @since 5.0
      */
     public static String Histogram_timeRange;
     /**
