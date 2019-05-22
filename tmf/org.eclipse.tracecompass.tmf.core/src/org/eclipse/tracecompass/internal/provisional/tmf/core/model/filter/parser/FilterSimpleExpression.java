@@ -28,7 +28,8 @@ public class FilterSimpleExpression implements Predicate<Multimap<String, Object
 
     private final String fField;
     private final BiPredicate<Object, Object> fOperator;
-    private final @Nullable String fValue;
+    private final @Nullable String fOriginalValue;
+    private final @Nullable Object fValue;
 
     /**
      * Constructor
@@ -43,16 +44,22 @@ public class FilterSimpleExpression implements Predicate<Multimap<String, Object
     public FilterSimpleExpression(String field, ConditionOperator operator, @Nullable String value) {
         fField = field;
         fOperator = operator;
-        fValue = value;
+        fOriginalValue = value;
+        fValue = ConditionOperator.prepareValue(value);
     }
 
     @Override
     public boolean test(Multimap<String, Object> data) {
-        String value = fValue;
+        Object value = fValue;
         return Iterables.any(data.entries(), entry -> (fField.equals("*") ||  //$NON-NLS-1$
                 Objects.requireNonNull(entry.getKey()).equals(fField) ||
                 Objects.requireNonNull(entry.getKey()).equals("> " + fField)) &&  //$NON-NLS-1$
                 (value == null || fOperator.test(entry.getValue(), value)));
+    }
+
+    @Override
+    public String toString() {
+        return fField + fOperator + fOriginalValue;
     }
 
 }

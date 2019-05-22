@@ -8,8 +8,10 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
+import java.text.Format;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -19,6 +21,8 @@ import java.util.regex.PatternSyntaxException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
+import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
@@ -28,6 +32,7 @@ import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterContainsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEqualsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterOrNode;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
 
@@ -38,6 +43,8 @@ import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
  *
  */
 public class FilterSimpleExpressionCu implements IFilterCu {
+
+    private static final Format DECIMAL_FORMAT = new DecimalUnitFormat();
 
     private final String fField;
     private final String fOperator;
@@ -238,9 +245,15 @@ public class FilterSimpleExpressionCu implements IFilterCu {
         }
 
         private static boolean equals(Object i, Object j) {
+            // Are objects equal
             if (Objects.equals(i, j)) {
                 return true;
             }
+            // Are their String representation equals
+            if (Objects.equals(String.valueOf(i), String.valueOf(j))) {
+                return true;
+            }
+            // Try to convert them to number and see if they are the same
             Number number1 = toNumber(i);
             if (number1 == null) {
                 return false;
@@ -258,14 +271,10 @@ public class FilterSimpleExpressionCu implements IFilterCu {
 
         private static int numericalCompare(Object i, Object j) {
             Number number1 = toNumber(i);
-            if (number1 == null) {
-                // This does not mean that both inputs are equal
-                return 0;
-            }
             Number number2 = toNumber(j);
-            if (number2 == null) {
-                // This does not mean that both inputs are equal
-                return 0;
+            if (number2 == null || number1 == null) {
+                // Compare their string representation
+                return String.valueOf(i).compareTo(String.valueOf(j));
             } else if (number1 instanceof Double || number2 instanceof Double
                     || number1 instanceof Float || number2 instanceof Float) {
                 return Double.compare(number1.doubleValue(), number2.doubleValue());
@@ -283,16 +292,69 @@ public class FilterSimpleExpressionCu implements IFilterCu {
             } catch (NumberFormatException e) {
             }
 
-            try {
-                return NumberFormat.getInstance().parse(val);
-            } catch (ParseException e) {
+            // Try to use some formatters to parse the value
+            ParsePosition pos = new ParsePosition(0);
+            Number parsed = NumberFormat.getInstance().parse(val, pos);
+            // The full string should have been parsed, not just the first
+            // numerical characters
+            if (pos.getErrorIndex() < 0 && pos.getIndex() == val.length()) {
+                return parsed;
             }
+
+            // Try the decimal with unit formatter
+            pos = new ParsePosition(0);
+            Object parsedObj = DECIMAL_FORMAT.parseObject(val, pos);
+            // The full string should have been parsed, not just the first
+            // numerical characters
+            if (pos.getErrorIndex() < 0 && pos.getIndex() == val.length() && parsedObj instanceof Number) {
+                return (Number) parsedObj;
+            }
+
+            // Try the duration formatter
+            pos = new ParsePosition(0);
+            parsedObj = SubSecondTimeWithUnitFormat.getInstance().parseObject(val, pos);
+            // The full string should have been parsed, not just the first
+            // numerical characters
+            if (pos.getErrorIndex() < 0 && pos.getIndex() == val.length() && parsedObj instanceof Number) {
+                return (Number) parsedObj;
+            }
+
+            // Try the timestamp formatter
+            try {
+                return TmfTimestampFormat.getDefaulTimeFormat().parseValue(val);
+            } catch (ParseException e) {
+                // Nothing to do
+            }
+
             return null;
         }
 
         @Override
         public boolean test(Object arg0, Object arg1) {
             return Objects.requireNonNull(fCmpFunction.apply(arg0, arg1));
+        }
+
+        /**
+         * Convert a human-readable string value to its machine representation.
+         * For example, duration strings such as "200ms" can be converted to the
+         * long value of 200000000.
+         *
+         * @param value
+         *            The human-readable string value entered by the user
+         * @return The parsed value if available, or the string itself if no
+         *         formatter succeeded.
+         */
+        public static @Nullable Object prepareValue(@Nullable String value) {
+            if (value == null) {
+                return null;
+            }
+            // Try to convert to a number
+            Number number = toNumber(value);
+            if (number != null) {
+                return number;
+            }
+
+            return value;
         }
     }
 

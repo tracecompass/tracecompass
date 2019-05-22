@@ -13,9 +13,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Map;
 import java.util.function.Predicate;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimePreferencesConstants;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableMultimap;
@@ -33,31 +40,31 @@ public class ElementResolverFilterTest {
 
     @Test
     public void testRegex() {
-        //Test a constant string
+        // Test a constant string
         FilterCu cu = FilterCu.compile("Label");
         assertNotNull(cu);
         Predicate<Multimap<String, Object>> predicate = cu.generate();
         assertTrue(predicate.test(ELEMENT.getMetadata()));
 
-        //Test an unmatched constant string
+        // Test an unmatched constant string
         cu = FilterCu.compile("fail");
         assertNotNull(cu);
         predicate = cu.generate();
         assertFalse(predicate.test(ELEMENT.getMetadata()));
 
-        //Test a regex
+        // Test a regex
         cu = FilterCu.compile("0$");
         assertNotNull(cu);
         predicate = cu.generate();
         assertTrue(predicate.test(ELEMENT.getMetadata()));
 
-        //Test a regex
+        // Test a regex
         cu = FilterCu.compile("a.*l");
         assertNotNull(cu);
         predicate = cu.generate();
         assertTrue(predicate.test(ELEMENT.getMetadata()));
 
-        //Test an unmatched regex
+        // Test an unmatched regex
         cu = FilterCu.compile("y$");
         assertNotNull(cu);
         predicate = cu.generate();
@@ -224,6 +231,76 @@ public class ElementResolverFilterTest {
         assertNotNull(cu);
         predicate = cu.generate();
         assertFalse(predicate.test(ELEMENT.getMetadata()));
+    }
+
+    @Test
+    public void testFilterWithNumber() {
+        // Simple number comparison
+        FilterCu cu = FilterCu.compile("key3 > 9");
+        assertNotNull(cu);
+        Predicate<Multimap<String, Object>> predicate = cu.generate();
+        assertTrue(predicate.test(ELEMENT.getMetadata()));
+        assertFalse(predicate.test(ImmutableMultimap.of("key3", 8)));
+
+        // String comparison, "10" < "9a"
+        cu = FilterCu.compile("key3 > 9a");
+        assertNotNull(cu);
+        predicate = cu.generate();
+        assertFalse(predicate.test(ELEMENT.getMetadata()));
+        // "9b" > "9a"
+        assertTrue(predicate.test(ImmutableMultimap.of("key3", "9b")));
+
+        // String comparison with duration numbers
+        cu = FilterCu.compile("key3 > 2ms");
+        assertNotNull(cu);
+        predicate = cu.generate();
+        assertFalse(predicate.test(ELEMENT.getMetadata()));
+        // Would be smaller as a String, but larger as a Number
+        assertTrue(predicate.test(ImmutableMultimap.of("key3", 10000000)));
+
+        // String comparison with decimal with unit numbers
+        cu = FilterCu.compile("key3 > 2k");
+        assertNotNull(cu);
+        predicate = cu.generate();
+        assertFalse(predicate.test(ELEMENT.getMetadata()));
+        // Would be smaller as a String, but larger as a Number
+        assertTrue(predicate.test(ImmutableMultimap.of("key3", 10000000)));
+
+        // String comparison with timestamps
+        // For now, only the TTT format works for timestamp comparison, so we
+        // first update the time preferences and put it back to its original
+        // value at the end
+        Map<String, String> defaultPrefMap = TmfTimePreferences.getPreferenceMap();
+        IEclipsePreferences defaultPreferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+        String dateFormat = defaultPrefMap.get(ITmfTimePreferencesConstants.DATIME);
+        try {
+
+            defaultPreferences.put(ITmfTimePreferencesConstants.DATIME, "TTT.SSS SSS SSS");
+            TmfTimestampFormat.updateDefaultFormats();
+
+            long timeValue = 1000000000L;
+            String dateString = TmfTimestampFormat.getDefaulTimeFormat().format(timeValue);
+            cu = FilterCu.compile("key3 == \"" + dateString + "\"");
+            assertNotNull(cu);
+            predicate = cu.generate();
+            assertFalse(predicate.test(ELEMENT.getMetadata()));
+            assertFalse(predicate.test(ImmutableMultimap.of("key3", timeValue + 3)));
+            assertTrue(predicate.test(ImmutableMultimap.of("key3", timeValue)));
+
+            // Use another less trivial time value
+            timeValue = 1539786952382956759L;
+            dateString = TmfTimestampFormat.getDefaulTimeFormat().format(timeValue);
+            cu = FilterCu.compile("key3 == \"" + dateString + "\"");
+            assertNotNull(cu);
+            predicate = cu.generate();
+            assertFalse(predicate.test(ELEMENT.getMetadata()));
+            assertFalse(predicate.test(ImmutableMultimap.of("key3", timeValue + 3)));
+            assertTrue(predicate.test(ImmutableMultimap.of("key3", timeValue)));
+        } finally {
+            defaultPreferences.put(ITmfTimePreferencesConstants.DATIME, dateFormat);
+            TmfTimestampFormat.updateDefaultFormats();
+        }
+
     }
 
     @Test
