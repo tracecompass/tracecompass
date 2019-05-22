@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.TmfStrings;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -96,6 +97,9 @@ public class TimeGraphState implements ITimeGraphState {
         if (label != null) {
             toTest.put(IElementResolver.LABEL_KEY, label);
         }
+        toTest.put(TmfStrings.startTime(), fStartTime);
+        toTest.put(TmfStrings.endTime(), fStartTime + fDuration);
+        toTest.put(TmfStrings.duration(), fDuration);
         return toTest;
     }
 

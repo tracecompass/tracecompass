@@ -17,6 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.IContentSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
+import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 
 import com.google.common.collect.HashMultimap;
@@ -75,6 +76,9 @@ public interface ISegmentStoreProvider {
      */
     static Multimap<String, Object> getFilterInput(ISegmentStoreProvider provider, ISegment segment) {
         Multimap<String, Object> map = HashMultimap.create();
+        map.put(TmfStrings.startTime(), segment.getStart());
+        map.put(TmfStrings.endTime(), segment.getEnd());
+        map.put(TmfStrings.duration(), segment.getLength());
         for (ISegmentAspect aspect : provider.getSegmentAspects()) {
             Object resolve = aspect.resolve(segment);
             if (resolve != null) {
