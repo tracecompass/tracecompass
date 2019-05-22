@@ -36,7 +36,7 @@ public class ElementResolverFilterTest {
         //Test a constant string
         FilterCu cu = FilterCu.compile("Label");
         assertNotNull(cu);
-        Predicate<Multimap<String, String>> predicate = cu.generate();
+        Predicate<Multimap<String, Object>> predicate = cu.generate();
         assertTrue(predicate.test(ELEMENT.getMetadata()));
 
         //Test an unmatched constant string
@@ -68,7 +68,7 @@ public class ElementResolverFilterTest {
     public void testLogicalOperator() {
         FilterCu cu = FilterCu.compile("Label && value");
         assertNotNull(cu);
-        Predicate<Multimap<String, String>> predicate = cu.generate();
+        Predicate<Multimap<String, Object>> predicate = cu.generate();
         assertTrue(predicate.test(ELEMENT.getMetadata()));
 
         cu = FilterCu.compile("label && fail");
@@ -91,7 +91,7 @@ public class ElementResolverFilterTest {
     public void testEqualsOperator() {
         FilterCu cu = FilterCu.compile("label == elementLabel");
         assertNotNull(cu);
-        Predicate<Multimap<String, String>> predicate = cu.generate();
+        Predicate<Multimap<String, Object>> predicate = cu.generate();
         assertTrue(predicate.test(ELEMENT.getMetadata()));
 
         cu = FilterCu.compile("label == fail");
@@ -104,7 +104,7 @@ public class ElementResolverFilterTest {
     public void testNotEqualsOperator() {
         FilterCu cu = FilterCu.compile("label != fail");
         assertNotNull(cu);
-        Predicate<Multimap<String, String>> predicate = cu.generate();
+        Predicate<Multimap<String, Object>> predicate = cu.generate();
         assertTrue(predicate.test(ELEMENT.getMetadata()));
 
         cu = FilterCu.compile("label != elementLabel");
@@ -117,7 +117,7 @@ public class ElementResolverFilterTest {
     public void testNotOperator() {
         FilterCu cu = FilterCu.compile("!fail");
         assertNotNull(cu);
-        Predicate<Multimap<String, String>> predicate = cu.generate();
+        Predicate<Multimap<String, Object>> predicate = cu.generate();
         assertTrue(predicate.test(ELEMENT.getMetadata()));
 
         cu = FilterCu.compile("!elementLabel");
@@ -130,7 +130,7 @@ public class ElementResolverFilterTest {
     public void testContainsOperator() {
         FilterCu cu = FilterCu.compile("label contains element");
         assertNotNull(cu);
-        Predicate<Multimap<String, String>> predicate = cu.generate();
+        Predicate<Multimap<String, Object>> predicate = cu.generate();
         assertTrue(predicate.test(ELEMENT.getMetadata()));
 
         cu = FilterCu.compile("label contains value");
@@ -143,7 +143,7 @@ public class ElementResolverFilterTest {
     public void testPresentOperator() {
         FilterCu cu = FilterCu.compile("key0 present");
         assertNotNull(cu);
-        Predicate<Multimap<String, String>> predicate = cu.generate();
+        Predicate<Multimap<String, Object>> predicate = cu.generate();
         assertTrue(predicate.test(ELEMENT.getMetadata()));
 
         cu = FilterCu.compile("invalidKey present");
@@ -156,7 +156,7 @@ public class ElementResolverFilterTest {
     public void testMatchesOperator() {
         FilterCu cu = FilterCu.compile("key0 matches v.*ue");
         assertNotNull(cu);
-        Predicate<Multimap<String, String>> predicate = cu.generate();
+        Predicate<Multimap<String, Object>> predicate = cu.generate();
         assertTrue(predicate.test(ELEMENT.getMetadata()));
 
         // Test with a second value of key0
@@ -180,7 +180,7 @@ public class ElementResolverFilterTest {
     public void testGreaterThanOperator() {
         FilterCu cu = FilterCu.compile("key3 > 9");
         assertNotNull(cu);
-        Predicate<Multimap<String, String>> predicate = cu.generate();
+        Predicate<Multimap<String, Object>> predicate = cu.generate();
         assertTrue(predicate.test(ELEMENT.getMetadata()));
 
         cu = FilterCu.compile("key3 > 10");
@@ -193,7 +193,7 @@ public class ElementResolverFilterTest {
     public void testLessThanOperator() {
         FilterCu cu = FilterCu.compile("key3 < 11");
         assertNotNull(cu);
-        Predicate<Multimap<String, String>> predicate = cu.generate();
+        Predicate<Multimap<String, Object>> predicate = cu.generate();
         assertTrue(predicate.test(ELEMENT.getMetadata()));
 
         cu = FilterCu.compile("key3 < 10");
@@ -206,7 +206,7 @@ public class ElementResolverFilterTest {
     public void testComplexFilter() {
         FilterCu cu = FilterCu.compile("(key0 matches v.*ue) && Label");
         assertNotNull(cu);
-        Predicate<Multimap<String, String>> predicate = cu.generate();
+        Predicate<Multimap<String, Object>> predicate = cu.generate();
         assertTrue(predicate.test(ELEMENT.getMetadata()));
 
         cu = FilterCu.compile("!(key0 matches v.*ue) && Label");

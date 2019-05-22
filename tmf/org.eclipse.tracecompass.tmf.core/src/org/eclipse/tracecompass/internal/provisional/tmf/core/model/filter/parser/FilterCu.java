@@ -123,7 +123,7 @@ public class FilterCu implements IFilterCu {
      *
      * @return a filter item runtime object
      */
-    public Predicate<Multimap<String, String>> generate() {
+    public Predicate<Multimap<String, Object>> generate() {
         Iterable<FilterExpression> expressions = Objects.requireNonNull(Iterables.transform(fExpressions, exp -> exp.generate()));
         return new Filter(expressions);
     }

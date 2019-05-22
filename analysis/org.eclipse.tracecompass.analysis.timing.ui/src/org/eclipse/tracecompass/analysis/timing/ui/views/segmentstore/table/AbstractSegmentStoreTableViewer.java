@@ -323,20 +323,21 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         // If results are not null, then the segment of the provider is ready
         // and model can be updated
 
-        //FIXME Filtering should be done at the data provider level
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = generateRegexPredicate();
+        // FIXME Filtering should be done at the data provider level
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>>> predicates = generateRegexPredicate();
         Predicate<ISegment> predicate = (segment) -> {
             if (!predicates.isEmpty()) {
 
                 // Get the filter external input data
-                Multimap<@NonNull String, @NonNull String> input = ISegmentStoreProvider.getFilterInput(provider, segment);
+                Multimap<@NonNull String, @NonNull Object> input = ISegmentStoreProvider.getFilterInput(provider, segment);
 
-                // Test each predicates and set the status of the property associated to the
+                // Test each predicates and set the status of the property
+                // associated to the
                 // predicate
                 boolean activateProperty = false;
-                for (Map.Entry<Integer, Predicate<Multimap<String, String>>> mapEntry : predicates.entrySet()) {
+                for (Map.Entry<Integer, Predicate<Multimap<String, Object>>> mapEntry : predicates.entrySet()) {
                     Integer property = Objects.requireNonNull(mapEntry.getKey());
-                    Predicate<Multimap<String, String>> value = Objects.requireNonNull(mapEntry.getValue());
+                    Predicate<Multimap<String, Object>> value = Objects.requireNonNull(mapEntry.getValue());
                     if (property == IFilterProperty.DIMMED || property == IFilterProperty.EXCLUDE) {
                         boolean status = value.test(input);
                         activateProperty |= status;
@@ -377,13 +378,13 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
      * @deprecated Use {@link #generateRegexPredicate()}
      */
     @Deprecated
-    protected Map<Integer, Predicate<@NonNull Map<@NonNull String, @NonNull String>>> computeRegexPredicate() {
+    protected Map<Integer, Predicate<@NonNull Map<@NonNull String, @NonNull Object>>> computeRegexPredicate() {
         Multimap<@NonNull Integer, @NonNull String> regexes = getRegexes();
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull Object>>> predicates = new HashMap<>();
         for (Map.Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
             String regex = IFilterStrings.mergeFilters(entry.getValue());
             FilterCu cu = FilterCu.compile(regex);
-            Predicate<@NonNull Map<@NonNull String, @NonNull String>> predicate = cu != null ? multiToMapPredicate(cu.generate()) : null;
+            Predicate<@NonNull Map<@NonNull String, @NonNull Object>> predicate = cu != null ? multiToMapPredicate(cu.generate()) : null;
             if (predicate != null) {
                 predicates.put(entry.getKey(), predicate);
             }
@@ -391,9 +392,9 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         return predicates;
     }
 
-    private static Predicate<@NonNull Map<@NonNull String, @NonNull String>> multiToMapPredicate(Predicate<@NonNull Multimap<@NonNull String, @NonNull String>> predicate) {
+    private static Predicate<@NonNull Map<@NonNull String, @NonNull Object>> multiToMapPredicate(Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>> predicate) {
         return map -> {
-            Builder<@NonNull String, @NonNull String> builder = ImmutableMultimap.builder();
+            Builder<@NonNull String, @NonNull Object> builder = ImmutableMultimap.builder();
             map.forEach((key, value) -> builder.put(key, value));
             return predicate.test(Objects.requireNonNull(builder.build()));
         };
@@ -405,13 +406,13 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
      * @return A map of predicate by property
      * @since 4.0
      */
-    protected Map<Integer, Predicate<Multimap<String, String>>> generateRegexPredicate() {
+    protected Map<Integer, Predicate<Multimap<String, Object>>> generateRegexPredicate() {
         Multimap<Integer, String> regexes = getRegexes();
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>>> predicates = new HashMap<>();
         for (Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
             String regex = IFilterStrings.mergeFilters(entry.getValue());
             FilterCu cu = FilterCu.compile(regex);
-            Predicate<@NonNull Multimap<@NonNull String, @NonNull String>> predicate = cu != null ? cu.generate() : null;
+            Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>> predicate = cu != null ? cu.generate() : null;
                 if (predicate != null) {
                     predicates.put(entry.getKey(), predicate);
                 }

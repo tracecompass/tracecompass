@@ -74,7 +74,7 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
     private final ReentrantReadWriteLock fLock = new ReentrantReadWriteLock(false);
     private final BiMap<Long, Integer> fIdToQuark = HashBiMap.create();
     private @Nullable TmfModelResponse<TmfTreeModel<M>> fCached;
-    private final Map<Long, Multimap<String, String>> fEntryMetadata = new HashMap<>();
+    private final Map<Long, Multimap<String, Object>> fEntryMetadata = new HashMap<>();
 
     /**
      * Constructor
@@ -239,7 +239,7 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      *            The ID of the entry
      * @return The metadata map for the entry
      */
-    protected Multimap<String, String> getEntryMetadata(Long entryId) {
+    protected Multimap<String, Object> getEntryMetadata(Long entryId) {
         return fEntryMetadata.getOrDefault(entryId, ImmutableMultimap.of());
     }
 

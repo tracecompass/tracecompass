@@ -18,7 +18,7 @@ import com.google.common.collect.Multimap;
  * @author Jean-Christian Kouame
  *
  */
-public class Filter implements Predicate<Multimap<String, String>> {
+public class Filter implements Predicate<Multimap<String, Object>> {
 
     private Iterable<FilterExpression> fExpressions;
 
@@ -33,7 +33,7 @@ public class Filter implements Predicate<Multimap<String, String>> {
     }
 
     @Override
-    public boolean test(Multimap<String, String> data) {
+    public boolean test(Multimap<String, Object> data) {
         for (FilterExpression expression : fExpressions) {
             if (!expression.test(data)) {
                 return false;

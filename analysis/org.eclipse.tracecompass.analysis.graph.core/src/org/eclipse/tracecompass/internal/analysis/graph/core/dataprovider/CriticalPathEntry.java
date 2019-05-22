@@ -31,7 +31,7 @@ public class CriticalPathEntry extends TimeGraphEntryModel implements IElementRe
 
     private final Long fSum;
     private final Double fPercent;
-    private final @NonNull Multimap<@NonNull String, @NonNull String> fAspects = HashMultimap.create();
+    private final @NonNull Multimap<@NonNull String, @NonNull Object> fAspects = HashMultimap.create();
 
     /**
      * Constructor
@@ -110,7 +110,7 @@ public class CriticalPathEntry extends TimeGraphEntryModel implements IElementRe
     }
 
     @Override
-    public @NonNull Multimap<@NonNull String, @NonNull String> getMetadata() {
+    public @NonNull Multimap<@NonNull String, @NonNull Object> getMetadata() {
         return fAspects;
     }
 

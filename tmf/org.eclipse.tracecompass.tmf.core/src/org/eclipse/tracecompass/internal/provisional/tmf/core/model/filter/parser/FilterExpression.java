@@ -20,7 +20,7 @@ import com.google.common.collect.Multimap;
  * @author Jean-Christian Kouame
  *
  */
-public class FilterExpression implements Predicate<Multimap<String, String>> {
+public class FilterExpression implements Predicate<Multimap<String, Object>> {
 
     private final Queue<Object> fElements;
 
@@ -36,7 +36,7 @@ public class FilterExpression implements Predicate<Multimap<String, String>> {
     }
 
     @Override
-    public boolean test(Multimap<String, String> data) {
+    public boolean test(Multimap<String, Object> data) {
 
         if (fElements.isEmpty()) {
             return false;

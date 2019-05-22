@@ -392,7 +392,7 @@ public class TimeChartEvent implements ITimeEvent {
     }
 
     @Override
-    public @NonNull Multimap<@NonNull String, @NonNull String> getMetadata() {
+    public @NonNull Multimap<@NonNull String, @NonNull Object> getMetadata() {
         return ImmutableMultimap.of();
     }
 }

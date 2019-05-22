@@ -8,9 +8,8 @@
 *******************************************************************************/
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
-import java.util.function.BiPredicate;
-
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterSimpleExpressionCu.ConditionOperator;
 
 import com.google.common.collect.Multimap;
 
@@ -32,12 +31,12 @@ public class FilterSimpleExpressionNot extends FilterSimpleExpression {
      * @param value
      *            The value to test
      */
-    public FilterSimpleExpressionNot(String field, BiPredicate<String, String> operator, @Nullable String value) {
+    public FilterSimpleExpressionNot(String field, ConditionOperator operator, @Nullable String value) {
         super(field, operator, value);
     }
 
     @Override
-    public boolean test(Multimap<String, String> data) {
+    public boolean test(Multimap<String, Object> data) {
         return !super.test(data);
     }
 }

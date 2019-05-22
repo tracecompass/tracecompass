@@ -33,7 +33,7 @@ public class FilterExpressionNot extends FilterExpression {
     }
 
     @Override
-    public boolean test(Multimap<String, String> data) {
+    public boolean test(Multimap<String, Object> data) {
         return !super.test(data);
     }
 }

@@ -13,6 +13,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterSimpleExpressionCu.ConditionOperator;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
@@ -23,10 +24,10 @@ import com.google.common.collect.Multimap;
  * @author Jean-Christian Kouame
  *
  */
-public class FilterSimpleExpression implements Predicate<Multimap<String, String>> {
+public class FilterSimpleExpression implements Predicate<Multimap<String, Object>> {
 
     private final String fField;
-    private final BiPredicate<String, String> fOperator;
+    private final BiPredicate<Object, Object> fOperator;
     private final @Nullable String fValue;
 
     /**
@@ -39,14 +40,14 @@ public class FilterSimpleExpression implements Predicate<Multimap<String, String
      * @param value
      *            The value to test
      */
-    public FilterSimpleExpression(String field, BiPredicate<String, String> operator, @Nullable String value) {
+    public FilterSimpleExpression(String field, ConditionOperator operator, @Nullable String value) {
         fField = field;
         fOperator = operator;
         fValue = value;
     }
 
     @Override
-    public boolean test(Multimap<String, String> data) {
+    public boolean test(Multimap<String, Object> data) {
         String value = fValue;
         return Iterables.any(data.entries(), entry -> (fField.equals("*") ||  //$NON-NLS-1$
                 Objects.requireNonNull(entry.getKey()).equals(fField) ||

@@ -104,19 +104,19 @@ public interface ITimeGraphStateFilter {
      *            The progress monitor
      * @since 5.0
      */
-    default void applyFilterAndAddState(List<ITimeGraphState> stateList, ITimeGraphState timeGraphState, Long key, Map<Integer, Predicate<Multimap<String, String>>> predicates, @Nullable IProgressMonitor monitor) {
+    default void applyFilterAndAddState(List<ITimeGraphState> stateList, ITimeGraphState timeGraphState, Long key, Map<Integer, Predicate<Multimap<String, Object>>> predicates, @Nullable IProgressMonitor monitor) {
 
         if (!predicates.isEmpty()) {
             // Get the filter external input data
             long startTime = timeGraphState.getStartTime();
-            Multimap<@NonNull String, @NonNull String> input = HashMultimap.create();
+            Multimap<@NonNull String, @NonNull Object> input = HashMultimap.create();
             input.putAll(getFilterData(key, startTime, monitor));
             input.putAll(timeGraphState.getMetadata());
 
             // Test each predicates and set the status of the property associated to the
             // predicate
-            for (Map.Entry<Integer, Predicate<Multimap<String, String>>> mapEntry : predicates.entrySet()) {
-                Predicate<Multimap<String, String>> value = Objects.requireNonNull(mapEntry.getValue());
+            for (Map.Entry<Integer, Predicate<Multimap<String, Object>>> mapEntry : predicates.entrySet()) {
+                Predicate<Multimap<String, Object>> value = Objects.requireNonNull(mapEntry.getValue());
                 boolean status = value.test(input);
                 Integer property = Objects.requireNonNull(mapEntry.getKey());
                 if (property == IFilterProperty.DIMMED || property == IFilterProperty.EXCLUDE) {
@@ -163,7 +163,7 @@ public interface ITimeGraphStateFilter {
      * @return The map of input data
      * @since 5.0
      */
-    default Multimap<String, String> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
+    default Multimap<String, Object> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
         return ImmutableMultimap.of();
     }
 
@@ -178,9 +178,9 @@ public interface ITimeGraphStateFilter {
      * @since 5.0
      */
     @SafeVarargs
-    static Multimap<String, String> mergeMultimaps(Multimap<String, String>... maps) {
-        Multimap<@NonNull String, @NonNull String> data = HashMultimap.create();
-        for (Multimap<String, String> multimap : maps) {
+    static Multimap<String, Object> mergeMultimaps(Multimap<String, Object>... maps) {
+        Multimap<@NonNull String, @NonNull Object> data = HashMultimap.create();
+        for (Multimap<String, Object> multimap : maps) {
             data.putAll(multimap);
         }
         return data;

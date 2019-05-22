@@ -107,7 +107,7 @@ public interface ITimeEvent extends IPropertyCollection, IElementResolver {
      * @since 5.0
      */
     @Override
-    default @NonNull Multimap<@NonNull String, @NonNull String> getMetadata() {
+    default @NonNull Multimap<@NonNull String, @NonNull Object> getMetadata() {
         String entryName = getEntry().getName();
         return (entryName != null) ? ImmutableMultimap.of(IElementResolver.ENTRY_NAME_KEY, entryName) : ImmutableMultimap.of();
     }

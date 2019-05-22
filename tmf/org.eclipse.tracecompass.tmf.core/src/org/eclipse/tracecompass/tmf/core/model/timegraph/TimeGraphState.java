@@ -90,8 +90,8 @@ public class TimeGraphState implements ITimeGraphState {
     }
 
     @Override
-    public Multimap<String, String> getMetadata() {
-        Multimap<String, String> toTest = HashMultimap.create();
+    public Multimap<String, Object> getMetadata() {
+        Multimap<String, Object> toTest = HashMultimap.create();
         String label = getLabel();
         if (label != null) {
             toTest.put(IElementResolver.LABEL_KEY, label);

@@ -305,7 +305,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             intervals.put(interval.getAttribute(), interval);
         }
 
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>>> predicates = new HashMap<>();
         Multimap<@NonNull Integer, @NonNull String> regexesMap = DataProviderParameterUtils.extractRegexFilter(parameters);
         if (regexesMap != null) {
             predicates.putAll(computeRegexPredicate(regexesMap));
@@ -696,8 +696,8 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     }
 
     @Override
-    public @NonNull Multimap<@NonNull String, @NonNull String> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
-        Multimap<@NonNull String, @NonNull String> data = HashMultimap.create();
+    public @NonNull Multimap<@NonNull String, @NonNull Object> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
+        Multimap<@NonNull String, @NonNull Object> data = HashMultimap.create();
         data.putAll(super.getFilterData(entryId, time, monitor));
 
         SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(Collections.singletonList(time), Collections.singleton(Objects.requireNonNull(entryId)));

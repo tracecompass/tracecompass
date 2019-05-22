@@ -106,7 +106,7 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
     private List<ITimeGraphArrow> fLinks;
 
     /** Cache for entry metadata */
-    private final Map<Long, @NonNull Multimap<@NonNull String, @NonNull String>> fEntryMetadata = new HashMap<>();
+    private final Map<Long, @NonNull Multimap<@NonNull String, @NonNull Object>> fEntryMetadata = new HashMap<>();
 
     /**
      * Constructor
@@ -184,7 +184,7 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
         if (filter == null) {
             return new TmfModelResponse<>(null, Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
         }
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>>> predicates = new HashMap<>();
         Multimap<@NonNull Integer, @NonNull String> regexesMap = DataProviderParameterUtils.extractRegexFilter(fetchParameters);
         if (regexesMap != null) {
             predicates.putAll(computeRegexPredicate(regexesMap));
@@ -480,7 +480,7 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
     }
 
     @Override
-    public @NonNull Multimap<@NonNull String, @NonNull String> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
+    public @NonNull Multimap<@NonNull String, @NonNull Object> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
         return ITimeGraphStateFilter.mergeMultimaps(ITimeGraphDataProvider.super.getFilterData(entryId, time, monitor),
                 fEntryMetadata.getOrDefault(entryId, ImmutableMultimap.of()));
     }

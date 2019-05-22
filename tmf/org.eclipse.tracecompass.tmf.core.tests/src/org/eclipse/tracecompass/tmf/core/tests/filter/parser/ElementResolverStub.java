@@ -15,7 +15,7 @@ import com.google.common.collect.Multimap;
  *
  */
 public class ElementResolverStub implements IElementResolver {
-    private final @NonNull Multimap<@NonNull String, @NonNull String> fData;
+    private final @NonNull Multimap<@NonNull String, @NonNull Object> fData;
 
     /**
      * Constructor
@@ -23,12 +23,12 @@ public class ElementResolverStub implements IElementResolver {
      * @param data
      *            The data to filter on
      */
-    public ElementResolverStub(@NonNull Multimap<@NonNull String, @NonNull String> data) {
+    public ElementResolverStub(@NonNull Multimap<@NonNull String, @NonNull Object> data) {
         fData = data;
     }
 
     @Override
-    public @NonNull Multimap<@NonNull String, @NonNull String> getMetadata() {
+    public @NonNull Multimap<@NonNull String, @NonNull Object> getMetadata() {
         return fData;
     }
 

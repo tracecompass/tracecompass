@@ -616,7 +616,7 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
      * @since 4.1
      */
     @Override
-    public @NonNull Multimap<@NonNull String, @NonNull String> getMetadata() {
+    public @NonNull Multimap<@NonNull String, @NonNull Object> getMetadata() {
         if (fModel instanceof IElementResolver) {
             return ((IElementResolver) fModel).getMetadata();
         }

@@ -57,9 +57,9 @@ public interface IElementResolver {
     @Deprecated
     default Map<@NonNull String, @NonNull String> computeData() {
         Map<String, String> map = new HashMap<>();
-        Multimap<String, String> metadata = getMetadata();
-        for (Entry<String, String> entry : metadata.entries()) {
-            map.put(entry.getKey(), entry.getValue());
+        Multimap<String, Object> metadata = getMetadata();
+        for (Entry<String, Object> entry : metadata.entries()) {
+            map.put(entry.getKey(), String.valueOf(entry.getValue()));
         }
         return map;
     }
@@ -72,7 +72,7 @@ public interface IElementResolver {
      * @return A map of field names to values
      * @since 5.0
      */
-    Multimap<@NonNull String, @NonNull String> getMetadata();
+    Multimap<@NonNull String, @NonNull Object> getMetadata();
 
     /**
      * Compare 2 sets of metadata to see if the second intersects the first. 2
@@ -87,7 +87,7 @@ public interface IElementResolver {
      * @return Whether the 2 metadata sets coincides
      * @since 5.0
      */
-    static boolean commonIntersect(Multimap<String, String> data1, Multimap<String, String> data2) {
+    static boolean commonIntersect(Multimap<String, Object> data1, Multimap<String, Object> data2) {
         Set<String> commonKeys = new HashSet<>(data1.keySet());
         commonKeys.retainAll(data2.keySet());
         if (commonKeys.isEmpty()) {

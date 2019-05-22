@@ -45,7 +45,7 @@ public class ResourcesEntryModel extends TimeGraphEntryModel implements IElement
     private final int fResourceId;
     private final Type fType;
 
-    private final @NonNull Multimap<@NonNull String, @NonNull String> fAspects;
+    private final @NonNull Multimap<@NonNull String, @NonNull Object> fAspects;
 
     /**
      * Constructor
@@ -73,7 +73,7 @@ public class ResourcesEntryModel extends TimeGraphEntryModel implements IElement
         case CPU: // resourceID is CPU, fall-through
         case CURRENT_THREAD: // resourceID is CPU, fall-through
         case FREQUENCY: // resourceID is CPU, fall-through
-            fAspects = ImmutableMultimap.of(OsStrings.cpu(), String.valueOf(resourceId));
+            fAspects = ImmutableMultimap.of(OsStrings.cpu(), resourceId);
             break;
         case IRQ:
         case SOFT_IRQ: // Fall-through
@@ -104,7 +104,7 @@ public class ResourcesEntryModel extends TimeGraphEntryModel implements IElement
     }
 
     @Override
-    public @NonNull Multimap<@NonNull String, @NonNull String> getMetadata() {
+    public @NonNull Multimap<@NonNull String, @NonNull Object> getMetadata() {
         return fAspects;
     }
 

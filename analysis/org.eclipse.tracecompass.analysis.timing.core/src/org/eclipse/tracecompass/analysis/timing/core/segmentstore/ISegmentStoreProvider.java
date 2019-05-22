@@ -73,8 +73,8 @@ public interface ISegmentStoreProvider {
      * @return A multimap of key, values that represent the data of this segment
      * @since 5.0
      */
-    static Multimap<String, String> getFilterInput(ISegmentStoreProvider provider, ISegment segment) {
-        Multimap<String, String> map = HashMultimap.create();
+    static Multimap<String, Object> getFilterInput(ISegmentStoreProvider provider, ISegment segment) {
+        Multimap<String, Object> map = HashMultimap.create();
         for (ISegmentAspect aspect : provider.getSegmentAspects()) {
             Object resolve = aspect.resolve(segment);
             if (resolve != null) {

@@ -146,7 +146,7 @@ public class ThreadEntryModel extends TimeGraphEntryModel implements IElementRes
 
     private final int fThreadId;
     private final int fParentThreadId;
-    private final @NonNull Multimap<@NonNull String, @NonNull String> fAspects;
+    private final @NonNull Multimap<@NonNull String, @NonNull Object> fAspects;
 
     /**
      * Constructor
@@ -171,9 +171,11 @@ public class ThreadEntryModel extends TimeGraphEntryModel implements IElementRes
         fThreadId = pid;
         fParentThreadId = ppid;
         fAspects = HashMultimap.create();
-        fAspects.put(OsStrings.tid(), String.valueOf(pid));
-        fAspects.put(OsStrings.pid(), String.valueOf(ppid));
-        fAspects.put("exec_name", String.valueOf(labels));
+        fAspects.put(OsStrings.tid(), pid);
+        fAspects.put(OsStrings.pid(), ppid);
+        if (!labels.isEmpty()) {
+            fAspects.put("exec_name", String.valueOf(labels.get(0)));
+        }
     }
 
     /**
@@ -202,7 +204,7 @@ public class ThreadEntryModel extends TimeGraphEntryModel implements IElementRes
     }
 
     @Override
-    public Multimap<@NonNull String, @NonNull String> getMetadata() {
+    public Multimap<@NonNull String, @NonNull Object> getMetadata() {
         return fAspects;
     }
 

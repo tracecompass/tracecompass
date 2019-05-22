@@ -14,7 +14,7 @@ import com.google.common.collect.Multimap;
  */
 public class TmfDataModelSelectedSignal extends TmfSignal {
 
-    private final @NonNull Multimap<@NonNull String, @NonNull String> fMetadata;
+    private final @NonNull Multimap<@NonNull String, @NonNull Object> fMetadata;
 
     /**
      * Constructor
@@ -24,7 +24,7 @@ public class TmfDataModelSelectedSignal extends TmfSignal {
      * @param metadata
      *            The metadata corresponding to the model object being selected
      */
-    public TmfDataModelSelectedSignal(Object source, @NonNull Multimap<@NonNull String, @NonNull String> metadata) {
+    public TmfDataModelSelectedSignal(Object source, Multimap<@NonNull String, @NonNull Object> metadata) {
         super(source);
         fMetadata = metadata;
     }
@@ -34,7 +34,7 @@ public class TmfDataModelSelectedSignal extends TmfSignal {
      *
      * @return The metadata of the selected object
      */
-    public @NonNull Multimap<@NonNull String, @NonNull String> getMetadata() {
+    public @NonNull Multimap<@NonNull String, @NonNull Object> getMetadata() {
         return fMetadata;
     }
 

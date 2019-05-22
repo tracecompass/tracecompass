@@ -115,7 +115,7 @@ public abstract class AbstractTimeGraphDataProvider<A extends TmfStateSystemAnal
     }
 
     @Override
-    public @NonNull Multimap<@NonNull String, @NonNull String> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
+    public @NonNull Multimap<@NonNull String, @NonNull Object> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
         return ITimeGraphStateFilter.mergeMultimaps(ITimeGraphDataProvider.super.getFilterData(entryId, time, monitor),
                 getEntryMetadata(entryId));
     }

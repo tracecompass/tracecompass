@@ -243,7 +243,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         }
         subMonitor.worked(1);
 
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>>> predicates = new HashMap<>();
         Multimap<@NonNull Integer, @NonNull String> regexesMap = DataProviderParameterUtils.extractRegexFilter(parameters);
         if (regexesMap != null) {
             predicates.putAll(computeRegexPredicate(regexesMap));

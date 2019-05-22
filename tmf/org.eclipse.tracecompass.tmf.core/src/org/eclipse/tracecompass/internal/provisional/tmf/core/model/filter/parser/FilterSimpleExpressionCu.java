@@ -180,7 +180,7 @@ public class FilterSimpleExpressionCu implements IFilterCu {
      *            The operator to convert to predicate
      * @return The condition predicate
      */
-    protected static BiPredicate<String, String> getConditionOperator(String equationType) {
+    protected static ConditionOperator getConditionOperator(String equationType) {
         switch (equationType) {
         case IFilterStrings.EQUAL:
             return ConditionOperator.EQ;
@@ -204,7 +204,7 @@ public class FilterSimpleExpressionCu implements IFilterCu {
     /**
      * Condition operators used to compare 2 values together
      */
-    protected enum ConditionOperator implements BiPredicate<String, String> {
+    protected enum ConditionOperator implements BiPredicate<Object, Object> {
         /** equal */
         EQ((i, j) -> equals(i, j)),
         /** not equal */
@@ -212,7 +212,7 @@ public class FilterSimpleExpressionCu implements IFilterCu {
         /** Matches */
         MATCHES(matchFunc()),
         /** Contains */
-        CONTAINS((i, j) -> i.contains(j)),
+        CONTAINS((i, j) -> String.valueOf(i).contains(String.valueOf(j))),
         /** Less than */
         LT((i, j) -> numericalCompare(i, j) < 0),
         /** Greater than */
@@ -220,24 +220,24 @@ public class FilterSimpleExpressionCu implements IFilterCu {
         /** Field is present */
         PRESENT((i, j) -> true);
 
-        private final BiFunction<String, String, Boolean> fCmpFunction;
+        private final BiFunction<Object, Object, Boolean> fCmpFunction;
 
-        ConditionOperator(BiFunction<String, String, Boolean> cmpFunction) {
+        ConditionOperator(BiFunction<Object, Object, Boolean> cmpFunction) {
             fCmpFunction = cmpFunction;
         }
 
-        private static BiFunction<String, String, Boolean> matchFunc() {
+        private static BiFunction<Object, Object, Boolean> matchFunc() {
             return (i, j) -> {
                 try {
-                    Pattern filterPattern = Pattern.compile(j);
-                    return filterPattern.matcher(i).find();
+                    Pattern filterPattern = Pattern.compile(String.valueOf(j));
+                    return filterPattern.matcher(String.valueOf(i)).find();
                 } catch (PatternSyntaxException e) {
                     return false;
                 }
             };
         }
 
-        private static boolean equals(String i, String j) {
+        private static boolean equals(Object i, Object j) {
             if (Objects.equals(i, j)) {
                 return true;
             }
@@ -256,7 +256,7 @@ public class FilterSimpleExpressionCu implements IFilterCu {
             return number1.longValue() == number2.longValue();
         }
 
-        private static int numericalCompare(String i, String j) {
+        private static int numericalCompare(Object i, Object j) {
             Number number1 = toNumber(i);
             if (number1 == null) {
                 // This does not mean that both inputs are equal
@@ -273,21 +273,25 @@ public class FilterSimpleExpressionCu implements IFilterCu {
             return Long.compare(number1.longValue(), number2.longValue());
         }
 
-        private static @Nullable Number toNumber(String value) {
+        private static @Nullable Number toNumber(Object value) {
+            if (value instanceof Number) {
+                return (Number) value;
+            }
+            String val = String.valueOf(value);
             try {
-                return Long.decode(value);
+                return Long.decode(val);
             } catch (NumberFormatException e) {
             }
 
             try {
-                return NumberFormat.getInstance().parse(value);
+                return NumberFormat.getInstance().parse(val);
             } catch (ParseException e) {
             }
             return null;
         }
 
         @Override
-        public boolean test(String arg0, String arg1) {
+        public boolean test(Object arg0, Object arg1) {
             return Objects.requireNonNull(fCmpFunction.apply(arg0, arg1));
         }
     }

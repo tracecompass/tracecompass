@@ -29,7 +29,7 @@ public class FilterNot extends Filter {
     }
 
     @Override
-    public boolean test(Multimap<String, String> data) {
+    public boolean test(Multimap<String, Object> data) {
         return !super.test(data);
     }
 

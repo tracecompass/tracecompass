@@ -204,7 +204,7 @@ public class TimeEvent implements ITimeEvent {
      * @since 4.1
      */
     @Override
-    public @NonNull Multimap<@NonNull String, @NonNull String> getMetadata() {
+    public @NonNull Multimap<@NonNull String, @NonNull Object> getMetadata() {
         // TODO Implement
         return HashMultimap.create();
     }

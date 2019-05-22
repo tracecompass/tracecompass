@@ -333,7 +333,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             }
         }
 
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>>> predicates = new HashMap<>();
         Multimap<@NonNull Integer, @NonNull String> regexesMap = DataProviderParameterUtils.extractRegexFilter(fetchParameters);
         if (regexesMap != null) {
             predicates.putAll(computeRegexPredicate(regexesMap));
@@ -408,18 +408,18 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
      * @param monitor
      *            The progress monitor
      */
-    private void addPoint(Series series, ISegment segment, Map<Integer, Predicate<Multimap<String, String>>> predicates, @Nullable IProgressMonitor monitor) {
+    private void addPoint(Series series, ISegment segment, Map<Integer, Predicate<Multimap<String, Object>>> predicates, @Nullable IProgressMonitor monitor) {
 
         if (!predicates.isEmpty()) {
 
             // Get the filter external input data
-            Multimap<@NonNull String, @NonNull String> input = ISegmentStoreProvider.getFilterInput(fProvider, segment);
+            Multimap<@NonNull String, @NonNull Object> input = ISegmentStoreProvider.getFilterInput(fProvider, segment);
 
             // Test each predicates and set the status of the property associated to the
             // predicate
             int mask = 0;
-            for (Map.Entry<Integer, Predicate<Multimap<String, String>>> mapEntry : predicates.entrySet()) {
-                Predicate<Multimap<String, String>> value = Objects.requireNonNull(mapEntry.getValue());
+            for (Map.Entry<Integer, Predicate<Multimap<String, Object>>> mapEntry : predicates.entrySet()) {
+                Predicate<Multimap<String, Object>> value = Objects.requireNonNull(mapEntry.getValue());
                 boolean status = value.test(input);
                 Integer property = Objects.requireNonNull(mapEntry.getKey());
                 if (status && property != IFilterProperty.DIMMED) {
