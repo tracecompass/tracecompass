@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 Ericsson, École Polytechnique de Montréal, and others
+ * Copyright (c) 2010, 2019 Ericsson, École Polytechnique de Montréal, and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -466,7 +466,8 @@ public class HistoryTreeClassic implements IHistoryTree {
         HTNode targetNode = fLatestBranch.get(indexOfNode);
 
         /* Verify if there is enough room in this node to store this interval */
-        if (interval.getSizeOnDisk() > targetNode.getNodeFreeSpace()) {
+        int newSizeOnDisk = interval.getSizeOnDisk(targetNode.getNodeStart());
+        if (newSizeOnDisk > targetNode.getNodeFreeSpace()) {
             /* Nope, not enough room. Insert in a new sibling instead. */
             addSiblingNode(indexOfNode, interval.getStartTime());
             tryInsertAtNode(interval, fLatestBranch.size() - 1);

@@ -57,7 +57,7 @@ public final class HTInterval implements ITmfStateInterval {
     private final @Nullable Object fStateValue;
 
     /** Number of bytes used by this interval when it is written to disk */
-    private final int fSizeOnDisk;
+    private int fSizeOnDisk;
 
     /**
      * Standard constructor
@@ -84,19 +84,26 @@ public final class HTInterval implements ITmfStateInterval {
         fDuration = intervalEnd - intervalStart;
         fAttribute = attribute;
         fStateValue = (value instanceof TmfStateValue) ? ((ITmfStateValue) value).unboxValue() : value;
-        fSizeOnDisk = computeSizeOnDisk(fStateValue);
+        fSizeOnDisk = computeSizeOnDisk(fStateValue, 0);
     }
 
     /**
      * Compute how much space (in bytes) an interval will take in its serialized
-     * form on disk. This is dependent on its state value.
+     * form on disk. This is dependent on its state value and the start time of
+     * the node it is linked to.
+     *
+     * @param stateValue
+     *            The state value
+     * @param nodeStart
+     *            The start time of the node the interval is linked to
+     * @return The computed size on disk (with HTVarInt encoding)
      */
-    private int computeSizeOnDisk(Object stateValue) {
+    private int computeSizeOnDisk(Object stateValue, long nodeStart) {
         /*
-         * Minimum size is 1x long (start), a value determined by HTVarInt (duration), 1x int (attribute) and 1x
+         * Minimum size is a 2x bytes (start), 2x bytes (duration), 1x int (attribute) and 1x
          * byte (value type).
          */
-        int minSize = Long.BYTES + HTVarInt.getEncodedLengthLong(fDuration) + Integer.BYTES + Byte.BYTES;
+        int minSize = HTVarInt.getEncodedLengthLong(fStart - nodeStart) + HTVarInt.getEncodedLengthLong(fDuration) + Integer.BYTES + Byte.BYTES;
 
         if (stateValue == null) {
             return minSize;
@@ -155,8 +162,8 @@ public final class HTInterval implements ITmfStateInterval {
      * The interval is just a start, end, attribute and value, this is the
      * layout of the HTInterval on disk
      * <ul>
-     * <li>start (8 bytes)</li>
-     * <li>end (8 bytes)</li>
+     * <li>start (2-9 bytes)</li>
+     * <li>end (2-9 bytes)</li>
      * <li>attribute (4 bytes)</li>
      * <li>sv type (1 byte)</li>
      * <li>sv ( 0 bytes for null, 4 for int , 8 for long and double, and the
@@ -165,16 +172,18 @@ public final class HTInterval implements ITmfStateInterval {
      *
      * @param buffer
      *            The ByteBuffer from which to read the information
+     * @param nodeStart
+     *             The start time of the node this interval is linked to
      * @return The interval object
      * @throws IOException
      *             If there was an error reading from the buffer
      */
-    public static final HTInterval readFrom(ByteBuffer buffer) throws IOException {
+    public static final HTInterval readFrom(ByteBuffer buffer, long nodeStart) throws IOException {
         Object value;
 
         int posStart = buffer.position();
         /* Read the Data Section entry */
-        long intervalStart = buffer.getLong();
+        long intervalStart = HTVarInt.readLong(buffer) + nodeStart;
         long intervalEnd = HTVarInt.readLong(buffer) + intervalStart;
         int attribute = buffer.getInt();
 
@@ -242,8 +251,8 @@ public final class HTInterval implements ITmfStateInterval {
      * The interval is just a start, end, attribute and value, this is the
      * layout of the HTInterval on disk
      * <ul>
-     * <li>start (8 bytes)</li>
-     * <li>end (8 bytes)</li>
+     * <li>start (2-9 bytes)</li>
+     * <li>end (2-9 bytes)</li>
      * <li>attribute (4 bytes)</li>
      * <li>sv type (1 byte)</li>
      * <li>sv ( 0 bytes for null, 4 for int , 8 for long and double, and the
@@ -253,8 +262,8 @@ public final class HTInterval implements ITmfStateInterval {
      * @param buffer
      *            The already-allocated ByteBuffer corresponding to a SHT Node
      */
-    public void writeInterval(ByteBuffer buffer) {
-        buffer.putLong(fStart);
+    public void writeInterval(ByteBuffer buffer, long nodeStart) {
+        HTVarInt.writeLong(buffer, fStart - nodeStart);
         HTVarInt.writeLong(buffer, fDuration);
         buffer.putInt(fAttribute);
 
@@ -332,6 +341,24 @@ public final class HTInterval implements ITmfStateInterval {
      */
     public int getSizeOnDisk() {
         return fSizeOnDisk;
+    }
+
+    /**
+     * Computes serialized size of this interval with linked node start time
+     *
+     * @param nodeStart
+     *            The start time of the node the interval is linked to
+     * @return The size of the interval on disk using the HTVarInt encoding
+     */
+    public int getSizeOnDisk(long nodeStart) {
+        return computeSizeOnDisk(fStateValue, nodeStart);
+    }
+
+    /**
+     * @param sizeOnDisk the sizeOnDisk to set
+     */
+    public void setSizeOnDisk(int sizeOnDisk) {
+        fSizeOnDisk = sizeOnDisk;
     }
 
     @Override

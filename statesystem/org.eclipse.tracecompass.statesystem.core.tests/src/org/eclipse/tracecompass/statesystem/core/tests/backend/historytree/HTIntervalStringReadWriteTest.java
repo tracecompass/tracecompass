@@ -156,7 +156,7 @@ public class HTIntervalStringReadWriteTest {
             bb.order(ByteOrder.LITTLE_ENDIAN);
             bb.clear();
 
-            interval.writeInterval(bb);
+            interval.writeInterval(bb, 1);
             bb.flip();
             int written = fc.write(bb);
             assertEquals(sizeOnDisk, written);
@@ -174,7 +174,7 @@ public class HTIntervalStringReadWriteTest {
             int read = fc.read(bb);
             assertEquals(sizeOnDisk, read);
             bb.flip();
-            readInterval = HTInterval.readFrom(bb);
+            readInterval = HTInterval.readFrom(bb, 1);
         }
 
         assertEquals(interval, readInterval);

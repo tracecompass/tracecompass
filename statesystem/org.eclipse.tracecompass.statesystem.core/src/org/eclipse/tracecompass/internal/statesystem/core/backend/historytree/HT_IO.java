@@ -87,7 +87,7 @@ public class HT_IO {
         }
     }
 
-    private static final int CACHE_SIZE = 256;
+    private static final int CACHE_SIZE = 200;
 
     private static final CacheLoader<CacheKey, HTNode> NODE_LOADER = new CacheLoader<CacheKey, HTNode>() {
         @Override

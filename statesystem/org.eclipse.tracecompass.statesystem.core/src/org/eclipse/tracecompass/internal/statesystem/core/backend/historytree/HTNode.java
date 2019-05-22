@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 Ericsson, École Polytechnique de Montréal, and others
+ * Copyright (c) 2010, 2019 Ericsson, École Polytechnique de Montréal, and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -236,7 +236,7 @@ public abstract class HTNode {
          * should only have the intervals left
          */
         for (int i = 0; i < intervalCount; i++) {
-            HTInterval interval = HTInterval.readFrom(buffer);
+            HTInterval interval = HTInterval.readFrom(buffer, start);
             newNode.fIntervals.add(interval);
             newNode.fSizeOfIntervalSection += interval.getSizeOnDisk();
         }
@@ -287,7 +287,7 @@ public abstract class HTNode {
 
             /* Back to us, we write the intervals */
             for (HTInterval interval : fIntervals) {
-                interval.writeInterval(buffer);
+                interval.writeInterval(buffer, fNodeStart);
             }
             if (blockSize - buffer.position() != getNodeFreeSpace()) {
                 throw new IllegalStateException("Wrong free space: Actual: " + (blockSize - buffer.position()) + ", Expected: " + getNodeFreeSpace()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -398,7 +398,8 @@ public abstract class HTNode {
             /*
              * Just in case, should be checked before even calling this function
              */
-            if (newInterval.getSizeOnDisk() > getNodeFreeSpace()) {
+            int newSizeOnDisk = newInterval.getSizeOnDisk(fNodeStart);
+            if (newSizeOnDisk > getNodeFreeSpace()) {
                 // Could be an IO exception, but that would change the API
                 throw new IllegalStateException("Insufficient disk space."); //$NON-NLS-1$
             }
@@ -417,7 +418,7 @@ public abstract class HTNode {
                  */
                 index = -index - 1;
             }
-
+            newInterval.setSizeOnDisk(newSizeOnDisk);
             fIntervals.add(index, newInterval);
             fNodeEnd = Long.max(fNodeEnd, newInterval.getEndTime());
             fMinQuark = Integer.min(fMinQuark, newInterval.getAttribute());

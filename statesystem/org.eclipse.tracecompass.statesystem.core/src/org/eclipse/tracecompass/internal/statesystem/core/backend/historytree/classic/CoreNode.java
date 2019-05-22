@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.In
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTConfig;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTNode;
+import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTVarInt;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.ParentNode;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 
@@ -103,12 +104,12 @@ public final class CoreNode extends ParentNode {
 
         fChildStart = new long[size];
         for (int i = 0; i < size; i++) {
-            fChildStart[i] = buffer.getLong();
+            fChildStart[i] = HTVarInt.readLong(buffer);
         }
 
         fChildEnd = new long[size];
         for (int i = 0; i < size; i++) {
-            fChildEnd[i] = buffer.getLong();
+            fChildEnd[i] = HTVarInt.readLong(buffer);
         }
 
         fChildMin = new int[size];
@@ -133,12 +134,12 @@ public final class CoreNode extends ParentNode {
 
         /* Write the "children's start times" array */
         for (long start : fChildStart) {
-            buffer.putLong(start);
+            HTVarInt.writeLong(buffer, start);
         }
 
         /* Write the "children's end times" array */
         for (long end : fChildEnd) {
-            buffer.putLong(end);
+            HTVarInt.writeLong(buffer, end);
         }
 
         /* Write the "children's min quark" array */
@@ -320,18 +321,18 @@ public final class CoreNode extends ParentNode {
     @Override
     protected int getSpecificHeaderSize() {
         int maxChildren = getConfig().getMaxChildren();
-        return    Integer.BYTES /* 1x int (nbChildren) */
-
-                /* MAX_NB * int ('children' table) */
-                + Integer.BYTES * maxChildren
-
-                /* MAX_NB * Timevalue ('childStart' table) */
-                + Long.BYTES * maxChildren
-                /* MAX_NB * Timevalue ('childEnd' table) */
-                + Long.BYTES * maxChildren
-
-                /* MAX_NB * quark ('childMin' and 'childMax' table) */
-                + 2 * Integer.BYTES * maxChildren;
+        int ret = 0;
+        /* 1x int (nbChildren) */
+        ret += Integer.BYTES;
+        for (int i = 0; i < getConfig().getMaxChildren(); i++) {
+            ret += HTVarInt.getEncodedLengthLong(fChildStart[i]);
+            ret += HTVarInt.getEncodedLengthLong(fChildEnd[i]);
+        }
+        /* MAX_NB * int ('children' table) */
+        ret += Integer.BYTES * maxChildren;
+        /* MAX_NB * quark ('childMin' and 'childMax' table) */
+        ret += 2 * Integer.BYTES * maxChildren;
+        return  ret;
     }
 
     @Override
