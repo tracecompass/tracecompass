@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2017 Ericsson
+ * Copyright (c) 2011, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -51,7 +51,9 @@ import org.eclipse.tracecompass.internal.tmf.ui.views.histogram.HistogramTimeAda
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimePreferencesConstants;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampDelta;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
@@ -378,6 +380,8 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         fTimeLineScale.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
         fTimeLineScale.setHeight(TIME_SCALE_HEIGHT);
         fTimeLineScale.setTimeProvider(new HistogramTimeAdapter(fDataModel));
+
+        updateTimeFormat();
 
         return composite;
     }
@@ -1100,8 +1104,18 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
      */
     @TmfSignalHandler
     public void timestampFormatUpdated(TmfTimestampFormatUpdateSignal signal) {
+        updateTimeFormat();
         fTimeLineScale.redraw();
         fComposite.layout();
     }
 
+    private void updateTimeFormat() {
+        HistogramTimeAdapter timeProvider = (HistogramTimeAdapter) fTimeLineScale.getTimeProvider();
+        String datime = TmfTimePreferences.getPreferenceMap().get(ITmfTimePreferencesConstants.DATIME);
+        if (ITmfTimePreferencesConstants.TIME_ELAPSED_FMT.equals(datime)) {
+            timeProvider.setTimeFormat(TimeFormat.RELATIVE);
+        } else {
+            timeProvider.setTimeFormat(TimeFormat.CALENDAR);
+        }
+    }
 }

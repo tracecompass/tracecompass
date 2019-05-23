@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2018 Ericsson, École Polytechnique de Montréal and others
+ * Copyright (c) 2012, 2019 Ericsson, École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -127,7 +127,9 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimePreferencesConstants;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -315,6 +317,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private ITimeGraphLegendProvider fLegendProvider;
 
     private int fAutoExpandLevel = ALL_LEVELS;
+
+    private @Nullable TimeFormat fTimeFormat = null;
 
     /** The default column index for sorting */
     private int fInitialSortColumn = 0;
@@ -1116,6 +1120,22 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     /**
+     * Sets the time format, or null to use the Time Format 'Date and Time
+     * format' preference (default).
+     *
+     * @param timeFormat
+     *            the {@link TimeFormat} used to display timestamps
+     * @since 5.0
+     */
+    protected void setTimeFormat(TimeFormat timeFormat) {
+        fTimeFormat = timeFormat;
+        if (fTimeGraphViewer != null) {
+            updateTimeFormat();
+            fTimeGraphViewer.refresh();
+        }
+    }
+
+    /**
      * Gets the entry list for a trace
      *
      * @param trace
@@ -1393,8 +1413,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             }
         });
 
-        timeGraphViewer.setTimeFormat(TimeFormat.CALENDAR);
-
         IStatusLineManager statusLineManager = getViewSite().getActionBars().getStatusLineManager();
         timeGraphControl.setStatusLineManager(statusLineManager);
 
@@ -1438,6 +1456,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 activateContextService();
             }
         });
+
+        updateTimeFormat();
     }
 
     private void activateContextService() {
@@ -1698,6 +1718,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     @TmfSignalHandler
     public void updateTimeFormat(final TmfTimestampFormatUpdateSignal signal) {
+        updateTimeFormat();
         fTimeGraphViewer.refresh();
     }
 
@@ -1718,6 +1739,19 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     // ------------------------------------------------------------------------
     // Internal
     // ------------------------------------------------------------------------
+
+    private void updateTimeFormat() {
+        if (fTimeFormat == null) {
+            String datime = TmfTimePreferences.getPreferenceMap().get(ITmfTimePreferencesConstants.DATIME);
+            if (ITmfTimePreferencesConstants.TIME_ELAPSED_FMT.equals(datime)) {
+                fTimeGraphViewer.setTimeFormat(TimeFormat.RELATIVE);
+            } else {
+                fTimeGraphViewer.setTimeFormat(TimeFormat.CALENDAR);
+            }
+        } else {
+            fTimeGraphViewer.setTimeFormat(fTimeFormat);
+        }
+    }
 
     private void loadTrace(final ITmfTrace trace) {
         if (fZoomThread != null) {

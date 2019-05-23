@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 Ericsson
+ * Copyright (c) 2010, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -35,12 +35,15 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfEventFilterAppliedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfEventSearchAppliedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimePreferencesConstants;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
@@ -105,7 +108,6 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         fViewer = new TimeGraphViewer(parent, SWT.NONE);
         fPresentationProvider = new TimeChartAnalysisProvider();
         fViewer.setTimeGraphProvider(fPresentationProvider);
-        fViewer.setTimeFormat(TimeFormat.CALENDAR);
         fViewer.addTimeListener(this);
         fViewer.addRangeListener(this);
         fViewer.addSelectionListener(this);
@@ -126,6 +128,8 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
 
         ColorSettingsManager.addColorSettingsListener(this);
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
+
+        updateTimeFormat();
     }
 
     @Override
@@ -786,6 +790,28 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         }
         decorationProvider.searchApplied(signal.getSearchFilter());
         redecorate();
+    }
+
+    /**
+     * Handler for the Timestamp Format Updated signal
+     *
+     * @param signal
+     *            the format of the timestamps was updated.
+     * @since 5.0
+     */
+    @TmfSignalHandler
+    public void updateTimeFormat(final TmfTimestampFormatUpdateSignal signal) {
+        updateTimeFormat();
+        fViewer.refresh();
+    }
+
+    private void updateTimeFormat() {
+        String datime = TmfTimePreferences.getPreferenceMap().get(ITmfTimePreferencesConstants.DATIME);
+        if (ITmfTimePreferencesConstants.TIME_ELAPSED_FMT.equals(datime)) {
+            fViewer.setTimeFormat(TimeFormat.RELATIVE);
+        } else {
+            fViewer.setTimeFormat(TimeFormat.CALENDAR);
+        }
     }
 
     /**

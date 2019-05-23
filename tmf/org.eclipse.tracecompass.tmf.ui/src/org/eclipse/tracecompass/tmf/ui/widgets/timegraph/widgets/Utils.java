@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2018 Intel Corporation, Ericsson
+ * Copyright (c) 2007, 2019 Intel Corporation, Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -71,6 +71,7 @@ public class Utils {
         /**
          * Timestamp displayed as percentages, where 100% maps to the long value
          * {@link LongToPercentFormat#MAX_PERCENT_VALUE}
+         *
          * @since 4.0
          */
         PERCENTAGE((FormatTimeUtils.TimeFormat.PERCENTAGE));
@@ -79,13 +80,35 @@ public class Utils {
         private TimeFormat(FormatTimeUtils.TimeFormat tf) {
             this.tf = tf;
         }
+
         /**
-         * Convert the {@link TimeFormat} to a {@link org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat}
+         * Convert this {@link TimeFormat} to a
+         * {@link org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat}
+         *
          * @return the converted time format
          * @since 3.3
          */
         public FormatTimeUtils.TimeFormat convert() {
             return tf;
+        }
+
+        /**
+         * Convert the specified
+         * {@link org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat}
+         * to a {@link TimeFormat}
+         *
+         * @param timeFormat
+         *            the time format
+         * @return the converted time format
+         * @since 5.0
+         */
+        public static TimeFormat convert(FormatTimeUtils.TimeFormat timeFormat) {
+            for (TimeFormat format : values()) {
+                if (format.tf == timeFormat) {
+                    return format;
+                }
+            }
+            return null;
         }
     }
 
