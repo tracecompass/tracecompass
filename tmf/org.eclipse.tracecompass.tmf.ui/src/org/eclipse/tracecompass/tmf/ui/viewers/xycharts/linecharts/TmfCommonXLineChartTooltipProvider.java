@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2019 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -18,8 +18,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.tracecompass.internal.tmf.ui.Activator;
-import org.eclipse.tracecompass.internal.tmf.ui.ITmfUIPreferences;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
@@ -81,7 +79,7 @@ public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implemen
                     viewer = (TmfCommonXAxisChartViewer) timeProvider;
                 }
                 ITmfTimestamp time = TmfTimestamp.fromNanos((long) xCoordinate + getChartViewer().getTimeOffset());
-                addItem(null, Messages.TmfCommonXLineChartTooltipProvider_time, time.toString(), time.toNanos());
+                addItem(null, ToolTipString.fromString(Messages.TmfCommonXLineChartTooltipProvider_time), ToolTipString.fromTimestamp(time.toString(), time.toNanos()));
 
                 /* For each series, get the value at the index */
                 for (ISeries serie : series) {
@@ -91,11 +89,11 @@ public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implemen
                      */
                     if (isValid(index, serie)) {
                         String key = serie.getId();
-                        if (key != null && viewer != null && Activator.getDefault().getPreferenceStore().getBoolean(ITmfUIPreferences.USE_BROWSER_TOOLTIPS)) {
+                        if (key != null && viewer != null) {
                             IYAppearance appearance = viewer.getSeriesAppearance(key);
                             key = String.format(HTML_COLOR_TOOLTIP, appearance.getColor(), key);
                         }
-                        addItem(null, key, String.format("%12.2f", yS[index]), null); //$NON-NLS-1$
+                        addItem(null, ToolTipString.fromHtml(key), ToolTipString.fromString(String.format("%12.2f", yS[index]))); //$NON-NLS-1$
                     }
                 }
             }

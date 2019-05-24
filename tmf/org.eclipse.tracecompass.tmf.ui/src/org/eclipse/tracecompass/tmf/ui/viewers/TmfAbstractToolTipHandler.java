@@ -9,20 +9,14 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
@@ -50,8 +44,6 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphTooltipHandler;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -64,21 +56,121 @@ import com.google.common.primitives.Longs;
  * @author Loic Prieur-Drevon - extracted from {@link TimeGraphTooltipHandler}
  */
 public abstract class TmfAbstractToolTipHandler {
+
+    /**
+     * String used for tool tip category, name or value
+     *
+     * @since 5.0
+     */
+    public static class ToolTipString {
+
+        private final String fText;
+        private final String fHtmlString;
+
+        private ToolTipString(String text, String htmlString) {
+            fText = text;
+            fHtmlString = htmlString;
+        }
+
+        /**
+         * Returns the HTML string representation of this tool tip string.
+         *
+         * @return the HTML string
+         */
+        public String toHtmlString() {
+            return fHtmlString;
+        }
+
+        /**
+         * Returns the plain text representation of this tool tip string.
+         *
+         * @return the plain text string
+         */
+        @Override
+        public String toString() {
+            return fText;
+        }
+
+        /**
+         * Creates a tool tip string from a plain text string
+         *
+         * @param text the plain text string
+         * @return the tool tip string
+         */
+        public static ToolTipString fromString(String text) {
+            return new ToolTipString(text, toHtmlString(text));
+        }
+
+        /**
+         * Creates a tool tip string from an HTML string
+         *
+         * @param htmlString the HTML string
+         * @return the tool tip string
+         */
+        public static ToolTipString fromHtml(String htmlString) {
+            return new ToolTipString(toText(htmlString), htmlString);
+        }
+
+        /**
+         * Creates a tool tip string from a timestamp. The HTML string will
+         * contain an hyperlink to the timestamp.
+         *
+         * @param text
+         *            the timestamp plain text representation
+         * @param timestamp
+         *            the timestamp in nanoseconds
+         * @return the tool tip string
+         */
+        public static ToolTipString fromTimestamp(String text, long timestamp) {
+            return new ToolTipString(text, String.format(TIME_HYPERLINK, timestamp, toHtmlString(text)));
+        }
+
+        private static String toHtmlString(String text) {
+            return StringEscapeUtils.escapeHtml4(text)
+                    .replaceAll("[ \\t]", "&nbsp;") //$NON-NLS-1$ //$NON-NLS-2$
+                    .replaceAll("\\r?\\n", "<br>"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+
+        private static String toText(String htmlString) {
+            return StringEscapeUtils.unescapeHtml4(htmlString.replaceAll("\\<[^>]*>", "")); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (obj.getClass() != getClass()) {
+                return false;
+            }
+            ToolTipString other = (ToolTipString) obj;
+            return Objects.equals(fText, other.fText) && Objects.equals(fHtmlString, other.fHtmlString);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(fText, fHtmlString);
+        }
+    }
+
     private static final int MAX_SHELL_WIDTH = 750;
     private static final int MAX_SHELL_HEIGHT = 700;
     private static final int MOUSE_DEADZONE = 5;
-    private static final String TIME_PREFIX = "time://"; //$NON-NLS-1$
+    private static final String TIME_HYPERLINK = "<a href=time://%d>%s</a>"; //$NON-NLS-1$
     private static final Pattern TIME_PATTERN = Pattern.compile("\\s*time\\:\\/\\/(\\d+).*"); //$NON-NLS-1$
 
-    private static final String UNCATEGORIZED = ""; //$NON-NLS-1$
+    private static final ToolTipString UNCATEGORIZED = ToolTipString.fromString(""); //$NON-NLS-1$
     private static final int OFFSET = 16;
     private static Point fScrollBarSize = null;
     private Composite fTipComposite;
     private Shell fTipShell;
     private Rectangle fInitialDeadzone;
     private MouseTrackAdapter fMouseTrackAdapter;
-    private Table<String, String, HyperLink> fModel = HashBasedTable.create();
-    private final DocumentBuilderFactory fDocumentBuilderFactory = DocumentBuilderFactory.newInstance();
+    /** Table of tooltip string information as (category, name, value) tuples */
+    private Table<ToolTipString, ToolTipString, ToolTipString> fModel = HashBasedTable.create();
 
     private static synchronized boolean isBrowserAvailable(Composite parent) {
         boolean isBrowserAvailable = Activator.getDefault().getPreferenceStore().getBoolean(ITmfUIPreferences.USE_BROWSER_TOOLTIPS);
@@ -281,43 +373,52 @@ public abstract class TmfAbstractToolTipHandler {
     }
 
     /**
-     * Method to call to add tuples : name, value to the tooltip. It has
-     * the possibility to add a time value for creating a hyperlink in the
-     * tooltip.
-     *
-     * @param category
-     *            the category of the item (used for grouping)
-     * @param name
-     *            name of the line
-     * @param label
-     *            label to display representing the time or line value
-     * @param time
-     *            time in nanoseconds, if time value else null
-     * @since 5.0
-     */
-    protected void addItem(String category, String name, String label, Long time) {
-        fModel.put(category == null ? UNCATEGORIZED : category, name, new HyperLink(label, time));
-    }
-
-    /**
-     * Method to call to add tuples : name, value to the tooltip.
+     * Adds an uncategorized (name, value) tuple to the tool tip. The name and
+     * value are plain text strings.
      *
      * @param name
      *            name of the line
      * @param value
      *            line value
-     * @deprecated use {@link #addItem(String, String, String, Long)} to
-     *             have categories and/or time
      */
-    @Deprecated
     protected void addItem(String name, String value) {
-        addItem(null, name, value, null);
+        addItem(null, ToolTipString.fromString(name), ToolTipString.fromString(value));
     }
 
     /**
-     * Abstract method to override within implementations. Call
-     * {@link TmfAbstractToolTipHandler#addItem(String, String)} to populate the
-     * tool tip.
+     * Adds a (category, name, value) tuple to the tool tip. The category, name and
+     * value are plain text strings.
+     *
+     * @param category
+     *            the category of the item (used for grouping)
+     * @param name
+     *            name of the line
+     * @param value
+     *            line value
+     * @since 5.0
+     */
+    protected void addItem(String category, String name, String value) {
+        addItem(category == null ? null : ToolTipString.fromString(category), ToolTipString.fromString(name), ToolTipString.fromString(value));
+    }
+
+    /**
+     * Adds a (category, name, value) tuple to the tool tip.
+     *
+     * @param category
+     *            the category of the item (used for grouping)
+     * @param name
+     *            name of the line
+     * @param value
+     *            line value
+     * @since 5.0
+     */
+    protected void addItem(ToolTipString category, ToolTipString name, ToolTipString value) {
+        fModel.put(category == null ? UNCATEGORIZED : category, name, value);
+    }
+
+    /**
+     * Abstract method to override within implementations. Call the addItem()
+     * methods to populate the tool tip.
      *
      * @param control
      *            the underlying control
@@ -328,50 +429,9 @@ public abstract class TmfAbstractToolTipHandler {
      */
     protected abstract void fill(Control control, MouseEvent event, Point pt);
 
-    // Stopgap interface
-    private static class HyperLink {
-        private String fLabel;
-        // TODO: use a real interface
-        private @Nullable Object fLink;
-
-        public HyperLink(String label, @Nullable Object link) {
-            fLabel = label;
-            fLink = link;
-        }
-
-        /**
-         * Get the label
-         *
-         * @return the label
-         */
-        public String getLabel() {
-            return fLabel;
-        }
-
-        /**
-         * Get the link
-         *
-         * @return the link, can be null
-         */
-        public Object getLink() {
-            return fLink;
-        }
-
-        @SuppressWarnings("nls")
-        @Override
-        public String toString() {
-            Object link = getLink();
-            String label = getLabel();
-            if (link == null) {
-                return label;
-            }
-            return "<a href=" + TIME_PREFIX + link + ">" + label + "</a>";
-        }
-    }
-
     private interface ITooltipContent {
         void create();
-        void setInput(Table<String, String, HyperLink> model);
+        void setInput(Table<ToolTipString, ToolTipString, ToolTipString> model);
         Point computePreferredSize();
 
         default void setupControl(Control control) {
@@ -384,7 +444,6 @@ public abstract class TmfAbstractToolTipHandler {
         private static final int MARGIN = 10;
         private static final int CHAR_WIDTH = 9;
         private static final int LINE_HEIGHT = 18;
-        private DocumentBuilder fDocumentBuilder;
 
         public BrowserContent(Composite parent) {
             super(parent);
@@ -393,7 +452,7 @@ public abstract class TmfAbstractToolTipHandler {
         @Override
         public void create() {
             Composite parent = getParent();
-            Table<String, String, HyperLink> model = getModel();
+            Table<ToolTipString, ToolTipString, ToolTipString> model = getModel();
             if (parent == null || model.size() == 0) {
                 return;
             }
@@ -435,32 +494,22 @@ public abstract class TmfAbstractToolTipHandler {
 
         @Override
         public Point computePreferredSize() {
-            Table<String, String, HyperLink> model = getModel();
+            Table<ToolTipString, ToolTipString, ToolTipString> model = getModel();
             int elementCount = model.size();
             int longestString = 0;
             int longestValueString = 0;
-            Set<String> rowKeySet = model.rowKeySet();
-            for (String row : rowKeySet) {
-                Set<@NonNull Entry<String, HyperLink>> entrySet = model.row(row).entrySet();
-                for (Entry<String, HyperLink> entry : entrySet) {
-                    int len;
-                    try (ByteArrayInputStream stream = new ByteArrayInputStream(entry.getKey().getBytes(StandardCharsets.UTF_8))) {
-                        if (fDocumentBuilder == null) {
-                            fDocumentBuilder = fDocumentBuilderFactory.newDocumentBuilder();
-                        }
-                        Document doc = fDocumentBuilder.parse(stream);
-                        len = doc.getFirstChild().getTextContent().length() + 2;
-                    } catch (SAXException | IOException | ParserConfigurationException e) {
-                        len = entry.getKey().length() + 2;
-                    }
-                    longestString = Math.max(longestString, len);
-                    longestValueString = Math.max(longestValueString, +entry.getValue().getLabel().length() + 2);
+            Set<ToolTipString> rowKeySet = model.rowKeySet();
+            for (ToolTipString row : rowKeySet) {
+                Set<@NonNull Entry<ToolTipString, ToolTipString>> entrySet = model.row(row).entrySet();
+                for (Entry<ToolTipString, ToolTipString> entry : entrySet) {
+                    longestString = Math.max(longestString, entry.getKey().toString().length() + 2);
+                    longestValueString = Math.max(longestValueString, +entry.getValue().toString().length() + 2);
                 }
             }
             int noCat = rowKeySet.size();
             if (model.containsRow(UNCATEGORIZED)) {
                 // don't count UNCATEGORIZED because it's not drawn as header
-                noCat -= (noCat > 0 ? 1 : 0);
+                noCat--;
             }
             int w = (longestString + longestValueString) * CHAR_WIDTH + 2 * 2 * MARGIN;
             int h = elementCount * LINE_HEIGHT + noCat * LINE_HEIGHT + 2 * MARGIN;
@@ -469,7 +518,7 @@ public abstract class TmfAbstractToolTipHandler {
 
         @SuppressWarnings("nls")
         private String toHtml() {
-            Table<String, String, HyperLink> model = getModel();
+            Table<ToolTipString, ToolTipString, ToolTipString> model = getModel();
             StringBuilder toolTipContent = new StringBuilder();
             toolTipContent.append("<head>\n" +
                     "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
@@ -509,21 +558,21 @@ public abstract class TmfAbstractToolTipHandler {
                     "</head>");
             toolTipContent.append("<body class=\"bodystyle\">"); //$NON-NLS-1$
 
-            Set<String> rowKeySet = model.rowKeySet();
-            for (String row : rowKeySet) {
+            Set<ToolTipString> rowKeySet = model.rowKeySet();
+            for (ToolTipString row : rowKeySet) {
                 if (!row.equals(UNCATEGORIZED)) {
-                    toolTipContent.append("<button class=\"collapsible\">").append(row).append("</button>");
+                    toolTipContent.append("<button class=\"collapsible\">").append(row.toHtmlString()).append("</button>");
                 }
                 toolTipContent.append("<div class=\"content\">");
                 toolTipContent.append("<table class=\"tab\">");
-                Set<@NonNull Entry<String, HyperLink>> entrySet = model.row(row).entrySet();
-                for (Entry<String, HyperLink> entry : entrySet) {
+                Set<@NonNull Entry<ToolTipString, ToolTipString>> entrySet = model.row(row).entrySet();
+                for (Entry<ToolTipString, ToolTipString> entry : entrySet) {
                     toolTipContent.append("<tr>");
                     toolTipContent.append("<td class=\"paddingBetweenCols\">");
-                    toolTipContent.append(entry.getKey());
+                    toolTipContent.append(entry.getKey().toHtmlString());
                     toolTipContent.append("</td>");
                     toolTipContent.append("<td class=\"paddingBetweenCols\">");
-                    toolTipContent.append(entry.getValue());
+                    toolTipContent.append(entry.getValue().toHtmlString());
                     toolTipContent.append("</td>");
                     toolTipContent.append("</tr>");
                 }
@@ -561,7 +610,7 @@ public abstract class TmfAbstractToolTipHandler {
         @Override
         public void create() {
             Composite parent = getParent();
-            Table<String, String, HyperLink> model = getModel();
+            Table<ToolTipString, ToolTipString, ToolTipString> model = getModel();
             if (parent == null || model.size() == 0) {
                 return;
             }
@@ -577,12 +626,12 @@ public abstract class TmfAbstractToolTipHandler {
             Composite composite = new Composite(scrolledComposite, SWT.NONE);
             composite.setLayout(new GridLayout(3, false));
             setupControl(composite);
-            Set<String> rowKeySet = model.rowKeySet();
-            for (String row : rowKeySet) {
-                Set<@NonNull Entry<String, HyperLink>> entrySet = model.row(row).entrySet();
-                for (Entry<String, HyperLink> entry : entrySet) {
+            Set<ToolTipString> rowKeySet = model.rowKeySet();
+            for (ToolTipString row : rowKeySet) {
+                Set<@NonNull Entry<ToolTipString, ToolTipString>> entrySet = model.row(row).entrySet();
+                for (Entry<ToolTipString, ToolTipString> entry : entrySet) {
                     Label nameLabel = new Label(composite, SWT.NO_FOCUS);
-                    nameLabel.setText(entry.getKey());
+                    nameLabel.setText(entry.getKey().toString());
                     setupControl(nameLabel);
                     Label separator = new Label(composite, SWT.NO_FOCUS | SWT.SEPARATOR | SWT.VERTICAL);
                     GridData gd = new GridData(SWT.CENTER, SWT.CENTER, false, false);
@@ -590,7 +639,7 @@ public abstract class TmfAbstractToolTipHandler {
                     separator.setLayoutData(gd);
                     setupControl(separator);
                     Label valueLabel = new Label(composite, SWT.NO_FOCUS);
-                    valueLabel.setText(entry.getValue().getLabel());
+                    valueLabel.setText(entry.getValue().toString());
                     setupControl(valueLabel);
                 }
             }
@@ -603,20 +652,20 @@ public abstract class TmfAbstractToolTipHandler {
 
     private abstract class AbstractContent implements ITooltipContent {
         private Composite fParent = null;
-        private Table<String, String, HyperLink> fContentModel = null;
+        private Table<ToolTipString, ToolTipString, ToolTipString> fContentModel = null;
 
         public AbstractContent(Composite parent) {
             fParent = parent;
         }
 
         @Override
-        public void setInput(Table<String, String, HyperLink> model) {
+        public void setInput(Table<ToolTipString, ToolTipString, ToolTipString> model) {
             fContentModel = model;
         }
 
         @NonNull
-        protected Table<String, String, HyperLink> getModel() {
-            Table<String, String, HyperLink> model = fContentModel;
+        protected Table<ToolTipString, ToolTipString, ToolTipString> getModel() {
+            Table<ToolTipString, ToolTipString, ToolTipString> model = fContentModel;
             if (model == null) {
                 model = HashBasedTable.create();
             }

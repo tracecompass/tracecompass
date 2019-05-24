@@ -266,15 +266,15 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             if (selectionBeginBucket <= index && index <= selectionEndBucket && fSelectionBegin != fSelectionEnd) {
                 long start = Math.abs(fSelectionEnd - fSelectionBegin);
                 TmfTimestampDelta delta = new TmfTimestampDelta(start, ITmfTimestamp.NANOSECOND_SCALE);
-                addItem(null, Messages.Histogram_selectionSpanToolTip, delta.toString(), null);
+                addItem(null, Messages.Histogram_selectionSpanToolTip, delta.toString());
             }
-            addItem(null, Messages.Histogram_bucketRangeToolTip, NLS.bind(Messages.Histogram_timeRange,
-                    TmfTimestamp.fromNanos(startTime).toString(),
-                    TmfTimestamp.fromNanos(endTime).toString()), startTime);
-            addItem(null, Messages.Histogram_eventCountToolTip, Long.toString(nbEvents), null);
+            addItem(null, ToolTipString.fromString(Messages.Histogram_bucketRangeToolTip),
+                    ToolTipString.fromTimestamp(NLS.bind(Messages.Histogram_timeRange,
+                            TmfTimestamp.fromNanos(startTime).toString(), TmfTimestamp.fromNanos(endTime).toString()), startTime));
+            addItem(null, Messages.Histogram_eventCountToolTip, Long.toString(nbEvents));
             if (!HistogramScaledData.hideLostEvents) {
                 final int nbLostEvents = (index >= 0) ? fScaledData.fLostEventsData[index] : 0;
-                addItem(null, Messages.Histogram_lostEventCountToolTip, Long.toString(nbLostEvents), null);
+                addItem(null, Messages.Histogram_lostEventCountToolTip, Long.toString(nbLostEvents));
             }
         }
     };

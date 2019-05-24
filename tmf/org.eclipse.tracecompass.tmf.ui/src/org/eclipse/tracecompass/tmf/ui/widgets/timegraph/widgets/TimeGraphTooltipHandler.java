@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2018 Intel Corporation, Ericsson
+ * Copyright (c) 2007, 2019 Intel Corporation, Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -150,18 +150,18 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
         Map<String, String> toolTips = fTimeGraphProvider.getEventHoverToolTipInfo(marker);
         String category = marker.getCategory();
         String label = marker.getLabel();
-        addItem(itemName, category == null ? Messages.TimeGraphTooltipHandler_DefaultMarkerName : category, label == null ? "" : label, null); //$NON-NLS-1$
+        addItem(itemName, category == null ? Messages.TimeGraphTooltipHandler_DefaultMarkerName : category, label == null ? "" : label); //$NON-NLS-1$
         long timestamp = marker.getTime();
         long duration = marker.getDuration();
         if (duration == 0) {
-            addItem(itemName, MARKER_OFFSET + Messages.TimeGraphTooltipHandler_Timestamp, TmfTimestamp.fromNanos(timestamp).toString(), timestamp);
+            addItem(ToolTipString.fromString(itemName), ToolTipString.fromString(MARKER_OFFSET + Messages.TimeGraphTooltipHandler_Timestamp), ToolTipString.fromTimestamp(TmfTimestamp.fromNanos(timestamp).toString(), timestamp));
         } else {
-            addItem(itemName, MARKER_OFFSET + Messages.TimeGraphTooltipHandler_StartTime, TmfTimestamp.fromNanos(timestamp).toString(), timestamp);
-            addItem(itemName, MARKER_OFFSET + Messages.TimeGraphTooltipHandler_EndTime, TmfTimestamp.fromNanos(timestamp + duration).toString(), timestamp);
+            addItem(ToolTipString.fromString(itemName), ToolTipString.fromString(MARKER_OFFSET + Messages.TimeGraphTooltipHandler_StartTime), ToolTipString.fromTimestamp(TmfTimestamp.fromNanos(timestamp).toString(), timestamp));
+            addItem(ToolTipString.fromString(itemName), ToolTipString.fromString(MARKER_OFFSET + Messages.TimeGraphTooltipHandler_EndTime), ToolTipString.fromTimestamp(TmfTimestamp.fromNanos(timestamp + duration).toString(), timestamp + duration));
         }
         if (toolTips != null) {
             for (Entry<String, String> tooltip : toolTips.entrySet()) {
-                addItem(itemName, MARKER_OFFSET + tooltip.getKey(), tooltip.getValue(), null); // $NON-NLS-1$
+                addItem(itemName, MARKER_OFFSET + tooltip.getKey(), tooltip.getValue()); // $NON-NLS-1$
             }
         }
     }
@@ -227,7 +227,7 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
             }
 
             if (!entryName.isEmpty()) {
-                addItem(ROW_CATEGORY, stateTypeName, entry.getName(), null);
+                addItem(ROW_CATEGORY, stateTypeName, entry.getName());
             }
 
             if (currEvent == null || currEvent instanceof NullTimeEvent) {
@@ -237,7 +237,7 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
             // state
             String state = fTimeGraphProvider.getEventName(currEvent);
             if (state != null) {
-                addItem(STATE_CATEGORY, Messages.TmfTimeTipHandler_TRACE_STATE, state, null);
+                addItem(STATE_CATEGORY, Messages.TmfTimeTipHandler_TRACE_STATE, state);
             }
 
             // This block receives a list of <String, String> values to
@@ -245,7 +245,7 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
             Map<String, String> eventAddOns = fTimeGraphProvider.getEventHoverToolTipInfo(currEvent, currPixelTime);
             if (eventAddOns != null) {
                 for (Entry<String, String> eventAddOn : eventAddOns.entrySet()) {
-                    addItem(STATE_CATEGORY, eventAddOn.getKey(), eventAddOn.getValue(), null);
+                    addItem(STATE_CATEGORY, eventAddOn.getKey(), eventAddOn.getValue());
                 }
             }
             if (fTimeGraphProvider.displayTimesInTooltip()) {
@@ -293,18 +293,17 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
                 }
                 if (tf == TimeFormat.CALENDAR) {
                     addItem(STATE_CATEGORY, Messages.TmfTimeTipHandler_TRACE_DATE,
-                            eventStartTime > -1 ? FormatTimeUtils.formatDate(eventStartTime) : "?", //$NON-NLS-1$
-                            eventStartTime > -1 ? eventStartTime : null);
+                            eventStartTime > -1 ? FormatTimeUtils.formatDate(eventStartTime) : "?"); //$NON-NLS-1$
                 }
                 if (eventDuration > 0) {
-                    addItem(STATE_CATEGORY, Messages.TmfTimeTipHandler_TRACE_START_TIME, startTime, eventStartTime);
-                    addItem(STATE_CATEGORY, Messages.TmfTimeTipHandler_TRACE_STOP_TIME, endTime, eventEndTime);
+                    addItem(ToolTipString.fromString(STATE_CATEGORY), ToolTipString.fromString(Messages.TmfTimeTipHandler_TRACE_START_TIME), ToolTipString.fromTimestamp(startTime, eventStartTime));
+                    addItem(ToolTipString.fromString(STATE_CATEGORY), ToolTipString.fromString(Messages.TmfTimeTipHandler_TRACE_STOP_TIME), ToolTipString.fromTimestamp(endTime, eventEndTime));
                 } else {
-                    addItem(STATE_CATEGORY, Messages.TmfTimeTipHandler_TRACE_EVENT_TIME, startTime, eventStartTime);
+                    addItem(ToolTipString.fromString(STATE_CATEGORY), ToolTipString.fromString(Messages.TmfTimeTipHandler_TRACE_EVENT_TIME), ToolTipString.fromTimestamp(startTime, eventStartTime));
                 }
 
                 if (eventDuration > 0) {
-                    addItem(STATE_CATEGORY, Messages.TmfTimeTipHandler_DURATION, duration, null);
+                    addItem(STATE_CATEGORY, Messages.TmfTimeTipHandler_DURATION, duration);
                     long begin = fTimeDataProvider.getSelectionBegin();
                     long end = fTimeDataProvider.getSelectionEnd();
                     final long delta = Math.abs(end - begin);
@@ -319,7 +318,7 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
                             percentage = String.format("%,.2f%%", durationRatio * 100.0); //$NON-NLS-1$
                         }
 
-                        addItem(STATE_CATEGORY, Messages.TmfTimeTipHandler_PERCENT_OF_SELECTION, percentage, null);
+                        addItem(STATE_CATEGORY, Messages.TmfTimeTipHandler_PERCENT_OF_SELECTION, percentage);
                     }
                 }
             }
@@ -327,15 +326,15 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
     }
 
     private void fillValues(ILinkEvent linkEvent) {
-        addItem(LINK_CATEGORY, Messages.TmfTimeTipHandler_LINK_SOURCE, linkEvent.getEntry().getName(), null);
-        addItem(LINK_CATEGORY, Messages.TmfTimeTipHandler_LINK_TARGET, linkEvent.getDestinationEntry().getName(), null);
+        addItem(LINK_CATEGORY, Messages.TmfTimeTipHandler_LINK_SOURCE, linkEvent.getEntry().getName());
+        addItem(LINK_CATEGORY, Messages.TmfTimeTipHandler_LINK_TARGET, linkEvent.getDestinationEntry().getName());
 
         // This block receives a list of <String, String> values to be
         // added to the tip table
         Map<String, String> eventAddOns = fTimeGraphProvider.getEventHoverToolTipInfo(linkEvent);
         if (eventAddOns != null) {
             for (Entry<String, String> eventAddOn : eventAddOns.entrySet()) {
-                addItem(LINK_CATEGORY, eventAddOn.getKey(), eventAddOn.getValue(), null);
+                addItem(LINK_CATEGORY, eventAddOn.getKey(), eventAddOn.getValue());
             }
         }
         if (fTimeGraphProvider.displayTimesInTooltip()) {
@@ -351,14 +350,14 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
             Resolution res = Resolution.NANOSEC;
             TimeFormat tf = fTimeDataProvider.getTimeFormat().convert();
             if (tf == TimeFormat.CALENDAR) {
-                addItem(LINK_CATEGORY, Messages.TmfTimeTipHandler_TRACE_DATE, FormatTimeUtils.formatDate(sourceTime), sourceTime);
+                addItem(LINK_CATEGORY, Messages.TmfTimeTipHandler_TRACE_DATE, FormatTimeUtils.formatDate(sourceTime));
             }
             if (duration > 0) {
-                addItem(LINK_CATEGORY, Messages.TmfTimeTipHandler_LINK_SOURCE_TIME, FormatTimeUtils.formatTime(sourceTime, tf, res), sourceTime);
-                addItem(LINK_CATEGORY, Messages.TmfTimeTipHandler_LINK_TARGET_TIME, FormatTimeUtils.formatTime(targetTime, tf, res), targetTime);
-                addItem(LINK_CATEGORY, Messages.TmfTimeTipHandler_DURATION, FormatTimeUtils.formatDelta(duration, tf, res), null);
+                addItem(ToolTipString.fromString(LINK_CATEGORY), ToolTipString.fromString(Messages.TmfTimeTipHandler_LINK_SOURCE_TIME), ToolTipString.fromTimestamp(FormatTimeUtils.formatTime(sourceTime, tf, res), sourceTime));
+                addItem(ToolTipString.fromString(LINK_CATEGORY), ToolTipString.fromString(Messages.TmfTimeTipHandler_LINK_TARGET_TIME), ToolTipString.fromTimestamp(FormatTimeUtils.formatTime(targetTime, tf, res), targetTime));
+                addItem(LINK_CATEGORY, Messages.TmfTimeTipHandler_DURATION, FormatTimeUtils.formatDelta(duration, tf, res));
             } else {
-                addItem(LINK_CATEGORY, Messages.TmfTimeTipHandler_LINK_TIME, FormatTimeUtils.formatTime(sourceTime, tf, res), sourceTime);
+                addItem(ToolTipString.fromString(LINK_CATEGORY), ToolTipString.fromString(Messages.TmfTimeTipHandler_LINK_TIME), ToolTipString.fromTimestamp(FormatTimeUtils.formatTime(sourceTime, tf, res), sourceTime));
             }
         }
     }
