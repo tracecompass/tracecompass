@@ -713,8 +713,7 @@ public final class BitBuffer {
     }
 
     /**
-     *
-     * Sets the position in the buffer.
+     * Gets the position in the buffer, in bits.
      *
      * @return order The position of the buffer.
      */
