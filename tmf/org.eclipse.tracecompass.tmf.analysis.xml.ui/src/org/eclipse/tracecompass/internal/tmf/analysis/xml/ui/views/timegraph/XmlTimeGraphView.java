@@ -81,20 +81,20 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
-    private static final Comparator<DataDrivenOutputEntryModel> XML_ENTRY_COMPARATOR = ((DataDrivenOutputEntryModel obj1, DataDrivenOutputEntryModel obj2) -> {
+    private static final Comparator<TimeGraphEntryModel> XML_ENTRY_COMPARATOR = ((TimeGraphEntryModel obj1, TimeGraphEntryModel obj2) -> {
         try {
             return Comparator
-                    .comparing((DataDrivenOutputEntryModel obj) -> Long.decode(obj.getName()))
-                    .thenComparingLong(DataDrivenOutputEntryModel::getStartTime)
+                    .comparing((TimeGraphEntryModel obj) -> Long.decode(obj.getName()))
+                    .thenComparingLong(TimeGraphEntryModel::getStartTime)
                     .compare(obj1, obj2);
         } catch (NumberFormatException nfe) {
             return Comparator
-                    .comparing(DataDrivenOutputEntryModel::getName)
-                    .thenComparingLong(DataDrivenOutputEntryModel::getStartTime)
+                    .comparing(TimeGraphEntryModel::getName)
+                    .thenComparingLong(TimeGraphEntryModel::getStartTime)
                     .compare(obj1, obj2);
         }
     });
-    private static final Comparator<ITimeGraphEntry> ENTRY_COMPARATOR = Comparator.comparing(x -> (DataDrivenOutputEntryModel) ((TimeGraphEntry) x).getModel(), XML_ENTRY_COMPARATOR);
+    private static final Comparator<ITimeGraphEntry> ENTRY_COMPARATOR = Comparator.comparing(x -> (TimeGraphEntryModel) ((TimeGraphEntry) x).getModel(), XML_ENTRY_COMPARATOR);
 
     private final @NonNull XmlViewInfo fViewInfo = new XmlViewInfo(ID);
     private final Map<String, Integer> fStringValueMap = new HashMap<>();
