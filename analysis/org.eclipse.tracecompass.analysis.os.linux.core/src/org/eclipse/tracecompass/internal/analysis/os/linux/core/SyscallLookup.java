@@ -63,7 +63,7 @@ public final class SyscallLookup {
                     Activator.getDefault().logWarning("Syscall names not available!"); //$NON-NLS-1$
                     return new SyscallLookup(Collections.emptyList());
                 }
-                return new SyscallLookup(FileUtils.readLines(file, StandardCharsets.UTF_8));
+                return new SyscallLookup(FileUtils.readLines(file, StandardCharsets.UTF_8.name()));
             }
         } catch (IOException e) {
             Activator.getDefault().logError("Failed to read file", e); //$NON-NLS-1$
