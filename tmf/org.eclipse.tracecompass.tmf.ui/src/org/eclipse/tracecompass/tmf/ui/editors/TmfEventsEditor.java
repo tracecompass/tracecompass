@@ -97,10 +97,12 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
 
     @Override
     public void doSave(final IProgressMonitor monitor) {
+        // Do nothing
     }
 
     @Override
     public void doSaveAs() {
+        // Do nothing
     }
 
     @Override
@@ -510,14 +512,17 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
 
     @Override
     public void partClosed(IWorkbenchPart part) {
+        // Do nothing
     }
 
     @Override
     public void partDeactivated(IWorkbenchPart part) {
+        // Do nothing
     }
 
     @Override
     public void partOpened(IWorkbenchPart part) {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------

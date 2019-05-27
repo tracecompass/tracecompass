@@ -502,10 +502,12 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
 
         @Override
         public void dispose() {
+            // Do nothing
         }
 
         @Override
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+            // Do nothing
         }
 
         @Override
@@ -1143,6 +1145,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             cardinalityCombo.addSelectionListener(new SelectionListener() {
                 @Override
                 public void widgetDefaultSelected(SelectionEvent e) {
+                    // Do nothing
                 }
 
                 @Override
@@ -1487,6 +1490,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
             tagCombo.addSelectionListener(new SelectionListener() {
                 @Override
                 public void widgetDefaultSelected(SelectionEvent e) {
+                    // Do nothing
                 }
 
                 @Override

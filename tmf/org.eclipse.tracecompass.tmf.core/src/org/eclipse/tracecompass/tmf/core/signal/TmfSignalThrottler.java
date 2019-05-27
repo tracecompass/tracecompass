@@ -69,6 +69,7 @@ public class TmfSignalThrottler {
         fCurrentTask = new TimerTask() {
             @Override
             public void run() {
+                // Do nothing
             }
         };
     }

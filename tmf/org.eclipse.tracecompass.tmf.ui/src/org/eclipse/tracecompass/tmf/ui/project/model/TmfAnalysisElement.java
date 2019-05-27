@@ -413,6 +413,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
      */
     @Override
     public final void resetPropertyValue(Object id) {
+        // Do nothing
     }
 
     /**
@@ -420,6 +421,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
      */
     @Override
     public final void setPropertyValue(Object id, Object value) {
+        // Do nothing
     }
 
     /**

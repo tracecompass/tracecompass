@@ -633,10 +633,12 @@ public class TmfTraceElement extends TmfCommonProjectElement implements IActionF
 
     @Override
     public void resetPropertyValue(Object id) {
+        // Do nothing
     }
 
     @Override
     public void setPropertyValue(Object id, Object value) {
+        // Do nothing
     }
 
     @Override

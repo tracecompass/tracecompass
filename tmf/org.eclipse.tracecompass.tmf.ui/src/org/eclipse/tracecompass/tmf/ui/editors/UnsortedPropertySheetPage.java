@@ -32,6 +32,7 @@ public class UnsortedPropertySheetPage extends PropertySheetPage {
         setSorter(new PropertySheetSorter() {
             @Override
             public void sort(IPropertySheetEntry[] entries) {
+                // Empty sorter, do nothing
             }
         });
     }

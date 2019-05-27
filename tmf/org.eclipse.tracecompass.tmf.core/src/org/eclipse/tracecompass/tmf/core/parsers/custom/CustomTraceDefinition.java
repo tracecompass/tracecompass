@@ -238,10 +238,12 @@ public abstract class CustomTraceDefinition {
         return new ErrorHandler() {
             @Override
             public void error(SAXParseException saxparseexception) throws SAXException {
+                // Do nothing
             }
 
             @Override
             public void warning(SAXParseException saxparseexception) throws SAXException {
+                // Do nothing
             }
 
             @Override

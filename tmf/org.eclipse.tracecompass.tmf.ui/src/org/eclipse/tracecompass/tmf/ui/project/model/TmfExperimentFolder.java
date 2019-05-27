@@ -255,10 +255,12 @@ public class TmfExperimentFolder extends TmfProjectModelElement implements IProp
 
     @Override
     public void resetPropertyValue(Object id) {
+        // Do nothing
     }
 
     @Override
     public void setPropertyValue(Object id, Object value) {
+        // Do nothing
     }
 
     @Override

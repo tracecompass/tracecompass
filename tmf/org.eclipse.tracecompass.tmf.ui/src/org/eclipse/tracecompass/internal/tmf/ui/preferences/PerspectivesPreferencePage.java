@@ -47,6 +47,7 @@ public class PerspectivesPreferencePage extends FieldEditorPreferencePage implem
 
     @Override
     public void init(IWorkbench workbench) {
+        // Do nothing
     }
 
     @Override

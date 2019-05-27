@@ -24,7 +24,7 @@ public class CriticalPathModuleListener implements ITmfNewAnalysisModuleListener
      * Constructor
      */
     public CriticalPathModuleListener() {
-
+        // Do nothing
     }
 
     @Override

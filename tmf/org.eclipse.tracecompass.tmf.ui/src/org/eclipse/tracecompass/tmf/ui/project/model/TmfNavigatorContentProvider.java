@@ -111,22 +111,27 @@ public class TmfNavigatorContentProvider implements IPipelinedTreeContentProvide
 
     @Override
     public void dispose() {
+        // Do nothing
     }
 
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        // Do nothing
     }
 
     @Override
     public void restoreState(IMemento aMemento) {
+        // Do nothing
     }
 
     @Override
     public void saveState(IMemento aMemento) {
+        // Do nothing
     }
 
     @Override
     public void init(ICommonContentExtensionSite aConfig) {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------

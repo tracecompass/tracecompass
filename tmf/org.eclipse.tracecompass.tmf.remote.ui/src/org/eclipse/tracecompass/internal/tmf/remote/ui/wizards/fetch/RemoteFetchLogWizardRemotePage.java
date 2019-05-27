@@ -231,6 +231,7 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
 
     @Override
     protected void updateWithFilePathSelection() {
+        // Do nothing
     }
 
     @Override

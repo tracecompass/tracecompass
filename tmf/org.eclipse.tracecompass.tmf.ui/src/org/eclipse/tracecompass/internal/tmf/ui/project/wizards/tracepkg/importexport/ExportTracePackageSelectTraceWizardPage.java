@@ -96,10 +96,12 @@ public class ExportTracePackageSelectTraceWizardPage extends WizardPage {
         traceViewer.setContentProvider(new IStructuredContentProvider() {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+                // Do nothing
             }
 
             @Override
             public void dispose() {
+                // Do nothing
             }
 
             @Override

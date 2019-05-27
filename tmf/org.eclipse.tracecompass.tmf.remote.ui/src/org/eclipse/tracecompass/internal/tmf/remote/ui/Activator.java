@@ -55,6 +55,7 @@ public class Activator extends AbstractUIPlugin {
      * Constructor
      */
     public Activator() {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------

@@ -56,6 +56,7 @@ public class TracingRcpPlugin extends AbstractUIPlugin {
      * The default constructor
      */
     public TracingRcpPlugin() {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------

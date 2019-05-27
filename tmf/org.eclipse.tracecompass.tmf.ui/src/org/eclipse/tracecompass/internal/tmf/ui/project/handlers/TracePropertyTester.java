@@ -47,6 +47,7 @@ public class TracePropertyTester extends PropertyTester {
      * Default constructor
      */
     public TracePropertyTester() {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------

@@ -49,7 +49,7 @@ public class TmfEventMatches implements IMatchProcessingUnit {
 
     @Override
     public void matchingEnded() {
-
+        // Do nothing
     }
 
     @Override

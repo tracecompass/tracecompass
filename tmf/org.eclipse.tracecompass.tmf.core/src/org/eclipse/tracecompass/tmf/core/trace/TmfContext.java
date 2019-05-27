@@ -123,6 +123,7 @@ public class TmfContext implements ITmfContext {
 
     @Override
     public void dispose() {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------

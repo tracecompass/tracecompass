@@ -84,7 +84,12 @@ public abstract class TmfEventProvider extends TmfComponent implements ITmfEvent
     private Timer fTimer;
 
     /** Current timer task */
-    @NonNull private TimerTask fCurrentTask = new TimerTask() { @Override public void run() {} };
+    @NonNull private TimerTask fCurrentTask = new TimerTask() {
+        @Override
+        public void run() {
+            // Do nothing
+        }
+    };
 
     private boolean fIsTimerEnabled;
 
