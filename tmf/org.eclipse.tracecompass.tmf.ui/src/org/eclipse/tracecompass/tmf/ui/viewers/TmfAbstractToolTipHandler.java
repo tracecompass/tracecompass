@@ -25,6 +25,8 @@ import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
+import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -343,7 +345,8 @@ public abstract class TmfAbstractToolTipHandler {
         content.setInput(fModel);
         content.create();
         Point p = content.computePreferredSize();
-        Rectangle t = fTipShell.computeTrim(0, 0, p.x, p.y);
+        Point scrollBarSize = getScrollbarSize(fTipComposite);
+        Rectangle t = fTipShell.computeTrim(0, 0, p.x + scrollBarSize.x, p.y);
         fTipShell.setSize(Math.min(t.width, MAX_SHELL_WIDTH), Math.min(t.height, MAX_SHELL_HEIGHT));
     }
 
@@ -442,8 +445,6 @@ public abstract class TmfAbstractToolTipHandler {
 
     private class BrowserContent extends AbstractContent {
         private static final int MARGIN = 10;
-        private static final int CHAR_WIDTH = 9;
-        private static final int LINE_HEIGHT = 18;
 
         public BrowserContent(Composite parent) {
             super(parent);
@@ -489,35 +490,46 @@ public abstract class TmfAbstractToolTipHandler {
             scrolledComposite.setContent(browser);
             Point preferredSize = computePreferredSize();
             Point scrollBarSize = getScrollbarSize(scrolledComposite);
-            scrolledComposite.setMinSize(Math.min(preferredSize.x > scrollBarSize.x ? preferredSize.x - scrollBarSize.x : preferredSize.x, MAX_SHELL_WIDTH - scrollBarSize.x), 0);
+            scrolledComposite.setMinSize(Math.min(preferredSize.x + scrollBarSize.x, MAX_SHELL_WIDTH - scrollBarSize.x), 0);
         }
 
         @Override
         public Point computePreferredSize() {
             Table<ToolTipString, ToolTipString, ToolTipString> model = getModel();
-            int elementCount = model.size();
-            int longestString = 0;
-            int longestValueString = 0;
+            int widestCat = 0;
+            int widestKey = 0;
+            int widestVal = 0;
+            int totalHeight = 0;
             Set<ToolTipString> rowKeySet = model.rowKeySet();
+            GC gc = new GC(Display.getDefault());
             for (ToolTipString row : rowKeySet) {
+                if (!row.equals(UNCATEGORIZED)) {
+                    Point catExtent = gc.textExtent(row.toString());
+                    widestCat = Math.max(widestCat, catExtent.x);
+                    totalHeight += catExtent.y + 8;
+                }
                 Set<@NonNull Entry<ToolTipString, ToolTipString>> entrySet = model.row(row).entrySet();
                 for (Entry<ToolTipString, ToolTipString> entry : entrySet) {
-                    longestString = Math.max(longestString, entry.getKey().toString().length() + 2);
-                    longestValueString = Math.max(longestValueString, +entry.getValue().toString().length() + 2);
+                    Point keyExtent = gc.textExtent(entry.getKey().toString());
+                    Point valExtent = gc.textExtent(entry.getValue().toString());
+                    widestKey = Math.max(widestKey, keyExtent.x);
+                    widestVal = Math.max(widestVal, valExtent.x);
+                    totalHeight += Math.max(keyExtent.y, valExtent.y) + 4;
                 }
             }
-            int noCat = rowKeySet.size();
-            if (model.containsRow(UNCATEGORIZED)) {
-                // don't count UNCATEGORIZED because it's not drawn as header
-                noCat--;
-            }
-            int w = (longestString + longestValueString) * CHAR_WIDTH + 2 * 2 * MARGIN;
-            int h = elementCount * LINE_HEIGHT + noCat * LINE_HEIGHT + 2 * MARGIN;
+            gc.dispose();
+            int w = Math.max(widestCat, widestKey + MARGIN + widestVal) + 2 * MARGIN;
+            int h = totalHeight + 2 * MARGIN;
             return new Point(w, h);
         }
 
         @SuppressWarnings("nls")
         private String toHtml() {
+            GC gc = new GC(Display.getDefault());
+            FontData fontData = gc.getFont().getFontData()[0];
+            String fontName = fontData.getName();
+            String fontHeight = fontData.getHeight() + "pt";
+            gc.dispose();
             Table<ToolTipString, ToolTipString, ToolTipString> model = getModel();
             StringBuilder toolTipContent = new StringBuilder();
             toolTipContent.append("<head>\n" +
@@ -532,7 +544,8 @@ public abstract class TmfAbstractToolTipHandler {
                     "  border: none;\n" +
                     "  text-align: left;\n" +
                     "  outline: none;\n" +
-                    "  font-size: 12px;\n" +
+                    "  font-family: " + fontName +";\n" +
+                    "  font-size: " + fontHeight + ";\n" +
                     "}\n" +
                     "\n" +
                     ".active, .collapsible:hover {\n" +
@@ -546,10 +559,12 @@ public abstract class TmfAbstractToolTipHandler {
                     "  background-color: #f1f1f1;\n" +
                     "}\n" +
                     ".tab {\n" +
-                    "  font-size: 14px;\n" +
+                    "  padding:0px;\n" +
+                    "  font-family: " + fontName +";\n" +
+                    "  font-size: " + fontHeight + ";\n" +
                     "}\n" +
-                    ".paddingBetweenCols {\n" +
-                    "  padding:0px 10px 0px 10px;\n" +
+                    ".leftPadding {\n" +
+                    "  padding:0px 0px 0px 10px;\n" +
                     "}\n" +
                     ".bodystyle {\n" +
                     "  padding:0px 0px;\n" +
@@ -558,26 +573,26 @@ public abstract class TmfAbstractToolTipHandler {
                     "</head>");
             toolTipContent.append("<body class=\"bodystyle\">"); //$NON-NLS-1$
 
+            toolTipContent.append("<div class=\"content\">");
+            toolTipContent.append("<table class=\"tab\">");
             Set<ToolTipString> rowKeySet = model.rowKeySet();
             for (ToolTipString row : rowKeySet) {
                 if (!row.equals(UNCATEGORIZED)) {
-                    toolTipContent.append("<button class=\"collapsible\">").append(row.toHtmlString()).append("</button>");
+                    toolTipContent.append("<tr><th colspan=\"2\"><button class=\"collapsible\">").append(row.toHtmlString()).append("</button></th></tr>");
                 }
-                toolTipContent.append("<div class=\"content\">");
-                toolTipContent.append("<table class=\"tab\">");
                 Set<@NonNull Entry<ToolTipString, ToolTipString>> entrySet = model.row(row).entrySet();
                 for (Entry<ToolTipString, ToolTipString> entry : entrySet) {
                     toolTipContent.append("<tr>");
-                    toolTipContent.append("<td class=\"paddingBetweenCols\">");
+                    toolTipContent.append("<td>");
                     toolTipContent.append(entry.getKey().toHtmlString());
                     toolTipContent.append("</td>");
-                    toolTipContent.append("<td class=\"paddingBetweenCols\">");
+                    toolTipContent.append("<td class=\"leftPadding\">");
                     toolTipContent.append(entry.getValue().toHtmlString());
                     toolTipContent.append("</td>");
                     toolTipContent.append("</tr>");
                 }
-                toolTipContent.append("</table></div>");
             }
+            toolTipContent.append("</table></div>");
             /* Add when enabling JavaScript
             toolTipContent.append("\n" +
                     "<script>\n" +
