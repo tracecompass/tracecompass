@@ -157,16 +157,6 @@ public class SeriesModel implements ISeriesModel {
     }
 
     @Override
-    public long[] getXValues() {
-        return fXValues;
-    }
-
-    @Override
-    public double[] getYValues() {
-        return fYValues;
-    }
-
-    @Override
     public TmfXYAxis getXAxisDescription() {
         return fXAxis;
     }
@@ -182,13 +172,11 @@ public class SeriesModel implements ISeriesModel {
     }
 
     @Override
-    @Deprecated
     public long[] getXAxis() {
         return fXValues;
     }
 
     @Override
-    @Deprecated
     public double[] getData() {
         return fYValues;
     }
@@ -212,8 +200,8 @@ public class SeriesModel implements ISeriesModel {
         SeriesModel other = (SeriesModel) obj;
         return fName.equals(other.getName())
                 && fId == other.getId()
-                && Arrays.equals(fXValues, other.getXValues())
-                && Arrays.equals(fYValues, other.getYValues())
+                && Arrays.equals(fXValues, other.getXAxis())
+                && Arrays.equals(fYValues, other.getData())
                 && fXAxis.equals(other.getXAxisDescription())
                 && fYAxis.equals(other.getYAxisDescription());
     }

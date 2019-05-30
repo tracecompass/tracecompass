@@ -80,26 +80,6 @@ public interface ISeriesModel {
     }
 
     /**
-     * Get the X values
-     *
-     * @return The x values
-     * @since 5.0
-     */
-    default long[] getXValues() {
-        return getXAxis();
-    }
-
-    /**
-     * Get the y values
-     *
-     * @return An array of y values
-     * @since 5.0
-     */
-    default double[] getYValues() {
-        return getData();
-    }
-
-    /**
      * Get the display type
      *
      * @return Type of display (eg. line, scatter, ...)
@@ -113,18 +93,14 @@ public interface ISeriesModel {
      * Get the X values
      *
      * @return The x values
-     * @deprecated Use getXValues instead
      */
-    @Deprecated
     long[] getXAxis();
 
     /**
      * Get the y values
      *
      * @return An array of y values
-     * @deprecated Use getYValues instead
      */
-    @Deprecated
     double[] getData();
 
     /**

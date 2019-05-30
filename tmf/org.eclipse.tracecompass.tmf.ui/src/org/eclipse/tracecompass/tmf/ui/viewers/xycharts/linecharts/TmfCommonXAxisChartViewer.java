@@ -423,14 +423,14 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                         long delta = getWindowEndTime() - getWindowStartTime();
                         if (delta > 0) {
                             for (ISeriesModel entry : seriesValues.getData().values()) {
-                                double[] extractXValuesToDisplay = extractXValuesToDisplay(entry.getXValues());
+                                double[] extractXValuesToDisplay = extractXValuesToDisplay(entry.getXAxis());
                                 List<Double> dimmedX = new ArrayList<>(extractXValuesToDisplay.length);
                                 List<Double> dimmedY = new ArrayList<>(extractXValuesToDisplay.length);
                                 List<Double> brightX = new ArrayList<>(extractXValuesToDisplay.length);
                                 List<Double> brightY = new ArrayList<>(extractXValuesToDisplay.length);
 
                                 int[] propertiesArray = entry.getProperties();
-                                double[] data = entry.getYValues();
+                                double[] data = entry.getData();
                                 for (int i = 0; i < extractXValuesToDisplay.length; i++) {
                                     double value = data[i];
                                     /*

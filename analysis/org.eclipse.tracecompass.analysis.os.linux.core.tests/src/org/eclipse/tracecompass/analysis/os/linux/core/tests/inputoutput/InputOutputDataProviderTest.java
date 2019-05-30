@@ -117,7 +117,7 @@ public class InputOutputDataProviderTest extends AbstractTestInputOutput {
             assertEquals(1, data.size());
             ISeriesModel ySeries = data.values().iterator().next();
             double[] expected = test.getActivity();
-            double[] actual = ySeries.getYValues();
+            double[] actual = ySeries.getData();
             for (int i = 0; i < expected.length; i++) {
                 assertTrue(String.format("No actual value at position %d for %s", i, test), actual.length > i);
                 assertEquals(String.format("Value at position %d for %s", i, test), expected[i], actual[i], 0.001);
