@@ -21,7 +21,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.tracecompass.internal.tmf.ui.viewers.statistics.model.TmfBaseColumnData.ITmfColumnPercentageProvider;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
@@ -209,13 +208,10 @@ public class TmfBaseColumnDataProvider {
                         return (int) (n1.getValues().getTotal() - n2.getValues().getTotal());
                     }
                 },
-                new ITmfColumnPercentageProvider() {
-                    @Override
-                    public double getPercentage(TmfStatisticsTreeNode node) {
-                        TmfStatisticsTreeNode top = node.getTop();
-                        return (top == null || top.getValues().getTotal() == 0) ?
-                                0 : (double) (node.getValues().getTotal()) / top.getValues().getTotal();
-                    }
+                node -> {
+                    TmfStatisticsTreeNode top = node.getTop();
+                    return (top == null || top.getValues().getTotal() == 0) ?
+                            0 : (double) (node.getValues().getTotal()) / top.getValues().getTotal();
                 }));
 
         /* Column showing the number of events within the selected time range */
@@ -244,13 +240,10 @@ public class TmfBaseColumnDataProvider {
                         return (int) (n1.getValues().getPartial() - n2.getValues().getPartial());
                     }
                 },
-                new ITmfColumnPercentageProvider() {
-                    @Override
-                    public double getPercentage(TmfStatisticsTreeNode node) {
-                        TmfStatisticsTreeNode top = node.getTop();
-                        return (top == null || top.getValues().getPartial() == 0) ?
-                                0 : (double) (node.getValues().getPartial()) / top.getValues().getPartial();
-                    }
+                node -> {
+                    TmfStatisticsTreeNode top = node.getTop();
+                    return (top == null || top.getValues().getPartial() == 0) ?
+                            0 : (double) (node.getValues().getPartial()) / top.getValues().getPartial();
                 }));
 
         /* Dummy column used to "fix" the display on Linux (using GTK) */
@@ -262,12 +255,7 @@ public class TmfBaseColumnDataProvider {
                     }
                 },
                 new ViewerComparator(),
-                new ITmfColumnPercentageProvider() {
-                    @Override
-                    public double getPercentage(TmfStatisticsTreeNode node) {
-                        return 0;
-                    }
-                }));
+                node -> 0));
 
         fColumnData = builder.build();
     }

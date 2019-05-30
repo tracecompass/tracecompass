@@ -46,7 +46,6 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Sash;
@@ -377,12 +376,7 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
                 if (fSashDragListener == null) {
                     for (Control control : fSashForm.getChildren()) {
                         if (control instanceof Sash) {
-                            fSashDragListener = new Listener() {
-                                @Override
-                                public void handleEvent(Event event) {
-                                    TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(fSashForm, getTimeViewAlignmentInfo()));
-                                }
-                            };
+                            fSashDragListener = event -> TmfSignalManager.dispatchSignal(new TmfTimeViewAlignmentSignal(fSashForm, getTimeViewAlignmentInfo()));
                             control.removePaintListener(this);
                             control.addListener(SWT.Selection, fSashDragListener);
                             // There should be only one sash
@@ -764,14 +758,11 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
     public void selectionRangeUpdated(final TmfSelectionRangeUpdatedSignal signal) {
         if (Display.getCurrent() == null) {
             // Make sure the signal is handled in the UI thread
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    if (getParentComposite().isDisposed()) {
-                        return;
-                    }
-                    selectionRangeUpdated(signal);
+            Display.getDefault().asyncExec(() -> {
+                if (getParentComposite().isDisposed()) {
+                    return;
                 }
+                selectionRangeUpdated(signal);
             });
             return;
         }
@@ -795,14 +786,11 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
     public void windowRangeUpdated(final TmfWindowRangeUpdatedSignal signal) {
         if (Display.getCurrent() == null) {
             // Make sure the signal is handled in the UI thread
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    if (getParentComposite().isDisposed()) {
-                        return;
-                    }
-                    windowRangeUpdated(signal);
+            Display.getDefault().asyncExec(() -> {
+                if (getParentComposite().isDisposed()) {
+                    return;
                 }
+                windowRangeUpdated(signal);
             });
             return;
         }
@@ -987,20 +975,17 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
             }
         });
 
-        fLinkButton.addPaintListener(new PaintListener() {
-            @Override
-            public void paintControl(PaintEvent e) {
-                if (fLinkState) {
-                    Rectangle r = fLinkButton.getBounds();
-                    r.x = -1;
-                    r.y = -1;
-                    e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
-                    e.gc.drawRectangle(r);
-                    r.x = 0;
-                    r.y = 0;
-                    e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_DARK_GRAY));
-                    e.gc.drawRectangle(r);
-                }
+        fLinkButton.addPaintListener(e -> {
+            if (fLinkState) {
+                Rectangle r = fLinkButton.getBounds();
+                r.x = -1;
+                r.y = -1;
+                e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
+                e.gc.drawRectangle(r);
+                r.x = 0;
+                r.y = 0;
+                e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_DARK_GRAY));
+                e.gc.drawRectangle(r);
             }
         });
     }

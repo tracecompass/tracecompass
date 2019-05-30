@@ -101,12 +101,7 @@ public class RenameFolderHandler extends AbstractHandler {
                     }
 
                     for (final TmfTraceElement traceElement : oldFolder.getTraces()) {
-                        Display.getDefault().syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                traceElement.closeEditors();
-                            }
-                        });
+                        Display.getDefault().syncExec(traceElement::closeEditors);
 
                         IPath relativePath = traceElement.getPath().makeRelativeTo(oldFolder.getPath());
                         String newElementPath = newFolderPath.makeRelativeTo(tracesFolder.getPath()).append(relativePath).toString();

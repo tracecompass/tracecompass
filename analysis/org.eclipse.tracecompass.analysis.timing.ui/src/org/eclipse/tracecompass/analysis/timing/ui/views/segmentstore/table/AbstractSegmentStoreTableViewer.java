@@ -280,24 +280,21 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
      */
     public void updateModel(final @Nullable Object dataInput) {
         final TableViewer tableViewer = getTableViewer();
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                if (!tableViewer.getTable().isDisposed()) {
-                    // Go to the top of the table
-                    tableViewer.getTable().setTopIndex(0);
-                    // Reset selected row
-                    tableViewer.setSelection(StructuredSelection.EMPTY);
-                    if (dataInput == null) {
-                        tableViewer.setInput(null);
-                        tableViewer.setItemCount(0);
-                        return;
-                    }
-                    addPackListener();
-                    tableViewer.setInput(dataInput);
-                    SegmentStoreContentProvider contentProvider = (SegmentStoreContentProvider) getTableViewer().getContentProvider();
-                    tableViewer.setItemCount((int) Math.min(Integer.MAX_VALUE, contentProvider.getSegmentCount()));
+        Display.getDefault().asyncExec(() -> {
+            if (!tableViewer.getTable().isDisposed()) {
+                // Go to the top of the table
+                tableViewer.getTable().setTopIndex(0);
+                // Reset selected row
+                tableViewer.setSelection(StructuredSelection.EMPTY);
+                if (dataInput == null) {
+                    tableViewer.setInput(null);
+                    tableViewer.setItemCount(0);
+                    return;
                 }
+                addPackListener();
+                tableViewer.setInput(dataInput);
+                SegmentStoreContentProvider contentProvider = (SegmentStoreContentProvider) getTableViewer().getContentProvider();
+                tableViewer.setItemCount((int) Math.min(Integer.MAX_VALUE, contentProvider.getSegmentCount()));
             }
         });
     }

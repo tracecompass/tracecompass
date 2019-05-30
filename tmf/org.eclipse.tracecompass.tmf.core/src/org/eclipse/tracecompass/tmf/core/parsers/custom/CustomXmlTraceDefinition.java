@@ -322,16 +322,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             }
         }
 
-        Set<CustomXmlTraceDefinition> defs = new TreeSet<>(new Comparator<CustomXmlTraceDefinition>() {
-            @Override
-            public int compare(CustomXmlTraceDefinition o1, CustomXmlTraceDefinition o2) {
-                int result = o1.categoryName.compareTo(o2.categoryName);
-                if (result != 0) {
-                    return result;
-                }
-                return o1.definitionName.compareTo(o2.definitionName);
-            }
-        });
+        Set<CustomXmlTraceDefinition> defs = new TreeSet<>(Comparator.comparing(CustomXmlTraceDefinition::getCategoryName).thenComparing(CustomXmlTraceDefinition::getDefinitionName));
         defs.addAll(Arrays.asList(loadAll(CUSTOM_XML_TRACE_DEFINITIONS_PATH_NAME)));
         if (includeDefaults) {
             defs.addAll(Arrays.asList(loadAll(CUSTOM_XML_TRACE_DEFINITIONS_DEFAULT_PATH_NAME)));
@@ -431,13 +422,10 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            EntityResolver resolver = new EntityResolver() {
-                @Override
-                public InputSource resolveEntity(String publicId, String systemId) {
-                    String empty = ""; //$NON-NLS-1$
-                    ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
-                    return new InputSource(bais);
-                }
+            EntityResolver resolver = (publicId, systemId) -> {
+                String empty = ""; //$NON-NLS-1$
+                ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
+                return new InputSource(bais);
             };
             db.setEntityResolver(resolver);
 
@@ -614,13 +602,10 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            EntityResolver resolver = new EntityResolver() {
-                @Override
-                public InputSource resolveEntity(String publicId, String systemId) {
-                    String empty = ""; //$NON-NLS-1$
-                    ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
-                    return new InputSource(bais);
-                }
+            EntityResolver resolver = (publicId, systemId) -> {
+                String empty = ""; //$NON-NLS-1$
+                ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
+                return new InputSource(bais);
             };
             db.setEntityResolver(resolver);
 
@@ -676,4 +661,5 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
             Activator.logError("Error deleteing CustomXmlTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         }
     }
+
 }

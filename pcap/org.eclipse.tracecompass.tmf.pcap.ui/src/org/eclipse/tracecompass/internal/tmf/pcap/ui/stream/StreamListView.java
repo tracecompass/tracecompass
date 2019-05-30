@@ -188,37 +188,33 @@ public class StreamListView extends TmfView {
     }
 
     private void queryAnalysis() {
-        Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                ITmfTrace trace = fCurrentTrace;
-                if (trace == null) {
-                    return;
-                }
-                StreamListAnalysis analysis = TmfTraceUtils.getAnalysisModuleOfClass(trace, StreamListAnalysis.class, StreamListAnalysis.ID);
-                if (analysis == null) {
-                    return;
-                }
-                while (!analysis.isFinished() && !fStopThread) {
-                    updateUI();
-                    try {
-                        Thread.sleep(WAIT_TIME);
-                    } catch (InterruptedException e) {
-                        String message = e.getMessage();
-                        if (message == null) {
-                            message = EMPTY_STRING;
-                        }
-                        Activator.logError(message, e);
-                        return;
-                    }
-                }
-                // Update UI one more time (daft punk)
-                if (!fStopThread) {
-                    updateUI();
-                }
-
+        Thread thread = new Thread(() -> {
+            ITmfTrace trace = fCurrentTrace;
+            if (trace == null) {
+                return;
             }
+            StreamListAnalysis analysis = TmfTraceUtils.getAnalysisModuleOfClass(trace, StreamListAnalysis.class, StreamListAnalysis.ID);
+            if (analysis == null) {
+                return;
+            }
+            while (!analysis.isFinished() && !fStopThread) {
+                updateUI();
+                try {
+                    Thread.sleep(WAIT_TIME);
+                } catch (InterruptedException e) {
+                    String message = e.getMessage();
+                    if (message == null) {
+                        message = EMPTY_STRING;
+                    }
+                    Activator.logError(message, e);
+                    return;
+                }
+            }
+            // Update UI one more time (daft punk)
+            if (!fStopThread) {
+                updateUI();
+            }
+
         });
 
         fStopThread = false;
@@ -235,21 +231,17 @@ public class StreamListView extends TmfView {
         if (display == null || display.isDisposed()) {
             return;
         }
-        display.asyncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                if (display.isDisposed()) {
-                    return;
-                }
-                Map<TmfPcapProtocol, Table> tableMap = fTableMap;
-                if (tableMap == null) {
-                    return;
-                }
-                for (Table table : tableMap.values()) {
-                    if (!table.isDisposed()) {
-                        table.removeAll();
-                    }
+        display.asyncExec(() -> {
+            if (display.isDisposed()) {
+                return;
+            }
+            Map<TmfPcapProtocol, Table> tableMap = fTableMap;
+            if (tableMap == null) {
+                return;
+            }
+            for (Table table : tableMap.values()) {
+                if (!table.isDisposed()) {
+                    table.removeAll();
                 }
             }
         });
@@ -260,60 +252,55 @@ public class StreamListView extends TmfView {
         if (display == null || display.isDisposed()) {
             return;
         }
-        display.asyncExec(new Runnable() {
+        display.asyncExec(() -> {
+            if (display.isDisposed()) {
+                return;
+            }
+            ITmfTrace trace = fCurrentTrace;
+            if (trace == null) {
+                return;
+            }
 
-            @Override
-            public void run() {
-                if (display.isDisposed()) {
-                    return;
-                }
-                ITmfTrace trace = fCurrentTrace;
-                if (trace == null) {
-                    return;
-                }
+            StreamListAnalysis analysis = TmfTraceUtils.getAnalysisModuleOfClass(trace, StreamListAnalysis.class, StreamListAnalysis.ID);
+            if (analysis == null) {
+                return;
+            }
 
-                StreamListAnalysis analysis = TmfTraceUtils.getAnalysisModuleOfClass(trace, StreamListAnalysis.class, StreamListAnalysis.ID);
-                if (analysis == null) {
-                    return;
-                }
+            Map<TmfPcapProtocol, Table> tables = fTableMap;
+            if (tables == null) {
+                return;
+            }
+            for (Entry<TmfPcapProtocol, Table> protocolEntry : tables.entrySet()) {
+                TmfPcapProtocol protocol = protocolEntry.getKey();
+                TmfPacketStreamBuilder builder = analysis.getBuilder(protocol);
+                Table table = protocolEntry.getValue();
+                if (builder != null && !(table.isDisposed())) {
+                    for (TmfPacketStream stream : builder.getStreams()) {
 
-                Map<TmfPcapProtocol, Table> tables = fTableMap;
-                if (tables == null) {
-                    return;
-                }
-                for (Entry<TmfPcapProtocol, Table> protocolEntry : tables.entrySet()) {
-                    TmfPcapProtocol protocol = protocolEntry.getKey();
-                    TmfPacketStreamBuilder builder = analysis.getBuilder(protocol);
-                    Table table = protocolEntry.getValue();
-                    if (builder != null && !(table.isDisposed())) {
-                        for (TmfPacketStream stream : builder.getStreams()) {
-
-                            TableItem item;
-                            if (stream.getID() < table.getItemCount()) {
-                                item = table.getItem(stream.getID());
-                            } else {
-                                item = new TableItem(table, SWT.NONE);
-                            }
-                            item.setText(0, String.valueOf(stream.getID()));
-                            item.setText(1, stream.getFirstEndpoint().toString());
-                            item.setText(2, stream.getSecondEndpoint().toString());
-                            item.setText(3, String.valueOf(stream.getNbPackets()));
-                            item.setText(4, String.valueOf(stream.getNbBytes()));
-                            item.setText(5, String.valueOf(stream.getNbPacketsAtoB()));
-                            item.setText(6, String.valueOf(stream.getNbBytesAtoB()));
-                            item.setText(7, String.valueOf(stream.getNbPacketsBtoA()));
-                            item.setText(8, String.valueOf(stream.getNbBytesBtoA()));
-                            item.setText(9, stream.getStartTime().toString());
-                            item.setText(10, stream.getStopTime().toString());
-                            item.setText(11, String.format("%.3f", stream.getDuration())); //$NON-NLS-1$
-                            item.setText(12, String.format("%.3f", stream.getBPSAtoB())); //$NON-NLS-1$
-                            item.setText(13, String.format("%.3f", stream.getBPSBtoA())); //$NON-NLS-1$
-                            item.setData(KEY_STREAM, stream);
+                        TableItem item;
+                        if (stream.getID() < table.getItemCount()) {
+                            item = table.getItem(stream.getID());
+                        } else {
+                            item = new TableItem(table, SWT.NONE);
                         }
+                        item.setText(0, String.valueOf(stream.getID()));
+                        item.setText(1, stream.getFirstEndpoint().toString());
+                        item.setText(2, stream.getSecondEndpoint().toString());
+                        item.setText(3, String.valueOf(stream.getNbPackets()));
+                        item.setText(4, String.valueOf(stream.getNbBytes()));
+                        item.setText(5, String.valueOf(stream.getNbPacketsAtoB()));
+                        item.setText(6, String.valueOf(stream.getNbBytesAtoB()));
+                        item.setText(7, String.valueOf(stream.getNbPacketsBtoA()));
+                        item.setText(8, String.valueOf(stream.getNbBytesBtoA()));
+                        item.setText(9, stream.getStartTime().toString());
+                        item.setText(10, stream.getStopTime().toString());
+                        item.setText(11, String.format("%.3f", stream.getDuration())); //$NON-NLS-1$
+                        item.setText(12, String.format("%.3f", stream.getBPSAtoB())); //$NON-NLS-1$
+                        item.setText(13, String.format("%.3f", stream.getBPSBtoA())); //$NON-NLS-1$
+                        item.setData(KEY_STREAM, stream);
                     }
                 }
             }
-
         });
     }
 
@@ -379,24 +366,15 @@ public class StreamListView extends TmfView {
                 Menu menu = new Menu(table);
                 MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
                 menuItem.setText(Messages.StreamListView_FollowStream);
-                menuItem.addListener(SWT.Selection, new Listener() {
-
-                    @Override
-                    public void handleEvent(@Nullable Event event) {
+                menuItem.addListener(SWT.Selection, (@Nullable Event event) -> {
                         TmfSignal signal = new TmfPacketStreamSelectedSignal(this, 0, fCurrentStream);
                         TmfSignalManager.dispatchSignal(signal);
-                    }
                 });
                 menuItem = new MenuItem(menu, SWT.PUSH);
                 menuItem.setText(Messages.StreamListView_Clear);
-                menuItem.addListener(SWT.Selection, new Listener() {
-
-                    @Override
-                    public void handleEvent(@Nullable Event event) {
+                menuItem.addListener(SWT.Selection, (@Nullable Event event) -> {
                         TmfSignal signal = new TmfPacketStreamSelectedSignal(this, 0, null);
                         TmfSignalManager.dispatchSignal(signal);
-
-                    }
                 });
                 menuItem = new MenuItem(menu, SWT.PUSH);
                 menuItem.setText(Messages.StreamListView_ExtractAsFilter);

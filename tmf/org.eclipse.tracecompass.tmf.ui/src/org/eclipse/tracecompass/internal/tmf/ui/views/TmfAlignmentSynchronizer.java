@@ -19,7 +19,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
@@ -99,18 +98,14 @@ public class TmfAlignmentSynchronizer {
     }
 
     private IPreferenceChangeListener createPreferenceListener() {
-        IPreferenceChangeListener listener = new IPreferenceChangeListener() {
-
-            @Override
-            public void preferenceChange(PreferenceChangeEvent event) {
-                if (event.getKey().equals(ITmfUIPreferences.PREF_ALIGN_VIEWS)) {
-                    Object oldValue = event.getOldValue();
-                    Object newValue = event.getNewValue();
-                    if (Boolean.toString(false).equals(oldValue) && Boolean.toString(true).equals(newValue)) {
-                        realignViews();
-                    } else if (Boolean.toString(true).equals(oldValue) && Boolean.toString(false).equals(newValue)) {
-                        restoreViews();
-                    }
+        IPreferenceChangeListener listener = event -> {
+            if (event.getKey().equals(ITmfUIPreferences.PREF_ALIGN_VIEWS)) {
+                Object oldValue = event.getOldValue();
+                Object newValue = event.getNewValue();
+                if (Boolean.toString(false).equals(oldValue) && Boolean.toString(true).equals(newValue)) {
+                    realignViews();
+                } else if (Boolean.toString(true).equals(oldValue) && Boolean.toString(false).equals(newValue)) {
+                    restoreViews();
                 }
             }
         };
@@ -138,12 +133,7 @@ public class TmfAlignmentSynchronizer {
                 fCopy = new ArrayList<>(fPendingOperations);
                 fPendingOperations.clear();
             }
-            Display.getDefault().syncExec(new Runnable() {
-                @Override
-                public void run() {
-                    performAllAlignments(fCopy);
-                }
-            });
+            Display.getDefault().syncExec(() -> performAllAlignments(fCopy));
             fComplete = true;
         }
     }

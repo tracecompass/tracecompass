@@ -201,27 +201,24 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
 
         private void doZoom(final ITmfStateSystem ss, final List<ILinkEvent> links, final List<IMarkerEvent> markers, long resolution, final @NonNull IProgressMonitor monitor, final long start, final long end, Sampling sampling,
                 Iterable<@NonNull TimeGraphEntry> entries, Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates, Map<TimeGraphEntry, List<ITimeEvent>> gaps) {
-            queryFullStates(ss, start, end, resolution, monitor, new IQueryHandler() {
-                @Override
-                public void handle(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) {
-                    try (TraceCompassLogUtils.ScopeLog scope = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStates");) { //$NON-NLS-1$
+            queryFullStates(ss, start, end, resolution, monitor, (@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) -> {
+                try (TraceCompassLogUtils.ScopeLog scope = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStates");) { //$NON-NLS-1$
 
-                        for (TimeGraphEntry entry : entries) {
-                            if (!sampling.equals(entry.getSampling())) {
-                                zoom(checkNotNull(entry), ss, fullStates, prevFullState, predicates, monitor, gaps);
-                            }
+                    for (TimeGraphEntry entry : entries) {
+                        if (!sampling.equals(entry.getSampling())) {
+                            zoom(checkNotNull(entry), ss, fullStates, prevFullState, predicates, monitor, gaps);
                         }
                     }
-                    /* Refresh the arrows when zooming */
-                    try (TraceCompassLogUtils.ScopeLog linksLogger = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingLinks")) { //$NON-NLS-1$
-                        links.addAll(getLinkList(ss, fullStates, prevFullState, monitor));
-                    }
-                    /* Refresh the view-specific markers when zooming */
-                    try (TraceCompassLogUtils.ScopeLog linksLogger = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingMarkers")) { //$NON-NLS-1$
-                        markers.addAll(getViewMarkerList(ss, fullStates, prevFullState, monitor));
-                    }
-                    refresh();
                 }
+                /* Refresh the arrows when zooming */
+                try (TraceCompassLogUtils.ScopeLog linksLogger1 = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingLinks")) { //$NON-NLS-1$
+                    links.addAll(getLinkList(ss, fullStates, prevFullState, monitor));
+                }
+                /* Refresh the view-specific markers when zooming */
+                try (TraceCompassLogUtils.ScopeLog linksLogger2 = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingMarkers")) { //$NON-NLS-1$
+                    markers.addAll(getViewMarkerList(ss, fullStates, prevFullState, monitor));
+                }
+                refresh();
             });
             if (!monitor.isCanceled()) {
                 applyResults(() -> entries.forEach(entry -> {
@@ -289,41 +286,37 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                         }
                     }
 
-                    queryRangeStates(ss, tableEntry.getKey().getLeft(), tableEntry.getKey().getRight(), quarks, resolution, monitor, new IQueryHandler() {
+                    queryRangeStates(ss, tableEntry.getKey().getLeft(), tableEntry.getKey().getRight(), quarks, resolution, monitor, (@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) -> {
+                        for (Entry<ITimeGraphEntry, List<ITimeEvent>> entryGap : row.entrySet()) {
+                            List<ITimeEvent> gapEvents = entryGap.getValue();
+                            TimeGraphEntry entry = (TimeGraphEntry) entryGap.getKey();
+                            List<ITimeEvent> eventList = getEventList(Objects.requireNonNull(entry), ss, fullStates, prevFullState, monitor);
 
-                        @Override
-                        public void handle(@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) {
-                            for (Entry<ITimeGraphEntry, List<ITimeEvent>> entryGap : row.entrySet()) {
-                                List<ITimeEvent> gapEvents = entryGap.getValue();
-                                TimeGraphEntry entry = (TimeGraphEntry) entryGap.getKey();
-                                List<ITimeEvent> eventList = getEventList(Objects.requireNonNull(entry), ss, fullStates, prevFullState, monitor);
+                            if (eventList != null && !eventList.isEmpty() && !monitor.isCanceled()) {
+                                doFilterEvents(entry, eventList, predicates);
+                                for (ITimeEvent event : eventList) {
+                                    int pos = Collections.binarySearch(gapEvents, event, TimeGraphEntry.WITHIN_COMPARATOR);
+                                    // If the event is within a gap
+                                    if (pos >= 0) {
+                                        ITimeEvent gap = gapEvents.get(pos);
+                                        if (!monitor.isCanceled()) {
+                                            // if any underlying event is not dimmed,
+                                            // then set the related gap event dimmed
+                                            // property to false
+                                            boolean dimmed = gap.isPropertyActive(IFilterProperty.DIMMED);
+                                            if (dimmed && !event.isPropertyActive(IFilterProperty.DIMMED)) {
+                                                gap.setProperty(IFilterProperty.DIMMED, false);
+                                            }
 
-                                if (eventList != null && !eventList.isEmpty() && !monitor.isCanceled()) {
-                                    doFilterEvents(entry, eventList, predicates);
-                                    for (ITimeEvent event : eventList) {
-                                        int pos = Collections.binarySearch(gapEvents, event, TimeGraphEntry.WITHIN_COMPARATOR);
-                                        // If the event is within a gap
-                                        if (pos >= 0) {
-                                            ITimeEvent gap = gapEvents.get(pos);
-                                            if (!monitor.isCanceled()) {
-                                                // if any underlying event is not dimmed,
-                                                // then set the related gap event dimmed
-                                                // property to false
-                                                boolean dimmed = gap.isPropertyActive(IFilterProperty.DIMMED);
-                                                if (dimmed && !event.isPropertyActive(IFilterProperty.DIMMED)) {
-                                                    gap.setProperty(IFilterProperty.DIMMED, false);
-                                                }
-
-                                                // if any underlying event is not excluded,
-                                                // then set the related gap event exclude
-                                                // status property to false and add the gap
-                                                // back to the zoom event list
-                                                if (hasActiveSavedFilters && !event.isPropertyActive(IFilterProperty.EXCLUDE)) {
-                                                    gap.setProperty(IFilterProperty.EXCLUDE, false);
-                                                    applyResults(() -> {
-                                                        entry.updateZoomedEvent(gap);
-                                                    });
-                                                }
+                                            // if any underlying event is not excluded,
+                                            // then set the related gap event exclude
+                                            // status property to false and add the gap
+                                            // back to the zoom event list
+                                            if (hasActiveSavedFilters && !event.isPropertyActive(IFilterProperty.EXCLUDE)) {
+                                                gap.setProperty(IFilterProperty.EXCLUDE, false);
+                                                applyResults(() -> {
+                                                    entry.updateZoomedEvent(gap);
+                                                });
                                             }
                                         }
                                     }

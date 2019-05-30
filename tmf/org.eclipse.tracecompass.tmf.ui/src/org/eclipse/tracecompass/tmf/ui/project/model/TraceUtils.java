@@ -63,13 +63,10 @@ public class TraceUtils {
      * @since 2.2
      */
     public static void displayErrorMsg(final String boxTitle, final String errorMsg, Throwable exception) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-                Activator.getDefault().logError(errorMsg, exception);
-                MessageDialog.openError(shell, boxTitle, errorMsg);
-            }
+        Display.getDefault().asyncExec(() -> {
+            final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+            Activator.getDefault().logError(errorMsg, exception);
+            MessageDialog.openError(shell, boxTitle, errorMsg);
         });
     }
 

@@ -62,7 +62,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -79,8 +78,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.MenuDetectEvent;
-import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -147,15 +144,10 @@ import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraph
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphBookmarkListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphContentProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphRangeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphSelectionListener;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphTimeListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphBookmarkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphContentProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphRangeUpdateEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphSelectionEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
@@ -386,16 +378,12 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private Collection<@NonNull String> fGlobalFilter = null;
 
     /** Listener that handles a click on an entry in the FusedVM View */
-    private final ITimeGraphSelectionListener fMetadataSelectionListener = new ITimeGraphSelectionListener() {
-
-        @Override
-        public void selectionChanged(TimeGraphSelectionEvent event) {
-            ITimeGraphEntry entry = event.getSelection();
-            if (entry instanceof IElementResolver) {
-                Multimap<@NonNull String, @NonNull Object> metadata = ((IElementResolver) entry).getMetadata();
-                if (!metadata.isEmpty()) {
-                    broadcast(new TmfDataModelSelectedSignal(AbstractTimeGraphView.this, metadata));
-                }
+    private final ITimeGraphSelectionListener fMetadataSelectionListener = event -> {
+        ITimeGraphEntry entry = event.getSelection();
+        if (entry instanceof IElementResolver) {
+            Multimap<@NonNull String, @NonNull Object> metadata = ((IElementResolver) entry).getMetadata();
+            if (!metadata.isEmpty()) {
+                broadcast(new TmfDataModelSelectedSignal(AbstractTimeGraphView.this, metadata));
             }
         }
     };
@@ -1309,24 +1297,18 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         fTimeEventFilterAction = timeEventFilterAction;
 
 
-        timeGraphViewer.addRangeListener(new ITimeGraphRangeListener() {
-            @Override
-            public void timeRangeUpdated(TimeGraphRangeUpdateEvent event) {
-                final long startTime = event.getStartTime();
-                final long endTime = event.getEndTime();
-                TmfTimeRange range = new TmfTimeRange(TmfTimestamp.fromNanos(startTime), TmfTimestamp.fromNanos(endTime));
-                broadcast(new TmfWindowRangeUpdatedSignal(AbstractTimeGraphView.this, range, fTrace));
-                startZoomThread(startTime, endTime);
-            }
+        timeGraphViewer.addRangeListener(event -> {
+            final long startTime = event.getStartTime();
+            final long endTime = event.getEndTime();
+            TmfTimeRange range = new TmfTimeRange(TmfTimestamp.fromNanos(startTime), TmfTimestamp.fromNanos(endTime));
+            broadcast(new TmfWindowRangeUpdatedSignal(AbstractTimeGraphView.this, range, fTrace));
+            startZoomThread(startTime, endTime);
         });
 
-        timeGraphViewer.addTimeListener(new ITimeGraphTimeListener() {
-            @Override
-            public void timeSelected(TimeGraphTimeEvent event) {
-                ITmfTimestamp startTime = TmfTimestamp.fromNanos(event.getBeginTime());
-                ITmfTimestamp endTime = TmfTimestamp.fromNanos(event.getEndTime());
-                broadcast(new TmfSelectionRangeUpdatedSignal(AbstractTimeGraphView.this, startTime, endTime, fTrace));
-            }
+        timeGraphViewer.addTimeListener(event -> {
+            ITmfTimestamp startTime = TmfTimestamp.fromNanos(event.getBeginTime());
+            ITmfTimestamp endTime = TmfTimestamp.fromNanos(event.getEndTime());
+            broadcast(new TmfSelectionRangeUpdatedSignal(AbstractTimeGraphView.this, startTime, endTime, fTrace));
         });
 
         timeGraphViewer.addBookmarkListener(new ITimeGraphBookmarkListener() {
@@ -1666,19 +1648,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         long beginTime = ctx.getSelectionRange().getStartTime().toNanos();
         long endTime = ctx.getSelectionRange().getEndTime().toNanos();
 
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                if (fTimeGraphViewer.getControl().isDisposed()) {
-                    return;
-                }
-                if (beginTime == endTime) {
-                    fTimeGraphViewer.setSelectedTime(beginTime, true);
-                } else {
-                    fTimeGraphViewer.setSelectionRange(beginTime, endTime, true);
-                }
-                synchingToTime(fTimeGraphViewer.getSelectionBegin());
+        Display.getDefault().asyncExec(() -> {
+            if (fTimeGraphViewer.getControl().isDisposed()) {
+                return;
             }
+            if (beginTime == endTime) {
+                fTimeGraphViewer.setSelectedTime(beginTime, true);
+            } else {
+                fTimeGraphViewer.setSelectionRange(beginTime, endTime, true);
+            }
+            synchingToTime(fTimeGraphViewer.getSelectionBegin());
         });
     }
 
@@ -1697,18 +1676,15 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         TmfTraceContext ctx = TmfTraceManager.getInstance().getTraceContext(checkNotNull(fTrace));
         final long startTime = ctx.getWindowRange().getStartTime().toNanos();
         final long endTime = ctx.getWindowRange().getEndTime().toNanos();
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                if (fTimeGraphViewer.getControl().isDisposed()) {
-                    return;
-                }
-                if (startTime == fTimeGraphViewer.getTime0() && endTime == fTimeGraphViewer.getTime1()) {
-                    return;
-                }
-                fTimeGraphViewer.setStartFinishTime(startTime, endTime);
-                startZoomThread(startTime, endTime);
+        Display.getDefault().asyncExec(() -> {
+            if (fTimeGraphViewer.getControl().isDisposed()) {
+                return;
             }
+            if (startTime == fTimeGraphViewer.getTime0() && endTime == fTimeGraphViewer.getTime1()) {
+                return;
+            }
+            fTimeGraphViewer.setStartFinishTime(startTime, endTime);
+            startZoomThread(startTime, endTime);
         });
     }
 
@@ -2042,82 +2018,79 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     protected void refresh() {
         try (FlowScopeLog parentLogger = new FlowScopeLogBuilder(LOGGER, Level.FINE, "RefreshRequested").setCategory(getViewId()).build()) { //$NON-NLS-1$
             final boolean isZoomThread = Thread.currentThread() instanceof ZoomThread;
-            TmfUiRefreshHandler.getInstance().queueUpdate(this, new Runnable() {
-                @Override
-                public void run() {
-                    try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TimeGraphView:Refresh").setParentScope(parentLogger).build()) { //$NON-NLS-1$
-                        if (fTimeGraphViewer.getControl().isDisposed()) {
-                            return;
-                        }
-                        fDirty.incrementAndGet();
-                        try {
-                            synchronized (fEntryListMap) {
-                                fEntryList = fEntryListMap.get(fTrace);
-                                if (fEntryList == null) {
-                                    fEntryList = new CopyOnWriteArrayList<>();
-                                } else if (fEntryComparator != null) {
-                                    List<TimeGraphEntry> list = new ArrayList<>(fEntryList);
-                                    Collections.sort(list, fEntryComparator);
-                                    for (ITimeGraphEntry entry : list) {
-                                        sortChildren(entry, fEntryComparator);
-                                    }
-                                    fEntryList.clear();
-                                    fEntryList.addAll(list);
+            TmfUiRefreshHandler.getInstance().queueUpdate(this, () -> {
+                try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TimeGraphView:Refresh").setParentScope(parentLogger).build()) { //$NON-NLS-1$
+                    if (fTimeGraphViewer.getControl().isDisposed()) {
+                        return;
+                    }
+                    fDirty.incrementAndGet();
+                    try {
+                        synchronized (fEntryListMap) {
+                            fEntryList = fEntryListMap.get(fTrace);
+                            if (fEntryList == null) {
+                                fEntryList = new CopyOnWriteArrayList<>();
+                            } else if (fEntryComparator != null) {
+                                List<TimeGraphEntry> list = new ArrayList<>(fEntryList);
+                                Collections.sort(list, fEntryComparator);
+                                for (ITimeGraphEntry entry : list) {
+                                    sortChildren(entry, fEntryComparator);
                                 }
+                                fEntryList.clear();
+                                fEntryList.addAll(list);
                             }
-                            boolean inputChanged = fEntryList != fTimeGraphViewer.getInput();
-                            if (inputChanged) {
-                                fTimeGraphViewer.setInput(fEntryList);
-                                /*
-                                 * restore the previously saved filters, if any
-                                 */
-                                fTimeGraphViewer.setFilters(fFiltersMap.get(fTrace));
-                                fTimeGraphViewer.setLinks(null);
-                                fTimeGraphViewer.setBookmarks(refreshBookmarks(fEditorFile));
-                                fTimeGraphViewer.setMarkerCategories(getMarkerCategories());
-                                fTimeGraphViewer.setMarkers(null);
-                                applyViewContext();
-                            } else {
-                                fTimeGraphViewer.refresh();
-                            }
-                            // reveal selection
-                            if (fIsRevealSelection) {
-                                fIsRevealSelection = false;
-                                fTimeGraphViewer.setSelection(fTimeGraphViewer.getSelection(), true);
-                            }
-                            long startBound = (fStartTime == Long.MAX_VALUE ? SWT.DEFAULT : fStartTime);
-                            long endBound = (fEndTime == Long.MIN_VALUE ? SWT.DEFAULT : fEndTime);
-                            fTimeGraphViewer.setTimeBounds(startBound, endBound);
+                        }
+                        boolean inputChanged = fEntryList != fTimeGraphViewer.getInput();
+                        if (inputChanged) {
+                            fTimeGraphViewer.setInput(fEntryList);
+                            /*
+                             * restore the previously saved filters, if any
+                             */
+                            fTimeGraphViewer.setFilters(fFiltersMap.get(fTrace));
+                            fTimeGraphViewer.setLinks(null);
+                            fTimeGraphViewer.setBookmarks(refreshBookmarks(fEditorFile));
+                            fTimeGraphViewer.setMarkerCategories(getMarkerCategories());
+                            fTimeGraphViewer.setMarkers(null);
+                            applyViewContext();
+                        } else {
+                            fTimeGraphViewer.refresh();
+                        }
+                        // reveal selection
+                        if (fIsRevealSelection) {
+                            fIsRevealSelection = false;
+                            fTimeGraphViewer.setSelection(fTimeGraphViewer.getSelection(), true);
+                        }
+                        long startBound = (fStartTime == Long.MAX_VALUE ? SWT.DEFAULT : fStartTime);
+                        long endBound = (fEndTime == Long.MIN_VALUE ? SWT.DEFAULT : fEndTime);
+                        fTimeGraphViewer.setTimeBounds(startBound, endBound);
 
-                            ITmfTrace trace = fTrace;
-                            TmfTraceContext ctx = (trace == null) ? null : TmfTraceManager.getInstance().getTraceContext(trace);
-                            long selectionBeginTime = ctx == null ? SWT.DEFAULT : ctx.getSelectionRange().getStartTime().toNanos();
-                            long selectionEndTime = ctx == null ? SWT.DEFAULT : ctx.getSelectionRange().getEndTime().toNanos();
-                            long startTime = ctx == null ? SWT.DEFAULT : ctx.getWindowRange().getStartTime().toNanos();
-                            long endTime = ctx == null ? SWT.DEFAULT : ctx.getWindowRange().getEndTime().toNanos();
-                            if (fStartTime > fEndTime) {
-                                startTime = SWT.DEFAULT;
-                                endTime = SWT.DEFAULT;
-                            } else {
-                                startTime = Math.min(Math.max(startTime, fStartTime), fEndTime);
-                                endTime = Math.min(Math.max(endTime, fStartTime), fEndTime);
-                            }
-                            fTimeGraphViewer.setSelectionRange(selectionBeginTime, selectionEndTime, false);
-                            fTimeGraphViewer.setStartFinishTime(startTime, endTime);
+                        ITmfTrace trace = fTrace;
+                        TmfTraceContext ctx = (trace == null) ? null : TmfTraceManager.getInstance().getTraceContext(trace);
+                        long selectionBeginTime = ctx == null ? SWT.DEFAULT : ctx.getSelectionRange().getStartTime().toNanos();
+                        long selectionEndTime = ctx == null ? SWT.DEFAULT : ctx.getSelectionRange().getEndTime().toNanos();
+                        long startTime = ctx == null ? SWT.DEFAULT : ctx.getWindowRange().getStartTime().toNanos();
+                        long endTime = ctx == null ? SWT.DEFAULT : ctx.getWindowRange().getEndTime().toNanos();
+                        if (fStartTime > fEndTime) {
+                            startTime = SWT.DEFAULT;
+                            endTime = SWT.DEFAULT;
+                        } else {
+                            startTime = Math.min(Math.max(startTime, fStartTime), fEndTime);
+                            endTime = Math.min(Math.max(endTime, fStartTime), fEndTime);
+                        }
+                        fTimeGraphViewer.setSelectionRange(selectionBeginTime, selectionEndTime, false);
+                        fTimeGraphViewer.setStartFinishTime(startTime, endTime);
 
-                            if (inputChanged && selectionBeginTime != SWT.DEFAULT) {
-                                synchingToTime(selectionBeginTime);
-                            }
+                        if (inputChanged && selectionBeginTime != SWT.DEFAULT) {
+                            synchingToTime(selectionBeginTime);
+                        }
 
-                            ZoomThread zoomThread = fZoomThread;
-                            if (!isZoomThread ||
-                                    (zoomThread != null && (zoomThread.getZoomStartTime() != startTime || zoomThread.getZoomEndTime() != endTime))) {
-                                startZoomThread(startTime, endTime);
-                            }
-                        } finally {
-                            if (fDirty.decrementAndGet() < 0) {
-                                Activator.getDefault().logError(DIRTY_UNDERFLOW_ERROR, new Throwable());
-                            }
+                        ZoomThread zoomThread = fZoomThread;
+                        if (!isZoomThread ||
+                                (zoomThread != null && (zoomThread.getZoomStartTime() != startTime || zoomThread.getZoomEndTime() != endTime))) {
+                            startZoomThread(startTime, endTime);
+                        }
+                    } finally {
+                        if (fDirty.decrementAndGet() < 0) {
+                            Activator.getDefault().logError(DIRTY_UNDERFLOW_ERROR, new Throwable());
                         }
                     }
                 }
@@ -2138,22 +2111,19 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             }
         }
         try (FlowScopeLog flowParent = new FlowScopeLogBuilder(LOGGER, Level.FINE, "RedrawRequested").setCategory(getViewId()).build()) { //$NON-NLS-1$
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TimeGraphView:Redraw").setParentScope(flowParent).build()) { //$NON-NLS-1$
-                        if (fTimeGraphViewer.getControl().isDisposed()) {
-                            return;
-                        }
-                        fTimeGraphViewer.getControl().redraw();
-                        fTimeGraphViewer.getControl().update();
-                        synchronized (fSyncObj) {
-                            if (fRedrawState == State.PENDING) {
-                                fRedrawState = State.IDLE;
-                                redraw();
-                            } else {
-                                fRedrawState = State.IDLE;
-                            }
+            Display.getDefault().asyncExec(() -> {
+                try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TimeGraphView:Redraw").setParentScope(flowParent).build()) { //$NON-NLS-1$
+                    if (fTimeGraphViewer.getControl().isDisposed()) {
+                        return;
+                    }
+                    fTimeGraphViewer.getControl().redraw();
+                    fTimeGraphViewer.getControl().update();
+                    synchronized (fSyncObj) {
+                        if (fRedrawState == State.PENDING) {
+                            fRedrawState = State.IDLE;
+                            redraw();
+                        } else {
+                            fRedrawState = State.IDLE;
                         }
                     }
                 }
@@ -2277,35 +2247,32 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
         fMarkerSetMenu = new MenuManager(Messages.AbstractTimeGraphView_MarkerSetMenuText);
         fMarkerSetMenu.setRemoveAllWhenShown(true);
-        fMarkerSetMenu.addMenuListener(new IMenuListener() {
-            @Override
-            public void menuAboutToShow(IMenuManager mgr) {
-                Action noneAction = new MarkerSetAction(null);
-                MarkerSet defaultMarkerSet = MarkerUtils.getDefaultMarkerSet();
-                String defaultMarkerSetId = (defaultMarkerSet == null) ? null : defaultMarkerSet.getId();
-                noneAction.setChecked(defaultMarkerSetId == null);
-                mgr.add(noneAction);
-                List<MarkerSet> markerSets = MarkerConfigXmlParser.getMarkerSets();
-                for (MarkerSet markerSet : markerSets) {
-                    Action action = new MarkerSetAction(markerSet);
-                    action.setChecked(markerSet.getId().equals(defaultMarkerSetId));
-                    mgr.add(action);
-                }
-                mgr.add(new Separator());
-                mgr.add(new Action(Messages.AbstractTimeGraphView_MarkerSetEditActionText) {
-                    @Override
-                    public void run() {
-                        MarkerConfigXmlParser.initMarkerSets();
-                        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-                        IFileStore fileStore = EFS.getLocalFileSystem().getStore(MarkerConfigXmlParser.MARKER_CONFIG_PATH);
-                        try {
-                            IDE.openEditorOnFileStore(page, fileStore);
-                        } catch (PartInitException e) {
-                            Activator.getDefault().logError("Error opening editor on " + MarkerConfigXmlParser.MARKER_CONFIG_PATH, e); //$NON-NLS-1$
-                        }
-                    }
-                });
+        fMarkerSetMenu.addMenuListener(mgr -> {
+            Action noneAction = new MarkerSetAction(null);
+            MarkerSet defaultMarkerSet = MarkerUtils.getDefaultMarkerSet();
+            String defaultMarkerSetId = (defaultMarkerSet == null) ? null : defaultMarkerSet.getId();
+            noneAction.setChecked(defaultMarkerSetId == null);
+            mgr.add(noneAction);
+            List<MarkerSet> markerSets = MarkerConfigXmlParser.getMarkerSets();
+            for (MarkerSet markerSet : markerSets) {
+                Action action = new MarkerSetAction(markerSet);
+                action.setChecked(markerSet.getId().equals(defaultMarkerSetId));
+                mgr.add(action);
             }
+            mgr.add(new Separator());
+            mgr.add(new Action(Messages.AbstractTimeGraphView_MarkerSetEditActionText) {
+                @Override
+                public void run() {
+                    MarkerConfigXmlParser.initMarkerSets();
+                    IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+                    IFileStore fileStore = EFS.getLocalFileSystem().getStore(MarkerConfigXmlParser.MARKER_CONFIG_PATH);
+                    try {
+                        IDE.openEditorOnFileStore(page, fileStore);
+                    } catch (PartInitException e) {
+                        Activator.getDefault().logError("Error opening editor on " + MarkerConfigXmlParser.MARKER_CONFIG_PATH, e); //$NON-NLS-1$
+                    }
+                }
+            });
         });
         return fMarkerSetMenu;
     }
@@ -2627,29 +2594,23 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         fEntryMenuManager.setRemoveAllWhenShown(true);
         TimeGraphControl timeGraphControl = getTimeGraphViewer().getTimeGraphControl();
         final Menu entryMenu = fEntryMenuManager.createContextMenu(timeGraphControl);
-        timeGraphControl.addTimeGraphEntryMenuListener(new MenuDetectListener() {
-            @Override
-            public void menuDetected(MenuDetectEvent event) {
-                Point p = timeGraphControl.toControl(event.x, event.y);
-                /*
-                 * The TimeGraphControl will call the TimeGraphEntryMenuListener before the
-                 * TimeEventMenuListener. If the event is triggered on the name space then show
-                 * the menu else clear the menu.
-                 */
-                if (p.x < getTimeGraphViewer().getNameSpace()) {
-                    timeGraphControl.setMenu(entryMenu);
-                } else {
-                    timeGraphControl.setMenu(null);
-                    event.doit = false;
-                }
+        timeGraphControl.addTimeGraphEntryMenuListener(event -> {
+            Point p = timeGraphControl.toControl(event.x, event.y);
+            /*
+             * The TimeGraphControl will call the TimeGraphEntryMenuListener before the
+             * TimeEventMenuListener. If the event is triggered on the name space then show
+             * the menu else clear the menu.
+             */
+            if (p.x < getTimeGraphViewer().getNameSpace()) {
+                timeGraphControl.setMenu(entryMenu);
+            } else {
+                timeGraphControl.setMenu(null);
+                event.doit = false;
             }
         });
-        fEntryMenuManager.addMenuListener(new IMenuListener() {
-            @Override
-            public void menuAboutToShow(IMenuManager manager) {
-                fillTimeGraphEntryContextMenu(fEntryMenuManager);
-                fEntryMenuManager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-            }
+        fEntryMenuManager.addMenuListener(manager -> {
+            fillTimeGraphEntryContextMenu(fEntryMenuManager);
+            fEntryMenuManager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
         });
         getSite().registerContextMenu(fEntryMenuManager, fTimeGraphViewer.getSelectionProvider());
     }

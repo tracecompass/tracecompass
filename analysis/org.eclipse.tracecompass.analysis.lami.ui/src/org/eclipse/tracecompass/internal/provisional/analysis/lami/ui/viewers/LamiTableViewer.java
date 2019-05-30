@@ -153,12 +153,9 @@ public final class LamiTableViewer extends TmfSimpleTableViewer implements ILami
     private void createColumns() {
         final List<LamiTableEntryAspect> aspects = fPage.getResultTable().getTableClass().getAspects();
 
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                for (LamiTableEntryAspect aspect : aspects) {
-                    createColumn(aspect.getLabel(), new LamiTableColumnLabelProvider(aspect), aspect.getComparator());
-                }
+        Display.getDefault().asyncExec(() -> {
+            for (LamiTableEntryAspect aspect : aspects) {
+                createColumn(aspect.getLabel(), new LamiTableColumnLabelProvider(aspect), aspect.getComparator());
             }
         });
     }

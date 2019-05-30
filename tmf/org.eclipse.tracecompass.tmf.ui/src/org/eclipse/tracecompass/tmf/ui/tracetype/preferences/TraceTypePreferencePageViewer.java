@@ -108,17 +108,14 @@ public class TraceTypePreferencePageViewer {
     public Composite create(Composite parent) {
         Composite composite = createFilterArea(parent);
         fIsEmpty = fEntries.iterator().hasNext();
-        BusyIndicator.showWhile(null, new Runnable() {
-            @Override
-            public void run() {
-                Iterable<@NonNull TraceTypeHelper> toCheck = Iterables.filter(fEntries, helper -> helper.isEnabled());
-                toCheck.forEach(handler -> checkElement(handler));
-                fTree.getViewer().expandAll();
-                for (TreeColumn column : fTree.getViewer().getTree().getColumns()) {
-                    column.pack();
-                }
-                fTree.getViewer().collapseAll();
+        BusyIndicator.showWhile(null, () -> {
+            Iterable<@NonNull TraceTypeHelper> toCheck = Iterables.filter(fEntries, helper -> helper.isEnabled());
+            toCheck.forEach(handler -> checkElement(handler));
+            fTree.getViewer().expandAll();
+            for (TreeColumn column : fTree.getViewer().getTree().getColumns()) {
+                column.pack();
             }
+            fTree.getViewer().collapseAll();
         });
         return composite;
     }

@@ -41,8 +41,6 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -177,33 +175,30 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
         public ActiveThreadsFilterAction() {
             super(PackageMessages.ControlFlowView_DynamicFiltersActiveThreadToggleLabel, IAction.AS_CHECK_BOX);
             setToolTipText(PackageMessages.ControlFlowView_DynamicFiltersActiveThreadToggleToolTip);
-            addPropertyChangeListener(new IPropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent event) {
-                    if (!(event.getNewValue() instanceof Boolean)) {
-                        return;
-                    }
-
-                    Boolean enabled = (Boolean) event.getNewValue();
-
-                    /* Always remove the previous Active Threads filter */
-                    getTimeGraphViewer().removeFilter(fActiveThreadsFilter);
-
-                    if (enabled) {
-                        fActiveThreadsFilter.setEnabled(true);
-                        getTimeGraphViewer().addFilter(fActiveThreadsFilter);
-
-                        /* Use flat representation */
-                        if (fFlatAction != null) {
-                            applyFlatPresentation();
-                            fFlatAction.setChecked(true);
-                            fHierarchicalAction.setChecked(false);
-                        }
-                    } else {
-                        fActiveThreadsFilter.setEnabled(false);
-                    }
-                    startZoomThread(getTimeGraphViewer().getTime0(), getTimeGraphViewer().getTime1());
+            addPropertyChangeListener(event -> {
+                if (!(event.getNewValue() instanceof Boolean)) {
+                    return;
                 }
+
+                Boolean enabled = (Boolean) event.getNewValue();
+
+                /* Always remove the previous Active Threads filter */
+                getTimeGraphViewer().removeFilter(fActiveThreadsFilter);
+
+                if (enabled) {
+                    fActiveThreadsFilter.setEnabled(true);
+                    getTimeGraphViewer().addFilter(fActiveThreadsFilter);
+
+                    /* Use flat representation */
+                    if (fFlatAction != null) {
+                        applyFlatPresentation();
+                        fFlatAction.setChecked(true);
+                        fHierarchicalAction.setChecked(false);
+                    }
+                } else {
+                    fActiveThreadsFilter.setEnabled(false);
+                }
+                startZoomThread(getTimeGraphViewer().getTime0(), getTimeGraphViewer().getTime1());
             });
         }
     }

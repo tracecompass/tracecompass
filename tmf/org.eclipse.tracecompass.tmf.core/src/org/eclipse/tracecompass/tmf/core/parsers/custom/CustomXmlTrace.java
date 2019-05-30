@@ -311,13 +311,10 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
             final DocumentBuilder db = dbf.newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
-            final EntityResolver resolver = new EntityResolver() {
-                @Override
-                public InputSource resolveEntity(final String publicId, final String systemId) {
-                    final String empty = ""; //$NON-NLS-1$
-                    final ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
-                    return new InputSource(bais);
-                }
+            final EntityResolver resolver = (publicId, systemId) -> {
+                final String empty = ""; //$NON-NLS-1$
+                final ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
+                return new InputSource(bais);
             };
             db.setEntityResolver(resolver);
 

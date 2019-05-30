@@ -18,8 +18,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableItem;
@@ -67,25 +65,22 @@ public class GdbEventsTable extends TmfEventsTable {
         fTable.getColumns()[1].setAlignment(SWT.RIGHT);
 
         // Synchronize currently selected frame in GDB with table selection
-        addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent e) {
-                TableItem[] selection = fTable.getSelection();
-                if (selection.length > 0) {
-                    TableItem selectedTableItem = selection[0];
-                    if (selectedTableItem != null) {
-                        Object data = selectedTableItem.getData();
-                        if (data instanceof GdbTraceEvent) {
-                            GdbTraceEvent event = (GdbTraceEvent) data;
-                            GdbTrace gdbTrace = (GdbTrace) event.getTrace();
-                            GdbTraceEventContent content = event.getContent();
-                            selectFrame(gdbTrace, content.getFrameNumber());
-                            return;
-                        }
+        addSelectionChangedListener(e -> {
+            TableItem[] selection = fTable.getSelection();
+            if (selection.length > 0) {
+                TableItem selectedTableItem = selection[0];
+                if (selectedTableItem != null) {
+                    Object data = selectedTableItem.getData();
+                    if (data instanceof GdbTraceEvent) {
+                        GdbTraceEvent event = (GdbTraceEvent) data;
+                        GdbTrace gdbTrace = (GdbTrace) event.getTrace();
+                        GdbTraceEventContent content = event.getContent();
+                        selectFrame(gdbTrace, content.getFrameNumber());
+                        return;
                     }
                 }
-                fSelectedTrace = null;
             }
+            fSelectedTrace = null;
         });
     }
 

@@ -219,13 +219,10 @@ public abstract class CustomTraceDefinition {
      * @return a new entity resolver
      */
     protected static EntityResolver createEmptyEntityResolver() {
-        return new EntityResolver() {
-            @Override
-            public InputSource resolveEntity(String publicId, String systemId) {
-                String empty = ""; //$NON-NLS-1$
-                ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
-                return new InputSource(bais);
-            }
+        return (publicId, systemId) -> {
+            String empty = ""; //$NON-NLS-1$
+            ByteArrayInputStream bais = new ByteArrayInputStream(empty.getBytes());
+            return new InputSource(bais);
         };
     }
 
@@ -289,6 +286,26 @@ public abstract class CustomTraceDefinition {
     }
 
     /**
+     * Return the category of this trace definition
+     *
+     * @return The category of this trace definition
+     * @since 5.0
+     */
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    /**
+     * Return the name of this trace definition
+     *
+     * @return The name of this trace definition
+     * @since 5.0
+     */
+    public String getDefinitionName() {
+        return definitionName;
+    }
+
+    /**
      * Get all the custom trace definition paths contributed by extensions, for
      * a given content type (XML or Text).
      *
@@ -335,4 +352,5 @@ public abstract class CustomTraceDefinition {
         }
         return extensionDefinitionsPaths;
     }
+
 }

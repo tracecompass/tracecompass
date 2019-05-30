@@ -112,21 +112,18 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
     private static final String LINE_SEP = System.getProperty("line.separator"); //$NON-NLS-1$
     private static final String ELEMENT_SEP = "-\t"; //$NON-NLS-1$
 
-    private static final IPropertyListener SAVE_EDITOR_LISTENER = new IPropertyListener() {
-        @Override
-        public void propertyChanged(Object source, int propId) {
-            if (source instanceof IEditorPart) {
-                IEditorPart editorPart = (IEditorPart) source;
-                if (ISaveablePart.PROP_DIRTY == propId && !editorPart.isDirty()) {
-                    // Editor is not dirty anymore, i.e. it was saved
-                    if (editorPart.getEditorInput() instanceof IURIEditorInput) {
-                        File file = URIUtil.toFile(((IURIEditorInput) editorPart.getEditorInput()).getURI());
-                        boolean success = loadXmlFile(file, false);
-                        if (success) {
-                            enableAndDisableAnalyses(Collections.singletonList(file.getName()), Collections.emptyList());
-                        } else {
-                            enableAndDisableAnalyses(Collections.emptyList(), Collections.singletonList(file.getName()));
-                        }
+    private static final IPropertyListener SAVE_EDITOR_LISTENER = (source, propId) -> {
+        if (source instanceof IEditorPart) {
+            IEditorPart editorPart = (IEditorPart) source;
+            if (ISaveablePart.PROP_DIRTY == propId && !editorPart.isDirty()) {
+                // Editor is not dirty anymore, i.e. it was saved
+                if (editorPart.getEditorInput() instanceof IURIEditorInput) {
+                    File file = URIUtil.toFile(((IURIEditorInput) editorPart.getEditorInput()).getURI());
+                    boolean success = loadXmlFile(file, false);
+                    if (success) {
+                        enableAndDisableAnalyses(Collections.singletonList(file.getName()), Collections.emptyList());
+                    } else {
+                        enableAndDisableAnalyses(Collections.emptyList(), Collections.singletonList(file.getName()));
                     }
                 }
             }

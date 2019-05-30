@@ -599,12 +599,7 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
 
         ImportProvider fileSystemStructureProvider = new ImportProvider();
 
-        IOverwriteQuery myQueryImpl = new IOverwriteQuery() {
-            @Override
-            public String queryOverwrite(String file) {
-                return IOverwriteQuery.NO_ALL;
-            }
-        };
+        IOverwriteQuery myQueryImpl = file -> IOverwriteQuery.NO_ALL;
 
         progressMonitor.setTaskName(Messages.ImportTraceWizard_ExtractImportOperationTaskName);
         IPath containerPath = tempFolder.getFullPath();
@@ -769,12 +764,7 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
 
         ImportProvider fileSystemStructureProvider = new ImportProvider();
 
-        IOverwriteQuery myQueryImpl = new IOverwriteQuery() {
-            @Override
-            public String queryOverwrite(String file) {
-                return IOverwriteQuery.NO_ALL;
-            }
-        };
+        IOverwriteQuery myQueryImpl = file -> IOverwriteQuery.NO_ALL;
 
         monitor.setTaskName(Messages.ImportTraceWizard_ImportOperationTaskName + " " + fileSystemElement.getFileSystemObject().getAbsolutePath()); //$NON-NLS-1$
         ImportOperation operation = new ImportOperation(containerPath, parentFolder, fileSystemStructureProvider, myQueryImpl, subList);

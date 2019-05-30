@@ -96,18 +96,15 @@ public class OpenAnalysisHelpHandler extends AbstractHandler {
     }
 
     private static void displayHelpMsg(final String errorMsg) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                /*
-                 * TODO: A message box is not the best place to show help.
-                 * Something should be done with the Eclipse help
-                 */
-                final MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-                mb.setText(Messages.AnalysisModule_Help);
-                mb.setMessage(errorMsg);
-                mb.open();
-            }
+        Display.getDefault().asyncExec(() -> {
+            /*
+             * TODO: A message box is not the best place to show help.
+             * Something should be done with the Eclipse help
+             */
+            final MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+            mb.setText(Messages.AnalysisModule_Help);
+            mb.setMessage(errorMsg);
+            mb.open();
         });
     }
 

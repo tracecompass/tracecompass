@@ -21,7 +21,6 @@ import java.util.Comparator;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -176,16 +175,13 @@ public class TmfSimpleTableViewer extends TmfViewer {
         fTablePopupMenuManager = new MenuManager();
         fTablePopupMenuManager.setRemoveAllWhenShown(true);
 
-        fTablePopupMenuManager.addMenuListener(new IMenuListener() {
-            @Override
-            public void menuAboutToShow(final @Nullable IMenuManager manager) {
-                TableViewer viewer = getTableViewer();
-                ISelection selection = viewer.getSelection();
-                if (selection instanceof IStructuredSelection) {
-                    IStructuredSelection sel = (IStructuredSelection) selection;
-                    if (manager != null) {
-                        appendToTablePopupMenu(manager, sel);
-                    }
+        fTablePopupMenuManager.addMenuListener((final @Nullable IMenuManager manager) -> {
+            TableViewer viewer = getTableViewer();
+            ISelection selection = viewer.getSelection();
+            if (selection instanceof IStructuredSelection) {
+                IStructuredSelection sel = (IStructuredSelection) selection;
+                if (manager != null) {
+                    appendToTablePopupMenu(manager, sel);
                 }
             }
         });

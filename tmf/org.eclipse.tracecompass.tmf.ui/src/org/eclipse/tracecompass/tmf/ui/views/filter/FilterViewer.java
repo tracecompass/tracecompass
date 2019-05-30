@@ -30,7 +30,6 @@ import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -41,10 +40,6 @@ import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -159,30 +154,24 @@ class FilterViewer extends Composite {
 
         createContextMenu();
 
-        fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                if (!(event.getSelection().isEmpty()) && event.getSelection() instanceof IStructuredSelection) {
-                    // Update the filter node properties panel to the selection
-                    IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-                    ITmfFilterTreeNode node = (ITmfFilterTreeNode) selection.getFirstElement();
-                    updateFilterNodeComposite(node);
-                    // Highlight the selection's children
-                    highlightTreeItems(fViewer.getTree().getSelection()[0].getItems());
-                } else {
-                    updateFilterNodeComposite(null);
-                }
+        fViewer.addSelectionChangedListener(event -> {
+            if (!(event.getSelection().isEmpty()) && event.getSelection() instanceof IStructuredSelection) {
+                // Update the filter node properties panel to the selection
+                IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+                ITmfFilterTreeNode node = (ITmfFilterTreeNode) selection.getFirstElement();
+                updateFilterNodeComposite(node);
+                // Highlight the selection's children
+                highlightTreeItems(fViewer.getTree().getSelection()[0].getItems());
+            } else {
+                updateFilterNodeComposite(null);
             }
         });
 
-        fViewer.getTree().addPaintListener(new PaintListener() {
-            @Override
-            public void paintControl(PaintEvent e) {
-                TmfFilterTreeNode root = (TmfFilterTreeNode) fViewer.getInput();
-                if (root == null || root.getChildrenCount() == 0) {
-                    e.gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
-                    e.gc.drawText(Messages.FilterViewer_EmptyTreeHintText, 5, 0);
-                }
+        fViewer.getTree().addPaintListener(e -> {
+            TmfFilterTreeNode root = (TmfFilterTreeNode) fViewer.getInput();
+            if (root == null || root.getChildrenCount() == 0) {
+                e.gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
+                e.gc.drawText(Messages.FilterViewer_EmptyTreeHintText, 5, 0);
             }
         });
 
@@ -829,13 +818,10 @@ class FilterViewer extends Composite {
                     fValueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
                 }
             });
-            fValueText.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    if (!fValueText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
-                        fNode.setValue(fValueText.getText());
-                        fViewer.refresh(fNode);
-                    }
+            fValueText.addModifyListener(e -> {
+                if (!fValueText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                    fNode.setValue(fValueText.getText());
+                    fViewer.refresh(fNode);
                 }
             });
 
@@ -912,13 +898,10 @@ class FilterViewer extends Composite {
                     fValueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
                 }
             });
-            fValueText.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    if (!fValueText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
-                        fNode.setValue(fValueText.getText());
-                        fViewer.refresh(fNode);
-                    }
+            fValueText.addModifyListener(e -> {
+                if (!fValueText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                    fNode.setValue(fValueText.getText());
+                    fViewer.refresh(fNode);
                 }
             });
 
@@ -994,13 +977,10 @@ class FilterViewer extends Composite {
                     fRegexText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
                 }
             });
-            fRegexText.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    if (!fRegexText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
-                        fNode.setRegex(fRegexText.getText());
-                        fViewer.refresh(fNode);
-                    }
+            fRegexText.addModifyListener(e -> {
+                if (!fRegexText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                    fNode.setRegex(fRegexText.getText());
+                    fViewer.refresh(fNode);
                 }
             });
         }
@@ -1173,13 +1153,10 @@ class FilterViewer extends Composite {
                     fValueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
                 }
             });
-            fValueText.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    if (!fValueText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
-                        fNode.setValue(fValueText.getText());
-                        fViewer.refresh(fNode);
-                    }
+            fValueText.addModifyListener(e -> {
+                if (!fValueText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                    fNode.setValue(fValueText.getText());
+                    fViewer.refresh(fNode);
                 }
             });
         }

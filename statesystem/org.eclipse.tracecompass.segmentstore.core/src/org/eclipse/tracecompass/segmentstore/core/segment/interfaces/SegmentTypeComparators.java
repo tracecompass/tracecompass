@@ -29,25 +29,22 @@ public interface SegmentTypeComparators {
      * named segments, their order will be undefined by they will be greater
      * than all the named ones.
      */
-    Comparator<ISegment> NAMED_SEGMENT_COMPARATOR = new Comparator<ISegment>() {
-        @Override
-        public int compare(@Nullable ISegment o1, @Nullable ISegment o2) {
-            if (o1 == null || o2 == null) {
-                throw new IllegalArgumentException("One of the segment to compare is null, that should never happen"); //$NON-NLS-1$
-            }
-            String name1 = SegmentAspects.getName(o1);
-            String name2 = SegmentAspects.getName(o2);
-            if (Objects.equals(name1, name2)) {
-                return 0;
-            }
-            // Segments that are not named are greater than named ones
-            if (name2 == null) {
-                return -1;
-            }
-            if (name1 == null) {
-                return 1;
-            }
-            return name1.compareTo(name2);
+    Comparator<ISegment> NAMED_SEGMENT_COMPARATOR = (@Nullable ISegment o1, @Nullable ISegment o2) -> {
+        if (o1 == null || o2 == null) {
+            throw new IllegalArgumentException("One of the segment to compare is null, that should never happen"); //$NON-NLS-1$
         }
+        String name1 = SegmentAspects.getName(o1);
+        String name2 = SegmentAspects.getName(o2);
+        if (Objects.equals(name1, name2)) {
+            return 0;
+        }
+        // Segments that are not named are greater than named ones
+        if (name2 == null) {
+            return -1;
+        }
+        if (name1 == null) {
+            return 1;
+        }
+        return name1.compareTo(name2);
     };
 }

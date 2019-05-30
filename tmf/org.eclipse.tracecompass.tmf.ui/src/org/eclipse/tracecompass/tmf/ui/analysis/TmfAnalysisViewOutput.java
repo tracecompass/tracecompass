@@ -123,22 +123,19 @@ public class TmfAnalysisViewOutput implements IAnalysisOutput, IExecutableExtens
 
     @Override
     public void requestOutput() {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    IViewPart view = openView();
-                    // Transfers the properties of this output to the view
-                    if (!(fProperties.isEmpty()) && (view instanceof WorkbenchPart)) {
-                        WorkbenchPart wbPart = (WorkbenchPart) view;
-                        for (String key : fProperties.keySet()) {
-                            wbPart.setPartProperty(key, fProperties.get(key));
-                        }
+        Display.getDefault().asyncExec(() -> {
+            try {
+                IViewPart view = openView();
+                // Transfers the properties of this output to the view
+                if (!(fProperties.isEmpty()) && (view instanceof WorkbenchPart)) {
+                    WorkbenchPart wbPart = (WorkbenchPart) view;
+                    for (String key : fProperties.keySet()) {
+                        wbPart.setPartProperty(key, fProperties.get(key));
                     }
-                } catch (final PartInitException e) {
-                    TraceUtils.displayErrorMsg(Messages.TmfAnalysisViewOutput_Title, "Error opening view " + getName() + e.getMessage()); //$NON-NLS-1$
-                    Activator.getDefault().logError("Error opening view " + getName(), e); //$NON-NLS-1$
                 }
+            } catch (final PartInitException e) {
+                TraceUtils.displayErrorMsg(Messages.TmfAnalysisViewOutput_Title, "Error opening view " + getName() + e.getMessage()); //$NON-NLS-1$
+                Activator.getDefault().logError("Error opening view " + getName(), e); //$NON-NLS-1$
             }
         });
     }

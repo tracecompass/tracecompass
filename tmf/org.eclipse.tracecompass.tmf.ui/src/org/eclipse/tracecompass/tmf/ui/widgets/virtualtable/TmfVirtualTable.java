@@ -28,9 +28,6 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -115,18 +112,15 @@ public class TmfVirtualTable extends Composite {
                 } catch (InterruptedException e) {
                 }
             }
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    if (fSliderThrottler != SliderThrottler.this) {
-                        return;
-                    }
-                    fSliderThrottler = null;
-                    if (SliderThrottler.this.isInterrupted() || fTable.isDisposed()) {
-                        return;
-                    }
-                    refreshTable();
+            Display.getDefault().asyncExec(() -> {
+                if (fSliderThrottler != SliderThrottler.this) {
+                    return;
                 }
+                fSliderThrottler = null;
+                if (SliderThrottler.this.isInterrupted() || fTable.isDisposed()) {
+                    return;
+                }
+                refreshTable();
             });
         }
     }
@@ -169,33 +163,24 @@ public class TmfVirtualTable extends Composite {
         fSlider.setLayoutData(sliderGridData);
 
         // Add the listeners
-        fTable.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(MouseEvent event) {
-                if (fTableItemCount <= fFullyVisibleRows || event.count == 0) {
-                    return;
-                }
-                fTableTopEventRank -= event.count;
-                if (fTableTopEventRank < 0) {
-                    fTableTopEventRank = 0;
-                }
-                int latestFirstRowOffset = fTableItemCount - fFullyVisibleRows;
-                if (fTableTopEventRank > latestFirstRowOffset) {
-                    fTableTopEventRank = latestFirstRowOffset;
-                }
-
-                fSlider.setSelection(fTableTopEventRank);
-                refreshTable();
+        fTable.addMouseWheelListener(event -> {
+            if (fTableItemCount <= fFullyVisibleRows || event.count == 0) {
+                return;
             }
+            fTableTopEventRank -= event.count;
+            if (fTableTopEventRank < 0) {
+                fTableTopEventRank = 0;
+            }
+            int latestFirstRowOffset = fTableItemCount - fFullyVisibleRows;
+            if (fTableTopEventRank > latestFirstRowOffset) {
+                fTableTopEventRank = latestFirstRowOffset;
+            }
+
+            fSlider.setSelection(fTableTopEventRank);
+            refreshTable();
         });
 
-        fTable.addListener(SWT.MouseWheel, new Listener() {
-            // disable mouse scroll of horizontal scroll bar
-            @Override
-            public void handleEvent(Event event) {
-                event.doit = false;
-            }
-        });
+        fTable.addListener(SWT.MouseWheel, event -> event.doit = false);
 
         fResizeListener = new ControlAdapter() {
             @Override
@@ -211,29 +196,26 @@ public class TmfVirtualTable extends Composite {
 
         // Implement a "fake" tooltip
         final String TOOLTIP_DATA_KEY = "_TABLEITEM"; //$NON-NLS-1$
-        final Listener labelListener = new Listener() {
-            @Override
-            public void handleEvent (Event event) {
-                Label label = (Label) event.widget;
-                Shell shell = label.getShell();
-                switch (event.type) {
-                case SWT.MouseDown:
-                    Event e = new Event();
-                    e.item = (TableItem) label.getData(TOOLTIP_DATA_KEY);
-                    // Assuming table is single select, set the selection as if
-                    // the mouse down event went through to the table
-                    fTable.setSelection(new TableItem [] {(TableItem) e.item});
-                    fTable.notifyListeners(SWT.Selection, e);
-                    shell.dispose();
-                    fTable.setFocus();
-                    break;
-                case SWT.MouseExit:
-                case SWT.MouseWheel:
-                    shell.dispose();
-                    break;
-                default:
-                    break;
-                }
+        final Listener labelListener = event -> {
+            Label label = (Label) event.widget;
+            Shell shell = label.getShell();
+            switch (event.type) {
+            case SWT.MouseDown:
+                Event e = new Event();
+                e.item = (TableItem) label.getData(TOOLTIP_DATA_KEY);
+                // Assuming table is single select, set the selection as if
+                // the mouse down event went through to the table
+                fTable.setSelection(new TableItem [] {(TableItem) e.item});
+                fTable.notifyListeners(SWT.Selection, e);
+                shell.dispose();
+                fTable.setFocus();
+                break;
+            case SWT.MouseExit:
+            case SWT.MouseWheel:
+                shell.dispose();
+                break;
+            default:
+                break;
             }
         };
 
@@ -355,18 +337,15 @@ public class TmfVirtualTable extends Composite {
         });
 
         fTable.addListener(
-                SWT.MouseDoubleClick, new Listener() {
-                    @Override
-                    public void handleEvent(Event event) {
-                        if (doubleClickListener != null) {
-                            TableItem item = fTable.getItem(new Point (event.x, event.y));
-                            if (item != null) {
-                                for (int i = 0; i < fTable.getColumnCount(); i++){
-                                    Rectangle bounds = item.getBounds(i);
-                                    if (bounds.contains(event.x, event.y)){
-                                        doubleClickListener.handleDoubleClick(TmfVirtualTable.this, item, i);
-                                        break;
-                                    }
+                SWT.MouseDoubleClick, event -> {
+                    if (doubleClickListener != null) {
+                        TableItem item = fTable.getItem(new Point (event.x, event.y));
+                        if (item != null) {
+                            for (int i = 0; i < fTable.getColumnCount(); i++){
+                                Rectangle bounds = item.getBounds(i);
+                                if (bounds.contains(event.x, event.y)){
+                                    doubleClickListener.handleDoubleClick(TmfVirtualTable.this, item, i);
+                                    break;
                                 }
                             }
                         }
@@ -382,14 +361,11 @@ public class TmfVirtualTable extends Composite {
          * Also reset the top index to 0 if indicated by the flag that was set
          * at table selection of a partially visible table item.
          */
-        fTable.addPaintListener(new PaintListener() {
-            @Override
-            public void paintControl(PaintEvent e) {
-                if (fTable.getTopIndex() != 0 || fResetTopIndex) {
-                    fTable.setTopIndex(0);
-                }
-                fResetTopIndex = false;
+        fTable.addPaintListener(e -> {
+            if (fTable.getTopIndex() != 0 || fResetTopIndex) {
+                fTable.setTopIndex(0);
             }
+            fResetTopIndex = false;
         });
     }
 
@@ -611,36 +587,33 @@ public class TmfVirtualTable extends Composite {
             fSlider.setVisible(false);
         }
 
-        fSlider.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                switch (event.detail) {
-                case SWT.ARROW_DOWN:
-                case SWT.ARROW_UP:
-                case SWT.END:
-                case SWT.HOME:
-                case SWT.PAGE_DOWN:
-                case SWT.PAGE_UP: {
-                    fTableTopEventRank = fSlider.getSelection();
-                    refreshTable();
-                    break;
+        fSlider.addListener(SWT.Selection, event -> {
+            switch (event.detail) {
+            case SWT.ARROW_DOWN:
+            case SWT.ARROW_UP:
+            case SWT.END:
+            case SWT.HOME:
+            case SWT.PAGE_DOWN:
+            case SWT.PAGE_UP: {
+                fTableTopEventRank = fSlider.getSelection();
+                refreshTable();
+                break;
+            }
+            case SWT.DRAG:
+            case SWT.NONE:
+                /*
+                 * While the slider thumb is being dragged, only perform the
+                 * refresh periodically. The event detail during the drag is
+                 * SWT.DRAG on Windows and SWT.NONE on Linux.
+                 */
+                fTableTopEventRank = fSlider.getSelection();
+                if (fSliderThrottler == null) {
+                    fSliderThrottler = new SliderThrottler();
+                    fSliderThrottler.start();
                 }
-                case SWT.DRAG:
-                case SWT.NONE:
-                    /*
-                     * While the slider thumb is being dragged, only perform the
-                     * refresh periodically. The event detail during the drag is
-                     * SWT.DRAG on Windows and SWT.NONE on Linux.
-                     */
-                    fTableTopEventRank = fSlider.getSelection();
-                    if (fSliderThrottler == null) {
-                        fSliderThrottler = new SliderThrottler();
-                        fSliderThrottler.start();
-                    }
-                    break;
-                default:
-                    break;
-                }
+                break;
+            default:
+                break;
             }
         });
 

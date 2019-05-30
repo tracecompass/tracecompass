@@ -38,10 +38,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.ui.dialog.TmfFileDialogFactory;
@@ -235,12 +233,7 @@ public abstract class AbstractTracePackageWizardPage extends WizardPage {
         fBrowseButton = new Button(filePathSelectionGroup,
                 SWT.PUSH);
         fBrowseButton.setText(org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_Browse);
-        fBrowseButton.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                handleFilePathBrowseButtonPressed(fileDialogStyle);
-            }
-        });
+        fBrowseButton.addListener(SWT.Selection, event -> handleFilePathBrowseButtonPressed(fileDialogStyle));
         setButtonLayoutData(fBrowseButton);
     }
 

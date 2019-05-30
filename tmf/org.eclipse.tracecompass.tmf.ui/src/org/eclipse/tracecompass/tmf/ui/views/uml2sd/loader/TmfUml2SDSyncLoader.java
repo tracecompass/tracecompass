@@ -954,33 +954,29 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             fLock.lock();
             try {
                 if (!fView.getSDWidget().isDisposed()) {
-                    fView.getSDWidget().getDisplay().asyncExec(new Runnable() {
+                    fView.getSDWidget().getDisplay().asyncExec(() -> {
 
-                        @Override
-                        public void run() {
+                        fLock.lock();
+                        try {
+                            // check if view was disposed in the meanwhile
+                            if ((fView != null) && (!fView.getSDWidget().isDisposed())) {
+                                fFrame = frame;
+                                fView.setFrame(fFrame);
 
-                            fLock.lock();
-                            try {
-                                // check if view was disposed in the meanwhile
-                                if ((fView != null) && (!fView.getSDWidget().isDisposed())) {
-                                    fFrame = frame;
-                                    fView.setFrame(fFrame);
-
-                                    if (fCurrentTime != null) {
-                                        moveToMessageInPage();
-                                    }
-
-                                    if (fFindCriteria != null) {
-                                        find(fFindCriteria);
-                                    }
-
-                                    fView.toggleWaitCursorAsync(false);
+                                if (fCurrentTime != null) {
+                                    moveToMessageInPage();
                                 }
-                            } finally {
-                                fLock.unlock();
-                            }
 
+                                if (fFindCriteria != null) {
+                                    find(fFindCriteria);
+                                }
+
+                                fView.toggleWaitCursorAsync(false);
+                            }
+                        } finally {
+                            fLock.unlock();
                         }
+
                     });
                 }
             } finally {
@@ -1045,12 +1041,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                     }
                 } else {
                     // Not in GUI thread - queue action in GUI thread.
-                    fView.getSDWidget().getDisplay().asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            moveToMessageInPage();
-                        }
-                    });
+                    fView.getSDWidget().getDisplay().asyncExec(this::moveToMessageInPage);
                 }
             }
         } finally {
@@ -1293,13 +1284,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                  */
                 fIsSelect = false;
                 if (!fView.getSDWidget().isDisposed()) {
-                    fView.getSDWidget().getDisplay().asyncExec(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            moveToMessage();
-                        }
-                    });
+                    fView.getSDWidget().getDisplay().asyncExec(() -> moveToMessage());
                 }
             } else {
                 if (monitor.isCanceled()) {

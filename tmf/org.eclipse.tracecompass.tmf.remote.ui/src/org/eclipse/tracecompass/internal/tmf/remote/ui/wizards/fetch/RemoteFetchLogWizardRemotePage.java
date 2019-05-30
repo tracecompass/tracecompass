@@ -39,8 +39,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -241,12 +239,7 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
         fIsVisible = visible;
 
         if (visible) {
-            getContainer().getShell().getDisplay().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    updateViewer();
-                }
-            });
+            getContainer().getShell().getDisplay().asyncExec(this::updateViewer);
         } else {
             getElementViewer().setInput(null);
         }
@@ -362,12 +355,7 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
             fExperimentNameText.setText(fExperimentName);
             fExperimentNameText.setEnabled(fCreateExperimentCheckbox.getSelection());
 
-            fExperimentNameText.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    updatePageCompletion();
-                }
-            });
+            fExperimentNameText.addModifyListener(e -> updatePageCompletion());
 
             fCreateExperimentCheckbox.addSelectionListener(new SelectionAdapter() {
                 @Override

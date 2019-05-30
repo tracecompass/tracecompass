@@ -199,52 +199,46 @@ public class SegmentHistoryTree<E extends ISegment> extends AbstractOverlappingH
      */
     public Iterable<@NonNull E> getIntersectingElements(final long start, final long end) {
         final TimeRangeCondition rc = TimeRangeCondition.forContinuousRange(start, end);
-        return new Iterable<E>() {
+        return () -> new Iterator<E>() {
+
+            private boolean started = false;
+            private Deque<Integer> queue = new LinkedList<>();
+            private Deque<E> intersecting = new LinkedList<>();
 
             @Override
-            public Iterator<@NonNull E> iterator() {
-                return new Iterator<E>() {
+            public @NonNull E next() {
+                hasNext();
+                return NonNullUtils.checkNotNull(intersecting.removeFirst());
+            }
 
-                    private boolean started = false;
-                    private Deque<Integer> queue = new LinkedList<>();
-                    private Deque<E> intersecting = new LinkedList<>();
+            @Override
+            public boolean hasNext() {
+                /* Iteration has not started yet */
+                if (!started) {
+                    queue.add(getRootNode().getSequenceNumber());
+                    started = true;
+                }
 
-                    @Override
-                    public @NonNull E next() {
-                        hasNext();
-                        return NonNullUtils.checkNotNull(intersecting.removeFirst());
+                /*
+                 * Need to read nodes until either we find more segments
+                 * or iterate over all segments
+                 */
+                while (intersecting.isEmpty() && !queue.isEmpty()) {
+                    SegmentTreeNode<E> currentNode;
+                    try {
+                        currentNode = readNode(queue.pop());
+                    } catch (ClosedChannelException e) {
+                        Activator.instance().logError(e.getMessage(), e);
+                        return false;
                     }
-
-                    @Override
-                    public boolean hasNext() {
-                        /* Iteration has not started yet */
-                        if (!started) {
-                            queue.add(getRootNode().getSequenceNumber());
-                            started = true;
-                        }
-
-                        /*
-                         * Need to read nodes until either we find more segments
-                         * or iterate over all segments
-                         */
-                        while (intersecting.isEmpty() && !queue.isEmpty()) {
-                            SegmentTreeNode<E> currentNode;
-                            try {
-                                currentNode = readNode(queue.pop());
-                            } catch (ClosedChannelException e) {
-                                Activator.instance().logError(e.getMessage(), e);
-                                return false;
-                            }
-                            if (currentNode.getNodeType() == IHTNode.NodeType.CORE) {
-                                queue.addAll(currentNode.selectNextChildren(rc));
-                            }
-                            intersecting.addAll(currentNode.getMatchingIntervals(rc, interval -> true));
-                        }
-
-                        /* Return if we have found segments */
-                        return !intersecting.isEmpty();
+                    if (currentNode.getNodeType() == IHTNode.NodeType.CORE) {
+                        queue.addAll(currentNode.selectNextChildren(rc));
                     }
-                };
+                    intersecting.addAll(currentNode.getMatchingIntervals(rc, interval -> true));
+                }
+
+                /* Return if we have found segments */
+                return !intersecting.isEmpty();
             }
         };
     }
@@ -262,64 +256,58 @@ public class SegmentHistoryTree<E extends ISegment> extends AbstractOverlappingH
      */
     public Iterable<@NonNull E> getIntersectingElements(long start, long end, Comparator<@NonNull E> order) {
         final TimeRangeCondition rc = TimeRangeCondition.forContinuousRange(start, end);
-        return new Iterable<E>() {
+        return () -> new Iterator<E>() {
+
+            private boolean started = false;
+            private PriorityQueue<SegmentTreeNode.Tuple<E>> queue = new PriorityQueue<>(getNodeCount(),
+                    Comparator.comparing(SegmentTreeNode.Tuple<E>::getSegment, order));
+
+            private PriorityQueue<E> intersecting = new PriorityQueue<>(ITERATOR_QUEUE_SIZE, order);
 
             @Override
-            public Iterator<@NonNull E> iterator() {
-                return new Iterator<E>() {
+            public @NonNull E next() {
+                if (hasNext()) {
+                    return NonNullUtils.checkNotNull(intersecting.remove());
+                }
+                throw new NoSuchElementException();
+            }
 
-                    private boolean started = false;
-                    private PriorityQueue<SegmentTreeNode.Tuple<E>> queue = new PriorityQueue<>(getNodeCount(),
-                            Comparator.comparing(SegmentTreeNode.Tuple<E>::getSegment, order));
+            @Override
+            public boolean hasNext() {
+                /* Iteration has not started yet */
+                if (!started) {
+                    SegmentTreeNode<E> rootNode = getRootNode();
 
-                    private PriorityQueue<E> intersecting = new PriorityQueue<>(ITERATOR_QUEUE_SIZE, order);
+                    /*
+                     * Add the root node with any segment for the tuple,
+                     * it will always be read.
+                     */
+                    queue.add(new SegmentTreeNode.Tuple(new BasicSegment(0,0), rootNode.getSequenceNumber()));
 
-                    @Override
-                    public @NonNull E next() {
-                        if (hasNext()) {
-                            return NonNullUtils.checkNotNull(intersecting.remove());
-                        }
-                        throw new NoSuchElementException();
+                    started = true;
+                }
+
+                /*
+                 * Need to read nodes until either we find more segments
+                 * or iterate over all nodes
+                 */
+                while (!queue.isEmpty() && (intersecting.isEmpty()
+                        || order.compare(intersecting.element(), queue.peek().getSegment()) > 0)) {
+                    SegmentTreeNode<E> currentNode;
+                    try {
+                        currentNode = readNode(queue.poll().getSequenceNumber());
+                    } catch (ClosedChannelException e) {
+                        Activator.instance().logError(e.getMessage(), e);
+                        return false;
                     }
-
-                    @Override
-                    public boolean hasNext() {
-                        /* Iteration has not started yet */
-                        if (!started) {
-                            SegmentTreeNode<E> rootNode = getRootNode();
-
-                            /*
-                             * Add the root node with any segment for the tuple,
-                             * it will always be read.
-                             */
-                            queue.add(new SegmentTreeNode.Tuple(new BasicSegment(0,0), rootNode.getSequenceNumber()));
-
-                            started = true;
-                        }
-
-                        /*
-                         * Need to read nodes until either we find more segments
-                         * or iterate over all nodes
-                         */
-                        while (!queue.isEmpty() && (intersecting.isEmpty()
-                                || order.compare(intersecting.element(), queue.peek().getSegment()) > 0)) {
-                            SegmentTreeNode<E> currentNode;
-                            try {
-                                currentNode = readNode(queue.poll().getSequenceNumber());
-                            } catch (ClosedChannelException e) {
-                                Activator.instance().logError(e.getMessage(), e);
-                                return false;
-                            }
-                            if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
-                                queue.addAll(((SegmentTreeNode) currentNode).selectNextChildren(rc, order));
-                            }
-                            intersecting.addAll(currentNode.getMatchingIntervals(rc, interval -> true));
-                        }
-
-                        /* Return if we have found segments */
-                        return !intersecting.isEmpty();
+                    if (currentNode.getNodeType() == HTNode.NodeType.CORE) {
+                        queue.addAll(((SegmentTreeNode) currentNode).selectNextChildren(rc, order));
                     }
-                };
+                    intersecting.addAll(currentNode.getMatchingIntervals(rc, interval -> true));
+                }
+
+                /* Return if we have found segments */
+                return !intersecting.isEmpty();
             }
         };
     }

@@ -659,12 +659,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
      *            the second message
      */
     public void highlightRegionSync(final BaseMessage mes1, final BaseMessage mes2) {
-        getDisplay().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                highlightRegion(mes1, mes2);
-            }
-        });
+        getDisplay().syncExec(() -> highlightRegion(mes1, mes2));
     }
 
     @Override

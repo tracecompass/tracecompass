@@ -35,10 +35,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -301,13 +299,10 @@ public class SelectTracesWizardPage extends WizardPage {
         // Set the checkbox for the traces already included
         setCheckedAlreadyIncludedTraces(keys, fContentProvider.getElements(fCheckboxTreeViewer.getInput()));
 
-        fCheckboxTreeViewer.addCheckStateListener(new ICheckStateListener() {
-            @Override
-            public void checkStateChanged(CheckStateChangedEvent event) {
-                Object element = event.getElement();
-                setSubtreeChecked(element, event.getChecked());
-                maintainCheckIntegrity(element);
-            }
+        fCheckboxTreeViewer.addCheckStateListener(event -> {
+            Object element = event.getElement();
+            setSubtreeChecked(element, event.getChecked());
+            maintainCheckIntegrity(element);
         });
 
         return fCheckboxTreeViewer;

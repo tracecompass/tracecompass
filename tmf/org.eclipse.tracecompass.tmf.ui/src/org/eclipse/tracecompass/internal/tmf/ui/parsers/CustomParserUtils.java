@@ -63,12 +63,7 @@ public class CustomParserUtils {
                                     throw new OperationCanceledException();
                                 }
                                 if (traceTypeId.equals(trace.getTraceType())) {
-                                    Display.getDefault().syncExec(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            trace.closeEditors();
-                                        }
-                                    });
+                                    Display.getDefault().syncExec(trace::closeEditors);
                                     trace.deleteSupplementaryResources();
                                     trace.refreshSupplementaryFolder();
                                 }

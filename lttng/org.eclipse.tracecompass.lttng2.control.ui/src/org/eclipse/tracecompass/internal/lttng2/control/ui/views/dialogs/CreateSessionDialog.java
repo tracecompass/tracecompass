@@ -28,8 +28,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -729,20 +727,12 @@ public class CreateSessionDialog extends TitleAreaDialog implements ICreateSessi
             fLiveDelayText.setText(DEFAULT_TEXT);
             fLiveDelayText.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_GRAY));
             fLiveDelayText.setToolTipText(Messages.TraceControl_CreateSessionLiveDelayTooltip);
-            fLiveDelayText.addVerifyListener(new VerifyListener() {
-                @Override
-                public void verifyText(VerifyEvent e) {
-                    // only numbers and default are allowed.
-                    e.doit = e.text.matches("[0-9]*") || e.text.matches(DEFAULT_TEXT); //$NON-NLS-1$
-                    updateEnablement();
-                }
+            fLiveDelayText.addVerifyListener(e -> {
+                // only numbers and default are allowed.
+                e.doit = e.text.matches("[0-9]*") || e.text.matches(DEFAULT_TEXT); //$NON-NLS-1$
+                updateEnablement();
             });
-            fLiveDelayText.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent event) {
-                    updateEnablement();
-                }
-            });
+            fLiveDelayText.addModifyListener(event -> updateEnablement());
 
             fLiveDelayText.addFocusListener(new FocusListener() {
 

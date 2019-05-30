@@ -20,7 +20,6 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -173,13 +172,7 @@ public class EnableChannelDialog extends Dialog implements IEnableChannelDialog 
        fDomain = TraceDomainType.KERNEL;
 
         // Common verify listener
-        fVerifyListener = new VerifyListener() {
-            @Override
-            public void verifyText(VerifyEvent e) {
-                // only numbers and default are allowed.
-                e.doit = e.text.matches("[0-9]*") || e.text.matches(DEFAULT_TEXT); //$NON-NLS-1$
-            }
-        };
+        fVerifyListener = e -> e.doit = e.text.matches("[0-9]*") || e.text.matches(DEFAULT_TEXT);
 
         // Common focus listener
         fFocusListener = new FocusListener() {

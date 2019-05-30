@@ -51,24 +51,19 @@ import org.osgi.framework.Bundle;
 public class TmfAnalysisModuleHelperConfigElement implements IAnalysisModuleHelper {
 
     /** Note: This comparator is not symmetric so it cannot be used by regular sorting algorithms */
-    private static final @NonNull Comparator<@NonNull ApplicableClass> APPLICABLE_CLASS_COMPARATOR = new Comparator<@NonNull ApplicableClass>() {
-
-        @Override
-        public int compare(@NonNull ApplicableClass o1, @NonNull ApplicableClass o2) {
-            if (o1.fClass.equals(o2.fClass)) {
-                // Classes are the same
-                return 0;
-            }
-            // Otherwise, if one class is assignable from the other, the most generic one is smaller
-            if (o1.fClass.isAssignableFrom(o2.fClass)) {
-                return -1;
-            }
-            if (o2.fClass.isAssignableFrom(o1.fClass)) {
-                return 1;
-            }
+    private static final @NonNull Comparator<@NonNull ApplicableClass> APPLICABLE_CLASS_COMPARATOR = (@NonNull ApplicableClass o1, @NonNull ApplicableClass o2) -> {
+        if (o1.fClass.equals(o2.fClass)) {
+            // Classes are the same
             return 0;
         }
-
+        // Otherwise, if one class is assignable from the other, the most generic one is smaller
+        if (o1.fClass.isAssignableFrom(o2.fClass)) {
+            return -1;
+        }
+        if (o2.fClass.isAssignableFrom(o1.fClass)) {
+            return 1;
+        }
+        return 0;
     };
 
     /** Class that stores whether the analysis applies to a certain trace type */

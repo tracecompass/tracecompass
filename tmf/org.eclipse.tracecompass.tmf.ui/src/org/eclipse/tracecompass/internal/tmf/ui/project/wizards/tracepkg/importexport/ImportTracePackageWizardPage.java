@@ -36,16 +36,12 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.AbstractTracePackageOperation;
@@ -152,21 +148,18 @@ public class ImportTracePackageWizardPage extends AbstractTracePackageWizardPage
         Button button = new Button(projectSelectionGroup,
                 SWT.PUSH);
         button.setText(Messages.ImportTracePackageWizardPage_SelectProjectButton);
-        button.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                ElementListSelectionDialog d = new ElementListSelectionDialog(getContainer().getShell(), new WorkbenchLabelProvider());
+        button.addListener(SWT.Selection, event -> {
+            ElementListSelectionDialog d = new ElementListSelectionDialog(getContainer().getShell(), new WorkbenchLabelProvider());
 
-                d.setBlockOnOpen(true);
-                d.setTitle(Messages.ImportTracePackageWizardPage_SelectProjectDialogTitle);
+            d.setBlockOnOpen(true);
+            d.setTitle(Messages.ImportTracePackageWizardPage_SelectProjectDialogTitle);
 
-                d.setElements(fOpenedTmfProjects.toArray(new IProject[] {}));
+            d.setElements(fOpenedTmfProjects.toArray(new IProject[] {}));
 
-                d.open();
-                if (d.getFirstResult() != null) {
-                    IProject project = (IProject) d.getFirstResult();
-                    selectProject(project);
-                }
+            d.open();
+            if (d.getFirstResult() != null) {
+                IProject project = (IProject) d.getFirstResult();
+                selectProject(project);
             }
         });
         setButtonLayoutData(button);
@@ -272,13 +265,10 @@ public class ImportTracePackageWizardPage extends AbstractTracePackageWizardPage
         });
 
         // User can type-in path and press return to validate
-        filePathCombo.addTraverseListener(new TraverseListener() {
-            @Override
-            public void keyTraversed(TraverseEvent e) {
-                if (e.detail == SWT.TRAVERSE_RETURN) {
-                    e.doit = false;
-                    updateWithFilePathSelection();
-                }
+        filePathCombo.addTraverseListener(e -> {
+            if (e.detail == SWT.TRAVERSE_RETURN) {
+                e.doit = false;
+                updateWithFilePathSelection();
             }
         });
     }
@@ -292,20 +282,17 @@ public class ImportTracePackageWizardPage extends AbstractTracePackageWizardPage
         }
         setErrorMessage(null);
 
-        getContainer().getShell().getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                CheckboxTreeViewer elementViewer = getElementViewer();
-                Object elementViewerInput = createElementViewerInput();
-                elementViewer.setInput(elementViewerInput);
-                if (elementViewerInput != null) {
-                    elementViewer.expandToLevel(2);
-                    setAllChecked(elementViewer, false, true);
-                    fValidatedFilePath = getFilePathValue();
-                }
-
-                updatePageCompletion();
+        getContainer().getShell().getDisplay().asyncExec(() -> {
+            CheckboxTreeViewer elementViewer = getElementViewer();
+            Object elementViewerInput = createElementViewerInput();
+            elementViewer.setInput(elementViewerInput);
+            if (elementViewerInput != null) {
+                elementViewer.expandToLevel(2);
+                setAllChecked(elementViewer, false, true);
+                fValidatedFilePath = getFilePathValue();
             }
+
+            updatePageCompletion();
         });
     }
 

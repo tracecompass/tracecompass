@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
-import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 
@@ -67,12 +66,7 @@ public final class TmfBaseAspects {
         }
     };
 
-    private static final TmfEventFieldAspect CONTENTS_ASPECT = new TmfEventFieldAspect(Messages.getMessage(Messages.AspectName_Contents), null, new TmfEventFieldAspect.IRootField() {
-        @Override
-        public @Nullable ITmfEventField getRootField(ITmfEvent event) {
-            return event.getContent();
-        }
-    }) {
+    private static final TmfEventFieldAspect CONTENTS_ASPECT = new TmfEventFieldAspect(Messages.getMessage(Messages.AspectName_Contents), null, event -> event.getContent()) {
         @Override
         public String getHelpText() {
             return Messages.getMessage(Messages.AspectHelpText_Contents);

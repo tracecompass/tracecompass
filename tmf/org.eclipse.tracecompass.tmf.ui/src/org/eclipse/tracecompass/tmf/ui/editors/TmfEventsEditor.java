@@ -410,18 +410,15 @@ public class TmfEventsEditor extends TmfEditor implements ITmfTraceEditor, IReus
         if (!deltaFound) {
             return;
         }
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                if (removed.isEmpty() && added.isEmpty()) {
-                    fEventsTable.getTable().refresh();
-                } else {
-                    if (!removed.isEmpty()) {
-                        fEventsTable.removeBookmark(Iterables.toArray(removed, IMarker.class));
-                    }
-                    if (!added.isEmpty()) {
-                        fEventsTable.addBookmark(Iterables.toArray(added, IMarker.class));
-                    }
+        Display.getDefault().asyncExec(() -> {
+            if (removed.isEmpty() && added.isEmpty()) {
+                fEventsTable.getTable().refresh();
+            } else {
+                if (!removed.isEmpty()) {
+                    fEventsTable.removeBookmark(Iterables.toArray(removed, IMarker.class));
+                }
+                if (!added.isEmpty()) {
+                    fEventsTable.addBookmark(Iterables.toArray(added, IMarker.class));
                 }
             }
         });

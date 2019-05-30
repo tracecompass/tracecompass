@@ -18,7 +18,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -534,12 +533,7 @@ public class SDView extends ViewPart implements IPartListener {
     protected void hookContextMenu() {
         fMenuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
         fMenuMgr.setRemoveAllWhenShown(true);
-        fMenuMgr.addMenuListener(new IMenuListener() {
-            @Override
-            public void menuAboutToShow(IMenuManager manager) {
-                fillContextMenu(manager);
-            }
-        });
+        fMenuMgr.addMenuListener(this::fillContextMenu);
         Menu menu = fMenuMgr.createContextMenu(fSdWidget.getViewControl());
         fSdWidget.getViewControl().setMenu(menu);
         getSite().registerContextMenu(fMenuMgr, fSdWidget.getSelectionProvider());
@@ -926,15 +920,12 @@ public class SDView extends ViewPart implements IPartListener {
         if (getSDWidget() == null || getSDWidget().isDisposed()) {
             return;
         }
-        getSDWidget().getDisplay().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                if (getSDWidget() == null || getSDWidget().isDisposed() ||
-                        ((fTimeCompressionBar != null) && fTimeCompressionBar.isDisposed())) {
-                    return;
-                }
-                setFrame(frame);
+        getSDWidget().getDisplay().syncExec(() -> {
+            if (getSDWidget() == null || getSDWidget().isDisposed() ||
+                    ((fTimeCompressionBar != null) && fTimeCompressionBar.isDisposed())) {
+                return;
             }
+            setFrame(frame);
         });
 
     }
@@ -945,14 +936,11 @@ public class SDView extends ViewPart implements IPartListener {
      * @param sm The node to make visible in view
      */
     public void ensureVisibleSync(final GraphNode sm) {
-        getSDWidget().getDisplay().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                if (getSDWidget() == null || getSDWidget().isDisposed()) {
-                    return;
-                }
-                getSDWidget().ensureVisible(sm);
+        getSDWidget().getDisplay().syncExec(() -> {
+            if (getSDWidget() == null || getSDWidget().isDisposed()) {
+                return;
             }
+            getSDWidget().ensureVisible(sm);
         });
     }
 
@@ -966,14 +954,11 @@ public class SDView extends ViewPart implements IPartListener {
         if (getSDWidget() == null || getSDWidget().isDisposed()) {
             return;
         }
-        getSDWidget().getDisplay().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                if (getSDWidget() == null || getSDWidget().isDisposed()) {
-                    return;
-                }
-                setFrameAndEnsureVisible(frame, sm);
+        getSDWidget().getDisplay().syncExec(() -> {
+            if (getSDWidget() == null || getSDWidget().isDisposed()) {
+                return;
             }
+            setFrameAndEnsureVisible(frame, sm);
         });
     }
 
@@ -1001,12 +986,7 @@ public class SDView extends ViewPart implements IPartListener {
             return;
         }
 
-        getSDWidget().getDisplay().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                setFrameAndEnsureVisible(frame, x, y);
-            }
-        });
+        getSDWidget().getDisplay().syncExec(() -> setFrameAndEnsureVisible(frame, x, y));
     }
 
     /**
@@ -1033,27 +1013,24 @@ public class SDView extends ViewPart implements IPartListener {
             return;
         }
 
-        getSDWidget().getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                if (getSDWidget() == null || getSDWidget().isDisposed()) {
-                    return;
+        getSDWidget().getDisplay().asyncExec(() -> {
+            if (getSDWidget() == null || getSDWidget().isDisposed()) {
+                return;
+            }
+            if (wait) {
+                if (fWaitCursor != null && !fWaitCursor.isDisposed()) {
+                    fWaitCursor.dispose();
                 }
-                if (wait) {
-                    if (fWaitCursor != null && !fWaitCursor.isDisposed()) {
-                        fWaitCursor.dispose();
-                    }
-                    fWaitCursor = new Cursor(getSDWidget().getDisplay(), SWT.CURSOR_WAIT);
-                    getSDWidget().setCursor(fWaitCursor);
-                    getSDWidget().getDisplay().update();
-                } else {
-                    if (fWaitCursor != null && !fWaitCursor.isDisposed()) {
-                        fWaitCursor.dispose();
-                    }
-                    fWaitCursor = null;
-                    getSDWidget().setCursor(null);
-                    getSDWidget().getDisplay().update();
+                fWaitCursor = new Cursor(getSDWidget().getDisplay(), SWT.CURSOR_WAIT);
+                getSDWidget().setCursor(fWaitCursor);
+                getSDWidget().getDisplay().update();
+            } else {
+                if (fWaitCursor != null && !fWaitCursor.isDisposed()) {
+                    fWaitCursor.dispose();
                 }
+                fWaitCursor = null;
+                getSDWidget().setCursor(null);
+                getSDWidget().getDisplay().update();
             }
         });
     }

@@ -293,20 +293,17 @@ public class TimeGraphFilterDialog extends SelectionStatusDialog {
 
     @Override
     public void create() {
-        BusyIndicator.showWhile(null, new Runnable() {
-            @Override
-            public void run() {
-                TimeGraphFilterDialog.super.create();
-                fTree.setCheckedElements(getInitialElementSelections()
-                        .toArray());
-                if (fExpandedElements != null) {
-                    fTree.getViewer().setExpandedElements(fExpandedElements);
-                }
-                for (TreeColumn column : fTree.getViewer().getTree().getColumns()) {
-                    column.pack();
-                }
-                updateOKStatus();
+        BusyIndicator.showWhile(null, () -> {
+            TimeGraphFilterDialog.super.create();
+            fTree.setCheckedElements(getInitialElementSelections()
+                    .toArray());
+            if (fExpandedElements != null) {
+                fTree.getViewer().setExpandedElements(fExpandedElements);
             }
+            for (TreeColumn column : fTree.getViewer().getTree().getColumns()) {
+                column.pack();
+            }
+            updateOKStatus();
         });
     }
 

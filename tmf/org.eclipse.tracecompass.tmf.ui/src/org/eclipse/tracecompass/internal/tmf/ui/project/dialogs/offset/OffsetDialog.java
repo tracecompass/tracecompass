@@ -16,7 +16,6 @@ package org.eclipse.tracecompass.internal.tmf.ui.project.dialogs.offset;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +37,6 @@ import org.eclipse.jface.viewers.TreeViewerFocusCellManager;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TreeEditor;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -249,12 +246,7 @@ public class OffsetDialog extends Dialog {
         setBasicMode();
 
         TmfSignalManager.register(this);
-        composite.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(DisposeEvent e) {
-                TmfSignalManager.deregister(OffsetDialog.this);
-            }
-        });
+        composite.addDisposeListener(e -> TmfSignalManager.deregister(OffsetDialog.this));
         return area;
     }
 
@@ -388,21 +380,18 @@ public class OffsetDialog extends Dialog {
         fTargetTimeColumn = column.getColumn();
 
         List<TmfTraceElement> traces = new ArrayList<>(fOffsetMap.keySet());
-        Collections.sort(traces, new Comparator<TmfTraceElement>() {
-            @Override
-            public int compare(TmfTraceElement o1, TmfTraceElement o2) {
-                IPath folder1 = new Path(o1.getElementPath()).removeLastSegments(1);
-                IPath folder2 = new Path(o2.getElementPath()).removeLastSegments(1);
-                if (folder1.equals(folder2)) {
-                    return o1.getName().compareToIgnoreCase(o2.getName());
-                }
-                if (folder1.isPrefixOf(folder2)) {
-                    return 1;
-                } else if (folder2.isPrefixOf(folder1)) {
-                    return -1;
-                }
-                return folder1.toString().compareToIgnoreCase(folder2.toString());
+        Collections.sort(traces, (o1, o2) -> {
+            IPath folder1 = new Path(o1.getElementPath()).removeLastSegments(1);
+            IPath folder2 = new Path(o2.getElementPath()).removeLastSegments(1);
+            if (folder1.equals(folder2)) {
+                return o1.getName().compareToIgnoreCase(o2.getName());
             }
+            if (folder1.isPrefixOf(folder2)) {
+                return 1;
+            } else if (folder2.isPrefixOf(folder1)) {
+                return -1;
+            }
+            return folder1.toString().compareToIgnoreCase(folder2.toString());
         });
 
         fViewer.getViewer().setContentProvider(new ArrayTreeContentProvider());
@@ -520,15 +509,12 @@ public class OffsetDialog extends Dialog {
      */
     @TmfSignalHandler
     public void eventSelected(final TmfEventSelectedSignal signal) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                for (TmfTraceElement traceElement : fOffsetMap.keySet()) {
-                    if (traceElement.getResource().equals(signal.getEvent().getTrace().getResource())) {
-                        fRefTimeMap.put(traceElement, signal.getEvent().getTimestamp());
-                        fViewer.getViewer().update(traceElement, null);
-                        break;
-                    }
+        Display.getDefault().asyncExec(() -> {
+            for (TmfTraceElement traceElement : fOffsetMap.keySet()) {
+                if (traceElement.getResource().equals(signal.getEvent().getTrace().getResource())) {
+                    fRefTimeMap.put(traceElement, signal.getEvent().getTimestamp());
+                    fViewer.getViewer().update(traceElement, null);
+                    break;
                 }
             }
         });
@@ -542,13 +528,10 @@ public class OffsetDialog extends Dialog {
      */
     @TmfSignalHandler
     public void timeSelected(final TmfSelectionRangeUpdatedSignal signal) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                for (TmfTraceElement traceElement : fOffsetMap.keySet()) {
-                    fTargetTimeMap.put(traceElement, signal.getBeginTime());
-                    fViewer.getViewer().update(traceElement, null);
-                }
+        Display.getDefault().asyncExec(() -> {
+            for (TmfTraceElement traceElement : fOffsetMap.keySet()) {
+                fTargetTimeMap.put(traceElement, signal.getBeginTime());
+                fViewer.getViewer().update(traceElement, null);
             }
         });
     }
@@ -561,18 +544,15 @@ public class OffsetDialog extends Dialog {
      */
     @TmfSignalHandler
     public void traceOpened(final TmfTraceOpenedSignal signal) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                for (ITmfTrace trace : TmfTraceManager.getTraceSet(signal.getTrace())) {
-                    for (TmfTraceElement traceElement : fOffsetMap.keySet()) {
-                        if (traceElement.getResource().equals(trace.getResource())) {
-                            if (fRefTimeMap.get(traceElement) == null) {
-                                fRefTimeMap.put(traceElement, trace.getStartTime());
-                                fViewer.getViewer().update(traceElement, null);
-                            }
-                            break;
+        Display.getDefault().asyncExec(() -> {
+            for (ITmfTrace trace : TmfTraceManager.getTraceSet(signal.getTrace())) {
+                for (TmfTraceElement traceElement : fOffsetMap.keySet()) {
+                    if (traceElement.getResource().equals(trace.getResource())) {
+                        if (fRefTimeMap.get(traceElement) == null) {
+                            fRefTimeMap.put(traceElement, trace.getStartTime());
+                            fViewer.getViewer().update(traceElement, null);
                         }
+                        break;
                     }
                 }
             }

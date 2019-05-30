@@ -167,14 +167,11 @@ public class DsfGdbAdaptor {
          *
          */
         public DsfGdbPlatformEventListener() {
-            Display.getDefault().syncExec(new Runnable() {
-                @Override
-                public void run() {
-                    DebugPlugin.getDefault().getLaunchManager().addLaunchListener(DsfGdbPlatformEventListener.this);
-                    IWorkbench wb = PlatformUI.getWorkbench();
-                    IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-                    DebugUITools.getDebugContextManager().getContextService(win).addDebugContextListener(DsfGdbPlatformEventListener.this);
-                }
+            Display.getDefault().syncExec(() -> {
+                DebugPlugin.getDefault().getLaunchManager().addLaunchListener(DsfGdbPlatformEventListener.this);
+                IWorkbench wb = PlatformUI.getWorkbench();
+                IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+                DebugUITools.getDebugContextManager().getContextService(win).addDebugContextListener(DsfGdbPlatformEventListener.this);
             });
         }
 
@@ -594,17 +591,14 @@ public class DsfGdbAdaptor {
              * selection policy. This could be removed when DSF provides
              * an API to force the trace record selection in the Debug view.
              */
-            Display.getDefault().syncExec(new Runnable() {
-                @Override
-                public void run() {
-                    for (IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-                        for (IWorkbenchPage wbPage : wbWindow.getPages()) {
-                            IViewPart vp = wbPage.findView(IDebugUIConstants.ID_DEBUG_VIEW);
-                            if (vp instanceof AbstractDebugView) {
-                                Viewer viewer = ((AbstractDebugView) vp).getViewer();
-                                if (viewer instanceof ITreeModelViewer) {
-                                    ((ITreeModelViewer) viewer).setSelection(StructuredSelection.EMPTY, false, true);
-                                }
+            Display.getDefault().syncExec(() -> {
+                for (IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+                    for (IWorkbenchPage wbPage : wbWindow.getPages()) {
+                        IViewPart vp = wbPage.findView(IDebugUIConstants.ID_DEBUG_VIEW);
+                        if (vp instanceof AbstractDebugView) {
+                            Viewer viewer = ((AbstractDebugView) vp).getViewer();
+                            if (viewer instanceof ITreeModelViewer) {
+                                ((ITreeModelViewer) viewer).setSelection(StructuredSelection.EMPTY, false, true);
                             }
                         }
                     }
@@ -830,19 +824,16 @@ public class DsfGdbAdaptor {
     }
 
     private static void closeGdbTraceEditor(final String sessionId) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                for (IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-                    for (IWorkbenchPage wbPage : wbWindow.getPages()) {
-                        for (IEditorReference editorReference : wbPage.getEditorReferences()) {
-                            IEditorPart editor = editorReference.getEditor(false);
-                            if (editor instanceof ITmfTraceEditor) {
-                                ITmfTrace trace = ((ITmfTraceEditor) editor).getTrace();
-                                if (trace instanceof GdbTrace) {
-                                    if (((GdbTrace) trace).getDsfSessionId().equals(sessionId)) {
-                                        wbPage.closeEditor(editor, false);
-                                    }
+        Display.getDefault().asyncExec(() -> {
+            for (IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+                for (IWorkbenchPage wbPage : wbWindow.getPages()) {
+                    for (IEditorReference editorReference : wbPage.getEditorReferences()) {
+                        IEditorPart editor = editorReference.getEditor(false);
+                        if (editor instanceof ITmfTraceEditor) {
+                            ITmfTrace trace = ((ITmfTraceEditor) editor).getTrace();
+                            if (trace instanceof GdbTrace) {
+                                if (((GdbTrace) trace).getDsfSessionId().equals(sessionId)) {
+                                    wbPage.closeEditor(editor, false);
                                 }
                             }
                         }
@@ -853,37 +844,34 @@ public class DsfGdbAdaptor {
     }
 
     private static void selectGdbTraceEditor(final String sessionId, final int recordId) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                for (IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-                    for (IWorkbenchPage wbPage : wbWindow.getPages()) {
-                        for (IEditorReference editorReference : wbPage.getEditorReferences()) {
-                            IEditorPart editor = editorReference.getEditor(false);
-                            if (editor instanceof ITmfTraceEditor) {
-                                ITmfTrace trace = ((ITmfTraceEditor) editor).getTrace();
-                                if (trace instanceof GdbTrace) {
-                                    if (((GdbTrace) trace).getDsfSessionId().equals(sessionId)) {
+        Display.getDefault().asyncExec(() -> {
+            for (IWorkbenchWindow wbWindow : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+                for (IWorkbenchPage wbPage : wbWindow.getPages()) {
+                    for (IEditorReference editorReference : wbPage.getEditorReferences()) {
+                        IEditorPart editor = editorReference.getEditor(false);
+                        if (editor instanceof ITmfTraceEditor) {
+                            ITmfTrace trace = ((ITmfTraceEditor) editor).getTrace();
+                            if (trace instanceof GdbTrace) {
+                                if (((GdbTrace) trace).getDsfSessionId().equals(sessionId)) {
+                                    wbPage.bringToTop(editor);
+                                    if (recordId != -1) {
+                                        gotoRank(editor, recordId);
+                                    }
+                                    return;
+                                }
+                            } else if (trace instanceof TmfExperiment) {
+                                TmfExperiment experiment = (TmfExperiment) trace;
+                                List<ITmfTrace> expTraces = experiment.getTraces();
+                                int nbTraces = expTraces.size();
+                                for (int i = 0; i < nbTraces; i++) {
+                                    GdbTrace gdbTrace = (GdbTrace) expTraces.get(i);
+                                    if (gdbTrace.getDsfSessionId().equals(sessionId)) {
                                         wbPage.bringToTop(editor);
                                         if (recordId != -1) {
-                                            gotoRank(editor, recordId);
+                                            int rank = recordId * nbTraces + i;
+                                            gotoRank(editor, rank);
                                         }
                                         return;
-                                    }
-                                } else if (trace instanceof TmfExperiment) {
-                                    TmfExperiment experiment = (TmfExperiment) trace;
-                                    List<ITmfTrace> expTraces = experiment.getTraces();
-                                    int nbTraces = expTraces.size();
-                                    for (int i = 0; i < nbTraces; i++) {
-                                        GdbTrace gdbTrace = (GdbTrace) expTraces.get(i);
-                                        if (gdbTrace.getDsfSessionId().equals(sessionId)) {
-                                            wbPage.bringToTop(editor);
-                                            if (recordId != -1) {
-                                                int rank = recordId * nbTraces + i;
-                                                gotoRank(editor, rank);
-                                            }
-                                            return;
-                                        }
                                     }
                                 }
                             }

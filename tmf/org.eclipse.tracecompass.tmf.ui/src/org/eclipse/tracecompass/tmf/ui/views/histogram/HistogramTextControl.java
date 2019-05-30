@@ -200,12 +200,9 @@ public abstract class HistogramTextControl implements FocusListener, KeyListener
 
         // Call self from the UI thread
         if (!isDisposed()) {
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    if (!isDisposed()) {
-                        setValue(time, displayTime);
-                    }
+            Display.getDefault().asyncExec(() -> {
+                if (!isDisposed()) {
+                    setValue(time, displayTime);
                 }
             });
         }

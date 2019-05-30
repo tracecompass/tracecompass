@@ -37,24 +37,21 @@ public class PieChartViewerStateNoContentSelected implements IPieChartViewerStat
             return;
         }
 
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (context) {
-                    if (!context.isDisposed()) {
-                        // Have to get rid of the time-range PieChart
-                        if (context.getTimeRangePC() != null) {
-                            if (!context.getTimeRangePC().isDisposed()) {
-                                context.getTimeRangePC().dispose();
-                            }
-                            context.setTimeRangePC(null);
+        Display.getDefault().asyncExec(() -> {
+            synchronized (context) {
+                if (!context.isDisposed()) {
+                    // Have to get rid of the time-range PieChart
+                    if (context.getTimeRangePC() != null) {
+                        if (!context.getTimeRangePC().isDisposed()) {
+                            context.getTimeRangePC().dispose();
                         }
-
-                        context.updateGlobalPieChart();
-                        // update the global chart so it takes all the place
-                        context.getGlobalPC().getLegend().setPosition(SWT.RIGHT);
-                        context.layout();
+                        context.setTimeRangePC(null);
                     }
+
+                    context.updateGlobalPieChart();
+                    // update the global chart so it takes all the place
+                    context.getGlobalPC().getLegend().setPosition(SWT.RIGHT);
+                    context.layout();
                 }
             }
         });
@@ -72,14 +69,11 @@ public class PieChartViewerStateNoContentSelected implements IPieChartViewerStat
 
     @Override
     public void newGlobalEntries(final TmfPieChartViewer context) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (context) {
-                    if (!context.isDisposed()) {
-                        context.updateGlobalPieChart();
-                        context.getGlobalPC().redraw();
-                    }
+        Display.getDefault().asyncExec(() -> {
+            synchronized (context) {
+                if (!context.isDisposed()) {
+                    context.updateGlobalPieChart();
+                    context.getGlobalPC().redraw();
                 }
             }
         });

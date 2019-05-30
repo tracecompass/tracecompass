@@ -39,8 +39,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -227,44 +225,41 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
              * Handler that will draw bar charts in the cell using a percentage
              * value.
              */
-            fTreeViewer.getTree().addListener(SWT.EraseItem, new Listener() {
-                @Override
-                public void handleEvent(Event event) {
-                    if (columns.get(event.index).getPercentageProvider() != null) {
+            fTreeViewer.getTree().addListener(SWT.EraseItem, event -> {
+                if (columns.get(event.index).getPercentageProvider() != null) {
 
-                        double percentage = columns.get(event.index).getPercentageProvider().getPercentage(event.item.getData());
-                        if (percentage == 0) { // No bar to draw
-                            return;
-                        }
-
-                        if ((event.detail & SWT.SELECTED) > 0) {
-                            /*
-                             * The item is selected. Draw our own background to
-                             * avoid overwriting the bar.
-                             */
-                            event.gc.fillRectangle(event.x, event.y, event.width, event.height);
-                            event.detail &= ~SWT.SELECTED;
-                        }
-
-                        int barWidth = (int) ((fTreeViewer.getTree().getColumn(event.index).getWidth() - 8) * percentage);
-                        int oldAlpha = event.gc.getAlpha();
-                        Color oldForeground = event.gc.getForeground();
-                        Color oldBackground = event.gc.getBackground();
-                        /*
-                         * Draws a transparent gradient rectangle from the color
-                         * of foreground and background.
-                         */
-                        event.gc.setAlpha(64);
-                        event.gc.setForeground(event.item.getDisplay().getSystemColor(SWT.COLOR_BLUE));
-                        event.gc.setBackground(event.item.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-                        event.gc.fillGradientRectangle(event.x, event.y, barWidth, event.height, true);
-                        event.gc.drawRectangle(event.x, event.y, barWidth, event.height);
-                        /* Restores old values */
-                        event.gc.setForeground(oldForeground);
-                        event.gc.setBackground(oldBackground);
-                        event.gc.setAlpha(oldAlpha);
-                        event.detail &= ~SWT.BACKGROUND;
+                    double percentage = columns.get(event.index).getPercentageProvider().getPercentage(event.item.getData());
+                    if (percentage == 0) { // No bar to draw
+                        return;
                     }
+
+                    if ((event.detail & SWT.SELECTED) > 0) {
+                        /*
+                         * The item is selected. Draw our own background to
+                         * avoid overwriting the bar.
+                         */
+                        event.gc.fillRectangle(event.x, event.y, event.width, event.height);
+                        event.detail &= ~SWT.SELECTED;
+                    }
+
+                    int barWidth = (int) ((fTreeViewer.getTree().getColumn(event.index).getWidth() - 8) * percentage);
+                    int oldAlpha = event.gc.getAlpha();
+                    Color oldForeground = event.gc.getForeground();
+                    Color oldBackground = event.gc.getBackground();
+                    /*
+                     * Draws a transparent gradient rectangle from the color
+                     * of foreground and background.
+                     */
+                    event.gc.setAlpha(64);
+                    event.gc.setForeground(event.item.getDisplay().getSystemColor(SWT.COLOR_BLUE));
+                    event.gc.setBackground(event.item.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+                    event.gc.fillGradientRectangle(event.x, event.y, barWidth, event.height, true);
+                    event.gc.drawRectangle(event.x, event.y, barWidth, event.height);
+                    /* Restores old values */
+                    event.gc.setForeground(oldForeground);
+                    event.gc.setBackground(oldBackground);
+                    event.gc.setAlpha(oldAlpha);
+                    event.detail &= ~SWT.BACKGROUND;
                 }
             });
         }
@@ -317,15 +312,12 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
             @Override
             public void run() {
                 initializeDataSource(trace);
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!trace.equals(getTrace())) {
-                            return;
-                        }
-                        clearContent();
-                        updateContent(getWindowStartTime(), getWindowEndTime(), false);
+                Display.getDefault().asyncExec(() -> {
+                    if (!trace.equals(getTrace())) {
+                        return;
                     }
+                    clearContent();
+                    updateContent(getWindowStartTime(), getWindowEndTime(), false);
                 });
             }
         };
@@ -429,23 +421,20 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
                 final ITmfTreeViewerEntry rootEntry = updateElements(trace, start, end, isSelection);
                 /* Set the input in main thread only if it didn't change */
                 if (rootEntry != null) {
-                    Display.getDefault().asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (fTreeViewer.getControl().isDisposed()) {
-                                return;
-                            }
+                    Display.getDefault().asyncExec(() -> {
+                        if (fTreeViewer.getControl().isDisposed()) {
+                            return;
+                        }
 
-                            if (rootEntry != fTreeViewer.getInput()) {
-                                fTreeViewer.setInput(rootEntry);
-                                contentChanged(rootEntry);
-                            } else {
-                                fTreeViewer.refresh();
-                            }
-                            // FIXME should add a bit of padding
-                            for (TreeColumn column : fTreeViewer.getTree().getColumns()) {
-                                column.pack();
-                            }
+                        if (rootEntry != fTreeViewer.getInput()) {
+                            fTreeViewer.setInput(rootEntry);
+                            contentChanged(rootEntry);
+                        } else {
+                            fTreeViewer.refresh();
+                        }
+                        // FIXME should add a bit of padding
+                        for (TreeColumn column : fTreeViewer.getTree().getColumns()) {
+                            column.pack();
                         }
                     });
                 }

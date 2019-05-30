@@ -176,15 +176,11 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
 
     private static <E extends Comparable<E>, M extends SegmentStoreStatisticsModel> Function<TmfTreeViewerEntry, E>
         keyExtractor(Function<M, E> modelExtractor) {
-        return new Function<TmfTreeViewerEntry, E>() {
-
-            @Override
-            public E apply(TmfTreeViewerEntry entry) {
-                if (entry instanceof TmfGenericTreeEntry) {
-                    return modelExtractor.apply(((TmfGenericTreeEntry<M>) entry).getModel());
-                }
-                return (E) (Comparable<E>) o -> 0;
+        return entry -> {
+            if (entry instanceof TmfGenericTreeEntry) {
+                return modelExtractor.apply(((TmfGenericTreeEntry<M>) entry).getModel());
             }
+            return (E) (Comparable<E>) o -> 0;
         };
     }
 

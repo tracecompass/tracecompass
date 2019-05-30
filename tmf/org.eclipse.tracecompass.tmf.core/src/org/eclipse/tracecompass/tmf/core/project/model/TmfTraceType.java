@@ -478,15 +478,12 @@ public final class TmfTraceType {
      */
     public static @NonNull List<TraceTypeHelper> selectTraceType(String path, String traceTypeHint) throws TmfTraceImportException {
 
-        Comparator<Pair<Integer, TraceTypeHelper>> comparator = new Comparator<Pair<Integer, TraceTypeHelper>>() {
-            @Override
-            public int compare(Pair<Integer, TraceTypeHelper> o1, Pair<Integer, TraceTypeHelper> o2) {
-                int res = -o1.getFirst().compareTo(o2.getFirst()); // invert so that highest confidence is first
-                if (res == 0) {
-                    res = o1.getSecond().getName().compareTo(o2.getSecond().getName());
-                }
-                return res;
+        Comparator<Pair<Integer, TraceTypeHelper>> comparator = (o1, o2) -> {
+            int res = -o1.getFirst().compareTo(o2.getFirst()); // invert so that highest confidence is first
+            if (res == 0) {
+                res = o1.getSecond().getName().compareTo(o2.getSecond().getName());
             }
+            return res;
         };
 
         TreeSet<Pair<Integer, TraceTypeHelper>> validCandidates = new TreeSet<>(comparator);

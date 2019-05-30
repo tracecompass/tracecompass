@@ -35,9 +35,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -125,12 +123,7 @@ public class RenameExperimentDialog extends SelectionStatusDialog {
         fNewExperimentName.setText(name);
         fNewExperimentName.setSelection(0, name.length());
 
-        fNewExperimentName.addListener(SWT.Modify, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                validateNewExperimentName();
-            }
-        });
+        fNewExperimentName.addListener(SWT.Modify, event -> validateNewExperimentName());
     }
 
     private void validateNewExperimentName() {
@@ -196,12 +189,7 @@ public class RenameExperimentDialog extends SelectionStatusDialog {
                         throw new OperationCanceledException();
                     }
                     // Close the experiment if open
-                    Display.getDefault().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            fExperiment.closeEditors();
-                        }
-                    });
+                    Display.getDefault().syncExec(() -> fExperiment.closeEditors());
 
                     IFolder folder = fExperiment.getResource();
                     IFile bookmarksFile = fExperiment.getBookmarksFile();

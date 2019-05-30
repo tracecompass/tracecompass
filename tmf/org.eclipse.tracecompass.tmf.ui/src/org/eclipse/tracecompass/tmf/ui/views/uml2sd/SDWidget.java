@@ -51,8 +51,6 @@ import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
@@ -265,14 +263,7 @@ public class SDWidget extends ScrollView implements SelectionListener,
         super.addDisposeListener(this);
 
         fScrollToolTip = new DiagramToolTip(c);
-        getVerticalBar().addListener(SWT.MouseUp, new Listener() {
-
-            @Override
-            public void handleEvent(Event event) {
-                fScrollToolTip.hideToolTip();
-            }
-
-        });
+        getVerticalBar().addListener(SWT.MouseUp, event -> fScrollToolTip.hideToolTip());
         fAccessible = getViewControl().getAccessible();
 
         fAccessible.addAccessibleListener(new AccessibleAdapter() {
@@ -1839,16 +1830,13 @@ public class SDWidget extends ScrollView implements SelectionListener,
             if ((display == null) || (display.isDisposed())) {
                 return;
             }
-            display.asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    if (fSdWidget.isDisposed()) {
-                        return;
-                    }
-                    fSdWidget.fDragX += fDeltaX;
-                    fSdWidget.fDragY += fDeltaY;
-                    fSdWidget.scrollBy(fDeltaX, fDeltaY);
+            display.asyncExec(() -> {
+                if (fSdWidget.isDisposed()) {
+                    return;
                 }
+                fSdWidget.fDragX += fDeltaX;
+                fSdWidget.fDragY += fDeltaY;
+                fSdWidget.scrollBy(fDeltaX, fDeltaY);
             });
         }
     }

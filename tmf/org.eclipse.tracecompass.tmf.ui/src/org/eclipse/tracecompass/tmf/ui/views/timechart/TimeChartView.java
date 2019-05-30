@@ -266,20 +266,17 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
             fRefreshBusy = true;
         }
         // Perform the refresh on the UI thread
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                if (fViewer.getControl().isDisposed()) {
-                    return;
-                }
-                fViewer.setInput(fTimeAnalysisEntries.toArray(new TimeChartAnalysisEntry[0]));
-                fViewer.resetStartFinishTime(false);
-                synchronized (fSyncObj) {
-                    fRefreshBusy = false;
-                    if (fRefreshPending) {
-                        fRefreshPending = false;
-                        refreshViewer();
-                    }
+        Display.getDefault().asyncExec(() -> {
+            if (fViewer.getControl().isDisposed()) {
+                return;
+            }
+            fViewer.setInput(fTimeAnalysisEntries.toArray(new TimeChartAnalysisEntry[0]));
+            fViewer.resetStartFinishTime(false);
+            synchronized (fSyncObj) {
+                fRefreshBusy = false;
+                if (fRefreshPending) {
+                    fRefreshPending = false;
+                    refreshViewer();
                 }
             }
         });
@@ -295,24 +292,21 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         }
         final boolean reset = resetTimeIntervals;
         // Perform the refresh on the UI thread
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                if (fViewer.getControl().isDisposed()) {
-                    return;
-                }
-                if (reset) {
-                    fViewer.setTimeRange(fTimeAnalysisEntries.toArray(new TimeChartAnalysisEntry[0]));
-                    fViewer.setTimeBounds();
-                }
-                fViewer.getControl().redraw();
-                fViewer.getControl().update();
-                synchronized (fSyncObj) {
-                    fRedrawBusy = false;
-                    if (fRedrawPending) {
-                        fRedrawPending = false;
-                        redrawViewer(reset);
-                    }
+        Display.getDefault().asyncExec(() -> {
+            if (fViewer.getControl().isDisposed()) {
+                return;
+            }
+            if (reset) {
+                fViewer.setTimeRange(fTimeAnalysisEntries.toArray(new TimeChartAnalysisEntry[0]));
+                fViewer.setTimeBounds();
+            }
+            fViewer.getControl().redraw();
+            fViewer.getControl().update();
+            synchronized (fSyncObj) {
+                fRedrawBusy = false;
+                if (fRedrawPending) {
+                    fRedrawPending = false;
+                    redrawViewer(reset);
                 }
             }
         });
@@ -718,19 +712,16 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         final long beginTime = signal.getBeginTime().toNanos();
         final long endTime = signal.getEndTime().toNanos();
 
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                if (beginTime == endTime) {
-                    fViewer.setSelectedTime(beginTime, true);
-                    if (fStartTime != fViewer.getTime0() || fStopTime != fViewer.getTime1()) {
-                        fStartTime = fViewer.getTime0();
-                        fStopTime = fViewer.getTime1();
-                        itemize(fStartTime, fStopTime);
-                    }
-                } else {
-                    fViewer.setSelectionRange(beginTime, endTime, true);
+        Display.getDefault().asyncExec(() -> {
+            if (beginTime == endTime) {
+                fViewer.setSelectedTime(beginTime, true);
+                if (fStartTime != fViewer.getTime0() || fStopTime != fViewer.getTime1()) {
+                    fStartTime = fViewer.getTime0();
+                    fStopTime = fViewer.getTime1();
+                    itemize(fStartTime, fStopTime);
                 }
+            } else {
+                fViewer.setSelectionRange(beginTime, endTime, true);
             }
         });
     }
@@ -749,14 +740,11 @@ public class TimeChartView extends TmfView implements ITimeGraphRangeListener, I
         }
         final long startTime = signal.getCurrentRange().getStartTime().toNanos();
         final long endTime = signal.getCurrentRange().getEndTime().toNanos();
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                fStartTime = startTime;
-                fStopTime = endTime;
-                itemize(fStartTime, fStopTime);
-                fViewer.setStartFinishTime(startTime, endTime);
-            }
+        Display.getDefault().asyncExec(() -> {
+            fStartTime = startTime;
+            fStopTime = endTime;
+            itemize(fStartTime, fStopTime);
+            fViewer.setStartFinishTime(startTime, endTime);
         });
     }
 

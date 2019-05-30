@@ -496,15 +496,12 @@ public class TargetNodeComponent extends TraceControlComponent implements IRemot
             }
 
             // Notify user
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    ErrorDialog er = new ErrorDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-                            Messages.TraceControl_ErrorTitle, Messages.TraceControl_RetrieveNodeConfigurationFailure,
-                            new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e),
-                            IStatus.ERROR);
-                    er.open();
-                }
+            Display.getDefault().asyncExec(() -> {
+                ErrorDialog er = new ErrorDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                        Messages.TraceControl_ErrorTitle, Messages.TraceControl_RetrieveNodeConfigurationFailure,
+                        new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e),
+                        IStatus.ERROR);
+                er.open();
             });
             Activator.getDefault().logError(Messages.TraceControl_RetrieveNodeConfigurationFailure + " (" + getName() + "). \n", e); //$NON-NLS-1$ //$NON-NLS-2$
         }

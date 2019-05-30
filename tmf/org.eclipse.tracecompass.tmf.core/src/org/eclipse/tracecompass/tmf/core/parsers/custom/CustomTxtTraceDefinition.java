@@ -663,16 +663,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             }
         }
 
-        Set<CustomTxtTraceDefinition> defs = new TreeSet<>(new Comparator<CustomTxtTraceDefinition>() {
-            @Override
-            public int compare(CustomTxtTraceDefinition o1, CustomTxtTraceDefinition o2) {
-                int result = o1.categoryName.compareTo(o2.categoryName);
-                if (result != 0) {
-                    return result;
-                }
-                return o1.definitionName.compareTo(o2.definitionName);
-            }
-        });
+        Set<CustomTxtTraceDefinition> defs = new TreeSet<>(Comparator.comparing(CustomTxtTraceDefinition::getCategoryName).thenComparing(CustomTxtTraceDefinition::getDefinitionName));
         defs.addAll(Arrays.asList(loadAll(CUSTOM_TXT_TRACE_DEFINITIONS_PATH_NAME)));
         if (includeDefaults) {
             defs.addAll(Arrays.asList(loadAll(CUSTOM_TXT_TRACE_DEFINITIONS_DEFAULT_PATH_NAME)));
@@ -951,4 +942,5 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
             Activator.logError("Error deleting CustomTxtTraceDefinition: definitionName=" + definitionName, e); //$NON-NLS-1$
         }
     }
+
 }

@@ -10,8 +10,7 @@
 package org.eclipse.tracecompass.segmentstore.core;
 
 import java.util.Comparator;
-
-import org.eclipse.jdt.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * Segments comparators. These do not allow for null arguments.
@@ -24,53 +23,21 @@ public interface SegmentComparators {
     /**
      * Basic long comparator
      */
-    Comparator<Long> LONG_COMPARATOR = new Comparator<Long>() {
-        @Override
-        public int compare(@Nullable Long o1, @Nullable Long o2) {
-            if (o1 == null || o2 == null) {
-                throw new IllegalArgumentException();
-            }
-            return o1.compareTo(o2);
-        }
-    };
+    Comparator<Long> LONG_COMPARATOR = Objects.requireNonNull(Long::compare);
 
     /**
      * Start time comparator
      */
-    Comparator<ISegment> INTERVAL_START_COMPARATOR = new Comparator<ISegment>() {
-        @Override
-        public int compare(@Nullable ISegment o1, @Nullable ISegment o2) {
-            if (o1 == null || o2 == null) {
-                throw new IllegalArgumentException();
-            }
-            return Long.compare(o1.getStart(), o2.getStart());
-        }
-    };
+    Comparator<ISegment> INTERVAL_START_COMPARATOR = Objects.requireNonNull(Comparator.comparingLong(ISegment::getStart));
 
     /**
      * End time comparator
      */
-    Comparator<ISegment> INTERVAL_END_COMPARATOR = new Comparator<ISegment>() {
-        @Override
-        public int compare(@Nullable ISegment o1, @Nullable ISegment o2) {
-            if (o1 == null || o2 == null) {
-                throw new IllegalArgumentException();
-            }
-            return Long.compare(o1.getEnd(), o2.getEnd());
-        }
-    };
+    Comparator<ISegment> INTERVAL_END_COMPARATOR = Objects.requireNonNull(Comparator.comparingLong(ISegment::getEnd));
 
     /**
      * Length comparator
      */
-    Comparator<ISegment> INTERVAL_LENGTH_COMPARATOR = new Comparator<ISegment>() {
-        @Override
-        public int compare(@Nullable ISegment o1, @Nullable ISegment o2) {
-            if (o1 == null || o2 == null) {
-                throw new IllegalArgumentException();
-            }
-            return Long.compare(o1.getLength(), o2.getLength());
-        }
-    };
+    Comparator<ISegment> INTERVAL_LENGTH_COMPARATOR = Objects.requireNonNull(Comparator.comparingLong(ISegment::getLength));
 
 }

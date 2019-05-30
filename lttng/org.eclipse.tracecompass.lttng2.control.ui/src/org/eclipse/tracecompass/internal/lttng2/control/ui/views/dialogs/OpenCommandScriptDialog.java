@@ -32,11 +32,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.Activator;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.messages.Messages;
@@ -148,12 +146,7 @@ public class OpenCommandScriptDialog extends Dialog implements ISelectCommandScr
 
         fBrowseButton = new Button(sessionGroup, SWT.PUSH);
         fBrowseButton.setText(Messages.TraceControl_ExecuteScriptBrowseText);
-        fBrowseButton.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                handleFilePathBrowseButtonPressed(SWT.OPEN);
-            }
-        });
+        fBrowseButton.addListener(SWT.Selection, event -> handleFilePathBrowseButtonPressed(SWT.OPEN));
 
         // layout widgets
         GridData data = new GridData(GridData.FILL_HORIZONTAL);

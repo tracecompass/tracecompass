@@ -196,12 +196,9 @@ public class SelectTracesOperation implements IRunnableWithProgress {
                 subMonitor.worked(1);
             }
             if (changed) {
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        experimentElement.closeEditors();
-                        experimentElement.deleteSupplementaryResources();
-                    }
+                Display.getDefault().asyncExec(() -> {
+                    experimentElement.closeEditors();
+                    experimentElement.deleteSupplementaryResources();
                 });
             }
             setStatus(Status.OK_STATUS);

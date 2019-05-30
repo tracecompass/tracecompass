@@ -16,10 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -140,17 +138,14 @@ public class SelectRootNodeWizardPage extends WizardPage {
         fCheckboxTreeViewer.setInput(fExperiment);
         column.getColumn().pack();
 
-        fCheckboxTreeViewer.addCheckStateListener(new ICheckStateListener() {
-            @Override
-            public void checkStateChanged(CheckStateChangedEvent event) {
-                Object element = event.getElement();
-                // Uncheck all elements
-                for (Object checkedElement : fCheckboxTreeViewer.getCheckedElements()) {
-                    fCheckboxTreeViewer.setChecked(checkedElement, false);
-                }
-                fCheckboxTreeViewer.setChecked(element, event.getChecked());
-                setPageComplete(event.getChecked());
+        fCheckboxTreeViewer.addCheckStateListener(event -> {
+            Object element = event.getElement();
+            // Uncheck all elements
+            for (Object checkedElement : fCheckboxTreeViewer.getCheckedElements()) {
+                fCheckboxTreeViewer.setChecked(checkedElement, false);
             }
+            fCheckboxTreeViewer.setChecked(element, event.getChecked());
+            setPageComplete(event.getChecked());
         });
 
         setPageComplete(true);

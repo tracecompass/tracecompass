@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
@@ -99,15 +98,12 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
         // Save workspace
         final MultiStatus status = new MultiStatus(TracingRcpPlugin.PLUGIN_ID, 1, Messages.Application_WorkspaceSavingError, null);
         try {
-            IRunnableWithProgress runnable = new IRunnableWithProgress() {
-                @Override
-                public void run(IProgressMonitor monitor) {
-                    try {
-                        IWorkspace ws = ResourcesPlugin.getWorkspace();
-                        status.merge(ws.save(true, monitor));
-                    } catch (CoreException e) {
-                        status.merge(e.getStatus());
-                    }
+            IRunnableWithProgress runnable = monitor -> {
+                try {
+                    IWorkspace ws = ResourcesPlugin.getWorkspace();
+                    status.merge(ws.save(true, monitor));
+                } catch (CoreException e) {
+                    status.merge(e.getStatus());
                 }
             };
             new ProgressMonitorDialog(null).run(true, true, runnable);

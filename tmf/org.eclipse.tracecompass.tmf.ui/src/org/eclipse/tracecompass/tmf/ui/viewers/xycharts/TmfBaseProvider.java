@@ -121,12 +121,9 @@ public abstract class TmfBaseProvider {
      */
     public void refresh() {
         if (!TmfXYChartViewer.getDisplay().isDisposed()) {
-            TmfXYChartViewer.getDisplay().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    if (!getChart().isDisposed()) {
-                        getChart().redraw();
-                    }
+            TmfXYChartViewer.getDisplay().asyncExec(() -> {
+                if (!getChart().isDisposed()) {
+                    getChart().redraw();
                 }
             });
         }

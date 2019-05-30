@@ -30,21 +30,16 @@ import com.google.common.collect.ImmutableList;
  */
 public abstract class AbstractTmfGraphProvider implements ITmfGraphProvider {
 
-    private static final Comparator<ITraceEventHandler> HANDLER_COMPARATOR = new Comparator<ITraceEventHandler>() {
-
-        @Override
-        public int compare(@Nullable ITraceEventHandler o1, @Nullable ITraceEventHandler o2) {
-            if (o1 == null) {
-                return 1;
-            }
-            if (o2 == null) {
-                return -1;
-            }
-            int res = Integer.compare(o1.getPriority(), o2.getPriority());
-            // If the handlers have the same priority, arbitrarily compare their names
-            return (res != 0 ? res : o1.getClass().getName().compareTo(o2.getClass().getName()));
+    private static final Comparator<ITraceEventHandler> HANDLER_COMPARATOR = (@Nullable ITraceEventHandler o1, @Nullable ITraceEventHandler o2) -> {
+        if (o1 == null) {
+            return 1;
         }
-
+        if (o2 == null) {
+            return -1;
+        }
+        int res = Integer.compare(o1.getPriority(), o2.getPriority());
+        // If the handlers have the same priority, arbitrarily compare their names
+        return (res != 0 ? res : o1.getClass().getName().compareTo(o2.getClass().getName()));
     };
 
     private final ITmfTrace fTrace;

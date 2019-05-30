@@ -51,8 +51,6 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.TitleEvent;
-import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyleRange;
@@ -62,7 +60,6 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -989,12 +986,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
         final Shell helpShell = new Shell(getShell(), SWT.SHELL_TRIM);
         helpShell.setLayout(new FillLayout());
         helpBrowser = new Browser(helpShell, SWT.NONE);
-        helpBrowser.addTitleListener(new TitleListener() {
-            @Override
-            public void changed(TitleEvent event) {
-                helpShell.setText(event.title);
-            }
-        });
+        helpBrowser.addTitleListener(event -> helpShell.setText(event.title));
         Rectangle r = container.getBounds();
         Point p = container.toDisplay(r.x, r.y);
         Rectangle trim = helpShell.computeTrim(p.x + (r.width - 750) / 2, p.y + (r.height - 400) / 2, 750, 400);
@@ -1229,20 +1221,17 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                 infiniteButton.setVisible(true);
             }
 
-            VerifyListener digitsListener = new VerifyListener() {
-                @Override
-                public void verifyText(VerifyEvent e) {
-                    if (e.text.equals(INFINITY_STRING)) {
-                        e.doit = e.widget == cardinalityMaxText && e.start == 0 && e.end == ((Text) e.widget).getText().length();
-                    } else {
-                        if (((Text) e.widget).getText().equals(INFINITY_STRING)) {
-                            e.doit = e.start == 0 && e.end == ((Text) e.widget).getText().length();
-                        }
-                        for (int i = 0; i < e.text.length(); i++) {
-                            if (!Character.isDigit(e.text.charAt(i))) {
-                                e.doit = false;
-                                break;
-                            }
+            VerifyListener digitsListener = e -> {
+                if (e.text.equals(INFINITY_STRING)) {
+                    e.doit = e.widget == cardinalityMaxText && e.start == 0 && e.end == ((Text) e.widget).getText().length();
+                } else {
+                    if (((Text) e.widget).getText().equals(INFINITY_STRING)) {
+                        e.doit = e.start == 0 && e.end == ((Text) e.widget).getText().length();
+                    }
+                    for (int i = 0; i < e.text.length(); i++) {
+                        if (!Character.isDigit(e.text.charAt(i))) {
+                            e.doit = false;
+                            break;
                         }
                     }
                 }

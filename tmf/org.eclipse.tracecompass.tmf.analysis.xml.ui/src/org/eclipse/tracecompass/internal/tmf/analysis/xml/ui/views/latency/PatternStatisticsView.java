@@ -10,8 +10,6 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics.AbstractSegmentsStatisticsView;
@@ -36,17 +34,14 @@ public class PatternStatisticsView extends AbstractSegmentsStatisticsView {
      * Constructor
      */
     public PatternStatisticsView() {
-        this.addPartPropertyListener(new IPropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent event) {
-                if (event.getProperty().equals(TmfXmlStrings.XML_LATENCY_OUTPUT_DATA)) {
-                    Object newValue = event.getNewValue();
-                    if (newValue instanceof String) {
-                        String data = (String) newValue;
-                        fViewInfo.setViewData(data);
-                        setPartName(fViewInfo.getLabel());
-                        loadStatisticView();
-                    }
+        this.addPartPropertyListener(event -> {
+            if (event.getProperty().equals(TmfXmlStrings.XML_LATENCY_OUTPUT_DATA)) {
+                Object newValue = event.getNewValue();
+                if (newValue instanceof String) {
+                    String data = (String) newValue;
+                    fViewInfo.setViewData(data);
+                    setPartName(fViewInfo.getLabel());
+                    loadStatisticView();
                 }
             }
         });
@@ -60,12 +55,7 @@ public class PatternStatisticsView extends AbstractSegmentsStatisticsView {
             fViewInfo.setName(name);
         }
         super.createPartControl(parent);
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                setPartName(fViewInfo.getLabel());
-            }
-        });
+        Display.getDefault().asyncExec(() -> setPartName(fViewInfo.getLabel()));
     }
 
     private void loadStatisticView() {

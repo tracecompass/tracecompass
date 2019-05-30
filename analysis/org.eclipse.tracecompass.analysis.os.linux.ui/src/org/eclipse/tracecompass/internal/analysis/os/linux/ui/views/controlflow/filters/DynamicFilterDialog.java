@@ -22,8 +22,6 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -137,25 +135,22 @@ public class DynamicFilterDialog extends TitleAreaDialog {
         fCpuRangesRadioButton.setToolTipText(Messages.DynamicFilterDialog_CpuRangesTooltip);
 
         /* Attach an automatic validation to the field */
-        fCpuRangesField.addVerifyListener(new VerifyListener() {
-            @Override
-            public void verifyText(VerifyEvent e) {
-                /* Reconstruct the string */
-                final String oldString = fCpuRangesField.getText();
-                final String newString = oldString.substring(0, e.start) + e.text + oldString.substring(e.end);
+        fCpuRangesField.addVerifyListener(e -> {
+            /* Reconstruct the string */
+            final String oldString = fCpuRangesField.getText();
+            final String newString = oldString.substring(0, e.start) + e.text + oldString.substring(e.end);
 
-                /* Validate the string */
-                boolean valid = validateCpuRange(newString);
+            /* Validate the string */
+            boolean valid = validateCpuRange(newString);
 
-                Button okButton = getButton(IDialogConstants.OK_ID);
-                if (okButton != null) {
-                    getButton(IDialogConstants.OK_ID).setEnabled(valid);
-                }
-                if (valid) {
-                    setErrorMessage(null);
-                } else {
-                    setErrorMessage(Messages.DynamicFilterDialog_InvalidRangesErrorMsg);
-                }
+            Button okButton = getButton(IDialogConstants.OK_ID);
+            if (okButton != null) {
+                getButton(IDialogConstants.OK_ID).setEnabled(valid);
+            }
+            if (valid) {
+                setErrorMessage(null);
+            } else {
+                setErrorMessage(Messages.DynamicFilterDialog_InvalidRangesErrorMsg);
             }
         });
 

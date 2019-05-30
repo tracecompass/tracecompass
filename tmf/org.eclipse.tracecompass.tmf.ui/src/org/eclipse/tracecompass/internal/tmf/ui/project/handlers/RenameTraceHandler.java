@@ -101,12 +101,7 @@ public class RenameTraceHandler extends AbstractHandler {
                         throw new OperationCanceledException();
                     }
                     // Close the trace if open
-                    Display.getDefault().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            oldTrace.closeEditors();
-                        }
-                    });
+                    Display.getDefault().syncExec(oldTrace::closeEditors);
 
                     if (oldTrace.getResource() instanceof IFolder) {
                         IFolder folder = (IFolder) oldTrace.getResource();

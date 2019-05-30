@@ -38,14 +38,7 @@ import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
 public final class MappingFile implements IMappingFile {
 
     private static final String DEFAULT_END_SUFFIX = "END__"; //$NON-NLS-1$
-    private static Comparator<@NonNull Long> MAP_COMPARATOR = new Comparator<@NonNull Long>() {
-
-        @Override
-        public int compare(Long o1, Long o2) {
-            return Long.compareUnsigned(o1, o2);
-        }
-
-    };
+    private static Comparator<@NonNull Long> MAP_COMPARATOR = Long::compareUnsigned;
 
     private final String fFullPath;
     private final boolean fIsBinaryFile;

@@ -38,8 +38,6 @@ import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tracecompass.internal.tmf.ui.commands.ExportToTsvUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.TmfPieChartViewer;
@@ -158,9 +156,7 @@ public class TmfStatisticsViewer extends TmfViewer {
         initContent(parent);
         initInput();
 
-        fSash.addDisposeListener((e) -> {
-            internalDispose();
-        });
+        fSash.addDisposeListener( e -> internalDispose());
     }
 
     @Override
@@ -319,12 +315,9 @@ public class TmfStatisticsViewer extends TmfViewer {
         if (viewerControl.isDisposed()) {
             return;
         }
-        TmfUiRefreshHandler.getInstance().queueUpdate(fTreeViewer, new Runnable() {
-            @Override
-            public void run() {
-                if (!viewerControl.isDisposed()) {
-                    fTreeViewer.refresh();
-                }
+        TmfUiRefreshHandler.getInstance().queueUpdate(fTreeViewer, () -> {
+            if (!viewerControl.isDisposed()) {
+                fTreeViewer.refresh();
             }
         });
     }
@@ -360,12 +353,9 @@ public class TmfStatisticsViewer extends TmfViewer {
 
         setPieChartsVisible(moreThanOne);
 
-        TmfUiRefreshHandler.getInstance().queueUpdate(fPieChartViewer, new Runnable() {
-            @Override
-            public void run() {
-                if (!viewerControl.isDisposed()) {
-                    fPieChartViewer.refresh(refreshGlobal, refreshSelection);
-                }
+        TmfUiRefreshHandler.getInstance().queueUpdate(fPieChartViewer, () -> {
+            if (!viewerControl.isDisposed()) {
+                fPieChartViewer.refresh(refreshGlobal, refreshSelection);
             }
         });
     }
@@ -422,24 +412,20 @@ public class TmfStatisticsViewer extends TmfViewer {
 
         fTreeViewer = new TreeViewer(fSash, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         fPieChartViewer = new TmfPieChartViewer(fSash);
-        fPieChartViewer.addEventTypeSelectionListener(new Listener() {
-
-            @Override
-            public void handleEvent(Event event) {
-                String eventTypeName = event.text;
-                if (getStatisticData().getRootNode() == null ||
-                        fTreeViewer.getTree() == null) {
-                    return;
-                }
-                /* Get all the nodes corresponding to the event name */
-                List<TmfStatisticsTreeNode> nodes = (List<TmfStatisticsTreeNode>) getStatisticData().getRootNode().findChildren(eventTypeName, true);
-                if (nodes.isEmpty()) {
-                    /* Shouldn't happen, except for when selecting "Others" */
-                    return;
-                }
-                /* Only select the first in the collection */
-                fTreeViewer.setSelection(new StructuredSelection(nodes.get(0)), true);
+        fPieChartViewer.addEventTypeSelectionListener(event -> {
+            String eventTypeName = event.text;
+            if (getStatisticData().getRootNode() == null ||
+                    fTreeViewer.getTree() == null) {
+                return;
             }
+            /* Get all the nodes corresponding to the event name */
+            List<TmfStatisticsTreeNode> nodes = (List<TmfStatisticsTreeNode>) getStatisticData().getRootNode().findChildren(eventTypeName, true);
+            if (nodes.isEmpty()) {
+                /* Shouldn't happen, except for when selecting "Others" */
+                return;
+            }
+            /* Only select the first in the collection */
+            fTreeViewer.setSelection(new StructuredSelection(nodes.get(0)), true);
         });
 
         /* Make sure the sash is split in 2 equal parts */
@@ -504,85 +490,81 @@ public class TmfStatisticsViewer extends TmfViewer {
         }
 
         // Handler that will draw the percentages and the bar charts.
-        fTreeViewer.getTree().addListener(SWT.EraseItem, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                if (columnDataList.get(event.index).getPercentageProvider() != null) {
+        fTreeViewer.getTree().addListener(SWT.EraseItem, event -> {
+            if (columnDataList.get(event.index).getPercentageProvider() != null) {
 
-                    TmfStatisticsTreeNode node = (TmfStatisticsTreeNode) event.item.getData();
+                TmfStatisticsTreeNode node = (TmfStatisticsTreeNode) event.item.getData();
 
-                    // If node is hidden, exit immediately.
-                    if (TmfBaseColumnDataProvider.HIDDEN_FOLDER_LEVELS.contains(node.getName())) {
-                        return;
-                    }
+                // If node is hidden, exit immediately.
+                if (TmfBaseColumnDataProvider.HIDDEN_FOLDER_LEVELS.contains(node.getName())) {
+                    return;
+                }
 
-                    // Otherwise, get percentage and draw bar and text if
-                    // applicable.
-                    double percentage = columnDataList.get(event.index).getPercentageProvider().getPercentage(node);
+                // Otherwise, get percentage and draw bar and text if
+                // applicable.
+                double percentage = columnDataList.get(event.index).getPercentageProvider().getPercentage(node);
 
-                    // The item is selected.
-                    if ((event.detail & SWT.SELECTED) > 0) {
-                        // Draws our own background to avoid overwriting the
-                        // bar.
-                        event.gc.fillRectangle(event.x, event.y, event.width, event.height);
-                        event.detail &= ~SWT.SELECTED;
-                    }
+                // The item is selected.
+                if ((event.detail & SWT.SELECTED) > 0) {
+                    // Draws our own background to avoid overwriting the
+                    // bar.
+                    event.gc.fillRectangle(event.x, event.y, event.width, event.height);
+                    event.detail &= ~SWT.SELECTED;
+                }
 
-                    // Drawing the percentage text
-                    // if events are present in top node
-                    // and the current node is not the top node
-                    // and if is total or partial events column.
-                    // If not, exit the method.
-                    if (!((event.index == TmfBaseColumnDataProvider.StatsColumn.TOTAL.getIndex() || event.index == TmfBaseColumnDataProvider.StatsColumn.PARTIAL.getIndex())
-                    && node != node.getTop())) {
-                        return;
-                    }
+                // Drawing the percentage text
+                // if events are present in top node
+                // and the current node is not the top node
+                // and if is total or partial events column.
+                // If not, exit the method.
+                if (!((event.index == TmfBaseColumnDataProvider.StatsColumn.TOTAL.getIndex() || event.index == TmfBaseColumnDataProvider.StatsColumn.PARTIAL.getIndex())
+                && node != node.getTop())) {
+                    return;
+                }
 
-                    long eventValue = event.index == TmfBaseColumnDataProvider.StatsColumn.TOTAL.getIndex() ?
-                            node.getTop().getValues().getTotal() : node.getTop().getValues().getPartial();
+                long eventValue = event.index == TmfBaseColumnDataProvider.StatsColumn.TOTAL.getIndex() ?
+                        node.getTop().getValues().getTotal() : node.getTop().getValues().getPartial();
 
-                    if (eventValue != 0) {
+                if (eventValue != 0) {
 
-                        int oldAlpha = event.gc.getAlpha();
-                        Color oldForeground = event.gc.getForeground();
-                        Color oldBackground = event.gc.getBackground();
+                    int oldAlpha = event.gc.getAlpha();
+                    Color oldForeground = event.gc.getForeground();
+                    Color oldBackground = event.gc.getBackground();
 
-                        // Bar to draw
-                        if (percentage != 0) {
-                            /*
-                             * Draws a transparent gradient rectangle from the
-                             * color of foreground and background.
-                             */
-                            int barWidth = (int) ((fTreeViewer.getTree().getColumn(event.index).getWidth() - 8) * percentage);
-                            event.gc.setAlpha(64);
-                            event.gc.setForeground(event.item.getDisplay().getSystemColor(SWT.COLOR_BLUE));
-                            event.gc.setBackground(event.item.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-                            event.gc.fillGradientRectangle(event.x, event.y, barWidth, event.height, true);
-                            event.gc.drawRectangle(event.x, event.y, barWidth, event.height);
+                    // Bar to draw
+                    if (percentage != 0) {
+                        /*
+                         * Draws a transparent gradient rectangle from the
+                         * color of foreground and background.
+                         */
+                        int barWidth = (int) ((fTreeViewer.getTree().getColumn(event.index).getWidth() - 8) * percentage);
+                        event.gc.setAlpha(64);
+                        event.gc.setForeground(event.item.getDisplay().getSystemColor(SWT.COLOR_BLUE));
+                        event.gc.setBackground(event.item.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+                        event.gc.fillGradientRectangle(event.x, event.y, barWidth, event.height, true);
+                        event.gc.drawRectangle(event.x, event.y, barWidth, event.height);
 
-                            // Restore old values
-                            event.gc.setBackground(oldBackground);
-                            event.gc.setAlpha(oldAlpha);
-                            event.detail &= ~SWT.BACKGROUND;
-
-                        }
-
-                        String percentageText = TmfStatisticsFormatter.toPercentageText(percentage);
-                        String absoluteNumberText = TmfStatisticsFormatter.toColumnData(node, TmfBaseColumnDataProvider.StatsColumn.getColumn(event.index));
-
-                        if (event.width > event.gc.stringExtent(percentageText).x + event.gc.stringExtent(absoluteNumberText).x) {
-                            int textHeight = event.gc.stringExtent(percentageText).y;
-                            event.gc.setForeground(event.item.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
-                            event.gc.drawText(percentageText, event.x, event.y + (event.height - textHeight) / 2, true);
-                        }
-
-                        // Restores old values
-                        event.gc.setForeground(oldForeground);
+                        // Restore old values
+                        event.gc.setBackground(oldBackground);
+                        event.gc.setAlpha(oldAlpha);
+                        event.detail &= ~SWT.BACKGROUND;
 
                     }
+
+                    String percentageText = TmfStatisticsFormatter.toPercentageText(percentage);
+                    String absoluteNumberText = TmfStatisticsFormatter.toColumnData(node, TmfBaseColumnDataProvider.StatsColumn.getColumn(event.index));
+
+                    if (event.width > event.gc.stringExtent(percentageText).x + event.gc.stringExtent(absoluteNumberText).x) {
+                        int textHeight = event.gc.stringExtent(percentageText).y;
+                        event.gc.setForeground(event.item.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+                        event.gc.drawText(percentageText, event.x, event.y + (event.height - textHeight) / 2, true);
+                    }
+
+                    // Restores old values
+                    event.gc.setForeground(oldForeground);
+
                 }
             }
-
         });
 
         // Initializes the comparator parameters
@@ -742,13 +724,10 @@ public class TmfStatisticsViewer extends TmfViewer {
         if (fPieChartViewer.isDisposed()) {
             return;
         }
-        TmfUiRefreshHandler.getInstance().queueUpdate(fPieChartViewer, new Runnable() {
-            @Override
-            public void run() {
-                if (!fPieChartViewer.isDisposed()) {
-                    fPieChartViewer.setVisible(visible);
-                    fPieChartViewer.getParent().layout();
-                }
+        TmfUiRefreshHandler.getInstance().queueUpdate(fPieChartViewer, () -> {
+            if (!fPieChartViewer.isDisposed()) {
+                fPieChartViewer.setVisible(visible);
+                fPieChartViewer.getParent().layout();
             }
         });
     }
@@ -800,17 +779,14 @@ public class TmfStatisticsViewer extends TmfViewer {
 
         if (needsUpdate) {
             // Performs the updates on the UI thread
-            display.asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    if ((fTreeViewer != null)
-                            && (!fTreeViewer.getTree().isDisposed())) {
-                        Cursor cursor = null; // indicates default
-                        if (waitRequested) {
-                            cursor = fWaitCursor;
-                        }
-                        fTreeViewer.getControl().setCursor(cursor);
+            display.asyncExec(() -> {
+                if ((fTreeViewer != null)
+                        && (!fTreeViewer.getTree().isDisposed())) {
+                    Cursor cursor = null; // indicates default
+                    if (waitRequested) {
+                        cursor = fWaitCursor;
                     }
+                    fTreeViewer.getControl().setCursor(cursor);
                 }
             });
         }

@@ -21,7 +21,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
@@ -740,15 +739,11 @@ public class SDPrintDialogUI {
 
         };
 
-        fModifyListener = new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                fPagesList = new int[0];
-                computeStepXY();
-                fTotalPages.setText(Integer.valueOf(maxNumOfPages()).toString());
-                fOverviewCanvas.redraw();
-            }
-
+        fModifyListener = e -> {
+            fPagesList = new int[0];
+            computeStepXY();
+            fTotalPages.setText(Integer.valueOf(maxNumOfPages()).toString());
+            fOverviewCanvas.redraw();
         };
     }
 

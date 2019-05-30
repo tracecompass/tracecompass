@@ -37,7 +37,6 @@ import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -47,9 +46,7 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -59,8 +56,6 @@ import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -258,20 +253,17 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
             }
         });
 
-        treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-                TracePackageElement element = (TracePackageElement) (selection.size() == 1 ? selection.getFirstElement() : null);
-                fDetailsPanel.refreshDetailsPanel(element);
-                enableButtons(selection);
-                fSelectedProfileName = null;
-                while (element != null) {
-                    if (element instanceof RemoteImportProfileElement) {
-                        fSelectedProfileName = ((RemoteImportProfileElement) element).getProfileName();
-                    }
-                    element = element.getParent();
+        treeViewer.addSelectionChangedListener(event -> {
+            IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+            TracePackageElement element = (TracePackageElement) (selection.size() == 1 ? selection.getFirstElement() : null);
+            fDetailsPanel.refreshDetailsPanel(element);
+            enableButtons(selection);
+            fSelectedProfileName = null;
+            while (element != null) {
+                if (element instanceof RemoteImportProfileElement) {
+                    fSelectedProfileName = ((RemoteImportProfileElement) element).getProfileName();
                 }
+                element = element.getParent();
             }
         });
 
@@ -483,12 +475,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
     private void createContextMenu() {
         MenuManager menuManager = new MenuManager();
         menuManager.setRemoveAllWhenShown(true);
-        menuManager.addMenuListener(new IMenuListener() {
-            @Override
-            public void menuAboutToShow(IMenuManager manager) {
-                fillContextMenu(manager);
-            }
-        });
+        menuManager.addMenuListener(manager -> fillContextMenu(manager));
 
         Menu contextMenu = menuManager.createContextMenu(fTreeViewer.getTree());
         fTreeViewer.getTree().setMenu(contextMenu);
@@ -762,14 +749,11 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
                 GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
                 profileNameText.setLayoutData(gd);
                 profileNameText.setText(element.getProfileName());
-                profileNameText.addModifyListener(new ModifyListener() {
-                    @Override
-                    public void modifyText(ModifyEvent e) {
-                        element.setProfileName(profileNameText.getText().trim());
-                        fTreeViewer.refresh(element, true);
-                        validate();
-                        fSelectedProfileName = element.getProfileName();
-                    }
+                profileNameText.addModifyListener(e -> {
+                    element.setProfileName(profileNameText.getText().trim());
+                    fTreeViewer.refresh(element, true);
+                    validate();
+                    fSelectedProfileName = element.getProfileName();
                 });
 
             } else if (selection instanceof RemoteImportConnectionNodeElement) {
@@ -781,13 +765,10 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
                 nameText.setText(element.getName());
                 GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
                 nameText.setLayoutData(gd);
-                nameText.addModifyListener(new ModifyListener() {
-                    @Override
-                    public void modifyText(ModifyEvent e) {
-                        element.setName(nameText.getText().trim());
-                        fTreeViewer.refresh(element, true);
-                        validate();
-                    }
+                nameText.addModifyListener(e -> {
+                    element.setName(nameText.getText().trim());
+                    fTreeViewer.refresh(element, true);
+                    validate();
                 });
 
                 label = new Label(fComposite, SWT.NONE);
@@ -796,13 +777,10 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
                 uriText.setText(element.getURI());
                 gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
                 uriText.setLayoutData(gd);
-                uriText.addModifyListener(new ModifyListener() {
-                    @Override
-                    public void modifyText(ModifyEvent e) {
-                        element.setURI(uriText.getText().trim());
-                        fTreeViewer.refresh(element, true);
-                        validate();
-                    }
+                uriText.addModifyListener(e -> {
+                    element.setURI(uriText.getText().trim());
+                    fTreeViewer.refresh(element, true);
+                    validate();
                 });
 
             } else if (selection instanceof RemoteImportTraceGroupElement) {
@@ -814,13 +792,10 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
                 GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
                 rootText.setLayoutData(gd);
                 rootText.setText(element.getRootImportPath());
-                rootText.addModifyListener(new ModifyListener() {
-                    @Override
-                    public void modifyText(ModifyEvent e) {
-                        element.setRootImportPath(rootText.getText().trim());
-                        fTreeViewer.refresh(element, true);
-                        validate();
-                    }
+                rootText.addModifyListener(e -> {
+                    element.setRootImportPath(rootText.getText().trim());
+                    fTreeViewer.refresh(element, true);
+                    validate();
                 });
 
                 // create label for alignment
@@ -852,18 +827,15 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
                 }
                 GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
                 fileNameText.setLayoutData(gd);
-                fileNameText.addModifyListener(new ModifyListener() {
-                    @Override
-                    public void modifyText(ModifyEvent e) {
-                        for (TracePackageElement child : element.getChildren()) {
-                            if (child instanceof TracePackageFilesElement) {
-                                TracePackageFilesElement files = (TracePackageFilesElement) child;
-                                files.setFileName(fileNameText.getText().trim());
-                            }
+                fileNameText.addModifyListener(e -> {
+                    for (TracePackageElement child : element.getChildren()) {
+                        if (child instanceof TracePackageFilesElement) {
+                            TracePackageFilesElement files = (TracePackageFilesElement) child;
+                            files.setFileName(fileNameText.getText().trim());
                         }
-                        fTreeViewer.refresh(element, true);
-                        validate();
                     }
+                    fTreeViewer.refresh(element, true);
+                    validate();
                 });
 
                 label = new Label(fComposite, SWT.NONE);

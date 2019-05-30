@@ -129,14 +129,9 @@ public class SaveHandler extends BaseControlViewHandler {
                             IFileStore remoteResource = fileService.getResource(remotePath.toString());
                             final boolean overwrite[] = new boolean[1];
                             if (destPath.toFile().exists()) {
-                                Display.getDefault().syncExec(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        overwrite[0] = MessageDialog.openConfirm(Display.getDefault().getActiveShell(),
-                                                Messages.TraceControl_ProfileAlreadyExists,
-                                                NLS.bind(Messages.TraceControl_OverwriteQuery, destPath.getFileName()));
-                                    }
-                                });
+                                Display.getDefault().syncExec(() -> overwrite[0] = MessageDialog.openConfirm(Display.getDefault().getActiveShell(),
+                                        Messages.TraceControl_ProfileAlreadyExists,
+                                        NLS.bind(Messages.TraceControl_OverwriteQuery, destPath.getFileName())));
 
                                 if (!overwrite[0]) {
                                     continue;

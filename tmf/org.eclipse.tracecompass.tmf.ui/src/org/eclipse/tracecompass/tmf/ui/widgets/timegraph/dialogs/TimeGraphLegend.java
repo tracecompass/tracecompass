@@ -47,9 +47,7 @@ import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -422,12 +420,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
 
             fColor = fResourceManager.createColor(rgb);
             setForeground(fColor);
-            addListener(SWT.Paint, new Listener() {
-                @Override
-                public void handleEvent(Event event) {
-                    draw(event.gc);
-                }
-            });
+            addListener(SWT.Paint, event -> draw(event.gc));
         }
 
         public void setColor(RGB rgb) {

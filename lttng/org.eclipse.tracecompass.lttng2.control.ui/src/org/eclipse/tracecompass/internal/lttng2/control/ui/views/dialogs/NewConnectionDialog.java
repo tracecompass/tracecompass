@@ -17,18 +17,13 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -131,12 +126,7 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         private static IRemoteConnection[] getConnections(IRemoteConnectionType parentElement) {
             List<IRemoteConnection> connectionList = parentElement.getConnections();
             IRemoteConnection[] result = connectionList.toArray(new IRemoteConnection[connectionList.size()]);
-            Arrays.sort(result, new Comparator<IRemoteConnection>() {
-                @Override
-                public int compare(IRemoteConnection o1, IRemoteConnection o2) {
-                    return getConnectionLabel(o1).compareTo(getConnectionLabel(o2));
-                }
-            });
+            Arrays.sort(result, (o1, o2) -> getConnectionLabel(o1).compareTo(getConnectionLabel(o2)));
             return result;
         }
 
@@ -245,18 +235,8 @@ public class NewConnectionDialog extends Dialog implements INewConnectionDialog 
         gd.heightHint = convertHeightInCharsToPixels(CONNECTIONTREE_HEIGHT_CHARS);
         fConnectionTree.setLabelProvider(new ConnectionTreeLabelProvider());
         fConnectionTree.setContentProvider(new ConnectionContentProvider());
-        fConnectionTree.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                onSelectionChanged();
-            }
-        });
-        fConnectionTree.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-            public void doubleClick(DoubleClickEvent event) {
-                okPressed();
-            }
-        });
+        fConnectionTree.addSelectionChangedListener(event -> onSelectionChanged());
+        fConnectionTree.addDoubleClickListener(event -> okPressed());
 
         Composite buttons = new Composite(dialogComposite, SWT.NONE);
         layout = new GridLayout(BUTTONS_NUMBER_OF_COLUMNS, true);

@@ -152,21 +152,18 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
                 } catch (InterruptedException e) {
                 }
             }
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    if (fSliderThrottler != SliderThrottler.this) {
-                        return;
-                    }
-                    fSliderThrottler = null;
-                    if (SliderThrottler.this.isInterrupted() || fSlider.isDisposed()) {
-                        return;
-                    }
-                    Event event = new Event();
-                    event.widget = TmfRawEventViewer.this;
-                    event.detail = SWT.NONE;
-                    widgetSelected(new SelectionEvent(event));
+            Display.getDefault().asyncExec(() -> {
+                if (fSliderThrottler != SliderThrottler.this) {
+                    return;
                 }
+                fSliderThrottler = null;
+                if (SliderThrottler.this.isInterrupted() || fSlider.isDisposed()) {
+                    return;
+                }
+                Event event = new Event();
+                event.widget = TmfRawEventViewer.this;
+                event.detail = SWT.NONE;
+                widgetSelected(new SelectionEvent(event));
             });
         }
     }
@@ -285,12 +282,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
         fStyledText.addMouseTrackListener(this);
         fStyledText.addMouseWheelListener(this);
         /* disable mouse scroll of horizontal scroll bar */
-        fStyledText.addListener(SWT.MouseWheel, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                event.doit = false;
-            }
-        });
+        fStyledText.addListener(SWT.MouseWheel, event -> event.doit = false);
         fStyledText.addKeyListener(this);
 
         fTextArea.setBackground(fStyledText.getBackground());

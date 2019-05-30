@@ -155,13 +155,7 @@ public class ImportConflictHandler {
         };
 
         final int[] returnValue = new int[1];
-        fShell.getDisplay().syncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                returnValue[0] = dialog.open();
-            }
-        });
+        fShell.getDisplay().syncExec(() -> returnValue[0] = dialog.open());
         return returnValue[0];
     }
 

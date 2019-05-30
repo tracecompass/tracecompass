@@ -49,7 +49,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -58,11 +57,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -320,12 +317,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
                 getFileProvider(), new WorkbenchLabelProvider(), SWT.NONE,
                 DialogUtil.inRegularFontMode(parent));
 
-        ICheckStateListener listener = new ICheckStateListener() {
-            @Override
-            public void checkStateChanged(CheckStateChangedEvent event) {
-                updateWidgetEnablements();
-            }
-        };
+        ICheckStateListener listener = event -> updateWidgetEnablements();
 
         WorkbenchViewerComparator comparator = new WorkbenchViewerComparator();
         fSelectionGroup.setTreeComparator(comparator);
@@ -486,14 +478,11 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         layoutData.widthHint = new PixelConverter(pathSelectionCombo).convertWidthInCharsToPixels(25);
         pathSelectionCombo.setLayoutData(layoutData);
 
-        TraverseListener traverseListener = new TraverseListener() {
-            @Override
-            public void keyTraversed(TraverseEvent e) {
-                if (e.detail == SWT.TRAVERSE_RETURN) {
-                    e.doit = false;
-                    entryChanged = false;
-                    updateFromSourceField();
-                }
+        TraverseListener traverseListener = e -> {
+            if (e.detail == SWT.TRAVERSE_RETURN) {
+                e.doit = false;
+                entryChanged = false;
+                updateFromSourceField();
             }
         };
 
@@ -516,12 +505,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             }
         };
 
-        ModifyListener modifyListner = new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                entryChanged = true;
-            }
-        };
+        ModifyListener modifyListner = e -> entryChanged = true;
 
         pathSelectionCombo.addModifyListener(modifyListner);
         pathSelectionCombo.addTraverseListener(traverseListener);
@@ -812,13 +796,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
     private TraceFileSystemElement selectFiles(final IFileSystemObject rootFileSystemObject,
             final FileSystemObjectImportStructureProvider structureProvider) {
         final TraceFileSystemElement[] results = new TraceFileSystemElement[1];
-        BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
-            @Override
-            public void run() {
-                // Create the root element from the supplied file system object
-                results[0] = TraceFileSystemElement.createRootTraceFileElement(rootFileSystemObject, structureProvider);
-            }
-        });
+        BusyIndicator.showWhile(getShell().getDisplay(), () -> results[0] = TraceFileSystemElement.createRootTraceFileElement(rootFileSystemObject, structureProvider));
         return results[0];
     }
 
@@ -921,12 +899,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
         data = new GridData(GridData.FILL, GridData.CENTER, true, false);
         fExperimentNameText.setLayoutData(data);
 
-        fExperimentNameText.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                updateWidgetEnablements();
-            }
-        });
+        fExperimentNameText.addModifyListener(e -> updateWidgetEnablements());
 
         fCreateExperimentCheckbox.addSelectionListener(new SelectionAdapter() {
             @Override

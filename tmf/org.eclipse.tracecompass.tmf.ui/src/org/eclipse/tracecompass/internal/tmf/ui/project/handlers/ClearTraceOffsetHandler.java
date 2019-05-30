@@ -95,12 +95,7 @@ public class ClearTraceOffsetHandler extends AbstractHandler {
                         throw new OperationCanceledException();
                     }
                     if (!TimestampTransformFactory.getTimestampTransform(trace.getResource()).equals(TimestampTransformFactory.getDefaultTransform())) {
-                        Display.getDefault().syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                trace.closeEditors();
-                            }
-                        });
+                        Display.getDefault().syncExec(trace::closeEditors);
                         trace.deleteSupplementaryResources();
                         TimestampTransformFactory.setTimestampTransform(trace.getResource(), null);
                         trace.refreshSupplementaryFolder();

@@ -125,12 +125,7 @@ public class TmfSynchronizationView extends TmfView {
         if (signal.getTrace() instanceof TmfExperiment) {
             fAlgoSync = ((TmfExperiment) signal.getTrace()).synchronizeTraces();
         }
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                updateTable();
-            }
-        });
+        Display.getDefault().asyncExec(this::updateTable);
     }
 
     /**
@@ -143,12 +138,7 @@ public class TmfSynchronizationView extends TmfView {
     public void traceSynchronized(TmfTraceSynchronizedSignal signal) {
         if (signal.getSyncAlgo() != fAlgoSync) {
             fAlgoSync = signal.getSyncAlgo();
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    updateTable();
-                }
-            });
+            Display.getDefault().asyncExec(this::updateTable);
         }
     }
 }

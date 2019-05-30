@@ -25,7 +25,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -232,28 +231,22 @@ public class ScrollView extends Composite {
 
         setLayout(new SVLayout());
 
-        fLocalPaintListener = new PaintListener() {
-            @Override
-            public void paintControl(PaintEvent event) {
-                // use clipping, to reduce cost of paint.
-                Rectangle r = event.gc.getClipping();
-                int cx = viewToContentsX(r.x);
-                int cy = viewToContentsY(r.y);
-                drawContents(event.gc, cx, cy, r.width, r.height);
-            }
+        fLocalPaintListener = event -> {
+            // use clipping, to reduce cost of paint.
+            Rectangle r = event.gc.getClipping();
+            int cx = viewToContentsX(r.x);
+            int cy = viewToContentsY(r.y);
+            drawContents(event.gc, cx, cy, r.width, r.height);
         };
         fViewControl.addPaintListener(fLocalPaintListener);
 
-        fLocalMouseMoveListener = new MouseMoveListener() {
-            @Override
-            public void mouseMove(MouseEvent e) {
-                int ox = e.x, oy = e.y;
-                e.x = viewToContentsX(e.x);
-                e.y = viewToContentsY(e.y);
-                contentsMouseMoveEvent(e);
-                e.x = ox;
-                e.y = oy;
-            }
+        fLocalMouseMoveListener = e -> {
+            int ox = e.x, oy = e.y;
+            e.x = viewToContentsX(e.x);
+            e.y = viewToContentsY(e.y);
+            contentsMouseMoveEvent(e);
+            e.x = ox;
+            e.y = oy;
         };
 
         fViewControl.addMouseMoveListener(fLocalMouseMoveListener);
@@ -864,12 +857,9 @@ public class ScrollView extends Composite {
             if ((display == null) || display.isDisposed()) {
                 return;
             }
-            display.asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    if (!scrollView.isDisposed()) {
-                        scrollView.scrollBy(deltaX, deltaY);
-                    }
+            display.asyncExec(() -> {
+                if (!scrollView.isDisposed()) {
+                    scrollView.scrollBy(deltaX, deltaY);
                 }
             });
         }
@@ -1849,12 +1839,7 @@ public class ScrollView extends Composite {
         protected void overviewAppear(int mx, int my) {
             if (fOverview == null) {
                 fOverview = new Shell(getShell(), SWT.ON_TOP | SWT.NO_BACKGROUND);
-                fOverview.addPaintListener(new PaintListener() {
-                    @Override
-                    public void paintControl(PaintEvent e) {
-                        drawOverview(e.gc, fOverview.getClientArea());
-                    }
-                });
+                fOverview.addPaintListener(e -> drawOverview(e.gc, fOverview.getClientArea()));
             }
             // always the same..
             fOverview.setForeground(fViewControl.getForeground());

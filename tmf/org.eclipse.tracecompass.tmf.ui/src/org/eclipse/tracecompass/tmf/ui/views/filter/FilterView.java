@@ -28,9 +28,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -165,14 +163,11 @@ public class FilterView extends TmfView {
 
         contributeToActionBars();
 
-        fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                if (!(event.getSelection().isEmpty()) && event.getSelection() instanceof IStructuredSelection) {
-                    fExportAction.setEnabled(true);
-                } else {
-                    fExportAction.setEnabled(false);
-                }
+        fViewer.addSelectionChangedListener(event -> {
+            if (!(event.getSelection().isEmpty()) && event.getSelection() instanceof IStructuredSelection) {
+                fExportAction.setEnabled(true);
+            } else {
+                fExportAction.setEnabled(false);
             }
         });
         this.getSite().setSelectionProvider(fViewer.getTreeViewer());

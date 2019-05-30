@@ -32,8 +32,6 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -186,16 +184,13 @@ public class ColorsView extends TmfView {
         fillerLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         fillerLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
-        fFillerComposite.addPaintListener(new PaintListener() {
-            @Override
-            public void paintControl(PaintEvent e) {
-                if (fSelectedRow == null) {
-                    Color lineColor = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
-                    Point p = fFillerComposite.getSize();
-                    GC gc = e.gc;
-                    gc.setForeground(lineColor);
-                    gc.drawLine(0, 0, p.x - 1, 0);
-                }
+        fFillerComposite.addPaintListener(e -> {
+            if (fSelectedRow == null) {
+                Color lineColor = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
+                Point p = fFillerComposite.getSize();
+                GC gc = e.gc;
+                gc.setForeground(lineColor);
+                gc.drawLine(0, 0, p.x - 1, 0);
             }
         });
 
@@ -502,22 +497,20 @@ public class ColorsView extends TmfView {
             gd.heightHint = bgButton.getSize().y;
             tickCanvas.setLayoutData(gd);
             tickCanvas.setBackground(traceColorScheme.getBkColor(false, false, false));
-            tickCanvas.addPaintListener(new PaintListener() {
-                @Override
-                public void paintControl(PaintEvent e) {
-                    Rectangle bounds = tickCanvas.getBounds();
-                    e.gc.setForeground(traceColorScheme.getColor(TimeGraphColorScheme.MID_LINE));
-                    int midy = bounds.y + bounds.height / 2 - 1;
-                    //int midy = e.y + e.height / 2;
-                    e.gc.drawLine(e.x, midy, e.x + e.width, midy);
-                    Rectangle rect = new Rectangle(e.x + 1, bounds.y + 2, 0, bounds.height - 6);
-                    for (int i = 1; i <= 3; i++) {
-                        rect.x += i;
-                        rect.width = i;
-                        e.gc.setBackground(fColorSetting.getTickColor());
-                        e.gc.fillRectangle(rect);
-                    }
-                }});
+            tickCanvas.addPaintListener(e -> {
+                Rectangle bounds = tickCanvas.getBounds();
+                e.gc.setForeground(traceColorScheme.getColor(TimeGraphColorScheme.MID_LINE));
+                int midy = bounds.y + bounds.height / 2 - 1;
+                //int midy = e.y + e.height / 2;
+                e.gc.drawLine(e.x, midy, e.x + e.width, midy);
+                Rectangle rect = new Rectangle(e.x + 1, bounds.y + 2, 0, bounds.height - 6);
+                for (int i = 1; i <= 3; i++) {
+                    rect.x += i;
+                    rect.width = i;
+                    e.gc.setBackground(fColorSetting.getTickColor());
+                    e.gc.fillRectangle(rect);
+                }
+            });
 
             tickButton.addSelectionListener(new SelectionAdapter() {
                 @Override
@@ -571,17 +564,14 @@ public class ColorsView extends TmfView {
                     }
                 }});
 
-            addPaintListener(new PaintListener() {
-                @Override
-                public void paintControl(PaintEvent e) {
-                    if (fSelectedRow == ColorSettingRow.this) {
-                        Color borderColor = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
-                        Point p = ColorSettingRow.this.getSize();
-                        Rectangle rect = new Rectangle(0, 0, p.x - 1, p.y - 1);
-                        GC gc = e.gc;
-                        gc.setForeground(borderColor);
-                        gc.drawRectangle(rect);
-                    }
+            addPaintListener(e -> {
+                if (fSelectedRow == ColorSettingRow.this) {
+                    Color borderColor = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
+                    Point p = ColorSettingRow.this.getSize();
+                    Rectangle rect = new Rectangle(0, 0, p.x - 1, p.y - 1);
+                    GC gc = e.gc;
+                    gc.setForeground(borderColor);
+                    gc.drawRectangle(rect);
                 }
             });
 

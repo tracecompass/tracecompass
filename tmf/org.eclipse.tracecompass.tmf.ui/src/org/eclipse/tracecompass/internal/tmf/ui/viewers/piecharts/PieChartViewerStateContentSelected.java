@@ -37,17 +37,14 @@ public class PieChartViewerStateContentSelected implements IPieChartViewerState 
             return;
         }
 
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (context) {
-                    if (!context.isDisposed()) {
-                        context.updateGlobalPieChart();
-                        context.updateTimeRangeSelectionPieChart();
-                        context.getTimeRangePC().redraw();
-                        context.getGlobalPC().getLegend().setPosition(SWT.BOTTOM);
-                        context.layout();
-                    }
+        Display.getDefault().asyncExec(() -> {
+            synchronized (context) {
+                if (!context.isDisposed()) {
+                    context.updateGlobalPieChart();
+                    context.updateTimeRangeSelectionPieChart();
+                    context.getTimeRangePC().redraw();
+                    context.getGlobalPC().getLegend().setPosition(SWT.BOTTOM);
+                    context.layout();
                 }
             }
         });
@@ -60,15 +57,12 @@ public class PieChartViewerStateContentSelected implements IPieChartViewerState 
             return;
         }
 
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (context) {
-                    if (!context.isDisposed()) {
-                        context.updateTimeRangeSelectionPieChart();
-                        context.getTimeRangePC().redraw();
-                        context.layout();
-                    }
+        Display.getDefault().asyncExec(() -> {
+            synchronized (context) {
+                if (!context.isDisposed()) {
+                    context.updateTimeRangeSelectionPieChart();
+                    context.getTimeRangePC().redraw();
+                    context.layout();
                 }
             }
         });

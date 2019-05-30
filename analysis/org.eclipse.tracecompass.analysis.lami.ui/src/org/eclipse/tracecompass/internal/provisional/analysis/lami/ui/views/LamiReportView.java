@@ -21,7 +21,6 @@ import java.util.function.Supplier;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -123,24 +122,20 @@ public final class LamiReportView extends TmfView {
         }
     };
 
-    private final Function<Integer, @Nullable IImageSave> fImageProvider = new Function<Integer, @Nullable IImageSave>() {
-
-        @Override
-        public @Nullable IImageSave apply(Integer index) {
-            LamiReportViewTabPage selectedPage = getCurrentSelectedPage();
-            if (selectedPage == null) {
-                return null;
-            }
-            List<LamiViewerControl> plots = selectedPage.getCustomGraphViewerControls();
-
-            if (index >= 0 && index < plots.size()) {
-                TmfViewer viewer = plots.get(index).getViewer();
-                if (viewer instanceof IImageSave) {
-                    return (IImageSave) viewer;
-                }
-            }
+    private final Function<Integer, @Nullable IImageSave> fImageProvider = index -> {
+        LamiReportViewTabPage selectedPage = getCurrentSelectedPage();
+        if (selectedPage == null) {
             return null;
         }
+        List<LamiViewerControl> plots = selectedPage.getCustomGraphViewerControls();
+
+        if (index >= 0 && index < plots.size()) {
+            TmfViewer viewer = plots.get(index).getViewer();
+            if (viewer instanceof IImageSave) {
+                return (IImageSave) viewer;
+            }
+        }
+        return null;
     };
 
     private List<Supplier<@Nullable IImageSave>> getSuppliers(){
@@ -229,13 +224,9 @@ public final class LamiReportView extends TmfView {
         fClearCustomViewsAction.setText(Messages.LamiReportView_ClearAllCustomViews);
         IMenuManager menuMgr = actionBars.getMenuManager();
         menuMgr.setRemoveAllWhenShown(true);
-        menuMgr.addMenuListener(new IMenuListener() {
-
-            @Override
-            public void menuAboutToShow(@Nullable IMenuManager manager) {
-                if (manager != null) {
-                    populateMenu(manager);
-                }
+        menuMgr.addMenuListener((@Nullable IMenuManager manager) -> {
+            if (manager != null) {
+                populateMenu(manager);
             }
         });
         populateMenu(menuMgr);

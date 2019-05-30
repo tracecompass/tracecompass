@@ -63,8 +63,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -1418,164 +1416,155 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
         fHeaderPopupMenuManager = new MenuManager();
         fHeaderPopupMenuManager.setRemoveAllWhenShown(true);
-        fHeaderPopupMenuManager.addMenuListener(new IMenuListener() {
-            @Override
-            public void menuAboutToShow(IMenuManager manager) {
-                final Point point = fTable.toControl(fLastMenuCursorLocation);
-                TableColumn selectedColumn = fTable.getColumn(point);
-                if (selectedColumn != null && selectedColumn.getResizable()) {
-                    fHeaderPopupMenuManager.add(createAutoFitAction(selectedColumn));
-                    fHeaderPopupMenuManager.add(new Separator());
-                }
-                for (int index : fTable.getColumnOrder()) {
-                    TableColumn column = fTable.getColumns()[index];
-                    if (column.getData(Key.WIDTH) != null) {
-                        fHeaderPopupMenuManager.add(createShowColumnAction(column));
-                    }
-                }
+        fHeaderPopupMenuManager.addMenuListener(manager -> {
+            final Point point = fTable.toControl(fLastMenuCursorLocation);
+            TableColumn selectedColumn = fTable.getColumn(point);
+            if (selectedColumn != null && selectedColumn.getResizable()) {
+                fHeaderPopupMenuManager.add(createAutoFitAction(selectedColumn));
                 fHeaderPopupMenuManager.add(new Separator());
-                fHeaderPopupMenuManager.add(createShowAllAction());
-                fHeaderPopupMenuManager.add(createResetAllAction());
             }
+            for (int index : fTable.getColumnOrder()) {
+                TableColumn column = fTable.getColumns()[index];
+                if (column.getData(Key.WIDTH) != null) {
+                    fHeaderPopupMenuManager.add(createShowColumnAction(column));
+                }
+            }
+            fHeaderPopupMenuManager.add(new Separator());
+            fHeaderPopupMenuManager.add(createShowAllAction());
+            fHeaderPopupMenuManager.add(createResetAllAction());
         });
 
         fTablePopupMenuManager = new MenuManager();
         fTablePopupMenuManager.setRemoveAllWhenShown(true);
-        fTablePopupMenuManager.addMenuListener(new IMenuListener() {
-            @Override
-            public void menuAboutToShow(final IMenuManager manager) {
-                if (fTable.getSelectionIndices().length == 1 && fTable.getSelectionIndices()[0] == 0) {
-                    // Right-click on header row
-                    if (fHeaderState == HeaderState.SEARCH) {
-                        fTablePopupMenuManager.add(addAsFilterAction);
+        fTablePopupMenuManager.addMenuListener(manager -> {
+            if (fTable.getSelectionIndices().length == 1 && fTable.getSelectionIndices()[0] == 0) {
+                // Right-click on header row
+                if (fHeaderState == HeaderState.SEARCH) {
+                    fTablePopupMenuManager.add(addAsFilterAction);
+                }
+                return;
+            }
+            final Point point = fTable.toControl(fLastMenuCursorLocation);
+            final TableItem item = fTable.getSelection().length > 0 ? fTable.getSelection()[0] : null;
+            if (item != null) {
+                final Rectangle imageBounds = item.getImageBounds(0);
+                imageBounds.width = BOOKMARK_IMAGE.getBounds().width;
+                if (point.x <= (imageBounds.x + imageBounds.width)) {
+                    // Right-click on left margin
+                    final Long rank = (Long) item.getData(Key.RANK);
+                    if ((rank != null) && (fBookmarksFile != null)) {
+                        if (fBookmarksMap.containsKey(rank)) {
+                            fTablePopupMenuManager.add(new ToggleBookmarkAction(
+                                    Messages.TmfEventsTable_RemoveBookmarkActionText, rank));
+                        } else {
+                            fTablePopupMenuManager.add(new ToggleBookmarkAction(
+                                    Messages.TmfEventsTable_AddBookmarkActionText, rank));
+                        }
                     }
                     return;
                 }
-                final Point point = fTable.toControl(fLastMenuCursorLocation);
-                final TableItem item = fTable.getSelection().length > 0 ? fTable.getSelection()[0] : null;
-                if (item != null) {
-                    final Rectangle imageBounds = item.getImageBounds(0);
-                    imageBounds.width = BOOKMARK_IMAGE.getBounds().width;
-                    if (point.x <= (imageBounds.x + imageBounds.width)) {
-                        // Right-click on left margin
-                        final Long rank = (Long) item.getData(Key.RANK);
-                        if ((rank != null) && (fBookmarksFile != null)) {
-                            if (fBookmarksMap.containsKey(rank)) {
-                                fTablePopupMenuManager.add(new ToggleBookmarkAction(
-                                        Messages.TmfEventsTable_RemoveBookmarkActionText, rank));
-                            } else {
-                                fTablePopupMenuManager.add(new ToggleBookmarkAction(
-                                        Messages.TmfEventsTable_AddBookmarkActionText, rank));
-                            }
-                        }
-                        return;
-                    }
-                }
-
-                // Right-click on table
-                if (fSelectedRank != -1 && fSelectedBeginRank != -1) {
-                    fTablePopupMenuManager.add(copyAction);
-                    fTablePopupMenuManager.add(new Separator());
-                }
-                if (fTable.isVisible() && fRawViewer.isVisible()) {
-                    fTablePopupMenuManager.add(hideTableAction);
-                    fTablePopupMenuManager.add(hideRawAction);
-                } else if (!fTable.isVisible()) {
-                    fTablePopupMenuManager.add(showTableAction);
-                } else if (!fRawViewer.isVisible()) {
-                    fTablePopupMenuManager.add(showRawAction);
-                }
-                fTablePopupMenuManager.add(exportToTextAction);
-                fTablePopupMenuManager.add(new Separator());
-
-                if (item != null) {
-                    final Object data = item.getData();
-                    Separator separator = null;
-                    if (data instanceof ITmfSourceLookup) {
-                        ITmfSourceLookup event = (ITmfSourceLookup) data;
-                        if (event.getCallsite() != null) {
-                            fTablePopupMenuManager.add(openCallsiteAction);
-                            separator = new Separator();
-                        }
-                    }
-
-                    if (data instanceof ITmfModelLookup) {
-                        ITmfModelLookup event = (ITmfModelLookup) data;
-                        if (event.getModelUri() != null) {
-                            fTablePopupMenuManager.add(openModelAction);
-                            separator = new Separator();
-                        }
-
-                        if (separator != null) {
-                            fTablePopupMenuManager.add(separator);
-                        }
-                    }
-                }
-
-                /*
-                 * Only show collapse filter if at least one trace can be
-                 * collapsed.
-                 */
-                boolean isCollapsible = false;
-                if (fTrace != null) {
-                    for (ITmfTrace trace : TmfTraceManager.getTraceSet(fTrace)) {
-                        Class<? extends ITmfEvent> eventClass = trace.getEventType();
-                        isCollapsible = ITmfCollapsibleEvent.class.isAssignableFrom(eventClass);
-                        if (isCollapsible) {
-                            break;
-                        }
-                    }
-                }
-
-                if (isCollapsible && !fCollapseFilterEnabled) {
-                    fTablePopupMenuManager.add(collapseAction);
-                    fTablePopupMenuManager.add(new Separator());
-                }
-
-                fTablePopupMenuManager.add(clearFiltersAction);
-                final ITmfFilterTreeNode[] savedFilters = FilterManager.getSavedFilters();
-                if (savedFilters.length > 0) {
-                    final MenuManager subMenu = new MenuManager(Messages.TmfEventsTable_ApplyPresetFilterMenuName);
-                    for (final ITmfFilterTreeNode node : savedFilters) {
-                        if (node instanceof TmfFilterNode) {
-                            final TmfFilterNode filter = (TmfFilterNode) node;
-                            subMenu.add(new Action(filter.getFilterName()) {
-                                @Override
-                                public void run() {
-                                    applyFilter(filter);
-                                }
-                            });
-                        }
-                    }
-                    fTablePopupMenuManager.add(subMenu);
-                }
-                fTablePopupMenuManager.add(new Separator());
-
-                ITmfTrace trace = fTrace;
-                if (trace != null) {
-                    synchronizeAction.setChecked(TmfTraceManager.getInstance().getTraceContext(trace).isSynchronized());
-                    fTablePopupMenuManager.add(synchronizeAction);
-                }
-
-                appendToTablePopupMenu(fTablePopupMenuManager, item);
             }
+
+            // Right-click on table
+            if (fSelectedRank != -1 && fSelectedBeginRank != -1) {
+                fTablePopupMenuManager.add(copyAction);
+                fTablePopupMenuManager.add(new Separator());
+            }
+            if (fTable.isVisible() && fRawViewer.isVisible()) {
+                fTablePopupMenuManager.add(hideTableAction);
+                fTablePopupMenuManager.add(hideRawAction);
+            } else if (!fTable.isVisible()) {
+                fTablePopupMenuManager.add(showTableAction);
+            } else if (!fRawViewer.isVisible()) {
+                fTablePopupMenuManager.add(showRawAction);
+            }
+            fTablePopupMenuManager.add(exportToTextAction);
+            fTablePopupMenuManager.add(new Separator());
+
+            if (item != null) {
+                final Object data = item.getData();
+                Separator separator = null;
+                if (data instanceof ITmfSourceLookup) {
+                    ITmfSourceLookup event1 = (ITmfSourceLookup) data;
+                    if (event1.getCallsite() != null) {
+                        fTablePopupMenuManager.add(openCallsiteAction);
+                        separator = new Separator();
+                    }
+                }
+
+                if (data instanceof ITmfModelLookup) {
+                    ITmfModelLookup event2 = (ITmfModelLookup) data;
+                    if (event2.getModelUri() != null) {
+                        fTablePopupMenuManager.add(openModelAction);
+                        separator = new Separator();
+                    }
+
+                    if (separator != null) {
+                        fTablePopupMenuManager.add(separator);
+                    }
+                }
+            }
+
+            /*
+             * Only show collapse filter if at least one trace can be
+             * collapsed.
+             */
+            boolean isCollapsible = false;
+            if (fTrace != null) {
+                for (ITmfTrace trace1 : TmfTraceManager.getTraceSet(fTrace)) {
+                    Class<? extends ITmfEvent> eventClass = trace1.getEventType();
+                    isCollapsible = ITmfCollapsibleEvent.class.isAssignableFrom(eventClass);
+                    if (isCollapsible) {
+                        break;
+                    }
+                }
+            }
+
+            if (isCollapsible && !fCollapseFilterEnabled) {
+                fTablePopupMenuManager.add(collapseAction);
+                fTablePopupMenuManager.add(new Separator());
+            }
+
+            fTablePopupMenuManager.add(clearFiltersAction);
+            final ITmfFilterTreeNode[] savedFilters = FilterManager.getSavedFilters();
+            if (savedFilters.length > 0) {
+                final MenuManager subMenu = new MenuManager(Messages.TmfEventsTable_ApplyPresetFilterMenuName);
+                for (final ITmfFilterTreeNode node : savedFilters) {
+                    if (node instanceof TmfFilterNode) {
+                        final TmfFilterNode filter = (TmfFilterNode) node;
+                        subMenu.add(new Action(filter.getFilterName()) {
+                            @Override
+                            public void run() {
+                                applyFilter(filter);
+                            }
+                        });
+                    }
+                }
+                fTablePopupMenuManager.add(subMenu);
+            }
+            fTablePopupMenuManager.add(new Separator());
+
+            ITmfTrace trace2 = fTrace;
+            if (trace2 != null) {
+                synchronizeAction.setChecked(TmfTraceManager.getInstance().getTraceContext(trace2).isSynchronized());
+                fTablePopupMenuManager.add(synchronizeAction);
+            }
+
+            appendToTablePopupMenu(fTablePopupMenuManager, item);
         });
 
         fRawViewerPopupMenuManager = new MenuManager();
         fRawViewerPopupMenuManager.setRemoveAllWhenShown(true);
-        fRawViewerPopupMenuManager.addMenuListener(new IMenuListener() {
-            @Override
-            public void menuAboutToShow(final IMenuManager manager) {
-                if (fTable.isVisible() && fRawViewer.isVisible()) {
-                    fRawViewerPopupMenuManager.add(hideTableAction);
-                    fRawViewerPopupMenuManager.add(hideRawAction);
-                } else if (!fTable.isVisible()) {
-                    fRawViewerPopupMenuManager.add(showTableAction);
-                } else if (!fRawViewer.isVisible()) {
-                    fRawViewerPopupMenuManager.add(showRawAction);
-                }
-                appendToRawPopupMenu(fRawViewerPopupMenuManager);
+        fRawViewerPopupMenuManager.addMenuListener(manager -> {
+            if (fTable.isVisible() && fRawViewer.isVisible()) {
+                fRawViewerPopupMenuManager.add(hideTableAction);
+                fRawViewerPopupMenuManager.add(hideRawAction);
+            } else if (!fTable.isVisible()) {
+                fRawViewerPopupMenuManager.add(showTableAction);
+            } else if (!fRawViewer.isVisible()) {
+                fRawViewerPopupMenuManager.add(showRawAction);
             }
+            appendToRawPopupMenu(fRawViewerPopupMenuManager);
         });
 
         fHeaderMenu = fHeaderPopupMenuManager.createContextMenu(fTable);
@@ -2378,27 +2367,24 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 }
                 refreshBusy = true;
             }
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    if (request.isCancelled()) {
-                        return;
-                    }
-                    if (fTable.isDisposed()) {
-                        return;
-                    }
-                    /*
-                     * +1 for header row, +2 for top and bottom filter status
-                     * rows
-                     */
-                    fTable.setItemCount((int) fFilterMatchCount + 3);
-                    fTable.refresh();
-                    synchronized (syncObj) {
-                        refreshBusy = false;
-                        if (refreshPending) {
-                            refreshPending = false;
-                            refreshTable();
-                        }
+            Display.getDefault().asyncExec(() -> {
+                if (request.isCancelled()) {
+                    return;
+                }
+                if (fTable.isDisposed()) {
+                    return;
+                }
+                /*
+                 * +1 for header row, +2 for top and bottom filter status
+                 * rows
+                 */
+                fTable.setItemCount((int) fFilterMatchCount + 3);
+                fTable.refresh();
+                synchronized (syncObj) {
+                    refreshBusy = false;
+                    if (refreshPending) {
+                        refreshPending = false;
+                        refreshTable();
                     }
                 }
             });
@@ -2652,29 +2638,25 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             /* +1 for header row, +1 for top filter status row */
             final int selection = index + 1 + (eventFilter != null ? +1 : 0);
 
-            display.asyncExec(new Runnable() {
-
-                @Override
-                public void run() {
-                    if (monitor.isCanceled()) {
-                        return;
-                    }
-                    if (fTable.isDisposed()) {
-                        return;
-                    }
-                    fTable.setSelection(selection);
-                    fSelectedRank = foundRank;
-                    fSelectedBeginRank = fSelectedRank;
-                    fRawViewer.selectAndReveal(fSelectedRank);
-                    if (foundTimestamp != null) {
-                        broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, foundTimestamp, foundTimestamp, fTrace));
-                    }
-                    fireSelectionChanged(new SelectionChangedEvent(TmfEventsTable.this, getSelection()));
-                    synchronized (fSearchSyncObj) {
-                        fSearchThread = null;
-                    }
-                    updateStatusLine(null);
+            display.asyncExec(() -> {
+                if (monitor.isCanceled()) {
+                    return;
                 }
+                if (fTable.isDisposed()) {
+                    return;
+                }
+                fTable.setSelection(selection);
+                fSelectedRank = foundRank;
+                fSelectedBeginRank = fSelectedRank;
+                fRawViewer.selectAndReveal(fSelectedRank);
+                if (foundTimestamp != null) {
+                    broadcast(new TmfSelectionRangeUpdatedSignal(TmfEventsTable.this, foundTimestamp, foundTimestamp, fTrace));
+                }
+                fireSelectionChanged(new SelectionChangedEvent(TmfEventsTable.this, getSelection()));
+                synchronized (fSearchSyncObj) {
+                    fSearchThread = null;
+                }
+                updateStatusLine(null);
             });
             return Status.OK_STATUS;
 
@@ -3041,33 +3023,30 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         fDisposeOnClose = disposeOnClose;
 
         // Perform the updates on the UI thread
-        PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                fSelectedRank = -1;
-                fSelectedBeginRank = -1;
-                fTable.removeAll();
-                fCache.setTrace(trace); // Clear the cache
-                if (trace != null) {
-                    if (!fTable.isDisposed()) {
-                        if (fTable.getData(Key.FILTER_OBJ) == null) {
-                            // +1 for header row
-                            fTable.setItemCount((int) trace.getNbEvents() + 1);
-                        } else {
-                            stopFilterThread();
-                            fFilterMatchCount = 0;
-                            fFilterCheckCount = 0;
-                            /*
-                             * +1 for header row, +2 for top and bottom filter
-                             * status rows
-                             */
-                            fTable.setItemCount(3);
-                            startFilterThread();
-                        }
+        PlatformUI.getWorkbench().getDisplay().syncExec(() -> {
+            fSelectedRank = -1;
+            fSelectedBeginRank = -1;
+            fTable.removeAll();
+            fCache.setTrace(trace); // Clear the cache
+            if (trace != null) {
+                if (!fTable.isDisposed()) {
+                    if (fTable.getData(Key.FILTER_OBJ) == null) {
+                        // +1 for header row
+                        fTable.setItemCount((int) trace.getNbEvents() + 1);
+                    } else {
+                        stopFilterThread();
+                        fFilterMatchCount = 0;
+                        fFilterCheckCount = 0;
+                        /*
+                         * +1 for header row, +2 for top and bottom filter
+                         * status rows
+                         */
+                        fTable.setItemCount(3);
+                        startFilterThread();
                     }
                 }
-                fRawViewer.setTrace(trace);
             }
+            fRawViewer.setTrace(trace);
         });
     }
 
@@ -3116,21 +3095,18 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             fCacheUpdateBusy = true;
         }
         // Event cache is now updated. Perform update on the UI thread
-        PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                if (!fTable.isDisposed()) {
-                    fTable.refresh();
-                }
-                if (completed) {
-                    populateCompleted();
-                }
-                synchronized (fCacheUpdateSyncObj) {
-                    fCacheUpdateBusy = false;
-                    if (fCacheUpdatePending) {
-                        fCacheUpdatePending = false;
-                        cacheUpdated(fCacheUpdateCompleted);
-                    }
+        PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+            if (!fTable.isDisposed()) {
+                fTable.refresh();
+            }
+            if (completed) {
+                populateCompleted();
+            }
+            synchronized (fCacheUpdateSyncObj) {
+                fCacheUpdateBusy = false;
+                if (fCacheUpdatePending) {
+                    fCacheUpdatePending = false;
+                    cacheUpdated(fCacheUpdateCompleted);
                 }
             }
         });
@@ -3426,27 +3402,24 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             return;
         }
         // Perform the refresh on the UI thread
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                if (!fTable.isDisposed() && (fTrace != null)) {
-                    if (fTable.getData(Key.FILTER_OBJ) == null) {
+        Display.getDefault().asyncExec(() -> {
+            if (!fTable.isDisposed() && (fTrace != null)) {
+                if (fTable.getData(Key.FILTER_OBJ) == null) {
+                    /* +1 for header row */
+                    fTable.setItemCount((int) fTrace.getNbEvents() + 1);
+                    /* +1 for header row */
+                    if ((fPendingGotoRank != -1) && ((fPendingGotoRank + 1) < fTable.getItemCount())) {
                         /* +1 for header row */
-                        fTable.setItemCount((int) fTrace.getNbEvents() + 1);
-                        /* +1 for header row */
-                        if ((fPendingGotoRank != -1) && ((fPendingGotoRank + 1) < fTable.getItemCount())) {
-                            /* +1 for header row */
-                            fTable.setSelection((int) fPendingGotoRank + 1);
-                            fPendingGotoRank = -1;
-                            updateStatusLine(null);
-                        }
-                    } else {
-                        startFilterThread();
+                        fTable.setSelection((int) fPendingGotoRank + 1);
+                        fPendingGotoRank = -1;
+                        updateStatusLine(null);
                     }
+                } else {
+                    startFilterThread();
                 }
-                if (!fRawViewer.isDisposed() && (fTrace != null)) {
-                    fRawViewer.refreshEventCount();
-                }
+            }
+            if (!fRawViewer.isDisposed() && (fTrace != null)) {
+                fRawViewer.refreshEventCount();
             }
         });
     }
@@ -3589,33 +3562,30 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     }
 
                     private void updateDisplayWithSelection(final long rankBegin, final long rankEnd) {
-                        PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Return if table is disposed
-                                if (fTable.isDisposed()) {
-                                    return;
-                                }
-                                if (fSelectedBeginRank == rankBegin && fSelectedRank == rankEnd) {
-                                    return;
-                                }
-
-                                fSelectedRank = rankEnd;
-                                long toReveal = fSelectedBeginRank != rankBegin ? rankBegin : rankEnd;
-                                fSelectedBeginRank = rankBegin;
-                                int indexBegin = (int) rankBegin;
-                                int indexEnd = (int) rankEnd;
-
-                                if (fTable.getData(Key.FILTER_OBJ) != null) {
-                                    /* +1 for top filter status row */
-                                    indexBegin = fCache.getFilteredEventIndex(rankBegin) + 1;
-                                    indexEnd = rankEnd == rankBegin ? indexBegin : fCache.getFilteredEventIndex(rankEnd) + 1;
-                                }
-                                /* +1 for header row */
-                                fTable.setSelectionRange(indexBegin + 1, indexEnd + 1);
-                                fRawViewer.selectAndReveal(toReveal);
-                                updateStatusLine(null);
+                        PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+                            // Return if table is disposed
+                            if (fTable.isDisposed()) {
+                                return;
                             }
+                            if (fSelectedBeginRank == rankBegin && fSelectedRank == rankEnd) {
+                                return;
+                            }
+
+                            fSelectedRank = rankEnd;
+                            long toReveal = fSelectedBeginRank != rankBegin ? rankBegin : rankEnd;
+                            fSelectedBeginRank = rankBegin;
+                            int indexBegin = (int) rankBegin;
+                            int indexEnd = (int) rankEnd;
+
+                            if (fTable.getData(Key.FILTER_OBJ) != null) {
+                                /* +1 for top filter status row */
+                                indexBegin = fCache.getFilteredEventIndex(rankBegin) + 1;
+                                indexEnd = rankEnd == rankBegin ? indexBegin : fCache.getFilteredEventIndex(rankEnd) + 1;
+                            }
+                            /* +1 for header row */
+                            fTable.setSelectionRange(indexBegin + 1, indexEnd + 1);
+                            fRawViewer.selectAndReveal(toReveal);
+                            updateStatusLine(null);
                         });
                     }
                 };

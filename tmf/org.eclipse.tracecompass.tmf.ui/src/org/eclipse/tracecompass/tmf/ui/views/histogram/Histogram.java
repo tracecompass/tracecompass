@@ -24,8 +24,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -366,13 +364,10 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         canvasComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).span(1, 1).create());
         fCanvas = new Canvas(canvasComposite, SWT.DOUBLE_BUFFERED);
         fCanvas.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-        fCanvas.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(DisposeEvent e) {
-                Object image = fCanvas.getData(IMAGE_KEY);
-                if (image instanceof Image) {
-                    ((Image) image).dispose();
-                }
+        fCanvas.addDisposeListener(e -> {
+            Object image = fCanvas.getData(IMAGE_KEY);
+            if (image instanceof Image) {
+                ((Image) image).dispose();
             }
         });
 
@@ -641,9 +636,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     @Override
     public void modelUpdated() {
         if (!fCanvas.isDisposed() && fCanvas.getDisplay() != null) {
-            fCanvas.getDisplay().asyncExec(new Runnable() {
-                @Override
-                public void run() {
+            fCanvas.getDisplay().asyncExec(() ->  {
                     if (!fCanvas.isDisposed()) {
                         // Retrieve and normalize the data
                         final int canvasWidth = fCanvas.getBounds().width;
@@ -674,7 +667,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                             }
                             fTimeLineScale.redraw();
                         }
-                    }
                 }
             });
         }

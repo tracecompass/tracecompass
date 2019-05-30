@@ -16,8 +16,6 @@ import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -55,15 +53,12 @@ public class SplashHandler extends BasicSplashHandler {
         setForeground(FOREGROUND_COLOR);
 
         // Set the software version.
-        getContent().addPaintListener(new PaintListener() {
-            @Override
-            public void paintControl(PaintEvent e) {
-                e.gc.setForeground(getForeground());
-                e.gc.drawText(
-                        NLS.bind(Messages.SplahScreen_VersionString,
-                                TracingRcpPlugin.getDefault().getBundle().getVersion().toString()),
-                        VERSION_LOCATION.x, VERSION_LOCATION.y, true);
-            }
+        getContent().addPaintListener(e -> {
+            e.gc.setForeground(getForeground());
+            e.gc.drawText(
+                    NLS.bind(Messages.SplahScreen_VersionString,
+                            TracingRcpPlugin.getDefault().getBundle().getVersion().toString()),
+                    VERSION_LOCATION.x, VERSION_LOCATION.y, true);
         });
     }
 }

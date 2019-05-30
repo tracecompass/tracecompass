@@ -147,32 +147,29 @@ public class TmfPieChartViewer extends Composite {
         fTimeRangePC = null;
 
         // Setup listeners for the tooltips
-        fMouseMoveListener = new Listener() {
-            @Override
-            public void handleEvent(org.eclipse.swt.widgets.Event event) {
-                PieChart pc = (PieChart) event.widget;
-                switch (event.type) {
-                /* Get tooltip information on the slice */
-                case SWT.MouseMove:
-                    int sliceIndex = pc.getSliceIndexFromPosition(0, event.x, event.y);
-                    if (sliceIndex < 0) {
-                        // mouse is outside the chart
-                        pc.setToolTipText(null);
-                        break;
-                    }
-                    float percOfSlice = (float) pc.getSlicePercent(0, sliceIndex);
-                    String percent = String.format("%.1f", percOfSlice); //$NON-NLS-1$
-                    Long nbEvents = Long.valueOf((long) pc.getSeriesSet().getSeries()[sliceIndex].getXSeries()[0]);
-
-                    String text = Messages.TmfStatisticsView_PieChartToolTipTextName + " = " + //$NON-NLS-1$
-                            pc.getSeriesSet().getSeries()[sliceIndex].getId() + "\n"; //$NON-NLS-1$
-
-                    text += Messages.TmfStatisticsView_PieChartToolTipTextEventCount + " = "//$NON-NLS-1$
-                            + nbEvents.toString() + " (" + percent + "%)"; //$NON-NLS-1$ //$NON-NLS-2$
-                    pc.setToolTipText(text);
-                    return;
-                default:
+        fMouseMoveListener = event -> {
+            PieChart pc = (PieChart) event.widget;
+            switch (event.type) {
+            /* Get tooltip information on the slice */
+            case SWT.MouseMove:
+                int sliceIndex = pc.getSliceIndexFromPosition(0, event.x, event.y);
+                if (sliceIndex < 0) {
+                    // mouse is outside the chart
+                    pc.setToolTipText(null);
+                    break;
                 }
+                float percOfSlice = (float) pc.getSlicePercent(0, sliceIndex);
+                String percent = String.format("%.1f", percOfSlice); //$NON-NLS-1$
+                Long nbEvents = Long.valueOf((long) pc.getSeriesSet().getSeries()[sliceIndex].getXSeries()[0]);
+
+                String text = Messages.TmfStatisticsView_PieChartToolTipTextName + " = " + //$NON-NLS-1$
+                        pc.getSeriesSet().getSeries()[sliceIndex].getId() + "\n"; //$NON-NLS-1$
+
+                text += Messages.TmfStatisticsView_PieChartToolTipTextEventCount + " = "//$NON-NLS-1$
+                        + nbEvents.toString() + " (" + percent + "%)"; //$NON-NLS-1$ //$NON-NLS-2$
+                pc.setToolTipText(text);
+                return;
+            default:
             }
         };
 

@@ -504,12 +504,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
         final File source = new File(path.toString());
         if (source.isDirectory()) {
             IPath containerPath = folder.getFullPath().addTrailingSeparator().append(targetName);
-            IOverwriteQuery overwriteImplementor = new IOverwriteQuery() {
-                @Override
-                public String queryOverwrite(String pathString) {
-                    return IOverwriteQuery.NO_ALL;
-                }
-            };
+            IOverwriteQuery overwriteImplementor = pathString -> IOverwriteQuery.NO_ALL;
             List<File> filesToImport = Arrays.asList(source.listFiles());
             ImportOperation operation = new ImportOperation(
                     containerPath,

@@ -88,23 +88,20 @@ public class CopyToClipboardOperation implements IRunnableWithProgress {
 
         copy(sb, monitor);
 
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                if (sb.length() == 0) {
-                    return;
-                }
-                Clipboard clipboard = new Clipboard(Display.getDefault());
-                try {
-                    clipboard.setContents(new Object[] { sb.toString() },
-                            new Transfer[] { TextTransfer.getInstance() });
-                } catch (OutOfMemoryError e) {
-                    sb.setLength(0);
-                    sb.trimToSize();
-                    showErrorDialog();
-                } finally {
-                    clipboard.dispose();
-                }
+        Display.getDefault().syncExec(() -> {
+            if (sb.length() == 0) {
+                return;
+            }
+            Clipboard clipboard = new Clipboard(Display.getDefault());
+            try {
+                clipboard.setContents(new Object[] { sb.toString() },
+                        new Transfer[] { TextTransfer.getInstance() });
+            } catch (OutOfMemoryError e) {
+                sb.setLength(0);
+                sb.trimToSize();
+                showErrorDialog();
+            } finally {
+                clipboard.dispose();
             }
         });
 
@@ -151,15 +148,12 @@ public class CopyToClipboardOperation implements IRunnableWithProgress {
     }
 
     private static void showErrorDialog() {
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-                MessageBox confirmOperation = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
-                confirmOperation.setText(Messages.CopyToClipboardOperation_OutOfMemoryErrorTitle);
-                confirmOperation.setMessage(Messages.CopyToClipboardOperation_OutOfMemoryErrorMessage);
-                confirmOperation.open();
-            }
+        Display.getDefault().syncExec(() -> {
+            Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+            MessageBox confirmOperation = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK);
+            confirmOperation.setText(Messages.CopyToClipboardOperation_OutOfMemoryErrorTitle);
+            confirmOperation.setMessage(Messages.CopyToClipboardOperation_OutOfMemoryErrorMessage);
+            confirmOperation.open();
         });
     }
 }

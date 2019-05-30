@@ -20,9 +20,7 @@ import java.nio.file.StandardCopyOption;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -89,12 +87,7 @@ public class ControlRemoteProfilesPreferencePage extends PreferencePage implemen
         buttonComposite.setLayout(new GridLayout());
         buttonComposite.setLayoutData(new GridData(GridData.CENTER, GridData.BEGINNING, false, false));
 
-        fFolderViewer.addCheckStateListener(new ICheckStateListener() {
-            @Override
-            public void checkStateChanged(CheckStateChangedEvent event) {
-                enableButtons();
-            }
-        });
+        fFolderViewer.addCheckStateListener(event -> enableButtons());
 
         return composite;
     }

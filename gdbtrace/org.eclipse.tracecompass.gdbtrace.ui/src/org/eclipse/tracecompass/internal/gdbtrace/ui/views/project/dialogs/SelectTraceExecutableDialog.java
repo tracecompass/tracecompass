@@ -35,10 +35,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.internal.gdbtrace.ui.GdbTraceUIPlugin;
@@ -120,17 +118,14 @@ public class SelectTraceExecutableDialog extends SelectionStatusDialog {
         data.widthHint = IDialogConstants.ENTRY_FIELD_WIDTH;
         fExecutableNameEntry.setLayoutData(data);
         fExecutableNameEntry.setFont(font);
-        fExecutableNameEntry.addListener(SWT.Modify, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                fExecutablePath = Path.fromOSString(fExecutableNameEntry.getText());
-                if (! validateExecutableName()) {
-                    updateStatus(PATH_ERROR_STATUS);
-                } else if (! validateExecutableBinary()) {
-                    updateStatus(BINARY_ERROR_STATUS);
-                } else {
-                    updateStatus(OK_STATUS);
-                }
+        fExecutableNameEntry.addListener(SWT.Modify, event -> {
+            fExecutablePath = Path.fromOSString(fExecutableNameEntry.getText());
+            if (! validateExecutableName()) {
+                updateStatus(PATH_ERROR_STATUS);
+            } else if (! validateExecutableBinary()) {
+                updateStatus(BINARY_ERROR_STATUS);
+            } else {
+                updateStatus(OK_STATUS);
             }
         });
 

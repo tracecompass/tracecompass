@@ -106,12 +106,7 @@ public class OffsetTraceHandler extends AbstractHandler {
                     final TmfTraceElement trace = entry.getKey();
                     Long offset = entry.getValue();
                     if (offset != 0 && trace.getResource().exists()) {
-                        Display.getDefault().syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                trace.closeEditors();
-                            }
-                        });
+                        Display.getDefault().syncExec(trace::closeEditors);
                         long previousOffset = TimestampTransformFactory.getTimestampTransform(trace.getResource()).transform(0);
                         ITmfTimestampTransform transform = TimestampTransformFactory.createWithOffset(previousOffset + offset);
                         trace.deleteSupplementaryResources();

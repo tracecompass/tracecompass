@@ -24,13 +24,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -206,39 +202,31 @@ public class SelectSupplementaryResourcesDialog extends Dialog {
         fTreeViewer.expandAll();
         setAllChecked(true);
 
-        fTreeViewer.addCheckStateListener(new ICheckStateListener() {
-            @Override
-            public void checkStateChanged(CheckStateChangedEvent event) {
-                if (event.getElement() instanceof TmfCommonProjectElement) {
-                    fTreeViewer.setSubtreeChecked(event.getElement(), event.getChecked());
-                    fTreeViewer.setGrayed(event.getElement(), false);
-                } else if (event.getElement() instanceof IResource) {
-                    TmfCommonProjectElement projectElement  = getParentElement((IResource) event.getElement());
-                    int checkedCount = 0;
-                    Collection<IResource> resources = fResourceMap.get(projectElement);
-                    for (IResource resource : resources) {
-                        if (fTreeViewer.getChecked(resource)) {
-                            checkedCount++;
-                        }
+        fTreeViewer.addCheckStateListener(event -> {
+            if (event.getElement() instanceof TmfCommonProjectElement) {
+                fTreeViewer.setSubtreeChecked(event.getElement(), event.getChecked());
+                fTreeViewer.setGrayed(event.getElement(), false);
+            } else if (event.getElement() instanceof IResource) {
+                TmfCommonProjectElement projectElement  = getParentElement((IResource) event.getElement());
+                int checkedCount = 0;
+                Collection<IResource> resources = fResourceMap.get(projectElement);
+                for (IResource resource : resources) {
+                    if (fTreeViewer.getChecked(resource)) {
+                        checkedCount++;
                     }
-                    if (checkedCount == resources.size()) {
-                        fTreeViewer.setChecked(projectElement, true);
-                        fTreeViewer.setGrayed(projectElement, false);
-                    } else if (checkedCount > 0) {
-                        fTreeViewer.setGrayChecked(projectElement, true);
-                    } else {
-                        fTreeViewer.setGrayChecked(projectElement, false);
-                    }
+                }
+                if (checkedCount == resources.size()) {
+                    fTreeViewer.setChecked(projectElement, true);
+                    fTreeViewer.setGrayed(projectElement, false);
+                } else if (checkedCount > 0) {
+                    fTreeViewer.setGrayChecked(projectElement, true);
+                } else {
+                    fTreeViewer.setGrayChecked(projectElement, false);
                 }
             }
         });
 
-        fTreeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                updateOKButtonEnablement();
-            }
-        });
+        fTreeViewer.addSelectionChangedListener(event -> updateOKButtonEnablement());
 
         Composite btComp = new Composite(contextGroup, SWT.NONE);
         FillLayout layout = new FillLayout(SWT.VERTICAL);

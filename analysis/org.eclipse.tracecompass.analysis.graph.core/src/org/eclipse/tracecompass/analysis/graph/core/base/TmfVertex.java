@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.analysis.graph.core.base;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge.EdgeType;
@@ -55,34 +56,12 @@ public class TmfVertex implements Comparable<TmfVertex> {
     /**
      * Compare vertices by ascending timestamps
      */
-    public static Comparator<TmfVertex> ascending = new Comparator<TmfVertex>() {
-        @Override
-        public int compare(@Nullable TmfVertex v1, @Nullable TmfVertex v2) {
-            if (v1 == null) {
-                return 1;
-            }
-            if (v2 == null) {
-                return -1;
-            }
-            return Long.compare(v1.getTs(), v2.getTs());
-        }
-    };
+    public static Comparator<TmfVertex> ascending = Objects.requireNonNull(Comparator.nullsLast(Comparator.comparing(TmfVertex::getTs)));
 
     /**
      * Compare vertices by descending timestamps
      */
-    public static Comparator<TmfVertex> descending = new Comparator<TmfVertex>() {
-        @Override
-        public int compare(@Nullable TmfVertex v1, @Nullable TmfVertex v2) {
-            if (v1 == null) {
-                return -1;
-            }
-            if (v2 == null) {
-                return 1;
-            }
-            return Long.compare(v2.getTs(), v1.getTs());
-        }
-    };
+    public static Comparator<TmfVertex> descending = Objects.requireNonNull(Comparator.nullsLast(Comparator.comparing(TmfVertex::getTs).reversed()));
 
     private @Nullable TmfEdge fOutgoingVertical = null;
     private @Nullable TmfEdge fIncomingVertical = null;

@@ -23,11 +23,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.preference.PreferenceDialog;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.remote.core.IRemoteConnection;
 import org.eclipse.remote.ui.widgets.RemoteResourceBrowserWidget;
 import org.eclipse.swt.SWT;
@@ -200,12 +196,7 @@ public class LoadDialog extends TitleAreaDialog implements ILoadDialog {
 
             fFolderViewer = LTTngProfileViewer.createLTTngProfileViewer(fLocalComposite, SWT.NONE);
             fFolderViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-            fFolderViewer.addCheckStateListener(new ICheckStateListener() {
-                @Override
-                public void checkStateChanged(CheckStateChangedEvent event) {
-                    enableLocalButtons();
-                }
-            });
+            fFolderViewer.addCheckStateListener(event -> enableLocalButtons());
         }
     }
 
@@ -225,12 +216,7 @@ public class LoadDialog extends TitleAreaDialog implements ILoadDialog {
             fFileWidget.setLayoutData(new GridData(GridData.FILL_BOTH));
             fFileWidget.setInitialPath(LTTngControlServiceConstants.DEFAULT_PATH);
             fFileWidget.setConnection(fConnection);
-            fFileWidget.addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    enableRemoteButtons();
-                }
-            });
+            fFileWidget.addSelectionChangedListener(event -> enableRemoteButtons());
             getButton(IDialogConstants.OK_ID).setEnabled(true);
         }
     }

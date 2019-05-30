@@ -24,9 +24,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -113,12 +111,7 @@ public class TrimTraceDialog extends SelectionStatusDialog {
         newElementName.setFocus();
         newElementName.setText(name);
         newElementName.setSelection(0, name.length());
-        newElementName.addListener(SWT.Modify, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                validateNewTraceName();
-            }
-        });
+        newElementName.addListener(SWT.Modify, event -> validateNewTraceName());
         fNewElementName = newElementName;
         validateNewTraceName();
     }
