@@ -12,6 +12,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
 
+import java.text.Format;
 import java.util.Arrays;
 
 import org.eclipse.swt.events.MouseEvent;
@@ -42,6 +43,11 @@ public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implemen
 
     private final class XYToolTipHandler extends TmfAbstractToolTipHandler {
         private static final String HTML_COLOR_TOOLTIP = "<span style=\"color:%s;\">%s</span>"; //$NON-NLS-1$
+
+        private boolean isValid(int index, ISeries serie) {
+            double[] ySeries = serie.getYSeries();
+            return serie.isVisible() && ySeries != null && ySeries.length > index;
+        }
 
         @Override
         public void fill(Control control, MouseEvent event, Point pt) {
@@ -74,26 +80,31 @@ public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implemen
                 }
 
                 TmfCommonXAxisChartViewer viewer = null;
+                Format format = null;
                 ITmfChartTimeProvider timeProvider = getChartViewer();
                 if (timeProvider instanceof TmfCommonXAxisChartViewer) {
                     viewer = (TmfCommonXAxisChartViewer) timeProvider;
+                    format = viewer.getSwtChart().getAxisSet().getYAxes()[0].getTick().getFormat();
                 }
                 ITmfTimestamp time = TmfTimestamp.fromNanos((long) xCoordinate + getChartViewer().getTimeOffset());
                 addItem(null, ToolTipString.fromString(Messages.TmfCommonXLineChartTooltipProvider_time), ToolTipString.fromTimestamp(time.toString(), time.toNanos()));
-
                 /* For each series, get the value at the index */
                 for (ISeries serie : series) {
                     double[] yS = serie.getYSeries();
-                    /*
-                     * Make sure the series values and the value at index exist
-                     */
+                    /* Make sure the series values and the value at index exist */
                     if (isValid(index, serie)) {
                         String key = serie.getId();
                         if (key != null && viewer != null) {
                             IYAppearance appearance = viewer.getSeriesAppearance(key);
                             key = String.format(HTML_COLOR_TOOLTIP, appearance.getColor(), key);
+
                         }
-                        addItem(null, ToolTipString.fromHtml(key), ToolTipString.fromString(String.format("%12.2f", yS[index]))); //$NON-NLS-1$
+                        double yValue = yS[index];
+                        if (format == null) {
+                            addItem(null, ToolTipString.fromHtml(key), ToolTipString.fromDecimal(yValue));
+                        } else {
+                            addItem(null, ToolTipString.fromHtml(key), ToolTipString.fromString(format.format(yValue)));
+                        }
                     }
                 }
             }
@@ -138,22 +149,30 @@ public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implemen
     // MouseTrackListener
     // ------------------------------------------------------------------------
 
+    /**
+     * @deprecated, do not extend, use as-is
+     */
+    @Deprecated
     @Override
     public void mouseEnter(MouseEvent e) {
+        // do nothing
     }
 
+    /**
+     * @deprecated, do not extend, use as-is
+     */
+    @Deprecated
     @Override
     public void mouseExit(MouseEvent e) {
+        // do nothing
     }
 
+    /**
+     * @deprecated, do not extend, use as-is
+     */
+    @Deprecated
     @Override
     public void mouseHover(MouseEvent e) {
-
+        // do nothing
     }
-
-    private static boolean isValid(int index, ISeries serie) {
-        double[] ySeries = serie.getYSeries();
-        return serie.isVisible() && ySeries != null && ySeries.length > index;
-    }
-
 }

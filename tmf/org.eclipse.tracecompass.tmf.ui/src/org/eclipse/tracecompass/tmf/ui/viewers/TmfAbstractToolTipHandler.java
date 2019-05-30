@@ -9,6 +9,9 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers;
 
+import java.text.Format;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
@@ -40,6 +43,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
+import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfUIPreferences;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
@@ -58,6 +62,8 @@ import com.google.common.primitives.Longs;
  * @author Loic Prieur-Drevon - extracted from {@link TimeGraphTooltipHandler}
  */
 public abstract class TmfAbstractToolTipHandler {
+
+    private static Format sNumberFormat = NumberFormat.getNumberInstance(Locale.getDefault());
 
     /**
      * String used for tool tip category, name or value
@@ -111,6 +117,26 @@ public abstract class TmfAbstractToolTipHandler {
          */
         public static ToolTipString fromHtml(String htmlString) {
             return new ToolTipString(toText(htmlString), htmlString);
+        }
+
+        /**
+         * Creates a tool tip string from a decimal number. The HTML string mirror the string value.
+         *
+         * @param decimal
+         *            The number to format
+         * @return the tool tip string
+         */
+        public static ToolTipString fromDecimal(Number decimal) {
+            Format format = sNumberFormat;
+            if (format == null) {
+                format = NumberFormat.getInstance(Locale.getDefault());
+                if (format == null) {
+                    format = new DecimalUnitFormat();
+                }
+                sNumberFormat = format;
+            }
+            String number = format.format(decimal);
+            return new ToolTipString(number, toHtmlString(number));
         }
 
         /**
