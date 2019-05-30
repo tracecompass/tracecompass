@@ -35,37 +35,37 @@ public class DataProviderParameterUtils {
     /**
      * Time requested key
      */
-    public static final String TIME_REQUESTED_KEY = "timeRequested"; //$NON-NLS-1$
+    public static final String REQUESTED_TIME_KEY = "requested_times"; //$NON-NLS-1$
 
     /**
      * Selected items key
      */
-    public static final String SELECTED_ITEMS_KEY = "items"; //$NON-NLS-1$
-
-    /**
-     * Key to extract isFiltered from parameters map
-     */
-    public static final String FILTERED_PARAMETER_KEY = "isFiltered"; //$NON-NLS-1$
+    public static final String REQUESTED_ITEMS_KEY = "requested_items"; //$NON-NLS-1$
 
     /**
      * Virtual table count key
      */
-    public static final String TABLE_COUNT = "count"; //$NON-NLS-1$
+    public static final String REQUESTED_TABLE_COUNT_KEY = "requested_table_count"; //$NON-NLS-1$
 
     /**
      * Virtual table starting index key
      */
-    public static final String TABLE_INDEX = "index"; //$NON-NLS-1$
+    public static final String REQUESTED_TABLE_INDEX_KEY = "requested_table_index"; //$NON-NLS-1$
 
     /**
      * Table column IDs key
      */
-    public static final String COLUMN_ID_KEY = "columnId"; //$NON-NLS-1$
+    public static final String REQUESTED_COLUMN_IDS_KEY = "requested_table_column_ids"; //$NON-NLS-1$
+
+    /**
+     * Key to extract isFiltered from parameters map
+     */
+    public static final String FILTERED_KEY = "isFiltered"; //$NON-NLS-1$
 
     /**
      * Regex filter key
      */
-    public static final String REGEX_FILTER_KEY = "regexFilter"; //$NON-NLS-1$
+    public static final String REGEX_MAP_FILTERS_KEY = "regex_map_filters"; //$NON-NLS-1$
 
     private DataProviderParameterUtils() {
         // Private constructor
@@ -113,7 +113,7 @@ public class DataProviderParameterUtils {
      * @return List of times or null if no time requested in the map
      */
     public static @Nullable List<Long> extractTimeRequested(Map<String, Object> parameters) {
-        return extractLongList(parameters, TIME_REQUESTED_KEY);
+        return extractLongList(parameters, REQUESTED_TIME_KEY);
     }
 
     /**
@@ -124,7 +124,7 @@ public class DataProviderParameterUtils {
      * @return List of selected items or null if no selected items in the map
      */
     public static @Nullable List<Long> extractSelectedItems(Map<String, Object> parameters) {
-        return extractLongList(parameters, SELECTED_ITEMS_KEY);
+        return extractLongList(parameters, REQUESTED_ITEMS_KEY);
     }
 
     /**
@@ -136,7 +136,7 @@ public class DataProviderParameterUtils {
      *         parameter
      */
     public static @Nullable Boolean extractIsFiltered(Map<String, Object> parameters) {
-        return extractBoolean(parameters, FILTERED_PARAMETER_KEY);
+        return extractBoolean(parameters, FILTERED_KEY);
     }
 
     /**
@@ -148,7 +148,7 @@ public class DataProviderParameterUtils {
      *         of parameters
      */
     public static @Nullable Multimap<Integer, String> extractRegexFilter(Map<String, Object> parameters) {
-        Object regexesObject = parameters.get(REGEX_FILTER_KEY);
+        Object regexesObject = parameters.get(REGEX_MAP_FILTERS_KEY);
         if (!(regexesObject instanceof Map<?, ?>)) {
             return null;
         }

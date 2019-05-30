@@ -47,8 +47,8 @@ public class DataProviderParameterTest {
      */
     @BeforeClass
     public static void setUp() {
-        fParameters.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, Collections.emptyList());
-        fParameters.put(DataProviderParameterUtils.SELECTED_ITEMS_KEY, Collections.emptyList());
+        fParameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, Collections.emptyList());
+        fParameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, Collections.emptyList());
     }
 
     /**
@@ -57,22 +57,22 @@ public class DataProviderParameterTest {
      */
     @Test
     public void testExtractTimeRequested() {
-        fParameters.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, fLongList);
+        fParameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, fLongList);
         List<@NonNull Long> timeRequested = DataProviderParameterUtils.extractTimeRequested(fParameters);
         assertNotNull(timeRequested);
         testLongList(timeRequested);
 
-        fParameters.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, fIntList);
+        fParameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, fIntList);
         timeRequested = DataProviderParameterUtils.extractTimeRequested(fParameters);
         assertNotNull(timeRequested);
         testLongList(timeRequested);
 
-        fParameters.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, fMixedList);
+        fParameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, fMixedList);
         timeRequested = DataProviderParameterUtils.extractTimeRequested(fParameters);
         assertNotNull(timeRequested);
         testLongList(timeRequested);
 
-        fParameters.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, fWrongParameter);
+        fParameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, fWrongParameter);
         timeRequested = DataProviderParameterUtils.extractTimeRequested(fParameters);
         assertNull(timeRequested);
     }
@@ -83,22 +83,22 @@ public class DataProviderParameterTest {
      */
     @Test
     public void testExtractSelectedItems() {
-        fParameters.put(DataProviderParameterUtils.SELECTED_ITEMS_KEY, fLongList);
+        fParameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, fLongList);
         List<@NonNull Long> items = DataProviderParameterUtils.extractSelectedItems(fParameters);
         assertNotNull(items);
         testLongList(items);
 
-        fParameters.put(DataProviderParameterUtils.SELECTED_ITEMS_KEY, fIntList);
+        fParameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, fIntList);
         items = DataProviderParameterUtils.extractSelectedItems(fParameters);
         assertNotNull(items);
         testLongList(items);
 
-        fParameters.put(DataProviderParameterUtils.SELECTED_ITEMS_KEY, fMixedList);
+        fParameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, fMixedList);
         items = DataProviderParameterUtils.extractSelectedItems(fParameters);
         assertNotNull(items);
         testLongList(items);
 
-        fParameters.put(DataProviderParameterUtils.SELECTED_ITEMS_KEY, fWrongParameter);
+        fParameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, fWrongParameter);
         items = DataProviderParameterUtils.extractSelectedItems(fParameters);
         assertNull(items);
     }

@@ -235,7 +235,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
         Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(start, end, nb));
         Multimap<@NonNull Integer, @NonNull String> regexesMap = getRegexes();
         if (!regexesMap.isEmpty()) {
-            parameters.put(DataProviderParameterUtils.REGEX_FILTER_KEY, regexesMap.asMap());
+            parameters.put(DataProviderParameterUtils.REGEX_MAP_FILTERS_KEY, regexesMap.asMap());
         }
         return parameters;
     }

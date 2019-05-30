@@ -204,8 +204,8 @@ public class CPUAnalysisBenchmark {
                     TimeQueryFilter filter = new SelectedCpuQueryFilter(startTime, endTime, 2, Collections.emptyList(), Collections.emptySet());
 
                     @NonNull Map<@NonNull String, @NonNull Object> parameters = new HashMap<>();
-                    parameters.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, getTimeRequested(filter));
-                    parameters.put(DataProviderParameterUtils.SELECTED_ITEMS_KEY, Collections.emptyList());
+                    parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, getTimeRequested(filter));
+                    parameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, Collections.emptyList());
                     parameters.put("cpus", Collections.emptySet());
                     TmfModelResponse<@NonNull TmfTreeModel<@NonNull CpuUsageEntryModel>> response = dataProvider.fetchTree(parameters, NULL_MONITOR);
                     TmfTreeModel<@NonNull CpuUsageEntryModel> model = response.getModel();
@@ -223,8 +223,8 @@ public class CPUAnalysisBenchmark {
                     // Get the usage for all threads
                     filter = new SelectedCpuQueryFilter(startTime, endTime, resolution, selected, Collections.emptySet());
                     parameters = new HashMap<>();
-                    parameters.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, getTimeRequested(filter));
-                    parameters.put(DataProviderParameterUtils.SELECTED_ITEMS_KEY, selected);
+                    parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, getTimeRequested(filter));
+                    parameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, selected);
                     parameters.put("cpus", Collections.emptySet());
                     TmfModelResponse<@NonNull ITmfXyModel> fetchXY = dataProvider.fetchXY(parameters, NULL_MONITOR);
                     ITmfXyModel model2 = fetchXY.getModel();

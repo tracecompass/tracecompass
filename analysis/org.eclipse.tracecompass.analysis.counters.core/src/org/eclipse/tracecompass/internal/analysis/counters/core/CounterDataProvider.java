@@ -61,7 +61,7 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
     /**
      * Cumulative key to extract isCumulative from parameters map
      */
-    public static final String CUMULATIVE_PARAMETER_KEY = "isCumulative"; //$NON-NLS-1$
+    public static final String CUMULATIVE_COUNTER_KEY = "isCumulative"; //$NON-NLS-1$
 
     /**
      * Chart's title
@@ -193,7 +193,7 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
             return null;
         }
 
-        Boolean isCumulativeParameter = DataProviderParameterUtils.extractBoolean(parameters, CUMULATIVE_PARAMETER_KEY);
+        Boolean isCumulativeParameter = DataProviderParameterUtils.extractBoolean(parameters, CUMULATIVE_COUNTER_KEY);
         // If the cumulative parameter is not present in the parameters use
         // "false" as default value
         boolean isCumulative = isCumulativeParameter != null && isCumulativeParameter;

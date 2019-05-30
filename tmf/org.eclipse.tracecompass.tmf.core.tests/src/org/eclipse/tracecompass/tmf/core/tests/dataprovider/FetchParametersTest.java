@@ -53,14 +53,14 @@ public class FetchParametersTest {
      */
     @BeforeClass
     public static void setUp() {
-        fExpectedTimeQueryMap.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, fTimeList);
+        fExpectedTimeQueryMap.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, fTimeList);
 
-        fExpectedSelectionTimeQueryMap.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, fTimeList);
-        fExpectedSelectionTimeQueryMap.put(DataProviderParameterUtils.SELECTED_ITEMS_KEY, fItemList);
+        fExpectedSelectionTimeQueryMap.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, fTimeList);
+        fExpectedSelectionTimeQueryMap.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, fItemList);
 
-        fExpectedVirtualTableQueryMap.put(DataProviderParameterUtils.COLUMN_ID_KEY, fItemList);
-        fExpectedVirtualTableQueryMap.put(DataProviderParameterUtils.TABLE_INDEX, TABLE_INDEX);
-        fExpectedVirtualTableQueryMap.put(DataProviderParameterUtils.TABLE_COUNT, TABLE_COUNT);
+        fExpectedVirtualTableQueryMap.put(DataProviderParameterUtils.REQUESTED_COLUMN_IDS_KEY, fItemList);
+        fExpectedVirtualTableQueryMap.put(DataProviderParameterUtils.REQUESTED_TABLE_INDEX_KEY, TABLE_INDEX);
+        fExpectedVirtualTableQueryMap.put(DataProviderParameterUtils.REQUESTED_TABLE_COUNT_KEY, TABLE_COUNT);
     }
 
     /**
@@ -107,9 +107,9 @@ public class FetchParametersTest {
 
         Map<String, Object> virtualTableQueryMap = FetchParametersUtils.virtualTableQueryToMap(fExpectedVirtualTableQuery);
         assertFalse(virtualTableQueryMap.isEmpty());
-        assertEquals(fExpectedVirtualTableQueryMap.get(DataProviderParameterUtils.COLUMN_ID_KEY), virtualTableQueryMap.get(DataProviderParameterUtils.COLUMN_ID_KEY));
-        assertEquals(fExpectedVirtualTableQueryMap.get(DataProviderParameterUtils.TABLE_INDEX), virtualTableQueryMap.get(DataProviderParameterUtils.TABLE_INDEX));
-        assertEquals(fExpectedVirtualTableQueryMap.get(DataProviderParameterUtils.TABLE_COUNT), virtualTableQueryMap.get(DataProviderParameterUtils.TABLE_COUNT));
+        assertEquals(fExpectedVirtualTableQueryMap.get(DataProviderParameterUtils.REQUESTED_COLUMN_IDS_KEY), virtualTableQueryMap.get(DataProviderParameterUtils.REQUESTED_COLUMN_IDS_KEY));
+        assertEquals(fExpectedVirtualTableQueryMap.get(DataProviderParameterUtils.REQUESTED_TABLE_INDEX_KEY), virtualTableQueryMap.get(DataProviderParameterUtils.REQUESTED_TABLE_INDEX_KEY));
+        assertEquals(fExpectedVirtualTableQueryMap.get(DataProviderParameterUtils.REQUESTED_TABLE_COUNT_KEY), virtualTableQueryMap.get(DataProviderParameterUtils.REQUESTED_TABLE_COUNT_KEY));
     }
 
 }

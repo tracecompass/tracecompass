@@ -140,8 +140,8 @@ public class CpuUsageDataProviderTest {
         /* This range should query the total range */
         TimeQueryFilter filter = new SelectedCpuQueryFilter(0L, 30L, 2, Collections.emptyList(), Collections.emptySet());
         @NonNull Map<@NonNull String, @NonNull Object> parameters = new HashMap<>();
-        parameters.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, getTimeRequested(filter));
-        parameters.put(DataProviderParameterUtils.SELECTED_ITEMS_KEY, Collections.emptyList());
+        parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, getTimeRequested(filter));
+        parameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, Collections.emptyList());
         parameters.put("cpus", Collections.emptySet());
         TmfModelResponse<@NonNull TmfTreeModel<@NonNull CpuUsageEntryModel>> response = dataProvider.fetchTree(parameters, monitor);
 
@@ -160,7 +160,7 @@ public class CpuUsageDataProviderTest {
 
         /* Verify a range when a process runs at the start */
         filter = new SelectedCpuQueryFilter(22L, 25L, 2, Collections.emptyList(), Collections.emptySet());
-        parameters.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, getTimeRequested(filter));
+        parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, getTimeRequested(filter));
         response = dataProvider.fetchTree(parameters, monitor);
         assertTrue(response.getStatus() == Status.COMPLETED);
 
@@ -175,7 +175,7 @@ public class CpuUsageDataProviderTest {
 
         /* Verify a range when a process runs at the end */
         filter = new SelectedCpuQueryFilter(1L, 4L, 2, Collections.emptyList(), Collections.emptySet());
-        parameters.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, getTimeRequested(filter));
+        parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, getTimeRequested(filter));
         response = dataProvider.fetchTree(parameters, monitor);
         assertTrue(response.getStatus() == Status.COMPLETED);
 
@@ -191,7 +191,7 @@ public class CpuUsageDataProviderTest {
 
         /* Verify a range when a process runs at start and at the end */
         filter = new SelectedCpuQueryFilter(4L, 13L, 2, Collections.emptyList(), Collections.emptySet());
-        parameters.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, getTimeRequested(filter));
+        parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, getTimeRequested(filter));
         response = dataProvider.fetchTree(parameters, monitor);
         assertTrue(response.getStatus() == Status.COMPLETED);
 

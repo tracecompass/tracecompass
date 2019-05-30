@@ -93,7 +93,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
      * Parameter key used when the thread tree should be filtered by active
      * thread
      */
-    public static final @NonNull String ACTIVE_THREAD_FILTER_KEY = "active_thread_filter_key"; //$NON-NLS-1$
+    public static final @NonNull String ACTIVE_THREAD_FILTER_KEY = "active_thread_filter"; //$NON-NLS-1$
 
     private static final String WILDCARD = "*"; //$NON-NLS-1$
     private static final Set<Integer> ACTIVE_STATES = ImmutableSet.of(StateValues.PROCESS_STATUS_RUN_USERMODE,

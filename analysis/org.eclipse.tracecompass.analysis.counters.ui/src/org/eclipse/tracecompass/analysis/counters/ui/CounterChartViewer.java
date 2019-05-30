@@ -62,7 +62,7 @@ public final class CounterChartViewer extends TmfFilteredXYChartViewer {
     @Override
     protected @NonNull Map<String, Object> createQueryParameters(long start, long end, int nb) {
         Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(new SelectionTimeQueryFilter(start, end, nb, getSelected()));
-        parameters.put(CounterDataProvider.CUMULATIVE_PARAMETER_KEY, fIsCumulative);
+        parameters.put(CounterDataProvider.CUMULATIVE_COUNTER_KEY, fIsCumulative);
         return parameters;
     }
 }

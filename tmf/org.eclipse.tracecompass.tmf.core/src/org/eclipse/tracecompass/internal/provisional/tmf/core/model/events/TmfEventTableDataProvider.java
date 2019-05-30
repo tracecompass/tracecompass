@@ -67,9 +67,15 @@ import com.google.common.collect.ImmutableSet;
  */
 public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider implements ITmfVirtualTableDataProvider<TmfEventTableColumnDataModel, EventTableLine> {
 
-    private static final String TABLE_SEARCH_FILTERS_PARAMETER_KEY = "tableSearchFilters"; //$NON-NLS-1$
+    /**
+     * Key for table search
+     */
+    public static final String TABLE_SEARCH_KEY = "table_search"; //$NON-NLS-1$
 
-    private static final String TABLE_FILTERS_PARAMETER_KEY = "tableFilters"; //$NON-NLS-1$
+    /**
+     * Key for table filters
+     */
+    public static final String TABLE_FILTERS_KEY = "table_filters"; //$NON-NLS-1$
 
     /**
      * Extension point ID.
@@ -471,7 +477,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
     }
 
     private static @Nullable ITmfFilter extractFilter(Map<String, Object> fetchParameters) {
-        Object filtersObject = fetchParameters.get(TABLE_FILTERS_PARAMETER_KEY);
+        Object filtersObject = fetchParameters.get(TABLE_FILTERS_KEY);
         if (filtersObject instanceof ITmfFilterModel) {
             ITmfFilterModel filters = (ITmfFilterModel) filtersObject;
             Map<Long, String> filterMap = filters.getTableFilter();
@@ -514,7 +520,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
     }
 
     private static @Nullable ITmfFilter extractSearchFilter(Map<String, Object> fetchParameters) {
-        Object searchFilterObject = fetchParameters.get(TABLE_SEARCH_FILTERS_PARAMETER_KEY);
+        Object searchFilterObject = fetchParameters.get(TABLE_SEARCH_KEY);
         if (searchFilterObject instanceof Map<?, ?>) {
             Map<Long, String> searchMap = (Map<Long, String>) searchFilterObject;
             if (searchMap.isEmpty()) {
@@ -537,7 +543,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
     }
 
     private static @Nullable TmfCollapseFilter extractCollapseFilter(Map<String, Object> fetchParameters) {
-        Object filtersObject = fetchParameters.get(TABLE_FILTERS_PARAMETER_KEY);
+        Object filtersObject = fetchParameters.get(TABLE_FILTERS_KEY);
         if (filtersObject instanceof ITmfFilterModel) {
             ITmfFilterModel filters = (ITmfFilterModel) filtersObject;
             if (filters.isCollapseFilter()) {

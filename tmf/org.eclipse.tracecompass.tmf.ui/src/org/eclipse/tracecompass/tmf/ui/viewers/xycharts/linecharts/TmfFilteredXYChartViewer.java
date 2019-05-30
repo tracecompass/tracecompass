@@ -117,7 +117,7 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
         Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(new SelectionTimeQueryFilter(start, end, nb, fSelectedIds));
         Multimap<@NonNull Integer, @NonNull String> regexesMap = getRegexes();
         if (!regexesMap.isEmpty()) {
-            parameters.put(DataProviderParameterUtils.REGEX_FILTER_KEY, regexesMap.asMap());
+            parameters.put(DataProviderParameterUtils.REGEX_MAP_FILTERS_KEY, regexesMap.asMap());
         }
         return parameters;
     }

@@ -68,7 +68,7 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
     /**
      * Parameter key to extract cpus from the parameters map
      */
-    public static final String CPUS_PARAMETER_KEY = "cpus"; //$NON-NLS-1$
+    public static final String REQUESTED_CPUS_KEY = "requested_cpus"; //$NON-NLS-1$
 
     /**
      * The Fake Tid to identify the total entry.
@@ -273,7 +273,7 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
     }
 
     private static Set<Integer> extractCpuSet(Map<String, Object> parameters) {
-        Object cpus = parameters.get(CPUS_PARAMETER_KEY);
+        Object cpus = parameters.get(REQUESTED_CPUS_KEY);
         if (cpus instanceof Collection<?>) {
             return ((Collection<?>) cpus).stream().filter(cpu -> cpu instanceof Integer)
                     .map(cpu -> (Integer) cpu)

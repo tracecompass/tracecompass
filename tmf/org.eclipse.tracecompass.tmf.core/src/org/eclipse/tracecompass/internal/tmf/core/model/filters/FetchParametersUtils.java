@@ -67,19 +67,19 @@ public class FetchParametersUtils {
      * @return A {@link VirtualTableQueryFilter} or null if the parameters are invalid
      */
     public static @Nullable VirtualTableQueryFilter createVirtualTableQueryFilter(Map<String, Object> parameters) {
-        List<Long> columnRequested = DataProviderParameterUtils.extractLongList(parameters, DataProviderParameterUtils.COLUMN_ID_KEY);
+        List<Long> columnRequested = DataProviderParameterUtils.extractLongList(parameters, DataProviderParameterUtils.REQUESTED_COLUMN_IDS_KEY);
         if(columnRequested == null) {
             return null;
         }
 
-        Object indexObject = parameters.get(DataProviderParameterUtils.TABLE_INDEX);
+        Object indexObject = parameters.get(DataProviderParameterUtils.REQUESTED_TABLE_INDEX_KEY);
         if (!(indexObject instanceof Long) && !(indexObject instanceof Integer)) {
             return null;
         }
 
         long index = indexObject instanceof Long ? (long) indexObject : ((Integer) indexObject).longValue();
 
-        Object countObject = parameters.get(DataProviderParameterUtils.TABLE_COUNT);
+        Object countObject = parameters.get(DataProviderParameterUtils.REQUESTED_TABLE_COUNT_KEY);
         if (!(countObject instanceof Integer)) {
             return null;
         }
@@ -101,7 +101,7 @@ public class FetchParametersUtils {
         for (long time : timesRequested) {
             longList.add(time);
         }
-        map.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, longList);
+        map.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, longList);
         return map;
     }
 
@@ -120,8 +120,8 @@ public class FetchParametersUtils {
         for (long time : timesRequested) {
             longList.add(time);
         }
-        map.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, longList);
-        map.put(DataProviderParameterUtils.SELECTED_ITEMS_KEY, selectedItems);
+        map.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, longList);
+        map.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, selectedItems);
         return map;
     }
 
@@ -137,9 +137,9 @@ public class FetchParametersUtils {
         List<Long> columnsId = queryFilter.getColumnsId();
         long index = queryFilter.getIndex();
         int count = queryFilter.getCount();
-        map.put(DataProviderParameterUtils.COLUMN_ID_KEY, columnsId);
-        map.put(DataProviderParameterUtils.TABLE_INDEX, index);
-        map.put(DataProviderParameterUtils.TABLE_COUNT, count);
+        map.put(DataProviderParameterUtils.REQUESTED_COLUMN_IDS_KEY, columnsId);
+        map.put(DataProviderParameterUtils.REQUESTED_TABLE_INDEX_KEY, index);
+        map.put(DataProviderParameterUtils.REQUESTED_TABLE_COUNT_KEY, count);
         return map;
     }
 
@@ -158,8 +158,8 @@ public class FetchParametersUtils {
         for (long time : timesRequested) {
             longList.add(time);
         }
-        map.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, longList);
-        map.put(DataProviderParameterUtils.FILTERED_PARAMETER_KEY, filtered);
+        map.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, longList);
+        map.put(DataProviderParameterUtils.FILTERED_KEY, filtered);
         return map;
     }
 }

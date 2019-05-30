@@ -62,7 +62,7 @@ public class CpuUsageXYViewer extends TmfFilteredXYChartViewer {
     @Override
     protected @NonNull Map<String, Object> createQueryParameters(long start, long end, int nb) {
         Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(new SelectionTimeQueryFilter(start, end, nb, getSelected()));
-        parameters.put(CpuUsageDataProvider.CPUS_PARAMETER_KEY, CpuUsageView.getCpus(getTrace()));
+        parameters.put(CpuUsageDataProvider.REQUESTED_CPUS_KEY, CpuUsageView.getCpus(getTrace()));
         return parameters;
     }
 

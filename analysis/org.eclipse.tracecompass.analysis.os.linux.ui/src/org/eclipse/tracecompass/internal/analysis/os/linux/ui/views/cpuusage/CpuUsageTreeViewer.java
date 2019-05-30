@@ -140,7 +140,7 @@ public class CpuUsageTreeViewer extends AbstractSelectTreeViewer {
         }
 
         Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(new SelectionTimeQueryFilter(start, end, 2, Collections.emptyList()));
-        parameters.put(CpuUsageDataProvider.CPUS_PARAMETER_KEY, CpuUsageView.getCpus(getTrace()));
+        parameters.put(CpuUsageDataProvider.REQUESTED_CPUS_KEY, CpuUsageView.getCpus(getTrace()));
         return parameters;
     }
 

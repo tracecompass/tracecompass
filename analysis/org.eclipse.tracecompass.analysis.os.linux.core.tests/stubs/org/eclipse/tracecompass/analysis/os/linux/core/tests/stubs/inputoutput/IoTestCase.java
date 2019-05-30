@@ -195,7 +195,7 @@ public class IoTestCase extends LinuxTestCase {
         public Map<String, Object> getTimeQuery() {
             TimeQueryFilter filter = new TimeQueryFilter(fStartTime, fEndTime, fResolution);
             Map<String, Object> parameters = new HashMap<>();
-            parameters.put(DataProviderParameterUtils.TIME_REQUESTED_KEY, getTimeRequested(filter));
+            parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, getTimeRequested(filter));
             return parameters;
         }
 
@@ -233,7 +233,7 @@ public class IoTestCase extends LinuxTestCase {
                 throw new NoSuchElementException("Requested entry not found for " + fDiskName + ' ' + fType);
             }
             Map<String, Object> parameters = getTimeQuery();
-            parameters.put(DataProviderParameterUtils.SELECTED_ITEMS_KEY, Collections.singletonList(selectionId));
+            parameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, Collections.singletonList(selectionId));
             return parameters;
         }
 

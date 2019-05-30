@@ -255,7 +255,7 @@ public class TmfEventTableDataProviderTest {
         TmfEventTableFilterModel filterModel = new TmfEventTableFilterModel(tableFilter, null, false);
         VirtualTableQueryFilter queryFilter = new EventTableQueryFilter(Arrays.asList(eventTypeColumnId, timestampColumnId), 0, 5, filterModel);
         Map<String, Object> parameters = FetchParametersUtils.virtualTableQueryToMap(queryFilter);
-        parameters.put("tableFilters", filterModel);
+        parameters.put(TmfEventTableDataProvider.TABLE_FILTERS_KEY, filterModel);
 
         List<Long> expectedColumnsId = Arrays.asList(eventTypeColumnId, timestampColumnId);
         TmfTimestampFormat.getDefaulTimeFormat().format(TmfTimestamp.fromMillis(2).toNanos());
@@ -290,7 +290,7 @@ public class TmfEventTableDataProviderTest {
         TmfEventTableFilterModel filterModel = new TmfEventTableFilterModel(tableFilter, null, false);
         VirtualTableQueryFilter queryFilter = new EventTableQueryFilter(Arrays.asList(1L, 0L), 0, 5, filterModel);
         Map<String, Object> parameters = FetchParametersUtils.virtualTableQueryToMap(queryFilter);
-        parameters.put("tableFilters", filterModel);
+        parameters.put(TmfEventTableDataProvider.TABLE_FILTERS_KEY, filterModel);
 
         List<Long> expectedColumnsId = Arrays.asList(eventTypeColumnId, timestampColumnId);
         List<EventTableLine> expectedData = Arrays.asList(
