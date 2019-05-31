@@ -38,7 +38,6 @@ public class SegmentStoreScatterGraphTooltipProvider extends TmfClosestDataPoint
      */
     public SegmentStoreScatterGraphTooltipProvider(ITmfChartTimeProvider tmfChartViewer) {
         super(tmfChartViewer);
-        register();
     }
 
     // ------------------------------------------------------------------------
