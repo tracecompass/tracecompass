@@ -62,7 +62,7 @@ public class DataSizeWithUnitFormat extends Format {
             double value = num.doubleValue();
             double abs = Math.abs(value);
             if (value == 0) {
-                return toAppendTo.append("0"); //$NON-NLS-1$
+                return toAppendTo.append("0").append(' ').append(B); //$NON-NLS-1$
             }
             if (abs >= KILO * KILO * KILO * KILO) {
                 return toAppendTo.append(FORMAT.format(value / (KILO * KILO * KILO * KILO))).append(' ').append(T).append(B);

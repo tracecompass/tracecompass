@@ -58,7 +58,7 @@ public class DataSizeFormatTest {
     @Parameters(name = "{index}: {0}")
     public static Iterable<Object[]> getParameters() {
         return Arrays.asList(new Object[][] {
-                { 0, "0", 0L },
+                { 0, "0 B", 0L },
                 { 3, "3 B", 3L },
                 { 975, "975 B", 975L },
                 { 1024, "1 KB", 1024L },
