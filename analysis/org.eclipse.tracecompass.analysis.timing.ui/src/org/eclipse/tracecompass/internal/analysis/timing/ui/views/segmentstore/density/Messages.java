@@ -18,9 +18,14 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density.messages"; //$NON-NLS-1$
 
     /**
-     * Tool-tip text when hovering on bars in the density viewer.
+     * Tooltip count message
      */
-    public static String SimpleTooltipProvider_toolTipText;
+    public static String SimpleTooltipProvider_count;
+
+    /**
+     * Tooltip duration message
+     */
+    public static String SimpleTooltipProvider_duration;
 
     static {
         // initialize resource bundle
