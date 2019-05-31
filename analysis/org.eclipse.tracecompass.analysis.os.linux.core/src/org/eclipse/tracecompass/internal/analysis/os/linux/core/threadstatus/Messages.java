@@ -17,9 +17,6 @@ import org.eclipse.osgi.util.NLS;
 class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.messages"; //$NON-NLS-1$
 
-    /** attribute cpu name */
-    public static String ThreadStatusDataProvider_attributeCpuName;
-
     /** The data provider title text */
     public static String ThreadStatusDataProviderFactory_title;
     /**

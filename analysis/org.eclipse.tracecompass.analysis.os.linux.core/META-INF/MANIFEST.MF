@@ -24,6 +24,8 @@ Import-Package: com.google.common.base,
  com.google.common.collect,
  com.google.common.hash,
  com.google.common.primitives,
+ org.apache.commons.io,
+ org.apache.commons.io.input,
  org.apache.commons.lang3
 Export-Package: org.eclipse.tracecompass.analysis.os.linux.core.contextswitch,
  org.eclipse.tracecompass.analysis.os.linux.core.cpuusage,

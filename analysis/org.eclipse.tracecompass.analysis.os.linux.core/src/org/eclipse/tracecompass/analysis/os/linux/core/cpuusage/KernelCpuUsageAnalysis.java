@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -147,7 +148,7 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
                 }
                 return Math.max(subAttributes.size(), cpus);
             } catch (AttributeNotFoundException e) {
-                Activator.getDefault().logError(e.getMessage(), e);
+                Activator.getDefault().logError("Error: getting number of core " + e.getMessage(), e); //$NON-NLS-1$
             }
         }
         return -1;
@@ -214,8 +215,8 @@ public class KernelCpuUsageAnalysis extends TmfStateSystemAnalysisModule {
             long countAtStart, countAtEnd;
 
             for (Entry<Integer, List<Integer>> entry : tidsPerCpu.entrySet()) {
-                int cpuNode = entry.getKey();
-                List<Integer> tidNodes = entry.getValue();
+                int cpuNode = Objects.requireNonNull(entry.getKey());
+                List<Integer> tidNodes = Objects.requireNonNull(entry.getValue());
 
                 String curCpuName = cpuSs.getAttributeName(cpuNode);
                 long cpuTotal = 0;

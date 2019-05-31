@@ -1,4 +1,28 @@
 class com/google/common/collect/Table
+cellSet
+ ()Ljava/util/Set<Lcom/google/common/collect/Table$Cell<TR;TC;TV;>;>;
+ ()L1java/util/Set<Lcom/google/common/collect/Table$Cell<TR;TC;TV;>;>;
+column
+ (TC;)Ljava/util/Map<TR;TV;>;
+ (TC;)L1java/util/Map<TR;TV;>;
+columnKeySet
+ ()Ljava/util/Set<TC;>;
+ ()L1java/util/Set<TC;>;
+columnMap
+ ()Ljava/util/Map<TC;Ljava/util/Map<TR;TV;>;>;
+ ()L1java/util/Map<TC;Ljava/util/Map<TR;TV;>;>;
 get
  (Ljava/lang/Object;Ljava/lang/Object;)TV;
  (Ljava/lang/Object;Ljava/lang/Object;)T0V;
+row
+ (TR;)Ljava/util/Map<TC;TV;>;
+ (TR;)L1java/util/Map<TC;TV;>;
+rowKeySet
+ ()Ljava/util/Set<TR;>;
+ ()L1java/util/Set<TR;>;
+rowMap
+ ()Ljava/util/Map<TR;Ljava/util/Map<TC;TV;>;>;
+ ()L1java/util/Map<TR;Ljava/util/Map<TC;TV;>;>;
+values
+ ()Ljava/util/Collection<TV;>;
+ ()L1java/util/Collection<TV;>;

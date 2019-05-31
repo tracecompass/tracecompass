@@ -38,6 +38,7 @@ public class TmfPieChartStatisticsModel {
      * Default constructor
      */
     public TmfPieChartStatisticsModel() {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------

@@ -12,7 +12,6 @@ package org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +25,7 @@ import java.util.function.Predicate;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IGroupingSegmentAspect;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.internal.analysis.timing.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
@@ -53,13 +53,11 @@ import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
-import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
@@ -92,6 +90,8 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
 
     private final BiMap<Long, String> fIdToType = HashBiMap.create();
     private final long fTraceId = ENTRY_ID.getAndIncrement();
+
+    private Iterable<IGroupingSegmentAspect> fGroupingAspects;
 
     private static class CheckSegmentType implements Predicate<ISegment> {
 
@@ -196,9 +196,9 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
 
     /**
      * Create an instance of {@link SegmentStoreScatterDataProvider} for a given
-     * analysis ID. Returns a null instance if the ISegmentStoreProvider is null. If
-     * the provider is an instance of {@link IAnalysisModule}, analysis is also
-     * scheduled.
+     * analysis ID. Returns a null instance if the ISegmentStoreProvider is
+     * null. If the provider is an instance of {@link IAnalysisModule}, analysis
+     * is also scheduled.
      * <p>
      * If the trace has multiple analysis modules with the same secondary ID,
      * <code>null</code> is returned so the caller can try to make a
@@ -213,14 +213,16 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
      * @since 4.0
      */
     public static @Nullable ITmfTreeDataProvider<? extends ITmfTreeDataModel> create(ITmfTrace trace, String secondaryId) {
-        // The trace can be an experiment, so we need to know if there are multiple analysis modules with the same ID
+        // The trace can be an experiment, so we need to know if there are multiple
+        // analysis modules with the same ID
         Iterable<ISegmentStoreProvider> modules = TmfTraceUtils.getAnalysisModulesOfClass(trace, ISegmentStoreProvider.class);
         Iterable<ISegmentStoreProvider> filteredModules = Iterables.filter(modules, m -> ((IAnalysisModule) m).getId().equals(secondaryId));
         Iterator<ISegmentStoreProvider> iterator = filteredModules.iterator();
         if (iterator.hasNext()) {
             ISegmentStoreProvider module = iterator.next();
             if (iterator.hasNext()) {
-                // More than one module, must be an experiment, return null so the factory can try with individual traces
+                // More than one module, must be an experiment, return null so the factory can
+                // try with individual traces
                 return null;
             }
             ((IAnalysisModule) module).schedule();
@@ -235,6 +237,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
     private SegmentStoreScatterDataProvider(ITmfTrace trace, ISegmentStoreProvider provider, String secondaryId) {
         super(trace);
         fProvider = provider;
+        fGroupingAspects = Iterables.filter(provider.getSegmentAspects(), IGroupingSegmentAspect.class);
         fId = ID + ':' + secondaryId;
     }
 
@@ -257,7 +260,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         long end = filter.getEnd();
         final Iterable<ISegment> intersectingElements = Iterables.filter(segStore.getIntersectingElements(start, end), s -> s.getStart() >= start);
 
-        Set<String> segmentTypes = new HashSet<>();
+        Map<String, INamedSegment> segmentTypes = new HashMap<>();
         IAnalysisModule module = (provider instanceof IAnalysisModule) ? (IAnalysisModule) provider : null;
         boolean complete = module == null ? true : module.isQueryable(filter.getEnd());
 
@@ -266,20 +269,36 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             if (monitor != null && monitor.isCanceled()) {
                 return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
             }
-            segmentTypes.add(segment.getName());
+            segmentTypes.put(segment.getName(), segment);
         }
 
         Builder<TmfTreeDataModel> nodes = new ImmutableList.Builder<>();
         nodes.add(new TmfTreeDataModel(fTraceId, -1, Collections.singletonList(String.valueOf(getTrace().getName()))));
+        Map<IGroupingSegmentAspect, Map<String, Long>> names = new HashMap<>();
 
-        // There are segments, but no type, probably not named segments, so just add a category
-        if (segmentTypes.isEmpty() && intersectingElements.iterator().hasNext()) {
-            long seriesId = getUniqueId(DEFAULT_CATEGORY);
-            nodes.add(new TmfTreeDataModel(seriesId, fTraceId, Collections.singletonList(DEFAULT_CATEGORY)));
-        }
-        for (String seriesName : segmentTypes) {
-            long seriesId = getUniqueId(seriesName);
-            nodes.add(new TmfTreeDataModel(seriesId, fTraceId, Collections.singletonList(seriesName)));
+        for (Entry<String, INamedSegment> series : segmentTypes.entrySet()) {
+            long parentId = fTraceId;
+            /*
+             * Create a tree sorting aspects by "Grouping aspect" much like
+             * counter analyses
+             */
+            for (IGroupingSegmentAspect aspect : fGroupingAspects) {
+                names.putIfAbsent(aspect, new HashMap<>());
+                Map<String, Long> map = names.get(aspect);
+                if (map == null) {
+                    break;
+                }
+                String name = String.valueOf(aspect.resolve(series.getValue()));
+                Long uniqueId = map.get(name);
+                if (uniqueId == null) {
+                    uniqueId = getUniqueId(name);
+                    map.put(name, uniqueId);
+                    nodes.add(new TmfTreeDataModel(uniqueId, parentId, name));
+                }
+                parentId = uniqueId;
+            }
+            long seriesId = getUniqueId(series.getKey());
+            nodes.add(new TmfTreeDataModel(seriesId, parentId, series.getKey()));
         }
 
         return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), nodes.build()), complete ? ITmfResponse.Status.COMPLETED : ITmfResponse.Status.RUNNING,
@@ -322,7 +341,8 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
 
         long start = filter.getStart();
         long end = filter.getEnd();
-        // The types in the tree do not contain the trace name for sake of readability, but
+        // The types in the tree do not contain the trace name for sake of readability,
+        // but
         // the name of the series in XY model should be unique per trace
         String prefix = getTrace().getName() + '/';
         Map<String, Series> types = initTypes(prefix, filter);
@@ -350,7 +370,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             Series thisSeries = types.get(name);
             if (thisSeries == null) {
                 // This shouldn't be, log an error and continue
-                Activator.getInstance().logError("Series " + thisSeries + " should exist");  //$NON-NLS-1$//$NON-NLS-2$
+                Activator.getInstance().logError("Series " + thisSeries + " should exist"); //$NON-NLS-1$//$NON-NLS-2$
                 continue;
             }
 
@@ -393,7 +413,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         if (!predicates.isEmpty()) {
 
             // Get the filter external input data
-            Multimap<@NonNull String, @NonNull String> input = getFilterInput(segment);
+            Multimap<@NonNull String, @NonNull String> input = ISegmentStoreProvider.getFilterInput(fProvider, segment);
 
             // Test each predicates and set the status of the property associated to the
             // predicate
@@ -416,17 +436,6 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         } else {
             series.addPoint(segment.getStart(), segment.getLength(), 0);
         }
-    }
-
-    private Multimap<String, String> getFilterInput(ISegment segment) {
-        Multimap<String, String> map = HashMultimap.create();
-        for(ISegmentAspect aspect : fProvider.getSegmentAspects()) {
-            Object resolve = aspect.resolve(segment);
-            if (resolve != null) {
-                map.put(aspect.getName(), String.valueOf(resolve));
-            }
-        }
-        return map;
     }
 
     private static class Series {

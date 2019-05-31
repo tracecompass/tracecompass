@@ -344,7 +344,7 @@ TRYLOCK_PI	136		264
 			</stateChange>
 		</action>
 		<fsm id="futex_lock_2_4">
-			<precondition event="exit_syscall" cond="isTidValid" />
+			<precondition event="*sys*" cond="isTidValid" />
 			<initialState>
 				<transition event="sys_futex" cond="isTidValid:lock_op" target="syscall_entry_x" action="saveContext:set_operation:waiter_in"/>
 			</initialState>
@@ -354,7 +354,7 @@ TRYLOCK_PI	136		264
 			<final id="syscall_exit_x"/>
 		</fsm>
 		<fsm id="futex_unlock_2_4">
-			<precondition event="exit_syscall" cond="isTidValid" />
+			<precondition event="*sys*" cond="isTidValid" />
 			<initialState>
 				<transition event="sys_futex" cond="isTidValid:unlock_op" target="syscall_entry_x" action="saveContext:set_operation"/>
 			</initialState>
@@ -373,7 +373,7 @@ TRYLOCK_PI	136		264
 			</state>
 		</fsm>
 		<fsm id="futex_lock_2_7">
-			<precondition event="syscall_exit_futex" cond="isTidValid" />
+			<precondition event="syscall_*_futex" cond="isTidValid" />
 			<initialState>
 				<transition event="syscall_entry_futex" cond="isTidValid:lock_op" target="syscall_entry_x" action="saveContext:set_operation:waiter_in"/>
 			</initialState>
@@ -383,7 +383,7 @@ TRYLOCK_PI	136		264
 			<final id="syscall_exit_x"/>
 		</fsm>
 		<fsm id="futex_unlock_2_7">
-			<precondition event="syscall_exit_futex" cond="isTidValid" />
+			<precondition event="syscall_*_futex" cond="isTidValid" />
 			<initialState>
 				<transition event="syscall_entry_futex" cond="isTidValid:unlock_op" target="syscall_entry_x" action="saveContext:set_operation"/>
 			</initialState>

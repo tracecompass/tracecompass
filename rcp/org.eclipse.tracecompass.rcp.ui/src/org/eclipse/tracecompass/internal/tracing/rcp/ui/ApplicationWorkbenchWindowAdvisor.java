@@ -156,6 +156,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
          * Default Constructor
          */
         public PerspectiveListener() {
+            // Do nothing
         }
 
         @Override
@@ -166,6 +167,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
         @Override
         public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId) {
+            // Do nothing
         }
     }
 

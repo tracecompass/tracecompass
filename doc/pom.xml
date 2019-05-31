@@ -26,6 +26,8 @@
 
   <properties>
     <docDestination>/home/data/httpd/archive.eclipse.org/tracecompass/doc</docDestination>
+    <wikitext.version>3.0.7</wikitext.version>
+    <guava.version>21.0</guava.version>
   </properties>
 
   <modules>
@@ -37,5 +39,36 @@
 
     <module>org.eclipse.tracecompass.examples</module>
   </modules>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+
+        <dependencies>
+          <dependency>
+            <groupId>org.eclipse.mylyn.docs</groupId>
+            <artifactId>org.eclipse.mylyn.wikitext</artifactId>
+            <version>${wikitext.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.mylyn.docs</groupId>
+            <artifactId>org.eclipse.mylyn.wikitext.ant</artifactId>
+            <version>${wikitext.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.mylyn.docs</groupId>
+            <artifactId>org.eclipse.mylyn.wikitext.mediawiki</artifactId>
+            <version>${wikitext.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+          </dependency>
+      </dependencies>
+      </plugin>
+    </plugins>
+   </build>
 
 </project>

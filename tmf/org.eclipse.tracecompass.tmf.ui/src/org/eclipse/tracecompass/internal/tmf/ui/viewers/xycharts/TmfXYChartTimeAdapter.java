@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017, 2018 Ericsson
+ * Copyright (c) 2017, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -23,6 +23,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeForma
 public final class TmfXYChartTimeAdapter implements ITimeDataProvider {
 
     private final TmfXYChartViewer fTimeProvider;
+    private TimeFormat fTimeFormat;
 
     /**
      * Constructor, requires a {@link ITmfChartTimeProvider}
@@ -97,7 +98,7 @@ public final class TmfXYChartTimeAdapter implements ITimeDataProvider {
 
     @Override
     public TimeFormat getTimeFormat() {
-        return TimeFormat.CALENDAR;
+        return fTimeFormat;
     }
 
     @Override
@@ -148,4 +149,13 @@ public final class TmfXYChartTimeAdapter implements ITimeDataProvider {
         // Do nothing
     }
 
+    /**
+     * Set the time format.
+     *
+     * @param timeFormat
+     *            the time format
+     */
+    public void setTimeFormat(org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat timeFormat) {
+        fTimeFormat = TimeFormat.convert(timeFormat);
+    }
 }

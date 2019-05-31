@@ -14,7 +14,7 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.xychart;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlXYDataProvider;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenXYDataProvider;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.XmlDataProviderManager;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
@@ -47,7 +47,7 @@ public class XmlXYViewer extends TmfFilteredXYChartViewer {
      *            The view info object
      */
     public XmlXYViewer(@Nullable Composite parent, TmfXYChartSettings settings, XmlViewInfo viewInfo) {
-        super(parent, settings, XmlXYDataProvider.ID);
+        super(parent, settings, DataDrivenXYDataProvider.ID);
         fViewInfo = viewInfo;
     }
 

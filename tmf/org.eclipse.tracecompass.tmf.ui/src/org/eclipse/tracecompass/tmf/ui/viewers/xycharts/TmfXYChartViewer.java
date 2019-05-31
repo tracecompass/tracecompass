@@ -15,6 +15,7 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xycharts;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -40,6 +41,8 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTimestampFormatUpdateSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimePreferencesConstants;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimePreferences;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -48,7 +51,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphScale;
 import org.swtchart.Chart;
@@ -83,6 +85,8 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     private Chart fSwtChart;
     /** The X axis for the chart */
     private TimeGraphScale fTimeScaleCtrl;
+    /** The time format */
+    private @Nullable TimeFormat fTimeFormat = null;
     /** The mouse selection provider */
     private TmfBaseProvider fMouseSelectionProvider;
     /** The mouse drag zoom provider */
@@ -99,7 +103,7 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      */
     private boolean fSendTimeAlignSignals = false;
 
-    private final ITimeDataProvider fDataProvider;
+    private final TmfXYChartTimeAdapter fDataProvider;
 
     private IStatusLineManager fStatusLineManager;
     // ------------------------------------------------------------------------
@@ -210,6 +214,7 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
 
         fDataProvider = new TmfXYChartTimeAdapter(this);
         fTimeScaleCtrl.setTimeProvider(fDataProvider);
+        updateTimeFormat();
     }
 
     private void initTitle(String label, ITitle titleCtrl) {
@@ -451,6 +456,23 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
         gc.setAlpha(255);
     }
 
+    /**
+     * Sets the time format, or null to use the Time Format 'Date and Time
+     * format' preference (default).
+     *
+     * @param timeFormat
+     *            the {@link TimeFormat} used to display timestamps
+     * @since 5.0
+     */
+    protected void setTimeFormat(TimeFormat timeFormat) {
+        fTimeFormat = timeFormat;
+        if (fSwtChart != null) {
+            updateTimeFormat();
+            fSwtChart.getAxisSet().adjustRange();
+            fSwtChart.redraw();
+        }
+    }
+
     // ------------------------------------------------------------------------
     // Signal Handler
     // ------------------------------------------------------------------------
@@ -494,6 +516,7 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      */
     @TmfSignalHandler
     public void timestampFormatUpdated(TmfTimestampFormatUpdateSignal signal) {
+        updateTimeFormat();
         fSwtChart.getAxisSet().adjustRange();
         fSwtChart.redraw();
     }
@@ -732,4 +755,16 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
         };
     }
 
+    private void updateTimeFormat() {
+        if (fTimeFormat == null) {
+            String datime = TmfTimePreferences.getPreferenceMap().get(ITmfTimePreferencesConstants.DATIME);
+            if (ITmfTimePreferencesConstants.TIME_ELAPSED_FMT.equals(datime)) {
+                fDataProvider.setTimeFormat(TimeFormat.RELATIVE);
+            } else {
+                fDataProvider.setTimeFormat(TimeFormat.CALENDAR);
+            }
+        } else {
+            fDataProvider.setTimeFormat(fTimeFormat);
+        }
+    }
 }

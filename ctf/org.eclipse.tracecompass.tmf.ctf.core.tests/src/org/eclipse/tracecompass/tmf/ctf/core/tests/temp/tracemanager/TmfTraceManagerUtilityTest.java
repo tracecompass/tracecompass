@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 EfficiOS Inc., Alexandre Montplaisir
+ * Copyright (c) 2016, 2019 EfficiOS Inc., Alexandre Montplaisir and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -67,16 +67,13 @@ public class TmfTraceManagerUtilityTest {
      */
     @Test
     public void testTemporaryDirPath() throws URISyntaxException {
-        String basePath = TmfTraceManager.getTemporaryDirPath();
-        assertTrue(basePath.endsWith(TEMP_DIR_NAME));
+        String tempDirPath = TmfTraceManager.getTemporaryDirPath();
+        assertTrue(tempDirPath.endsWith(TEMP_DIR_NAME));
 
         String property = System.getProperty("osgi.instance.area"); //$NON-NLS-1$
         File dir = URIUtil.toFile(URIUtil.fromString(property));
-        String propertyToTest = dir.getAbsolutePath();
-        if (property != null) {
-            basePath = basePath.substring(0, basePath.length() - TEMP_DIR_NAME.length() - 1);
-            assertTrue(propertyToTest.contains(basePath));
-        }
+        String basePath = dir.getAbsolutePath();
+        assertTrue(tempDirPath.startsWith(basePath));
     }
 
     /**
@@ -86,10 +83,10 @@ public class TmfTraceManagerUtilityTest {
     public void testSupplementaryFileDir() {
         final ITmfTrace trace = fTrace;
         assertNotNull(trace);
-        String name1 = trace.getName();
-        String basePath = TmfTraceManager.getTemporaryDirPath() + File.separator;
+        String tracePath = trace.getPath();
+        String tempDirPath = TmfTraceManager.getTemporaryDirPath();
 
-        String expected = basePath + name1 + File.separator;
+        String expected = Paths.get(tempDirPath, tracePath).toString() + File.separator;
         assertEquals(expected, TmfTraceManager.getSupplementaryFileDir(trace));
     }
 

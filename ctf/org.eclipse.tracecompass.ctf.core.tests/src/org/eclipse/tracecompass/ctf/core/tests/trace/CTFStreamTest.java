@@ -104,6 +104,19 @@ public class CTFStreamTest {
         fixture.addEvent(event);
     }
 
+
+    /**
+     * Run the void addEvent(EventDeclaration) method test with the basic huge id'ed event.
+     *
+     * @throws ParseException
+     */
+    @Test
+    public void testAddHugeIDEvent_base() throws ParseException {
+        EventDeclaration event = new EventDeclaration();
+        event.setId(123456789);
+        fixture.addEvent(event);
+    }
+
     /**
      * Run the boolean eventContextIsSet() method test.
      */

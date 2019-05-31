@@ -64,10 +64,12 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider, IStyledL
 
     @Override
     public void addListener(ILabelProviderListener listener) {
+        // Do nothing
     }
 
     @Override
     public void dispose() {
+        // Do nothing
     }
 
     @Override
@@ -77,14 +79,17 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider, IStyledL
 
     @Override
     public void removeListener(ILabelProviderListener listener) {
+        // Do nothing
     }
 
     @Override
     public void restoreState(IMemento aMemento) {
+        // Do nothing
     }
 
     @Override
     public void saveState(IMemento aMemento) {
+        // Do nothing
     }
 
     @Override

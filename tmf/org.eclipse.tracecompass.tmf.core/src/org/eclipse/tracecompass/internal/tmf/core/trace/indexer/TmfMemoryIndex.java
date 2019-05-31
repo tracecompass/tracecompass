@@ -101,5 +101,6 @@ public class TmfMemoryIndex implements ITmfCheckpointIndex, ICheckpointCollectio
 
     @Override
     public void delete() {
+        // Do nothing
     }
 }

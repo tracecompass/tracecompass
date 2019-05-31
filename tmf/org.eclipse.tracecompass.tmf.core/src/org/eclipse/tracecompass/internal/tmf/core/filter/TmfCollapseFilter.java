@@ -106,6 +106,7 @@ public class TmfCollapseFilter implements ITmfFilterTreeNode {
 
     @Override
     public void setParent(ITmfFilterTreeNode parent) {
+        // Do nothing
     }
 
     @Override

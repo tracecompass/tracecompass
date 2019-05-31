@@ -104,7 +104,9 @@ public class ManageCustomParsersDialog extends Dialog {
         txtButton.setSelection(true);
         txtButton.addSelectionListener(new SelectionListener() {
             @Override
-            public void widgetDefaultSelected(SelectionEvent e) {}
+            public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
+            }
 
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -117,6 +119,7 @@ public class ManageCustomParsersDialog extends Dialog {
         xmlButton.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
             }
 
             @Override
@@ -129,7 +132,9 @@ public class ManageCustomParsersDialog extends Dialog {
         parserList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         parserList.addSelectionListener(new SelectionListener() {
             @Override
-            public void widgetDefaultSelected(SelectionEvent e) {}
+            public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
+            }
 
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -154,7 +159,9 @@ public class ManageCustomParsersDialog extends Dialog {
         newButton.setText(Messages.ManageCustomParsersDialog_NewButtonLabel);
         newButton.addSelectionListener(new SelectionListener() {
             @Override
-            public void widgetDefaultSelected(SelectionEvent e) {}
+            public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
+            }
 
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -179,7 +186,9 @@ public class ManageCustomParsersDialog extends Dialog {
         editButton.setEnabled(false);
         editButton.addSelectionListener(new SelectionListener() {
             @Override
-            public void widgetDefaultSelected(SelectionEvent e) {}
+            public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
+            }
 
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -209,7 +218,9 @@ public class ManageCustomParsersDialog extends Dialog {
         deleteButton.setEnabled(false);
         deleteButton.addSelectionListener(new SelectionListener() {
             @Override
-            public void widgetDefaultSelected(SelectionEvent e) {}
+            public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
+            }
 
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -240,7 +251,9 @@ public class ManageCustomParsersDialog extends Dialog {
         importButton.setText(Messages.ManageCustomParsersDialog_ImportButtonLabel);
         importButton.addSelectionListener(new SelectionListener() {
             @Override
-            public void widgetDefaultSelected(SelectionEvent e) {}
+            public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
+            }
 
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -279,7 +292,9 @@ public class ManageCustomParsersDialog extends Dialog {
         exportButton.setEnabled(false);
         exportButton.addSelectionListener(new SelectionListener() {
             @Override
-            public void widgetDefaultSelected(SelectionEvent e) {}
+            public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
+            }
 
             @Override
             public void widgetSelected(SelectionEvent e) {

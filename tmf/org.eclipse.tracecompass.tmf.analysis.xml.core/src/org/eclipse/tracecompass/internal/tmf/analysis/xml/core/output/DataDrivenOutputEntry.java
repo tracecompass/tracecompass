@@ -25,7 +25,8 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDri
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenStateSystemPath;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.IDataDrivenRuntimeObject;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.IAnalysisDataContainer;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphEntryModel.EntryBuilder;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenOutputEntryModel.EntryBuilder;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenXYDataProvider.DisplayType;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -39,7 +40,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  *
  * @author Geneviève Bastien
  */
-public class DataDrivenTimeGraphEntry implements IDataDrivenRuntimeObject {
+public class DataDrivenOutputEntry implements IDataDrivenRuntimeObject {
 
     /**
      * Integer to get an ID from a state system and quark
@@ -73,8 +74,10 @@ public class DataDrivenTimeGraphEntry implements IDataDrivenRuntimeObject {
          *            The state system to query
          * @param quark
          *            The quark to use to get the data
+         * @param displayType
+         *            The way to compute the data to show
          */
-        void registerQuark(long id, ITmfStateSystem ss, int quark);
+        void registerQuark(long id, ITmfStateSystem ss, int quark, DisplayType displayType);
     }
 
     private static class DataContainer implements IAnalysisDataContainer {
@@ -100,7 +103,7 @@ public class DataDrivenTimeGraphEntry implements IDataDrivenRuntimeObject {
     private static final String SPLIT_STRING = "/"; //$NON-NLS-1$
     private static final Map<ITmfStateSystem, DataContainer> SS_TO_CONTAINER = new WeakHashMap<>();
 
-    private final List<DataDrivenTimeGraphEntry> fChildrenEntries;
+    private final List<DataDrivenOutputEntry> fChildrenEntries;
     private final String fPath;
     private final @Nullable String fAnalysisId;
     private final boolean fDisplayText;
@@ -108,6 +111,7 @@ public class DataDrivenTimeGraphEntry implements IDataDrivenRuntimeObject {
     private final @Nullable DataDrivenStateSystemPath fId;
     private final @Nullable DataDrivenStateSystemPath fParent;
     private final @Nullable DataDrivenStateSystemPath fName;
+    private final DisplayType fDisplayType;
 
     /**
      * Constructor
@@ -132,13 +136,17 @@ public class DataDrivenTimeGraphEntry implements IDataDrivenRuntimeObject {
      *            is the ID of another entry at the same level
      * @param name
      *            The state ssytem path for the name of the entry
+     * @param displayType
+     *            The type of value to display, whether absolute or relative to
+     *            previous value
      */
-    public DataDrivenTimeGraphEntry(List<DataDrivenTimeGraphEntry> entries, String path,
+    public DataDrivenOutputEntry(List<DataDrivenOutputEntry> entries, String path,
             @Nullable String analysisId, boolean displayText,
             @Nullable DataDrivenStateSystemPath display,
             @Nullable DataDrivenStateSystemPath id,
             @Nullable DataDrivenStateSystemPath parent,
-            @Nullable DataDrivenStateSystemPath name) {
+            @Nullable DataDrivenStateSystemPath name,
+            DisplayType displayType) {
         fChildrenEntries = entries;
         fPath = path;
         fAnalysisId = analysisId;
@@ -147,6 +155,7 @@ public class DataDrivenTimeGraphEntry implements IDataDrivenRuntimeObject {
         fId = id;
         fParent = parent;
         fName = name;
+        fDisplayType = displayType;
     }
 
     /**
@@ -225,8 +234,8 @@ public class DataDrivenTimeGraphEntry implements IDataDrivenRuntimeObject {
         DataDrivenStateSystemPath namePath = fName;
         DataDrivenStateSystemPath idPath = fId;
         DataDrivenStateSystemPath parentPath = fParent;
-        Map<String, DataDrivenTimeGraphEntryModel.EntryBuilder> entryMap = new HashMap<>();
-        List<DataDrivenTimeGraphEntryModel.EntryBuilder> entries = new ArrayList<>();
+        Map<String, DataDrivenOutputEntryModel.EntryBuilder> entryMap = new HashMap<>();
+        List<DataDrivenOutputEntryModel.EntryBuilder> entries = new ArrayList<>();
         List<TimeGraphEntryModel> entryList = new ArrayList<>();
         for (int quark : quarks) {
 
@@ -241,7 +250,7 @@ public class DataDrivenTimeGraphEntry implements IDataDrivenRuntimeObject {
                     // The entry has no display quark, do not display
                     continue;
                 }
-                callback.registerQuark(id, ss, displayQuark);
+                callback.registerQuark(id, ss, displayQuark, fDisplayType);
 
                 try {
 
@@ -296,12 +305,12 @@ public class DataDrivenTimeGraphEntry implements IDataDrivenRuntimeObject {
                 xmlParentId = getFirstValue(quark, parentPath, container);
             }
 
-            EntryBuilder entryBuilder = new DataDrivenTimeGraphEntryModel.EntryBuilder(id, parentEntryId, displayQuark, name, xmlId, xmlParentId, entryStart, entryEnd, fDisplayText);
+            EntryBuilder entryBuilder = new DataDrivenOutputEntryModel.EntryBuilder(id, parentEntryId, displayQuark, name, xmlId, xmlParentId, entryStart, entryEnd, fDisplayText, fDisplayType);
             entryMap.put(xmlId, entryBuilder);
             entries.add(entryBuilder);
 
             /* Process the children entry of this entry */
-            for (DataDrivenTimeGraphEntry subEntry : fChildrenEntries) {
+            for (DataDrivenOutputEntry subEntry : fChildrenEntries) {
                 @NonNull String regex = prevRegex.isEmpty() ? regexName : prevRegex + '/' + regexName;
                 entryList.addAll(subEntry.buildEntries(ss, entryBuilder.getId(), trace, quark, regex, currentEnd, idGenerator, callback));
             }

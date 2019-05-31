@@ -37,7 +37,7 @@ import com.google.common.collect.Iterables;
 public class DataDrivenTimeGraphProviderFactory implements IDataDrivenRuntimeObject {
 
     private final List<DataDrivenPresentationState> fValues;
-    private final List<DataDrivenTimeGraphEntry> fEntries;
+    private final List<DataDrivenOutputEntry> fEntries;
     private final Set<String> fAnalysisIds;
 
     /**
@@ -51,7 +51,7 @@ public class DataDrivenTimeGraphProviderFactory implements IDataDrivenRuntimeObj
      *            The values to use to display the labels and colors of this
      *            time graph
      */
-    public DataDrivenTimeGraphProviderFactory(List<DataDrivenTimeGraphEntry> entries, Set<String> analysisIds, List<DataDrivenPresentationState> values) {
+    public DataDrivenTimeGraphProviderFactory(List<DataDrivenOutputEntry> entries, Set<String> analysisIds, List<DataDrivenPresentationState> values) {
         fValues = values;
         fEntries = entries;
         fAnalysisIds = analysisIds;
@@ -92,7 +92,22 @@ public class DataDrivenTimeGraphProviderFactory implements IDataDrivenRuntimeObj
                 module.getStateSystems().forEach(sss::add);
             }
         }
-        return (sss.isEmpty() ? null : new DataDrivenTimeGraphDataProvider(trace, sss, fEntries, fValues));
+        return (sss.isEmpty() ? null : new DataDrivenTimeGraphDataProvider(trace, sss, fEntries, fValues, null));
+    }
+
+    /**
+     * Create a data provider with state systems already available
+     *
+     * @param trace
+     *            The trace this data provider is associated with
+     * @param stateSystems
+     *            The state systems to use
+     * @param id
+     *            The ID of the data provider to create
+     * @return The data provider
+     */
+    public ITimeGraphDataProvider<TimeGraphEntryModel> create(ITmfTrace trace, List<ITmfStateSystem> stateSystems, String id) {
+        return new DataDrivenTimeGraphDataProvider(trace, stateSystems, fEntries, fValues, id);
     }
 
 }

@@ -14,7 +14,7 @@ import java.util.Comparator;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlXYDataProvider;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenXYDataProvider;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.XmlDataProviderManager;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlViewInfo;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
@@ -64,7 +64,7 @@ public class XmlTreeViewer extends AbstractSelectTreeViewer {
      *            {@link XmlViewInfo} to manage the info on the class
      */
     public XmlTreeViewer(Composite parent, XmlViewInfo viewInfo) {
-        super(parent, 1, XmlXYDataProvider.ID);
+        super(parent, 1, DataDrivenXYDataProvider.ID);
         fViewInfo = viewInfo;
         setLabelProvider(new XmlLabelProvider());
     }

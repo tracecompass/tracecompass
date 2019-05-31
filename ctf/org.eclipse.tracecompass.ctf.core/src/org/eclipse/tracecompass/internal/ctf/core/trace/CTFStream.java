@@ -30,6 +30,7 @@ import org.eclipse.tracecompass.ctf.core.trace.CTFTrace;
 import org.eclipse.tracecompass.ctf.core.trace.ICTFStream;
 import org.eclipse.tracecompass.internal.ctf.core.event.EventDeclaration;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ParseException;
+import org.eclipse.tracecompass.internal.ctf.core.utils.SparseList;
 
 /**
  * <b><u>Stream</u></b>
@@ -62,7 +63,7 @@ public class CTFStream implements ICTFStream {
     /**
      * Maps event ids to events
      */
-    private final ArrayList<@Nullable IEventDeclaration> fEvents = new ArrayList<>();
+    private List<@Nullable IEventDeclaration> fEvents = new ArrayList<>();
 
     private boolean fEventUnsetId = false;
     private boolean fStreamIdSet = false;
@@ -252,7 +253,7 @@ public class CTFStream implements ICTFStream {
             if (fEvents.size() > id && fEvents.get(id) != null) {
                 throw new ParseException("Event id already exists"); //$NON-NLS-1$
             }
-            ensureSize(fEvents, id);
+            ensureSize(id);
             /* Put the event in the list */
             fEvents.set(id, event);
         }
@@ -279,7 +280,7 @@ public class CTFStream implements ICTFStream {
         for (IEventDeclaration event : events) {
             if (event != null) {
                 int index = event.getId().intValue();
-                ensureSize(fEvents, index);
+                ensureSize(index);
                 if (fEvents.get(index) != null) {
                     throw new CTFException("Both lists have an event defined at position " + index); //$NON-NLS-1$
                 }
@@ -288,10 +289,22 @@ public class CTFStream implements ICTFStream {
         }
     }
 
-    private static void ensureSize(ArrayList<@Nullable ? extends Object> list, int index) {
-        list.ensureCapacity(index);
-        while (list.size() <= index) {
-            list.add(null);
+    private void ensureSize(int index) {
+        List<@Nullable IEventDeclaration> list = fEvents;
+        if (list instanceof ArrayList) {
+            if (index > 50000) {
+                SparseList<@Nullable IEventDeclaration> sparseList = new SparseList<>(fEvents);
+                sparseList.ensureSize(index + 1);
+                fEvents = sparseList;
+                return;
+            }
+            ((ArrayList<@Nullable IEventDeclaration>) list).ensureCapacity(index);
+            while (list.size() <= index) {
+                list.add(null);
+            }
+        } else if (list instanceof SparseList) {
+            SparseList sparseList = (SparseList) list;
+            sparseList.ensureSize(index + 1);
         }
     }
 

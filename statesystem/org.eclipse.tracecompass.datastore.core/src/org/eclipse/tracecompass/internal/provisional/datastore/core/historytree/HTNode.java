@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -68,7 +69,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
             + 3 * Integer.BYTES
             + Byte.BYTES;
 
-    private static final Predicate<Integer> ALWAYS_TRUE = i -> true;
+    private static final IntPredicate ALWAYS_TRUE = i -> true;
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -330,7 +331,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
          * @return Collection of sequence numbers of the child nodes that
          *         intersect t, non-null empty collection if this is a Leaf Node
          */
-        public final Collection<Integer> selectNextChildren(TimeRangeCondition timeCondition, Predicate<Integer> extraPredicate) {
+        public final Collection<Integer> selectNextChildren(TimeRangeCondition timeCondition, IntPredicate extraPredicate) {
             fNode.takeReadLock();
             try {
                 List<Integer> list = new ArrayList<>();
@@ -838,7 +839,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
      *            The predicate on the intervals of a node
      * @return The predicate on the index in the core node data
      */
-    public Predicate<Integer> getCoreDataPredicate(Predicate<E> predicate) {
+    public IntPredicate getCoreDataPredicate(Predicate<E> predicate) {
         return ALWAYS_TRUE;
     }
 
@@ -1048,7 +1049,7 @@ public class HTNode<E extends IHTInterval> implements IHTNode<E> {
      * @throws RangeException
      *             If t is out of the node's range
      */
-    protected Collection<Integer> selectNextChildren(TimeRangeCondition timeCondition, Predicate<Integer> extraPredicate)
+    protected Collection<Integer> selectNextChildren(TimeRangeCondition timeCondition, IntPredicate extraPredicate)
             throws RangeException {
         CoreNodeData extraData = fExtraData;
         if (extraData != null) {

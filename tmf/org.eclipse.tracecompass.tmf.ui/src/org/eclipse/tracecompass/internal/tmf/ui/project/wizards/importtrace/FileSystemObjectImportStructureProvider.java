@@ -104,5 +104,6 @@ public class FileSystemObjectImportStructureProvider implements IImportStructure
      * Disposes of the resources associated with the provider.
      */
     public void dispose() {
+        // Do nothing
     }
 }

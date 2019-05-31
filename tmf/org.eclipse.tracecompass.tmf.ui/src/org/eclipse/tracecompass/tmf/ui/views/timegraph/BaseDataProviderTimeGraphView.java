@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -51,6 +51,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
@@ -150,6 +151,8 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                             if (uiEntry != null) {
                                 uiEntry.updateModel(entry);
                             } else {
+                                // Do not assume that parentless entries are
+                                // trace entries
                                 uiEntry = new TraceEntry(entry, trace, dataProvider);
                                 fEntries.put(dataProvider, entry.getId(), uiEntry);
                                 addToEntryList(parentTrace, Collections.singletonList(uiEntry));
@@ -160,7 +163,11 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                 long start = getStartTime();
                 long end = getEndTime();
                 final long resolution = Long.max(1, (end - start) / getDisplayWidth());
-                zoomEntries(fEntries.values(), start, end, resolution, monitor);
+                @NonNull Iterable<@NonNull TimeGraphEntry> entries;
+                synchronized (fEntries) {
+                    entries = ImmutableList.copyOf(fEntries.values());
+                }
+                zoomEntries(entries, start, end, resolution, monitor);
             }
 
             if (monitor.isCanceled()) {
@@ -184,8 +191,9 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
     }
 
     /**
-     * Class to encapsulate a {@link TimeGraphEntryModel} for the trace level and
-     * the relevant data provider
+     * Class to represent a parent entry, for which we keep a link to the trace
+     * and data provider to avoid having to do so for its children. This type of
+     * entry is otherwise not different from any other time graph entry.
      *
      * @author Loic Prieur-Drevon
      * @since 3.3
@@ -209,11 +217,6 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             super(model);
             fTrace = trace;
             fProvider = provider;
-        }
-
-        @Override
-        public boolean hasTimeEvents() {
-            return false;
         }
 
         /**
@@ -332,7 +335,10 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
     private void zoomEntries(Map<Long, TimeGraphEntry> map, List<ITimeGraphRowModel> model, boolean completed, Sampling sampling) {
         boolean isZoomThread = Thread.currentThread() instanceof ZoomThread;
         for (ITimeGraphRowModel rowModel : model) {
-            TimeGraphEntry entry = map.get(rowModel.getEntryID());
+            TimeGraphEntry entry;
+            synchronized (fEntries) {
+                entry = map.get(rowModel.getEntryID());
+            }
 
             if (entry != null) {
                 List<ITimeEvent> events = createTimeEvents(entry, rowModel.getStates());
@@ -396,10 +402,10 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      * @since 3.3
      */
     protected TimeEvent createTimeEvent(TimeGraphEntry entry, ITimeGraphState state) {
-        if (state.getValue() == Integer.MIN_VALUE) {
+        String label = state.getLabel();
+        if (state.getValue() == Integer.MIN_VALUE && label == null) {
             return new NullTimeEvent(entry, state.getStartTime(), state.getDuration());
         }
-        String label = state.getLabel();
         if (label != null) {
             return new NamedTimeEvent(entry, state.getStartTime(), state.getDuration(), state.getValue(), label, state.getActiveProperties());
         }
@@ -424,8 +430,12 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
 
             if (model != null) {
                 for (ITimeGraphArrow arrow : model) {
-                    ITimeGraphEntry prevEntry = fEntries.get(provider, arrow.getSourceId());
-                    ITimeGraphEntry nextEntry = fEntries.get(provider, arrow.getDestinationId());
+                    ITimeGraphEntry prevEntry;
+                    ITimeGraphEntry nextEntry;
+                    synchronized (fEntries) {
+                        prevEntry = fEntries.get(provider, arrow.getSourceId());
+                        nextEntry = fEntries.get(provider, arrow.getDestinationId());
+                    }
                     if (prevEntry != null && nextEntry != null) {
                         linkList.add(new TimeLinkEvent(prevEntry, nextEntry, arrow.getStartTime(), arrow.getDuration(), arrow.getValue()));
                     }

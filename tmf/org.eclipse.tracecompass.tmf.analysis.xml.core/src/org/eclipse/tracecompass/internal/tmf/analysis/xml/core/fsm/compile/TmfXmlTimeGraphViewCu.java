@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenPresentationState;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphEntry;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenOutputEntry;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphProviderFactory;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
@@ -31,10 +31,10 @@ import org.w3c.dom.Element;
 public class TmfXmlTimeGraphViewCu implements IDataDrivenCompilationUnit {
 
     private final List<DataDrivenPresentationState> fValues;
-    private final List<TmfXmlTimeGraphEntryCu> fEntries;
+    private final List<TmfXmlOutputEntryCu> fEntries;
     private final Set<String> fAnalysisIds;
 
-    private TmfXmlTimeGraphViewCu(List<DataDrivenPresentationState> values, List<TmfXmlTimeGraphEntryCu> entriesCu, Set<String> analysisIds) {
+    private TmfXmlTimeGraphViewCu(List<DataDrivenPresentationState> values, List<TmfXmlOutputEntryCu> entriesCu, Set<String> analysisIds) {
         fValues = values;
         fEntries = entriesCu;
         fAnalysisIds = analysisIds;
@@ -42,8 +42,8 @@ public class TmfXmlTimeGraphViewCu implements IDataDrivenCompilationUnit {
 
     @Override
     public DataDrivenTimeGraphProviderFactory generate() {
-        List<DataDrivenTimeGraphEntry> entries = fEntries.stream()
-                .map(TmfXmlTimeGraphEntryCu::generate)
+        List<DataDrivenOutputEntry> entries = fEntries.stream()
+                .map(TmfXmlOutputEntryCu::generate)
                 .collect(Collectors.toList());
         return new DataDrivenTimeGraphProviderFactory(entries, fAnalysisIds, fValues);
     }
@@ -69,9 +69,9 @@ public class TmfXmlTimeGraphViewCu implements IDataDrivenCompilationUnit {
         Set<@NonNull String> analysisIds = TmfXmlUtils.getViewAnalysisIds(viewElement);
         List<Element> entries = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.ENTRY_ELEMENT);
 
-        List<TmfXmlTimeGraphEntryCu> entriesCu = new ArrayList<>();
+        List<TmfXmlOutputEntryCu> entriesCu = new ArrayList<>();
         for (Element entry : entries) {
-            TmfXmlTimeGraphEntryCu entryCu = TmfXmlTimeGraphEntryCu.compile(compilationData, entry);
+            TmfXmlOutputEntryCu entryCu = TmfXmlOutputEntryCu.compile(compilationData, entry);
             if (entryCu != null) {
                 entriesCu.add(entryCu);
             }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2018 Intel Corporation and others
+ * Copyright (c) 2007, 2019 Intel Corporation and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -3217,15 +3217,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 return;
             }
         }
-        if (fTimeProvider == null ||
-                fTimeProvider.getTime0() == fTimeProvider.getTime1() ||
-                getSize().x - fTimeProvider.getNameSpace() <= 0) {
-            return;
-        }
-        int idx;
         if (1 == e.button && ((e.stateMask & SWT.MODIFIER_MASK) == 0 || (e.stateMask & SWT.MODIFIER_MASK) == SWT.SHIFT)) {
             int nameSpace = fTimeProvider.getNameSpace();
-            idx = getItemIndexAtY(e.y);
+            int idx = getItemIndexAtY(e.y);
             if (idx >= 0) {
                 Item item = fItemData.fExpandedItems[idx];
                 if (item.fHasChildren && e.x < nameSpace && e.x < MARGIN + (item.fLevel + 1) * EXPAND_SIZE) {
@@ -3238,6 +3232,17 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 selectItem(idx, false); // clear selection
                 fireSelectionChanged();
             }
+        } else if (3 == e.button && e.x < fTimeProvider.getNameSpace()) {
+            int idx = getItemIndexAtY(e.y);
+            selectItem(idx, false);
+            fireSelectionChanged();
+        }
+        if (fTimeProvider == null ||
+                fTimeProvider.getTime0() == fTimeProvider.getTime1() ||
+                getSize().x - fTimeProvider.getNameSpace() <= 0) {
+            return;
+        }
+        if (1 == e.button && ((e.stateMask & SWT.MODIFIER_MASK) == 0 || (e.stateMask & SWT.MODIFIER_MASK) == SWT.SHIFT)) {
             long hitTime = getTimeAtX(e.x);
             if (hitTime >= 0) {
                 setCapture(true);
@@ -3294,22 +3299,16 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 fTime1bak = fTimeProvider.getTime1();
                 updateCursor(e.x, e.stateMask);
             }
-        } else if (3 == e.button) {
-            if (e.x >= fTimeProvider.getNameSpace()) {
-                setCapture(true);
-                fDragX = Math.min(Math.max(e.x, fTimeProvider.getNameSpace()), getSize().x - RIGHT_MARGIN);
-                fDragX0 = fDragX;
-                fDragTime0 = getTimeAtX(fDragX0);
-                fDragState = DRAG_ZOOM;
-                fDragButton = e.button;
-                redraw();
-                updateCursor(e.x, e.stateMask);
-                fTimeGraphScale.setDragRange(fDragX0, fDragX);
-            } else {
-                idx = getItemIndexAtY(e.y);
-                selectItem(idx, false);
-                fireSelectionChanged();
-            }
+        } else if (3 == e.button && e.x >= fTimeProvider.getNameSpace()) {
+            setCapture(true);
+            fDragX = Math.min(Math.max(e.x, fTimeProvider.getNameSpace()), getSize().x - RIGHT_MARGIN);
+            fDragX0 = fDragX;
+            fDragTime0 = getTimeAtX(fDragX0);
+            fDragState = DRAG_ZOOM;
+            fDragButton = e.button;
+            redraw();
+            updateCursor(e.x, e.stateMask);
+            fTimeGraphScale.setDragRange(fDragX0, fDragX);
         }
     }
 

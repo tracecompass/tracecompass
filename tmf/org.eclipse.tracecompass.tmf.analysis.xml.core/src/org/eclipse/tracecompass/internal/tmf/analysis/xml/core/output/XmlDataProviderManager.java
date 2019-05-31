@@ -11,18 +11,18 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.AnalysisCompilationData;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlTimeGraphViewCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlXYViewCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlXYDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.timegraph.TmfTimeGraphCompositeDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
-import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
@@ -52,6 +52,8 @@ public class XmlDataProviderManager {
     private static final String ID_ATTRIBUTE = "id"; //$NON-NLS-1$
     private final Table<ITmfTrace, String, ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel>> fXyProviders = HashBasedTable.create();
     private final Table<ITmfTrace, String, ITimeGraphDataProvider<@NonNull TimeGraphEntryModel>> fTimeGraphProviders = HashBasedTable.create();
+    private final Map<String, @Nullable DataDrivenTimeGraphProviderFactory> fTimeGraphFactories = new HashMap<>();
+    private final Map<String, @Nullable DataDrivenXYProviderFactory> fXYFactories = new HashMap<>();
 
     /**
      * Get the instance of the manager
@@ -69,8 +71,6 @@ public class XmlDataProviderManager {
 
     /**
      * Dispose the singleton instance if it exists
-     *
-     * @since 2.5
      */
     public static synchronized void dispose() {
         XmlDataProviderManager manager = INSTANCE;
@@ -90,15 +90,42 @@ public class XmlDataProviderManager {
     }
 
     /**
-     * Create (if necessary) and get the {@link XmlXYDataProvider} for the specified
-     * trace and viewElement.
+     * Create (if necessary) and get the {@link DataDrivenXYProviderFactory} for
+     * the specified trace and viewElement.
+     *
+     * @param viewElement
+     *            the XML XY view element for which we are querying a provider
+     * @return the unique instance of an XY provider for the queried parameters
+     */
+    public synchronized @Nullable DataDrivenXYProviderFactory getXyProviderFactory(Element viewElement) {
+        if (!viewElement.hasAttribute(ID_ATTRIBUTE)) {
+            return null;
+        }
+        String viewId = viewElement.getAttribute(ID_ATTRIBUTE);
+        // Factory is nullable, so make sure the key exist and return the
+        // factory that can be null
+        if (fXYFactories.containsKey(viewId)) {
+            return fXYFactories.get(viewId);
+        }
+        // Create with the trace or experiment first
+        DataDrivenXYProviderFactory factory = null;
+        TmfXmlXYViewCu tgViewCu = TmfXmlXYViewCu.compile(new AnalysisCompilationData(), viewElement);
+        if (tgViewCu != null) {
+            factory = tgViewCu.generate();
+        }
+        fXYFactories.put(viewId, factory);
+        return factory;
+    }
+
+    /**
+     * Create (if necessary) and get the {@link ITmfTreeXYDataProvider} for the
+     * specified trace and viewElement.
      *
      * @param trace
      *            trace for which we are querying a provider
      * @param viewElement
-     *            the XML XY view for which we are querying a provider
+     *            the XML XY view element for which we are querying a provider
      * @return the unique instance of an XY provider for the queried parameters
-     * @since 3.0
      */
     public synchronized @Nullable ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> getXyProvider(ITmfTrace trace, Element viewElement) {
         if (!viewElement.hasAttribute(ID_ATTRIBUTE)) {
@@ -111,28 +138,62 @@ public class XmlDataProviderManager {
         }
         if (Iterables.any(TmfTraceManager.getInstance().getOpenedTraces(),
                 opened -> TmfTraceManager.getTraceSetWithExperiment(opened).contains(trace))) {
-            /* if this trace or an experiment containing this trace is opened */
-            Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
-            if (traces.size() == 1) {
-                Set<@NonNull String> analysisIds = TmfXmlUtils.getViewAnalysisIds(viewElement);
-                Element entry = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.ENTRY_ELEMENT).get(0);
 
-                provider = XmlXYDataProvider.create(trace, analysisIds, entry);
-            } else {
-                provider = generateExperimentProviderXy(traces, viewElement);
+            DataDrivenXYProviderFactory xyFactory = getXyProviderFactory(viewElement);
+            // Create with the trace or experiment first
+            if (xyFactory != null) {
+                return createXYProvider(trace, viewId, xyFactory);
             }
-            if (provider != null) {
-                fXyProviders.put(trace, viewId, provider);
-            }
-            return provider;
+
         }
         return null;
     }
 
-    private @Nullable ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> generateExperimentProviderXy(Collection<@NonNull ITmfTrace> traces, Element viewElement) {
+    /**
+     * Get the XY provider with a certain ID for a trace
+     *
+     * @param trace
+     *            The trace to get the provider for
+     * @param providerId
+     *            The ID of the provider
+     * @return The XY data provider
+     */
+    public synchronized @Nullable ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> getXyProvider(ITmfTrace trace, String providerId) {
+        ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> provider = fXyProviders.get(trace, providerId);
+        if (provider != null) {
+            return provider;
+        }
+        DataDrivenXYProviderFactory factory = fXYFactories.get(providerId);
+        if (factory != null) {
+            return createXYProvider(trace, providerId, factory);
+        }
+        return null;
+    }
+
+    private @Nullable ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> createXYProvider(ITmfTrace trace, String providerId, DataDrivenXYProviderFactory xyFactory) {
+        ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> provider = xyFactory.create(trace);
+
+        if (provider == null) {
+            // Otherwise, see if it's an experiment and create a composite if
+            // that's the case
+            Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
+            if (traces.size() > 1) {
+                // Try creating a composite only if there are many traces,
+                // otherwise, the previous call to create should have returned
+                // the data provider
+                provider = generateExperimentProviderXy(traces, providerId);
+            }
+        }
+        if (provider != null) {
+            fXyProviders.put(trace, providerId, provider);
+        }
+        return provider;
+    }
+
+    private @Nullable ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> generateExperimentProviderXy(Collection<@NonNull ITmfTrace> traces, String providerId) {
         List<@NonNull ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel>> providers = new ArrayList<>();
         for (ITmfTrace child : traces) {
-            ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> childProvider = getXyProvider(child, viewElement);
+            ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> childProvider = getXyProvider(child, providerId);
             if (childProvider != null) {
                 providers.add(childProvider);
             }
@@ -146,15 +207,46 @@ public class XmlDataProviderManager {
     }
 
     /**
-     * Create (if necessary) and get the {@link XmlXYDataProvider} for the specified
-     * trace and viewElement.
+     * Create (if necessary) and get the
+     * {@link DataDrivenTimeGraphProviderFactory} from the viewElement.
+     *
+     * @param viewElement
+     *            the XML time graph view element for which we are querying a
+     *            provider
+     * @return the unique instance of a time graph provider for the queried
+     *         parameters
+     */
+    public synchronized @Nullable DataDrivenTimeGraphProviderFactory getTimeGraphProviderFactory(Element viewElement) {
+        if (!viewElement.hasAttribute(ID_ATTRIBUTE)) {
+            return null;
+        }
+        String viewId = viewElement.getAttribute(ID_ATTRIBUTE);
+        // Factory is nullable, so make sure the key exist and return the
+        // factory that can be null
+        if (fTimeGraphFactories.containsKey(viewId)) {
+            return fTimeGraphFactories.get(viewId);
+        }
+        // Create with the trace or experiment first
+        DataDrivenTimeGraphProviderFactory factory = null;
+        TmfXmlTimeGraphViewCu tgViewCu = TmfXmlTimeGraphViewCu.compile(new AnalysisCompilationData(), viewElement);
+        if (tgViewCu != null) {
+            factory = tgViewCu.generate();
+        }
+        fTimeGraphFactories.put(viewId, factory);
+        return factory;
+    }
+
+    /**
+     * Create (if necessary) and get the time graph data provider for the
+     * specified trace and viewElement.
      *
      * @param trace
      *            trace for which we are querying a provider
      * @param viewElement
-     *            the XML XY view for which we are querying a provider
-     * @return the unique instance of an XY provider for the queried parameters
-     * @since 3.0
+     *            the XML time graph view element for which we are querying a
+     *            provider
+     * @return the unique instance of a time graph provider for the queried
+     *         parameters
      */
     public synchronized @Nullable ITimeGraphDataProvider<@NonNull TimeGraphEntryModel> getTimeGraphProvider(ITmfTrace trace, Element viewElement) {
         if (!viewElement.hasAttribute(ID_ATTRIBUTE)) {
@@ -216,7 +308,6 @@ public class XmlDataProviderManager {
      *
      * @param signal
      *            The incoming signal
-     * @since 2.5
      */
     @TmfSignalHandler
     public synchronized void traceClosed(final TmfTraceClosedSignal signal) {

@@ -74,6 +74,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableMultimap.Builder;
 import com.google.common.collect.Multimap;
 
 /**
@@ -323,20 +324,20 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         // and model can be updated
 
         //FIXME Filtering should be done at the data provider level
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = computeRegexPredicate();
+        Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = generateRegexPredicate();
         Predicate<ISegment> predicate = (segment) -> {
             if (!predicates.isEmpty()) {
 
                 // Get the filter external input data
-                Map<@NonNull String, @NonNull String> input = getFilterInput(segment, provider);
+                Multimap<@NonNull String, @NonNull String> input = ISegmentStoreProvider.getFilterInput(provider, segment);
 
                 // Test each predicates and set the status of the property associated to the
                 // predicate
                 boolean activateProperty = false;
-                for (Map.Entry<Integer, Predicate<Map<String, String>>> mapEntry : predicates.entrySet()) {
+                for (Map.Entry<Integer, Predicate<Multimap<String, String>>> mapEntry : predicates.entrySet()) {
                     Integer property = Objects.requireNonNull(mapEntry.getKey());
-                    Predicate<Map<String, String>> value = Objects.requireNonNull(mapEntry.getValue());
-                    if (property == IFilterProperty.DIMMED | property == IFilterProperty.EXCLUDE) {
+                    Predicate<Multimap<String, String>> value = Objects.requireNonNull(mapEntry.getValue());
+                    if (property == IFilterProperty.DIMMED || property == IFilterProperty.EXCLUDE) {
                         boolean status = value.test(input);
                         activateProperty |= status;
                     }
@@ -368,17 +369,6 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         }
     }
 
-    private static Map<String, String> getFilterInput(ISegment segment, ISegmentStoreProvider provider) {
-        Map<String, String> map = new HashMap<>();
-        for(ISegmentAspect aspect : provider.getSegmentAspects()) {
-            Object resolve = aspect.resolve(segment);
-            if (resolve != null) {
-                map.put(aspect.getName(), String.valueOf(resolve));
-            }
-        }
-        return map;
-    }
-
     /**
      * Compute the predicate for every property regexes
      *
@@ -401,14 +391,11 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         return predicates;
     }
 
-    private static Predicate<@NonNull Map<@NonNull String, @NonNull String>> multiToMapPredicate(@NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>> predicate) {
-        return new Predicate<@NonNull Map<@NonNull String, @NonNull String>> () {
-
-            @Override
-            public boolean test(@NonNull Map<@NonNull String, @NonNull String> arg0) {
-                return predicate.test(ImmutableMultimap.copyOf(arg0.entrySet()));
-            }
-
+    private static Predicate<@NonNull Map<@NonNull String, @NonNull String>> multiToMapPredicate(Predicate<@NonNull Multimap<@NonNull String, @NonNull String>> predicate) {
+        return map -> {
+            Builder<@NonNull String, @NonNull String> builder = ImmutableMultimap.builder();
+            map.forEach((key, value) -> builder.put(key, value));
+            return predicate.test(Objects.requireNonNull(builder.build()));
         };
     }
 

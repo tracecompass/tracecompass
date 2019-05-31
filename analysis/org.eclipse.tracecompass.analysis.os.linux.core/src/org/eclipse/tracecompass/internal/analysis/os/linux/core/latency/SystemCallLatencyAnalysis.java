@@ -26,7 +26,9 @@ import org.eclipse.tracecompass.analysis.os.linux.core.tid.TidAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.AbstractSegmentStoreAnalysisEventBasedModule;
+import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IGroupingSegmentAspect;
 import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.SyscallLookup;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory.SegmentStoreType;
@@ -51,8 +53,14 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
     private static final String RET_FIELD = "ret"; //$NON-NLS-1$
     private static final int VERSION = 2;
 
-    private static final Collection<ISegmentAspect> BASE_ASPECTS =
-            ImmutableList.of(SyscallNameAspect.INSTANCE, SyscallTidAspect.INSTANCE, SyscallRetAspect.INSTANCE);
+    private static final Collection<ISegmentAspect> BASE_ASPECTS = ImmutableList.of(SyscallNameAspect.INSTANCE, SyscallTidAspect.INSTANCE, SyscallRetAspect.INSTANCE, SyscallComponentAspect.INSTANCE, SyscallFileAspect.INSTANCE);
+
+    /**
+     * Constructor
+     */
+    public SystemCallLatencyAnalysis() {
+        // do nothing
+    }
 
     @Override
     public String getId() {
@@ -187,20 +195,25 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
     private static final class SyscallNameAspect implements ISegmentAspect {
         public static final ISegmentAspect INSTANCE = new SyscallNameAspect();
 
-        private SyscallNameAspect() { }
+        private SyscallNameAspect() {
+            // Do nothing
+        }
 
         @Override
         public String getHelpText() {
             return checkNotNull(Messages.SegmentAspectHelpText_SystemCall);
         }
+
         @Override
         public String getName() {
             return checkNotNull(Messages.SegmentAspectName_SystemCall);
         }
+
         @Override
         public @Nullable Comparator<?> getComparator() {
             return null;
         }
+
         @Override
         public @Nullable String resolve(ISegment segment) {
             if (segment instanceof SystemCall) {
@@ -213,20 +226,25 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
     private static final class SyscallTidAspect implements ISegmentAspect {
         public static final ISegmentAspect INSTANCE = new SyscallTidAspect();
 
-        private SyscallTidAspect() { }
+        private SyscallTidAspect() {
+            // Do nothing
+        }
 
         @Override
         public String getHelpText() {
             return checkNotNull(Messages.SegmentAspectHelpText_SystemCallTid);
         }
+
         @Override
         public String getName() {
             return OsStrings.tid();
         }
+
         @Override
         public @Nullable Comparator<?> getComparator() {
             return null;
         }
+
         @Override
         public @Nullable Integer resolve(ISegment segment) {
             if (segment instanceof SystemCall) {
@@ -236,30 +254,98 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
         }
     }
 
+    private static final class SyscallComponentAspect implements IGroupingSegmentAspect {
+        public static final ISegmentAspect INSTANCE = new SyscallComponentAspect();
+
+        private SyscallComponentAspect() {
+            // Do nothing
+        }
+
+        @Override
+        public String getName() {
+            return "Component"; //$NON-NLS-1$
+        }
+
+        @Override
+        public String getHelpText() {
+            return "Code Component that this system call belongs to"; //$NON-NLS-1$
+        }
+
+        @Override
+        public @Nullable Comparator<?> getComparator() {
+            return null;
+        }
+
+        @Override
+        public @Nullable Object resolve(ISegment segment) {
+            if (segment instanceof SystemCall) {
+                return SyscallLookup.getInstance().getComponent(((SystemCall) segment).getName());
+            }
+            return EMPTY_STRING;
+        }
+    }
+
     private static final class SyscallRetAspect implements ISegmentAspect {
         public static final ISegmentAspect INSTANCE = new SyscallRetAspect();
 
-        private SyscallRetAspect() { }
+        private SyscallRetAspect() {
+            // Do nothing
+        }
 
         @Override
         public String getHelpText() {
             return checkNotNull(Messages.SegmentAspectHelpText_SystemCallRet);
         }
+
         @Override
         public String getName() {
             return checkNotNull(Messages.SegmentAspectName_SystemCallRet);
         }
+
+        @Override
+        public @Nullable Object resolve(ISegment segment) {
+            if (segment instanceof SystemCall) {
+                return ((SystemCall) segment).getReturnValue();
+            }
+            return EMPTY_STRING;
+        }
+
         @Override
         public @Nullable Comparator<?> getComparator() {
             return null;
         }
-        @Override
-        public @Nullable Integer resolve(ISegment segment) {
-            if (segment instanceof SystemCall) {
-                return ((SystemCall) segment).getReturnValue();
-            }
-            return -1;
-        }
+
     }
 
+    private static final class SyscallFileAspect implements ISegmentAspect {
+        public static final ISegmentAspect INSTANCE = new SyscallFileAspect();
+
+        private SyscallFileAspect() {
+            // Do nothing
+        }
+
+        @Override
+        public String getName() {
+            return "File"; //$NON-NLS-1$
+        }
+
+        @Override
+        public String getHelpText() {
+            return "File that implements the system call"; //$NON-NLS-1$
+        }
+
+        @Override
+        public @Nullable Comparator<?> getComparator() {
+            return null;
+        }
+
+        @Override
+        public @Nullable Object resolve(ISegment segment) {
+            if (segment instanceof SystemCall) {
+                return SyscallLookup.getInstance().getFile(((SystemCall) segment).getName());
+            }
+            return EMPTY_STRING;
+        }
+
+    }
 }

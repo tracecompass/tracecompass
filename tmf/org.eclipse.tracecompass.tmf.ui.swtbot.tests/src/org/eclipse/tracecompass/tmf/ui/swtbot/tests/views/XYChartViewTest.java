@@ -11,9 +11,6 @@ package org.eclipse.tracecompass.tmf.ui.swtbot.tests.views;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-import java.lang.reflect.Method;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
@@ -44,7 +41,6 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotSwtChart;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
-import org.eclipse.ui.IViewPart;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -128,8 +124,8 @@ public class XYChartViewTest {
         fViewBot = fBot.viewById(XYChartViewStub.ID);
         fViewBot.show();
 
-        IViewPart viewSite = fViewBot.getViewReference().getView(true);
-        fXyViewer = getChartViewer(viewSite);
+        TmfChartView viewPart = (TmfChartView) fViewBot.getViewReference().getView(true);
+        fXyViewer = viewPart.getChartViewer();
 
         // Wait till SWT chart is constructed
         fViewBot.bot().waitUntil(new DefaultCondition() {
@@ -268,17 +264,6 @@ public class XYChartViewTest {
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
-    private static TmfXYChartViewer getChartViewer(IViewPart viewSite) {
-        try {
-            TmfChartView chartView = (TmfChartView) viewSite;
-            Method viewer = TmfChartView.class.getDeclaredMethod("getChartViewer");
-            viewer.setAccessible(true);
-            return (TmfXYChartViewer) viewer.invoke(chartView);
-        } catch (Exception e) {
-            fail("Reflection exception " + e);
-        }
-        return null;
-    }
 
     private static void fireKeyInGraph(SWTBotSwtChart chart, char c, int... modifiers) {
         chart.setFocus();

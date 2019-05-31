@@ -886,10 +886,21 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
         // Setup the columns
         for (ITmfEventAspect<?> aspect : aspects) {
             if (aspect != null) {
-                fColumns.add(new TmfEventTableColumn(aspect));
-
+                String aspectName = aspect.getName();
+                Boolean unique = true;
+                for (TmfEventTableColumn column : fColumns) {
+                    if (column.getHeaderName().equals(aspectName)) {
+                        unique = false;
+                        column.addDuplicate(aspect);
+                        break;
+                    }
+                }
+                if (unique) {
+                    fColumns.add(new TmfEventTableColumn(aspect));
+                }
             }
         }
+
 
         TmfMarginColumn collapseCol = new TmfMarginColumn();
         fColumns.add(MARGIN_COLUMN_INDEX, collapseCol);
@@ -2686,7 +2697,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      */
     private void createResources() {
         ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
-        Color c = colorRegistry.get("org.eclipse.tracecompass.tmf.ui.FOREGROUND");
+        Color c = colorRegistry.get("org.eclipse.tracecompass.tmf.ui.FOREGROUND"); //$NON-NLS-1$
         if (c != null) {
             fGrayColor = c;
         } else {

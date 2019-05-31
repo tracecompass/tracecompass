@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.StateValues;
@@ -667,7 +668,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
             ITmfStateInterval interval = ss.querySingleState(start, currentCpuRqQuark);
             Object value = interval.getValue();
             if (value instanceof Integer) {
-                return new TmfModelResponse<>(ImmutableMap.of(Messages.ThreadStatusDataProvider_attributeCpuName, String.valueOf(value)), status, statusMessage);
+                return new TmfModelResponse<>(ImmutableMap.of(OsStrings.cpu(), String.valueOf(value)), status, statusMessage);
             }
         } catch (StateSystemDisposedException e) {
             /* Ignored */
@@ -717,8 +718,17 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
 
     @Override
     public @NonNull Multimap<@NonNull String, @NonNull String> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
-        return ITimeGraphStateFilter.mergeMultimaps(ITimeGraphDataProvider.super.getFilterData(entryId, time, monitor),
+        Multimap<@NonNull String, @NonNull String> data = ITimeGraphStateFilter.mergeMultimaps(ITimeGraphDataProvider.super.getFilterData(entryId, time, monitor),
                 fEntryMetadata.getOrDefault(entryId, ImmutableMultimap.of()));
+        SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(Collections.singletonList(time), Collections.singleton(Objects.requireNonNull(entryId)));
+        TmfModelResponse<Map<String, String>> response = fetchTooltip(filter, monitor);
+        Map<@NonNull String, @NonNull String> model = response.getModel();
+        if (model != null) {
+            for (Entry<String, String> entry : model.entrySet()) {
+                data.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return data;
     }
 
 }

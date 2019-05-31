@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 Ericsson
+ * Copyright (c) 2009, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -57,7 +57,6 @@ import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSignalThrottler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceRangeUpdatedSignal;
@@ -72,6 +71,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
+import org.eclipse.tracecompass.tmf.ui.signal.TmfUiSignalThrottler;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 import org.eclipse.ui.IActionBars;
@@ -151,8 +151,8 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
     private Image[] fLegendImages;
 
     // Throttlers for the time sync and time-range sync signals
-    private final TmfSignalThrottler fTimeSyncThrottle;
-    private final TmfSignalThrottler fTimeRangeSyncThrottle;
+    private final TmfUiSignalThrottler fTimeSyncThrottle;
+    private final TmfUiSignalThrottler fTimeRangeSyncThrottle;
 
     // Action for toggle showing the lost events
     private Action hideLostEventsAction;
@@ -168,8 +168,8 @@ public class HistogramView extends TmfView implements ITmfTimeAligned {
      */
     public HistogramView() {
         super(ID);
-        fTimeSyncThrottle = new TmfSignalThrottler(this, 200);
-        fTimeRangeSyncThrottle = new TmfSignalThrottler(this, 200);
+        fTimeSyncThrottle = new TmfUiSignalThrottler(this, 200);
+        fTimeRangeSyncThrottle = new TmfUiSignalThrottler(this, 200);
     }
 
     @Override

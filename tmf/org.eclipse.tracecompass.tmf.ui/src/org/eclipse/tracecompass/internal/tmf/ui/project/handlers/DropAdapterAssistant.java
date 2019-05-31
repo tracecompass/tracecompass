@@ -77,6 +77,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
      * Default constructor
      */
     public DropAdapterAssistant() {
+        // Do nothing
     }
 
     @Override

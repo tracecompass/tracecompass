@@ -161,6 +161,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
      * Constructor
      */
     public RemoteProfilesPreferencePage() {
+        // Do nothing
     }
 
     @Override

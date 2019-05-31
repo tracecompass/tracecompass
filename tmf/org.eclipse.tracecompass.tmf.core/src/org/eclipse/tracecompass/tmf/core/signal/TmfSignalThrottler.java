@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -22,16 +22,18 @@ import org.eclipse.tracecompass.tmf.core.component.ITmfComponent;
 /**
  * "Buffer" between a TmfComponent and the signal manager. You can use this if
  * you want to throttle the amount of signals your component will send.
- *
+ * <p>
  * It works by specifying a delay, then calling {@link #queue}. The signals will
  * only be really sent if no other call to {@link #queue} happens within $delay
  * milliseconds afterwards. This guarantees that only the *last* signal is
  * actually broadcasted.
- *
+ * <p>
  * Note that this class does not discriminate for signal types, sources, or
  * whatever. If you want to throttle different signals in different ways, you
  * can use multiple signal throttlers in your component and call them
  * accordingly.
+ * <p>
+ * This throttler will broadcast the signal from a TimerThread.
  *
  * @author Alexandre Montplaisir
  */
@@ -67,6 +69,7 @@ public class TmfSignalThrottler {
         fCurrentTask = new TimerTask() {
             @Override
             public void run() {
+                // Do nothing
             }
         };
     }
@@ -107,12 +110,22 @@ public class TmfSignalThrottler {
 
         @Override
         public void run() {
-            if (fComponent != null) {
-                fComponent.broadcast(signal);
-            } else {
-                TmfSignalManager.dispatchSignal(signal);
-            }
+            dispatchSignal(signal);
         }
     }
 
+    /**
+     * Dispatch the signal
+     *
+     * @param signal
+     *            the signal
+     * @since 5.0
+     */
+    protected void dispatchSignal(TmfSignal signal) {
+        if (fComponent != null) {
+            fComponent.broadcast(signal);
+        } else {
+            TmfSignalManager.dispatchSignal(signal);
+        }
+    }
 }

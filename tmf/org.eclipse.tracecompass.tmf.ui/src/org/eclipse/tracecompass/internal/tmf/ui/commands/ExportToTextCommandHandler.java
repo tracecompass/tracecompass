@@ -47,6 +47,7 @@ public class ExportToTextCommandHandler extends AbstractHandler {
      * Constructor
      */
     public ExportToTextCommandHandler() {
+        // Do nothing
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2018 Ericsson and others
+ * Copyright (c) 2013, 2019 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -666,19 +668,19 @@ public final class TmfTraceManager {
     }
 
     /**
-     * Get a temporary directory based on a trace's name. We will create the
+     * Get a temporary directory based on a trace's path. We will create the
      * directory if it doesn't exist, so that it's ready to be used.
      */
     private static String getTemporaryDir(ITmfTrace trace) {
-        String pathName = getTemporaryDirPath() +
-                File.separator +
-                trace.getName() +
-                File.separator;
+        String pathName = new Path(getTemporaryDirPath())
+                .append(trace.getPath() != null ? trace.getPath() : trace.getName())
+                .addTrailingSeparator()
+                .toOSString();
         File dir = new File(pathName);
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        return pathName;
+        return Objects.requireNonNull(pathName);
     }
 
     /*

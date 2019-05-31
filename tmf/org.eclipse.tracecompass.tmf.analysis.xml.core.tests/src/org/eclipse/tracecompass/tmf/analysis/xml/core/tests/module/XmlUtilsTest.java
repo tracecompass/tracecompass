@@ -376,12 +376,12 @@ public class XmlUtilsTest {
 
         // Test the content of the pattern segment
         assertEquals("content size", expected.getContent().size(), actual.getContent().size());
-        Iterator<Map.Entry<String, @NonNull ITmfStateValue>> it2 = expected.getContent().entrySet().iterator();
+        Iterator<Map.Entry<String, @NonNull Object>> it2 = expected.getContent().entrySet().iterator();
         for (int i = 0; i < expected.getContent().size(); i++) {
-            Map.Entry<String, @NonNull ITmfStateValue> expectedContent = it2.next();
-            ITmfStateValue actualValue = actual.getContent().get(expectedContent.getKey());
+            Map.Entry<String, @NonNull Object> expectedContent = it2.next();
+            Object actualValue = actual.getContent().get(expectedContent.getKey());
             assertNotNull("Content " + expectedContent.getKey() + " exists", actualValue);
-            assertEquals("Content value comparison " + i, 0, expectedContent.getValue().compareTo(actualValue));
+            assertEquals("Content value comparison " + i, expectedContent, actualValue);
         }
     }
 

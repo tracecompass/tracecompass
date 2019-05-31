@@ -10,7 +10,7 @@
  * Contributors: Simon Marchi - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.ctf.core.trace;
+package org.eclipse.tracecompass.internal.ctf.core.utils;
 
 import java.util.UUID;
 

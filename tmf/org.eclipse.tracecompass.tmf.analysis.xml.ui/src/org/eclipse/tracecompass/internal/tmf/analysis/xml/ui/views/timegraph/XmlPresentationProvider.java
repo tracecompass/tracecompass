@@ -26,7 +26,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphEntryModel;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenOutputEntryModel;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
@@ -96,7 +96,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
             int value = tcEvent.getValue();
 
             ITimeGraphEntryModel model = entry.getModel();
-            if (model instanceof DataDrivenTimeGraphEntryModel) {
+            if (model instanceof DataDrivenOutputEntryModel) {
                 // Draw state only if state is already known
                 Integer index = stateIndex.get(value);
                 if (index != null) {
@@ -117,7 +117,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
         if (event instanceof TimeEvent && ((TimeEvent) event).hasValue()) {
             TimeEvent tcEvent = (TimeEvent) event;
 
-            DataDrivenTimeGraphEntryModel model = (DataDrivenTimeGraphEntryModel) ((TimeGraphEntry) event.getEntry()).getModel();
+            DataDrivenOutputEntryModel model = (DataDrivenOutputEntryModel) ((TimeGraphEntry) event.getEntry()).getModel();
             int value = tcEvent.getValue();
 
             if (model.getDisplayQuark() >= 0) {
@@ -156,7 +156,7 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
     @Override
     public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
         // Is there text to show
-        DataDrivenTimeGraphEntryModel entry = (DataDrivenTimeGraphEntryModel) ((TimeGraphEntry) event.getEntry()).getModel();
+        DataDrivenOutputEntryModel entry = (DataDrivenOutputEntryModel) ((TimeGraphEntry) event.getEntry()).getModel();
         if (!entry.showText()) {
             return;
         }

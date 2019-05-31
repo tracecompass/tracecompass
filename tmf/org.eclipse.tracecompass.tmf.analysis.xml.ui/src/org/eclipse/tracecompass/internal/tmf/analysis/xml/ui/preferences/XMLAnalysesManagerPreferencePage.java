@@ -185,6 +185,7 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
         fAnalysesTable.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
             }
 
             @Override

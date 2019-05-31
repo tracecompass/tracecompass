@@ -206,4 +206,10 @@ public class ThreadEntryModel extends TimeGraphEntryModel implements IElementRes
         return fAspects;
     }
 
+    @Override
+    public boolean hasRowModel() {
+        // parent level entries do not have row models
+        return getParentId() != -1L;
+    }
+
 }

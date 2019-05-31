@@ -28,6 +28,10 @@ import java.util.Objects;
  */
 public final class OsStrings {
 
+    private OsStrings()  {
+        // Do nothing
+    }
+
     /**
      * Get the string for the thread ID
      *

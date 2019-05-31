@@ -114,7 +114,8 @@ public class SequenceDeclaration extends CompoundDeclaration {
         }
 
         long length = lengthDefinition.getValue();
-        if ((length > Integer.MAX_VALUE) || (!input.canRead((int) length * fElemType.getMaximumSize()))) {
+        long maxBits = length * fElemType.getMaximumSize();
+        if ((length > Integer.MAX_VALUE) || (maxBits > Integer.MAX_VALUE) || (!input.canRead((int) maxBits))) {
             throw new CTFException("Sequence length too long " + length); //$NON-NLS-1$
         }
 

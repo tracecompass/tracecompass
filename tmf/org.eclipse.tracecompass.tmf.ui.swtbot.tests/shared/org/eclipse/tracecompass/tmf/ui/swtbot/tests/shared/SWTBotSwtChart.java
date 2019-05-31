@@ -9,11 +9,16 @@
 
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
 import org.swtchart.Chart;
+import org.swtchart.ISeries;
 
 /**
  * SWTBot class representing a SwtChart
@@ -48,5 +53,34 @@ public class SWTBotSwtChart extends AbstractSWTBotControl<Chart> {
     @Override
     public AbstractSWTBotControl<Chart> moveMouseToWidget() {
         return super.moveMouseToWidget();
+    }
+
+    /**
+     * Returns the list of series
+     *
+     * @return the list of series
+     */
+    public List<SWTBotSwtChartSeries> getSeries() {
+        List<SWTBotSwtChartSeries> list = new ArrayList<>();
+        for (ISeries series : widget.getSeriesSet().getSeries()) {
+            list.add(new SWTBotSwtChartSeries(widget, series));
+        }
+        return list;
+    }
+
+    /**
+     * Returns the series with the specified id
+     *
+     * @param id
+     *            the id
+     * @return the series
+     */
+    public SWTBotSwtChartSeries getSeries(String id) {
+        AtomicReference<ISeries> series = new AtomicReference<>();
+        SWTBotUtils.waitUntil(chart -> {
+            series.set(widget.getSeriesSet().getSeries(id));
+            return series.get() != null;
+        }, widget, () -> "Timed out waiting for series " + id);
+        return new SWTBotSwtChartSeries(widget, series.get());
     }
 }

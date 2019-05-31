@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 Ericsson, École Polytechnique de Montréal, and others
+ * Copyright (c) 2010, 2019 Ericsson, École Polytechnique de Montréal, and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -51,7 +51,7 @@ public interface IHistoryTree {
         HTNode createCoreNode(HTConfig config, int seqNumber, int parentSeqNumber, long start) throws IOException;
 
         /**
-         * Creates a new core node for the specific history tree
+         * Creates a new leaf node for the specific history tree
          *
          * @param config
          *            Configuration of the History Tree
@@ -62,7 +62,7 @@ public interface IHistoryTree {
          *            The sequence number of this node's parent node
          * @param start
          *            The earliest timestamp stored in this node
-         * @return The new core node
+         * @return The new leaf node
          * @throws IOException
          *             any exception occurring while trying to read/create the
          *             node

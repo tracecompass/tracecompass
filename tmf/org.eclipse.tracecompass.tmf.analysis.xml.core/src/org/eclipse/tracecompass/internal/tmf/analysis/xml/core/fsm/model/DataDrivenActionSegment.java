@@ -23,7 +23,6 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.patter
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 
 /**
@@ -75,10 +74,19 @@ public class DataDrivenActionSegment implements DataDrivenAction {
 
         Object segmentName = fType.getValue(event, ITmfStateSystem.ROOT_ATTRIBUTE, scenarioInfo, container);
 
-        Map<String, ITmfStateValue> fields = new HashMap<>();
+        Map<String, Object> fields = new HashMap<>();
         for (Entry<String, DataDrivenValue> field : fFields.entrySet()) {
             Object value = field.getValue().getValue(event, ITmfStateSystem.ROOT_ATTRIBUTE, scenarioInfo, container);
-            fields.put(field.getKey(), value instanceof ITmfStateValue ? (ITmfStateValue) value : TmfStateValue.newValue(value));
+            // Segment content does not support null values
+            if (value != null) {
+                if (value instanceof ITmfStateValue) {
+                    if (!((ITmfStateValue) value).isNull()) {
+                        fields.put(field.getKey(), Objects.requireNonNull(((ITmfStateValue) value).unboxValue()));
+                    }
+                } else {
+                    fields.put(field.getKey(), value);
+                }
+            }
         }
 
         // Set the start time

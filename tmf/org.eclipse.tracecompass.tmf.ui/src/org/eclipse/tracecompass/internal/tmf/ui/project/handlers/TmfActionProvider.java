@@ -43,6 +43,7 @@ public class TmfActionProvider extends CommonActionProvider {
      * Default constructor
      */
     public TmfActionProvider() {
+        // Do nothing
     }
 
     @Override

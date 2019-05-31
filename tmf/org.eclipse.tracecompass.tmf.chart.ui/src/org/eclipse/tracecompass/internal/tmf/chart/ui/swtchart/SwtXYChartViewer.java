@@ -906,6 +906,7 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
     private class ResizeEvent implements ControlListener {
         @Override
         public void controlMoved(@Nullable ControlEvent e) {
+            // Do nothing
         }
 
         @Override
@@ -932,6 +933,7 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
 
         @Override
         public void widgetDefaultSelected(@Nullable SelectionEvent e) {
+            // Do nothing
         }
     }
 

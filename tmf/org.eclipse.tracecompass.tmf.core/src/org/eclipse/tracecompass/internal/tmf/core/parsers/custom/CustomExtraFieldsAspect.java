@@ -31,6 +31,7 @@ public class CustomExtraFieldsAspect implements ITmfEventAspect<String> {
      * Constructor
      */
     public CustomExtraFieldsAspect() {
+        // Do nothing
     }
 
     @Override

@@ -75,8 +75,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
 
     private static final String TITLE = Objects.requireNonNull(Messages.XmlDataProvider_DefaultXYTitle);
     /**
-     * Extension point ID
-     * @since 2.4
+     * Data provider ID
      */
     public static final String ID = "org.eclipse.tracecompass.tmf.analysis.xml.core.module.XmlXYDataProvider"; //$NON-NLS-1$
     private static final String SPLIT_STRING = "/"; //$NON-NLS-1$

@@ -548,10 +548,12 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
         @Override
         public void dispose() {
+            // Do nothing
         }
 
         @Override
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+            // Do nothing
         }
 
         @Override
@@ -762,10 +764,12 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             db.setErrorHandler(new ErrorHandler() {
                 @Override
                 public void error(SAXParseException saxparseexception) throws SAXException {
+                    // Do nothing
                 }
 
                 @Override
                 public void warning(SAXParseException saxparseexception) throws SAXException {
+                    // Do nothing
                 }
 
                 @Override
@@ -941,6 +945,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 logEntryButton.addSelectionListener(new SelectionListener() {
                     @Override
                     public void widgetDefaultSelected(SelectionEvent e) {
+                        // Do nothing
                     }
 
                     @Override
@@ -974,6 +979,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
                 tagCombo.addSelectionListener(new SelectionListener() {
                     @Override
                     public void widgetDefaultSelected(SelectionEvent e) {
+                        // Do nothing
                     }
 
                     @Override
@@ -1401,6 +1407,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
             tagCombo.addSelectionListener(new SelectionListener() {
                 @Override
                 public void widgetDefaultSelected(SelectionEvent e) {
+                    // Do nothing
                 }
 
                 @Override

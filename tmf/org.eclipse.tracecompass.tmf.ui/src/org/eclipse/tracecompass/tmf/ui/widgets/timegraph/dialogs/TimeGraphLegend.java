@@ -271,6 +271,10 @@ public class TimeGraphLegend extends TitleAreaDialog {
      * @since 3.3
      */
     protected class LegendEntry extends Composite {
+        /**
+         * ID to identify a control as part of a given entry
+         */
+        private static final String LEGEND_ENTRY_KEY = "legend.entry.key"; //$NON-NLS-1$
         private final Swatch fBar;
         private final Scale fScale;
         private final Button fReset;
@@ -292,6 +296,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
             String name = si.getStateString();
             setLayout(GridLayoutFactory.swtDefaults().numColumns(4).create());
             fBar = new Swatch(this, si.getStateColor());
+            fBar.setData(LEGEND_ENTRY_KEY, name);
             fBar.setToolTipText(Messages.TimeGraphLegend_swatchClick);
             fBar.addMouseListener(new MouseAdapter() {
 
@@ -347,6 +352,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
                     return text;
                 }
             };
+            label.setData(LEGEND_ENTRY_KEY, name);
             label.setText(name);
             label.setLayoutData(GridDataFactory.fillDefaults().hint(160, SWT.DEFAULT).align(SWT.FILL, SWT.CENTER).grab(true, false).create());
             fScale = new Scale(this, SWT.NONE);
@@ -354,6 +360,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
             fScale.setMinimum(1);
             fScale.setSelection((int) (100 * si.getStateHeightFactor()));
             fScale.setToolTipText(Messages.TimeGraphLegend_widthTooltip);
+            fScale.setData(LEGEND_ENTRY_KEY, name);
             fScale.addSelectionListener(new SelectionListener() {
 
                 @Override
@@ -372,6 +379,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
             });
             fScale.setLayoutData(GridDataFactory.swtDefaults().hint(120, SWT.DEFAULT).create());
             fReset = new Button(this, SWT.FLAT);
+            fReset.setData(LEGEND_ENTRY_KEY, name);
             fReset.addSelectionListener(new SelectionListener() {
 
                 @Override

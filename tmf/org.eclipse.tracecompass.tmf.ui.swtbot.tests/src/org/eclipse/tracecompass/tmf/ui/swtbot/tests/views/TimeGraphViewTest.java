@@ -141,6 +141,19 @@ public class TimeGraphViewTest {
     private static final String RESET_LOC = "reset";
 
     private static final TmfTimeRange INITIAL_WINDOW_RANGE = new TmfTimeRange(TmfTimestamp.fromNanos(20), TmfTimestamp.fromNanos(100));
+    /**
+     * Legend id key
+     */
+    private static final String LEGEND_ENTRY_KEY = "legend.entry.key";
+
+    /**
+     * Hair entry id
+     */
+    private static final String HAIR_ID = "HAIR";
+    /**
+     * Laser entry id
+     */
+    private static final String QUOTE_LASER_UNQUOTE = "\"LASER\"";
 
     private SWTBotView fViewBot;
 
@@ -339,10 +352,10 @@ public class TimeGraphViewTest {
         SWTBotShell legendShell = fBot.shell(LEGEND_NAME);
         legendShell.activate();
         SWTBot legendBot = legendShell.bot();
-        assertFalse(legendBot.button(5).isEnabled());
-        int defaultValue = legendBot.scale(5).getValue();
-        legendBot.scale(5).setValue(100);
-        assertTrue(legendBot.button(5).isEnabled());
+        assertFalse(legendBot.buttonWithId(LEGEND_ENTRY_KEY, (Object) QUOTE_LASER_UNQUOTE).isEnabled());
+        int defaultValue = legendBot.scaleWithId(LEGEND_ENTRY_KEY, QUOTE_LASER_UNQUOTE).getValue();
+        legendBot.scaleWithId(LEGEND_ENTRY_KEY, QUOTE_LASER_UNQUOTE).setValue(100);
+        assertTrue(legendBot.buttonWithId(LEGEND_ENTRY_KEY, (Object) QUOTE_LASER_UNQUOTE).isEnabled());
         legendShell.bot().button(OK_BUTTON).click();
         fBot.waitUntil(Conditions.shellCloses(legendShell));
         resetTimeRange();
@@ -359,10 +372,10 @@ public class TimeGraphViewTest {
         fViewBot.toolbarButton(SHOW_LEGEND).click();
         legendShell = fBot.shell(LEGEND_NAME);
         legendBot = legendShell.bot();
-        assertTrue(legendBot.button(5).isEnabled());
-        legendBot.button(5).click();
-        assertEquals(defaultValue, legendBot.scale(5).getValue());
-        assertFalse(legendBot.button(5).isEnabled());
+        assertTrue(legendBot.buttonWithId(LEGEND_ENTRY_KEY, (Object) QUOTE_LASER_UNQUOTE).isEnabled());
+        legendBot.buttonWithId(LEGEND_ENTRY_KEY, (Object) QUOTE_LASER_UNQUOTE).click();
+        assertEquals(defaultValue, legendBot.scaleWithId(LEGEND_ENTRY_KEY, QUOTE_LASER_UNQUOTE).getValue());
+        assertFalse(legendBot.buttonWithId(LEGEND_ENTRY_KEY, (Object) QUOTE_LASER_UNQUOTE).isEnabled());
         legendBot.button(OK_BUTTON).click();
         fBot.waitUntil(Conditions.shellCloses(legendShell));
         resetTimeRange();
@@ -425,10 +438,10 @@ public class TimeGraphViewTest {
         SWTBotShell legendShell = fBot.shell(LEGEND_NAME);
         legendShell.activate();
         SWTBot legendBot = legendShell.bot();
-        assertFalse(legendBot.button(2).isEnabled());
-        int defaultValue = legendBot.scale(2).getValue();
-        legendBot.scale(2).setValue(25);
-        assertTrue(legendBot.button(2).isEnabled());
+        assertFalse(legendBot.buttonWithId(LEGEND_ENTRY_KEY, (Object) HAIR_ID).isEnabled());
+        int defaultValue = legendBot.scaleWithId(LEGEND_ENTRY_KEY, HAIR_ID).getValue();
+        legendBot.scaleWithId(LEGEND_ENTRY_KEY, HAIR_ID).setValue(25);
+        assertTrue(legendBot.buttonWithId(LEGEND_ENTRY_KEY, (Object) HAIR_ID).isEnabled());
         legendShell.bot().button(OK_BUTTON).click();
         fBot.waitUntil(Conditions.shellCloses(legendShell));
         resetTimeRange();
@@ -445,10 +458,10 @@ public class TimeGraphViewTest {
         fViewBot.toolbarButton(SHOW_LEGEND).click();
         legendShell = fBot.shell(LEGEND_NAME);
         legendBot = legendShell.bot();
-        assertTrue(legendBot.button(2).isEnabled());
-        legendBot.button(2).click();
-        assertEquals(defaultValue, legendBot.scale(2).getValue());
-        assertFalse(legendBot.button(2).isEnabled());
+        assertTrue(legendBot.buttonWithId(LEGEND_ENTRY_KEY, (Object) HAIR_ID).isEnabled());
+        legendBot.buttonWithId(LEGEND_ENTRY_KEY, (Object) HAIR_ID).click();
+        assertEquals(defaultValue, legendBot.scaleWithId(LEGEND_ENTRY_KEY, HAIR_ID).getValue());
+        assertFalse(legendBot.buttonWithId(LEGEND_ENTRY_KEY, (Object) HAIR_ID).isEnabled());
         legendBot.button(OK_BUTTON).click();
         fBot.waitUntil(Conditions.shellCloses(legendShell));
         resetTimeRange();
@@ -498,7 +511,7 @@ public class TimeGraphViewTest {
         SWTBotShell legendShell = fBot.shell(LEGEND_NAME);
         legendShell.activate();
         SWTBot legendBot = legendShell.bot();
-        legendBot.scale(2).setValue(50);
+        legendBot.scaleWithId(LEGEND_ENTRY_KEY, HAIR_ID).setValue(50);
         legendShell.bot().button(OK_BUTTON).click();
         fBot.waitUntil(Conditions.shellCloses(legendShell));
         resetTimeRange();
@@ -519,7 +532,7 @@ public class TimeGraphViewTest {
         fViewBot.toolbarButton(SHOW_LEGEND).click();
         legendShell = fBot.shell(LEGEND_NAME);
         legendBot = legendShell.bot();
-        legendBot.button(2).click();
+        legendBot.buttonWithId(LEGEND_ENTRY_KEY, (Object) HAIR_ID).click();
         legendBot.button(OK_BUTTON).click();
         fBot.waitUntil(Conditions.shellCloses(legendShell));
         resetTimeRange();
@@ -585,6 +598,7 @@ public class TimeGraphViewTest {
     @Test
     public void testVerticalZoom() {
         resetTimeRange();
+
         int threshold = 10;
         SWTBotTimeGraph timegraph = fTimeGraph;
         Rectangle bounds = fBounds;
@@ -597,6 +611,8 @@ public class TimeGraphViewTest {
         ImageHelper bigSmall = ImageHelper.grabImage(bounds);
 
         ImageHelper diff = ref.diff(bigSmall);
+        // 3% of the image
+        threshold = (int) (diff.getHistogram().size() * 0.03);
         List<RGB> colors = filter(diff.getHistogram(), threshold);
         assertEquals(colors.toString(), 1, colors.size());
 
@@ -728,7 +744,7 @@ public class TimeGraphViewTest {
         assertEquals(16, getVisibleItems(timegraph));
 
         timegraph.getEntry(pg, "Hat1").select();
-        fireKey(timegraph,  true, SWT.CR);
+        fireKey(timegraph, true, SWT.CR);
         assertEquals(1, timegraph.selection().columnCount());
         assertEquals("[Hat1]", timegraph.selection().get(0).toString());
         assertEquals(16, getVisibleItems(timegraph));

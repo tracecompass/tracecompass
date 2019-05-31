@@ -325,10 +325,12 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
             db.setErrorHandler(new ErrorHandler() {
                 @Override
                 public void error(final SAXParseException saxparseexception) throws SAXException {
+                    // Do nothing
                 }
 
                 @Override
                 public void warning(final SAXParseException saxparseexception) throws SAXException {
+                    // Do nothing
                 }
 
                 @Override

@@ -28,10 +28,12 @@ public class TracePackageLabelProvider extends ColumnLabelProvider {
 
     @Override
     public void addListener(ILabelProviderListener listener) {
+        // Do nothing
     }
 
     @Override
     public void dispose() {
+        // Do nothing
     }
 
     @Override
@@ -41,6 +43,7 @@ public class TracePackageLabelProvider extends ColumnLabelProvider {
 
     @Override
     public void removeListener(ILabelProviderListener listener) {
+        // Do nothing
     }
 
     @Override

@@ -36,8 +36,20 @@ public class DataDrivenStateSystemPath implements IDataDrivenRuntimeObject {
      * @param attributes
      *            The list of state values whose resolved value will be the
      *            attributes in the state system
+     *                 */
+    public DataDrivenStateSystemPath(List<DataDrivenValue> attributes) {
+        this(attributes, IBaseQuarkProvider.IDENTITY_BASE_QUARK);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param attributes
+     *            The list of state values whose resolved value will be the
+     *            attributes in the state system
      * @param quarkProvider
      *            The provider for the base quark
+     *
      */
     public DataDrivenStateSystemPath(List<DataDrivenValue> attributes, IBaseQuarkProvider quarkProvider) {
         fAttributes = attributes;

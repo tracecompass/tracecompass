@@ -116,7 +116,7 @@ public final class TmfTraceTypeUIUtils {
 
                 @Override
                 public void widgetDefaultSelected(SelectionEvent e) {
-
+                    // Do nothing
                 }
             });
         }

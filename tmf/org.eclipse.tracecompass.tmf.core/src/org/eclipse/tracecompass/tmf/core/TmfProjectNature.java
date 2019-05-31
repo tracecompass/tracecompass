@@ -45,10 +45,12 @@ public class TmfProjectNature implements IProjectNature {
 
     @Override
     public void configure() throws CoreException {
+        // Do nothing
     }
 
     @Override
     public void deconfigure() throws CoreException {
+        // Do nothing
     }
 
     @Override

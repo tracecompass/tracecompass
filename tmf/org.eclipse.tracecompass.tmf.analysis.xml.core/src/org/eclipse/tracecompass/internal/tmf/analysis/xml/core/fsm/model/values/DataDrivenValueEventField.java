@@ -61,7 +61,13 @@ public class DataDrivenValueEventField extends DataDrivenValue {
 
         /* If the field does not exist, see if it's a special case */
         if (field == null) {
-            if (fFieldName.equalsIgnoreCase(TmfXmlStrings.CPU)) {
+            final ITmfEventField splitFieldName = event.getContent().getField(fFieldName.split("\\.")); //$NON-NLS-1$
+            if (splitFieldName != null) {
+                fieldValue = splitFieldName.getValue();
+                if (fieldValue != null) {
+                    return fieldValue;
+                }
+            } else if (fFieldName.equalsIgnoreCase(TmfXmlStrings.CPU)) {
                 /* A "CPU" field will return the CPU aspect if available */
                 Integer cpu = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
                 if (cpu != null) {

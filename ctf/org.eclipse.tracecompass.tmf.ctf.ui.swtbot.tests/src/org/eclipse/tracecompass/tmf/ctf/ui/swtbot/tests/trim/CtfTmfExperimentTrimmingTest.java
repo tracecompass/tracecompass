@@ -45,7 +45,6 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -180,17 +179,6 @@ public class CtfTmfExperimentTrimmingTest {
         assertNotNull("No active trace", fNewExperiment);
         assertEquals("Incorrect active trace", "Experiment-trimmed", fNewExperiment.getName());
         WaitUtils.waitForJobs();
-    }
-
-    /**
-     * Test teardown
-     */
-    @After
-    public void tearDown() {
-        fNewExperiment = null;
-        fOriginalExperiment = null;
-        fBot.closeAllEditors();
-        SWTBotUtils.clearTracesFolderUI(fBot, PROJECT_NAME);
     }
 
     /**

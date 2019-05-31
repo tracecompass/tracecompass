@@ -145,7 +145,9 @@ public class ControlRemoteProfilesPreferencePage extends PreferencePage implemen
 
         fImportButton.addSelectionListener(new SelectionListener() {
             @Override
-            public void widgetDefaultSelected(SelectionEvent e) {}
+            public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
+            }
 
             @Override
             public void widgetSelected(SelectionEvent e) {
