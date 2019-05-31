@@ -13,10 +13,18 @@ package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.ITmfChartTimeProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfClosestDataPointTooltipProvider;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
+import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
 import org.swtchart.ISeries;
 
 /**
@@ -44,22 +52,21 @@ public class SegmentStoreScatterGraphTooltipProvider extends TmfClosestDataPoint
     // TmfClosestDataPointTooltipProvider
     // ------------------------------------------------------------------------
     @Override
-    protected @Nullable String createToolTipText(Parameter param) {
+    protected @Nullable Map<String, Map<String, Object>> createToolTipMap(Parameter param) {
         ISeries[] series = getChart().getSeriesSet().getSeries();
         int seriesIndex = param.getSeriesIndex();
         int dataIndex = param.getDataIndex();
         if ((series != null) && (seriesIndex < series.length)) {
+            Map<String, Object> segMap = new HashMap<>();
             ISeries serie = series[seriesIndex];
             double[] xS = serie.getXSeries();
             double[] yS = serie.getYSeries();
             if ((xS != null) && (yS != null) && (dataIndex < xS.length) && (dataIndex < yS.length)) {
-                StringBuffer buffer = new StringBuffer();
-                buffer.append(checkNotNull(Messages.SegmentStoreScatterGraphViewer_xAxis)).append('=');
-                buffer.append(TmfTimestamp.fromNanos((long) xS[dataIndex] + getChartViewer().getTimeOffset()).toString());
-                buffer.append('\n');
-                buffer.append(Messages.SegmentStoreScatterGraphViewer_yAxis).append('=');
-                buffer.append((long) yS[dataIndex]);
-                return buffer.toString();
+                ITmfTimestamp segTs = TmfTimestamp.fromNanos((long) xS[dataIndex] + getChartViewer().getTimeOffset());
+                long segDuration = (long) yS[dataIndex];
+                segMap.put(checkNotNull(Messages.SegmentStoreScatterGraphViewer_xAxis), segTs);
+                segMap.put(checkNotNull(Messages.SegmentStoreScatterGraphViewer_yAxis), String.valueOf(FormatTimeUtils.formatDelta(segDuration, TimeFormat.RELATIVE, Resolution.NANOSEC)));
+                return Collections.singletonMap(checkNotNull(Messages.SegmentStoreScatterGraphTooltipProvider_category), segMap);
             }
         }
         return null;

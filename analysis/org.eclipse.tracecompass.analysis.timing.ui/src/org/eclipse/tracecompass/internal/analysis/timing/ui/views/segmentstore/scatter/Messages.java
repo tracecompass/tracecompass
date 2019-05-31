@@ -20,6 +20,11 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter.messages"; //$NON-NLS-1$
 
     /**
+     * Category
+     */
+    public static String SegmentStoreScatterGraphTooltipProvider_category;
+
+    /**
      * Title of the scatter graph
      */
     public static String SegmentStoreScatterGraphViewer_title;

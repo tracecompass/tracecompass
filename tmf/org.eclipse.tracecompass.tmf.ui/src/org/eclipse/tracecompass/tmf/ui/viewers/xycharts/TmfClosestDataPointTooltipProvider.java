@@ -11,6 +11,10 @@
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
@@ -19,8 +23,13 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.ui.viewers.TmfAbstractToolTipHandler;
+import org.swtchart.Chart;
 import org.swtchart.IAxis;
 import org.swtchart.ISeries;
 
@@ -33,6 +42,88 @@ import org.swtchart.ISeries;
  * @since 2.0
  */
 public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implements MouseTrackListener, MouseMoveListener, PaintListener {
+
+    private static final @NonNull String OLD_TOOLTIP = ""; //$NON-NLS-1$
+
+    private final class XYToolTipHandler extends TmfAbstractToolTipHandler {
+        @Override
+        public void fill(Control control, MouseEvent e, Point pt) {
+            if ((getChartViewer().getWindowDuration() != 0) && (e != null)) {
+                Chart chart = getChart();
+                IAxis xAxis = chart.getAxisSet().getXAxis(0);
+                IAxis yAxis = chart.getAxisSet().getYAxis(0);
+
+                ISeries[] series = chart.getSeriesSet().getSeries();
+
+                double smallestDistance = Double.MAX_VALUE;
+                Parameter param = null;
+
+                // go over all series
+                for (int k = 0; k < series.length; k++) {
+                    ISeries serie = series[k];
+                    double[] xS = serie.getXSeries();
+                    double[] yS = serie.getYSeries();
+
+                    if ((xS == null) || (yS == null)) {
+                        continue;
+                    }
+                    // go over all data points
+                    for (int i = 0; i < xS.length; i++) {
+                        int xs = xAxis.getPixelCoordinate(xS[i]) - e.x;
+                        int ys = yAxis.getPixelCoordinate(yS[i]) - e.y;
+                        double currentDistance = xs * xs + ys * ys;
+
+                        /*
+                         * Check for smallest distance to mouse position and
+                         * only consider it if the mouse is close the data
+                         * point.
+                         */
+                        if ((currentDistance < smallestDistance) && (currentDistance < (HIGHLIGHT_RADIUS * HIGHLIGHT_RADIUS))) {
+                            smallestDistance = currentDistance;
+                            fHighlightX = xs + e.x;
+                            fHighlightY = ys + e.y;
+                            if (param == null) {
+                                param = new Parameter();
+                            }
+                            param.setSeriesIndex(k);
+                            param.setDataIndex(i);
+                        }
+                    }
+                }
+                Map<String, Map<String, Object>> tooltip = null;
+                if (param != null) {
+                    tooltip = createToolTipMap(param);
+                    if (tooltip == null) {
+                        return;
+                    }
+                    fIsHighlight = true;
+                    chart.redraw();
+                }
+                if (tooltip == null) {
+                    return;
+                }
+                /*
+                 * Note that tooltip might be null which will clear the previous
+                 * tooltip string. This is intentional.
+                 */
+                for (Entry<String, Map<String, Object>> entry : tooltip.entrySet()) {
+                    ToolTipString category = entry.getKey().isEmpty() || entry.getKey().equals(OLD_TOOLTIP) ? null : ToolTipString.fromString(entry.getKey());
+                    for (Entry<String, Object> secondEntry : entry.getValue().entrySet()) {
+
+                        Object value = secondEntry.getValue();
+                        String key = secondEntry.getKey();
+                        if (value instanceof Number) {
+                            addItem(category, ToolTipString.fromString(key), ToolTipString.fromDecimal((Number) value));
+                        } else if (value instanceof ITmfTimestamp) {
+                            addItem(category, ToolTipString.fromString(key), ToolTipString.fromTimestamp(String.valueOf(value), ((ITmfTimestamp) value).toNanos()));
+                        } else {
+                            addItem(category, ToolTipString.fromString(key), ToolTipString.fromString(String.valueOf(value)));
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     // ------------------------------------------------------------------------
     // Constants
@@ -49,6 +140,8 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
     private int fHighlightY;
     /** Flag to do highlighting or not */
     private boolean fIsHighlight;
+    /** Tooltip handler */
+    private TmfAbstractToolTipHandler fTooltipHandler = new XYToolTipHandler();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -69,17 +162,20 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
     // ------------------------------------------------------------------------
     @Override
     public void register() {
-        getChart().getPlotArea().addMouseTrackListener(this);
-        getChart().getPlotArea().addMouseMoveListener(this);
-        getChart().getPlotArea().addPaintListener(this);
+        Chart chart = getChart();
+        chart.getPlotArea().addMouseMoveListener(this);
+        chart.getPlotArea().addPaintListener(this);
+        fTooltipHandler.activateHoverHelp(chart.getPlotArea());
     }
 
     @Override
     public void deregister() {
-        if ((getChartViewer().getControl() != null) && !getChartViewer().getControl().isDisposed()) {
-            getChart().getPlotArea().removeMouseTrackListener(this);
-            getChart().getPlotArea().removeMouseMoveListener(this);
-            getChart().getPlotArea().removePaintListener(this);
+
+        Chart chart = getChart();
+        if ((chart != null) && !chart.isDisposed()) {
+            chart.getPlotArea().removeMouseMoveListener(this);
+            chart.getPlotArea().removePaintListener(this);
+            fTooltipHandler.deactivateHoverHelp(chart.getPlotArea());
         }
     }
 
@@ -91,70 +187,35 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
     // ------------------------------------------------------------------------
     // MouseTrackListener
     // ------------------------------------------------------------------------
+
+    /**
+     * @deprecated, do not extend, use {@link #createToolTipMap(Parameter)} to
+     * populate tooltips
+     */
+    @Deprecated
     @Override
     public void mouseEnter(MouseEvent e) {
+        // do nothing
     }
 
+    /**
+     * @deprecated, do not extend, use {@link #createToolTipMap(Parameter)} to
+     * populate tooltips
+     */
+    @Deprecated
     @Override
     public void mouseExit(MouseEvent e) {
+        // do nothing
     }
 
+    /**
+     * @deprecated, do not extend, use {@link #createToolTipMap(Parameter)} to
+     * populate tooltips
+     */
+    @Deprecated
     @Override
     public void mouseHover(MouseEvent e) {
-        if ((getChartViewer().getWindowDuration() != 0) && (e != null)) {
-            IAxis xAxis = getChart().getAxisSet().getXAxis(0);
-            IAxis yAxis = getChart().getAxisSet().getYAxis(0);
-
-            ISeries[] series = getChart().getSeriesSet().getSeries();
-
-            double smallestDistance = Double.MAX_VALUE;
-            Parameter param = null;
-
-            // go over all series
-            for (int k = 0; k < series.length; k++) {
-                ISeries serie = series[k];
-                double[] xS = serie.getXSeries();
-                double[] yS = serie.getYSeries();
-
-                if ((xS == null) || (yS == null)) {
-                    continue;
-                }
-                // go over all data points
-                for (int i = 0; i < xS.length; i++) {
-                    int xs = xAxis.getPixelCoordinate(xS[i]) - e.x;
-                    int ys = yAxis.getPixelCoordinate(yS[i]) - e.y;
-                    double currentDistance = xs * xs + ys * ys;
-
-                    /*
-                     * Check for smallest distance to mouse position and only
-                     * consider it if the mouse is close the data point.
-                     */
-                    if ((currentDistance < smallestDistance) && (currentDistance < (HIGHLIGHT_RADIUS * HIGHLIGHT_RADIUS))) {
-                        smallestDistance = currentDistance;
-                        fHighlightX = xs + e.x;
-                        fHighlightY = ys + e.y;
-                        if (param == null) {
-                            param = new Parameter();
-                        }
-                        param.setSeriesIndex(k);
-                        param.setDataIndex(i);
-                    }
-                }
-            }
-            String tooltip = null;
-            if (param != null) {
-                tooltip = createToolTipText(param);
-                if (tooltip != null) {
-                    fIsHighlight = true;
-                    getChart().redraw();
-                }
-            }
-            /*
-             * Note that tooltip might be null which will clear the previous
-             * tooltip string. This is intentional.
-             */
-            getChart().getPlotArea().setToolTipText(tooltip);
-        }
+        // do nothing
     }
 
     // ------------------------------------------------------------------------
@@ -189,7 +250,10 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
      * @param param
      *            parameter to create the tooltip string
      * @return the tooltip based on the given parameter.
+     * @deprecated use {@link #createToolTipMap(Parameter)} as it will
+     *             categorize data better
      */
+    @Deprecated
     protected String createToolTipText(@NonNull Parameter param) {
         ISeries[] series = getChart().getSeriesSet().getSeries();
         int seriesIndex = param.getSeriesIndex();
@@ -199,7 +263,7 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
             double[] xS = serie.getXSeries();
             double[] yS = serie.getYSeries();
             if ((xS != null) && (yS != null) && (dataIndex < xS.length) && (dataIndex < yS.length)) {
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder buffer = new StringBuilder();
                 buffer.append("x="); //$NON-NLS-1$
                 buffer.append(TmfTimestamp.fromNanos((long) xS[dataIndex] + getChartViewer().getTimeOffset()).toString());
                 buffer.append('\n');
@@ -209,6 +273,24 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
             }
         }
         return null;
+    }
+
+    /**
+     * Creates the tooltip based on the given parameter.
+     *
+     * @param param
+     *            parameter to create the tooltip string
+     * @return the tooltip map based on the given parameter. The Map<String,
+     *         Map<String, Object>> can be seen as a table. The first element is
+     *         the category, the second is the key, third is the value.
+     * @since 5.0
+     */
+    protected @Nullable Map<@NonNull String, @NonNull Map<@NonNull String, @NonNull Object>> createToolTipMap(@NonNull Parameter param) {
+        String toolTipText = createToolTipText(param);
+        if (toolTipText == null) {
+            return null;
+        }
+        return Collections.singletonMap(OLD_TOOLTIP, Collections.singletonMap(OLD_TOOLTIP, toolTipText));
     }
 
     /**
