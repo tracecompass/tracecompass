@@ -13,6 +13,7 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow;
 
+import java.util.Collections;
 import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -50,7 +51,7 @@ public class ControlFlowEntry extends TimeGraphEntry {
      *            The end time of this process
      */
     public ControlFlowEntry(int quark, @NonNull String execName, int threadId, int parentThreadId, long startTime, long endTime) {
-        this(new ThreadEntryModel(quark, -1, execName, startTime, endTime, threadId, parentThreadId));
+        this(new ThreadEntryModel(quark, -1, Collections.singletonList(execName), startTime, endTime, threadId, parentThreadId));
     }
 
     /**

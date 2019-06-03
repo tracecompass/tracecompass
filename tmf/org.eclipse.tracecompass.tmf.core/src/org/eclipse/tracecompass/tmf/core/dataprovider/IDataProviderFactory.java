@@ -9,6 +9,9 @@
 
 package org.eclipse.tracecompass.tmf.core.dataprovider;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
@@ -36,6 +39,7 @@ public interface IDataProviderFactory {
      */
     @Nullable ITmfTreeDataProvider<? extends ITmfTreeDataModel> createProvider(@NonNull ITmfTrace trace);
 
+
     /**
      * Create a {@link ITmfTreeDataProvider} for the given trace. If this factory
      * does not know how to handle the given trace it will return null. The
@@ -55,6 +59,21 @@ public interface IDataProviderFactory {
      */
     default @Nullable ITmfTreeDataProvider<? extends ITmfTreeDataModel> createProvider(@NonNull ITmfTrace trace, @NonNull String secondaryId) {
         return createProvider(trace);
+    }
+
+    /**
+     * Gets the collection of data provider descriptors for this trace that this
+     * data provider factory can create, if the trace supports it, else
+     * it returns an empty list
+     *
+     * @param trace
+     *            trace whose support for this data provider we want to determine
+     * @return a collection of {@link IDataProviderDescriptor} if this trace supports this
+     *         provider, else empty list
+     * @since 5.0
+     */
+    default @NonNull Collection<IDataProviderDescriptor> getDescriptors(@NonNull ITmfTrace trace) {
+        return Collections.emptyList();
     }
 
 }

@@ -23,15 +23,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.EventTableQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.VirtualTableQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.EventTableLine;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfFilterModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfVirtualTableDataProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfVirtualTableModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.TmfVirtualTableModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.VirtualTableCell;
 import org.eclipse.tracecompass.internal.tmf.core.filter.TmfCollapseFilter;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
@@ -43,16 +44,18 @@ import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterRootNode;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
+import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
-import org.eclipse.tracecompass.tmf.core.request.TmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
+
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -63,6 +66,16 @@ import com.google.common.collect.ImmutableSet;
  * @since 4.0
  */
 public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider implements ITmfVirtualTableDataProvider<TmfEventTableColumnDataModel, EventTableLine> {
+
+    /**
+     * Key for table search
+     */
+    public static final String TABLE_SEARCH_KEY = "table_search"; //$NON-NLS-1$
+
+    /**
+     * Key for table filters
+     */
+    public static final String TABLE_FILTERS_KEY = "table_filters"; //$NON-NLS-1$
 
     /**
      * Extension point ID.
@@ -124,26 +137,43 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         return ID;
     }
 
+    @Deprecated
     @Override
     public TmfModelResponse<List<TmfEventTableColumnDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        TmfModelResponse<TmfTreeModel<TmfEventTableColumnDataModel>> response = fetchTree(parameters, monitor);
+        TmfTreeModel<TmfEventTableColumnDataModel> model = response.getModel();
+        List<TmfEventTableColumnDataModel> treeModel = null;
+        if (model != null) {
+            treeModel = model.getEntries();
+        }
+        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
+    }
+
+    @Override
+    public TmfModelResponse<TmfTreeModel<TmfEventTableColumnDataModel>> fetchTree(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         List<TmfEventTableColumnDataModel> model = new ArrayList<>();
 
         for (ITmfEventAspect<?> aspect : getTraceAspects(getTrace())) {
             synchronized (fAspectToIdMap) {
                 long id = fAspectToIdMap.computeIfAbsent(aspect, a -> fAtomicLong.getAndIncrement());
                 fIdToAspectMap.putIfAbsent(id, aspect);
-                model.add(new TmfEventTableColumnDataModel(id, -1, aspect.getName(), aspect.getHelpText(), aspect.isHiddenByDefault()));
+                model.add(new TmfEventTableColumnDataModel(id, -1, Collections.singletonList(aspect.getName()), aspect.getHelpText(), aspect.isHiddenByDefault()));
             }
         }
 
-        return new TmfModelResponse<>(model, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), model), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
     @Override
-    public TmfModelResponse<ITmfVirtualTableModel<EventTableLine>> fetchLines(VirtualTableQueryFilter queryFilter, @Nullable IProgressMonitor monitor) {
-        @Nullable ITmfFilter filter = extractFilter(queryFilter);
-        @Nullable ITmfFilter searchFilter = extractSearchFilter(queryFilter);
-        @Nullable TmfCollapseFilter collapseFilter = extractCollapseFilter(queryFilter);
+    public TmfModelResponse<ITmfVirtualTableModel<EventTableLine>> fetchLines(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+        VirtualTableQueryFilter queryFilter = FetchParametersUtils.createVirtualTableQueryFilter(fetchParameters);
+        if (queryFilter == null) {
+            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
+        }
+        @Nullable ITmfFilter filter = extractFilter(fetchParameters);
+        @Nullable ITmfFilter searchFilter = extractSearchFilter(fetchParameters);
+        @Nullable TmfCollapseFilter collapseFilter = extractCollapseFilter(fetchParameters);
         Map<Long, ITmfEventAspect<?>> aspects = getAspectsFromColumnsId(queryFilter.getColumnsId());
 
         if (aspects.isEmpty()) {
@@ -177,12 +207,12 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
     }
 
     /**
-     * Find the index in the table of an event using the rank in the trace or the
-     * timestamp value. It will take any filter into consideration.
+     * Find the index in the table of an event using the rank in the trace or
+     * the timestamp value. It will take any filter into consideration.
      *
-     * @param queryFilter
-     *            Query filter that contain the filter applied to the table, if any.
-     *            Everything else is ignored.
+     * @param fetchParameters
+     *            Map of parameters that contain the filter applied to the
+     *            table, if any. Everything else is ignored.
      * @param traceRank
      *            Rank of the event in the trace
      * @param timeBegin
@@ -191,8 +221,8 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
      *            Progress monitor
      * @return Index in the table
      */
-    public TmfModelResponse<List<Long>> fetchIndex(VirtualTableQueryFilter queryFilter, long traceRank, long timeBegin, @Nullable IProgressMonitor monitor) {
-        @Nullable ITmfFilter filter = extractFilter(queryFilter);
+    public TmfModelResponse<List<Long>> fetchIndex(Map<String, Object> fetchParameters, long traceRank, long timeBegin, @Nullable IProgressMonitor monitor) {
+        @Nullable ITmfFilter filter = extractFilter(fetchParameters);
         long rank;
         if (traceRank == -1) {
             ITmfContext context = getTrace().seekEvent(TmfTimestamp.fromNanos(timeBegin));
@@ -318,7 +348,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
                     int lastIndex = events.size() - 1;
                     EventTableLine prevLine = events.get(lastIndex);
                     long prevRepeatCount = prevLine.getRepeatCount();
-                    events.set(lastIndex, new EventTableLine(prevLine.getLine(), prevLine.getIndex(), prevLine.getTimestamp(), prevLine.getRank(), prevRepeatCount++));
+                    events.set(lastIndex, new EventTableLine(prevLine.getCells(), prevLine.getIndex(), prevLine.getTimestamp(), prevLine.getRank(), prevRepeatCount++));
                 }
 
                 if (searchFilter != null && ((!forwardSearch && getCurrentCount() == queryCount) || events.size() == queryCount)) {
@@ -369,7 +399,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
                     int lastIndex = events.size() - 1;
                     EventTableLine prevLine = events.get(lastIndex);
                     long prevRepeatCount = prevLine.getRepeatCount();
-                    events.set(lastIndex, new EventTableLine(prevLine.getLine(), prevLine.getIndex(), prevLine.getTimestamp(), prevLine.getRank(), prevRepeatCount++));
+                    events.set(lastIndex, new EventTableLine(prevLine.getCells(), prevLine.getIndex(), prevLine.getTimestamp(), prevLine.getRank(), prevRepeatCount++));
                 }
 
                 if ((searchFilter != null && !forwardSearch && getNbRead() == queryCount) || events.size() == queryCount) {
@@ -395,10 +425,11 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
      * @return A new event table line
      */
     private static EventTableLine buildEventTableLine(Map<Long, ITmfEventAspect<?>> aspects, ITmfEvent event, long lineIndex, long lineRank) {
-        List<String> entry = new ArrayList<>(aspects.size());
+        List<VirtualTableCell> entry = new ArrayList<>(aspects.size());
         for (Entry<Long, ITmfEventAspect<?>> aspectEntry : aspects.entrySet()) {
             Object aspectResolved = aspectEntry.getValue().resolve(event);
-            entry.add(aspectResolved == null ? StringUtils.EMPTY : String.valueOf(aspectResolved));
+            String cellContent = aspectResolved == null ? StringUtils.EMPTY : String.valueOf(aspectResolved);
+            entry.add(new VirtualTableCell(cellContent));
         }
         return new EventTableLine(entry, lineIndex, event.getTimestamp(), lineRank, 0);
     }
@@ -445,13 +476,10 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         return fIdToAspectMap;
     }
 
-    private static @Nullable ITmfFilter extractFilter(VirtualTableQueryFilter queryFilter) {
-        if (queryFilter instanceof EventTableQueryFilter) {
-            EventTableQueryFilter eventTableQueryFilter = (EventTableQueryFilter) queryFilter;
-            ITmfFilterModel filters = eventTableQueryFilter.getFilters();
-            if (filters == null) {
-                return null;
-            }
+    private static @Nullable ITmfFilter extractFilter(Map<String, Object> fetchParameters) {
+        Object filtersObject = fetchParameters.get(TABLE_FILTERS_KEY);
+        if (filtersObject instanceof ITmfFilterModel) {
+            ITmfFilterModel filters = (ITmfFilterModel) filtersObject;
             Map<Long, String> filterMap = filters.getTableFilter();
             List<String> presetFilter = filters.getPresetFilter();
 
@@ -491,11 +519,11 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         return null;
     }
 
-    private static @Nullable ITmfFilter extractSearchFilter(VirtualTableQueryFilter queryFilter) {
-        if (queryFilter instanceof EventTableQueryFilter) {
-            EventTableQueryFilter eventTableQueryFilter = (EventTableQueryFilter) queryFilter;
-            Map<Long, String> searchMap = eventTableQueryFilter.getSearchFilter();
-            if (searchMap == null || searchMap.isEmpty()) {
+    private static @Nullable ITmfFilter extractSearchFilter(Map<String, Object> fetchParameters) {
+        Object searchFilterObject = fetchParameters.get(TABLE_SEARCH_KEY);
+        if (searchFilterObject instanceof Map<?, ?>) {
+            Map<Long, String> searchMap = (Map<Long, String>) searchFilterObject;
+            if (searchMap.isEmpty()) {
                 return null;
             }
 
@@ -514,10 +542,11 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         return null;
     }
 
-    private static @Nullable TmfCollapseFilter extractCollapseFilter(VirtualTableQueryFilter queryFilter) {
-        if (queryFilter instanceof EventTableQueryFilter) {
-            ITmfFilterModel filters = ((EventTableQueryFilter) queryFilter).getFilters();
-            if (filters != null && filters.isCollapseFilter()) {
+    private static @Nullable TmfCollapseFilter extractCollapseFilter(Map<String, Object> fetchParameters) {
+        Object filtersObject = fetchParameters.get(TABLE_FILTERS_KEY);
+        if (filtersObject instanceof ITmfFilterModel) {
+            ITmfFilterModel filters = (ITmfFilterModel) filtersObject;
+            if (filters.isCollapseFilter()) {
                 return new TmfCollapseFilter();
             }
             return null;

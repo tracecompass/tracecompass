@@ -11,16 +11,20 @@ package org.eclipse.tracecompass.internal.tmf.core.model.tree;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -89,17 +93,30 @@ public class TmfTreeCompositeDataProvider<M extends ITmfTreeDataModel, P extends
         fId = id;
     }
 
+    @Deprecated
     @Override
     public TmfModelResponse<List<M>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        TmfModelResponse<TmfTreeModel<M>> response = fetchTree(parameters, monitor);
+        TmfTreeModel<M> model = response.getModel();
+        List<M> treeModel = null;
+        if (model != null) {
+            treeModel = model.getEntries();
+        }
+        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
+    }
+
+    @Override
+    public TmfModelResponse<TmfTreeModel<M>> fetchTree(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         boolean isComplete = true;
         ImmutableList.Builder<M> series = ImmutableList.builder();
 
         for (P dataProvider : fProviders) {
-            TmfModelResponse<List<M>> response = dataProvider.fetchTree(filter, monitor);
+            TmfModelResponse<TmfTreeModel<M>> response = dataProvider.fetchTree(fetchParameters, monitor);
             isComplete &= response.getStatus() == ITmfResponse.Status.COMPLETED;
-            List<M> model = response.getModel();
+            TmfTreeModel<M> model = response.getModel();
             if (model != null) {
-                series.addAll(model);
+                series.addAll(model.getEntries());
             }
 
             if (monitor != null && monitor.isCanceled()) {
@@ -107,9 +124,9 @@ public class TmfTreeCompositeDataProvider<M extends ITmfTreeDataModel, P extends
             }
         }
         if (isComplete) {
-            return new TmfModelResponse<>(series.build(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+            return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), series.build()), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
-        return new TmfModelResponse<>(series.build(), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
+        return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), series.build()), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
     }
 
     @Override

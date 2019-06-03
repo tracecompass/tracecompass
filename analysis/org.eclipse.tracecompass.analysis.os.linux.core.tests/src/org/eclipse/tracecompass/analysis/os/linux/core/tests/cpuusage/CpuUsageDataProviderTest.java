@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,12 +34,14 @@ import org.eclipse.tracecompass.analysis.os.linux.core.tid.TidAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.CpuUsageDataProvider;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectedCpuQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse.Status;
+import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
@@ -124,7 +127,7 @@ public class CpuUsageDataProviderTest {
 
     /**
      * Test the
-     * {@link CpuUsageDataProvider#fetchTree(TimeQueryFilter, IProgressMonitor)}
+     * {@link CpuUsageDataProvider#fetchTree(Map, IProgressMonitor)}
      * method.
      * <p>
 
@@ -136,11 +139,16 @@ public class CpuUsageDataProviderTest {
 
         /* This range should query the total range */
         TimeQueryFilter filter = new SelectedCpuQueryFilter(0L, 30L, 2, Collections.emptyList(), Collections.emptySet());
-        TmfModelResponse<List<CpuUsageEntryModel>> response = dataProvider.fetchTree(filter, monitor);
+        @NonNull Map<@NonNull String, @NonNull Object> parameters = new HashMap<>();
+        parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, getTimeRequested(filter));
+        parameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, Collections.emptyList());
+        parameters.put("cpus", Collections.emptySet());
+        TmfModelResponse<@NonNull TmfTreeModel<@NonNull CpuUsageEntryModel>> response = dataProvider.fetchTree(parameters, monitor);
 
         assertTrue(response.getStatus() == Status.COMPLETED);
 
-        List<CpuUsageEntryModel> model = response.getModel();
+        TmfTreeModel<@NonNull CpuUsageEntryModel> model = response.getModel();
+        assertNotNull(model);
         /* Maps a tid to the total time */
         Map<Integer, Long> expected = new HashMap<>();
         expected.put(1, 5L);
@@ -148,48 +156,54 @@ public class CpuUsageDataProviderTest {
         expected.put(3, 11L);
         expected.put(4, 13L);
         expected.put(-2, 48L);
-        compareModel(expected, model);
+        compareModel(expected, model.getEntries());
 
         /* Verify a range when a process runs at the start */
         filter = new SelectedCpuQueryFilter(22L, 25L, 2, Collections.emptyList(), Collections.emptySet());
-        response = dataProvider.fetchTree(filter, monitor);
+        parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, getTimeRequested(filter));
+        response = dataProvider.fetchTree(parameters, monitor);
         assertTrue(response.getStatus() == Status.COMPLETED);
 
         model = response.getModel();
+        assertNotNull(model);
         /* Maps a tid to the total time */
         expected.clear();
         expected.put(3, 3L);
         expected.put(4, 3L);
         expected.put(-2, 6L);
-        compareModel(expected, model);
+        compareModel(expected, model.getEntries());
 
         /* Verify a range when a process runs at the end */
         filter = new SelectedCpuQueryFilter(1L, 4L, 2, Collections.emptyList(), Collections.emptySet());
-        response = dataProvider.fetchTree(filter, monitor);
+        parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, getTimeRequested(filter));
+        response = dataProvider.fetchTree(parameters, monitor);
         assertTrue(response.getStatus() == Status.COMPLETED);
 
         model = response.getModel();
+        assertNotNull(model);
         /* Maps a tid to the total time */
         expected.clear();
         expected.put(2, 3L);
         expected.put(3, 1L);
         expected.put(4, 2L);
         expected.put(-2, 6L);
-        compareModel(expected, model);
+        compareModel(expected, model.getEntries());
 
         /* Verify a range when a process runs at start and at the end */
         filter = new SelectedCpuQueryFilter(4L, 13L, 2, Collections.emptyList(), Collections.emptySet());
-        response = dataProvider.fetchTree(filter, monitor);
+        parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, getTimeRequested(filter));
+        response = dataProvider.fetchTree(parameters, monitor);
         assertTrue(response.getStatus() == Status.COMPLETED);
 
         model = response.getModel();
+        assertNotNull(model);
         /* Maps a tid to the total time */
         expected.clear();
         expected.put(2, 9L);
         expected.put(3, 5L);
         expected.put(4, 4L);
         expected.put(-2, 18L);
-        compareModel(expected, model);
+        compareModel(expected, model.getEntries());
 
     }
 
@@ -198,6 +212,14 @@ public class CpuUsageDataProviderTest {
         Map<Integer, Long> actual = new HashMap<>();
         model.forEach(entry -> actual.put(entry.getTid(), entry.getTime()));
         assertEquals("model entries", expected, actual);
+    }
+
+    private static @NonNull List<Long> getTimeRequested(TimeQueryFilter filter) {
+        List<Long> times = new ArrayList<>();
+        for (long time : filter.getTimesRequested()) {
+            times.add(time);
+        }
+        return times;
     }
 
 }

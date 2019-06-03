@@ -27,9 +27,9 @@ import com.google.common.collect.ImmutableList;
 public class TmfVirtualTableModel<L extends VirtualTableLine> implements ITmfVirtualTableModel<L> {
 
     private final List<Long> fColumnIds;
-    private final List<L> fData;
-    private final long fIndex;
-    private final long fNbTotalEvents;
+    private final List<L> fLines;
+    private final long fLowIndex;
+    private final long fSize;
 
     /**
      * Constructor. The data passed in parameter is deep copied
@@ -45,11 +45,11 @@ public class TmfVirtualTableModel<L extends VirtualTableLine> implements ITmfVir
      *            the total number of entries
      */
     public TmfVirtualTableModel(List<Long> columnIds, List<L> data, long index, long nbTotalEvents) {
-        fIndex = index;
+        fLowIndex = index;
         fColumnIds = ImmutableList.copyOf(columnIds);
 
-        fData = ImmutableList.copyOf(data);
-        fNbTotalEvents = nbTotalEvents;
+        fLines = ImmutableList.copyOf(data);
+        fSize = nbTotalEvents;
     }
 
     @Override
@@ -58,23 +58,23 @@ public class TmfVirtualTableModel<L extends VirtualTableLine> implements ITmfVir
     }
 
     @Override
-    public List<L> getData() {
-        return fData;
+    public List<L> getLines() {
+        return fLines;
     }
 
     @Override
     public long getIndex() {
-        return fIndex;
+        return fLowIndex;
     }
 
     @Override
-    public long getNbTotalEntries() {
-        return fNbTotalEvents;
+    public long getSize() {
+        return fSize;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fIndex, fNbTotalEvents, fColumnIds, fData);
+        return Objects.hash(fLowIndex, fSize, fColumnIds, fLines);
     }
 
     @Override
@@ -89,17 +89,17 @@ public class TmfVirtualTableModel<L extends VirtualTableLine> implements ITmfVir
             return false;
         }
         TmfVirtualTableModel<?> other = (TmfVirtualTableModel<?>) obj;
-        return fIndex == other.getIndex() &&
-                fNbTotalEvents == other.getNbTotalEntries() &&
+        return fLowIndex == other.getIndex() &&
+                fSize == other.getSize() &&
                 fColumnIds.equals(other.fColumnIds) &&
-                fData.equals(other.fData);
+                fLines.equals(other.fLines);
     }
 
     @Override
     public String toString() {
         return "Column Ids: " + fColumnIds + //$NON-NLS-1$
-                ", Data: " + fData + //$NON-NLS-1$
-                ", Index: " + fIndex + //$NON-NLS-1$
-                ", Total nb of events: " + fNbTotalEvents; //$NON-NLS-1$
+                ", Data: " + fLines + //$NON-NLS-1$
+                ", Index: " + fLowIndex + //$NON-NLS-1$
+                ", Total nb of events: " + fSize; //$NON-NLS-1$
     }
 }

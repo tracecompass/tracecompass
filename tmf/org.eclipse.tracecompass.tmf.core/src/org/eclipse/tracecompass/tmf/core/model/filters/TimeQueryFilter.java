@@ -9,7 +9,11 @@
 
 package org.eclipse.tracecompass.tmf.core.model.filters;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.common.collect.Ordering;
 import com.google.common.primitives.Longs;
@@ -125,5 +129,22 @@ public class TimeQueryFilter {
         /* This is to make sure that last value will always be end */
         result[result.length - 1] = Math.max(start, end);
         return result;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        if (this == obj) {
+            return true;
+        }
+        TimeQueryFilter other = (TimeQueryFilter) obj;
+        return Arrays.equals(fTimesRequested, other.getTimesRequested());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fTimesRequested);
     }
 }

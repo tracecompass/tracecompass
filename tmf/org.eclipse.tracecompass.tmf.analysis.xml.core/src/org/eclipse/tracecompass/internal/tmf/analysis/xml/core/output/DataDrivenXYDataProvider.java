@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDriven
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenOutputEntry.QuarkCallback;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.TmfXyResponseFactory;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -37,6 +38,7 @@ import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
@@ -75,7 +77,7 @@ public class DataDrivenXYDataProvider extends AbstractTmfTraceDataProvider
     public enum DisplayType {
         /** Displays absolute value */
         ABSOLUTE,
-        /** Disaplys the difference between current and previous value */
+        /** Displays the difference between current and previous value */
         DELTA
     }
 
@@ -92,7 +94,7 @@ public class DataDrivenXYDataProvider extends AbstractTmfTraceDataProvider
     private final List<DataDrivenOutputEntry> fEntries;
     private final String fId;
 
-    private @Nullable TmfModelResponse<List<ITmfTreeDataModel>> fCached;
+    private @Nullable TmfModelResponse<TmfTreeModel<ITmfTreeDataModel>> fCached;
 
     private final ReentrantReadWriteLock fLock = new ReentrantReadWriteLock(false);
 
@@ -128,9 +130,21 @@ public class DataDrivenXYDataProvider extends AbstractTmfTraceDataProvider
     }
 
     @Override
+    @Deprecated
     public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        return fetchXY(FetchParametersUtils.timeQueryToMap(filter), monitor);
+    }
+
+    @Override
+    public TmfModelResponse<ITmfXyModel> fetchXY(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+        TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(fetchParameters);
+        if (filter == null) {
+            return TmfXyResponseFactory.createFailedResponse(CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
+        }
         long[] xValues = filter.getTimesRequested();
-        if (!(filter instanceof SelectionTimeQueryFilter)) {
+
+        filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
+        if (filter == null) {
             return TmfXyResponseFactory.create(TITLE, xValues, Collections.emptyMap(), true);
         }
 
@@ -179,7 +193,7 @@ public class DataDrivenXYDataProvider extends AbstractTmfTraceDataProvider
         }
 
         boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
-        return TmfXyResponseFactory.create(TITLE, xValues, Maps.uniqueIndex(map.values(), IYModel::getName), complete);
+        return TmfXyResponseFactory.create(TITLE, xValues, Maps.uniqueIndex(map.values(), value -> Long.toString(value.getId())), complete);
     }
 
     private static void getSeriesDelta(double[] data) {
@@ -223,7 +237,20 @@ public class DataDrivenXYDataProvider extends AbstractTmfTraceDataProvider
     }
 
     @Override
+    @Deprecated
     public TmfModelResponse<List<ITmfTreeDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        TmfModelResponse<TmfTreeModel<ITmfTreeDataModel>> response = fetchTree(parameters, monitor);
+        TmfTreeModel<ITmfTreeDataModel> model = response.getModel();
+        List<ITmfTreeDataModel> treeModel = null;
+        if (model != null) {
+            treeModel = model.getEntries();
+        }
+        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
+    }
+
+    @Override
+    public TmfModelResponse<TmfTreeModel<ITmfTreeDataModel>> fetchTree(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         fLock.readLock().lock();
         try {
             if (fCached != null) {
@@ -256,15 +283,14 @@ public class DataDrivenXYDataProvider extends AbstractTmfTraceDataProvider
             fIdToTitle.clear();
             entryList.forEach(e -> fIdToTitle.put(e.getId(), e.getName()));
             if (isComplete) {
-                TmfModelResponse<List<ITmfTreeDataModel>> tmfModelResponse = new TmfModelResponse<>(entryList, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+                TmfModelResponse<TmfTreeModel<ITmfTreeDataModel>> tmfModelResponse = new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), entryList), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
                 fCached = tmfModelResponse;
                 return tmfModelResponse;
             }
-            return new TmfModelResponse<>(entryList, ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
+            return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), entryList), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
         } finally {
             fLock.writeLock().unlock();
         }
-
     }
 
     @Override

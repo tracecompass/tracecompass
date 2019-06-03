@@ -57,12 +57,15 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.FollowThreadAction;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.filters.ActiveThreadsFilter;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.filters.DynamicFilterDialog;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
@@ -680,7 +683,7 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
         boolean complete = false;
         TraceEntry traceEntry = null;
         while (!complete && !monitor.isCanceled()) {
-            TmfModelResponse<List<ThreadEntryModel>> response = dataProvider.fetchTree(new TimeQueryFilter(0, Long.MAX_VALUE, 2), monitor);
+            TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> response = dataProvider.fetchTree(FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(0, Long.MAX_VALUE, 2)), monitor);
             if (response.getStatus() == ITmfResponse.Status.FAILED) {
                 Activator.getDefault().logError("Thread Status Data Provider failed: " + response.getStatusMessage()); //$NON-NLS-1$
                 return;
@@ -689,10 +692,10 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
             }
             complete = response.getStatus() == ITmfResponse.Status.COMPLETED;
 
-            List<ThreadEntryModel> model = response.getModel();
-            if (model != null) {
+            TmfTreeModel<@NonNull ThreadEntryModel> model = response.getModel();
+            if (model != null && !model.getEntries().isEmpty()) {
                 synchronized (fEntries) {
-                    for (ThreadEntryModel entry : model) {
+                    for (ThreadEntryModel entry : model.getEntries()) {
                         if (entry.getThreadId() != Integer.MIN_VALUE) {
                             if (traceEntry == null) {
                                 break;
@@ -796,12 +799,12 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
             Map<Long, TimeGraphEntry> map = Maps.uniqueIndex(unfiltered, e -> e.getEntryModel().getId());
             // use time -1 as a lower bound for the end of Time events to be included.
             SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(time - 1, time, 2, map.keySet());
-            TmfModelResponse<@NonNull List<@NonNull ITimeGraphRowModel>> response = traceEntry.getProvider().fetchRowModel(filter, null);
-            List<@NonNull ITimeGraphRowModel> model = response.getModel();
+            TmfModelResponse<@NonNull TimeGraphModel> response = traceEntry.getProvider().fetchRowModel(FetchParametersUtils.selectionTimeQueryToMap(filter), null);
+            TimeGraphModel model = response.getModel();
             if (model == null) {
                 continue;
             }
-            for (ITimeGraphRowModel row : model) {
+            for (ITimeGraphRowModel row : model.getRows()) {
                 if (syncToRow(row, time, map)) {
                     return;
                 }

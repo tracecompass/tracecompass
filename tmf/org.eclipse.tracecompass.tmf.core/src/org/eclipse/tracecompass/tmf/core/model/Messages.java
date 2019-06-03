@@ -51,6 +51,13 @@ public class Messages extends NLS {
      */
     public static @Nullable String CommonStatusMessage_IncorrectQueryInterval;
 
+    /**
+     * Detailed message for failed status cause by incorrect query parameters
+     *
+     * @since 5.0
+     */
+    public static @Nullable String CommonStatusMessage_IncorrectQueryParameters;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

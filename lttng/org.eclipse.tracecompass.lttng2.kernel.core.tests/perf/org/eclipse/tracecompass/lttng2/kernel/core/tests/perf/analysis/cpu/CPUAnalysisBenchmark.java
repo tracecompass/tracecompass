@@ -17,7 +17,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.FileLocator;
@@ -35,10 +37,12 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.CpuUsag
 import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectedCpuQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -198,19 +202,31 @@ public class CPUAnalysisBenchmark {
                 for (int j = 0; j < 10; j++) {
                     // Query the tree for that range
                     TimeQueryFilter filter = new SelectedCpuQueryFilter(startTime, endTime, 2, Collections.emptyList(), Collections.emptySet());
-                    TmfModelResponse<List<CpuUsageEntryModel>> response = dataProvider.fetchTree(filter, NULL_MONITOR);
-                    List<CpuUsageEntryModel> model = response.getModel();
+
+                    @NonNull Map<@NonNull String, @NonNull Object> parameters = new HashMap<>();
+                    parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, getTimeRequested(filter));
+                    parameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, Collections.emptyList());
+                    parameters.put("cpus", Collections.emptySet());
+                    TmfModelResponse<@NonNull TmfTreeModel<@NonNull CpuUsageEntryModel>> response = dataProvider.fetchTree(parameters, NULL_MONITOR);
+                    TmfTreeModel<@NonNull CpuUsageEntryModel> model = response.getModel();
                     assertNotNull(model);
+
+                    List<CpuUsageEntryModel> entries = model.getEntries();
+                    assertNotNull(entries);
 
                     // Add all entries to the list of selected
                     List<Long> selected = new ArrayList<>();
-                    for (CpuUsageEntryModel entry : model) {
+                    for (CpuUsageEntryModel entry : entries) {
                         selected.add(entry.getId());
                     }
 
                     // Get the usage for all threads
                     filter = new SelectedCpuQueryFilter(startTime, endTime, resolution, selected, Collections.emptySet());
-                    TmfModelResponse<@NonNull ITmfXyModel> fetchXY = dataProvider.fetchXY(filter, NULL_MONITOR);
+                    parameters = new HashMap<>();
+                    parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, getTimeRequested(filter));
+                    parameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, selected);
+                    parameters.put("cpus", Collections.emptySet());
+                    TmfModelResponse<@NonNull ITmfXyModel> fetchXY = dataProvider.fetchXY(parameters, NULL_MONITOR);
                     ITmfXyModel model2 = fetchXY.getModel();
                     assertNotNull(model2);
 
@@ -228,5 +244,13 @@ public class CPUAnalysisBenchmark {
         }
         pmAnalysisExecution.commit();
         pmQueryUsage.commit();
+    }
+
+    private static @NonNull List<Long> getTimeRequested(TimeQueryFilter filter) {
+        List<Long> times = new ArrayList<>();
+        for (long time : filter.getTimesRequested()) {
+            times.add(time);
+        }
+        return times;
     }
 }

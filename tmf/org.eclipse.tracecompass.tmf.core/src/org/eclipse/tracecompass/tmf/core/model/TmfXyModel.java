@@ -55,4 +55,9 @@ public class TmfXyModel implements ITmfXyModel {
         return fSeries;
     }
 
+    @Override
+    public boolean hasCommonXAxis() {
+        return false;
+    }
+
 }

@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -26,8 +25,8 @@ import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.inputoutput.I
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.inputoutput.IoTestCase.DiskActivity;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.inputoutput.IoTestFactory;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.DisksIODataProvider;
-import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
@@ -104,13 +103,13 @@ public class InputOutputDataProviderTest extends AbstractTestInputOutput {
         DisksIODataProvider provider = getProvider();
         Collection<@NonNull DiskActivity> diskActivity = fTestCase.getDiskActivity();
         for (DiskActivity test : diskActivity) {
-            TimeQueryFilter filter = test.getTimeQuery();
-            TmfModelResponse<@NonNull List<@NonNull TmfTreeDataModel>> response = provider.fetchTree(filter, PROGRESS_MONITOR);
+            Map<@NonNull String, @NonNull Object> parameters = test.getTimeQuery();
+            TmfModelResponse<@NonNull TmfTreeModel<@NonNull TmfTreeDataModel>> response = provider.fetchTree(parameters, PROGRESS_MONITOR);
             assertEquals(ITmfResponse.Status.COMPLETED, response.getStatus());
-            List<@NonNull TmfTreeDataModel> model = response.getModel();
+            TmfTreeModel<@NonNull TmfTreeDataModel> model = response.getModel();
             assertNotNull(model);
-            filter = test.getTimeQueryForModel(model);
-            TmfModelResponse<@NonNull ITmfXyModel> yResponse = provider.fetchXY(filter, PROGRESS_MONITOR);
+            parameters = test.getTimeQueryForModel(model);
+            TmfModelResponse<@NonNull ITmfXyModel> yResponse = provider.fetchXY(parameters, PROGRESS_MONITOR);
             assertEquals(ITmfResponse.Status.COMPLETED, yResponse.getStatus());
             ITmfXyModel yModel = yResponse.getModel();
             assertNotNull(yModel);

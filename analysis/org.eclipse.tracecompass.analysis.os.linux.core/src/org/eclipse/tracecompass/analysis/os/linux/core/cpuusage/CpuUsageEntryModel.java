@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.core.cpuusage;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -40,7 +42,26 @@ public class CpuUsageEntryModel extends TmfTreeDataModel {
      *            The total amount of time spent on CPU
      */
     public CpuUsageEntryModel(long id, long parentId, String processName, int tid, long time) {
-        super(id, parentId, processName);
+        this(id, parentId, Collections.singletonList(processName), tid, time);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param id
+     *            the new entry's unique ID
+     * @param parentId
+     *            the entry's parent ID
+     * @param tid
+     *            The TID of the process
+     * @param labels
+     *            The process's labels
+     * @param time
+     *            The total amount of time spent on CPU
+     * @since 4.0
+     */
+    public CpuUsageEntryModel(long id, long parentId, List<String> labels, int tid, long time) {
+        super(id, parentId, labels);
         fTid = tid;
         fTime = time;
     }

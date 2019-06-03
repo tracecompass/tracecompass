@@ -35,6 +35,11 @@ public class Messages extends NLS {
      */
     public static @Nullable String DisksIODataProvider_write;
 
+    /**
+     * Data provider help text
+     */
+    public static @Nullable String DisksIODataProviderFactory_descriptionText;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

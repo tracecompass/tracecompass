@@ -13,16 +13,19 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadEntryModel;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadStatusDataProvider;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
@@ -30,9 +33,6 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ITimeGraphEntryActiveProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
-
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 
 /**
  * Provides Functionality for check Active / uncheck inactive
@@ -97,14 +97,16 @@ public final class ControlFlowCheckActiveProvider implements ITimeGraphEntryActi
             return fActive;
         }
         TimeQueryFilter filter = new TimeQueryFilter(range.getStartTime().toNanos(), range.getEndTime().toNanos(), 2);
-        TmfModelResponse<List<ThreadEntryModel>> response = ((ThreadStatusDataProvider) dataProvider).fetchTree(filter, null);
-        List<ThreadEntryModel> model = response.getModel();
+        Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        parameters.put(ThreadStatusDataProvider.ACTIVE_THREAD_FILTER_KEY, true);
+        TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> response = ((ThreadStatusDataProvider) dataProvider).fetchTree(parameters, null);
+        TmfTreeModel<@NonNull ThreadEntryModel> model = response.getModel();
         if (model == null) {
             // query must have failed, return empty and don't invalidate the cache.
             return Collections.emptySet();
         }
         fRange = range;
-        fActive = Sets.newHashSet(Iterables.transform(model, ThreadEntryModel::getId));
+        fActive = model.getEntries().stream().map(ThreadEntryModel::getId).collect(Collectors.toSet());
         return fActive;
 
     }

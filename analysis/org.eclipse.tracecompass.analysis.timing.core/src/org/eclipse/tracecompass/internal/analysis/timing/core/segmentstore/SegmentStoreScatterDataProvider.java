@@ -30,21 +30,25 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreP
 import org.eclipse.tracecompass.internal.analysis.timing.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.TmfXyResponseFactory;
-import org.eclipse.tracecompass.internal.tmf.core.model.filters.IRegexQuery;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.xy.TmfTreeXYCompositeDataProvider;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 import org.eclipse.tracecompass.segmentstore.core.segment.interfaces.INamedSegment;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.SeriesModel;
+import org.eclipse.tracecompass.tmf.core.model.SeriesModel.SeriesModelBuilder;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
+import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
@@ -57,7 +61,6 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
@@ -242,12 +245,16 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
      * @since 4.0
      */
     @Override
-    public TmfModelResponse<List<TmfTreeDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<TmfTreeModel<TmfTreeDataModel>> fetchTree(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         ISegmentStoreProvider provider = fProvider;
         ISegmentStore<ISegment> segStore = provider.getSegmentStore();
 
         if (segStore == null) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
+        }
+        TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(fetchParameters);
+        if (filter == null) {
+            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
         }
         long start = filter.getStart();
         long end = filter.getEnd();
@@ -266,7 +273,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         }
 
         Builder<TmfTreeDataModel> nodes = new ImmutableList.Builder<>();
-        nodes.add(new TmfTreeDataModel(fTraceId, -1, String.valueOf(getTrace().getName())));
+        nodes.add(new TmfTreeDataModel(fTraceId, -1, Collections.singletonList(String.valueOf(getTrace().getName()))));
         Map<IGroupingSegmentAspect, Map<String, Long>> names = new HashMap<>();
 
         for (Entry<String, INamedSegment> series : segmentTypes.entrySet()) {
@@ -294,12 +301,12 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             nodes.add(new TmfTreeDataModel(seriesId, parentId, series.getKey()));
         }
 
-        return new TmfModelResponse<>(nodes.build(), complete ? ITmfResponse.Status.COMPLETED : ITmfResponse.Status.RUNNING,
-                complete ? CommonStatusMessage.COMPLETED : CommonStatusMessage.RUNNING);
+        return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), nodes.build()), complete ? ITmfResponse.Status.COMPLETED : ITmfResponse.Status.RUNNING,
+                complete ? CommonStatusMessage.COMPLETED: CommonStatusMessage.RUNNING);
     }
 
     @Override
-    public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<ITmfXyModel> fetchXY(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         ISegmentStoreProvider provider = fProvider;
 
         // FIXME: There is no way to get the running status of a segment store analysis,
@@ -314,10 +321,22 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             return TmfXyResponseFactory.createFailedResponse(Objects.requireNonNull(Messages.SegmentStoreDataProvider_SegmentNotAvailable));
         }
 
+        // TODO server: Parameters validation should be handle separately. It
+        // can be either in the data provider itself or before calling it. It
+        // will avoid the creation of filters and the content of the map can be
+        // use directly.
+        TimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
+        if (filter == null) {
+            filter = FetchParametersUtils.createTimeQuery(fetchParameters);
+            if (filter == null) {
+                return TmfXyResponseFactory.createFailedResponse(CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
+            }
+        }
+
         Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
-        if (filter instanceof IRegexQuery) {
-            IRegexQuery regexFilter = (IRegexQuery) filter;
-            predicates.putAll(computeRegexPredicate(regexFilter));
+        Multimap<@NonNull Integer, @NonNull String> regexesMap = DataProviderParameterUtils.extractRegexFilter(fetchParameters);
+        if (regexesMap != null) {
+            predicates.putAll(computeRegexPredicate(regexesMap));
         }
 
         long start = filter.getStart();
@@ -358,8 +377,13 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             addPoint(thisSeries, segment, predicates, monitor);
         }
 
+        Map<String, ISeriesModel> seriesModelMap = new HashMap<>();
+        for (Entry<String, Series> entry : types.entrySet()) {
+            SeriesModel seriesModel = entry.getValue().build();
+            seriesModelMap.put(Long.toString(seriesModel.getId()), seriesModel);
+        }
         return TmfXyResponseFactory.create(Objects.requireNonNull(Messages.SegmentStoreScatterGraphViewer_title),
-                Maps.transformValues(types, Series::build), complete);
+                seriesModelMap, complete);
     }
 
     private static String getSegmentName(ISegment segment) {
@@ -433,7 +457,9 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         }
 
         public SeriesModel build() {
-            return new SeriesModel(getId(), getName(), Longs.toArray(fXValues), Doubles.toArray(fYValues), Ints.toArray(fProperties));
+            SeriesModelBuilder builder = new SeriesModel.SeriesModelBuilder(getId(), getName(), Longs.toArray(fXValues), Doubles.toArray(fYValues));
+            builder.setProperties(Ints.toArray(fProperties)).build();
+            return builder.setProperties(Ints.toArray(fProperties)).build();
         }
 
         private long getId() {
@@ -477,6 +503,26 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
     @Override
     public String getId() {
         return fId;
+    }
+
+    @Deprecated
+    @Override
+    public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        return fetchXY(parameters, monitor);
+    }
+
+    @Deprecated
+    @Override
+    public TmfModelResponse<List<TmfTreeDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        TmfModelResponse<TmfTreeModel<TmfTreeDataModel>> response = fetchTree(parameters, monitor);
+        TmfTreeModel<@NonNull TmfTreeDataModel> model = response.getModel();
+        List<TmfTreeDataModel> treeModel = null;
+        if (model != null) {
+            treeModel = model.getEntries();
+        }
+        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
     }
 
 }

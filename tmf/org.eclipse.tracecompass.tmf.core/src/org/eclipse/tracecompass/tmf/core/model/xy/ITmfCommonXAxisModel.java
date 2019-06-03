@@ -43,7 +43,19 @@ public interface ITmfCommonXAxisModel extends ITmfXyModel {
      * Get the X values
      *
      * @return The x values
+     * @since 5.0
      */
+    default long[] getXValues() {
+        return getXAxis();
+    }
+
+    /**
+     * Get the X values
+     *
+     * @return The x values
+     * @deprecated Use getXValues instead
+     */
+    @Deprecated
     long[] getXAxis();
 
     /**

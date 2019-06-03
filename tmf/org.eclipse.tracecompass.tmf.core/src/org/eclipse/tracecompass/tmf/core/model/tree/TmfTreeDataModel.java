@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.tmf.core.model.tree;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -23,7 +25,7 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
 
     private final long fId;
     private final long fParentId;
-    private final String fName;
+    private final List<String> fLabels;
 
     /**
      * Constructor
@@ -36,9 +38,24 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
      *            The name of this model
      */
     public TmfTreeDataModel(long id, long parentId, String name) {
+        this(id, parentId, Collections.singletonList(name));
+    }
+
+    /**
+     * Constructor
+     *
+     * @param id
+     *            The id of the model
+     * @param parentId
+     *            The parent id of this model. If it has none, give <code>-1</code>.
+     * @param labels
+     *            The name of this model
+     * @since 5.0
+     */
+    public TmfTreeDataModel(long id, long parentId, List<String> labels) {
         fId = id;
         fParentId = parentId;
-        fName = name;
+        fLabels = labels;
     }
 
     @Override
@@ -53,7 +70,12 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
 
     @Override
     public String getName() {
-        return fName;
+        return fLabels.isEmpty() ? "" : fLabels.get(0); //$NON-NLS-1$
+    }
+
+    @Override
+    public List<String> getLabels() {
+        return fLabels;
     }
 
     @Override
@@ -70,16 +92,16 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
         TmfTreeDataModel other = (TmfTreeDataModel) obj;
         return fId == other.fId
                 && fParentId == other.fParentId
-                && fName.equals(other.fName);
+                && fLabels.equals(other.fLabels);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fId, fParentId, fName);
+        return Objects.hash(fId, fParentId, fLabels);
     }
 
     @Override
     public String toString() {
-        return "<name=" + fName + " id=" + fId + " parentId=" + fParentId + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        return "<name=" + fLabels + " id=" + fId + " parentId=" + fParentId + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 }

@@ -24,15 +24,16 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.counters.core.CounterAnalysis;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.xy.AbstractTreeCommonXDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.YModel;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectedCounterQueryFilter;
-import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
-import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
@@ -56,6 +57,11 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
      * This data provider's extension point ID
      */
     public static final String ID = "org.eclipse.tracecompass.analysis.counters.core.CounterDataProvider"; //$NON-NLS-1$
+
+    /**
+     * Cumulative key to extract isCumulative from parameters map
+     */
+    public static final String CUMULATIVE_COUNTER_KEY = "isCumulative"; //$NON-NLS-1$
 
     /**
      * Chart's title
@@ -96,19 +102,19 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
      * @since 1.2
      */
     @Override
-    protected List<TmfTreeDataModel> getTree(ITmfStateSystem ss, TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    protected TmfTreeModel<TmfTreeDataModel> getTree(ITmfStateSystem ss, Map<String, Object> parameters, @Nullable IProgressMonitor monitor) {
         List<TmfTreeDataModel> entries = new ArrayList<>();
         long rootId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
-        entries.add(new TmfTreeDataModel(rootId, -1, getTrace().getName()));
+        entries.add(new TmfTreeDataModel(rootId, -1, Collections.singletonList(getTrace().getName())));
 
-        addTreeViewerBranch(ss, rootId, CounterAnalysis.GROUPED_COUNTER_ASPECTS_ATTRIB, entries);
-        addTreeViewerBranch(ss, rootId, CounterAnalysis.UNGROUPED_COUNTER_ASPECTS_ATTRIB, entries);
+        addTreeViewerBranch(ss, rootId, Collections.singletonList(CounterAnalysis.GROUPED_COUNTER_ASPECTS_ATTRIB), entries);
+        addTreeViewerBranch(ss, rootId, Collections.singletonList(CounterAnalysis.UNGROUPED_COUNTER_ASPECTS_ATTRIB), entries);
 
-        return entries;
+        return new TmfTreeModel<>(Collections.emptyList(), entries);
     }
 
-    private void addTreeViewerBranch(ITmfStateSystem ss, long parentId, String branchName, List<TmfTreeDataModel> entries) {
-        int quark = ss.optQuarkAbsolute(branchName);
+    private void addTreeViewerBranch(ITmfStateSystem ss, long parentId, List<String> branchName, List<TmfTreeDataModel> entries) {
+        int quark = ss.optQuarkAbsolute(branchName.get(0));
         if (quark != ITmfStateSystem.INVALID_ATTRIBUTE && !ss.getSubAttributes(quark, false).isEmpty()) {
             long id = getId(quark);
             TmfTreeDataModel branch = new TmfTreeDataModel(id, parentId, branchName);
@@ -123,7 +129,7 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
     private void addTreeViewerEntries(ITmfStateSystem ss, long parentId, int quark, List<TmfTreeDataModel> entries) {
         for (int childQuark : ss.getSubAttributes(quark, false)) {
             long id = getId(childQuark);
-            TmfTreeDataModel childBranch = new TmfTreeDataModel(id, parentId, ss.getAttributeName(childQuark));
+            TmfTreeDataModel childBranch = new TmfTreeDataModel(id, parentId, Collections.singletonList(ss.getAttributeName(childQuark)));
             entries.add(childBranch);
             addTreeViewerEntries(ss, id, childQuark, entries);
         }
@@ -133,17 +139,22 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
      * @since 1.2
      */
     @Override
-    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, SelectionTimeQueryFilter filter,
+    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters,
             @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
-        if (filter instanceof SelectedCounterQueryFilter) {
-            SelectedCounterQueryFilter selection = (SelectedCounterQueryFilter) filter;
-            return internalFetch(ss, selection, monitor);
+        // Check if the parameters contain timeRequested and selectedItems
+        // isCumulative will be compute later
+        if (FetchParametersUtils.createSelectionTimeQuery(fetchParameters) != null) {
+            return internalFetch(ss, fetchParameters, monitor);
         }
         return Collections.emptyMap();
     }
 
-    private @Nullable Map<String, IYModel> internalFetch(ITmfStateSystem ss, SelectedCounterQueryFilter filter,
+    private @Nullable Map<String, IYModel> internalFetch(ITmfStateSystem ss, Map<String, Object> fetchParameters,
             @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
+        SelectedCounterQueryFilter filter = createCounterQuery(fetchParameters);
+        if (filter == null) {
+            return null;
+        }
         long stateSystemEndTime = ss.getCurrentEndTime();
         Collection<Long> times = extractRequestedTimes(ss, filter, stateSystemEndTime);
 
@@ -172,6 +183,21 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
         }
 
         return ySeries.build();
+    }
+
+    private static @Nullable SelectedCounterQueryFilter createCounterQuery(Map<String, Object> parameters) {
+        List<Long> timeRequested = DataProviderParameterUtils.extractTimeRequested(parameters);
+        List<Long> selectedItems = DataProviderParameterUtils.extractSelectedItems(parameters);
+
+        if (timeRequested == null || selectedItems == null) {
+            return null;
+        }
+
+        Boolean isCumulativeParameter = DataProviderParameterUtils.extractBoolean(parameters, CUMULATIVE_COUNTER_KEY);
+        // If the cumulative parameter is not present in the parameters use
+        // "false" as default value
+        boolean isCumulative = isCumulativeParameter != null && isCumulativeParameter;
+        return new SelectedCounterQueryFilter(timeRequested, selectedItems, isCumulative);
     }
 
     /**

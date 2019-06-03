@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractStateSystemAnalysisDataProvider;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
@@ -34,6 +35,7 @@ import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -71,7 +73,7 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
     private final A fAnalysisModule;
     private final ReentrantReadWriteLock fLock = new ReentrantReadWriteLock(false);
     private final BiMap<Long, Integer> fIdToQuark = HashBiMap.create();
-    private @Nullable TmfModelResponse<List<M>> fCached;
+    private @Nullable TmfModelResponse<TmfTreeModel<M>> fCached;
     private final Map<Long, Multimap<String, String>> fEntryMetadata = new HashMap<>();
 
     /**
@@ -98,7 +100,7 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
 
     /**
      * Get (and generate if necessary) a unique id for this quark. Should be called
-     * inside {@link #getTree(ITmfStateSystem, TimeQueryFilter, IProgressMonitor)},
+     * inside {@link #getTree(ITmfStateSystem, Map, IProgressMonitor)},
      * where the write lock is held.
      *
      * @param quark
@@ -164,8 +166,21 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
         return times;
     }
 
+    @Deprecated
     @Override
-    public final TmfModelResponse<List<M>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<List<M>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        TmfModelResponse<TmfTreeModel<M>> response = fetchTree(parameters, monitor);
+        TmfTreeModel<M> treeModel = response.getModel();
+        List<M> listModel = null;
+        if (treeModel != null) {
+            listModel = treeModel.getEntries();
+        }
+        return new TmfModelResponse<>(listModel, response.getStatus(), response.getStatusMessage());
+    }
+
+    @Override
+    public final TmfModelResponse<TmfTreeModel<M>> fetchTree(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         fLock.readLock().lock();
         try {
             if (fCached != null) {
@@ -190,18 +205,18 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
         boolean complete = ss.waitUntilBuilt(0);
         try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "AbstractTreeDataProvider#fetchTree") //$NON-NLS-1$
                 .setCategory(getClass().getSimpleName()).build()) {
-            List<M> tree = null;
+            TmfTreeModel<M> tree = null;
             /* Don't query empty state system */
             if (ss.getNbAttributes() > 0 && ss.getStartTime() != Long.MIN_VALUE) {
-                tree = getTree(ss, filter, monitor);
-                for (M model : tree) {
+                tree = getTree(ss, fetchParameters, monitor);
+                for (M model : tree.getEntries()) {
                     if (model instanceof IElementResolver) {
                         fEntryMetadata.put(model.getId(), ((IElementResolver) model).getMetadata());
                     }
                 }
             }
             if (complete) {
-                TmfModelResponse<List<M>> response = new TmfModelResponse<>(tree,
+                TmfModelResponse<TmfTreeModel<M>> response = new TmfModelResponse<>(tree,
                         ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
                 if (isCacheable()) {
                     fCached = response;
@@ -245,8 +260,8 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      *
      * @param ss
      *            the {@link TmfStateSystemAnalysisModule}'s {@link ITmfStateSystem}
-     * @param filter
-     *            the query's filter
+     * @param fetchParameters
+     *            the query's parameters
      * @param monitor
      *            progress monitor
      * @return the tree of entries
@@ -254,6 +269,6 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      *             if the state system was closed during the query or could not be
      *             queried.
      */
-    protected abstract List<M> getTree(ITmfStateSystem ss, TimeQueryFilter filter,
+    protected abstract TmfTreeModel<M> getTree(ITmfStateSystem ss, Map<String, Object> fetchParameters,
             @Nullable IProgressMonitor monitor) throws StateSystemDisposedException;
 }

@@ -24,6 +24,10 @@ public class Messages extends NLS {
      * CPU Usage title
      */
     public static @Nullable String CpuUsageDataProvider_title;
+    /**
+     * Data provider help text
+     */
+    public static @Nullable String CpuUsageProviderFactory_DescriptionText;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -19,6 +19,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -26,6 +27,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlAnalysisModuleSource;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.XmlDataProviderManager;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
@@ -33,6 +35,7 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
@@ -166,7 +169,7 @@ public class XmlXyDataProviderTest {
     }
 
     private static void assertRows(ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> xyProvider, Map<Long, String> tree, List<String> expectedStrings) {
-        TmfModelResponse<@NonNull ITmfXyModel> rowResponse = xyProvider.fetchXY(new SelectionTimeQueryFilter(1, 20, 20, tree.keySet()), null);
+        TmfModelResponse<@NonNull ITmfXyModel> rowResponse = xyProvider.fetchXY(FetchParametersUtils.selectionTimeQueryToMap(new SelectionTimeQueryFilter(1, 20, 20, tree.keySet())), null);
         assertNotNull(rowResponse);
         assertEquals(ITmfResponse.Status.COMPLETED, rowResponse.getStatus());
         ITmfXyModel rowModel = rowResponse.getModel();
@@ -177,7 +180,15 @@ public class XmlXyDataProviderTest {
             String expectedString = expectedStrings.get(i);
             String[] split = expectedString.split(":");
             String rowName = split[0];
-            ISeriesModel row = data.get(rowName);
+            String rowId = null;
+            for (Entry<Long, String> entry : tree.entrySet()) {
+                if (entry.getValue().equals(rowName)) {
+                    rowId = Long.toString(entry.getKey());
+                    break;
+                }
+            }
+            assertNotNull(rowId);
+            ISeriesModel row = data.get(rowId);
             assertNotNull(row);
 
             String[] expectedData = split[1].split(",");
@@ -194,18 +205,19 @@ public class XmlXyDataProviderTest {
     }
 
     private static Map<Long, String> assertAndGetTree(ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> xyProvider, ITmfTrace trace, List<String> expectedStrings) {
-        TmfModelResponse<@NonNull List<ITmfTreeDataModel>> treeResponse = xyProvider.fetchTree(new TimeQueryFilter(0, Long.MAX_VALUE, 2), MONITOR);
+        TmfModelResponse<@NonNull TmfTreeModel<@NonNull ITmfTreeDataModel>> treeResponse = xyProvider.fetchTree(FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(0, Long.MAX_VALUE, 2)), MONITOR);
         assertNotNull(treeResponse);
         assertEquals(ITmfResponse.Status.COMPLETED, treeResponse.getStatus());
-        List<ITmfTreeDataModel> treeModel = treeResponse.getModel();
+        TmfTreeModel<@NonNull ITmfTreeDataModel> treeModel = treeResponse.getModel();
         assertNotNull(treeModel);
+        List<@NonNull ITmfTreeDataModel> treeEntries = treeModel.getEntries();
 
         Map<Long, String> map = new HashMap<>();
         for (int i = 0; i < expectedStrings.size(); i++) {
             String expectedString = expectedStrings.get(i);
-            assertTrue("actual entry absent at " + i + ": " + expectedString, treeModel.size() > i);
+            assertTrue("actual entry absent at " + i + ": " + expectedString, treeEntries.size() > i);
             String[] split = expectedString.split(",");
-            ITmfTreeDataModel xmlXyEntry = treeModel.get(i);
+            ITmfTreeDataModel xmlXyEntry = treeEntries.get(i);
 
             assertEquals("Checking entry name at " + i, split[0], xmlXyEntry.getName());
             // Check the parent
@@ -218,7 +230,7 @@ public class XmlXyDataProviderTest {
             }
             map.put(xmlXyEntry.getId(), xmlXyEntry.getName());
         }
-        assertEquals("Extra actual entries", expectedStrings.size(), treeModel.size());
+        assertEquals("Extra actual entries", expectedStrings.size(), treeEntries.size());
 
         return map;
     }

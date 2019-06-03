@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.events;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -39,15 +40,15 @@ public class TmfEventTableColumnDataModel extends TmfTreeDataModel {
      *            Column ID
      * @param parentId
      *            Parent ID, -1 if no parent
-     * @param name
-     *            Column name
+     * @param columnLabels
+     *            Column labels
      * @param headerTooltip
      *            Header tooltip
      * @param isHiddenByDefault
      *            If the column should be hidden by default
      */
-    public TmfEventTableColumnDataModel(long id, long parentId, String name, String headerTooltip, boolean isHiddenByDefault) {
-        super(id, parentId, name);
+    public TmfEventTableColumnDataModel(long id, long parentId, List<String> columnLabels, String headerTooltip, boolean isHiddenByDefault) {
+        super(id, parentId, columnLabels);
         fHeaderTooltip = headerTooltip;
         fHiddenByDefault = isHiddenByDefault;
     }
@@ -87,6 +88,6 @@ public class TmfEventTableColumnDataModel extends TmfTreeDataModel {
 
     @Override
     public int hashCode() {
-        return Objects.hash(fHeaderTooltip, fHiddenByDefault, getId(), getName());
+        return Objects.hash(fHeaderTooltip, fHiddenByDefault, getId(), getLabels());
     }
 }

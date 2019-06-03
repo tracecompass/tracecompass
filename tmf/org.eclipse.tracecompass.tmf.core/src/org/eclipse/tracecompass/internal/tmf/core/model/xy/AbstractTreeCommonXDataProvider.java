@@ -9,7 +9,6 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.model.xy;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -19,6 +18,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.tmf.core.model.TmfXyResponseFactory;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.tree.AbstractTreeDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -63,9 +63,25 @@ public abstract class AbstractTreeCommonXDataProvider<A extends TmfStateSystemAn
         super(trace, analysisModule);
     }
 
+    @Deprecated
     @Override
-    public final TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        return fetchXY(parameters, monitor);
+    }
+
+    @Override
+    public final TmfModelResponse<ITmfXyModel> fetchXY(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         A module = getAnalysisModule();
+
+        // TODO server: Parameters validation should be handle separately. It
+        // can be either in the data provider itself or before calling it. It
+        // will avoid the creation of filters and the content of the map can be
+        // use directly.
+        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
+        if (filter == null) {
+            return TmfXyResponseFactory.createFailedResponse(CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
+        }
         TmfModelResponse<ITmfXyModel> res = verifyParameters(module, filter, monitor);
         if (res != null) {
             return res;
@@ -78,11 +94,7 @@ public abstract class AbstractTreeCommonXDataProvider<A extends TmfStateSystemAn
 
         try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "AbstractTreeXyDataProvider#fetchXY") //$NON-NLS-1$
                 .setCategory(getClass().getSimpleName()).build()) {
-            if (!(filter instanceof SelectionTimeQueryFilter)) {
-                return TmfXyResponseFactory.create(getTitle(), filter.getTimesRequested(), Collections.emptyMap(), complete);
-            }
-
-            Map<String, IYModel> yModels = getYModels(ss, (SelectionTimeQueryFilter) filter, monitor);
+            Map<String, IYModel> yModels = getYModels(ss, fetchParameters, monitor);
             if (yModels == null) {
                 // getModels returns null if the query was cancelled.
                 return TmfXyResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
@@ -100,7 +112,7 @@ public abstract class AbstractTreeCommonXDataProvider<A extends TmfStateSystemAn
      *
      * @param ss
      *            the {@link TmfStateSystemAnalysisModule}'s {@link ITmfStateSystem}
-     * @param filter
+     * @param fetchParameters
      *            the query's filter
      * @param monitor
      *            progress monitor
@@ -110,7 +122,7 @@ public abstract class AbstractTreeCommonXDataProvider<A extends TmfStateSystemAn
      *             queried.
      */
     protected abstract @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss,
-            SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor)
+            Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor)
                     throws StateSystemDisposedException;
 
     /**

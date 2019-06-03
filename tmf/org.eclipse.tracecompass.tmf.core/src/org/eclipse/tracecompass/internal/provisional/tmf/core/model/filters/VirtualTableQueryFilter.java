@@ -10,6 +10,10 @@
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;
 
 import java.util.List;
+import java.util.Objects;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 
@@ -22,6 +26,7 @@ import com.google.common.collect.ImmutableList;
  * @author Yonni Chen
  * @since 4.0
  */
+@NonNullByDefault
 public class VirtualTableQueryFilter {
 
     private final List<Long> fDesiredColumns;
@@ -74,5 +79,24 @@ public class VirtualTableQueryFilter {
      */
     public long getIndex() {
         return fDesiredIndex;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        if (this == obj) {
+            return true;
+        }
+        VirtualTableQueryFilter other = (VirtualTableQueryFilter) obj;
+        return fDesiredColumns.equals(other.getColumnsId())
+                && fDesiredIndex == other.getIndex()
+                && fDesiredCount == other.getCount();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fDesiredColumns, fDesiredIndex, fDesiredCount);
     }
 }

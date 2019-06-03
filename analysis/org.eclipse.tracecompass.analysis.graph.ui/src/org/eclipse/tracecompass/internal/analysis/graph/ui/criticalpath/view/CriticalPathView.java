@@ -25,6 +25,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathModule;
 import org.eclipse.tracecompass.internal.analysis.graph.core.dataprovider.CriticalPathDataProvider;
 import org.eclipse.tracecompass.internal.analysis.graph.core.dataprovider.CriticalPathEntry;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
@@ -162,7 +163,7 @@ public class CriticalPathView extends BaseDataProviderTimeGraphView {
         for (Map.Entry<ITimeGraphDataProvider<?>, Map<Long, TimeGraphEntry>> entry : table.rowMap().entrySet()) {
             ITimeGraphDataProvider<?> provider = entry.getKey();
             Map<Long, TimeGraphEntry> map = entry.getValue();
-            TmfModelResponse<List<ITimeGraphArrow>> response = provider.fetchArrows(queryFilter, monitor);
+            TmfModelResponse<List<ITimeGraphArrow>> response = provider.fetchArrows(FetchParametersUtils.timeQueryToMap(queryFilter), monitor);
             List<ITimeGraphArrow> model = response.getModel();
 
             if (monitor.isCanceled()) {

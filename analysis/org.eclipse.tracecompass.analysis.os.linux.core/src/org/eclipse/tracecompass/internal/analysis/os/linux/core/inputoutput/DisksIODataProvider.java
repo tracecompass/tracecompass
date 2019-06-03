@@ -21,6 +21,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.Attributes;
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.Disk;
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.InputOutputAnalysisModule;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.xy.AbstractTreeCommonXDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
@@ -28,8 +29,8 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.model.YModel;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
-import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -151,10 +152,10 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
     }
 
     @Override
-    protected List<TmfTreeDataModel> getTree(ITmfStateSystem ss, TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    protected TmfTreeModel<TmfTreeDataModel> getTree(ITmfStateSystem ss, Map<String, Object> parameters, @Nullable IProgressMonitor monitor) {
         List<TmfTreeDataModel> nodes = new ArrayList<>();
         long rootId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
-        nodes.add(new TmfTreeDataModel(rootId, -1, getTrace().getName()));
+        nodes.add(new TmfTreeDataModel(rootId, -1, Collections.singletonList(getTrace().getName())));
 
         String readName = Objects.requireNonNull(Messages.DisksIODataProvider_read);
         String writeName = Objects.requireNonNull(Messages.DisksIODataProvider_write);
@@ -162,19 +163,19 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
         for (Integer diskQuark : ss.getQuarks(Attributes.DISKS, "*")) { //$NON-NLS-1$
             String diskName = getDiskName(ss, diskQuark);
             long diskId = getId(diskQuark);
-            nodes.add(new TmfTreeDataModel(diskId, rootId, diskName));
+            nodes.add(new TmfTreeDataModel(diskId, rootId, Collections.singletonList(diskName)));
 
             int readQuark = ss.optQuarkRelative(diskQuark, Attributes.SECTORS_READ);
             if (readQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
-                nodes.add(new TmfTreeDataModel(getId(readQuark), diskId, readName));
+                nodes.add(new TmfTreeDataModel(getId(readQuark), diskId, Collections.singletonList(readName)));
             }
 
             int writeQuark = ss.optQuarkRelative(diskQuark, Attributes.SECTORS_WRITTEN);
             if (writeQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
-                nodes.add(new TmfTreeDataModel(getId(writeQuark), diskId, writeName));
+                nodes.add(new TmfTreeDataModel(getId(writeQuark), diskId, Collections.singletonList(writeName)));
             }
         }
-        return nodes;
+        return new TmfTreeModel<>(Collections.emptyList(), nodes);
     }
 
     private static String getDiskName(ITmfStateSystem ss, Integer diskQuark) {
@@ -187,7 +188,11 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
     }
 
     @Override
-    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
+    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
+        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
+        if (filter == null) {
+            return null;
+        }
         long[] xValues = filter.getTimesRequested();
         List<DiskBuilder> builders = initBuilders(ss, filter);
         if (builders.isEmpty()) {

@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.core.memory;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -44,7 +46,24 @@ public class MemoryUsageTreeModel extends TmfTreeDataModel {
      *            The thread's name
      */
     public MemoryUsageTreeModel(long id, long parentId, int tid, String name) {
-        super(id, parentId, name);
+        this(id, parentId, tid, Collections.singletonList(name));
+    }
+
+    /**
+     * Constructor
+     *
+     * @param id
+     *            The id of this model
+     * @param parentId
+     *            The parent id of this model
+     * @param tid
+     *            The TID of the process
+     * @param labels
+     *            The thread's labels
+     * @since 4.0
+     */
+    public MemoryUsageTreeModel(long id, long parentId, int tid, List<String> labels) {
+        super(id, parentId, labels);
         fTid = tid;
     }
 

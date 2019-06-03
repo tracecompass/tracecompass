@@ -25,19 +25,22 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
-import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.timegraph.AbstractTimeGraphDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
@@ -116,14 +119,14 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
     }
 
     @Override
-    protected List<CallStackEntryModel> getTree(ITmfStateSystem ss, TimeQueryFilter filter,
+    protected TmfTreeModel<@NonNull CallStackEntryModel> getTree(ITmfStateSystem ss, Map<String, Object> parameters,
             @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
         long start = ss.getStartTime();
         long end = ss.getCurrentEndTime();
 
         ImmutableList.Builder<CallStackEntryModel> builder = ImmutableList.builder();
         long traceId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
-        builder.add(new CallStackEntryModel(traceId, -1, getTrace().getName(), start, end, CallStackEntryModel.TRACE, UNKNOWN_TID));
+        builder.add(new CallStackEntryModel(traceId, -1, Collections.singletonList(getTrace().getName()), start, end, CallStackEntryModel.TRACE, UNKNOWN_TID));
 
         List<Integer> processQuarks = ss.getQuarks(getAnalysisModule().getProcessesPattern());
         SubMonitor subMonitor = SubMonitor.convert(monitor, "CallStackDataProvider#fetchTree", processQuarks.size()); //$NON-NLS-1$
@@ -141,7 +144,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
                 String processName = ss.getAttributeName(processQuark);
                 Object processValue = fullEnd.get(processQuark).getValue();
                 pid = getThreadProcessId(processName, processValue);
-                builder.add(new CallStackEntryModel(threadParentId, traceId, processName, start, end,
+                builder.add(new CallStackEntryModel(threadParentId, traceId, Collections.singletonList(processName), start, end,
                         CallStackEntryModel.PROCESS, pid));
             }
 
@@ -169,7 +172,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
             subMonitor.worked(1);
         }
 
-        return builder.build();
+        return new TmfTreeModel<>(Collections.emptyList(), builder.build());
     }
 
     private CallStackEntryModel createThread(ITmfStateSystem ss, long start, long end, int threadQuark, long processId, int callStackQuark,
@@ -184,7 +187,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         int threadId = getThreadProcessId(threadName, threadStateValue);
         ITmfStateInterval startInterval = fullStart.get(callStackQuark);
         long threadStart = startInterval.getValue() == null ? Long.min(startInterval.getEndTime() + 1, end) : start;
-        return new CallStackEntryModel(getId(threadQuark), processId, threadName, threadStart, threadEnd, CallStackEntryModel.THREAD, threadId);
+        return new CallStackEntryModel(getId(threadQuark), processId, Collections.singletonList(threadName), threadStart, threadEnd, CallStackEntryModel.THREAD, threadId);
     }
 
     private void createStackEntries(List<Integer> callStackAttributes, long start, long end, int pid,
@@ -192,7 +195,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         int level = 1;
         for (int stackLevelQuark : callStackAttributes) {
             long id = getId(stackLevelQuark);
-            builder.add(new CallStackEntryModel(id, callStackParent, threadName, start, end, level, pid));
+            builder.add(new CallStackEntryModel(id, callStackParent, Collections.singletonList(threadName), start, end, level, pid));
             fQuarkToPid.put(stackLevelQuark, pid);
             level++;
         }
@@ -210,16 +213,20 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
     }
 
     @Override
-    protected List<ITimeGraphRowModel> getRowModel(ITmfStateSystem ss, SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor)
+    protected TimeGraphModel getRowModel(ITmfStateSystem ss, @NonNull Map<@NonNull String, @NonNull Object> parameters, @Nullable IProgressMonitor monitor)
             throws StateSystemDisposedException {
+        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(parameters);
+        if (filter == null) {
+            return null;
+        }
         Map<@NonNull Long, @NonNull Integer> entries = getSelectedEntries(filter);
         if (entries.size() == 1 && filter.getTimesRequested().length == 2) {
             // this is a request for a follow event.
             Entry<@NonNull Long, @NonNull Integer> entry = entries.entrySet().iterator().next();
             if (filter.getStart() == Long.MIN_VALUE) {
-                return getFollowEvent(ss, entry, filter.getEnd(), false);
+                return new TimeGraphModel(getFollowEvent(ss, entry, filter.getEnd(), false));
             } else if (filter.getEnd() == Long.MAX_VALUE) {
-                return getFollowEvent(ss, entry, filter.getStart(), true);
+                return new TimeGraphModel(getFollowEvent(ss, entry, filter.getStart(), true));
             }
         }
 
@@ -237,12 +244,12 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         subMonitor.worked(1);
 
         Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
-        if (filter instanceof TimeGraphStateQueryFilter) {
-            TimeGraphStateQueryFilter timeEventFilter = (TimeGraphStateQueryFilter) filter;
-            predicates.putAll(computeRegexPredicate(timeEventFilter));
+        Multimap<@NonNull Integer, @NonNull String> regexesMap = DataProviderParameterUtils.extractRegexFilter(parameters);
+        if (regexesMap != null) {
+            predicates.putAll(computeRegexPredicate(regexesMap));
         }
 
-        List<ITimeGraphRowModel> rows = new ArrayList<>();
+        @NonNull List<@NonNull ITimeGraphRowModel> rows = new ArrayList<>();
         for (Map.Entry<Long, Integer> entry : entries.entrySet()) {
             if (subMonitor.isCanceled()) {
                 return null;
@@ -258,7 +265,7 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
             rows.add(new TimeGraphRowModel(entry.getKey(), eventList));
         }
         subMonitor.worked(1);
-        return rows;
+        return new TimeGraphModel(rows);
     }
 
     private ITimeGraphState createTimeGraphState(ITmfStateInterval interval) {
@@ -273,8 +280,15 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         return new TimeGraphState(startTime, duration, Integer.MIN_VALUE);
     }
 
+    @Deprecated
     @Override
-    public TmfModelResponse<List<ITimeGraphArrow>> fetchArrows(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphArrow>> fetchArrows(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        return fetchArrows(parameters, monitor);
+    }
+
+    @Override
+    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphArrow>> fetchArrows(Map<String, Object> parameters, @Nullable IProgressMonitor monitor) {
         return new TmfModelResponse<>(null, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
@@ -342,8 +356,15 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         return null;
     }
 
+    @Deprecated
     @Override
-    public TmfModelResponse<Map<String, String>> fetchTooltip(SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
+        return fetchTooltip(parameters, monitor);
+    }
+
+    @Override
+    public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(Map<String, Object> parameters, @Nullable IProgressMonitor monitor) {
         return new TmfModelResponse<>(Collections.emptyMap(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 

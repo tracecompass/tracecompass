@@ -23,6 +23,27 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 public interface ISeriesModel {
 
     /**
+     * Series data type
+     *
+     * @author Simon Delisle
+     * @since 5.0
+     */
+    public enum DisplayType {
+        /**
+         * Line
+         */
+        LINE,
+        /**
+         * Scatter
+         */
+        SCATTER,
+        /**
+         * Area
+         */
+        AREA
+    }
+
+    /**
      * Get the unique ID for the entry associated to this series.
      *
      * @return the unique ID.
@@ -35,6 +56,38 @@ public interface ISeriesModel {
      * @return The name
      */
     String getName();
+
+    /**
+     * Get the X axis description
+     *
+     * @return X Axis description
+     * @since 5.0
+     */
+    @SuppressWarnings("nls")
+    default TmfXYAxis getXAxisDescription() {
+        return new TmfXYAxis("X Axis", "");
+    }
+
+    /**
+     * Get the Y axis description
+     *
+     * @return Y Axis description
+     * @since 5.0
+     */
+    @SuppressWarnings("nls")
+    default TmfXYAxis getYAxisDescription() {
+        return new TmfXYAxis("Y Axis", "");
+    }
+
+    /**
+     * Get the display type
+     *
+     * @return Type of display (eg. line, scatter, ...)
+     * @since 5.0
+     */
+    default DisplayType getDisplayType() {
+        return DisplayType.LINE;
+    }
 
     /**
      * Get the X values

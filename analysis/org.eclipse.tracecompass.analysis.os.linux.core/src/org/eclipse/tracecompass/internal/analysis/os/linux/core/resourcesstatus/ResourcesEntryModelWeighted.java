@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus;
 
+import java.util.List;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphEntryModelWeighted;
 
@@ -25,8 +27,8 @@ public class ResourcesEntryModelWeighted extends ResourcesEntryModel implements 
      *            unique Entry ID
      * @param parentId
      *            parent ID
-     * @param name
-     *            entry name
+     * @param labels
+     *            entry labels
      * @param startTime
      *            start time for this entry
      * @param endTime
@@ -40,8 +42,8 @@ public class ResourcesEntryModelWeighted extends ResourcesEntryModel implements 
      * @param max
      *            The maximum value of the states
      */
-    public ResourcesEntryModelWeighted(long id, long parentId, String name, long startTime, long endTime, int resourceId, Type type, long min, long max) {
-        super(id, parentId, name, startTime, endTime, resourceId, type);
+    public ResourcesEntryModelWeighted(long id, long parentId, List<String> labels, long startTime, long endTime, int resourceId, Type type, long min, long max) {
+        super(id, parentId, labels, startTime, endTime, resourceId, type);
         fMin = min;
         fMax = max;
     }

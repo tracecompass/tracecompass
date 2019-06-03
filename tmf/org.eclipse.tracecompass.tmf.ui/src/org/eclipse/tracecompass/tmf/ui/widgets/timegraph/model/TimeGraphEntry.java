@@ -161,8 +161,7 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
      *            The end time of this entry
      */
     public TimeGraphEntry(String name, long startTime, long endTime) {
-        this(new TimeGraphEntryModel(-1, -1, name, startTime, endTime));
-
+        this(new TimeGraphEntryModel(-1, -1, Collections.singletonList(name), startTime, endTime));
     }
 
     /**
@@ -255,7 +254,7 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
          * Model is immutable, this is the only way to do this, consider not updating
          * name in the future?
          */
-        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), name, getStartTime(), getEndTime(), fModel instanceof ITimeGraphEntryModel ? ((TimeGraphEntryModel) fModel).hasRowModel() : true);
+        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), Collections.singletonList(name), getStartTime(), getEndTime(), fModel instanceof ITimeGraphEntryModel ? ((TimeGraphEntryModel) fModel).hasRowModel() : true);
     }
 
     @Override
@@ -550,7 +549,7 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '(' + fModel.getName() + ')';
+        return getClass().getSimpleName() + '(' + fModel.getLabels() + ')';
     }
 
     /**

@@ -32,6 +32,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXm
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.model.DataDrivenStateSystemPath;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.TmfXyResponseFactory;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -43,6 +44,7 @@ import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
@@ -88,7 +90,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
     private final BiMap<Long, Integer> fIdToQuark = HashBiMap.create();
     private final BiMap<Integer, String> fQuarkToString = HashBiMap.create();
     private final long fTraceId = ENTRY_IDS.getAndIncrement();
-    private @Nullable TmfModelResponse<List<ITmfTreeDataModel>> fCached;
+    private @Nullable TmfModelResponse<TmfTreeModel<ITmfTreeDataModel>> fCached;
 
     private static class XmlXYEntry implements IXmlStateSystemContainer {
 
@@ -229,13 +231,17 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
     }
 
     @Override
-    public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<ITmfXyModel> fetchXY(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         DataDrivenStateSystemPath display = fDisplay;
         XmlXYEntry entry = fXmlEntry;
         ITmfStateSystem ss = entry.getStateSystem();
 
+        TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(fetchParameters);
+        if (filter == null) {
+            return TmfXyResponseFactory.createFailedResponse(CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
+        }
         long[] xValues = filter.getTimesRequested();
-        Map<Integer, IYModel> map = initSeries(filter);
+        Map<Integer, IYModel> map = initSeries(fetchParameters);
         if (map.isEmpty()) {
             return TmfXyResponseFactory.create(TITLE, xValues, Collections.emptyMap(), true);
         }
@@ -272,7 +278,29 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         }
 
         boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
-        return TmfXyResponseFactory.create(TITLE, xValues, Maps.uniqueIndex(map.values(), IYModel::getName), complete);
+        return TmfXyResponseFactory.create(TITLE, xValues, Maps.uniqueIndex(map.values(), yModel -> Long.toString(yModel.getId())), complete);
+    }
+
+    private Map<Integer, IYModel> initSeries(Map<String, Object> parameters) {
+        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(parameters);
+        if (filter == null) {
+            return Collections.emptyMap();
+        }
+        fLock.readLock().lock();
+        try {
+            Map<Integer, IYModel> map = new HashMap<>();
+            int length = filter.getTimesRequested().length;
+            for (Long id : filter.getSelectedItems()) {
+                Integer quark = fIdToQuark.get(id);
+                if (quark != null) {
+                    String name = String.valueOf(fQuarkToString.get(quark));
+                    map.put(quark, new YModel(id, name, new double[length]));
+                }
+            }
+            return map;
+        } finally {
+            fLock.readLock().unlock();
+        }
     }
 
     private static void getSeriesDelta(double[] data) {
@@ -286,28 +314,6 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         }
         data[0] = data[1];
     }
-
-    private Map<Integer, IYModel> initSeries(TimeQueryFilter filter) {
-        if (!(filter instanceof SelectionTimeQueryFilter)) {
-            return Collections.emptyMap();
-        }
-        fLock.readLock().lock();
-        try {
-            Map<Integer, IYModel> map = new HashMap<>();
-            int length = filter.getTimesRequested().length;
-            for (Long id : ((SelectionTimeQueryFilter) filter).getSelectedItems()) {
-                Integer quark = fIdToQuark.get(id);
-                if (quark != null) {
-                    String name = String.valueOf(fQuarkToString.get(quark));
-                    map.put(quark, new YModel(id, name, new double[length]));
-                }
-            }
-            return map;
-        } finally {
-            fLock.readLock().unlock();
-        }
-    }
-
     private static double extractValue(@Nullable Object val) {
         if (val instanceof Number) {
             return ((Number) val).doubleValue();
@@ -339,7 +345,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
      * @since 2.4
      */
     @Override
-    public TmfModelResponse<List<ITmfTreeDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<TmfTreeModel<ITmfTreeDataModel>> fetchTree(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         fLock.readLock().lock();
         try {
             if (fCached != null) {
@@ -359,7 +365,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         try {
             List<ITmfStateInterval> fullState = ss.queryFullState(ss.getCurrentEndTime());
             ImmutableList.Builder<ITmfTreeDataModel> builder = ImmutableList.builder();
-            builder.add(new TmfTreeDataModel(fTraceId, -1, getTrace().getName()));
+            builder.add(new TmfTreeDataModel(fTraceId, -1, Collections.singletonList(getTrace().getName())));
 
             for (int quark : quarks) {
                 String seriesName = ss.getAttributeName(quark);
@@ -376,17 +382,17 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
                     String uniqueName = fQuarkToString.computeIfAbsent(quark, q -> getUniqueNameFor(tempSeriesName));
                     // Check if an ID has already been created for this quark.
                     Long id = fIdToQuark.inverse().computeIfAbsent(quark, q -> ENTRY_IDS.getAndIncrement());
-                    builder.add(new TmfTreeDataModel(id, fTraceId, uniqueName));
+                    builder.add(new TmfTreeDataModel(id, fTraceId, Collections.singletonList(uniqueName)));
                 }
             }
 
             ImmutableList<ITmfTreeDataModel> list = builder.build();
             if (isComplete) {
-                TmfModelResponse<List<ITmfTreeDataModel>> tmfModelResponse = new TmfModelResponse<>(list, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+                TmfModelResponse<TmfTreeModel<ITmfTreeDataModel>> tmfModelResponse = new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), list), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
                 fCached = tmfModelResponse;
                 return tmfModelResponse;
             }
-            return new TmfModelResponse<>(list, ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
+            return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), list), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
         } catch (StateSystemDisposedException e) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
         } finally {
@@ -412,5 +418,25 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
     @Override
     public String getId() {
         return ID;
+    }
+
+    @Deprecated
+    @Override
+    public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        return fetchXY(parameters, monitor);
+    }
+
+    @Deprecated
+    @Override
+    public TmfModelResponse<List<ITmfTreeDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        TmfModelResponse<@NonNull TmfTreeModel<@NonNull ITmfTreeDataModel>> response = fetchTree(parameters, monitor);
+        TmfTreeModel<@NonNull ITmfTreeDataModel> model = response.getModel();
+        List<ITmfTreeDataModel> treeModel = null;
+        if (model != null) {
+            treeModel = model.getEntries();
+        }
+        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
     }
 }

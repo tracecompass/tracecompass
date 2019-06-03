@@ -540,4 +540,14 @@ public interface ITmfTrace extends ITmfEventProvider {
         String traceTypeId = getTraceTypeId();
         long initialTimeRange = traceTypeId != null ? TraceTypePreferences.getInitialTimeRange(traceTypeId, getInitialRangeOffset().toNanos()) : getInitialRangeOffset().toNanos();
         return new TmfTimeRange(startTime, TmfTimestamp.fromNanos(SaturatedArithmetic.add(startTime.toNanos(), initialTimeRange)));    }
+
+    /**
+     * Get the indexing status of trace
+     *
+     * @return True if the trace is still being indexed, false if not
+     * @since 5.0
+     */
+    public default boolean isIndexing() {
+        return false;
+    }
 }

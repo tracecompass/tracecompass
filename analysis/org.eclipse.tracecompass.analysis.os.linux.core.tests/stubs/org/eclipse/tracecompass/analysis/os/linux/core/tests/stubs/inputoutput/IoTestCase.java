@@ -8,17 +8,20 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.inputoutput;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.IoOperationType;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.LinuxTestCase;
-import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -187,10 +190,13 @@ public class IoTestCase extends LinuxTestCase {
         /**
          * Get the time query given the test parameters
          *
-         * @return The time query filter
+         * @return The parameter map for the time query
          */
-        public TimeQueryFilter getTimeQuery() {
-            return new TimeQueryFilter(fStartTime, fEndTime, fResolution);
+        public Map<String, Object> getTimeQuery() {
+            TimeQueryFilter filter = new TimeQueryFilter(fStartTime, fEndTime, fResolution);
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, getTimeRequested(filter));
+            return parameters;
         }
 
         /**
@@ -201,10 +207,10 @@ public class IoTestCase extends LinuxTestCase {
          *            The list of tree models available
          * @return The query
          */
-        public TimeQueryFilter getTimeQueryForModel(List<TmfTreeDataModel> model) {
+        public Map<String, Object> getTimeQueryForModel(TmfTreeModel<TmfTreeDataModel> model) {
             long diskId = getDiskId(model);
             long selectionId = -1;
-            for (TmfTreeDataModel oneModel : model) {
+            for (TmfTreeDataModel oneModel : model.getEntries()) {
                 if (oneModel.getParentId() == diskId) {
                     switch (fType) {
                     case READ:
@@ -226,11 +232,13 @@ public class IoTestCase extends LinuxTestCase {
             if (selectionId == -1) {
                 throw new NoSuchElementException("Requested entry not found for " + fDiskName + ' ' + fType);
             }
-            return new SelectionTimeQueryFilter(fStartTime, fEndTime, fResolution, Collections.singleton(selectionId));
+            Map<String, Object> parameters = getTimeQuery();
+            parameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, Collections.singletonList(selectionId));
+            return parameters;
         }
 
-        private long getDiskId(List<TmfTreeDataModel> model) {
-            for (TmfTreeDataModel oneModel : model) {
+        private long getDiskId(TmfTreeModel<TmfTreeDataModel> model) {
+            for (TmfTreeDataModel oneModel : model.getEntries()) {
                 if (fDiskName.equals(oneModel.getName())) {
                     return oneModel.getId();
                 }
@@ -278,6 +286,14 @@ public class IoTestCase extends LinuxTestCase {
      */
     public Collection<DiskActivity> getDiskActivity() {
         return Collections.emptyList();
+    }
+
+    private static List<Long> getTimeRequested(TimeQueryFilter filter) {
+        List<Long> times = new ArrayList<>();
+        for (long time : filter.getTimesRequested()) {
+            times.add(time);
+        }
+        return times;
     }
 
 }

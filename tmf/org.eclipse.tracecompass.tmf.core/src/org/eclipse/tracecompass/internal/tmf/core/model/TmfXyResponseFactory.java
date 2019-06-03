@@ -15,13 +15,15 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
-import org.eclipse.tracecompass.tmf.core.model.TmfCommonXAxisModel;
+import org.eclipse.tracecompass.tmf.core.model.SeriesModel;
 import org.eclipse.tracecompass.tmf.core.model.TmfXyModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
+
+import com.google.common.collect.Maps;
 
 /**
  * This class creates instance of {@link TmfModelResponse}
@@ -55,7 +57,9 @@ public final class TmfXyResponseFactory {
      *         completed status
      */
     public static TmfModelResponse<ITmfXyModel> create(String title, long[] xValues, Map<String, IYModel> yModels, boolean isComplete) {
-        ITmfXyModel model = new TmfCommonXAxisModel(title, xValues, yModels);
+//        ITmfXyModel model = new TmfCommonXAxisModel(title, xValues, yModels);
+        Map<String, ISeriesModel> series = Maps.transformValues(yModels, model -> new SeriesModel(model.getId(), model.getName(), xValues, model.getData()));
+        ITmfXyModel model = new TmfXyModel(title, series);
 
         if (isComplete) {
             return new TmfModelResponse<>(model, ITmfResponse.Status.COMPLETED, Objects.requireNonNull(CommonStatusMessage.COMPLETED));

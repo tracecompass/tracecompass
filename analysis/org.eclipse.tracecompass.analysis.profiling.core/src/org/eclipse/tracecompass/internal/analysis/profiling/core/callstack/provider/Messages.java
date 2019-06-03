@@ -33,6 +33,15 @@ public class Messages extends NLS {
      */
     public static @Nullable String CallStackStateProvider_IncoherentCallstack;
 
+    /**
+     * Name of the data provider shown to the user
+     */
+    public static @Nullable String CallStackDataProviderFactory_title;
+    /**
+     * Help text for the data descriptor
+     */
+    public static @Nullable String CallStackDataProviderFactory_descriptionText;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

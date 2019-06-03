@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfFilterModel;
 
@@ -24,6 +25,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfFi
  * @author Yonni Chen
  * @since 4.0
  */
+@NonNullByDefault
 public class EventTableQueryFilter extends VirtualTableQueryFilter {
 
     private final @Nullable Map<Long, String> fSearchFilter;

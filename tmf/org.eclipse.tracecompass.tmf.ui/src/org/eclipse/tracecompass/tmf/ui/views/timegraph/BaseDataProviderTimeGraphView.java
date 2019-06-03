@@ -19,10 +19,12 @@ import java.util.Map.Entry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeGraphStateQueryFilter;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
+import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
@@ -30,7 +32,9 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -115,7 +119,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         }
         boolean complete = false;
         while (!complete && !monitor.isCanceled()) {
-            TmfModelResponse<List<TimeGraphEntryModel>> response = dataProvider.fetchTree(new TimeQueryFilter(0, Long.MAX_VALUE, 2), monitor);
+            TmfModelResponse<TmfTreeModel<@NonNull TimeGraphEntryModel>> response = dataProvider.fetchTree(FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(0, Long.MAX_VALUE, 2)), monitor);
             if (response.getStatus() == ITmfResponse.Status.FAILED) {
                 Activator.getDefault().logError(getClass().getSimpleName() + " Data Provider failed: " + response.getStatusMessage()); //$NON-NLS-1$
                 return;
@@ -124,10 +128,10 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             }
             complete = response.getStatus() == ITmfResponse.Status.COMPLETED;
 
-            List<TimeGraphEntryModel> model = response.getModel();
+            TmfTreeModel<@NonNull TimeGraphEntryModel> model = response.getModel();
             if (model != null) {
                 synchronized (fEntries) {
-                    for (TimeGraphEntryModel entry : model) {
+                    for (TimeGraphEntryModel entry : model.getEntries()) {
                         TimeGraphEntry uiEntry = fEntries.get(dataProvider, entry.getId());
                         if (entry.getParentId() != -1) {
                             if (uiEntry == null) {
@@ -286,12 +290,17 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
 
         for (Entry<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Collection<Long>> entry : providersToModelIds.asMap().entrySet()) {
             ITimeGraphDataProvider<? extends TimeGraphEntryModel> dataProvider = entry.getKey();
-            TimeGraphStateQueryFilter filter = new TimeGraphStateQueryFilter(times, entry.getValue(), getRegexes());
-            TmfModelResponse<List<ITimeGraphRowModel>> response = dataProvider.fetchRowModel(filter, monitor);
+            SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(times, entry.getValue());
+            Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
+            Multimap<@NonNull Integer, @NonNull String> regexesMap = getRegexes();
+            if (!regexesMap.isEmpty()) {
+                parameters.put(DataProviderParameterUtils.REGEX_MAP_FILTERS_KEY, regexesMap.asMap());
+            }
+            TmfModelResponse<TimeGraphModel> response = dataProvider.fetchRowModel(parameters, monitor);
 
-            List<ITimeGraphRowModel> model = response.getModel();
+            TimeGraphModel model = response.getModel();
             if (model != null) {
-                zoomEntries(fEntries.row(dataProvider), model, response.getStatus() == ITmfResponse.Status.COMPLETED, sampling);
+                zoomEntries(fEntries.row(dataProvider), model.getRows(), response.getStatus() == ITmfResponse.Status.COMPLETED, sampling);
             }
             subMonitor.worked(1);
         }
@@ -416,7 +425,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
 
         for (TraceEntry entry : Iterables.filter(traceEntries, TraceEntry.class)) {
             ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = entry.getProvider();
-            TmfModelResponse<List<ITimeGraphArrow>> response = provider.fetchArrows(queryFilter, monitor);
+            TmfModelResponse<List<ITimeGraphArrow>> response = provider.fetchArrows(FetchParametersUtils.timeQueryToMap(queryFilter), monitor);
             List<ITimeGraphArrow> model = response.getModel();
 
             if (model != null) {

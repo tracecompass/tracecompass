@@ -21,19 +21,23 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreStatisticsModel;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
 import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.FilterTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
-import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse.Status;
+import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -99,8 +103,21 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         fProvider = provider;
     }
 
+    @Deprecated
     @Override
     public TmfModelResponse<List<SegmentStoreStatisticsModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        TmfModelResponse<@NonNull TmfTreeModel<@NonNull SegmentStoreStatisticsModel>> response = fetchTree(parameters, monitor);
+        TmfTreeModel<@NonNull SegmentStoreStatisticsModel> model = response.getModel();
+        List<SegmentStoreStatisticsModel> treeModel = null;
+        if (model != null) {
+            treeModel = model.getEntries();
+        }
+        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
+    }
+
+    @Override
+    public TmfModelResponse<TmfTreeModel<SegmentStoreStatisticsModel>> fetchTree(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         if (monitor != null) {
             fProvider.waitForCompletion(monitor);
             if (monitor.isCanceled()) {
@@ -116,22 +133,24 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         }
 
         List<SegmentStoreStatisticsModel> list = new ArrayList<>();
-        list.add(new SegmentStoreStatisticsModel(fTraceId, -1, Objects.requireNonNull(getTrace().getName()), statsTotal));
+        list.add(new SegmentStoreStatisticsModel(fTraceId, -1, Collections.singletonList(Objects.requireNonNull(getTrace().getName())), statsTotal));
 
         /*
          * Add statistics for full duration.
          */
         long totalId = getUniqueId(TOTAL_PREFIX);
-        list.add(new SegmentStoreStatisticsModel(totalId, fTraceId, Objects.requireNonNull(Messages.SegmentStoreStatisticsDataProvider_Total), statsTotal));
+        list.add(new SegmentStoreStatisticsModel(totalId, fTraceId, Collections.singletonList(Objects.requireNonNull(Messages.SegmentStoreStatisticsDataProvider_Total)), statsTotal));
         Map<String, IStatistics<ISegment>> totalStats = fProvider.getStatsPerType();
         for (Entry<String, IStatistics<ISegment>> entry : totalStats.entrySet()) {
-            list.add(new SegmentStoreStatisticsModel(getUniqueId(TOTAL_PREFIX + entry.getKey()), totalId, entry.getKey(), entry.getValue()));
+            list.add(new SegmentStoreStatisticsModel(getUniqueId(TOTAL_PREFIX + entry.getKey()), totalId, Collections.singletonList(entry.getKey()), entry.getValue()));
         }
 
         /*
          * Add statistics for selection if any.
          */
-        if (filter instanceof FilterTimeQueryFilter && ((FilterTimeQueryFilter) filter).isFiltered()) {
+        TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(fetchParameters);
+        Boolean isFiltered = DataProviderParameterUtils.extractIsFiltered(fetchParameters);
+        if (filter != null && isFiltered != null && isFiltered) {
             long start = filter.getStart();
             long end = filter.getEnd();
 
@@ -142,13 +161,13 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
             }
 
             long selectionId = getUniqueId(SELECTION_PREFIX);
-            list.add(new SegmentStoreStatisticsModel(selectionId, fTraceId, Objects.requireNonNull(Messages.SegmentStoreStatisticsDataProvider_Selection), statsForRange));
+            list.add(new SegmentStoreStatisticsModel(selectionId, fTraceId, Collections.singletonList(Objects.requireNonNull(Messages.SegmentStoreStatisticsDataProvider_Selection)), statsForRange));
             Map<String, IStatistics<ISegment>> selectionStats = fProvider.getStatsPerTypeForRange(start, end, nonNullMonitor);
             for (Entry<String, IStatistics<ISegment>> entry : selectionStats.entrySet()) {
-                list.add(new SegmentStoreStatisticsModel(getUniqueId(SELECTION_PREFIX + entry.getKey()), selectionId, entry.getKey(), entry.getValue()));
+                list.add(new SegmentStoreStatisticsModel(getUniqueId(SELECTION_PREFIX + entry.getKey()), selectionId, Collections.singletonList(entry.getKey()), entry.getValue()));
             }
         }
-        return new TmfModelResponse<>(Collections.unmodifiableList(list), Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), Collections.unmodifiableList(list)), Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
     private long getUniqueId(String name) {

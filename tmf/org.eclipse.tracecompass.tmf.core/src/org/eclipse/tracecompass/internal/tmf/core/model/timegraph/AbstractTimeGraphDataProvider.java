@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.internal.tmf.core.model.timegraph;
 
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -17,6 +18,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.tree.AbstractTreeDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
@@ -27,6 +29,7 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphStateFilter;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse.Status;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
@@ -63,8 +66,21 @@ public abstract class AbstractTimeGraphDataProvider<A extends TmfStateSystemAnal
         super(trace, analysisModule);
     }
 
+    @Deprecated
     @Override
-    public final TmfModelResponse<List<ITimeGraphRowModel>> fetchRowModel(SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<List<ITimeGraphRowModel>> fetchRowModel(SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
+        TmfModelResponse<@NonNull TimeGraphModel> response = fetchRowModel(parameters, monitor);
+        TimeGraphModel model = response.getModel();
+        List<@NonNull ITimeGraphRowModel> rows = null;
+        if (model != null) {
+            rows = model.getRows();
+        }
+        return new TmfModelResponse<>(rows, response.getStatus(), response.getStatusMessage());
+    }
+
+    @Override
+    public final TmfModelResponse<TimeGraphModel> fetchRowModel(Map<String, Object> parameters, @Nullable IProgressMonitor monitor) {
         A module = getAnalysisModule();
         if (!module.waitForInitialization()) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.ANALYSIS_INITIALIZATION_FAILED);
@@ -76,12 +92,17 @@ public abstract class AbstractTimeGraphDataProvider<A extends TmfStateSystemAnal
         }
 
         long currentEnd = ss.getCurrentEndTime();
+        //TODO Converting the map to a filter to see if mandatory parameters are there. This should be handle differently.
+        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(parameters);
+        if (filter == null) {
+            return new TmfModelResponse<>(null, Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
+        }
         boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
 
         try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "AbstractTimeGraphDataProvider#fetchRowModel") //$NON-NLS-1$
                 .setCategory(getClass().getSimpleName()).build()) {
 
-            List<ITimeGraphRowModel> models = getRowModel(ss, filter, monitor);
+            TimeGraphModel models = getRowModel(ss, parameters, monitor);
             if (models == null) {
                 // getRowModel returns null if the query was cancelled.
                 return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
@@ -106,8 +127,8 @@ public abstract class AbstractTimeGraphDataProvider<A extends TmfStateSystemAnal
      *
      * @param ss
      *            the {@link TmfStateSystemAnalysisModule}'s {@link ITmfStateSystem}
-     * @param filter
-     *            the query's filter
+     * @param parameters
+     *            the query's parameters
      * @param monitor
      *            progress monitor
      * @return the list of row models, null if the query was cancelled
@@ -115,7 +136,7 @@ public abstract class AbstractTimeGraphDataProvider<A extends TmfStateSystemAnal
      *             if the state system was closed during the query or could not be
      *             queried.
      */
-    protected abstract @Nullable List<ITimeGraphRowModel> getRowModel(ITmfStateSystem ss,
-            SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor)
+    protected abstract @Nullable TimeGraphModel getRowModel(ITmfStateSystem ss,
+            Map<String, Object> parameters, @Nullable IProgressMonitor monitor)
             throws StateSystemDisposedException;
 }

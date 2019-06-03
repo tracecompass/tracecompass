@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphDataProvider;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphProviderFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.XmlDataProviderManager;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
@@ -44,6 +45,8 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
@@ -146,11 +149,12 @@ public class XmlTimeGraphDataProviderTest {
     }
 
     private static void assertRows(ITimeGraphDataProvider<@NonNull TimeGraphEntryModel> provider, Map<Long, String> tree, List<String> expectedStrings) {
-        TmfModelResponse<List<ITimeGraphRowModel>> rowResponse = provider.fetchRowModel(new SelectionTimeQueryFilter(1, 20, 20, tree.keySet()), null);
+        TmfModelResponse<@NonNull TimeGraphModel> rowResponse = provider.fetchRowModel(FetchParametersUtils.selectionTimeQueryToMap(new SelectionTimeQueryFilter(1, 20, 20, tree.keySet())), null);
         assertNotNull(rowResponse);
         assertEquals(ITmfResponse.Status.COMPLETED, rowResponse.getStatus());
-        List<ITimeGraphRowModel> rowModel = rowResponse.getModel();
-        assertNotNull(rowModel);
+        TimeGraphModel timeGraphModel = rowResponse.getModel();
+        assertNotNull(timeGraphModel);
+        List<@NonNull ITimeGraphRowModel> rowModel = timeGraphModel.getRows();
         // ensure row order
         rowModel.sort(Comparator.comparingLong(ITimeGraphRowModel::getEntryID));
 
@@ -181,19 +185,20 @@ public class XmlTimeGraphDataProviderTest {
     }
 
     private static Map<Long, String> assertAndGetTree(ITimeGraphDataProvider<@NonNull TimeGraphEntryModel> timeGraphProvider, ITmfTrace trace, List<String> expectedStrings) {
-        TmfModelResponse<@NonNull List<@NonNull TimeGraphEntryModel>> treeResponse = timeGraphProvider.fetchTree(new TimeQueryFilter(0, Long.MAX_VALUE, 2), MONITOR);
+        TmfModelResponse<@NonNull TmfTreeModel<@NonNull TimeGraphEntryModel>> treeResponse = timeGraphProvider.fetchTree(FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(0, Long.MAX_VALUE, 2)), MONITOR);
         assertNotNull(treeResponse);
         assertEquals(ITmfResponse.Status.COMPLETED, treeResponse.getStatus());
-        List<TimeGraphEntryModel> treeModel = treeResponse.getModel();
+        TmfTreeModel<@NonNull TimeGraphEntryModel> treeModel = treeResponse.getModel();
         assertNotNull(treeModel);
+        List<@NonNull TimeGraphEntryModel> xmlEntries = treeModel.getEntries();
 
-        Collections.sort(treeModel, Comparator.comparingLong(TimeGraphEntryModel::getId));
+        Collections.sort(xmlEntries, Comparator.comparingLong(TimeGraphEntryModel::getId));
         Map<Long, String> map = new HashMap<>();
         for (int i = 0; i < expectedStrings.size(); i++) {
             String expectedString = expectedStrings.get(i);
-            assertTrue("actual entry present at " + i + ": " + expectedString, treeModel.size() > i);
+            assertTrue("actual entry present at " + i + ": " + expectedString, xmlEntries.size() > i);
             String[] split = expectedString.split(",");
-            TimeGraphEntryModel xmlTgEntry = treeModel.get(i);
+            TimeGraphEntryModel xmlTgEntry = xmlEntries.get(i);
 
             assertEquals("Checking entry name at " + i, split[0], xmlTgEntry.getName());
             assertEquals("Checking entry start time at " + i, Long.parseLong(split[1]), xmlTgEntry.getStartTime());
@@ -208,7 +213,7 @@ public class XmlTimeGraphDataProviderTest {
             }
             map.put(xmlTgEntry.getId(), xmlTgEntry.getName());
         }
-        assertEquals("Extra actual entries", expectedStrings.size(), treeModel.size());
+        assertEquals("Extra actual entries", expectedStrings.size(), xmlEntries.size());
 
         return map;
     }

@@ -30,5 +30,5 @@ public interface IVirtualTableLine {
      *
      * @return A list of string that contain the data for this line
      */
-    List<String> getLine();
+    List<VirtualTableCell> getCells();
 }

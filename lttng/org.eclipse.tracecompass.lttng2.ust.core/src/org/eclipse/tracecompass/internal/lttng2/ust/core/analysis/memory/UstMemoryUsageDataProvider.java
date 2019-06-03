@@ -21,14 +21,16 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.memory.MemoryUsageTreeModel;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.xy.AbstractTreeCommonXDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.YModel;
-import org.eclipse.tracecompass.tmf.core.model.filters.FilterTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -82,7 +84,11 @@ public class UstMemoryUsageDataProvider extends AbstractTreeCommonXDataProvider<
      * @since 3.3
      */
     @Override
-    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
+    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
+        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
+        if (filter == null) {
+            return null;
+        }
         long[] xValues = filter.getTimesRequested();
         long currentEnd = ss.getCurrentEndTime();
 
@@ -137,21 +143,26 @@ public class UstMemoryUsageDataProvider extends AbstractTreeCommonXDataProvider<
      * @since 3.3
      */
     @Override
-    protected List<MemoryUsageTreeModel> getTree(ITmfStateSystem ss, TimeQueryFilter filter, @Nullable IProgressMonitor monitor)
+    protected TmfTreeModel<MemoryUsageTreeModel> getTree(ITmfStateSystem ss, Map<String, Object> parameters, @Nullable IProgressMonitor monitor)
             throws StateSystemDisposedException {
 
+        TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(parameters);
+        if (filter == null) {
+            return new TmfTreeModel<>(Collections.emptyList(), Collections.emptyList());
+        }
         long start = filter.getStart();
         long end = filter.getEnd();
 
         // Let the list of active states be null if we aren't filtering
         List<ITmfStateInterval> active = null;
-        if (filter instanceof FilterTimeQueryFilter && ((FilterTimeQueryFilter) filter).isFiltered()) {
+        Boolean isFiltered = DataProviderParameterUtils.extractIsFiltered(parameters);
+        if (isFiltered != null && isFiltered) {
             if (start == end || start > ss.getCurrentEndTime() || end < ss.getStartTime()) {
                 /*
                  * return an empty list if the filter is empty or does not intersect the state
                  * system
                  */
-                return Collections.emptyList();
+                return new TmfTreeModel<>(Collections.emptyList(), Collections.emptyList());
             }
             active = ss.queryFullState(Long.max(start, ss.getStartTime()));
         }
@@ -161,7 +172,7 @@ public class UstMemoryUsageDataProvider extends AbstractTreeCommonXDataProvider<
 
         ImmutableList.Builder<MemoryUsageTreeModel> builder = ImmutableList.builder();
         long rootId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
-        builder.add(new MemoryUsageTreeModel(rootId, -1L, -1, getTrace().getName()));
+        builder.add(new MemoryUsageTreeModel(rootId, -1L, -1, Collections.singletonList(getTrace().getName())));
         for (int quark : tidQuarks) {
             int memoryAttribute = ss.optQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_MEMORY_ATTRIBUTE);
             int procNameQuark = ss.optQuarkRelative(quark, UstMemoryStrings.UST_MEMORY_PROCNAME_ATTRIBUTE);
@@ -175,11 +186,11 @@ public class UstMemoryUsageDataProvider extends AbstractTreeCommonXDataProvider<
                     && (active == null || (memoryAttribute < active.size() && active.get(memoryAttribute).getEndTime() < end))) {
 
                 int tid = Integer.parseInt(ss.getAttributeName(quark));
-                builder.add(new MemoryUsageTreeModel(getId(quark), rootId, tid, name));
+                builder.add(new MemoryUsageTreeModel(getId(quark), rootId, tid, Collections.singletonList(name)));
             }
         }
 
-        return builder.build();
+        return new TmfTreeModel<>(Collections.emptyList(), builder.build());
     }
 
     /**

@@ -67,6 +67,14 @@ public final class CommonStatusMessage {
     public static final String INCORRECT_QUERY_INTERVAL = Objects.requireNonNull(Messages.CommonStatusMessage_IncorrectQueryInterval);
 
     /**
+     * A possible detailed message for a
+     * {@link org.eclipse.tracecompass.tmf.core.response.ITmfResponse.Status#FAILED}
+     * status
+     * @since 5.0
+     */
+    public static final String INCORRECT_QUERY_PARAMETERS = Objects.requireNonNull(Messages.CommonStatusMessage_IncorrectQueryParameters);
+
+    /**
      * Constructor
      */
     private CommonStatusMessage() {
