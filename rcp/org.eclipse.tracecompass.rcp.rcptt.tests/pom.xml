@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <!--
   /*******************************************************************************
-  * Copyright (c) 2015 Efficios Inc.
+  * Copyright (c) 2015, 2019 Efficios Inc. and others
   * All rights reserved. This program and the accompanying materials
   * are made available under the terms of the Eclipse Public License v1.0
   * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@
   <parent>
     <artifactId>org.eclipse.tracecompass.rcp-parent</artifactId>
     <groupId>org.eclipse.tracecompass</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>5.0.0-SNAPSHOT</version>
   </parent>
 
   <packaging>rcpttTest</packaging>
