@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.tmf.core.model.xy;
 
+import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.tmf.core.model.xy.Messages;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 
 /**
@@ -63,9 +65,8 @@ public interface ISeriesModel {
      * @return X Axis description
      * @since 5.0
      */
-    @SuppressWarnings("nls")
     default TmfXYAxis getXAxisDescription() {
-        return new TmfXYAxis("X Axis", "");
+        return new TmfXYAxis(NonNullUtils.nullToEmptyString(Messages.TmfCoreModelXy_xAxisLabel), ""); //$NON-NLS-1$
     }
 
     /**
@@ -74,9 +75,8 @@ public interface ISeriesModel {
      * @return Y Axis description
      * @since 5.0
      */
-    @SuppressWarnings("nls")
     default TmfXYAxis getYAxisDescription() {
-        return new TmfXYAxis("Y Axis", "");
+        return new TmfXYAxis(NonNullUtils.nullToEmptyString(Messages.TmfCoreModelXy_xAxisLabel), ""); //$NON-NLS-1$
     }
 
     /**

@@ -57,7 +57,6 @@ public final class TmfXyResponseFactory {
      *         completed status
      */
     public static TmfModelResponse<ITmfXyModel> create(String title, long[] xValues, Map<String, IYModel> yModels, boolean isComplete) {
-//        ITmfXyModel model = new TmfCommonXAxisModel(title, xValues, yModels);
         Map<String, ISeriesModel> series = Maps.transformValues(yModels, model -> new SeriesModel(model.getId(), model.getName(), xValues, model.getData()));
         ITmfXyModel model = new TmfXyModel(title, series);
 

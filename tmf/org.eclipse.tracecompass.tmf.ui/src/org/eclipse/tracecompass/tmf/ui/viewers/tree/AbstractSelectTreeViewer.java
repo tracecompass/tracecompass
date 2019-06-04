@@ -496,7 +496,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
      *            if the query is a selection
      * @return the resulting query filter
      * @since 4.0
-     * @deprecated Use getParameters instead
+     * @deprecated Use {@link #getParameters(long, long, boolean)} instead
      */
     @Deprecated
     protected @Nullable TimeQueryFilter getFilter(long start, long end, boolean isSelection) {

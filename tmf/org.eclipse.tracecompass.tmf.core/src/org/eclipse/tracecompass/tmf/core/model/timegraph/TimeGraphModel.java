@@ -12,7 +12,7 @@ package org.eclipse.tracecompass.tmf.core.model.timegraph;
 import java.util.List;
 
 /**
- * Represent an entire Time Graph model
+ * Represent a Time Graph model that includes all the rows.
  *
  * @author Simon Delisle
  * @since 5.0

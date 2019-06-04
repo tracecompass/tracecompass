@@ -68,7 +68,7 @@ public class FetchParametersUtils {
      */
     public static @Nullable VirtualTableQueryFilter createVirtualTableQueryFilter(Map<String, Object> parameters) {
         List<Long> columnRequested = DataProviderParameterUtils.extractLongList(parameters, DataProviderParameterUtils.REQUESTED_COLUMN_IDS_KEY);
-        if(columnRequested == null) {
+        if (columnRequested == null) {
             return null;
         }
 

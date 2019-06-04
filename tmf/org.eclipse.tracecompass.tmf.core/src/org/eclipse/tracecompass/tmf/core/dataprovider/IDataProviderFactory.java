@@ -39,7 +39,6 @@ public interface IDataProviderFactory {
      */
     @Nullable ITmfTreeDataProvider<? extends ITmfTreeDataModel> createProvider(@NonNull ITmfTrace trace);
 
-
     /**
      * Create a {@link ITmfTreeDataProvider} for the given trace. If this factory
      * does not know how to handle the given trace it will return null. The
