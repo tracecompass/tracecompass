@@ -22,11 +22,11 @@ import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.eclipse.tracecompass.datastore.core.encoding.HTVarInt;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.IntegerRangeCondition;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.condition.TimeRangeCondition;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTConfig;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTNode;
-import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTVarInt;
 import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.ParentNode;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 

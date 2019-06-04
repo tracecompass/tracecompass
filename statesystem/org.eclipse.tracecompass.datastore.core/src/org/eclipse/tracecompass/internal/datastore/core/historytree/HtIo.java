@@ -93,7 +93,7 @@ public class HtIo<E extends IHTInterval, N extends HTNode<E>> {
         }
     }
 
-    private static final int CACHE_SIZE = 256;
+    private static final int CACHE_SIZE = 230;
 
     private static final LoadingCache<CacheKey, HTNode<IHTInterval>> NODE_CACHE = checkNotNull(CacheBuilder.newBuilder()
             .maximumSize(CACHE_SIZE)

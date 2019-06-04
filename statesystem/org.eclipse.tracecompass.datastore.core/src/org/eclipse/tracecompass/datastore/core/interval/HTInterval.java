@@ -14,6 +14,7 @@ import java.util.StringJoiner;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.datastore.core.encoding.HTVarInt;
 import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWriter;
 
 /**
@@ -25,13 +26,17 @@ import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWrit
 public class HTInterval implements IHTInterval {
 
     private final long fStart;
-    private final long fEnd;
+    private final long fDuration;
 
     /**
      * The object to use to read a BaseHtObject from the disk
      */
     public static final IHTIntervalReader<HTInterval> INTERVAL_READER =
-        (buffer) -> new HTInterval(buffer.getLong(), buffer.getLong());
+        buffer -> {
+            long start = buffer.getLong();
+            return new HTInterval(start, start + HTVarInt.readLong(buffer));
+        };
+
 
     /**
      * Create a new segment.
@@ -48,7 +53,7 @@ public class HTInterval implements IHTInterval {
             throw new IllegalArgumentException();
         }
         fStart = start;
-        fEnd = end;
+        fDuration = end - start;
     }
 
     @Override
@@ -58,31 +63,31 @@ public class HTInterval implements IHTInterval {
 
     @Override
     public long getEnd() {
-        return fEnd;
+        return fStart + fDuration;
     }
 
     @Override
     public String toString() {
         return (new StringJoiner(", ", "[", "]")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 .add(String.valueOf(fStart))
-                .add(String.valueOf(fEnd))
+                .add(String.valueOf(fStart + fDuration))
                 .toString();
     }
 
     @Override
     public int getSizeOnDisk() {
-        return 2 * Long.BYTES;
+        return Long.BYTES + HTVarInt.getEncodedLengthLong(fDuration);
     }
 
     @Override
     public void writeSegment(@NonNull ISafeByteBufferWriter buffer) {
         buffer.putLong(fStart);
-        buffer.putLong(fEnd);
+        HTVarInt.writeLong(buffer, fDuration);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fStart, fEnd);
+        return Objects.hash(fStart, fStart + fDuration);
     }
 
     @Override
@@ -95,7 +100,7 @@ public class HTInterval implements IHTInterval {
         }
         HTInterval other = (HTInterval) obj;
         return (fStart == other.fStart
-                && fEnd == other.fEnd);
+                && fDuration == other.fDuration);
     }
 
 }

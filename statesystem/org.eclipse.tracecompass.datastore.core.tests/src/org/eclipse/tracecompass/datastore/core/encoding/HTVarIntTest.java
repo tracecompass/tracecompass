@@ -6,14 +6,14 @@
  * accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.eclipse.tracecompass.statesystem.core.tests.backend.historytree;
+package org.eclipse.tracecompass.datastore.core.encoding;
 
 import static org.junit.Assert.*;
 
 import java.nio.ByteBuffer;
 import java.util.Random;
 
-import org.eclipse.tracecompass.internal.statesystem.core.backend.historytree.HTVarInt;
+import org.eclipse.tracecompass.datastore.core.encoding.HTVarInt;
 import org.junit.Test;
 
 /**

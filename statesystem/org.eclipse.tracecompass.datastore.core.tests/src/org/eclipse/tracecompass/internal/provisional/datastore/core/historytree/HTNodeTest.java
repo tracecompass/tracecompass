@@ -304,7 +304,8 @@ public class HTNodeTest<E extends IHTInterval, N extends HTNode<E>> {
         // Check the free space and sizes
         int expectedSize = HtTestUtils.BLOCKSIZE - fHeaderSize - object.getSizeOnDisk() * nbObjects;
         assertEquals(expectedSize, node.getNodeFreeSpace());
-        assertEquals(99, node.getNodeUsagePercent());
+        int expectedNodeUsagePercent = expectedSize == 0 ? 100 : 99;
+        assertEquals(expectedNodeUsagePercent, node.getNodeUsagePercent());
         assertEquals(nbObjects, node.getIntervals().size());
 
     }

@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.datastore.core.encoding.HTVarInt;
 import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferReader;
 import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWriter;
 import org.eclipse.tracecompass.datastore.core.serialization.SafeByteBufferFactory;
