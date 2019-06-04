@@ -259,7 +259,7 @@ public abstract class TmfAbstractToolTipHandler {
             Point pt = control.toDisplay(e.x, e.y);
             Shell tipShell = fTipShell;
             if (tipShell != null && !tipShell.isDisposed()) {
-                Rectangle bounds = tipShell.getBounds();
+                Rectangle bounds = getBounds(tipShell);
                 bounds.x -= OFFSET;
                 bounds.y -= OFFSET;
                 bounds.height += 2 * OFFSET;
@@ -346,7 +346,7 @@ public abstract class TmfAbstractToolTipHandler {
             fTipShell.dispose();
         }
         fModel.clear();
-        fTipShell = new Shell(parent, SWT.ON_TOP | SWT.TOOL | SWT.RESIZE | SWT.NO_SCROLL);
+        fTipShell = new Shell(parent, SWT.ON_TOP | SWT.TOOL | SWT.RESIZE);
         // Deregister display filters on dispose
         fTipShell.addDisposeListener(e -> e.display.removeFilter(SWT.MouseMove, fListener));
         fTipShell.addDisposeListener(e -> e.display.removeFilter(SWT.FocusOut, fFocusLostListener));
@@ -378,7 +378,7 @@ public abstract class TmfAbstractToolTipHandler {
 
     private static void setHoverLocation(Shell shell, Point position) {
         Rectangle displayBounds = shell.getDisplay().getBounds();
-        Rectangle shellBounds = shell.getBounds();
+        Rectangle shellBounds = getBounds(shell);
         if (position.x + shellBounds.width + OFFSET > displayBounds.width && position.x - shellBounds.width - OFFSET >= 0) {
             shellBounds.x = position.x - shellBounds.width - OFFSET;
         } else {
@@ -390,6 +390,15 @@ public abstract class TmfAbstractToolTipHandler {
             shellBounds.y = Math.max(Math.min(position.y + OFFSET, displayBounds.height - shellBounds.height), 0);
         }
         shell.setBounds(shellBounds);
+    }
+
+    private static Rectangle getBounds(Shell shell) {
+        Rectangle bounds = shell.getBounds();
+        if (SWT.getVersion() < 4902 && SWT.getPlatform().equals("gtk")) { //$NON-NLS-1$
+            /* Bug 319612 - [Gtk] Shell.getSize() returns wrong value when created with style SWT.RESIZE | SWT.ON_TOP */
+            bounds = shell.computeTrim(bounds.x, bounds.y, bounds.width, bounds.height);
+        }
+        return bounds;
     }
 
     /**
