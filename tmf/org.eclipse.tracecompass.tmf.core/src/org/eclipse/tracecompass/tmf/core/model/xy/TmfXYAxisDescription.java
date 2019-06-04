@@ -14,12 +14,12 @@ import java.util.Objects;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
- * Represent a XY Axis model
+ * Represent a XY Axis description
  *
  * @author Simon Delisle
  * @since 5.0
  */
-public class TmfXYAxis {
+public class TmfXYAxisDescription {
     private String fLabel;
     private String fUnit;
 
@@ -31,7 +31,7 @@ public class TmfXYAxis {
      * @param unit
      *            Unit type
      */
-    public TmfXYAxis(String label, String unit) {
+    public TmfXYAxisDescription(String label, String unit) {
         super();
         fLabel = label;
         fUnit = unit;
@@ -66,7 +66,7 @@ public class TmfXYAxis {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        TmfXYAxis other = (TmfXYAxis) obj;
+        TmfXYAxisDescription other = (TmfXYAxisDescription) obj;
         return fLabel.equals(other.getLabel())
                 && fUnit.equals(other.getUnit());
     }

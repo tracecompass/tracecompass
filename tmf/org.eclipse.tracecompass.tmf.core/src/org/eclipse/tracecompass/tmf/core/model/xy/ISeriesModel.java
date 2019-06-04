@@ -65,8 +65,8 @@ public interface ISeriesModel {
      * @return X Axis description
      * @since 5.0
      */
-    default TmfXYAxis getXAxisDescription() {
-        return new TmfXYAxis(NonNullUtils.nullToEmptyString(Messages.TmfCoreModelXy_xAxisLabel), ""); //$NON-NLS-1$
+    default TmfXYAxisDescription getXAxisDescription() {
+        return new TmfXYAxisDescription(NonNullUtils.nullToEmptyString(Messages.TmfCoreModelXy_xAxisLabel), ""); //$NON-NLS-1$
     }
 
     /**
@@ -75,8 +75,8 @@ public interface ISeriesModel {
      * @return Y Axis description
      * @since 5.0
      */
-    default TmfXYAxis getYAxisDescription() {
-        return new TmfXYAxis(NonNullUtils.nullToEmptyString(Messages.TmfCoreModelXy_xAxisLabel), ""); //$NON-NLS-1$
+    default TmfXYAxisDescription getYAxisDescription() {
+        return new TmfXYAxisDescription(NonNullUtils.nullToEmptyString(Messages.TmfCoreModelXy_yAxisLabel), ""); //$NON-NLS-1$
     }
 
     /**

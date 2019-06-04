@@ -15,7 +15,7 @@ import java.util.Objects;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
-import org.eclipse.tracecompass.tmf.core.model.xy.TmfXYAxis;
+import org.eclipse.tracecompass.tmf.core.model.xy.TmfXYAxisDescription;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -64,10 +64,10 @@ public class SeriesModel implements ISeriesModel {
     private final double[] fYValues;
 
     @SerializedName("xAxis")
-    private final TmfXYAxis fXAxis;
+    private final TmfXYAxisDescription fXAxis;
 
     @SerializedName("yAxis")
-    private final TmfXYAxis fYAxis;
+    private final TmfXYAxisDescription fYAxis;
 
     @SerializedName("dataType")
     private final DisplayType fDisplayType;
@@ -89,7 +89,7 @@ public class SeriesModel implements ISeriesModel {
      * @since 4.2
      */
     public SeriesModel(long id, String name, long[] xValues, double[] yValues) {
-        this(id, name, xValues, yValues, new TmfXYAxis(DEFAULT_XAXIS_NAME, DEFAULT_XAXIS_UNIT), new TmfXYAxis(DEFAULT_YAXIS_NAME, DEFAULT_YAXIS_UNIT), DisplayType.LINE, new int[xValues.length]);
+        this(id, name, xValues, yValues, new TmfXYAxisDescription(DEFAULT_XAXIS_NAME, DEFAULT_XAXIS_UNIT), new TmfXYAxisDescription(DEFAULT_YAXIS_NAME, DEFAULT_YAXIS_UNIT), DisplayType.LINE, new int[xValues.length]);
     }
 
     /**
@@ -111,7 +111,7 @@ public class SeriesModel implements ISeriesModel {
      */
     @Deprecated
     public SeriesModel(long id, String name, long[] xValues, double[] yValues, int[] properties) {
-        this(id, name, xValues, yValues, new TmfXYAxis(DEFAULT_XAXIS_NAME, DEFAULT_XAXIS_UNIT), new TmfXYAxis(DEFAULT_YAXIS_NAME, DEFAULT_YAXIS_UNIT), DisplayType.LINE, properties);
+        this(id, name, xValues, yValues, new TmfXYAxisDescription(DEFAULT_XAXIS_NAME, DEFAULT_XAXIS_UNIT), new TmfXYAxisDescription(DEFAULT_YAXIS_NAME, DEFAULT_YAXIS_UNIT), DisplayType.LINE, properties);
     }
 
     /**
@@ -135,7 +135,7 @@ public class SeriesModel implements ISeriesModel {
      *            The properties values for this series. Some priority values
      *            are available in {@link IFilterProperty}
      */
-    private SeriesModel(long id, String name, long[] xValues, double[] yValues, TmfXYAxis xAxis, TmfXYAxis yAxis, DisplayType displayType, int[] properties) {
+    private SeriesModel(long id, String name, long[] xValues, double[] yValues, TmfXYAxisDescription xAxis, TmfXYAxisDescription yAxis, DisplayType displayType, int[] properties) {
         fId = id;
         fName = name;
         fXValues = xValues;
@@ -157,12 +157,12 @@ public class SeriesModel implements ISeriesModel {
     }
 
     @Override
-    public TmfXYAxis getXAxisDescription() {
+    public TmfXYAxisDescription getXAxisDescription() {
         return fXAxis;
     }
 
     @Override
-    public TmfXYAxis getYAxisDescription() {
+    public TmfXYAxisDescription getYAxisDescription() {
         return fYAxis;
     }
 
@@ -222,8 +222,8 @@ public class SeriesModel implements ISeriesModel {
         private final String name;
         private final long[] xValues;
         private final double[] yValues;
-        private @Nullable TmfXYAxis xAxis;
-        private @Nullable TmfXYAxis yAxis;
+        private @Nullable TmfXYAxisDescription xAxis;
+        private @Nullable TmfXYAxisDescription yAxis;
         private @Nullable DisplayType displayType;
         private int @Nullable [] properties;
 
@@ -253,7 +253,7 @@ public class SeriesModel implements ISeriesModel {
          *            Axis description
          * @return {@link SeriesModelBuilder}
          */
-        public SeriesModelBuilder xAxisDescription(TmfXYAxis axis) {
+        public SeriesModelBuilder xAxisDescription(TmfXYAxisDescription axis) {
             this.xAxis = axis;
             return this;
         }
@@ -265,7 +265,7 @@ public class SeriesModel implements ISeriesModel {
          *            Axis description
          * @return {@link SeriesModelBuilder}
          */
-        public SeriesModelBuilder yAxisDescription(TmfXYAxis axis) {
+        public SeriesModelBuilder yAxisDescription(TmfXYAxisDescription axis) {
             this.yAxis = axis;
             return this;
         }
@@ -301,8 +301,8 @@ public class SeriesModel implements ISeriesModel {
          */
         public SeriesModel build() {
             return new SeriesModel(id, name, xValues, yValues,
-                    xAxis != null ? xAxis : new TmfXYAxis(DEFAULT_XAXIS_NAME, DEFAULT_XAXIS_UNIT),
-                    yAxis != null ? yAxis : new TmfXYAxis(DEFAULT_YAXIS_NAME, DEFAULT_YAXIS_UNIT),
+                    xAxis != null ? xAxis : new TmfXYAxisDescription(DEFAULT_XAXIS_NAME, DEFAULT_XAXIS_UNIT),
+                    yAxis != null ? yAxis : new TmfXYAxisDescription(DEFAULT_YAXIS_NAME, DEFAULT_YAXIS_UNIT),
                     displayType != null ? displayType : DisplayType.LINE,
                     properties != null ? properties : new int[xValues.length]);
         }
