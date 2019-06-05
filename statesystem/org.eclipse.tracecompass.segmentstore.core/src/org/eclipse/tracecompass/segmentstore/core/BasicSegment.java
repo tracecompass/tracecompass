@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.segmentstore.core;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.datastore.core.encoding.HTVarInt;
 import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWriter;
 
@@ -25,13 +26,14 @@ public class BasicSegment implements ISegment {
      * @since 2.0
      */
     public static final IHTIntervalReader<BasicSegment> BASIC_SEGMENT_READ_FACTORY = buffer -> {
-            return new BasicSegment(buffer.getLong(), buffer.getLong());
+            long start = buffer.getLong();
+            return new BasicSegment(start, start + HTVarInt.readLong(buffer));
     };
 
     private static final long serialVersionUID = -3257452887960883177L;
 
     private final long fStart;
-    private final long fEnd;
+    private final long fDuration;
 
     /**
      * Create a new segment.
@@ -48,7 +50,7 @@ public class BasicSegment implements ISegment {
             throw new IllegalArgumentException();
         }
         fStart = start;
-        fEnd = end;
+        fDuration = end - start;
     }
 
     @Override
@@ -58,7 +60,7 @@ public class BasicSegment implements ISegment {
 
     @Override
     public long getEnd() {
-        return fEnd;
+        return fStart + fDuration;
     }
 
     /**
@@ -67,7 +69,7 @@ public class BasicSegment implements ISegment {
     @Override
     public int getSizeOnDisk() {
         // Save the start and end time
-        return Long.BYTES * 2;
+        return HTVarInt.getEncodedLengthLong(fDuration) + Long.BYTES;
     }
 
     /**
@@ -76,12 +78,20 @@ public class BasicSegment implements ISegment {
     @Override
     public void writeSegment(@NonNull ISafeByteBufferWriter buffer) {
         buffer.putLong(getStart());
-        buffer.putLong(getEnd());
+        HTVarInt.writeLong(buffer, fDuration);
     }
 
     @Override
     public String toString() {
-        return new String('[' + String.valueOf(fStart) + ", " + String.valueOf(fEnd) + ']'); //$NON-NLS-1$
+        StringBuilder sb = new StringBuilder();
+
+        sb.append('[');
+        sb.append(fStart);
+        sb.append(", "); //$NON-NLS-1$
+        sb.append(fStart + fDuration);
+        sb.append(']');
+
+        return sb.toString();
     }
 
 }
