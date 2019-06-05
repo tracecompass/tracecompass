@@ -65,20 +65,19 @@ public class SWTBotTimeGraphEntry extends AbstractSWTBotControl<TimeGraphControl
 
     @Override
     protected SWTBotRootMenu contextMenu(final Control control) throws WidgetNotFoundException {
+        Rectangle bounds = absoluteLocation();
+        if (bounds == null) {
+            return null;
+        }
         UIThreadRunnable.syncExec(new VoidResult() {
             @Override
             public void run() {
-                Rectangle bounds = widget.getItemBounds(fEntry);
-                if (bounds == null) {
-                    return;
-                }
-                Point location = widget.toDisplay(bounds.x, bounds.y);
                 final Event event = new Event();
                 event.time = (int) System.currentTimeMillis();
                 event.display = control.getDisplay();
                 event.widget = control;
-                event.x = location.x + widget.getTimeDataProvider().getNameSpace() / 2;
-                event.y = location.y + bounds.height / 2;
+                event.x = bounds.x + widget.getTimeDataProvider().getNameSpace() / 2;
+                event.y = bounds.y + bounds.height / 2;
                 control.notifyListeners(SWT.MenuDetect, event);
             }
         });
@@ -87,6 +86,23 @@ public class SWTBotTimeGraphEntry extends AbstractSWTBotControl<TimeGraphControl
         WaitForObjectCondition<Menu> waitForMenu = Conditions.waitForPopupMenu(control);
         new SWTBot().waitUntilWidgetAppears(waitForMenu);
         return new SWTBotRootMenu(waitForMenu.get(0));
+    }
+
+    /*
+     * Note this is public
+     */
+    @Override
+    public Rectangle absoluteLocation() {
+        return UIThreadRunnable.syncExec(() -> {
+            Rectangle bounds = widget.getItemBounds(fEntry);
+            if (bounds == null) {
+                return null;
+            }
+            Point location = widget.toDisplay(bounds.x, bounds.y);
+            bounds.x = location.x;
+            bounds.y = location.y;
+            return bounds;
+        });
     }
 
     /**

@@ -20,7 +20,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.RGBA;
+import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.model.TimeLineEvent;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -28,6 +30,7 @@ import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry.DisplayStyle;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.MarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
@@ -104,6 +107,7 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
         TimeGraphEntry row5 = new TimeGraphEntry("row5", 80, 160);
         TimeGraphEntry row6 = new TimeGraphEntry("row6", 80, 160);
         TimeGraphEntry row7 = new TimeGraphEntry("row7", 80, 160);
+        TimeGraphEntry pulse = TimeGraphEntry.create(new TimeGraphEntryModel(444, -1, Collections.singletonList("pulse"), -1, Long.MAX_VALUE), DisplayStyle.LINE);
 
         fEntries.add(hero1);
         hero1.addChild(hat1);
@@ -121,6 +125,7 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
         hero2.addChild(row5);
         hero2.addChild(row6);
         hero2.addChild(row7);
+        fEntries.add(pulse);
 
         fEvents.put(hero1.getName(), Arrays.asList(new NullTimeEvent(hero1, 0, 120)));
         // hat
@@ -144,6 +149,16 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
         fEvents.put(row5.getName(), Arrays.asList(new TimeEvent(row5, 80, 50, PIE)));
         fEvents.put(row6.getName(), Arrays.asList(new TimeEvent(row6, 90, 60, PIE)));
         fEvents.put(row7.getName(), Arrays.asList(new TimeEvent(row7, 110, 30, PIE)));
+        List<ITimeEvent> events = new ArrayList<>();
+        for (long i = -1; i < 160; i++) {
+            double phase = ((double) i) / 16;
+            long value1 = Math.abs((long) (Math.sin(phase) * 1024) + 1024);
+            long value2 = Math.abs((long) (Math.sin(phase + Math.PI * 0.2) * 1024)+1024);
+            long value3 = Math.abs((long) (Math.sin(phase + Math.PI * 0.4) * 1024)+1024);
+            long value4 = Math.abs((long) (Math.sin(phase + Math.PI * 0.6) * 1024)+1024);
+            events.add(new TimeLineEvent(pulse, i, Arrays.asList(value1, value2, value3, value4)));
+        }
+        fEvents.put(pulse.getName(), events);
     }
 
     @Override
@@ -195,6 +210,7 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
         refresh();
     }
 
+    @SuppressWarnings("restriction")
     @Override
     protected @Nullable List<@NonNull ITimeEvent> getEventList(@NonNull TimeGraphEntry entry, long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor) {
         ITmfTrace trace = getTrace();
@@ -207,7 +223,9 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
             for (ITimeEvent ref : references) {
                 if (ref instanceof NullTimeEvent) {
                     ret.add(new NullTimeEvent(ref.getEntry(), ref.getTime() + trace.getStartTime().toNanos(), ref.getDuration()));
-                } else if (ref instanceof TimeEvent) {
+                } else if (ref instanceof TimeLineEvent) {
+                    ret.add(new TimeLineEvent(ref.getEntry(), ref.getTime() + trace.getStartTime().toNanos(), ((TimeLineEvent) ref).getValues()));
+                } if (ref instanceof TimeEvent) {
                     ret.add(new TimeEvent(ref.getEntry(), ref.getTime() + trace.getStartTime().toNanos(), ref.getDuration(), ((TimeEvent) ref).getValue()));
                 }
             }

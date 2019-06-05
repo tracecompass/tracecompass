@@ -86,6 +86,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
@@ -556,7 +557,7 @@ public class TimeGraphViewTest {
         String pg = "Plumber guy";
         String hpc = "Hungry pie chart";
         String element = "row2";
-        int totalItems = 16;
+        int totalItems = 17;
 
         resetTimeRange();
         SWTBotTimeGraph timegraph = fTimeGraph;
@@ -569,19 +570,19 @@ public class TimeGraphViewTest {
 
         timegraph.collapseAll();
         entries = timegraph.getEntries();
-        assertEquals(2, getVisibleItems(timegraph));
+        assertEquals(3, getVisibleItems(timegraph));
 
         timegraph.getEntry(pg).select();
         fireKey(timegraph, true, '+');
-        assertEquals(9, getVisibleItems(timegraph));
+        assertEquals(10, getVisibleItems(timegraph));
 
         timegraph.getEntry(pg).select();
         fireKey(timegraph, true, '-');
-        assertEquals(2, getVisibleItems(timegraph));
+        assertEquals(3, getVisibleItems(timegraph));
 
         timegraph.getEntry(hpc).select();
         fireKey(timegraph, true, '+');
-        assertEquals(9, getVisibleItems(timegraph));
+        assertEquals(10, getVisibleItems(timegraph));
         assertNotNull(timegraph.getEntry(hpc, element));
 
         timegraph.getEntry(pg).select();
@@ -676,9 +677,9 @@ public class TimeGraphViewTest {
         fireKeyInGraph(timegraph, '-');
         fViewBot.bot().waitUntil(new WindowRangeCondition(view, 77));
         /*
-         *  Note that 'w' and 's' zooming is based on mouse position. Just check if
-         *  window range was increased or decreased to avoid inaccuracy due to
-         *  the mouse position in test environment.
+         * Note that 'w' and 's' zooming is based on mouse position. Just check
+         * if window range was increased or decreased to avoid inaccuracy due to
+         * the mouse position in test environment.
          */
         long previousRange = getDuration(view.getWindowRange());
         fireKeyInGraph(timegraph, 'w');
@@ -714,7 +715,7 @@ public class TimeGraphViewTest {
         fireKey(timegraph, true, SWT.PAGE_UP);
         assertEquals('[' + pg + ']', timegraph.selection().get(0).toString());
         fireKey(timegraph, true, SWT.END);
-        assertEquals("[row7]", timegraph.selection().get(0).toString());
+        assertEquals("[pulse]", timegraph.selection().get(0).toString());
         fireKey(timegraph, true, SWT.HOME);
         assertEquals('[' + pg + ']', timegraph.selection().get(0).toString());
     }
@@ -731,23 +732,47 @@ public class TimeGraphViewTest {
         timegraph.getEntry(pg).select();
 
         assertEquals(1, timegraph.selection().columnCount());
-        assertEquals(16, getVisibleItems(timegraph));
+        assertEquals(17, getVisibleItems(timegraph));
 
         fireKey(timegraph, true, SWT.CR);
         assertEquals(1, timegraph.selection().columnCount());
         assertEquals('[' + pg + ']', timegraph.selection().get(0).toString());
-        assertEquals(9, getVisibleItems(timegraph));
+        assertEquals(10, getVisibleItems(timegraph));
 
         fireKey(timegraph, true, SWT.CR);
         assertEquals(1, timegraph.selection().columnCount());
         assertEquals('[' + pg + ']', timegraph.selection().get(0).toString());
-        assertEquals(16, getVisibleItems(timegraph));
+        assertEquals(17, getVisibleItems(timegraph));
 
         timegraph.getEntry(pg, "Hat1").select();
         fireKey(timegraph, true, SWT.CR);
         assertEquals(1, timegraph.selection().columnCount());
         assertEquals("[Hat1]", timegraph.selection().get(0).toString());
-        assertEquals(16, getVisibleItems(timegraph));
+        assertEquals(17, getVisibleItems(timegraph));
+    }
+
+    /**
+     * Test the line entries
+     */
+    @Test
+    public void testTimeLine() {
+        String lines = "pulse";
+        resetTimeRange();
+        SWTBotTimeGraph timegraph = fTimeGraph;
+        assertEquals(0, timegraph.selection().columnCount());
+        ImageHelper currentImage = ImageHelper.waitForNewImage(fBounds, null);
+        SWTBotTimeGraphEntry entry = timegraph.getEntry(lines);
+        // make sure it's visible
+        entry = timegraph.getEntry(lines).select();
+        ImageHelper.waitForNewImage(fBounds, currentImage);
+        Rectangle rect = entry.absoluteLocation();
+        ImageHelper image = ImageHelper.grabImage(rect);
+        ImmutableMultiset<RGB> ms = Multisets.copyHighestCountFirst(image.getHistogram());
+        int black = ms.count(new RGB(0, 0, 0));
+        RGB bgColor = ms.elementSet().iterator().next();
+        int bgCount = ms.count(bgColor);
+        float actual = ((float) black) / (bgCount);
+        assertEquals(0.113f, actual, 0.05f);
     }
 
     /**
@@ -1111,6 +1136,5 @@ public class TimeGraphViewTest {
                     " (previous: " + fPreviousRange + ", actual: " + getDuration(fView.getWindowRange()) + ")";
         }
     }
-
 
 }
