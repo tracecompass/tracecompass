@@ -53,6 +53,10 @@
             class="org.eclipse.tracecompass.internal.tmf.core.histogram.HistogramDataProviderFactory"
             id="org.eclipse.tracecompass.internal.tmf.core.histogram.HistogramDataProvider">
       </dataProviderFactory>
+      <dataProviderFactory
+            class="org.eclipse.tracecompass.internal.tmf.core.statesystem.provider.StateSystemDataProviderFactory"
+            id="org.eclipse.tracecompass.internal.tmf.core.statesystem.provider.StateSystemDataProvider">
+      </dataProviderFactory>
    </extension>
    <extension
          point="org.eclipse.tracecompass.tmf.core.dataprovider">

@@ -9,28 +9,35 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.statesystem;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
+import org.eclipse.tracecompass.internal.tmf.core.statesystem.provider.StateSystemDataProvider.ModuleEntryModel;
+import org.eclipse.tracecompass.internal.tmf.core.statesystem.provider.StateSystemDataProvider.StateSystemEntryModel;
+import org.eclipse.tracecompass.internal.tmf.core.statesystem.provider.StateSystemDataProvider.TraceEntryModel;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.presentation.IPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.presentation.RotatingPaletteProvider;
+import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
-import org.eclipse.tracecompass.tmf.ui.views.statesystem.TmfStateSystemExplorer.AttributeEntry;
-import org.eclipse.tracecompass.tmf.ui.views.statesystem.TmfStateSystemExplorer.ModuleEntry;
-import org.eclipse.tracecompass.tmf.ui.views.statesystem.TmfStateSystemExplorer.StateSystemEntry;
-import org.eclipse.tracecompass.tmf.ui.views.statesystem.TmfStateSystemExplorer.TraceEntry;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
 /**
  * Presentation Provider for the state system time graph view.
@@ -65,16 +72,21 @@ class StateSystemPresentationProvider extends TimeGraphPresentationProvider {
 
     @Override
     public int getStateTableIndex(ITimeEvent event) {
-        if (event instanceof StateSystemEvent) {
-            StateSystemEvent stateSystemEvent = (StateSystemEvent) event;
-            Object value = stateSystemEvent.getInterval().getValue();
+        if (event instanceof TimeEvent) {
+            TimeEvent timeEvent = (TimeEvent) event;
+            Object value = timeEvent.getLabel();
             if (value != null) {
                 return Math.floorMod(value.hashCode(), NUM_COLORS);
             }
+
+            ITimeGraphEntry entry = event.getEntry();
+            ITmfTreeDataModel model = ((TimeGraphEntry) entry).getEntryModel();
+            if (model instanceof StateSystemEntryModel || model instanceof ModuleEntryModel) {
+                // Those two model have an event just so they can have a tooltip
+                return INVISIBLE;
+            }
             // grey
             return NUM_COLORS;
-        } else if (event.getEntry() instanceof AttributeEntry) {
-            return TRANSPARENT;
         }
         return INVISIBLE;
     }
@@ -90,45 +102,59 @@ class StateSystemPresentationProvider extends TimeGraphPresentationProvider {
 
     @Override
     public String getStateTypeName(ITimeGraphEntry entry) {
-        if (entry instanceof TraceEntry) {
-            return Messages.TraceEntry_StateTypeName;
-        } else if (entry instanceof ModuleEntry) {
-            return Messages.ModuleEntry_StateTypeName;
-        } else if(entry instanceof StateSystemEntry) {
-            return Messages.StateSystemEntry_StateTypeName;
+        if (entry instanceof TimeGraphEntry) {
+            ITmfTreeDataModel model = ((TimeGraphEntry) entry).getEntryModel();
+            if (model instanceof TraceEntryModel) {
+                return Messages.TraceEntry_StateTypeName;
+            } else if (model instanceof ModuleEntryModel) {
+                return Messages.ModuleEntry_StateTypeName;
+            } else if (model instanceof StateSystemEntryModel) {
+                return Messages.StateSystemEntry_StateTypeName;
+            }
         }
         return Messages.AttributeEntry_StateTypeName;
     }
 
     @Override
+    public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime) {
+        Map<String, String> retMap = super.getEventHoverToolTipInfo(event, hoverTime);
+        if (retMap == null) {
+            retMap = new LinkedHashMap<>(1);
+        }
+
+        if (!(event instanceof TimeEvent) || !((TimeEvent) event).hasValue() ||
+                !(event.getEntry() instanceof TimeGraphEntry)) {
+            return retMap;
+        }
+
+        TimeGraphEntry entry = (TimeGraphEntry) event.getEntry();
+        ITimeGraphDataProvider<? extends TimeGraphEntryModel> dataProvider = BaseDataProviderTimeGraphView.getProvider(entry);
+        Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(new SelectionTimeQueryFilter(hoverTime, hoverTime, 1, Collections.singletonList(entry.getEntryModel().getId())));
+        TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> response = dataProvider.fetchTooltip(parameters, null);
+        Map<@NonNull String, @NonNull String> map = response.getModel();
+        if (map != null) {
+            retMap.putAll(map);
+        }
+
+        return retMap;
+    }
+
+    @Override
     public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event) {
         Map<String, String> retMap = new LinkedHashMap<>();
-        if (event instanceof StateSystemEvent) {
-            StateSystemEvent ssEvent = (StateSystemEvent) event;
-            AttributeEntry entry = (AttributeEntry) event.getEntry();
 
-            Object value = ssEvent.getInterval().getValue();
-            if (value != null) {
-                retMap.put(Messages.ValueColumnLabel, value.toString());
-            }
-
-            int quark = ssEvent.getInterval().getAttribute();
-            retMap.put(Messages.QuarkColumnLabel, Integer.toString(quark));
-
-            ITmfStateSystem ss = TmfStateSystemExplorer.getStateSystem(entry);
-            if (ss != null) {
-                retMap.put(Messages.AttributePathColumnLabel, ss.getFullAttributePath(entry.getQuark()));
-            }
-        } else if (event instanceof TimeEvent) {
+        if (event instanceof TimeEvent) {
             ITimeGraphEntry entry = event.getEntry();
-            if (entry instanceof StateSystemEntry) {
-                ModuleEntry moduleEntry = (ModuleEntry) entry.getParent();
-                ITmfAnalysisModuleWithStateSystems module = moduleEntry.getModule();
+            ITmfTreeDataModel model = ((TimeGraphEntry) entry).getEntryModel();
+            if (model instanceof StateSystemEntryModel) {
+                TimeGraphEntry moduleEntry = (TimeGraphEntry) entry.getParent();
+                ModuleEntryModel moduleModel = (ModuleEntryModel) moduleEntry.getEntryModel();
+                ITmfAnalysisModuleWithStateSystems module = (moduleModel).getModule();
                 if (module instanceof TmfAbstractAnalysisModule) {
                     retMap.putAll(((TmfAbstractAnalysisModule) module).getProperties());
                 }
-            } else if (entry instanceof ModuleEntry) {
-                ITmfAnalysisModuleWithStateSystems module = ((ModuleEntry) entry).getModule();
+            } else if (model instanceof ModuleEntryModel) {
+                ITmfAnalysisModuleWithStateSystems module = ((ModuleEntryModel) model).getModule();
                 retMap.put(Messages.ModuleHelpText, module.getHelpText());
                 retMap.put(Messages.ModuleIsAutomatic, Boolean.toString(module.isAutomatic()));
             }
