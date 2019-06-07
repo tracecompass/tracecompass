@@ -20,6 +20,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
@@ -70,6 +72,7 @@ public abstract class TmfAbstractToolTipHandler {
      *
      * @since 5.0
      */
+    @NonNullByDefault
     public static class ToolTipString {
 
         private final String fText;
@@ -135,7 +138,7 @@ public abstract class TmfAbstractToolTipHandler {
                 }
                 sNumberFormat = format;
             }
-            String number = format.format(decimal);
+            String number = Objects.requireNonNull(format.format(decimal));
             return new ToolTipString(number, toHtmlString(number));
         }
 
@@ -150,21 +153,21 @@ public abstract class TmfAbstractToolTipHandler {
          * @return the tool tip string
          */
         public static ToolTipString fromTimestamp(String text, long timestamp) {
-            return new ToolTipString(text, String.format(TIME_HYPERLINK, timestamp, toHtmlString(text)));
+            return new ToolTipString(text, Objects.requireNonNull(String.format(TIME_HYPERLINK, timestamp, toHtmlString(text))));
         }
 
         private static String toHtmlString(String text) {
-            return StringEscapeUtils.escapeHtml4(text)
+            return Objects.requireNonNull(StringEscapeUtils.escapeHtml4(text)
                     .replaceAll("[ \\t]", "&nbsp;") //$NON-NLS-1$ //$NON-NLS-2$
-                    .replaceAll("\\r?\\n", "<br>"); //$NON-NLS-1$ //$NON-NLS-2$
+                    .replaceAll("\\r?\\n", "<br>")); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         private static String toText(String htmlString) {
-            return StringEscapeUtils.unescapeHtml4(htmlString.replaceAll("\\<[^>]*>", "")); //$NON-NLS-1$ //$NON-NLS-2$
+            return Objects.requireNonNull(StringEscapeUtils.unescapeHtml4(htmlString.replaceAll("\\<[^>]*>", ""))); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             if (obj == this) {
                 return true;
             }
@@ -420,7 +423,7 @@ public abstract class TmfAbstractToolTipHandler {
      *            line value
      */
     protected void addItem(String name, String value) {
-        addItem(null, ToolTipString.fromString(name), ToolTipString.fromString(value));
+        addItem(null, ToolTipString.fromString(Objects.requireNonNull(name)), ToolTipString.fromString(Objects.requireNonNull(value)));
     }
 
     /**
@@ -435,7 +438,7 @@ public abstract class TmfAbstractToolTipHandler {
      *            line value
      * @since 5.0
      */
-    protected void addItem(String category, String name, String value) {
+    protected void addItem(@Nullable String category, @NonNull String name, @NonNull String value) {
         addItem(category == null ? null : ToolTipString.fromString(category), ToolTipString.fromString(name), ToolTipString.fromString(value));
     }
 
@@ -450,7 +453,7 @@ public abstract class TmfAbstractToolTipHandler {
      *            line value
      * @since 5.0
      */
-    protected void addItem(ToolTipString category, ToolTipString name, ToolTipString value) {
+    protected void addItem(ToolTipString category, @NonNull ToolTipString name, @NonNull ToolTipString value) {
         fModel.put(category == null ? UNCATEGORIZED : category, name, value);
     }
 
@@ -543,7 +546,7 @@ public abstract class TmfAbstractToolTipHandler {
                     widestCat = Math.max(widestCat, catExtent.x);
                     totalHeight += catExtent.y + 8;
                 }
-                Set<@NonNull Entry<ToolTipString, ToolTipString>> entrySet = model.row(row).entrySet();
+                Set<Entry<ToolTipString, ToolTipString>> entrySet = model.row(row).entrySet();
                 for (Entry<ToolTipString, ToolTipString> entry : entrySet) {
                     Point keyExtent = gc.textExtent(entry.getKey().toString());
                     Point valExtent = gc.textExtent(entry.getValue().toString());
@@ -615,7 +618,7 @@ public abstract class TmfAbstractToolTipHandler {
                 if (!row.equals(UNCATEGORIZED)) {
                     toolTipContent.append("<tr><th colspan=\"2\"><button class=\"collapsible\">").append(row.toHtmlString()).append("</button></th></tr>");
                 }
-                Set<@NonNull Entry<ToolTipString, ToolTipString>> entrySet = model.row(row).entrySet();
+                Set<Entry<ToolTipString, ToolTipString>> entrySet = model.row(row).entrySet();
                 for (Entry<ToolTipString, ToolTipString> entry : entrySet) {
                     toolTipContent.append("<tr>");
                     toolTipContent.append("<td>");
@@ -678,7 +681,7 @@ public abstract class TmfAbstractToolTipHandler {
             setupControl(composite);
             Set<ToolTipString> rowKeySet = model.rowKeySet();
             for (ToolTipString row : rowKeySet) {
-                Set<@NonNull Entry<ToolTipString, ToolTipString>> entrySet = model.row(row).entrySet();
+                Set<Entry<ToolTipString, ToolTipString>> entrySet = model.row(row).entrySet();
                 for (Entry<ToolTipString, ToolTipString> entry : entrySet) {
                     Label nameLabel = new Label(composite, SWT.NO_FOCUS);
                     nameLabel.setText(entry.getKey().toString());
