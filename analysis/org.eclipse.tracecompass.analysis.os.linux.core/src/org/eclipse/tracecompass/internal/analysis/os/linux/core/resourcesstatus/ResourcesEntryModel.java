@@ -66,7 +66,7 @@ public class ResourcesEntryModel extends TimeGraphEntryModel implements IElement
      *            type of entry (GROUP / CPU / CURRENT_THREAD / IRQ / SOFT_IRQ)
      */
     public ResourcesEntryModel(long id, long parentId, @NonNull List<@NonNull String> labels, long startTime, long endTime, int resourceId, Type type) {
-        super(id, parentId, labels, startTime, endTime, !labels.isEmpty());
+        super(id, parentId, labels, startTime, endTime, type != Type.GROUP);
         fResourceId = resourceId;
         fType = type;
         switch (type) {
