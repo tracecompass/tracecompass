@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.tmf.ui.swtbot.tests.viewers.events;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
@@ -24,12 +25,18 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
+import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCanvas;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.tmf.core.io.BufferedRandomAccessFile;
@@ -174,6 +181,7 @@ public class SDViewTest {
 
         timeCompressionBar.click();
 
+        // Zoom in page using toolbar buttons
         viewBot.toolbarButton("Select").click();
         sdWidget.click(0, 0);
 
@@ -185,6 +193,20 @@ public class SDViewTest {
         sdWidget.click();
 
         viewBot.toolbarButton("Reset zoom factor").click();
+        sdWidget.click();
+
+        // Zoom in page using view menu
+        viewBot.viewMenu("Select").click();
+        sdWidget.click(0, 0);
+
+        viewBot.viewMenu("Zoom in").click();
+        sdWidget.click();
+        sdWidget.click();
+
+        viewBot.viewMenu("Zoom out").click();
+        sdWidget.click();
+
+        viewBot.viewMenu("Reset zoom factor").click();
         sdWidget.click();
 
         assertEquals(0, pagingProvider.currentPage());
@@ -235,6 +257,7 @@ public class SDViewTest {
         configurationBot.button("Default").click();
         configurationBot.button("OK").click();
 
+        // Navigate pages using toolbar buttons
         assertEquals(0, pagingProvider.currentPage());
         viewBot.toolbarButton("Go to next page").click();
         SWTBotUtils.waitUntil(pp -> pp.currentPage() == 1, pagingProvider, "Did not change page");
@@ -245,10 +268,86 @@ public class SDViewTest {
         viewBot.toolbarButton("Go to first page").click();
         SWTBotUtils.waitUntil(pp -> pp.currentPage() == 0, pagingProvider, "Did not change page");
 
+        // Navigate pages using view menu
+        assertEquals(0, pagingProvider.currentPage());
+        viewBot.viewMenu("Next page").click();
+        SWTBotUtils.waitUntil(pp -> pp.currentPage() == 1, pagingProvider, "Did not change page");
+        viewBot.viewMenu("Previous page").click();
+        SWTBotUtils.waitUntil(pp -> pp.currentPage() == 0, pagingProvider, "Did not change page");
+        viewBot.viewMenu("Last page").click();
+        SWTBotUtils.waitUntil(pp -> pp.currentPage() == 1, pagingProvider, "Did not change page");
+        viewBot.viewMenu("First page").click();
+        SWTBotUtils.waitUntil(pp -> pp.currentPage() == 0, pagingProvider, "Did not change page");
+
         viewBot.viewMenu("Pages...").click();
         SWTBot pagesBot = fBot.shell("Sequence Diagram Pages").bot();
         pagesBot.text().setText("2");
         pagesBot.button("OK").click();
         SWTBotUtils.waitUntil(pp -> pp.currentPage() == 1, pagingProvider, "Did not change page");
+    }
+
+    /**
+     * Test Sequence diagram print dialog
+     */
+    @Test
+    public void testSDPrintUi() {
+        SWTBotView viewBot = fBot.viewById(UML2DVIEW_ID);
+        assertNotNull(viewBot);
+        viewBot.setFocus();
+        WaitUtils.waitForJobs();
+
+        // Test print dialog
+        SWTBotCanvas canvas = viewBot.bot().canvas(1);
+        canvas.setFocus();
+        canvas.pressShortcut(Keystrokes.CTRL, KeyStroke.getInstance('P'));
+        SWTBotShell printShell = fBot.shell("Print");
+        assertNotNull(printShell);
+        SWTBot printBot = printShell.bot();
+
+        printBot.radio("Use current zoom").click();
+
+        SWTBotRadio allPages = printBot.radio("All pages");
+        SWTBotRadio currentView = printBot.radio("Current view");
+        // 'All pages' and 'Current view' buttons will be enabled
+        allPages.click();
+        currentView.click();
+
+        // Test 'Number of horizontal pages' button
+        printBot.radio("Number of horizontal pages:").click();
+        SWTBotText horizontalPagesText = printBot.text(0);
+        SWTBotUtils.waitUntil(t -> t.getText().equals(String.valueOf(1)), horizontalPagesText, "Number of horizontal pages should be 1");
+        horizontalPagesText.setText("2");
+        SWTBotUtils.waitUntil(t -> t.getText().equals(String.valueOf(2)), horizontalPagesText, "Number of horizontal pages should be 2");
+        assertFalse(currentView.isEnabled());
+
+        // Test 'Number of vertical pages' button
+        SWTBotText totalPagesText = printBot.textWithLabel("Total number of pages:");
+        printBot.radio("Number of vertical pages:").click();
+        SWTBotText verticalPagesText = printBot.text(1);
+        SWTBotUtils.waitUntil(t -> t.getText().equals(String.valueOf(1)), verticalPagesText, "Number of vertical pages should be 1");
+        SWTBotUtils.waitUntil(t -> t.getText().equals(String.valueOf(1)), totalPagesText, "Total number of pages should be 1");
+        verticalPagesText.setText("2");
+        SWTBotUtils.waitUntil(t -> t.getText().equals(String.valueOf(2)), verticalPagesText, "Number of vertical pages should be 2");
+        assertFalse(currentView.isEnabled());
+
+        // Test 'selected pages' button
+        printBot.radio("Selected pages").click();
+        assertFalse(currentView.isEnabled());
+
+        // Test 'From pages' buttons
+        printBot.radio("From page").click();
+        SWTBotText fromText = printBot.text(3);
+        SWTBotText toText = printBot.text(4);
+        SWTBotUtils.waitUntil(t -> t.getText().isEmpty(), fromText, "From text is not empty");
+        SWTBotUtils.waitUntil(t -> t.getText().isEmpty(), toText, "To text is not empty");
+        fromText.setText("2");
+        toText.setText("3");
+        SWTBotUtils.waitUntil(t -> t.getText().equals(String.valueOf(2)), fromText, "From text is not 2");
+        SWTBotUtils.waitUntil(t -> t.getText().equals(String.valueOf(3)), toText, "To text is not 3");
+        assertFalse(currentView.isEnabled());
+
+        // Don't actually print
+        printBot.button("Cancel").click();
+        printBot.waitUntil(Conditions.shellCloses(printShell));
     }
 }
