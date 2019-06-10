@@ -430,6 +430,7 @@ class TimeGraphFindDialog extends Dialog {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
             }
         };
 

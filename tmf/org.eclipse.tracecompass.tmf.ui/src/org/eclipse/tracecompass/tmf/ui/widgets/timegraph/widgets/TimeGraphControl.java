@@ -3472,6 +3472,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     @Override
     public void mouseEnter(MouseEvent e) {
+        // Do nothing
     }
 
     @Override
@@ -3485,6 +3486,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     @Override
     public void mouseHover(MouseEvent e) {
+        // Do nothing
     }
 
     @Override
@@ -3839,6 +3841,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         private List<ILinkEvent> fLinks = new ArrayList<>();
 
         public ItemData() {
+            // Do nothing
         }
 
         public Item findItem(ITimeGraphEntry entry) {

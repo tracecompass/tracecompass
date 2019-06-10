@@ -69,10 +69,12 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
 
         @Override
         public void dispose() {
+            // Do nothing
         }
 
         @Override
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+            // Do nothing
         }
 
         @Override
@@ -114,10 +116,12 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
 
         @Override
         public void addListener(ILabelProviderListener listener) {
+            // Do nothing
         }
 
         @Override
         public void dispose() {
+            // Do nothing
         }
 
         @Override
@@ -127,6 +131,7 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
 
         @Override
         public void removeListener(ILabelProviderListener listener) {
+            // Do nothing
         }
 
         @Override

@@ -99,6 +99,7 @@ public class TmfNavigatorLabelProvider implements ICommonLabelProvider, IStyledL
 
     @Override
     public void init(ICommonContentExtensionSite aConfig) {
+        // Do nothing
     }
 
     @Override

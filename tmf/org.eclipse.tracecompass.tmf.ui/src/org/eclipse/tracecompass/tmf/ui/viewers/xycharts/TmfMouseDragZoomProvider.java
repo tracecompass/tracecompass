@@ -81,6 +81,7 @@ public class TmfMouseDragZoomProvider extends TmfBaseProvider implements MouseLi
     // ------------------------------------------------------------------------
     @Override
     public void mouseDoubleClick(MouseEvent e) {
+        // Do nothing
     }
 
     @Override

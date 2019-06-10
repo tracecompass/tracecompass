@@ -136,6 +136,7 @@ public class RenameTraceDialog extends SelectionStatusDialog {
 
     @Override
     protected void computeResult() {
+        // Do nothing
     }
 
     @Override

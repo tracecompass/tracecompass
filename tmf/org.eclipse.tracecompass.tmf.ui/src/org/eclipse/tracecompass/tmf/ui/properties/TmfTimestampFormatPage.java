@@ -198,6 +198,7 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
 
     @Override
     public void init(IWorkbench workbench) {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------
@@ -332,10 +333,12 @@ public class TmfTimestampFormatPage extends PreferencePage implements IWorkbench
 
     @Override
     public void widgetSelected(SelectionEvent e) {
+        // Do nothing
     }
 
     @Override
     public void widgetDefaultSelected(SelectionEvent e) {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------

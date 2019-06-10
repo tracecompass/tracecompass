@@ -751,6 +751,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
     @Override
     public void controlMoved(ControlEvent e) {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------
@@ -861,6 +862,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
     @Override
     public void widgetDefaultSelected(SelectionEvent e) {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------
@@ -872,6 +874,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
      */
     @Override
     public void mouseDown(MouseEvent e) {
+        // Do nothing
     }
 
     /**
@@ -901,6 +904,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
      */
     @Override
     public void mouseDoubleClick(MouseEvent e) {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------
@@ -1073,6 +1077,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
     @Override
     public void keyReleased(KeyEvent e) {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------
@@ -1155,6 +1160,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
 
     @Override
     public void mouseHover(MouseEvent e) {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------

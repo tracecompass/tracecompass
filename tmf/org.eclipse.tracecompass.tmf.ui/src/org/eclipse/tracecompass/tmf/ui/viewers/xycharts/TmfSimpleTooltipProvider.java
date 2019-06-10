@@ -91,14 +91,16 @@ public class TmfSimpleTooltipProvider extends TmfBaseProvider implements MouseTr
     // ------------------------------------------------------------------------
     @Override
     public void mouseEnter(MouseEvent e) {
+        // Do nothing
     }
 
     @Override
     public void mouseExit(MouseEvent e) {
+        // Do nothing
     }
 
     @Override
     public void mouseHover(MouseEvent e) {
-        // do nothing
+        // Do nothing
     }
 }

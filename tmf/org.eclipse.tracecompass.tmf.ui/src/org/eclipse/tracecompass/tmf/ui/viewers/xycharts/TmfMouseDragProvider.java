@@ -79,6 +79,7 @@ public class TmfMouseDragProvider extends TmfBaseProvider implements MouseListen
     // ------------------------------------------------------------------------
     @Override
     public void mouseDoubleClick(MouseEvent e) {
+        // Do nothing
     }
 
     @Override

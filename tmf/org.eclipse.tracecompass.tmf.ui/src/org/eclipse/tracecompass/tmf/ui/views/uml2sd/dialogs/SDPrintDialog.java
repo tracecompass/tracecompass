@@ -117,6 +117,7 @@ public class SDPrintDialog extends Dialog {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
             }
         });
 

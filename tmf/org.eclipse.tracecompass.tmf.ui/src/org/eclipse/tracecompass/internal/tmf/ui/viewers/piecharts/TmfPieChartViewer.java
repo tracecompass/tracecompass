@@ -177,6 +177,7 @@ public class TmfPieChartViewer extends Composite {
 
             @Override
             public void mouseUp(MouseEvent e) {
+                // Do nothing
             }
 
             @Override
@@ -194,6 +195,7 @@ public class TmfPieChartViewer extends Composite {
 
             @Override
             public void mouseDoubleClick(MouseEvent e) {
+                // Do nothing
             }
         };
 

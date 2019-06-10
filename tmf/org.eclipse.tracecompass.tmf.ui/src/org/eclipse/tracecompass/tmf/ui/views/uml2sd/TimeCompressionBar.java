@@ -664,6 +664,7 @@ public class TimeCompressionBar extends ScrollView implements DisposeListener {
 
     @Override
     public void scrollBy(int x, int y) {
+        // Do nothing
     }
 
     /**

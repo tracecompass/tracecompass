@@ -86,10 +86,12 @@ public class TmfHistogramTooltipProvider extends TmfBaseProvider implements Mous
     // ------------------------------------------------------------------------
     @Override
     public void mouseEnter(MouseEvent e) {
+        // Do nothing
     }
 
     @Override
     public void mouseExit(MouseEvent e) {
+        // Do nothing
     }
 
     @Override

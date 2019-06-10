@@ -166,6 +166,7 @@ public class HistogramZoom implements MouseWheelListener, KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
+        // Do nothing
     }
 
     private synchronized void zoom(int nbClicks) {

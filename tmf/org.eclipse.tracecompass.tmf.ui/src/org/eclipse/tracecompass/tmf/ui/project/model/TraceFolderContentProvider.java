@@ -46,10 +46,12 @@ public class TraceFolderContentProvider implements IStructuredContentProvider {
 
     @Override
     public void dispose() {
+        // Do nothing
     }
 
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        // Do nothing
     }
 
 }

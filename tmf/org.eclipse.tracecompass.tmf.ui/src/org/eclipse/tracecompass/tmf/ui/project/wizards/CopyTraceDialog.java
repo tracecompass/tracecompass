@@ -172,6 +172,7 @@ public class CopyTraceDialog extends SelectionStatusDialog {
 
     @Override
     protected void computeResult() {
+        // Do nothing
     }
 
     @Override

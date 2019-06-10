@@ -289,6 +289,7 @@ public class SDPrintDialogUI {
 
         @Override
         protected void contentsMouseHover(MouseEvent event) {
+            // Do nothing
         }
 
         /**
@@ -970,6 +971,7 @@ public class SDPrintDialogUI {
 
                 @Override
                 public void widgetDefaultSelected(SelectionEvent e) {
+                    // Do nothing
                 }
 
             });

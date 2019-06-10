@@ -135,6 +135,7 @@ public class NewTmfProjectWizard extends Wizard implements INewWizard, IExecutab
 
     @Override
     public void init(IWorkbench iworkbench, IStructuredSelection istructuredselection) {
+        // Do nothing
     }
 
     // ------------------------------------------------------------------------

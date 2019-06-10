@@ -427,5 +427,6 @@ public class SDViewerPage extends PreferencePage implements IWorkbenchPreference
 
     @Override
     public void widgetDefaultSelected(SelectionEvent e) {
+        // Do nothing
     }
 }

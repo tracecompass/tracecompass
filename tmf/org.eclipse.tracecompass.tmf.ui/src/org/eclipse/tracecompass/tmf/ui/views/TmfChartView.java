@@ -409,6 +409,7 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
         }
         @Override
         public void refresh() {
+            // Do nothing
         }
         @Override
         public Control getControl() {

@@ -217,6 +217,7 @@ public class TmfSimpleTableViewer extends TmfViewer {
      * @since 2.0
      */
     protected void appendToTablePopupMenu(@NonNull IMenuManager manager, @NonNull IStructuredSelection sel) {
+        // Do nothing
     }
 
     /**

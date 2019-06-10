@@ -133,6 +133,7 @@ public class RenameFolderDialog extends SelectionStatusDialog {
 
     @Override
     protected void computeResult() {
+        // Do nothing
     }
 
     @Override

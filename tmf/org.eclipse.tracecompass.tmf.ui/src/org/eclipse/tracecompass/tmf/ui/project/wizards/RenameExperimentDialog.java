@@ -157,6 +157,7 @@ public class RenameExperimentDialog extends SelectionStatusDialog {
 
     @Override
     protected void computeResult() {
+        // Do nothing
     }
 
     @Override

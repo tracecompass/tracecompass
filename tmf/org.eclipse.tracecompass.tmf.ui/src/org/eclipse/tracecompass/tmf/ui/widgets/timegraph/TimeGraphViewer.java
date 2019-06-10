@@ -436,6 +436,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
      *            The caller event
      */
     public void controlMoved(ControlEvent e) {
+        // Do nothing
     }
 
     /**

@@ -351,6 +351,7 @@ public class ScrollView extends Composite {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
             }
         });
 
@@ -367,6 +368,7 @@ public class ScrollView extends Composite {
 
                 @Override
                 public void widgetDefaultSelected(SelectionEvent e) {
+                    // Do nothing
                 }
             });
         }
@@ -383,6 +385,7 @@ public class ScrollView extends Composite {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
+                // Do nothing
             }
         });
         if (fViewControl.getHorizontalBar() != null) {
@@ -397,6 +400,7 @@ public class ScrollView extends Composite {
 
                 @Override
                 public void widgetDefaultSelected(SelectionEvent e) {
+                    // Do nothing
                 }
             });
         }
@@ -780,6 +784,7 @@ public class ScrollView extends Composite {
      *            Mouse event
      */
     protected void contentsMouseExit(MouseEvent e) {
+        // Do nothing
     }
 
     /**
@@ -790,6 +795,7 @@ public class ScrollView extends Composite {
      *            Mouse event
      */
     protected void contentsMouseHover(MouseEvent e) {
+        // Do nothing
     }
 
     /**
@@ -799,6 +805,7 @@ public class ScrollView extends Composite {
      *            Mouse event
      */
     protected void contentsMouseEnter(MouseEvent e) {
+        // Do nothing
     }
 
     /**
@@ -808,6 +815,7 @@ public class ScrollView extends Composite {
      *            Mouse event
      */
     protected void contentsMouseDoubleClickEvent(MouseEvent e) {
+        // Do nothing
     }
 
     /**
@@ -953,6 +961,7 @@ public class ScrollView extends Composite {
      *            H clip
      */
     protected void drawContents(GC gc, int clipx, int clipy, int clipw, int cliph) {
+        // Do nothing
     }
 
     /**
@@ -1554,6 +1563,7 @@ public class ScrollView extends Composite {
      * @param event The key event.
      */
     protected void keyReleasedEvent(KeyEvent event) {
+        // Do nothing
     }
 
     /**
@@ -1740,6 +1750,7 @@ public class ScrollView extends Composite {
             control.addMouseListener(new MouseListener() {
                 @Override
                 public void mouseDoubleClick(MouseEvent e) {
+                    // Do nothing
                 }
 
                 @Override
@@ -1757,6 +1768,7 @@ public class ScrollView extends Composite {
 
                 @Override
                 public void focusGained(FocusEvent e) {
+                    // Do nothing
                 }
 
                 @Override
@@ -1795,6 +1807,7 @@ public class ScrollView extends Composite {
 
                 @Override
                 public void keyReleased(KeyEvent e) {
+                    // Do nothing
                 }
             });
             control.addMouseMoveListener(new MouseMoveListener() {

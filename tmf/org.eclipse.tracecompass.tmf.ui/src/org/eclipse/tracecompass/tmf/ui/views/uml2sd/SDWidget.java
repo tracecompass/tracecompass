@@ -1880,6 +1880,7 @@ public class SDWidget extends ScrollView implements SelectionListener,
 
     @Override
     public void widgetDefaultSelected(SelectionEvent event) {
+        // Do nothing
     }
 
     @Override

@@ -1158,6 +1158,7 @@ public class SDView extends ViewPart implements IPartListener {
 
         @Override
         public void dispose() {
+            // Do nothing
         }
     }
 
@@ -1171,10 +1172,12 @@ public class SDView extends ViewPart implements IPartListener {
 
     @Override
     public void partBroughtToTop(IWorkbenchPart part) {
+        // Do nothing
     }
 
     @Override
     public void partClosed(IWorkbenchPart part) {
+        // Do nothing
     }
 
     @Override
@@ -1187,5 +1190,6 @@ public class SDView extends ViewPart implements IPartListener {
 
     @Override
     public void partOpened(IWorkbenchPart part) {
+        // Do nothing
     }
 }
