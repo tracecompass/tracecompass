@@ -32,11 +32,13 @@
 			</segment>
 		</action>
 		<action id="pattern segment test 2">
-<!-- 			Generate a pattern segment with the name 'test2' and with three fields 'field1', 'field2' and 'field2'-->
+<!-- 			Generate a pattern segment with the name 'test2' and with three fields 'field1', 'field2' and 'field3'-->
 			<segment>
 				<segType segName="test2" />
 				<segContent>
-					<segField name="field1" type="long" value="5"/>
+					<segField name="field1" type="long">
+						<stateValue type="eventField" value="testField"/>
+					</segField>
 					<segField name="field2" type="string" value="test"/>
 					<segField name="field3" type="int" value="1"/>
 				</segContent>
@@ -46,12 +48,14 @@
 <!-- 		FSMs -->
 
 <!-- 	test fsm
-		Declare a test FSM that that will generate two segments for each event received
+		Declare a test FSM that will go back and forth between 2 states
 -->
-		<fsm id="test" multiple="false" initial="state">
-			<state id="state">
-<!-- 					The state will stay here forever-->
-				<transition target="state" action="pattern segment test 1:pattern segment test 2" />
+		<fsm id="test" multiple="true" initial="state1">
+		    <state id="state1">
+		        <transition event="test" target="state2" action="pattern segment test 1" />
+		    </state>
+			<state id="state2">
+				<transition event="test1" target="state1" action="pattern segment test 2" />
 			</state>
 		</fsm>
 	</patternHandler>

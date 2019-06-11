@@ -381,7 +381,7 @@ public class XmlUtilsTest {
             Map.Entry<String, @NonNull Object> expectedContent = it2.next();
             Object actualValue = actual.getContent().get(expectedContent.getKey());
             assertNotNull("Content " + expectedContent.getKey() + " exists", actualValue);
-            assertEquals("Content value comparison " + i, expectedContent, actualValue);
+            assertEquals("Content value comparison " + i, expectedContent.getValue(), actualValue);
         }
     }
 
