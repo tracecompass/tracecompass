@@ -298,8 +298,7 @@ public abstract class TmfAbstractToolTipHandler {
                     Point ptInDisplay = control.toDisplay(event.x, event.y);
                     fInitialDeadzone = new Rectangle(ptInDisplay.x - MOUSE_DEADZONE, ptInDisplay.y - MOUSE_DEADZONE, 2 * MOUSE_DEADZONE, 2 * MOUSE_DEADZONE);
                     createTooltipShell(timeGraphControl.getShell(), control, event, pt);
-                    if (fTipComposite.getChildren().length == 0) {
-                        // avoid displaying empty tool tips.
+                    if (fTipShell == null || fTipShell.isDisposed()) {
                         return;
                     }
                     Point tipPosition = control.toDisplay(pt);
@@ -372,11 +371,13 @@ public abstract class TmfAbstractToolTipHandler {
             content = new DefaultContent(fTipComposite);
         }
         content.setInput(fModel);
-        content.create();
-        Point p = content.computePreferredSize();
-        Point scrollBarSize = getScrollbarSize(fTipComposite);
-        Rectangle t = fTipShell.computeTrim(0, 0, p.x + scrollBarSize.x, p.y);
-        fTipShell.setSize(Math.min(t.width, MAX_SHELL_WIDTH), Math.min(t.height, MAX_SHELL_HEIGHT));
+        Point preferredSize = content.create();
+        if (preferredSize == null) {
+            fTipShell.dispose();
+            return;
+        }
+        Rectangle trim = fTipShell.computeTrim(0, 0, preferredSize.x, preferredSize.y);
+        fTipShell.setSize(Math.min(trim.width, MAX_SHELL_WIDTH), Math.min(trim.height, MAX_SHELL_HEIGHT));
     }
 
     private static void setHoverLocation(Shell shell, Point position) {
@@ -471,7 +472,7 @@ public abstract class TmfAbstractToolTipHandler {
     protected abstract void fill(Control control, MouseEvent event, Point pt);
 
     private interface ITooltipContent {
-        void create();
+        Point create();
         void setInput(Table<ToolTipString, ToolTipString, ToolTipString> model);
         Point computePreferredSize();
 
@@ -482,21 +483,25 @@ public abstract class TmfAbstractToolTipHandler {
     }
 
     private class BrowserContent extends AbstractContent {
-        private static final int MARGIN = 10;
+        private static final int BODY_MARGIN = 3;
+        private static final int CONTENT_MARGIN = 1;
+        private static final int CELL_PADDING = 10;
 
         public BrowserContent(Composite parent) {
             super(parent);
         }
 
         @Override
-        public void create() {
+        public Point create() {
             Composite parent = getParent();
             Table<ToolTipString, ToolTipString, ToolTipString> model = getModel();
             if (parent == null || model.size() == 0) {
-                return;
+                // avoid displaying empty tool tips.
+                return null;
             }
             setupControl(parent);
-            ScrolledComposite scrolledComposite = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+            // vertical scroll is handled by the Browser
+            ScrolledComposite scrolledComposite = new ScrolledComposite(parent, SWT.H_SCROLL);
             scrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             scrolledComposite.setExpandVertical(true);
             scrolledComposite.setExpandHorizontal(true);
@@ -527,8 +532,9 @@ public abstract class TmfAbstractToolTipHandler {
             browser.setText(toolTipHtml);
             scrolledComposite.setContent(browser);
             Point preferredSize = computePreferredSize();
-            Point scrollBarSize = getScrollbarSize(scrolledComposite);
-            scrolledComposite.setMinSize(Math.min(preferredSize.x + scrollBarSize.x, MAX_SHELL_WIDTH - scrollBarSize.x), 0);
+            // do not set minimum height since Browser handles vertical scroll
+            scrolledComposite.setMinSize(preferredSize.x, 0);
+            return preferredSize;
         }
 
         @Override
@@ -556,9 +562,10 @@ public abstract class TmfAbstractToolTipHandler {
                 }
             }
             gc.dispose();
-            int w = Math.max(widestCat, widestKey + MARGIN + widestVal) + 2 * MARGIN;
-            int h = totalHeight + 2 * MARGIN;
-            return new Point(w, h);
+            int w = Math.max(widestCat, widestKey + CELL_PADDING + widestVal) + 2 * CONTENT_MARGIN + 2 * BODY_MARGIN;
+            int h = totalHeight + 2 * CONTENT_MARGIN + 2 * BODY_MARGIN;
+            Point scrollBarSize = getScrollbarSize(getParent());
+            return new Point(w + scrollBarSize.x, h);
         }
 
         @SuppressWarnings("nls")
@@ -598,13 +605,14 @@ public abstract class TmfAbstractToolTipHandler {
                     "}\n" +
                     ".tab {\n" +
                     "  padding:0px;\n" +
-                    "  font-family: " + fontName +";\n" +
+                    "  font-family: " + fontName + ";\n" +
                     "  font-size: " + fontHeight + ";\n" +
                     "}\n" +
                     ".leftPadding {\n" +
-                    "  padding:0px 0px 0px 10px;\n" +
+                    "  padding:0px 0px 0px " + CELL_PADDING + "px;\n" +
                     "}\n" +
                     ".bodystyle {\n" +
+                    "  margin:" + BODY_MARGIN + "px;\n" +
                     "  padding:0px 0px;\n" +
                     "}\n" +
                     "</style>\n" +
@@ -656,27 +664,28 @@ public abstract class TmfAbstractToolTipHandler {
     }
 
     private class DefaultContent extends AbstractContent {
+        private Composite fComposite;
+
         public DefaultContent(Composite parent) {
             super(parent);
         }
 
         @Override
-        public void create() {
+        public Point create() {
             Composite parent = getParent();
             Table<ToolTipString, ToolTipString, ToolTipString> model = getModel();
             if (parent == null || model.size() == 0) {
-                return;
+                // avoid displaying empty tool tips.
+                return null;
             }
             setupControl(parent);
-            parent.setLayout(new GridLayout());
-
             ScrolledComposite scrolledComposite = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
-            scrolledComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             scrolledComposite.setExpandVertical(true);
             scrolledComposite.setExpandHorizontal(true);
             setupControl(scrolledComposite);
 
             Composite composite = new Composite(scrolledComposite, SWT.NONE);
+            fComposite = composite;
             composite.setLayout(new GridLayout(3, false));
             setupControl(composite);
             Set<ToolTipString> rowKeySet = model.rowKeySet();
@@ -698,8 +707,13 @@ public abstract class TmfAbstractToolTipHandler {
             }
             scrolledComposite.setContent(composite);
             Point preferredSize = computePreferredSize();
-            Point scrollBarSize = getScrollbarSize(composite);
-            scrolledComposite.setMinSize(preferredSize.x > scrollBarSize.x ? preferredSize.x - scrollBarSize.x : preferredSize.x, preferredSize.y > scrollBarSize.y ? preferredSize.y - scrollBarSize.y : preferredSize.y);
+            scrolledComposite.setMinSize(preferredSize.x, preferredSize.y);
+            return preferredSize;
+        }
+
+        @Override
+        public Point computePreferredSize() {
+            return fComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
         }
     }
 
@@ -723,15 +737,6 @@ public abstract class TmfAbstractToolTipHandler {
                 model = HashBasedTable.create();
             }
             return model;
-        }
-
-        @Override
-        public Point computePreferredSize() {
-            Composite parent = fParent;
-            if (parent == null) {
-                return new Point(0, 0);
-            }
-            return parent.computeSize(SWT.DEFAULT, SWT.DEFAULT);
         }
 
         protected Composite getParent() {
