@@ -51,11 +51,7 @@ public class TmfProviderManager {
      *            The data provider
      */
     public static synchronized <T extends ITmfEvent> void register(Class<T> eventType, TmfEventProvider provider) {
-        List<TmfEventProvider> typeProviders = fProviders.get(eventType);
-        if (typeProviders == null) {
-            typeProviders = new ArrayList<>();
-            fProviders.put(eventType, typeProviders);
-        }
+        List<TmfEventProvider> typeProviders = fProviders.computeIfAbsent(eventType, type -> new ArrayList<>());
         typeProviders.add(provider);
     }
 

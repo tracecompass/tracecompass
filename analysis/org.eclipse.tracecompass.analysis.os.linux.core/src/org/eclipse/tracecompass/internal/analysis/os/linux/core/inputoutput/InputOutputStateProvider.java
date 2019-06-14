@@ -167,12 +167,7 @@ public class InputOutputStateProvider extends AbstractTmfStateProvider {
      * @return The disk corresponding to the device ID
      */
     public DiskWriteModel getDisk(int deviceId) {
-        DiskWriteModel disk = fDisks.get(deviceId);
-        if (disk == null) {
-            disk = new DiskWriteModel(deviceId, checkNotNull(getStateSystemBuilder()));
-            fDisks.put(deviceId, disk);
-        }
-        return disk;
+        return fDisks.computeIfAbsent(deviceId, diskId -> new DiskWriteModel(diskId, checkNotNull(getStateSystemBuilder())));
     }
 
     private boolean isSyscallEntry(String eventName) {

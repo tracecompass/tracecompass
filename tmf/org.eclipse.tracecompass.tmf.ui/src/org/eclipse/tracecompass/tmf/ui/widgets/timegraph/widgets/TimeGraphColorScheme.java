@@ -479,12 +479,7 @@ public class TimeGraphColorScheme {
      * @since 2.0
      */
     public Color getColor(RGBA rgba) {
-        Color color = fColorMap.get(rgba);
-        if (color == null) {
-            color = new Color(Display.getDefault(), rgba);
-            fColorMap.put(rgba, color);
-        }
-        return color;
+        return fColorMap.computeIfAbsent(rgba, colorRgba -> new Color(Display.getDefault(), colorRgba));
     }
 
 }

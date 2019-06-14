@@ -861,11 +861,7 @@ public class CTFTrace implements IDefinitionScope {
         if (file == null) {
             throw new CTFException("cannot create a stream with no file"); //$NON-NLS-1$
         }
-        ICTFStream stream = fStreams.get(id);
-        if (stream == null) {
-            stream = new CTFStream(this);
-            fStreams.put(id, stream);
-        }
+        ICTFStream stream = fStreams.computeIfAbsent(id, ctfStream -> new CTFStream(this));
         if (stream instanceof CTFStream) {
             CTFStream ctfStream = (CTFStream) stream;
             ctfStream.addInput(new CTFStreamInput(stream, file));

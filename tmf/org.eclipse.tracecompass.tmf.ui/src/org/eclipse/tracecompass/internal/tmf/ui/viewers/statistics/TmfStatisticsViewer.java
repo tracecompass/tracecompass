@@ -710,13 +710,12 @@ public class TmfStatisticsViewer extends TmfViewer {
                 continue;
             }
 
-            Job job = updateJobs.get(aTrace);
-            if (job == null) {
-                job = new StatisticsUpdateJob("Statistics update", aTrace, isGlobal, timeRange, statsMod, this); //$NON-NLS-1$
-                updateJobs.put(aTrace, job);
+            updateJobs.computeIfAbsent(aTrace, k -> {
+                Job job = new StatisticsUpdateJob("Statistics update", aTrace, isGlobal, timeRange, statsMod, this); //$NON-NLS-1$
                 job.setSystem(true);
                 job.schedule();
-            }
+                return job;
+            });
         }
     }
 

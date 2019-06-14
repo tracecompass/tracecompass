@@ -56,13 +56,12 @@ public class TcpLttngEventMatching implements ITmfMatchEventDefinition {
         IKernelAnalysisEventLayout layout = ((IKernelTrace) trace).getKernelEventLayout();
         TRACE_LAYOUTS.put(trace, layout);
 
-        Set<String> events = REQUIRED_EVENTS.get(layout);
-        if (events == null) {
-            events = new HashSet<>();
-            events.addAll(layout.eventsNetworkSend());
-            events.addAll(layout.eventsNetworkReceive());
-            REQUIRED_EVENTS.put(layout, events);
-        }
+        Set<String> events = REQUIRED_EVENTS.computeIfAbsent(layout, eventLayout -> {
+            Set<String> eventsSet = new HashSet<>();
+            eventsSet.addAll(eventLayout.eventsNetworkSend());
+            eventsSet.addAll(eventLayout.eventsNetworkReceive());
+            return eventsSet;
+        });
 
         if (!(trace instanceof ITmfTraceWithPreDefinedEvents)) {
             // No predefined events, suppose events are present

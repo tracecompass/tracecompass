@@ -98,12 +98,7 @@ public class DataDrivenPattern extends AbstractTmfStateProvider implements IAnal
         if (!(ss instanceof ITmfStateSystemBuilder)) {
             throw new IllegalStateException("The state system hasn't been initialized yet"); //$NON-NLS-1$
         }
-        TmfAttributePool pool = fAttributePools.get(startNodeQuark);
-        if (pool == null) {
-            pool = new TmfAttributePool((ITmfStateSystemBuilder) ss, startNodeQuark, QueueType.PRIORITY);
-            fAttributePools.put(startNodeQuark, pool);
-        }
-        return pool;
+        return fAttributePools.computeIfAbsent(startNodeQuark, baseQuark -> new TmfAttributePool((ITmfStateSystemBuilder) ss, baseQuark, QueueType.PRIORITY));
     }
 
     @Override

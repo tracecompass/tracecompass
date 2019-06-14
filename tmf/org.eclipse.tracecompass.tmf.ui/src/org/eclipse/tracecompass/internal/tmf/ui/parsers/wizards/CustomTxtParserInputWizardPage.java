@@ -798,9 +798,7 @@ public class CustomTxtParserInputWizardPage extends WizardPage {
                                                 if (checkNotNull(countMap.get(currentInput)) >= currentInput.getMaxCount()) {
                                                     if (!currentInput.getNextInputs(countMap).isEmpty()) {
                                                         currentInput = currentInput.getNextInputs(countMap).get(0);
-                                                        if (countMap.get(currentInput) == null) {
-                                                            countMap.put(currentInput, 0);
-                                                        }
+                                                        countMap.putIfAbsent(currentInput, 0);
                                                         iter = countMap.keySet().iterator();
                                                         while (iter.hasNext()) {
                                                             InputLine inputLine = iter.next();

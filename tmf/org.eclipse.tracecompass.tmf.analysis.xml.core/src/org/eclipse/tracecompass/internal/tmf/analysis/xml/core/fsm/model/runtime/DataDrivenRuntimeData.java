@@ -38,12 +38,7 @@ public class DataDrivenRuntimeData {
      * @return The runtime data for this FSM
      */
     public DataDrivenRuntimeFsm getRuntimeForFsm(DataDrivenFsm fsm) {
-        DataDrivenRuntimeFsm runtimeFsm = fFsmRuntime.get(fsm);
-        if (runtimeFsm == null) {
-            runtimeFsm = new DataDrivenRuntimeFsm();
-            fFsmRuntime.put(fsm, runtimeFsm);
-        }
-        return runtimeFsm;
+        return fFsmRuntime.computeIfAbsent(fsm, dataDrivenRuntimeFsm -> new DataDrivenRuntimeFsm());
     }
 
     /**

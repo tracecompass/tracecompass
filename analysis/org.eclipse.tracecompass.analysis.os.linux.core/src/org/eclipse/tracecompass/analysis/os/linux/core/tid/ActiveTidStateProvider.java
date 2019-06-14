@@ -83,13 +83,7 @@ class ActiveTidStateProvider extends AbstractTmfStateProvider {
         if (cpu == null) {
             return;
         }
-        Integer cpuQuark = fCpuNumToQuark.get(cpu);
-        if (cpuQuark == null) {
-            // this will only happen once
-            String cpuAttributeName = NonNullUtils.nullToEmptyString(cpu);
-            cpuQuark = ssb.getQuarkAbsoluteAndAdd(cpuAttributeName);
-            fCpuNumToQuark.put(cpu, cpuQuark);
-        }
+        Integer cpuQuark = fCpuNumToQuark.computeIfAbsent(cpu, cpuNum -> ssb.getQuarkAbsoluteAndAdd(NonNullUtils.nullToEmptyString(cpuNum)));
         try {
             int nextTid = ((Long) event.getContent().getField(fNextTid).getValue()).intValue();
             ssb.modifyAttribute(event.getTimestamp().toNanos(), nextTid, cpuQuark);

@@ -2927,13 +2927,11 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private void setFontForHeight(int pixels, GC gc) {
         /* convert font height from pixels to points */
         int height = Math.max(pixels * PPI / DPI, 1);
-        Font font = fFonts.get(height);
-        if (font == null) {
+        Font font = fFonts.computeIfAbsent(height, fontHeight -> {
             FontData fontData = gc.getFont().getFontData()[0];
-            fontData.setHeight(height);
-            font = new Font(gc.getDevice(), fontData);
-            fFonts.put(height, font);
-        }
+            fontData.setHeight(fontHeight);
+            return new Font(gc.getDevice(), fontData);
+        });
         gc.setFont(font);
     }
 

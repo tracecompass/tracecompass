@@ -143,12 +143,7 @@ public class DataDrivenScenarioInfo {
      *         path.
      */
     public Integer getAttributeFromPool(TmfAttributePool pool) {
-        Integer quark = fPoolAttributes.get(pool);
-        if (quark == null) {
-            quark = pool.getAvailable();
-            fPoolAttributes.put(pool, quark);
-        }
-        return quark;
+        return fPoolAttributes.computeIfAbsent(pool, TmfAttributePool::getAvailable);
     }
 
     /**
