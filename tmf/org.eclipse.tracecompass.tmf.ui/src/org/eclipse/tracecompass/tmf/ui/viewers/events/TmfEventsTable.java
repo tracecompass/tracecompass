@@ -2007,14 +2007,25 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             // This view is the source of the signal, ignore
             return;
         }
-        ITmfFilter eventFilter = signal.getFilter().getEventFilter();
-        if (eventFilter == null) {
-            fTable.setData(Key.SEARCH_OBJ, null);
-            fTable.refresh();
+        Runnable runnable = () -> {
+            if (fTable.isDisposed()) {
+                return;
+            }
+            ITmfFilter eventFilter = signal.getFilter().getEventFilter();
+            if (eventFilter == null) {
+                fTable.setData(Key.SEARCH_OBJ, null);
+                fTable.refresh();
+            } else {
+                fTable.setData(Key.SEARCH_OBJ, eventFilter);
+                fTable.refresh();
+                searchNext();
+            }
+        };
+        Display display = PlatformUI.getWorkbench().getDisplay();
+        if (display == Display.getCurrent()) {
+            runnable.run();
         } else {
-            fTable.setData(Key.SEARCH_OBJ, eventFilter);
-            fTable.refresh();
-            searchNext();
+            Display.getDefault().asyncExec(runnable);
         }
 
     }
