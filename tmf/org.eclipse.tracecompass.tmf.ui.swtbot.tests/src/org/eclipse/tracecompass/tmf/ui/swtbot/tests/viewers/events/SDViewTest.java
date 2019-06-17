@@ -49,7 +49,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -76,6 +75,8 @@ public class SDViewTest {
 
     private static final String PROJECT_NAME = "TestForFiltering";
 
+    private static final String DISABLE_PRINTING_KEY = "org.eclipse.swt.internal.gtk.disablePrinting";
+
     /** The Log4j logger instance. */
     private static final Logger fLogger = Logger.getRootLogger();
     private static SWTWorkbenchBot fBot;
@@ -85,6 +86,7 @@ public class SDViewTest {
     }
 
     private static File fFileLocation;
+    private static String fDisablePrinting;
 
     /**
      * Initialization, creates a temp trace
@@ -115,6 +117,9 @@ public class SDViewTest {
             }
             braf.writeBytes(TRACE_END);
         }
+
+        fDisablePrinting = System.getProperty(DISABLE_PRINTING_KEY);
+        System.setProperty(DISABLE_PRINTING_KEY, "true");
     }
 
     /**
@@ -137,6 +142,11 @@ public class SDViewTest {
         SWTBotUtils.closeViewById(UML2DVIEW_ID, fBot);
         fFileLocation.delete();
         fLogger.removeAllAppenders();
+        if (fDisablePrinting == null) {
+            System.getProperties().remove(DISABLE_PRINTING_KEY);
+        } else {
+            System.setProperty(DISABLE_PRINTING_KEY, fDisablePrinting);
+        }
     }
 
     /**
@@ -291,7 +301,6 @@ public class SDViewTest {
      * Test Sequence diagram print dialog
      */
     @Test
-    @Ignore
     public void testSDPrintUi() {
         SWTBotView viewBot = fBot.viewById(UML2DVIEW_ID);
         assertNotNull(viewBot);
