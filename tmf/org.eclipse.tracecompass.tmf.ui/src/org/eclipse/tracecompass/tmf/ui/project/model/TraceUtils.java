@@ -63,6 +63,23 @@ public class TraceUtils {
     }
 
     /**
+     * Displays a warning message in a box
+     *
+     * @param exception
+     *            the exception or null if the error does not originate from an
+     *            exception
+     * @since 5.1
+     */
+    public static void displayWarningMsg(Throwable exception) {
+        final String warningMsg = exception.getMessage();
+        Display.getDefault().asyncExec(() -> {
+            final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+            Activator.getDefault().logWarning(warningMsg, exception);
+            MessageDialog.openWarning(shell, exception.getClass().getSimpleName(), warningMsg);
+        });
+    }
+
+    /**
      * Displays an error message in a box
      *
      * @param boxTitle

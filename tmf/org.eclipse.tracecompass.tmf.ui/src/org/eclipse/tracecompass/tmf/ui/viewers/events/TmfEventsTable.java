@@ -18,7 +18,6 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.events;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -40,12 +39,9 @@ import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.expressions.IEvaluationContext;
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -63,6 +59,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -72,18 +69,13 @@ import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -135,7 +127,6 @@ import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.collapse.ITmfCollapsibleEvent;
-import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfModelLookup;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
 import org.eclipse.tracecompass.tmf.core.filter.FilterManager;
@@ -165,6 +156,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.TmfUiRefreshHandler;
+import org.eclipse.tracecompass.tmf.ui.actions.OpenSourceCodeAction;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsCache.CachedEvent;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsTableHeader.IEventsTableHeaderListener;
@@ -174,17 +166,14 @@ import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSettingsManager;
 import org.eclipse.tracecompass.tmf.ui.views.colors.IColorSettingsListener;
 import org.eclipse.tracecompass.tmf.ui.widgets.rawviewer.TmfRawEventViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.virtualtable.TmfVirtualTable;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.dialogs.ListDialog;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.ide.IGotoMarker;
-import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.themes.ColorUtil;
 import org.eclipse.ui.themes.IThemeManager;
 
@@ -1182,113 +1171,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             }
         };
 
-        final IAction openCallsiteAction = new Action(Messages.TmfEventsTable_OpenSourceCodeActionText) {
-            @Override
-            public void run() {
-                final TableItem items[] = fTable.getSelection();
-                if (items.length != 1) {
-                    return;
-                }
-                final TableItem item = items[0];
-
-                final Object data = item.getData();
-                if (!(data instanceof ITmfSourceLookup)) {
-                    return;
-                }
-                ITmfSourceLookup event = (ITmfSourceLookup) data;
-                ITmfCallsite cs = event.getCallsite();
-                if (cs == null) {
-                    return;
-                }
-                Long lineNo = cs.getLineNo();
-                if (lineNo == null) {
-                    /* Not enough information to provide a full callsite */
-                    return;
-                }
-
-                String fileName = cs.getFileName();
-                final String trimmedPath = fileName.replaceAll("\\.\\./", EMPTY_STRING); //$NON-NLS-1$
-                File fileToOpen = new File(trimmedPath);
-
-                try {
-                    if (fileToOpen.exists() && fileToOpen.isFile()) {
-                        /*
-                         * The path points to a "real" file, attempt to open
-                         * that
-                         */
-                        IFileStore fileStore = EFS.getLocalFileSystem().getStore(fileToOpen.toURI());
-                        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-
-                        IEditorPart editor = IDE.openEditorOnFileStore(page, fileStore);
-                        if (editor instanceof ITextEditor) {
-                            /*
-                             * Calculate the "document offset" corresponding to
-                             * the line number, then seek there.
-                             */
-                            ITextEditor textEditor = (ITextEditor) editor;
-                            int lineNumber = lineNo.intValue();
-                            IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
-
-                            IRegion region = document.getLineInformation(lineNumber - 1);
-                            if (region != null) {
-                                textEditor.selectAndReveal(region.getOffset(), region.getLength());
-                            }
-                        }
-
-                    } else {
-                        /*
-                         * The file was not found on disk, attempt to find it in
-                         * the workspace instead.
-                         */
-                        IMarker marker = null;
-                        final ArrayList<IFile> files = new ArrayList<>();
-                        IPath p = new Path(trimmedPath);
-                        ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceVisitor() {
-                            @Override
-                            public boolean visit(IResource resource) throws CoreException {
-                                if (resource instanceof IFile && resource.getFullPath().toString().endsWith(p.lastSegment())) {
-                                    files.add((IFile) resource);
-                                }
-                                return true;
-                            }
-                        });
-                        IFile file = null;
-                        if (files.size() > 1) {
-                            ListDialog dialog = new ListDialog(getTable().getShell());
-                            dialog.setContentProvider(ArrayContentProvider.getInstance());
-                            dialog.setLabelProvider(new LabelProvider() {
-                                @Override
-                                public String getText(Object element) {
-                                    return ((IFile) element).getFullPath().toString();
-                                }
-                            });
-                            dialog.setInput(files);
-                            dialog.setTitle(Messages.TmfEventsTable_OpenSourceCodeSelectFileDialogTitle);
-                            dialog.setMessage(Messages.TmfEventsTable_OpenSourceCodeSelectFileDialogTitle + '\n' + cs.toString());
-                            dialog.open();
-                            Object[] result = dialog.getResult();
-                            if (result != null && result.length > 0) {
-                                file = (IFile) result[0];
-                            }
-                        } else if (files.size() == 1) {
-                            file = files.get(0);
-                        }
-                        if (file != null) {
-                            marker = file.createMarker(IMarker.MARKER);
-                            marker.setAttribute(IMarker.LINE_NUMBER, lineNo.intValue());
-                            IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), marker);
-                            marker.delete();
-                        } else if (files.isEmpty()) {
-                            final Exception e = new FileNotFoundException('\'' + cs.toString() + '\'' + '\n' + Messages.TmfEventsTable_OpenSourceCodeNotFound);
-                            TraceUtils.displayErrorMsg(e);
-                        }
-                    }
-                } catch (BadLocationException | CoreException e) {
-                    TraceUtils.displayErrorMsg(e);
-                }
-            }
-        };
-
         final IAction openModelAction = new Action(Messages.TmfEventsTable_OpenModelActionText) {
             @Override
             public void run() {
@@ -1487,9 +1369,9 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 final Object data = item.getData();
                 Separator separator = null;
                 if (data instanceof ITmfSourceLookup) {
-                    ITmfSourceLookup event1 = (ITmfSourceLookup) data;
-                    if (event1.getCallsite() != null) {
-                        fTablePopupMenuManager.add(openCallsiteAction);
+                    IContributionItem action = OpenSourceCodeAction.create(Messages.TmfSourceLookup_OpenSourceCodeActionText, (ITmfSourceLookup) data, fTable.getShell());
+                    if (action != null) {
+                        fTablePopupMenuManager.add(action);
                         separator = new Separator();
                     }
                 }

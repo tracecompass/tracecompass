@@ -57,9 +57,6 @@ public class Messages extends NLS {
     public static String TmfEventsTable_HideRawActionText;
     public static String TmfEventsTable_HideTableActionText;
     public static String TmfEventsTable_MultipleBookmarksToolTip;
-    public static String TmfEventsTable_OpenSourceCodeActionText;
-    public static String TmfEventsTable_OpenSourceCodeNotFound;
-    public static String TmfEventsTable_OpenSourceCodeSelectFileDialogTitle;
     public static String TmfEventsTable_OpenModelActionText;
     public static String TmfEventsTable_OpenModelUnsupportedURI;
     public static String TmfEventsTable_ReferenceColumnHeader;
@@ -374,6 +371,9 @@ public class Messages extends NLS {
     public static String TmfTracingPreferencePage_HideManyEntriesSelectedWarning;
     public static String TmfTracingPreferencePage_UseBrowserTooltips;
 
+    public static String TmfSourceLookup_OpenSourceCodeActionText;
+    public static String TmfSourceLookup_OpenSourceCodeNotFound;
+    public static String TmfSourceLookup_OpenSourceCodeSelectFileDialogTitle;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
