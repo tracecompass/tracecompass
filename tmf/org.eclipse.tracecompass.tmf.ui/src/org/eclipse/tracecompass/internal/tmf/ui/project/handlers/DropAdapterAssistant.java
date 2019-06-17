@@ -60,6 +60,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceTypeUIUtils;
+import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyDelegatingOperation;
 import org.eclipse.ui.dialogs.IOverwriteQuery;
@@ -288,7 +289,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 }
                 traceResource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
             } catch (CoreException e) {
-                displayException(e);
+                TraceUtils.displayErrorMsg(e);
                 return null;
             }
         }
@@ -376,7 +377,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             }
             return traceResource;
         } catch (CoreException e) {
-            displayException(e);
+            TraceUtils.displayErrorMsg(e);
         }
         return null;
     }
@@ -437,7 +438,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 String sourceLocation = URIUtil.toUnencodedString(path.toFile().toURI());
                 traceResource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
             } catch (CoreException e) {
-                displayException(e);
+                TraceUtils.displayErrorMsg(e);
             }
             setTraceType(traceResource);
             for (TmfTraceElement trace : tracesFolder.getTraces()) {
@@ -486,7 +487,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 String sourceLocation = URIUtil.toUnencodedString(path.toFile().toURI());
                 traceResource.setPersistentProperty(TmfCommonConstants.SOURCE_LOCATION, sourceLocation);
             } catch (CoreException e) {
-                displayException(e);
+                TraceUtils.displayErrorMsg(e);
             }
             setTraceType(traceResource);
         }
@@ -516,9 +517,9 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             try {
                 operation.run(new NullProgressMonitor());
             } catch (InvocationTargetException e) {
-                displayException(e);
+                TraceUtils.displayErrorMsg(e);
             } catch (InterruptedException e) {
-                displayException(e);
+                Thread.currentThread().interrupt();
             }
         } else {
             IRunnableWithProgress runnable = new IRunnableWithProgress() {
@@ -528,7 +529,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                         IFile targetFile = folder.getFile(targetName);
                         targetFile.create(inputStream, IResource.NONE, monitor);
                     } catch (CoreException | IOException e) {
-                        displayException(e);
+                        TraceUtils.displayErrorMsg(e);
                     }
                 }
             };
@@ -536,9 +537,9 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
             try {
                 operation.run(new NullProgressMonitor());
             } catch (InvocationTargetException e) {
-                displayException(e);
+                TraceUtils.displayErrorMsg(e);
             } catch (InterruptedException e) {
-                displayException(e);
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -581,7 +582,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 }
             }
         } catch (CoreException e) {
-            displayException(e);
+            TraceUtils.displayErrorMsg(e);
         }
     }
 
@@ -615,7 +616,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 }
             }
         } catch (CoreException e) {
-            displayException(e);
+            TraceUtils.displayErrorMsg(e);
         }
     }
 
@@ -656,7 +657,7 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                     }
                 }
             } catch (CoreException e) {
-                displayException(e);
+                TraceUtils.displayErrorMsg(e);
             }
         }
     }
@@ -672,21 +673,9 @@ public class DropAdapterAssistant extends CommonDropAdapterAssistant {
                 TmfTraceTypeUIUtils.setTraceType(traceResource, traceTypeHelper);
             }
         } catch (TmfTraceImportException e) {
+            // Ignored, no trace type selected
         } catch (CoreException e) {
-            displayException(e);
+            TraceUtils.displayErrorMsg(e);
         }
     }
-
-    /**
-     * Display an exception in a message box
-     *
-     * @param e the exception
-     */
-    private static void displayException(Exception e) {
-        MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-        mb.setText(e.getClass().getName());
-        mb.setMessage(e.getMessage());
-        mb.open();
-    }
-
 }

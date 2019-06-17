@@ -45,7 +45,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
@@ -135,9 +134,7 @@ public class TmfOpenTraceHelper {
         try (ScopeLog scopeLog = new ScopeLog(LOGGER, Level.FINE, "TmfOpenTraceHelper#openTraceFromPath", "Get trace type")) { //$NON-NLS-1$//$NON-NLS-2$
             traceTypeToSet = TmfTraceTypeUIUtils.selectTraceType(pathToUse, null, tracetypeHint);
         } catch (TmfTraceImportException e) {
-            MessageBox mb = new MessageBox(shell);
-            mb.setMessage(e.getMessage());
-            mb.open();
+            TraceUtils.displayErrorMsg(e);
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
         }
 

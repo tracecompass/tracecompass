@@ -53,6 +53,18 @@ public class TraceUtils {
     /**
      * Displays an error message in a box
      *
+     * @param exception
+     *            the exception or null if the error does not originate from an
+     *            exception
+     * @since 5.1
+     */
+    public static void displayErrorMsg(Throwable exception) {
+        displayErrorMsg(exception.getClass().getSimpleName(), exception.getMessage(), exception);
+    }
+
+    /**
+     * Displays an error message in a box
+     *
      * @param boxTitle
      *            The message box title
      * @param errorMsg

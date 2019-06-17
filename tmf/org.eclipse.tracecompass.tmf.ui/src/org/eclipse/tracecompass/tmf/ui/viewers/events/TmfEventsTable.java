@@ -117,7 +117,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -166,6 +165,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.TmfUiRefreshHandler;
+import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsCache.CachedEvent;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.TmfEventsTableHeader.IEventsTableHeaderListener;
 import org.eclipse.tracecompass.tmf.ui.viewers.events.columns.TmfEventTableColumn;
@@ -1279,11 +1279,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), marker);
                             marker.delete();
                         } else if (files.isEmpty()) {
-                            displayException(new FileNotFoundException('\'' + cs.toString() + '\'' + '\n' + Messages.TmfEventsTable_OpenSourceCodeNotFound));
+                            final Exception e = new FileNotFoundException('\'' + cs.toString() + '\'' + '\n' + Messages.TmfEventsTable_OpenSourceCodeNotFound);
+                            TraceUtils.displayErrorMsg(e);
                         }
                     }
                 } catch (BadLocationException | CoreException e) {
-                    displayException(e);
+                    TraceUtils.displayErrorMsg(e);
                 }
             }
         };
@@ -1330,10 +1331,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                                 IDE.openEditor(activePage, marker, OpenStrategy.activateOnOpen());
                                 marker.delete();
                             } catch (CoreException e) {
-                                displayException(e);
+                                TraceUtils.displayErrorMsg(e);
                             }
                         } else {
-                            displayException(new FileNotFoundException('\'' + modelURI + '\'' + '\n' + Messages.TmfEventsTable_OpenModelUnsupportedURI));
+                            final Exception e = new FileNotFoundException('\'' + modelURI + '\'' + '\n' + Messages.TmfEventsTable_OpenModelUnsupportedURI);
+                            TraceUtils.displayErrorMsg(e);
                         }
                     }
                 }
@@ -1366,7 +1368,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
 
                     handlerService.executeCommandInContext(cmd, null, context);
                 } catch (ExecutionException | NotDefinedException | NotEnabledException | NotHandledException e) {
-                    displayException(e);
+                    TraceUtils.displayErrorMsg(e);
                 }
             }
         };
@@ -1683,7 +1685,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     }
                 }
             } catch (CoreException e) {
-                displayException(e);
+                TraceUtils.displayErrorMsg(e);
             }
             item.setData(Key.BOOKMARK, joiner.join(parts));
         } else {
@@ -3226,7 +3228,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         fBookmarksMap.put(rank, id[0]);
                         fTable.refresh();
                     } catch (final CoreException e) {
-                        displayException(e);
+                        TraceUtils.displayErrorMsg(e);
                     }
                 }
             }
@@ -3296,7 +3298,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     }
                 }
             } catch (final CoreException e) {
-                displayException(e);
+                TraceUtils.displayErrorMsg(e);
             }
         } else {
             addBookmark(fBookmarksFile);
@@ -3322,7 +3324,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             IMarker[] bookmarks = bookmarksFile.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO);
             addBookmark(bookmarks);
         } catch (final CoreException e) {
-            displayException(e);
+            TraceUtils.displayErrorMsg(e);
         }
     }
 
@@ -3599,23 +3601,6 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 fTimeSelectJob = timeSelectJob;
             }
         }
-    }
-
-    // ------------------------------------------------------------------------
-    // Error handling
-    // ------------------------------------------------------------------------
-
-    /**
-     * Display an exception in a message box
-     *
-     * @param e
-     *            the exception
-     */
-    private static void displayException(final Exception e) {
-        final MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-        mb.setText(e.getClass().getSimpleName());
-        mb.setMessage(e.getMessage());
-        mb.open();
     }
 
     /**

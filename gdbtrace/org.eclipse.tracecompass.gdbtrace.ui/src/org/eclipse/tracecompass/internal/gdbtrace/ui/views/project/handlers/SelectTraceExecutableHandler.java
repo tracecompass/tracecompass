@@ -22,12 +22,11 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.gdbtrace.core.trace.GdbTrace;
 import org.eclipse.tracecompass.internal.gdbtrace.ui.views.project.dialogs.SelectTraceExecutableDialog;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
@@ -58,10 +57,7 @@ public class SelectTraceExecutableHandler extends AbstractHandler {
                 try {
                     resource.setPersistentProperty(GdbTrace.EXEC_KEY, tracedExecutable.toString());
                 } catch (CoreException e) {
-                    final MessageBox mb = new MessageBox(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-                    mb.setText(e.getClass().getName());
-                    mb.setMessage(e.getMessage());
-                    mb.open();
+                    TraceUtils.displayErrorMsg(e);
                 }
             }
         }
