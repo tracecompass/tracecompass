@@ -12,6 +12,10 @@
 
 package org.eclipse.tracecompass.tmf.core.event.lookup;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
@@ -28,4 +32,27 @@ public interface ITmfSourceLookup {
      * @return The call site instance
      */
     @Nullable ITmfCallsite getCallsite();
+
+    /**
+     * <p>
+     * Returns a list of call sites of this event or 'null' if there is no call
+     * site information available.
+     * </p>
+     * <p>
+     * Example uses of multiple callsites can be a product of snapshots of
+     * pipelines or polled events on stream processes.
+     * <p>
+     *
+     * @return a list of the callsites returned, order is undefined, duplication
+     *         is possible.
+     *
+     * @since 5.1
+     */
+    default @Nullable List<@NonNull ITmfCallsite> getCallsites() {
+        ITmfCallsite callsite = getCallsite();
+        if (callsite == null) {
+            return null;
+        }
+        return Collections.singletonList(callsite);
+    }
 }
