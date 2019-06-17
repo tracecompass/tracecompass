@@ -49,6 +49,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -290,6 +291,7 @@ public class SDViewTest {
      * Test Sequence diagram print dialog
      */
     @Test
+    @Ignore
     public void testSDPrintUi() {
         SWTBotView viewBot = fBot.viewById(UML2DVIEW_ID);
         assertNotNull(viewBot);
