@@ -120,7 +120,7 @@ public class ControlViewExcludeEventsTest extends ControlViewTest {
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
         WaitUtils.waitForJobs();
 
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.UST_DOMAIN_NAME, sessionItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(ControlViewSwtBotUtil.UST_DOMAIN_NAME, sessionItem));
 
         // Assert that the domain is UST global
         SWTBotTreeItem ustGlobalDomainItem = SWTBotUtils.getTreeItem(fBot, fTree,

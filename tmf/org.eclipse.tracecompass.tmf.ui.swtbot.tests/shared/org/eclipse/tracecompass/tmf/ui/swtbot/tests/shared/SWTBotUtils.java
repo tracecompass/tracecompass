@@ -366,7 +366,7 @@ public final class SWTBotUtils {
         for (SWTBotView view : openViews) {
             if (view.getTitle().equalsIgnoreCase(title)) {
                 view.close();
-                bot.waitUntil(ConditionHelpers.ViewIsClosed(view));
+                bot.waitUntil(ConditionHelpers.viewIsClosed(view));
             }
         }
     }
@@ -383,7 +383,7 @@ public final class SWTBotUtils {
     public static void closeViewById(String viewId, SWTWorkbenchBot bot) {
         final SWTBotView view = bot.viewById(viewId);
         view.close();
-        bot.waitUntil(ConditionHelpers.ViewIsClosed(view));
+        bot.waitUntil(ConditionHelpers.viewIsClosed(view));
     }
 
     /**
@@ -612,7 +612,7 @@ public final class SWTBotUtils {
         SWTBot projectExplorerBot = projectExplorerView.bot();
 
         final SWTBotTree tree = projectExplorerBot.tree();
-        projectExplorerBot.waitUntil(ConditionHelpers.IsTreeNodeAvailable(projectName, tree));
+        projectExplorerBot.waitUntil(ConditionHelpers.isTreeNodeAvailable(projectName, tree));
         final SWTBotTreeItem treeItem = tree.getTreeItem(projectName);
         treeItem.expand();
 
@@ -939,7 +939,7 @@ public final class SWTBotUtils {
             return null;
         }
 
-        bot.waitUntil(ConditionHelpers.IsTreeNodeAvailable(nodeNames[0], tree));
+        bot.waitUntil(ConditionHelpers.isTreeNodeAvailable(nodeNames[0], tree));
         SWTBotTreeItem currentNode = tree.getTreeItem(nodeNames[0]);
         return getTreeItem(bot, currentNode, Arrays.copyOfRange(nodeNames, 1, nodeNames.length));
     }
@@ -968,13 +968,13 @@ public final class SWTBotUtils {
 
             String nodeName = nodeNames[i];
             try {
-                bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(nodeName, currentNode));
+                bot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(nodeName, currentNode));
             } catch (TimeoutException e) {
                 // FIXME: Sometimes in a JFace TreeViewer, it expands to
                 // nothing. Need to find out why.
                 currentNode.collapse();
                 currentNode.expand();
-                bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(nodeName, currentNode));
+                bot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(nodeName, currentNode));
             }
 
             SWTBotTreeItem newNode = currentNode.getNode(nodeName);

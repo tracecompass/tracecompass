@@ -157,7 +157,7 @@ public class ControlViewSpecificEventTest extends ControlViewTest {
         WaitUtils.waitForJobs();
 
         // Wait until the child of Sessions is activated
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
 
         // Assert that the new channel name is channel0 (which is the default name)
         SWTBotTreeItem channelItem = SWTBotUtils.getTreeItem(fBot, fTree,
@@ -176,7 +176,7 @@ public class ControlViewSpecificEventTest extends ControlViewTest {
             if (event.equals(ControlViewSwtBotUtil.ALL_TREE_NODE)) {
                 eventName = ControlViewSwtBotUtil.ALL_EVENTS_NAME;
             }
-            fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(eventName, channelItem));
+            fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(eventName, channelItem));
             // Assert that the event type in the channel node are correct
             SWTBotTreeItem eventItem = SWTBotUtils.getTreeItem(fBot, fTree,
                     getNodeName(),

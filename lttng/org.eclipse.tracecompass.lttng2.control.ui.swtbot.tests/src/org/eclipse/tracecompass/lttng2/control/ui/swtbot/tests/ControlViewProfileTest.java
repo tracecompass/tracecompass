@@ -126,7 +126,7 @@ public class ControlViewProfileTest extends ControlViewTest {
         sessionGroupItem = SWTBotUtils.getTreeItem(fBot, fTree,
                 getNodeName(), ControlViewSwtBotUtil.SESSION_GROUP_NAME);
 
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(SESSION_NAME, sessionGroupItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(SESSION_NAME, sessionGroupItem));
         assertEquals(1, sessionGroupItem.getNodes().size());
     }
 

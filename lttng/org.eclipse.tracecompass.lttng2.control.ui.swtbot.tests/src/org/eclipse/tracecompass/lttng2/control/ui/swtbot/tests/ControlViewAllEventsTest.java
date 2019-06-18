@@ -84,7 +84,7 @@ public class ControlViewAllEventsTest extends ControlViewTest {
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
         WaitUtils.waitForJobs();
 
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
 
         SWTBotTreeItem channelItem = SWTBotUtils.getTreeItem(fBot, fTree,
                 getNodeName(),

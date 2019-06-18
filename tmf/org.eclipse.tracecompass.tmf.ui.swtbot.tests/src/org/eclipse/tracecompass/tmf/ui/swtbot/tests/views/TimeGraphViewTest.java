@@ -318,7 +318,7 @@ public class TimeGraphViewTest {
         TmfSignalManager.dispatchSignal(new TmfTraceClosedSignal(this, trace));
         fBot.waitUntil(Conditions.shellCloses(legendShell));
         fViewBot.close();
-        fBot.waitUntil(ConditionHelpers.ViewIsClosed(fViewBot));
+        fBot.waitUntil(ConditionHelpers.viewIsClosed(fViewBot));
         fTrace.dispose();
     }
 

@@ -33,6 +33,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.results.BoolResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.TableCollection;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
@@ -49,6 +50,9 @@ import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.hamcrest.Matcher;
 import org.swtchart.Chart;
 
@@ -86,9 +90,9 @@ public final class ConditionHelpers {
      *            the name of the node
      * @param tree
      *            the parent tree
-     * @return true or false, it should swallow all exceptions
+     * @return ICondition for verification
      */
-    public static ICondition IsTreeNodeAvailable(final String name, final SWTBotTree tree) {
+    public static ICondition isTreeNodeAvailable(final String name, final SWTBotTree tree) {
         return new SWTBotTestCondition() {
             @Override
             public boolean test() throws Exception {
@@ -120,7 +124,7 @@ public final class ConditionHelpers {
      *            the name of the item
      * @param table
      *            the parent table
-     * @return true or false, it should swallow all exceptions
+     * @return ICondition for verification
      */
     public static ICondition isTableItemAvailable(final String name, final SWTBotTable table) {
         return new SWTBotTestCondition() {
@@ -147,9 +151,9 @@ public final class ConditionHelpers {
      *            the name of the node
      * @param treeItem
      *            the treeItem
-     * @return true or false, it should swallow all exceptions
+     * @return ICondition for verification
      */
-    public static ICondition IsTreeChildNodeAvailable(final String name, final SWTBotTreeItem treeItem) {
+    public static ICondition isTreeChildNodeAvailable(final String name, final SWTBotTreeItem treeItem) {
         return new SWTBotTestCondition() {
             @Override
             public boolean test() throws Exception {
@@ -175,7 +179,7 @@ public final class ConditionHelpers {
      *            length of the node after removal
      * @param treeItem
      *            the treeItem
-     * @return true or false, it should swallow all exceptions
+     * @return ICondition for verification
      */
     public static ICondition isTreeChildNodeRemoved(final int length, final SWTBotTreeItem treeItem) {
         return new SWTBotTestCondition() {
@@ -226,7 +230,7 @@ public final class ConditionHelpers {
      *
      * @param wizard
      *            the null
-     * @return false if either are null
+     * @return ICondition for verification
      */
     public static ICondition isWizardReady(final Wizard wizard) {
         return new SWTBotTestCondition() {
@@ -247,7 +251,7 @@ public final class ConditionHelpers {
      *            wizard
      * @param page
      *            the desired page
-     * @return true or false
+     * @return ICondition for verification
      */
     public static ICondition isWizardOnPage(final Wizard wizard, final IWizardPage page) {
         return new SWTBotTestCondition() {
@@ -267,33 +271,59 @@ public final class ConditionHelpers {
     }
 
     /**
-     * Wait for a view to close
+     * Condition to wait for a view to close
      *
      * @param view
-     *            bot view for the view
-     * @return true if the view is closed, false if it's active.
+     *            view bot for the view
+     * @return ICondition for verification
      */
-    public static ICondition ViewIsClosed(final SWTBotView view) {
+    public static ICondition viewIsClosed(final SWTBotView view) {
         return new SWTBotTestCondition() {
             @Override
             public boolean test() throws Exception {
-                return (view != null) && (!view.isActive());
+                return UIThreadRunnable.syncExec(new BoolResult() {
+                    @Override
+                    public Boolean run() {
+                        if (!PlatformUI.isWorkbenchRunning()) {
+                            return true;
+                        }
+                        IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+                        if (workbenchWindow == null) {
+                            return true;
+                        }
+                        IWorkbenchPage activePage = workbenchWindow.getActivePage();
+                        if (activePage == null) {
+                            return true;
+                        }
+                        return !Arrays.asList(activePage.getViewReferences()).contains(view.getReference());
+                    }
+                });
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return view.getTitle() + " view did not close";
             }
         };
     }
 
     /**
-     * Wait for a view to open
+     * Condition to wait for a view to become active
      *
      * @param view
      *            bot view for the view
-     * @return true if the view is open, false otherwise
+     * @return ICondition for verification
      */
-    public static ICondition viewIsOpened(final SWTBotView view) {
+    public static ICondition viewIsActive(final SWTBotView view) {
         return new SWTBotTestCondition() {
             @Override
             public boolean test() throws Exception {
                 return (view != null) && (view.isActive());
+            }
+
+            @Override
+            public String getFailureMessage() {
+                return view.getTitle() + " view did not become active";
             }
         };
     }

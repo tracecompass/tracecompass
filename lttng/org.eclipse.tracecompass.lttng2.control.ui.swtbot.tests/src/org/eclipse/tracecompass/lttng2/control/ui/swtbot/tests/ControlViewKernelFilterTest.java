@@ -120,7 +120,7 @@ public class ControlViewKernelFilterTest extends ControlViewTest {
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
         WaitUtils.waitForJobs();
 
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
 
         SWTBotTreeItem kernelDomainItem = SWTBotUtils.getTreeItem(fBot, fTree,
                 getNodeName(),
@@ -182,7 +182,7 @@ public class ControlViewKernelFilterTest extends ControlViewTest {
                 ControlViewSwtBotUtil.SESSION_GROUP_NAME,
                 getSessionName());
 
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
 
         SWTBotTreeItem kernelDomainItem = SWTBotUtils.getTreeItem(fBot, fTree,
                 getNodeName(),

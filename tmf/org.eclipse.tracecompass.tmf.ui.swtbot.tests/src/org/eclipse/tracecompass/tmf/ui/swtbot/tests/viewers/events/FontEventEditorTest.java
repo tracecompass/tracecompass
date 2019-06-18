@@ -137,11 +137,11 @@ public class FontEventEditorTest {
         SWTBotTreeItem generalItem = bot.tree().getTreeItem("General");
         generalItem.click();
         generalItem.select();
-        bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable("Appearance", generalItem));
+        bot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable("Appearance", generalItem));
         SWTBotTreeItem appearanceNode = generalItem.getNode("Appearance");
         appearanceNode.click();
         appearanceNode.select();
-        bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable("Colors and Fonts", appearanceNode));
+        bot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable("Colors and Fonts", appearanceNode));
         SWTBotTreeItem colorAndFontNode = appearanceNode.getNode("Colors and Fonts");
         colorAndFontNode.click();
         colorAndFontNode.select();

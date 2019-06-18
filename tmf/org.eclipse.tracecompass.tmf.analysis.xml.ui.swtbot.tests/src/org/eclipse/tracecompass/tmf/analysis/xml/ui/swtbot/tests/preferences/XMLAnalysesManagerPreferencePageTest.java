@@ -407,7 +407,7 @@ public class XMLAnalysesManagerPreferencePageTest {
         SWTBotTreeItem treeNode = tree.getTreeItem("Tracing");
         treeNode.select();
         treeNode.expand();
-        bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable("XML Analyses", treeNode));
+        bot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable("XML Analyses", treeNode));
         treeNode = treeNode.getNode("XML Analyses");
         treeNode.select();
         return preferencesShell;

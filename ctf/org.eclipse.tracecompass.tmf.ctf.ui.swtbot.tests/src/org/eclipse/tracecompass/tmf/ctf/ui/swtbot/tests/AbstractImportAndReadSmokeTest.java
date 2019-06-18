@@ -124,12 +124,12 @@ public abstract class AbstractImportAndReadSmokeTest {
         SWTBotTree tree = fBot.tree();
         assertNotNull(tree);
         final String tracingKey = "Tracing";
-        fBot.waitUntil(ConditionHelpers.IsTreeNodeAvailable(tracingKey, tree));
+        fBot.waitUntil(ConditionHelpers.isTreeNodeAvailable(tracingKey, tree));
         final SWTBotTreeItem tracingNode = tree.expandNode(tracingKey);
 
         tracingNode.select();
         final String projectKey = "Tracing Project";
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(projectKey, tracingNode));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(projectKey, tracingNode));
         final SWTBotTreeItem tracingProject = tracingNode.getNode(projectKey);
         assertNotNull(tracingProject);
 

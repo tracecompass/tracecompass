@@ -255,7 +255,7 @@ public class ControlViewTest {
         SWTBotMenu menuBot = nodeItem.contextMenu(ControlViewSwtBotUtil.CONNECT_MENU_ITEM);
         menuBot.click();
 
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.SESSION_GROUP_NAME, nodeItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(ControlViewSwtBotUtil.SESSION_GROUP_NAME, nodeItem));
 
         // Verify that node is connected
         fBot.waitUntil(ControlViewSwtBotUtil.isStateChanged(fNode, TargetNodeState.CONNECTED));
@@ -286,7 +286,7 @@ public class ControlViewTest {
 
         sessionGroupItem.expand();
 
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(getSessionName(), sessionGroupItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(getSessionName(), sessionGroupItem));
         assertEquals(1, sessionGroupItem.getNodes().size());
 
         SWTBotTreeItem sessionItem = SWTBotUtils.getTreeItem(fBot, fTree,
@@ -319,7 +319,7 @@ public class ControlViewTest {
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
         WaitUtils.waitForJobs();
 
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
 
         SWTBotTreeItem channelItem = SWTBotUtils.getTreeItem(fBot, fTree,
                 getNodeName(),
@@ -369,7 +369,7 @@ public class ControlViewTest {
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
         WaitUtils.waitForJobs();
 
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
 
         SWTBotTreeItem kernelDomainItem = SWTBotUtils.getTreeItem(fBot, fTree,
                 getNodeName(),
@@ -417,7 +417,7 @@ public class ControlViewTest {
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
         WaitUtils.waitForJobs();
 
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(ControlViewSwtBotUtil.KERNEL_DOMAIN_NAME, sessionItem));
 
         kernelDomainItem = SWTBotUtils.getTreeItem(fBot, fTree,
                 getNodeName(),
@@ -482,7 +482,7 @@ public class ControlViewTest {
         shell.bot().radioInGroup(ControlViewSwtBotUtil.BUFFERTYPE_PER_UID, ControlViewSwtBotUtil.BUFFERTYPE_GROUP_NAME).click();
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
         WaitUtils.waitForJobs();
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(ControlViewSwtBotUtil.UST_DOMAIN_NAME, sessionItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(ControlViewSwtBotUtil.UST_DOMAIN_NAME, sessionItem));
     }
 
     /**

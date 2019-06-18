@@ -153,7 +153,7 @@ public class XYChartViewTest {
         assertNotNull(trace);
         UIThreadRunnable.syncExec(() -> TmfSignalManager.dispatchSignal(new TmfTraceClosedSignal(this, trace)));
         fViewBot.close();
-        fBot.waitUntil(ConditionHelpers.ViewIsClosed(fViewBot));
+        fBot.waitUntil(ConditionHelpers.viewIsClosed(fViewBot));
         fTrace.dispose();
     }
 

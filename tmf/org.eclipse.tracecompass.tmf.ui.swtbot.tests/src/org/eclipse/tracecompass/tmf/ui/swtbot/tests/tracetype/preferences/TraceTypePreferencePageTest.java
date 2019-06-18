@@ -331,7 +331,7 @@ public class TraceTypePreferencePageTest {
         SWTBotTreeItem treeNode = tree.getTreeItem("Tracing");
         treeNode.select();
         treeNode.expand();
-        bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable("Trace Types", treeNode));
+        bot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable("Trace Types", treeNode));
         treeNode = treeNode.getNode("Trace Types");
         treeNode.select();
         return preferencesShell;

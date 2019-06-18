@@ -145,7 +145,7 @@ public class ControlViewLoggerTest extends ControlViewTest {
         // Click the Ok at the bottom of the dialog window
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
         WaitUtils.waitForJobs();
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(domainName, sessionItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(domainName, sessionItem));
 
         // Assert that the domain is correct
         SWTBotTreeItem domainItem = SWTBotUtils.getTreeItem(fBot, fTree,
@@ -185,7 +185,7 @@ public class ControlViewLoggerTest extends ControlViewTest {
         // Click the Ok at the bottom of the dialog window
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
         WaitUtils.waitForJobs();
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(domainName, sessionItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(domainName, sessionItem));
 
         // Assert that the domain is correct
         domainItem = SWTBotUtils.getTreeItem(fBot, fTree,
@@ -224,7 +224,7 @@ public class ControlViewLoggerTest extends ControlViewTest {
         // Click the Ok at the bottom of the dialog window
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
         WaitUtils.waitForJobs();
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(domainName, sessionItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(domainName, sessionItem));
 
         // Assert that the domain is correct
         domainItem = SWTBotUtils.getTreeItem(fBot, fTree,
@@ -255,7 +255,7 @@ public class ControlViewLoggerTest extends ControlViewTest {
         // Click the Ok at the bottom of the dialog window
         shell.bot().button(ControlViewSwtBotUtil.DIALOG_OK_BUTTON).click();
         WaitUtils.waitForJobs();
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(domainName, sessionItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(domainName, sessionItem));
 
         // Assert that the domain is correct
         domainItem = SWTBotUtils.getTreeItem(fBot, fTree,

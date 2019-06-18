@@ -428,7 +428,7 @@ public class ProjectExplorerTraceActionsTest {
         fBot.waitUntil(new ConditionHelpers.ActiveEventsEditor(fBot, "Experiment"));
         SWTBotTreeItem experimentsItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME), "Experiments");
         experimentsItem.expand();
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable("Experiment [2]", experimentsItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable("Experiment [2]", experimentsItem));
 
         SWTBotTreeItem expItem = SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, "Experiment");
 
@@ -466,7 +466,7 @@ public class ProjectExplorerTraceActionsTest {
         fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
         SWTBotTreeItem experimentsItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME), "Experiments");
         experimentsItem.expand();
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable("ExampleCustomTxt.log [1]", experimentsItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable("ExampleCustomTxt.log [1]", experimentsItem));
         SWTBotTreeItem expItem = SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, "ExampleCustomTxt.log [1]");
         expItem.expand();
         SWTBotTreeItem expTrace = expItem.getNode(TRACE_NAME);
@@ -505,7 +505,7 @@ public class ProjectExplorerTraceActionsTest {
         fBot.viewByTitle(PROJECT_EXPLORER_VIEW_NAME).setFocus();
         SWTBotTreeItem experimentsItem = SWTBotUtils.getTraceProjectItem(fBot, SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME), "Experiments");
         experimentsItem.expand();
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable("ExampleCustomTxt.log [1]", experimentsItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable("ExampleCustomTxt.log [1]", experimentsItem));
         SWTBotTreeItem expItem = SWTBotUtils.getTraceProjectItem(fBot, experimentsItem, "ExampleCustomTxt.log [1]");
         expItem.expand();
         SWTBotTreeItem expTrace = expItem.getNode(TRACE_NAME);
@@ -701,11 +701,11 @@ public class ProjectExplorerTraceActionsTest {
     private static void testLinkStatus(SWTBotTreeItem traceItem, boolean isLinked) {
         SWTBotView viewBot = fBot.viewByTitle(PROPERTIES_VIEW_NAME);
         viewBot.show();
-        fBot.waitUntil(ConditionHelpers.viewIsOpened(viewBot));
+        fBot.waitUntil(ConditionHelpers.viewIsActive(viewBot));
         traceItem.select();
         SWTBotTree tree = viewBot.bot().tree();
         SWTBotTreeItem resourcePropertiesItem = tree.getTreeItem(RESOURCE_PROPERTIES_ITEM_NAME);
-        fBot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(LINKED_ITEM_NAME, resourcePropertiesItem));
+        fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(LINKED_ITEM_NAME, resourcePropertiesItem));
         SWTBotTreeItem linkedNode = resourcePropertiesItem.getNode(LINKED_ITEM_NAME);
         String linkedValue = linkedNode.cell(1);
         assertEquals(Boolean.toString(isLinked), linkedValue);

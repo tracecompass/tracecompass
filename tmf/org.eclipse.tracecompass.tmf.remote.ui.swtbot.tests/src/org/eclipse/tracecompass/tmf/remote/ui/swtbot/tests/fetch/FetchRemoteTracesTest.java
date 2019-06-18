@@ -979,7 +979,7 @@ public class FetchRemoteTracesTest {
         SWTBotTreeItem currentNode = tree.getTreeItem(nodeNames[0]);
         for (int i = 1; i < nodeNames.length; i++) {
             String nodeName = nodeNames[i];
-            bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable(nodeName, currentNode));
+            bot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(nodeName, currentNode));
             SWTBotTreeItem newNode = currentNode.getNode(nodeName);
             currentNode = newNode;
         }
@@ -996,7 +996,7 @@ public class FetchRemoteTracesTest {
         SWTBotTreeItem treeNode = tree.getTreeItem("Tracing");
         treeNode.select();
         treeNode.expand();
-        bot.waitUntil(ConditionHelpers.IsTreeChildNodeAvailable("Remote Profiles", treeNode));
+        bot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable("Remote Profiles", treeNode));
         treeNode = treeNode.getNode("Remote Profiles");
         treeNode.select();
     }
