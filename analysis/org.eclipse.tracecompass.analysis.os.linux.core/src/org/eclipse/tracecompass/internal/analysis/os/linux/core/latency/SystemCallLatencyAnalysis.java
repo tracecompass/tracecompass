@@ -9,8 +9,6 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.latency;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -34,6 +32,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory.SegmentStoreType;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
@@ -201,12 +200,12 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
 
         @Override
         public String getHelpText() {
-            return checkNotNull(Messages.SegmentAspectHelpText_SystemCall);
+            return Messages.getMessage(Messages.SegmentAspectHelpText_SystemCall);
         }
 
         @Override
         public String getName() {
-            return checkNotNull(Messages.SegmentAspectName_SystemCall);
+            return Messages.getMessage(Messages.SegmentAspectName_SystemCall);
         }
 
         @Override
@@ -232,7 +231,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
 
         @Override
         public String getHelpText() {
-            return checkNotNull(Messages.SegmentAspectHelpText_SystemCallTid);
+            return Messages.getMessage(Messages.SegmentAspectHelpText_SystemCallTid);
         }
 
         @Override
@@ -263,12 +262,12 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
 
         @Override
         public String getName() {
-            return "Component"; //$NON-NLS-1$
+            return Messages.getMessage(Messages.SystemCallLatencyAnalysis_componentName);
         }
 
         @Override
         public String getHelpText() {
-            return "Code Component that this system call belongs to"; //$NON-NLS-1$
+            return Messages.getMessage(Messages.SystemCallLatencyAnalysis_componentDescription);
         }
 
         @Override
@@ -294,12 +293,12 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
 
         @Override
         public String getHelpText() {
-            return checkNotNull(Messages.SegmentAspectHelpText_SystemCallRet);
+            return Messages.getMessage(Messages.SegmentAspectHelpText_SystemCallRet);
         }
 
         @Override
         public String getName() {
-            return checkNotNull(Messages.SegmentAspectName_SystemCallRet);
+            return Messages.getMessage(Messages.SegmentAspectName_SystemCallRet);
         }
 
         @Override
@@ -326,12 +325,12 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
 
         @Override
         public String getName() {
-            return "File"; //$NON-NLS-1$
+            return Messages.getMessage(Messages.SystemCallLatencyAnalysis_fileName);
         }
 
         @Override
         public String getHelpText() {
-            return "File that implements the system call"; //$NON-NLS-1$
+            return Messages.getMessage(Messages.SystemCallLatencyAnalysis_fileDescription);
         }
 
         @Override
@@ -345,6 +344,45 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
                 return SyscallLookup.getInstance().getFile(((SystemCall) segment).getName());
             }
             return EMPTY_STRING;
+        }
+    }
+
+    /**
+     * Callsite aspect for system calls
+     */
+    public static final class SyscallCallsiteAspect implements ISegmentAspect {
+
+        /**
+         * Instance
+         */
+        public static final ISegmentAspect INSTANCE = new SyscallCallsiteAspect();
+
+        private SyscallCallsiteAspect() {
+            // Do nothing
+        }
+
+        @Override
+        public String getName() {
+            return Messages.getMessage(Messages.SystemCallLatencyAnalysis_sourceLookupName);
+        }
+
+        @Override
+        public String getHelpText() {
+            return Messages.getMessage(Messages.SystemCallLatencyAnalysis_sourceLookupDescription);
+        }
+
+        @Override
+        public @Nullable Comparator<?> getComparator() {
+            return null;
+        }
+
+        @Override
+        public @Nullable Object resolve(ISegment segment) {
+            String file = (String) SyscallFileAspect.INSTANCE.resolve(segment);
+            if (file == null || file.isEmpty()) {
+                return null;
+            }
+            return new TmfCallsite(file, 0L);
         }
 
     }

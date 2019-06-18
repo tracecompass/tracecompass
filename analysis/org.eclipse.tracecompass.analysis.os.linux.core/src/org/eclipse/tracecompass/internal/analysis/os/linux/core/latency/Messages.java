@@ -15,7 +15,6 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * Messages for Syscall latency analysis.
- * @since 2.0
  */
 public class Messages extends NLS {
 
@@ -27,14 +26,32 @@ public class Messages extends NLS {
     /** System Call latency analysis aspect help text */
     public static @Nullable String SegmentAspectHelpText_SystemCall;
 
-    /** System Call latency analysis aspect help text */
+    /** System Call TID aspect help text */
     public static @Nullable String SegmentAspectHelpText_SystemCallTid;
 
-    /** System Call latency analysis aspect name */
+    /** System Call return value aspect name */
     public static @Nullable String SegmentAspectName_SystemCallRet;
 
-    /** System Call latency analysis aspect help text */
+    /** System Call return value aspect help text */
     public static @Nullable String SegmentAspectHelpText_SystemCallRet;
+
+    /** System Call component aspect name */
+    public static @Nullable String SystemCallLatencyAnalysis_componentName;
+
+    /** System Call component aspect help text */
+    public static @Nullable String SystemCallLatencyAnalysis_componentDescription;
+
+    /** System Call file aspect name */
+    public static @Nullable String SystemCallLatencyAnalysis_fileName;
+
+    /** System Call file aspect help text */
+    public static @Nullable String SystemCallLatencyAnalysis_fileDescription;
+
+    /** System Call lookup aspect name */
+    public static @Nullable String SystemCallLatencyAnalysis_sourceLookupName;
+
+    /** System Call lookup aspect help text */
+    public static @Nullable String SystemCallLatencyAnalysis_sourceLookupDescription;
 
     static {
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

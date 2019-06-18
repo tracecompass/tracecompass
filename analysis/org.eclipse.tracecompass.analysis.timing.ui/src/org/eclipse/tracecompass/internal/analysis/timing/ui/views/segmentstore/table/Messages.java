@@ -35,6 +35,9 @@ public class Messages extends NLS {
     /** Title of the table, to be appended to the analysis name for the title of the view */
     public static String SegmentStoreTableViewer_genericTitle;
 
+    /** Lookup code text */
+    public static String SegmentStoreTableViewer_lookup;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
