@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.analysis.os.linux.core.kernel;
 import java.util.Collection;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.ThreadPriorityAspect;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.KernelCallsiteAspect;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.KernelPidAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 
@@ -35,6 +36,7 @@ public final class KernelUtils {
         builder.add(KernelTidAspect.INSTANCE);
         builder.add(ThreadPriorityAspect.INSTANCE);
         builder.add(KernelPidAspect.INSTANCE);
+        builder.add(KernelCallsiteAspect.getInstance());
         KERNEL_ASPECTS = builder.build();
     }
 

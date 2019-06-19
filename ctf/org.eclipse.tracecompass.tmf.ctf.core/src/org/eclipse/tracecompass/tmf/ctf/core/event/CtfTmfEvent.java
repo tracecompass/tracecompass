@@ -34,6 +34,8 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventType;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCallsiteAspect;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfModelLookup;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
@@ -41,7 +43,6 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.ctf.core.CtfConstants;
-import org.eclipse.tracecompass.tmf.ctf.core.event.lookup.CtfTmfCallsite;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
 /**
@@ -349,7 +350,7 @@ public class CtfTmfEvent extends TmfEvent
      */
     @Override
     public @Nullable ITmfCallsite getCallsite() {
-        CtfTmfCallsite callsite = null;
+        ITmfCallsite callsite = null;
 
         ITmfEventField ipField = getContent().getField(CtfConstants.CONTEXT_FIELD_PREFIX + CtfConstants.IP_KEY);
         if (ipField != null && ipField.getValue() instanceof Long) {
@@ -361,6 +362,19 @@ public class CtfTmfEvent extends TmfEvent
             callsite = getTrace().getCallsite(fEventName);
         }
         return callsite;
+    }
+
+    @Override
+    public @Nullable List<@NonNull ITmfCallsite> getCallsites() {
+        for (ITmfEventAspect<?> aspect : getTrace().getEventAspects()) {
+            if (aspect instanceof TmfCallsiteAspect) {
+                List<ITmfCallsite> callsite = ((TmfCallsiteAspect) aspect).resolve(this);
+                if (callsite != null) {
+                    return callsite;
+                }
+            }
+        }
+        return ITmfSourceLookup.super.getCallsites();
     }
 
     // ------------------------------------------------------------------------

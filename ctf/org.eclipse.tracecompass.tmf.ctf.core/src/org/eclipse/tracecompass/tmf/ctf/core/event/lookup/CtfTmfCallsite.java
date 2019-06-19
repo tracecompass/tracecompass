@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.tmf.ctf.core.event.lookup;
 import java.util.Objects;
 
 import org.eclipse.tracecompass.ctf.core.event.CTFCallsite;
+import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 
 /**
@@ -50,6 +51,21 @@ public class CtfTmfCallsite extends TmfCallsite {
         super(callsite.getFileName(), callsite.getLineNumber());
         fEventName = callsite.getEventName();
         fInstructionPointer = callsite.getIp();
+    }
+
+    /**
+     * Constructor to wrap a ITmfCallsite
+     *
+     * @param callsite
+     *            the callsite
+     * @param eventName
+     *            the event name
+     * @since 4.1
+     */
+    public CtfTmfCallsite(ITmfCallsite callsite, String eventName) {
+        super(callsite.getFileName(), callsite.getLineNo());
+        fEventName = eventName;
+        fInstructionPointer = 0;
     }
 
     // ------------------------------------------------------------------------
