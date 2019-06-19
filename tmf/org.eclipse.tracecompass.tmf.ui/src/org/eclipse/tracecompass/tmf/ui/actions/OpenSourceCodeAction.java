@@ -12,6 +12,8 @@ package org.eclipse.tracecompass.tmf.ui.actions;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -26,6 +28,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -53,7 +56,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 public class OpenSourceCodeAction extends Action {
 
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
-    private final ITmfSourceLookup fSourceLookup;
+    private final ITmfCallsite fCallsite;
     private final Shell fShell;
 
     /**
@@ -69,27 +72,35 @@ public class OpenSourceCodeAction extends Action {
      * @return an contribution item to open a callsite or null if invalid
      */
     public static IContributionItem create(String actionText, ITmfSourceLookup sourceLookup, Shell shell) {
-        ITmfCallsite cs = sourceLookup.getCallsite();
+        List<ITmfCallsite> cs = sourceLookup.getCallsites();
         if (cs == null) {
             return null;
         }
-        Long lineNo = cs.getLineNo();
-        if (lineNo == null) {
+        List<ITmfCallsite> callsites = cs.stream().filter(callstack -> callstack.getLineNo() != null).collect(Collectors.toList());
+        if (callsites.isEmpty()) {
             /* Not enough information to provide a full callsite */
             return null;
         }
-        return new ActionContributionItem(new OpenSourceCodeAction(actionText, sourceLookup, shell));
+        if (callsites.size() == 1) {
+            return new ActionContributionItem(new OpenSourceCodeAction(actionText, callsites.get(0), shell));
+        }
+
+        MenuManager mgr = new MenuManager(actionText);
+        for (ITmfCallsite callsite : callsites) {
+            mgr.add(new OpenSourceCodeAction(callsite.toString(), callsite, shell));
+        }
+        return mgr;
     }
 
-    private OpenSourceCodeAction(String text, ITmfSourceLookup sourceLookup, Shell shell) {
+    private OpenSourceCodeAction(String text, ITmfCallsite callsite, Shell shell) {
         super(text);
-        fSourceLookup = sourceLookup;
+        fCallsite = callsite;
         fShell = shell;
     }
 
     @Override
     public void run() {
-        ITmfCallsite cs = fSourceLookup.getCallsite();
+        ITmfCallsite cs = fCallsite;
         if (cs == null) {
             return;
         }
