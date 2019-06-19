@@ -717,11 +717,6 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     // ------------------------------------------------------------------------
 
     private void updateSelectionTime() {
-        if (fSelectionBegin > fSelectionEnd) {
-            long end = fSelectionBegin;
-            fSelectionBegin = fSelectionEnd;
-            fSelectionEnd = end;
-        }
         ((HistogramView) fParentView).updateSelectionTime(fSelectionBegin, fSelectionEnd);
     }
 

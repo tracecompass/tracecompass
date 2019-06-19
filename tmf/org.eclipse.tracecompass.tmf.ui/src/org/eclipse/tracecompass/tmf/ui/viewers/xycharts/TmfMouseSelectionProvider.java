@@ -115,12 +115,6 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
     @Override
     public void mouseUp(MouseEvent e) {
         if (fIsInternalUpdate) {
-            if (fBeginTime > fEndTime) {
-                // Swap time
-                long tmp = fBeginTime;
-                fBeginTime = fEndTime;
-                fEndTime = tmp;
-            }
             ITmfChartTimeProvider viewer = getChartViewer();
             viewer.updateSelectionRange(fBeginTime + viewer.getTimeOffset(), fEndTime + viewer.getTimeOffset());
 
