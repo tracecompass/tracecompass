@@ -311,7 +311,13 @@ public class TmfOpenTraceHelper {
             // the traces folder
             element = element.getElementUnderTraceFolder();
 
-            ITmfTrace trace = openTraceElement(element);
+            ITmfTrace trace = null;
+            if (element.getParent() instanceof TmfExperimentElement) {
+                TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, element.getTypeName()),
+                        NLS.bind(Messages.TmfOpenTraceHelper_TraceNotFound, element.getElementPath()));
+            } else {
+                trace = openTraceElement(element);
+            }
 
             if (trace == null) {
                 for (int j = 0; j < i; j++) {
