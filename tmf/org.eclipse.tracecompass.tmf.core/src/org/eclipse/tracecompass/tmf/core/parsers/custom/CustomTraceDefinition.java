@@ -289,7 +289,7 @@ public abstract class CustomTraceDefinition {
      * Return the category of this trace definition
      *
      * @return The category of this trace definition
-     * @since 5.0
+     * @since 5.1
      */
     public String getCategoryName() {
         return categoryName;
@@ -299,7 +299,7 @@ public abstract class CustomTraceDefinition {
      * Return the name of this trace definition
      *
      * @return The name of this trace definition
-     * @since 5.0
+     * @since 5.1
      */
     public String getDefinitionName() {
         return definitionName;
