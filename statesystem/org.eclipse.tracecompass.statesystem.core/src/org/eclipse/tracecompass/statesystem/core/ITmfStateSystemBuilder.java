@@ -51,10 +51,11 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
     /**
      * Basic quark-retrieving method. Pass an attribute in parameter as an array
      * of strings, the matching quark will be returned.
-     *
+     * <p>
      * This version WILL create new attributes: if the attribute passed in
      * parameter is new in the system, it will be added and its new quark will
      * be returned.
+     * </p>
      *
      * @param attribute
      *            Attribute given as its full path in the Attribute Tree
@@ -67,14 +68,16 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      * "Relative path" quark-getting method. Instead of specifying a full path,
      * if you know the path is relative to another attribute for which you
      * already have the quark, use this for better performance.
-     *
+     * <p>
      * This is useful for cases where a lot of modifications or queries will
      * originate from the same branch of the attribute tree : the common part of
      * the path won't have to be re-hashed for every access.
-     *
+     * </p>
+     * <p>
      * This version WILL create new attributes: if the attribute passed in
      * parameter is new in the system, it will be added and its new quark will
      * be returned.
+     * </p>
      *
      * @param startingNodeQuark
      *            The quark of the attribute from which 'subPath' originates.
@@ -93,14 +96,16 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
     /**
      * Modify a current "ongoing" state (instead of inserting a state change,
      * like modifyAttribute() and others).
-     *
+     * <p>
      * This can be used to update the value of a previous state change, for
      * example when we get information at the end of the state and not at the
      * beginning. (return values of system calls, etc.)
-     *
+     * </p>
+     * <p>
      * Note that past states can only be modified while they are still in
      * memory, so only the "current state" can be updated. Once they get
      * committed to disk (by inserting a new state change) it becomes too late.
+     * </p>
      *
      * @param newValue
      *            The new value that will overwrite the "current" one.
@@ -114,14 +119,16 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
     /**
      * Modify a current "ongoing" state (instead of inserting a state change,
      * like modifyAttribute() and others).
-     *
+     * <p>
      * This can be used to update the value of a previous state change, for
      * example when we get information at the end of the state and not at the
      * beginning. (return values of system calls, etc.)
-     *
+     * </p>
+     * <p>
      * Note that past states can only be modified while they are still in
      * memory, so only the "current state" can be updated. Once they get
      * committed to disk (by inserting a new state change) it becomes too late.
+     * </p>
      *
      * @param newValue
      *            The new value that will overwrite the "current" one.
@@ -185,10 +192,10 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
 
     /**
      * "Push" helper method. This uses the given integer attribute as a stack:
-     * The value of that attribute will represent the stack depth (always >= 1).
-     * Sub-attributes will be created, their base-name will be the position in
-     * the stack (1, 2, etc.) and their value will be the state value 'value'
-     * that was pushed to this position.
+     * The value of that attribute will represent the stack depth (always
+     * {@literal >=} 1). Sub-attributes will be created, their base-name will be
+     * the position in the stack (1, 2, etc.) and their value will be the state
+     * value 'value' that was pushed to this position.
      *
      * @param t
      *            Timestamp of the state change
@@ -213,10 +220,10 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
 
     /**
      * "Push" helper method. This uses the given integer attribute as a stack:
-     * The value of that attribute will represent the stack depth (always >= 1).
-     * Sub-attributes will be created, their base-name will be the position in
-     * the stack (1, 2, etc.) and their value will be the state value 'value'
-     * that was pushed to this position.
+     * The value of that attribute will represent the stack depth (always
+     * {@literal >=} 1). Sub-attributes will be created, their base-name will be
+     * the position in the stack (1, 2, etc.) and their value will be the state
+     * value 'value' that was pushed to this position.
      *
      * @param t
      *            Timestamp of the state change
@@ -324,10 +331,11 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      * Delete any generated files or anything that might have been created by
      * the history backend (either temporary or save files). By calling this, we
      * return to the state as it was before ever building the history.
-     *
+     * <p>
      * You might not want to call automatically if, for example, you want an
      * index file to persist on disk. This could be limited to actions
      * originating from the user.
+     * </p>
      *
      * @since 2.1
      */

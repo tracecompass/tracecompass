@@ -46,6 +46,7 @@ public interface IProfilingElement {
      * Add a child element to this one
      *
      * @param node
+     *            The child element to add
      */
     void addChild(IProfilingElement node);
 

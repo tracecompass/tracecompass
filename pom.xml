@@ -594,9 +594,16 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.10.4</version>
+          <version>3.1.0</version>
           <configuration>
-            <excludePackageNames>org.eclipse.tracecompass.internal.*:*.test*</excludePackageNames>
+            <groups>
+              <group>
+                <title>Backend</title>
+                <packages>org.eclipse.tracecompass.statesystem.*:org.eclipse.tracecompass.segmentstore.*:org.eclipse.tracecompass.datastore.*</packages>
+               </group>
+            </groups>
+            <excludePackageNames>org.eclipse.tracecompass.internal.*:*.test*:*.alltests*:*.examples*:*.btf.*:*.lttng2.*:*.remote.*:*.rcp.*</excludePackageNames>
+            <doclint>none</doclint>
           </configuration>
         </plugin>
 

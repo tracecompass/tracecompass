@@ -78,13 +78,15 @@ public interface ITmfStateSystem {
      * While it's possible to query a state history that is being built,
      * sometimes we might want to wait until the construction is finished before
      * we start doing queries.
-     *
+     * <p>
      * This method blocks the calling thread until the history back-end is done
      * building. If it's already built (ie, opening a pre-existing file) this
      * should return immediately.
-     *
+     * </p>
+     * <p>
      * You should always check with {@link #isCancelled()} if it is safe to
      * query this state system before doing queries.
+     * </p>
      */
     void waitUntilBuilt();
 
@@ -92,15 +94,18 @@ public interface ITmfStateSystem {
      * Wait until the state system construction is finished. Similar to
      * {@link #waitUntilBuilt()}, but we also specify a timeout. If the timeout
      * elapses before the construction is finished, the method will return.
-     *
+     * <p>
      * The return value determines if the return was due to the construction
      * finishing (true), or the timeout elapsing (false).
-     *
+     * </p>
+     * <p>
      * This can be useful, for example, for a component doing queries
      * periodically to the system while it is being built.
-     *
+     * </p>
+     * <p>
      * Specifying a timeout of 0 (or less) will return immediately with whether
      * the state system is finished building or not.
+     * </p>
      *
      * @param timeout
      *            Timeout value in milliseconds
@@ -135,9 +140,11 @@ public interface ITmfStateSystem {
      * <p>
      * This version will NOT create any new attributes. If an invalid attribute
      * is requested, an exception will be thrown.
+     * </p>
      * <p>
      * If it is expected that the requested attribute might be absent, it is
      * recommended to use {@link #optQuarkAbsolute(String...)} instead.
+     * </p>
      *
      * @param attribute
      *            Attribute given as its full path in the Attribute Tree
@@ -156,6 +163,7 @@ public interface ITmfStateSystem {
      * <p>
      * This version will NOT create any new attributes. If an attribute that
      * does not exist is requested, {@link #INVALID_ATTRIBUTE} will be returned.
+     * </p>
      *
      * @param attribute
      *            Attribute given as its full path in the Attribute Tree
@@ -173,12 +181,15 @@ public interface ITmfStateSystem {
      * This is useful for cases where a lot of modifications or queries will
      * originate from the same branch of the attribute tree : the common part of
      * the path won't have to be re-hashed for every access.
+     * </p>
      * <p>
      * This version will NOT create any new attributes. If an invalid attribute
      * is requested, an exception will be thrown.
+     * </p>
      * <p>
      * If it is expected that the requested sub-attribute might be absent, it is
      * recommended to use {@link #optQuarkRelative(int, String...)} instead.
+     * </p>
      *
      * @param startingNodeQuark
      *            The quark of the attribute from which 'subPath' originates.
@@ -202,9 +213,11 @@ public interface ITmfStateSystem {
      * This is useful for cases where a lot of modifications or queries will
      * originate from the same branch of the attribute tree : the common part of
      * the path won't have to be re-hashed for every access.
+     * </p>
      * <p>
      * This version will NOT create any new attributes. If a sub-attribute that
      * does not exist is requested, {@link #INVALID_ATTRIBUTE} will be returned.
+     * </p>
      *
      * @param startingNodeQuark
      *            The quark of the attribute from which 'subPath' originates.
@@ -265,11 +278,13 @@ public interface ITmfStateSystem {
      * of quarks for attributes "Threads/1000/Exec_mode",
      * "Threads/1500/Exec_mode", and so on, depending on what exists at this
      * time in the attribute tree.
+     * </p>
      * <p>
      * If no wildcard or parent element is specified, the behavior is the same
      * as getQuarkAbsolute() (except it will return a List with one entry, or an
      * empty list if there is no match instead of throwing an exception). This
      * method will never create new attributes.
+     * </p>
      *
      * @param pattern
      *            The array of strings representing the pattern to look for.
@@ -287,14 +302,17 @@ public interface ITmfStateSystem {
      * those who match the pattern.
      * <p>
      * For example, passing (5, "Threads", "*", "Exec_mode") will return the
-     * list of quarks for attributes "<path of quark 5>/Threads/1000/Exec_mode",
-     * "<path of quark 5>/Threads/1500/Exec_mode", and so on, depending on what
-     * exists at this time in the attribute tree.
+     * list of quarks for attributes
+     * "{@literal <path of quark 5>}/Threads/1000/Exec_mode",
+     * "{@literal <path of quark 5>}/Threads/1500/Exec_mode", and so on,
+     * depending on what exists at this time in the attribute tree.
+     * </p>
      * <p>
      * If no wildcard or parent element is specified, the behavior is the same
      * as getQuarkRelative() (except it will return a List with one entry, or an
      * empty list if there is no match instead of throwing an exception). This
      * method will never create new attributes.
+     * </p>
      *
      * @param startingNodeQuark
      *            The quark of the attribute from which 'pattern' originates.
@@ -366,10 +384,11 @@ public interface ITmfStateSystem {
     /**
      * Returns the current state value we have (in the Transient State) for the
      * given attribute.
-     *
+     * <p>
      * This is useful even for a StateHistorySystem, as we are guaranteed it
      * will only do a memory access and not go look on disk (and we don't even
      * have to provide a timestamp!)
+     * </p>
      *
      * @param attributeQuark
      *            For which attribute we want the current state
@@ -382,10 +401,11 @@ public interface ITmfStateSystem {
     /**
      * Returns the current state value we have (in the Transient State) for the
      * given attribute.
-     *
+     * <p>
      * This is useful even for a StateHistorySystem, as we are guaranteed it
      * will only do a memory access and not go look on disk (and we don't even
      * have to provide a timestamp!)
+     * </p>
      *
      * @param attributeQuark
      *            For which attribute we want the current state
@@ -414,11 +434,12 @@ public interface ITmfStateSystem {
      * Load the complete state information at time 't' into the returned List.
      * You can then get the intervals for single attributes by using
      * List.get(n), where 'n' is the quark of the attribute.
-     *
+     * <p>
      * On average if you need around 10 or more queries for the same timestamps,
      * use this method. If you need less than 10 (for example, running many
      * queries for the same attributes but at different timestamps), you might
      * be better using the querySingleState() methods instead.
+     * </p>
      *
      * @param t
      *            We will recreate the state information to what it was at time
@@ -437,11 +458,12 @@ public interface ITmfStateSystem {
      * Singular query method. This one does not update the whole stateInfo
      * vector, like queryFullState() does. It only searches for one specific
      * entry in the state history.
-     *
+     * <p>
      * It should be used when you only want very few entries, instead of the
      * whole state (or many entries, but all at different timestamps). If you do
      * request many entries all at the same time, you should use the
      * conventional queryFullState() + List.get() method.
+     * </p>
      *
      * @param t
      *            The timestamp at which we want the state
@@ -486,10 +508,11 @@ public interface ITmfStateSystem {
      * from attributes in the quarks collection that intersect the [start, end]
      * timerange with no guaranteed order. There may be duplicates during State
      * System construction.
-     *
-     * If start > end, iteration will start from the last nodes first, so while
-     * there is still no guarantee of order, in general, intervals finishing
-     * later should be returned first.
+     * <p>
+     * If start {@literal >} end, iteration will start from the last nodes
+     * first, so while there is still no guarantee of order, in general,
+     * intervals finishing later should be returned first.
+     * </p>
      *
      * @param quarks
      *            a collection of quarks for which we want information
@@ -501,8 +524,8 @@ public interface ITmfStateSystem {
      * @throws StateSystemDisposedException
      *             If the query is sent after the state system has been disposed
      * @throws IndexOutOfBoundsException
-     *             If the smallest attribute is <0 or if the largest is >= to
-     *             the number of attributes.
+     *             If the smallest attribute is {@literal <} 0 or if the largest
+     *             is {@literal >=} to the number of attributes.
      * @throws TimeRangeException
      *             If the smallest time is before the state system start time.
      * @since 3.0

@@ -119,7 +119,7 @@ import org.eclipse.jdt.annotation.NonNull;
  *         <td><code>456</code>
  *     <tr>
  *         <td><code>N</code>
- *         <td>Nanoseconds in &#181s
+ *         <td>Nanoseconds in &#181;s
  *         <td><code>0-999</code>
  *         <td><code>789</code>
  * </table>

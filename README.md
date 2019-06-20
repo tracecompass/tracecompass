@@ -54,6 +54,12 @@ Stand-alone application (RCP) packages will be placed in
 The p2 update site, used for installation as plugins inside Eclipse, will be
 placed in `releng/org.eclipse.tracecompass.releng-site/target/repository`.
 
+To generate the javadoc from the Trace Compass source code, run the following
+command from the top-level directory:
+
+    mvn clean package javadoc:aggregate
+
+The javadoc html files will be under `target/site/apidocs`.
 
 Maven profiles and properties
 -----------------------------

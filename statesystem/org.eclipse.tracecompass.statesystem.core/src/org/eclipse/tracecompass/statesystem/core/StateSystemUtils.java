@@ -49,9 +49,10 @@ public final class StateSystemUtils {
      * pushAttribute()/popAttribute()). This will return the interval that is
      * currently at the top of the stack, or 'null' if that stack is currently
      * empty. It works similarly to querySingleState().
-     *
+     * <p>
      * To retrieve the other values in a stack, you can query the sub-attributes
      * manually.
+     * </p>
      *
      * @param ss
      *            The state system to query
@@ -103,9 +104,10 @@ public final class StateSystemUtils {
      * will return the interval value that is currently at the top of the stack,
      * or 'null' if that stack is currently empty. It works similarly to
      * queryOngoing().
-     *
+     * <p>
      * To retrieve the other values in a stack, you can query the sub-attributes
      * manually.
+     * </p>
      *
      * @param ss
      *            The state system to query
@@ -152,10 +154,11 @@ public final class StateSystemUtils {
      * Return a list of state intervals, containing the "history" of a given
      * attribute between timestamps t1 and t2. The list will be ordered by
      * ascending time.
-     *
+     * <p>
      * Note that contrary to queryFullState(), the returned list here is in the
      * "direction" of time (and not in the direction of attributes, as is the
      * case with queryFullState()).
+     * </p>
      *
      * @param ss
      *            The state system to query
@@ -169,7 +172,7 @@ public final class StateSystemUtils {
      *            history.
      * @return The List of state intervals that happened between t1 and t2
      * @throws TimeRangeException
-     *             If t1 is invalid, or if t2 <= t1
+     *             If t1 is invalid, or if t2 {@literal <=} t1
      * @throws AttributeNotFoundException
      *             If the requested quark does not exist in the model.
      * @throws StateSystemDisposedException
@@ -235,8 +238,8 @@ public final class StateSystemUtils {
      *            use "null" if you do not want to use one.
      * @return The List of states that happened between t1 and t2
      * @throws TimeRangeException
-     *             If t1 is invalid, if t2 <= t1, or if the resolution isn't
-     *             greater than zero.
+     *             If t1 is invalid, if t2 {@literal <=} t1, or if the
+     *             resolution isn't greater than zero.
      * @throws AttributeNotFoundException
      *             If the attribute doesn't exist
      * @throws StateSystemDisposedException
@@ -342,7 +345,7 @@ public final class StateSystemUtils {
      * {@link ITmfStateSystemBuilder#pushAttribute(long, Object, int)}, but it
      * represents a queue. An element is added to the end of the queue as if it
      * were a stack.
-     *
+     * <p>
      * To get the size of the queue later, use the following code:
      *
      * <pre>
@@ -351,6 +354,7 @@ public final class StateSystemUtils {
      *     size = 0;
      * }
      * </pre>
+     * </p>
      *
      * @param ss
      *            The state system
