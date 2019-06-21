@@ -284,7 +284,7 @@ public class TmfOpenTraceHelper {
             trace.initTrace(traceElement.getResource(), traceElement.getResource().getLocation().toOSString(), traceEvent.getClass(), traceElement.getElementPath(), traceElement.getTraceType());
         } catch (final TmfTraceException e) {
             TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
-                    Messages.TmfOpenTraceHelper_InitError + ENDL + ENDL + e, e);
+                    Messages.TmfOpenTraceHelper_InitError + ENDL + ENDL + e, e.getCause());
             trace.dispose();
             return null;
         }
@@ -372,7 +372,7 @@ public class TmfOpenTraceHelper {
             } catch (InvocationTargetException e) {
                 Activator.getDefault().logError(NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getTypeName()) + ' ' + traceElement.getName());
                 TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
-                        NLS.bind(Messages.TmfOpenTraceHelper_ErrorElement, traceElement.getTypeName()) + ENDL + ENDL + e.getTargetException().getMessage());
+                        NLS.bind(Messages.TmfOpenTraceHelper_ErrorElement, traceElement.getTypeName()) + ENDL + ENDL + e.getTargetException().getMessage(), e.getTargetException());
                 return;
             }
             IFile file = bookmarksFile.get();
@@ -399,7 +399,7 @@ public class TmfOpenTraceHelper {
                     IDE.openEditor(activePage, file, activate);
                 } catch (PartInitException e) {
                     TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
-                            NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getElementPath()) + ENDL + ENDL + e.getMessage());
+                            NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getElementPath()) + ENDL + ENDL + e.getMessage(), e);
                 }
                 return;
             }
@@ -481,7 +481,7 @@ public class TmfOpenTraceHelper {
                             // editor should dispose the trace on close
                         } catch (final PartInitException e) {
                             TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, fTraceElement.getTypeName()),
-                                    NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, fTraceElement.getTypeName()) + ENDL + ENDL + e.getMessage());
+                                    NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, fTraceElement.getTypeName()) + ENDL + ENDL + e.getMessage(), e);
                             Activator.getDefault().logError(NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, fTraceElement.getTypeName()) + ' ' + fTraceElement.getName());
                             fTrace.dispose();
                         }
@@ -555,7 +555,7 @@ public class TmfOpenTraceHelper {
             } catch (final InvocationTargetException e) {
                 Activator.getDefault().logError(NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getTypeName()) + ' ' + traceElement.getName());
                 TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
-                        NLS.bind(Messages.TmfOpenTraceHelper_ErrorElement, traceElement.getTypeName()) + ENDL + ENDL + e.getTargetException().getMessage());
+                        NLS.bind(Messages.TmfOpenTraceHelper_ErrorElement, traceElement.getTypeName()) + ENDL + ENDL + e.getTargetException().getMessage(), e.getTargetException());
                 return;
             }
             IFile file = bookmarksFile.get();
