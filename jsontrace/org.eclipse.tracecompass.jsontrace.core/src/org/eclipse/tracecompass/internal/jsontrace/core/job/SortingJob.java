@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -266,6 +266,7 @@ public abstract class SortingJob extends Job {
         } catch (IOException e) {
             TraceCompassLogUtils.traceInstant(LOGGER, Level.WARNING, "IOException in sorting job", "trace", fPath, //$NON-NLS-1$ //$NON-NLS-2$
                     "exception", e); //$NON-NLS-1$
+            return new Status(IStatus.WARNING, Activator.PLUGIN_ID, "IOException in sorting job for " + fPath, e); //$NON-NLS-1$
         } finally {
             try {
                 for (File tl : tracelings) {
