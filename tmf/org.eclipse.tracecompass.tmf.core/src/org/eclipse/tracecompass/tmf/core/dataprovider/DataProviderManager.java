@@ -191,4 +191,24 @@ public class DataProviderManager {
         }
         return list;
     }
+
+    /**
+     * Remove a data provider from the instances. This method will not dispose
+     * of the data provider. It is the responsibility of the caller to dispose
+     * of it if needed.
+     *
+     * @param <T>
+     *            The type of data provider
+     * @param trace
+     *            The trace for which to remove the data provider
+     * @param provider
+     *            The data provider to remove
+     * @return Whether the data provider was removed. The result would be
+     *         <code>false</code> if the data provider was not present in the
+     *         list.
+     * @since 5.1
+     */
+    public <T extends ITmfTreeDataProvider<? extends ITmfTreeDataModel>> boolean removeDataProvider(ITmfTrace trace, T provider) {
+        return fInstances.remove(trace, provider);
+    }
 }
