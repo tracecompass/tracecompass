@@ -12,8 +12,11 @@ package org.eclipse.tracecompass.tmf.ui.swtbot.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -22,6 +25,8 @@ import java.util.Objects;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.RGB;
@@ -47,6 +52,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 import org.swtchart.Chart;
 import org.swtchart.IBarSeries;
 import org.swtchart.ILineSeries;
@@ -138,6 +145,25 @@ public abstract class XYDataProviderBaseTest {
     }
 
     /**
+     * Get the full path to a test file from this class's bundle.
+     *
+     * @param bundlePath
+     *            path from the bundle
+     * @return the absolute path
+     */
+    private String getFullPath(String bundlePath) {
+        try {
+            Bundle bundle = FrameworkUtil.getBundle(this.getClass());
+            URL location = FileLocator.find(bundle, new Path(bundlePath), null);
+            URI uri = FileLocator.toFileURL(location).toURI();
+            return new File(uri).getAbsolutePath();
+        } catch (Exception e) {
+            fail(e.toString());
+            return null;
+        }
+    }
+
+    /**
      * Based on a SWT Chart, we check if data shown is valid with a JSON file.
      * Comparison with the main series and other series if exists
      *
@@ -146,7 +172,7 @@ public abstract class XYDataProviderBaseTest {
      * @param otherSeries
      *            An array of other series name to check other than the main series
      * @param expectedJson
-     *            The path of the JSON file
+     *            The path of the JSON file relative to this class's bundle
      * @return True if the serialized chart data matches the JSON file content
      */
     protected boolean isChartDataValid(final Chart chart, String expectedJson, String... otherSeries) {
@@ -154,7 +180,7 @@ public abstract class XYDataProviderBaseTest {
          * FIXME : Once CQ for Jackson is approved, use deserialization instead of
          * comparing strings
          */
-        String expected = FileUtils.read(expectedJson);
+        String expected = FileUtils.read(getFullPath(expectedJson));
         TmfCommonXAxisModel model = extractModelFromChart(chart, otherSeries);
         String current = fGson.toJson(model);
         return expected.equals(current);

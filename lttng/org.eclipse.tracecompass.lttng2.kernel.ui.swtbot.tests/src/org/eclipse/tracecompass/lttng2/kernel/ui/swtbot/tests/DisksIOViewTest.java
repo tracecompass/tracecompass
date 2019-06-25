@@ -12,15 +12,6 @@ package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -40,7 +31,6 @@ import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.ui.IViewPart;
 import org.junit.Test;
-import org.osgi.framework.Bundle;
 import org.swtchart.Chart;
 import org.swtchart.ISeries;
 import org.swtchart.LineStyle;
@@ -64,21 +54,14 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
 
     private static final @NonNull ITmfTimestamp ZOOM_START_TIME = TmfTimestamp.fromNanos(1361214078967381303L);
     private static final @NonNull ITmfTimestamp ZOOM_END_TIME = TmfTimestamp.fromNanos(1361214078967971599L);
-    private static final Bundle BUNDLE = Platform.getBundle("org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests");
 
     /**
      * Test to check the Disks IO Activity view. First, when trace opened, there
      * should not be any activity. Then, we move to a time range where there are
      * write activity. Afterward, we test the zoom
-     *
-     * @throws URISyntaxException
-     *             if this URL is not formatted strictly according to to RFC2396 and
-     *             cannot be converted to a URI.
-     * @throws IOException
-     *             if an error occurs during the conversion
      */
     @Test
-    public void testDiskView() throws URISyntaxException, IOException {
+    public void testDiskView() {
         // Wait for analysis to finish.
         WaitUtils.waitForJobs();
         IViewPart viewPart = getSWTBotView().getViewReference().getView(true);
@@ -98,7 +81,7 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
         chartViewer.setNbPoints(NUMBER_OF_POINT);
 
         /* Initially, no disk activity */
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), getFullPath("resources/disk/disk0-res50.json"), "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk/disk0-res50.json", "Chart data is not valid");
 
         /* Change time range where there is disks activity */
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, new TmfTimeRange(ZOOM_START_TIME, ZOOM_END_TIME)));
@@ -109,7 +92,7 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
         verifyChartStyle();
 
         /* Test data model */
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), getFullPath("resources/disk/disk1-res50.json"), "Chart data is not valid");
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk/disk1-res50.json", "Chart data is not valid");
 
         /* Change Zoom and number of points */
         chartViewer.setNbPoints(MORE_POINTS);
@@ -118,25 +101,7 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
         verifyChartStyle();
 
         /* Test data model */
-        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), getFullPath("resources/disk/disk2-res100.json"), "Chart data is not valid");
-    }
-
-    /**
-     * Get the full path to the test file from the bundle.
-     *
-     * @param bundlePath
-     *            path from the bundle
-     * @return the absolute path
-     * @throws URISyntaxException
-     *             if this URL is not formatted strictly according to to RFC2396 and
-     *             cannot be converted to a URI.
-     * @throws IOException
-     *             if an error occurs during the conversion
-     */
-    private static String getFullPath(String bundlePath) throws URISyntaxException, IOException {
-        URL location = FileLocator.find(BUNDLE, new Path(bundlePath), null);
-        URI uri = FileLocator.toFileURL(location).toURI();
-        return new File(uri).getAbsolutePath();
+        SWTBotUtils.waitUntil(json -> isChartDataValid(chart, json, WRITE_SERIES_NAME), "resources/disk/disk2-res100.json", "Chart data is not valid");
     }
 
     private void verifyChartStyle() {
