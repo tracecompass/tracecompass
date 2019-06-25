@@ -141,7 +141,7 @@ public final class SWTBotUtils {
     private static boolean fPrintedEnvironment = false;
     private static Logger log = Logger.getLogger(SWTBotUtils.class);
     private static final int ACTIVE_EDITOR_TIMEOUT = 120000;
-    private static final int DELETE_PROJECT_TIMEOUT = 120000;
+    private static final int DELETE_PROJECT_TIMEOUT = 240000;
 
     private SWTBotUtils() {
 
