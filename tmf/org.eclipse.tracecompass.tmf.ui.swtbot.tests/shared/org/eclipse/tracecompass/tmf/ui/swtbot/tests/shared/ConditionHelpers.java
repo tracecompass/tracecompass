@@ -367,9 +367,9 @@ public final class ConditionHelpers {
                     return ExceptionUtils.getStackTrace(exception);
                 }
                 if (actual == null) {
-                    return NLS.bind("Cell absent, expected: '{0}'", content);
+                    return NLS.bind("Cell absent, expected: ''{0}''", content);
                 }
-                return NLS.bind("Cell content: '{0}' expected: '{1}'", actual, content);
+                return NLS.bind("Cell content: ''{0}'' expected: ''{1}''", actual, content);
             }
         };
     }
