@@ -415,6 +415,7 @@ public class SegmentTableTest {
             for (int i = 0; i < size; i++) {
                 fixture.add(new BasicSegment(i, 2 * i));
             }
+            fixture.close(false);
             assertNotNull(getTable());
             getTable().updateModel(fixture);
             SWTBotTable tableBot = new SWTBotTable(getTable().getTableViewer().getTable());
@@ -422,8 +423,7 @@ public class SegmentTableTest {
             tableBot.header("Duration").click();
             fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "0", 0, 2));
             tableBot.header("Duration").click();
-            // FIXME: Should be 999,999, but sorting on disk does not work well yet
-            fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "823,881", 0, 2));
+            fBot.waitUntil(ConditionHelpers.isTableCellFilled(tableBot, "999,999", 0, 2));
         } finally {
             if (fixture != null) {
                 fixture.close(true);
