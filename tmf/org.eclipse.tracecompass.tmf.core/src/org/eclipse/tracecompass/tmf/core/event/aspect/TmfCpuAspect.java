@@ -19,8 +19,6 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * Event aspect representing the CPU of a trace event. Trace types that do have
  * the notion of CPU can use this to expose it in their traces.
  *
- * TODO Move to an eventualy kernel-trace-specific plugin.
- *
  * @author Alexandre Montplaisir
  */
 public abstract class TmfCpuAspect implements ITmfEventAspect<Integer> {
