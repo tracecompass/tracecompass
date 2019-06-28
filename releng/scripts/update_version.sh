@@ -51,6 +51,7 @@ sed -i -e s/$oldVersion/$newVersion/g ../../rcp/org.eclipse.tracecompass.rcp.bra
 
 #Update .product rcp/org.eclipse.tracecompass.rcp.product/tracing.product
 sed -i -e s/$oldVersion/$newVersion/g ../../rcp/org.eclipse.tracecompass.rcp.product/tracing.product
+sed -i -e s/$oldVersion/$newVersion/g ../../rcp/org.eclipse.tracecompass.rcp.product/legacy/tracing.product
 
 #Update rcp.ui plugin rcp/org.eclipse.tracecompass.rcp.ui/META-INF/MANIFEST.MF
 sed -i -e s/$oldVersion.qualifier/$newVersion.qualifier/g ../../rcp/org.eclipse.tracecompass.rcp.ui/META-INF/MANIFEST.MF

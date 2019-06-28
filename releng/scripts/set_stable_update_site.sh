@@ -12,20 +12,22 @@
 # meant to be used when the master branch is being branched into a stable
 # branch.
 
-PATH_TO_PRODUCT_FILE="../../rcp/org.eclipse.tracecompass.rcp.product/tracing.product"
+files=("../../rcp/org.eclipse.tracecompass.rcp.product/tracing.product" "../../rcp/org.eclipse.tracecompass.rcp.product/legacy/tracing.product")
 
-OUTPUT=$(cat $PATH_TO_PRODUCT_FILE  | grep "<repository.*stable.*")
-if [[ -z "$OUTPUT" ]];
-then
-sed -i -E  s/\(\<repository.*\)master\(.*$\)/\\1stable\\2/g $PATH_TO_PRODUCT_FILE
-	CHECK_OUTPUT=$(cat $PATH_TO_PRODUCT_FILE | grep "<repository.*stable.*")
-	if [[ -z "$CHECK_OUTPUT" ]];
-	then
-		echo "Failed!"
-	else
-		echo "Success!"
-	fi
-else
-	echo "Stable update site already set?"
-fi
-
+for file in "${files[@]}"
+do
+    OUTPUT=$(cat $file | grep "<repository.*stable.*")
+    if [[ -z "$OUTPUT" ]];
+    then
+    sed -i -E  s/\(\<repository.*\)master\(.*$\)/\\1stable\\2/g $file
+	    CHECK_OUTPUT=$(cat $file | grep "<repository.*stable.*")
+	    if [[ -z "$CHECK_OUTPUT" ]];
+	    then
+		    echo "Failed!"
+	    else
+		    echo "Success!"
+	    fi
+    else
+	    echo "Stable update site already set?"
+    fi
+done

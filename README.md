@@ -58,6 +58,10 @@ placed in `releng/org.eclipse.tracecompass.releng-site/target/repository`.
 Maven profiles and properties
 -----------------------------
 
+NOTE: if you want to build the RCP with older platforms than 4.12 you need to
+copy the legacy `tracing.product`:
+`cp rcp/org.eclipse.tracecompass.rcp.product/legacy/tracing.product rcp/org.eclipse.tracecompass.rcp.product/`
+
 The following Maven profiles and properties are defined in
 the build system. You can set them by using `-P[profile name]` and
 `-D[property name]=[value]` in `mvn` commands.
