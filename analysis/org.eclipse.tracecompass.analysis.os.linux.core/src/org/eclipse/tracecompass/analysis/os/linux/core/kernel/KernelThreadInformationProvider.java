@@ -351,8 +351,52 @@ public final class KernelThreadInformationProvider {
      *            The thread ID of the process for which to get the name
      * @return The last executable name of this process, or {@code null} if not
      *         found
+     *
+     *         TODO: use
+     *         {@link #getExecutableName(KernelAnalysisModule, Integer, long)}
+     *         to handle TID reuse
      */
     public static @Nullable String getExecutableName(KernelAnalysisModule module, Integer threadId) {
+        ITmfStateSystem stateSystem = module.getStateSystem();
+        if(stateSystem == null) {
+            return null;
+        }
+        return getExecutableName(module, threadId, stateSystem.getCurrentEndTime());
+    }
+
+    /**
+     * Get the executable name of the thread ID at a specified time. If the
+     * thread ID was used multiple time or the name changed in between, it will
+     * return the last name the thread has taken before the given timestamp, or
+     * {@code null} if no name is found before the time.
+     *
+     * In other words, if:
+     * <ul>
+     * <li>trace start < <em>ts</em> < start of the first process: the TID was
+     * never seen to be used in this trace, and
+     * {@link #getExecutableName(KernelAnalysisModule, Integer, long)} returns
+     * null</li>
+     * <li><em>ts</em> > trace end: the name of the last thread to run is returned.
+     * (could be null if the tid was never used)</li>
+     * <li>thread start > <em>ts</em> > thread end: the thread name will be the
+     * thread name of the process at that time. This may be a parent as the
+     * thread inherrits the parent's name until it is changed.</li>
+     * <li>thread end > <em>ts</em> > next thread start: the last valid
+     * executable name is returned</li>
+     * </ul>
+     *
+     * @param module
+     *            The kernel analysis instance to run this method on
+     * @param threadId
+     *            The thread ID of the process for which to get the name
+     * @param ts
+     *            timestamp to query at. It will look up the thread name of the
+     *            current or closest previous lifetime
+     * @return The last executable name of this process for a given time, or
+     *         {@code null} if not found.
+     * @since 4.0
+     */
+    public static @Nullable String getExecutableName(KernelAnalysisModule module, Integer threadId, long ts) {
         ITmfStateSystem ss = module.getStateSystem();
         if (ss == null) {
             return null;
@@ -361,11 +405,11 @@ public final class KernelThreadInformationProvider {
         if (execNameNode == ITmfStateSystem.INVALID_ATTRIBUTE) {
             return null;
         }
-        QuarkIterator reversedIterator = new QuarkIterator(ss, execNameNode, ss.getCurrentEndTime());
+        QuarkIterator reversedIterator = new QuarkIterator(ss, execNameNode, ts);
         while (reversedIterator.hasPrevious()) {
-            ITmfStateValue nameInterval = reversedIterator.previous().getStateValue();
-            if (nameInterval.getType() == Type.STRING) {
-                return nameInterval.unboxStr();
+            Object value = reversedIterator.previous().getValue();
+            if (value instanceof String) {
+                return (String) value;
             }
         }
         return null;

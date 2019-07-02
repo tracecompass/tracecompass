@@ -268,7 +268,7 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
         for (Integer threadQuark : threadQuarkList) {
             if (active == null || active.get(threadQuark).getEndTime() < end) {
                 String tidString = ss.getAttributeName(threadQuark);
-                String procname = fProcessNameMap.computeIfAbsent(tidString, this::getProcessName);
+                String procname = fProcessNameMap.computeIfAbsent(tidString, string -> getProcessName(string, end));
 
                 // Ensure that we reuse the same id for a given quark.
                 long id = getId(threadQuark);
@@ -289,11 +289,11 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
     /*
      * Get the process name from its TID by using the LTTng kernel analysis module
      */
-    private String getProcessName(String tid) {
+    private String getProcessName(String tid, long ts) {
         if (tid.equals(KernelMemoryStateProvider.OTHER_TID)) {
             return tid;
         }
-        String execName = KernelThreadInformationProvider.getExecutableName(fKernelModule, Integer.parseInt(tid));
+        String execName = KernelThreadInformationProvider.getExecutableName(fKernelModule, Integer.parseInt(tid), ts);
         return execName != null ? execName : tid;
     }
 

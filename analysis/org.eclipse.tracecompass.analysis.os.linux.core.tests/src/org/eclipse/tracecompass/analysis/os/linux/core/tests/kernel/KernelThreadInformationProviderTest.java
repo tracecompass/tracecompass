@@ -325,18 +325,18 @@ public class KernelThreadInformationProviderTest {
         KernelAnalysisModule module = checkNotNull(fModule);
 
         /* Check with invalid threads */
-        String execName = KernelThreadInformationProvider.getExecutableName(module, 101);
+        String execName = KernelThreadInformationProvider.getExecutableName(module, 101, 70);
         assertNull(execName);
 
-        execName = KernelThreadInformationProvider.getExecutableName(module, -2);
+        execName = KernelThreadInformationProvider.getExecutableName(module, -2, 70);
         assertNull(execName);
 
         /* Check valid value */
-        execName = KernelThreadInformationProvider.getExecutableName(module, 20);
+        execName = KernelThreadInformationProvider.getExecutableName(module, 20, 70);
         assertEquals("proc20", execName);
 
         /* Check valid value with process name change in history */
-        execName = KernelThreadInformationProvider.getExecutableName(module, 21);
+        execName = KernelThreadInformationProvider.getExecutableName(module, 21, 70);
         assertEquals("tid21", execName);
 
     }

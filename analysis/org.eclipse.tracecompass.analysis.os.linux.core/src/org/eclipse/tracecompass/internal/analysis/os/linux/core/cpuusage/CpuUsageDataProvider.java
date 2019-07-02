@@ -232,7 +232,7 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
             if (strings.length > 1) {
                 int tid = Integer.parseInt(strings[1]);
                 if (tid != 0) {
-                    entryList.add(new CpuUsageEntryModel(getId(tid), totalId, Collections.singletonList(getProcessName(tid, strings[1])), tid, entry.getValue()));
+                    entryList.add(new CpuUsageEntryModel(getId(tid), totalId, Collections.singletonList(getProcessName(tid, strings[1], end)), tid, entry.getValue()));
                 }
             }
         }
@@ -243,14 +243,14 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
      * Get the process name from its TID by using the LTTng kernel analysis
      * module
      */
-    private String getProcessName(int tid, String defaultTidName) {
+    private String getProcessName(int tid, String defaultTidName, long endTime) {
         // try and get from cache
         String execName = fProcessNameMap.get(tid);
         if (execName != null) {
             return execName;
         }
 
-        execName = KernelThreadInformationProvider.getExecutableName(fKernelAnalysisModule, tid);
+        execName = KernelThreadInformationProvider.getExecutableName(fKernelAnalysisModule, tid, endTime);
         ITmfStateSystem ss = fKernelAnalysisModule.getStateSystem();
         if (ss != null && ss.waitUntilBuilt(0) && execName != null) {
             // cache only if non null and state system analysis completed
