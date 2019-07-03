@@ -160,12 +160,12 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
         createTree();
         WaitUtils.waitForJobs();
         SWTBotTreeItem totalEntry = fTreeBot.getTreeItem("bug446190").getNode("Total");
-        validate(totalEntry, "Total", "1.000 µs", "5.904 s", "15.628 ms", "175.875 ms", "1801");
+        validate(totalEntry, "Total", "1 µs", "5.904 s", "15.628 ms", "175.875 ms", "1801");
         assertEquals(55, totalEntry.getNodes().size());
-        validate(totalEntry.getNode(2), "select", "13.600 µs", "1.509 s", "192.251 ms", "386.369 ms", "58");
-        validate(totalEntry.getNode(3), "poll", "6.300 µs", "6.800 µs", "6.550 µs", "---", "2");
-        validate(totalEntry.getNode(5), "set_tid_address", "2.300 µs", "2.300 µs", "2.300 µs", "---", "1");
-        validate(totalEntry.getNode(7), "pipe", "27.900 µs", "29.700 µs", "28.800 µs", "---", "2");
+        validate(totalEntry.getNode(2), "select", "13.6 µs", "1.509 s", "192.251 ms", "386.369 ms", "58");
+        validate(totalEntry.getNode(3), "poll", "6.3 µs", "6.8 µs", "6.55 µs", "---", "2");
+        validate(totalEntry.getNode(5), "set_tid_address", "2.3 µs", "2.3 µs", "2.3 µs", "---", "1");
+        validate(totalEntry.getNode(7), "pipe", "27.9 µs", "29.7 µs", "28.8 µs", "---", "2");
         testToTsv(view);
         SWTBotMenu menuBot = view.viewMenu().menu("Export to TSV...");
         assertTrue(menuBot.isEnabled());
@@ -197,7 +197,7 @@ public class SystemCallLatencyStatisticsTableAnalysisTest {
         assertNotNull(lines);
         assertEquals("header", "Level\tMinimum\tMaximum\tAverage\tStandard Deviation\tCount\tTotal", lines[0]);
         assertEquals("line 1", "bug446190\t\t\t\t\t\t", lines[1]);
-        assertEquals("line 2", "Total\t1.000 µs\t5.904 s\t15.628 ms\t175.875 ms\t1801\t28.146 s", lines[2]);
+        assertEquals("line 2", "Total\t1 µs\t5.904 s\t15.628 ms\t175.875 ms\t1801\t28.146 s", lines[2]);
     }
 
     private static void validate(SWTBotTreeItem treeItem, final String nodeName, final String min, final String max, final String avg, final String stdev, final String count) {

@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreStatisticsModel;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
+import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProvider;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.statistics.Messages;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
@@ -68,7 +68,7 @@ import com.google.common.collect.ImmutableList;
  */
 public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeViewer {
 
-    private static final Format FORMATTER = new SubSecondTimeWithUnitFormat();
+    private static final Format FORMATTER = SubSecondTimeWithUnitFormat.getInstance();
 
     private @Nullable TmfAbstractAnalysisModule fModule;
     private MenuManager fTablePopupMenuManager;

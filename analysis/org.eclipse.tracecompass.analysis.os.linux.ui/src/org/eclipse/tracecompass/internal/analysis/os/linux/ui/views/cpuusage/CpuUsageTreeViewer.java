@@ -25,7 +25,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageEntryModel;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
+import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.CpuUsageDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectedCpuQueryFilter;
@@ -50,7 +50,7 @@ import com.google.common.collect.Iterables;
  */
 public class CpuUsageTreeViewer extends AbstractSelectTreeViewer {
 
-    private static final Format TIME_FORMATTER = new SubSecondTimeWithUnitFormat();
+    private static final Format TIME_FORMATTER = SubSecondTimeWithUnitFormat.getInstance();
 
     /** Provides label for the CPU usage tree viewer cells */
     protected class CpuLabelProvider extends TreeLabelProvider {

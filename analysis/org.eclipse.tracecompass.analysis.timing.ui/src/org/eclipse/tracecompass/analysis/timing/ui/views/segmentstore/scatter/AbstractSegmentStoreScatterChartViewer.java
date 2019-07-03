@@ -14,7 +14,7 @@ import java.text.Format;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
+import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreScatterDataProvider;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.scatter.SegmentStoreScatterGraphTooltipProvider;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
@@ -39,7 +39,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSet
  */
 public class AbstractSegmentStoreScatterChartViewer extends TmfFilteredXYChartViewer {
 
-    private static final Format FORMAT = new SubSecondTimeWithUnitFormat();
+    private static final Format FORMAT =SubSecondTimeWithUnitFormat.getInstance();
     private static final int DEFAULT_SERIES_WIDTH = 1;
     private String fAnalysisId;
 

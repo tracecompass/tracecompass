@@ -16,7 +16,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
+import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.AggregatedCalledFunctionStatistics;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.ICalledFunction;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.SymbolAspect;
@@ -44,7 +44,7 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
     /** Number of colors used for flameGraph events */
     public static final int NUM_COLORS = 360;
 
-    private static final Format FORMATTER = new SubSecondTimeWithUnitFormat();
+    private static final Format FORMATTER = SubSecondTimeWithUnitFormat.getInstance();
 
     private final StateItem[] fStateTable;
     private FlameGraphView fView;

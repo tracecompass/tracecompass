@@ -14,8 +14,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityViewer;
+import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfAbstractToolTipHandler;
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
@@ -31,7 +31,7 @@ import org.swtchart.ISeries;
  */
 public class SimpleTooltipProvider extends BaseMouseProvider {
 
-    private static final Format FORMAT = new SubSecondTimeWithUnitFormat();
+    private static final Format FORMAT = SubSecondTimeWithUnitFormat.getInstance();
 
     private final class DensityToolTipHandler extends TmfAbstractToolTipHandler {
 

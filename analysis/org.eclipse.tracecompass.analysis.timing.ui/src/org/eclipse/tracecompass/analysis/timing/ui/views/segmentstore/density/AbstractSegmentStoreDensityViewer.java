@@ -26,8 +26,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density.MouseDragZoomProvider;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density.MouseSelectionProvider;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density.SimpleTooltipProvider;
@@ -69,7 +69,7 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implements IImageSave {
 
-    private static final Format DENSITY_TIME_FORMATTER = new SubSecondTimeWithUnitFormat();
+    private static final Format DENSITY_TIME_FORMATTER = SubSecondTimeWithUnitFormat.getInstance();
     private static final RGB BAR_COLOR = new RGB(0x42, 0x85, 0xf4);
     /** The color scheme for the chart */
     private TimeGraphColorScheme fColorScheme = new TimeGraphColorScheme();
