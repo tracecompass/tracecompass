@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.core;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 
 /**
@@ -19,6 +20,23 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.tmf.core.messages"; //$NON-NLS-1$
     public static String TmfCheckpointIndexer_EventsPerSecond;
     public static String TmfCheckpointIndexer_Indexing;
+
+    /**
+     * String to refer to the start time
+     */
+    public static @Nullable String TmfStrings_StartTime;
+    /**
+     * String to refer to the end time
+     */
+    public static @Nullable String TmfStrings_EndTime;
+    /**
+     * String to refer to the time
+     */
+    public static @Nullable String TmfStrings_Time;
+    /**
+     * String to refer to the duration
+     */
+    public static @Nullable String TmfStrings_Duration;
 
     static {
         // initialize resource bundle

@@ -185,10 +185,6 @@ public class Messages extends NLS {
 
     public static String TimeGraphTooltipHandler_DefaultMarkerName;
 
-    public static String TimeGraphTooltipHandler_EndTime;
-
-    public static String TimeGraphTooltipHandler_StartTime;
-
     public static String TimeGraphTooltipHandler_Timestamp;
 
     public static String CustomTxtParserInputWizardPage_addChildLine;

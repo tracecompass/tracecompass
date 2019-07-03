@@ -25,6 +25,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
+import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfAbstractToolTipHandler;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
@@ -156,8 +157,8 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
         if (duration == 0) {
             addItem(ToolTipString.fromString(itemName), ToolTipString.fromString(MARKER_OFFSET + Messages.TimeGraphTooltipHandler_Timestamp), ToolTipString.fromTimestamp(TmfTimestamp.fromNanos(timestamp).toString(), timestamp));
         } else {
-            addItem(ToolTipString.fromString(itemName), ToolTipString.fromString(MARKER_OFFSET + Messages.TimeGraphTooltipHandler_StartTime), ToolTipString.fromTimestamp(TmfTimestamp.fromNanos(timestamp).toString(), timestamp));
-            addItem(ToolTipString.fromString(itemName), ToolTipString.fromString(MARKER_OFFSET + Messages.TimeGraphTooltipHandler_EndTime), ToolTipString.fromTimestamp(TmfTimestamp.fromNanos(timestamp + duration).toString(), timestamp + duration));
+            addItem(ToolTipString.fromString(itemName), ToolTipString.fromString(MARKER_OFFSET + TmfStrings.startTime()), ToolTipString.fromTimestamp(TmfTimestamp.fromNanos(timestamp).toString(), timestamp));
+            addItem(ToolTipString.fromString(itemName), ToolTipString.fromString(MARKER_OFFSET + TmfStrings.endTime()), ToolTipString.fromTimestamp(TmfTimestamp.fromNanos(timestamp + duration).toString(), timestamp + duration));
         }
         if (toolTips != null) {
             for (Entry<String, String> tooltip : toolTips.entrySet()) {

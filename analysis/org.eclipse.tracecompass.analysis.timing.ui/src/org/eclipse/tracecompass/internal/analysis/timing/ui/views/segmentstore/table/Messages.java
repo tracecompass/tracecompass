@@ -23,21 +23,6 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME = Messages.class.getPackage().getName() + ".messages"; //$NON-NLS-1$
 
     /**
-     * Name of the duration column
-     */
-    public static String SegmentStoreTableViewer_duration;
-
-    /**
-     * Name of the end time column
-     */
-    public static String SegmentStoreTableViewer_endTime;
-
-    /**
-     * Name of the start time column
-     */
-    public static String SegmentStoreTableViewer_startTime;
-
-    /**
      * Title of action to goto start time time
      */
     public static String SegmentStoreTableViewer_goToStartEvent;

@@ -54,6 +54,7 @@ import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.ArrayListSt
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
+import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
@@ -229,21 +230,21 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
      * Create default columns for start time, end time and duration
      */
     private void createColumns() {
-        createColumn(Messages.SegmentStoreTableViewer_startTime, new SegmentStoreTableColumnLabelProvider() {
+        createColumn(TmfStrings.startTime(), new SegmentStoreTableColumnLabelProvider() {
             @Override
             public String getTextForSegment(ISegment input) {
                 return NonNullUtils.nullToEmptyString(TmfTimestampFormat.getDefaulTimeFormat().format(input.getStart()));
             }
         }, SegmentComparators.INTERVAL_START_COMPARATOR);
 
-        createColumn(Messages.SegmentStoreTableViewer_endTime, new SegmentStoreTableColumnLabelProvider() {
+        createColumn(TmfStrings.endTime(), new SegmentStoreTableColumnLabelProvider() {
             @Override
             public String getTextForSegment(ISegment input) {
                 return NonNullUtils.nullToEmptyString(TmfTimestampFormat.getDefaulTimeFormat().format(input.getEnd()));
             }
         }, SegmentComparators.INTERVAL_END_COMPARATOR);
 
-        createColumn(Messages.SegmentStoreTableViewer_duration, new SegmentStoreTableColumnLabelProvider() {
+        createColumn(TmfStrings.duration(), new SegmentStoreTableColumnLabelProvider() {
             @Override
             public String getTextForSegment(ISegment input) {
                 return NonNullUtils.nullToEmptyString(FORMATTER.format(input.getLength()));
