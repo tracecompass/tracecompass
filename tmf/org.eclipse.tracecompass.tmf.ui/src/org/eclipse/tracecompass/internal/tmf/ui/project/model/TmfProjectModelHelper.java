@@ -26,6 +26,10 @@ public class TmfProjectModelHelper {
     // Shadow project name
     private static final String SHADOW_PROJECT_NAME_PREFIX = ".tracecompass-"; //$NON-NLS-1$
 
+    private TmfProjectModelHelper() {
+        // Do nothing, private constructor
+    }
+
     /**
      * Returns the parent project for a given shadow project.
      *

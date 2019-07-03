@@ -30,7 +30,12 @@ import com.google.common.net.MediaType;
  *
  */
 public class DownloadTraceHttpHelper {
+
     private static final String CONTENT_DISPOSITION = "Content-Disposition"; //$NON-NLS-1$
+
+    private DownloadTraceHttpHelper() {
+        // Do nothing, private constructor
+    }
 
     /**
      * Download trace from a HTTP/HTTPS source.

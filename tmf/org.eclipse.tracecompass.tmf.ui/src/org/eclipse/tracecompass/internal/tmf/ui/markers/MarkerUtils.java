@@ -27,6 +27,10 @@ public class MarkerUtils {
 
     private static MarkerSet fDefaultMarkerSet = null;
 
+    private MarkerUtils() {
+        // Do nothing, private constructor
+    }
+
     /**
      * Get the default marker set
      *

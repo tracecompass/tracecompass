@@ -40,6 +40,10 @@ public class HtTestUtils {
      */
     public static final IHTIntervalReader<HTInterval> READ_FACTORY = HTInterval.INTERVAL_READER;
 
+    private HtTestUtils() {
+        // Do nothing, private constructor
+    }
+
     /**
      * Helper method to check the integrity of a tree. For each node of the
      * tree, it makes sure that elements in nodes are within the node's range

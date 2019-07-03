@@ -26,6 +26,10 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
  */
 public class TmfHandlerUtil {
 
+    private TmfHandlerUtil() {
+        // Do nothing, private constructor
+    }
+
     /**
      * Get the enclosing project from the selection
      *

@@ -31,6 +31,10 @@ public class TmfStatisticsTreeManager {
      */
     private static final Map<String, TmfStatisticsTree> fTreeInstances = new HashMap<>();
 
+    private TmfStatisticsTreeManager() {
+        // Do nothing, private constructor
+    }
+
     /**
      * Provide a statisticsTree instance per trace
      *

@@ -52,6 +52,10 @@ public class RemoteImportProfilesReader {
     private static final @NonNull TracePackageElement @NonNull [] EMPTY_ARRAY =
             new @NonNull TracePackageElement[0];
 
+    private RemoteImportProfilesReader() {
+        // Do nothing, private constructor
+    }
+
     /**
      * Validate the content of the profiles file from an input stream
      *

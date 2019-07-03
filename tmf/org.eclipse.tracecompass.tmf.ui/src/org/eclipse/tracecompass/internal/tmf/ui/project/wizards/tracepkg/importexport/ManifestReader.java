@@ -60,6 +60,10 @@ public class ManifestReader {
     private static final @NonNull TracePackageElement @NonNull [] EMPTY_ARRAY =
             new @NonNull TracePackageElement[0];
 
+    private ManifestReader() {
+        // Do nothing, private constructor
+    }
+
     /**
      * Validate the content of a manifest from an input stream
      *

@@ -39,6 +39,10 @@ import com.google.common.collect.ImmutableList;
  */
 public class CustomEventAspects {
 
+    private CustomEventAspects() {
+        // Do nothing, private constructor
+    }
+
     /**
      * Build a set of event aspects for a given trace definition
      *

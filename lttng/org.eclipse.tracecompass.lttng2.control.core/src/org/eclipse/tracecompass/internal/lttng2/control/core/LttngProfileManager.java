@@ -35,6 +35,10 @@ public class LttngProfileManager {
         }
     }
 
+    private LttngProfileManager() {
+        // Do nothing, private constructor
+    }
+
     /**
      * Returns all LTTng profile files available in workspace.
      *

@@ -29,6 +29,10 @@ import org.eclipse.ui.PlatformUI;
  */
 public class LTTngProfileViewer  {
 
+    private LTTngProfileViewer() {
+        // Do nothing, private constructor
+    }
+
     /**
      * Creates a CheckboxTreeViewer for selection available LTTng profiles.
      * @param parent

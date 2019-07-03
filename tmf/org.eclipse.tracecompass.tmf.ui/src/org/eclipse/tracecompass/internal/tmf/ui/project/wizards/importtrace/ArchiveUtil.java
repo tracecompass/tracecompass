@@ -35,6 +35,10 @@ import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
  */
 public class ArchiveUtil {
 
+    private ArchiveUtil() {
+        // Do nothing, not meant to be instantiated
+    }
+
     /**
      * Returns whether or not the source file is an archive file (Zip, tar,
      * tar.gz, gz).

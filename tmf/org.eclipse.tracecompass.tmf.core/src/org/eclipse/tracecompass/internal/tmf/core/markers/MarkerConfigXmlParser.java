@@ -80,6 +80,10 @@ public class MarkerConfigXmlParser {
     private static final @NonNull String ELEMENT_NAME_CUSTOM_MARKERS = "customMarker"; //$NON-NLS-1$
     private static final @NonNull String ATTRIBUTE_NAME_FILE = "file"; //$NON-NLS-1$
 
+    private MarkerConfigXmlParser() {
+        // Do nothing, private constructor
+    }
+
     /**
      * Get the marker sets from the marker configuration file.
      *

@@ -47,6 +47,14 @@ public final class TmfRemotePreferences {
     public static final int TRACE_CONTROL_MAX_TIMEOUT_VALUE = 600;
 
     // ------------------------------------------------------------------------
+    // constructor
+    // ------------------------------------------------------------------------
+
+    private TmfRemotePreferences() {
+        // Do nothing, private constructor
+    }
+
+    // ------------------------------------------------------------------------
     // operations
     // ------------------------------------------------------------------------
 

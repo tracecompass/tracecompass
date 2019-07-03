@@ -35,6 +35,10 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
  */
 public class TmfImportHelper {
 
+    private TmfImportHelper() {
+        // Do nothing, private constructor
+    }
+
     /**
      * Create a link and replace what was already there.
      *

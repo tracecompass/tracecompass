@@ -34,6 +34,10 @@ public class TmfUiTracer {
     private static final String LOGNAME = "traceUI.log";
     private static BufferedWriter fTraceLog = null;
 
+    private TmfUiTracer() {
+        // Do nothing, private constructor
+    }
+
     private static BufferedWriter openLogFile(String filename) {
         BufferedWriter outfile = null;
         try {

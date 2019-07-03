@@ -39,6 +39,10 @@ import org.eclipse.ui.PlatformUI;
  */
 public class CustomParserUtils {
 
+    private CustomParserUtils() {
+        // Do nothing, private constructor
+    }
+
     /**
      * Perform required cleanup when a custom parser is modified or deleted.
      *

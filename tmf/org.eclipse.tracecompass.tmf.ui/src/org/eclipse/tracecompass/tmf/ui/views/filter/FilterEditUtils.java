@@ -23,6 +23,10 @@ import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
  */
 class FilterEditUtils {
 
+    private FilterEditUtils() {
+        // Do nothing, private constructor
+    }
+
     /**
      * Gets the ITmfFilterTreeNode in LocalSelectionTransfer, if any
      * @return a ITmfFilterTreeNode or <code>null</code>

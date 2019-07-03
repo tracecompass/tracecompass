@@ -37,6 +37,10 @@ import org.w3c.dom.Node;
  */
 public class RemoteImportProfilesWriter {
 
+    private RemoteImportProfilesWriter() {
+        // Do nothing, private constructor
+    }
+
     /**
      * Write the profiles to XML format.
      *
