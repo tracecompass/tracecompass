@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g 2018-06-18 15:13:46
+// $ANTLR 3.5.2 org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g 2019-07-05 11:56:36
 
 /*******************************************************************************
  * Copyright (c) 2018 Ericsson
@@ -397,7 +397,7 @@ public class FilterParserParser extends Parser {
 					stream_23.add(close);
 
 					// AST REWRITE
-					// elements: start, parseRoot, close, OP_NEGATE
+					// elements: OP_NEGATE, parseRoot, start, close
 					// token labels: start, close
 					// rule labels: retval
 					// token list labels: 
@@ -466,7 +466,7 @@ public class FilterParserParser extends Parser {
 					}
 
 					// AST REWRITE
-					// elements: OP_NEGATE, expression
+					// elements: expression, OP_NEGATE
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -690,7 +690,7 @@ public class FilterParserParser extends Parser {
 					stream_TEXT.add(TEXT12);
 
 					// AST REWRITE
-					// elements: TEXT, TEXT, OP
+					// elements: TEXT, OP, TEXT
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -729,7 +729,7 @@ public class FilterParserParser extends Parser {
 					stream_OP_PRESENT.add(OP_PRESENT14);
 
 					// AST REWRITE
-					// elements: TEXT, OP_PRESENT
+					// elements: OP_PRESENT, TEXT
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -778,7 +778,7 @@ public class FilterParserParser extends Parser {
 					stream_TEXT.add(text);
 
 					// AST REWRITE
-					// elements: key0, text, op
+					// elements: key0, op, text
 					// token labels: op, text
 					// rule labels: key0, retval
 					// token list labels: 
@@ -879,7 +879,7 @@ public class FilterParserParser extends Parser {
 					stream_21.add(char_literal23);
 
 					// AST REWRITE
-					// elements: paragraph, TEXT, OP
+					// elements: TEXT, OP, paragraph
 					// token labels: 
 					// rule labels: retval
 					// token list labels: 
@@ -937,7 +937,7 @@ public class FilterParserParser extends Parser {
 					stream_21.add(char_literal28);
 
 					// AST REWRITE
-					// elements: OP, key3, key4
+					// elements: OP, key4, key3
 					// token labels: 
 					// rule labels: key3, key4, retval
 					// token list labels: 

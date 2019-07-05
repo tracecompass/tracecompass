@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g 2018-06-18 15:13:46
+// $ANTLR 3.5.2 org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g 2019-07-05 11:56:36
 
 /*******************************************************************************
  * Copyright (c) 2018 Ericsson
@@ -321,16 +321,16 @@ public class FilterParserLexer extends Lexer {
 		try {
 			int _type = TEXT;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:107:8: ( ( ( 'a' .. 'z' ) | ( 'A' .. 'Z' ) | ( '0' .. '9' ) | '-' | '_' | '[' | ']' | '.' | '*' | '$' | '^' | '|' | '\\\\' | '{' | '}' | '?' | '+' )+ )
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:107:10: ( ( 'a' .. 'z' ) | ( 'A' .. 'Z' ) | ( '0' .. '9' ) | '-' | '_' | '[' | ']' | '.' | '*' | '$' | '^' | '|' | '\\\\' | '{' | '}' | '?' | '+' )+
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:107:8: ( ( ( 'a' .. 'z' ) | ( 'A' .. 'Z' ) | ( '0' .. '9' ) | '-' | '_' | '[' | ']' | '.' | '*' | '$' | '^' | '|' | '\\\\' | '{' | '}' | '?' | '+' | ':' | ';' )+ )
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:107:10: ( ( 'a' .. 'z' ) | ( 'A' .. 'Z' ) | ( '0' .. '9' ) | '-' | '_' | '[' | ']' | '.' | '*' | '$' | '^' | '|' | '\\\\' | '{' | '}' | '?' | '+' | ':' | ';' )+
 			{
-			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:107:10: ( ( 'a' .. 'z' ) | ( 'A' .. 'Z' ) | ( '0' .. '9' ) | '-' | '_' | '[' | ']' | '.' | '*' | '$' | '^' | '|' | '\\\\' | '{' | '}' | '?' | '+' )+
+			// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:107:10: ( ( 'a' .. 'z' ) | ( 'A' .. 'Z' ) | ( '0' .. '9' ) | '-' | '_' | '[' | ']' | '.' | '*' | '$' | '^' | '|' | '\\\\' | '{' | '}' | '?' | '+' | ':' | ';' )+
 			int cnt3=0;
 			loop3:
 			while (true) {
 				int alt3=2;
 				int LA3_0 = input.LA(1);
-				if ( (LA3_0=='$'||(LA3_0 >= '*' && LA3_0 <= '+')||(LA3_0 >= '-' && LA3_0 <= '.')||(LA3_0 >= '0' && LA3_0 <= '9')||LA3_0=='?'||(LA3_0 >= 'A' && LA3_0 <= '_')||(LA3_0 >= 'a' && LA3_0 <= '}')) ) {
+				if ( (LA3_0=='$'||(LA3_0 >= '*' && LA3_0 <= '+')||(LA3_0 >= '-' && LA3_0 <= '.')||(LA3_0 >= '0' && LA3_0 <= ';')||LA3_0=='?'||(LA3_0 >= 'A' && LA3_0 <= '_')||(LA3_0 >= 'a' && LA3_0 <= '}')) ) {
 					alt3=1;
 				}
 
@@ -338,7 +338,7 @@ public class FilterParserLexer extends Lexer {
 				case 1 :
 					// org/eclipse/tracecompass/tmf/filter/parser/FilterParser.g:
 					{
-					if ( input.LA(1)=='$'||(input.LA(1) >= '*' && input.LA(1) <= '+')||(input.LA(1) >= '-' && input.LA(1) <= '.')||(input.LA(1) >= '0' && input.LA(1) <= '9')||input.LA(1)=='?'||(input.LA(1) >= 'A' && input.LA(1) <= '_')||(input.LA(1) >= 'a' && input.LA(1) <= '}') ) {
+					if ( input.LA(1)=='$'||(input.LA(1) >= '*' && input.LA(1) <= '+')||(input.LA(1) >= '-' && input.LA(1) <= '.')||(input.LA(1) >= '0' && input.LA(1) <= ';')||input.LA(1)=='?'||(input.LA(1) >= 'A' && input.LA(1) <= '_')||(input.LA(1) >= 'a' && input.LA(1) <= '}') ) {
 						input.consume();
 					}
 					else {
@@ -446,7 +446,7 @@ public class FilterParserLexer extends Lexer {
 			int LA5_4 = input.LA(2);
 			if ( (LA5_4=='|') ) {
 				int LA5_13 = input.LA(3);
-				if ( (LA5_13=='$'||(LA5_13 >= '*' && LA5_13 <= '+')||(LA5_13 >= '-' && LA5_13 <= '.')||(LA5_13 >= '0' && LA5_13 <= '9')||LA5_13=='?'||(LA5_13 >= 'A' && LA5_13 <= '_')||(LA5_13 >= 'a' && LA5_13 <= '}')) ) {
+				if ( (LA5_13=='$'||(LA5_13 >= '*' && LA5_13 <= '+')||(LA5_13 >= '-' && LA5_13 <= '.')||(LA5_13 >= '0' && LA5_13 <= ';')||LA5_13=='?'||(LA5_13 >= 'A' && LA5_13 <= '_')||(LA5_13 >= 'a' && LA5_13 <= '}')) ) {
 					alt5=8;
 				}
 
@@ -482,7 +482,7 @@ public class FilterParserLexer extends Lexer {
 								int LA5_27 = input.LA(7);
 								if ( (LA5_27=='t') ) {
 									int LA5_30 = input.LA(8);
-									if ( (LA5_30=='$'||(LA5_30 >= '*' && LA5_30 <= '+')||(LA5_30 >= '-' && LA5_30 <= '.')||(LA5_30 >= '0' && LA5_30 <= '9')||LA5_30=='?'||(LA5_30 >= 'A' && LA5_30 <= '_')||(LA5_30 >= 'a' && LA5_30 <= '}')) ) {
+									if ( (LA5_30=='$'||(LA5_30 >= '*' && LA5_30 <= '+')||(LA5_30 >= '-' && LA5_30 <= '.')||(LA5_30 >= '0' && LA5_30 <= ';')||LA5_30=='?'||(LA5_30 >= 'A' && LA5_30 <= '_')||(LA5_30 >= 'a' && LA5_30 <= '}')) ) {
 										alt5=8;
 									}
 
@@ -565,7 +565,7 @@ public class FilterParserLexer extends Lexer {
 									int LA5_31 = input.LA(8);
 									if ( (LA5_31=='s') ) {
 										int LA5_34 = input.LA(9);
-										if ( (LA5_34=='$'||(LA5_34 >= '*' && LA5_34 <= '+')||(LA5_34 >= '-' && LA5_34 <= '.')||(LA5_34 >= '0' && LA5_34 <= '9')||LA5_34=='?'||(LA5_34 >= 'A' && LA5_34 <= '_')||(LA5_34 >= 'a' && LA5_34 <= '}')) ) {
+										if ( (LA5_34=='$'||(LA5_34 >= '*' && LA5_34 <= '+')||(LA5_34 >= '-' && LA5_34 <= '.')||(LA5_34 >= '0' && LA5_34 <= ';')||LA5_34=='?'||(LA5_34 >= 'A' && LA5_34 <= '_')||(LA5_34 >= 'a' && LA5_34 <= '}')) ) {
 											alt5=8;
 										}
 
@@ -632,7 +632,7 @@ public class FilterParserLexer extends Lexer {
 								int LA5_29 = input.LA(7);
 								if ( (LA5_29=='s') ) {
 									int LA5_32 = input.LA(8);
-									if ( (LA5_32=='$'||(LA5_32 >= '*' && LA5_32 <= '+')||(LA5_32 >= '-' && LA5_32 <= '.')||(LA5_32 >= '0' && LA5_32 <= '9')||LA5_32=='?'||(LA5_32 >= 'A' && LA5_32 <= '_')||(LA5_32 >= 'a' && LA5_32 <= '}')) ) {
+									if ( (LA5_32=='$'||(LA5_32 >= '*' && LA5_32 <= '+')||(LA5_32 >= '-' && LA5_32 <= '.')||(LA5_32 >= '0' && LA5_32 <= ';')||LA5_32=='?'||(LA5_32 >= 'A' && LA5_32 <= '_')||(LA5_32 >= 'a' && LA5_32 <= '}')) ) {
 										alt5=8;
 									}
 
@@ -693,6 +693,8 @@ public class FilterParserLexer extends Lexer {
 		case '7':
 		case '8':
 		case '9':
+		case ':':
+		case ';':
 		case '?':
 		case 'A':
 		case 'B':
