@@ -16,6 +16,8 @@ import java.text.Format;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -40,8 +42,13 @@ public class DecimalUnitFormat extends Format {
 
     private static final String MILLI_PREFIX = "m"; //$NON-NLS-1$
     private static final String MICRO_PREFIX = "µ"; //$NON-NLS-1$
+    private static final String MICRO_PREFIX2 = "u"; //$NON-NLS-1$
     private static final String NANO_PREFIX = "n"; //$NON-NLS-1$
     private static final String PICO_PREFIX = "p"; //$NON-NLS-1$
+
+    private static final Pattern UNIT_PATTERN = Pattern.compile("^[\\s]*([" + KILO_PREFIX + //$NON-NLS-1$
+            MEGA_PREFIX + GIGA_PREFIX + TERA_PREFIX + PETA_PREFIX + MILLI_PREFIX +
+            MICRO_PREFIX + MICRO_PREFIX2 + NANO_PREFIX + PICO_PREFIX + "]+)"); //$NON-NLS-1$
 
     private static final long KILO = 1000L;
     private static final long MEGA = 1000000L;
@@ -51,11 +58,11 @@ public class DecimalUnitFormat extends Format {
 
     private static final double MILLI = 0.001;
     private static final double MICRO = 0.000001;
-    private static final double NANO  = 0.000000001;
-    private static final double PICO  = 0.000000000001;
+    private static final double NANO = 0.000000001;
+    private static final double PICO = 0.000000000001;
 
     /* Map of prefix to exponent */
-    private static final Map<String, Integer> PREFIX_MAP = ImmutableMap.<String, Integer>builder()
+    private static final Map<String, Integer> PREFIX_MAP = ImmutableMap.<String, Integer> builder()
             .put(KILO_PREFIX, +3)
             .put(MEGA_PREFIX, +6)
             .put(GIGA_PREFIX, +9)
@@ -63,12 +70,12 @@ public class DecimalUnitFormat extends Format {
             .put(PETA_PREFIX, +15)
             .put(MILLI_PREFIX, -3)
             .put(MICRO_PREFIX, -6)
+            .put(MICRO_PREFIX2, -6)
             .put(NANO_PREFIX, -9)
             .put(PICO_PREFIX, -12)
             .build();
     private static final Format FORMAT = new DecimalFormat("#.#"); //$NON-NLS-1$
     private final double fFactor;
-
 
     /**
      * Default constructor.
@@ -81,7 +88,8 @@ public class DecimalUnitFormat extends Format {
     /**
      * Constructor with multiplication factor.
      *
-     * @param factor Multiplication factor to apply to the value
+     * @param factor
+     *            Multiplication factor to apply to the value
      */
     public DecimalUnitFormat(double factor) {
         super();
@@ -150,13 +158,19 @@ public class DecimalUnitFormat extends Format {
         if (number == null) {
             return null;
         }
-        String unit = source.substring(pos.getIndex()).trim();
+        // Try to match the unit, if no match, assume no unit and don't
+        // update the position
+        String remaining = source.substring(pos.getIndex());
+        Matcher matcher = UNIT_PATTERN.matcher(remaining);
         Integer exponent = null;
-        if (!unit.isEmpty()) {
-            String prefix = unit.substring(0, 1);
+        if (matcher.find()) {
+            String unitString = matcher.group();
+            String prefix = matcher.group(1);
             exponent = PREFIX_MAP.get(prefix);
+            pos.setIndex(pos.getIndex() + unitString.length());
         }
         if (exponent != null && Double.isFinite(number.doubleValue())) {
+            // Calculate the value with exponent
             BigDecimal bd = new BigDecimal(number.toString());
             bd = bd.movePointRight(exponent.intValue());
             if (bd.remainder(BigDecimal.ONE).equals(BigDecimal.ZERO) &&

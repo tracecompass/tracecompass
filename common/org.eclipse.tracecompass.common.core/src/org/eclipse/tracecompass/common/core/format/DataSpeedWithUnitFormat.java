@@ -9,7 +9,6 @@
 
 package org.eclipse.tracecompass.common.core.format;
 
-import java.text.FieldPosition;
 import java.text.Format;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -32,7 +31,7 @@ public class DataSpeedWithUnitFormat extends DataSizeWithUnitFormat {
      * Protected constructor
      */
     protected DataSpeedWithUnitFormat() {
-        super();
+        super(PER_SECOND);
     }
 
     /**
@@ -43,11 +42,5 @@ public class DataSpeedWithUnitFormat extends DataSizeWithUnitFormat {
     public static @NonNull Format getInstance() {
         return INSTANCE;
     }
-
-    @Override
-    public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
-        return super.format(obj, toAppendTo, pos).append(PER_SECOND);
-    }
-
 
 }
