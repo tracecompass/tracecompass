@@ -60,6 +60,8 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 
 import com.google.common.collect.Collections2;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * Legend for the colors used in the time graph view
@@ -185,7 +187,6 @@ public class TimeGraphLegend extends TitleAreaDialog {
      * @since 3.3
      */
     protected void createStatesGroup(Composite composite) {
-        Group gs = new Group(composite, SWT.NONE);
         String stateTypeName = fProvider.getStateTypeName();
         StringBuilder buffer = new StringBuilder();
         if (!stateTypeName.isEmpty()) {
@@ -193,26 +194,36 @@ public class TimeGraphLegend extends TitleAreaDialog {
             buffer.append(" "); //$NON-NLS-1$
         }
         buffer.append(Messages.TmfTimeLegend_StateTypeName);
-        gs.setText(buffer.toString());
 
-        GridLayout layout = new GridLayout();
-        layout.marginWidth = 20;
-        layout.marginBottom = 10;
-        gs.setLayout(layout);
-
-        GridData gridData = new GridData();
-        gridData.verticalAlignment = SWT.TOP;
-        gs.setLayoutData(gridData);
-
-        // Go through all the defined pairs of state color and state name and
-        // display them.
         StateItem[] stateTable = fProvider.getStateTable();
         List<StateItem> stateItems = stateTable != null ? Arrays.asList(stateTable) : Collections.emptyList();
-        stateItems.forEach(si -> {
-            if (!isLinkState(si)) {
-                new LegendEntry(gs, si);
+        Multimap<String, StateItem> groupedStateItems = LinkedHashMultimap.create();
+        for (StateItem stateItem : stateItems) {
+            if (!isLinkState(stateItem)) {
+                Object group = stateItem.getStyleMap().get(ITimeEventStyleStrings.group());
+                if (group instanceof String) {
+                    groupedStateItems.put((String) group, stateItem);
+                } else {
+                    groupedStateItems.put(buffer.toString(), stateItem);
+                }
             }
-        });
+        }
+
+        for (String groupedStateLabel : groupedStateItems.keySet()) {
+            Group gs = new Group(composite, SWT.NONE);
+            gs.setText(groupedStateLabel);
+            GridLayout layout = new GridLayout();
+            layout.marginWidth = 20;
+            layout.marginBottom = 10;
+            gs.setLayout(layout);
+
+            GridData gridData = new GridData();
+            gridData.verticalAlignment = SWT.TOP;
+            gs.setLayoutData(gridData);
+            for (StateItem stateItem : groupedStateItems.get(groupedStateLabel)) {
+                new LegendEntry(gs, stateItem);
+            }
+        }
     }
 
     private void createLinkGroup(Collection<StateItem> linkStates, Composite innerComposite) {

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -39,14 +39,20 @@ import com.google.common.collect.Multimap;
 public interface IElementResolver {
 
     /**
-     * The key to get the label
+     * The key for the label field
+     *
+     * @deprecated Use {@link IMetadataStrings#LABEL_KEY} instead.
      */
-    static final String LABEL_KEY= "label"; //$NON-NLS-1$
+    @Deprecated
+    static final String LABEL_KEY = IMetadataStrings.LABEL_KEY;
 
     /**
-     * the key to get the entry name
+     * The key for the entry name field
+     *
+     * @deprecated Use {@link IMetadataStrings#ENTRY_NAME_KEY} instead.
      */
-    static final String ENTRY_NAME_KEY = "entry"; //$NON-NLS-1$
+    @Deprecated
+    static final String ENTRY_NAME_KEY = IMetadataStrings.ENTRY_NAME_KEY;
 
     /**
      * Get available information from an item and return it into a key-value map

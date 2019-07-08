@@ -23,6 +23,7 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
@@ -32,7 +33,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleSt
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
-import org.eclipse.tracecompass.tmf.ui.colors.X11Color;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -66,7 +66,7 @@ public class CriticalPathPresentationProvider extends TimeGraphPresentationProvi
         /** Any other reason */
         UNKNOWN(new RGB(0x40, 0x3b, 0x33)),
         /** Worked is blocked for undetermined reason */
-        UNKNOWN_BLOCKED(X11Color.toRGB("Crimson")), //$NON-NLS-1$
+        UNKNOWN_BLOCKED(ColorUtils.fromX11Color("Crimson")), //$NON-NLS-1$
         /** Network communication arrow*/
         NETWORK_ARROW(new RGB(0xff, 0x9b, 0xff)),
         /** Unknown arrow*/

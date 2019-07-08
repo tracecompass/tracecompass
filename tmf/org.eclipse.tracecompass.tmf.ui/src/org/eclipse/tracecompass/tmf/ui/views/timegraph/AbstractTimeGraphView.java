@@ -2651,7 +2651,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         Multimap<@NonNull Integer, @NonNull String> regexes = HashMultimap.create();
 
         @NonNull String dialogRegex = fTimeEventFilterDialog != null ? fTimeEventFilterDialog.getTextBoxRegex() : ""; //$NON-NLS-1$
-        regexes.put(IFilterProperty.DIMMED, dialogRegex);
+        if (!dialogRegex.isEmpty()) {
+            regexes.put(IFilterProperty.DIMMED, dialogRegex);
+        }
 
         Set<@NonNull String> savedFilters = fTimeEventFilterDialog != null ? fTimeEventFilterDialog.getSavedFilters() : Collections.emptySet();
         for (String savedFilter : savedFilters) {

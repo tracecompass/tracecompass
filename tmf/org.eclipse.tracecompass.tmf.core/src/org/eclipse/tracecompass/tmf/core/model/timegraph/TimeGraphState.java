@@ -129,7 +129,7 @@ public class TimeGraphState implements ITimeGraphState {
             metadata = HashMultimap.create();
             String label = getLabel();
             if (label != null) {
-                metadata.put(IElementResolver.LABEL_KEY, label);
+                metadata.put(IMetadataStrings.LABEL_KEY, label);
             }
             metadata.put(TmfStrings.startTime(), fStartTime);
             metadata.put(TmfStrings.endTime(), fStartTime + fDuration);

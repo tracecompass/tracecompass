@@ -43,7 +43,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.trace.AbstractTmfTraceAdapterFactory.IDisposableAdapter;
 import org.eclipse.tracecompass.tmf.core.trace.ICyclesConverter;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ui.colors.X11Color;
+import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
 import org.eclipse.tracecompass.tmf.ui.markers.IMarkerReferenceProvider;
 import org.eclipse.tracecompass.tmf.ui.markers.PeriodicMarkerEventSource;
 import org.eclipse.tracecompass.tmf.ui.markers.PeriodicMarkerEventSource.Reference;
@@ -158,11 +158,9 @@ public class ConfigurableMarkerEventSource implements IMarkerEventSource, IDispo
     private static @NonNull RGBA parseColor(String color) {
         RGB rgb = null;
         if (color.matches(COLOR_REGEX)) {
-            rgb = new RGB(Integer.valueOf(color.substring(1, 3), 16),
-                    Integer.valueOf(color.substring(3, 5), 16),
-                    Integer.valueOf(color.substring(5, 7), 16));
+            rgb = ColorUtils.fromHexColor(color);
         } else {
-            rgb = X11Color.toRGB(color);
+            rgb = ColorUtils.fromX11Color(color);
             if (rgb == null) {
                 rgb = new RGB(0, 0, 0);
             }

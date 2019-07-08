@@ -32,6 +32,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.BaseDataProviderTimeGraphPresentationProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.Messages;
@@ -55,6 +56,7 @@ import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.actions.OpenSourceCodeAction;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -143,6 +145,10 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                 .getInstance().getDataProvider(trace, getProviderId(), ITimeGraphDataProvider.class);
         if (dataProvider == null) {
             return;
+        }
+        ITimeGraphPresentationProvider presentationProvider = getPresentationProvider();
+        if (presentationProvider instanceof BaseDataProviderTimeGraphPresentationProvider) {
+            ((BaseDataProviderTimeGraphPresentationProvider) presentationProvider).addProvider(dataProvider);
         }
         boolean complete = false;
         while (!complete && !monitor.isCanceled()) {
@@ -448,13 +454,13 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      */
     protected TimeEvent createTimeEvent(TimeGraphEntry entry, ITimeGraphState state) {
         String label = state.getLabel();
-        if (state.getValue() == Integer.MIN_VALUE && label == null) {
+        if (state.getValue() == Integer.MIN_VALUE && label == null && state.getStyle() == null) {
             return new NullTimeEvent(entry, state.getStartTime(), state.getDuration());
         }
         if (label != null) {
-            return new NamedTimeEvent(entry, state.getStartTime(), state.getDuration(), state.getValue(), label, state.getActiveProperties());
+            return new NamedTimeEvent(entry, label, state);
         }
-        return new TimeEvent(entry, state.getStartTime(), state.getDuration(), state.getValue(), state.getActiveProperties());
+        return new TimeEvent(entry, state);
     }
 
     @Override
