@@ -16,18 +16,28 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.AnalysisCompilationData;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlOutputEntryCu;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlXYViewCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlAnalysisModuleSource;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenOutputEntry;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenXYDataProvider;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenXYProviderFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.XmlDataProviderManager;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlUtils;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.tests.common.TmfXmlTestFiles;
@@ -43,14 +53,17 @@ import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.tracecompass.tmf.core.statesystem.ITmfAnalysisModuleWithStateSystems;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Element;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 /**
  * Test the XML XY data provider
@@ -166,6 +179,62 @@ public class XmlXyDataProviderTest {
             TmfTraceManager.getInstance().traceClosed(new TmfTraceClosedSignal(this, trace));
         }
 
+    }
+
+    /**
+     * Test the {@link DataDrivenXYProviderFactory} class
+     */
+    @Test
+    public void testXYFactory() {
+        ITmfTrace trace = getTrace();
+        assertNotNull(trace);
+        try {
+            runModule(trace);
+            // Get the view element from the file
+            Element viewElement = TmfXmlUtils.getElementInFile(TmfXmlTestFiles.DATA_PROVIDER_SIMPLE_FILE.getPath().toOSString(), TmfXmlStrings.XY_VIEW, XY_VIEW_ID_DELTA);
+            assertNotNull(viewElement);
+
+            TmfXmlXYViewCu tgViewCu = TmfXmlXYViewCu.compile(new AnalysisCompilationData(), viewElement);
+            assertNotNull(tgViewCu);
+            DataDrivenXYProviderFactory XYFactory = tgViewCu.generate();
+
+            // Test the factory with a simple trace
+            ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> provider = XYFactory.create(trace);
+            assertNotNull(provider);
+            assertEquals(DataDrivenXYDataProvider.ID, provider.getId());
+
+            // Test the factory with an ID and state system
+            ITmfAnalysisModuleWithStateSystems module = TmfTraceUtils.getAnalysisModuleOfClass(trace, ITmfAnalysisModuleWithStateSystems.class, ANALYSIS_ID);
+            assertNotNull(module);
+            Iterable<@NonNull ITmfStateSystem> stateSystems = module.getStateSystems();
+            assertNotNull(stateSystems);
+
+
+            provider = DataDrivenXYProviderFactory.create(trace, Objects.requireNonNull(Lists.newArrayList(stateSystems)), getEntries(new AnalysisCompilationData(), viewElement), ANALYSIS_ID);
+            assertNotNull(provider);
+            assertEquals(ANALYSIS_ID, provider.getId());
+
+        } finally {
+            trace.dispose();
+            TmfTraceManager.getInstance().traceClosed(new TmfTraceClosedSignal(this, trace));
+        }
+
+    }
+
+    private static List<DataDrivenOutputEntry> getEntries(AnalysisCompilationData compilationData, Element viewElement) {
+        List<Element> entries = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.ENTRY_ELEMENT);
+
+        List<TmfXmlOutputEntryCu> entriesCu = new ArrayList<>();
+        for (Element entry : entries) {
+            TmfXmlOutputEntryCu entryCu = TmfXmlOutputEntryCu.compile(compilationData, entry);
+            if (entryCu != null) {
+                entriesCu.add(entryCu);
+            }
+        }
+
+        return entriesCu.stream()
+                .map(TmfXmlOutputEntryCu::generate)
+                .collect(Collectors.toList());
     }
 
     private static void assertRows(ITmfTreeXYDataProvider<@NonNull ITmfTreeDataModel> xyProvider, Map<Long, String> tree, List<String> expectedStrings) {

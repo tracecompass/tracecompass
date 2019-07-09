@@ -92,7 +92,7 @@ public class DataDrivenTimeGraphProviderFactory implements IDataDrivenRuntimeObj
                 module.getStateSystems().forEach(sss::add);
             }
         }
-        return (sss.isEmpty() ? null : new DataDrivenTimeGraphDataProvider(trace, sss, fEntries, fValues, null));
+        return (sss.isEmpty() ? null : create(trace, sss, fEntries, fValues, null));
     }
 
     /**
@@ -102,12 +102,17 @@ public class DataDrivenTimeGraphProviderFactory implements IDataDrivenRuntimeObj
      *            The trace this data provider is associated with
      * @param stateSystems
      *            The state systems to use
+     * @param entries
+     *            The entries for this time graph
+     * @param values
+     *            The values to use to display the labels and colors of this
+     *            time graph
      * @param id
      *            The ID of the data provider to create
      * @return The data provider
      */
-    public ITimeGraphDataProvider<TimeGraphEntryModel> create(ITmfTrace trace, List<ITmfStateSystem> stateSystems, String id) {
-        return new DataDrivenTimeGraphDataProvider(trace, stateSystems, fEntries, fValues, id);
+    public static ITimeGraphDataProvider<TimeGraphEntryModel> create(ITmfTrace trace, List<ITmfStateSystem> stateSystems, List<DataDrivenOutputEntry> entries, List<DataDrivenPresentationState> values, @Nullable String id) {
+        return new DataDrivenTimeGraphDataProvider(trace, stateSystems, entries, values, id);
     }
 
 }

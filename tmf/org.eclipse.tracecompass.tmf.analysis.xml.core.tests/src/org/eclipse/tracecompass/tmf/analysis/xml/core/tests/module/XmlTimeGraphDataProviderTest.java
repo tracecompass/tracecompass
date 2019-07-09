@@ -16,20 +16,25 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.AnalysisCompilationData;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlOutputEntryCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlTimeGraphViewCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlAnalysisModuleSource;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenOutputEntry;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenPresentationState;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphDataProvider;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphProviderFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.XmlDataProviderManager;
@@ -279,7 +284,7 @@ public class XmlTimeGraphDataProviderTest {
             assertNotNull(module);
             Iterable<@NonNull ITmfStateSystem> stateSystems = module.getStateSystems();
             assertNotNull(stateSystems);
-            provider = timeGraphFactory.create(trace, Objects.requireNonNull(Lists.newArrayList(stateSystems)), ANALYSIS_ID);
+            provider = DataDrivenTimeGraphProviderFactory.create(trace, Objects.requireNonNull(Lists.newArrayList(stateSystems)), getEntries(new AnalysisCompilationData(), viewElement), getvalues(viewElement), ANALYSIS_ID);
             assertNotNull(provider);
             assertEquals(ANALYSIS_ID, provider.getId());
 
@@ -288,6 +293,30 @@ public class XmlTimeGraphDataProviderTest {
             TmfTraceManager.getInstance().traceClosed(new TmfTraceClosedSignal(this, trace));
         }
 
+    }
+
+    private static List<DataDrivenOutputEntry> getEntries(AnalysisCompilationData compilationData, Element viewElement) {
+        List<Element> entries = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.ENTRY_ELEMENT);
+
+        List<TmfXmlOutputEntryCu> entriesCu = new ArrayList<>();
+        for (Element entry : entries) {
+            TmfXmlOutputEntryCu entryCu = TmfXmlOutputEntryCu.compile(compilationData, entry);
+            if (entryCu != null) {
+                entriesCu.add(entryCu);
+            }
+        }
+        return entriesCu.stream()
+                .map(TmfXmlOutputEntryCu::generate)
+                .collect(Collectors.toList());
+    }
+
+    private static List<DataDrivenPresentationState> getvalues(Element viewElement) {
+        List<DataDrivenPresentationState> values = new ArrayList<>();
+        List<Element> childElements = TmfXmlUtils.getChildElements(viewElement, TmfXmlStrings.DEFINED_VALUE);
+        for (Element element : childElements) {
+            values.add(new DataDrivenPresentationState(element.getAttribute(TmfXmlStrings.VALUE), element.getAttribute(TmfXmlStrings.NAME), element.getAttribute(TmfXmlStrings.COLOR)));
+        }
+        return values;
     }
 
 }

@@ -84,7 +84,24 @@ public class DataDrivenXYProviderFactory implements IDataDrivenRuntimeObject {
                 module.getStateSystems().forEach(sss::add);
             }
         }
-        return (sss.isEmpty() ? null : new DataDrivenXYDataProvider(trace, sss, fEntries, null));
+        return (sss.isEmpty() ? null : create(trace, sss, fEntries, null));
+    }
+
+    /**
+     * Create an XY data provider with state systems already available
+     *
+     * @param trace
+     *            The trace for which to create the data provider
+     * @param stateSystems
+     *            The state systems to use
+     * @param entries
+     *            The list of entries
+     * @param id
+     *            The ID of the data provider to create
+     * @return The XY data provider
+     */
+    public static @Nullable ITmfTreeXYDataProvider<ITmfTreeDataModel> create(ITmfTrace trace, List<ITmfStateSystem> stateSystems, List<DataDrivenOutputEntry> entries, @Nullable String id) {
+        return new DataDrivenXYDataProvider(trace, stateSystems, entries, id);
     }
 
 }
