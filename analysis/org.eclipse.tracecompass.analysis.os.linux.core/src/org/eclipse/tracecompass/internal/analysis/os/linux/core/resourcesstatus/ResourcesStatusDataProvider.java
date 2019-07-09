@@ -685,7 +685,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         if (execNameQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
             Object processName = full.get(execNameQuark).getValue();
             if (processName instanceof String) {
-                retMap.put(Attributes.EXEC_NAME, (String) processName);
+                retMap.put(OsStrings.execName(), (String) processName);
             }
         }
     }

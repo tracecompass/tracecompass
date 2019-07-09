@@ -30,6 +30,12 @@ public class Messages extends NLS {
 
     public static @Nullable String AspectName_Tid;
 
+    /**
+     * String to identify the executable name
+     * @since 4.1
+     */
+    public static @Nullable String AspectName_ExecName;
+
     public static @Nullable String AspectHelpText_Tid;
 
     public static @Nullable String AspectName_Prio;

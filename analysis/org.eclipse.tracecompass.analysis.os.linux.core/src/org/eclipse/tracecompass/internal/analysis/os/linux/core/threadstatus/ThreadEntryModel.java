@@ -174,7 +174,7 @@ public class ThreadEntryModel extends TimeGraphEntryModel implements IElementRes
         fAspects.put(OsStrings.tid(), pid);
         fAspects.put(OsStrings.pid(), ppid);
         if (!labels.isEmpty()) {
-            fAspects.put("exec_name", String.valueOf(labels.get(0)));
+            fAspects.put(OsStrings.execName(), String.valueOf(labels.get(0)));
         }
     }
 

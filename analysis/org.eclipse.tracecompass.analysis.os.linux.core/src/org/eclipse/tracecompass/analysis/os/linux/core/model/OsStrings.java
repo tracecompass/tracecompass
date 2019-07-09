@@ -35,7 +35,7 @@ public final class OsStrings {
     /**
      * Get the string for the thread ID
      *
-     * @return The externalized label
+     * @return The externalized label for thread ID
      */
     public static String tid() {
         return Objects.requireNonNull(org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.Messages.AspectName_Tid);
@@ -44,7 +44,7 @@ public final class OsStrings {
     /**
      * Get the string for the process ID
      *
-     * @return The externalized label
+     * @return The externalized label for process ID
      */
     public static String pid() {
         return Objects.requireNonNull(org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.Messages.AspectName_Pid);
@@ -53,10 +53,20 @@ public final class OsStrings {
     /**
      * Get the string for the cpu string
      *
-     * @return The externalized label
+     * @return The externalized label for CPU
      */
     public static String cpu() {
         return Objects.requireNonNull(org.eclipse.tracecompass.tmf.core.event.aspect.Messages.AspectName_CPU);
+    }
+
+    /**
+     * Get the externalized string for the executable name of a thread
+     *
+     * @return The externalized label for exec name
+     * @since 4.1
+     */
+    public static String execName() {
+        return Objects.requireNonNull(org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.Messages.AspectName_ExecName);
     }
 
 }
