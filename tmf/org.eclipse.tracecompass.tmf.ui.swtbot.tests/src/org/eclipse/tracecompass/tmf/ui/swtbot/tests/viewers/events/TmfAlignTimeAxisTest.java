@@ -131,6 +131,10 @@ public class TmfAlignTimeAxisTest {
      */
     @AfterClass
     public static void cleanup() {
+        fBot.perspectiveById(TestingPerspectiveFactory.ID).close();
+        fBot.perspectiveById(AlignPerspectiveFactory1.ID).close();
+        fBot.perspectiveById(AlignPerspectiveFactory2.ID).close();
+        fBot.perspectiveById(AlignPerspectiveFactory3.ID).close();
         SWTBotUtils.deleteProject(PROJET_NAME, new SWTWorkbenchBot());
         fLocation.delete();
         fLogger.removeAllAppenders();
