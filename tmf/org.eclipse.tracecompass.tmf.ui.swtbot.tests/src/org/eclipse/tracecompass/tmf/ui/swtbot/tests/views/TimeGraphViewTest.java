@@ -315,7 +315,7 @@ public class TimeGraphViewTest {
         legendBot.button(OK_BUTTON).click();
         TmfTraceStub trace = fTrace;
         assertNotNull(trace);
-        TmfSignalManager.dispatchSignal(new TmfTraceClosedSignal(this, trace));
+        UIThreadRunnable.syncExec(() -> TmfSignalManager.dispatchSignal(new TmfTraceClosedSignal(this, trace)));
         fBot.waitUntil(Conditions.shellCloses(legendShell));
         fViewBot.close();
         fBot.waitUntil(ConditionHelpers.viewIsClosed(fViewBot));
