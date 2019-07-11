@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2018, 2019 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.TmfStrings;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 
 import com.google.common.collect.ImmutableMultimap;
@@ -24,7 +23,7 @@ import com.google.common.collect.Multimap;
  *
  * @author Loic Prieur-Drevon
  */
-public class ResourcesEntryModel extends TimeGraphEntryModel implements IElementResolver {
+public class ResourcesEntryModel extends TimeGraphEntryModel {
 
     /** Type of entry */
     public enum Type {

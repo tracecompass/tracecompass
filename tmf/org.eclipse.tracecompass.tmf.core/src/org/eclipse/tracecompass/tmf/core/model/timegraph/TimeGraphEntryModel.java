@@ -14,6 +14,9 @@ import java.util.List;
 
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
 /**
  * Implementation of {@link ITimeGraphEntryModel}.
  *
@@ -24,6 +27,7 @@ public class TimeGraphEntryModel extends TmfTreeDataModel implements ITimeGraphE
     private final long fStartTime;
     private final long fEndTime;
     private final boolean fHasRowModel;
+    private Multimap<String, Object> fMetaData = HashMultimap.create();
 
     /**
      * Constructor
@@ -119,6 +123,11 @@ public class TimeGraphEntryModel extends TmfTreeDataModel implements ITimeGraphE
     @Override
     public boolean hasRowModel() {
         return fHasRowModel;
+    }
+
+    @Override
+    public Multimap<String, Object> getMetadata() {
+        return fMetaData;
     }
 
     @Override

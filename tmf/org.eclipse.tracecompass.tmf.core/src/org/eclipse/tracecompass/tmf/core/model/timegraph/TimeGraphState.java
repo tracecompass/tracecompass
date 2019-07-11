@@ -31,6 +31,7 @@ public class TimeGraphState implements ITimeGraphState {
     private final int fValue;
     private final @Nullable String fLabel;
     private final @Nullable OutputElementStyle fStyle;
+    private @Nullable Multimap<String, Object> fMetadata = null;
 
     /**
      * A bitmap of properties to activate or deactivate
@@ -122,16 +123,20 @@ public class TimeGraphState implements ITimeGraphState {
     }
 
     @Override
-    public Multimap<String, Object> getMetadata() {
-        Multimap<String, Object> toTest = HashMultimap.create();
-        String label = getLabel();
-        if (label != null) {
-            toTest.put(IElementResolver.LABEL_KEY, label);
+    public synchronized Multimap<String, Object> getMetadata() {
+        Multimap<String, Object> metadata = fMetadata;
+        if (metadata == null) {
+            metadata = HashMultimap.create();
+            String label = getLabel();
+            if (label != null) {
+                metadata.put(IElementResolver.LABEL_KEY, label);
+            }
+            metadata.put(TmfStrings.startTime(), fStartTime);
+            metadata.put(TmfStrings.endTime(), fStartTime + fDuration);
+            metadata.put(TmfStrings.duration(), fDuration);
+            fMetadata = metadata;
         }
-        toTest.put(TmfStrings.startTime(), fStartTime);
-        toTest.put(TmfStrings.endTime(), fStartTime + fDuration);
-        toTest.put(TmfStrings.duration(), fDuration);
-        return toTest;
+        return metadata;
     }
 
     @Override

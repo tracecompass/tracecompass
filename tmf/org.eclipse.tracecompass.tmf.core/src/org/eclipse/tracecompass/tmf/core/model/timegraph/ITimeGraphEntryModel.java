@@ -9,7 +9,12 @@
 
 package org.eclipse.tracecompass.tmf.core.model.timegraph;
 
+import java.util.Map;
+
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * Represents a time graph entry model. These objects are typically returned by
@@ -19,7 +24,7 @@ import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
  * @author Simon Delisle
  * @since 4.0
  */
-public interface ITimeGraphEntryModel extends ITmfTreeDataModel {
+public interface ITimeGraphEntryModel extends ITmfTreeDataModel, IElementResolver {
 
     /**
      * Gets the entry start time
@@ -43,5 +48,19 @@ public interface ITimeGraphEntryModel extends ITmfTreeDataModel {
      */
     default boolean hasRowModel() {
         return true;
+    }
+
+    @Override
+    default Multimap<String, Object> getMetadata() {
+        return HashMultimap.create();
+    }
+
+    /**
+     * @since 5.1
+     */
+    @Override
+    @Deprecated
+    default Map<String, String> computeData() {
+        return IElementResolver.super.computeData();
     }
 }
