@@ -16,11 +16,15 @@ package org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared;
 
 import static org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory.withPartName;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardContainer;
@@ -50,10 +54,12 @@ import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.hamcrest.Matcher;
+import org.osgi.framework.Version;
 import org.swtchart.Chart;
 
 /**
@@ -295,9 +301,65 @@ public final class ConditionHelpers {
                         if (activePage == null) {
                             return true;
                         }
-                        return !Arrays.asList(activePage.getViewReferences()).contains(view.getReference());
+                        for (IViewReference viewReference : activePage.getViewReferences()) {
+                            if (viewReference.equals(view.getReference()) && !isHiddenPlaceholder(viewReference, activePage)) {
+                                return false;
+                            }
+                        }
+                        return true;
                     }
                 });
+            }
+
+            private boolean isHiddenPlaceholder(IViewReference viewReference, IWorkbenchPage activePage) {
+                /*
+                 * Workaround for Platform UI Bug 540297. Without this bug fix,
+                 * IWorkbenchPage.getViewReferences() can return views that have
+                 * been closed but that still exist in another perspective.
+                 * Implement locally the fix to WorkbenchPage from
+                 * https://git.eclipse.org/r/131188 included in Eclipse 4.10.
+                 */
+                Version version = Platform.getBundle("org.eclipse.platform").getVersion();
+                if (version.getMajor() != 4 || version.getMinor() >= 10) {
+                    // Workaround is not needed
+                    return false;
+                }
+                try {
+                    /*
+                     * EModelService modelService = activePage.modelService;
+                     * MWindow window = activePage.window;
+                     * MPart model = viewReference.getModel();
+                     * MPlaceholder mPlaceholder = modelService.findPlaceholderFor(window, model);
+                     * return (mPlacehoder != null && !mPlaceHolder.isToBeRendered());
+                     */
+                    Field modelServiceField = activePage.getClass().getDeclaredField("modelService");
+                    modelServiceField.setAccessible(true);
+                    Object modelService = modelServiceField.get(activePage);
+                    Field windowField = activePage.getClass().getDeclaredField("window");
+                    windowField.setAccessible(true);
+                    Object window = windowField.get(activePage);
+                    Method getModelMethod = viewReference.getClass().getMethod("getModel");
+                    getModelMethod.setAccessible(true);
+                    Object model = getModelMethod.invoke(viewReference);
+                    for (Method method : modelService.getClass().getMethods()) {
+                        if (method.getName().equals("findPlaceholderFor")) {
+                            method.setAccessible(true);
+                            Object mPlaceholder = method.invoke(modelService, window, model);
+                            if (mPlaceholder != null) {
+                                Method isToBeRenderedMethod = mPlaceholder.getClass().getMethod("isToBeRendered");
+                                isToBeRenderedMethod.setAccessible(true);
+                                Object isToBeRendered = isToBeRenderedMethod.invoke(mPlaceholder);
+                                if (Boolean.FALSE.equals(isToBeRendered)) {
+                                    return true;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchFieldException e) {
+                    return false;
+                }
+                return false;
             }
 
             @Override
