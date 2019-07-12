@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2016, 2018 Ericsson
+ * Copyright (c) 2016, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -83,7 +83,7 @@ public class ProjectExplorerTraceActionsTest {
     private static final String RENAMED_TRACE_NAME = TRACE_NAME + 2;
     private static final String RENAMED_AS_NEW_TRACE_NAME = TRACE_NAME + 3;
     private static final String COPY_AS_NEW_TRACE_OPTION = "Copy as a new trace";
-    private static final String RESOURCE_PROPERTIES_ITEM_NAME = "Resource properties";
+    private static final String RESOURCE_PROPERTIES = "Resource properties";
     private static final String LINKED_ITEM_NAME = "linked";
     private static final String COPY_TRACE_DIALOG_TITLE = "Copy Trace";
     private static final String PROJECT_EXPLORER_VIEW_NAME = "Project Explorer";
@@ -703,8 +703,9 @@ public class ProjectExplorerTraceActionsTest {
         viewBot.show();
         fBot.waitUntil(ConditionHelpers.viewIsActive(viewBot));
         traceItem.select();
+        SWTBotUtils.waitUntil(bot -> bot.tree().cell(0, 0).equals(RESOURCE_PROPERTIES), viewBot.bot(), "Resource properties did not appear");
         SWTBotTree tree = viewBot.bot().tree();
-        SWTBotTreeItem resourcePropertiesItem = tree.getTreeItem(RESOURCE_PROPERTIES_ITEM_NAME);
+        SWTBotTreeItem resourcePropertiesItem = tree.getTreeItem(RESOURCE_PROPERTIES);
         fBot.waitUntil(ConditionHelpers.isTreeChildNodeAvailable(LINKED_ITEM_NAME, resourcePropertiesItem));
         SWTBotTreeItem linkedNode = resourcePropertiesItem.getNode(LINKED_ITEM_NAME);
         String linkedValue = linkedNode.cell(1);

@@ -75,6 +75,8 @@ import com.google.common.collect.Lists;
 @SuppressWarnings({"restriction", "javadoc"})
 public class ProjectExplorerTracesFolderTest {
 
+    private static final String RESOURCE_PROPERTIES = "Resource properties";
+
     private static final class ImportConfirmationSupplier implements Supplier<ImportConfirmation> {
         List<ImportConfirmation> fConfirmations = Lists.newArrayList(ImportConfirmation.CONTINUE);
 
@@ -1631,7 +1633,9 @@ public class ProjectExplorerTracesFolderTest {
         SWTBotView view = fBot.viewById(IPageLayout.ID_PROP_SHEET);
         view.show();
         traceItem.select();
-        SWTBotTreeItem traceTypeItem = SWTBotUtils.getTreeItem(view.bot(), view.bot().tree(), "Resource properties", property);
+        SWTBot viewBot = view.bot();
+        SWTBotUtils.waitUntil(bot -> bot.tree().cell(0, 0).equals(RESOURCE_PROPERTIES), viewBot, "Resource properties did not appear");
+        SWTBotTreeItem traceTypeItem = SWTBotUtils.getTreeItem(viewBot, viewBot.tree(), RESOURCE_PROPERTIES, property);
         return traceTypeItem.cell(1);
     }
 
