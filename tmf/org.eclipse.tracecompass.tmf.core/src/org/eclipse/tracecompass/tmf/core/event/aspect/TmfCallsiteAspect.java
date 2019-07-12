@@ -20,7 +20,7 @@ import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
  * occurred.
  *
  * @author Matthew Khouzam
- * @since 5.0
+ * @since 5.1
  */
 public abstract class TmfCallsiteAspect implements ITmfEventAspect<List<ITmfCallsite>> {
 

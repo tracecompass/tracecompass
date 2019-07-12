@@ -394,7 +394,7 @@ public final class KernelThreadInformationProvider {
      *            current or closest previous lifetime
      * @return The last executable name of this process for a given time, or
      *         {@code null} if not found.
-     * @since 4.0
+     * @since 4.1
      */
     public static @Nullable String getExecutableName(KernelAnalysisModule module, Integer threadId, long ts) {
         ITmfStateSystem ss = module.getStateSystem();

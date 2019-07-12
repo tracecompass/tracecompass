@@ -60,7 +60,7 @@ public class CtfTmfCallsite extends TmfCallsite {
      *            the callsite
      * @param eventName
      *            the event name
-     * @since 4.1
+     * @since 4.2
      */
     public CtfTmfCallsite(ITmfCallsite callsite, String eventName) {
         super(callsite.getFileName(), callsite.getLineNo());
