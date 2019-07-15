@@ -129,7 +129,7 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
         List<IMarkerEvent> markers = timeGraphControl.getMarkers();
         List<IMarkerEvent> retVal = new ArrayList<>();
         if (markers != null) {
-            // Minimum of 5 pixels for the dead zone
+            // Include markers up to 5 pixels left and right of cursor
             int fuzz = 5;
             long fuzzStart = timeGraphControl.getTimeAtX(pt.x - fuzz);
             long fuzzEnd = timeGraphControl.getTimeAtX(pt.x + fuzz);
@@ -138,7 +138,7 @@ public class TimeGraphTooltipHandler extends TmfAbstractToolTipHandler {
                     long duration = marker.getDuration();
                     long startTime = marker.getTime();
                     long endTime = startTime + duration;
-                    if ((startTime < fuzzEnd) && (endTime > fuzzStart)) {
+                    if ((startTime <= fuzzEnd) && (endTime >= fuzzStart)) {
                         retVal.add(marker);
                     }
                 }
