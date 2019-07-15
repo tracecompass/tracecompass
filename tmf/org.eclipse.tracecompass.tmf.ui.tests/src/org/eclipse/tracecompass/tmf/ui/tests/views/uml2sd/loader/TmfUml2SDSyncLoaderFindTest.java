@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011-2014 Ericsson
+ * Copyright (c) 2011, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -20,8 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.GraphNode;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.Lifeline;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.dialogs.Criteria;
@@ -148,25 +147,31 @@ public class TmfUml2SDSyncLoaderFindTest {
      */
     @Test
     public void verifyFirstMessage() {
+        fTmfComponent.setWindowRangeSignalReceived(false);
+
         fFacility.firstPage();
+
+        WaitUtils.waitUntil(validator -> validator.isWindowRangeSignalReceived(), fTmfComponent, "Window range signal not received");
 
         criteria = new Criteria();
         criteria.setSyncMessageSelected(true);
         criteria.setExpression("GAME_.*");
 
+        fTmfComponent.setSignalError(false);
+        fTmfComponent.setSourceError(false);
+        fTmfComponent.setCurrentTimeError(false);
+        fTmfComponent.setSelectionRangeSignalReceived(false);
+
         // set expected values
         fTmfComponent.setSource(fFacility.getLoader());
         fTmfComponent.setCurrentTime(TC_002_TIME_VALUE);
-        fTmfComponent.setCurrentRange(null); // not used
-        fTmfComponent.setSignalReceived(false);
 
         fFacility.getLoader().find(criteria);
-        // Wait for the selection to finish - needed due to new platform behavior in Juno
-        fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
-        assertTrue("find", fTmfComponent.isSignalReceived());
+
+        WaitUtils.waitUntil(validator -> validator.isSelectionRangeSignalReceived(), fTmfComponent, "Selection range signal not received");
         assertFalse("find", fTmfComponent.isSignalError());
-        assertFalse("find", fTmfComponent.isCurrentTimeError());
         assertFalse("find", fTmfComponent.isSourceError());
+        assertFalse("find", fTmfComponent.isCurrentTimeError());
 
         assertEquals("find", TC_002_PAGE_VALUE, fFacility.getLoader().currentPage());
         selection = fFacility.getSdView().getSDWidget().getSelection();
@@ -188,20 +193,21 @@ public class TmfUml2SDSyncLoaderFindTest {
          * Expected result: Correct message is selected
          */
 
+        fTmfComponent.setSignalError(false);
+        fTmfComponent.setSourceError(false);
+        fTmfComponent.setCurrentTimeError(false);
+        fTmfComponent.setSelectionRangeSignalReceived(false);
+
         // set expected values
         fTmfComponent.setSource(fFacility.getLoader());
         fTmfComponent.setCurrentTime(TC_003_TIME_VALUE);
-        fTmfComponent.setCurrentRange(null); // not used
-
-        fTmfComponent.setSignalReceived(false);
 
         fFacility.getLoader().find(criteria);
-        // Wait for the selection to finish - needed due to new platform behavior in Juno
-        fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
-        assertTrue("find", fTmfComponent.isSignalReceived());
+
+        WaitUtils.waitUntil(validator -> validator.isSelectionRangeSignalReceived(), fTmfComponent, "Selection range signal not received");
         assertFalse("find", fTmfComponent.isSignalError());
-        assertFalse("find", fTmfComponent.isCurrentTimeError());
         assertFalse("find", fTmfComponent.isSourceError());
+        assertFalse("find", fTmfComponent.isCurrentTimeError());
 
         assertEquals("find", TC_003_PAGE_VALUE, fFacility.getLoader().currentPage());
         selection = fFacility.getSdView().getSDWidget().getSelection();
@@ -222,24 +228,27 @@ public class TmfUml2SDSyncLoaderFindTest {
          * Verified Methods: loader.find(), loader.moveToPage(), loader.moveToMessage()
          * Expected result: Correct message is selected
          */
+
+        fTmfComponent.setSignalError(false);
+        fTmfComponent.setSourceError(false);
+        fTmfComponent.setCurrentTimeError(false);
+        fTmfComponent.setSelectionRangeSignalReceived(false);
+
         // set expected values
         fTmfComponent.setSource(fFacility.getLoader());
         fTmfComponent.setCurrentTime(TC_004_TIME_VALUE);
-        fTmfComponent.setCurrentRange(new TmfTimeRange(TmfTimestamp.BIG_BANG, TmfTimestamp.BIG_CRUNCH)); // not used
-
-        fTmfComponent.setSignalReceived(false);
 
         fFacility.getLoader().find(criteria);
+
         fFacility.waitForJobs(); // find across pages uses a job
         // to make sure pageRequest has been started before calling waitforCompletion()
         fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
         fFacility.getLoader().waitForCompletion();
-        fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
 
-        assertTrue("find", fTmfComponent.isSignalReceived());
+        WaitUtils.waitUntil(validator -> validator.isSelectionRangeSignalReceived(), fTmfComponent, "Selection range signal not received");
         assertFalse("find", fTmfComponent.isSignalError());
-        assertFalse("find", fTmfComponent.isCurrentTimeError());
         assertFalse("find", fTmfComponent.isSourceError());
+        assertFalse("find", fTmfComponent.isCurrentTimeError());
 
         assertEquals("find", TC_004_PAGE_VALUE, fFacility.getLoader().currentPage());
         selection = fFacility.getSdView().getSDWidget().getSelection();

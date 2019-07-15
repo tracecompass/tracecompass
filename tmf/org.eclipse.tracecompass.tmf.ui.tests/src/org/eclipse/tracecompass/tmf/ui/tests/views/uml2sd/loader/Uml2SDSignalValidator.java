@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2011, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -20,6 +20,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfStartSynchSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.ui.tests.TmfUITestPlugin;
 
 /**
  *  Class to implement that certain signals are sent as well as are sent with correct content.
@@ -32,7 +33,8 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
     // Attributes
     // ------------------------------------------------------------------------
     private int fSignalDepth = 0;
-    private boolean fIsSignalReceived = false;
+    private boolean fIsSelectionRangeSignalReceived = false;
+    private boolean fIsWindowRangeSignalReceived = false;
     private boolean fIsSignalError = false;
     private boolean fIsSourceError = false;
     private boolean fIsCurrentTimeError = false;
@@ -61,9 +63,15 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
     @TmfSignalHandler
     public void synchToTime(TmfSelectionRangeUpdatedSignal signal) {
         // Set results so that it can be validated in the test case
-        setSignalReceived(true);
         setSourceError(getSource() != signal.getSource());
+        if (isSourceError()) {
+            TmfUITestPlugin.getDefault().logError("Source Error: source:" + signal.getSource() + ", expected " + getSource());
+        }
         setCurrentTimeError(!getCurrentTime().equals(signal.getBeginTime()));
+        if (isCurrentTimeError()) {
+            TmfUITestPlugin.getDefault().logError("Current Time Error: begin time:" + signal.getBeginTime() + ", expected " + getCurrentTime());
+        }
+        setSelectionRangeSignalReceived(true);
     }
 
     /**
@@ -73,13 +81,19 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
     @TmfSignalHandler
     public void synchToTimeRange(TmfWindowRangeUpdatedSignal signal) {
         // Set results so that it can be validated in the test case
-        setSignalReceived(true);
         if (getSource() != null) {
             setSourceError(getSource() != signal.getSource());
+            if (isSourceError()) {
+                TmfUITestPlugin.getDefault().logError("Source Error: source:" + signal.getSource() + ", expected " + getSource());
+            }
         }
         if (getCurrentRange() != null) {
             setRangeError(!getCurrentRange().equals(signal.getCurrentRange()));
+            if (isRangeError()) {
+                TmfUITestPlugin.getDefault().logError("Range Error: current range:" + signal.getCurrentRange() + ", expected " + getCurrentRange());
+            }
         }
+        setWindowRangeSignalReceived(true);
     }
 
     /**
@@ -94,6 +108,9 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
 
         // Set results so that it can be validated in the test case
         setSignalError(fSignalDepth > 1);
+        if (isSignalError()) {
+            TmfUITestPlugin.getDefault().logError("Signal Error: signal depth:" + fSignalDepth);
+        }
     }
 
     /**
@@ -106,13 +123,23 @@ public class Uml2SDSignalValidator extends TmfComponent implements IUml2SdSignal
     }
 
     @Override
-    public boolean isSignalReceived() {
-        return fIsSignalReceived;
+    public boolean isSelectionRangeSignalReceived() {
+        return fIsSelectionRangeSignalReceived;
     }
 
     @Override
-    public void setSignalReceived(boolean received) {
-        fIsSignalReceived = received;
+    public void setSelectionRangeSignalReceived(boolean received) {
+        fIsSelectionRangeSignalReceived = received;
+    }
+
+    @Override
+    public boolean isWindowRangeSignalReceived() {
+        return fIsWindowRangeSignalReceived;
+    }
+
+    @Override
+    public void setWindowRangeSignalReceived(boolean received) {
+        fIsWindowRangeSignalReceived = received;
     }
 
     @Override

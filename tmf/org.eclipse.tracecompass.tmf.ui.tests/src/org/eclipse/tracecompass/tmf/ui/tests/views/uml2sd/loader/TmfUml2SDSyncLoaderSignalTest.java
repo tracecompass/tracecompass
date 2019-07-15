@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2011, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,12 +16,12 @@ package org.eclipse.tracecompass.tmf.ui.tests.views.uml2sd.loader;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.views.uml2sd.core.GraphNode;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -83,20 +83,18 @@ public class TmfUml2SDSyncLoaderSignalTest {
         range = new TmfTimeRange(currentTime, new Uml2SDTestTimestamp(currentTime.getValue() + rangeWindow.getValue()));
 
         fTmfComponent.setSignalError(false);
-        fTmfComponent.setSignalReceived(false);
-        fTmfComponent.setCurrentTimeError(false);
-        fTmfComponent.setRangeError(false);
         fTmfComponent.setSourceError(false);
+        fTmfComponent.setRangeError(false);
+        fTmfComponent.setWindowRangeSignalReceived(false);
 
         // set expected values
         fTmfComponent.setSource(fFacility.getLoader());
-        fTmfComponent.setCurrentTime(currentTime);
         fTmfComponent.setCurrentRange(range);
 
         fFacility.firstPage();
-        assertTrue("TmfRangeSynchSignal",  fTmfComponent.isSignalReceived());
+
+        WaitUtils.waitUntil(validator -> validator.isWindowRangeSignalReceived(), fTmfComponent, "Window range signal not received");
         assertFalse("TmfRangeSynchSignal", fTmfComponent.isSignalError());
-        assertFalse("TmfRangeSynchSignal", fTmfComponent.isCurrentTimeError());
         assertFalse("TmfRangeSynchSignal", fTmfComponent.isSourceError());
         assertFalse("TmfRangeSynchSignal", fTmfComponent.isRangeError());
     }
@@ -109,26 +107,26 @@ public class TmfUml2SDSyncLoaderSignalTest {
      */
     @Test
     public void verifySelectionSignal() {
-        fTmfComponent.setSignalReceived(false);
 
         int count = fFacility.getSdView().getFrame().syncMessageCount();
         assertEquals("Test Preparation", IUml2SDTestConstants.MAX_MESSEAGES_PER_PAGE, count);
         GraphNode node = fFacility.getSdView().getFrame().getSyncMessage(3);
 
+        fTmfComponent.setSignalError(false);
+        fTmfComponent.setSourceError(false);
+        fTmfComponent.setCurrentTimeError(false);
+        fTmfComponent.setSelectionRangeSignalReceived(false);
+
         // set expected values
         fTmfComponent.setSource(fFacility.getLoader());
         fTmfComponent.setCurrentTime(new Uml2SDTestTimestamp(9788642113228L));
-        fTmfComponent.setCurrentRange(null); // not used
 
         fFacility.getSdView().getSDWidget().moveTo(node); // selects the given node
-        // Wait for the selection to finish - needed due to new platform behavior in Juno
-        fFacility.delay(IUml2SDTestConstants.GUI_REFESH_DELAY);
-        assertTrue("TmfTimeSynchSignal", fTmfComponent.isSignalReceived());
-        assertFalse("TmfTimeSynchSignal", fTmfComponent.isSignalError());
-        assertFalse("TmfTimeSynchSignal", fTmfComponent.isCurrentTimeError());
-        assertFalse("TmfTimeSynchSignal", fTmfComponent.isSourceError());
 
-        fTmfComponent.setSignalReceived(false);
+        WaitUtils.waitUntil(validator -> validator.isSelectionRangeSignalReceived(), fTmfComponent, "Selection range signal not received");
+        assertFalse("TmfTimeSynchSignal", fTmfComponent.isSignalError());
+        assertFalse("TmfTimeSynchSignal", fTmfComponent.isSourceError());
+        assertFalse("TmfTimeSynchSignal", fTmfComponent.isCurrentTimeError());
 
         fTmfComponent.dispose();
     }

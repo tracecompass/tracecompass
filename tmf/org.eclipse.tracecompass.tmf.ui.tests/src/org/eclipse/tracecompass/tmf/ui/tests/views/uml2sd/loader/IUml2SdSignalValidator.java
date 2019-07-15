@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 Ericsson
+ * Copyright (c) 2011, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -20,15 +20,28 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
  *  @author Bernd Hufmann
  */
 public interface IUml2SdSignalValidator {
+
     /**
-     * @return if signal is received or not
+     * @return if selection range signal is received or not
      */
-    boolean isSignalReceived();
+    boolean isSelectionRangeSignalReceived();
+
     /**
-     * Sets signal received value
+     * Sets selection range signal received value
      * @param received boolean value to set
      */
-    void setSignalReceived(boolean received);
+    void setSelectionRangeSignalReceived(boolean received);
+
+    /**
+     * @return if window range signal is received or not
+     */
+    boolean isWindowRangeSignalReceived();
+
+    /**
+     * Sets window range signal received value
+     * @param received boolean value to set
+     */
+    void setWindowRangeSignalReceived(boolean received);
 
     /**
      * @return whether source of signal is correct or not
