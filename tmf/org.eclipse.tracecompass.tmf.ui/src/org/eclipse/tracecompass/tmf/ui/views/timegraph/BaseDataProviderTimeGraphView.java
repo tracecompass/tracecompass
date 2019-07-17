@@ -131,6 +131,12 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             TmfTreeModel<@NonNull TimeGraphEntryModel> model = response.getModel();
             if (model != null) {
                 synchronized (fEntries) {
+                    /*
+                     * The provider may send entries unordered and parents may
+                     * not exist when child is constructor, we'll re-unite
+                     * families at the end
+                     */
+                    List<TimeGraphEntry> orphaned = new ArrayList<>();
                     for (TimeGraphEntryModel entry : model.getEntries()) {
                         TimeGraphEntry uiEntry = fEntries.get(dataProvider, entry.getId());
                         if (entry.getParentId() != -1) {
@@ -139,6 +145,8 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                                 TimeGraphEntry parent = fEntries.get(dataProvider, entry.getParentId());
                                 if (parent != null) {
                                     parent.addChild(uiEntry);
+                                } else {
+                                    orphaned.add(uiEntry);
                                 }
                                 fEntries.put(dataProvider, entry.getId(), uiEntry);
                             } else {
@@ -159,7 +167,15 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                             }
                         }
                     }
+                    // Find missing parents
+                    for (TimeGraphEntry orphanedEntry : orphaned) {
+                        TimeGraphEntry parent = fEntries.get(dataProvider, orphanedEntry.getEntryModel().getParentId());
+                        if (parent != null) {
+                            parent.addChild(orphanedEntry);
+                        }
+                    }
                 }
+
                 long start = getStartTime();
                 long end = getEndTime();
                 final long resolution = Long.max(1, (end - start) / getDisplayWidth());
