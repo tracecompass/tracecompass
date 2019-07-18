@@ -66,6 +66,7 @@ import org.junit.Test;
  */
 public class TraceImportOperationTest {
 
+    private static final int EXPECTED_TRACE_COUNT = 11;
     private static String fSourcePath;
     private static TmfTraceFolder fTracesFolder;
     private static TmfTraceFolder fDestFolder;
@@ -110,7 +111,7 @@ public class TraceImportOperationTest {
     public void test() throws Exception {
         WorkspaceModifyOperation operation = new TraceImportOperation(fSourcePath, fDestFolder);
         PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
-        WaitUtils.waitUntil(folder -> folder.getTraces().size() == 9, fDestFolder, () -> String.format("expected: 9 but was: %d", fDestFolder.getTraces().size()));
+        WaitUtils.waitUntil(folder -> folder.getTraces().size() == EXPECTED_TRACE_COUNT, fDestFolder, () -> String.format("expected: %d but was: %d", EXPECTED_TRACE_COUNT, fDestFolder.getTraces().size()));
         validateImport(fSourcePath, fDestFolder, true);
     }
 
@@ -135,7 +136,7 @@ public class TraceImportOperationTest {
         assertEquals(1, skipFalseFolder.getChildren().size());
         assertTrue(skipFalseFolder.getChildren().get(0) instanceof TmfTraceFolder);
         TmfTraceFolder destFolder = (TmfTraceFolder) skipFalseFolder.getChildren().get(0);
-        WaitUtils.waitUntil(folder -> folder.getTraces().size() == 9, destFolder, () -> String.format("expected: 9 but was: %d", destFolder.getTraces().size()));
+        WaitUtils.waitUntil(folder -> folder.getTraces().size() == EXPECTED_TRACE_COUNT, destFolder, () -> String.format("expected: %d but was: %d", EXPECTED_TRACE_COUNT, destFolder.getTraces().size()));
         assertEquals("testfiles.zip", destFolder.getName());
         validateImport(fSourcePath, destFolder, false);
 

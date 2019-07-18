@@ -63,6 +63,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TraceValidationStatus;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.ITmfTraceIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.indexer.checkpoint.TmfCheckpointIndexer;
 import org.eclipse.tracecompass.tmf.core.trace.location.ITmfLocation;
@@ -245,7 +246,9 @@ public abstract class TmfXmlTraceStub extends TmfTrace {
              */
             ByteBufferTracker.setMarked();
         }
-        return Status.OK_STATUS;
+        // XML validates, we have confidence it is this trace type
+        IStatus status = new TraceValidationStatus(1, Activator.PLUGIN_ID);
+        return status;
     }
 
     private static String getStringValue(ITmfEventField content, String fieldName) {
