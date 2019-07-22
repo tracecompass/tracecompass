@@ -68,7 +68,8 @@ import com.google.common.primitives.Longs;
  */
 public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITmfPropertiesProvider {
 
-    private static final int MAX_FIELDS = 7;
+    private static final int MAX_FIELDS = 8;
+    private static final int MIN_FIELDS = 7;
 
     private static final long MICROSECONDS_IN_A_SECOND = 1000000L;
 
@@ -424,7 +425,7 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
             return null;
         }
         String[] tokens = line.split(",", MAX_FIELDS); //$NON-NLS-1$
-        if (tokens.length < MAX_FIELDS) {
+        if (tokens.length < MIN_FIELDS) {
             return null;
         }
         Iterator<String> token = Iterators.forArray(tokens);
@@ -448,7 +449,12 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
         }
         String event = token.next();
 
-        ITmfEventField content = type.generateContent(event, sourceInstance, targetInstance);
+        String notes = null;
+        if (token.hasNext()) {
+            notes = token.next();
+        }
+
+        ITmfEventField content = type.generateContent(event, sourceInstance, targetInstance, notes);
 
         return new BtfEvent(this, rank,
                 getTimestampTransform().transform(fTsFormat.createTimestamp(timestamp + fTsOffset)),

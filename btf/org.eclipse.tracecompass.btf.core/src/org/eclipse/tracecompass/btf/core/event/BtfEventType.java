@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.btf.core.Messages;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.btf.core.trace.BtfColumnNames;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
@@ -32,21 +32,14 @@ import com.google.common.collect.ImmutableList;
  */
 public class BtfEventType extends TmfEventType {
 
-    private static final String @NonNull [] FIELD_WITH_NOTES_COLUMNS = new String[] {
-            BtfColumnNames.EVENT.toString(),
-            BtfColumnNames.SOURCE_INSTANCE.toString(),
-            BtfColumnNames.TARGET_INSTANCE.toString() };
-
-    private static final String @NonNull [] FIELDS_WITHOUT_NOTES_COLUMNS = new String[] {
+    private static final String @NonNull [] FIELDS_WITH_NOTES_COLUMNS = new String[] {
             BtfColumnNames.EVENT.toString(),
             BtfColumnNames.SOURCE_INSTANCE.toString(),
             BtfColumnNames.TARGET_INSTANCE.toString(),
             BtfColumnNames.NOTES.toString() };
-    private static final @NonNull ITmfEventField FIELDS_WITHOUT_NOTES = TmfEventField.makeRoot(FIELD_WITH_NOTES_COLUMNS);
-    private static final @NonNull ITmfEventField FIELDS_WITH_NOTES = TmfEventField.makeRoot(FIELDS_WITHOUT_NOTES_COLUMNS);
+    private static final @NonNull ITmfEventField FIELDS_WITH_NOTES = TmfEventField.makeRoot(FIELDS_WITH_NOTES_COLUMNS);
     private final @NonNull String fName;
     private final String fDescription;
-    private final boolean fHasNotes;
     private final List<String> fCols;
     private final ITmfEventField fFields;
 
@@ -59,18 +52,19 @@ public class BtfEventType extends TmfEventType {
         super();
         fName = name;
         fDescription = description;
-        fHasNotes = (fName.equals(Messages.BtfTypeId_SIGName) || fName.equals(Messages.BtfTypeId_SEMName));
-        fCols = ImmutableList.copyOf(fHasNotes ? FIELDS_WITHOUT_NOTES_COLUMNS : FIELD_WITH_NOTES_COLUMNS);
-        fFields = (fHasNotes ? FIELDS_WITH_NOTES : FIELDS_WITHOUT_NOTES);
+        fCols = ImmutableList.copyOf(FIELDS_WITH_NOTES_COLUMNS);
+        fFields = FIELDS_WITH_NOTES;
     }
 
     /**
      * does the event have an eighth column
      *
      * @return if the name is "sem" or "sig" true
+     * @deprecated - notes column is always there, while the content is optional
      */
+    @Deprecated
     public boolean hasNotes() {
-        return fHasNotes;
+        return true;
     }
 
     /**
@@ -110,20 +104,31 @@ public class BtfEventType extends TmfEventType {
      * @return a field.
      */
     public ITmfEventField generateContent(String event, long sourceInstance, long targetInstance) {
-        String[] data;
+        return generateContent(event, sourceInstance, targetInstance, null);
+    }
+
+    /**
+     * Gets the event field values
+     *
+     * @param event
+     *            the "event" payload
+     * @param sourceInstance
+     *            source instance
+     * @param targetInstance
+     *            target instance
+     * @param notes
+     *            optional notes (use null if no notes)
+     * @return a field.
+     * @since 2.1
+     */
+    public ITmfEventField generateContent(String event, long sourceInstance, long targetInstance, @Nullable String notes) {
+        String notesString = notes == null ? "" : notes; //$NON-NLS-1$
         TmfEventField retField;
         TmfEventField sourceInstanceField = new TmfEventField(BtfColumnNames.SOURCE_INSTANCE.toString(), sourceInstance, null);
         TmfEventField targetInstanceField = new TmfEventField(BtfColumnNames.TARGET_INSTANCE.toString(), targetInstance, null);
-        if (fHasNotes) {
-            data = event.split(",", 2); //$NON-NLS-1$
-            TmfEventField eventField = new TmfEventField(BtfColumnNames.EVENT.toString(), data[0], BTFPayload.getFieldDescription(data[0]));
-            TmfEventField notesField = new TmfEventField(BtfColumnNames.NOTES.toString(), data.length == 2 ? data[1] : null, null);
-            retField = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, null, new TmfEventField[] { eventField, sourceInstanceField, targetInstanceField, notesField });
-        } else {
-            data = new String[] { event };
-            TmfEventField eventField = new TmfEventField(BtfColumnNames.EVENT.toString(), data[0], BTFPayload.getFieldDescription(data[0]));
-            retField = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, null, new TmfEventField[] { eventField, sourceInstanceField, targetInstanceField });
-        }
+        TmfEventField eventField = new TmfEventField(BtfColumnNames.EVENT.toString(), event, BTFPayload.getFieldDescription(event));
+        TmfEventField notesField = new TmfEventField(BtfColumnNames.NOTES.toString(), notesString, null);
+        retField = new TmfEventField(ITmfEventField.ROOT_FIELD_ID, null, new TmfEventField[] { eventField, sourceInstanceField, targetInstanceField, notesField });
         return retField;
     }
 }

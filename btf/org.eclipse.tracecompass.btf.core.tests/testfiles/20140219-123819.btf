@@ -20,7 +20,7 @@
 0,TASK_WritingActuator,0,SCHED,SCHED_Tasks_C2,-1,processactivate
 0,SIM,-1,STI,TIMER-10MS_2,0,trigger
 0,TIMER-10MS_2,0,T,TASK_10MS_DL2,0,activate
-0,TASK_10MS_DL2,0,SCHED,SCHED_Tasks_C1,-1,processactivate
+0,TASK_10MS_DL2,0,SCHED,SCHED_Tasks_C1,-1,processactivate,some note
 0,SIM,-1,STI,TIMER-200MS,0,trigger
 0,TIMER-200MS,0,T,TASK_200MS,0,activate
 0,TASK_200MS,0,SCHED,SCHED_Tasks_C1,-1,processactivate
