@@ -108,6 +108,7 @@
 629400,Core_1,0,T,TASK_10MS_DL2,0,resume
 629400,TASK_10MS_DL2,0,R,FUNC_EXECTIME_1,0,resume
 956750,TASK_5MS,0,R,FUNC_EXECTIME_1,3,terminate
+# Some useful information
 956750,Core_2,0,T,TASK_5MS,0,terminate
 956750,TASK_5MS,0,SCHED,SCHED_Tasks_C2,-1,processterminate
 956750,Core_2,0,C,Core_2,0,idle

@@ -15,9 +15,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import org.eclipse.tracecompass.btf.core.event.BtfEvent;
 import org.eclipse.tracecompass.btf.core.tests.utils.BtfTestTrace;
+import org.eclipse.tracecompass.btf.core.trace.BtfColumnNames;
 import org.eclipse.tracecompass.btf.core.trace.BtfTrace;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
@@ -34,6 +38,14 @@ import org.junit.Test;
 public class BtfTraceTest {
 
     private static final long START_TIME = 1392809960000000000L;
+
+
+
+    private static final int EVENT_RANK = 10;
+
+    private static final int EVENT_RANK_COMMENT_TEST = 98;
+    private static final long EVENT_COMMENT_TIME = 1392809960000956750L;
+    private static final String[] ECXPECT_CONTENT_COMMENT_EVENT = { String.valueOf(EVENT_COMMENT_TIME), "Core_2", "0", "TASK_5MS", "0", "Task", "terminate", "" };
 
     private BtfTrace fixture;
 
@@ -93,7 +105,7 @@ public class BtfTraceTest {
      */
     @Test
     public void testRead10thEvent1() {
-        ITmfContext ctx = fixture.seekEvent(10);
+        ITmfContext ctx = fixture.seekEvent(EVENT_RANK);
         ITmfEvent event = fixture.getNext(ctx);
         assertNotNull(event);
         assertEquals(START_TIME, event.getTimestamp().getValue());
@@ -105,12 +117,38 @@ public class BtfTraceTest {
     @Test
     public void testRead10thEvent2() {
         ITmfContext ctx = fixture.seekEvent(0);
-        ITmfEvent event = null;
-        for (int i = 0; i < 10; i++) {
+        ITmfEvent event = fixture.getNext(ctx);
+        for (int i = 0; i < EVENT_RANK; i++) {
             event = fixture.getNext(ctx);
         }
         assertNotNull(event);
         assertEquals(START_TIME, event.getTimestamp().getValue());
+    }
+
+    /**
+     * Read the event after comment line
+     */
+    @Test
+    public void testReadCommentLineEvent1() {
+        ITmfContext ctx = fixture.seekEvent(EVENT_RANK_COMMENT_TEST);
+        ITmfEvent event = fixture.getNext(ctx);
+        assertNotNull(event);
+        validateCommentEvent(ECXPECT_CONTENT_COMMENT_EVENT, event);
+    }
+
+    /**
+     * Read the event after comment line without seeking
+     */
+    @Test
+    public void testReadCommentLineEvent2() {
+        ITmfContext ctx = fixture.seekEvent(0);
+        ITmfEvent event = fixture.getNext(ctx);
+        for (int i = 0; i < EVENT_RANK_COMMENT_TEST; i++) {
+            event = fixture.getNext(ctx);
+        }
+        assertNotNull(event);
+        assertEquals(EVENT_COMMENT_TIME, event.getTimestamp().getValue());
+        validateCommentEvent(ECXPECT_CONTENT_COMMENT_EVENT, event);
     }
 
     /**
@@ -140,4 +178,23 @@ public class BtfTraceTest {
         assertNotNull(event1);
         assertEquals(event, event1);
     }
+
+    private static void validateCommentEvent(String[] expected, ITmfEvent event) {
+        assertTrue(event instanceof BtfEvent);
+        BtfEvent btfEvent = (BtfEvent) event;
+        List<String> actual = new ArrayList<>();
+        actual.add(String.valueOf(event.getTimestamp().getValue()));
+        actual.add(btfEvent.getSource());
+        actual.add(event.getContent().getField(BtfColumnNames.SOURCE_INSTANCE.toString()).getValue().toString());
+        actual.add(btfEvent.getTarget());
+        actual.add(event.getContent().getField(BtfColumnNames.TARGET_INSTANCE.toString()).getValue().toString());
+        actual.add(event.getType().getName());
+        actual.add(event.getContent().getField(BtfColumnNames.EVENT.toString()).getValue().toString());
+        String notes = event.getContent().getFieldValue(String.class, BtfColumnNames.NOTES.toString());
+        actual.add(notes == null ? "" : notes);
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(String.valueOf(i),  expected[i], actual.get(i));
+        }
+    }
+
 }

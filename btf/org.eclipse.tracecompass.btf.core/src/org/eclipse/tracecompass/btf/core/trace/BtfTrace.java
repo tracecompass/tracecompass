@@ -271,6 +271,10 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
                 line = rafile.getNextLine();
             }
             while ((line != null) && (lineCount++ < MAX_LINES)) {
+                // Skip comment lines
+                while (line != null && line.startsWith("#")) { //$NON-NLS-1$
+                    line = fFileInput.readLine();
+                }
                 ITmfEvent event = parseLine(0, line);
                 if (event != null) {
                     matches++;
@@ -394,6 +398,9 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
             String line;
             try {
                 line = fFileInput.readLine();
+                while (line != null && line.startsWith("#")) { //$NON-NLS-1$
+                    line = fFileInput.readLine();
+                }
                 return parseLine(context.getRank(), line);
 
             } catch (IOException e) {
