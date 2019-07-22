@@ -25,6 +25,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -298,9 +299,10 @@ public class StateSystem implements ITmfStateSystemBuilder {
     public List<@NonNull Integer> getSubAttributes(int quark, boolean recursive, String pattern) {
         List<Integer> all = getSubAttributes(quark, recursive);
         List<@NonNull Integer> ret = new LinkedList<>();
+        Pattern regex = Pattern.compile(pattern, Pattern.MULTILINE | Pattern.DOTALL);
         for (Integer attQuark : all) {
             String name = getAttributeName(attQuark.intValue());
-            if (name.matches(pattern)) {
+            if (regex.matcher(name).matches()) {
                 ret.add(attQuark);
             }
         }

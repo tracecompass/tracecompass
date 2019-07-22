@@ -14,15 +14,19 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.tracecompass.internal.statesystem.core.StateSystem;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.backend.IStateHistoryBackend;
 import org.eclipse.tracecompass.statesystem.core.backend.StateHistoryBackendFactory;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -141,6 +145,90 @@ public class StateSystemTest {
         ongoing = ss.queryOngoing(quark);
         assertTrue(ongoing instanceof Long);
         assertEquals(val, ongoing);
+    }
+
+    /**
+     * Test getting various lists of attributes
+     */
+    @Test
+    public void testAttributes() {
+        String searchPattern = "abc";
+        String attribute1 = "Test";
+        String attribute2 = attribute1 + searchPattern;
+        String attribute3 = attribute1 + "\n" + searchPattern;
+        String search = "(.*)" + searchPattern + "(.*)";
+        ITmfStateSystemBuilder ss = fSs;
+        assertNotNull(ss);
+
+        // Add the 3 attributes to the root
+        int quark1 = ss.getQuarkAbsoluteAndAdd(attribute1);
+        int quark2 = ss.getQuarkAbsoluteAndAdd(attribute2);
+        int quark3 = ss.getQuarkAbsoluteAndAdd(attribute3);
+
+        // Add the 3 attributes as children of one attribute
+        int quark11 = ss.getQuarkRelativeAndAdd(quark1, attribute1);
+        int quark12 = ss.getQuarkRelativeAndAdd(quark1, attribute2);
+        int quark132 = ss.getQuarkRelativeAndAdd(quark1, attribute3, attribute2);
+        // This attribute should already be created from previous call
+        int quark13 = ss.getQuarkRelativeAndAdd(quark1, attribute3);
+
+        // Query the sub-attributes from the root
+        List<Integer> subAttributes = ss.getSubAttributes(ITmfStateSystem.ROOT_ATTRIBUTE, false);
+        List<Integer> expected = Arrays.asList(quark1, quark2, quark3);
+        assertArrayContent(expected, subAttributes);
+
+        // Query the sub-attributes from the root recursively
+        subAttributes = ss.getSubAttributes(ITmfStateSystem.ROOT_ATTRIBUTE, true);
+        expected = Arrays.asList(quark1, quark11, quark12, quark13, quark132, quark2, quark3);
+        assertArrayContent(expected, subAttributes);
+
+        // Query the sub-attributes from the root with exact match
+        subAttributes = ss.getSubAttributes(ITmfStateSystem.ROOT_ATTRIBUTE, false, attribute1);
+        expected = Arrays.asList(quark1);
+        assertArrayContent(expected, subAttributes);
+
+        // Query the sub-attributes from the root with exact match
+        // recursively
+        subAttributes = ss.getSubAttributes(ITmfStateSystem.ROOT_ATTRIBUTE, true, attribute1);
+        expected = Arrays.asList(quark1, quark11);
+        assertArrayContent(expected, subAttributes);
+
+        // Query the sub-attributes from the root with regex
+        subAttributes = ss.getSubAttributes(ITmfStateSystem.ROOT_ATTRIBUTE, false, search);
+        expected = Arrays.asList(quark2, quark3);
+        assertArrayContent(expected, subAttributes);
+
+        // Query the sub-attributes from the root recursively with regex
+        subAttributes = ss.getSubAttributes(ITmfStateSystem.ROOT_ATTRIBUTE, true, search);
+        expected = Arrays.asList(quark2, quark3, quark12, quark13, quark132);
+        assertArrayContent(expected, subAttributes);
+
+        // Query the sub-attributes from another quark
+        subAttributes = ss.getSubAttributes(quark1, false);
+        expected = Arrays.asList(quark11, quark12, quark13);
+        assertArrayContent(expected, subAttributes);
+
+        // Query the sub-attributes from another quark with regex
+        subAttributes = ss.getSubAttributes(quark1, false, search);
+        expected = Arrays.asList(quark12, quark13);
+        assertArrayContent(expected, subAttributes);
+
+        // Test getting the attribute names
+        assertEquals(attribute1, ss.getAttributeName(quark1));
+        assertEquals(attribute2, ss.getAttributeName(quark2));
+        assertEquals(attribute3, ss.getAttributeName(quark3));
+    }
+
+    private static void assertArrayContent(List<Integer> expected, List<Integer> actual) {
+        // Use a temp list to remove matched object, in case there are
+        // duplicates
+        List<Integer> list = new ArrayList<>(actual);
+        for (Integer expectedInt : expected) {
+            assertTrue("Missing value " + expectedInt, list.contains(expectedInt));
+            list.remove(expectedInt);
+        }
+        assertEquals(expected.size(), actual.size());
+
     }
 
 }
