@@ -23,6 +23,8 @@ class Messages extends NLS {
      * The data provider description text
      */
     public static String ThreadStatusDataProviderFactory_descriptionText;
+    /** Text for links */
+    public static String ThreadStatusDataProvider_link;
 
     static {
         // initialize resource bundle

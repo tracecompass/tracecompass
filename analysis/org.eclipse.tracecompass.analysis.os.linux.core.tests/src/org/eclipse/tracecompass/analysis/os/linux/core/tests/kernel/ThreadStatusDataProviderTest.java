@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.analysis.os.linux.core.tests.kernel;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,6 +32,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.Thr
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
@@ -65,24 +67,26 @@ public class ThreadStatusDataProviderTest {
     @Test
     public void testThreadStatusDataProvider() throws TmfTraceException, IOException {
         TmfXmlKernelTraceStub trace = new TmfXmlKernelTraceStub();
-        IPath filePath = Activator.getAbsoluteFilePath(KERNEL_ANALYSIS);
-        trace.initTrace(null, filePath.toOSString(), TmfEvent.class);
-        trace.traceOpened(new TmfTraceOpenedSignal(this, trace, null));
+        try {
+            IPath filePath = Activator.getAbsoluteFilePath(KERNEL_ANALYSIS);
+            trace.initTrace(null, filePath.toOSString(), TmfEvent.class);
+            trace.traceOpened(new TmfTraceOpenedSignal(this, trace, null));
 
-        KernelAnalysisModule module = TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelAnalysisModule.class, KernelAnalysisModule.ID);
-        assertNotNull(module);
-        assertTrue(module.schedule().isOK());
-        assertTrue(module.waitForCompletion());
+            KernelAnalysisModule module = TmfTraceUtils.getAnalysisModuleOfClass(trace, KernelAnalysisModule.class, KernelAnalysisModule.ID);
+            assertNotNull(module);
+            assertTrue(module.schedule().isOK());
+            assertTrue(module.waitForCompletion());
 
-        ThreadStatusDataProvider provider = new ThreadStatusDataProvider(trace, module);
+            ThreadStatusDataProvider provider = new ThreadStatusDataProvider(trace, module);
 
-        Map<Long, String> idsToNames = assertAndGetTree(provider);
+            Map<Long, String> idsToNames = assertAndGetTree(provider);
 
-        assertRows(provider, idsToNames);
+            assertRows(provider, idsToNames);
 
-        assertArrows(provider, idsToNames);
-
-        trace.dispose();
+            assertArrows(provider, idsToNames);
+        } finally {
+            trace.dispose();
+        }
     }
 
     private static Map<Long, String> assertAndGetTree(ThreadStatusDataProvider provider) throws IOException {
@@ -142,7 +146,17 @@ public class ThreadStatusDataProviderTest {
             ITimeGraphState state = states.get(i);
             assertEquals(element + ": start time at position " + i, Long.parseLong(stringStates[i * 4]), state.getStartTime());
             assertEquals(element + ": duration at position " + i, Long.parseLong(stringStates[i * 4 + 1]), state.getDuration());
-            assertEquals(element + ": value at position " + i, Long.parseLong(stringStates[i * 4 + 2]), state.getValue());
+            OutputElementStyle style = state.getStyle();
+            if (style == null) {
+                // Expected a value of Long
+                try {
+                    assertEquals(element + ": value at position " + i, Long.parseLong(stringStates[i * 4 + 2]), state.getValue());
+                } catch (NumberFormatException e) {
+                    fail(element + ": value at position " + i + ": did not expect a null style");
+                }
+            } else {
+                assertEquals(element + ": value at position " + i, stringStates[i * 4 + 2], style.getParentKey());
+            }
             assertEquals(element + ": label at position " + i, stringStates[i * 4 + 3], String.valueOf(state.getLabel()));
         }
     }

@@ -24,6 +24,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     // FIXME Link to all swtbot tests
+    org.eclipse.tracecompass.tmf.ui.swtbot.tests.views.TimeGraphViewTest.class
 })
 public class RunAllSWTBotTests {
 

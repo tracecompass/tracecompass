@@ -10,6 +10,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
@@ -153,16 +154,18 @@ public final class ControlFlowColumnComparators {
         }
     };
 
-    /**
-     * Scheduling comparator.
-     */
-    public static final ITimeGraphEntryComparator SCHEDULING_COLUMN_COMPARATOR = new ITimeGraphEntryComparator() {
+    private static class SchedulingComparator implements ITimeGraphEntryComparator {
         private final List<Comparator<ITimeGraphEntry>> SECONDARY_COMPARATORS = init();
         private int fDirection = SWT.DOWN;
+        private Map<ITimeGraphEntry, Long> fSchedulingPosition;
+
+        public SchedulingComparator(Map<ITimeGraphEntry, Long> schedulingPositions) {
+            fSchedulingPosition = schedulingPositions;
+        }
 
         @Override
         public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
-            int result = IControlFlowEntryComparator.SCHEDULING_COMPARATOR.compare(o1, o2);
+            int result = Long.compare(fSchedulingPosition.getOrDefault(o1, -1L), fSchedulingPosition.getOrDefault(o2, -1L));
             return compareList(result, fDirection, SECONDARY_COMPARATORS, o1, o2);
         }
 
@@ -171,7 +174,7 @@ public final class ControlFlowColumnComparators {
             fDirection = direction;
         }
 
-        private List<Comparator<ITimeGraphEntry>> init() {
+        private static List<Comparator<ITimeGraphEntry>> init() {
             ImmutableList.Builder<Comparator<ITimeGraphEntry>> builder = ImmutableList.builder();
             builder.add(IControlFlowEntryComparator.BIRTH_TIME_COMPARATOR)
                 .add(IControlFlowEntryComparator.PROCESS_NAME_COMPARATOR)
@@ -179,7 +182,18 @@ public final class ControlFlowColumnComparators {
                 .add(IControlFlowEntryComparator.PTID_COMPARATOR);
             return builder.build();
         }
-    };
+    }
+
+    /**
+     * Scheduling comparator for a given position map
+     *
+     * @param schedulingPositions
+     *            A map of entry to its scheduling position
+     * @return The comparator
+     */
+    public static Comparator<ITimeGraphEntry> newSchedulingComparator(Map<ITimeGraphEntry, Long> schedulingPositions) {
+        return new SchedulingComparator(schedulingPositions);
+    }
 
     private static int compareList(int prevResult, int direction, List<Comparator<ITimeGraphEntry>> comps, ITimeGraphEntry o1, ITimeGraphEntry o2) {
         int result = prevResult;

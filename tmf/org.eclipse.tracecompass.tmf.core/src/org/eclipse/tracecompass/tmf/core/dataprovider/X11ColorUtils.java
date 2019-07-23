@@ -65,4 +65,19 @@ public class X11ColorUtils {
     public static @Nullable String toHexColor(String name) {
         return COLORS.get(name.toLowerCase());
     }
+
+    /**
+     * Get the RGB hex string for the rgb values
+     *
+     * @param red
+     *            The red value, should be between 0 and 255
+     * @param green
+     *            The green value, should be between 0 and 255
+     * @param blue
+     *            The blue value, should be between 0 and 255
+     * @return The hexadecimal string for the color
+     */
+    public static String toHexColor(int red, int green, int blue) {
+        return String.format(HEX_COLOR_FORMAT, Math.abs(red % 256), Math.abs(green % 256), Math.abs(blue % 256));
+    }
 }

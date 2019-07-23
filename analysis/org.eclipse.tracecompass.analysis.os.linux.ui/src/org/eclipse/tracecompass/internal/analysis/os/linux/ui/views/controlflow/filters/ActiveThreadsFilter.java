@@ -23,7 +23,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadEntryModel;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadStatusDataProvider;
-import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.ControlFlowEntry;
+import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.ControlFlowView;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
@@ -126,26 +126,30 @@ public class ActiveThreadsFilter extends ViewerFilter {
     @Override
     public boolean select(Viewer viewer, Object parentElement, Object element) {
 
-        if (!fEnabled || !(element instanceof ControlFlowEntry)) {
+        if (!fEnabled || !(element instanceof TimeGraphEntry)) {
             return true;
         }
-        ControlFlowEntry cfe = (ControlFlowEntry) element;
+        TimeGraphEntry entry = (TimeGraphEntry) element;
+        ThreadEntryModel entryModel = ControlFlowView.getThreadEntryModel(entry);
+        if (entryModel == null) {
+            return true;
+        }
 
-        ITmfTrace trace = BaseDataProviderTimeGraphView.getTrace(cfe);
+        ITmfTrace trace = BaseDataProviderTimeGraphView.getTrace(entry);
 
         Set<Long> onCpusThreadForTimeRange = fCachedOnCpusThreadForTimeRange.get(trace);
         Set<Long> activeThreadForTimeRange = fCachedActiveThreadForTimeRange.get(trace);
 
         /* Check if on CPU */
-        if (fCpuRangesBasedFiltering && (onCpusThreadForTimeRange != null) && onCpusThreadForTimeRange.contains(cfe.getEntryModel().getId())) {
+        if (fCpuRangesBasedFiltering && (onCpusThreadForTimeRange != null) && onCpusThreadForTimeRange.contains(entryModel.getId())) {
             return true;
-        } else if ((activeThreadForTimeRange != null) && activeThreadForTimeRange.contains(cfe.getEntryModel().getId())) {
+        } else if ((activeThreadForTimeRange != null) && activeThreadForTimeRange.contains(entryModel.getId())) {
             return true;
         }
 
         /* Not active per see. Check children if any is active */
-        for (TimeGraphEntry child : cfe.getChildren()) {
-            if (select(viewer, cfe, child)) {
+        for (TimeGraphEntry child : entry.getChildren()) {
+            if (select(viewer, entry, child)) {
                 return true;
             }
         }

@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Function;
 
-import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.ControlFlowEntry;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadEntryModel;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.NaiveOptimizationAlgorithm;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
@@ -241,8 +241,8 @@ public class ControlFlowOptimizerTest {
      *            the TID to lookup
      * @return a {@link ControlFlowEntry} with the correct tid.
      */
-    private static ControlFlowEntry generateCFVEntry(int tid) {
-        return new ControlFlowEntry(0, "exec", tid, 0, Long.MIN_VALUE, Long.MAX_VALUE);
+    private static TimeGraphEntry generateCFVEntry(int tid) {
+        return new TimeGraphEntry(new ThreadEntryModel(0, -1, Collections.singletonList("exec"), Long.MIN_VALUE, Long.MAX_VALUE, tid, 0));
     }
 
     // -------------------------------------------------------------------------

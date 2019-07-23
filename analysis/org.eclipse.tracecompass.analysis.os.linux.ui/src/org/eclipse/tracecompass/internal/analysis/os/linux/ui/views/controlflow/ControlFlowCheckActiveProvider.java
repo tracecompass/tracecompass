@@ -33,6 +33,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.ITimeGraphEntryActiveProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
 /**
  * Provides Functionality for check Active / uncheck inactive
@@ -71,9 +72,8 @@ public final class ControlFlowCheckActiveProvider implements ITimeGraphEntryActi
 
     @Override
     public boolean isActive(ITimeGraphEntry element) {
-        if (element instanceof ControlFlowEntry) {
-            ControlFlowEntry cfe = (ControlFlowEntry) element;
-
+        ThreadEntryModel model = ControlFlowView.getThreadEntryModel(element);
+        if (model != null) {
             TmfTraceManager traceManager = TmfTraceManager.getInstance();
             TmfTraceContext traceContext = traceManager.getCurrentTraceContext();
             TmfTimeRange range = traceContext.getSelectionRange();
@@ -83,14 +83,14 @@ public final class ControlFlowCheckActiveProvider implements ITimeGraphEntryActi
                 range = traceContext.getWindowRange();
             }
 
-            Set<Long> ids = getActiveIds(cfe, range);
-            return ids.contains(cfe.getEntryModel().getId());
+            Set<Long> ids = getActiveIds((TimeGraphEntry) element, range);
+            return ids.contains(model.getId());
         }
 
         return false;
     }
 
-    private Set<Long> getActiveIds(ControlFlowEntry cfe, TmfTimeRange range) {
+    private Set<Long> getActiveIds(TimeGraphEntry cfe, TmfTimeRange range) {
         ITimeGraphDataProvider<? extends TimeGraphEntryModel> dataProvider = BaseDataProviderTimeGraphView.getProvider(cfe);
         if (range.equals(fRange) && dataProvider.equals(fProvider)
                 || !(dataProvider instanceof ThreadStatusDataProvider)) {

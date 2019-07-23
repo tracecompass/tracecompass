@@ -18,8 +18,8 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
@@ -46,6 +47,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelTidAspect;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadEntryModel;
@@ -55,16 +57,14 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.FollowThreadAction;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.filters.ActiveThreadsFilter;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.filters.DynamicFilterDialog;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.BaseDataProviderTimeGraphPresentationProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
-import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
-import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
-import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
-import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -112,7 +112,6 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
     private static final String TID_COLUMN = Messages.ControlFlowView_tidColumn;
     private static final String PTID_COLUMN = Messages.ControlFlowView_ptidColumn;
     private static final String BIRTH_TIME_COLUMN = Messages.ControlFlowView_birthTimeColumn;
-    private static final String INVISIBLE_COLUMN = Messages.ControlFlowView_invisibleColumn;
     private Action fOptimizationAction;
 
     private static final String NEXT_EVENT_ICON_PATH = "icons/elcl16/shift_r_edit.gif"; //$NON-NLS-1$
@@ -211,7 +210,7 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
      * Constructor
      */
     public ControlFlowView() {
-        super(ID, new ControlFlowPresentationProvider(), ThreadStatusDataProvider.ID);
+        super(ID, new BaseDataProviderTimeGraphPresentationProvider(), ThreadStatusDataProvider.ID);
         setTreeColumns(COLUMN_NAMES, COLUMN_COMPARATORS, INITIAL_SORT_COLUMN_INDEX);
         setTreeLabelProvider(new ControlFlowTreeLabelProvider());
         setFilterColumns(FILTER_COLUMN_NAMES);
@@ -238,9 +237,12 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
         ISelection selection = getSite().getSelectionProvider().getSelection();
         if (selection instanceof StructuredSelection) {
             StructuredSelection sSel = (StructuredSelection) selection;
-            if (sSel.getFirstElement() instanceof ControlFlowEntry) {
-                ControlFlowEntry entry = (ControlFlowEntry) sSel.getFirstElement();
-                menuManager.add(new FollowThreadAction(ControlFlowView.this, entry.getName(), entry.getThreadId(), getTrace(entry)));
+            if (sSel.getFirstElement() instanceof TimeGraphEntry) {
+                TimeGraphEntry entry = (TimeGraphEntry) sSel.getFirstElement();
+                ITmfTreeDataModel entryModel = entry.getEntryModel();
+                if (entryModel instanceof ThreadEntryModel) {
+                    menuManager.add(new FollowThreadAction(ControlFlowView.this, entry.getName(), ((ThreadEntryModel) entryModel).getThreadId(), getTrace(entry)));
+                }
             }
         }
     }
@@ -356,13 +358,13 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
                         return Status.OK_STATUS;
                     }
                     ITimeGraphEntry entry = selectedState.getEntry();
-                    if (!(entry instanceof ControlFlowEntry)) {
+                    ThreadEntryModel entryModel = ControlFlowView.getThreadEntryModel(entry);
+                    if (entryModel == null) {
                         return Status.OK_STATUS;
                     }
-                    ControlFlowEntry cfEntry = (ControlFlowEntry) entry;
-                    int tid = cfEntry.getThreadId();
+                    int tid = entryModel.getThreadId();
 
-                    ITmfTrace trace = getTrace(cfEntry);
+                    ITmfTrace trace = getTrace((TimeGraphEntry) entry);
                     ITmfContext ctx = trace.seekEvent(TmfTimestamp.fromNanos(ts));
                     long rank = ctx.getRank();
                     ctx.dispose();
@@ -553,6 +555,7 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
              * each threads in the view. For this, we assign a value to an invisible column
              * and sort according to the values in this column.
              */
+            Map<ITimeGraphEntry, Long> schedulingPositions = new HashMap<>();
             synchronized (fEntries) {
                 for (TimeGraphEntry entry : currentList) {
                     Collection<TimeGraphEntry> controlFlowEntries = fEntries.row(getProvider(entry)).values();
@@ -562,13 +565,15 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
                          * there's no activity in the current interval for that thread. We set its
                          * position to Long.MAX_VALUE so it goes to the bottom.
                          */
-                        ControlFlowEntry controlFlowEntry = (ControlFlowEntry) child;
-                        controlFlowEntry.setSchedulingPosition(orderedTidMap.getOrDefault(controlFlowEntry.getThreadId(), Long.MAX_VALUE));
+                        ITmfTreeDataModel entryModel = child.getEntryModel();
+                        if (entryModel instanceof ThreadEntryModel) {
+                            schedulingPositions.put(child, orderedTidMap.getOrDefault(((ThreadEntryModel) entryModel).getThreadId(), Long.MAX_VALUE));
+                        }
                     }
                 }
             }
 
-            setEntryComparator(ControlFlowColumnComparators.SCHEDULING_COLUMN_COMPARATOR);
+            setEntryComparator(ControlFlowColumnComparators.newSchedulingComparator(schedulingPositions));
             refresh();
         }
 
@@ -582,25 +587,29 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
 
         @Override
         public String getColumnText(Object element, int columnIndex) {
-            if (columnIndex == 0 && element instanceof TimeGraphEntry) {
-                return ((TimeGraphEntry) element).getName();
+            if (!(element instanceof TimeGraphEntry)) {
+                return ""; //$NON-NLS-1$
+            }
+            TimeGraphEntry entry = (TimeGraphEntry) element;
+
+            if (columnIndex == 0) {
+                return entry.getName();
             }
 
-            if (element instanceof ControlFlowEntry) {
-                ControlFlowEntry entry = (ControlFlowEntry) element;
+            ITmfTreeDataModel entryModel = entry.getEntryModel();
+            if (entryModel instanceof ThreadEntryModel) {
+                ThreadEntryModel model = (ThreadEntryModel) entryModel;
 
                 if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_tidColumn)) {
-                    return Integer.toString(entry.getThreadId());
+                    return Integer.toString(model.getThreadId());
                 } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_ptidColumn)) {
-                    if (entry.getParentThreadId() > 0) {
-                        return Integer.toString(entry.getParentThreadId());
+                    if (model.getParentThreadId() > 0) {
+                        return Integer.toString(model.getParentThreadId());
                     }
                 } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_birthTimeColumn)) {
                     return FormatTimeUtils.formatTime(entry.getStartTime(), TimeFormat.CALENDAR, Resolution.NANOSEC);
                 } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_traceColumn)) {
                     return getTrace(entry).getName();
-                } else if (COLUMN_NAMES[columnIndex].equals(INVISIBLE_COLUMN)) {
-                    return Long.toString(entry.getSchedulingPosition());
                 }
             }
             return ""; //$NON-NLS-1$
@@ -612,10 +621,17 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
 
         @Override
         public String getColumnText(Object element, int columnIndex) {
-            if (columnIndex == 0 && element instanceof TimeGraphEntry) {
-                return ((TimeGraphEntry) element).getName();
-            } else if (columnIndex == 1 && element instanceof ControlFlowEntry) {
-                return Integer.toString(((ControlFlowEntry) element).getThreadId());
+            if (!(element instanceof TimeGraphEntry)) {
+                return ""; //$NON-NLS-1$
+            }
+            TimeGraphEntry entry = (TimeGraphEntry) element;
+            if (columnIndex == 0) {
+                return entry.getName();
+            } else if (columnIndex == 1) {
+                ITmfTreeDataModel entryModel = entry.getEntryModel();
+                if (entryModel instanceof ThreadEntryModel) {
+                    return Integer.toString(((ThreadEntryModel) entryModel).getThreadId());
+                }
             }
             return ""; //$NON-NLS-1$
         }
@@ -669,76 +685,11 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
 
     @Override
     protected void buildEntryList(final ITmfTrace trace, final ITmfTrace parentTrace, final IProgressMonitor monitor) {
-        ThreadStatusDataProvider dataProvider = DataProviderManager.getInstance()
-                .getDataProvider(trace, ThreadStatusDataProvider.ID, ThreadStatusDataProvider.class);
-        if (dataProvider == null) {
-            return;
-        }
+        super.buildEntryList(trace, parentTrace, monitor);
 
-        boolean complete = false;
-        TraceEntry traceEntry = null;
-        while (!complete && !monitor.isCanceled()) {
-            TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> response = dataProvider.fetchTree(FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(0, Long.MAX_VALUE, 2)), monitor);
-            if (response.getStatus() == ITmfResponse.Status.FAILED) {
-                Activator.getDefault().logError("Thread Status Data Provider failed: " + response.getStatusMessage()); //$NON-NLS-1$
-                return;
-            } else if (response.getStatus() == ITmfResponse.Status.CANCELLED) {
-                return;
-            }
-            complete = response.getStatus() == ITmfResponse.Status.COMPLETED;
-
-            TmfTreeModel<@NonNull ThreadEntryModel> model = response.getModel();
-            if (model != null && !model.getEntries().isEmpty()) {
-                synchronized (fEntries) {
-                    for (ThreadEntryModel entry : model.getEntries()) {
-                        if (entry.getThreadId() != Integer.MIN_VALUE) {
-                            if (traceEntry == null) {
-                                break;
-                            }
-                            TimeGraphEntry e = fEntries.get(traceEntry.getProvider(), entry.getId());
-                            if (e != null) {
-                                e.updateModel(entry);
-                            } else {
-                                fEntries.put(traceEntry.getProvider(), entry.getId(), new ControlFlowEntry(entry));
-                            }
-                        } else {
-                            setStartTime(Long.min(getStartTime(), entry.getStartTime()));
-                            setEndTime(Long.max(getEndTime(), entry.getEndTime() + 1));
-
-                            if (traceEntry != null) {
-                                traceEntry.updateModel(entry);
-                            } else {
-                                traceEntry = new TraceEntry(entry, trace, dataProvider);
-                                addToEntryList(parentTrace, Collections.singletonList(traceEntry));
-                            }
-                        }
-                    }
-                }
-
-                Objects.requireNonNull(traceEntry, "ControlFlow tree model should have a trace entry with PID=Integer.MIN_VALUE"); //$NON-NLS-1$
-                Collection<TimeGraphEntry> controlFlowEntries = fEntries.row(getProvider(traceEntry)).values();
-                synchronized (fFlatTraces) {
-                    if (fFlatTraces.contains(parentTrace)) {
-                        addEntriesToFlatTree(controlFlowEntries, traceEntry);
-                    } else {
-                        addEntriesToHierarchicalTree(controlFlowEntries, traceEntry);
-                    }
-                }
-                Iterable<TimeGraphEntry> entries = Iterables.filter(controlFlowEntries, TimeGraphEntry.class);
-                final long resolution = Long.max(1, (traceEntry.getEndTime() - traceEntry.getStartTime()) / getDisplayWidth());
-                zoomEntries(entries, traceEntry.getStartTime(), traceEntry.getEndTime(), resolution, monitor);
-            }
-            if (parentTrace.equals(getTrace())) {
-                refresh();
-            }
-
-            if (!complete) {
-                try {
-                    Thread.sleep(BUILD_UPDATE_TIMEOUT);
-                } catch (InterruptedException e) {
-                    Activator.getDefault().logError("Failed to wait for analysis to finish", e); //$NON-NLS-1$
-                }
-            }
+        // By default is a hierarchical presentation, if flat is requested, update
+        if (fFlatTraces.contains(parentTrace)) {
+            applyFlatPresentation();
         }
     }
 
@@ -748,6 +699,10 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
     private static void addEntriesToFlatTree(Collection<@NonNull TimeGraphEntry> entries, TimeGraphEntry traceEntry) {
         traceEntry.clearChildren();
         for (TimeGraphEntry e : entries) {
+            // the main entry is in the list, ignore it
+            if (traceEntry == e) {
+                continue;
+            }
             // reset the entries
             e.setParent(null);
             e.clearChildren();
@@ -767,6 +722,10 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
             e.setParent(null);
         }
         for (TimeGraphEntry entry : entryList) {
+            // the main entry is in the list, ignore it
+            if (entry == traceEntry) {
+                continue;
+            }
             TimeGraphEntry parent = map.get(entry.getEntryModel().getParentId());
             /*
              * Associate the parent entry only if their time overlap. A child entry may
@@ -837,7 +796,7 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
         if (time == event.getStartTime()) {
             TimeGraphEntry entry = entryMap.get(id);
             if (entry != null) {
-                getTimeGraphViewer().setSelection(entry, true);
+                Display.getDefault().asyncExec(() -> getTimeGraphViewer().setSelection(entry, true));
                 return true;
             }
         }
@@ -851,5 +810,24 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
             }
         }
         return null;
+    }
+
+    /**
+     * Get the thread entry model for an entry
+     *
+     * @param entry
+     *            The entry
+     * @return The entry model for a thread or <code>null</code> if the entry
+     *         does not have a thread entry model
+     */
+    public static @Nullable ThreadEntryModel getThreadEntryModel(ITimeGraphEntry entry) {
+        if (!(entry instanceof TimeGraphEntry)) {
+            return null;
+        }
+        ITmfTreeDataModel model = ((TimeGraphEntry) entry).getEntryModel();
+        if (!(model instanceof ThreadEntryModel)) {
+            return null;
+        }
+        return (ThreadEntryModel) model;
     }
 }

@@ -11,6 +11,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow
 import java.util.Comparator;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadEntryModel;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 
 /**
@@ -44,10 +45,10 @@ public interface IControlFlowEntryComparator {
                 throw new IllegalArgumentException();
             }
             int result = 0;
-            if ((o1 instanceof ControlFlowEntry) && (o2 instanceof ControlFlowEntry)) {
-                ControlFlowEntry entry1 = (ControlFlowEntry) o1;
-                ControlFlowEntry entry2 = (ControlFlowEntry) o2;
-                result = Integer.compare(entry1.getThreadId(), entry2.getThreadId());
+            ThreadEntryModel model1 = ControlFlowView.getThreadEntryModel(o1);
+            ThreadEntryModel model2 = ControlFlowView.getThreadEntryModel(o2);
+            if (model1 != null && model2 != null) {
+                result = Integer.compare(model1.getThreadId(), model2.getThreadId());
             }
             return result;
         }
@@ -63,10 +64,10 @@ public interface IControlFlowEntryComparator {
                 throw new IllegalArgumentException();
             }
             int result = 0;
-            if ((o1 instanceof ControlFlowEntry) && (o2 instanceof ControlFlowEntry)) {
-                ControlFlowEntry entry1 = (ControlFlowEntry) o1;
-                ControlFlowEntry entry2 = (ControlFlowEntry) o2;
-                result = Integer.compare(entry1.getParentThreadId(), entry2.getParentThreadId());
+            ThreadEntryModel model1 = ControlFlowView.getThreadEntryModel(o1);
+            ThreadEntryModel model2 = ControlFlowView.getThreadEntryModel(o2);
+            if (model1 != null && model2 != null) {
+                result = Integer.compare(model1.getParentThreadId(), model2.getParentThreadId());
             }
             return result;
         }
@@ -82,20 +83,6 @@ public interface IControlFlowEntryComparator {
                 throw new IllegalArgumentException();
             }
             return Long.compare(o1.getStartTime(), o2.getStartTime());
-        }
-    };
-
-    /**
-     * Scheduling Comparator - this is for the link optimizer. It compares the
-     * values in an invisible column. (scheduled position)
-     */
-    Comparator<ITimeGraphEntry> SCHEDULING_COMPARATOR = new Comparator<ITimeGraphEntry>() {
-        @Override
-        public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
-            if ((o1 instanceof ControlFlowEntry) && (o2 instanceof ControlFlowEntry)) {
-                return Long.compare(((ControlFlowEntry) o1).getSchedulingPosition(), ((ControlFlowEntry) o2).getSchedulingPosition());
-            }
-            return 0;
         }
     };
 

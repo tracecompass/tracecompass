@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
+
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.bindings.keys.KeyStroke;

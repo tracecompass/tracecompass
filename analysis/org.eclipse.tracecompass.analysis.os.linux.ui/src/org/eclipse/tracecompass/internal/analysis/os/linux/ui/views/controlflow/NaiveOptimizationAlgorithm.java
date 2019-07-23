@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadEntryModel;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
@@ -56,12 +57,9 @@ public final class NaiveOptimizationAlgorithm implements Function<Collection<ILi
         for (ILinkEvent arrow : arrows) {
             ITimeGraphEntry from = arrow.getEntry();
             ITimeGraphEntry to = arrow.getDestinationEntry();
-            if (!(from instanceof ControlFlowEntry) || !(to instanceof ControlFlowEntry)) {
-                continue;
-            }
-            int fromTid = ((ControlFlowEntry) from).getThreadId();
-            int toTid = ((ControlFlowEntry) to).getThreadId();
-            if (fromTid != toTid) {
+            int fromTid = getTid(from);
+            int toTid = getTid(to);
+            if (fromTid >= 0 && toTid >= 0 && fromTid != toTid) {
                 Pair<Integer, Integer> key = new Pair<>(Math.min(fromTid, toTid), Math.max(fromTid, toTid));
                 transitions.add(key);
             }
@@ -94,5 +92,10 @@ public final class NaiveOptimizationAlgorithm implements Function<Collection<ILi
         }
 
         return orderedTidMap;
+    }
+
+    private static int getTid(ITimeGraphEntry entry) {
+        ThreadEntryModel model = ControlFlowView.getThreadEntryModel(entry);
+        return model == null ? -1 : model.getThreadId();
     }
 }

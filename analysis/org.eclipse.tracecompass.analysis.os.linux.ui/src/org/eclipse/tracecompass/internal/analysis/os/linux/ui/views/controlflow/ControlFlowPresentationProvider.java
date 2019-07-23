@@ -20,8 +20,9 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.registry.LinuxStyle;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadEntryModel;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
-import org.eclipse.tracecompass.internal.analysis.os.linux.ui.registry.LinuxStyle;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
@@ -36,6 +37,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleSt
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NamedTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -143,15 +145,15 @@ public class ControlFlowPresentationProvider extends TimeGraphPresentationProvid
             retMap = new LinkedHashMap<>(1);
         }
 
+        ThreadEntryModel entryModel = ControlFlowView.getThreadEntryModel(event.getEntry());
         if (!(event instanceof TimeEvent) || !((TimeEvent) event).hasValue() ||
-                !(event.getEntry() instanceof ControlFlowEntry)) {
+                entryModel == null) {
             return retMap;
         }
 
-        ControlFlowEntry entry = (ControlFlowEntry) event.getEntry();
-        ITimeGraphDataProvider<? extends TimeGraphEntryModel> dataProvider = BaseDataProviderTimeGraphView.getProvider(entry);
+        ITimeGraphDataProvider<? extends TimeGraphEntryModel> dataProvider = BaseDataProviderTimeGraphView.getProvider((TimeGraphEntry) event.getEntry());
         TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> response = dataProvider.fetchTooltip(
-        FetchParametersUtils.selectionTimeQueryToMap(new SelectionTimeQueryFilter(hoverTime, hoverTime, 1, Collections.singletonList(entry.getEntryModel().getId()))), null);
+        FetchParametersUtils.selectionTimeQueryToMap(new SelectionTimeQueryFilter(hoverTime, hoverTime, 1, Collections.singletonList(entryModel.getId()))), null);
         Map<@NonNull String, @NonNull String> tooltipModel = response.getModel();
         if (tooltipModel != null) {
             retMap.putAll(tooltipModel);
