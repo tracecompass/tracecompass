@@ -185,7 +185,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     /** points per inch */
     private static final int PPI = 72;
-    private static final int DPI = Display.getDefault().getDPI().y;
+    private static final int DPI = 96;
 
     private static final int OPAQUE = 255;
 
