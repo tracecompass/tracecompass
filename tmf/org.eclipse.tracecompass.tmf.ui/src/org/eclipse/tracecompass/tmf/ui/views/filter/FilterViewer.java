@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ericsson
+ * Copyright (c) 2010, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -143,7 +143,6 @@ class FilterViewer extends Composite {
         fViewer = new TreeViewer(sash, SWT.NONE);
         fViewer.setContentProvider(new FilterTreeContentProvider());
         fViewer.setLabelProvider(new FilterTreeLabelProvider());
-        fViewer.setInput(new TmfFilterRootNode());
 
         // Create the empty filter node properties panel
         fComposite = new Composite(sash, SWT.NONE);

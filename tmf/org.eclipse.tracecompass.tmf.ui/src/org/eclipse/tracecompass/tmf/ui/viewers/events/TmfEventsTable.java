@@ -2050,7 +2050,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      *            The filter to apply
      */
     protected void applyFilter(ITmfFilter filter) {
-        ITmfFilterTreeNode rootFilter = applyEventFilter(filter);
+        ITmfFilterTreeNode rootFilter = applyEventFilter(filter instanceof ITmfFilterTreeNode ? ((ITmfFilterTreeNode) filter).clone() : filter);
         fireFilterApplied(rootFilter);
     }
 

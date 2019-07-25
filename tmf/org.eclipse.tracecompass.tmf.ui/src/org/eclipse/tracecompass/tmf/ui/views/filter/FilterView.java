@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -129,7 +129,7 @@ public class FilterView extends TmfView {
                 return;
             }
         }
-        root.addChild(filter);
+        root.addChild(filter.clone());
         fViewer.setInput(root);
         fViewer.setSelection(filter);
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Ericsson
+ * Copyright (c) 2010, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,8 +11,6 @@
  *******************************************************************************/
 
 package org.eclipse.tracecompass.tmf.ui.views.filter;
-
-import java.util.ArrayList;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -38,24 +36,15 @@ public class FilterTreeContentProvider implements ITreeContentProvider {
 
     @Override
     public Object[] getElements(Object inputElement) {
-        if (inputElement instanceof ITmfFilterTreeNode) {
-            ArrayList<ITmfFilterTreeNode> result = new ArrayList<>();
-            for (int i = 0; i < ((ITmfFilterTreeNode) inputElement).getChildrenCount(); i++) {
-                result.add(((ITmfFilterTreeNode) inputElement).getChild(i));
-            }
-
-            return result.toArray();
-        }
-        return null;
+        return getChildren(inputElement);
     }
 
     @Override
     public Object[] getChildren(Object parentElement) {
-        ArrayList<ITmfFilterTreeNode> result = new ArrayList<>();
-        for (int i = 0; i < ((ITmfFilterTreeNode) parentElement).getChildrenCount(); i++) {
-            result.add(((ITmfFilterTreeNode) parentElement).getChild(i));
+        if (parentElement instanceof ITmfFilterTreeNode) {
+            return ((ITmfFilterTreeNode) parentElement).getChildren();
         }
-        return result.toArray();
+        return new ITmfFilterTreeNode[0];
     }
 
     @Override
