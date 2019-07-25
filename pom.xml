@@ -57,10 +57,12 @@
     <!-- Sonar rule configuration -->
     <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
     <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-    <sonar.jacoco.reportPath>${project.basedir}/../../target/jacoco.exec</sonar.jacoco.reportPath>
     <sonar.java.source>1.8</sonar.java.source>
-    <sonar.exclusions>**/tests/**,**/test/**,**/stubs/**,**/Messages*,**/alltests/**</sonar.exclusions>
+    <sonar.exclusions>**/tests/**,**/test/**,**/stubs/**,**/Messages*,**/alltests/**,**/ITmfEventField.java</sonar.exclusions>
     <sonar.skippedModules>org.eclipse.tracecompass.ctf.parser,org.eclipse.tracecompass.examples</sonar.skippedModules>
+    <jacoco.destFile>${project.basedir}/../../target/jacoco.exec</jacoco.destFile>
+    <sonar.jacoco.reportPath>${jacoco.destFile}</sonar.jacoco.reportPath>
+    <sonar.coverage.jacoco.xmlReportPaths>${project.reporting.outputDirectory}/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     <sonar.issue.ignore.multicriteria>e1,e2,e3,e4,e5,e6,e7,e8</sonar.issue.ignore.multicriteria>
     <sonar.issue.ignore.multicriteria.e1.ruleKey>findbugs:NP_STORE_INTO_NONNULL_FIELD</sonar.issue.ignore.multicriteria.e1.ruleKey>
     <sonar.issue.ignore.multicriteria.e1.resourceKey>**/*.java</sonar.issue.ignore.multicriteria.e1.resourceKey>
@@ -175,7 +177,7 @@
           <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.7.9</version>
+            <version>0.8.4</version>
             <executions>
               <execution>
                 <id>pre-test</id>
@@ -184,7 +186,7 @@
                 </goals>
                 <configuration>
                   <!-- Where to put jacoco coverage report -->
-                  <destFile>${sonar.jacoco.reportPath}</destFile>
+                  <destFile>${jacoco.destFile}</destFile>
                   <includes>
                     <include>org.eclipse.tracecompass.*</include>
                   </includes>
@@ -192,14 +194,12 @@
                 </configuration>
               </execution>
               <execution>
-                <id>post-test</id>
-                <phase>post-integration-test</phase>
+                <id>jacoco-report</id>
+                <phase>verify</phase>
                 <goals>
                   <goal>report</goal>
+                  <goal>report-aggregate</goal>
                 </goals>
-                <configuration>
-                  <dataFile>${sonar.jacoco.reportPath}</dataFile>
-                </configuration>
               </execution>
             </executions>
           </plugin>
@@ -616,7 +616,7 @@
         <plugin>
           <groupId>org.sonarsource.scanner.maven</groupId>
           <artifactId>sonar-maven-plugin</artifactId>
-          <version>3.2</version>
+          <version>3.6.0.1398</version>
         </plugin>
 
         <plugin>
