@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -83,7 +84,7 @@ public class StateSystemDataProvider extends AbstractTmfTraceDataProvider implem
 
     private static final String HT_EXTENSION = ".ht"; //$NON-NLS-1$
 
-    private static AtomicLong ENTRY_ID = new AtomicLong();
+    private static final AtomicLong ENTRY_ID = new AtomicLong();
 
     private Map<Long, Pair<ITmfStateSystem, Integer>> fIDToDisplayQuark = new HashMap<>();
 
@@ -165,7 +166,7 @@ public class StateSystemDataProvider extends AbstractTmfTraceDataProvider implem
     }
 
     private static String getQuarkValue(Map<String, Object> fetchParameters, ITmfStateSystem ss, Integer quark) {
-        String valueString = ""; //$NON-NLS-1$
+        String valueString = null;
         try {
             Object actualTimeObj = fetchParameters.get(DataProviderParameterUtils.REQUESTED_TIME_KEY);
             if (actualTimeObj instanceof ArrayList) {
@@ -174,10 +175,7 @@ public class StateSystemDataProvider extends AbstractTmfTraceDataProvider implem
                 if (actualTime != null) {
                     for (ITmfStateInterval fullstate : ss.queryFullState(actualTime)) {
                         if (fullstate.getAttribute() == quark) {
-                            Object value = fullstate.getValue();
-                            if (value != null) {
-                                valueString = value.toString();
-                            }
+                            valueString = NonNullUtils.nullToEmptyString(fullstate.getValue());
                             break;
                         }
                     }

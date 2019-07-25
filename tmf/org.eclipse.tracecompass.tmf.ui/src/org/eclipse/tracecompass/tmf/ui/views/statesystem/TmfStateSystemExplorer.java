@@ -19,6 +19,7 @@ package org.eclipse.tracecompass.tmf.ui.views.statesystem;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -249,7 +250,7 @@ public class TmfStateSystemExplorer extends BaseDataProviderTimeGraphView {
 
     private StateSystemDataProvider getDataProvider(ITmfTrace moduleTrace) {
         ITimeGraphDataProvider<@NonNull TimeGraphEntryModel> dataProvider = DataProviderManager
-                .getInstance().getDataProvider(moduleTrace, getProviderId(), ITimeGraphDataProvider.class);
+                .getInstance().getDataProvider(Objects.requireNonNull(moduleTrace), getProviderId(), ITimeGraphDataProvider.class);
         if (dataProvider instanceof StateSystemDataProvider) {
             return (StateSystemDataProvider) dataProvider;
         }
