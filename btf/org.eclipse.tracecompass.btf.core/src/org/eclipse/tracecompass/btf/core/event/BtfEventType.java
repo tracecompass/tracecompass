@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -119,7 +119,7 @@ public class BtfEventType extends TmfEventType {
      * @param notes
      *            optional notes (use null if no notes)
      * @return a field.
-     * @since 2.1
+     * @since 2.2
      */
     public ITmfEventField generateContent(String event, long sourceInstance, long targetInstance, @Nullable String notes) {
         String notesString = notes == null ? "" : notes; //$NON-NLS-1$
