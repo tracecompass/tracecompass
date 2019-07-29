@@ -15,6 +15,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.views.IViewDescriptor;
 
 /**
  * View for displaying a segment store analysis in a table.
@@ -32,7 +33,10 @@ public class SegmentStoreTableView extends AbstractSegmentStoreTableView {
     @Override
     public void createPartControl(@Nullable Composite parent) {
         super.createPartControl(parent);
-        setPartName(PlatformUI.getWorkbench().getViewRegistry().find(getViewId()).getLabel());
+        IViewDescriptor descriptor = PlatformUI.getWorkbench().getViewRegistry().find(getViewId());
+        if (descriptor != null) {
+            setPartName(descriptor.getLabel());
+        }
     }
 
     @Override
