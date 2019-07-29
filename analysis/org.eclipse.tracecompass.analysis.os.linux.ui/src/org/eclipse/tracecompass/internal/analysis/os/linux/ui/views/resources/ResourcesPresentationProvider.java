@@ -110,13 +110,9 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
                     return STATE_MAP.get(StateValues.CPU_STATUS_SOFT_IRQ_RAISED);
                 }
                 return STATE_MAP.get(StateValues.CPU_STATUS_SOFTIRQ);
-            case CURRENT_THREAD:
-                if (!event.hasValue()) {
-                    return null;
-                }
-                return STATE_MAP.get(StateValues.CPU_STATUS_RUN_USERMODE);
             case GROUP:
                 return null;
+            case CURRENT_THREAD:
             case FREQUENCY:
                 if (!event.hasValue()) {
                     return null;
