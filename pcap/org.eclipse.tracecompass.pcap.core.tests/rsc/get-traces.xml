@@ -16,14 +16,14 @@ http://wiki.wireshark.org/SampleCaptures
 
 <target name="main">
   <echo message="Attempting to download test traces"/>
-  <get ignoreerrors="true" maxtime="600" dest="Short_LittleEndian.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/1/18/Short_LittleEndian.pcap.zip" />
-  <get ignoreerrors="true" maxtime="600" dest="Short_BigEndian.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/2/25/Short_BigEndian.pcap.zip" />
-  <get ignoreerrors="true" maxtime="600" dest="MostlyUDP.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/6/64/MostlyUDP.pcap.zip" />
-  <get ignoreerrors="true" maxtime="600" dest="MostlyTCP.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/8/8d/MostlyTCP.pcap.zip" />
-  <get ignoreerrors="true" maxtime="600" dest="EmptyPcap.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/c/c1/EmptyPcap.pcap.zip" />
-  <get ignoreerrors="true" maxtime="600" dest="BadPcapFile.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/5/5e/BadPcapFile.pcap.zip" />
-  <get ignoreerrors="true" maxtime="600" dest="BenchmarkTrace.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/1/12/BenchmarkTrace.pcap.zip" />
-  <get ignoreerrors="true" maxtime="600" dest="sample-ctf-trace-20120412.tar.bz2" skipexisting="true" src="http://lttng.org/files/samples/sample-ctf-trace-20120412.tar.bz2"/>
+  <get ignoreerrors="true" maxtime="1200" dest="Short_LittleEndian.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/1/18/Short_LittleEndian.pcap.zip" />
+  <get ignoreerrors="true" maxtime="1200" dest="Short_BigEndian.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/2/25/Short_BigEndian.pcap.zip" />
+  <get ignoreerrors="true" maxtime="1200" dest="MostlyUDP.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/6/64/MostlyUDP.pcap.zip" />
+  <get ignoreerrors="true" maxtime="1200" dest="MostlyTCP.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/8/8d/MostlyTCP.pcap.zip" />
+  <get ignoreerrors="true" maxtime="1200" dest="EmptyPcap.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/c/c1/EmptyPcap.pcap.zip" />
+  <get ignoreerrors="true" maxtime="1200" dest="BadPcapFile.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/5/5e/BadPcapFile.pcap.zip" />
+  <get ignoreerrors="true" maxtime="2400" dest="BenchmarkTrace.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/1/12/BenchmarkTrace.pcap.zip" />
+  <get ignoreerrors="true" maxtime="1200" dest="sample-ctf-trace-20120412.tar.bz2" skipexisting="true" src="http://lttng.org/files/samples/sample-ctf-trace-20120412.tar.bz2"/>
   <condition property="testSuiteExists">
     <and>
       <available file="pcap-testsuite" type="dir"/>

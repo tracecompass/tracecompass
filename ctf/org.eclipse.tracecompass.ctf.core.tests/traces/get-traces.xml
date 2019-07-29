@@ -72,10 +72,10 @@
 
 <target name="downloadTraceFiles">
   <echo message="Attempting to download test traces"/>
-  <get ignoreerrors="true" maxtime="600" skipexisting="true" dest="synctraces.tar.gz" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/synctraces.tar.gz" />
-  <get ignoreerrors="true" maxtime="600" skipexisting="true" dest="os-events.tar.gz" src="http://archive.eclipse.org/tracecompass/test-traces/os-events.tar.gz" />
-  <get ignoreerrors="true" maxtime="600" skipexisting="true" dest="qmlscene.tar.gz" src="http://archive.eclipse.org/tracecompass/test-traces/qmlscene.tgz" />
-  <get ignoreerrors="true" maxtime="600" skipexisting="true" dest="vlc.tar.gz" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/vlc.tar.gz" />
+  <get ignoreerrors="true" maxtime="1200" skipexisting="true" dest="synctraces.tar.gz" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/synctraces.tar.gz" />
+  <get ignoreerrors="true" maxtime="1200" skipexisting="true" dest="os-events.tar.gz" src="http://archive.eclipse.org/tracecompass/test-traces/os-events.tar.gz" />
+  <get ignoreerrors="true" maxtime="1200" skipexisting="true" dest="qmlscene.tar.gz" src="http://archive.eclipse.org/tracecompass/test-traces/qmlscene.tgz" />
+  <get ignoreerrors="true" maxtime="2400" skipexisting="true" dest="vlc.tar.gz" src="http://archive.eclipse.org/tracecompass/test-traces/ctf/vlc.tar.gz" />
 </target>
 
 <target name="pullTestSuite" if="testSuiteExists">
