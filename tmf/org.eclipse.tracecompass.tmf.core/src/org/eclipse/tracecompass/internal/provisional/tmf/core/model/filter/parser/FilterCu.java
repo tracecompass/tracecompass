@@ -10,7 +10,6 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.pars
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 import org.antlr.runtime.ANTLRStringStream;
@@ -25,7 +24,7 @@ import org.eclipse.tracecompass.tmf.filter.parser.FilterParserLexer;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser.parse_return;
 
-import com.google.common.collect.Iterables;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 
 /**
@@ -124,8 +123,11 @@ public class FilterCu implements IFilterCu {
      * @return a filter item runtime object
      */
     public Predicate<Multimap<String, Object>> generate() {
-        Iterable<FilterExpression> expressions = Objects.requireNonNull(Iterables.transform(fExpressions, exp -> exp.generate()));
-        return new Filter(expressions);
+        ImmutableList.Builder<FilterExpression> builder = ImmutableList.builder();
+        for (FilterExpressionCu filterExpression : fExpressions) {
+            builder.add(filterExpression.generate());
+        }
+        return new Filter(builder.build());
     }
 
     @Override

@@ -8,7 +8,7 @@
 *******************************************************************************/
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
-import java.util.Queue;
+import java.util.List;
 
 import com.google.common.collect.Multimap;
 
@@ -28,7 +28,7 @@ public class FilterExpressionNot extends FilterExpression {
      *            The list of element representing this experession
      *
      */
-    public FilterExpressionNot(Queue<Object> elements) {
+    public FilterExpressionNot(List<Object> elements) {
         super(elements);
     }
 

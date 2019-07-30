@@ -9,10 +9,8 @@
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Queue;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.jdt.annotation.Nullable;
@@ -26,6 +24,8 @@ import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterOrNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * This implements a filter expression compilation unit
@@ -113,7 +113,7 @@ public class FilterExpressionCu implements IFilterCu {
      * @return a filter expression
      */
     public FilterExpression generate() {
-        Queue<Object> queue = getElementsQueue();
+        List<Object> queue = getElementsQueue();
         return new FilterExpression(queue);
     }
 
@@ -122,8 +122,8 @@ public class FilterExpressionCu implements IFilterCu {
      *
      * @return The queue of operation
      */
-    protected final Queue<Object> getElementsQueue() {
-        Queue<Object> queue = new LinkedList<>();
+    protected final List<Object> getElementsQueue() {
+        ImmutableList.Builder<Object> builder = ImmutableList.builder();
         int count = fElements.size();
 
         for (int i = 0; i < count; i++) {
@@ -133,12 +133,12 @@ public class FilterExpressionCu implements IFilterCu {
 
                     FilterSimpleExpression node = ((FilterSimpleExpressionCu) element).generate();
 
-                    queue.offer(node);
+                    builder.add(node);
                 } else if (element instanceof FilterExpressionCu) {
 
                     FilterExpression node = ((FilterExpressionCu) element).generate();
 
-                    queue.offer(node);
+                    builder.add(node);
 
                 } else {
                     throw new IllegalStateException("Unknown element while getting the filter element queue"); //$NON-NLS-1$
@@ -148,10 +148,10 @@ public class FilterExpressionCu implements IFilterCu {
                 if (!(op instanceof String)) {
                     throw new IllegalStateException("Element at position " + i + " should be a String"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
-                queue.offer(op);
+                builder.add(op);
             }
         }
-        return queue;
+        return builder.build();
     }
 
     @Override

@@ -9,7 +9,6 @@
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
 import java.util.List;
-import java.util.Queue;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.jdt.annotation.Nullable;
@@ -42,7 +41,7 @@ public class FilterExpressionNotCu extends FilterExpressionCu {
 
     @Override
     public FilterExpression generate() {
-        Queue<Object> queue = getElementsQueue();
+        List<Object> queue = getElementsQueue();
         return new FilterExpressionNot(queue);
     }
 

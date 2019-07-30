@@ -8,7 +8,7 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser;
 
-import java.util.Queue;
+import java.util.List;
 import java.util.function.Predicate;
 
 import com.google.common.collect.Multimap;
@@ -22,7 +22,7 @@ import com.google.common.collect.Multimap;
  */
 public class FilterExpression implements Predicate<Multimap<String, Object>> {
 
-    private final Queue<Object> fElements;
+    private final List<Object> fElements;
 
     /**
      * Constructor
@@ -31,13 +31,12 @@ public class FilterExpression implements Predicate<Multimap<String, Object>> {
      *            The list of element representing this experession
      *
      */
-    public FilterExpression(Queue<Object> elements) {
+    public FilterExpression(List<Object> elements) {
         fElements = elements;
     }
 
     @Override
     public boolean test(Multimap<String, Object> data) {
-
         if (fElements.isEmpty()) {
             return false;
         }
@@ -45,8 +44,8 @@ public class FilterExpression implements Predicate<Multimap<String, Object>> {
         int index = 0;
         boolean result = false;
         String operator = IFilterStrings.OR;
-        while (!fElements.isEmpty()) {
-            Object element = fElements.poll();
+        while (index < fElements.size()) {
+            Object element = fElements.get(index);
 
             if (index % 2 == 0) {
                 if (element instanceof FilterSimpleExpression) {
