@@ -33,33 +33,21 @@
     <module>org.eclipse.tracecompass.lttng2.control.core.tests</module>
     <module>org.eclipse.tracecompass.lttng2.control.ui</module>
     <module>org.eclipse.tracecompass.lttng2.control.ui.tests</module>
+    <module>org.eclipse.tracecompass.lttng2.control.ui.swtbot.tests</module>
 
     <module>org.eclipse.tracecompass.lttng2.kernel</module>
     <module>org.eclipse.tracecompass.lttng2.kernel.core</module>
     <module>org.eclipse.tracecompass.lttng2.kernel.core.tests</module>
     <module>org.eclipse.tracecompass.lttng2.kernel.ui</module>
+    <module>org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests</module>
 
     <module>org.eclipse.tracecompass.lttng2.ust</module>
     <module>org.eclipse.tracecompass.lttng2.ust.core</module>
     <module>org.eclipse.tracecompass.lttng2.ust.core.tests</module>
     <module>org.eclipse.tracecompass.lttng2.ust.ui</module>
     <module>org.eclipse.tracecompass.lttng2.ust.ui.tests</module>
-  </modules>
+    <module>org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests</module>
 
-  <profiles>
-    <profile>
-      <id>automated-ui-tests</id>
-      <activation>
-        <property>
-          <name>!skip-automated-ui-tests</name>
-        </property>
-      </activation>
-      <modules>
-        <module>org.eclipse.tracecompass.lttng2.control.ui.swtbot.tests</module>
-        <module>org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests</module>
-        <module>org.eclipse.tracecompass.lttng2.ust.ui.swtbot.tests</module>
-      </modules>
-    </profile>
-  </profiles>
+  </modules>
 
 </project>
