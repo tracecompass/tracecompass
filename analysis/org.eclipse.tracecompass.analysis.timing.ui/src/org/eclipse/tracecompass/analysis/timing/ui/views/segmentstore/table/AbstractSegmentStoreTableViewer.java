@@ -25,6 +25,10 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
@@ -163,6 +167,8 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     boolean fColumnsCreated = false;
 
     private Collection<String> fGlobalFilter = Collections.emptySet();
+
+    private @Nullable Job fFilteringJob = null;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -310,7 +316,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
      * @param provider
      *            segment store provider
      */
-    public void setData(@Nullable ISegmentStoreProvider provider) {
+    public synchronized void setData(@Nullable ISegmentStoreProvider provider) {
         // Set the current segment store provider
         fSegmentProvider = provider;
         if (provider == null) {
@@ -327,26 +333,23 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         // FIXME Filtering should be done at the data provider level
         Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>>> predicates = generateRegexPredicate();
         Predicate<ISegment> predicate = (segment) -> {
-            if (!predicates.isEmpty()) {
 
-                // Get the filter external input data
-                Multimap<@NonNull String, @NonNull Object> input = ISegmentStoreProvider.getFilterInput(provider, segment);
+            // Get the filter external input data
+            Multimap<@NonNull String, @NonNull Object> input = ISegmentStoreProvider.getFilterInput(provider, segment);
 
-                // Test each predicates and set the status of the property
-                // associated to the
-                // predicate
-                boolean activateProperty = false;
-                for (Map.Entry<Integer, Predicate<Multimap<String, Object>>> mapEntry : predicates.entrySet()) {
-                    Integer property = Objects.requireNonNull(mapEntry.getKey());
-                    Predicate<Multimap<String, Object>> value = Objects.requireNonNull(mapEntry.getValue());
-                    if (property == IFilterProperty.DIMMED || property == IFilterProperty.EXCLUDE) {
-                        boolean status = value.test(input);
-                        activateProperty |= status;
-                    }
+            // Test each predicates and set the status of the property
+            // associated to the
+            // predicate
+            boolean activateProperty = false;
+            for (Map.Entry<Integer, Predicate<Multimap<String, Object>>> mapEntry : predicates.entrySet()) {
+                Integer property = Objects.requireNonNull(mapEntry.getKey());
+                Predicate<Multimap<String, Object>> value = Objects.requireNonNull(mapEntry.getValue());
+                if (property == IFilterProperty.DIMMED || property == IFilterProperty.EXCLUDE) {
+                    boolean status = value.test(input);
+                    activateProperty |= status;
                 }
-                return activateProperty;
             }
-            return true;
+            return activateProperty;
         };
 
         if (segStore != null) {
@@ -354,9 +357,31 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
                 updateModel(segStore);
                 return;
             }
-            Collection<ISegment> filtered = Collections2.filter(segStore, seg -> predicate.test(seg));
-            ISegmentStore<ISegment> filteredStore = new ArrayListStore<>(filtered.toArray(new ISegment[filtered.size()]));
-            updateModel(filteredStore);
+            // The segment store filtering may take a while
+            Job job = fFilteringJob;
+            if (job != null) {
+                job.cancel();
+            }
+            job = new Job(Messages.SegmentStoreTableViewer_FilteringData) {
+
+                @Override
+                protected IStatus run(@Nullable IProgressMonitor monitor) {
+                    Collection<ISegment> filtered = Collections2.filter(segStore, seg -> predicate.test(seg));
+                    if (monitor != null && monitor.isCanceled()) {
+                        return Status.CANCEL_STATUS;
+                    }
+                    ISegmentStore<ISegment> filteredStore = new ArrayListStore<>(filtered.toArray(new ISegment[filtered.size()]));
+                    if (monitor != null && monitor.isCanceled()) {
+                        return Status.CANCEL_STATUS;
+                    }
+                    updateModel(filteredStore);
+
+                    return Status.OK_STATUS;
+                }
+            };
+            fFilteringJob = job;
+            job.schedule();
+
             return;
         }
         // If results are null, then add completion listener and if the provider

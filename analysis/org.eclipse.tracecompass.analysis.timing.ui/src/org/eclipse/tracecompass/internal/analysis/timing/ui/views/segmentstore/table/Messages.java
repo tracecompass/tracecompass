@@ -38,6 +38,9 @@ public class Messages extends NLS {
     /** Lookup code text */
     public static String SegmentStoreTableViewer_lookup;
 
+    /** Filtering job title */
+    public static String SegmentStoreTableViewer_FilteringData;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
