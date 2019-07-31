@@ -101,6 +101,7 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLo
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.IFilterStrings;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerConfigXmlParser;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -374,8 +375,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private IContextService fContextService;
 
     private List<IContextActivation> fActiveContexts = new ArrayList<>();
-
-    private Collection<@NonNull String> fGlobalFilter = null;
 
     /** Listener that handles a click on an entry in the FusedVM View */
     private final ITimeGraphSelectionListener fMetadataSelectionListener = event -> {
@@ -2658,33 +2657,17 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             regexes.put(IFilterProperty.DIMMED, savedFilter);
         }
 
-        Collection<@NonNull String> globalFilter = fGlobalFilter;
-        if (globalFilter != null) {
-            // The global regexes should be AND'ed
-            regexes.putAll(IFilterProperty.DIMMED, globalFilter);
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            return regexes;
         }
+        TraceCompassFilter globalFilter = TraceCompassFilter.getFilterForTrace(trace);
+        if (globalFilter == null) {
+            return regexes;
+        }
+        regexes.putAll(IFilterProperty.DIMMED, globalFilter.getRegexes());
+
         return regexes;
-    }
-
-    /**
-     * Set the global regex filter applied to the views
-     *
-     * @param regexes
-     *                  The global regex to apply
-     */
-    private void setGlobalRegexFilter(Collection<@NonNull String> regexes) {
-        fGlobalFilter = regexes;
-        // Make sure the update is done in the UI thread
-        Display.getDefault().asyncExec(() -> globalFilterUpdated());
-    }
-
-    /**
-     * The global filter was updated and the view may need to act on this
-     * filter. By default, this method will restart the zoom thread so the time
-     * graph data will be refreshed.
-     */
-    private void globalFilterUpdated() {
-        restartZoomThread();
     }
 
     private @Nullable TimeGraphControl getTimeGraphControl() {
@@ -2887,12 +2870,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     @TmfSignalHandler
     public void regexFilterApplied(TmfFilterAppliedSignal signal) {
-        Collection<@NonNull String> regex = signal.getFilter().getRegexes();
-        if (!regex.isEmpty()) {
-            setGlobalRegexFilter(regex);
-        } else {
-            setGlobalRegexFilter(null);
-        }
+        // Restart the zoom thread to apply the new filter
+        Display.getDefault().asyncExec(() -> restartZoomThread());
     }
 
     /**

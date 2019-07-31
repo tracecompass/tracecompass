@@ -13,12 +13,9 @@
 
 package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -55,6 +52,7 @@ import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.t
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.IFilterStrings;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
 import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.ArrayListStore;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -127,7 +125,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
             // Check if the active trace was changed while the provider was
             // building its segment store
             if (activeProvider.equals(fSegmentProvider)) {
-                updateModel(data);
+                Display.getDefault().asyncExec(() -> setData(activeProvider));
             }
         }
     }
@@ -165,8 +163,6 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
      * Flag to create columns once
      */
     boolean fColumnsCreated = false;
-
-    private Collection<String> fGlobalFilter = Collections.emptySet();
 
     private @Nullable Job fFilteringJob = null;
 
@@ -569,13 +565,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
      */
     @TmfSignalHandler
     public void regexFilterApplied(TmfFilterAppliedSignal signal) {
-        Collection<String> regex = signal.getFilter().getRegexes();
-        setGlobalRegexFilter(regex);
         setData(getSegmentProvider());
-    }
-
-    private void setGlobalRegexFilter(Collection<String> regex) {
-        fGlobalFilter = regex;
     }
 
     /**
@@ -591,9 +581,15 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     protected Multimap<@NonNull Integer, @NonNull String> getRegexes() {
         Multimap<@NonNull Integer, @NonNull String> regexes = HashMultimap.create();
 
-        if (!fGlobalFilter.isEmpty()) {
-            regexes.putAll(IFilterProperty.DIMMED, checkNotNull(fGlobalFilter));
+        ITmfTrace trace = fTrace;
+        if (trace == null) {
+            return regexes;
         }
+        TraceCompassFilter globalFilter = TraceCompassFilter.getFilterForTrace(trace);
+        if (globalFilter == null) {
+            return regexes;
+        }
+        regexes.putAll(IFilterProperty.DIMMED, globalFilter.getRegexes());
 
         return regexes;
     }

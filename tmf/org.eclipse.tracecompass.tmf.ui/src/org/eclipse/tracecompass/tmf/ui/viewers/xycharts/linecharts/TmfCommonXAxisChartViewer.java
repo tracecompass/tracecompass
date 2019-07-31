@@ -9,11 +9,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +34,7 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeQueryRegexFilter;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -122,8 +119,6 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
 
     /** Used for testing **/
     private int fOverrideNbPoints = 0;
-
-    private Collection<@NonNull String> fGlobalFilter = Collections.emptyList();
 
     /**
      * Constructor
@@ -651,13 +646,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      */
     @TmfSignalHandler
     public void regexFilterApplied(TmfFilterAppliedSignal signal) {
-        Collection<@NonNull String> regex = signal.getFilter().getRegexes();
-        setGlobalRegexFilter(regex);
         updateContent();
-    }
-
-    private void setGlobalRegexFilter(Collection<@NonNull String> regex) {
-        fGlobalFilter = regex;
     }
 
     /**
@@ -673,9 +662,15 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
     protected @NonNull Multimap<@NonNull Integer, @NonNull String> getRegexes() {
         Multimap<@NonNull Integer, @NonNull String> regexes = HashMultimap.create();
 
-        if (fGlobalFilter != null && !fGlobalFilter.isEmpty()) {
-            regexes.putAll(IFilterProperty.DIMMED, checkNotNull(fGlobalFilter));
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            return regexes;
         }
+        TraceCompassFilter globalFilter = TraceCompassFilter.getFilterForTrace(trace);
+        if (globalFilter == null) {
+            return regexes;
+        }
+        regexes.putAll(IFilterProperty.DIMMED, globalFilter.getRegexes());
 
         return regexes;
     }
