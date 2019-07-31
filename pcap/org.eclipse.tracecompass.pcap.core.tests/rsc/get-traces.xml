@@ -15,6 +15,57 @@ http://wiki.wireshark.org/SampleCaptures
 <project name="Extract Traces" default="main" >
 
 <target name="main">
+  <antcall>
+    <target name="checkAnyTraceExists"/>
+    <target name="verifyChecksum"/>
+    <target name="deleteFailedCheckSumTraces"/>
+  </antcall>
+  <antcall target="downloadTraceFiles"/>
+  <condition property="tracesExist">
+    <and>
+      <available file="Short_LittleEndian.pcap.zip" />
+    </and>
+  </condition>
+  <antcall target="extractTraces"/>
+</target>
+
+<target name="checkAnyTraceExists">
+  <pathconvert property="anyTraceExists" setonempty="false" pathsep=" ">
+    <path>
+      <fileset dir="." includes="*.zip *.bz2" />
+    </path>
+  </pathconvert>
+</target>
+
+<target name="verifyChecksum">
+  <echo message="Verifying: ${anyTraceExists}"/>
+  <condition property="failedCheckSum">
+    <and>
+      <isset property="anyTraceExists"/>
+      <not>
+        <and>
+          <checksum>
+            <fileset dir="." includes="*.zip *.bz2" />
+          </checksum>
+        </and>
+      </not>
+    </and>
+  </condition>
+</target>
+
+
+<target name="deleteFailedCheckSumTraces" if="failedCheckSum">
+  <echo message="Some traces have failed the checksum tests. Deleting traces."/>
+  <delete verbose="true">
+    <fileset dir="." includes="*.zip *.bz2" />
+  </delete>
+</target>
+
+<target name="warnFailedCheckSum" if="failedCheckSum">
+  <echo message="WARNING: Some downloaded traces failed the checkum."/>
+</target>
+
+<target name="downloadTraceFiles">
   <echo message="Attempting to download test traces"/>
   <get ignoreerrors="true" maxtime="1200" dest="Short_LittleEndian.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/1/18/Short_LittleEndian.pcap.zip" />
   <get ignoreerrors="true" maxtime="1200" dest="Short_BigEndian.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/2/25/Short_BigEndian.pcap.zip" />
@@ -24,27 +75,14 @@ http://wiki.wireshark.org/SampleCaptures
   <get ignoreerrors="true" maxtime="1200" dest="BadPcapFile.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/5/5e/BadPcapFile.pcap.zip" />
   <get ignoreerrors="true" maxtime="2400" dest="BenchmarkTrace.pcap.zip" skipexisting="true" src="http://wiki.eclipse.org/images/1/12/BenchmarkTrace.pcap.zip" />
   <get ignoreerrors="true" maxtime="1200" dest="sample-ctf-trace-20120412.tar.bz2" skipexisting="true" src="http://lttng.org/files/samples/sample-ctf-trace-20120412.tar.bz2"/>
-  <condition property="testSuiteExists">
-    <and>
-      <available file="pcap-testsuite" type="dir"/>
-    </and>
-  </condition>
-  <condition property="tracesExist">
-    <and>
-        <available file="Short_LittleEndian.pcap.zip"/>
-        <available file="Short_BigEndian.pcap.zip"/>
-        <available file="MostlyUDP.pcap.zip"/>
-        <available file="MostlyTCP.pcap.zip"/>
-        <available file="EmptyPcap.pcap.zip"/>
-        <available file="BadPcapFile.pcap.zip"/>
-        <available file="BenchmarkTrace.pcap.zip"/>
-        <available file="sample-ctf-trace-20120412.tar.bz2"/>
-    </and>
-  </condition>
-  <antcall target="extractTraces"/>
 </target>
 
 <target name="extractTraces" if="tracesExist">
+    <antcall>
+      <target name="checkAnyTraceExists"/>
+      <target name="verifyChecksum"/>
+      <target name="warnFailedCheckSum"/>
+    </antcall>
     <unzip src="Short_LittleEndian.pcap.zip" dest="." />
     <unzip src="Short_BigEndian.pcap.zip" dest="." />
     <unzip src="MostlyUDP.pcap.zip" dest="." />
