@@ -239,6 +239,8 @@ public class AddProjectNatureTest {
             title = CUSTOMIZE_VIEW_DIALOG_TITLE_4_6;
         }
         SWTBotShell shell = fBot.shell(title).activate();
+        // Select first cTabItem which has name 'Filters' in 4.10 or older, and 'Pre-set filters' starting with 4.11
+        shell.bot().cTabItem(0).activate();
 
         SWTBotTable table = shell.bot().table();
         SWTBotTableItem item = table.getTableItem(CUSTOMIZE_VIEW_RESOUCES_FILTER);
