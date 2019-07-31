@@ -11,9 +11,9 @@ package org.eclipse.tracecompass.datastore.core.encoding;
 import static org.junit.Assert.*;
 
 import java.nio.ByteBuffer;
+import java.util.PrimitiveIterator.OfLong;
 import java.util.Random;
 
-import org.eclipse.tracecompass.datastore.core.encoding.HTVarInt;
 import org.junit.Test;
 
 /**
@@ -35,9 +35,10 @@ public class HTVarIntTest {
         ByteBuffer bb = ByteBuffer.allocate(128);
         Random r= new Random();
         r.setSeed(0);
+        OfLong randomStream = r.longs(0L, Long.MAX_VALUE).iterator();
         for (int i = 1; i < Long.BYTES; i++) {
             for (int l = 0; l < LOOP_COUNT; l++) {
-                long value = Math.abs(r.nextLong()) >> (i * Byte.SIZE);
+                long value = randomStream.nextLong() >> (i * Byte.SIZE);
                 HTVarInt.writeLong(bb, value);
                 bb.position(0);
                 assertEquals(l + " " + Long.toHexString(value), value, HTVarInt.readLong(bb));
