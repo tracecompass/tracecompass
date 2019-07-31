@@ -12,13 +12,12 @@
 
 package org.eclipse.tracecompass.tmf.core.statistics;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -46,11 +45,11 @@ public class TmfEventsStatistics implements ITmfStatistics {
     /* All timestamps should be stored in nanoseconds in the statistics backend */
     private static final int SCALE = ITmfTimestamp.NANOSECOND_SCALE;
 
-    private final ITmfTrace trace;
+    private final ITmfTrace fTrace;
 
     /* Event request objects for the time-range request. */
-    private StatsTotalRequest totalRequest = null;
-    private StatsPerTypeRequest perTypeRequest = null;
+    private StatsTotalRequest fTotalRequest = null;
+    private StatsPerTypeRequest fPerTypeRequest = null;
 
     /**
      * Constructor
@@ -59,7 +58,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
      *            The trace for which we are building the statistics
      */
     public TmfEventsStatistics(ITmfTrace trace) {
-        this.trace = trace;
+        fTrace = trace;
     }
 
     @Override
@@ -75,18 +74,29 @@ public class TmfEventsStatistics implements ITmfStatistics {
         return new ArrayList<>(req.getResults());
     }
 
-    private synchronized void cancelOngoingRequests() {
-        if (totalRequest != null && totalRequest.isRunning()) {
-            totalRequest.cancel();
+    private void cancelOngoingRequests() {
+        killTotalRequestAndReplace(null);
+        killPerTypeRequestAndReplace(null);
+    }
+
+    private synchronized void killPerTypeRequestAndReplace(StatsPerTypeRequest request) {
+        if (fPerTypeRequest != null && fPerTypeRequest.isRunning()) {
+            fPerTypeRequest.cancel();
         }
-        if (perTypeRequest != null && perTypeRequest.isRunning()) {
-            perTypeRequest.cancel();
+        fPerTypeRequest = request;
+    }
+
+    private synchronized void killTotalRequestAndReplace(StatsTotalRequest request ) {
+        if (fTotalRequest != null && fTotalRequest.isRunning()) {
+            fTotalRequest.cancel();
         }
+        fTotalRequest = request;
     }
 
     @Override
     public long getEventsTotal() {
-        StatsTotalRequest request = new StatsTotalRequest(trace, TmfTimeRange.ETERNITY);
+        StatsTotalRequest request = new StatsTotalRequest(fTrace, TmfTimeRange.ETERNITY);
+        killTotalRequestAndReplace(request);
         sendAndWait(request);
 
         return request.getResult();
@@ -94,7 +104,8 @@ public class TmfEventsStatistics implements ITmfStatistics {
 
     @Override
     public Map<@NonNull String, @NonNull Long> getEventTypesTotal() {
-        StatsPerTypeRequest request = new StatsPerTypeRequest(trace, TmfTimeRange.ETERNITY);
+        StatsPerTypeRequest request = new StatsPerTypeRequest(fTrace, TmfTimeRange.ETERNITY);
+        killPerTypeRequestAndReplace(request);
         sendAndWait(request);
 
         return request.getResults();
@@ -106,7 +117,8 @@ public class TmfEventsStatistics implements ITmfStatistics {
         ITmfTimestamp endTS = TmfTimestamp.create(end, SCALE);
         TmfTimeRange range = new TmfTimeRange(startTS, endTS);
 
-        StatsTotalRequest request = new StatsTotalRequest(trace, range);
+        StatsTotalRequest request = new StatsTotalRequest(fTrace, range);
+        killTotalRequestAndReplace(request);
         sendAndWait(request);
 
         return request.getResult();
@@ -117,19 +129,19 @@ public class TmfEventsStatistics implements ITmfStatistics {
         ITmfTimestamp startTS = TmfTimestamp.create(start, SCALE);
         ITmfTimestamp endTS = TmfTimestamp.create(end, SCALE);
         TmfTimeRange range = new TmfTimeRange(startTS, endTS);
-
-        StatsPerTypeRequest request = new StatsPerTypeRequest(trace, range);
+        StatsPerTypeRequest request = new StatsPerTypeRequest(fTrace, range);
+        killPerTypeRequestAndReplace(request);
         sendAndWait(request);
 
         return request.getResults();
     }
 
     private void sendAndWait(TmfEventRequest request) {
-        trace.sendRequest(request);
+        fTrace.sendRequest(request);
         try {
             request.waitForCompletion();
         } catch (InterruptedException e) {
-            // Do nothing
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -155,7 +167,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
         @Override
         public void handleData(final ITmfEvent event) {
             super.handleData(event);
-            if (!(event instanceof ITmfLostEvent) && event.getTrace() == trace) {
+            if (!(event instanceof ITmfLostEvent) && Objects.equals(event.getTrace(), fTrace)) {
                 total += 1;
             }
         }
@@ -183,7 +195,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
         @Override
         public void handleData(final ITmfEvent event) {
             super.handleData(event);
-            if (event.getTrace() == trace) {
+            if (event.getTrace() == fTrace) {
                 String eventType = event.getName();
                 /*
                  * Special handling for lost events: instead of counting just
@@ -201,12 +213,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
         }
 
         private void incrementStats(@NonNull String key, long count) {
-            if (stats.containsKey(key)) {
-                long curValue = checkNotNull(stats.get(key));
-                stats.put(key, curValue + count);
-            } else {
-                stats.put(key, count);
-            }
+            stats.merge(key, count, Long::sum);
         }
     }
 
@@ -231,7 +238,7 @@ public class TmfEventsStatistics implements ITmfStatistics {
          *            but we need to know when to stop the event request.
          */
         public HistogramQueryRequest(long[] borders, long endTime) {
-            super(trace.getEventType(),
+            super(fTrace.getEventType(),
                     new TmfTimeRange(
                             TmfTimestamp.create(borders[0], SCALE),
                             TmfTimestamp.create(endTime, SCALE)),
@@ -253,19 +260,13 @@ public class TmfEventsStatistics implements ITmfStatistics {
         @Override
         public void handleData(ITmfEvent event) {
             super.handleData(event);
-            if (event.getTrace() == trace) {
+            if (Objects.equals(event.getTrace(), fTrace)) {
                 long ts = event.getTimestamp().toNanos();
                 Long key = results.ceilingKey(ts);
                 if (key != null) {
-                    incrementValue(key);
+                    results.merge(key, 1L, Long::sum);
                 }
             }
-        }
-
-        private void incrementValue(Long key) {
-            long value = checkNotNull(results.get(key));
-            value++;
-            results.put(key, value);
         }
     }
 
