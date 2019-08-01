@@ -27,7 +27,7 @@
   <modules>
     <module>org.eclipse.tracecompass.jsontrace</module>
     <module>org.eclipse.tracecompass.jsontrace.core</module>
-    <module>org.eclipse.tracecompass.jsontrace.core.test</module>
+    <module>org.eclipse.tracecompass.jsontrace.core.tests</module>
   </modules>
 
 </project>

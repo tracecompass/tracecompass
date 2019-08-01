@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.jsontrace.core.test.stub;
+package org.eclipse.tracecompass.jsontrace.core.tests.stub;
 
 import java.io.IOException;
 
