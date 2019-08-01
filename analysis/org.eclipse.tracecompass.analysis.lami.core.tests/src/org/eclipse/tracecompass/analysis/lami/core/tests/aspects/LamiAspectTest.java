@@ -44,7 +44,7 @@ import org.junit.Test;
  *
  * @author Matthew Khouzam
  */
-public class LamiAspectTests {
+public class LamiAspectTest {
 
     private static final @NonNull String ASPECT_NAME = "aspect_name";
 
