@@ -60,42 +60,4 @@
     </profile>
   </profiles>
 
-  <build>
-    <plugins>
-
-      <!-- We don't use the ant file to clean because of http://jira.codehaus.org/browse/MANTRUN-78 -->
-      <plugin>
-        <artifactId>maven-clean-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>clean-traces</id>
-            <phase>clean</phase>
-            <configuration>
-              <filesets>
-                <fileset>
-                  <directory>rsc</directory>
-                  <includes>
-                    <include>*.zip</include>
-                    <include>*.pcap</include>
-                    <include>*.cap</include>
-                    <include>*.tar*</include>
-                  </includes>
-                  <excludes>
-                    <exclude>*.xml</exclude>
-                    <exclude>*.sh</exclude>
-                  </excludes>
-                </fileset>
-                <fileset><directory>rsc/kernel</directory></fileset>
-              </filesets>
-            </configuration>
-            <goals>
-              <goal>clean</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-    </plugins>
-  </build>
-
 </project>
