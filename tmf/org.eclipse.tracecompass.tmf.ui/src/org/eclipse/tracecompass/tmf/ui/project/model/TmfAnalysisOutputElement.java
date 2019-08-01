@@ -13,20 +13,30 @@
 
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisOutput;
 import org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput;
+import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.views.IViewDescriptor;
+import org.eclipse.ui.views.properties.IPropertyDescriptor;
+import org.eclipse.ui.views.properties.IPropertySource2;
 
 /**
  * Class for project elements of type analysis output
  *
  * @author Geneviève Bastien
  */
-public class TmfAnalysisOutputElement extends TmfProjectModelElement {
+public class TmfAnalysisOutputElement extends TmfProjectModelElement implements IPropertySource2 {
+
+    private static final String OUTPUT_PROPERTIES_CATEGORY = Messages.TmfAnalysisOutputElement_Properties;
 
     private final IAnalysisOutput fOutput;
 
@@ -92,6 +102,77 @@ public class TmfAnalysisOutputElement extends TmfProjectModelElement {
      */
     IAnalysisOutput getOutput() {
         return fOutput;
+    }
+
+    // ------------------------------------------------------------------------
+    // IPropertySource2
+    // ------------------------------------------------------------------------
+
+    @Override
+    public Object getEditableValue() {
+        return null;
+    }
+
+    private Map<String, String> getOutpuProperties() {
+        Map<String, String> properties = new HashMap<>();
+
+        IAnalysisOutput output = fOutput;
+        if (output instanceof TmfAnalysisViewOutput) {
+            properties.put(Messages.TmfAnalysisOutputElement_ViewIdProperty, ((TmfAnalysisViewOutput) output).getViewId());
+        }
+        return properties;
+    }
+
+    @Override
+    public IPropertyDescriptor[] getPropertyDescriptors() {
+        Map<String, String> outputProperties = getOutpuProperties();
+        if (!outputProperties.isEmpty()) {
+            List<IPropertyDescriptor> propertyDescriptorArray = new ArrayList<>(outputProperties.size());
+            for (Map.Entry<String, String> varName : outputProperties.entrySet()) {
+                ReadOnlyTextPropertyDescriptor descriptor = new ReadOnlyTextPropertyDescriptor(this.getName() + '_' + varName.getKey(), varName.getKey());
+                descriptor.setCategory(OUTPUT_PROPERTIES_CATEGORY);
+                propertyDescriptorArray.add(descriptor);
+            }
+            return propertyDescriptorArray.toArray(new IPropertyDescriptor[outputProperties.size()]);
+        }
+        return new IPropertyDescriptor[0];
+    }
+
+    @Override
+    public Object getPropertyValue(Object id) {
+        if (id == null) {
+            return null;
+        }
+        Map<String, String> properties = getOutpuProperties();
+        String key = (String) id;
+        /* Remove name from key */
+        key = key.substring(this.getName().length() + 1);
+        if (properties.containsKey(key)) {
+            String value = properties.get(key);
+            return value;
+        }
+
+        return null;
+    }
+
+    @Override
+    public final void resetPropertyValue(Object id) {
+        // Do nothing
+    }
+
+    @Override
+    public final void setPropertyValue(Object id, Object value) {
+        // Do nothing
+    }
+
+    @Override
+    public final boolean isPropertyResettable(Object id) {
+        return false;
+    }
+
+    @Override
+    public final boolean isPropertySet(Object id) {
+        return false;
     }
 
 }
