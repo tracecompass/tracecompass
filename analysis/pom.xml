@@ -41,7 +41,6 @@
     <module>org.eclipse.tracecompass.analysis.profiling.core</module>
     <module>org.eclipse.tracecompass.analysis.profiling.core.tests</module>
     <module>org.eclipse.tracecompass.analysis.profiling.ui</module>
-    <module>org.eclipse.tracecompass.analysis.profiling.ui.swtbot.tests</module>
     <module>org.eclipse.tracecompass.analysis.timing.core</module>
     <module>org.eclipse.tracecompass.analysis.timing.core.tests</module>
     <module>org.eclipse.tracecompass.analysis.timing.ui</module>
@@ -58,6 +57,7 @@
       <modules>
         <module>org.eclipse.tracecompass.analysis.counters.ui.swtbot.tests</module>
         <module>org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests</module>
+        <module>org.eclipse.tracecompass.analysis.profiling.ui.swtbot.tests</module>
         <module>org.eclipse.tracecompass.analysis.timing.ui.swtbot.tests</module>
         <module>org.eclipse.tracecompass.analysis.lami.ui.swtbot.tests</module>
       </modules>
