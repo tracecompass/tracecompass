@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -90,6 +90,13 @@ public class TmfTimePreferencesTest {
         // Make sure the default is still the same
         defaultPreferenceMap = TmfTimePreferences.getDefaultPreferenceMap();
         assertEquals(ITmfTimePreferencesConstants.TIME_HOUR_FMT, defaultPreferenceMap.get(ITmfTimePreferencesConstants.DATIME));
+
+        // Reset the preference to default
+        node.put(ITmfTimePreferencesConstants.DATIME, ITmfTimePreferencesConstants.TIME_HOUR_FMT);
+        try {
+            node.flush();
+        } catch (BackingStoreException e) {
+        }
     }
 
     /**
