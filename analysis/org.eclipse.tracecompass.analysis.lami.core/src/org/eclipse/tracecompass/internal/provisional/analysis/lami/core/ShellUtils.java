@@ -18,7 +18,11 @@ import java.util.List;
  *
  * @author Philippe Proulx
  */
-public class ShellUtils {
+public final class ShellUtils {
+
+    private ShellUtils() {
+        // Do nothing
+    }
 
     /**
      * Converts the string {@code command} to a list of individual arguments.

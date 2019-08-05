@@ -9,7 +9,6 @@
 
 package org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.DirectoryStream;
@@ -106,7 +105,7 @@ public final class LamiAnalysisFactoryFromConfigFile {
      */
     public static LamiAnalysis buildFromConfigFile(Path configFilePath, boolean isUserDefined,
             Predicate<ITmfTrace> appliesTo) throws LamiAnalysisFactoryException {
-        try (final FileInputStream propsStream = new FileInputStream(configFilePath.toFile())) {
+        try (final InputStream propsStream = Files.newInputStream(configFilePath)) {
             return buildFromInputStream(propsStream, isUserDefined, appliesTo);
         } catch (IOException e) {
             throw new LamiAnalysisFactoryException(e);

@@ -20,7 +20,7 @@ import org.eclipse.jdt.annotation.Nullable;
  *
  * @author Alexandre Montplaisir
  */
-class LamiUnknown extends LamiData {
+final class LamiUnknown extends LamiData {
 
     public static final LamiUnknown INSTANCE = new LamiUnknown();
 

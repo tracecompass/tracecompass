@@ -12,8 +12,8 @@ package org.eclipse.tracecompass.internal.provisional.analysis.lami.core;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,11 +29,12 @@ import org.eclipse.tracecompass.internal.analysis.lami.core.Activator;
  *
  * @author Philippe Proulx
  */
-public class LamiConfigUtils {
+public final class LamiConfigUtils {
 
     private static final String CONFIG_DIR = "user-defined-configs"; //$NON-NLS-1$
 
     private LamiConfigUtils() {
+        // Do nothing
     }
 
     /**
@@ -86,7 +87,7 @@ public class LamiConfigUtils {
             throw new IOException(String.format("Configuration file \"%s\" exists", configFilePath.toString())); //$NON-NLS-1$
         }
 
-        try (final FileOutputStream out = new FileOutputStream(configFilePath.toFile())) {
+        try (final OutputStream out = Files.newOutputStream(configFilePath)) {
             String userName = System.getProperty("user.name"); //$NON-NLS-1$
 
             if (userName == null) {

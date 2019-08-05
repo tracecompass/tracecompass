@@ -11,7 +11,7 @@ package org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types;
 
 import org.eclipse.jdt.annotation.Nullable;
 
-class LamiEmpty extends LamiData {
+final class LamiEmpty extends LamiData {
 
     public static final LamiEmpty INSTANCE = new LamiEmpty();
 

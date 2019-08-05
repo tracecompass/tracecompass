@@ -13,7 +13,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyStrin
 
 import org.eclipse.jdt.annotation.Nullable;
 
-class LamiBoolean extends LamiData {
+final class LamiBoolean extends LamiData {
 
     private static final LamiBoolean TRUE = new LamiBoolean(true);
     private static final LamiBoolean FALSE = new LamiBoolean(false);
