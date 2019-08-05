@@ -14,6 +14,7 @@ import java.util.Comparator;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiTableEntry;
+import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiData;
 
 /**
  * Base class for LAMI table aspects.
@@ -66,14 +67,24 @@ public class LamiGenericAspect extends LamiTableEntryAspect {
     public @Nullable Number resolveNumber(@NonNull LamiTableEntry entry) {
         if (fIsContinuous) {
             try {
-                if (entry.getValue(fColIndex).toString() != null) {
-                    return Double.parseDouble(entry.getValue(fColIndex).toString());
+                LamiData value = entry.getValue(fColIndex);
+                if (value.toString() != null) {
+                    return Double.parseDouble(value.toString());
                 }
             } catch (NumberFormatException e) {
                 // Fallback to default value below
             }
         }
         return null;
+    }
+
+    /**
+     * Get the column index
+     *
+     * @return the column index
+     */
+    protected int getColIndex() {
+        return fColIndex;
     }
 
     @Override

@@ -21,9 +21,7 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.La
  *
  * @author Philippe Proulx
  */
-public class LamiProcessTIDAspect extends LamiTableEntryAspect {
-
-    private final int fColIndex;
+public class LamiProcessTIDAspect extends LamiGenericAspect {
 
     /**
      * Constructor
@@ -34,23 +32,12 @@ public class LamiProcessTIDAspect extends LamiTableEntryAspect {
      *            Column index
      */
     public LamiProcessTIDAspect(String colName, int colIndex) {
-        super(colName + " (TID)", null); //$NON-NLS-1$
-        fColIndex = colIndex;
-    }
-
-    @Override
-    public boolean isContinuous() {
-        return false;
-    }
-
-    @Override
-    public boolean isTimeStamp() {
-        return false;
+        super(colName + " (TID)", null, colIndex, false, false); //$NON-NLS-1$
     }
 
     @Override
     public @Nullable String resolveString(LamiTableEntry entry) {
-        LamiData data = entry.getValue(fColIndex);
+        LamiData data = entry.getValue(getColIndex());
         if (data instanceof LamiProcess) {
             Long tid = ((LamiProcess) data).getTID();
 
@@ -66,7 +53,7 @@ public class LamiProcessTIDAspect extends LamiTableEntryAspect {
 
     @Override
     public @Nullable Number resolveNumber(LamiTableEntry entry) {
-        LamiData data = entry.getValue(fColIndex);
+        LamiData data = entry.getValue(getColIndex());
         if (data instanceof LamiProcess) {
             Long tid = ((LamiProcess) data).getTID();
             return tid;

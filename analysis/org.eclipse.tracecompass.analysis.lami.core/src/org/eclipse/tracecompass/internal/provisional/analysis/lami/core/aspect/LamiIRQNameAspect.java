@@ -9,8 +9,6 @@
 
 package org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect;
 
-import java.util.Comparator;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiTableEntry;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiData;
@@ -24,9 +22,7 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.La
  *
  * @author Philippe Proulx
  */
-public class LamiIRQNameAspect extends LamiTableEntryAspect {
-
-    private final int fColIndex;
+public class LamiIRQNameAspect extends LamiGenericAspect {
 
     /**
      * Constructor
@@ -37,23 +33,12 @@ public class LamiIRQNameAspect extends LamiTableEntryAspect {
      *            Column index
      */
     public LamiIRQNameAspect(String colName, int colIndex) {
-        super(colName + " (" + Messages.LamiAspect_Name +')', null); //$NON-NLS-1$
-        fColIndex = colIndex;
-    }
-
-    @Override
-    public boolean isContinuous() {
-        return false;
-    }
-
-    @Override
-    public boolean isTimeStamp() {
-        return false;
+        super(colName + " (" + Messages.LamiAspect_Name +')', null, colIndex, false, false); //$NON-NLS-1$
     }
 
     @Override
     public @Nullable String resolveString(LamiTableEntry entry) {
-        LamiData data = entry.getValue(fColIndex);
+        LamiData data = entry.getValue(getColIndex());
         if (data instanceof LamiIRQ) {
             return ((LamiIRQ) data).getName();
         }
@@ -65,10 +50,4 @@ public class LamiIRQNameAspect extends LamiTableEntryAspect {
     public @Nullable Number resolveNumber(LamiTableEntry entry) {
         return null;
     }
-
-    @Override
-    public Comparator<LamiTableEntry> getComparator() {
-        return LamiComparators.getStringComparator(this::resolveString);
-    }
-
 }

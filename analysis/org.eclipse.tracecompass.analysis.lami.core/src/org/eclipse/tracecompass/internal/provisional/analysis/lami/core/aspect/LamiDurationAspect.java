@@ -22,9 +22,7 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.La
  *
  * @author Michael Jeanson
  */
-public class LamiDurationAspect extends LamiTableEntryAspect {
-
-    private final int fColIndex;
+public class LamiDurationAspect extends LamiGenericAspect {
 
     /**
      * Constructor
@@ -35,18 +33,7 @@ public class LamiDurationAspect extends LamiTableEntryAspect {
      *            Column index
      */
     public LamiDurationAspect(String colName, int colIndex) {
-        super(colName, "ns"); //$NON-NLS-1$
-        fColIndex = colIndex;
-    }
-
-    @Override
-    public boolean isContinuous() {
-        return true;
-    }
-
-    @Override
-    public boolean isTimeStamp() {
-        return false;
+        super(colName, "ns", colIndex, true, false); //$NON-NLS-1$
     }
 
     @Override
@@ -58,14 +45,14 @@ public class LamiDurationAspect extends LamiTableEntryAspect {
     public @Nullable String resolveString(LamiTableEntry entry) {
         Number n = resolveNumber(entry);
         if (n == null) {
-            return String.valueOf(entry.getValue(fColIndex));
+            return String.valueOf(entry.getValue(getColIndex()));
         }
         return n.toString();
     }
 
     @Override
     public @Nullable Number resolveNumber(@NonNull LamiTableEntry entry) {
-        LamiData data = entry.getValue(fColIndex);
+        LamiData data = entry.getValue(getColIndex());
         if (data instanceof LamiDuration) {
             LamiDuration duration = (LamiDuration) data;
 

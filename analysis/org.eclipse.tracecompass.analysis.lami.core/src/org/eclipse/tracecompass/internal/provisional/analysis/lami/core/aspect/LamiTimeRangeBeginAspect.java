@@ -24,9 +24,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
  *
  * @author Alexandre Montplaisir
  */
-public class LamiTimeRangeBeginAspect extends LamiTableEntryAspect {
-
-    private final int fColIndex;
+public class LamiTimeRangeBeginAspect extends LamiGenericAspect {
 
     /**
      * Constructor
@@ -37,23 +35,12 @@ public class LamiTimeRangeBeginAspect extends LamiTableEntryAspect {
      *            Column index
      */
     public LamiTimeRangeBeginAspect(String timeRangeName, int colIndex) {
-        super(timeRangeName + " (" + Messages.LamiAspect_TimeRangeBegin + ')', null); //$NON-NLS-1$
-        fColIndex = colIndex;
-    }
-
-    @Override
-    public boolean isContinuous() {
-        return true;
-    }
-
-    @Override
-    public boolean isTimeStamp() {
-        return true;
+        super(timeRangeName + " (" + Messages.LamiAspect_TimeRangeBegin + ')', null, colIndex, true, true); //$NON-NLS-1$
     }
 
     @Override
     public @Nullable String resolveString(LamiTableEntry entry) {
-        LamiData data = entry.getValue(fColIndex);
+        LamiData data = entry.getValue(getColIndex());
         if (data instanceof LamiTimeRange) {
             LamiTimeRange range = (LamiTimeRange) data;
             LamiTimestamp ts = range.getBegin();
@@ -73,7 +60,7 @@ public class LamiTimeRangeBeginAspect extends LamiTableEntryAspect {
 
     @Override
     public @Nullable Number resolveNumber(@NonNull LamiTableEntry entry) {
-        LamiData data = entry.getValue(fColIndex);
+        LamiData data = entry.getValue(getColIndex());
         if (data instanceof LamiTimeRange) {
             LamiTimeRange range = (LamiTimeRange) data;
             LamiTimestamp ts = range.getBegin();

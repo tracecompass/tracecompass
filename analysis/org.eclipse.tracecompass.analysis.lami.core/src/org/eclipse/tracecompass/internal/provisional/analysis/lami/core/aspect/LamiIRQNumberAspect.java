@@ -23,9 +23,7 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.La
  *
  * @author Philippe Proulx
  */
-public class LamiIRQNumberAspect extends LamiTableEntryAspect {
-
-    private final int fColIndex;
+public class LamiIRQNumberAspect extends LamiGenericAspect {
 
     /**
      * Constructor
@@ -36,33 +34,21 @@ public class LamiIRQNumberAspect extends LamiTableEntryAspect {
      *            Column index
      */
     public LamiIRQNumberAspect(String colName, int colIndex) {
-        super(colName + " (#)", null); //$NON-NLS-1$
-        fColIndex = colIndex;
-    }
-
-    @Override
-    public boolean isContinuous() {
-        return false;
-    }
-
-    @Override
-    public boolean isTimeStamp() {
-        return false;
+        super(colName + " (#)", null, colIndex, false, false); //$NON-NLS-1$
     }
 
     @Override
     public @Nullable String resolveString(LamiTableEntry entry) {
-        LamiData data = entry.getValue(fColIndex);
-        if (data instanceof LamiIRQ) {
-            return String.valueOf(((LamiIRQ) data).getNumber());
+        Number number = resolveNumber(entry);
+        if (number == null) {
+            return entry.getValue(getColIndex()).toString();
         }
-        /* Could be null, unknown, etc. */
-        return data.toString();
+        return String.valueOf(number);
     }
 
     @Override
     public @Nullable Number resolveNumber(LamiTableEntry entry) {
-        LamiData data = entry.getValue(fColIndex);
+        LamiData data = entry.getValue(getColIndex());
         if (data instanceof LamiIRQ) {
             return (((LamiIRQ) data).getNumber());
         }

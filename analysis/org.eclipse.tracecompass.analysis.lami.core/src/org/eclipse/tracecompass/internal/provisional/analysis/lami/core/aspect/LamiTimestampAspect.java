@@ -23,9 +23,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
  *
  * @author Alexandre Montplaisir
  */
-public class LamiTimestampAspect extends LamiTableEntryAspect {
-
-    private final int fColIndex;
+public class LamiTimestampAspect extends LamiGenericAspect {
 
     /**
      * Constructor
@@ -36,23 +34,12 @@ public class LamiTimestampAspect extends LamiTableEntryAspect {
      *            Column index
      */
     public LamiTimestampAspect(String timestampName, int colIndex) {
-        super(timestampName, null);
-        fColIndex = colIndex;
-    }
-
-    @Override
-    public boolean isContinuous() {
-        return true;
-    }
-
-    @Override
-    public boolean isTimeStamp() {
-        return true;
+        super(timestampName, null, colIndex, true, true);
     }
 
     @Override
     public @Nullable String resolveString(LamiTableEntry entry) {
-        LamiData data = entry.getValue(fColIndex);
+        LamiData data = entry.getValue(getColIndex());
         if (data instanceof LamiTimestamp) {
             LamiTimestamp ts = (LamiTimestamp) data;
 
@@ -68,7 +55,7 @@ public class LamiTimestampAspect extends LamiTableEntryAspect {
 
     @Override
     public @Nullable Number resolveNumber(@NonNull LamiTableEntry entry) {
-        LamiData data = entry.getValue(fColIndex);
+        LamiData data = entry.getValue(getColIndex());
         if (data instanceof LamiTimestamp) {
             LamiTimestamp ts = (LamiTimestamp) data;
 

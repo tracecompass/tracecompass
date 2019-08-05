@@ -9,8 +9,6 @@
 
 package org.eclipse.tracecompass.internal.provisional.analysis.lami.core.aspect;
 
-import java.util.Comparator;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.LamiTableEntry;
 import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.LamiData;
@@ -23,9 +21,7 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.La
  *
  * @author Philippe Proulx
  */
-public class LamiMixedAspect extends LamiTableEntryAspect {
-
-    private final int fColIndex;
+public class LamiMixedAspect extends LamiGenericAspect {
 
     /**
      * Constructor
@@ -36,23 +32,12 @@ public class LamiMixedAspect extends LamiTableEntryAspect {
      *            Column index
      */
     public LamiMixedAspect(String colName, int colIndex) {
-        super(colName, null);
-        fColIndex = colIndex;
-    }
-
-    @Override
-    public boolean isContinuous() {
-        return false;
-    }
-
-    @Override
-    public boolean isTimeStamp() {
-        return false;
+        super(colName, null, colIndex, false, false);
     }
 
     @Override
     public @Nullable String resolveString(LamiTableEntry entry) {
-        LamiData data = entry.getValue(fColIndex);
+        LamiData data = entry.getValue(getColIndex());
         Class<? extends LamiData> cls = data.getClass();
 
         DataType dataType = DataType.fromClass(cls);
@@ -73,11 +58,6 @@ public class LamiMixedAspect extends LamiTableEntryAspect {
     @Override
     public @Nullable Number resolveNumber(LamiTableEntry entry) {
         return null;
-    }
-
-    @Override
-    public Comparator<LamiTableEntry> getComparator() {
-        return LamiComparators.getStringComparator(this::resolveString);
     }
 
 }

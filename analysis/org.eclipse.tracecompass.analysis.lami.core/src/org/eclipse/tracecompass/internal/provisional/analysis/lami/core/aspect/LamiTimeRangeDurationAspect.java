@@ -22,7 +22,7 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.types.La
  *
  * @author Alexandre Montplaisir
  */
-public class LamiTimeRangeDurationAspect extends LamiTableEntryAspect {
+public class LamiTimeRangeDurationAspect extends LamiGenericAspect {
 
     private final int fColIndex;
 
@@ -35,18 +35,8 @@ public class LamiTimeRangeDurationAspect extends LamiTableEntryAspect {
      *            Column index
      */
     public LamiTimeRangeDurationAspect(String timeRangeName, int colIndex) {
-        super(timeRangeName + " (" + Messages.LamiAspect_TimeRangeDuration + ')', "ns"); //$NON-NLS-1$ //$NON-NLS-2$
+        super(timeRangeName + " (" + Messages.LamiAspect_TimeRangeDuration + ')', "ns", colIndex, true, false); //$NON-NLS-1$ //$NON-NLS-2$
         fColIndex = colIndex;
-    }
-
-    @Override
-    public boolean isContinuous() {
-        return true;
-    }
-
-    @Override
-    public boolean isTimeStamp() {
-        return false;
     }
 
     @Override
