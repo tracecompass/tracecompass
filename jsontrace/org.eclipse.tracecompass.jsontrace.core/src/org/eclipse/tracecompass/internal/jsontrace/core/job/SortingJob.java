@@ -158,7 +158,7 @@ public abstract class SortingJob extends Job {
                 }
             }
             List<PartiallyParsedEvent> events = new ArrayList<>(CHUNK_SIZE);
-            String eventString = JsonTrace.readNextEventString(() -> (char) parser.read());
+            String eventString = JsonTrace.readNextEventString(parser::read);
             if (eventString == null) {
                 return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Empty event in " + fPath); //$NON-NLS-1$
             }
@@ -173,7 +173,7 @@ public abstract class SortingJob extends Job {
                     if (subMonitor.isCanceled()) {
                         return Status.CANCEL_STATUS;
                     }
-                    eventString = JsonTrace.readNextEventString(() -> (char) parser.read());
+                    eventString = JsonTrace.readNextEventString(parser::read);
                     if (eventString == null) {
                         break;
                     }
@@ -215,12 +215,12 @@ public abstract class SortingJob extends Job {
                  */
                 BufferedInputStream createParser = new BufferedInputStream(new FileInputStream(traceling));
                 while (data != '{') {
-                    data = (char) parser.read();
-                    if (data == (char) -1) {
+                    data = parser.read();
+                    if (data == -1) {
                         break;
                     }
                 }
-                eventString = JsonTrace.readNextEventString(() -> (char) createParser.read());
+                eventString = JsonTrace.readNextEventString(createParser::read);
                 PartiallyParsedEvent parse = new PartiallyParsedEvent(fTsKey, eventString, i);
                 evs.add(parse);
                 i++;
@@ -297,7 +297,7 @@ public abstract class SortingJob extends Job {
 
     private static @Nullable PartiallyParsedEvent readNextEvent(BufferedInputStream parser, String key, int i)
             throws IOException {
-        String event = JsonTrace.readNextEventString(() -> (char) parser.read());
+        String event = JsonTrace.readNextEventString(parser::read);
         return event == null ? null : new PartiallyParsedEvent(key, event, i);
 
     }
