@@ -72,23 +72,7 @@ public class LamiIRQNumberAspect extends LamiTableEntryAspect {
 
     @Override
     public Comparator<LamiTableEntry> getComparator() {
-        return (o1, o2) -> {
-            Number d1 = resolveNumber(o1);
-            Number d2 = resolveNumber(o2);
-
-            if (d1 == null && d2 == null) {
-                return 0;
-            }
-            if (d1 == null) {
-                return 1;
-            }
-
-            if (d2 == null) {
-                return -1;
-            }
-
-            return Integer.compare(d1.intValue(), d2.intValue());
-        };
+        return LamiComparators.getLongComparator(this::resolveNumber);
     }
 
 }

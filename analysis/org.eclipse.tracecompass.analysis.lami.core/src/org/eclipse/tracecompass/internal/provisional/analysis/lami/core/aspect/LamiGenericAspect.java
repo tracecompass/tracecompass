@@ -79,43 +79,11 @@ public class LamiGenericAspect extends LamiTableEntryAspect {
     @Override
     public Comparator<LamiTableEntry> getComparator() {
         if (isContinuous()) {
-            return (o1, o2) -> {
-                Number d1 = resolveNumber(o1);
-                Number d2 = resolveNumber(o2);
-
-                if (d1 == null && d2 == null) {
-                    return 0;
-                }
-                if (d1 == null) {
-                    return 1;
-                }
-
-                if (d2 == null) {
-                    return -1;
-                }
-
-                return Double.compare(d1.doubleValue(), d2.doubleValue());
-            };
+            return LamiComparators.getDoubleComparator(this::resolveNumber);
         }
 
         /* Use regular string comparison */
-        return (o1, o2) -> {
-            String s1 = resolveString(o1);
-            String s2 = resolveString(o2);
-
-            if (s1 == null && s2 == null) {
-                return 0;
-            }
-            if (s1 == null) {
-                return 1;
-            }
-
-            if (s2 == null) {
-                return -1;
-            }
-
-            return s1.compareTo(s2);
-        };
+        return LamiComparators.getStringComparator(this::resolveString);
     }
 
 }

@@ -65,22 +65,6 @@ public class LamiProcessNameAspect extends LamiTableEntryAspect {
 
     @Override
     public Comparator<LamiTableEntry> getComparator() {
-        return (o1, o2) -> {
-            String s1 = resolveString(o1);
-            String s2 = resolveString(o2);
-
-            if (s1 == null && s2 == null) {
-                return 0;
-            }
-            if (s1 == null) {
-                return 1;
-            }
-
-            if (s2 == null) {
-                return -1;
-            }
-
-            return s1.compareTo(s2);
-        };
+        return LamiComparators.getStringComparator(this::resolveString);
     }
 }

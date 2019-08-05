@@ -21,7 +21,7 @@ import org.eclipse.tracecompass.internal.provisional.analysis.lami.core.module.L
  *
  * @author Alexandre Montplaisir
  */
-public class LamiEmptyAspect extends LamiTableEntryAspect {
+public final class LamiEmptyAspect extends LamiTableEntryAspect {
 
     /** Singleton instance */
     public static final LamiEmptyAspect INSTANCE = new LamiEmptyAspect();

@@ -56,14 +56,11 @@ public class LamiDurationAspect extends LamiTableEntryAspect {
 
     @Override
     public @Nullable String resolveString(LamiTableEntry entry) {
-        LamiData data = entry.getValue(fColIndex);
-        if (data instanceof LamiDuration) {
-            LamiDuration duration = (LamiDuration) data;
-
-            // TODO: Consider low and high limits here.
-            return String.valueOf(duration.getValue());
+        Number n = resolveNumber(entry);
+        if (n == null) {
+            return String.valueOf(entry.getValue(fColIndex));
         }
-        return data.toString();
+        return n.toString();
     }
 
     @Override
@@ -80,23 +77,7 @@ public class LamiDurationAspect extends LamiTableEntryAspect {
 
     @Override
     public @NonNull Comparator<@NonNull LamiTableEntry> getComparator() {
-        return (o1, o2) -> {
-            Number d1 = resolveNumber(o1);
-            Number d2 = resolveNumber(o2);
-
-            if (d1 == null && d2 == null) {
-                return 0;
-            }
-            if (d1 == null) {
-                return 1;
-            }
-
-            if (d2 == null) {
-                return -1;
-            }
-
-            return Long.compare(d1.longValue(), d2.longValue());
-        };
+        return LamiComparators.getLongComparator(this::resolveNumber);
     }
 
 }
