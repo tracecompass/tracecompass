@@ -42,28 +42,26 @@ public class FilterTreeLabelProvider implements ILabelProvider {
 
     @Override
     public void addListener(ILabelProviderListener listener) {
-        // TODO Auto-generated method stub
+        // Do nothing
     }
 
     @Override
     public void dispose() {
-        // TODO Auto-generated method stub
+        // Do nothing
     }
 
     @Override
     public boolean isLabelProperty(Object element, String property) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public void removeListener(ILabelProviderListener listener) {
-        // TODO Auto-generated method stub
+        // Do nothing
     }
 
     @Override
     public Image getImage(Object element) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -80,7 +78,7 @@ public class FilterTreeLabelProvider implements ILabelProvider {
         } else if (element instanceof TmfFilterTraceTypeNode) {
 
             TmfFilterTraceTypeNode node = (TmfFilterTraceTypeNode) element;
-            label.append("WITH ").append(node.getNodeName()).append(' ').append((node.getName() != null ? node.getName() : Messages.FilterTreeLabelProvider_TraceTypeHint)); //$NON-NLS-1$
+            label.append(node.isNot() ? NOT : EMPTY_STRING).append("WITH ").append(node.getNodeName()).append(' ').append((node.getName() != null ? node.getName() : Messages.FilterTreeLabelProvider_TraceTypeHint)); //$NON-NLS-1$
 
         } else if (element instanceof TmfFilterAndNode) {
 

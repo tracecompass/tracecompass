@@ -17,11 +17,16 @@ package org.eclipse.tracecompass.tmf.core.filter.model;
 public interface ITmfFilterWithNot {
 
     /**
+     * not attribute name, for serialization
+     */
+    String NOT_ATTRIBUTE = "not"; //$NON-NLS-1$
+
+    /**
      * Gets the not state
      *
      * @return the equals not state
      */
-    public boolean isNot();
+    boolean isNot();
 
     /**
      * Sets the current not state
@@ -29,5 +34,5 @@ public interface ITmfFilterWithNot {
      * @param not
      *            the not state
      */
-    public void setNot(boolean not);
+    void setNot(boolean not);
 }

@@ -28,14 +28,14 @@ import org.eclipse.tracecompass.common.core.xml.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
-import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterWithNot;
+import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterWithValue;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAspectNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterContainsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterEqualsNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
-import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterOrNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterTraceTypeNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -80,60 +80,46 @@ public class TmfFilterXMLWriter {
      */
     public static void buildXMLTree(final Document document, final ITmfFilterTreeNode treenode, Element parentElement) {
         Element element = document.createElement(treenode.getNodeName());
-
+        if (treenode instanceof ITmfFilterWithNot && ((ITmfFilterWithNot) treenode).isNot()) {
+            element.setAttribute(ITmfFilterWithNot.NOT_ATTRIBUTE, Boolean.TRUE.toString());
+        }
+        if (treenode instanceof ITmfFilterWithValue) {
+            ITmfFilterWithValue node = (ITmfFilterWithValue) treenode;
+            element.setAttribute(ITmfFilterWithValue.VALUE_ATTRIBUTE, node.getValue());
+        }
         if (treenode instanceof TmfFilterNode) {
-
             TmfFilterNode node = (TmfFilterNode) treenode;
             element.setAttribute(TmfFilterNode.NAME_ATTR, node.getFilterName());
-
         } else if (treenode instanceof TmfFilterTraceTypeNode) {
 
             TmfFilterTraceTypeNode node = (TmfFilterTraceTypeNode) treenode;
             element.setAttribute(TmfFilterTraceTypeNode.TYPE_ATTR, node.getTraceTypeId());
             element.setAttribute(TmfFilterTraceTypeNode.NAME_ATTR, node.getName());
 
-        } else if (treenode instanceof TmfFilterAndNode) {
-
-            TmfFilterAndNode node = (TmfFilterAndNode) treenode;
-            element.setAttribute(TmfFilterAndNode.NOT_ATTR, Boolean.toString(node.isNot()));
-
-        } else if (treenode instanceof TmfFilterOrNode) {
-
-            TmfFilterOrNode node = (TmfFilterOrNode) treenode;
-            element.setAttribute(TmfFilterOrNode.NOT_ATTR, Boolean.toString(node.isNot()));
-
         } else if (treenode instanceof TmfFilterContainsNode) {
 
             TmfFilterContainsNode node = (TmfFilterContainsNode) treenode;
-            element.setAttribute(TmfFilterContainsNode.NOT_ATTR, Boolean.toString(node.isNot()));
             setAspectAttributes(element, node);
-            element.setAttribute(TmfFilterContainsNode.VALUE_ATTR, node.getValue());
             element.setAttribute(TmfFilterContainsNode.IGNORECASE_ATTR, Boolean.toString(node.isIgnoreCase()));
 
         } else if (treenode instanceof TmfFilterEqualsNode) {
 
             TmfFilterEqualsNode node = (TmfFilterEqualsNode) treenode;
-            element.setAttribute(TmfFilterEqualsNode.NOT_ATTR, Boolean.toString(node.isNot()));
             setAspectAttributes(element, node);
-            element.setAttribute(TmfFilterEqualsNode.VALUE_ATTR, node.getValue());
             element.setAttribute(TmfFilterEqualsNode.IGNORECASE_ATTR, Boolean.toString(node.isIgnoreCase()));
 
         } else if (treenode instanceof TmfFilterMatchesNode) {
 
             TmfFilterMatchesNode node = (TmfFilterMatchesNode) treenode;
-            element.setAttribute(TmfFilterMatchesNode.NOT_ATTR, Boolean.toString(node.isNot()));
             setAspectAttributes(element, node);
             element.setAttribute(TmfFilterMatchesNode.REGEX_ATTR, node.getRegex());
 
         } else if (treenode instanceof TmfFilterCompareNode) {
 
             TmfFilterCompareNode node = (TmfFilterCompareNode) treenode;
-            element.setAttribute(TmfFilterCompareNode.NOT_ATTR, Boolean.toString(node.isNot()));
             setAspectAttributes(element, node);
             element.setAttribute(TmfFilterCompareNode.RESULT_ATTR, Integer.toString(node.getResult()));
             element.setAttribute(TmfFilterCompareNode.TYPE_ATTR, node.getType().toString());
-            element.setAttribute(TmfFilterCompareNode.VALUE_ATTR, node.getValue());
-
         }
 
         parentElement.appendChild(element);

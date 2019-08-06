@@ -27,9 +27,13 @@ public class TmfFilterEqualsNode extends TmfFilterAspectNode implements ITmfFilt
 
     /** equals node name */
     public static final String NODE_NAME = "EQUALS"; //$NON-NLS-1$
-    /** not attribute name */
+    /** not attribute name
+     * @deprecated use {@link ITmfFilterWithNot#NOT_ATTRIBUTE} */
+    @Deprecated
     public static final String NOT_ATTR = "not"; //$NON-NLS-1$
-    /** value attribute name */
+    /** value attribute name
+     * @deprecated use {@link ITmfFilterWithValue#VALUE_ATTRIBUTE} */
+    @Deprecated
     public static final String VALUE_ATTR = "value"; //$NON-NLS-1$
     /** ignorecase attribute name */
     public static final String IGNORECASE_ATTR = "ignorecase"; //$NON-NLS-1$

@@ -15,6 +15,12 @@ package org.eclipse.tracecompass.tmf.core.filter.model;
  * @since 5.1
  */
 public interface ITmfFilterWithValue {
+
+    /**
+     * value attribute name, for serialization
+     */
+    String VALUE_ATTRIBUTE = "value"; //$NON-NLS-1$
+
     /**
      * Gets the value
      *

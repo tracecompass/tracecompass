@@ -24,7 +24,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  * @version 1.0
  * @author Patrick Tasse
  */
-public class TmfFilterTraceTypeNode extends TmfFilterTreeNode {
+public class TmfFilterTraceTypeNode extends TmfFilterTreeNode implements ITmfFilterWithNot {
 
     /** tracetype node name */
     public static final String NODE_NAME = "TRACETYPE"; //$NON-NLS-1$
@@ -36,6 +36,7 @@ public class TmfFilterTraceTypeNode extends TmfFilterTreeNode {
     private String fTraceTypeId;
     private Class<? extends ITmfTrace> fTraceClass;
     private String fName;
+    private boolean fNot;
 
     /**
      * @param parent the parent node
@@ -104,10 +105,10 @@ public class TmfFilterTraceTypeNode extends TmfFilterTreeNode {
                 match = true;
             }
         }
-        if (match) {
+        if (match ^ isNot()) {
             // There should be at most one child
             for (ITmfFilterTreeNode node : getChildren()) {
-                if (! node.matches(event)) {
+                if (!node.matches(event)) {
                     return false;
                 }
             }
@@ -128,6 +129,9 @@ public class TmfFilterTraceTypeNode extends TmfFilterTreeNode {
     public String toString(boolean explicit) {
         StringBuilder buf = new StringBuilder();
         buf.append("TraceType is "); //$NON-NLS-1$
+        if (isNot()) {
+            buf.append("not "); //$NON-NLS-1$
+        }
         buf.append(fName);
         if (explicit) {
             buf.append('[');
@@ -151,5 +155,15 @@ public class TmfFilterTraceTypeNode extends TmfFilterTreeNode {
             buf.append(" )"); //$NON-NLS-1$
         }
         return buf.toString();
+    }
+
+    @Override
+    public boolean isNot() {
+        return fNot;
+    }
+
+    @Override
+    public void setNot(boolean not) {
+        fNot = not;
     }
 }

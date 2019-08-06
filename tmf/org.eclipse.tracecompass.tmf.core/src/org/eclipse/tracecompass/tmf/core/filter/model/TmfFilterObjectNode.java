@@ -25,7 +25,7 @@ import org.eclipse.tracecompass.tmf.core.filter.ITmfFilter;
  * @author Patrick Tasse
  * @since 2.0
  */
-public class TmfFilterObjectNode extends TmfFilterTreeNode {
+public class TmfFilterObjectNode extends TmfFilterTreeNode implements ITmfFilterWithNot {
 
     /** filter node name */
     public static final String NODE_NAME = "FILTEROBJECT"; //$NON-NLS-1$
@@ -33,6 +33,7 @@ public class TmfFilterObjectNode extends TmfFilterTreeNode {
     public static final String NAME_ATTR = "name"; //$NON-NLS-1$
 
     private final ITmfFilter fFilter;
+    private boolean fNot;
 
     /**
      * @param filter the filter object
@@ -68,10 +69,10 @@ public class TmfFilterObjectNode extends TmfFilterTreeNode {
         // There should be at most one child
         for (ITmfFilterTreeNode node : getChildren()) {
             if (node.matches(event)) {
-                return true;
+                return !isNot();
             }
         }
-        return false;
+        return isNot();
     }
 
     @Override
@@ -84,6 +85,19 @@ public class TmfFilterObjectNode extends TmfFilterTreeNode {
         if (fFilter instanceof ITmfFilterTreeNode) {
             return ((ITmfFilterTreeNode) fFilter).toString(explicit);
         }
+        if (isNot()) {
+            return "not " + fFilter.toString(); //$NON-NLS-1$
+        }
         return fFilter.toString();
+    }
+
+    @Override
+    public boolean isNot() {
+        return fNot;
+    }
+
+    @Override
+    public void setNot(boolean not) {
+        fNot = not;
     }
 }

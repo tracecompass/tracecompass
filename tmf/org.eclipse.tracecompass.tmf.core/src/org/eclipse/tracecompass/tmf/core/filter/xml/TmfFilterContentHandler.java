@@ -21,6 +21,8 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterWithNot;
+import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterWithValue;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAspectNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode;
@@ -105,29 +107,16 @@ public class TmfFilterContentHandler extends DefaultHandler {
         } else if (localName.equals(TmfFilterAndNode.NODE_NAME)) {
 
             node = new TmfFilterAndNode(null);
-            String value = atts.getValue(TmfFilterAndNode.NOT_ATTR);
-            if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
-                ((TmfFilterAndNode) node).setNot(true);
-            }
 
         } else if (localName.equals(TmfFilterOrNode.NODE_NAME)) {
 
             node = new TmfFilterOrNode(null);
-            String value = atts.getValue(TmfFilterOrNode.NOT_ATTR);
-            if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
-                ((TmfFilterOrNode) node).setNot(true);
-            }
 
         } else if (localName.equals(TmfFilterContainsNode.NODE_NAME)) {
 
             node = new TmfFilterContainsNode(null);
-            String value = atts.getValue(TmfFilterContainsNode.NOT_ATTR);
-            if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
-                ((TmfFilterContainsNode) node).setNot(true);
-            }
             createEventAspect((TmfFilterAspectNode) node, atts);
-            ((TmfFilterContainsNode) node).setValue(atts.getValue(TmfFilterContainsNode.VALUE_ATTR));
-            value = atts.getValue(TmfFilterContainsNode.IGNORECASE_ATTR);
+            String value = atts.getValue(TmfFilterContainsNode.IGNORECASE_ATTR);
             if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
                 ((TmfFilterContainsNode) node).setIgnoreCase(true);
             }
@@ -135,13 +124,8 @@ public class TmfFilterContentHandler extends DefaultHandler {
         } else if (localName.equals(TmfFilterEqualsNode.NODE_NAME)) {
 
             node = new TmfFilterEqualsNode(null);
-            String value = atts.getValue(TmfFilterEqualsNode.NOT_ATTR);
-            if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
-                ((TmfFilterEqualsNode) node).setNot(true);
-            }
             createEventAspect((TmfFilterAspectNode) node, atts);
-            ((TmfFilterEqualsNode) node).setValue(atts.getValue(TmfFilterEqualsNode.VALUE_ATTR));
-            value = atts.getValue(TmfFilterEqualsNode.IGNORECASE_ATTR);
+            String value = atts.getValue(TmfFilterEqualsNode.IGNORECASE_ATTR);
             if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
                 ((TmfFilterEqualsNode) node).setIgnoreCase(true);
             }
@@ -149,22 +133,14 @@ public class TmfFilterContentHandler extends DefaultHandler {
         } else if (localName.equals(TmfFilterMatchesNode.NODE_NAME)) {
 
             node = new TmfFilterMatchesNode(null);
-            String value = atts.getValue(TmfFilterMatchesNode.NOT_ATTR);
-            if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
-                ((TmfFilterMatchesNode) node).setNot(true);
-            }
             createEventAspect((TmfFilterAspectNode) node, atts);
             ((TmfFilterMatchesNode) node).setRegex(atts.getValue(TmfFilterMatchesNode.REGEX_ATTR));
 
         } else if (localName.equals(TmfFilterCompareNode.NODE_NAME)) {
 
             node = new TmfFilterCompareNode(null);
-            String value = atts.getValue(TmfFilterCompareNode.NOT_ATTR);
-            if (value != null && value.equalsIgnoreCase(Boolean.TRUE.toString())) {
-                ((TmfFilterCompareNode) node).setNot(true);
-            }
             createEventAspect((TmfFilterAspectNode) node, atts);
-            value = atts.getValue(TmfFilterCompareNode.TYPE_ATTR);
+            String value = atts.getValue(TmfFilterCompareNode.TYPE_ATTR);
             if (value != null) {
                 ((TmfFilterCompareNode) node).setType(Type.valueOf(value));
             }
@@ -178,8 +154,6 @@ public class TmfFilterContentHandler extends DefaultHandler {
                     ((TmfFilterCompareNode) node).setResult(0);
                 }
             }
-            ((TmfFilterCompareNode) node).setValue(atts.getValue(TmfFilterCompareNode.VALUE_ATTR));
-
         // Backward compatibility with event type filter node
         } else if (localName.equals(EVENTTYPE_NODE_NAME)) {
 
@@ -210,6 +184,13 @@ public class TmfFilterContentHandler extends DefaultHandler {
                 ((TmfFilterTraceTypeNode) node).setName(label);
             }
 
+        }
+        String value = atts.getValue(ITmfFilterWithNot.NOT_ATTRIBUTE);
+        if (node instanceof ITmfFilterWithNot && Boolean.TRUE.toString().equalsIgnoreCase(value)) {
+            ((ITmfFilterWithNot) node).setNot(true);
+        }
+        if (node instanceof ITmfFilterWithValue) {
+            ((ITmfFilterWithValue) node).setValue(atts.getValue(ITmfFilterWithValue.VALUE_ATTRIBUTE));
         }
 
         fFilterTreeStack.addFirst(node);

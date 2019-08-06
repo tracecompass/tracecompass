@@ -319,7 +319,7 @@ class FilterViewer extends Composite {
         } else if (node instanceof TmfFilterCompareNode) {
             new FilterCompareNodeComposite(fComposite, (TmfFilterCompareNode) node);
         } else {
-            new FilterBaseNodeComposite(fComposite);
+            new FilterBaseNodeComposite(fComposite, node);
         }
         fComposite.layout();
     }
@@ -413,11 +413,14 @@ class FilterViewer extends Composite {
 
     private class FilterBaseNodeComposite extends Composite {
 
-        FilterBaseNodeComposite(Composite parent) {
+        FilterBaseNodeComposite(Composite parent, ITmfFilterTreeNode node) {
             super(parent, SWT.NONE);
             setLayout(new GridLayout(2, false));
             setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+            if (node instanceof ITmfFilterWithNot) {
+                createNotButton((ITmfFilterWithNot) node);
+            }
         }
 
         protected Map<String, TraceTypeHelper> getTraceTypeMap(String selected) {
@@ -499,7 +502,7 @@ class FilterViewer extends Composite {
         private List<AspectItem> fAspectList = null;
 
         FilterAspectNodeComposite(Composite parent, TmfFilterAspectNode node) {
-            super(parent);
+            super(parent, node);
             fAspectNode = node;
         }
 
@@ -701,7 +704,7 @@ class FilterViewer extends Composite {
         Text fNameText;
 
         FilterNodeComposite(Composite parent, TmfFilterNode node) {
-            super(parent);
+            super(parent, node);
             fNode = node;
 
             Label label = new Label(this, SWT.NONE);
@@ -748,7 +751,7 @@ class FilterViewer extends Composite {
         Map<String, TraceTypeHelper> fTraceTypeMap;
 
         FilterTraceTypeNodeComposite(Composite parent, TmfFilterTraceTypeNode node) {
-            super(parent);
+            super(parent, node);
             fNode = node;
             fTraceTypeMap = getTraceTypeMap(fNode.getTraceTypeId());
 
@@ -775,16 +778,14 @@ class FilterViewer extends Composite {
     private class FilterAndNodeComposite extends FilterBaseNodeComposite {
 
         FilterAndNodeComposite(Composite parent, TmfFilterAndNode node) {
-            super(parent);
-            createNotButton(node);
+            super(parent, node);
         }
     }
 
     private class FilterOrNodeComposite extends FilterBaseNodeComposite {
 
         FilterOrNodeComposite(Composite parent, TmfFilterOrNode node) {
-            super(parent);
-            createNotButton(node);
+            super(parent, node);
         }
     }
 
@@ -795,8 +796,6 @@ class FilterViewer extends Composite {
         FilterContainsNodeComposite(Composite parent, TmfFilterContainsNode node) {
             super(parent, node);
             fNode = node;
-
-            createNotButton(node);
 
             createAspectControls();
 
@@ -827,8 +826,6 @@ class FilterViewer extends Composite {
             super(parent, node);
             fNode = node;
 
-            createNotButton(node);
-
             createAspectControls();
 
             createValueText(fNode);
@@ -858,7 +855,6 @@ class FilterViewer extends Composite {
         FilterMatchesNodeComposite(Composite parent, TmfFilterMatchesNode node) {
             super(parent, node);
             fNode = node;
-            createNotButton(node);
             createAspectControls();
 
             Label label = new Label(this, SWT.NONE);
@@ -912,7 +908,6 @@ class FilterViewer extends Composite {
             super(parent, node);
             fNode = node;
 
-            createNotButton(node);
             createAspectControls();
 
             Label label = new Label(this, SWT.NONE);
