@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * @version 1.0
  * @author Patrick Tasse
  */
-public class TmfFilterContainsNode extends TmfFilterAspectNode {
+public class TmfFilterContainsNode extends TmfFilterAspectNode implements ITmfFilterWithValue {
 
     /** contains node name */
     public static final String NODE_NAME = "CONTAINS"; //$NON-NLS-1$
@@ -45,16 +45,12 @@ public class TmfFilterContainsNode extends TmfFilterAspectNode {
         super(parent);
     }
 
-    /**
-     * @return the contains value
-     */
+    @Override
     public String getValue() {
         return fValue;
     }
 
-    /**
-     * @param value the contains value
-     */
+    @Override
     public void setValue(String value) {
         fValue = value;
         fValueUpperCase = null;

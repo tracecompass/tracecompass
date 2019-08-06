@@ -60,6 +60,7 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterWithNot;
+import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterWithValue;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAspectNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode;
@@ -448,6 +449,45 @@ class FilterViewer extends Composite {
             return notButton;
         }
 
+        protected Text createValueText(ITmfFilterWithValue valueNode) {
+            Label label = new Label(this, SWT.NONE);
+            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+            label.setText(Messages.FilterViewer_ValueLabel);
+
+            Text valueText = new Text(this, SWT.BORDER);
+            valueText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+            String value = valueNode.getValue();
+            if (value != null && value.length() > 0) {
+                valueText.setText(value);
+            } else {
+                valueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+                valueText.setText(Messages.FilterViewer_ValueHint);
+            }
+            valueText.addFocusListener(new FocusListener() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                    if (value == null || value.length() == 0) {
+                        valueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+                        valueText.setText(Messages.FilterViewer_ValueHint);
+                    }
+                }
+
+                @Override
+                public void focusGained(FocusEvent e) {
+                    if (valueText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                        valueText.setText(""); //$NON-NLS-1$
+                    }
+                    valueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+                }
+            });
+            valueText.addModifyListener(e -> {
+                if (!valueText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                    valueNode.setValue(valueText.getText());
+                    fViewer.refresh(valueNode);
+                }
+            });
+            return valueText;
+        }
     }
 
     private abstract class FilterAspectNodeComposite extends FilterBaseNodeComposite {
@@ -750,7 +790,6 @@ class FilterViewer extends Composite {
 
     private class FilterContainsNodeComposite extends FilterAspectNodeComposite {
         private final TmfFilterContainsNode fNode;
-        private final Text fValueText;
         private final Button fIgnoreCaseButton;
 
         FilterContainsNodeComposite(Composite parent, TmfFilterContainsNode node) {
@@ -761,43 +800,9 @@ class FilterViewer extends Composite {
 
             createAspectControls();
 
+            createValueText(fNode);
+
             Label label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            label.setText(Messages.FilterViewer_ValueLabel);
-
-            fValueText = new Text(this, SWT.BORDER);
-            fValueText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-            if (node.getValue() != null && node.getValue().length() > 0) {
-                fValueText.setText(node.getValue());
-            } else {
-                fValueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-                fValueText.setText(Messages.FilterViewer_ValueHint);
-            }
-            fValueText.addFocusListener(new FocusListener() {
-                @Override
-                public void focusLost(FocusEvent e) {
-                    if (fNode.getValue() == null || fNode.getValue().length() == 0) {
-                        fValueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-                        fValueText.setText(Messages.FilterViewer_ValueHint);
-                    }
-                }
-
-                @Override
-                public void focusGained(FocusEvent e) {
-                    if (fValueText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
-                        fValueText.setText(""); //$NON-NLS-1$
-                    }
-                    fValueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-                }
-            });
-            fValueText.addModifyListener(e -> {
-                if (!fValueText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
-                    fNode.setValue(fValueText.getText());
-                    fViewer.refresh(fNode);
-                }
-            });
-
-            label = new Label(this, SWT.NONE);
             label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 
             fIgnoreCaseButton = new Button(this, SWT.CHECK);
@@ -816,7 +821,6 @@ class FilterViewer extends Composite {
 
     private class FilterEqualsNodeComposite extends FilterAspectNodeComposite {
         private final TmfFilterEqualsNode fNode;
-        private final Text fValueText;
         private final Button fIgnoreCaseButton;
 
         FilterEqualsNodeComposite(Composite parent, TmfFilterEqualsNode node) {
@@ -827,43 +831,9 @@ class FilterViewer extends Composite {
 
             createAspectControls();
 
+            createValueText(fNode);
+
             Label label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            label.setText(Messages.FilterViewer_ValueLabel);
-
-            fValueText = new Text(this, SWT.BORDER);
-            fValueText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-            if (node.getValue() != null && node.getValue().length() > 0) {
-                fValueText.setText(node.getValue());
-            } else {
-                fValueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-                fValueText.setText(Messages.FilterViewer_ValueHint);
-            }
-            fValueText.addFocusListener(new FocusListener() {
-                @Override
-                public void focusLost(FocusEvent e) {
-                    if (fNode.getValue() == null || fNode.getValue().length() == 0) {
-                        fValueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-                        fValueText.setText(Messages.FilterViewer_ValueHint);
-                    }
-                }
-
-                @Override
-                public void focusGained(FocusEvent e) {
-                    if (fValueText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
-                        fValueText.setText(""); //$NON-NLS-1$
-                    }
-                    fValueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-                }
-            });
-            fValueText.addModifyListener(e -> {
-                if (!fValueText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
-                    fNode.setValue(fValueText.getText());
-                    fViewer.refresh(fNode);
-                }
-            });
-
-            label = new Label(this, SWT.NONE);
             label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 
             fIgnoreCaseButton = new Button(this, SWT.CHECK);
@@ -931,7 +901,6 @@ class FilterViewer extends Composite {
 
     private class FilterCompareNodeComposite extends FilterAspectNodeComposite {
         private final TmfFilterCompareNode fNode;
-        private final Text fValueText;
         private final Button fLTButton;
         private final Button fEQButton;
         private final Button fGTButton;
@@ -1052,41 +1021,7 @@ class FilterViewer extends Composite {
                 }
             });
 
-            label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            label.setText(Messages.FilterViewer_ValueLabel);
-
-            fValueText = new Text(this, SWT.BORDER);
-            fValueText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-            if (node.getValue() != null && node.getValue().length() > 0) {
-                fValueText.setText(node.getValue());
-            } else {
-                fValueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-                fValueText.setText(Messages.FilterViewer_ValueHint);
-            }
-            fValueText.addFocusListener(new FocusListener() {
-                @Override
-                public void focusLost(FocusEvent e) {
-                    if (fNode.getValue() == null || fNode.getValue().length() == 0) {
-                        fValueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-                        fValueText.setText(Messages.FilterViewer_ValueHint);
-                    }
-                }
-
-                @Override
-                public void focusGained(FocusEvent e) {
-                    if (fValueText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
-                        fValueText.setText(""); //$NON-NLS-1$
-                    }
-                    fValueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-                }
-            });
-            fValueText.addModifyListener(e -> {
-                if (!fValueText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
-                    fNode.setValue(fValueText.getText());
-                    fViewer.refresh(fNode);
-                }
-            });
+            createValueText(fNode);
         }
     }
 

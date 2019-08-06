@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * @version 1.0
  * @author Patrick Tasse
  */
-public class TmfFilterEqualsNode extends TmfFilterAspectNode {
+public class TmfFilterEqualsNode extends TmfFilterAspectNode implements ITmfFilterWithValue {
 
     /** equals node name */
     public static final String NODE_NAME = "EQUALS"; //$NON-NLS-1$
@@ -44,16 +44,12 @@ public class TmfFilterEqualsNode extends TmfFilterAspectNode {
         super(parent);
     }
 
-    /**
-     * @return the equals value
-     */
+    @Override
     public String getValue() {
         return fValue;
     }
 
-    /**
-     * @param value the equals value
-     */
+    @Override
     public void setValue(String value) {
         this.fValue = value;
     }

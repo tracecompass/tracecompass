@@ -28,7 +28,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
  * @version 1.0
  * @author Patrick Tasse
  */
-public class TmfFilterCompareNode extends TmfFilterAspectNode {
+public class TmfFilterCompareNode extends TmfFilterAspectNode implements ITmfFilterWithValue {
 
     /** compare node name */
     public static final String NODE_NAME = "COMPARE"; //$NON-NLS-1$
@@ -97,16 +97,15 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode {
         setValue(fValue);
     }
 
-    /**
-     * @return the comparison value (in seconds for the TIMESTAMP type)
-     */
+    @Override
     public String getValue() {
         return fValue;
     }
 
     /**
-     * @param value the comparison value (in seconds for the TIMESTAMP type)
+     * @param value the comparison value (in nanoseconds for the TIMESTAMP type)
      */
+    @Override
     public void setValue(String value) {
         this.fValue = value;
         fValueNumber = null;
