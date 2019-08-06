@@ -531,7 +531,7 @@ public class XmlUtils {
      *             If any IO errors occur.
      */
     public static Document getDocumentFromFile(File file) throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory dbFactory = org.eclipse.tracecompass.common.core.xml.XmlUtils.newSafeDocumentBuilderFactory();
         Document doc = dbFactory.newDocumentBuilder().parse(file);
         doc.getDocumentElement().normalize();
         return doc;

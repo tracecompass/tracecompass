@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -30,6 +29,7 @@ import javax.xml.validation.Validator;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.xml.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.remote.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageElement;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.importexport.ManifestReader;
@@ -128,7 +128,7 @@ public class RemoteImportProfilesReader {
 
         List<TracePackageElement> packageElements = new ArrayList<>();
         RemoteImportProfileElement profile = null;
-        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
+        Document doc = XmlUtils.newSafeDocumentBuilderFactory().newDocumentBuilder().parse(
                 inputStream);
 
         NodeList profileNodes = doc.getDocumentElement().getElementsByTagName(

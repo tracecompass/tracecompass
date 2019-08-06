@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -94,7 +93,7 @@ public final class TmfXmlTestUtils {
      *             Exception thrown by parser
      */
     public static List<@NonNull Element> getXmlElements(String elementName, String xmlString) throws SAXException, IOException, ParserConfigurationException {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        DocumentBuilder builder = org.eclipse.tracecompass.common.core.xml.XmlUtils.newSafeDocumentBuilderFactory().newDocumentBuilder();
         InputSource src = new InputSource();
         src.setCharacterStream(new StringReader(xmlString));
 

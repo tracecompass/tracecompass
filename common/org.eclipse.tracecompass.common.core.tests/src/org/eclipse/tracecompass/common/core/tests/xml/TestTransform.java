@@ -94,7 +94,7 @@ public class TestTransform {
     private static void testExploit(String attackVector) throws SAXException, IOException, ParserConfigurationException, TransformerException {
         Transformer newSafeTransformer = XmlUtils.newSecureTransformer();
         assertNotNull(newSafeTransformer);
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory dbf = XmlUtils.newSafeDocumentBuilderFactory();
         Document document = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(attackVector)));
         newSafeTransformer.setOutputProperty(OutputKeys.METHOD, "xml");
         newSafeTransformer.setOutputProperty(OutputKeys.INDENT, "yes");

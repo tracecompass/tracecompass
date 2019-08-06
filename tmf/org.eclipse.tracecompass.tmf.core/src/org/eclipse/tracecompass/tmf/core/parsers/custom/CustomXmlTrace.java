@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IProject;
@@ -31,6 +30,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.xml.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.parsers.custom.CustomEventAspects;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -307,8 +307,7 @@ public class CustomXmlTrace extends TmfTrace implements ITmfPersistentlyIndexabl
 
     private Element parseElementBuffer(final StringBuffer elementBuffer) {
         try {
-            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            final DocumentBuilder db = dbf.newDocumentBuilder();
+            final DocumentBuilder db = XmlUtils.newSafeDocumentBuilderFactory().newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
             final EntityResolver resolver = (publicId, systemId) -> {

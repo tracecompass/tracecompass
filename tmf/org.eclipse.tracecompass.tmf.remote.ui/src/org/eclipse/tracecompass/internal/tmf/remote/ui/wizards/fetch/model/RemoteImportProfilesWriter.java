@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.model;
 
 import java.io.StringWriter;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -53,7 +52,7 @@ public class RemoteImportProfilesWriter {
     public static String writeProfilesToXML(TracePackageElement[] profiles)
             throws ParserConfigurationException, TransformerException {
 
-        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        Document doc = XmlUtils.newSafeDocumentBuilderFactory().newDocumentBuilder().newDocument();
         Element profilesElement = doc.createElement(RemoteImportProfileConstants.PROFILES_ELEMENT);
         doc.appendChild(profilesElement);
         Element versionElement = doc.createElement(RemoteImportProfileConstants.VERSION_ELEMENT);

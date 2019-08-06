@@ -32,7 +32,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -512,8 +511,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
     @Override
     public void save(String path) {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = XmlUtils.newSafeDocumentBuilderFactory().newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
             db.setEntityResolver(createEmptyEntityResolver());
@@ -695,8 +693,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
      */
     public static CustomTxtTraceDefinition[] loadAll(String path) {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = XmlUtils.newSafeDocumentBuilderFactory().newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
             db.setEntityResolver(createEmptyEntityResolver());
@@ -748,8 +745,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
      */
     public static CustomTxtTraceDefinition load(String categoryName, String definitionName) {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = XmlUtils.newSafeDocumentBuilderFactory().newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
             db.setEntityResolver(createEmptyEntityResolver());
@@ -899,8 +895,7 @@ public class CustomTxtTraceDefinition extends CustomTraceDefinition {
      */
     public static void delete(String categoryName, String definitionName) {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = XmlUtils.newSafeDocumentBuilderFactory().newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
             db.setEntityResolver(createEmptyEntityResolver());

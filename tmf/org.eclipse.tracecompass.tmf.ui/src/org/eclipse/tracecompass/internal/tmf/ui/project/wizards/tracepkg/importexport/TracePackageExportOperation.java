@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
@@ -112,7 +111,7 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
 
             fExportFolder = createExportFolder(progressMonitor);
 
-            Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Document doc = XmlUtils.newSafeDocumentBuilderFactory().newDocumentBuilder().newDocument();
             Element createElement = doc.createElement(ITracePackageConstants.TMF_EXPORT_ELEMENT);
             Node tmfNode = doc.appendChild(createElement);
 

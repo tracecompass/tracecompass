@@ -59,7 +59,7 @@ public class TmfFilterXMLWriter {
      *   cannot be created which satisfies the configuration requested.
      */
     public TmfFilterXMLWriter(final ITmfFilterTreeNode root) throws ParserConfigurationException {
-        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory documentBuilderFactory = XmlUtils.newSafeDocumentBuilderFactory();
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         document = documentBuilder.newDocument();
 

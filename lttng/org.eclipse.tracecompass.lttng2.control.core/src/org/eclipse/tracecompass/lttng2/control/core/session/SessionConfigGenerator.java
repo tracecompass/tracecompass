@@ -18,7 +18,6 @@ import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -174,8 +173,7 @@ public final class SessionConfigGenerator {
      *             On an parser configuration error
      */
     private static @NonNull Document generateSessionConfig(Iterable<ISessionInfo> sessions) throws IllegalArgumentException, ParserConfigurationException {
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        DocumentBuilder docBuilder = XmlUtils.newSafeDocumentBuilderFactory().newDocumentBuilder();
 
         Document document = docBuilder.newDocument();
 

@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.tracecompass.common.core.xml.XmlUtils;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IBaseEventInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IChannelInfo;
 import org.eclipse.tracecompass.internal.lttng2.control.core.model.IDomainInfo;
@@ -115,7 +116,8 @@ public class LTTngControlServiceMI extends LTTngControlService {
         super(shell);
         setVersion(version);
 
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory docBuilderFactory = XmlUtils.newSafeDocumentBuilderFactory();
+        docBuilderFactory.setExpandEntityReferences(false);
         docBuilderFactory.setValidating(false);
 
         if (isSchemaValidationEnabled()) {
@@ -189,7 +191,7 @@ public class LTTngControlServiceMI extends LTTngControlService {
      *             when xml extraction fail
      */
     public static LttngVersion parseVersion(ICommandResult commandResult) throws ExecutionException {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory docBuilderFactory = XmlUtils.newSafeDocumentBuilderFactory();
         DocumentBuilder documentBuilder;
         try {
             documentBuilder = docBuilderFactory.newDocumentBuilder();

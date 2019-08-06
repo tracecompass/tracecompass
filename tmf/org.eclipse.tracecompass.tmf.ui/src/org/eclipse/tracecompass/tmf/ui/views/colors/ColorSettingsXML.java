@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Transformer;
@@ -70,8 +69,7 @@ public class ColorSettingsXML {
      */
     public static void save(String pathName, ColorSetting[] colorSettings) {
         try {
-            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            DocumentBuilder documentBuilder = XmlUtils.newSafeDocumentBuilderFactory().newDocumentBuilder();
             Document document = documentBuilder.newDocument();
 
             Element rootElement = document.createElement(COLOR_SETTINGS_TAG);

@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -163,9 +162,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
     @Override
     public void save(String path) {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-
+            DocumentBuilder db = XmlUtils.newSafeDocumentBuilderFactory().newDocumentBuilder();
             // The following allows xml parsing without access to the dtd
             db.setEntityResolver(createEmptyEntityResolver());
 
@@ -374,8 +371,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
      */
     public static CustomXmlTraceDefinition[] loadAll(InputStream stream) {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = XmlUtils.newSafeDocumentBuilderFactory().newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
             db.setEntityResolver(createEmptyEntityResolver());
@@ -418,8 +414,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
      */
     public static CustomXmlTraceDefinition load(String categoryName, String definitionName) {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = XmlUtils.newSafeDocumentBuilderFactory().newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
             EntityResolver resolver = (publicId, systemId) -> {
@@ -598,8 +593,7 @@ public class CustomXmlTraceDefinition extends CustomTraceDefinition {
      */
     public static void delete(String categoryName, String definitionName) {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = XmlUtils.newSafeDocumentBuilderFactory().newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
             EntityResolver resolver = (publicId, systemId) -> {

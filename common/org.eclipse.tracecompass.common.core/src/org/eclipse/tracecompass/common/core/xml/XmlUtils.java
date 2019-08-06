@@ -10,9 +10,13 @@
 package org.eclipse.tracecompass.common.core.xml;
 
 import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
+
+import org.eclipse.tracecompass.internal.common.core.Activator;
 
 /**
  * XML Utilities. Useful to avoid copy-pasting secure code generation. Utils
@@ -52,5 +56,68 @@ public final class XmlUtils {
         TransformerFactory factory = TransformerFactory.newInstance();
         factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         return factory.newTransformer();
+    }
+
+    /**
+     * Create a document builder factory that is safe according to the OWASP
+     * injection prevention cheat sheet.
+     *
+     * @return the documentBuilderFactory
+     * @since 4.1
+     */
+    public static DocumentBuilderFactory newSafeDocumentBuilderFactory() {
+        String feature = null;
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        try {
+            // This one is from Sonar (squid:S2755)
+            dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            // This is the PRIMARY defense. If DTDs (doctypes) are disallowed,
+            // almost all
+            // XML entity attacks are prevented
+            // Xerces 2 only -
+            // http://xerces.apache.org/xerces2-j/features.html#disallow-doctype-decl
+            feature = "http://apache.org/xml/features/disallow-doctype-decl"; //$NON-NLS-1$
+            dbf.setFeature(feature, true);
+
+            // If you can't completely disable DTDs, then at least do the
+            // following:
+            // Xerces 1 -
+            // http://xerces.apache.org/xerces-j/features.html#external-general-entities
+            // Xerces 2 -
+            // http://xerces.apache.org/xerces2-j/features.html#external-general-entities
+            // JDK7+ - http://xml.org/sax/features/external-general-entities
+            feature = "http://xml.org/sax/features/external-general-entities"; //$NON-NLS-1$
+            dbf.setFeature(feature, false);
+
+            // Xerces 1 -
+            // http://xerces.apache.org/xerces-j/features.html#external-parameter-entities
+            // Xerces 2 -
+            // http://xerces.apache.org/xerces2-j/features.html#external-parameter-entities
+            // JDK7+ - http://xml.org/sax/features/external-parameter-entities
+            feature = "http://xml.org/sax/features/external-parameter-entities"; //$NON-NLS-1$
+            dbf.setFeature(feature, false);
+
+            // Disable external DTDs as well
+            feature = "http://apache.org/xml/features/nonvalidating/load-external-dtd"; //$NON-NLS-1$
+            dbf.setFeature(feature, false);
+
+            // and these as well, per Timothy Morgan's 2014 paper: "XML Schema,
+            // DTD, and Entity Attacks"
+            dbf.setXIncludeAware(false);
+            dbf.setExpandEntityReferences(false);
+
+            // And, per Timothy Morgan:
+            // "If for some reason support for inline  DOCTYPEs are a requirement, then  ensure
+            // the entity settings are disabled (as shown above) and beware that SSRF attacks
+            // (http://cwe.mitre.org/data/definitions/918.html)
+            // and denial of service attacks (such as billion laughs or decompression bombs via
+            // "jar:") are a risk."
+
+        } catch (ParserConfigurationException e) {
+            // This should catch a failed setFeature feature
+            Activator.instance().logInfo("ParserConfigurationException was thrown. The feature '" + feature //$NON-NLS-1$
+                    + "' is probably not supported by your XML processor.", e); //$NON-NLS-1$
+        }
+        return dbf;
     }
 }

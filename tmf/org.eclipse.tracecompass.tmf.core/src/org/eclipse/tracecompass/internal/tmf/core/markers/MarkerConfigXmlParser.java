@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.common.core.xml.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.markers.Marker.PeriodicMarker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker.SplitMarker;
@@ -133,7 +134,7 @@ public class MarkerConfigXmlParser {
 
         List<MarkerSet> markerSets = new ArrayList<>();
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory dbf = XmlUtils.newSafeDocumentBuilderFactory();
             dbf.setValidating(false);
             dbf.setNamespaceAware(true);
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);

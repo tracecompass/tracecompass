@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IFile;
@@ -74,6 +73,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.tracecompass.common.core.xml.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.parsers.custom.CustomTraceDefinition;
@@ -749,8 +749,7 @@ public class CustomXmlParserInputWizardPage extends WizardPage {
 
     private void parseXmlInput(final String string) {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = XmlUtils.newSafeDocumentBuilderFactory().newDocumentBuilder();
 
             // The following allows xml parsing without access to the dtd
             EntityResolver resolver = (publicId, systemId) -> {
