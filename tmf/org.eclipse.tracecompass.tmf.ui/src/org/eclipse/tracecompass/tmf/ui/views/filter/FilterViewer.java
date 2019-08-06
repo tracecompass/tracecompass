@@ -59,6 +59,7 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
+import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterWithNot;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAndNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterAspectNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterCompareNode;
@@ -427,15 +428,35 @@ class FilterViewer extends Composite {
             }
             return traceTypeMap;
         }
+
+        protected Button createNotButton(ITmfFilterWithNot node) {
+            Label label;
+            label = new Label(this, SWT.NONE);
+            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+            label.setText(Messages.FilterViewer_NotLabel);
+
+            Button notButton = new Button(this, SWT.CHECK);
+            notButton.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+            notButton.setSelection(node.isNot());
+            notButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    node.setNot(notButton.getSelection());
+                    fViewer.refresh(node);
+                }
+            });
+            return notButton;
+        }
+
     }
 
     private abstract class FilterAspectNodeComposite extends FilterBaseNodeComposite {
-        TmfFilterAspectNode fAspectNode;
-        Combo fTraceTypeCombo;
-        Combo fAspectCombo;
-        Label fFieldLabel;
-        Text fFieldText;
-        List<AspectItem> fAspectList = null;
+        private final TmfFilterAspectNode fAspectNode;
+        private Combo fTraceTypeCombo;
+        private Combo fAspectCombo;
+        private Label fFieldLabel;
+        private Text fFieldText;
+        private List<AspectItem> fAspectList = null;
 
         FilterAspectNodeComposite(Composite parent, TmfFilterAspectNode node) {
             super(parent);
@@ -712,83 +733,35 @@ class FilterViewer extends Composite {
     }
 
     private class FilterAndNodeComposite extends FilterBaseNodeComposite {
-        TmfFilterAndNode fNode;
-        Button fNotButton;
 
         FilterAndNodeComposite(Composite parent, TmfFilterAndNode node) {
             super(parent);
-            fNode = node;
-
-            Label label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            label.setText(Messages.FilterViewer_NotLabel);
-
-            fNotButton = new Button(this, SWT.CHECK);
-            fNotButton.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            fNotButton.setSelection(fNode.isNot());
-            fNotButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    fNode.setNot(fNotButton.getSelection());
-                    fViewer.refresh(fNode);
-                }
-            });
+            createNotButton(node);
         }
     }
 
     private class FilterOrNodeComposite extends FilterBaseNodeComposite {
-        TmfFilterOrNode fNode;
-        Button fNotButton;
 
         FilterOrNodeComposite(Composite parent, TmfFilterOrNode node) {
             super(parent);
-            fNode = node;
-
-            Label label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            label.setText(Messages.FilterViewer_NotLabel);
-
-            fNotButton = new Button(this, SWT.CHECK);
-            fNotButton.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            fNotButton.setSelection(fNode.isNot());
-            fNotButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    fNode.setNot(fNotButton.getSelection());
-                    fViewer.refresh(fNode);
-                }
-            });
+            createNotButton(node);
         }
     }
 
     private class FilterContainsNodeComposite extends FilterAspectNodeComposite {
-        TmfFilterContainsNode fNode;
-        Button fNotButton;
-        Text fValueText;
-        Button fIgnoreCaseButton;
+        private final TmfFilterContainsNode fNode;
+        private final Text fValueText;
+        private final Button fIgnoreCaseButton;
 
         FilterContainsNodeComposite(Composite parent, TmfFilterContainsNode node) {
             super(parent, node);
             fNode = node;
 
-            Label label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            label.setText(Messages.FilterViewer_NotLabel);
-
-            fNotButton = new Button(this, SWT.CHECK);
-            fNotButton.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            fNotButton.setSelection(fNode.isNot());
-            fNotButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    fNode.setNot(fNotButton.getSelection());
-                    fViewer.refresh(fNode);
-                }
-            });
+            createNotButton(node);
 
             createAspectControls();
 
-            label = new Label(this, SWT.NONE);
+            Label label = new Label(this, SWT.NONE);
             label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             label.setText(Messages.FilterViewer_ValueLabel);
 
@@ -842,33 +815,19 @@ class FilterViewer extends Composite {
     }
 
     private class FilterEqualsNodeComposite extends FilterAspectNodeComposite {
-        TmfFilterEqualsNode fNode;
-        Button fNotButton;
-        Text fValueText;
-        Button fIgnoreCaseButton;
+        private final TmfFilterEqualsNode fNode;
+        private final Text fValueText;
+        private final Button fIgnoreCaseButton;
 
         FilterEqualsNodeComposite(Composite parent, TmfFilterEqualsNode node) {
             super(parent, node);
             fNode = node;
 
-            Label label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            label.setText(Messages.FilterViewer_NotLabel);
-
-            fNotButton = new Button(this, SWT.CHECK);
-            fNotButton.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            fNotButton.setSelection(fNode.isNot());
-            fNotButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    fNode.setNot(fNotButton.getSelection());
-                    fViewer.refresh(fNode);
-                }
-            });
+            createNotButton(node);
 
             createAspectControls();
 
-            label = new Label(this, SWT.NONE);
+            Label label = new Label(this, SWT.NONE);
             label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             label.setText(Messages.FilterViewer_ValueLabel);
 
@@ -919,35 +878,20 @@ class FilterViewer extends Composite {
                 }
             });
         }
+
     }
 
     private class FilterMatchesNodeComposite extends FilterAspectNodeComposite {
-        TmfFilterMatchesNode fNode;
-        Button fNotButton;
-        Text fRegexText;
+        private final TmfFilterMatchesNode fNode;
+        private final Text fRegexText;
 
         FilterMatchesNodeComposite(Composite parent, TmfFilterMatchesNode node) {
             super(parent, node);
             fNode = node;
-
-            Label label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            label.setText(Messages.FilterViewer_NotLabel);
-
-            fNotButton = new Button(this, SWT.CHECK);
-            fNotButton.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            fNotButton.setSelection(fNode.isNot());
-            fNotButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    fNode.setNot(fNotButton.getSelection());
-                    fViewer.refresh(fNode);
-                }
-            });
-
+            createNotButton(node);
             createAspectControls();
 
-            label = new Label(this, SWT.NONE);
+            Label label = new Label(this, SWT.NONE);
             label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             label.setText(Messages.FilterViewer_RegexLabel);
 
@@ -986,38 +930,23 @@ class FilterViewer extends Composite {
     }
 
     private class FilterCompareNodeComposite extends FilterAspectNodeComposite {
-        TmfFilterCompareNode fNode;
-        Button fNotButton;
-        Text fValueText;
-        Button fLTButton;
-        Button fEQButton;
-        Button fGTButton;
-        Button fNumButton;
-        Button fAlphaButton;
-        Button fTimestampButton;
+        private final TmfFilterCompareNode fNode;
+        private final Text fValueText;
+        private final Button fLTButton;
+        private final Button fEQButton;
+        private final Button fGTButton;
+        private final Button fNumButton;
+        private final Button fAlphaButton;
+        private final Button fTimestampButton;
 
         FilterCompareNodeComposite(Composite parent, TmfFilterCompareNode node) {
             super(parent, node);
             fNode = node;
 
-            Label label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            label.setText(Messages.FilterViewer_NotLabel);
-
-            fNotButton = new Button(this, SWT.CHECK);
-            fNotButton.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-            fNotButton.setSelection(fNode.isNot());
-            fNotButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    fNode.setNot(fNotButton.getSelection());
-                    fViewer.refresh(fNode);
-                }
-            });
-
+            createNotButton(node);
             createAspectControls();
 
-            label = new Label(this, SWT.NONE);
+            Label label = new Label(this, SWT.NONE);
             label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             label.setText(Messages.FilterViewer_ResultLabel);
 
