@@ -457,7 +457,7 @@ public class TCPPacket extends Packet {
     public String getLocalSummaryString() {
         return "Src Port: " + fSourcePort + ", Dst Port: " + fDestinationPort + //$NON-NLS-1$ //$NON-NLS-2$
                 ", Seq: " + fSequenceNumber + ", Ack: " + fAcknowledgmentNumber + //$NON-NLS-1$ //$NON-NLS-2$
-                ", Len: " + (fDataOffset * TCPValues.BLOCK_SIZE); //$NON-NLS-1$    }
+                ", Len: " + (fDataOffset * TCPValues.BLOCK_SIZE); //$NON-NLS-1$
     }
 
     @Override
