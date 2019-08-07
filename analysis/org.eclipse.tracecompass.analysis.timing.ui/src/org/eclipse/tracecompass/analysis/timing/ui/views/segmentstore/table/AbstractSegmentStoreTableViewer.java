@@ -366,7 +366,13 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
                     if (monitor != null && monitor.isCanceled()) {
                         return Status.CANCEL_STATUS;
                     }
-                    ISegmentStore<ISegment> filteredStore = new ArrayListStore<>(filtered.toArray(new ISegment[filtered.size()]));
+                    /*
+                     * The filtered collection is an iterable and the original
+                     * segment store may be big. Make sure it is parsed only
+                     * once, ie no call to size()
+                     */
+                    ISegmentStore<ISegment> filteredStore = new ArrayListStore<>();
+                    filteredStore.addAll(filtered);
                     if (monitor != null && monitor.isCanceled()) {
                         return Status.CANCEL_STATUS;
                     }
