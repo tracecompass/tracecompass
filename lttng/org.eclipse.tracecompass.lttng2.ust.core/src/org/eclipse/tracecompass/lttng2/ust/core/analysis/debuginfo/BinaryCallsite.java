@@ -30,6 +30,8 @@ public class BinaryCallsite {
     private final @Nullable String fBuildId;
     private final long fOffset;
     private final boolean fIsPic;
+    private final long fStart;
+    private final long fEnd;
 
     /**
      * Constructor
@@ -52,6 +54,35 @@ public class BinaryCallsite {
      *            the binary (is isPic is true).
      */
     public BinaryCallsite(String binaryFilePath, @Nullable String buildId, long offset, boolean isPic) {
+        this(binaryFilePath, buildId, offset, isPic, 0, 0);    }
+
+    /**
+     * Constructor
+     *
+     * @param binaryFilePath
+     *            The path to the binary file on disk, as specified in the trace
+     *            (may or may not be present on the system opening the trace).
+     * @param buildId
+     *            The Build-Id of the binary file. This is an unique identifier
+     *            for a given object, so it can be used to make sure the file at
+     *            the given path is the exact one we expect.
+     * @param offset
+     *            The offset of the call site. Its exact meaning will depend on
+     *            the value of 'isPic'. This should be ready to be passed as-is
+     *            to tools like addr2line.
+     * @param isPic
+     *            Indicates if the specified binary is Position-Independant Code
+     *            or not. This will indicate if the 'offset' parameter is an
+     *            absolute address (if isPic is false), or if it is an offset in
+     *            the binary (is isPic is true).
+     * @param start
+     *            The timestamp at which this binary callsite becomes valid.
+     * @param end
+     *            The timestamp at which this binary callsite becomes invalid.
+     * @since 4.1
+     */
+    public BinaryCallsite(String binaryFilePath, @Nullable String buildId, long offset, boolean isPic,
+            long start, long end) {
         if (offset < 0) {
             throw new IllegalArgumentException("Address offset cannot be negative"); //$NON-NLS-1$
         }
@@ -60,7 +91,10 @@ public class BinaryCallsite {
         fBuildId = buildId;
         fOffset = offset;
         fIsPic = isPic;
+        fStart = start;
+        fEnd = end;
     }
+
 
     /**
      * Get the binary file's path
@@ -88,6 +122,18 @@ public class BinaryCallsite {
      */
     public long getOffset() {
         return fOffset;
+    }
+
+    /**
+     * Return whether this binary callsite is valid for the given timestamp
+     *
+     * @param timestamp
+     *            The timestamp to check with the validity period
+     * @return Whether this binary callsite is valid at the given timestamp
+     * @since 4.1
+     */
+    public boolean intersects(long timestamp) {
+        return (timestamp >= fStart && timestamp <= fEnd);
     }
 
     @Override

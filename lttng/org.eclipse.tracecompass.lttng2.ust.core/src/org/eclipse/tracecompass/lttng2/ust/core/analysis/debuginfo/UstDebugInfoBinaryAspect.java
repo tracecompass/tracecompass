@@ -12,6 +12,8 @@ package org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyString;
 
 import java.io.File;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
@@ -20,6 +22,10 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * Event aspect of UST traces that indicate the binary callsite (binary, symbol
@@ -35,6 +41,94 @@ public class UstDebugInfoBinaryAspect implements ITmfEventAspect<BinaryCallsite>
 
     /** Singleton instance */
     public static final UstDebugInfoBinaryAspect INSTANCE = new UstDebugInfoBinaryAspect();
+    private static final long CACHE_SIZE = 1000;
+
+    /**
+     * Cache of all calls to 'addr2line', so that we can avoid recalling the
+     * external process repeatedly.
+     *
+     * It is static, meaning one cache for the whole application, since the
+     * symbols in a file on disk are independent from the trace referring to it.
+     */
+    private static final Optional<BinaryCallsite> OPTIONAL_NULL = Objects.requireNonNull(Optional.empty());
+    private static final LoadingCache<TraceBinarySymbol, Optional<BinaryCallsite>> BINARY_CALLSITE_CACHE;
+    static {
+        BINARY_CALLSITE_CACHE = Objects.requireNonNull(CacheBuilder.newBuilder()
+                .maximumSize(CACHE_SIZE)
+                .build(new CacheLoader<TraceBinarySymbol, Optional<BinaryCallsite>>() {
+                    @Override
+                    public Optional<BinaryCallsite> load(TraceBinarySymbol symbolIp) {
+                        /*
+                         * First match the IP to the correct binary or library, by using the
+                         * UstDebugInfoAnalysis.
+                         */
+                        UstDebugInfoAnalysisModule module = TmfTraceUtils.getAnalysisModuleOfClass(symbolIp.fTrace,
+                                UstDebugInfoAnalysisModule.class, UstDebugInfoAnalysisModule.ID);
+                        if (module == null) {
+                            /*
+                             * The analysis is not available for this trace, we won't be able to
+                             * find the information.
+                             */
+                            return OPTIONAL_NULL;
+                        }
+                        UstDebugInfoLoadedBinaryFile file = module.getMatchingFile(symbolIp.fTs, symbolIp.fPid, symbolIp.fIp);
+                        if (file == null) {
+                            return OPTIONAL_NULL;
+                        }
+
+                        /* Apply the path prefix defined by the trace, if any */
+
+                        String fullPath = new File(symbolIp.fTrace.getSymbolProviderConfig().getActualRootDirPath(), file.getFilePath()).toString();
+
+                        long offset;
+                        if (file.isPic()) {
+                            offset = symbolIp.fIp - file.getBaseAddress();
+                        } else {
+                            /*
+                             * In the case of the object being non-position-independent, we must
+                             * pass the actual 'ip' address directly to addr2line.
+                             */
+                            offset = symbolIp.fIp;
+                        }
+
+                        return Objects.requireNonNull(Optional.of(new BinaryCallsite(fullPath, file.getBuildId(), offset, file.isPic(), file.getValidityStart(), file.getValidityEnd())));
+                    }
+                }));
+    }
+
+    private static final class TraceBinarySymbol {
+
+        private LttngUstTrace fTrace;
+        private int fPid;
+        private long fTs;
+        private long fIp;
+
+        public TraceBinarySymbol(LttngUstTrace trace, int pid, long ts, long ip) {
+            fTrace = trace;
+            fPid = pid;
+            fTs = ts;
+            fIp = ip;
+        }
+
+        @Override
+        public int hashCode() {
+            // The timestamp does not participate in the hash code, it is for
+            // the purpose of the cache
+            return Objects.hash(fTrace, fPid, fIp);
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            // The timestamp does not participate in the equality, it is for the
+            // purpose of the cache
+            if (!(obj instanceof TraceBinarySymbol)) {
+                return false;
+            }
+            TraceBinarySymbol other = (TraceBinarySymbol) obj;
+            return Objects.equals(fTrace, other.fTrace) && fPid == other.fPid && fIp == other.fIp;
+        }
+
+    }
 
     private UstDebugInfoBinaryAspect() {
     }
@@ -91,39 +185,15 @@ public class UstDebugInfoBinaryAspect implements ITmfEventAspect<BinaryCallsite>
      * @return The {@link BinaryCallsite} object with the relevant information
      */
     public static @Nullable BinaryCallsite getBinaryCallsite(LttngUstTrace trace, int pid, long ts, long ip) {
-        /*
-         * First match the IP to the correct binary or library, by using the
-         * UstDebugInfoAnalysis.
-         */
-        UstDebugInfoAnalysisModule module = TmfTraceUtils.getAnalysisModuleOfClass(trace,
-                UstDebugInfoAnalysisModule.class, UstDebugInfoAnalysisModule.ID);
-        if (module == null) {
-            /*
-             * The analysis is not available for this trace, we won't be able to
-             * find the information.
-             */
+        TraceBinarySymbol traceBinarySymbol = new TraceBinarySymbol(trace, pid, ts, ip);
+        Optional<BinaryCallsite> binaryCallsite = BINARY_CALLSITE_CACHE.getUnchecked(traceBinarySymbol);
+        if (!binaryCallsite.isPresent()) {
             return null;
         }
-        UstDebugInfoLoadedBinaryFile file = module.getMatchingFile(ts, pid, ip);
-        if (file == null) {
-            return null;
+        if (!binaryCallsite.get().intersects(ts)) {
+            BINARY_CALLSITE_CACHE.invalidate(traceBinarySymbol);
+            binaryCallsite = BINARY_CALLSITE_CACHE.getUnchecked(traceBinarySymbol);
         }
-
-        /* Apply the path prefix defined by the trace, if any */
-
-        String fullPath = new File(trace.getSymbolProviderConfig().getActualRootDirPath(), file.getFilePath()).toString();
-
-        long offset;
-        if (file.isPic()) {
-            offset = ip - file.getBaseAddress();
-        } else {
-            /*
-             * In the case of the object being non-position-independent, we must
-             * pass the actual 'ip' address directly to addr2line.
-             */
-            offset = ip;
-        }
-
-        return new BinaryCallsite(fullPath, file.getBuildId(), offset, file.isPic());
+        return (binaryCallsite.isPresent() ? binaryCallsite.get() : null);
     }
 }

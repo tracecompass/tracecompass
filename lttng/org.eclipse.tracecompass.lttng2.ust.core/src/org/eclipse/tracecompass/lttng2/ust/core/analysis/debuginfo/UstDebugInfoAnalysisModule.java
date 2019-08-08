@@ -248,7 +248,10 @@ public class UstDebugInfoAnalysisModule extends TmfStateSystemAnalysisModule {
             final int isPicQuark = ss.getQuarkRelative(baddrQuark, UstDebugInfoStateProvider.IS_PIC_ATTRIB);
             boolean isPic = state.get(isPicQuark).getStateValue().unboxInt() != 0;
 
-            return new UstDebugInfoLoadedBinaryFile(baddr, filePath, buildId, debugLink, isPic);
+            // The baddrQuark interval lasts for the time this file is loaded
+            ITmfStateInterval validityInterval = state.get(baddrQuark);
+
+            return new UstDebugInfoLoadedBinaryFile(baddr, filePath, buildId, debugLink, isPic, validityInterval.getStartTime(), validityInterval.getEndTime());
 
         } catch (AttributeNotFoundException | TimeRangeException | StateSystemDisposedException e) {
             /* Either the data is not available yet, or incomplete. */

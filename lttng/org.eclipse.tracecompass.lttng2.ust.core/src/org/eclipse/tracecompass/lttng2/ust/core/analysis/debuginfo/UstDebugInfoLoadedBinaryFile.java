@@ -23,6 +23,8 @@ import org.eclipse.jdt.annotation.Nullable;
 public class UstDebugInfoLoadedBinaryFile extends UstDebugInfoBinaryFile {
 
     private final long fBaseAddress;
+    private final long fStartValidity;
+    private final long fEndValidity;
 
     /**
      * Constructor
@@ -41,8 +43,34 @@ public class UstDebugInfoLoadedBinaryFile extends UstDebugInfoBinaryFile {
     public UstDebugInfoLoadedBinaryFile(long baseAddress, String filePath,
             @Nullable String buildId, @Nullable String debugLink,
             boolean isPic) {
+        this(baseAddress, filePath, buildId, debugLink, isPic, 0, 0);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param baseAddress
+     *            The base address at which the binary or library is loaded
+     * @param filePath
+     *            The binary's path on the filesystem.
+     * @param buildId
+     *            The binary's unique buildID (in base16 form).
+     * @param debugLink
+     *            Path to the binary's separate debug info.
+     * @param isPic
+     *            Whether the code in the binary is position-independent.
+     * @param startValidity
+     *            The timestamp at which this binary file becomes valid.
+     * @param endValidity
+     *            The timestamp at which this binary file becomes invalid.
+     */
+    public UstDebugInfoLoadedBinaryFile(long baseAddress, String filePath,
+            @Nullable String buildId, @Nullable String debugLink,
+            boolean isPic, long startValidity, long endValidity) {
         super(filePath, buildId, debugLink, isPic);
         this.fBaseAddress = baseAddress;
+        fStartValidity = startValidity;
+        fEndValidity = endValidity;
     }
 
     /**
@@ -52,6 +80,24 @@ public class UstDebugInfoLoadedBinaryFile extends UstDebugInfoBinaryFile {
      */
     public long getBaseAddress() {
         return fBaseAddress;
+    }
+
+    /**
+     * Return the timestamp at which this binary file is loaded
+     *
+     * @return The timestamp
+     */
+    public long getValidityStart() {
+        return fStartValidity;
+    }
+
+    /**
+     * Return the timestamp at which this binary file is loaded
+     *
+     * @return The timestamp
+     */
+    public long getValidityEnd() {
+        return fEndValidity;
     }
 
     @Override
