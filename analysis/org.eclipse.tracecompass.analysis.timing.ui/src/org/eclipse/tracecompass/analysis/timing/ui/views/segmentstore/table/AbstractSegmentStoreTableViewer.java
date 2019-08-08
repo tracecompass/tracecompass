@@ -21,10 +21,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -47,6 +50,8 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.table.Messages;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.table.SegmentStoreContentProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
@@ -77,7 +82,6 @@ import org.eclipse.tracecompass.tmf.ui.actions.OpenSourceCodeAction;
 import org.eclipse.tracecompass.tmf.ui.viewers.table.TmfSimpleTableViewer;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableMultimap.Builder;
@@ -92,6 +96,7 @@ import com.google.common.collect.Multimap;
 public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableViewer {
 
     private static final Format FORMATTER = new DecimalFormat("###,###.##"); //$NON-NLS-1$
+    private static final Logger LOGGER = TraceCompassLog.getLogger(AbstractSegmentStoreTableViewer.class);
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -349,36 +354,38 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         };
 
         if (segStore != null) {
-            if (predicates.isEmpty()) {
-                updateModel(segStore);
-                return;
-            }
-            // The segment store filtering may take a while
+            // Cancel the current filtering job
             Job job = fFilteringJob;
             if (job != null) {
                 job.cancel();
+            }
+            if (predicates.isEmpty()) {
+                updateModel(segStore);
+                return;
             }
             job = new Job(Messages.SegmentStoreTableViewer_FilteringData) {
 
                 @Override
                 protected IStatus run(@Nullable IProgressMonitor monitor) {
-                    Collection<ISegment> filtered = Collections2.filter(segStore, seg -> predicate.test(seg));
-                    if (monitor != null && monitor.isCanceled()) {
-                        return Status.CANCEL_STATUS;
-                    }
-                    /*
-                     * The filtered collection is an iterable and the original
-                     * segment store may be big. Make sure it is parsed only
-                     * once, ie no call to size()
-                     */
-                    ISegmentStore<ISegment> filteredStore = new ArrayListStore<>();
-                    filteredStore.addAll(filtered);
-                    if (monitor != null && monitor.isCanceled()) {
-                        return Status.CANCEL_STATUS;
-                    }
-                    updateModel(filteredStore);
+                    try (ScopeLog log = new ScopeLog(LOGGER, Level.FINE, "SegmentStoreTable:Filtering")) { //$NON-NLS-1$
+                        SubMonitor subMonitor = SubMonitor.convert(monitor);
 
-                    return Status.OK_STATUS;
+                        ISegmentStore<ISegment> filteredStore = new ArrayListStore<>();
+                        for (ISegment segment : segStore) {
+                            if (subMonitor.isCanceled()) {
+                                return Status.CANCEL_STATUS;
+                            }
+                            if (predicate.test(segment)) {
+                                filteredStore.add(segment);
+                            }
+                        }
+                        if (subMonitor.isCanceled()) {
+                            return Status.CANCEL_STATUS;
+                        }
+                        updateModel(filteredStore);
+
+                        return Status.OK_STATUS;
+                    }
                 }
             };
             fFilteringJob = job;
@@ -486,6 +493,16 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         }
     }
 
+    @Override
+    public void dispose() {
+        super.dispose();
+        // Cancel the filtering job if any
+        Job job = fFilteringJob;
+        if (job != null) {
+            job.cancel();
+        }
+    }
+
     // ------------------------------------------------------------------------
     // Getters
     // ------------------------------------------------------------------------
@@ -513,6 +530,13 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
         ITmfTrace trace = signal.getTrace();
+        if (trace != fTrace) {
+            // Cancel the filtering job from the previous trace
+            Job job = fFilteringJob;
+            if (job != null) {
+                job.cancel();
+            }
+        }
         fTrace = trace;
         if (trace != null) {
             setData(getSegmentStoreProvider(trace));
@@ -529,6 +553,13 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
         ITmfTrace trace = signal.getTrace();
+        if (trace != fTrace) {
+            // Cancel the filtering job from the previous trace
+            Job job = fFilteringJob;
+            if (job != null) {
+                job.cancel();
+            }
+        }
         fTrace = trace;
         if (trace != null) {
             setData(getSegmentStoreProvider(trace));
@@ -543,6 +574,14 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
      */
     @TmfSignalHandler
     public void traceClosed(TmfTraceClosedSignal signal) {
+        ITmfTrace trace = fTrace;
+        if (trace == signal.getTrace()) {
+            // Cancel the filtering job
+            Job job = fFilteringJob;
+            if (job != null) {
+                job.cancel();
+            }
+        }
         // Check if there is no more opened trace
         if (TmfTraceManager.getInstance().getActiveTrace() == null) {
             if (!getTableViewer().getTable().isDisposed()) {

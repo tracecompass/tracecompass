@@ -87,7 +87,6 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
                 fSegmentStoreViewer.traceSelected(signal);
             }
         }
-        setInitialData();
     }
 
     // ------------------------------------------------------------------------
@@ -126,15 +125,6 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
     @Nullable
     public AbstractSegmentStoreTableViewer getSegmentStoreViewer() {
         return fSegmentStoreViewer;
-    }
-
-    /**
-     * Set initial data into the viewer
-     */
-    private void setInitialData() {
-        if (fSegmentStoreViewer != null) {
-            fSegmentStoreViewer.setData(fSegmentStoreViewer.getSegmentProvider());
-        }
     }
 
     /**
