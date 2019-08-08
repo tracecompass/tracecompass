@@ -2161,7 +2161,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     /**
-     * Start or restart the zoom thread.
+     * Start or restart the zoom thread. This function needs to be called in the
+     * UI thread.
      *
      * @param startTime
      *            the zoom start time
@@ -2182,6 +2183,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     restart = true;
                 }
             }
+            // This line requires to be in the UI thread
             int timeSpace = getTimeGraphViewer().getTimeSpace();
             if (timeSpace > 0) {
                 long resolution = Long.max(1, (clampedEndTime - clampedStartTime) / timeSpace);
@@ -2714,7 +2716,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             zoomThread.cancel();
             fZoomThread = null;
         }
-        startZoomThread(getTimeGraphViewer().getTime0(), getTimeGraphViewer().getTime1());
+        Runnable runnable = () -> {
+            startZoomThread(getTimeGraphViewer().getTime0(), getTimeGraphViewer().getTime1());
+        };
+        Display display = PlatformUI.getWorkbench().getDisplay();
+        if (display == Display.getCurrent()) {
+            runnable.run();
+        } else {
+            Display.getDefault().asyncExec(runnable);
+        }
+
     }
 
     /**
