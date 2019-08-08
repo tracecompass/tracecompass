@@ -12,7 +12,6 @@ package org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -222,10 +221,6 @@ public final class FileOffsetMapper {
                 "Offset", offset, //$NON-NLS-1$
                 "Build id", buildId)) { //$NON-NLS-1$
 
-            if (!Files.exists((file.toPath()))) {
-                sl.addData("file not found", file.toPath()); //$NON-NLS-1$
-                return null;
-            }
             /*
              * TODO We should also eventually verify that the passed buildId
              * matches the file we are attempting to open.
