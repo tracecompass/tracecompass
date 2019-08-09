@@ -36,6 +36,7 @@ import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
 public class UstDebugInfoSymbolProvider extends DefaultSymbolProvider implements ISymbolProvider {
 
     private final List<org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider> fOtherProviders = new ArrayList<>();
+    private boolean fIsLoaded = false;
     /**
      * Create a new {@link UstDebugInfoSymbolProvider} for the given trace
      *
@@ -59,11 +60,16 @@ public class UstDebugInfoSymbolProvider extends DefaultSymbolProvider implements
 
     @Override
     public void loadConfiguration(@Nullable IProgressMonitor monitor) {
-        super.loadConfiguration(monitor);
-        // Get all the symbol providers that are not of default class
-        for (org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider provider : SymbolProviderManager.getInstance().getSymbolProviders(getTrace())) {
-            if (!(provider instanceof DefaultSymbolProvider)) {
-                fOtherProviders.add(provider);
+        synchronized (fOtherProviders) {
+            if (!fIsLoaded) {
+                super.loadConfiguration(monitor);
+                // Get all the symbol providers that are not of default class
+                for (org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider provider : SymbolProviderManager.getInstance().getSymbolProviders(getTrace())) {
+                    if (!(provider instanceof DefaultSymbolProvider)) {
+                        fOtherProviders.add(provider);
+                    }
+                }
+                fIsLoaded = true;
             }
         }
     }
@@ -85,7 +91,11 @@ public class UstDebugInfoSymbolProvider extends DefaultSymbolProvider implements
         if (loc != null) {
             return new TmfResolvedSymbol(bc.getOffset(), loc.getFunctionName());
         }
-        // Try to see if some other symbol provider has a symbol for this relative binary callsite
+        if (!fIsLoaded) {
+            return null;
+        }
+        // Try to see if some other symbol provider has a symbol for this
+        // relative binary callsite
         // FIXME: Ideally, it would be good to be able to specify the filename
         for (org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider provider : fOtherProviders) {
             TmfResolvedSymbol symbol = provider.getSymbol(pid, timestamp, bc.getOffset());
