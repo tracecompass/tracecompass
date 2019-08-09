@@ -209,7 +209,9 @@ public class FilterSimpleExpressionCu implements IFilterCu {
     }
 
     /**
-     * Condition operators used to compare 2 values together
+     * Condition operators used to compare 2 values together. The first value
+     * should be the internal value and the second value the value entered by
+     * the user or filter.
      */
     protected enum ConditionOperator implements BiPredicate<Object, Object> {
         /** equal */
@@ -237,6 +239,15 @@ public class FilterSimpleExpressionCu implements IFilterCu {
             return (i, j) -> {
                 try {
                     Pattern filterPattern = Pattern.compile(String.valueOf(j));
+                    // j is the value entered by the user, it was converted to a
+                    // Number, we should not try to check numerical equality if
+                    // value entered is not a number
+                    if (j instanceof Number) {
+                        // For numbers, the equality check is better suited as
+                        // the format (hex, decimal) is considered. For strings,
+                        // the pattern matching will work better
+                        return equals(i, j) || filterPattern.matcher(String.valueOf(i)).find();
+                    }
                     return filterPattern.matcher(String.valueOf(i)).find();
                 } catch (PatternSyntaxException e) {
                     return false;
