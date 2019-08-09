@@ -21,11 +21,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -33,6 +35,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
@@ -42,18 +45,17 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
@@ -79,6 +81,9 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 class FilterViewer extends Composite {
+
+    private final String TEXT_HINT_KEY = "$text-hint" //$NON-NLS-1$
+            + "--"; //$NON-NLS-1$
 
     private static class TraceTypeItem {
         private final String fLabel;
@@ -119,12 +124,28 @@ class FilterViewer extends Composite {
         }
 
     }
+
+    private static final String THEME_SEL_FOREGROUND = "org.eclipse.tracecompass.tmf.ui.FOREGROUND_SEL_NOFOCUS"; //$NON-NLS-1$
+    private static final String THEME_FOREGROUND = "org.eclipse.tracecompass.tmf.ui.FOREGROUND"; //$NON-NLS-1$
+    private static final Color SEL_FOREGROUND_COLOR = getThemeColor(THEME_SEL_FOREGROUND, SWT.COLOR_GRAY);
+    private static final Color FOREGROUND_COLOR = getThemeColor(THEME_FOREGROUND, SWT.COLOR_BLACK);
+
     private TreeViewer fViewer;
 
     private Composite fComposite;
     private MenuManager fMenuManager;
 
     private boolean fIsDialog = false;
+
+    private static Color getThemeColor(String themeColorName, int systemDefault) {
+        ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
+        Color c = colorRegistry.get(themeColorName);
+
+        if (c == null) {
+            c = Display.getDefault().getSystemColor(systemDefault);
+        }
+        return c;
+    }
 
     public FilterViewer(Composite parent, int style) {
         this(parent, style, false);
@@ -161,8 +182,6 @@ class FilterViewer extends Composite {
                 IStructuredSelection selection = (IStructuredSelection) event.getSelection();
                 ITmfFilterTreeNode node = (ITmfFilterTreeNode) selection.getFirstElement();
                 updateFilterNodeComposite(node);
-                // Highlight the selection's children
-                highlightTreeItems(fViewer.getTree().getSelection()[0].getItems());
             } else {
                 updateFilterNodeComposite(null);
             }
@@ -171,7 +190,7 @@ class FilterViewer extends Composite {
         fViewer.getTree().addPaintListener(e -> {
             TmfFilterTreeNode root = (TmfFilterTreeNode) fViewer.getInput();
             if (root == null || root.getChildrenCount() == 0) {
-                e.gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
+                e.gc.setForeground(FOREGROUND_COLOR);
                 e.gc.drawText(Messages.FilterViewer_EmptyTreeHintText, 5, 0);
             }
         });
@@ -324,27 +343,6 @@ class FilterViewer extends Composite {
         fComposite.layout();
     }
 
-    /**
-     * Highlight the provided tree items
-     */
-    private void highlightTreeItems(TreeItem[] items) {
-        resetTreeItems(fViewer.getTree().getItems());
-        for (TreeItem item : items) {
-            item.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-        }
-
-    }
-
-    /**
-     * Reset the provided tree items (remove highlight)
-     */
-    private void resetTreeItems(TreeItem[] items) {
-        for (TreeItem item : items) {
-            item.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-            resetTreeItems(item.getItems());
-        }
-    }
-
     public void setInput(ITmfFilterTreeNode root) {
         fViewer.setInput(root);
         fViewer.expandAll();
@@ -417,7 +415,6 @@ class FilterViewer extends Composite {
             super(parent, SWT.NONE);
             setLayout(new GridLayout(2, false));
             setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-            setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             if (node instanceof ITmfFilterWithNot) {
                 createNotButton((ITmfFilterWithNot) node);
             }
@@ -436,11 +433,9 @@ class FilterViewer extends Composite {
         protected Button createNotButton(ITmfFilterWithNot node) {
             Label label;
             label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             label.setText(Messages.FilterViewer_NotLabel);
 
             Button notButton = new Button(this, SWT.CHECK);
-            notButton.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             notButton.setSelection(node.isNot());
             notButton.addSelectionListener(new SelectionAdapter() {
                 @Override
@@ -454,7 +449,6 @@ class FilterViewer extends Composite {
 
         protected Text createValueText(ITmfFilterWithValue valueNode) {
             Label label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             label.setText(Messages.FilterViewer_ValueLabel);
 
             Text valueText = new Text(this, SWT.BORDER);
@@ -462,29 +456,35 @@ class FilterViewer extends Composite {
             String value = valueNode.getValue();
             if (value != null && value.length() > 0) {
                 valueText.setText(value);
+                valueText.setData(null);
             } else {
-                valueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
                 valueText.setText(Messages.FilterViewer_ValueHint);
+                valueText.setData(TEXT_HINT_KEY);
+                this.layout();
+                valueText.setForeground(SEL_FOREGROUND_COLOR);
             }
             valueText.addFocusListener(new FocusListener() {
                 @Override
                 public void focusLost(FocusEvent e) {
-                    if (value == null || value.length() == 0) {
-                        valueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+                    String myValue = valueNode.getValue();
+                    if (myValue == null || myValue.length() == 0) {
+                        valueText.setData(TEXT_HINT_KEY);
+                        valueText.setForeground(SEL_FOREGROUND_COLOR);
                         valueText.setText(Messages.FilterViewer_ValueHint);
                     }
                 }
 
                 @Override
                 public void focusGained(FocusEvent e) {
-                    if (valueText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                    if (valueText.getData() != null) {
+                        valueText.setData(null);
                         valueText.setText(""); //$NON-NLS-1$
                     }
-                    valueText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+                    valueText.setForeground(FOREGROUND_COLOR);
                 }
             });
             valueText.addModifyListener(e -> {
-                if (!valueText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                if (valueText.getData() == null) {
                     valueNode.setValue(valueText.getText());
                     fViewer.refresh(valueNode);
                 }
@@ -495,8 +495,8 @@ class FilterViewer extends Composite {
 
     private abstract class FilterAspectNodeComposite extends FilterBaseNodeComposite {
         private final TmfFilterAspectNode fAspectNode;
-        private Combo fTraceTypeCombo;
-        private Combo fAspectCombo;
+        private CCombo fTraceTypeCombo;
+        private CCombo fAspectCombo;
         private Label fFieldLabel;
         private Text fFieldText;
         private List<AspectItem> fAspectList = null;
@@ -508,16 +508,15 @@ class FilterViewer extends Composite {
 
         protected void createAspectControls() {
             Label label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             label.setText(Messages.FilterViewer_TypeLabel);
 
             final List<TraceTypeItem> traceTypeList = getTraceTypeList(fAspectNode, fAspectNode.getTraceTypeId());
 
-            fTraceTypeCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
+            fTraceTypeCombo = new CCombo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
             fTraceTypeCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-            for (TraceTypeItem traceType : traceTypeList) {
-                fTraceTypeCombo.add(traceType.getLabel());
-            }
+            List<String> items = traceTypeList.stream()
+                    .map(it -> it.getLabel()).collect(Collectors.toList());
+            fTraceTypeCombo.setItems(items.toArray(new String[0]));
             if (fAspectNode.getTraceTypeId() == null) {
                 fTraceTypeCombo.select(0);
                 fAspectNode.setTraceTypeId(traceTypeList.get(0).getTraceTypeId());
@@ -530,29 +529,31 @@ class FilterViewer extends Composite {
                     }
                 }
             }
-            fTraceTypeCombo.addModifyListener(e -> {
-                TraceTypeItem traceType = traceTypeList.get(fTraceTypeCombo.getSelectionIndex());
-                fAspectNode.setTraceTypeId(traceType.getTraceTypeId());
-                fAspectList = getAspectList(fAspectNode.getTraceTypeId());
-                String text = fAspectCombo.getText();
-                fAspectCombo.removeAll();
-                for (AspectItem aspect : fAspectList) {
-                    fAspectCombo.add(aspect.getLabel());
+            fTraceTypeCombo.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    TraceTypeItem traceType = traceTypeList.get(fTraceTypeCombo.getSelectionIndex());
+                    fAspectNode.setTraceTypeId(traceType.getTraceTypeId());
+                    fAspectList = getAspectList(fAspectNode.getTraceTypeId());
+                    List<String> aspectItems = fAspectList.stream()
+                            .map(it -> it.getLabel()).collect(Collectors.toList());
+                    String text = fAspectCombo.getText();
+                    fAspectCombo.removeAll();
+                    fAspectCombo.setItems(aspectItems.toArray(new String[0]));
+                    int index = Arrays.asList(fAspectCombo.getItems()).indexOf(text);
+                    if (index >= 0 && !text.isEmpty()) {
+                        fAspectCombo.select(index);
+                    }
+                    fViewer.refresh(fAspectNode);
                 }
-                int index = Arrays.asList(fAspectCombo.getItems()).indexOf(text);
-                if (index >= 0 && !text.isEmpty()) {
-                    fAspectCombo.select(index);
-                }
-                fViewer.refresh(fAspectNode);
             });
 
             label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             label.setText(Messages.FilterViewer_AspectLabel);
 
             fAspectList = getAspectList(fAspectNode.getTraceTypeId());
 
-            fAspectCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
+            fAspectCombo = new CCombo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
             fAspectCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
             for (AspectItem aspect : fAspectList) {
                 fAspectCombo.add(aspect.getLabel());
@@ -573,37 +574,40 @@ class FilterViewer extends Composite {
                     }
                 }
             }
-            fAspectCombo.addModifyListener(e -> {
-                int selection = fAspectCombo.getSelectionIndex();
-                AspectItem aspect = null;
-                if (selection != -1) {
-                    aspect = fAspectList.get(fAspectCombo.getSelectionIndex());
-                    fAspectNode.setEventAspect(aspect.getEventAspect());
-                } else {
-                    fAspectNode.setEventAspect(null);
+            fAspectCombo.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    int selection = fAspectCombo.getSelectionIndex();
+                    AspectItem aspect = null;
+                    if (selection != -1) {
+                        aspect = fAspectList.get(fAspectCombo.getSelectionIndex());
+                        fAspectNode.setEventAspect(aspect.getEventAspect());
+                    } else {
+                        fAspectNode.setEventAspect(null);
+                    }
+                    if (fAspectNode.getEventAspect() instanceof TmfEventFieldAspect) {
+                        TmfEventFieldAspect eventFieldAspect = (TmfEventFieldAspect) fAspectNode.getEventAspect();
+                        createFieldControls(eventFieldAspect, aspect);
+                        layout();
+                    } else if (fFieldLabel != null && fFieldText != null) {
+                        fFieldLabel.dispose();
+                        fFieldLabel = null;
+                        fFieldText.dispose();
+                        fFieldText = null;
+                        layout();
+                    }
+                    fViewer.refresh(fAspectNode);
                 }
-                if (fAspectNode.getEventAspect() instanceof TmfEventFieldAspect) {
-                    TmfEventFieldAspect eventFieldAspect = (TmfEventFieldAspect) fAspectNode.getEventAspect();
-                    createFieldControls(eventFieldAspect, aspect);
-                    layout();
-                } else if (fFieldLabel != null && fFieldText != null) {
-                    fFieldLabel.dispose();
-                    fFieldLabel = null;
-                    fFieldText.dispose();
-                    fFieldText = null;
-                    layout();
-                }
-                fViewer.refresh(fAspectNode);
             });
         }
 
         private void createFieldControls(final TmfEventFieldAspect eventFieldAspect, final AspectItem aspect) {
+
             if (fFieldLabel != null) {
                 fFieldLabel.dispose();
             }
             fFieldLabel = new Label(this, SWT.NONE);
             fFieldLabel.moveBelow(fAspectCombo);
-            fFieldLabel.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             fFieldLabel.setText(Messages.FilterViewer_FieldLabel);
 
             if (fFieldText != null) {
@@ -617,28 +621,33 @@ class FilterViewer extends Composite {
                 fFieldText.setText(eventFieldAspect.getFieldPath());
             }
             if (fFieldText.getText().length() == 0) {
-                fFieldText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+                fFieldText.setData(TEXT_HINT_KEY);
                 fFieldText.setText(Messages.FilterViewer_FieldHint);
+                this.layout();
+                fFieldText.setForeground(SEL_FOREGROUND_COLOR);
+
             }
             fFieldText.addFocusListener(new FocusListener() {
                 @Override
                 public void focusLost(FocusEvent e) {
                     if (fFieldText.getText().length() == 0) {
-                        fFieldText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+                        fFieldText.setData(TEXT_HINT_KEY);
+                        fFieldText.setForeground(SEL_FOREGROUND_COLOR);
                         fFieldText.setText(Messages.FilterViewer_FieldHint);
                     }
                 }
 
                 @Override
                 public void focusGained(FocusEvent e) {
-                    if (fFieldText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                    if (fFieldText.getData() != null) {
+                        fFieldText.setData(null);
                         fFieldText.setText(""); //$NON-NLS-1$
                     }
-                    fFieldText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+                    fFieldText.setForeground(FOREGROUND_COLOR);
                 }
             });
             fFieldText.addModifyListener(e -> {
-                if (!fFieldText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                if (fFieldText.getData() == null) {
                     if (fFieldText.getText().isEmpty()) {
                         fAspectNode.setEventAspect(eventFieldAspect.forField(null));
                     } else {
@@ -708,7 +717,6 @@ class FilterViewer extends Composite {
             fNode = node;
 
             Label label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             label.setText(Messages.FilterViewer_NameLabel);
 
             fNameText = new Text(this, SWT.BORDER);
@@ -716,28 +724,32 @@ class FilterViewer extends Composite {
             if (node.getFilterName() != null && node.getFilterName().length() > 0) {
                 fNameText.setText(node.getFilterName());
             } else {
-                fNameText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
                 fNameText.setText(Messages.FilterViewer_FilterNameHint);
+                fNameText.setData(TEXT_HINT_KEY);
+                this.layout();
+                fNameText.setForeground(SEL_FOREGROUND_COLOR);
             }
             fNameText.addFocusListener(new FocusListener() {
                 @Override
                 public void focusLost(FocusEvent e) {
                     if (fNode.getFilterName() == null || fNode.getFilterName().length() == 0) {
-                        fNameText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+                        fNameText.setForeground(SEL_FOREGROUND_COLOR);
+                        fNameText.setData(TEXT_HINT_KEY);
                         fNameText.setText(Messages.FilterViewer_FilterNameHint);
                     }
                 }
 
                 @Override
                 public void focusGained(FocusEvent e) {
-                    if (fNameText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                    if (fNameText.getData() != null) {
+                        fNameText.setData(null);
                         fNameText.setText(""); //$NON-NLS-1$
                     }
-                    fNameText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+                    fNameText.setForeground(FOREGROUND_COLOR);
                 }
             });
             fNameText.addModifyListener(e -> {
-                if (!fNameText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                if (fNameText.getData() == null) {
                     fNode.setFilterName(fNameText.getText());
                     fViewer.refresh(fNode);
                 }
@@ -747,7 +759,7 @@ class FilterViewer extends Composite {
 
     private class FilterTraceTypeNodeComposite extends FilterBaseNodeComposite {
         TmfFilterTraceTypeNode fNode;
-        Combo fTypeCombo;
+        CCombo fTypeCombo;
         Map<String, TraceTypeHelper> fTraceTypeMap;
 
         FilterTraceTypeNodeComposite(Composite parent, TmfFilterTraceTypeNode node) {
@@ -756,21 +768,23 @@ class FilterViewer extends Composite {
             fTraceTypeMap = getTraceTypeMap(fNode.getTraceTypeId());
 
             Label label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             label.setText(Messages.FilterViewer_TypeLabel);
 
-            fTypeCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
+            fTypeCombo = new CCombo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
             fTypeCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
             fTypeCombo.setItems(fTraceTypeMap.keySet().toArray(new String[0]));
             if (fNode.getTraceTypeId() != null) {
                 fTypeCombo.setText(fNode.getName());
             }
-            fTypeCombo.addModifyListener(e -> {
-                TraceTypeHelper helper = checkNotNull(fTraceTypeMap.get(fTypeCombo.getText()));
-                fNode.setTraceTypeId(helper.getTraceTypeId());
-                fNode.setTraceClass(helper.getTraceClass());
-                fNode.setName(fTypeCombo.getText());
-                fViewer.refresh(fNode);
+            fTypeCombo.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    TraceTypeHelper helper = checkNotNull(fTraceTypeMap.get(fTypeCombo.getText()));
+                    fNode.setTraceTypeId(helper.getTraceTypeId());
+                    fNode.setTraceClass(helper.getTraceClass());
+                    fNode.setName(fTypeCombo.getText());
+                    fViewer.refresh(fNode);
+                }
             });
         }
     }
@@ -801,13 +815,11 @@ class FilterViewer extends Composite {
 
             createValueText(fNode);
 
-            Label label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+            new Label(this, SWT.NONE);
 
             fIgnoreCaseButton = new Button(this, SWT.CHECK);
             fIgnoreCaseButton.setSelection(fNode.isIgnoreCase());
             fIgnoreCaseButton.setText(Messages.FilterViewer_IgnoreCaseButtonText);
-            fIgnoreCaseButton.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             fIgnoreCaseButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -830,13 +842,11 @@ class FilterViewer extends Composite {
 
             createValueText(fNode);
 
-            Label label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+            new Label(this, SWT.NONE);
 
             fIgnoreCaseButton = new Button(this, SWT.CHECK);
             fIgnoreCaseButton.setSelection(fNode.isIgnoreCase());
             fIgnoreCaseButton.setText(Messages.FilterViewer_IgnoreCaseButtonText);
-            fIgnoreCaseButton.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             fIgnoreCaseButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -858,7 +868,6 @@ class FilterViewer extends Composite {
             createAspectControls();
 
             Label label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             label.setText(Messages.FilterViewer_RegexLabel);
 
             fRegexText = new Text(this, SWT.BORDER);
@@ -866,28 +875,32 @@ class FilterViewer extends Composite {
             if (node.getRegex() != null && node.getRegex().length() > 0) {
                 fRegexText.setText(node.getRegex());
             } else {
-                fRegexText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
                 fRegexText.setText(Messages.FilterViewer_RegexHint);
+                fRegexText.setData(TEXT_HINT_KEY);
+                this.layout();
+                fRegexText.setForeground(SEL_FOREGROUND_COLOR);
             }
             fRegexText.addFocusListener(new FocusListener() {
                 @Override
                 public void focusLost(FocusEvent e) {
                     if (fNode.getRegex() == null || fNode.getRegex().length() == 0) {
-                        fRegexText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+                        fRegexText.setData(TEXT_HINT_KEY);
+                        fRegexText.setForeground(SEL_FOREGROUND_COLOR);
                         fRegexText.setText(Messages.FilterViewer_RegexHint);
                     }
                 }
 
                 @Override
                 public void focusGained(FocusEvent e) {
-                    if (fRegexText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                    if (fRegexText.getData() != null) {
+                        fRegexText.setData(null);
                         fRegexText.setText(""); //$NON-NLS-1$
                     }
-                    fRegexText.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+                    fRegexText.setForeground(FOREGROUND_COLOR);
                 }
             });
             fRegexText.addModifyListener(e -> {
-                if (!fRegexText.getForeground().equals(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY))) {
+                if (fRegexText.getData() == null) {
                     fNode.setRegex(fRegexText.getText());
                     fViewer.refresh(fNode);
                 }
@@ -911,7 +924,6 @@ class FilterViewer extends Composite {
             createAspectControls();
 
             Label label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             label.setText(Messages.FilterViewer_ResultLabel);
 
             Composite resultGroup = new Composite(this, SWT.NONE);
@@ -919,12 +931,10 @@ class FilterViewer extends Composite {
             rggl.marginHeight = 0;
             rggl.marginWidth = 0;
             resultGroup.setLayout(rggl);
-            resultGroup.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 
             fLTButton = new Button(resultGroup, SWT.RADIO);
             fLTButton.setSelection(fNode.getResult() < 0);
             fLTButton.setText("<"); //$NON-NLS-1$
-            fLTButton.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             fLTButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -938,7 +948,6 @@ class FilterViewer extends Composite {
             fEQButton = new Button(resultGroup, SWT.RADIO);
             fEQButton.setSelection(fNode.getResult() == 0);
             fEQButton.setText("="); //$NON-NLS-1$
-            fEQButton.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             fEQButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -952,7 +961,6 @@ class FilterViewer extends Composite {
             fGTButton = new Button(resultGroup, SWT.RADIO);
             fGTButton.setSelection(fNode.getResult() > 0);
             fGTButton.setText(">"); //$NON-NLS-1$
-            fGTButton.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             fGTButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -964,7 +972,6 @@ class FilterViewer extends Composite {
             });
 
             label = new Label(this, SWT.NONE);
-            label.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             label.setText(Messages.FilterViewer_TypeLabel);
 
             Composite typeGroup = new Composite(this, SWT.NONE);
@@ -972,12 +979,10 @@ class FilterViewer extends Composite {
             tggl.marginHeight = 0;
             tggl.marginWidth = 0;
             typeGroup.setLayout(tggl);
-            typeGroup.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 
             fNumButton = new Button(typeGroup, SWT.RADIO);
             fNumButton.setSelection(fNode.getType() == Type.NUM);
             fNumButton.setText(Messages.FilterViewer_NumButtonText);
-            fNumButton.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             fNumButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -991,7 +996,6 @@ class FilterViewer extends Composite {
             fAlphaButton = new Button(typeGroup, SWT.RADIO);
             fAlphaButton.setSelection(fNode.getType() == Type.ALPHA);
             fAlphaButton.setText(Messages.FilterViewer_AlphaButtonText);
-            fAlphaButton.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             fAlphaButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -1005,7 +1009,6 @@ class FilterViewer extends Composite {
             fTimestampButton = new Button(typeGroup, SWT.RADIO);
             fTimestampButton.setSelection(fNode.getType() == Type.TIMESTAMP);
             fTimestampButton.setText(Messages.FilterViewer_TimestampButtonText);
-            fTimestampButton.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
             fTimestampButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
