@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2017 Ericsson
+ * Copyright (c) 2014, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -274,7 +274,7 @@ public class BtfTrace extends TmfTrace implements ITmfPersistentlyIndexable, ITm
             while ((line != null) && (lineCount++ < MAX_LINES)) {
                 // Skip comment lines
                 while (line != null && line.startsWith("#")) { //$NON-NLS-1$
-                    line = fFileInput.readLine();
+                    line = rafile.readLine();
                 }
                 ITmfEvent event = parseLine(0, line);
                 if (event != null) {
