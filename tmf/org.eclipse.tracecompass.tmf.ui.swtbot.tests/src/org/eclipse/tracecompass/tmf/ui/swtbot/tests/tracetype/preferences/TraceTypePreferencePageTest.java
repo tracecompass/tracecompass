@@ -35,6 +35,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -256,7 +257,7 @@ public class TraceTypePreferencePageTest {
         SWTBotTreeItem item = tree.expandNode("FILTER test", "WITH TRACETYPE Custom XML : testxmlextension");
         item.select();
 
-        SWTBotCombo comboBox = bot.comboBox(0);
+        SWTBotCCombo comboBox = bot.ccomboBox(0);
         assertEquals("Combo: number of trace types", defaultCount, comboBox.itemCount());
 
         // Change the preference value for testxmlextension
@@ -268,7 +269,7 @@ public class TraceTypePreferencePageTest {
         item = tree.expandNode("FILTER test", "WITH TRACETYPE Custom XML : testxmlextension");
         item.select();
 
-        comboBox = bot.comboBox(0);
+        comboBox = bot.ccomboBox(0);
         assertEquals("Combo: number of trace types", 1, comboBox.itemCount());
 
         setTraceTypePreferences(UNCHECK_ALL, "Custom Text", "testtxtextension");
@@ -279,7 +280,7 @@ public class TraceTypePreferencePageTest {
         item = tree.expandNode("FILTER test", "WITH TRACETYPE Custom XML : testxmlextension");
         item.select();
 
-        comboBox = bot.comboBox(0);
+        comboBox = bot.ccomboBox(0);
         assertEquals("Combo: number of trace types", 2, comboBox.itemCount());
     }
 

@@ -27,7 +27,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
@@ -173,7 +173,7 @@ public class FilterViewerTest {
         filterNodeBot.click();
         filterNodeBot.contextMenu("TRACETYPE").click();
         filterNodeBot.expand();
-        SWTBotCombo comboBot = filterBot.comboBox();
+        SWTBotCCombo comboBot = filterBot.ccomboBox();
         comboBot.setSelection(TRACETYPE);
         filterNodeBot.getNode(WITH_TRACETYPE).expand();
 
@@ -189,7 +189,7 @@ public class FilterViewerTest {
 
         filterNodeBot.getNode(WITH_TRACETYPE).getNode(AND).contextMenu(CONTAINS).click();
         filterNodeBot.getNode(WITH_TRACETYPE).getNode(AND).expand();
-        comboBot = filterBot.comboBox(1); // aspect
+        comboBot = filterBot.ccomboBox(1); // aspect
         comboBot.setSelection(TIMESTAMP);
         textBot = filterBot.text();
         textBot.setFocus();
@@ -223,7 +223,7 @@ public class FilterViewerTest {
         filterNodeBot.click();
         filterNodeBot.contextMenu("TRACETYPE").click();
         filterNodeBot.expand();
-        SWTBotCombo comboBot = filterBot.comboBox();
+        SWTBotCCombo comboBot = filterBot.ccomboBox();
         comboBot.setSelection(TRACETYPE);
         filterNodeBot.getNode(WITH_TRACETYPE).expand();
 
@@ -241,7 +241,7 @@ public class FilterViewerTest {
         orNode.contextMenu("EQUALS").click();
         orNode.expand();
         orNode.getNode(0).select();
-        comboBot = filterBot.comboBox(1); // aspect
+        comboBot = filterBot.ccomboBox(1); // aspect
         comboBot.setSelection(TIMESTAMP);
         textBot = filterBot.text();
         textBot.setFocus();
@@ -253,7 +253,7 @@ public class FilterViewerTest {
         orNode.contextMenu("MATCHES").click();
         orNode.expand();
         orNode.getNode(1).select();
-        comboBot = filterBot.comboBox(1); // aspect
+        comboBot = filterBot.ccomboBox(1); // aspect
         comboBot.setSelection(CONTENTS);
         textBot = filterBot.text(0); // field
         textBot.setFocus();
@@ -289,7 +289,7 @@ public class FilterViewerTest {
         filterNodeBot.click();
         filterNodeBot.contextMenu("TRACETYPE").click();
         filterNodeBot.expand();
-        SWTBotCombo comboBot = filterBot.comboBox();
+        SWTBotCCombo comboBot = filterBot.ccomboBox();
         comboBot.setSelection(TRACETYPE);
         filterNodeBot.getNode(WITH_TRACETYPE).expand();
 
@@ -300,7 +300,7 @@ public class FilterViewerTest {
         filterNodeBot.getNode(WITH_TRACETYPE).contextMenu(COMPARE).click();
         SWTBotTreeItem contentNode = filterNodeBot.getNode(WITH_TRACETYPE).getNode("<select aspect> " + "=" + " <value>");
         contentNode.expand();
-        comboBot = filterBot.comboBox(1); // aspect
+        comboBot = filterBot.ccomboBox(1); // aspect
         comboBot.setSelection(CONTENTS);
         textBot = filterBot.text(0); // field
         textBot.setFocus();
