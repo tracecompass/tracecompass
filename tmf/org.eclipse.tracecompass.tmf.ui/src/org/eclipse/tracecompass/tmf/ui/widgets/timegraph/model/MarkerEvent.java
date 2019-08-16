@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016 Ericsson
+ * Copyright (c) 2015, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -13,6 +13,8 @@
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
 import org.eclipse.swt.graphics.RGBA;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.Annotation;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
 
 /**
  * TimeEvent implementation for marker events
@@ -77,6 +79,27 @@ public class MarkerEvent extends TimeEvent implements IMarkerEvent {
         fCategory = category;
         fColor = color;
         fLabel = label;
+        fForeground = foreground;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param annotation
+     *            {@link Annotation} that represent this marker event
+     * @param entry
+     *            The entry to which this marker event is assigned
+     * @param category
+     *            The category of the marker
+     * @param foreground
+     *            true if the marker is drawn in foreground, and false otherwise
+     * @since 5.1
+     */
+    public MarkerEvent(Annotation annotation, ITimeGraphEntry entry, String category, boolean foreground) {
+        super(entry, new TimeGraphState(annotation.getTime(), annotation.getDuration(), annotation.getLabel(), annotation.getStyle()));
+        fCategory = category;
+        fLabel = annotation.getLabel();
+        fColor = new RGBA(0, 0, 0, 255);
         fForeground = foreground;
     }
 

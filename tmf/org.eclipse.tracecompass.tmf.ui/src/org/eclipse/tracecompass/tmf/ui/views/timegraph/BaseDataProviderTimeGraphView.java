@@ -32,6 +32,11 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.Annotation;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.Annotation.AnnotationType;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationCategoriesModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.BaseDataProviderTimeGraphPresentationProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -59,8 +64,10 @@ import org.eclipse.tracecompass.tmf.ui.actions.OpenSourceCodeAction;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.MarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NamedTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
@@ -68,6 +75,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sampling;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
 import com.google.common.collect.HashBasedTable;
@@ -474,8 +482,8 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         List<@NonNull Long> times = StateSystemUtils.getTimes(zoomStartTime, zoomEndTime, resolution);
         TimeQueryFilter queryFilter = new TimeQueryFilter(times);
 
-        for (TraceEntry entry : Iterables.filter(traceEntries, TraceEntry.class)) {
-            ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = entry.getProvider();
+        for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
+            ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = traceEntry.getProvider();
             TmfModelResponse<List<ITimeGraphArrow>> response = provider.fetchArrows(FetchParametersUtils.timeQueryToMap(queryFilter), monitor);
             List<ITimeGraphArrow> model = response.getModel();
 
@@ -494,6 +502,63 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             }
         }
         return linkList;
+    }
+
+    @Override
+    protected @NonNull List<String> getViewMarkerCategories() {
+        List<String> viewMarkerCategories = super.getViewMarkerCategories();
+        List<@NonNull TimeGraphEntry> traceEntries = getEntryList(getTrace());
+        if (traceEntries == null) {
+            return viewMarkerCategories;
+        }
+        for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
+            ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = traceEntry.getProvider();
+            if (provider instanceof IOutputAnnotationProvider) {
+                TmfModelResponse<@NonNull AnnotationCategoriesModel> response = ((IOutputAnnotationProvider) provider).fetchAnnotationCategories(Collections.emptyMap(), new NullProgressMonitor());
+                AnnotationCategoriesModel model = response.getModel();
+                if (model != null) {
+                    viewMarkerCategories.addAll(model.getAnnotationCategories());
+                }
+            }
+        }
+        return viewMarkerCategories;
+    }
+
+    @Override
+    protected @NonNull List<IMarkerEvent> getViewMarkerList(long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor) {
+        List<IMarkerEvent> viewMarkerList = super.getViewMarkerList(startTime, endTime, resolution, monitor);
+        List<@NonNull TimeGraphEntry> traceEntries = getEntryList(getTrace());
+        if (traceEntries == null) {
+            return viewMarkerList;
+        }
+        List<@NonNull Long> times = StateSystemUtils.getTimes(startTime, endTime, resolution);
+        for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
+            Multimap<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Long> providersToModelIds = filterGroupEntries(Utils.flatten(traceEntry), startTime, endTime);
+            ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = traceEntry.getProvider();
+            if (provider instanceof IOutputAnnotationProvider) {
+                SelectionTimeQueryFilter queryFilter = new SelectionTimeQueryFilter(times, providersToModelIds.get(provider));
+                TmfModelResponse<@NonNull AnnotationModel> response = ((IOutputAnnotationProvider) provider).fetchAnnotations(FetchParametersUtils.selectionTimeQueryToMap(queryFilter), new NullProgressMonitor());
+                AnnotationModel model = response.getModel();
+                if (model != null) {
+                    for (Entry<String, Collection<Annotation>> entry : model.getAnnotations().entrySet()) {
+                        String category = entry.getKey();
+                        for (Annotation annotation : entry.getValue()) {
+                            if (annotation.getType() == AnnotationType.CHART) {
+                                // If the annotation entry ID is -1 we want the
+                                // marker to span across all entries
+                                ITimeGraphEntry markerEntry = null;
+                                if (annotation.getEntryId() != -1) {
+                                    markerEntry = fEntries.get(provider, annotation.getEntryId());
+                                }
+                                MarkerEvent markerEvent = new MarkerEvent(annotation, markerEntry, category, true);
+                                viewMarkerList.add(markerEvent);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return viewMarkerList;
     }
 
     @Override

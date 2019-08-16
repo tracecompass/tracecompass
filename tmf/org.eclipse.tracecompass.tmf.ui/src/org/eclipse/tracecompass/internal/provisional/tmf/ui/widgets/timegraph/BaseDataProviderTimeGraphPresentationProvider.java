@@ -26,13 +26,15 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.model.IOutputStyleProvider;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
-import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.model.OutputStyleModel;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties.SymbolType;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
@@ -46,6 +48,8 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
+import com.google.common.collect.ImmutableMap;
+
 /**
  * {@link TimeGraphPresentationProvider} for views whose data provider
  * implements the {@link IOutputStyleProvider} interface. This presentation
@@ -55,6 +59,15 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
  */
 public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPresentationProvider {
 
+    private static final Map<String, String> SYMBOL_TYPES = ImmutableMap.<String, String>builder()
+            .put(SymbolType.DIAMOND, IYAppearance.SymbolStyle.DIAMOND)
+            .put(SymbolType.CIRCLE, IYAppearance.SymbolStyle.CIRCLE)
+            .put(SymbolType.SQUARE, IYAppearance.SymbolStyle.SQUARE)
+            .put(SymbolType.TRIANGLE, IYAppearance.SymbolStyle.TRIANGLE)
+            .put(SymbolType.INVERTED_TRIANGLE, IYAppearance.SymbolStyle.INVERTED_TRIANGLE)
+            .put(SymbolType.CROSS, IYAppearance.SymbolStyle.CROSS)
+            .put(SymbolType.PLUS, IYAppearance.SymbolStyle.PLUS)
+            .build();
     private final Set<ITimeGraphDataProvider<?>> fProviders = new HashSet<>();
     private Map<String, Integer> fLabelToIndex = new HashMap<>();
     private @Nullable Map<String, OutputElementStyle> fStylesMap = null;
@@ -135,7 +148,6 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
             int tableIndex = 0;
             for (Entry<String, OutputElementStyle> styleEntry : styles.entrySet()) {
                 Map<String, Object> elementStyle = styleEntry.getValue().getStyleValues();
-                // TODO PP: Handle other style, right now it is just color
                 Object color = elementStyle.get(StyleProperties.BACKGROUND_COLOR);
                 RGB rgb = new RGB(0, 0, 0);
                 if (color instanceof String) {
@@ -148,6 +160,14 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
                 styleMap.put(ITimeEventStyleStrings.fillStyle(), ITimeEventStyleStrings.solidColorFillStyle());
                 styleMap.put(ITimeEventStyleStrings.fillColor(), new RGBAColor(rgb.red, rgb.green, rgb.blue).toInt());
                 styleMap.put(ITimeEventStyleStrings.label(), styleEntry.getKey());
+                Object height = elementStyle.get(StyleProperties.HEIGHT);
+                if (height instanceof Float) {
+                    styleMap.put(ITimeEventStyleStrings.heightFactor(), height);
+                }
+                Object symbolType = SYMBOL_TYPES.get(elementStyle.get(StyleProperties.SYMBOL_TYPE));
+                if (symbolType instanceof String) {
+                    styleMap.put(ITimeEventStyleStrings.symbolStyle(), symbolType);
+                }
                 Object styleGroup = elementStyle.get(StyleProperties.STYLE_GROUP);
                 if (styleGroup != null) {
                     styleMap.put(ITimeEventStyleStrings.group(), styleGroup);
