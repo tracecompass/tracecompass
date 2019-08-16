@@ -153,7 +153,9 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                                 uiEntry.updateModel(entry);
                             }
                         } else {
-                            setStartTime(Long.min(getStartTime(), entry.getStartTime()));
+                            if (entry.getStartTime() != Long.MIN_VALUE) {
+                                setStartTime(Long.min(getStartTime(), entry.getStartTime()));
+                            }
                             setEndTime(Long.max(getEndTime(), entry.getEndTime() + 1));
 
                             if (uiEntry != null) {
