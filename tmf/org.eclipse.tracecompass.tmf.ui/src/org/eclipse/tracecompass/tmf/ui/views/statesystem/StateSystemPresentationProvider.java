@@ -80,10 +80,13 @@ class StateSystemPresentationProvider extends TimeGraphPresentationProvider {
             }
 
             ITimeGraphEntry entry = event.getEntry();
-            ITmfTreeDataModel model = ((TimeGraphEntry) entry).getEntryModel();
-            if (model instanceof StateSystemEntryModel || model instanceof ModuleEntryModel) {
-                // Those two model have an event just so they can have a tooltip
-                return INVISIBLE;
+            if (entry != null) {
+                ITmfTreeDataModel model = ((TimeGraphEntry) entry).getEntryModel();
+                if (model instanceof StateSystemEntryModel || model instanceof ModuleEntryModel) {
+                    // Those two model have an event just so they can have a
+                    // tooltip
+                    return INVISIBLE;
+                }
             }
             // grey
             return NUM_COLORS;
