@@ -59,7 +59,8 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.internal.tmf.ui.util.TimeGraphStyleUtil;
-import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
+import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
@@ -232,7 +233,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
         Multimap<String, StateItem> groupedStateItems = LinkedHashMultimap.create();
         for (StateItem stateItem : stateItems) {
             if (!isLinkState(stateItem)) {
-                Object group = stateItem.getStyleMap().get(ITimeEventStyleStrings.group());
+                Object group = stateItem.getStyleMap().get(StyleProperties.STYLE_GROUP);
                 if (group instanceof String) {
                     groupedStateItems.put((String) group, stateItem);
                 } else {
@@ -334,8 +335,8 @@ public class TimeGraphLegend extends TitleAreaDialog {
          */
         public LegendEntry(Composite parent, StateItem si) {
             super(parent, SWT.NONE);
-            String fillColorKey = TimeGraphStyleUtil.getPreferenceName(fProvider, si, ITimeEventStyleStrings.fillColor());
-            String heightFactorKey = TimeGraphStyleUtil.getPreferenceName(fProvider, si, ITimeEventStyleStrings.heightFactor());
+            String fillColorKey = TimeGraphStyleUtil.getPreferenceName(fProvider, si, StyleProperties.BACKGROUND_COLOR);
+            String heightFactorKey = TimeGraphStyleUtil.getPreferenceName(fProvider, si, StyleProperties.HEIGHT);
             IPreferenceStore store = TimeGraphStyleUtil.getStore();
             TimeGraphStyleUtil.loadValue(fProvider, si);
             String name = si.getStateString();
@@ -352,7 +353,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
                     cd.setRGB(fBar.fColor.getRGB());
                     RGB color = cd.open();
                     if (color != null) {
-                        store.setValue(fillColorKey, new RGBAColor(color.red, color.green, color.blue, 255).toString());
+                        store.setValue(fillColorKey, ColorUtils.toHexColor(color.red, color.green, color.blue));
                         fBar.setColor(color);
                         si.setStateColor(color);
                         fProvider.refresh();
@@ -412,7 +413,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
                 public void widgetSelected(SelectionEvent e) {
                     float newWidth = fScale.getSelection() * 0.01f;
                     store.setValue(heightFactorKey, newWidth);
-                    si.getStyleMap().put(ITimeEventStyleStrings.heightFactor(), newWidth);
+                    si.getStyleMap().put(StyleProperties.HEIGHT, newWidth);
                     fProvider.refresh();
                     fReset.setEnabled(true);
                 }

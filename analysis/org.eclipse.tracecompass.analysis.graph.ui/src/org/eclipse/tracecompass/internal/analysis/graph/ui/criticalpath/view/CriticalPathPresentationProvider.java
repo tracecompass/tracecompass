@@ -18,10 +18,10 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
-import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
@@ -109,10 +109,9 @@ public class CriticalPathPresentationProvider extends TimeGraphPresentationProvi
             RGB stateColor = state.rgb;
             String stateType = state.equals(State.NETWORK_ARROW) || state.equals(State.UNKNOWN_ARROW) ? ITimeEventStyleStrings.linkType() : ITimeEventStyleStrings.stateType();
             ImmutableMap<String, Object> styleMap = ImmutableMap.of(
-                    ITimeEventStyleStrings.fillStyle(), ITimeEventStyleStrings.solidColorFillStyle(),
-                    ITimeEventStyleStrings.fillColor(), new RGBAColor(stateColor.red, stateColor.green, stateColor.blue).toInt(),
-                    ITimeEventStyleStrings.label(), String.valueOf(state.toString()),
-                    ITimeEventStyleStrings.heightFactor(), heightFactor,
+                    StyleProperties.BACKGROUND_COLOR, ColorUtils.toHexColor(stateColor.red, stateColor.green, stateColor.blue),
+                    StyleProperties.STYLE_NAME, String.valueOf(state.toString()),
+                    StyleProperties.HEIGHT, heightFactor,
                     ITimeEventStyleStrings.itemTypeProperty(), stateType);
                     STATE_TABLE[i] = new StateItem(styleMap);
         }

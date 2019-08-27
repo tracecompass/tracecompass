@@ -22,6 +22,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.registry.LinuxStyle;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphEntryModelWeighted;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
@@ -29,11 +30,11 @@ import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.presentation.RotatingPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
@@ -204,22 +205,18 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
     @Override
     public Map<String, Object> getSpecificEventStyle(ITimeEvent event) {
         Map<String, Object> map = new HashMap<>(super.getSpecificEventStyle(event));
-        Integer oldColor = (Integer) map.getOrDefault(ITimeEventStyleStrings.fillColor(), 255);
-        RGBAColor rgbaColor = new RGBAColor(oldColor);
-        short alpha = rgbaColor.getAlpha();
         if (isType(event.getEntry(), Type.CURRENT_THREAD) && event instanceof TimeEvent) {
             int threadEventValue = ((TimeEvent) event).getValue();
             RGBAColor color = PALETTE.get(Math.floorMod(threadEventValue + COLOR_DIFFERENCIATION_FACTOR, NUM_COLORS));
-            RGBAColor newColor = new RGBAColor(color.getRed(), color.getGreen(), color.getBlue(), alpha);
-            map.put(ITimeEventStyleStrings.fillColor(), newColor.toInt());
-            map.put(ITimeEventStyleStrings.label(), String.valueOf(threadEventValue));
+            map.put(StyleProperties.BACKGROUND_COLOR, ColorUtils.toHexColor(color.getRed(), color.getGreen(), color.getBlue()));
+            map.put(StyleProperties.STYLE_NAME, String.valueOf(threadEventValue));
 
         } else if (event.getEntry() instanceof TimeGraphEntry &&
                 ((TimeGraphEntry) event.getEntry()).getEntryModel() instanceof ITimeGraphEntryModelWeighted) {
             ITimeGraphEntryModelWeighted model = (ITimeGraphEntryModelWeighted) ((TimeGraphEntry) event.getEntry()).getEntryModel();
             int eventValue = ((TimeEvent) event).getValue();
 
-            map.put(ITimeEventStyleStrings.heightFactor(), (float) model.getWeight(eventValue));
+            map.put(StyleProperties.HEIGHT, (float) model.getWeight(eventValue));
         }
         return map;
     }

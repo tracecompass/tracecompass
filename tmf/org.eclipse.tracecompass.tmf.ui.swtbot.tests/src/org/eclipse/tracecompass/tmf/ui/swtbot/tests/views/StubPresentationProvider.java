@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,13 +14,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance.SymbolStyle;
-import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties.SymbolType;
+import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry.DisplayStyle;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.MarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
@@ -34,7 +36,8 @@ import com.google.common.collect.ImmutableMap;
  */
 class StubPresentationProvider extends TimeGraphPresentationProvider {
 
-    private static final int MARKER_COLOR = new RGBAColor(160, 170, 200, 80).toInt();
+    private static final @NonNull String MARKER_COLOR_HEX = ColorUtils.toHexColor(160, 170, 200);
+    private static final float OPACITY = (float) 80 / 255;
 
     @Override
     public String getPreferenceKey() {
@@ -42,18 +45,22 @@ class StubPresentationProvider extends TimeGraphPresentationProvider {
     }
 
     private static final List<StateItem> SYMBOLS = Arrays.asList(
-            new StateItem(ImmutableMap.of(ITimeEventStyleStrings.symbolStyle(), SymbolStyle.CIRCLE, ITimeEventStyleStrings.fillColor(), MARKER_COLOR)),
-            new StateItem(ImmutableMap.of(ITimeEventStyleStrings.symbolStyle(), SymbolStyle.SQUARE, ITimeEventStyleStrings.fillColor(), MARKER_COLOR)),
-            new StateItem(ImmutableMap.of(ITimeEventStyleStrings.symbolStyle(), SymbolStyle.TRIANGLE, ITimeEventStyleStrings.fillColor(), MARKER_COLOR)),
-            new StateItem(ImmutableMap.of(ITimeEventStyleStrings.symbolStyle(), SymbolStyle.INVERTED_TRIANGLE, ITimeEventStyleStrings.fillColor(), MARKER_COLOR)),
-            new StateItem(ImmutableMap.of(ITimeEventStyleStrings.symbolStyle(), SymbolStyle.CROSS, ITimeEventStyleStrings.fillColor(), MARKER_COLOR)),
-            new StateItem(ImmutableMap.of(ITimeEventStyleStrings.symbolStyle(), SymbolStyle.PLUS, ITimeEventStyleStrings.fillColor(), MARKER_COLOR)));
+            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.CIRCLE, StyleProperties.BACKGROUND_COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY)),
+            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.SQUARE, StyleProperties.BACKGROUND_COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY)),
+            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.TRIANGLE, StyleProperties.BACKGROUND_COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY)),
+            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.INVERTED_TRIANGLE, StyleProperties.BACKGROUND_COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY)),
+            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.CROSS, StyleProperties.BACKGROUND_COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY)),
+            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.PLUS, StyleProperties.BACKGROUND_COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY)));
 
     private static final StateItem LASER = new StateItem(
             ImmutableMap.of(
-                    ITimeEventStyleStrings.label(), "\"LASER\"",
-                    ITimeEventStyleStrings.heightFactor(), 0.1f,
-                    ITimeEventStyleStrings.fillColor(), (255 << 24 | 255)));
+                    StyleProperties.STYLE_NAME, "\"LASER\"",
+                    StyleProperties.HEIGHT, 0.1f,
+                    StyleProperties.BACKGROUND_COLOR, "#ff0000",
+                    StyleProperties.COLOR, "#ff0000"));
+
+    private static final StateItem PULSE = new StateItem(
+            ImmutableMap.of(StyleProperties.STYLE_NAME, "PULSE"));
 
     /**
      * States, visible since they are tested
@@ -64,7 +71,8 @@ class StubPresentationProvider extends TimeGraphPresentationProvider {
             new StateItem(new RGB(0, 64, 128), "HAIR"),
             new StateItem(new RGB(0, 0, 255), "EYE"),
             new StateItem(new RGB(255, 64, 128), "PUCK"),
-            LASER
+            LASER,
+            PULSE
     };
 
     @Override
@@ -76,6 +84,9 @@ class StubPresentationProvider extends TimeGraphPresentationProvider {
     public int getStateTableIndex(ITimeEvent event) {
         if (event instanceof TimeLinkEvent) {
             return 5;
+        }
+        if (event.getEntry() != null && DisplayStyle.LINE.equals(event.getEntry().getStyle())) {
+            return 6;
         }
 
         if (event instanceof TimeEvent) {

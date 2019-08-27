@@ -15,11 +15,12 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.presentation.IPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
+import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 
 /**
@@ -40,7 +41,7 @@ public abstract class PalettedPresentationProvider extends StubPresentationProvi
     public PalettedPresentationProvider() {
         StateItem[] states = getStateTable();
         for(int i = 0; i < states.length; i++) {
-            states[i].getStyleMap().put(ITimeEventStyleStrings.fillColor(), getColor(new TimeEvent(null, 0, 0, i)));
+            states[i].getStyleMap().put(StyleProperties.BACKGROUND_COLOR, getColor(new TimeEvent(null, 0, 0, i)));
         }
     }
 
@@ -51,16 +52,17 @@ public abstract class PalettedPresentationProvider extends StubPresentationProvi
      */
     public abstract IPaletteProvider getPalette();
 
-    private int getColor(TimeEvent event) {
+    private String getColor(TimeEvent event) {
         List<@NonNull RGBAColor> list = getPalette().get();
-        return list.get((int) Math.floorMod((event.getValue() & ((1L << Integer.SIZE) - 1)), list.size())).toInt();
+        int colorInt = list.get((int) Math.floorMod((event.getValue() & ((1L << Integer.SIZE) - 1)), list.size())).toInt();
+        return ColorUtils.toHexColor(colorInt >> 24, colorInt >> 16, colorInt >> 8);
     }
 
     @Override
     public Map<String, Object> getEventStyle(@Nullable ITimeEvent event) {
         Map<String, Object> style = new HashMap<>(super.getEventStyle(event));
         if (event instanceof TimeEvent) {
-            style.put(ITimeEventStyleStrings.fillColor(), getColor((TimeEvent) event));
+            style.put(StyleProperties.BACKGROUND_COLOR, getColor((TimeEvent) event));
         }
         return style;
     }

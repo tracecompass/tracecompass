@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties.BorderStyle;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties.SymbolType;
 import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
@@ -51,44 +52,38 @@ import com.google.common.collect.ImmutableMap;
 public interface ITimeEventStyleStrings {
 
     /**
-     * Mapping of {@link StyleProperties#SYMBOL_TYPE} to {@link #symbolStyle()}
+     * Mapping of {@link #symbolStyle()} to {@link StyleProperties#SYMBOL_TYPE}
      *
      * @since 5.1
      */
-    Map<String, String> SYMBOL_STYLES = ImmutableMap.<String, String>builder()
-            .put(SymbolType.DIAMOND, IYAppearance.SymbolStyle.DIAMOND)
-            .put(SymbolType.CIRCLE, IYAppearance.SymbolStyle.CIRCLE)
-            .put(SymbolType.SQUARE, IYAppearance.SymbolStyle.SQUARE)
-            .put(SymbolType.TRIANGLE, IYAppearance.SymbolStyle.TRIANGLE)
-            .put(SymbolType.INVERTED_TRIANGLE, IYAppearance.SymbolStyle.INVERTED_TRIANGLE)
-            .put(SymbolType.CROSS, IYAppearance.SymbolStyle.CROSS)
-            .put(SymbolType.PLUS, IYAppearance.SymbolStyle.PLUS)
+    Map<String, String> SYMBOL_TYPES = ImmutableMap.<String, String>builder()
+            .put(IYAppearance.SymbolStyle.DIAMOND, SymbolType.DIAMOND)
+            .put(IYAppearance.SymbolStyle.CIRCLE, SymbolType.CIRCLE)
+            .put(IYAppearance.SymbolStyle.SQUARE, SymbolType.SQUARE)
+            .put(IYAppearance.SymbolStyle.TRIANGLE, SymbolType.TRIANGLE)
+            .put(IYAppearance.SymbolStyle.INVERTED_TRIANGLE, SymbolType.INVERTED_TRIANGLE)
+            .put(IYAppearance.SymbolStyle.CROSS, SymbolType.CROSS)
+            .put(IYAppearance.SymbolStyle.PLUS, SymbolType.PLUS)
             .build();
 
     /**
      * The label to display in the legend
      *
      * @return the key to get the value
+     * @deprecated Use {@link StyleProperties#STYLE_NAME} instead
      */
+    @Deprecated
     static String label() {
         return ".label"; //$NON-NLS-1$
-    }
-
-    /**
-     * The style group, to organize styles together
-     *
-     * @return the key to get the value
-     * @since 5.1
-     */
-    static String group() {
-        return ".group"; //$NON-NLS-1$
     }
 
     /**
      * Height factor, can be between 0.0 and 1.0f.
      *
      * @return the key to get the value
+     * @deprecated Use {@link StyleProperties#HEIGHT} instead
      */
+    @Deprecated
     static String heightFactor() {
         return ".height.factor"; //$NON-NLS-1$
     }
@@ -98,7 +93,13 @@ public interface ITimeEventStyleStrings {
      * {@link #gradientColorFillStyle()} or {@link #hatchPatternFillStyle()}
      *
      * @return the key to get the value
+     * @deprecated For {@link #solidColorFillStyle()}, set
+     *             {@link StyleProperties#LINEAR_GRADIENT} to
+     *             false, for {@link #gradientColorFillStyle()}, set
+     *             {@link StyleProperties#LINEAR_GRADIENT} to true
+     *             and hatch pattern is not supported.
      */
+    @Deprecated
     static String fillStyle() {
         return ".fill";//$NON-NLS-1$
     }
@@ -111,7 +112,10 @@ public interface ITimeEventStyleStrings {
      * @see #fillStyle()
      *
      * @return the color fill style
+     * @deprecated For this style, set
+     *             {@link StyleProperties#LINEAR_GRADIENT} to false
      */
+    @Deprecated
     static String solidColorFillStyle() {
         return "color"; //$NON-NLS-1$
     }
@@ -123,7 +127,10 @@ public interface ITimeEventStyleStrings {
      * @see #fillStyle()
      *
      * @return the color fill style
+     * @deprecated For this style, set
+     *             {@link StyleProperties#LINEAR_GRADIENT} to true
      */
+    @Deprecated
     static String gradientColorFillStyle() {
         return "gradient"; //$NON-NLS-1$
     }
@@ -135,7 +142,9 @@ public interface ITimeEventStyleStrings {
      *
      * @see #fillStyle()
      * @return the color fill style
+     * @deprecated not supported
      */
+    @Deprecated
     static String hatchPatternFillStyle() {
         return "hatch"; //$NON-NLS-1$
     }
@@ -144,7 +153,9 @@ public interface ITimeEventStyleStrings {
      * Fill color, used in all styles except for image.
      *
      * @return the key to get the value
+     * @deprecated Use {@link StyleProperties#BACKGROUND_COLOR} instead
      */
+    @Deprecated
     static String fillColor() {
         return ".fill.color";//$NON-NLS-1$
     }
@@ -153,7 +164,11 @@ public interface ITimeEventStyleStrings {
      * Second fill color, used in gradients
      *
      * @return the key to get the value
+     * @deprecated Use
+     *             {@link StyleProperties#LINEAR_GRADIENT_COLOR_END}
+     *             instead
      */
+    @Deprecated
     static String fillColorEnd() {
         return ".fill.color_end";//$NON-NLS-1$
     }
@@ -162,7 +177,9 @@ public interface ITimeEventStyleStrings {
      * Shadow the time event
      *
      * @return the key to get the value
+     * @deprecated Not supported
      */
+    @Deprecated
     static String shadowEnabled() {
         return ".shadow.enable";//$NON-NLS-1$
     }
@@ -171,7 +188,12 @@ public interface ITimeEventStyleStrings {
      * Border
      *
      * @return the key to get the value
+     * @deprecated To disable borders, set
+     *             {@link StyleProperties#BORDER_STYLE} to
+     *             {@link BorderStyle#NONE}, to enable, set it to any other
+     *             value in {@link BorderStyle}
      */
+    @Deprecated
     static String borderEnable() {
         return ".border.enable";//$NON-NLS-1$
     }
@@ -180,7 +202,9 @@ public interface ITimeEventStyleStrings {
      * Border thickness
      *
      * @return the key to get the value
+     * @deprecated Use {@link StyleProperties#BORDER_WIDTH} instead
      */
+    @Deprecated
     static String borderThickness() {
         return ".border.weight";//$NON-NLS-1$
     }
@@ -189,14 +213,17 @@ public interface ITimeEventStyleStrings {
      * Border color
      *
      * @return the key to get the value
+     * @deprecated Use {@link StyleProperties#BORDER_COLOR} instead
      */
+    @Deprecated
     static String borderColor() {
         return ".border.color";//$NON-NLS-1$
     }
 
     /**
-     * Item property. Possible values are {@link ITimeEventStyleStrings#stateType()}
-     * or {@link ITimeEventStyleStrings#linkType()}
+     * Item property. Possible values are
+     * {@link ITimeEventStyleStrings#stateType()} or
+     * {@link ITimeEventStyleStrings#linkType()}
      *
      * @return The key to get the item property of a state item
      * @since 4.0
@@ -237,12 +264,15 @@ public interface ITimeEventStyleStrings {
     }
 
     /**
-     * Indicate that the item has a symbol style associated to it.
-     * Values associated to it are defined in {@link org.eclipse.tracecompass.tmf.core.presentation.IYAppearance.SymbolStyle}
+     * Indicate that the item has a symbol style associated to it. Values
+     * associated to it are defined in
+     * {@link org.eclipse.tracecompass.tmf.core.presentation.IYAppearance.SymbolStyle}
      *
      * @return the key associated to the symbol style.
      * @since 4.1
+     * @deprecated Use {@link StyleProperties#SYMBOL_TYPE} instead
      */
+    @Deprecated
     static String symbolStyle() {
         return ".symbol.style"; //$NON-NLS-1$
     }

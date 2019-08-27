@@ -15,7 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
+import org.eclipse.tracecompass.internal.tmf.ui.util.StylePropertiesUtils;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
+import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 
@@ -38,7 +40,7 @@ public class StateItem {
      */
     public static final String UNDEFINED_STATE_NAME = "Undefined"; //$NON-NLS-1$
 
-    private static final int UNDEFINED_COLOR_VALUE = 0xff;
+    private static final String UNDEFINED_COLOR_VALUE = "#000000"; //$NON-NLS-1$
 
     // ------------------------------------------------------------------------
     // Attributes
@@ -73,8 +75,8 @@ public class StateItem {
     public StateItem(Map<String, Object> style) {
         Map<String, Object> styleMap = new HashMap<>();
         styleMap.putAll(style);
-        fStyleMap = styleMap;
-        fOriginalStyleMap = ImmutableMap.copyOf(styleMap);
+        fStyleMap = StylePropertiesUtils.updateEventStyleProperties(styleMap);
+        fOriginalStyleMap = ImmutableMap.copyOf(fStyleMap);
     }
 
     /**
@@ -86,11 +88,11 @@ public class StateItem {
      *            A state string
      */
     public StateItem(RGB stateColor, String stateString) {
-        int stateColorInt = new RGBAColor(stateColor.red, stateColor.green, stateColor.blue).toInt();
         Map<String, Object> styleMap = new HashMap<>();
-        styleMap.put(ITimeEventStyleStrings.fillStyle(), ITimeEventStyleStrings.solidColorFillStyle());
-        styleMap.put(ITimeEventStyleStrings.fillColor(), stateColorInt);
-        styleMap.put(ITimeEventStyleStrings.label(), stateString);
+        String hexColor = ColorUtils.toHexColor(stateColor.red, stateColor.green, stateColor.blue);
+        styleMap.put(StyleProperties.BACKGROUND_COLOR, hexColor);
+        styleMap.put(StyleProperties.COLOR, hexColor);
+        styleMap.put(StyleProperties.STYLE_NAME, stateString);
         fStyleMap = styleMap;
         fOriginalStyleMap = ImmutableMap.copyOf(styleMap);
     }
@@ -104,8 +106,8 @@ public class StateItem {
      * @return Returns the state color.
      */
     public RGB getStateColor() {
-        int rgbInt = (int) fStyleMap.getOrDefault(ITimeEventStyleStrings.fillColor(), UNDEFINED_COLOR_VALUE);
-        return new RGB((rgbInt >> 24) & 0xff, (rgbInt >> 16) & 0xff, (rgbInt >> 8) & 0xff);
+        String rgb = (String) fStyleMap.getOrDefault(StyleProperties.BACKGROUND_COLOR, UNDEFINED_COLOR_VALUE);
+        return ColorUtils.fromHexColor(rgb);
     }
 
     /**
@@ -116,8 +118,9 @@ public class StateItem {
      */
     public void setStateColor(RGB stateColor) {
         if (stateColor != null) {
-            int rbgVal = new RGBAColor(stateColor.red, stateColor.green, stateColor.blue).toInt();
-            fStyleMap.put(ITimeEventStyleStrings.fillColor(), rbgVal);
+            String hexColor = ColorUtils.toHexColor(stateColor.red, stateColor.green, stateColor.blue);
+            fStyleMap.put(StyleProperties.BACKGROUND_COLOR, hexColor);
+            fStyleMap.put(StyleProperties.COLOR, hexColor);
         }
     }
 
@@ -131,7 +134,7 @@ public class StateItem {
         Object itemType = fStyleMap.get(ITimeEventStyleStrings.itemTypeProperty());
         float defaultStateWidth = ITimeEventStyleStrings.linkType().equals(itemType) ?
                 TimeGraphControl.DEFAULT_LINK_WIDTH : TimeGraphControl.DEFAULT_STATE_WIDTH;
-        return (float) fStyleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), defaultStateWidth);
+        return (float) fStyleMap.getOrDefault(StyleProperties.HEIGHT, defaultStateWidth);
     }
 
     /**
@@ -140,7 +143,7 @@ public class StateItem {
      * @return the state string.
      */
     public String getStateString() {
-        return String.valueOf(fStyleMap.getOrDefault(ITimeEventStyleStrings.label(), UNDEFINED_STATE_NAME));
+        return String.valueOf(fStyleMap.getOrDefault(StyleProperties.STYLE_NAME, UNDEFINED_STATE_NAME));
     }
 
     /**
@@ -160,7 +163,7 @@ public class StateItem {
      *            A state string to set
      */
     public void setStateString(String stateString) {
-        fStyleMap.put(ITimeEventStyleStrings.label(), stateString);
+        fStyleMap.put(StyleProperties.STYLE_NAME, stateString);
     }
 
     /**

@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 
 /**
@@ -27,10 +29,12 @@ import org.eclipse.tracecompass.internal.tmf.core.Activator;
  * @author Simon Delisle
  * @since 5.1
  */
+@NonNullByDefault
 public class X11ColorUtils {
 
     private static final String X11_COLOR_FILE = "share/rgb.txt"; //$NON-NLS-1$
     private static final Pattern PATTERN = Pattern.compile("\\s*(\\d{1,3})\\s*(\\d{1,3})\\s*(\\d{1,3})\\s*(.*\\S)\\s*"); //$NON-NLS-1$
+    private static final String HEX_COLOR_FORMAT = "#%02x%02x%02x"; //$NON-NLS-1$
     private static final Map<String, String> COLORS = new HashMap<>();
     static {
         URL url = Activator.getDefault().getBundle().getEntry(X11_COLOR_FILE);
@@ -42,7 +46,7 @@ public class X11ColorUtils {
                     int r = Integer.parseInt(matcher.group(1));
                     int g = Integer.parseInt(matcher.group(2));
                     int b = Integer.parseInt(matcher.group(3));
-                    String hexColor = String.format("#%02x%02x%02x", r, g, b); //$NON-NLS-1$
+                    String hexColor = String.format(HEX_COLOR_FORMAT, r, g, b);
                     COLORS.put(matcher.group(4).toLowerCase(), hexColor);
                 }
             }
@@ -58,7 +62,7 @@ public class X11ColorUtils {
      *            the X11 color name (case insensitive)
      * @return the corresponding RGB hex string, or null
      */
-    public static String toHexColor(String name) {
+    public static @Nullable String toHexColor(String name) {
         return COLORS.get(name.toLowerCase());
     }
 }

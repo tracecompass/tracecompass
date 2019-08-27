@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.model;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -26,6 +27,8 @@ import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
  */
 public class StyleManager {
 
+    private final static StyleManager EMPTY = new StyleManager(Collections.emptyMap());
+
     private final Map<String, OutputElementStyle> fStyleMap;
 
     /**
@@ -35,6 +38,16 @@ public class StyleManager {
      */
     public StyleManager(Map<String, OutputElementStyle> styleMap) {
         fStyleMap = styleMap;
+    }
+
+    /**
+     * Get a manager that has an empty style map. It can be used to resolve
+     * element styles that have no parent key.
+     *
+     * @return an empty style manager
+     */
+    public static StyleManager empty() {
+        return EMPTY;
     }
 
     /**

@@ -11,8 +11,8 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.registry;
 
 import java.util.Map;
 
-import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
+import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -115,10 +115,10 @@ public enum LinuxStyle {
         if (heightFactor > 1.0 || heightFactor < 0) {
             throw new IllegalArgumentException("Height factor needs to be between 0 and 1.0, given hint : " + heightFactor); //$NON-NLS-1$
         }
-        fMap = ImmutableMap.of(ITimeEventStyleStrings.label(), label,
-                ITimeEventStyleStrings.fillStyle(), ITimeEventStyleStrings.solidColorFillStyle(),
-                ITimeEventStyleStrings.fillColor(), new RGBAColor(red, green, blue, alpha).toInt(),
-                ITimeEventStyleStrings.heightFactor(), heightFactor);
+        fMap = ImmutableMap.of(StyleProperties.STYLE_NAME, label,
+                StyleProperties.BACKGROUND_COLOR, ColorUtils.toHexColor(red, green, blue),
+                StyleProperties.HEIGHT, heightFactor,
+                StyleProperties.OPACITY, (float) alpha / 255);
     }
 
     /**
@@ -127,15 +127,15 @@ public enum LinuxStyle {
      * @return the label to display
      */
     public String getLabel() {
-        return (String) toMap().get(ITimeEventStyleStrings.label());
+        return (String) toMap().get(StyleProperties.STYLE_NAME);
     }
 
     /**
      * Get a map of the values corresponding to the fields in
-     * {@link ITimeEventStyleStrings}
+     * {@link StyleProperties}
      *
      * @return the map corresponding to the api defined in
-     *         {@link ITimeEventStyleStrings}
+     *         {@link StyleProperties}
      */
     public Map<String, Object> toMap() {
         return fMap;

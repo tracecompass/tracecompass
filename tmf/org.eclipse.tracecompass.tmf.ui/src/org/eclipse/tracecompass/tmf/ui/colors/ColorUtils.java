@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.colors;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tracecompass.tmf.core.dataprovider.X11ColorUtils;
 
@@ -20,6 +21,7 @@ import org.eclipse.tracecompass.tmf.core.dataprovider.X11ColorUtils;
  */
 public final class ColorUtils {
 
+    private static final String HEX_COLOR_FORMAT = "#%02x%02x%02x"; //$NON-NLS-1$
     private static final String HEX_COLOR_REGEX = "#[A-Fa-f0-9]{6}"; //$NON-NLS-1$
 
     private ColorUtils() {
@@ -44,28 +46,43 @@ public final class ColorUtils {
     }
 
     /**
-     * Get an hex string from {@link RGB}.
+     * Get an RGB hex string from a {@link RGB}.
      *
      * @param rgb
      *            RGB color
-     * @return Hex string #rrggbb
+     * @return The hexadecimal string in format #rrggbb
      */
-    public static String toHexColor(RGB rgb) {
+    public static @NonNull String toHexColor(RGB rgb) {
         int r = rgb.red;
         int g = rgb.green;
         int b = rgb.blue;
-        return String.format("#%02x%02x%02x", r, g, b); //$NON-NLS-1$
+        return String.format(HEX_COLOR_FORMAT, r, g, b);
+    }
+
+    /**
+     * Get an RGB hex string from the RGB values.
+     *
+     * @param red
+     *            The red value, should be between 0 and 255
+     * @param green
+     *            The green value, should be between 0 and 255
+     * @param blue
+     *            The blue value, should be between 0 and 255
+     * @return The hexadecimal string in format #rrggbb
+     */
+    public static @NonNull String toHexColor(int red, int green, int blue) {
+        return String.format(HEX_COLOR_FORMAT, Math.abs(red % 256), Math.abs(green % 256), Math.abs(blue % 256));
     }
 
     /**
      * Get {@link RGB} from an X11 color name as described in
      * {@link X11ColorUtils}.
      *
-     * @param X11ColorName
+     * @param x11ColorName
      *            Name of the color
      * @return RGB color
      */
-    public static RGB fromX11Color(String X11ColorName) {
-        return fromHexColor(X11ColorUtils.toHexColor(X11ColorName));
+    public static RGB fromX11Color(String x11ColorName) {
+        return (x11ColorName) == null ? null : fromHexColor(X11ColorUtils.toHexColor(x11ColorName));
     }
 }

@@ -42,7 +42,6 @@ import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraph
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
@@ -151,26 +150,26 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
                 fKeyToIndex.put(styleKey, tableIndex++);
                 OutputElementStyle elementStyle = styleEntry.getValue();
                 Map<String, Object> styleMap = new HashMap<>();
-                styleMap.put(ITimeEventStyleStrings.fillStyle(), ITimeEventStyleStrings.solidColorFillStyle());
                 RGBAColor rgba = getColorStyle(elementStyle, StyleProperties.BACKGROUND_COLOR);
-                styleMap.put(ITimeEventStyleStrings.fillColor(), rgba != null ? rgba.toInt() : new RGBAColor(0, 0, 0).toInt());
+                RGB rgb = (rgba != null) ?  new RGB(rgba.getRed(), rgba.getGreen(), rgba.getBlue()) : new RGB(0, 0, 0);
+                styleMap.put(StyleProperties.BACKGROUND_COLOR, ColorUtils.toHexColor(rgb));
                 Object styleName = getStyle(elementStyle, StyleProperties.STYLE_NAME);
                 if (styleName instanceof String) {
-                    styleMap.put(ITimeEventStyleStrings.label(), styleName);
+                    styleMap.put(StyleProperties.STYLE_NAME, styleName);
                 } else {
-                    styleMap.put(ITimeEventStyleStrings.label(), styleEntry.getKey());
+                    styleMap.put(StyleProperties.STYLE_NAME, styleEntry.getKey());
                 }
                 Float height = getFloatStyle(elementStyle, StyleProperties.HEIGHT);
                 if (height != null) {
-                    styleMap.put(ITimeEventStyleStrings.heightFactor(), height);
+                    styleMap.put(StyleProperties.HEIGHT, height);
                 }
-                Object symbolType = ITimeEventStyleStrings.SYMBOL_STYLES.get(getStyle(elementStyle, StyleProperties.SYMBOL_TYPE));
+                Object symbolType = getStyle(elementStyle, StyleProperties.SYMBOL_TYPE);
                 if (symbolType instanceof String) {
-                    styleMap.put(ITimeEventStyleStrings.symbolStyle(), symbolType);
+                    styleMap.put(StyleProperties.SYMBOL_TYPE, symbolType);
                 }
                 Object styleGroup = getStyle(elementStyle, StyleProperties.STYLE_GROUP);
                 if (styleGroup != null) {
-                    styleMap.put(ITimeEventStyleStrings.group(), styleGroup);
+                    styleMap.put(StyleProperties.STYLE_GROUP, styleGroup);
                 }
                 stateItemList.add(new StateItem(styleMap));
             }
@@ -252,6 +251,11 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
             }
         }
         return TRANSPARENT_STYLE;
+    }
+
+    @Override
+    public @NonNull StyleManager getStyleManager() {
+        return fStyleManager;
     }
 
     @Override
