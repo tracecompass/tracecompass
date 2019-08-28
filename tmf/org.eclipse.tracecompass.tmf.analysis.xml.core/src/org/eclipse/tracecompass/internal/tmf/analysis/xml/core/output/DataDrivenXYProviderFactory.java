@@ -100,7 +100,7 @@ public class DataDrivenXYProviderFactory implements IDataDrivenRuntimeObject {
      *            The ID of the data provider to create
      * @return The XY data provider
      */
-    public static @Nullable ITmfTreeXYDataProvider<ITmfTreeDataModel> create(ITmfTrace trace, List<ITmfStateSystem> stateSystems, List<DataDrivenOutputEntry> entries, @Nullable String id) {
+    public static ITmfTreeXYDataProvider<ITmfTreeDataModel> create(ITmfTrace trace, List<ITmfStateSystem> stateSystems, List<DataDrivenOutputEntry> entries, @Nullable String id) {
         return new DataDrivenXYDataProvider(trace, stateSystems, entries, id);
     }
 
