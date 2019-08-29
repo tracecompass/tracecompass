@@ -54,7 +54,6 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode {
     }
 
 
-    private boolean fNot = false;
     private int fResult;
     private Type fType = Type.NUM;
     private String fValue;
@@ -67,20 +66,6 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode {
      */
     public TmfFilterCompareNode(ITmfFilterTreeNode parent) {
         super(parent);
-    }
-
-    /**
-     * @return the NOT state
-     */
-    public boolean isNot() {
-        return fNot;
-    }
-
-    /**
-     * @param not the NOT state
-     */
-    public void setNot(boolean not) {
-        this.fNot = not;
     }
 
     /**
@@ -166,26 +151,26 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode {
             if (fValueNumber instanceof Double) {
                 Number valueNumber = toNumber(value);
                 if (valueNumber != null) {
-                    return (Double.compare(valueNumber.doubleValue(), fValueNumber.doubleValue()) == fResult) ^ fNot;
+                    return (Double.compare(valueNumber.doubleValue(), fValueNumber.doubleValue()) == fResult) ^ isNot();
                 }
             } else if (fValueNumber != null) {
                 Number valueNumber = toNumber(value);
                 if (valueNumber instanceof Double || valueNumber instanceof Float) {
-                    return (Double.compare(valueNumber.doubleValue(), fValueNumber.doubleValue()) == fResult) ^ fNot;
+                    return (Double.compare(valueNumber.doubleValue(), fValueNumber.doubleValue()) == fResult) ^ isNot();
                 } else if (valueNumber != null) {
-                    return (Long.compare(valueNumber.longValue(), fValueNumber.longValue()) == fResult) ^ fNot;
+                    return (Long.compare(valueNumber.longValue(), fValueNumber.longValue()) == fResult) ^ isNot();
                 }
             }
         } else if (fType == Type.ALPHA) {
             String valueString = value.toString();
             int comp = (int) Math.signum(valueString.compareTo(fValue));
-            return (comp == fResult) ^ fNot;
+            return (comp == fResult) ^ isNot();
         } else if (fType == Type.TIMESTAMP) {
             if (fValueTimestamp != null) {
                 ITmfTimestamp valueTimestamp = toTimestamp(value);
                 if (valueTimestamp != null) {
                     int comp = (int) Math.signum(valueTimestamp.compareTo(fValueTimestamp));
-                    return (comp == fResult) ^ fNot;
+                    return (comp == fResult) ^ isNot();
                 }
             }
         }
@@ -228,7 +213,7 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode {
         String result = (fResult == 0 ? "= " : fResult < 0 ? "< " : "> "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         String open = (fType == Type.NUM ? "" : fType == Type.ALPHA ? "\"" : "["); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         String close = (fType == Type.NUM ? "" : fType == Type.ALPHA ? "\"" : "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        return getAspectLabel(explicit) + (fNot ? " not " : " ") + result + open + fValue + close; //$NON-NLS-1$ //$NON-NLS-2$
+        return getAspectLabel(explicit) + (isNot() ? " not " : " ") + result + open + fValue + close; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     @Override

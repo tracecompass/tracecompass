@@ -34,7 +34,6 @@ public class TmfFilterEqualsNode extends TmfFilterAspectNode {
     /** ignorecase attribute name */
     public static final String IGNORECASE_ATTR = "ignorecase"; //$NON-NLS-1$
 
-    private boolean fNot = false;
     private String fValue;
     private boolean fIgnoreCase = false;
 
@@ -43,20 +42,6 @@ public class TmfFilterEqualsNode extends TmfFilterAspectNode {
      */
     public TmfFilterEqualsNode(ITmfFilterTreeNode parent) {
         super(parent);
-    }
-
-    /**
-     * @return the NOT state
-     */
-    public boolean isNot() {
-        return fNot;
-    }
-
-    /**
-     * @param not the NOT state
-     */
-    public void setNot(boolean not) {
-        this.fNot = not;
     }
 
     /**
@@ -95,17 +80,17 @@ public class TmfFilterEqualsNode extends TmfFilterAspectNode {
     @Override
     public boolean matches(ITmfEvent event) {
         if (event == null || fEventAspect == null) {
-            return false ^ fNot;
+            return false ^ isNot();
         }
         Object value = fEventAspect.resolve(event);
         if (value == null) {
-            return false ^ fNot;
+            return false ^ isNot();
         }
         String valueString = value.toString();
         if (fIgnoreCase) {
-            return valueString.equalsIgnoreCase(fValue) ^ fNot;
+            return valueString.equalsIgnoreCase(fValue) ^ isNot();
         }
-        return valueString.equals(fValue) ^ fNot;
+        return valueString.equals(fValue) ^ isNot();
     }
 
     @Override
@@ -115,7 +100,7 @@ public class TmfFilterEqualsNode extends TmfFilterAspectNode {
 
     @Override
     public String toString(boolean explicit) {
-        return getAspectLabel(explicit) + (fNot ? " not equals " : " equals ") + (fIgnoreCase ? "ignorecase \"" : "\"") + fValue + '\"'; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        return getAspectLabel(explicit) + (isNot() ? " not equals " : " equals ") + (fIgnoreCase ? "ignorecase \"" : "\"") + fValue + '\"'; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 
     @Override

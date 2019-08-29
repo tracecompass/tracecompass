@@ -20,7 +20,7 @@ import org.eclipse.tracecompass.tmf.core.event.aspect.TmfEventFieldAspect;
  *
  * @author Patrick Tasse
  */
-public abstract class TmfFilterAspectNode extends TmfFilterTreeNode {
+public abstract class TmfFilterAspectNode extends TmfFilterTreeNode implements ITmfFilterWithNot {
 
     /** event aspect attribute name */
     public static final String EVENT_ASPECT_ATTR = "eventaspect"; //$NON-NLS-1$
@@ -35,6 +35,7 @@ public abstract class TmfFilterAspectNode extends TmfFilterTreeNode {
     protected ITmfEventAspect<?> fEventAspect;
 
     private String fTraceTypeId;
+    private boolean fNot;
 
     /**
      * @param parent the parent node
@@ -113,5 +114,15 @@ public abstract class TmfFilterAspectNode extends TmfFilterTreeNode {
         clone.setEventAspect(fEventAspect);
         clone.setTraceTypeId(fTraceTypeId);
         return clone;
+    }
+
+    @Override
+    public boolean isNot() {
+        return fNot;
+    }
+
+    @Override
+    public void setNot(boolean not) {
+        fNot = not;
     }
 }

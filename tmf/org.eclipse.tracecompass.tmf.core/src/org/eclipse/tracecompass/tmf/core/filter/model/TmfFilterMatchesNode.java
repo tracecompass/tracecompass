@@ -34,8 +34,6 @@ public class TmfFilterMatchesNode extends TmfFilterAspectNode {
     /** regex attribute name */
     public static final String REGEX_ATTR = "regex"; //$NON-NLS-1$
 
-    private boolean fNot = false;
-
     private String fRegex;
     private transient Pattern fPattern;
 
@@ -45,21 +43,6 @@ public class TmfFilterMatchesNode extends TmfFilterAspectNode {
      */
     public TmfFilterMatchesNode(ITmfFilterTreeNode parent) {
         super(parent);
-    }
-
-    /**
-     * @return the NOT state
-     */
-    public boolean isNot() {
-        return fNot;
-    }
-
-    /**
-     * @param not
-     *            the NOT state
-     */
-    public void setNot(boolean not) {
-        this.fNot = not;
     }
 
     /**
@@ -125,6 +108,6 @@ public class TmfFilterMatchesNode extends TmfFilterAspectNode {
 
     @Override
     public String toString(boolean explicit) {
-        return getAspectLabel(explicit) + (fNot ? " not matches \"" : " matches \"") + getRegex() + '\"'; //$NON-NLS-1$ //$NON-NLS-2$
+        return getAspectLabel(explicit) + (isNot() ? " not matches \"" : " matches \"") + getRegex() + '\"'; //$NON-NLS-1$ //$NON-NLS-2$
     }
 }

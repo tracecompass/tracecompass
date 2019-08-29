@@ -34,7 +34,6 @@ public class TmfFilterContainsNode extends TmfFilterAspectNode {
     /** ignorecase attribute name */
     public static final String IGNORECASE_ATTR = "ignorecase"; //$NON-NLS-1$
 
-    private boolean fNot = false;
     private String fValue;
     private transient String fValueUpperCase;
     private boolean fIgnoreCase = false;
@@ -44,20 +43,6 @@ public class TmfFilterContainsNode extends TmfFilterAspectNode {
      */
     public TmfFilterContainsNode(ITmfFilterTreeNode parent) {
         super(parent);
-    }
-
-    /**
-     * @return the NOT state
-     */
-    public boolean isNot() {
-        return fNot;
-    }
-
-    /**
-     * @param not the NOT state
-     */
-    public void setNot(boolean not) {
-        this.fNot = not;
     }
 
     /**
@@ -100,17 +85,17 @@ public class TmfFilterContainsNode extends TmfFilterAspectNode {
     @Override
     public boolean matches(ITmfEvent event) {
         if (event == null || fEventAspect == null) {
-            return false ^ fNot;
+            return false ^ isNot();
         }
         Object value = fEventAspect.resolve(event);
         if (value == null) {
-            return false ^ fNot;
+            return false ^ isNot();
         }
         String valueString = value.toString();
         if (fIgnoreCase) {
-            return valueString.toUpperCase().contains(fValueUpperCase) ^ fNot;
+            return valueString.toUpperCase().contains(fValueUpperCase) ^ isNot();
         }
-        return valueString.contains(fValue) ^ fNot;
+        return valueString.contains(fValue) ^ isNot();
     }
 
     @Override
@@ -120,7 +105,7 @@ public class TmfFilterContainsNode extends TmfFilterAspectNode {
 
     @Override
     public String toString(boolean explicit) {
-        return getAspectLabel(explicit) + (fNot ? " not contains " : " contains ") + (fIgnoreCase ? "ignorecase \"" : "\"") + fValue + '\"'; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        return getAspectLabel(explicit) + (isNot() ? " not contains " : " contains ") + (fIgnoreCase ? "ignorecase \"" : "\"") + fValue + '\"'; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 
     @Override

@@ -20,7 +20,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * @version 1.0
  * @author Patrick Tasse
  */
-public class TmfFilterAndNode extends TmfFilterTreeNode {
+public class TmfFilterAndNode extends TmfFilterTreeNode implements ITmfFilterWithNot {
 
     /** and node name */
     public static final String NODE_NAME = "AND"; //$NON-NLS-1$
@@ -36,20 +36,6 @@ public class TmfFilterAndNode extends TmfFilterTreeNode {
         super(parent);
     }
 
-    /**
-     * @return the NOT state
-     */
-    public boolean isNot() {
-        return fNot;
-    }
-
-    /**
-     * @param not the NOT state
-     */
-    public void setNot(boolean not) {
-        this.fNot = not;
-    }
-
     @Override
     public String getNodeName() {
         return NODE_NAME;
@@ -59,21 +45,21 @@ public class TmfFilterAndNode extends TmfFilterTreeNode {
     public boolean matches(ITmfEvent event) {
         // Empty children
         if (getChildren().length == 0) {
-            return false ^ fNot;
+            return false ^ isNot();
         }
         for (ITmfFilterTreeNode node : getChildren()) {
             if (! node.matches(event)) {
-                return false ^ fNot;
+                return false ^ isNot();
             }
         }
         // All children match
-        return true ^ fNot;
+        return true ^ isNot();
     }
 
     @Override
     public String toString(boolean explicit) {
-        StringBuffer buf = new StringBuffer();
-        if (fNot) {
+        StringBuilder buf = new StringBuilder();
+        if (isNot()) {
             buf.append("not "); //$NON-NLS-1$
         }
         if (getParent() != null && !(getParent() instanceof TmfFilterRootNode) && !(getParent() instanceof TmfFilterNode)) {
@@ -90,5 +76,15 @@ public class TmfFilterAndNode extends TmfFilterTreeNode {
             buf.append(" )"); //$NON-NLS-1$
         }
         return buf.toString();
+    }
+
+    @Override
+    public boolean isNot() {
+        return fNot;
+    }
+
+    @Override
+    public void setNot(boolean not) {
+        fNot = not;
     }
 }

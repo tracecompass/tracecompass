@@ -20,14 +20,14 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  * @version 1.0
  * @author Patrick Tasse
  */
-public class TmfFilterOrNode extends TmfFilterTreeNode {
+public class TmfFilterOrNode extends TmfFilterTreeNode implements ITmfFilterWithNot {
 
     /** or node name */
     public static final String NODE_NAME = "OR"; //$NON-NLS-1$
     /** not attribute name */
     public static final String NOT_ATTR = "not"; //$NON-NLS-1$
 
-    private boolean fNot = false;
+    private boolean fNot;
 
     /**
      * @param parent the parent node
@@ -41,38 +41,24 @@ public class TmfFilterOrNode extends TmfFilterTreeNode {
         return NODE_NAME;
     }
 
-    /**
-     * @return the NOT state
-     */
-    public boolean isNot() {
-        return fNot;
-    }
-
-    /**
-     * @param not the NOT state
-     */
-    public void setNot(boolean not) {
-        this.fNot = not;
-    }
-
     @Override
     public boolean matches(ITmfEvent event) {
         // Empty children
         if (getChildren().length == 0) {
-            return false ^ fNot;
+            return false ^ isNot();
         }
         for (ITmfFilterTreeNode node : getChildren()) {
             if (node.matches(event)) {
-                return true ^ fNot;
+                return true ^ isNot();
             }
         }
-        return false ^ fNot;
+        return false ^ isNot();
     }
 
     @Override
     public String toString(boolean explicit) {
         StringBuffer buf = new StringBuffer();
-        if (fNot) {
+        if (isNot()) {
             buf.append("not "); //$NON-NLS-1$
         }
         if (getParent() != null && !(getParent() instanceof TmfFilterRootNode) && !(getParent() instanceof TmfFilterNode)) {
@@ -89,5 +75,15 @@ public class TmfFilterOrNode extends TmfFilterTreeNode {
             buf.append(" )"); //$NON-NLS-1$
         }
         return buf.toString();
+    }
+
+    @Override
+    public boolean isNot() {
+        return fNot;
+    }
+
+    @Override
+    public void setNot(boolean not) {
+        fNot = not;
     }
 }
