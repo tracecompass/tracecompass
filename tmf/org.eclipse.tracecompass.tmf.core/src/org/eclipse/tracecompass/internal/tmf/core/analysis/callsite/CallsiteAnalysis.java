@@ -9,21 +9,18 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.analysis.callsite;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
-import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.analysis.callsite.ITmfCallsiteIterator;
 import org.eclipse.tracecompass.tmf.core.analysis.callsite.ITmfCallsiteResolver;
+import org.eclipse.tracecompass.tmf.core.analysis.callsite.TimeCallsite;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCallsiteAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
-import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -64,42 +61,18 @@ public class CallsiteAnalysis extends TmfStateSystemAnalysisModule implements IT
 
     @Override
     public List<ITmfCallsite> getCallsites(String traceId, String device, long time) {
-        ITmfStateSystem ss = getStateSystem();
-        if (ss == null) {
-            return Collections.emptyList();
-        }
-        int quark = ss.optQuarkAbsolute(CallsiteStateProvider.DEVICES, traceId, device);
-        int invalidAttribute = ITmfStateSystem.INVALID_ATTRIBUTE;
-        if (quark == invalidAttribute) {
-            return Collections.emptyList();
-        }
-        int stringPool = ss.optQuarkAbsolute(CallsiteStateProvider.STRING_POOL);
-        int fileQuark = ss.optQuarkRelative(quark, CallsiteStateProvider.FILES);
-        int lineQuark = ss.optQuarkRelative(quark, CallsiteStateProvider.LINES);
-        if (fileQuark == ITmfStateSystem.INVALID_ATTRIBUTE || lineQuark == ITmfStateSystem.INVALID_ATTRIBUTE || stringPool == ITmfStateSystem.INVALID_ATTRIBUTE) {
-            return Collections.emptyList();
-        }
-        List<Integer> files = ss.getSubAttributes(fileQuark, false);
-        List<Integer> lines = ss.getSubAttributes(lineQuark, false);
-        int size = files.size();
-        if (size != lines.size()) {
-            return Collections.emptyList();
-        }
-        List<ITmfCallsite> retVal = new ArrayList<>();
-        try {
-            List<ITmfStateInterval> values = ss.queryFullState(time);
-            Object stringIntern = values.get(fileQuark).getValue();
-            int lineNo = values.get(lineQuark).getValueInt();
-            if (lineNo != CallsiteStateProvider.UNKNOWN_LINE_NO && stringIntern instanceof Integer) {
-                String fileName = fSSInterner.resolve(ss, (Integer) stringIntern + ss.getStartTime(), stringPool);
-                if (fileName != null) {
-                    retVal.add(new TmfCallsite(fileName, (long) lineNo));
-                }
+        ITmfCallsiteIterator iterator = iterator(traceId, device, time);
+        if (iterator.hasNext()) {
+            TimeCallsite next = iterator.next();
+            if(next.getTime() <= time) {
+                return Collections.singletonList(next.getCallsite());
             }
-
-        } catch (StateSystemDisposedException e) {
-            // swallow it
         }
-        return retVal;
+        return Collections.emptyList();
+    }
+
+    @Override
+    public ITmfCallsiteIterator iterator(String traceId, String device, long initialTime) {
+        return new CallsiteIterator(getStateSystem(), traceId, device, initialTime, fSSInterner);
     }
 }

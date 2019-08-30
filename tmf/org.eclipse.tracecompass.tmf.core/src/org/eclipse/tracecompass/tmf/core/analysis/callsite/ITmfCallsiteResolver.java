@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.tmf.core.analysis.callsite;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
@@ -33,4 +34,17 @@ public interface ITmfCallsiteResolver {
      * @return a list of callsites. May be empty
      */
     List<ITmfCallsite> getCallsites(String hostId, String device, long time);
+
+    /**
+     * Get a callsite iterator
+     *
+     * @param hostId
+     *            hostId to iterate over
+     * @param device
+     *            the device to iterate over
+     * @param initialTime
+     *            initial time
+     * @return the iterator
+     */
+    Iterator<TimeCallsite> iterator(String hostId, String device, long initialTime);
 }
