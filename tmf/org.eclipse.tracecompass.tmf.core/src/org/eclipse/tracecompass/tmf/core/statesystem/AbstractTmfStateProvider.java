@@ -36,14 +36,16 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import com.google.common.annotations.VisibleForTesting;
 
 /**
- * Instead of using IStateChangeInput directly, one can extend this class, which
- * defines a lot of the common functions of the state change input plugin.
+ * Instead of implementing {@link ITmfStateProvider} directly, one can extend
+ * this class, which defines a lot of the common functions of the state
+ * provider.
  *
  * It will handle the state-system-processing in a separate thread, which is
  * normally not a bad idea for traces of some size.
  *
- * processEvent() is replaced with eventHandle(), so that all the multi-thread
- * logic is abstracted away.
+ * {@link #processEvent(ITmfEvent)} is replaced with
+ * {@link #eventHandle(ITmfEvent)}, so that all the multi-thread logic is
+ * abstracted away.
  *
  * @author Alexandre Montplaisir
  */
@@ -97,12 +99,12 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
     private final Queue<FutureEvent> fFutureEvents = new PriorityQueue<>(Comparator.comparingLong(FutureEvent::getTime));
 
     /**
-     * Instantiate a new state provider plugin.
+     * Instantiate a new state provider.
      *
      * @param trace
-     *            The LTTng 2.0 kernel trace directory
+     *            The trace
      * @param id
-     *            Name given to this state change input. Only used internally.
+     *            ID given to this analysis. Only used internally.
      */
     public AbstractTmfStateProvider(ITmfTrace trace, String id) {
         this(trace, id, DEFAULT_EVENTS_QUEUE_SIZE, DEFAULT_EVENTS_CHUNK_SIZE);
@@ -116,7 +118,7 @@ public abstract class AbstractTmfStateProvider implements ITmfStateProvider {
      * @param trace
      *            The trace
      * @param id
-     *            Name given to this state change input. Only used internally.
+     *            ID given to this analysis. Only used internally.
      * @param queueSize
      *            The size of the queue, a.k.a the number of chunks that fit
      *            into the buffered queue.
