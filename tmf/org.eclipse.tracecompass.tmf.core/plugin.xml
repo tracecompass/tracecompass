@@ -39,6 +39,17 @@
          </tracetype>
       </module>
    </extension>
+    <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <module
+            analysis_module="org.eclipse.tracecompass.internal.tmf.core.analysis.callsite.CallsiteAnalysis"
+            applies_experiment="false"
+            automatic="true"
+            icon="icons/file_obj.png"
+            id="org.eclipse.tracecompass.tmf.core.analysis.callsite"
+            name="%callsite.name">
+      </module>
+   </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.core.tracetype">
       <experiment

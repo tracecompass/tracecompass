@@ -88,6 +88,11 @@
                class="org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace">
          </tracetype>
       </module>
+      <tracetype
+            applies="true"
+            class="org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace"
+            id="org.eclipse.tracecompass.tmf.core.analysis.callsite">
+      </tracetype>
    </extension>
    <extension
          point="org.eclipse.tracecompass.tmf.core.dataprovider">
