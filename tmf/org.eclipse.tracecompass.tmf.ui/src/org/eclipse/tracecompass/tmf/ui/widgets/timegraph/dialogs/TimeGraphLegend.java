@@ -13,6 +13,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,6 +30,8 @@ import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
@@ -37,6 +40,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -48,6 +52,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -75,6 +80,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
     private static final ImageDescriptor RESET_IMAGE = Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_RESET_BUTTON);
     private final ITimeGraphPresentationProvider fProvider;
     private final LocalResourceManager fResourceManager = new LocalResourceManager(JFaceResources.getResources());
+    private Composite fInnerComposite;
 
     /**
      * Open the time graph legend window
@@ -114,13 +120,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
 
     @Override
     protected Control createDialogArea(Composite parent) {
-        Composite dlgArea = (Composite) super.createDialogArea(parent);
-        Composite composite = new Composite(dlgArea, SWT.NONE);
-
-        GridLayout layout = new GridLayout();
-        composite.setLayout(layout);
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        composite.setLayoutData(gd);
+        Composite composite = (Composite) super.createDialogArea(parent);
 
         addStateGroups(composite);
 
@@ -128,13 +128,31 @@ public class TimeGraphLegend extends TitleAreaDialog {
         setDialogHelpAvailable(false);
         setHelpAvailable(false);
 
-        // Set the minimum size to avoid 0 sized legends from user resize
-        dlgArea.getShell().setMinimumSize(150, 150);
+        // Set the minimum size to avoid 0-sized legends from user resize
+        parent.getShell().setMinimumSize(150, 150);
 
         composite.addDisposeListener((e) -> {
             fResourceManager.dispose();
         });
         return composite;
+    }
+
+    @Override
+    protected Point getInitialSize() {
+        Point initialSize = super.getInitialSize();
+        Composite innerComposite = fInnerComposite;
+        /*
+         * If shell initial size is taller than available area, use 2 columns.
+         */
+        if (initialSize.y > Display.getDefault().getClientArea().height && innerComposite != null) {
+            // Needed to make sure resize listener gets the right shell size
+            getShell().layout();
+            getGridLayouts(innerComposite).forEach(gl -> gl.numColumns = 2);
+            initialSize = super.getInitialSize();
+            // Needed to make sure vertical scroll bar appears
+            Display.getDefault().asyncExec(() -> innerComposite.getParent().layout());
+        }
+        return initialSize;
     }
 
     /**
@@ -152,31 +170,45 @@ public class TimeGraphLegend extends TitleAreaDialog {
         }
         List<StateItem> stateItems = Arrays.asList(stateTable);
         Collection<StateItem> linkStates = Collections2.filter(stateItems, TimeGraphLegend::isLinkState);
-        int numColumn = linkStates.isEmpty() ? 1 : 2;
 
         ScrolledComposite sc = new ScrolledComposite(composite, SWT.V_SCROLL | SWT.H_SCROLL);
-        Composite innerComposite = new Composite(sc, SWT.NONE);
-
+        sc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         sc.setExpandHorizontal(true);
         sc.setExpandVertical(true);
+        sc.setLayout(GridLayoutFactory.swtDefaults().margins(200, 0).create());
 
+        Composite innerComposite = new Composite(sc, SWT.NONE);
+        fInnerComposite = innerComposite;
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-
-        sc.setLayout(GridLayoutFactory.swtDefaults().margins(20, 0).create());
-        sc.setLayoutData(gd);
-
-        GridLayout gridLayout = GridLayoutFactory.swtDefaults().margins(0, 0).create();
-        gridLayout.numColumns = numColumn;
-        gridLayout.makeColumnsEqualWidth = false;
-        innerComposite.setLayout(gridLayout);
         innerComposite.setLayoutData(gd);
+        innerComposite.setLayout(new GridLayout());
+        innerComposite.addControlListener(new ControlAdapter() {
+            @Override
+            public void controlResized(ControlEvent e) {
+                /*
+                 * Find the highest number of columns that fits in the new width
+                 */
+                Point size = innerComposite.getSize();
+                List<GridLayout> gridLayouts = getGridLayouts(innerComposite);
+                Point minSize = new Point(0, 0);
+                for (int columns = 8; columns > 0; columns--) {
+                    final int numColumns = columns;
+                    gridLayouts.forEach(gl -> gl.numColumns = numColumns);
+                    minSize = innerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+                    if (minSize.x <= size.x) {
+                        break;
+                    }
+                }
+                sc.setMinSize(0, minSize.y);
+            }
+        });
 
         sc.setContent(innerComposite);
 
         createStatesGroup(innerComposite);
         createLinkGroup(linkStates, innerComposite);
 
-        sc.setMinSize(innerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+        sc.setMinSize(0, innerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
     }
 
     /**
@@ -209,42 +241,46 @@ public class TimeGraphLegend extends TitleAreaDialog {
             }
         }
 
-        for (String groupedStateLabel : groupedStateItems.keySet()) {
-            Group gs = new Group(composite, SWT.NONE);
-            gs.setText(groupedStateLabel);
-            GridLayout layout = new GridLayout();
-            layout.marginWidth = 20;
-            layout.marginBottom = 10;
-            gs.setLayout(layout);
-
-            GridData gridData = new GridData();
-            gridData.verticalAlignment = SWT.TOP;
-            gs.setLayoutData(gridData);
-            for (StateItem stateItem : groupedStateItems.get(groupedStateLabel)) {
-                new LegendEntry(gs, stateItem);
-            }
+        for (String groupName : groupedStateItems.keySet()) {
+            Collection<StateItem> groupItems = groupedStateItems.get(groupName);
+            createGroup(composite, groupName, groupItems);
         }
     }
 
-    private void createLinkGroup(Collection<StateItem> linkStates, Composite innerComposite) {
+    private static List<GridLayout> getGridLayouts(Composite innerComposite) {
+        List<GridLayout> gridLayouts = new ArrayList<>();
+        if (innerComposite == null) {
+            return gridLayouts;
+        }
+        Arrays.asList(innerComposite.getChildren()).forEach(control -> {
+            if (control instanceof Composite) {
+                Layout layout = ((Composite) control).getLayout();
+                if (layout instanceof GridLayout) {
+                    gridLayouts.add((GridLayout) layout);
+                }
+            }
+        });
+        return gridLayouts;
+    }
+    private void createLinkGroup(Collection<StateItem> linkStates, Composite composite) {
         if (linkStates.isEmpty()) {
             return;
         }
-        Group gs = new Group(innerComposite, SWT.NONE);
-        gs.setText(fProvider.getLinkTypeName());
+        createGroup(composite, fProvider.getLinkTypeName(), linkStates);
+    }
 
-        GridLayout layout = new GridLayout();
-        layout.marginWidth = 20;
+    private void createGroup(Composite parent, String name, Collection<StateItem> stateItems) {
+        Group group = new Group(parent, SWT.NONE);
+        group.setText(name);
+        group.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
+        GridLayout layout = new GridLayout(1, true);
+        layout.marginWidth = 10;
         layout.marginBottom = 10;
-        gs.setLayout(layout);
+        group.setLayout(layout);
 
-        GridData gridData = new GridData();
-        gridData.verticalAlignment = SWT.TOP;
-        gs.setLayoutData(gridData);
-
-        // Go through all the defined pairs of state color and state name and
-        // display them.
-        linkStates.forEach(si -> new LegendEntry(gs, si));
+        for (StateItem stateItem : stateItems) {
+            new LegendEntry(group, stateItem);
+        }
     }
 
     /**
