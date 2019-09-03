@@ -236,7 +236,7 @@ public class InstrumentedProfilingElement extends ProfilingElement {
             callstack =  new CallStack(getStateSystem(), subAttributes, this, hostProvider, threadIdProvider);
             fCallstack = callstack;
         } else {
-            synchronized (fCallstack) {
+            synchronized (callstack) {
                 // Update the callstack if attributes were added
                 if (callstack.getMaxDepth() < subAttributes.size()) {
                     callstack.updateAttributes(subAttributes);

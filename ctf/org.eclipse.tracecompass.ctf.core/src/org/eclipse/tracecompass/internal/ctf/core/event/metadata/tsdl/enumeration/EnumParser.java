@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.metadata.DeclarationScope;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.IDeclaration;
@@ -151,7 +152,7 @@ public final class EnumParser extends AbstractScopedCommonTreeParser {
         EnumDeclaration enumDeclaration = null;
 
         /* Name */
-        String enumName = null;
+        @Nullable String enumName = null;
 
         /* Body */
         CommonTree enumBody = null;

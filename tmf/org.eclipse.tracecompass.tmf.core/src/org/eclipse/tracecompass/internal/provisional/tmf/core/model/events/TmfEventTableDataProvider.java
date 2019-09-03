@@ -609,7 +609,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
      *         different types.
      */
     private static boolean hasCommonTraceType(TmfExperiment experiment) {
-        String commonTraceType = null;
+        @Nullable String commonTraceType = null;
         for (ITmfTrace trace : experiment.getTraces()) {
             String traceType = trace.getTraceTypeId();
             if (commonTraceType != null && !commonTraceType.equals(traceType)) {
