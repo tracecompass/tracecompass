@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -74,7 +75,6 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.tracecompass.tmf.ui.project.model.TraceUtils;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * Wizard page that connects to a remote node, lists all traces according to
@@ -131,7 +131,7 @@ public class RemoteFetchLogWizardRemotePage extends AbstractTracePackageWizardPa
      */
     protected RemoteFetchLogWizardRemotePage(String title, IStructuredSelection selection, @Nullable RemoteImportProfileElement profile, @Nullable String experimentName) {
         super(PAGE_NAME, title, null, selection);
-        setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID, ICON_PATH));
+        setImageDescriptor(ResourceLocator.imageDescriptorFromBundle(Activator.PLUGIN_ID, ICON_PATH).orElse(null));
 
         if (selection.getFirstElement() instanceof TmfTraceFolder) {
             fTmfTraceFolder = (TmfTraceFolder) selection.getFirstElement();

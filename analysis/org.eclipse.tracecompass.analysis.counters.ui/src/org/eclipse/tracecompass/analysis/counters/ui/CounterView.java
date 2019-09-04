@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.analysis.counters.ui;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.analysis.counters.ui.Messages;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
@@ -20,7 +21,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSet
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * Main implementation for the counters view.
@@ -87,7 +87,7 @@ public class CounterView extends TmfChartView {
         };
 
         action.setToolTipText(Messages.CounterView_CumulativeAction_CumulativeTooltipText);
-        action.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.tracecompass.tmf.ui", "icons/elcl16/sigma.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+        action.setImageDescriptor(ResourceLocator.imageDescriptorFromBundle("org.eclipse.tracecompass.tmf.ui", "icons/elcl16/sigma.gif").orElse(null)); //$NON-NLS-1$ //$NON-NLS-2$
         return action;
     }
 

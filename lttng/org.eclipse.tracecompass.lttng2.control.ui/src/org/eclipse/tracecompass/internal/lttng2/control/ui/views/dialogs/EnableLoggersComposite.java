@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -346,7 +346,7 @@ public class EnableLoggersComposite extends Composite implements IBaseEnableUstE
         loggersGroup.setLayout(layout);
         data = new GridData(GridData.FILL_BOTH);
         loggersGroup.setLayoutData(data);
-        new FilteredTree(loggersGroup, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, new PatternFilter(), true) {
+        new FilteredTree(loggersGroup, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, new PatternFilter(), true, true) {
             @Override
             protected TreeViewer doCreateTreeViewer(Composite aparent, int style) {
                 fLoggersViewer = new CheckboxTreeViewer(aparent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);

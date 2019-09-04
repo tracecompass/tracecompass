@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2015 Ericsson
+ * Copyright (c) 2012, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -431,7 +431,7 @@ public class EnableUstEventsComposite extends Composite implements IEnableUstEve
         tpGroup.setLayout(layout);
         data = new GridData(GridData.FILL_BOTH);
         tpGroup.setLayoutData(data);
-        new FilteredTree(tpGroup, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, new PatternFilter(), true) {
+        new FilteredTree(tpGroup, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, new PatternFilter(), true, true) {
             @Override
             protected TreeViewer doCreateTreeViewer(Composite aparent, int style) {
                 fTracepointsViewer = new CheckboxTreeViewer(aparent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
