@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2019 Ericsson
+ * Copyright (c) 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
@@ -124,7 +123,7 @@ public class Activator extends AbstractUIPlugin {
      * @return image descriptor object
      */
     public ImageDescriptor getImageDescripterFromPath(String path) {
-        return ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, path).orElse(null);
+        return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
 
     /**

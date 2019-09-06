@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2019 Ericsson
+ * Copyright (c) 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.PreferenceDialog;
-import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -42,6 +41,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.Impo
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.importtrace.Messages;
 import org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.TracePackageElement;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 
 /**
@@ -81,7 +81,7 @@ public class RemoteFetchLogWizardPage extends ImportTraceWizardPage {
     public RemoteFetchLogWizardPage(String title, IStructuredSelection selection) {
         super(PAGE_NAME, selection);
         setTitle(title);
-        setImageDescriptor(ResourceLocator.imageDescriptorFromBundle(Activator.PLUGIN_ID, ICON_PATH).orElse(null));
+        setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID, ICON_PATH));
         setDescription(RemoteMessages.RemoteFetchLogWizardPage_Description);
     }
 

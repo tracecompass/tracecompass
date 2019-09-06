@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2019 Ericsson
+ * Copyright (c) 2012, 2015 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.relayd.LttngRelaydConnectionManager;
 import org.eclipse.tracecompass.internal.lttng2.control.ui.views.preferences.ControlPreferences;
@@ -118,7 +117,7 @@ public class Activator extends AbstractUIPlugin {
      * @return image descriptor object
      */
     public ImageDescriptor getImageDescripterFromPath(String path) {
-        return ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, path).orElse(null);
+        return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
 
     /**

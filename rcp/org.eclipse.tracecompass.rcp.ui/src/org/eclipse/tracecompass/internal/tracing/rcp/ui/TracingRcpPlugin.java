@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.tracecompass.internal.tracing.rcp.ui.cli.CliParser;
 import org.eclipse.tracecompass.internal.tracing.rcp.ui.cli.TracingRCPCliException;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -129,7 +128,7 @@ public class TracingRcpPlugin extends AbstractUIPlugin {
      * @return the image descriptor
      */
     public static ImageDescriptor getImageDescriptor(String path) {
-        return ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, path).orElse(null);
+        return imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
 
     /**

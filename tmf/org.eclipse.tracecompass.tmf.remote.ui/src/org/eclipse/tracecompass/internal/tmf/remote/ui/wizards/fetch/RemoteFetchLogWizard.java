@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2019 Ericsson
+ * Copyright (c) 2016 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -16,7 +16,6 @@ import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -26,6 +25,7 @@ import org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.model.Remot
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * Wizard for remote fetching of logs and traces.
@@ -92,7 +92,7 @@ public class RemoteFetchLogWizard extends Wizard implements IImportWizard {
         }
 
         setWindowTitle(RemoteMessages.RemoteFetchLogWizard_Title);
-        setDefaultPageImageDescriptor(ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, ICON_PATH).orElse(null));
+        setDefaultPageImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, ICON_PATH));
         setNeedsProgressMonitor(true);
     }
 

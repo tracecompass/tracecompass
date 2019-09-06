@@ -76,11 +76,6 @@
                     <classifier>tracecompass-e4.12</classifier>
                   </artifact>
                   <artifact>
-                    <file>tracecompass-e4.13.target</file>
-                    <type>target</type>
-                    <classifier>tracecompass-e4.13</classifier>
-                  </artifact>
-                  <artifact>
                     <file>tracecompass-eStaging.target</file>
                     <type>target</type>
                     <classifier>tracecompass-eStaging</classifier>

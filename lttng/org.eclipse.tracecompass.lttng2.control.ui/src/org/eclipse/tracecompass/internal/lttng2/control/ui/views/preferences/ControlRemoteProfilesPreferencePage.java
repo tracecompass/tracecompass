@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2019 Ericsson
+ * Copyright (c) 2015, 2018 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -73,7 +73,7 @@ public class ControlRemoteProfilesPreferencePage extends PreferencePage implemen
         composite.setLayout(new GridLayout(2, false));
 
         final FilteredTree filteredTree = new FilteredTree(composite,
-                SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, new PatternFilter(), true, true) {
+                SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, new PatternFilter(), true) {
             @Override
             protected TreeViewer doCreateTreeViewer(Composite aParent, int style) {
                 fFolderViewer = LTTngProfileViewer.createLTTngProfileViewer(aParent, style);

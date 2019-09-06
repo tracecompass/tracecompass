@@ -201,7 +201,7 @@ public class RemoteProfilesPreferencePage extends PreferencePage implements IWor
         };
 
         final FilteredTree filteredTree = new FilteredTree(composite,
-                SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, patternFilter, true, true);
+                SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, patternFilter, true);
         gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.heightHint = 0;
         filteredTree.setLayoutData(gd);

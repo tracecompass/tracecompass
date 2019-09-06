@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2016, 2019 École Polytechnique de Montréal and others
+ * Copyright (c) 2016, 2018 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -11,7 +11,6 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.memory.MemoryUsageTreeModel;
 import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
@@ -22,6 +21,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXY
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * Memory usage view
@@ -94,7 +94,7 @@ public class MemoryUsageView extends TmfChartView {
             }
         };
         action.setToolTipText(Messages.MemoryView_FilterAction_FilteredTooltipText);
-        action.setImageDescriptor(ResourceLocator.imageDescriptorFromBundle("org.eclipse.tracecompass.tmf.ui", "icons/elcl16/filter_items.gif").orElse(null)); //$NON-NLS-1$ //$NON-NLS-2$
+        action.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("org.eclipse.tracecompass.tmf.ui", "icons/elcl16/filter_items.gif")); //$NON-NLS-1$ //$NON-NLS-2$
         // filtered by default, to not change the default behavior
         action.setChecked(true);
         return action;
