@@ -21,11 +21,13 @@
       <activity name="%activity.name.pluginDevPerspective" id="org.eclipse.unwantedPluginDevPerspective" description="%activity.description.pluginDevPerspective" />
       <activity name="%activity.name.resourcePerspective"  id="org.eclipse.unwantedResourcePerspective"  description="%activity.description.resourcePerspective" />
       <activity name="%activity.name.search"  id="org.eclipse.unwantedSearch"  description="%activity.description.search" />
+      <activity name="%activity.name.quicksearch"  id="org.eclipse.unwantedQuickSearch"  description="%activity.description.quicksearch" />
       <activityPatternBinding activityId="org.eclipse.tracecompass.rcp.ui"      pattern="org\.eclipse\.tracecompass.*" />
       <activityPatternBinding activityId="org.eclipse.unwantedJavaPerspective"     pattern="org\.eclipse\.jdt.*" />
       <activityPatternBinding activityId="org.eclipse.unwantedTeamPerspective"     pattern="org\.eclipse\.team.*" />
       <activityPatternBinding activityId="org.eclipse.unwantedDebugPerspective"    pattern="org\.eclipse\.debug.*" />
       <activityPatternBinding activityId="org.eclipse.unwantedSearch" pattern="org\.eclipse\.search.*" />
+      <activityPatternBinding activityId="org.eclipse.unwantedQuickSearch" pattern="org\.eclipse\.text\.quicksearch.*" />
       <activityPatternBinding activityId="org.eclipse.unwantedResourcePerspective"  pattern="org\.eclipse\.ui\.[r]*" />
       <defaultEnablement id="org.eclipse.tracecompass.rcp.ui" />
    </extension>
