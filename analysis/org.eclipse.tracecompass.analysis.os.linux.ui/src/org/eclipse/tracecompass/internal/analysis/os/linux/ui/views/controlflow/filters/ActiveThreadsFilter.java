@@ -172,8 +172,8 @@ public class ActiveThreadsFilter extends ViewerFilter {
                 cpus.add(cpu);
             }
         }
-        TimeQueryFilter filter = new SelectionTimeQueryFilter(beginTS, endTS, 2, cpus);
-        Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
+        SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(beginTS, endTS, 2, cpus);
+        Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
         parameters.put(ThreadStatusDataProvider.ACTIVE_THREAD_FILTER_KEY, true);
         TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> response = threadStatusProvider.fetchTree(parameters, null);
         TmfTreeModel<@NonNull ThreadEntryModel> model = response.getModel();

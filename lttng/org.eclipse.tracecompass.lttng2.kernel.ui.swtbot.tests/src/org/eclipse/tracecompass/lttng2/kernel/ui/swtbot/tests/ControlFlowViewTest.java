@@ -572,6 +572,70 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
     }
 
     /**
+     * Test dynamic filters dialog on CPU
+     */
+    @Test
+    public void testDynamicFilteringCpu() {
+        /* Change window range to 10 ms */
+        TmfTimeRange range = new TmfTimeRange(START_TIME, START_TIME.normalize(10000000L, ITmfTimestamp.NANOSECOND_SCALE));
+        TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, range));
+        TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, range.getStartTime(), range.getEndTime()));
+        timeGraphIsReadyCondition(range);
+
+        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(getViewBot().bot());
+        SWTBotTimeGraphEntry traceEntry = timeGraph.getEntry(LttngTraceGenerator.getName());
+        SWTBotUtils.waitUntil(entry -> entry.getEntries().length == 225, traceEntry, () -> "Entries size expected:225 actual:" + traceEntry.getEntries().length);
+
+        getViewBot().viewMenu(DYNAMIC_FILTER_CONFIGURE_LABEL).click();
+        SWTBotShell shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT).activate();
+
+        /* Make sure nothing is checked and radio buttons are disabled */
+        SWTBotCheckBox activeThreadsCheckbox = shell.bot().checkBox(DYNAMIC_FILTERS_SHOW_ACTIVE_THREADS_ONLY_CHECKBOX);
+        assertFalse(activeThreadsCheckbox.isChecked());
+
+        SWTBotRadio onCpuRadio = shell.bot().radio(DYNAMIC_FILTERS_ON_CPU_RADIO);
+        SWTBotText onCpuField = shell.bot().textWithMessage(DYNAMIC_FILTER_ON_CPU_FIELD_MESSAGE);
+
+        /* Toggle active thread filter button */
+        activeThreadsCheckbox.click();
+        assertTrue(activeThreadsCheckbox.isChecked());
+
+        /* Filter on selected CPUs */
+        onCpuRadio.click();
+        onCpuField.setText("0");
+
+        shell.bot().button(DIALOG_OK).click();
+
+        /*
+         * A zoom thread is started after applying the filter. Make sure that the time graph
+         * is ready before continuing with the test
+         */
+        timeGraphIsReadyCondition(range);
+
+        /* Change window range to 50 us */
+        range = new TmfTimeRange(START_TIME, START_TIME.normalize(50000L, ITmfTimestamp.NANOSECOND_SCALE));
+        TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, range));
+        TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, range.getStartTime(), range.getEndTime()));
+        timeGraphIsReadyCondition(range);
+
+        /* Verify that number active entries changed */
+        SWTBotUtils.waitUntil(entry -> entry.getEntries().length == 1, traceEntry, () -> "Entries size expected:1 actual:" + traceEntry.getEntries().length);
+
+        getViewBot().viewMenu(DYNAMIC_FILTER_CONFIGURE_LABEL).click();
+        shell = fBot.shell(DYNAMIC_FILTERS_SHELL_TEXT).activate();
+
+        activeThreadsCheckbox = shell.bot().checkBox(DYNAMIC_FILTERS_SHOW_ACTIVE_THREADS_ONLY_CHECKBOX);
+        assertTrue(activeThreadsCheckbox.isChecked());
+
+        /*
+         * Test Active Filter buttons toggle
+         */
+        activeThreadsCheckbox.click();
+        /* All objects should be enabled except for the CPU ranges field */
+        assertFalse(activeThreadsCheckbox.isChecked());
+    }
+
+    /**
      * Test tool bar buttons "Follow CPU Forward" and "Follow CPU Backward"
      */
     @Test
