@@ -496,7 +496,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                         nextEntry = fEntries.get(provider, arrow.getDestinationId());
                     }
                     if (prevEntry != null && nextEntry != null) {
-                        linkList.add(new TimeLinkEvent(prevEntry, nextEntry, arrow.getStartTime(), arrow.getDuration(), arrow.getValue()));
+                        linkList.add(new TimeLinkEvent(arrow, prevEntry, nextEntry));
                     }
                 }
             }

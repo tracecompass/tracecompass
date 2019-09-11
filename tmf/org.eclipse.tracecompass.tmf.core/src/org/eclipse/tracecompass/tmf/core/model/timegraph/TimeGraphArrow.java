@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017, 2018 Ericsson
+ * Copyright (c) 2017, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,9 @@
  **********************************************************************/
 
 package org.eclipse.tracecompass.tmf.core.model.timegraph;
+
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 
 /**
  * Implementation of {@link ITimeGraphArrow}.
@@ -21,6 +24,7 @@ public class TimeGraphArrow implements ITimeGraphArrow {
     private final long fStartTime;
     private final long fDuration;
     private final int fValue;
+    private final @Nullable OutputElementStyle fStyle;
 
     /**
      * Constructor
@@ -42,6 +46,7 @@ public class TimeGraphArrow implements ITimeGraphArrow {
         fStartTime = time;
         fDuration = duration;
         fValue = value;
+        fStyle = null;
     }
 
     /**
@@ -58,6 +63,30 @@ public class TimeGraphArrow implements ITimeGraphArrow {
      */
     public TimeGraphArrow(long sourceId, long destinationId, long time, long duration) {
         this(sourceId, destinationId, time, duration, Integer.MIN_VALUE);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param sourceId
+     *            ID of source element
+     * @param destinationId
+     *            ID of destination element
+     * @param time
+     *            Time
+     * @param duration
+     *            Duration
+     * @param style
+     *            Style
+     * @since 5.1
+     */
+    public TimeGraphArrow(long sourceId, long destinationId, long time, long duration, OutputElementStyle style) {
+        fSourceId = sourceId;
+        fDestinationId = destinationId;
+        fStartTime = time;
+        fDuration = duration;
+        fValue = Integer.MIN_VALUE;
+        fStyle = style;
     }
 
     @Override
@@ -83,5 +112,10 @@ public class TimeGraphArrow implements ITimeGraphArrow {
     @Override
     public int getValue() {
         return fValue;
+    }
+
+    @Override
+    public @Nullable OutputElementStyle getStyle() {
+        return fStyle;
     }
 }

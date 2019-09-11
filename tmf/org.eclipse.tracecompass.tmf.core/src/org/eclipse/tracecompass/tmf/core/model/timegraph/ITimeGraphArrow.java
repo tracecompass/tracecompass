@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017, 2018 Ericsson
+ * Copyright (c) 2017, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -8,6 +8,9 @@
  **********************************************************************/
 
 package org.eclipse.tracecompass.tmf.core.model.timegraph;
+
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 
 /**
  * Model of a arrow used in a time graph data provider.
@@ -52,4 +55,13 @@ public interface ITimeGraphArrow {
      */
     int getValue();
 
+    /**
+     * Get the style associated with this state
+     *
+     * @return {@link OutputElementStyle} describing the style of this state
+     * @since 5.1
+     */
+    default @Nullable OutputElementStyle getStyle() {
+        return null;
+    }
 }
