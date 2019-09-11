@@ -76,4 +76,8 @@ public class OutputElementStyle {
         return fValues;
     }
 
+    @Override
+    public String toString() {
+        return String.format("Style [%s, %s]", fParentStyleKey, fValues); //$NON-NLS-1$
+    }
 }

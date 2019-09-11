@@ -87,6 +87,7 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.tim
  org.eclipse.tracecompass.tmf.ui.dialog,
  org.eclipse.tracecompass.tmf.ui.editors,
  org.eclipse.tracecompass.tmf.ui.markers,
+ org.eclipse.tracecompass.tmf.ui.model,
  org.eclipse.tracecompass.tmf.ui.project.model,
  org.eclipse.tracecompass.tmf.ui.project.wizards,
  org.eclipse.tracecompass.tmf.ui.properties,

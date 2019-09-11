@@ -73,7 +73,7 @@ public final class StyleProperties {
 
     /**
      * Opacity level of an element between 0.0 and 1.0 (float) where 0.0 is
-     * transparent and 1.0 is fully opaque. Multiplicative with parent style.
+     * transparent and 1.0 is fully opaque.
      * <p>
      * Default: 1.0
      */
@@ -326,7 +326,7 @@ public final class StyleProperties {
 
     /**
      * Height of an element, as a factor, between 0.0 and 1.0 (float), of the
-     * normal element height. Multiplicative with parent style.
+     * normal element height.
      * <p>
      * Default: 1.0
      */
@@ -347,6 +347,22 @@ public final class StyleProperties {
      * Default: "auto"
      */
     public static final String CURSOR = "cursor"; //$NON-NLS-1$
+
+    // modifiers
+
+    /**
+     * Suffix to be appended to a color style key to apply a blending color to
+     * that style's color value. The value of the modifier style is a hex string
+     * that includes the blending color's alpha between 0 and 255 (#rrggbbaa).
+     */
+    public static final String BLEND = "-blend"; //$NON-NLS-1$
+
+    /**
+     * Suffix to be appended to a numerical style key to apply a multiplication
+     * factor to that style's numerical value. The value of the modifier style
+     * is a positive float.
+     */
+    public static final String FACTOR = "-factor"; //$NON-NLS-1$
 
     // custom properties
 

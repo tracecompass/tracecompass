@@ -80,7 +80,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -91,10 +90,14 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.IStylePresentationProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.util.LineClipper;
 import org.eclipse.tracecompass.internal.tmf.ui.util.SymbolHelper;
 import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.model.TimeGraphLineEntry;
 import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.model.TimeLineEvent;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties.BorderStyle;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
@@ -2173,22 +2176,38 @@ public class TimeGraphControl extends TimeGraphBaseControl
         rect.x = Math.max(nameSpace, Math.min(bounds.width, x0));
         rect.width = Math.max(1, Math.min(bounds.width, x1) - rect.x);
 
-        Map<String, Object> style = fTimeGraphProvider.getEventStyle(marker);
-        if (style != null && !style.isEmpty()) {
-            Object rgbaObj = style.get(ITimeEventStyleStrings.fillColor());
-            RGBA rgba = null;
-            if (rgbaObj instanceof Integer) {
-                rgba = RGBAUtil.fromInt((int) rgbaObj);
-            } else {
-                rgba = marker.getColor();
+        Map<String, Object> styleMap;
+        if (fTimeGraphProvider instanceof IStylePresentationProvider) {
+            IStylePresentationProvider provider = (IStylePresentationProvider) fTimeGraphProvider;
+            OutputElementStyle elementStyle = provider.getElementStyle(marker);
+            if (elementStyle == null) {
+                return;
             }
-            RGB rgb = rgba.rgb;
-            COLOR_REGISTRY.put(rgb.toString(), rgb);
-            Color color = COLOR_REGISTRY.get(rgb.toString());
-            Object symbolType = style.get(ITimeEventStyleStrings.symbolStyle());
+            styleMap = new HashMap<>();
+            RGBAColor color = provider.getColorStyle(elementStyle, StyleProperties.COLOR);
+            styleMap.put(ITimeEventStyleStrings.fillColor(), (color != null) ? color.toInt() : OPAQUE);
+            Object height = provider.getStyle(elementStyle, StyleProperties.HEIGHT);
+            if (height instanceof Float) {
+                styleMap.put(ITimeEventStyleStrings.heightFactor(), height);
+            }
+            Object symbolType = provider.getStyle(elementStyle, StyleProperties.SYMBOL_TYPE);
+            if (symbolType instanceof String) {
+                styleMap.put(ITimeEventStyleStrings.symbolStyle(), ITimeEventStyleStrings.SYMBOL_STYLES.get(symbolType));
+            }
+        } else {
+            styleMap = fTimeGraphProvider.getEventStyle(marker);
+        }
+        if (styleMap != null && !styleMap.isEmpty()) {
+            Object fillColor = styleMap.get(ITimeEventStyleStrings.fillColor());
+            if (!(fillColor instanceof Integer)) {
+                fillColor = RGBAUtil.fromRGBA(marker.getColor());
+            }
+            int colorInt = (int) fillColor;
+            Color color = getColor(colorInt);
+            Object symbolType = styleMap.get(ITimeEventStyleStrings.symbolStyle());
             if (symbolType != null) {
-                gc.setAlpha(rgba.alpha);
-                float heightFactor = (float) style.getOrDefault(ITimeEventStyleStrings.heightFactor(), 1.0f);
+                gc.setAlpha(colorInt & 0xff);
+                float heightFactor = (float) styleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), 1.0f);
                 int symbolSize = (int) Math.ceil(rect.height * heightFactor);
                 switch (String.valueOf(symbolType)) {
                 case IYAppearance.SymbolStyle.CROSS:
@@ -2392,14 +2411,11 @@ public class TimeGraphControl extends TimeGraphBaseControl
         double scale = (max - min) == 0 ? 1.0 : (double) rect.height / (max - min);
         Map<String, Object> eventStyle = timeGraphProvider.getEventStyle(lastValid);
         int colorInt = (int) eventStyle.getOrDefault(ITimeEventStyleStrings.fillColor(), 0xff);
-        RGBA rgba = RGBAUtil.fromInt(colorInt);
-        COLOR_REGISTRY.put(rgba.toString(), rgba.rgb);
-        // TODO: Make color registry scheme
+        Color color = getColor(colorInt);
         for (int i = 0; i < seriesModel.size(); i++) {
-            Color color = COLOR_REGISTRY.get(rgba.toString());
             Color prev = gc.getForeground();
             int prevAlpha = gc.getAlpha();
-            gc.setAlpha(rgba.alpha);
+            gc.setAlpha(colorInt & 0xff);
             gc.setForeground(color);
             List<LongPoint> series = seriesModel.get(i);
             int[] points = new int[series.size() * 2];
@@ -2528,48 +2544,60 @@ public class TimeGraphControl extends TimeGraphBaseControl
     protected boolean drawArrow(TimeGraphColorScheme colors, ITimeEvent event,
             Rectangle rect, GC gc) {
 
-        if (rect == null) {
+        if (rect == null || ((rect.height == 0) && (rect.width == 0))) {
             return false;
         }
-        int colorIdx = fTimeGraphProvider.getStateTableIndex(event);
-        if (colorIdx < 0) {
-            return false;
+        Map<String, Object> styleMap;
+        if (fTimeGraphProvider instanceof IStylePresentationProvider) {
+            IStylePresentationProvider provider = (IStylePresentationProvider) fTimeGraphProvider;
+            OutputElementStyle elementStyle = provider.getElementStyle(event);
+            if (elementStyle == null) {
+                return false;
+            }
+            styleMap = new HashMap<>();
+            RGBAColor color = provider.getColorStyle(elementStyle, StyleProperties.COLOR);
+            styleMap.put(ITimeEventStyleStrings.fillColor(), (color != null) ? color.toInt() : OPAQUE);
+            Object height = provider.getStyle(elementStyle, StyleProperties.HEIGHT);
+            if (height instanceof Float) {
+                styleMap.put(ITimeEventStyleStrings.heightFactor(), height);
+            }
+        } else {
+            int colorIdx = fTimeGraphProvider.getStateTableIndex(event);
+            if (colorIdx < 0) {
+                return false;
+            }
+            styleMap = fTimeGraphProvider.getEventStyle(event);
+            if (!styleMap.containsKey(ITimeEventStyleStrings.fillColor())) {
+                RGB rgb = (colorIdx < fEventColorMap.length) ? fEventColorMap[colorIdx].getRGB() : null;
+                styleMap.put(ITimeEventStyleStrings.fillColor(), rgb != null ? new RGBAColor(rgb.red, rgb.green, rgb.blue).toInt() : OPAQUE);
+            }
         }
-        boolean visible = ((rect.height == 0) && (rect.width == 0)) ? false : true;
 
-        Map<String, Object> styleMap = fTimeGraphProvider.getEventStyle(event);
         Map<String, Object> updatedStyleMap = applyEventStyleProperties(styleMap, event);
-        int alpha = ((int) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.fillColor(), 0xff)) & 0xff;
-        if (visible) {
-            int prevAlpha = gc.getAlpha();
-            gc.setAlpha(alpha);
-            Color stateColor = null;
-            if (colorIdx < fEventColorMap.length) {
-                stateColor = fEventColorMap[colorIdx];
-            } else {
-                stateColor = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
-            }
+        int fillColor = (int) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.fillColor(), OPAQUE);
+        Color stateColor = getColor(fillColor);
+        int alpha = fillColor & 0xff;
+        int prevAlpha = gc.getAlpha();
+        gc.setAlpha(alpha);
 
-            gc.setForeground(stateColor);
-            gc.setBackground(stateColor);
-            int old = gc.getLineWidth();
-            float heightFactor = (float) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), DEFAULT_LINK_WIDTH);
-            if (heightFactor > 1.0 || heightFactor < 0) {
-                heightFactor = 0.1f;
-            }
-            heightFactor *= 10;
-            gc.setLineWidth((int) (heightFactor));
-            /* Draw the arrow */
-            Point newEndpoint = drawArrowHead(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, heightFactor, gc);
-            gc.drawLine(rect.x, rect.y, newEndpoint.x, newEndpoint.y);
-            gc.setLineWidth(old);
-            gc.setAlpha(prevAlpha);
-
+        gc.setForeground(stateColor);
+        gc.setBackground(stateColor);
+        int old = gc.getLineWidth();
+        float heightFactor = (float) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), DEFAULT_LINK_WIDTH);
+        if (heightFactor > 1.0 || heightFactor < 0) {
+            heightFactor = 0.1f;
         }
-        if (visible && !(boolean) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.annotated(), false)) {
+        heightFactor *= 10;
+        gc.setLineWidth((int) (heightFactor));
+        /* Draw the arrow */
+        Point newEndpoint = drawArrowHead(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, heightFactor, gc);
+        gc.drawLine(rect.x, rect.y, newEndpoint.x, newEndpoint.y);
+        gc.setLineWidth(old);
+        gc.setAlpha(prevAlpha);
+        if (!(boolean) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.annotated(), false)) {
             fTimeGraphProvider.postDrawEvent(event, rect, gc);
         }
-        return visible;
+        return true;
     }
 
     /*
@@ -2729,15 +2757,47 @@ public class TimeGraphControl extends TimeGraphBaseControl
     protected boolean drawState(TimeGraphColorScheme colors, ITimeEvent event,
             Rectangle rect, GC gc, boolean selected, boolean timeSelected) {
 
-        int colorIdx = fTimeGraphProvider.getStateTableIndex(event);
-        if (colorIdx < 0 && colorIdx != ITimeGraphPresentationProvider.TRANSPARENT) {
-            return false;
+        Map<String, Object> styleMap;
+        boolean transparent = false;
+        if (fTimeGraphProvider instanceof IStylePresentationProvider) {
+            IStylePresentationProvider provider = (IStylePresentationProvider) fTimeGraphProvider;
+            OutputElementStyle elementStyle = provider.getElementStyle(event);
+            if (elementStyle == null) {
+                return false;
+            }
+            styleMap = new HashMap<>();
+            RGBAColor backgroundColor = provider.getColorStyle(elementStyle, StyleProperties.BACKGROUND_COLOR);
+            styleMap.put(ITimeEventStyleStrings.fillColor(), (backgroundColor != null) ? backgroundColor.toInt() : OPAQUE);
+            Object height = provider.getStyle(elementStyle, StyleProperties.HEIGHT);
+            if (height instanceof Float) {
+                styleMap.put(ITimeEventStyleStrings.heightFactor(), height);
+            }
+            Object borderStyle = provider.getStyle(elementStyle, StyleProperties.BORDER_STYLE);
+            if (borderStyle != null && !borderStyle.equals(BorderStyle.NONE)) {
+                RGBAColor borderColor = provider.getColorStyle(elementStyle, StyleProperties.BORDER_COLOR);
+                styleMap.put(ITimeEventStyleStrings.borderColor(), (borderColor != null) ? borderColor.toInt() : OPAQUE);
+                Object borderWidth = provider.getStyle(elementStyle, StyleProperties.BORDER_WIDTH);
+                if (borderWidth instanceof Integer) {
+                    styleMap.put(ITimeEventStyleStrings.borderThickness(), borderWidth);
+                }
+            }
+            transparent = elementStyle.getParentKey() == null && elementStyle.getStyleValues().isEmpty();
+        } else {
+            int colorIdx = fTimeGraphProvider.getStateTableIndex(event);
+            transparent = (colorIdx == ITimeGraphPresentationProvider.TRANSPARENT);
+            if (colorIdx < 0 && !transparent) {
+                return false;
+            }
+            styleMap = fTimeGraphProvider.getEventStyle(event);
+            if (!styleMap.containsKey(ITimeEventStyleStrings.fillColor())) {
+                RGB rgb = (colorIdx < fEventColorMap.length && !transparent) ? fEventColorMap[colorIdx].getRGB() : null;
+                styleMap.put(ITimeEventStyleStrings.fillColor(), rgb != null ? new RGBAColor(rgb.red, rgb.green, rgb.blue).toInt() : OPAQUE);
+            }
         }
         boolean visible = rect.width <= 0 ? false : true;
         rect.width = Math.max(1, rect.width);
         Color black = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
         gc.setForeground(black);
-        Map<String, Object> styleMap = fTimeGraphProvider.getEventStyle(event);
         Map<String, Object> updatedStyleMap = applyEventStyleProperties(styleMap, event);
         float heightFactor = (float) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.heightFactor(), DEFAULT_STATE_WIDTH);
         if (heightFactor > 1.0 || heightFactor < 0) {
@@ -2753,7 +2813,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
         Rectangle drawRect = new Rectangle(rect.x, rect.y + ((rect.height - height) / 2), rect.width, height);
 
-        if (colorIdx == ITimeGraphPresentationProvider.TRANSPARENT) {
+        if (transparent) {
             if (visible) {
                 // Avoid overlapping transparent states
                 int x = Math.max(fLastTransparentX, drawRect.x);
@@ -2787,49 +2847,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
             fTimeGraphProvider.postDrawEvent(event, drawRect, gc);
             return false;
         }
-        Color stateColor = null;
-        int fillColor = (int) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.fillColor(), 255);
-        Integer previousFillColor = (Integer) styleMap.get(ITimeEventStyleStrings.fillColor());
-        if (previousFillColor != null) {
-            String hexRGB = Integer.toHexString(fillColor);
-            stateColor = COLOR_REGISTRY.get(hexRGB);
-            if (stateColor == null) {
-                COLOR_REGISTRY.put(hexRGB, RGBAUtil.fromInt(fillColor).rgb);
-                stateColor = COLOR_REGISTRY.get(hexRGB);
-            }
 
-        } else {
-            fillColor = OPAQUE;
-            if (colorIdx < fEventColorMap.length) {
-                stateColor = fEventColorMap[colorIdx];
-            } else {
-                stateColor = black;
-            }
-        }
-
-        //draw border line
-        Integer borderColorInt = (Integer) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.borderColor(), 0);
         int arc = Math.min(drawRect.height + 1, drawRect.width) / 2;
-        int borderAlpha = borderColorInt & 0xff;
-        if (borderAlpha != 0) {
-            Color oldForeground = gc.getForeground();
-            int oldLineWidth = gc.getLineWidth();
-            int oldAlpha = gc.getAlpha();
-            String hexRGB = Integer.toHexString(borderColorInt);
-            Color borderColor = COLOR_REGISTRY.get(hexRGB);
-            if (borderColor == null) {
-                COLOR_REGISTRY.put(hexRGB, RGBAUtil.fromInt(borderColorInt).rgb);
-                borderColor = COLOR_REGISTRY.get(hexRGB);
-            }
-            gc.setForeground(borderColor);
-            gc.setAlpha(borderAlpha);
-            gc.setLineWidth(HIGHLIGHTED_BOUND_WIDTH);
-            gc.drawRoundRectangle(drawRect.x, drawRect.y, drawRect.width, drawRect.height , arc, arc);
-            gc.setForeground(oldForeground);
-            gc.setLineWidth(oldLineWidth);
-            gc.setAlpha(oldAlpha);
-        }
-
+        int fillColor = (int) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.fillColor(), OPAQUE);
+        Color stateColor = getColor(fillColor);
         boolean reallySelected = timeSelected && selected;
         // fill all rect area
         gc.setBackground(stateColor);
@@ -2846,6 +2867,23 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
 
         gc.setAlpha(OPAQUE);
+
+        //draw border line
+        Integer borderColorInt = (Integer) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.borderColor(), 0);
+        int borderAlpha = borderColorInt & 0xff;
+        if (borderAlpha != 0) {
+            Color oldForeground = gc.getForeground();
+            int oldLineWidth = gc.getLineWidth();
+            int oldAlpha = gc.getAlpha();
+            Color borderColor = getColor(borderColorInt);
+            gc.setForeground(borderColor);
+            gc.setAlpha(borderAlpha);
+            gc.setLineWidth((Integer) updatedStyleMap.getOrDefault(ITimeEventStyleStrings.borderThickness(), 1));
+            gc.drawRoundRectangle(drawRect.x, drawRect.y, drawRect.width, drawRect.height , arc, arc);
+            gc.setForeground(oldForeground);
+            gc.setLineWidth(oldLineWidth);
+            gc.setAlpha(oldAlpha);
+        }
 
         if (reallySelected) {
             gc.drawRoundRectangle(drawRect.x - 1, drawRect.y - 1, drawRect.width, drawRect.height + 1, arc, arc);
@@ -2877,9 +2915,20 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
         if (event.isPropertyActive(IFilterProperty.BOUND)) {
             updatedStyles.put(ITimeEventStyleStrings.borderColor(), HIGHLIGHTED_BOUND_COLOR);
+            updatedStyles.put(ITimeEventStyleStrings.borderThickness(), HIGHLIGHTED_BOUND_WIDTH);
             updatedStyles.put(ITimeEventStyleStrings.annotated(), false);
         }
         return updatedStyles;
+    }
+
+    private static Color getColor(int colorInt) {
+        String hexRGB = Integer.toHexString(colorInt);
+        Color color = COLOR_REGISTRY.get(hexRGB);
+        if (color == null) {
+            COLOR_REGISTRY.put(hexRGB, RGBAUtil.fromInt(colorInt).rgb);
+            color = COLOR_REGISTRY.get(hexRGB);
+        }
+        return color;
     }
 
     /**

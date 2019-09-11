@@ -23,21 +23,21 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.model.IOutputStyleProvider;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 import org.eclipse.tracecompass.tmf.core.model.OutputStyleModel;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
-import org.eclipse.tracecompass.tmf.core.model.StyleProperties.SymbolType;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
-import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
+import org.eclipse.tracecompass.tmf.ui.model.StyleManager;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
@@ -49,6 +49,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 /**
  * {@link TimeGraphPresentationProvider} for views whose data provider
@@ -57,21 +58,15 @@ import com.google.common.collect.ImmutableMap;
  *
  * @author Simon Delisle
  */
-public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPresentationProvider {
+public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPresentationProvider implements IStylePresentationProvider {
 
-    private static final Map<String, String> SYMBOL_TYPES = ImmutableMap.<String, String>builder()
-            .put(SymbolType.DIAMOND, IYAppearance.SymbolStyle.DIAMOND)
-            .put(SymbolType.CIRCLE, IYAppearance.SymbolStyle.CIRCLE)
-            .put(SymbolType.SQUARE, IYAppearance.SymbolStyle.SQUARE)
-            .put(SymbolType.TRIANGLE, IYAppearance.SymbolStyle.TRIANGLE)
-            .put(SymbolType.INVERTED_TRIANGLE, IYAppearance.SymbolStyle.INVERTED_TRIANGLE)
-            .put(SymbolType.CROSS, IYAppearance.SymbolStyle.CROSS)
-            .put(SymbolType.PLUS, IYAppearance.SymbolStyle.PLUS)
-            .build();
+    private static final OutputElementStyle TRANSPARENT_STYLE = new OutputElementStyle(null, ImmutableMap.of());
+
     private final Set<ITimeGraphDataProvider<?>> fProviders = new HashSet<>();
-    private Map<String, Integer> fLabelToIndex = new HashMap<>();
+    private Map<String, Integer> fKeyToIndex = new HashMap<>();
     private @Nullable Map<String, OutputElementStyle> fStylesMap = null;
     private @Nullable StateItem @Nullable[] fStateTable = null;
+    private StyleManager fStyleManager = new StyleManager(fetchStyles());
 
     /**
      * Constructor
@@ -91,9 +86,8 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
     public void addProvider(ITimeGraphDataProvider<?> provider) {
         synchronized (fProviders) {
             fProviders.add(provider);
-            fStylesMap = null;
-            fStateTable = null;
         }
+        Display.getDefault().asyncExec(() -> refresh());
     }
 
     /**
@@ -106,7 +100,7 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
      *
      * @return The style map
      */
-    private Map<@NonNull String, @NonNull OutputElementStyle> getStyles() {
+    private Map<@NonNull String, @NonNull OutputElementStyle> fetchStyles() {
         Map<String, OutputElementStyle> stylesMap = fStylesMap;
         if (stylesMap == null) {
             stylesMap = new LinkedHashMap<>();
@@ -116,8 +110,12 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
                         TmfModelResponse<@NonNull OutputStyleModel> styleResponse = ((IOutputStyleProvider) provider).fetchStyle(getStyleParameters(), null);
                         OutputStyleModel styleModel = styleResponse.getModel();
                         if (styleModel != null) {
-                            Map<String, OutputElementStyle> currentStyleMap = styleModel.getStyles();
-                            stylesMap.putAll(currentStyleMap);
+                            for (Entry<String, OutputElementStyle> entry : styleModel.getStyles().entrySet()) {
+                                OutputElementStyle style = entry.getValue();
+                                // Make sure the style values map is mutable
+                                stylesMap.put(entry.getKey(),
+                                        new OutputElementStyle(style.getParentKey(), Maps.newHashMap(style.getStyleValues())));
+                            }
                         }
                     }
                 }
@@ -140,35 +138,37 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
     public StateItem[] getStateTable() {
         @Nullable StateItem[] stateTable = fStateTable;
         if (stateTable == null) {
-            Map<@NonNull String, @NonNull OutputElementStyle> styles = getStyles();
+            Map<@NonNull String, @NonNull OutputElementStyle> styles = fetchStyles();
             if (styles.isEmpty()) {
-                return new StateItem[0];
+                stateTable = new StateItem[0];
+                fStateTable = stateTable;
+                return stateTable;
             }
             List<StateItem> stateItemList = new ArrayList<>();
             int tableIndex = 0;
-            for (Entry<String, OutputElementStyle> styleEntry : styles.entrySet()) {
-                Map<String, Object> elementStyle = styleEntry.getValue().getStyleValues();
-                Object color = elementStyle.get(StyleProperties.BACKGROUND_COLOR);
-                RGB rgb = new RGB(0, 0, 0);
-                if (color instanceof String) {
-                    RGB rgbColor = ColorUtils.fromHexColor((String) color);
-                    rgb = rgbColor != null ? rgbColor : new RGB(0, 0, 0);
-                }
-                fLabelToIndex.put(styleEntry.getKey(), tableIndex);
-                tableIndex++;
+            for (Entry<@NonNull String, @NonNull OutputElementStyle> styleEntry : styles.entrySet()) {
+                String styleKey = styleEntry.getKey();
+                fKeyToIndex.put(styleKey, tableIndex++);
+                OutputElementStyle elementStyle = styleEntry.getValue();
                 Map<String, Object> styleMap = new HashMap<>();
                 styleMap.put(ITimeEventStyleStrings.fillStyle(), ITimeEventStyleStrings.solidColorFillStyle());
-                styleMap.put(ITimeEventStyleStrings.fillColor(), new RGBAColor(rgb.red, rgb.green, rgb.blue).toInt());
-                styleMap.put(ITimeEventStyleStrings.label(), styleEntry.getKey());
-                Object height = elementStyle.get(StyleProperties.HEIGHT);
-                if (height instanceof Float) {
+                RGBAColor rgba = getColorStyle(elementStyle, StyleProperties.BACKGROUND_COLOR);
+                styleMap.put(ITimeEventStyleStrings.fillColor(), rgba != null ? rgba.toInt() : new RGBAColor(0, 0, 0).toInt());
+                Object styleName = getStyle(elementStyle, StyleProperties.STYLE_NAME);
+                if (styleName instanceof String) {
+                    styleMap.put(ITimeEventStyleStrings.label(), styleName);
+                } else {
+                    styleMap.put(ITimeEventStyleStrings.label(), styleEntry.getKey());
+                }
+                Float height = getFloatStyle(elementStyle, StyleProperties.HEIGHT);
+                if (height != null) {
                     styleMap.put(ITimeEventStyleStrings.heightFactor(), height);
                 }
-                Object symbolType = SYMBOL_TYPES.get(elementStyle.get(StyleProperties.SYMBOL_TYPE));
+                Object symbolType = ITimeEventStyleStrings.SYMBOL_STYLES.get(getStyle(elementStyle, StyleProperties.SYMBOL_TYPE));
                 if (symbolType instanceof String) {
                     styleMap.put(ITimeEventStyleStrings.symbolStyle(), symbolType);
                 }
-                Object styleGroup = elementStyle.get(StyleProperties.STYLE_GROUP);
+                Object styleGroup = getStyle(elementStyle, StyleProperties.STYLE_GROUP);
                 if (styleGroup != null) {
                     styleMap.put(ITimeEventStyleStrings.group(), styleGroup);
                 }
@@ -180,27 +180,13 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
         return stateTable;
     }
 
+    /**
+     * @deprecated Use {@link #getEventStyle(ITimeEvent)} instead.
+     */
+    @Deprecated
     @Override
     public int getStateTableIndex(@Nullable ITimeEvent event) {
-        if (event instanceof NullTimeEvent) {
-            return INVISIBLE;
-        }
-
-        if (event instanceof TimeEvent) {
-            ITimeGraphState model = ((TimeEvent) event).getStateModel();
-            OutputElementStyle eventStyle = model.getStyle();
-            if (eventStyle == null && event.getEntry() instanceof TimeGraphEntry) {
-                eventStyle = ((TimeGraphEntry) event.getEntry()).getEntryModel().getStyle();
-            }
-            if (eventStyle != null) {
-                String styleKey = eventStyle.getParentKey();
-                if (styleKey != null) {
-                    Integer index = fLabelToIndex.get(styleKey);
-                    return index != null ? index : Integer.MAX_VALUE;
-                }
-            }
-        }
-        return TRANSPARENT;
+        return INVISIBLE;
     }
 
     /**
@@ -250,9 +236,83 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
     }
 
     @Override
+    public @Nullable OutputElementStyle getElementStyle(ITimeEvent event) {
+        if (event instanceof NullTimeEvent) {
+            return null;
+        }
+
+        if (event instanceof TimeEvent) {
+            ITimeGraphState model = ((TimeEvent) event).getStateModel();
+            OutputElementStyle eventStyle = model.getStyle();
+            if (eventStyle == null && event.getEntry() instanceof TimeGraphEntry) {
+                eventStyle = ((TimeGraphEntry) event.getEntry()).getEntryModel().getStyle();
+            }
+            if (eventStyle != null) {
+                return eventStyle;
+            }
+        }
+        return TRANSPARENT_STYLE;
+    }
+
+    @Override
+    public @Nullable Object getStyle(OutputElementStyle elementStyle, String property) {
+        return fStyleManager.getStyle(elementStyle, property);
+    }
+
+    @Override
+    public @Nullable Float getFloatStyle(OutputElementStyle elementStyle, String property) {
+        return fStyleManager.getFactorStyle(elementStyle, property);
+    }
+
+    @Override
+    public @Nullable RGBAColor getColorStyle(OutputElementStyle elementStyle, String property) {
+        return fStyleManager.getColorStyle(elementStyle, property);
+    }
+
+    @Override
     public void refresh() {
         fStylesMap = null;
         fStateTable = null;
+        fStyleManager = new StyleManager(fetchStyles());
         super.refresh();
+        updateStyles();
+    }
+
+    private void updateStyles() {
+        Map<String, OutputElementStyle> stylesMap = fStylesMap;
+        StateItem[] stateTable = fStateTable;
+        if (stylesMap == null || stateTable == null) {
+            return;
+        }
+        for (Entry<String, Integer> entry : fKeyToIndex.entrySet()) {
+            OutputElementStyle elementStyle = stylesMap.get(entry.getKey());
+            Integer index = entry.getValue();
+            if (elementStyle == null || index >= stateTable.length) {
+                continue;
+            }
+            StateItem stateItem = stateTable[index];
+
+            RGB rgb = stateItem.getStateColor();
+            Map<@NonNull String, @NonNull Object> styleValues = elementStyle.getStyleValues();
+            RGBAColor rgba = getColorStyle(elementStyle, StyleProperties.BACKGROUND_COLOR);
+            if (rgba == null || !new RGB(rgba.getRed(), rgba.getGreen(), rgba.getBlue()).equals(rgb)) {
+                String hexColor = ColorUtils.toHexColor(rgb);
+                styleValues.put(StyleProperties.BACKGROUND_COLOR, hexColor);
+                styleValues.put(StyleProperties.COLOR, hexColor);
+                styleValues.put(StyleProperties.OPACITY, 1.0f);
+            }
+
+            float heightFactor = stateItem.getStateHeightFactor();
+            Float prevHeightFactor = getFloatStyle(elementStyle, StyleProperties.HEIGHT);
+            if (!Float.valueOf(heightFactor).equals(prevHeightFactor)) {
+                if (prevHeightFactor == null) {
+                    styleValues.put(StyleProperties.HEIGHT, heightFactor);
+                } else {
+                    Object height = elementStyle.getStyleValues().getOrDefault(StyleProperties.HEIGHT, 1.0f);
+                    height = height instanceof Float ? height : 1.0f;
+                    styleValues.put(StyleProperties.HEIGHT, (float) height * heightFactor / prevHeightFactor);
+                }
+            }
+        }
     }
 }

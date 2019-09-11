@@ -9,8 +9,15 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
+import java.util.Map;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties.SymbolType;
+import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationProvider;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * <p>
@@ -42,6 +49,21 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.ITimeGraphPresentationP
  */
 @NonNullByDefault
 public interface ITimeEventStyleStrings {
+
+    /**
+     * Mapping of {@link StyleProperties#SYMBOL_TYPE} to {@link #symbolStyle()}
+     *
+     * @since 5.1
+     */
+    Map<String, String> SYMBOL_STYLES = ImmutableMap.<String, String>builder()
+            .put(SymbolType.DIAMOND, IYAppearance.SymbolStyle.DIAMOND)
+            .put(SymbolType.CIRCLE, IYAppearance.SymbolStyle.CIRCLE)
+            .put(SymbolType.SQUARE, IYAppearance.SymbolStyle.SQUARE)
+            .put(SymbolType.TRIANGLE, IYAppearance.SymbolStyle.TRIANGLE)
+            .put(SymbolType.INVERTED_TRIANGLE, IYAppearance.SymbolStyle.INVERTED_TRIANGLE)
+            .put(SymbolType.CROSS, IYAppearance.SymbolStyle.CROSS)
+            .put(SymbolType.PLUS, IYAppearance.SymbolStyle.PLUS)
+            .build();
 
     /**
      * The label to display in the legend
