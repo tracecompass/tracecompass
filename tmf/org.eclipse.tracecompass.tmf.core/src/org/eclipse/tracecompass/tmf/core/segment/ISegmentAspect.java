@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015-2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -32,6 +32,14 @@ public interface ISegmentAspect {
      * Static definition of an empty string.
      */
     String EMPTY_STRING = ""; //$NON-NLS-1$
+
+    /**
+     * @since 5.2
+     */
+    enum SegmentType {
+            CATEGORICAL,
+            CONTINUOUS,
+    }
 
     /**
      * Get the name of this aspect. This name will be user-visible and, as such,
@@ -69,4 +77,12 @@ public interface ISegmentAspect {
      */
     @Nullable Object resolve(ISegment segment);
 
+    /** Gets the type of the segment aspect, Categorical or Continuous
+     *
+     * @return the type of the segment aspect
+     * @since 5.2
+     */
+    default SegmentType getType() {
+        return SegmentType.CATEGORICAL;
+    }
 }

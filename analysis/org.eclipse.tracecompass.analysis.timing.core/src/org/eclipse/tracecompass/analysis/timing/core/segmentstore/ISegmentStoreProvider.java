@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016-2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,6 +10,7 @@
 package org.eclipse.tracecompass.analysis.timing.core.segmentstore;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -17,10 +18,13 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.segmentstore.core.IContentSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
-import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
+import org.eclipse.tracecompass.tmf.core.segment.SegmentEndTimeAspect;
+import org.eclipse.tracecompass.tmf.core.segment.SegmentDurationAspect;
+import org.eclipse.tracecompass.tmf.core.segment.SegmentStartTimeAspect;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 
 /**
@@ -35,7 +39,7 @@ public interface ISegmentStoreProvider {
      * Add a listener for the viewers
      *
      * @param listener
-     *                     listener for each type of viewer
+     *            listener for each type of viewer
      */
     void addListener(IAnalysisProgressListener listener);
 
@@ -43,7 +47,7 @@ public interface ISegmentStoreProvider {
      * Remove listener for the viewers
      *
      * @param listener
-     *                     listener for each type of viewer
+     *            listener for each type of viewer
      */
     void removeListener(IAnalysisProgressListener listener);
 
@@ -55,6 +59,18 @@ public interface ISegmentStoreProvider {
      * @return The segment aspects for this analysis
      */
     Iterable<ISegmentAspect> getSegmentAspects();
+
+    /**
+     * Gets the base segment aspects: Segment start time, Segment end time, and
+     * Segment duration.
+     *
+     * @return The Segment start time, Segment end time, and Segment duration
+     *         aspects
+     * @since 5.0
+     */
+    static Iterable<ISegmentAspect> getBaseSegmentAspects() {
+        return ImmutableList.of(Objects.requireNonNull(SegmentStartTimeAspect.SEGMENT_START_TIME_ASPECT), Objects.requireNonNull(SegmentEndTimeAspect.SEGMENT_END_TIME_ASPECT), Objects.requireNonNull(SegmentDurationAspect.SEGMENT_DURATION_ASPECT));
+    }
 
     /**
      * Returns the result in a from the analysis in a ISegmentStore
@@ -76,9 +92,12 @@ public interface ISegmentStoreProvider {
      */
     static Multimap<String, Object> getFilterInput(ISegmentStoreProvider provider, ISegment segment) {
         Multimap<String, Object> map = HashMultimap.create();
-        map.put(TmfStrings.startTime(), segment.getStart());
-        map.put(TmfStrings.endTime(), segment.getEnd());
-        map.put(TmfStrings.duration(), segment.getLength());
+        for (ISegmentAspect aspect : getBaseSegmentAspects()) {
+            Object resolve = aspect.resolve(segment);
+            if (resolve != null) {
+                map.put(aspect.getName(), String.valueOf(resolve));
+            }
+        }
         for (ISegmentAspect aspect : provider.getSegmentAspects()) {
             Object resolve = aspect.resolve(segment);
             if (resolve != null) {

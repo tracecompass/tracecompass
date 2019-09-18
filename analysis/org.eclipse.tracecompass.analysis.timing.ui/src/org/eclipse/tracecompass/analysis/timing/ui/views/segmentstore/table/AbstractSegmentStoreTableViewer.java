@@ -61,7 +61,6 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.Trac
 import org.eclipse.tracecompass.internal.segmentstore.core.arraylist.ArrayListStore;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
-import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
@@ -240,26 +239,25 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
      * Create default columns for start time, end time and duration
      */
     private void createColumns() {
-        createColumn(TmfStrings.startTime(), new SegmentStoreTableColumnLabelProvider() {
-            @Override
-            public String getTextForSegment(ISegment input) {
-                return NonNullUtils.nullToEmptyString(TmfTimestampFormat.getDefaulTimeFormat().format(input.getStart()));
-            }
-        }, SegmentComparators.INTERVAL_START_COMPARATOR);
 
-        createColumn(TmfStrings.endTime(), new SegmentStoreTableColumnLabelProvider() {
-            @Override
-            public String getTextForSegment(ISegment input) {
-                return NonNullUtils.nullToEmptyString(TmfTimestampFormat.getDefaulTimeFormat().format(input.getEnd()));
+        for (final ISegmentAspect aspect : ISegmentStoreProvider.getBaseSegmentAspects()) {
+            if (aspect.getName().equals(TmfStrings.duration())) {
+                createColumn(aspect.getName(), new SegmentStoreTableColumnLabelProvider() {
+                    @Override
+                    public String getTextForSegment(ISegment input) {
+                        return NonNullUtils.nullToEmptyString(FORMATTER.format(aspect.resolve(input)));
+                    }
+                }, aspect.getComparator());
+            } else {
+                createColumn(aspect.getName(), new SegmentStoreTableColumnLabelProvider() {
+                    @Override
+                    public String getTextForSegment(ISegment input) {
+                        return NonNullUtils.nullToEmptyString(TmfTimestampFormat.getDefaulTimeFormat().format(((Long) Objects.requireNonNull(aspect.resolve(input))).longValue()));
+                    }
+                }, aspect.getComparator());
             }
-        }, SegmentComparators.INTERVAL_END_COMPARATOR);
 
-        createColumn(TmfStrings.duration(), new SegmentStoreTableColumnLabelProvider() {
-            @Override
-            public String getTextForSegment(ISegment input) {
-                return NonNullUtils.nullToEmptyString(FORMATTER.format(input.getLength()));
-            }
-        }, SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
+        }
     }
 
     /**
