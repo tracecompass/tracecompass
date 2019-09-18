@@ -18,8 +18,8 @@ import java.util.Objects;
  *
  * These strings are meant to be used and viewed by the user. Internally, they
  * may be translated into fixed non-externalized strings for actual
- * manipulation. Example: views will display TID in english, WXT in klingon,
- * searches for a thread ID would be written TID == 123 in english, WXT == 123
+ * manipulation. Example: views will display TID in english, SvQQ in klingon,
+ * searches for a thread ID would be written TID == 123 in english, SvQQ == 123
  * in klingon or eventually thread.tid in non-externalized (but maybe less
  * discoverable) concepts.
  *
