@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
-import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.StateValues;
@@ -43,6 +42,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedE
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
@@ -668,7 +668,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
             ITmfStateInterval interval = ss.querySingleState(start, currentCpuRqQuark);
             Object value = interval.getValue();
             if (value instanceof Integer) {
-                return new TmfModelResponse<>(ImmutableMap.of(OsStrings.cpu(), String.valueOf(value)), status, statusMessage);
+                return new TmfModelResponse<>(ImmutableMap.of(TmfStrings.cpu(), String.valueOf(value)), status, statusMessage);
             }
         } catch (StateSystemDisposedException e) {
             /* Ignored */

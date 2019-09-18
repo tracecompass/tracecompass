@@ -41,6 +41,7 @@ import org.eclipse.tracecompass.internal.tmf.core.model.timegraph.AbstractTimeGr
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
@@ -621,7 +622,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
 
         if (!cpuList.isEmpty()) {
             Collections.sort(cpuList, (s1, s2) -> Integer.compare(Integer.parseInt(s1), Integer.parseInt(s2)));
-            retMap.put(OsStrings.cpu(), String.join(", ", cpuList)); //$NON-NLS-1$
+            retMap.put(TmfStrings.cpu(), String.join(", ", cpuList)); //$NON-NLS-1$
         }
     }
 

@@ -12,7 +12,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
+import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 
@@ -73,7 +73,7 @@ public class ResourcesEntryModel extends TimeGraphEntryModel implements IElement
         case CPU: // resourceID is CPU, fall-through
         case CURRENT_THREAD: // resourceID is CPU, fall-through
         case FREQUENCY: // resourceID is CPU, fall-through
-            fAspects = ImmutableMultimap.of(OsStrings.cpu(), resourceId);
+            fAspects = ImmutableMultimap.of(TmfStrings.cpu(), resourceId);
             break;
         case IRQ:
         case SOFT_IRQ: // Fall-through

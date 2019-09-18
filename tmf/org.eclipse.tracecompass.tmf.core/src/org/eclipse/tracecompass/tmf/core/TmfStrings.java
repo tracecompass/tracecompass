@@ -69,4 +69,12 @@ public final class TmfStrings {
         return Objects.requireNonNull(Messages.TmfStrings_Duration);
     }
 
+    /**
+     * Get the string for the cpu string
+     *
+     * @return The externalized label for CPU
+     */
+    public static @NonNull String cpu() {
+        return Objects.requireNonNull(org.eclipse.tracecompass.tmf.core.event.aspect.Messages.AspectName_CPU);
+    }
 }
