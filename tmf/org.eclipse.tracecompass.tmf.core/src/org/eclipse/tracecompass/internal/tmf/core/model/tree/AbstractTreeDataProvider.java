@@ -129,11 +129,23 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      *         quark
      */
     protected Map<Long, Integer> getSelectedEntries(SelectionTimeQueryFilter filter) {
+        return getSelectedEntries(filter.getSelectedItems());
+    }
+
+    /**
+     * Get selected entries from the collection of selected items for this provider
+     *
+     * @param selectedItems
+     *            {@link SelectionTimeQueryFilter}.
+     * @return a map of the valid entries' ID from the filter to their respective
+     *         quark
+     */
+    protected Map<Long, Integer> getSelectedEntries(Collection<Long> selectedItems) {
         fLock.readLock().lock();
         try {
             Map<Long, Integer> selectedEntries = new HashMap<>();
 
-            for (Long selectedItem : filter.getSelectedItems()) {
+            for (Long selectedItem : selectedItems) {
                 Integer quark = fIdToQuark.get(selectedItem);
                 if (quark != null && quark >= 0) {
                     selectedEntries.put(selectedItem, quark);

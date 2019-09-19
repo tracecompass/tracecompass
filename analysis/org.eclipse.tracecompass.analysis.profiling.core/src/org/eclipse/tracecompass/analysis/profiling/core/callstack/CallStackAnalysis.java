@@ -47,6 +47,7 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
     public static final String CALL_STACK = "CallStack"; //$NON-NLS-1$
 
     private static final String[] DEFAULT_PROCESSES_PATTERN = new String[] { CallStackStateProvider.PROCESSES, "*" }; //$NON-NLS-1$
+
     private static final String[] DEFAULT_THREADS_PATTERN = new String[] { "*" }; //$NON-NLS-1$
 
     private static final String[] DEFAULT_CALL_STACK_PATH = new String[] { CALL_STACK };
@@ -86,6 +87,22 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
      */
     public String[] getProcessesPattern() {
         return DEFAULT_PROCESSES_PATTERN;
+    }
+
+    /**
+     * Resolve the device ID if applicable. A device is the hardware context the trace is running
+     * on. An example would be CPU, GPU, DSP or even FPGA. This could allow device centric analyses
+     * such as the Callsite analysis to enrich the view.
+     *
+     * @param quark
+     *            quark of the state system to query
+     * @param timestamp
+     *            time stamp to query
+     * @return the device ID
+     * @since 1.1
+     */
+    public @Nullable Long resolveDeviceId(int quark, long timestamp) {
+        return null;
     }
 
     /**

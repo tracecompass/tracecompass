@@ -25,12 +25,15 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
+import org.eclipse.tracecompass.internal.tmf.core.analysis.callsite.CallsiteAnalysis;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.timegraph.AbstractTimeGraphDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
+import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
@@ -47,6 +50,7 @@ import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
 import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderUtils;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 
 import com.google.common.cache.CacheBuilder;
@@ -365,6 +369,31 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
 
     @Override
     public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(Map<String, Object> parameters, @Nullable IProgressMonitor monitor) {
+        CallStackAnalysis analysis = getAnalysisModule();
+        Map<String, String> tooltips = new HashMap<>();
+        List<@NonNull Long> selected = DataProviderParameterUtils.extractSelectedItems(parameters);
+        List<@NonNull Long> times = DataProviderParameterUtils.extractTimeRequested(parameters);
+        if (selected != null && times != null) {
+            Map<@NonNull Long, @NonNull Integer> md = getSelectedEntries(selected);
+            for (Long time : times) {
+                for (Entry<@NonNull Long, @NonNull Integer> entry : md.entrySet()) {
+                    Long result = analysis.resolveDeviceId(entry.getValue(), time);
+                    if (result != null) {
+                        String cpuId = String.valueOf(result);
+                        tooltips.put(TmfStrings.cpu(), cpuId);
+                        ITmfTrace trace = getTrace();
+                        CallsiteAnalysis csa = TmfTraceUtils.getAnalysisModuleOfClass(trace, CallsiteAnalysis.class, CallsiteAnalysis.ID);
+                        if (csa != null) {
+                            List<@NonNull ITmfCallsite> res = csa.getCallsites(String.valueOf(trace.getUUID()), cpuId, time);
+                            if (!res.isEmpty()) {
+                                tooltips.put(TmfStrings.source(), String.valueOf(res.get(0)));
+                            }
+                        }
+                        return new TmfModelResponse<>(tooltips, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+                    }
+                }
+            }
+        }
         return new TmfModelResponse<>(Collections.emptyMap(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
