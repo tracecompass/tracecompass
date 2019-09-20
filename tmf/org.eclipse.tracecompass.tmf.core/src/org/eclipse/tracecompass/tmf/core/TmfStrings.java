@@ -77,4 +77,13 @@ public final class TmfStrings {
     public static @NonNull String cpu() {
         return Objects.requireNonNull(org.eclipse.tracecompass.tmf.core.event.aspect.Messages.AspectName_CPU);
     }
+
+    /**
+     * Get the string for the source code location
+     *
+     * @return The externalized label for source
+     */
+    public static String source() {
+        return Objects.requireNonNull(org.eclipse.tracecompass.internal.tmf.core.aspect.Messages.TmfCallsiteAspect_name);
+    }
 }
