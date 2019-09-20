@@ -180,6 +180,12 @@
 <field name="next_tid" value="20" type="long" />
 <field name="next_prio" value="20" type="long" />
 </event>
+<event timestamp="71" name="sys_write">
+<field name="cpu" value="0" type="int" />
+</event>
+<event timestamp="78" name="exit_syscall">
+<field name="cpu" value="0" type="int" />
+</event>
 <event timestamp="80" name="sched_switch">
 <field name="cpu" value="1" type="int" />
 <field name="prev_comm" value="proc20" type="string" />

@@ -24,7 +24,7 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.core.model.eve
  org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph;x-friends:="org.eclipse.tracecompass.analysis.os.linux.core,org.eclipse.tracecompass.analysis.os.linux.ui",
  org.eclipse.tracecompass.internal.tmf.core;x-friends:="org.eclipse.tracecompass.tmf.core.tests,org.eclipse.tracecompass.tmf.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.tmf.core.analysis;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
- org.eclipse.tracecompass.internal.tmf.core.analysis.callsite;x-internal:=true,
+ org.eclipse.tracecompass.internal.tmf.core.analysis.callsite;x-friends:="org.eclipse.tracecompass.analysis.os.linux.core.tests",
  org.eclipse.tracecompass.internal.tmf.core.aspect;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.core.callstack;x-friends:="org.eclipse.tracecompass.tmf.ui,org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.tmf.core.component;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
