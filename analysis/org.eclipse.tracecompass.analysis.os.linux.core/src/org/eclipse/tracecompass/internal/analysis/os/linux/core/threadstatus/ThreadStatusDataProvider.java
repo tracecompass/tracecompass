@@ -30,9 +30,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.StateValues;
+import org.eclipse.tracecompass.internal.tmf.core.analysis.callsite.CallsiteAnalysis;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -43,7 +45,9 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.TmfStrings;
+import org.eclipse.tracecompass.tmf.core.analysis.callsite.ITmfCallsiteResolver;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
+import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
@@ -60,10 +64,10 @@ import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -657,18 +661,31 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
         if (quark == null) {
             return new TmfModelResponse<>(null, status, statusMessage);
         }
-
         long start = filter.getStart();
-        int currentCpuRqQuark = ss.optQuarkRelative(quark, Attributes.CURRENT_CPU_RQ);
-        if (currentCpuRqQuark == ITmfStateSystem.INVALID_ATTRIBUTE || start < ss.getStartTime() || start > ss.getCurrentEndTime()) {
-            return new TmfModelResponse<>(null, status, statusMessage);
-        }
-
         try {
-            ITmfStateInterval interval = ss.querySingleState(start, currentCpuRqQuark);
-            Object value = interval.getValue();
+            List<@NonNull ITmfStateInterval> states = ss.queryFullState(start);
+            int currentCpuRqQuark = ss.optQuarkRelative(quark, Attributes.CURRENT_CPU_RQ);
+            if (currentCpuRqQuark == ITmfStateSystem.INVALID_ATTRIBUTE || start < ss.getStartTime() || start > ss.getCurrentEndTime()) {
+                return new TmfModelResponse<>(null, status, statusMessage);
+            }
+            ITmfCallsiteResolver csAnalysis = TmfTraceUtils.getAnalysisModuleOfClass(getTrace(), CallsiteAnalysis.class, CallsiteAnalysis.ID);
+            List<ITmfCallsite> source = null;
+            Object value = states.get(currentCpuRqQuark).getValue();
+
             if (value instanceof Integer) {
-                return new TmfModelResponse<>(ImmutableMap.of(TmfStrings.cpu(), String.valueOf(value)), status, statusMessage);
+                String cpuId = String.valueOf(value);
+                if (csAnalysis != null) {
+                    Object cpuThreadObj = states.get(quark).getValue();
+                    if (cpuThreadObj instanceof Integer && Objects.equals(ProcessStatus.RUN_SYTEMCALL.getStateValue().unboxInt(), cpuThreadObj)) {
+                        source = csAnalysis.getCallsites(String.valueOf(getTrace().getUUID()), cpuId, start);
+                    }
+                }
+                Map<String, String> returnValue = new HashMap<>();
+                returnValue.put(TmfStrings.cpu(), cpuId);
+                if (source != null && !source.isEmpty()) {
+                    returnValue.put(TmfStrings.source(), source.get(0).toString());
+                }
+                return new TmfModelResponse<>(returnValue, status, statusMessage);
             }
         } catch (StateSystemDisposedException e) {
             /* Ignored */

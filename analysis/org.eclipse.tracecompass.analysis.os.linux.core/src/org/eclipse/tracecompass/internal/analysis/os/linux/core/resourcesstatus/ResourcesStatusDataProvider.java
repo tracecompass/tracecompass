@@ -36,13 +36,16 @@ import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
 import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel.Type;
+import org.eclipse.tracecompass.internal.tmf.core.analysis.callsite.CallsiteAnalysis;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.timegraph.AbstractTimeGraphDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.TmfStrings;
+import org.eclipse.tracecompass.tmf.core.analysis.callsite.ITmfCallsiteResolver;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
+import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
@@ -56,6 +59,7 @@ import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -646,7 +650,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         }
     }
 
-    private static void putCpuTooltip(ITmfStateSystem ss, String attributeName,
+    private void putCpuTooltip(ITmfStateSystem ss, String attributeName,
             Map<String, String> retMap, List<ITmfStateInterval> full, int status) {
         int currentThreadQuark = ss.optQuarkAbsolute(Attributes.CPUS, attributeName, Attributes.CURRENT_THREAD);
         if (currentThreadQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
@@ -669,9 +673,17 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             int syscallQuark = ss.optQuarkAbsolute(Attributes.THREADS, currentThread, Attributes.SYSTEM_CALL);
             if (status == StateValues.CPU_STATUS_RUN_SYSCALL
                     && syscallQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
-                Object syscall = full.get(syscallQuark).getValue();
+                ITmfStateInterval interval = full.get(syscallQuark);
+                Object syscall = interval.getValue();
                 if (syscall instanceof String) {
                     retMap.put(Attributes.SYSTEM_CALL, (String) syscall);
+                    ITmfCallsiteResolver csAnalysis = TmfTraceUtils.getAnalysisModuleOfClass(getTrace(), CallsiteAnalysis.class, CallsiteAnalysis.ID);
+                    if (csAnalysis != null) {
+                        List<@NonNull ITmfCallsite> callsites = csAnalysis.getCallsites(String.valueOf(getTrace().getUUID()), attributeName, interval.getStartTime() / 2L + interval.getEndTime() / 2L);
+                        if (!callsites.isEmpty()) {
+                            retMap.put(TmfStrings.source(), callsites.get(0).toString());
+                        }
+                    }
                 }
             }
         }
