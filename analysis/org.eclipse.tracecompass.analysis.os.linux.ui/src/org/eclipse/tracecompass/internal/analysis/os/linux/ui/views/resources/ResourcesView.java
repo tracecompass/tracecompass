@@ -19,13 +19,9 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.HostThread;
 import org.eclipse.tracecompass.analysis.os.linux.core.signals.TmfCpuSelectedSignal;
 import org.eclipse.tracecompass.analysis.os.linux.core.signals.TmfThreadSelectedSignal;
@@ -46,10 +42,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NamedTimeEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
-import org.eclipse.ui.IWorkbenchActionConstants;
 
 import com.google.common.collect.Multimap;
 
@@ -129,35 +122,6 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
         }
     }
 
-    @Override
-    public void createPartControl(Composite parent) {
-        super.createPartControl(parent);
-        createTimeEventContextMenu();
-    }
-
-    private void createTimeEventContextMenu() {
-        MenuManager eventMenuManager = new MenuManager();
-        eventMenuManager.setRemoveAllWhenShown(true);
-        TimeGraphControl timeGraphControl = getTimeGraphViewer().getTimeGraphControl();
-        final Menu timeEventMenu = eventMenuManager.createContextMenu(timeGraphControl);
-
-        timeGraphControl.addTimeEventMenuListener(event -> {
-            Menu menu = timeEventMenu;
-            if (event.data instanceof TimeEvent) {
-                timeGraphControl.setMenu(menu);
-                return;
-            }
-            timeGraphControl.setMenu(null);
-            event.doit = false;
-        });
-
-        eventMenuManager.addMenuListener(manager -> {
-            fillTimeEventContextMenu(eventMenuManager);
-            eventMenuManager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-        });
-        getSite().registerContextMenu(eventMenuManager, getTimeGraphViewer().getSelectionProvider());
-    }
-
     /**
      * @since 2.0
      */
@@ -188,12 +152,7 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
         }
     }
 
-    /**
-     * Fill context menu
-     *
-     * @param menuManager
-     *                        a menuManager to fill
-     */
+    @Override
     protected void fillTimeEventContextMenu(@NonNull IMenuManager menuManager) {
         ISelection selection = getSite().getSelectionProvider().getSelection();
         if (selection instanceof IStructuredSelection) {
@@ -214,6 +173,7 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
                 }
             }
         }
+        super.fillTimeEventContextMenu(menuManager);
     }
 
     private static class ResourcesFilterLabelProvider extends TreeLabelProvider {

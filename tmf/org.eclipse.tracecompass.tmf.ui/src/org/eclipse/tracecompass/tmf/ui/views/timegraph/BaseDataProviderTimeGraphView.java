@@ -12,18 +12,34 @@ package org.eclipse.tracecompass.tmf.ui.views.timegraph;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jface.action.GroupMarker;
+import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.Messages;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
+import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
+import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
@@ -38,6 +54,7 @@ import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ui.actions.OpenSourceCodeAction;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ILinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
@@ -48,6 +65,8 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sampling;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
+import org.eclipse.ui.IWorkbenchActionConstants;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.HashMultimap;
@@ -75,6 +94,8 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      * {@link #getLinkList}.
      */
     protected final Table<ITimeGraphDataProvider<? extends @NonNull TimeGraphEntryModel>, Long, @NonNull TimeGraphEntry> fEntries = HashBasedTable.create();
+
+    private static final Pattern SOURCE_REGEX = Pattern.compile("(.*):(\\d+)"); //$NON-NLS-1$
 
     private final String fProviderId;
 
@@ -108,6 +129,12 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      */
     protected String getProviderId() {
         return fProviderId;
+    }
+
+    @Override
+    public void createPartControl(Composite parent) {
+        super.createPartControl(parent);
+        createTimeEventContextMenu();
     }
 
     @Override
@@ -477,6 +504,76 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                 }
             }
         }
+    }
+
+    private IContributionItem createOpenSouceCodeAction(Map<String, String> model) {
+        if(model != null) {
+            String callsite = model.get(TmfStrings.source());
+            return OpenSourceCodeAction.create(Messages.BaseDataProviderTimeGraphView_OpenSourceActionName, () -> {
+                if (callsite != null) {
+                    Matcher matcher = SOURCE_REGEX.matcher(callsite);
+                    if (matcher.matches()) {
+                        return new TmfCallsite(Objects.requireNonNull(matcher.group(1)), Long.parseLong(matcher.group(2)));
+                    }
+                }
+                return null;
+            }, this.getTimeGraphViewer().getTimeGraphControl().getShell());
+        }
+        return null;
+    }
+
+    /**
+     * Fill context menu
+     *
+     * @param menuManager
+     *            a menuManager to fill
+     * @since 5.1
+     */
+    protected void fillTimeEventContextMenu(@NonNull IMenuManager menuManager) {
+        ISelection selection = getSite().getSelectionProvider().getSelection();
+        if (selection instanceof IStructuredSelection) {
+            IStructuredSelection sSel = (IStructuredSelection) selection;
+            Object firstElement = sSel.getFirstElement();
+            if (firstElement instanceof TimeGraphEntry) {
+                Object entryObject = sSel.toArray()[1];
+                if (entryObject instanceof TimeEvent) {
+                    TimeGraphEntry entry = (TimeGraphEntry) firstElement;
+                    ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = getProvider(entry);
+                    long timestamp = getTimeGraphViewer().getSelectionBegin();
+                    Map<String, Object> map = new HashMap<>();
+                    map.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, Collections.singletonList(timestamp));
+                    map.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, Collections.singletonList(entry.getEntryModel().getId()));
+                    IContributionItem contribItem = createOpenSouceCodeAction(provider.fetchTooltip(map, new NullProgressMonitor()).getModel());
+                    if (contribItem != null) {
+                        menuManager.add(contribItem);
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void createTimeEventContextMenu() {
+        MenuManager eventMenuManager = new MenuManager();
+        eventMenuManager.setRemoveAllWhenShown(true);
+        TimeGraphControl timeGraphControl = getTimeGraphViewer().getTimeGraphControl();
+        final Menu timeEventMenu = eventMenuManager.createContextMenu(timeGraphControl);
+
+        timeGraphControl.addTimeEventMenuListener(event -> {
+            Menu menu = timeEventMenu;
+            if (event.data instanceof TimeEvent) {
+                timeGraphControl.setMenu(menu);
+                return;
+            }
+            timeGraphControl.setMenu(null);
+            event.doit = false;
+        });
+
+        eventMenuManager.addMenuListener(manager -> {
+            fillTimeEventContextMenu(eventMenuManager);
+            eventMenuManager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+        });
+        getSite().registerContextMenu(eventMenuManager, getTimeGraphViewer().getSelectionProvider());
     }
 
 }
