@@ -360,9 +360,9 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         TmfVertex wupTarget = new TmfVertex(ts);
         TmfEdge hLink = graph.append(target, wupTarget);
         ITmfEventField content = context.getEvent().getContent();
+        Integer vec = content.getFieldValue(Integer.class, eventLayout.fieldVec());
         if (hLink != null) {
             // Try to resolve the type of the target edge to the softirq's source
-            Integer vec = content.getFieldValue(Integer.class, eventLayout.fieldVec());
             hLink.setType(resolveSoftirq(vec));
         }
         /*
@@ -371,7 +371,6 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
          * Packet_Reception context replaces this if the right events are
          * enabled.
          */
-        Long vec = content.getFieldValue(Long.class, eventLayout.fieldVec());
         if (vec == LinuxValues.SOFTIRQ_NET_RX || vec == LinuxValues.SOFTIRQ_NET_TX) {
             // create edge if wake up is caused by incoming packet
             OsWorker k = getOrCreateKernelWorker(event, cpu);
@@ -396,8 +395,16 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         TmfVertex wup = new TmfVertex(ts);
         TmfEdge link = graph.append(target, wup);
         if (link != null) {
-            Integer vec = context.getEvent().getContent().getFieldValue(Integer.class, eventLayout.fieldIrq());
-            link.setType(resolveIRQ(vec));
+            ITmfEventField content = context.getEvent().getContent();
+            Integer vec = content.getFieldValue(Integer.class, eventLayout.fieldIrq());
+            EdgeType edgeType = resolveIRQ(vec);
+            if (edgeType.equals(EdgeType.BLOCKED)) {
+                // Blocked for unknown reason, add the irq name as qualifier
+                String irqName = content.getFieldValue(String.class, eventLayout.fieldName());
+                link.setType(edgeType, irqName);
+            } else {
+                link.setType(edgeType);
+            }
         }
     }
 
@@ -421,7 +428,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
             ret = EdgeType.INTERRUPTED;
             break;
         default:
-            ret = EdgeType.UNKNOWN;
+            ret = EdgeType.BLOCKED;
             break;
         }
         return ret;
@@ -449,7 +456,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
             ret = EdgeType.INTERRUPTED;
             break;
         default:
-            ret = EdgeType.UNKNOWN;
+            ret = EdgeType.BLOCKED;
             break;
         }
         return ret;

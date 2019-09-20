@@ -86,6 +86,7 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
             case INTERRUPTED:
             case PREEMPTED:
             case RUNNING:
+            case UNKNOWN:
                 /**
                  * This edge is not blocked, so nothing to resolve, just add the
                  * edge to the critical path
@@ -113,7 +114,6 @@ public class CriticalPathAlgorithmBounded extends AbstractCriticalPathAlgorithm 
                 break;
             case DEFAULT:
                 throw new CriticalPathAlgorithmException("Illegal link type " + nextEdge.getType()); //$NON-NLS-1$
-            case UNKNOWN:
             default:
                 break;
             }

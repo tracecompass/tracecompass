@@ -428,10 +428,11 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
             return 6;
         case IPI:
             return 7;
+        case BLOCKED:
+            return 9;
         case EPS:
         case UNKNOWN:
         case DEFAULT:
-        case BLOCKED:
             break;
         default:
             break;
