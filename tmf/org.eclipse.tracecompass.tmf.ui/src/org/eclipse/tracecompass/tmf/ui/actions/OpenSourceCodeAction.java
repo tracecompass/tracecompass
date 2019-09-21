@@ -92,7 +92,17 @@ public class OpenSourceCodeAction extends Action {
         return mgr;
     }
 
-    private OpenSourceCodeAction(String text, ITmfCallsite callsite, Shell shell) {
+    /**
+     * Open Source Code Action Constructor
+     *
+     * @param text
+     *            text to display
+     * @param callsite
+     *            the callsite
+     * @param shell
+     *            the shell
+     */
+    public OpenSourceCodeAction(String text, ITmfCallsite callsite, Shell shell) {
         super(text);
         fCallsite = callsite;
         fShell = shell;

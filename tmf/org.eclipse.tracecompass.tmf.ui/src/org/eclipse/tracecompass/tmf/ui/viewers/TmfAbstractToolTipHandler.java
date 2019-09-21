@@ -48,9 +48,12 @@ import org.eclipse.swt.widgets.Slider;
 import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfUIPreferences;
+import org.eclipse.tracecompass.tmf.core.TmfStrings;
+import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.ui.actions.OpenSourceCodeAction;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphTooltipHandler;
 
 import com.google.common.collect.HashBasedTable;
@@ -191,7 +194,9 @@ public abstract class TmfAbstractToolTipHandler {
     private static final int MAX_SHELL_HEIGHT = 700;
     private static final int MOUSE_DEADZONE = 5;
     private static final String TIME_HYPERLINK = "<a href=time://%d>%s</a>"; //$NON-NLS-1$
+    private static final String SOURCE_HYPERLINK = "<a href=" + TmfStrings.source() + "://%s\\\">%s</a>"; //$NON-NLS-1$//$NON-NLS-2$
     private static final Pattern TIME_PATTERN = Pattern.compile("\\s*time\\:\\/\\/(\\d+).*"); //$NON-NLS-1$
+    private static final Pattern SOURCE_PATTERN = Pattern.compile(TmfStrings.source().toLowerCase() +"\\:\\/\\/(.*):(\\d+).*"); //$NON-NLS-1$
 
     private static final ToolTipString UNCATEGORIZED = ToolTipString.fromString(""); //$NON-NLS-1$
     private static final int OFFSET = 16;
@@ -440,7 +445,11 @@ public abstract class TmfAbstractToolTipHandler {
      * @since 5.0
      */
     protected void addItem(@Nullable String category, @NonNull String name, @NonNull String value) {
-        addItem(category == null ? null : ToolTipString.fromString(category), ToolTipString.fromString(name), ToolTipString.fromString(value));
+        if (Objects.equals(TmfStrings.source(), name)) {
+            addItem(category == null ? null : ToolTipString.fromString(category), ToolTipString.fromString(name), ToolTipString.fromHtml(String.format(SOURCE_HYPERLINK, value, value)));
+        } else {
+            addItem(category == null ? null : ToolTipString.fromString(category), ToolTipString.fromString(name), ToolTipString.fromString(value));
+        }
     }
 
     /**
@@ -511,7 +520,8 @@ public abstract class TmfAbstractToolTipHandler {
             browser.addLocationListener(new LocationListener() {
                 @Override
                 public void changing(LocationEvent ev) {
-                    Matcher matcher = TIME_PATTERN.matcher(ev.location);
+                    String locationValue = ev.location;
+                    Matcher matcher = TIME_PATTERN.matcher(locationValue);
                     if (matcher.find()) {
                         String time = matcher.group(1);
                         Long val = Longs.tryParse(time);
@@ -519,6 +529,12 @@ public abstract class TmfAbstractToolTipHandler {
                             TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(ev.getSource(), TmfTimestamp.fromNanos(val)));
                         }
                         ev.doit = false;
+                    } else {
+                        Matcher sMatcher = SOURCE_PATTERN.matcher(locationValue);
+                        if (sMatcher.matches()) {
+                            new OpenSourceCodeAction("", new TmfCallsite(sMatcher.group(1), Long.parseLong(sMatcher.group(2))), getParent().getShell()).run(); //$NON-NLS-1$
+                            ev.doit = false;
+                        }
                     }
                 }
                 @Override
