@@ -11,6 +11,8 @@ package org.eclipse.tracecompass.tmf.core.model.tree;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * Represent an entire tree model
  *
@@ -22,6 +24,7 @@ import java.util.List;
 public class TmfTreeModel<T extends ITmfTreeDataModel> {
     private List<String> fHeaders;
     private List<T> fEntries;
+    private @Nullable String fScope;
 
     /**
      * Constructor
@@ -34,6 +37,23 @@ public class TmfTreeModel<T extends ITmfTreeDataModel> {
     public TmfTreeModel(List<String> headers, List<T> entries) {
         fHeaders = headers;
         fEntries = entries;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param headers
+     *            List of string that represent the header of a column
+     * @param entries
+     *            List of entries in the tree
+     * @param scope
+     *            The scope of all entry ids in the model
+     * @since 5.2
+     */
+    public TmfTreeModel(List<String> headers, List<T> entries, @Nullable String scope) {
+        fHeaders = headers;
+        fEntries = entries;
+        fScope = scope;
     }
 
     /**
@@ -52,5 +72,15 @@ public class TmfTreeModel<T extends ITmfTreeDataModel> {
      */
     public List<T> getEntries() {
         return fEntries;
+    }
+
+    /**
+     * Scope of all entry ids in the model
+     *
+     * @return Scope
+     * @since 5.2
+     */
+    public @Nullable String getScope() {
+        return fScope;
     }
 }

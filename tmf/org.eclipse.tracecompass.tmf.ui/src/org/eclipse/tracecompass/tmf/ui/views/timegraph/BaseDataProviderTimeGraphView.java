@@ -98,6 +98,8 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      */
     protected static final long BUILD_UPDATE_TIMEOUT = 500;
 
+    private static final Pattern SOURCE_REGEX = Pattern.compile("(.*):(\\d+)"); //$NON-NLS-1$
+
     /**
      * Table of (data provider, model id) to time graph entry. The table should be
      * filled by {@link #buildEntryList} and is read by {@link #zoomEntries} and
@@ -105,7 +107,26 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      */
     protected final Table<ITimeGraphDataProvider<? extends @NonNull TimeGraphEntryModel>, Long, @NonNull TimeGraphEntry> fEntries = HashBasedTable.create();
 
-    private static final Pattern SOURCE_REGEX = Pattern.compile("(.*):(\\d+)"); //$NON-NLS-1$
+    /**
+     * Table of (time graph entry, data provider) to model id. The table should
+     * be filled by {@link #buildEntryList}.
+     *
+     * @since 5.2
+     */
+    protected final Table<@NonNull TimeGraphEntry, ITimeGraphDataProvider<? extends @NonNull TimeGraphEntryModel>, Long> fEntryIds = HashBasedTable.create();
+
+    /**
+     * Table of (scope, model id) to time graph entry. The table should be
+     * filled by {@link #buildEntryList}.
+     *
+     * @since 5.2
+     */
+    protected final Table<Object, Long, @NonNull TimeGraphEntry> fScopedEntries = HashBasedTable.create();
+
+    /** Map of parent trace to providers */
+    private Multimap<ITmfTrace, ITimeGraphDataProvider<? extends @NonNull TimeGraphEntryModel>> fProviders = HashMultimap.create();
+    /** Map of parent trace to scopes, for cleanup */
+    private Multimap<ITmfTrace, Object> fScopes = HashMultimap.create();
 
     private final String fProviderId;
 
@@ -172,6 +193,9 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             TmfTreeModel<@NonNull TimeGraphEntryModel> model = response.getModel();
             if (model != null) {
                 synchronized (fEntries) {
+                    Object scope = (model.getScope() == null) ? dataProvider : model.getScope();
+                    fProviders.put(parentTrace, dataProvider);
+                    fScopes.put(parentTrace, scope);
                     /*
                      * The provider may send entries unordered and parents may
                      * not exist when child is constructor, we'll re-unite
@@ -179,17 +203,18 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                      */
                     List<TimeGraphEntry> orphaned = new ArrayList<>();
                     for (TimeGraphEntryModel entry : model.getEntries()) {
-                        TimeGraphEntry uiEntry = fEntries.get(dataProvider, entry.getId());
+                        TimeGraphEntry uiEntry = fScopedEntries.get(scope, entry.getId());
                         if (entry.getParentId() != -1) {
                             if (uiEntry == null) {
                                 uiEntry = new TimeGraphEntry(entry);
-                                TimeGraphEntry parent = fEntries.get(dataProvider, entry.getParentId());
+                                TimeGraphEntry parent = fScopedEntries.get(scope, entry.getParentId());
                                 if (parent != null) {
+                                    // TODO: the order of children from different data providers is undefined
                                     parent.addChild(uiEntry);
                                 } else {
                                     orphaned.add(uiEntry);
                                 }
-                                fEntries.put(dataProvider, entry.getId(), uiEntry);
+                                fScopedEntries.put(scope, entry.getId(), uiEntry);
                             } else {
                                 uiEntry.updateModel(entry);
                             }
@@ -205,14 +230,16 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                                 // Do not assume that parentless entries are
                                 // trace entries
                                 uiEntry = new TraceEntry(entry, trace, dataProvider);
-                                fEntries.put(dataProvider, entry.getId(), uiEntry);
+                                fScopedEntries.put(scope, entry.getId(), uiEntry);
                                 addToEntryList(parentTrace, Collections.singletonList(uiEntry));
                             }
                         }
+                        fEntries.put(dataProvider, entry.getId(), uiEntry);
+                        fEntryIds.put(uiEntry, dataProvider, entry.getId());
                     }
                     // Find missing parents
                     for (TimeGraphEntry orphanedEntry : orphaned) {
-                        TimeGraphEntry parent = fEntries.get(dataProvider, orphanedEntry.getEntryModel().getParentId());
+                        TimeGraphEntry parent = fScopedEntries.get(scope, orphanedEntry.getEntryModel().getParentId());
                         if (parent != null) {
                             parent.addChild(orphanedEntry);
                         }
@@ -319,7 +346,28 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      * @since 3.3
      */
     public static ITimeGraphDataProvider<? extends TimeGraphEntryModel> getProvider(TimeGraphEntry entry) {
-        return getTraceEntry(entry).getProvider();
+        TraceEntry traceEntry = getTraceEntry(entry);
+        // TODO: A trace can have many providers
+        return traceEntry.getProvider();
+    }
+
+    private Collection<ITimeGraphDataProvider<? extends @NonNull TimeGraphEntryModel>> getProviders(ITmfTrace viewTrace) {
+        Collection<ITimeGraphDataProvider<? extends @NonNull TimeGraphEntryModel>> providers;
+        synchronized (fEntries) {
+            providers = fProviders.get(viewTrace);
+        }
+        if (!providers.isEmpty()) {
+            return providers;
+        }
+        List<@NonNull TimeGraphEntry> traceEntries = getEntryList(viewTrace);
+        if (traceEntries == null) {
+            return Collections.emptyList();
+        }
+        providers = new ArrayList<>();
+        for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
+            providers.add(traceEntry.getProvider());
+        }
+        return providers;
     }
 
     private static TraceEntry getTraceEntry(TimeGraphEntry entry) {
@@ -377,14 +425,20 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      *            the rightmost time bound of the view
      * @return A Multimap of data providers to their visible entries' model IDs.
      */
-    private static Multimap<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Long> filterGroupEntries(Iterable<TimeGraphEntry> visible,
+    private Multimap<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Long> filterGroupEntries(Iterable<TimeGraphEntry> visible,
             long zoomStartTime, long zoomEndTime) {
         Multimap<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Long> providersToModelIds = HashMultimap.create();
         for (TimeGraphEntry entry : visible) {
             if (zoomStartTime <= entry.getEndTime() && zoomEndTime >= entry.getStartTime() && entry.hasTimeEvents()) {
-                ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = getProvider(entry);
-                if (provider != null) {
-                    providersToModelIds.put(provider, entry.getModel().getId());
+                synchronized (fEntries) {
+                    if (!fEntryIds.isEmpty()) {
+                        fEntryIds.row(entry).forEach((provider, modelId) -> providersToModelIds.put(provider, modelId));
+                    } else {
+                        ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = getProvider(entry);
+                        if (provider != null) {
+                            providersToModelIds.put(provider, entry.getEntryModel().getId());
+                        }
+                    }
                 }
             }
         }
@@ -474,16 +528,15 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
     @Override
     protected List<@NonNull ILinkEvent> getLinkList(long zoomStartTime, long zoomEndTime, long resolution,
             @NonNull IProgressMonitor monitor) {
-        List<@NonNull TimeGraphEntry> traceEntries = getEntryList(getTrace());
-        if (traceEntries == null) {
+        Collection<ITimeGraphDataProvider<? extends @NonNull TimeGraphEntryModel>> providers = getProviders(getTrace());
+        if (providers.isEmpty()) {
             return Collections.emptyList();
         }
         List<@NonNull ILinkEvent> linkList = new ArrayList<>();
         List<@NonNull Long> times = StateSystemUtils.getTimes(zoomStartTime, zoomEndTime, resolution);
         TimeQueryFilter queryFilter = new TimeQueryFilter(times);
 
-        for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
-            ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = traceEntry.getProvider();
+        for (ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider : providers) {
             TmfModelResponse<List<ITimeGraphArrow>> response = provider.fetchArrows(FetchParametersUtils.timeQueryToMap(queryFilter), monitor);
             List<ITimeGraphArrow> model = response.getModel();
 
@@ -507,12 +560,11 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
     @Override
     protected @NonNull List<String> getViewMarkerCategories() {
         List<String> viewMarkerCategories = super.getViewMarkerCategories();
-        List<@NonNull TimeGraphEntry> traceEntries = getEntryList(getTrace());
-        if (traceEntries == null) {
+        Collection<ITimeGraphDataProvider<? extends @NonNull TimeGraphEntryModel>> providers = getProviders(getTrace());
+        if (providers.isEmpty()) {
             return viewMarkerCategories;
         }
-        for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
-            ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = traceEntry.getProvider();
+        for (ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider : providers) {
             if (provider instanceof IOutputAnnotationProvider) {
                 TmfModelResponse<@NonNull AnnotationCategoriesModel> response = ((IOutputAnnotationProvider) provider).fetchAnnotationCategories(Collections.emptyMap(), new NullProgressMonitor());
                 AnnotationCategoriesModel model = response.getModel();
@@ -534,24 +586,27 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         List<@NonNull Long> times = StateSystemUtils.getTimes(startTime, endTime, resolution);
         for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
             Multimap<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Long> providersToModelIds = filterGroupEntries(Utils.flatten(traceEntry), startTime, endTime);
-            ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = traceEntry.getProvider();
-            if (provider instanceof IOutputAnnotationProvider) {
-                SelectionTimeQueryFilter queryFilter = new SelectionTimeQueryFilter(times, providersToModelIds.get(provider));
-                TmfModelResponse<@NonNull AnnotationModel> response = ((IOutputAnnotationProvider) provider).fetchAnnotations(FetchParametersUtils.selectionTimeQueryToMap(queryFilter), new NullProgressMonitor());
-                AnnotationModel model = response.getModel();
-                if (model != null) {
-                    for (Entry<String, Collection<Annotation>> entry : model.getAnnotations().entrySet()) {
-                        String category = entry.getKey();
-                        for (Annotation annotation : entry.getValue()) {
-                            if (annotation.getType() == AnnotationType.CHART) {
-                                // If the annotation entry ID is -1 we want the
-                                // marker to span across all entries
-                                ITimeGraphEntry markerEntry = null;
-                                if (annotation.getEntryId() != -1) {
-                                    markerEntry = fEntries.get(provider, annotation.getEntryId());
+            for (ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider : providersToModelIds.keySet()) {
+                if (provider instanceof IOutputAnnotationProvider) {
+                    SelectionTimeQueryFilter queryFilter = new SelectionTimeQueryFilter(times, providersToModelIds.get(provider));
+                    TmfModelResponse<@NonNull AnnotationModel> response = ((IOutputAnnotationProvider) provider).fetchAnnotations(FetchParametersUtils.selectionTimeQueryToMap(queryFilter), new NullProgressMonitor());
+                    AnnotationModel model = response.getModel();
+                    if (model != null) {
+                        for (Entry<String, Collection<Annotation>> entry : model.getAnnotations().entrySet()) {
+                            String category = entry.getKey();
+                            for (Annotation annotation : entry.getValue()) {
+                                if (annotation.getType() == AnnotationType.CHART) {
+                                    // If the annotation entry ID is -1 we want the
+                                    // marker to span across all entries
+                                    ITimeGraphEntry markerEntry = null;
+                                    if (annotation.getEntryId() != -1) {
+                                        synchronized (fEntries) {
+                                            markerEntry = fEntries.get(provider, annotation.getEntryId());
+                                        }
+                                    }
+                                    MarkerEvent markerEvent = new MarkerEvent(annotation, markerEntry, category, true);
+                                    viewMarkerList.add(markerEvent);
                                 }
-                                MarkerEvent markerEvent = new MarkerEvent(annotation, markerEntry, category, true);
-                                viewMarkerList.add(markerEvent);
                             }
                         }
                     }
@@ -568,17 +623,25 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         // Remove the entries for this trace
         if (entryList != null) {
             synchronized (fEntries) {
-                for (TimeGraphEntry entry : entryList) {
-                    if (entry instanceof TraceEntry) {
-                        fEntries.row(((TraceEntry) entry).getProvider()).clear();
+                if (!fProviders.isEmpty()) {
+                    fProviders.removeAll(viewTrace).forEach(provider -> {
+                        fEntries.row(provider).clear();
+                        fEntryIds.column(provider).clear();
+                    });
+                } else {
+                    for (TimeGraphEntry entry : entryList) {
+                        if (entry instanceof TraceEntry) {
+                            fEntries.row(((TraceEntry) entry).getProvider()).clear();
+                        }
                     }
                 }
+                fScopes.removeAll(viewTrace).forEach(scope -> fScopedEntries.row(scope).clear());
             }
         }
     }
 
-    private IContributionItem createOpenSouceCodeAction(Map<String, String> model) {
-        if(model != null) {
+    private IContributionItem createOpenSourceCodeAction(Map<String, String> model) {
+        if (model != null) {
             String callsite = model.get(TmfStrings.source());
             return OpenSourceCodeAction.create(Messages.BaseDataProviderTimeGraphView_OpenSourceActionName, () -> {
                 if (callsite != null) {
@@ -614,7 +677,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                     Map<String, Object> map = new HashMap<>();
                     map.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, Collections.singletonList(timestamp));
                     map.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, Collections.singletonList(entry.getEntryModel().getId()));
-                    IContributionItem contribItem = createOpenSouceCodeAction(provider.fetchTooltip(map, new NullProgressMonitor()).getModel());
+                    IContributionItem contribItem = createOpenSourceCodeAction(provider.fetchTooltip(map, new NullProgressMonitor()).getModel());
                     if (contribItem != null) {
                         menuManager.add(contribItem);
                     }
@@ -622,7 +685,6 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             }
         }
     }
-
 
     private void createTimeEventContextMenu() {
         MenuManager eventMenuManager = new MenuManager();

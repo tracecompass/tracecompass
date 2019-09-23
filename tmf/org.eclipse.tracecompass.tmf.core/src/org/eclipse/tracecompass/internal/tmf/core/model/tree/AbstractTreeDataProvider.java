@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017, 2018 Ericsson
+ * Copyright (c) 2017, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -42,9 +43,11 @@ import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModul
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Table;
 
 /**
  * Class to abstract {@link ITmfTreeDataProvider} methods and fields. Handles
@@ -69,12 +72,19 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      */
     protected static final Logger LOGGER = TraceCompassLog.getLogger(AbstractTreeDataProvider.class);
 
-    private static final AtomicLong ENTRY_ID = new AtomicLong();
+    /* Map of scope to unique id generator */
+    private static final Map<String, AtomicLong> fScopedIdGeneratorMap = new HashMap<>();
+    /* Table of <scope, key> to id */
+    private static final Table<String, Object, Long> fScopedIdTable = HashBasedTable.create();
+
     private final A fAnalysisModule;
     private final ReentrantReadWriteLock fLock = new ReentrantReadWriteLock(false);
     private final BiMap<Long, Integer> fIdToQuark = HashBiMap.create();
     private @Nullable TmfModelResponse<TmfTreeModel<M>> fCached;
     private final Map<Long, Multimap<String, Object>> fEntryMetadata = new HashMap<>();
+    private final @Nullable String fScope;
+    private final AtomicLong fIdGenerator;
+    private final Map<Object, Long> fIdTable;
 
     /**
      * Constructor
@@ -87,6 +97,27 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
     public AbstractTreeDataProvider(ITmfTrace trace, A analysisModule) {
         super(trace);
         fAnalysisModule = analysisModule;
+        fScope = getScope();
+        if (fScope != null) {
+            synchronized (fScopedIdTable) {
+                fIdGenerator = fScopedIdGeneratorMap.computeIfAbsent(fScope, scope -> new AtomicLong());
+                fIdTable = fScopedIdTable.row(Objects.requireNonNull(fScope));
+            }
+        } else {
+            fIdGenerator = new AtomicLong();
+            fIdTable = new HashMap<>();
+        }
+    }
+
+    @Override
+    public void dispose() {
+        ITmfTreeDataProvider.super.dispose();
+        if (fScope != null) {
+            synchronized (fScopedIdTable) {
+                fScopedIdGeneratorMap.remove(fScope);
+                fScopedIdTable.row(Objects.requireNonNull(fScope)).clear();
+            }
+        }
     }
 
     /**
@@ -99,6 +130,31 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
     }
 
     /**
+     * Returns the scope of all entry ids used by the provider. The entry ids
+     * are unique to this scope. Override to provide a common scope if multiple
+     * providers need to share entry ids. In this case, shared entry ids should
+     * be obtained using a shared key that is unique to this scope.
+     * <p>
+     * Examples of data providers and their scope and entry ids:
+     * <ul>
+     * <li>dp1 (scope=null): { 0, 1, 2, 3, ... }
+     * <li>dp2 (scope="scope1": { 0 (key1), 1, 4, 5 (key2), 7, ... }
+     * <li>dp3 (scope="scope1": { 0 (key1), 2, 3, 5 (key2), 6, ... }
+     * <li>dp4 (scope="scope2": { 0, 1, 2 (key1), 3, ... }
+     * </ul>
+     * Within "scope1", the entry id associated with key1 (or key2) is shared
+     * between data providers. The other entry ids not associated to any key are
+     * unique within the scope. Within "scope2", the entry id associated with
+     * key1 is independent from the one is "scope1".
+     *
+     * @return the scope, or <code>null</code> if scope is unique to this data
+     *         provider
+     */
+    protected @Nullable String getScope() {
+        return null;
+    }
+
+    /**
      * Get (and generate if necessary) a unique id for this quark. Should be called
      * inside {@link #getTree(ITmfStateSystem, Map, IProgressMonitor)},
      * where the write lock is held.
@@ -108,7 +164,25 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      * @return the unique id for this quark
      */
     protected long getId(int quark) {
-        return fIdToQuark.inverse().computeIfAbsent(quark, q -> ENTRY_ID.getAndIncrement());
+        return fIdToQuark.inverse().computeIfAbsent(quark, q -> getEntryId());
+    }
+
+    /**
+     * Get (and generate if necessary) a unique id for this quark. Should be
+     * called inside {@link #getTree(ITmfStateSystem, Map, IProgressMonitor)},
+     * where the write lock is held.
+     * <p>
+     * The shared key is unique to this provider's scope, and ensures that only
+     * one shared entry id exists in the scope for this key.
+     *
+     * @param quark
+     *            quark to map to
+     * @param key
+     *            shared key
+     * @return the unique id for this quark
+     */
+    protected long getId(int quark, Object key) {
+        return fIdToQuark.inverse().computeIfAbsent(quark, q -> getEntryId(key));
     }
 
     /**
@@ -117,7 +191,23 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      * @return the unique id
      */
     protected long getEntryId() {
-        return ENTRY_ID.getAndIncrement();
+        return fIdGenerator.getAndIncrement();
+    }
+
+    /**
+     * Get a new unique id, unbound to any quark.
+     * <p>
+     * The shared key is unique to this provider's scope, and ensures that only
+     * one shared entry id exists in the scope for this key.
+     *
+     * @param key
+     *            shared key
+     * @return the unique id
+     */
+    protected long getEntryId(Object key) {
+        synchronized (fScopedIdTable) {
+            return fIdTable.computeIfAbsent(key, k -> fIdGenerator.getAndIncrement());
+        }
     }
 
     /**
