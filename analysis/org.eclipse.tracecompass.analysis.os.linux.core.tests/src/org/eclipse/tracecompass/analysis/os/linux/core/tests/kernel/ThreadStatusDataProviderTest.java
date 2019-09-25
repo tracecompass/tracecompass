@@ -108,7 +108,8 @@ public class ThreadStatusDataProviderTest {
             assertEquals(Long.parseLong(split[1]), threadEntry.getStartTime());
             assertEquals(Long.parseLong(split[2]), threadEntry.getEndTime());
             assertEquals(Integer.parseInt(split[3]), threadEntry.getThreadId());
-            assertEquals(Integer.parseInt(split[4]), threadEntry.getParentThreadId());
+            assertEquals(Integer.parseInt(split[4]), threadEntry.getProcessId());
+            assertEquals(Integer.parseInt(split[5]), threadEntry.getParentThreadId());
         }
         Map<Long, String> map = new HashMap<>();
         for (ThreadEntryModel threadModel : treeEntries) {

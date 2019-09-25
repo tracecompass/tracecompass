@@ -35,8 +35,9 @@ public class ThreadEntryModel extends TimeGraphEntryModel {
         private @NonNull List<@NonNull String> fLabels;
         private final long fStartTime;
         private long fEndTime;
-        private final int fPid;
+        private final int fTid;
         private int fPpid;
+        private int fPid;
 
         /**
          * Constructor
@@ -49,18 +50,23 @@ public class ThreadEntryModel extends TimeGraphEntryModel {
          *            the thread's start time
          * @param end
          *            the thread's end time
-         * @param pid
-         *            the thread's PID
+         * @param tid
+         *            the thread's TID
          * @param ppid
          *            the thread's parent TID
+         * @param pid
+         *            the thread's Process ID. If it is not know, a value of
+         *            <code>-1</code> can be used. The PID will be assumed to be
+         *            the same as the TID
          */
-        public Builder(long id, @NonNull List<@NonNull String> labels, long start, long end, int pid, int ppid) {
+        public Builder(long id, @NonNull List<@NonNull String> labels, long start, long end, int tid, int ppid, int pid) {
             fId = id;
             fLabels = labels;
             fStartTime = start;
             fEndTime = end;
-            fPid = pid;
+            fTid = tid;
             fPpid = ppid;
+            fPid = pid;
         }
 
         /**
@@ -130,6 +136,18 @@ public class ThreadEntryModel extends TimeGraphEntryModel {
         }
 
         /**
+         * Update this entry / builder's PID
+         *
+         * @param pid
+         *            the new PPID
+         */
+        public void setPid(int pid) {
+            if (pid >= 0) {
+                fPid = pid;
+            }
+        }
+
+        /**
          * Build the {@link ThreadEntryModel} from the builder, specify the parent id
          * here to avoid race conditions
          *
@@ -139,13 +157,14 @@ public class ThreadEntryModel extends TimeGraphEntryModel {
          *         {@link NullPointerException} if the parent Id is not set.
          */
         public ThreadEntryModel build(long parentId) {
-            return new ThreadEntryModel(fId, parentId, fLabels, fStartTime, fEndTime, fPid, fPpid);
+            return new ThreadEntryModel(fId, parentId, fLabels, fStartTime, fEndTime, fTid, fPpid, fPid);
         }
     }
 
     private final int fThreadId;
     private final int fParentThreadId;
     private final @NonNull Multimap<@NonNull String, @NonNull Object> fAspects;
+    private final int fProcessId;
 
     /**
      * Constructor
@@ -160,21 +179,26 @@ public class ThreadEntryModel extends TimeGraphEntryModel {
      *            the thread's start time
      * @param end
      *            the thread's end time
-     * @param pid
-     *            the thread's PID
+     * @param tid
+     *            the thread's TID
      * @param ppid
      *            the thread's parent thread ID
+     * @param pid
+     *            The thread's process ID
      */
-    public ThreadEntryModel(long id, long parentId, @NonNull List<@NonNull String> labels, long start, long end, int pid, int ppid) {
+    public ThreadEntryModel(long id, long parentId, @NonNull List<@NonNull String> labels, long start, long end, int tid, int ppid, int pid) {
         super(id, parentId, labels, start, end);
-        fThreadId = pid;
+        fThreadId = tid;
         fParentThreadId = ppid;
         fAspects = HashMultimap.create();
-        fAspects.put(OsStrings.tid(), pid);
+        fAspects.put(OsStrings.tid(), tid);
         fAspects.put(OsStrings.ptid(), ppid);
+        fProcessId = pid <= 0 ? tid : pid;
+        fAspects.put(OsStrings.pid(), fProcessId);
         if (!labels.isEmpty()) {
             fAspects.put(OsStrings.execName(), String.valueOf(labels.get(0)));
         }
+
     }
 
     /**
@@ -193,6 +217,15 @@ public class ThreadEntryModel extends TimeGraphEntryModel {
      */
     public int getParentThreadId() {
         return fParentThreadId;
+    }
+
+    /**
+     * Gets the process ID
+     *
+     * @return Process ID
+     */
+    public int getProcessId() {
+        return fProcessId;
     }
 
     @Override

@@ -78,8 +78,9 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
     private static final String TID_COLUMN = "TID";
     private static final int TID_COLUMN_ID = 1;
     private static final String PTID_COLUMN = "PTID";
+    private static final String PID_COLUMN = "PID";
     private static final String BIRTH_COLUMN = "Birth time";
-    private static final int BIRTH_COLUMN_ID = 3;
+    private static final int BIRTH_COLUMN_ID = 4;
 
     private static final String SYSTEMD_PROCESS_NAME = "systemd";
     private static final long SYSTEMD_BIRTHTIME = 1361214078967531336L;
@@ -156,6 +157,7 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
         testProcessSorting(tree, timeGraph);
         testTidSorting(tree, timeGraph);
         testPidSorting(tree, timeGraph);
+        testPtidSorting(tree, timeGraph);
         testBirthtimeSorting(tree, timeGraph);
     }
 
@@ -220,7 +222,7 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
      * lttng-consumerd has PTID -1 that is unknown. Currently
      * in CFV PTID is only shown when it's greater than 0.
      */
-    private static void testPidSorting(final SWTBotTree tree, final SWTBotTimeGraph timeGraph) {
+    private static void testPtidSorting(final SWTBotTree tree, final SWTBotTimeGraph timeGraph) {
         SWTBotTreeColumn column = tree.header(PTID_COLUMN);
         String[] expected = { LTTNG_CONSUMER_PROCESS_NAME, SYSTEMD_PROCESS_NAME, KTHREAD_PROCESS_NAME };
         /* Sort direction Up */
@@ -230,6 +232,23 @@ public class ControlFlowViewSortingTest extends KernelTestBase {
         /* Sort direction Down */
         String[] expected2 = { SYSTEMD_PROCESS_NAME, KTHREAD_PROCESS_NAME, LTTNG_CONSUMER_PROCESS_NAME };
         condition = getSortCondition(PTID_COLUMN, PROCESS_COLUMN_ID, expected2, timeGraph, false);
+        clickColumn(tree, column, condition);
+    }
+
+    /*
+     * Note: In the trace being tested, none of the threads have a PID, they are
+     * all processes, so this just tests the secondary comparators
+     */
+    private static void testPidSorting(final SWTBotTree tree, final SWTBotTimeGraph timeGraph) {
+        SWTBotTreeColumn column = tree.header(PID_COLUMN);
+        String[] expected = { SYSTEMD_PROCESS_NAME, KTHREAD_PROCESS_NAME, LTTNG_CONSUMER_PROCESS_NAME };
+        /* Sort direction Up */
+        SWTBotTestCondition condition = getSortCondition(PID_COLUMN, PROCESS_COLUMN_ID, expected, timeGraph, false);
+        clickColumn(tree, column, condition);
+
+        /* Sort direction Down */
+        String[] expected2 = { LTTNG_CONSUMER_PROCESS_NAME, KTHREAD_PROCESS_NAME, SYSTEMD_PROCESS_NAME };
+        condition = getSortCondition(PID_COLUMN, PROCESS_COLUMN_ID, expected2, timeGraph, false);
         clickColumn(tree, column, condition);
     }
 

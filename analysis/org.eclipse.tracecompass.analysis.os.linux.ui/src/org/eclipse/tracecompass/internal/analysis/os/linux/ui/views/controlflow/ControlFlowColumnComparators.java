@@ -95,6 +95,38 @@ public final class ControlFlowColumnComparators {
     };
 
     /**
+     * Process PID comparator. This compares first the trace, then the process PID, then the TID, then the
+     * birth time, then the process name finally the parent TID.
+     */
+    public static final ITimeGraphEntryComparator PID_COLUMN_COMPARATOR = new ITimeGraphEntryComparator() {
+
+        private final List<Comparator<ITimeGraphEntry>> SECONDARY_COMPARATORS = init();
+        private int fDirection = SWT.DOWN;
+
+        @Override
+        public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
+            /* First sort by PID */
+            int result = IControlFlowEntryComparator.PID_COMPARATOR.compare(o1, o2);
+            return compareList(result, fDirection, SECONDARY_COMPARATORS, o1, o2);
+        }
+
+        @Override
+        public void setDirection(int direction) {
+            fDirection = direction;
+        }
+
+        private List<Comparator<ITimeGraphEntry>> init() {
+            ImmutableList.Builder<Comparator<ITimeGraphEntry>> builder = ImmutableList.builder();
+            builder.add(IControlFlowEntryComparator.TID_COMPARATOR)
+                .add(IControlFlowEntryComparator.BIRTH_TIME_COMPARATOR)
+                .add(IControlFlowEntryComparator.PROCESS_NAME_COMPARATOR)
+                .add(IControlFlowEntryComparator.PTID_COMPARATOR);
+            return builder.build();
+        }
+
+    };
+
+    /**
      * Process PTID comparator. This compares first the trace, then the process
      * parent TID, then the birth time, then the process name finally the TID.
      */

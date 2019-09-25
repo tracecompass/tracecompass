@@ -242,7 +242,7 @@ public class ControlFlowOptimizerTest {
      * @return a {@link ControlFlowEntry} with the correct tid.
      */
     private static TimeGraphEntry generateCFVEntry(int tid) {
-        return new TimeGraphEntry(new ThreadEntryModel(0, -1, Collections.singletonList("exec"), Long.MIN_VALUE, Long.MAX_VALUE, tid, 0));
+        return new TimeGraphEntry(new ThreadEntryModel(0, -1, Collections.singletonList("exec"), Long.MIN_VALUE, Long.MAX_VALUE, tid, 0, -1));
     }
 
     // -------------------------------------------------------------------------

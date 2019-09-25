@@ -36,7 +36,7 @@ public interface IControlFlowEntryComparator {
     };
 
     /**
-     * TreadID Comparator
+     * Thread ID Comparator
      */
     Comparator<ITimeGraphEntry> TID_COMPARATOR = new Comparator<ITimeGraphEntry>() {
         @Override
@@ -49,6 +49,25 @@ public interface IControlFlowEntryComparator {
             ThreadEntryModel model2 = ControlFlowView.getThreadEntryModel(o2);
             if (model1 != null && model2 != null) {
                 result = Integer.compare(model1.getThreadId(), model2.getThreadId());
+            }
+            return result;
+        }
+    };
+
+    /**
+     * Process ID Comparator
+     */
+    Comparator<ITimeGraphEntry> PID_COMPARATOR = new Comparator<ITimeGraphEntry>() {
+        @Override
+        public int compare(@Nullable ITimeGraphEntry o1, @Nullable ITimeGraphEntry o2) {
+            if (o1 == null || o2 == null) {
+                throw new IllegalArgumentException();
+            }
+            int result = 0;
+            ThreadEntryModel model1 = ControlFlowView.getThreadEntryModel(o1);
+            ThreadEntryModel model2 = ControlFlowView.getThreadEntryModel(o2);
+            if (model1 != null && model2 != null) {
+                result = Integer.compare(model1.getProcessId(), model2.getProcessId());
             }
             return result;
         }

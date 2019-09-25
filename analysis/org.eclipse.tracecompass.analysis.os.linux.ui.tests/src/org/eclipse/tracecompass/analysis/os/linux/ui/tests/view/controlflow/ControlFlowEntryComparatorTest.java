@@ -100,7 +100,7 @@ public class ControlFlowEntryComparatorTest {
      * @return a {@link TimeGraphEntry} with the correct tid.
      */
     private static TimeGraphEntry generateCFVEntry(int id, @NonNull String execName, int tid, int ptid, int startTime, int endTime) {
-        return new TimeGraphEntry(new ThreadEntryModel(0, -1, Collections.singletonList(execName), startTime, endTime, tid, ptid));
+        return new TimeGraphEntry(new ThreadEntryModel(0, -1, Collections.singletonList(execName), startTime, endTime, tid, ptid, -1));
     }
 
     /**

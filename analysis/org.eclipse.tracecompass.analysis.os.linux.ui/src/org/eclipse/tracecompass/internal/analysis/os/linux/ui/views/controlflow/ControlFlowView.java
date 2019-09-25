@@ -112,6 +112,7 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
     private static final String PROCESS_COLUMN = Messages.ControlFlowView_processColumn;
     private static final String TID_COLUMN = OsStrings.tid();
     private static final String PTID_COLUMN = OsStrings.ptid();
+    private static final String PID_COLUMN = OsStrings.pid();
     private static final String BIRTH_TIME_COLUMN = Messages.ControlFlowView_birthTimeColumn;
     private Action fOptimizationAction;
 
@@ -121,6 +122,7 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
     private static final String[] COLUMN_NAMES = new String[] {
             PROCESS_COLUMN,
             TID_COLUMN,
+            PID_COLUMN,
             PTID_COLUMN,
             BIRTH_TIME_COLUMN
     };
@@ -140,6 +142,7 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
         ImmutableList.Builder<Comparator<ITimeGraphEntry>> builder = ImmutableList.builder();
         builder.add(ControlFlowColumnComparators.PROCESS_NAME_COLUMN_COMPARATOR)
             .add(ControlFlowColumnComparators.TID_COLUMN_COMPARATOR)
+            .add(ControlFlowColumnComparators.PID_COLUMN_COMPARATOR)
             .add(ControlFlowColumnComparators.PTID_COLUMN_COMPARATOR)
             .add(ControlFlowColumnComparators.BIRTH_TIME_COLUMN_COMPARATOR);
         List<Comparator<ITimeGraphEntry>> l = builder.build();
@@ -611,6 +614,8 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
                     return FormatTimeUtils.formatTime(entry.getStartTime(), TimeFormat.CALENDAR, Resolution.NANOSEC);
                 } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_traceColumn)) {
                     return getTrace(entry).getName();
+                } else if (COLUMN_NAMES[columnIndex].equals(OsStrings.pid())) {
+                    return Integer.toString(model.getProcessId());
                 }
             }
             return ""; //$NON-NLS-1$

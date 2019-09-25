@@ -205,7 +205,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
                 long end = ss.getCurrentEndTime();
                 fLastEnd = Long.max(fLastEnd, ss.getStartTime());
 
-                TreeMultimap<Integer, ITmfStateInterval> execNamesPPIDs = TreeMultimap.create(Comparator.naturalOrder(),
+                TreeMultimap<Integer, ITmfStateInterval> threadData = TreeMultimap.create(Comparator.naturalOrder(),
                         Comparator.comparing(ITmfStateInterval::getStartTime));
 
                 /*
@@ -213,12 +213,13 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
                  */
                 List<Integer> quarks = new ArrayList<>(ss.getQuarks(Attributes.THREADS, WILDCARD, Attributes.EXEC_NAME));
                 quarks.addAll(ss.getQuarks(Attributes.THREADS, WILDCARD, Attributes.PPID));
+                quarks.addAll(ss.getQuarks(Attributes.THREADS, WILDCARD, Attributes.PID));
                 try {
                     for (ITmfStateInterval interval : ss.query2D(quarks, Long.min(fLastEnd, end), end)) {
                         if (monitor != null && monitor.isCanceled()) {
                             return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
                         }
-                        execNamesPPIDs.put(interval.getAttribute(), interval);
+                        threadData.put(interval.getAttribute(), interval);
                     }
                 } catch (TimeRangeException | StateSystemDisposedException e) {
                     return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, e.getClass().getName() + ':' + String.valueOf(e.getMessage()));
@@ -226,7 +227,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
 
                 // update the trace Entry.
                 fTidToEntry.replaceValues(Integer.MIN_VALUE, Collections.singleton(new ThreadEntryModel.Builder(fTraceId, Collections.singletonList(getTrace().getName()),
-                        ss.getStartTime(), end, Integer.MIN_VALUE, Integer.MIN_VALUE)));
+                        ss.getStartTime(), end, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE)));
 
                 for (Integer threadQuark : ss.getQuarks(Attributes.THREADS, WILDCARD)) {
                     String threadAttributeName = ss.getAttributeName(threadQuark);
@@ -239,12 +240,14 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
 
                     int execNameQuark = ss.optQuarkRelative(threadQuark, Attributes.EXEC_NAME);
                     int ppidQuark = ss.optQuarkRelative(threadQuark, Attributes.PPID);
-                    NavigableSet<ITmfStateInterval> ppidIntervals = execNamesPPIDs.get(ppidQuark);
-                    for (ITmfStateInterval execNameInterval : execNamesPPIDs.get(execNameQuark)) {
+                    int pidQuark = ss.optQuarkRelative(threadQuark, Attributes.PID);
+                    NavigableSet<ITmfStateInterval> ppidIntervals = threadData.get(ppidQuark);
+                    NavigableSet<ITmfStateInterval> pidIntervals = threadData.get(pidQuark);
+                    for (ITmfStateInterval execNameInterval : threadData.get(execNameQuark)) {
                         if (monitor != null && monitor.isCanceled()) {
                             return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
                         }
-                        updateEntry(threadQuark, entryKey, ppidIntervals, execNameInterval);
+                        updateEntry(threadQuark, entryKey, ppidIntervals, execNameInterval, pidIntervals);
                     }
                 }
 
@@ -268,7 +271,8 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
     }
 
     private void updateEntry(Integer threadQuark, Pair<Integer, Integer> entryKey,
-            NavigableSet<ITmfStateInterval> ppidIntervals, ITmfStateInterval execNameInterval) {
+            NavigableSet<ITmfStateInterval> ppidIntervals, ITmfStateInterval execNameInterval,
+            NavigableSet<ITmfStateInterval> pidIntervals) {
         Object value = execNameInterval.getValue();
         if (value == null) {
             fBuildMap.remove(entryKey);
@@ -280,11 +284,12 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
         long endTime = execNameInterval.getEndTime() + 1;
         String execName = String.valueOf(value);
         int threadId = entryKey.getFirst();
-        int ppid = getPpid(ppidIntervals, endTime);
+        int ppid = getIntegerFromSet(ppidIntervals, endTime);
+        int pid = getIntegerFromSet(pidIntervals, endTime);
 
         if (entry == null) {
             long id = fAtomicLong.getAndIncrement();
-            entry = new ThreadEntryModel.Builder(id, Collections.singletonList(execName), startTime, endTime, threadId, ppid);
+            entry = new ThreadEntryModel.Builder(id, Collections.singletonList(execName), startTime, endTime, threadId, ppid, pid);
             fQuarkMap.put(id, threadQuark);
         } else {
             /*
@@ -302,16 +307,16 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
     /**
      * Find the parent PID for a given time from a thread's sorted PPID intervals.
      *
-     * @param ppidIterator
+     * @param intervalIterator
      *            a navigable set sorted by increasing start time
      * @param t
      *            the time stamp at which we want to know the PPID
      * @return the entry's PPID or -1 if we could not find it.
      */
-    private static int getPpid(NavigableSet<ITmfStateInterval> ppidIterator, long t) {
-        ITmfStateInterval ppidInterval = ppidIterator.lower(new TmfStateInterval(t, t + 1, 0, 0));
-        if (ppidInterval != null) {
-            Object o = ppidInterval.getValue();
+    private static int getIntegerFromSet(NavigableSet<ITmfStateInterval> intervalIterator, long t) {
+        ITmfStateInterval interval = intervalIterator.lower(new TmfStateInterval(t, t + 1, 0, 0));
+        if (interval != null) {
+            Object o = interval.getValue();
             if (o instanceof Integer) {
                 return (Integer) o;
             }
