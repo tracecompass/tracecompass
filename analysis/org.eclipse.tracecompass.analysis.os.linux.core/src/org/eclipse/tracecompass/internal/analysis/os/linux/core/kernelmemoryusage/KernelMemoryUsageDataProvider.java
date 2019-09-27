@@ -266,7 +266,7 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
         long totalId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
         nodes.add(new MemoryUsageTreeModel(totalId, -1, TOTAL_TID, Collections.singletonList(getTrace().getName())));
         for (Integer threadQuark : threadQuarkList) {
-            if (active == null || active.get(threadQuark).getEndTime() < end) {
+            if (active == null || ((threadQuark < active.size()) && active.get(threadQuark).getEndTime() < end)) {
                 String tidString = ss.getAttributeName(threadQuark);
                 String procname = fProcessNameMap.computeIfAbsent(tidString, string -> getProcessName(string, end));
 
