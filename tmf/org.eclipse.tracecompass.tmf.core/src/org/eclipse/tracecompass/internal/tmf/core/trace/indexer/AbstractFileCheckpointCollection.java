@@ -20,7 +20,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.text.MessageFormat;
+import java.util.Objects;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.TmfCoreTracer;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -165,7 +167,7 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
     /**
      * File handle for the file being read/written
      */
-    private RandomAccessFile fRandomAccessFile;
+    private @Nullable RandomAccessFile fRandomAccessFile;
     /**
      * File handle for the file being read/written
      */
@@ -257,13 +259,14 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
     private CheckpointCollectionFileHeader initialize() {
         CheckpointCollectionFileHeader header = null;
         try {
-            fRandomAccessFile = new RandomAccessFile(fFile, "rw"); //$NON-NLS-1$
-            fFileChannel = fRandomAccessFile.getChannel();
+            RandomAccessFile randomAccessFile = new RandomAccessFile(fFile, "rw"); //$NON-NLS-1$
+            fFileChannel = randomAccessFile.getChannel();
             header = createHeader();
 
             // Reserve space for header
-            fRandomAccessFile.setLength(header.getSize());
+            randomAccessFile.setLength(header.getSize());
             TmfCoreTracer.traceIndexer(CheckpointCollectionFileHeader.class.getSimpleName() + " initialize " + "nbEvents: " + header.fNbEvents + " fTimeRange: " + header.fTimeRange); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            fRandomAccessFile = randomAccessFile;
         } catch (IOException e) {
             Activator.logError(MessageFormat.format(Messages.ErrorOpeningIndex, fFile), e);
             return null;
@@ -281,16 +284,19 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
     private CheckpointCollectionFileHeader tryRestore() {
         CheckpointCollectionFileHeader header = null;
 
+        RandomAccessFile randomAccessFile = fRandomAccessFile;
         try {
-            fRandomAccessFile = new RandomAccessFile(fFile, "rw"); //$NON-NLS-1$
-            fFileChannel = fRandomAccessFile.getChannel();
+            randomAccessFile = new RandomAccessFile(fFile, "rw"); //$NON-NLS-1$
+            fFileChannel = randomAccessFile.getChannel();
         } catch (FileNotFoundException e) {
             Activator.logError(MessageFormat.format(Messages.ErrorOpeningIndex, fFile), e);
             return null;
+        } finally {
+            fRandomAccessFile = randomAccessFile;
         }
 
         try {
-            header = createHeader(fRandomAccessFile);
+            header = createHeader(randomAccessFile);
             if (header.fVersion != VERSION || header.getSubVersion() != getSubVersion()) {
                 return null;
             }
@@ -298,7 +304,10 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
         } catch (IOException e) {
             Activator.logError(MessageFormat.format(Messages.IOErrorReadingHeader, fFile), e);
             return null;
+        } finally {
+            fRandomAccessFile = randomAccessFile;
         }
+
 
         return header;
     }
@@ -309,14 +318,15 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
      * disposed.
      */
     protected void markDirty() {
-        if (fIsDirty) {
+        RandomAccessFile randomAccessFile = fRandomAccessFile;
+        if (fIsDirty || randomAccessFile == null) {
             return;
         }
         try {
             // Write an invalid version until the very last moment when dispose
             // the index. This is how we know if it's corrupted or not.
-            fRandomAccessFile.seek(0);
-            fRandomAccessFile.writeInt(INVALID_VERSION);
+            randomAccessFile.seek(0);
+            randomAccessFile.writeInt(INVALID_VERSION);
         } catch (IOException e) {
             Activator.logError(MessageFormat.format(Messages.IOErrorWritingHeader, fFile), e);
         }
@@ -440,7 +450,7 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
      * @return the file channel
      */
     protected FileChannel getFileChannel() {
-        return fRandomAccessFile.getChannel();
+        return Objects.requireNonNull(fRandomAccessFile).getChannel();
     }
 
     /**
@@ -487,25 +497,27 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
 
     private void dispose(boolean deleting) {
         try {
-            if (fRandomAccessFile != null) {
+            RandomAccessFile randomAccessFile = fRandomAccessFile;
+            if (randomAccessFile != null) {
                 if (!deleting && fIsDirty) {
                     if (fHeader != null) {
-                        fHeader.serialize(fRandomAccessFile);
+                        fHeader.serialize(randomAccessFile);
                     }
 
-                    fRandomAccessFile.seek(0);
-                    fRandomAccessFile.writeInt(getVersion());
+                    randomAccessFile.seek(0);
+                    randomAccessFile.writeInt(getVersion());
                     fIsDirty = false;
                 }
 
-                fRandomAccessFile.close();
+                randomAccessFile.close();
             }
             setCreatedFromScratch(true);
-            fRandomAccessFile = null;
             String headerTrace = fHeader == null ? "No header" : "nbEvents: " + fHeader.fNbEvents + " timerange:" + fHeader.fTimeRange; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             TmfCoreTracer.traceIndexer(this.getClass().getSimpleName() + " disposed. " + headerTrace); //$NON-NLS-1$
         } catch (IOException e) {
             Activator.logError(MessageFormat.format(Messages.IOErrorClosingIndex, fFile), e);
+        } finally {
+            fRandomAccessFile = null;
         }
     }
 }
