@@ -12,21 +12,34 @@
 
 package org.eclipse.tracecompass.analysis.profiling.ui.views.flamechart;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.provider.CallStackEntryModel;
 import org.eclipse.tracecompass.internal.analysis.profiling.ui.views.flamechart.Messages;
+import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
+import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.presentation.IPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.presentation.RotatingPaletteProvider;
+import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
+import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NamedTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
 /**
@@ -113,5 +126,30 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
             return ((NamedTimeEvent) event).getLabel();
         }
         return State.MULTIPLE.toString();
+    }
+
+    @Override
+    @NonNullByDefault({})
+    public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime) {
+        Map<String, String> retMap = super.getEventHoverToolTipInfo(event, hoverTime);
+        if (retMap == null) {
+            retMap = new LinkedHashMap<>(1);
+        }
+
+        if (!(event instanceof TimeEvent) || !((TimeEvent) event).hasValue() ||
+                !(event.getEntry() instanceof TimeGraphEntry)) {
+            return retMap;
+        }
+
+        TimeGraphEntry entry = (TimeGraphEntry) event.getEntry();
+        ITimeGraphDataProvider<? extends TimeGraphEntryModel> dataProvider = BaseDataProviderTimeGraphView.getProvider(entry);
+        TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> response = dataProvider.fetchTooltip(
+                FetchParametersUtils.selectionTimeQueryToMap(new SelectionTimeQueryFilter(hoverTime, hoverTime, 1, Collections.singletonList(entry.getEntryModel().getId()))), null);
+        Map<@NonNull String, @NonNull String> tooltipModel = response.getModel();
+        if (tooltipModel != null) {
+            retMap.putAll(tooltipModel);
+        }
+
+        return retMap;
     }
 }
