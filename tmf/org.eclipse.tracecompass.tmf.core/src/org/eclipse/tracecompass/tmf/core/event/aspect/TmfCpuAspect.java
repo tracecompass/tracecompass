@@ -21,7 +21,7 @@ import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
  *
  * @author Alexandre Montplaisir
  */
-public abstract class TmfCpuAspect implements ITmfEventAspect<Integer> {
+public abstract class TmfCpuAspect extends TmfDeviceAspect {
 
     @Override
     public final String getName() {
@@ -47,6 +47,11 @@ public abstract class TmfCpuAspect implements ITmfEventAspect<Integer> {
          * merged in a single CPU column/aspect.
          */
         return (other instanceof TmfCpuAspect);
+    }
+
+    @Override
+    public String getDeviceType() {
+        return "cpu"; //$NON-NLS-1$
     }
 
     @Override
