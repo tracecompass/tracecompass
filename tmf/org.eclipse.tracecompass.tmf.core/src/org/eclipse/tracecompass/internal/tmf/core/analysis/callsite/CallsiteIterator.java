@@ -54,20 +54,22 @@ class CallsiteIterator implements ITmfCallsiteIterator {
      *            the program flow state system
      * @param traceId
      *            the trace Id
-     * @param category
-     *            the device to iterate on
+     * @param deviceType
+     *            the device type (CPU/GPU...) to iterate on
+     * @param deviceId
+     *            the device id to iterate on
      * @param initialTime
      *            the start time of the iteration
      * @param interner
      *            String interner
      */
     @VisibleForTesting
-    public CallsiteIterator(@Nullable ITmfStateSystem ss, String traceId, String category, long initialTime, StateSystemStringInterner interner) {
+    public CallsiteIterator(@Nullable ITmfStateSystem ss, String traceId, String deviceType, String deviceId, long initialTime, StateSystemStringInterner interner) {
         fInterner = interner;
         if (ss == null) {
             return;
         }
-        int deviceQuark = ss.optQuarkAbsolute(CallsiteStateProvider.DEVICES, traceId, category);
+        int deviceQuark = ss.optQuarkAbsolute(CallsiteStateProvider.DEVICES, traceId, deviceType, deviceId);
         if (deviceQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
             return;
         }

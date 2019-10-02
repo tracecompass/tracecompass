@@ -19,7 +19,7 @@ import org.eclipse.tracecompass.tmf.core.analysis.callsite.ITmfCallsiteResolver;
 import org.eclipse.tracecompass.tmf.core.analysis.callsite.TimeCallsite;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCallsiteAspect;
-import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfDeviceAspect;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -48,9 +48,9 @@ public class CallsiteAnalysis extends TmfStateSystemAnalysisModule implements IT
 
     @Override
     public boolean canExecute(ITmfTrace trace) {
-        Iterable<ITmfEventAspect<?>> cpus = TmfTraceUtils.getEventAspects(trace, TmfCpuAspect.class);
-        Iterable<ITmfEventAspect<?>>  callsites = TmfTraceUtils.getEventAspects(trace, TmfCallsiteAspect.class);
-        return trace.getUUID() != null && !Iterables.isEmpty(cpus) && !Iterables.isEmpty(callsites) && super.canExecute(trace);
+        Iterable<ITmfEventAspect<?>> devices = TmfTraceUtils.getEventAspects(trace, TmfDeviceAspect.class);
+        Iterable<ITmfEventAspect<?>> callsites = TmfTraceUtils.getEventAspects(trace, TmfCallsiteAspect.class);
+        return trace.getUUID() != null && !Iterables.isEmpty(devices) && !Iterables.isEmpty(callsites) && super.canExecute(trace);
     }
 
     @Override
@@ -60,8 +60,8 @@ public class CallsiteAnalysis extends TmfStateSystemAnalysisModule implements IT
     }
 
     @Override
-    public List<ITmfCallsite> getCallsites(String traceId, String device, long time) {
-        ITmfCallsiteIterator iterator = iterator(traceId, device, time);
+    public List<ITmfCallsite> getCallsites(String traceId, String deviceType, String deviceId, long time) {
+        ITmfCallsiteIterator iterator = iterator(traceId, deviceType, deviceId, time);
         if (iterator.hasNext()) {
             TimeCallsite next = iterator.next();
             if(next.getTime() <= time) {
@@ -72,7 +72,7 @@ public class CallsiteAnalysis extends TmfStateSystemAnalysisModule implements IT
     }
 
     @Override
-    public ITmfCallsiteIterator iterator(String traceId, String device, long initialTime) {
-        return new CallsiteIterator(getStateSystem(), traceId, device, initialTime, fSSInterner);
+    public ITmfCallsiteIterator iterator(String traceId, String deviceType, String deviceId, long initialTime) {
+        return new CallsiteIterator(getStateSystem(), traceId, deviceType, deviceId, initialTime, fSSInterner);
     }
 }

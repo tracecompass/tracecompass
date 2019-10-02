@@ -21,7 +21,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCallsiteAspect;
-import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfDeviceAspect;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
@@ -107,7 +107,7 @@ public class CallsiteStateProvider extends AbstractTmfStateProvider {
 
     @Override
     public int getVersion() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -129,19 +129,23 @@ public class CallsiteStateProvider extends AbstractTmfStateProvider {
                 devicesQuark = ssb.getQuarkAbsoluteAndAdd(DEVICES);
                 fDevicesQuark = devicesQuark;
             }
-            Iterable<ITmfEventAspect<?>> aspects = TmfTraceUtils.getEventAspects(trace, TmfCpuAspect.class);
-            String cpu = null;
-            for (ITmfEventAspect<?> aspect : aspects) {
-                Object result = aspect.resolve(event);
-                if (result != null) {
-                    cpu = result.toString();
-                    break;
+            String deviceId = null;
+            String deviceType = null;
+            for (ITmfEventAspect<?> aspect : trace.getEventAspects()) {
+                if (aspect instanceof TmfDeviceAspect) {
+                    TmfDeviceAspect deviceAspect = (TmfDeviceAspect) aspect;
+                    Object result = deviceAspect.resolve(event);
+                    if (result != null) {
+                        deviceId = result.toString();
+                        deviceType = deviceAspect.getDeviceType();
+                        break;
+                    }
                 }
             }
-            if (cpu == null) {
+            if (deviceId == null) {
                 return;
             }
-            List<String> path = Arrays.asList(String.valueOf(trace.getUUID()), cpu);
+            List<String> path = Arrays.asList(String.valueOf(trace.getUUID()), deviceType, deviceId);
             List<ITmfCallsite> callsites = null;
             for (ITmfEventAspect<?> aspect : csAspects) {
                 Object result = aspect.resolve(event);

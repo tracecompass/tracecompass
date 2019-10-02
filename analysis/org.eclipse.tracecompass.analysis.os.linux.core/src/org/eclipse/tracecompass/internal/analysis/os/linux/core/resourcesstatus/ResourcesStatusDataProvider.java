@@ -45,6 +45,9 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.analysis.callsite.ITmfCallsiteResolver;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfDeviceAspect;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
@@ -677,11 +680,17 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                 Object syscall = interval.getValue();
                 if (syscall instanceof String) {
                     retMap.put(Attributes.SYSTEM_CALL, (String) syscall);
-                    ITmfCallsiteResolver csAnalysis = TmfTraceUtils.getAnalysisModuleOfClass(getTrace(), CallsiteAnalysis.class, CallsiteAnalysis.ID);
+                    ITmfTrace trace = getTrace();
+                    ITmfCallsiteResolver csAnalysis = TmfTraceUtils.getAnalysisModuleOfClass(trace, CallsiteAnalysis.class, CallsiteAnalysis.ID);
                     if (csAnalysis != null) {
-                        List<@NonNull ITmfCallsite> callsites = csAnalysis.getCallsites(String.valueOf(getTrace().getUUID()), attributeName, interval.getStartTime() / 2L + interval.getEndTime() / 2L);
-                        if (!callsites.isEmpty()) {
-                            retMap.put(TmfStrings.source(), callsites.get(0).toString());
+                        for (ITmfEventAspect<?> aspect : trace.getEventAspects()) {
+                            if (aspect instanceof TmfCpuAspect) {
+                                TmfDeviceAspect deviceAspect = (TmfCpuAspect) aspect;
+                                List<@NonNull ITmfCallsite> callsites = csAnalysis.getCallsites(String.valueOf(trace.getUUID()), deviceAspect.getDeviceType(), attributeName, interval.getStartTime() / 2L + interval.getEndTime() / 2L);
+                                if (!callsites.isEmpty()) {
+                                    retMap.put(TmfStrings.source(), callsites.get(0).toString());
+                                }
+                            }
                         }
                     }
                 }

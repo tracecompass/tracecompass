@@ -22,9 +22,13 @@ import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackSerie
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CallGraphAnalysis;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.SymbolAspect;
+import org.eclipse.tracecompass.internal.tmf.core.analysis.callsite.CallsiteAnalysis;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfDeviceAspect;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -103,6 +107,44 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
      */
     public @Nullable Long resolveDeviceId(int quark, long timestamp) {
         return null;
+    }
+
+
+    /**
+     * Resolve the device type if applicable. A device is the hardware context
+     * the trace is running on. An example would be CPU, GPU, DSP or even FPGA.
+     * This could allow device centric analyses such as the
+     * {@link CallsiteAnalysis} to enrich the view.
+     *
+     * @implNote the default implementation is associating the callstack to a
+     *           CPU first, then any device type or "unknown" if the trace has
+     *           no device information. An implementer could override this to
+     *           give a custom implementation with ordering, for example, if
+     *           GPUs are higher priority, however, it is up to them to make
+     *           sure the data is coherent.
+     *
+     * @param quark
+     *            quark of the state system to query
+     * @param timestamp
+     *            time stamp to query
+     * @return the device type
+     * @since 1.1
+     */
+    public @Nullable String resolveDeviceType(int quark, long timestamp) {
+        ITmfTrace trace = getTrace();
+        if (trace != null) {
+            for (ITmfEventAspect<?> aspect : trace.getEventAspects()) {
+                if (aspect instanceof TmfCpuAspect) {
+                    return ((TmfCpuAspect) aspect).getDeviceType();
+                }
+            }
+            for (ITmfEventAspect<?> aspect : trace.getEventAspects()) {
+                if (aspect instanceof TmfDeviceAspect) {
+                    return ((TmfDeviceAspect) aspect).getDeviceType();
+                }
+            }
+        }
+        return "unknown"; //$NON-NLS-1$
     }
 
     /**

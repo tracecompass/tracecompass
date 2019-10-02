@@ -83,14 +83,15 @@ public class CallsiteTest {
         assertTrue(module.schedule().isOK());
         assertTrue(module.waitForCompletion());
         String uuid = String.valueOf(fTrace.getUUID());
-        List<@NonNull ITmfCallsite> cs = module.getCallsites(uuid, "0", 42);
+        String cpu = "cpu";
+        List<@NonNull ITmfCallsite> cs = module.getCallsites(uuid, cpu, "0", 42);
         assertEquals(EXPECTED, cs);
-        assertEquals(Collections.emptyList(), module.getCallsites("Hello", "0", 42));
-        assertEquals(Collections.emptyList(), module.getCallsites(uuid, "1", 42));
-        assertEquals(Collections.emptyList(), module.getCallsites(uuid, "0", 12));
-        assertEquals(EXPECTED, module.getCallsites(uuid, "0", 55));
-        assertEquals(Collections.emptyList(), module.getCallsites(uuid, "..", 42));
-        assertEquals(Collections.emptyList(), module.getCallsites(uuid, "..", 42));
+        assertEquals(Collections.emptyList(), module.getCallsites("Hello", cpu, "0", 42));
+        assertEquals(Collections.emptyList(), module.getCallsites(uuid, cpu, "1", 42));
+        assertEquals(Collections.emptyList(), module.getCallsites(uuid, cpu, "0", 12));
+        assertEquals(EXPECTED, module.getCallsites(uuid, cpu, "0", 55));
+        assertEquals(Collections.emptyList(), module.getCallsites(uuid, cpu, "..", 42));
+        assertEquals(Collections.emptyList(), module.getCallsites(uuid, cpu, "..", 42));
     }
 
     /**
@@ -106,14 +107,15 @@ public class CallsiteTest {
         assertTrue(module.waitForCompletion());
         UUID uuid = trace.getUUID();
         assertNotNull(uuid);
-        ITmfCallsiteIterator iter = module.iterator(uuid.toString(), "0", 1);
+        String cpu = "cpu";
+        ITmfCallsiteIterator iter = module.iterator(uuid.toString(), cpu, "0", 1);
         evaluateIterator(iter, 40, new TmfCallsite("fs/open.c", 0L));
         evaluateIterator(iter, 71, new TmfCallsite("fs/read_write.c", 0L));
 
-        for(int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             evaluateEmptyIterator(iter);
         }
-        iter = module.iterator(uuid.toString(), "0", 42);
+        iter = module.iterator(uuid.toString(), cpu, "0", 42);
         evaluateIterator(iter, 40, new TmfCallsite("fs/open.c", 0L));
         for (int i = 0; i < 10; i++) {
             evaluateIterator(iter, 71, new TmfCallsite("fs/read_write.c", 0L));
@@ -121,9 +123,9 @@ public class CallsiteTest {
             evaluatePrevIterator(iter, 40, new TmfCallsite("fs/open.c", 0L));
             evaluateBackEmptyIterator(iter);
         }
-        iter = module.iterator("", "0", 42);
+        iter = module.iterator("", cpu, "0", 42);
         evaluateEmptyIterator(iter);
-        iter = module.iterator(uuid.toString(), "elephant", 42);
+        iter = module.iterator(uuid.toString(), cpu, "elephant", 42);
         evaluateEmptyIterator(iter);
     }
 
@@ -134,7 +136,6 @@ public class CallsiteTest {
     private static void evaluateBackEmptyIterator(ITmfCallsiteIterator iter) {
         assertFalse(iter.hasPrevious());
     }
-
 
     private static void evaluateIterator(Iterator<@NonNull TimeCallsite> iter, long time, TmfCallsite callsite) {
         assertTrue(iter.hasNext());

@@ -27,24 +27,29 @@ public interface ITmfCallsiteResolver {
      * @param hostId
      *            a host ID, e.g. PCI1 or PCI2 in the case of multi-gpu or the
      *            trace UUID in the case of CPU
-     * @param device
-     *            a category, can be a CPU, GPU, Thread or other.
+     * @param deviceType
+     *            the device type (cpu, gpu, dsp, asic...) to query
+     * @param deviceId
+     *            an id for the device type
      * @param time
      *            the time to query at, in nanoseconds
      * @return a list of callsites. May be empty
      */
-    List<ITmfCallsite> getCallsites(String hostId, String device, long time);
+    List<ITmfCallsite> getCallsites(String hostId, String deviceType, String deviceId, long time);
 
     /**
      * Get a callsite iterator
      *
      * @param hostId
      *            hostId to iterate over
-     * @param device
-     *            the device to iterate over
+     * @param deviceType
+     *            the device type (cpu, gpu, dsp, asic...) to query
+     * @param deviceId
+     *            an id for the device type
      * @param initialTime
      *            initial time
-     * @return the iterator
+     * @return the iterator that will traverse the callsites for the given
+     *         parameters
      */
-    Iterator<TimeCallsite> iterator(String hostId, String device, long initialTime);
+    Iterator<TimeCallsite> iterator(String hostId, String deviceType, String deviceId, long initialTime);
 }

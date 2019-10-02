@@ -47,6 +47,8 @@ import org.eclipse.tracecompass.statesystem.core.interval.TmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.analysis.callsite.ITmfCallsiteResolver;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
+import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
@@ -669,21 +671,26 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
                 return new TmfModelResponse<>(null, status, statusMessage);
             }
             ITmfCallsiteResolver csAnalysis = TmfTraceUtils.getAnalysisModuleOfClass(getTrace(), CallsiteAnalysis.class, CallsiteAnalysis.ID);
-            List<ITmfCallsite> source = null;
             Object value = states.get(currentCpuRqQuark).getValue();
 
             if (value instanceof Integer) {
                 String cpuId = String.valueOf(value);
+                Map<String, String> returnValue = new LinkedHashMap<>();
+                returnValue.put(TmfStrings.cpu(), cpuId);
                 if (csAnalysis != null) {
                     Object cpuThreadObj = states.get(quark).getValue();
                     if (cpuThreadObj instanceof Integer && Objects.equals(ProcessStatus.RUN_SYTEMCALL.getStateValue().unboxInt(), cpuThreadObj)) {
-                        source = csAnalysis.getCallsites(String.valueOf(getTrace().getUUID()), cpuId, start);
+                        ITmfTrace trace = getTrace();
+                        for (ITmfEventAspect<?> aspect : trace.getEventAspects()) {
+                            if (aspect instanceof TmfCpuAspect) {
+                                TmfCpuAspect deviceAspect = (TmfCpuAspect) aspect;
+                                List<@NonNull ITmfCallsite> callsites = csAnalysis.getCallsites(String.valueOf(trace.getUUID()), deviceAspect.getDeviceType(), cpuId, start);
+                                if (!callsites.isEmpty()) {
+                                    returnValue.put(TmfStrings.source(), callsites.get(0).toString());
+                                }
+                            }
+                        }
                     }
-                }
-                Map<String, String> returnValue = new HashMap<>();
-                returnValue.put(TmfStrings.cpu(), cpuId);
-                if (source != null && !source.isEmpty()) {
-                    returnValue.put(TmfStrings.source(), source.get(0).toString());
                 }
                 return new TmfModelResponse<>(returnValue, status, statusMessage);
             }

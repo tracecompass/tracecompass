@@ -379,12 +379,13 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
                 for (Entry<@NonNull Long, @NonNull Integer> entry : md.entrySet()) {
                     Long result = analysis.resolveDeviceId(entry.getValue(), time);
                     if (result != null) {
-                        String cpuId = String.valueOf(result);
-                        tooltips.put(TmfStrings.cpu(), cpuId);
+                        String deviceId = String.valueOf(result);
+                        String deviceType = analysis.resolveDeviceType(entry.getValue(), time);
+                        tooltips.put(deviceType, deviceId);
                         ITmfTrace trace = getTrace();
                         CallsiteAnalysis csa = TmfTraceUtils.getAnalysisModuleOfClass(trace, CallsiteAnalysis.class, CallsiteAnalysis.ID);
                         if (csa != null) {
-                            List<@NonNull ITmfCallsite> res = csa.getCallsites(String.valueOf(trace.getUUID()), cpuId, time);
+                            List<@NonNull ITmfCallsite> res = csa.getCallsites(String.valueOf(trace.getUUID()), deviceType, deviceId, time);
                             if (!res.isEmpty()) {
                                 tooltips.put(TmfStrings.source(), String.valueOf(res.get(0)));
                             }
