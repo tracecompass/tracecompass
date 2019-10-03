@@ -21,12 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -78,13 +75,9 @@ public class ManifestReader {
         }
 
         try {
-            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = factory.newSchema(new StreamSource(schemaFileUrl.openStream()));
-            Validator validator = schema.newValidator();
-            validator.validate(new StreamSource(input));
-        } catch (SAXException e) {
-            throw new IOException(Messages.TracePackageExtractManifestOperation_ErrorManifestNotValid, e);
-        } catch (IOException e) {
+            Schema schema = XmlUtils.newSafeSchemaFactory().newSchema(new StreamSource(schemaFileUrl.openStream()));
+            XmlUtils.safeValidate(schema, new StreamSource(input));
+        } catch (SAXException | IOException e) {
             throw new IOException(Messages.TracePackageExtractManifestOperation_ErrorManifestNotValid, e);
         }
     }

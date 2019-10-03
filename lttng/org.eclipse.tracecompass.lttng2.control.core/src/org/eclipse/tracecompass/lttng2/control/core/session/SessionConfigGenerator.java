@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Set;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -27,8 +26,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -476,13 +473,11 @@ public final class SessionConfigGenerator {
      */
     public static IStatus sessionValidate(File sessionFile) {
         URL url = SessionConfigGenerator.class.getResource(SESSION_XSD_FILENAME);
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Source xmlSource = new StreamSource(sessionFile);
 
         try {
-            Schema schema = schemaFactory.newSchema(url);
-            Validator validator = schema.newValidator();
-            validator.validate(xmlSource);
+            Schema schema = XmlUtils.newSafeSchemaFactory().newSchema(url);
+            XmlUtils.safeValidate(schema, xmlSource);
         } catch (SAXParseException e) {
             String error = NLS.bind(Messages.SessionConfigXML_XmlParseError, e.getLineNumber(), e.getLocalizedMessage());
             Activator.getDefault().logError(error);

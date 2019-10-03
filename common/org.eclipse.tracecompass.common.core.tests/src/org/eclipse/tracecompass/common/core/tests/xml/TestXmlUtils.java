@@ -9,19 +9,29 @@
 
 package org.eclipse.tracecompass.common.core.tests.xml;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import org.eclipse.tracecompass.common.core.xml.XmlUtils;
 import org.junit.Ignore;
@@ -29,13 +39,14 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * Test XmlUtils
  *
  * @author Matthew Khouzam
  */
-public class TestTransform {
+public class TestXmlUtils {
 
     /**
      * XML Denial of service attack. When an XML parser tries to resolve the
@@ -90,6 +101,73 @@ public class TestTransform {
             "     <foo>&xxe;</foo>\n" +
             "  </soap:Body>\n" +
             "</soap:Envelope>\n";
+
+    /**
+     * XXE Schema attack
+     *
+     * source:
+     * https://depthsecurity.com/blog/exploitation-xml-external-entity-xxe-injection
+     */
+    private static final String SCHEMA_XXE_ATTACK = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
+            "<!DOCTYPE foo [ <!ELEMENT foo ANY >\n" +
+            "<!ENTITY xxe SYSTEM \"file:///etc/passwd\" >]>\n" +
+            "<creds>\n" +
+            "    <user>&xxe;</user>\n" +
+            "    <pass>mypass</pass>\n" +
+            "</creds>";
+
+    /**
+     * Disclosing the password attack
+     *
+     * source:
+     * https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Processing
+     */
+    private static final String GET_PASSWORD_ATTACK = " <?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
+            " <!DOCTYPE foo [" +
+            "   <!ELEMENT foo ANY >" +
+            "   <!ENTITY xxe SYSTEM \"file:///etc/passwd\" >]><foo>&xxe;</foo>" +
+            " <?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
+            " <!DOCTYPE foo [  \n" +
+            "   <!ELEMENT foo ANY >\n" +
+            "   <!ENTITY xxe SYSTEM \"file:///etc/shadow\" >]><foo>&xxe;</foo>\n" +
+            "\n" +
+            " <?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
+            " <!DOCTYPE foo [  \n" +
+            "   <!ELEMENT foo ANY >\n" +
+            "   <!ENTITY xxe SYSTEM \"file:///c:/boot.ini\" >]><foo>&xxe;</foo>\n" +
+            "\n" +
+            " <?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +
+            " <!DOCTYPE foo [  \n" +
+            "   <!ELEMENT foo ANY >\n" +
+            "   <!ENTITY xxe SYSTEM \"http://www.attacker.com/text.txt\" >]><foo>&xxe;</foo>";
+
+    /**
+     * Safe schema, https://www.w3schools.com/XML/schema_howto.asp
+     */
+    private static String SAFE_SCHEMA = "<?xml version=\"1.0\"?>\n" +
+            "<xs:schema xmlns:xs=\"" + XMLConstants.W3C_XML_SCHEMA_NS_URI + "\" >" +
+            "<xs:element name=\"note\"> " +
+            "  <xs:complexType> " +
+            "    <xs:sequence> " +
+            "      <xs:element name=\"to\" type=\"xs:string\"/> " +
+            "      <xs:element name=\"from\" type=\"xs:string\"/> " +
+            "      <xs:element name=\"heading\" type=\"xs:string\"/> " +
+            "      <xs:element name=\"body\" type=\"xs:string\"/> " +
+            "    </xs:sequence> " +
+            "  </xs:complexType> " +
+            "</xs:element> " +
+            "</xs:schema>";
+
+    /**
+     * Safe document, https://www.w3schools.com/XML/schema_howto.asp
+     */
+    private static String SAFE_DOCUMENT = "<?xml version=\"1.0\"?>" +
+            "<note>" +
+            "  <to>Tove</to>" +
+            "  <from>Jani</from>" +
+            "  <heading>Reminder</heading>" +
+            "  <body>Don't forget me this weekend!</body>" +
+            "</note> ";
 
     private static void testExploit(String attackVector) throws SAXException, IOException, ParserConfigurationException, TransformerException {
         Transformer newSafeTransformer = XmlUtils.newSecureTransformer();
@@ -155,4 +233,79 @@ public class TestTransform {
         testExploit(XML_INJECTION_ATTACK);
     }
 
+    /**
+     * Test schema safety
+     *
+     * @throws SAXException
+     *             failed to parse, should happen as this is an attack
+     */
+    @Test(expected = SAXException.class)
+    public void testNewSafeSchemaFactory() throws SAXException {
+        SchemaFactory schemaFactory = XmlUtils.newSafeSchemaFactory();
+        assertNotNull(schemaFactory);
+        Schema schema = XmlUtils.newSafeSchemaFactory().newSchema(new StreamSource(new StringReader(SCHEMA_XXE_ATTACK)));
+        assertNotNull(schema);
+    }
+
+    /**
+     * Test a safe validation
+     *
+     * @throws SAXException
+     *             the file failed. Should not happen
+     * @throws IOException
+     *             the file could not be read, cannot happen.
+     */
+    @Test
+    public void testSafeValidate() throws SAXException, IOException {
+        Schema newSafeSchema = XmlUtils.newSafeSchemaFactory().newSchema(new StreamSource(new StringReader(SAFE_SCHEMA)));
+        assertNotNull(newSafeSchema);
+        XmlUtils.safeValidate(newSafeSchema, new StreamSource(new StringReader(SAFE_DOCUMENT)));
+    }
+
+    /**
+     * Test an invalid validation
+     *
+     * @throws SAXException
+     *             the file failed. Should happen
+     * @throws IOException
+     *             the file could not be read, cannot happen.
+     */
+    @Test(expected = SAXException.class)
+    public void testAttackValidate() throws SAXException, IOException {
+        Schema newSafeSchema = XmlUtils.newSafeSchemaFactory().newSchema(new StreamSource(new StringReader(SAFE_SCHEMA)));
+        assertNotNull(newSafeSchema);
+        XmlUtils.safeValidate(newSafeSchema, new StreamSource(new StringReader(GET_PASSWORD_ATTACK)));
+    }
+
+    /**
+     * Test the SAX parser factory
+     *
+     * @throws SAXException
+     *             the file could not parse
+     * @throws ParserConfigurationException
+     *             the parser was badly configured, should not happen
+     * @throws IOException
+     *             permission issue, should not happen
+     */
+    @Test
+    public void testNewSafeSaxParserFactory() throws SAXException, ParserConfigurationException, IOException {
+        SAXParserFactory parserFactory = XmlUtils.newSafeSaxParserFactory();
+        assertNotNull(parserFactory);
+        XMLReader xmlReader = parserFactory.newSAXParser().getXMLReader();
+        assertNotNull(xmlReader);
+        xmlReader.parse(new InputSource(new StringReader(SAFE_DOCUMENT)));
+    }
+
+    /**
+     * Test newSafeXmlStreamReader, simple test to make sure it still works.
+     *
+     * @throws XMLStreamException
+     *             the stream cannot be read
+     */
+    @Test
+    public void newSafeXmlStreamReader() throws XMLStreamException {
+        XMLStreamReader reader = XmlUtils.newSafeXmlStreamReader(new ByteArrayInputStream(SAFE_DOCUMENT.getBytes(StandardCharsets.UTF_8)));
+        assertNotNull(reader);
+        assertEquals(1, reader.next());
+    }
 }

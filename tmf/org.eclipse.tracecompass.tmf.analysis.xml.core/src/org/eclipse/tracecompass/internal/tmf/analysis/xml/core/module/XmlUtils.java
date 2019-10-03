@@ -37,7 +37,6 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.core.runtime.CoreException;
@@ -202,7 +201,6 @@ public class XmlUtils {
     public static IStatus xmlValidate(File xmlFile) {
         URL url = TmfXmlUtils.class.getResource(XSD);
         List<@NonNull URL> xsdFiles = getExtraXsdFiles();
-        Validator validator = null;
         Schema schema = null;
 
         Source[] sources = new Source[xsdFiles.size() + 1];
@@ -210,9 +208,11 @@ public class XmlUtils {
         for (int i = 0; i < xsdFiles.size(); i++) {
             sources[i + 1] = new StreamSource(xsdFiles.get(i).toExternalForm());
         }
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
+        /*
+         * TODO: Unsecure, figure out how to harden this and do it.
+         */
         try {
+            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             /*
              * Even though the XSDs do not define a namespace, there is one default
              * namespace of null and to allow multiple XSDs to be parsed together, we must
@@ -224,19 +224,14 @@ public class XmlUtils {
             // There was an error setting up the schema, log the error
             String error = NLS.bind(Messages.XmlUtils_XsdValidationError, e.getLocalizedMessage());
             Activator.logError(error);
-            try {
-                // and fallback to the builtin schema only
-                schema = schemaFactory.newSchema(url);
-            } catch (SAXException e1) {
-                error = NLS.bind(Messages.XmlUtils_XsdValidationError, e1.getLocalizedMessage());
-                Activator.logError(error);
-                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, error, e1);
-            }
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, error, e);
         }
-        validator = schema.newValidator();
         Source xmlSource = new StreamSource(xmlFile);
         try {
-            validator.validate(xmlSource);
+            /*
+             * TODO: Unsecure, figure out how to harden this and do it.
+             */
+            schema.newValidator().validate(xmlSource);
         } catch (SAXParseException e) {
             String error = NLS.bind(Messages.XmlUtils_XmlParseError, e.getLineNumber(), e.getLocalizedMessage());
             Activator.logError(error);

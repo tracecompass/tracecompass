@@ -24,7 +24,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -82,8 +81,7 @@ public class RemoteImportProfilesReader {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = factory.newSchema(new StreamSource(
                     schemaFileUrl.openStream()));
-            Validator validator = schema.newValidator();
-            validator.validate(new StreamSource(input));
+            XmlUtils.safeValidate(schema, new StreamSource(input));
         } catch (SAXException e) {
             throw new SAXException(
                     Messages.TracePackageExtractManifestOperation_ErrorManifestNotValid,

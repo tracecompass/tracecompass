@@ -17,6 +17,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.eclipse.tracecompass.common.core.xml.XmlUtils;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.tmf.core.filter.model.ITmfFilterTreeNode;
 import org.xml.sax.SAXException;
@@ -42,13 +43,10 @@ public class TmfFilterXMLParser {
      */
     public TmfFilterXMLParser(final String uri) throws SAXException, IOException {
 
-        SAXParserFactory m_parserFactory = SAXParserFactory.newInstance();
         XMLReader saxReader = null;
         try {
-            m_parserFactory.setFeature("http://xml.org/sax/features/external-general-entities", false); //$NON-NLS-1$
-            m_parserFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false); //$NON-NLS-1$
-            m_parserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false); //$NON-NLS-1$
-            m_parserFactory.setNamespaceAware(true);
+            SAXParserFactory m_parserFactory = XmlUtils.newSafeSaxParserFactory();
+
 
             saxReader = m_parserFactory.newSAXParser().getXMLReader();
             saxReader.setContentHandler(new TmfFilterContentHandler());
