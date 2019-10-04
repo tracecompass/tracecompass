@@ -17,13 +17,13 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.datastore.core.interval.IHTInterval;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.AbstractHistoryTree;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTNode;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,11 +61,12 @@ public abstract class AbstractHistoryTreeTestBase<E extends IHTInterval, N exten
 
     /**
      * Delete the temporary history tree file after the test
+     * @throws IOException failed to delete file
      */
     @After
-    public void cleanup() {
+    public void cleanup() throws IOException {
         if (fTempFile != null) {
-            fTempFile.delete();
+            Files.delete(fTempFile.toPath());
         }
     }
 
@@ -96,7 +97,7 @@ public abstract class AbstractHistoryTreeTestBase<E extends IHTInterval, N exten
         }
 
         assertNotNull(ht);
-        return ht;
+        return Objects.requireNonNull(ht);
     }
 
     /**
@@ -247,7 +248,7 @@ public abstract class AbstractHistoryTreeTestBase<E extends IHTInterval, N exten
         assertTrue(node.getNodeFreeSpace() < initialFreeSpace - 2 * limit);
 
         /* Add elements up to ~40% */
-        start = fillValues(ht, limit, start);
+        fillValues(ht, limit, start);
         assertTrue(node.getNodeFreeSpace() > initialFreeSpace - 4 * limit);
         assertTrue(node.getNodeFreeSpace() < initialFreeSpace - 3 * limit);
 
@@ -377,7 +378,7 @@ public abstract class AbstractHistoryTreeTestBase<E extends IHTInterval, N exten
 
         /* Create a third branch */
         ht.insert(createInterval(time, time + 1));
-        time = fillNextLeafNode(ht, time + 1);
+        fillNextLeafNode(ht, time + 1);
         assertEquals(6, ht.getNodeCount());
         assertEquals(3, ht.getDepth());
 
