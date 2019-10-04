@@ -49,6 +49,7 @@ import org.eclipse.tracecompass.internal.common.core.Activator;
  */
 public class BufferedBlockingQueue<T> implements Iterable<T> {
 
+    private static final String BUFFERED_QUEUE_INTERRUPTED = "Buffered queue interrupted"; //$NON-NLS-1$
     private final BlockingDeque<Deque<T>> fInnerQueue;
     private final Lock fInputLock = new ReentrantLock();
     private final Lock fOutputLock = new ReentrantLock();
@@ -148,7 +149,8 @@ public class BufferedBlockingQueue<T> implements Iterable<T> {
             }
 
         } catch (InterruptedException e) {
-            Activator.instance().logError("Buffered queue interrupted", e); //$NON-NLS-1$
+            Activator.instance().logError(BUFFERED_QUEUE_INTERRUPTED, e);
+            Thread.currentThread().interrupt();
         } finally {
             fInputLock.unlock();
         }
@@ -180,7 +182,10 @@ public class BufferedBlockingQueue<T> implements Iterable<T> {
                  * the next buffer in the queue. The loop will block if the
                  * inner queue is empty, releasing the lock while it waits.
                  */
-                fInnerQueue.remove();
+                Deque<T> value = fInnerQueue.remove();
+                if (!value.isEmpty()) {
+                    Activator.instance().logError("Queue chunk not empty " + value); //$NON-NLS-1$
+                }
                 while (fInnerQueue.isEmpty()) {
                     fInnerQueueNotEmpty.await();
                 }
@@ -191,7 +196,9 @@ public class BufferedBlockingQueue<T> implements Iterable<T> {
             fSize.decrementAndGet();
             return element;
         } catch (InterruptedException e) {
-            Activator.instance().logError("Buffered queue interrupted", e); //$NON-NLS-1$
+            Activator.instance().logError(BUFFERED_QUEUE_INTERRUPTED, e);
+            Thread.currentThread().interrupt();
+            // won't happen
             throw new IllegalStateException(e);
         } finally {
             fOutputLock.unlock();
@@ -217,7 +224,10 @@ public class BufferedBlockingQueue<T> implements Iterable<T> {
                  * the next buffer in the queue. The loop will block if the
                  * inner queue is empty, releasing the lock while it waits.
                  */
-                fInnerQueue.remove();
+                Deque<T> value = fInnerQueue.remove();
+                if (!value.isEmpty()) {
+                    Activator.instance().logError("Queue chunk not empty " + value); //$NON-NLS-1$
+                }
                 while (fInnerQueue.isEmpty()) {
                     fInnerQueueNotEmpty.await();
                 }
@@ -226,7 +236,9 @@ public class BufferedBlockingQueue<T> implements Iterable<T> {
             /* Our implementation guarantees this output buffer is not empty. */
             return checkNotNull(fOutputBuffer.peek());
         } catch (InterruptedException e) {
-            Activator.instance().logError("Buffered queue interrupted", e); //$NON-NLS-1$
+            Activator.instance().logError(BUFFERED_QUEUE_INTERRUPTED, e);
+            Thread.currentThread().interrupt();
+            // won't happen
             throw new IllegalStateException(e);
         } finally {
             fOutputLock.unlock();

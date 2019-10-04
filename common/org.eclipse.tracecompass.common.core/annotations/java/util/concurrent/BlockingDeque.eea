@@ -1,0 +1,4 @@
+class java/util/concurrent/BlockingDeque
+remove
+ ()TE;
+ ()T1E;
