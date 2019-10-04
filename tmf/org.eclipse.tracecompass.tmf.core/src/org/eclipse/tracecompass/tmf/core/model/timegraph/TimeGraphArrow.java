@@ -78,7 +78,7 @@ public class TimeGraphArrow implements ITimeGraphArrow {
      *            Duration
      * @param style
      *            Style
-     * @since 5.1
+     * @since 5.2
      */
     public TimeGraphArrow(long sourceId, long destinationId, long time, long duration, OutputElementStyle style) {
         fSourceId = sourceId;

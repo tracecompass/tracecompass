@@ -70,7 +70,7 @@ public class TimeLinkEvent extends TimeEvent implements ILinkEvent {
      *            The source entry of this event
      * @param dst
      *            The destination entry of this event
-     * @since 5.1
+     * @since 5.2
      */
     public TimeLinkEvent(ITimeGraphArrow arrowModel, ITimeGraphEntry src, ITimeGraphEntry dst) {
         super(src, new TimeGraphState(arrowModel.getStartTime(), arrowModel.getDuration(), null, arrowModel.getStyle()));

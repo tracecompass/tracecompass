@@ -93,7 +93,7 @@ public class MarkerEvent extends TimeEvent implements IMarkerEvent {
      *            The category of the marker
      * @param foreground
      *            true if the marker is drawn in foreground, and false otherwise
-     * @since 5.1
+     * @since 5.2
      */
     public MarkerEvent(Annotation annotation, ITimeGraphEntry entry, String category, boolean foreground) {
         super(entry, new TimeGraphState(annotation.getTime(), annotation.getDuration(), annotation.getLabel(), annotation.getStyle()));

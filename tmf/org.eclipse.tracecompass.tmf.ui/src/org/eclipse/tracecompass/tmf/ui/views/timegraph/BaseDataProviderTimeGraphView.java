@@ -598,7 +598,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      *
      * @param menuManager
      *            a menuManager to fill
-     * @since 5.1
+     * @since 5.2
      */
     protected void fillTimeEventContextMenu(@NonNull IMenuManager menuManager) {
         ISelection selection = getSite().getSelectionProvider().getSelection();

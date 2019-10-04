@@ -76,7 +76,7 @@ public class NamedTimeEvent extends TimeEvent {
      *            This event's label
      * @param stateModel
      *            {@link ITimeGraphState} that represents this time event
-     * @since 5.1
+     * @since 5.2
      */
     public NamedTimeEvent(ITimeGraphEntry entry, String label, ITimeGraphState stateModel) {
         super(entry, stateModel);

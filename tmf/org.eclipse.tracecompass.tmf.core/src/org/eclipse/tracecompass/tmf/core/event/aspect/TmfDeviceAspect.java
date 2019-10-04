@@ -14,7 +14,7 @@ package org.eclipse.tracecompass.tmf.core.event.aspect;
  * hardware context. Typically an event will only resolve by one device aspect.
  *
  * @author Matthew Khouzam
- * @since 5.1
+ * @since 5.2
  */
 public abstract class TmfDeviceAspect implements ITmfEventAspect<Integer> {
 

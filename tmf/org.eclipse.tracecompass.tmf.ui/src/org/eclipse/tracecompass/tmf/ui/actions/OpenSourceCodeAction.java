@@ -101,6 +101,7 @@ public class OpenSourceCodeAction extends Action {
      *            the callsite
      * @param shell
      *            the shell
+     * @since 5.2
      */
     public OpenSourceCodeAction(String text, ITmfCallsite callsite, Shell shell) {
         super(text);

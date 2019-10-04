@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
  * style refer to a parent style key.
  *
  * @author Patrick Tasse
- * @since 5.1
+ * @since 5.2
  */
 public class StyleManager {
 

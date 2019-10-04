@@ -17,7 +17,7 @@ import org.eclipse.tracecompass.tmf.core.dataprovider.X11ColorUtils;
  * Color utility to manipulate {@link RGB} and Hex string
  *
  * @author Simon Delisle
- * @since 5.1
+ * @since 5.2
  */
 public final class ColorUtils {
 

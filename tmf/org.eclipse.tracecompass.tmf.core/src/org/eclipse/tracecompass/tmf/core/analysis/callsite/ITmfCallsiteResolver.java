@@ -18,7 +18,7 @@ import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
  * Callsite source, will give callsites for a given device at a given time
  *
  * @author Matthew Khouzam
- * @since 5.1
+ * @since 5.2
  */
 public interface ITmfCallsiteResolver {
     /**

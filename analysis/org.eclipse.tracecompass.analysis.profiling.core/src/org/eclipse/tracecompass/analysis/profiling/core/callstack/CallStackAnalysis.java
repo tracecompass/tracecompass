@@ -103,7 +103,7 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
      * @param timestamp
      *            time stamp to query
      * @return the device ID
-     * @since 1.1
+     * @since 1.2
      */
     public @Nullable Long resolveDeviceId(int quark, long timestamp) {
         return null;
@@ -128,7 +128,7 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
      * @param timestamp
      *            time stamp to query
      * @return the device type
-     * @since 1.1
+     * @since 1.2
      */
     public @Nullable String resolveDeviceType(int quark, long timestamp) {
         ITmfTrace trace = getTrace();

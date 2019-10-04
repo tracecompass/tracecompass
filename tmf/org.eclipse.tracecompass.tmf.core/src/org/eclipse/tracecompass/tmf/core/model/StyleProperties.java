@@ -14,7 +14,7 @@ package org.eclipse.tracecompass.tmf.core.model;
  * {@link OutputElementStyle}
  *
  * @author Simon Delisle
- * @since 5.1
+ * @since 5.2
  */
 public final class StyleProperties {
 

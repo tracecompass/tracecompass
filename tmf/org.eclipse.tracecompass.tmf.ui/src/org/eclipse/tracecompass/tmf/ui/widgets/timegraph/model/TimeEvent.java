@@ -105,7 +105,7 @@ public class TimeEvent implements ITimeEvent {
      *            {@link ITimeGraphState} that represents this time event
      * @param entry
      *            The entry to which this time event is assigned
-     * @since 5.1
+     * @since 5.2
      */
     public TimeEvent(ITimeGraphEntry entry, ITimeGraphState stateModel) {
         fEntry = entry;
@@ -151,7 +151,7 @@ public class TimeEvent implements ITimeEvent {
      * Get the model associated with this time event
      *
      * @return State model
-     * @since 5.1
+     * @since 5.2
      */
     public ITimeGraphState getStateModel() {
         return fModel;

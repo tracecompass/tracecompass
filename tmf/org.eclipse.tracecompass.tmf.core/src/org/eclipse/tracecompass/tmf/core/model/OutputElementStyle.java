@@ -21,7 +21,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * can add or override style properties.
  *
  * @author Simon Delisle
- * @since 5.1
+ * @since 5.2
  */
 public class OutputElementStyle {
 

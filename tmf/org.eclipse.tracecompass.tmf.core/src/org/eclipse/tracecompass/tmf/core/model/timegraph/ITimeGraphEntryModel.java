@@ -56,7 +56,7 @@ public interface ITimeGraphEntryModel extends ITmfTreeDataModel, IElementResolve
     }
 
     /**
-     * @since 5.1
+     * @since 5.2
      */
     @Override
     @Deprecated

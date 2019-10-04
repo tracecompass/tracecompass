@@ -54,7 +54,7 @@ public interface ITimeEventStyleStrings {
     /**
      * Mapping of {@link #symbolStyle()} to {@link StyleProperties#SYMBOL_TYPE}
      *
-     * @since 5.1
+     * @since 5.2
      */
     Map<String, String> SYMBOL_TYPES = ImmutableMap.<String, String>builder()
             .put(IYAppearance.SymbolStyle.DIAMOND, SymbolType.DIAMOND)

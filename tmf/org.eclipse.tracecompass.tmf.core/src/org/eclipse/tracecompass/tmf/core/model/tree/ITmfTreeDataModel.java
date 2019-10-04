@@ -64,7 +64,7 @@ public interface ITmfTreeDataModel {
      * Get the style associated with this model
      *
      * @return {@link OutputElementStyle} describing the style of this model
-     * @since 5.1
+     * @since 5.2
      */
     default @Nullable OutputElementStyle getStyle() {
         return null;

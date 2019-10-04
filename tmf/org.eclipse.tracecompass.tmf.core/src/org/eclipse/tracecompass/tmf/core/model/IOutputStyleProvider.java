@@ -23,7 +23,7 @@ import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
  * XY series)
  *
  * @author Simon Delisle
- * @since 5.1
+ * @since 5.2
  */
 public interface IOutputStyleProvider {
 

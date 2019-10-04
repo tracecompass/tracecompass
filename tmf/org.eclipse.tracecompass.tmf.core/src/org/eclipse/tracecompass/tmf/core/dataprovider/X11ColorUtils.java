@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.internal.tmf.core.Activator;
  * colors. See {@linktourl https://en.wikipedia.org/wiki/X11_color_names}
  *
  * @author Simon Delisle
- * @since 5.1
+ * @since 5.2
  */
 @NonNullByDefault
 public class X11ColorUtils {

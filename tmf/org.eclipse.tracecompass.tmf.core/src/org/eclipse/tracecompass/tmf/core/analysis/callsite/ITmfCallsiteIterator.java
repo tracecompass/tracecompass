@@ -16,7 +16,7 @@ import java.util.NoSuchElementException;
  * Callsite iterator
  *
  * @author Matthew Khouzam
- * @since 5.1
+ * @since 5.2
  */
 public interface ITmfCallsiteIterator extends Iterator<TimeCallsite> {
 

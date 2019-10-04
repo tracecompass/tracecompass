@@ -87,7 +87,7 @@ public class TimeGraphState implements ITimeGraphState {
      *            State label
      * @param style
      *            Style
-     * @since 5.1
+     * @since 5.2
      */
     public TimeGraphState(long time, long duration, @Nullable String label, @Nullable OutputElementStyle style) {
         fStartTime = time;

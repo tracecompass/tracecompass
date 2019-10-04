@@ -16,7 +16,7 @@ import java.util.Map;
  * {@link OutputElementStyle} attached to a style key.
  *
  * @author Simon Delisle
- * @since 5.1
+ * @since 5.2
  */
 public class OutputStyleModel {
 

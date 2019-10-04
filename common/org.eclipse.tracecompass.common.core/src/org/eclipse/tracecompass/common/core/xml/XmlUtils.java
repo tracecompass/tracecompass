@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -35,7 +35,7 @@ import org.xml.sax.SAXNotSupportedException;
 
 /**
  * XML Utilities. Useful to avoid copy-pasting secure code generation. Utils
- * here should be OASP compliant.
+ * here should be OWASP compliant.
  *
  * @author Matthew Khouzam
  * @since 3.2
@@ -150,7 +150,7 @@ public final class XmlUtils {
      * @return an XML stream reader
      * @throws XMLStreamException
      *             if the stream could not be read or is badly formatted
-     * @since 4.1
+     * @since 4.2
      */
     public static @Nullable XMLStreamReader newSafeXmlStreamReader(InputStream inputStream) throws XMLStreamException {
         XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -168,7 +168,7 @@ public final class XmlUtils {
      * @throws SAXException
      *             parse exception with
      *             {@link XMLConstants#W3C_XML_SCHEMA_NS_URI}
-     * @since 4.1
+     * @since 4.2
      */
     public static SchemaFactory newSafeSchemaFactory() throws SAXException {
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -191,7 +191,7 @@ public final class XmlUtils {
      * @throws IOException
      *             the source failed validation due to file reasons, e.g.
      *             permissions
-     * @since 4.1
+     * @since 4.2
      */
     public static void safeValidate(Schema schema, Source source) throws SAXException, IOException {
         Validator validator = schema.newValidator();
@@ -212,7 +212,7 @@ public final class XmlUtils {
      * @throws SAXNotSupportedException
      *             When the underlying XMLReader does recognize the property
      *             name but does not support it
-     * @since 4.1
+     * @since 4.2
      */
     public static SAXParserFactory newSafeSaxParserFactory() throws SAXNotRecognizedException, SAXNotSupportedException, ParserConfigurationException {
         SAXParserFactory parserFactory = SAXParserFactory.newInstance();

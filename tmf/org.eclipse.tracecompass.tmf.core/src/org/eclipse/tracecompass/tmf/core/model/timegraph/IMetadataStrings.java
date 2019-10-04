@@ -12,7 +12,7 @@ package org.eclipse.tracecompass.tmf.core.model.timegraph;
 /**
  * String constants to be used for the metadata of {@link IElementResolver}.
  *
- * @since 5.1
+ * @since 5.2
  * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface IMetadataStrings {

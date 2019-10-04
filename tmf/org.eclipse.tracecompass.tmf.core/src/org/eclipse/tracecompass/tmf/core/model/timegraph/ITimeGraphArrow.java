@@ -59,7 +59,7 @@ public interface ITimeGraphArrow {
      * Get the style associated with this state
      *
      * @return {@link OutputElementStyle} describing the style of this state
-     * @since 5.1
+     * @since 5.2
      */
     default @Nullable OutputElementStyle getStyle() {
         return null;

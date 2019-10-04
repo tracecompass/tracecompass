@@ -18,7 +18,7 @@ import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
  * Class to store callsite and the time when it was called.
  *
  * @author Bernd Hufmann
- * @since 5.1
+ * @since 5.2
  */
 public class TimeCallsite {
     private final long fTime;
