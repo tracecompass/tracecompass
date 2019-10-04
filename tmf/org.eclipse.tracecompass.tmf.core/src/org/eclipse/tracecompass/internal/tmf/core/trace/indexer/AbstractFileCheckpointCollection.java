@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
@@ -466,8 +467,13 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
     @Override
     public void delete() {
         dispose(true);
-        if (fFile.exists()) {
-            fFile.delete();
+        File file = fFile;
+        if (file.exists()) {
+            try {
+                Files.delete(file.toPath());
+            } catch (IOException e) {
+                Activator.logError(e.getMessage(), e);
+            }
         }
     }
 
