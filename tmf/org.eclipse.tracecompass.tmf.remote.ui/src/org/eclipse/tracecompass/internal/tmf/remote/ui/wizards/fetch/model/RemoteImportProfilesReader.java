@@ -81,6 +81,9 @@ public class RemoteImportProfilesReader {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = factory.newSchema(new StreamSource(
                     schemaFileUrl.openStream()));
+            if (schema == null) {
+                throw new SAXException("Schema failed to create"); //$NON-NLS-1$
+            }
             XmlUtils.safeValidate(schema, new StreamSource(input));
         } catch (SAXException e) {
             throw new SAXException(

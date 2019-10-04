@@ -13,7 +13,6 @@
 package org.eclipse.tracecompass.internal.tmf.remote.ui.wizards.fetch.model;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -349,7 +348,7 @@ public class RemoteImportTracesOperation extends TmfWorkspaceModifyOperation {
             tempFile = intermediateTempFolder.getFile(destination.lastSegment());
             tempFile.create(null, true, SubMonitor.convert(monitor));
             intermediateFile = tempFile.getLocation().toFile();
-            intermediateFile.createNewFile();
+            Files.createFile(intermediateFile.toPath());
             copy(in, intermediateFile, length, monitor);
             if (ArchiveUtil.isArchiveFile(intermediateFile)) {
                 // Select all the elements in the archive
@@ -381,13 +380,15 @@ public class RemoteImportTracesOperation extends TmfWorkspaceModifyOperation {
                 // super fast on the same drive
                 Files.move(intermediateFile.toPath(), destination.toFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
-        } catch (CoreException | InvocationTargetException | InterruptedException e) {
+        } catch (CoreException | InvocationTargetException e) {
             Activator.getDefault().logError(e.getMessage(), e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         } finally {
-            if (intermediateFile != null && intermediateFile.exists()) {
-                intermediateFile.delete();
-            }
             try {
+                if (intermediateFile != null && intermediateFile.exists()) {
+                    Files.delete(intermediateFile.toPath());
+                }
                 if (tempFile != null && tempFile.exists()) {
                     tempFile.delete(true, SubMonitor.convert(monitor));
                 }
@@ -400,7 +401,7 @@ public class RemoteImportTracesOperation extends TmfWorkspaceModifyOperation {
         }
     }
 
-    private static void copy(InputStream in, File intermediateFile, long length, SubMonitor monitor) throws IOException, FileNotFoundException {
+    private static void copy(InputStream in, File intermediateFile, long length, SubMonitor monitor) throws IOException {
         try (OutputStream out = new FileOutputStream(intermediateFile)) {
             monitor.setWorkRemaining((int) (length / BYTES_PER_KB));
             byte[] buf = new byte[BYTES_PER_KB * BUFFER_IN_KB];
