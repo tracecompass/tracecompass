@@ -12,7 +12,10 @@
 
 package org.eclipse.tracecompass.common.core;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -28,6 +31,7 @@ import org.eclipse.jdt.annotation.Nullable;
 public final class NonNullUtils {
 
     private NonNullUtils() {
+        // do nothing
     }
 
     /**
@@ -65,10 +69,7 @@ public final class NonNullUtils {
      *             If the reference was actually null
      */
     public static <T> @NonNull T checkNotNull(@Nullable T obj) {
-        if (obj == null) {
-            throw new NullPointerException();
-        }
-        return obj;
+        return requireNonNull(obj);
     }
 
     /**
@@ -85,10 +86,7 @@ public final class NonNullUtils {
      * @since 2.0
      */
     public static <T> Stream<@NonNull T> checkNotNullContents(@Nullable Stream<T> stream) {
-        if (stream == null) {
-            throw new NullPointerException();
-        }
-        return checkNotNull(stream.<@NonNull T> map(t -> checkNotNull(t)));
+        return requireNonNull(requireNonNull(stream).<@NonNull T> map(Objects::requireNonNull));
     }
 
     /**
@@ -102,10 +100,7 @@ public final class NonNullUtils {
      * @since 2.0
      */
     public static <T> @NonNull T[] checkNotNullContents(T @Nullable [] array) {
-        if (array == null) {
-            throw new NullPointerException();
-        }
-        Arrays.stream(array).forEach(elem -> checkNotNull(elem));
+        Arrays.stream(requireNonNull(array)).forEach(Objects::requireNonNull);
         @SuppressWarnings("null")
         @NonNull T[] ret = (@NonNull T[]) array;
         return ret;
