@@ -57,7 +57,7 @@ public class TmfXmlStateValueCu implements IDataDrivenCompilationUnit {
      * {@link IBaseQuarkProvider#CURRENT_SCENARIO_BASE_QUARK} and should not
      * generate a state value
      */
-    public static TmfXmlStateValueCu CURRENT_SCENARIO_QUARK = new TmfXmlStateValueCu(() -> {
+    public static final TmfXmlStateValueCu CURRENT_SCENARIO_QUARK = new TmfXmlStateValueCu(() -> {
         throw new UnsupportedOperationException("This should never do anything"); //$NON-NLS-1$
     });
 

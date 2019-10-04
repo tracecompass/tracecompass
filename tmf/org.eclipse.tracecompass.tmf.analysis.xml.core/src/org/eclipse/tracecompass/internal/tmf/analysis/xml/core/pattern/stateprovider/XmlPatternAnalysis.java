@@ -11,6 +11,8 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.statepro
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,6 +26,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.compile.TmfXmlPatternCu;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.segment.TmfXmlPatternSegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
@@ -123,6 +126,7 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
         try {
             fInitialized.await();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             return false;
         }
         return fInitializationSucceeded;
@@ -146,7 +150,12 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
 
         if (!segmentStoreFile.exists()) {
             fStateSystemModule.cancel();
-            stateSystemFile.delete();
+            try {
+                Files.delete(stateSystemFile.toPath());
+            } catch (IOException e) {
+                // log it, failing to delete doesn't garantee failure
+                Activator.logWarning(e.getMessage(), e);
+            }
         }
 
         IStatus segmentStoreStatus = fSegmentStoreModule.schedule();
@@ -243,8 +252,7 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
             return null;
         }
         String directory = TmfTraceManager.getSupplementaryFileDir(trace);
-        File file = new File(directory + filename);
-        return file;
+        return new File(directory + filename);
     }
 
     private String getStateSystemFileName() {
@@ -351,13 +359,19 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
         TmfAbstractAnalysisModule module = fStateSystemModule;
         if (module != null) {
             for (Entry<String, String> entry : module.getProperties().entrySet()) {
-                properties.put(Objects.requireNonNull(Messages.PatternAnalysis_StateSystemPrefix + ' ' +entry.getKey()), entry.getValue());
+                String value = entry.getValue();
+                if (value != null) {
+                    properties.put(Objects.requireNonNull(Messages.PatternAnalysis_StateSystemPrefix + ' ' + entry.getKey()), value);
+                }
             }
         }
         module = fSegmentStoreModule;
         if (module != null) {
             for (Entry<String, String> entry : module.getProperties().entrySet()) {
-                properties.put(Objects.requireNonNull(Messages.PatternAnalysis_SegmentStorePrefix + ' ' +entry.getKey()), entry.getValue());
+                String value = entry.getValue();
+                if (value != null) {
+                    properties.put(Objects.requireNonNull(Messages.PatternAnalysis_SegmentStorePrefix + ' ' + entry.getKey()), value);
+                }
             }
         }
         return properties;

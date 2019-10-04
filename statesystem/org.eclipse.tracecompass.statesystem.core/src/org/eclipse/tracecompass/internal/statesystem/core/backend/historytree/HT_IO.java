@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.Objects;
@@ -149,7 +150,7 @@ public class HT_IO {
         if (newFile) {
             /* Create a new empty History Tree file */
             if (historyTreeFile.exists()) {
-                historyTreeFile.delete();
+                Files.delete(historyTreeFile.toPath());
                 /* delete can fail as long as file no longer exists */
                 if (historyTreeFile.exists()) {
                     throw new IOException("Cannot delete existing file at " + //$NON-NLS-1$

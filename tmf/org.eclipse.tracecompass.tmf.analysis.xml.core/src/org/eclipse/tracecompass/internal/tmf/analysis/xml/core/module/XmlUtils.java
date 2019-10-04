@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -396,7 +397,11 @@ public class XmlUtils {
             File file = files.get(name);
             if (file != null) {
                 removeXmlOutput(file.getAbsolutePath());
-                file.delete();
+                try {
+                    Files.delete(file.toPath());
+                } catch (IOException e) {
+                    Activator.logError(e.getMessage(), e);
+                }
             }
         }
     }
@@ -459,7 +464,10 @@ public class XmlUtils {
     private static IStatus copyXmlFile(File fromFile, File toFile) {
         try {
             if (!toFile.exists()) {
-                toFile.createNewFile();
+                boolean success = toFile.createNewFile();
+                if (!success) {
+                    throw new IllegalStateException("File " + toFile.getAbsolutePath() + " failed to create."); //$NON-NLS-1$ //$NON-NLS-2$
+                }
             }
         } catch (IOException e) {
             String error = Messages.XmlUtils_ErrorCopyingFile;
