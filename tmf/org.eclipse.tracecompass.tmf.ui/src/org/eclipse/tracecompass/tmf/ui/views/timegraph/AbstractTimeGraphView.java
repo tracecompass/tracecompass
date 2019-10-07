@@ -618,13 +618,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 boolean hasSavedFilter = fTimeEventFilterDialog != null && fTimeEventFilterDialog.hasActiveSavedFilters();
                 getTimeGraphViewer().setSavedFilterStatus(hasSavedFilter);
 
-                if (getZoomStartTime() <= fStartTime && getZoomEndTime() >= fEndTime && !isFilterActive) {
-                    // Fall back on the full event list
-                    applyResults(() -> fEntries.forEach(entry -> entry.setZoomedEventList(null)));
-                } else {
-                    Iterable<@NonNull TimeGraphEntry> incorrectSample = Iterables.filter(fEntries, entry -> isFilterActive || isFilterCleared || !sampling.equals(entry.getSampling()));
-                    zoomEntries(incorrectSample, getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
-                }
+                Iterable<@NonNull TimeGraphEntry> incorrectSample = Iterables.filter(fEntries, entry -> isFilterActive || isFilterCleared || !sampling.equals(entry.getSampling()));
+                zoomEntries(incorrectSample, getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
             }
             List<ILinkEvent> computedLinks;
             try (TraceCompassLogUtils.ScopeLog linkLog = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingLinks")) { //$NON-NLS-1$
