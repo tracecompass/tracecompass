@@ -58,6 +58,13 @@ public class DataProviderParameterUtils {
     public static final String REQUESTED_COLUMN_IDS_KEY = "requested_table_column_ids"; //$NON-NLS-1$
 
     /**
+     * Requested element key
+     *
+     * @since 5.2
+     */
+    public static final String REQUESTED_ELEMENT_KEY = "requested_element"; //$NON-NLS-1$
+
+    /**
      * Key to extract isFiltered from parameters map
      */
     public static final String FILTERED_KEY = "isFiltered"; //$NON-NLS-1$

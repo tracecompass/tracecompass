@@ -12,7 +12,7 @@ package org.eclipse.tracecompass.tmf.core.model.timegraph;
  * Interface to get and set properties. This represents a group of items known
  * as properties. It provides a caching method for filtering elements, storing
  * the results as properties.
- *
+ * <p>
  * A developer should use this to store the results of tests to be able to
  * exchange these with another process that can act upon this "report".
  *

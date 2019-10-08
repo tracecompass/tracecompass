@@ -16,6 +16,7 @@ package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.tmf.core.model.ITimeElement;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
@@ -33,7 +34,7 @@ public class TimeEvent implements ITimeEvent {
     /** TimeGraphEntry matching this time event */
     protected ITimeGraphEntry fEntry;
 
-    private final ITimeGraphState fModel;
+    private final ITimeElement fModel;
 
     /** Beginning timestamp of this time event */
     protected long fTime;
@@ -90,7 +91,7 @@ public class TimeEvent implements ITimeEvent {
      * @param activeProperties
      *            The active properties of the event represented by a bitmask
      *            value. Each bit represents a property. Available properties
-     *            could be find in {@link IFilterProperty}.
+     *            can be found in {@link IFilterProperty}.
      * @since 4.0
      */
     public TimeEvent(ITimeGraphEntry entry, long time, long duration, int value, int activeProperties) {
@@ -107,7 +108,7 @@ public class TimeEvent implements ITimeEvent {
      *            The entry to which this time event is assigned
      * @since 5.2
      */
-    public TimeEvent(ITimeGraphEntry entry, ITimeGraphState stateModel) {
+    public TimeEvent(ITimeGraphEntry entry, ITimeElement stateModel) {
         fEntry = entry;
         fTime = stateModel.getStartTime();
         fDuration = stateModel.getDuration();
@@ -150,10 +151,10 @@ public class TimeEvent implements ITimeEvent {
     /**
      * Get the model associated with this time event
      *
-     * @return State model
+     * @return Model
      * @since 5.2
      */
-    public ITimeGraphState getStateModel() {
+    public ITimeElement getModel() {
         return fModel;
     }
 

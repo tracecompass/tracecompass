@@ -13,8 +13,7 @@
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
 import org.eclipse.swt.graphics.RGBA;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.Annotation;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IAnnotation;
 
 /**
  * TimeEvent implementation for marker events
@@ -86,7 +85,7 @@ public class MarkerEvent extends TimeEvent implements IMarkerEvent {
      * Constructor
      *
      * @param annotation
-     *            {@link Annotation} that represent this marker event
+     *            {@link IAnnotation} that represent this marker event
      * @param entry
      *            The entry to which this marker event is assigned
      * @param category
@@ -95,8 +94,8 @@ public class MarkerEvent extends TimeEvent implements IMarkerEvent {
      *            true if the marker is drawn in foreground, and false otherwise
      * @since 5.2
      */
-    public MarkerEvent(Annotation annotation, ITimeGraphEntry entry, String category, boolean foreground) {
-        super(entry, new TimeGraphState(annotation.getTime(), annotation.getDuration(), annotation.getLabel(), annotation.getStyle()));
+    public MarkerEvent(IAnnotation annotation, ITimeGraphEntry entry, String category, boolean foreground) {
+        super(entry, annotation);
         fCategory = category;
         fLabel = annotation.getLabel();
         fColor = new RGBA(0, 0, 0, 255);

@@ -13,7 +13,6 @@
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
 
 /**
  * TimeEvent implementation for events that do not involve only one entry, they
@@ -73,7 +72,7 @@ public class TimeLinkEvent extends TimeEvent implements ILinkEvent {
      * @since 5.2
      */
     public TimeLinkEvent(ITimeGraphArrow arrowModel, ITimeGraphEntry src, ITimeGraphEntry dst) {
-        super(src, new TimeGraphState(arrowModel.getStartTime(), arrowModel.getDuration(), null, arrowModel.getStyle()));
+        super(src, arrowModel);
         fDestEntry = dst;
     }
 

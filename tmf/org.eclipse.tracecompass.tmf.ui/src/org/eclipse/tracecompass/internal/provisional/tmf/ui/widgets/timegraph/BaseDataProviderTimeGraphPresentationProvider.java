@@ -12,37 +12,30 @@ package org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
+import java.util.function.BiFunction;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
+import org.eclipse.tracecompass.tmf.core.model.IOutputElement;
 import org.eclipse.tracecompass.tmf.core.model.IOutputStyleProvider;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 import org.eclipse.tracecompass.tmf.core.model.OutputStyleModel;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
-import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
-import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
 import org.eclipse.tracecompass.tmf.ui.model.StyleManager;
-import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
@@ -61,7 +54,7 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
 
     private static final OutputElementStyle TRANSPARENT_STYLE = new OutputElementStyle(null, ImmutableMap.of());
 
-    private final Set<ITimeGraphDataProvider<?>> fProviders = new HashSet<>();
+    private final Map<ITimeGraphDataProvider<?>, BiFunction<ITimeEvent, Long, Map<String, String>>> fProviders = new LinkedHashMap<>();
     private Map<String, Integer> fKeyToIndex = new HashMap<>();
     private @Nullable Map<String, OutputElementStyle> fStylesMap = null;
     private @Nullable StateItem @Nullable[] fStateTable = null;
@@ -81,10 +74,12 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
      *
      * @param provider
      *            Data provider to add to this presentation provider
+     * @param tooltipResolver
+     *            Tooltip resolver for this data provider
      */
-    public void addProvider(ITimeGraphDataProvider<?> provider) {
+    public void addProvider(ITimeGraphDataProvider<?> provider, BiFunction<ITimeEvent, Long, Map<String, String>> tooltipResolver) {
         synchronized (fProviders) {
-            fProviders.add(provider);
+            fProviders.put(provider, tooltipResolver);
         }
         Display.getDefault().asyncExec(() -> refresh());
     }
@@ -104,7 +99,7 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
         if (stylesMap == null) {
             stylesMap = new LinkedHashMap<>();
             synchronized (fProviders) {
-                for (ITimeGraphDataProvider<?> provider : fProviders) {
+                for (ITimeGraphDataProvider<?> provider : fProviders.keySet()) {
                     if (provider instanceof IOutputStyleProvider) {
                         TmfModelResponse<@NonNull OutputStyleModel> styleResponse = ((IOutputStyleProvider) provider).fetchStyle(getStyleParameters(), null);
                         OutputStyleModel styleModel = styleResponse.getModel();
@@ -188,17 +183,6 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
         return INVISIBLE;
     }
 
-    /**
-     * Get the provider associated with this entry
-     *
-     * @param entry
-     *            Time Graph Entry
-     * @return The data provider
-     */
-    protected @Nullable ITimeGraphDataProvider<? extends TimeGraphEntryModel> getProvider(TimeGraphEntry entry) {
-        return BaseDataProviderTimeGraphView.getProvider(entry);
-    }
-
     @Override
     @NonNullByDefault({})
     public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event) {
@@ -208,30 +192,14 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
     @Override
     @NonNullByDefault({})
     public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime) {
-        ITimeGraphEntry entry = event.getEntry();
-
-        if (event instanceof TimeEvent && !(event instanceof NullTimeEvent) && entry instanceof TimeGraphEntry) {
-            ITmfTreeDataModel model = ((TimeGraphEntry) entry).getEntryModel();
-            ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = getProvider((TimeGraphEntry) entry);
-            if (provider != null) {
-                return getTooltip(provider, model.getId(), hoverTime);
+        if (event != null && !(event instanceof NullTimeEvent)) {
+            Map<String, String> tooltipInfo = new LinkedHashMap<>();
+            synchronized (fProviders) {
+                fProviders.values().forEach(tooltipResolver -> tooltipInfo.putAll(tooltipResolver.apply(event, hoverTime)));
             }
+            return tooltipInfo;
         }
-
         return Collections.emptyMap();
-    }
-
-    private static Map<String, String> getTooltip(ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider, long id, long hoverTime) {
-        SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(Collections.singletonList(hoverTime), Collections.singleton(id));
-        TmfModelResponse<Map<String, String>> response = provider.fetchTooltip(FetchParametersUtils.selectionTimeQueryToMap(filter), null);
-        Map<String, String> tooltip = response.getModel();
-
-        if (tooltip == null) {
-            return Collections.emptyMap();
-        }
-
-        Map<String, String> retMap = new LinkedHashMap<>(tooltip);
-        return retMap;
     }
 
     @Override
@@ -241,7 +209,7 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
         }
 
         if (event instanceof TimeEvent) {
-            ITimeGraphState model = ((TimeEvent) event).getStateModel();
+            IOutputElement model = ((TimeEvent) event).getModel();
             OutputElementStyle eventStyle = model.getStyle();
             if (eventStyle == null && event.getEntry() instanceof TimeGraphEntry) {
                 eventStyle = ((TimeGraphEntry) event.getEntry()).getEntryModel().getStyle();

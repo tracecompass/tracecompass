@@ -9,7 +9,7 @@
 
 package org.eclipse.tracecompass.tmf.core.model.timegraph;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.model.OutputElement;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 
 /**
@@ -18,13 +18,12 @@ import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
  * @author Simon Delisle
  * @since 4.0
  */
-public class TimeGraphArrow implements ITimeGraphArrow {
+public class TimeGraphArrow extends OutputElement implements ITimeGraphArrow {
     private final long fSourceId;
     private final long fDestinationId;
     private final long fStartTime;
     private final long fDuration;
     private final int fValue;
-    private final @Nullable OutputElementStyle fStyle;
 
     /**
      * Constructor
@@ -41,12 +40,12 @@ public class TimeGraphArrow implements ITimeGraphArrow {
      *            value payload associated with this arrow
      */
     public TimeGraphArrow(long sourceId, long destinationId, long time, long duration, int value) {
+        super(null);
         fSourceId = sourceId;
         fDestinationId = destinationId;
         fStartTime = time;
         fDuration = duration;
         fValue = value;
-        fStyle = null;
     }
 
     /**
@@ -81,12 +80,12 @@ public class TimeGraphArrow implements ITimeGraphArrow {
      * @since 5.2
      */
     public TimeGraphArrow(long sourceId, long destinationId, long time, long duration, OutputElementStyle style) {
+        super(style);
         fSourceId = sourceId;
         fDestinationId = destinationId;
         fStartTime = time;
         fDuration = duration;
         fValue = Integer.MIN_VALUE;
-        fStyle = style;
     }
 
     @Override
@@ -112,10 +111,5 @@ public class TimeGraphArrow implements ITimeGraphArrow {
     @Override
     public int getValue() {
         return fValue;
-    }
-
-    @Override
-    public @Nullable OutputElementStyle getStyle() {
-        return fStyle;
     }
 }

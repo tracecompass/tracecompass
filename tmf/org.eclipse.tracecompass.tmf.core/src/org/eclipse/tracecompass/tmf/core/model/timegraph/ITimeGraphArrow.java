@@ -9,8 +9,10 @@
 
 package org.eclipse.tracecompass.tmf.core.model.timegraph;
 
-import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.ITimeElement;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * Model of a arrow used in a time graph data provider.
@@ -18,7 +20,7 @@ import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
  * @author Simon Delisle
  * @since 4.0
  */
-public interface ITimeGraphArrow {
+public interface ITimeGraphArrow extends ITimeElement {
 
     /**
      * Gets the source {@link ITimeGraphEntryModel}'s ID
@@ -34,34 +36,8 @@ public interface ITimeGraphArrow {
      */
     long getDestinationId();
 
-    /**
-     * Gets the start time
-     *
-     * @return The start time
-     */
-    long getStartTime();
-
-    /**
-     * Gets the duration
-     *
-     * @return The duration
-     */
-    long getDuration();
-
-    /**
-     * Gets the arrow value
-     *
-     * @return value associated to this arrow
-     */
-    int getValue();
-
-    /**
-     * Get the style associated with this state
-     *
-     * @return {@link OutputElementStyle} describing the style of this state
-     * @since 5.2
-     */
-    default @Nullable OutputElementStyle getStyle() {
-        return null;
+    @Override
+    default Multimap<String, Object> getMetadata() {
+        return HashMultimap.create();
     }
 }

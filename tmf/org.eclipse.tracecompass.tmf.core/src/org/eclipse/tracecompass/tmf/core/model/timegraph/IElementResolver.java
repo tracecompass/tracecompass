@@ -22,9 +22,9 @@ import com.google.common.collect.Multimap;
 /**
  * Element Resolver, can be used to convert an element to a set of key value
  * pairs.
- *
+ * <p>
  * Possible key strings to use in the map are provider by this interface
- *
+ * <p>
  * Candidates to use this are
  * <ul>
  * <li>States</li>

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,6 +25,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
@@ -33,9 +35,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.Annotation;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.Annotation.AnnotationType;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationCategoriesModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IAnnotation.AnnotationType;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.BaseDataProviderTimeGraphPresentationProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -45,6 +47,7 @@ import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
+import org.eclipse.tracecompass.tmf.core.model.IOutputElement;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
@@ -174,7 +177,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         }
         ITimeGraphPresentationProvider presentationProvider = getPresentationProvider();
         if (presentationProvider instanceof BaseDataProviderTimeGraphPresentationProvider) {
-            ((BaseDataProviderTimeGraphPresentationProvider) presentationProvider).addProvider(dataProvider);
+            ((BaseDataProviderTimeGraphPresentationProvider) presentationProvider).addProvider(dataProvider, getTooltipResolver(dataProvider));
         }
         boolean complete = false;
         while (!complete && !monitor.isCanceled()) {
@@ -662,13 +665,18 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      *            The time of the tooltip.
      * @param item
      *            The unique key of the tooltip entry.
+     * @param element
+     *            The model element of the tooltip.
      * @return Map of parameters for fetchTooltip
      * @since 5.2
      */
-    protected @NonNull Map<@NonNull String, @NonNull Object> getFetchTooltipParameters(long time, long item) {
+    protected @NonNull Map<@NonNull String, @NonNull Object> getFetchTooltipParameters(long time, long item, @Nullable IOutputElement element) {
         @NonNull Map<@NonNull String, @NonNull Object> parameters = new HashMap<>();
         parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, Collections.singletonList(time));
         parameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, Collections.singletonList(item));
+        if (element != null) {
+            parameters.put(DataProviderParameterUtils.REQUESTED_ELEMENT_KEY, element);
+        }
         return parameters;
     }
 
@@ -697,6 +705,26 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, times);
         parameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, items);
         return parameters;
+    }
+
+    private BiFunction<ITimeEvent, Long, Map<String, String>> getTooltipResolver(ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider) {
+        return (event, time) -> {
+            Long entryId = null;
+            synchronized (fEntries) {
+                entryId = fEntryIds.get(event.getEntry(), provider);
+            }
+            if (entryId == null) {
+                return Collections.emptyMap();
+            }
+            IOutputElement element = null;
+            if (event instanceof TimeEvent) {
+                element = ((TimeEvent) event).getModel();
+            }
+            Map<@NonNull String, @NonNull Object> parameters = getFetchTooltipParameters(time, entryId, element);
+            TmfModelResponse<Map<String, String>> response = provider.fetchTooltip(parameters, new NullProgressMonitor());
+            Map<String, String> tooltip = response.getModel();
+            return (tooltip == null) ? Collections.emptyMap() : tooltip;
+        };
     }
 
     @Override
@@ -757,7 +785,8 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                     TimeGraphEntry entry = (TimeGraphEntry) firstElement;
                     ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = getProvider(entry);
                     long timestamp = getTimeGraphViewer().getSelectionBegin();
-                    Map<@NonNull String, @NonNull Object> parameters = getFetchTooltipParameters(timestamp, entry.getEntryModel().getId());
+                    IOutputElement element = ((TimeEvent) entryObject).getModel();
+                    Map<@NonNull String, @NonNull Object> parameters = getFetchTooltipParameters(timestamp, entry.getEntryModel().getId(), element);
                     IContributionItem contribItem = createOpenSourceCodeAction(provider.fetchTooltip(parameters, new NullProgressMonitor()).getModel());
                     if (contribItem != null) {
                         menuManager.add(contribItem);
