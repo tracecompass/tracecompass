@@ -1,0 +1,4 @@
+Error parsing command line argument:
+org.apache.commons.cli.UnrecognizedOptionException: Unrecognized option: -faulty
+
+%HELP%

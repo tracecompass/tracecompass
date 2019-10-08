@@ -37,10 +37,20 @@ public class Messages extends NLS {
     /** Version string */
     public static String SplahScreen_VersionString;
 
-    /** Malformed command */
-    public static String CliParser_MalformedCommand;
-    /** Unkown command */
-    public static String CliParser_UnknownCommand;
+    /** Help description */
+    public static String CliParser_HelpDescription;
+    /** List capabilities description */
+    public static String CliParser_ListCapabilitiesDescription;
+    /** Open trace description */
+    public static String CliParser_OpenTraceDescription;
+    /** List of supported tracetypes text */
+    public static String CliParser_ListSupportedTraceTypes;
+    /** Help intro text */
+    public static String CliParser_HelpTextIntro;
+    /** Error parsing arguments text */
+    public static String CliParser_ErrorParsingArguments;
+    /** Warning for legacy --open option */
+    public static String CliParser_WarningCliPrefix;
 
     static {
         // initialize resource bundle

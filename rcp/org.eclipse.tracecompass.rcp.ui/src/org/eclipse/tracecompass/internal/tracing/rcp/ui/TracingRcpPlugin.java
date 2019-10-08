@@ -13,11 +13,8 @@
 package org.eclipse.tracecompass.internal.tracing.rcp.ui;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.tracecompass.internal.tracing.rcp.ui.cli.CliParser;
-import org.eclipse.tracecompass.internal.tracing.rcp.ui.cli.TracingRCPCliException;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -47,7 +44,6 @@ public class TracingRcpPlugin extends AbstractUIPlugin {
 
     // The shared instance
     private static TracingRcpPlugin fPlugin;
-    private static CliParser fCli;
 
     // ------------------------------------------------------------------------
     // Constructor(s)
@@ -95,28 +91,12 @@ public class TracingRcpPlugin extends AbstractUIPlugin {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         fPlugin = this;
-        String args[] = Platform.getCommandLineArgs();
-        fCli = null;
-        try {
-            fCli = new CliParser(args);
-        } catch (TracingRCPCliException e) {
-            logError(e.getMessage());
-        }
     }
 
     @Override
     public void stop(BundleContext context) throws Exception {
         fPlugin = null;
         super.stop(context);
-    }
-
-    /**
-     * Gets the command line parser
-     *
-     * @return the command line parser
-     */
-    public CliParser getCli() {
-        return fCli;
     }
 
     /**

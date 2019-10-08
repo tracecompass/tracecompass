@@ -1,0 +1,4 @@
+Error parsing command line argument:
+org.apache.commons.cli.MissingArgumentException: Missing argument for option: o
+
+%HELP%

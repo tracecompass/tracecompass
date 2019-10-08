@@ -15,12 +15,14 @@ import java.io.File;
 import java.net.URL;
 import java.text.MessageFormat;
 
+import org.apache.commons.cli.ParseException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.internal.tracing.rcp.ui.cli.CliParser;
 import org.eclipse.tracecompass.internal.tracing.rcp.ui.messages.Messages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -64,6 +66,19 @@ public class Application implements IApplication {
                 String workspace = TracingRcpPlugin.getWorkspaceRoot() + File.separator + TracingRcpPlugin.WORKSPACE_NAME;
                 // set location to workspace
                 fInstanceLoc.set(new URL("file", null, workspace), false); //$NON-NLS-1$
+            }
+
+            /*
+             * Parse the command line options.
+             */
+            try {
+                CliParser.getInstance().parse(Platform.getCommandLineArgs());
+                if (CliParser.getInstance().handleEarlyOption()) {
+                    return IApplication.EXIT_OK;
+                }
+            } catch(ParseException e) {
+                TracingRcpPlugin.getDefault().logError("Error parsing command line arguments", e); //$NON-NLS-1$
+                return IApplication.EXIT_OK;
             }
 
             if (!fInstanceLoc.lock()) {

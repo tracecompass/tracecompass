@@ -1,0 +1,4 @@
+usage: How to use the command line options:
+ -h,--help          Shows the help.
+ -l,--list          List capabilities.
+ -o,--open <path>   Opens the specified trace.

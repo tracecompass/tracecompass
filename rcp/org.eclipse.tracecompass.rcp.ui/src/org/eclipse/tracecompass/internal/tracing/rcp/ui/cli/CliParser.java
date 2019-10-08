@@ -12,28 +12,61 @@
 
 package org.eclipse.tracecompass.internal.tracing.rcp.ui.cli;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tracing.rcp.ui.TracingRcpPlugin;
 import org.eclipse.tracecompass.internal.tracing.rcp.ui.messages.Messages;
+import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
+import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
+import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 
 /**
  * Command line parser
  *
  * @author Matthew Khouzam
+ * @author Bernd Hufmann
  */
 public class CliParser {
 
-    private static final String NOUI_ARG = "--NOUI"; //$NON-NLS-1$
+    /**
+     * The CLI Parser instance
+     */
+    private static @Nullable CliParser INSTANCE = null;
 
-    private static final String OPEN_ARG = "--open"; //$NON-NLS-1$
+    private static final String CLI_ARGS_PREFIX = "--cli"; //$NON-NLS-1$
 
-    private final Map<String, String> params = new HashMap<>();
+    // Help
+    private static final String OPTION_HELP_SHORT = "h"; //$NON-NLS-1$
+    private static final String OPTION_HELP_LONG = "help"; //$NON-NLS-1$
+    private static final String OPTION_HELP_DESCRIPTION = Messages.CliParser_HelpDescription;
 
-    /** Open key     */
-    public static final String OPEN_FILE_LOCATION = ".,-=open=-,."; //$NON-NLS-1$
-    /** No ui key    */
-    public static final String NO_UI = ".,-=noui=-,."; //$NON-NLS-1$
+    private static final String OPTION_COMMAND_LINE_OPEN_SHORT = "o"; //$NON-NLS-1$
+    private static final String OPTION_COMMAND_LINE_OPEN_LONG = "open"; //$NON-NLS-1$
+    private static final String OPTION_COMMAND_LINE_OPEN_DESCRIPTION = Messages.CliParser_OpenTraceDescription;
+
+    private static final String OPTION_COMMAND_LINE_LIST_SHORT = "l"; //$NON-NLS-1$
+    private static final String OPTION_COMMAND_LINE_LIST_LONG = "list"; //$NON-NLS-1$
+    private static final String OPTION_COMMAND_LINE_LIST_DESCRIPTION = Messages.CliParser_ListCapabilitiesDescription;
+
+    private final Options fOptions;
+
+    private CommandLine fLineParser;
 
     /**
      * Constructor
@@ -43,33 +76,141 @@ public class CliParser {
      * @throws TracingRCPCliException
      *             an error occurred parsing the cli
      */
-    public CliParser(final String[] args) throws TracingRCPCliException {
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals(OPEN_ARG)) {
-                put(OPEN_FILE_LOCATION, args, i);
-                // skip since we have two args
-                i++;
-            }
-            else if (args[i].equals(NOUI_ARG)) {
-                params.put(NO_UI, new String());
-            }
-        }
-    }
+    private CliParser() {
+        fOptions = new Options();
+        fOptions.addOption(OPTION_HELP_SHORT, OPTION_HELP_LONG, false, OPTION_HELP_DESCRIPTION);
+        fOptions.addOption(OPTION_COMMAND_LINE_LIST_SHORT, OPTION_COMMAND_LINE_LIST_LONG, false, OPTION_COMMAND_LINE_LIST_DESCRIPTION);
 
-    private void put(String key, String[] args, int pos) throws TracingRCPCliException {
-        if (args.length <= pos) {
-            throw new TracingRCPCliException(Messages.CliParser_MalformedCommand + ':' + ' ' + args[pos]);
-        }
-        params.put(key, args[pos + 1]);
+        OptionBuilder.withArgName("path"); //$NON-NLS-1$
+        OptionBuilder.hasArg();
+        OptionBuilder.withLongOpt(OPTION_COMMAND_LINE_OPEN_LONG);
+        OptionBuilder.withDescription(OPTION_COMMAND_LINE_OPEN_DESCRIPTION);
+        Option openOpt = OptionBuilder.create(OPTION_COMMAND_LINE_OPEN_SHORT);
+
+        fOptions.addOption(openOpt);
     }
 
     /**
-     * Get a parameter from the parsed command line
-     * @param key OPEN_FILE_LOCATION or NO_UI
-     * @return the value of the parameter, can be null
+     * Get the instance of this class
+     *
+     * @return The instance
      */
-    public String getArgument(String key) {
-        return params.get(key);
+    public static synchronized CliParser getInstance() {
+        CliParser instance = INSTANCE;
+        if (instance == null) {
+            instance = new CliParser();
+            INSTANCE = instance;
+        }
+        return instance;
+    }
+
+    /**
+     * Parse the command line arguments
+     *
+     * @param args
+     *            The arguments of the application
+     * @throws ParseException
+     *             If there were exceptions parsing the arguments
+     */
+    public void parse(String[] args) throws ParseException {
+        List<String> tcArgs = new ArrayList<>();
+        boolean found = false;
+        boolean addNext = false;
+        for (String arg : args) {
+            if (arg.equals(CLI_ARGS_PREFIX)) {
+                found = true;
+                continue;
+            }
+            if (found) {
+                tcArgs.add(arg);
+            } else if (arg.equals("--open")) { //$NON-NLS-1$
+                // Legacy parsing of the --open option, without preceding --cli
+                System.out.println(Messages.CliParser_WarningCliPrefix);
+                tcArgs.add(arg);
+                addNext = true;
+            } else if (addNext) {
+                tcArgs.add(arg);
+                addNext = false;
+            }
+        }
+        CommandLineParser cmdLineParser = new PosixParser();
+        try {
+            fLineParser = cmdLineParser.parse(fOptions, tcArgs.toArray(new String[0]), false);
+        } catch(ParseException e) {
+            // Print to screen the error and help text and re-throw the exception
+            System.out.println(Messages.CliParser_ErrorParsingArguments);
+            System.out.println(e);
+            System.out.println();
+            printHelpText();
+            throw e;
+        }
+    }
+
+    /**
+     * Handle early command line option. If any option is handled at this point,
+     * the method will return true and the application will exit.
+     *
+     * @return <code>true</code> if an option was handled at this stage, or
+     *         <code>false</code> otherwise, indicating to continue loading the
+     *         application.
+     */
+    public boolean handleEarlyOption() {
+        if (fLineParser.hasOption(OPTION_HELP_SHORT)) {
+            printHelpText();
+            return true;
+        }
+        if (fLineParser.hasOption(OPTION_COMMAND_LINE_LIST_SHORT)) {
+            System.out.println(Messages.CliParser_ListSupportedTraceTypes);
+            System.out.println();
+            for (TraceTypeHelper helper : TmfTraceType.getTraceTypeHelpers()) {
+                System.out.println(helper.getName() + ": " + helper.getTraceTypeId()); //$NON-NLS-1$
+                System.out.println();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Print the help text for the command line
+     */
+    public void printHelpText() {
+        HelpFormatter helpFormatter = new HelpFormatter();
+        helpFormatter.printHelp(Messages.CliParser_HelpTextIntro, fOptions);
+    }
+
+    /**
+     * Handle the command line options. The Trace Compass application will load
+     * as usual and those options will act upon it.
+     */
+    public void handleLateOptions() {
+        if (fLineParser.hasOption(OPTION_COMMAND_LINE_OPEN_SHORT)) {
+            IProject defaultProject = createDefaultProject();
+            openTraceIfNecessary(defaultProject, fLineParser.getOptionValue(OPTION_COMMAND_LINE_OPEN_SHORT));
+        }
+
+    }
+
+    private static void openTraceIfNecessary(IProject project, String trace) {
+        String traceToOpen = trace;
+        String userHome = System.getProperty("user.home"); //$NON-NLS-1$
+        // In case the application was not started on the shell, expand ~ to home directory
+        if ((traceToOpen != null) && traceToOpen.startsWith("~/") && (userHome != null)) { //$NON-NLS-1$
+            traceToOpen = traceToOpen.replaceFirst("^~", userHome); //$NON-NLS-1$
+        }
+
+        if (traceToOpen != null) {
+            try {
+                TmfTraceFolder destinationFolder = TmfProjectRegistry.getProject(project, true).getTracesFolder();
+                TmfOpenTraceHelper.openTraceFromPath(destinationFolder, traceToOpen, TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell());
+            } catch (CoreException e) {
+                TracingRcpPlugin.getDefault().logError(e.getMessage());
+            }
+        }
+    }
+
+    private static IProject createDefaultProject() {
+        return TmfProjectRegistry.createProject(TmfCommonConstants.DEFAULT_TRACE_PROJECT_NAME, null, new NullProgressMonitor());
     }
 
 }

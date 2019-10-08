@@ -1,0 +1,1 @@
+Warning: command line options should now be preceded by the --cli argument. See --help for details.

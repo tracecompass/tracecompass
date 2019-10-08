@@ -13,13 +13,10 @@
 package org.eclipse.tracecompass.internal.tracing.rcp.ui;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.tracecompass.internal.tracing.rcp.ui.cli.CliParser;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
-import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -99,30 +96,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     public void postWindowCreate() {
         super.postWindowOpen();
         TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(new PerspectiveListener());
-        IProject defaultProject = createDefaultProject();
         hideActionSets();
-        openTraceIfNecessary(defaultProject);
-    }
-
-
-
-    private static void openTraceIfNecessary(IProject project) {
-        String traceToOpen = TracingRcpPlugin.getDefault().getCli().getArgument(CliParser.OPEN_FILE_LOCATION);
-        String userHome = System.getProperty("user.home"); //$NON-NLS-1$
-        // In case the application was not started on the shell, expand ~ to home directory
-        if ((traceToOpen != null) && traceToOpen.startsWith("~/") && (userHome != null)) { //$NON-NLS-1$
-            traceToOpen = traceToOpen.replaceFirst("^~", userHome); //$NON-NLS-1$
-        }
-
-        if (traceToOpen != null) {
-            try {
-                TmfTraceFolder destinationFolder = TmfProjectRegistry.getProject(project, true).getTracesFolder();
-                TmfOpenTraceHelper.openTraceFromPath(destinationFolder, traceToOpen, TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell());
-            } catch (CoreException e) {
-                TracingRcpPlugin.getDefault().logError(e.getMessage());
-            }
-
-        }
+        CliParser.getInstance().handleLateOptions();
     }
 
     // ------------------------------------------------------------------------

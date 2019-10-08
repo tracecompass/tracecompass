@@ -1,0 +1,4 @@
+List of supported tracetypes:
+
+Generic Experiment: org.eclipse.linuxtools.tmf.core.experiment.generic
+

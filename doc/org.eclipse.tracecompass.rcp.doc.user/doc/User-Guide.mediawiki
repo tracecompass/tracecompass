@@ -41,10 +41,16 @@ the computation of the confidence level are trace type specific. After
 successful validation, the trace will be opened with the detected trace type.
 
 Alternatively the user can launch '''tracecompass''' with the command-line
-argument '''--open <trace-path>'''. The trace will then automatically open 
+argument '''--cli --open <trace-path>'''. The trace will then automatically open 
 using the same algorithm than described above.
 
 In both of the above cases, the trace will be linked to the default project.
+
+== Run From Command Line ==
+
+Trace Compass has some command line options that can be used to act on the application at startup. The argument list must be preceded by the '''--cli''' option.
+
+To list all the command line options, one can get the help text by running '''tracecompass --cli --help''' or '''tracecompass --cli -h'''.
 
 = Trace Compass Incubator =
 
