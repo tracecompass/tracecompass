@@ -428,8 +428,6 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
                     mask |= IFilterProperty.DIMMED;
                 } else if (!status && property == IFilterProperty.EXCLUDE) {
                     mask |= IFilterProperty.EXCLUDE;
-                } else if (status){
-                    mask |= property;
                 }
             }
             series.addPoint(segment.getStart(), segment.getLength(), mask);
