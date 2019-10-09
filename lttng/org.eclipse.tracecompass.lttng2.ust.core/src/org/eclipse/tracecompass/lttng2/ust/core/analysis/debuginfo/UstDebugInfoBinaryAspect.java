@@ -131,6 +131,7 @@ public class UstDebugInfoBinaryAspect implements ITmfEventAspect<BinaryCallsite>
     }
 
     private UstDebugInfoBinaryAspect() {
+      // Do nothing
     }
 
     @Override
@@ -195,5 +196,18 @@ public class UstDebugInfoBinaryAspect implements ITmfEventAspect<BinaryCallsite>
             binaryCallsite = BINARY_CALLSITE_CACHE.getUnchecked(traceBinarySymbol);
         }
         return (binaryCallsite.isPresent() ? binaryCallsite.get() : null);
+    }
+
+    /**
+     * Invalidate all symbols in the cache. This should be called when UST debug
+     * info configuration changes.
+     *
+     * @since 4.1
+     */
+    public static void invalidateSymbolCache() {
+        // Invalidate all symbols in the cache, even if only one trace has
+        // changed. It won't happen very often, so it's not a very big
+        // performance hit compared to the performance gain of the cache
+        BINARY_CALLSITE_CACHE.invalidateAll();
     }
 }

@@ -282,5 +282,6 @@ public class LttngUstTrace extends CtfTmfTrace implements ILttngTrace{
      */
     public void setSymbolProviderConfig(@NonNull SymbolProviderConfig config) {
         fCurrentProviderConfig = config;
+        UstDebugInfoBinaryAspect.invalidateSymbolCache();
     }
 }
