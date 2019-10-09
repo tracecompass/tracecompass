@@ -17,10 +17,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
+import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency.SystemCallLatencyScatterView;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -31,6 +34,7 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.XYDataProviderBaseTest;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
 import org.eclipse.ui.IViewPart;
 import org.junit.Test;
@@ -48,8 +52,8 @@ import org.swtchart.LineStyle;
 public class SystemCallLatencyScatterChartViewTest extends XYDataProviderBaseTest {
 
     private static final @NonNull String TITLE = "Duration vs Time";
-    private static final @NonNull String SERIES1_NAME = "bug446190/clock_gettime";
-    private static final @NonNull String SERIES2_NAME = "bug446190/ioctl";
+    private static final @NonNull String SERIES1_NAME = "clock_gettime";
+    private static final @NonNull String SERIES2_NAME = "ioctl";
 
     private static final String VIEW_ID = SystemCallLatencyScatterView.ID;
 
@@ -96,9 +100,51 @@ public class SystemCallLatencyScatterChartViewTest extends XYDataProviderBaseTes
         assertEquals(1, items.length);
     }
 
+    private class IdFinder implements Result<Long> {
+        private final String fSeriesName;
+
+        public IdFinder(String seriesName) {
+            fSeriesName = seriesName;
+        }
+
+        @Override
+        public Long run() {
+            SWTBotTreeItem[] items = getSWTBotView().bot().tree().getAllItems();
+
+            for (SWTBotTreeItem item : items) {
+                Long id = recurseFindItem(item);
+                if (id >= 0) {
+                    return id;
+                }
+            }
+            return -1L;
+        }
+
+        private Long recurseFindItem(SWTBotTreeItem item) {
+            if (fSeriesName.equals(item.getText())) {
+                Object data = item.widget.getData();
+                if (data instanceof TmfGenericTreeEntry) {
+                    ITmfTreeDataModel model = ((TmfGenericTreeEntry<?>) data).getModel();
+                    if (model != null) {
+                        return model.getId();
+                    }
+                }
+            }
+            for (SWTBotTreeItem child : item.getItems()) {
+                Long id = recurseFindItem(child);
+                if (id >= 0) {
+                    return id;
+                }
+            }
+            return -1L;
+        }
+    }
+
     private void verifyChartStyle() {
-        verifySeriesStyle(SERIES1_NAME, ISeries.SeriesType.LINE, null, LineStyle.NONE, false);
-        verifySeriesStyle(SERIES2_NAME, ISeries.SeriesType.LINE, null, LineStyle.NONE, false);
+        Long entryId = UIThreadRunnable.syncExec(new IdFinder(SERIES1_NAME));
+        verifySeriesStyle(String.valueOf(entryId), ISeries.SeriesType.LINE, null, LineStyle.NONE, false);
+        entryId = UIThreadRunnable.syncExec(new IdFinder(SERIES2_NAME));
+        verifySeriesStyle(String.valueOf(entryId), ISeries.SeriesType.LINE, null, LineStyle.NONE, false);
     }
 
     @Override

@@ -440,14 +440,12 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
 
     private static class Series {
         private final long fId;
-        private final String fName;
         private final List<Long> fXValues = new ArrayList<>();
         private final List<Double> fYValues = new ArrayList<>();
         private final List<Integer> fProperties = new ArrayList<>();
 
-        public Series(long id, String name) {
+        public Series(long id) {
             fId = id;
-            fName = name;
         }
 
         public void addPoint(long x, double y, int properties) {
@@ -457,7 +455,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         }
 
         public SeriesModel build() {
-            SeriesModelBuilder builder = new SeriesModel.SeriesModelBuilder(getId(), getName(), Longs.toArray(fXValues), Doubles.toArray(fYValues));
+            SeriesModelBuilder builder = new SeriesModel.SeriesModelBuilder(getId(), String.valueOf(getId()), Longs.toArray(fXValues), Doubles.toArray(fYValues));
             builder.setProperties(Ints.toArray(fProperties)).build();
             return builder.setProperties(Ints.toArray(fProperties)).build();
         }
@@ -466,9 +464,6 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             return fId;
         }
 
-        private String getName() {
-            return fName;
-        }
     }
 
     private Map<String, Series> initTypes(String prefix, TimeQueryFilter filter) {
@@ -484,7 +479,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             }
 
             String name = prefix + string;
-            segmentTypes.put(name, new Series(id, name));
+            segmentTypes.put(name, new Series(id));
         }
         return segmentTypes;
     }

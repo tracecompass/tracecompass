@@ -57,7 +57,7 @@ public class AbstractSegmentStoreScatterChartTreeViewer extends AbstractSelectTr
                 TmfGenericTreeEntry<TmfTreeDataModel> entry = (TmfGenericTreeEntry<TmfTreeDataModel>) element;
                 if (!entry.hasChildren()) {
                     // ensures that only leaf nodes return images
-                    return getLegendImage(getFullPath(entry));
+                    return getLegendImage(String.valueOf(entry.getModel().getId()));
                 }
             }
             return null;
