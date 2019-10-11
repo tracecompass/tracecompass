@@ -62,11 +62,7 @@ public class TimeGraphState extends OutputElement implements ITimeGraphState {
      *            State label
      */
     public TimeGraphState(long time, long duration, int value, String label) {
-        super(null);
-        fStartTime = time;
-        fDuration = duration;
-        fValue = value;
-        fLabel = label;
+        this(time, duration, value, label, null);
     }
 
     /**
@@ -83,10 +79,29 @@ public class TimeGraphState extends OutputElement implements ITimeGraphState {
      * @since 5.2
      */
     public TimeGraphState(long time, long duration, @Nullable String label, @Nullable OutputElementStyle style) {
+        this(time, duration, Integer.MIN_VALUE, label, style);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param time
+     *            Time
+     * @param duration
+     *            State duration
+     * @param value
+     *            Type of state (event type)
+     * @param label
+     *            State label
+     * @param style
+     *            Style
+     * @since 5.2
+     */
+    public TimeGraphState(long time, long duration, int value, @Nullable String label, @Nullable OutputElementStyle style) {
         super(style);
         fStartTime = time;
         fDuration = duration;
-        fValue = Integer.MIN_VALUE;
+        fValue = value;
         fLabel = label;
     }
 
