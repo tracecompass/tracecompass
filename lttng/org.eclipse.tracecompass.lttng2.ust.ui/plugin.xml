@@ -62,9 +62,9 @@
    <extension
          point="org.eclipse.tracecompass.tmf.core.symbolProvider">
       <providerFactory
-            class="org.eclipse.tracecompass.internal.lttng2.ust.ui.analysis.debuginfo.UstDebugInfoSymbolProviderFactory"
+            class="org.eclipse.tracecompass.internal.lttng2.ust.ui.analysis.debuginfo.UstDebugInfoUiSymbolProviderFactory"
             id="org.eclipse.tracecompass.lttng2.ust.ui.analysis.debuginfo.providerFactory"
-            priority="50">
+            priority="51">
       </providerFactory>
    </extension>
 </plugin>

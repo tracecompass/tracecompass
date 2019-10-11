@@ -18,12 +18,12 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 /**
- * Factory to create {@link UstDebugInfoSymbolProvider}. Provided to TMF via
+ * Factory to create {@link UstDebugInfoUiSymbolProvider}. Provided to TMF via
  * the extension point. Only works with LTTng-UST traces.
  *
  * @author Alexandre Montplaisir
  */
-public class UstDebugInfoSymbolProviderFactory implements ISymbolProviderFactory {
+public class UstDebugInfoUiSymbolProviderFactory implements ISymbolProviderFactory {
 
     @Override
     public @Nullable ISymbolProvider createProvider(ITmfTrace trace) {
@@ -35,7 +35,7 @@ public class UstDebugInfoSymbolProviderFactory implements ISymbolProviderFactory
                 UstDebugInfoAnalysisModule.class, UstDebugInfoAnalysisModule.ID);
 
         if (module != null && trace instanceof LttngUstTrace) {
-            return new UstDebugInfoSymbolProvider((LttngUstTrace) trace);
+            return new UstDebugInfoUiSymbolProvider((LttngUstTrace) trace);
         }
         return null;
     }

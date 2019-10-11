@@ -63,4 +63,12 @@
             id="org.eclipse.tracecompass.lttng2.ust.core.analysis.memory.UstMemoryUsageDataProvider">
       </dataProviderFactory>
    </extension>
+   <extension
+         point="org.eclipse.tracecompass.tmf.core.symbolProvider">
+      <providerFactory
+            class="org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo.UstDebugInfoSymbolProviderFactory"
+            id="org.eclipse.tracecompass.lttng2.ust.core.analysis.debuginfo.providerFactory"
+            priority="50">
+      </providerFactory>
+   </extension>
 </plugin>

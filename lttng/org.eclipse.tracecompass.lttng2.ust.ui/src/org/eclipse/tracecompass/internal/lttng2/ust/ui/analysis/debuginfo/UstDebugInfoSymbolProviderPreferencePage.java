@@ -57,7 +57,7 @@ public class UstDebugInfoSymbolProviderPreferencePage extends AbstractSymbolProv
      * @param provider
      *            a non-null provider
      */
-    public UstDebugInfoSymbolProviderPreferencePage(UstDebugInfoSymbolProvider provider) {
+    public UstDebugInfoSymbolProviderPreferencePage(UstDebugInfoUiSymbolProvider provider) {
         super(provider);
         setDescription(MessageFormat.format(Messages.PreferencePage_WindowDescription, provider.getTrace().getName()));
         setValid(true);
@@ -65,9 +65,9 @@ public class UstDebugInfoSymbolProviderPreferencePage extends AbstractSymbolProv
     }
 
     @Override
-    public UstDebugInfoSymbolProvider getSymbolProvider() {
+    public UstDebugInfoUiSymbolProvider getSymbolProvider() {
         /* Type enforced at constructor */
-        return (UstDebugInfoSymbolProvider) super.getSymbolProvider();
+        return (UstDebugInfoUiSymbolProvider) super.getSymbolProvider();
     }
 
     @Override

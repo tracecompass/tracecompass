@@ -7,7 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.lttng2.ust.ui.analysis.debuginfo;
+package org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.debuginfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +24,6 @@ import org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace;
 import org.eclipse.tracecompass.tmf.core.symbols.DefaultSymbolProvider;
 import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
 import org.eclipse.tracecompass.tmf.core.symbols.TmfResolvedSymbol;
-import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProvider;
-import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
 
 /**
  * Symbol provider for UST traces with debug information.
@@ -33,10 +31,9 @@ import org.eclipse.tracecompass.tmf.ui.symbols.ISymbolProviderPreferencePage;
  * @author Alexandre Montplaisir
  * @see UstDebugInfoAnalysisModule
  */
-public class UstDebugInfoSymbolProvider extends DefaultSymbolProvider implements ISymbolProvider {
+public class UstDebugInfoSymbolProvider extends DefaultSymbolProvider {
 
     private final List<org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider> fOtherProviders = new ArrayList<>();
-    private boolean fIsLoaded = false;
     /**
      * Create a new {@link UstDebugInfoSymbolProvider} for the given trace
      *
@@ -60,16 +57,11 @@ public class UstDebugInfoSymbolProvider extends DefaultSymbolProvider implements
 
     @Override
     public void loadConfiguration(@Nullable IProgressMonitor monitor) {
-        synchronized (fOtherProviders) {
-            if (!fIsLoaded) {
-                super.loadConfiguration(monitor);
-                // Get all the symbol providers that are not of default class
-                for (org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider provider : SymbolProviderManager.getInstance().getSymbolProviders(getTrace())) {
-                    if (!(provider instanceof DefaultSymbolProvider)) {
-                        fOtherProviders.add(provider);
-                    }
-                }
-                fIsLoaded = true;
+        super.loadConfiguration(monitor);
+        // Get all the symbol providers that are not of default class
+        for (org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider provider : SymbolProviderManager.getInstance().getSymbolProviders(getTrace())) {
+            if (!(provider instanceof DefaultSymbolProvider)) {
+                fOtherProviders.add(provider);
             }
         }
     }
@@ -91,11 +83,7 @@ public class UstDebugInfoSymbolProvider extends DefaultSymbolProvider implements
         if (loc != null) {
             return new TmfResolvedSymbol(bc.getOffset(), loc.getFunctionName());
         }
-        if (!fIsLoaded) {
-            return null;
-        }
-        // Try to see if some other symbol provider has a symbol for this
-        // relative binary callsite
+        // Try to see if some other symbol provider has a symbol for this relative binary callsite
         // FIXME: Ideally, it would be good to be able to specify the filename
         for (org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider provider : fOtherProviders) {
             TmfResolvedSymbol symbol = provider.getSymbol(pid, timestamp, bc.getOffset());
@@ -105,10 +93,4 @@ public class UstDebugInfoSymbolProvider extends DefaultSymbolProvider implements
         }
         return null;
     }
-
-    @Override
-    public @NonNull ISymbolProviderPreferencePage createPreferencePage() {
-        return new UstDebugInfoSymbolProviderPreferencePage(this);
-    }
-
 }
