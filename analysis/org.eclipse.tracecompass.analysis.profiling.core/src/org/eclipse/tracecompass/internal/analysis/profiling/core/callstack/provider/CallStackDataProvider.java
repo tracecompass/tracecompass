@@ -125,6 +125,10 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
     @Override
     protected TmfTreeModel<@NonNull CallStackEntryModel> getTree(ITmfStateSystem ss, Map<String, Object> parameters,
             @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
+
+        // make sure that function names are up-to-date
+        resetFunctionNames(monitor);
+
         long start = ss.getStartTime();
         long end = ss.getCurrentEndTime();
 
