@@ -106,7 +106,8 @@ public class StateItem {
      * @return Returns the state color.
      */
     public RGB getStateColor() {
-        String rgb = (String) fStyleMap.getOrDefault(StyleProperties.BACKGROUND_COLOR, UNDEFINED_COLOR_VALUE);
+        String rgb = (String) fStyleMap.getOrDefault(StyleProperties.BACKGROUND_COLOR,
+                fStyleMap.getOrDefault(StyleProperties.COLOR, UNDEFINED_COLOR_VALUE));
         return ColorUtils.fromHexColor(rgb);
     }
 
