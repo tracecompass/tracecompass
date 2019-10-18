@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -12,25 +12,17 @@ import java.text.Format;
 import java.text.NumberFormat;
 import java.util.Map;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.AggregatedCalledFunctionStatistics;
-import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.ICalledFunction;
-import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.SymbolAspect;
 import org.eclipse.tracecompass.tmf.core.presentation.IPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.presentation.RotatingPaletteProvider;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -48,8 +40,6 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
 
     private final StateItem[] fStateTable;
     private FlameGraphView fView;
-
-    private Integer fAverageCharWidth;
 
     private IPaletteProvider fPalette = new RotatingPaletteProvider.Builder().setNbColors(NUM_COLORS).build();
 
@@ -121,64 +111,6 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
             return INVISIBLE;
         }
         return State.MULTIPLE.ordinal();
-    }
-
-    /**
-     * Get the event's symbol.It could be an address or a name.
-     *
-     * @param fGEvent
-     *            An event
-     */
-    private static String getFunctionSymbol(FlamegraphEvent event) {
-        String funcSymbol = ""; //$NON-NLS-1$
-        if (event.getSymbol() instanceof Long || event.getSymbol() instanceof Integer) {
-
-            ICalledFunction segment = event.getStatistics().getDurationStatistics().getMinObject();
-            if (segment == null) {
-                long longAddress = ((Long) event.getSymbol()).longValue();
-                return "0x" + Long.toHexString(longAddress); //$NON-NLS-1$
-            }
-            Object symbol = SymbolAspect.SYMBOL_ASPECT.resolve(segment);
-            if (symbol != null) {
-                return symbol.toString();
-            }
-        } else {
-            return event.getSymbol().toString();
-        }
-        return funcSymbol;
-    }
-    /**
-     * Returns the average character width, measured in pixels, of the font
-     * described by the receiver.
-     *
-     * @param gc
-     *            The graphic context
-     * @return the average character width of the font
-     */
-    @Deprecated
-    private static int getAverageCharWidth(GC gc) {
-        return gc.getFontMetrics().getAverageCharWidth();
-    }
-
-    @Override
-    public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
-        if (fAverageCharWidth == null) {
-            fAverageCharWidth = getAverageCharWidth(gc);
-        }
-        if (bounds.width <= fAverageCharWidth) {
-            return;
-        }
-        if (!(event instanceof FlamegraphEvent)) {
-            return;
-        }
-        String funcSymbol = ""; //$NON-NLS-1$
-        ITmfTrace activeTrace = TmfTraceManager.getInstance().getActiveTrace();
-        if (activeTrace != null) {
-            FlamegraphEvent fgEvent = (FlamegraphEvent) event;
-            funcSymbol = getFunctionSymbol(fgEvent);
-        }
-        gc.setForeground(gc.getDevice().getSystemColor(SWT.COLOR_WHITE));
-        Utils.drawText(gc, funcSymbol, bounds.x, bounds.y, bounds.width, bounds.height, true, true);
     }
 
     /**

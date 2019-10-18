@@ -68,6 +68,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.commands.ActionHandler;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -209,6 +210,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(AbstractTimeGraphView.class);
 
     private static final int DEFAULT_BUFFER_SIZE = 3;
+
+    private static final String HIDE_LABELS_KEY = "hide.labels"; //$NON-NLS-1$
 
     /**
      * Redraw state enum
@@ -2234,6 +2237,50 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         fNextResourceAction.setToolTipText(getNextTooltip());
     }
 
+    /**
+     * Returns an action that toggles the display of labels
+     *
+     * @return the action
+     * @since 5.2
+     */
+    protected Action getShowLabelsAction() {
+        final Action showLabelsAction = new Action(Messages.AbstractTimeGraphView_ShowLabelsActionText, IAction.AS_CHECK_BOX) {
+            @Override
+            public void run() {
+                boolean showLabels = isChecked();
+                getTimeGraphViewer().setLabelsVisible(showLabels);
+                redraw();
+                IDialogSettings dialogSettings = getDialogSettings(true);
+                dialogSettings.put(HIDE_LABELS_KEY, !showLabels);
+            }
+        };
+        boolean showLabels = true;
+        IDialogSettings dialogSettings = getDialogSettings(false);
+        if (dialogSettings != null) {
+            showLabels = !dialogSettings.getBoolean(HIDE_LABELS_KEY);
+        }
+        showLabelsAction.setChecked(showLabels);
+        getTimeGraphViewer().setLabelsVisible(showLabels);
+        return showLabelsAction;
+    }
+
+    /**
+     * Get the dialog settings for this view
+     *
+     * @param force
+     *            true to create the section if it doesn't exist
+     * @return the dialog settings
+     */
+    private IDialogSettings getDialogSettings(boolean force) {
+        IDialogSettings settings = Activator.getDefault().getDialogSettings();
+        String sectionName = getViewSite().getId();
+        IDialogSettings section = settings.getSection(sectionName);
+        if (section == null && force) {
+            section = settings.addNewSection(sectionName);
+        }
+        return section;
+    }
+
     private class MarkerSetAction extends Action {
 
         private MarkerSet fMarkerSet;
@@ -2337,6 +2384,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     protected void fillLocalMenu(IMenuManager manager) {
         manager.add(fTimeGraphViewer.getGridlinesMenu());
+        manager.add(getShowLabelsAction());
         manager.add(fTimeGraphViewer.getMarkersMenu());
         manager.add(getMarkerSetMenu());
     }

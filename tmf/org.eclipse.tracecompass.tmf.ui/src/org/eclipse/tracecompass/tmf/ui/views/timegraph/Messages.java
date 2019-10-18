@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2017 École Polytechnique de Montréal
+ * Copyright (c) 2013, 2019 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -41,7 +41,8 @@ public class Messages extends NLS {
     public static String AbstractTimeGraphView_ExportImageActionText;
     /** @since 3.3*/
     public static String AbstractTimeGraphView_ExportImageToolTipText;
-
+    /** @since 5.2*/
+    public static String AbstractTimeGraphView_ShowLabelsActionText;
     /**
      * @since 4.0
      */

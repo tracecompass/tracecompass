@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2018 École Polytechnique de Montréal and others
+ * Copyright (c) 2014, 2019 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -333,7 +333,19 @@ public class XmlTimeGraphView extends BaseDataProviderTimeGraphView {
         if (label != null && !pres.hasIndex(status)) {
             status = getStringIndex(label);
         }
-        return new TimeEvent(entry, state.getStartTime(), state.getDuration(), status, state.getActiveProperties());
+
+        return new TimeEvent(entry, state.getStartTime(), state.getDuration(), status, state.getActiveProperties()) {
+            @Override
+            public String getLabel() {
+                if (entry.getEntryModel() instanceof DataDrivenOutputEntryModel) {
+                    // Is there text to show
+                    if (((DataDrivenOutputEntryModel) entry.getEntryModel()).showText()) {
+                        return pres.getEventName(this);
+                    }
+                }
+                return null;
+            }
+        };
     }
 
     private int getStringIndex(String state) {

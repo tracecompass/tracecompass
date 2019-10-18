@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2018 École Polytechnique de Montréal and others.
+ * Copyright (c) 2014, 2019 École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -20,10 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenOutputEntryModel;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
@@ -32,11 +29,9 @@ import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.w3c.dom.Element;
 
 import com.google.common.primitives.Ints;
@@ -59,11 +54,6 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
     private static final int COLOR_MASK = 0xffffff;
 
     private List<StateItem> stateValues = new ArrayList<>();
-    /**
-     * Average width of the characters used for state labels. Is computed in the
-     * first call to postDrawEvent(). Is null before that.
-     */
-    private Integer fAverageCharacterWidth = null;
     /*
      * Maps the value of an event with the corresponding index in the
      * stateValues list
@@ -139,48 +129,6 @@ public class XmlPresentationProvider extends TimeGraphPresentationProvider {
          * tooltips and implement this
          */
         return Collections.emptyMap();
-    }
-
-    /**
-     * Returns the average character width, measured in pixels, of the font
-     * described by the receiver.
-     *
-     * @param gc
-     *            The graphic context
-     * @return the average character width of the font
-     */
-    @Deprecated
-    private static int getAverageCharWidth(GC gc) {
-        return gc.getFontMetrics().getAverageCharWidth();
-    }
-
-    @Override
-    public void postDrawEvent(ITimeEvent event, Rectangle bounds, GC gc) {
-        // Is there text to show
-        DataDrivenOutputEntryModel entry = (DataDrivenOutputEntryModel) ((TimeGraphEntry) event.getEntry()).getEntryModel();
-        if (!entry.showText()) {
-            return;
-        }
-        // See if the state is too short to show text
-        if (fAverageCharacterWidth == null) {
-            fAverageCharacterWidth = getAverageCharWidth(gc);
-        }
-        if (bounds.width <= fAverageCharacterWidth) {
-            return;
-        }
-        String eventName = getEventName(event);
-        if (eventName == null) {
-            return;
-        }
-
-        Color stateColor = gc.getBackground();
-        gc.setForeground(Utils.getDistinctColor(stateColor.getRGB()));
-        Utils.drawText(gc, eventName, bounds.x, bounds.y, bounds.width, bounds.height, true, true);
-    }
-
-    @Override
-    public void postDrawEntry(ITimeGraphEntry entry, Rectangle bounds, GC gc) {
-        // Do nothing
     }
 
     /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
@@ -11,6 +11,8 @@ package org.eclipse.tracecompass.internal.analysis.profiling.ui.flamegraph;
 
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.AggregatedCalledFunction;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.AggregatedCalledFunctionStatistics;
+import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.ICalledFunction;
+import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.SymbolAspect;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 
@@ -80,5 +82,29 @@ public class FlamegraphEvent extends TimeEvent {
      */
     public int getProcessId() {
         return fProcessId;
+    }
+
+    @Override
+    public String getLabel() {
+        return getFunctionSymbol();
+    }
+
+    private String getFunctionSymbol() {
+        String funcSymbol = ""; //$NON-NLS-1$
+        if (getSymbol() instanceof Long || getSymbol() instanceof Integer) {
+
+            ICalledFunction segment = getStatistics().getDurationStatistics().getMinObject();
+            if (segment == null) {
+                long longAddress = ((Long) getSymbol()).longValue();
+                return "0x" + Long.toHexString(longAddress); //$NON-NLS-1$
+            }
+            Object symbol = SymbolAspect.SYMBOL_ASPECT.resolve(segment);
+            if (symbol != null) {
+                return symbol.toString();
+            }
+        } else {
+            return getSymbol().toString();
+        }
+        return funcSymbol;
     }
 }

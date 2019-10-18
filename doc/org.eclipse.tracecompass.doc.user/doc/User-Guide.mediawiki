@@ -2384,8 +2384,17 @@ View Menu
 | New Control Flow view
 | Spawn a new Control Flow view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
 |-
+| Export...
+| Opens a file menu to choose a file name to export the current time graph to a PNG image.
+|-
 | Align Views
 | Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
+|-
+| Show Gridlines
+| Toggles visibility of '''Horizontal''' and '''Vertical''' gridlines.
+|-
+| Show Labels
+| Toggles visibility of labels.
 |-
 | Show Markers
 | A marker highlights a time interval. A marker can be used for instance to indicate a time range where lost events occurred or to bookmark an interesting interval for future reference. Selecting a category name will toggle the visibility of markers of that category.
@@ -2533,8 +2542,17 @@ View Menu
 | New Resources view
 | Spawn a new Resources view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
 |-
+| Export...
+| Opens a file menu to choose a file name to export the current time graph to a PNG image.
+|-
 | Align Views
 | Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
+|-
+| Show Gridlines
+| Toggles visibility of '''Horizontal''' and '''Vertical''' gridlines.
+|-
+| Show Labels
+| Toggles visibility of labels.
 |-
 | Show Markers
 | A marker highlights a time interval. A marker can be used for instance to indicate a time range where lost events occurred or to bookmark an interesting interval for future reference. Selecting a category name will toggle the visibility of markers of that category.
@@ -2639,6 +2657,9 @@ The CPU Usage View '''view menu''', located at the top right of the view, has sh
 | New CPU Usage view
 | Spawn a new CPU Usage view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
 |-
+| Export...
+| Opens a file menu to choose a file name to export the current time chart to a PNG image.
+|-
 | Align Views
 | Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
 |}
@@ -2694,6 +2715,9 @@ The Memory Usage View '''view menu''', located at the top right of the view, has
 {|
 | New Memory Usage view
 | Spawn a new Memory Usage view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
+|-
+| Export...
+| Opens a file menu to choose a file name to export the current time chart to a PNG image.
 |-
 | Align Views
 | Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
@@ -2826,6 +2850,9 @@ The Disk I/O View '''view menu''', located at the top right of the view, has sho
 {|
 | New Disk I/O Activity view
 | Spawn a new Disk I/O Activity view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
+|-
+| Export...
+| Opens a file menu to choose a file name to export the current time chart to a PNG image.
 |-
 | Align Views
 | Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
@@ -3121,6 +3148,9 @@ The Memory Usage View '''view menu''', located at the top right of the view, has
 {|
 | New Memory Usage view
 | Spawn a new Memory Usage view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
+|-
+| Export...
+| Opens a file menu to choose a file name to export the current time chart to a PNG image.
 |-
 | Align Views
 | Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.
@@ -4183,6 +4213,9 @@ The Counters View '''view menu''', located at the top right of the view, has sho
 {|
 | New Counters view
 | Spawn a new Counters view. The new view can be pinned to a new instance of the current trace, pinned to any opened trace, or unpinned.
+|-
+| Export...
+| Opens a file menu to choose a file name to export the current time chart to a PNG image.
 |-
 | Align Views
 | Disable and enable the automatic time axis alignment of time-based views. Disabling the alignment in this view will disable this feature across all the views because it's a workspace preference.

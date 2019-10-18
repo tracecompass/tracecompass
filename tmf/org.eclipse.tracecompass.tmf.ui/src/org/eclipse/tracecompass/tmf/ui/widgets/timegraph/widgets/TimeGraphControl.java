@@ -261,6 +261,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private MenuDetectEvent fPendingMenuDetectEvent = null;
     private boolean fGridLinesVisible = true;
     private Color fGridLineColor = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
+    private boolean fLabelsVisible = true;
     private boolean fMidLinesVisible = true;
     private boolean fHideArrows = false;
     private int fAutoExpandLevel = ALL_LEVELS;
@@ -1441,6 +1442,18 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     /**
+     * Set the label visibility. The default is true.
+     *
+     * @param visible
+     *            true to show the labels, false otherwise
+     * @since 5.2
+     */
+    public void setLabelsVisible(boolean visible) {
+        fLabelsVisible = visible;
+        redraw();
+    }
+
+    /**
      * Set the horizontal middle lines visibility. The default is true.
      *
      * @param visible
@@ -2227,7 +2240,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         gc.fillRectangle(rect);
         gc.setAlpha(OPAQUE);
         String label = marker.getLabel();
-        if (label != null && marker.getEntry() != null) {
+        if (fLabelsVisible && label != null && marker.getEntry() != null) {
             label = label.substring(0, Math.min(label.indexOf('\n') != -1 ? label.indexOf('\n') : label.length(), MAX_LABEL_LENGTH));
             gc.setForeground(color);
             Utils.drawText(gc, label, rect.x - gc.textExtent(label).x, rect.y, true);
@@ -2822,7 +2835,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
         if (visible && !Boolean.TRUE.equals(styleManager.getStyle(elementStyle, ITimeEventStyleStrings.annotated()))) {
             String label = event.getLabel();
-            if (label != null && !label.isEmpty() && rect.width > rect.height) {
+            if (fLabelsVisible && label != null && !label.isEmpty() && rect.width > rect.height) {
                 gc.setForeground(Utils.getDistinctColor(color.getRGB()));
                 Utils.drawText(gc, label, drawRect.x, drawRect.y, drawRect.width, drawRect.height, true, true);
                 gc.setForeground(black);
