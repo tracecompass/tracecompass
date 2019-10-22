@@ -81,9 +81,9 @@ public class DataProviderParameterUtils {
      * @return List of Long or null if it fails to extract
      */
     public static @Nullable List<Long> extractLongList(Map<String, Object> parameters, String key) {
-        Object listObject = parameters.get(key);
-        if (listObject instanceof List<?>) {
-            return transformToLongList((List<?>) listObject);
+        Object collectionObject = parameters.get(key);
+        if (collectionObject instanceof Collection<?>) {
+            return transformToLongList((Collection<?>) collectionObject);
         }
         return null;
     }
@@ -163,26 +163,26 @@ public class DataProviderParameterUtils {
     }
 
     /**
-     * Transform a List<?> to a List<Long>, where ? is Integer or Long.
+     * Transform a Collection<?> to a List<Long>, where ? is Integer or Long.
      *
-     * @param listToTransform
-     *            List to transform
-     * @return List<Long> or null if the list can not be transformed
+     * @param collectionToTransform
+     *            Collection to transform
+     * @return List<Long> or null if the collection can not be transformed
      */
     @SuppressWarnings("unchecked")
-    private static @Nullable List<Long> transformToLongList(List<?> listToTransform) {
-        if (!listToTransform.isEmpty()) {
-            if (listToTransform.stream().allMatch(e -> e instanceof Long)) {
-                return (List<Long>) listToTransform;
-            } else if (listToTransform.stream().allMatch(e -> e instanceof Integer)) {
+    private static @Nullable List<Long> transformToLongList(Collection<?> collectionToTransform) {
+        if (!collectionToTransform.isEmpty()) {
+            if (collectionToTransform instanceof List<?> && collectionToTransform.stream().allMatch(e -> e instanceof Long)) {
+                return (List<Long>) collectionToTransform;
+            } else if (collectionToTransform.stream().allMatch(e -> e instanceof Integer)) {
                 List<Long> list = new ArrayList<>();
-                for (Integer element : (List<Integer>) listToTransform) {
+                for (Integer element : (List<Integer>) collectionToTransform) {
                     list.add(element.longValue());
                 }
                 return list;
             } else {
                 List<Long> list = new ArrayList<>();
-                for (Object element : listToTransform) {
+                for (Object element : collectionToTransform) {
                     if (!(element instanceof Number)) {
                         return null;
                     }

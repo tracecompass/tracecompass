@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.model.timegraph;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -23,6 +24,7 @@ import org.eclipse.tracecompass.internal.tmf.core.model.tree.AbstractTreeDataPro
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
@@ -36,6 +38,7 @@ import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
 /**
@@ -92,12 +95,16 @@ public abstract class AbstractTimeGraphDataProvider<A extends TmfStateSystemAnal
         }
 
         long currentEnd = ss.getCurrentEndTime();
-        //TODO Converting the map to a filter to see if mandatory parameters are there. This should be handle differently.
-        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(parameters);
-        if (filter == null) {
+        Object times = parameters.get(DataProviderParameterUtils.REQUESTED_TIME_KEY);
+        Object items = parameters.get(DataProviderParameterUtils.REQUESTED_ITEMS_KEY);
+        if (!(times instanceof List<?>) || ((List<?>) times).isEmpty() || !(items instanceof Collection<?>)) {
             return new TmfModelResponse<>(null, Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
         }
-        boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
+        Object end = Iterables.getLast(((List<?>) times));
+        if (!(end instanceof Number)) {
+            return new TmfModelResponse<>(null, Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
+        }
+        boolean complete = ss.waitUntilBuilt(0) || ((Number) end).longValue() <= currentEnd;
 
         try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "AbstractTimeGraphDataProvider#fetchRowModel") //$NON-NLS-1$
                 .setCategory(getClass().getSimpleName()).build()) {

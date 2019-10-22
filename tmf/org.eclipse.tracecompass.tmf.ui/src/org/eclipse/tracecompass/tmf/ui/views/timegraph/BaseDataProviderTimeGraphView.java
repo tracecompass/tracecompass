@@ -38,7 +38,6 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.BaseDataProviderTimeGraphPresentationProvider;
-import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.Messages;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
@@ -46,8 +45,6 @@ import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.event.lookup.TmfCallsite;
-import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
-import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
@@ -181,7 +178,8 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         }
         boolean complete = false;
         while (!complete && !monitor.isCanceled()) {
-            TmfModelResponse<TmfTreeModel<@NonNull TimeGraphEntryModel>> response = dataProvider.fetchTree(FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(0, Long.MAX_VALUE, 2)), monitor);
+            Map<@NonNull String, @NonNull Object> parameters = getFetchTreeParameters();
+            TmfModelResponse<TmfTreeModel<@NonNull TimeGraphEntryModel>> response = dataProvider.fetchTree(parameters, monitor);
             if (response.getStatus() == ITmfResponse.Status.FAILED) {
                 Activator.getDefault().logError(getClass().getSimpleName() + " Data Provider failed: " + response.getStatusMessage()); //$NON-NLS-1$
                 return;
@@ -397,12 +395,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
 
         for (Entry<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Collection<Long>> entry : providersToModelIds.asMap().entrySet()) {
             ITimeGraphDataProvider<? extends TimeGraphEntryModel> dataProvider = entry.getKey();
-            SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(times, entry.getValue());
-            Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
-            Multimap<@NonNull Integer, @NonNull String> regexesMap = getRegexes();
-            if (!regexesMap.isEmpty()) {
-                parameters.put(DataProviderParameterUtils.REGEX_MAP_FILTERS_KEY, regexesMap.asMap());
-            }
+            Map<@NonNull String, @NonNull Object> parameters = getFetchRowModelParameters(times, entry.getValue());
             TmfModelResponse<TimeGraphModel> response = dataProvider.fetchRowModel(parameters, monitor);
 
             TimeGraphModel model = response.getModel();
@@ -534,10 +527,10 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         }
         List<@NonNull ILinkEvent> linkList = new ArrayList<>();
         List<@NonNull Long> times = StateSystemUtils.getTimes(zoomStartTime, zoomEndTime, resolution);
-        TimeQueryFilter queryFilter = new TimeQueryFilter(times);
+        Map<@NonNull String, @NonNull Object> parameters = getFetchArrowsParameters(times);
 
         for (ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider : providers) {
-            TmfModelResponse<List<ITimeGraphArrow>> response = provider.fetchArrows(FetchParametersUtils.timeQueryToMap(queryFilter), monitor);
+            TmfModelResponse<List<ITimeGraphArrow>> response = provider.fetchArrows(parameters, monitor);
             List<ITimeGraphArrow> model = response.getModel();
 
             if (model != null) {
@@ -566,7 +559,8 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         }
         for (ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider : providers) {
             if (provider instanceof IOutputAnnotationProvider) {
-                TmfModelResponse<@NonNull AnnotationCategoriesModel> response = ((IOutputAnnotationProvider) provider).fetchAnnotationCategories(Collections.emptyMap(), new NullProgressMonitor());
+                Map<@NonNull String, @NonNull Object> parameters = getFetchAnnotationCategoriesParameters();
+                TmfModelResponse<@NonNull AnnotationCategoriesModel> response = ((IOutputAnnotationProvider) provider).fetchAnnotationCategories(parameters, new NullProgressMonitor());
                 AnnotationCategoriesModel model = response.getModel();
                 if (model != null) {
                     viewMarkerCategories.addAll(model.getAnnotationCategories());
@@ -588,8 +582,8 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             Multimap<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Long> providersToModelIds = filterGroupEntries(Utils.flatten(traceEntry), startTime, endTime);
             for (ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider : providersToModelIds.keySet()) {
                 if (provider instanceof IOutputAnnotationProvider) {
-                    SelectionTimeQueryFilter queryFilter = new SelectionTimeQueryFilter(times, providersToModelIds.get(provider));
-                    TmfModelResponse<@NonNull AnnotationModel> response = ((IOutputAnnotationProvider) provider).fetchAnnotations(FetchParametersUtils.selectionTimeQueryToMap(queryFilter), new NullProgressMonitor());
+                    Map<@NonNull String, @NonNull Object> parameters = getFetchAnnotationsParameters(times, providersToModelIds.get(provider));
+                    TmfModelResponse<@NonNull AnnotationModel> response = ((IOutputAnnotationProvider) provider).fetchAnnotations(parameters, new NullProgressMonitor());
                     AnnotationModel model = response.getModel();
                     if (model != null) {
                         for (Entry<String, Collection<Annotation>> entry : model.getAnnotations().entrySet()) {
@@ -614,6 +608,95 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             }
         }
         return viewMarkerList;
+    }
+
+    /**
+     * Get the fetch parameters to pass to a fetchTree call
+     *
+     * @return Map of parameters for fetchTree
+     * @since 5.2
+     */
+    protected @NonNull Map<@NonNull String, @NonNull Object> getFetchTreeParameters() {
+        return new HashMap<>();
+    }
+
+    /**
+     * Get the fetch parameters to pass to a fetchRowModel call
+     *
+     * @param times
+     *            Sorted list of times to query.
+     * @param items
+     *            The unique keys of the entries to query.
+     * @return Map of parameters for fetchRowModel
+     * @since 5.2
+     */
+    protected @NonNull Map<@NonNull String, @NonNull Object> getFetchRowModelParameters(@NonNull List<Long> times, @NonNull Collection<Long> items) {
+        @NonNull Map<@NonNull String, @NonNull Object> parameters = new HashMap<>();
+        parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, times);
+        parameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, items);
+        Multimap<@NonNull Integer, @NonNull String> regexesMap = getRegexes();
+        if (!regexesMap.isEmpty()) {
+            parameters.put(DataProviderParameterUtils.REGEX_MAP_FILTERS_KEY, regexesMap.asMap());
+        }
+        return parameters;
+    }
+
+    /**
+     * Get the fetch parameters to pass to a fetchArrows call
+     *
+     * @param times
+     *            Sorted list of times to query.
+     * @return Map of parameters for fetchArrows
+     * @since 5.2
+     */
+    protected @NonNull Map<@NonNull String, @NonNull Object> getFetchArrowsParameters(@NonNull List<@NonNull Long> times) {
+        @NonNull Map<@NonNull String, @NonNull Object> parameters = new HashMap<>();
+        parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, times);
+        return parameters;
+    }
+
+    /**
+     * Get the fetch parameters to pass to a fetchTooltip call
+     *
+     * @param time
+     *            The time of the tooltip.
+     * @param item
+     *            The unique key of the tooltip entry.
+     * @return Map of parameters for fetchTooltip
+     * @since 5.2
+     */
+    protected @NonNull Map<@NonNull String, @NonNull Object> getFetchTooltipParameters(long time, long item) {
+        @NonNull Map<@NonNull String, @NonNull Object> parameters = new HashMap<>();
+        parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, Collections.singletonList(time));
+        parameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, Collections.singletonList(item));
+        return parameters;
+    }
+
+    /**
+     * Get the fetch parameters to pass to a fetchAnnotationCategories call
+     *
+     * @return Map of parameters for fetchAnnotationCategories
+     * @since 5.2
+     */
+    protected @NonNull Map<@NonNull String, @NonNull Object> getFetchAnnotationCategoriesParameters() {
+        return new HashMap<>();
+    }
+
+    /**
+     * Get the fetch parameters to pass to a fetchAnnotations call
+     *
+     * @param times
+     *            Sorted list of times to query.
+     * @param items
+     *            The unique keys of the entries to query.
+     * @return Map of parameters for fetchAnnotations
+     * @since 5.2
+     */
+    protected @NonNull Map<@NonNull String, @NonNull Object> getFetchAnnotationsParameters(@NonNull List<Long> times, @NonNull Collection<Long> items) {
+        @NonNull Map<@NonNull String, @NonNull Object> parameters = new HashMap<>();
+        parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, times);
+        parameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, items);
+        return parameters;
     }
 
     @Override
@@ -674,10 +757,8 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                     TimeGraphEntry entry = (TimeGraphEntry) firstElement;
                     ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = getProvider(entry);
                     long timestamp = getTimeGraphViewer().getSelectionBegin();
-                    Map<String, Object> map = new HashMap<>();
-                    map.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, Collections.singletonList(timestamp));
-                    map.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, Collections.singletonList(entry.getEntryModel().getId()));
-                    IContributionItem contribItem = createOpenSourceCodeAction(provider.fetchTooltip(map, new NullProgressMonitor()).getModel());
+                    Map<@NonNull String, @NonNull Object> parameters = getFetchTooltipParameters(timestamp, entry.getEntryModel().getId());
+                    IContributionItem contribItem = createOpenSourceCodeAction(provider.fetchTooltip(parameters, new NullProgressMonitor()).getModel());
                     if (contribItem != null) {
                         menuManager.add(contribItem);
                     }
