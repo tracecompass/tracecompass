@@ -782,12 +782,8 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             if (firstElement instanceof TimeGraphEntry) {
                 Object entryObject = sSel.toArray()[1];
                 if (entryObject instanceof TimeEvent) {
-                    TimeGraphEntry entry = (TimeGraphEntry) firstElement;
-                    ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = getProvider(entry);
-                    long timestamp = getTimeGraphViewer().getSelectionBegin();
-                    IOutputElement element = ((TimeEvent) entryObject).getModel();
-                    Map<@NonNull String, @NonNull Object> parameters = getFetchTooltipParameters(timestamp, entry.getEntryModel().getId(), element);
-                    IContributionItem contribItem = createOpenSourceCodeAction(provider.fetchTooltip(parameters, new NullProgressMonitor()).getModel());
+                    TimeEvent event = (TimeEvent) entryObject;
+                    IContributionItem contribItem = createOpenSourceCodeAction(getPresentationProvider().getEventHoverToolTipInfo(event));
                     if (contribItem != null) {
                         menuManager.add(contribItem);
                     }
