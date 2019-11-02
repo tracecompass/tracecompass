@@ -448,7 +448,9 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
      * Get the file channel currently used for the index
      *
      * @return the file channel
+     * @deprecated potential resource leak, use {@link #getRandomAccessFile()} instead
      */
+    @Deprecated
     protected FileChannel getFileChannel() {
         return Objects.requireNonNull(fRandomAccessFile).getChannel();
     }
