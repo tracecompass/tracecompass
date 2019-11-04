@@ -89,17 +89,17 @@ public class StateSystemDataProvider extends AbstractTmfTraceDataProvider implem
     private Map<Long, Pair<ITmfStateSystem, Integer>> fIDToDisplayQuark = new HashMap<>();
 
     // Use to add one event for every state system and module
-    private Map<ITmfStateSystem, Long> fSsToId = new HashMap<>();
-    private List<ModuleEntryModel> fModuleEntryModelList = new ArrayList<>();
+    private final Map<ITmfStateSystem, Long> fSsToId = new HashMap<>();
+    private final List<ModuleEntryModel> fModuleEntryModelList = new ArrayList<>();
 
-    private Map<ITmfAnalysisModuleWithStateSystems, Boolean> fModulesToStatus = new HashMap<>();
+    private final Map<ITmfAnalysisModuleWithStateSystems, Boolean> fModulesToStatus = new HashMap<>();
 
     /*
      * Entry Builder is a table to stash the entries so it won't duplicate the
      * entry when fetchTree is called again. Long represent the parentId. String
      * is the name of the entry. EntryModelBuilder is the builder of the entry.
      */
-    private Table<Long, String, EntryModelBuilder> fEntryBuilder = HashBasedTable.create();
+    private final Table<Long, String, EntryModelBuilder> fEntryBuilder = HashBasedTable.create();
 
     /**
      * Set of {@link ITmfAnalysisModuleWithStateSystems} that were received by
@@ -156,10 +156,12 @@ public class StateSystemDataProvider extends AbstractTmfTraceDataProvider implem
             return Collections.emptyMap();
         }
         Map<Long, Pair<ITmfStateSystem, Integer>> idToQuark = new HashMap<>();
-        for (Long id : selectedItems) {
-            Pair<ITmfStateSystem, Integer> pair = fIDToDisplayQuark.get(id);
-            if (pair != null) {
-                idToQuark.put(id, pair);
+        synchronized (fEntryBuilder) {
+            for (Long id : selectedItems) {
+                Pair<ITmfStateSystem, Integer> pair = fIDToDisplayQuark.get(id);
+                if (pair != null) {
+                    idToQuark.put(id, pair);
+                }
             }
         }
         return idToQuark;
@@ -449,10 +451,10 @@ public class StateSystemDataProvider extends AbstractTmfTraceDataProvider implem
 
     @Override
     public @NonNull TmfModelResponse<TmfTreeModel<TimeGraphEntryModel>> fetchTree(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
-        fModuleEntryModelList = new ArrayList<>();
         // need to create the tree
         boolean fetchTreeIsComplete;
         synchronized (fEntryBuilder) {
+            fModuleEntryModelList.clear();
             fetchTreeIsComplete = addTrace(monitor);
             if (monitor != null && monitor.isCanceled()) {
                 return new TmfModelResponse<>(null, Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
@@ -684,14 +686,16 @@ public class StateSystemDataProvider extends AbstractTmfTraceDataProvider implem
         Table<ITmfStateSystem, Integer, Long> table = HashBasedTable.create();
         // Get the quarks to display
         Collection<Long> selectedItems = DataProviderParameterUtils.extractSelectedItems(fetchParameters);
-        if (selectedItems == null) {
-            // No selected items, take them all
-            selectedItems = fIDToDisplayQuark.keySet();
-        }
-        for (Long id : selectedItems) {
-            Pair<ITmfStateSystem, Integer> pair = fIDToDisplayQuark.get(id);
-            if (pair != null) {
-                table.put(pair.getFirst(), pair.getSecond(), id);
+        synchronized (fEntryBuilder) {
+            if (selectedItems == null) {
+                // No selected items, take them all
+                selectedItems = fIDToDisplayQuark.keySet();
+            }
+            for (Long id : selectedItems) {
+                Pair<ITmfStateSystem, Integer> pair = fIDToDisplayQuark.get(id);
+                if (pair != null) {
+                    table.put(pair.getFirst(), pair.getSecond(), id);
+                }
             }
         }
         List<@NonNull ITimeGraphRowModel> allRows = new ArrayList<>();
@@ -703,20 +707,24 @@ public class StateSystemDataProvider extends AbstractTmfTraceDataProvider implem
                 if (monitor != null && monitor.isCanceled()) {
                     return new TmfModelResponse<>(null, Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
                 }
-                // Add the SS
-                Long ssId = fSsToId.get(ss);
-                if (ssId != null && selectedItems.contains(ssId)) {
-                    TimeGraphRowModel ssRow = new TimeGraphRowModel(ssId, new ArrayList<>());
-                    List<@NonNull ITimeGraphState> states = ssRow.getStates();
-                    states.add(new TimeGraphState(ss.getStartTime(), ss.getCurrentEndTime() - ss.getStartTime(), Integer.MAX_VALUE));
-                    rows.add(ssRow);
+                synchronized (fEntryBuilder) {
+                    // Add the SS
+                    Long ssId = fSsToId.get(ss);
+                    if (ssId != null && selectedItems.contains(ssId)) {
+                        TimeGraphRowModel ssRow = new TimeGraphRowModel(ssId, new ArrayList<>());
+                        List<@NonNull ITimeGraphState> states = ssRow.getStates();
+                        states.add(new TimeGraphState(ss.getStartTime(), ss.getCurrentEndTime() - ss.getStartTime(), Integer.MAX_VALUE));
+                        rows.add(ssRow);
+                    }
                 }
                 allRows.addAll(rows);
             }
 
-            for (ModuleEntryModel module : fModuleEntryModelList) {
-                if (selectedItems.contains(module.getId())) {
-                    allRows.add(getModuleRowModels(module));
+            synchronized (fEntryBuilder) {
+                for (ModuleEntryModel module : fModuleEntryModelList) {
+                    if (selectedItems.contains(module.getId())) {
+                        allRows.add(getModuleRowModels(module));
+                    }
                 }
             }
             if (monitor != null && monitor.isCanceled()) {
