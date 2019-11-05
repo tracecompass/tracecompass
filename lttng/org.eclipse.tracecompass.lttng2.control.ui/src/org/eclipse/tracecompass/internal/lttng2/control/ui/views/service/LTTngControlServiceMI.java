@@ -120,20 +120,19 @@ public class LTTngControlServiceMI extends LTTngControlService {
         docBuilderFactory.setExpandEntityReferences(false);
         docBuilderFactory.setValidating(false);
 
-        if (isSchemaValidationEnabled()) {
-            if (version != null) {
-                SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                try {
-                    URL xsdUrl = LTTngControlService.class.getResource(LTTngControlServiceConstants.MI_XSD_FILENAME);
-                    if (version.compareTo(new LttngVersion(2, 8, 0, null, null, null, null, null, null)) >= 0) {
-                        xsdUrl = LTTngControlService.class.getResource(LTTngControlServiceConstants.MI3_XSD_FILENAME);
-                        // MI 3.0 added name spaces. It will fail to validate if this is not set to true.
-                        docBuilderFactory.setNamespaceAware(true);
-                    }
-                    docBuilderFactory.setSchema(schemaFactory.newSchema(xsdUrl));
-                } catch (SAXException e) {
-                    throw new ExecutionException(Messages.TraceControl_InvalidSchemaError, e);
+        // TODO: remove check for 2.11 when new schema is available
+        if (isSchemaValidationEnabled() && (version != null && (version.compareTo(new LttngVersion(2, 11, 0, null, null, null, null, null, null)) < 0))) {
+            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            try {
+                URL xsdUrl = LTTngControlService.class.getResource(LTTngControlServiceConstants.MI_XSD_FILENAME);
+                if (version.compareTo(new LttngVersion(2, 8, 0, null, null, null, null, null, null)) >= 0) {
+                    xsdUrl = LTTngControlService.class.getResource(LTTngControlServiceConstants.MI3_XSD_FILENAME);
+                    // MI 3.0 added name spaces. It will fail to validate if this is not set to true.
+                    docBuilderFactory.setNamespaceAware(true);
                 }
+                docBuilderFactory.setSchema(schemaFactory.newSchema(xsdUrl));
+            } catch (SAXException e) {
+                throw new ExecutionException(Messages.TraceControl_InvalidSchemaError, e);
             }
         }
 
@@ -1182,6 +1181,25 @@ public class LTTngControlServiceMI extends LTTngControlService {
 
         ICommandInput command = createCommand(LTTngControlServiceConstants.COMMAND_ADD_CONTEXT, LTTngControlServiceConstants.OPTION_LIST);
         ICommandResult result = executeCommand(command, monitor);
-        return result.getOutput();
+
+        if (!isVersionSupported("2.11.0")) { //$NON-NLS-1$
+            return result.getOutput();
+        }
+
+        if (isError(result)) {
+            throw new ExecutionException(Messages.TraceControl_CommandError + command.toString());
+        }
+        Document document = getDocumentFromStrings(result.getOutput(), fDocumentBuilder);
+        NodeList rawContexts = document.getElementsByTagName(MIStrings.CONTEXT);
+
+        List<String> returnedContexts = new ArrayList<>();
+        for (int i = 0; i < rawContexts.getLength(); i++) {
+            Node contextNode = rawContexts.item(i);
+            Node symbol = getFirstOf(contextNode.getChildNodes(), MIStrings.SYMBOL);
+            if (symbol != null) {
+                returnedContexts.add(symbol.getTextContent());
+            }
+        }
+        return returnedContexts;
     }
 }

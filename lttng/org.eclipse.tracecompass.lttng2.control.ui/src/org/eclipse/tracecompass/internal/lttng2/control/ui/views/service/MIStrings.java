@@ -590,4 +590,9 @@ public interface MIStrings {
      * Represent the max_size xml element
      */
     String MAX_SIZE = "max_size";
+
+    /**
+     * Represents the Symbol xml elemen
+     */
+    String SYMBOL = "symbol";
 }
