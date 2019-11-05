@@ -149,7 +149,7 @@ public class CTFStreamInputTest {
     public void testEquals2() throws CTFException {
         s1 = new CTFStreamInput(new CTFStream(CtfTestTraceUtils.getTrace(testTrace)),
                 createFile());
-        assertFalse(s1.equals(new Long(23L)));
+        assertFalse(s1.equals(Long.valueOf(23)));
 
     }
 

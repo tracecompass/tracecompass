@@ -350,7 +350,7 @@ public class EventDeclarationTest {
     @Test
     public void testEquals2() {
         e1 = LostEventDeclaration.INSTANCE;
-        assertFalse(e1.equals(new Long(23L)));
+        assertFalse(e1.equals(Long.valueOf(23L)));
     }
 
     @Test

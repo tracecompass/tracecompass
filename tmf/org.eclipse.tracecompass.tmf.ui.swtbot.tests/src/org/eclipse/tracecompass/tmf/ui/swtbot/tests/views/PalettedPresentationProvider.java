@@ -54,7 +54,8 @@ public abstract class PalettedPresentationProvider extends StubPresentationProvi
 
     private String getColor(TimeEvent event) {
         List<@NonNull RGBAColor> list = getPalette().get();
-        int colorInt = list.get((int) Math.floorMod((event.getValue() & ((1L << Integer.SIZE) - 1)), list.size())).toInt();
+        int floor = Long.valueOf(Math.floorMod((event.getValue() & ((1L << Integer.SIZE) - 1)), list.size())).intValue();
+        int colorInt = list.get(floor).toInt();
         return ColorUtils.toHexColor(colorInt >> 24, colorInt >> 16, colorInt >> 8);
     }
 

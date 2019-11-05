@@ -12,6 +12,7 @@ package org.eclipse.tracecompass.internal.tmf.chart.ui.data;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * Simple class that maps two {@link ChartRange} together. The first one is the
@@ -159,7 +160,7 @@ public class ChartRangeMap {
         BigDecimal internalValue = value
                 .subtract(external.getMinimum())
                 .multiply(internal.getDelta())
-                .divide(external.getDelta(), BIG_DECIMAL_DIVISION_SCALE, BigDecimal.ROUND_DOWN)
+                .divide(external.getDelta(), BIG_DECIMAL_DIVISION_SCALE, RoundingMode.DOWN)
                 .add(internal.getMinimum());
 
         return checkNotNull(internalValue);
@@ -189,7 +190,7 @@ public class ChartRangeMap {
         BigDecimal externalValue = (new BigDecimal(number.toString()))
                 .subtract(internal.getMinimum())
                 .multiply(external.getDelta())
-                .divide(internal.getDelta(), BIG_DECIMAL_DIVISION_SCALE, BigDecimal.ROUND_DOWN)
+                .divide(internal.getDelta(), BIG_DECIMAL_DIVISION_SCALE, RoundingMode.DOWN)
                 .add(external.getMinimum());
 
         return checkNotNull(externalValue);

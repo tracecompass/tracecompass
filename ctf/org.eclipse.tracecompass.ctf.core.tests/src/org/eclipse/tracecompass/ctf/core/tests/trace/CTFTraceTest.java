@@ -188,7 +188,7 @@ public class CTFTraceTest {
      */
     @Test
     public void testGetStream() {
-        Long id = new Long(0L);
+        Long id = 0L;
         ICTFStream result = fixture.getStream(id);
         assertNotNull(result);
     }
@@ -337,7 +337,7 @@ public class CTFTraceTest {
         String name = "";
         CTFClock ctfClock = new CTFClock();
         ctfClock.addAttribute("name", "Bob");
-        ctfClock.addAttribute("pi", new Double(java.lang.Math.PI));
+        ctfClock.addAttribute("pi", Double.valueOf(java.lang.Math.PI));
         fixture.addClock(name, ctfClock);
         CTFClock result = fixture.getClock(name);
 
