@@ -104,7 +104,7 @@ public class TraceAndExperimentTypeTest {
             fail(e.getMessage());
         }
 
-        TmfOpenTraceHelper.openTraceFromElement(fExperiment);
+        TmfOpenTraceHelper.openFromElement(fExperiment);
         ProjectModelTestData.delayUntilTraceOpened(fExperiment);
 
         ITmfTrace trace = fExperiment.getTrace();
@@ -119,7 +119,7 @@ public class TraceAndExperimentTypeTest {
      */
     @Test
     public void testNoExperimentTypeChildren() {
-        TmfOpenTraceHelper.openTraceFromElement(fExperiment);
+        TmfOpenTraceHelper.openFromElement(fExperiment);
 
         ProjectModelTestData.delayUntilTraceOpened(fExperiment);
 
@@ -150,7 +150,7 @@ public class TraceAndExperimentTypeTest {
             fail(e.getMessage());
         }
 
-        TmfOpenTraceHelper.openTraceFromElement(fExperiment);
+        TmfOpenTraceHelper.openFromElement(fExperiment);
 
         ProjectModelTestData.delayThread(500);
 

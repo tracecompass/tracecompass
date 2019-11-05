@@ -14,7 +14,9 @@ package org.eclipse.tracecompass.internal.tracing.rcp.ui;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.tracecompass.internal.provisional.tmf.cli.core.parser.CliCommandLine;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -44,6 +46,8 @@ public class TracingRcpPlugin extends AbstractUIPlugin {
 
     // The shared instance
     private static TracingRcpPlugin fPlugin;
+
+    private @Nullable CliCommandLine fCommandLine = null;
 
     // ------------------------------------------------------------------------
     // Constructor(s)
@@ -97,6 +101,27 @@ public class TracingRcpPlugin extends AbstractUIPlugin {
     public void stop(BundleContext context) throws Exception {
         fPlugin = null;
         super.stop(context);
+    }
+
+    /**
+     * Get the application's startup command line
+     *
+     * @return The startup command line or <code>null</code> if there was no
+     *         command line options entered
+     */
+    public @Nullable CliCommandLine getCommandLine() {
+        return fCommandLine;
+    }
+
+    /**
+     * Set the application's startup command line
+     *
+     * @param cmdLine
+     *            The startup command line or <code>null</code> if there was no
+     *            command line options entered
+     */
+    public void setCommandLine(@Nullable CliCommandLine cmdLine) {
+        fCommandLine = cmdLine;
     }
 
     /**

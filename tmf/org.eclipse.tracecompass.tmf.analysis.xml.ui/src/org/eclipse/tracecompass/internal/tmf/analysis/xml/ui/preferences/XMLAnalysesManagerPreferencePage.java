@@ -711,7 +711,7 @@ public class XMLAnalysesManagerPreferencePage extends PreferencePage implements 
         }
 
         // Re-open given elements
-        elements.forEach(TmfOpenTraceHelper::openTraceFromElement);
+        elements.forEach(TmfOpenTraceHelper::openFromElement);
     }
 
     /**

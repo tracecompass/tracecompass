@@ -30,6 +30,7 @@ public class CliOption {
     private final @Nullable String fLongOption;
     private final @Nullable String fDescription;
     private final int fMinArguments;
+    // Maximum number of arguments. Use Integer.MAX_VALUE for unbounded.
     private final int fMaxArguments;
     private final String fArgumentName;
 
@@ -37,15 +38,40 @@ public class CliOption {
      * Create a new simple options, without arguments.
      *
      * @param optionShort
-     *            The short key for this options, can be null
+     *            The short key for this option, cannot be null
      * @param optionLong
      *            The long key for this option
      * @param optionDescription
-     *            The options description
+     *            The option description
      * @return A new option
      */
     public static CliOption createSimpleOption(String optionShort, @Nullable String optionLong, @Nullable String optionDescription) {
         return new CliOption(optionShort, optionLong, optionDescription, 0, 0, DEFAULT_ARG_NAME);
+    }
+
+    /**
+     * Create an option with arguments
+     *
+     * @param optionShort
+     *            The short key for this options, cannot be null
+     * @param optionLong
+     *            The long key for this option
+     * @param optionDescription
+     *            he option description
+     * @param mandatory
+     *            Whether the arguments to this option are mandatory or
+     *            optional. <code>true</code> is mandatory.
+     * @param multiple
+     *            Whether there can be multiple arguments to this option.
+     *            <code>true</code> means multiple arguments
+     * @param argName
+     *            A help string for the arguments, for the help message. For
+     *            instance, if the argument is a path, "path" can be used as
+     *            value
+     * @return A new option
+     */
+    public static CliOption createOptionWithArgs(String optionShort, @Nullable String optionLong, @Nullable String optionDescription, boolean mandatory, boolean multiple, String argName) {
+        return new CliOption(optionShort, optionLong, optionDescription, mandatory ? 1 : 0, multiple ? Integer.MAX_VALUE : 1, argName);
     }
 
     private CliOption(String optionShort, @Nullable String optionLong, @Nullable String optionDescription, int min, int max, String argName) {

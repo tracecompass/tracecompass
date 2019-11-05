@@ -18,7 +18,8 @@ Require-Bundle: org.eclipse.core.commands,
  org.eclipse.tracecompass.tmf.core,
  org.eclipse.update.configurator,
  org.eclipse.equinox.p2.ui.sdk,
- org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
+ org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional,
+ org.eclipse.tracecompass.tmf.cli.core
 Export-Package: org.eclipse.tracecompass.internal.tracing.rcp.ui;x-friends:="org.eclipse.tracecompass.rcp.ui.tests",
  org.eclipse.tracecompass.internal.tracing.rcp.ui.cli;x-friends:="org.eclipse.tracecompass.rcp.ui.tests",
  org.eclipse.tracecompass.internal.tracing.rcp.ui.messages;x-friends:="org.eclipse.tracecompass.rcp.ui.tests"

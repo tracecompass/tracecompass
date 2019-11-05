@@ -77,7 +77,7 @@ public class ProjectModelTraceTest {
         ITmfTrace trace = traceElement.getTrace();
         assertNull(trace);
 
-        TmfOpenTraceHelper.openTraceFromElement(traceElement);
+        TmfOpenTraceHelper.openFromElement(traceElement);
 
         /* Give the trace a chance to open */
         try {
@@ -93,7 +93,7 @@ public class ProjectModelTraceTest {
          * Open the trace from project, then get from element, both should be
          * the exact same element as the active trace
          */
-        TmfOpenTraceHelper.openTraceFromElement(traceElement);
+        TmfOpenTraceHelper.openFromElement(traceElement);
         try {
             ProjectModelTestData.delayUntilTraceOpened(traceElement);
         } catch (WaitTimeoutException e) {

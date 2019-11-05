@@ -15,14 +15,15 @@ import java.io.File;
 import java.net.URL;
 import java.text.MessageFormat;
 
-import org.apache.commons.cli.ParseException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.internal.tracing.rcp.ui.cli.CliParser;
+import org.eclipse.tracecompass.internal.provisional.tmf.cli.core.parser.CliCommandLine;
+import org.eclipse.tracecompass.internal.provisional.tmf.cli.core.parser.CliParserException;
+import org.eclipse.tracecompass.internal.provisional.tmf.cli.core.parser.CliParserManager;
 import org.eclipse.tracecompass.internal.tracing.rcp.ui.messages.Messages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -69,14 +70,15 @@ public class Application implements IApplication {
             }
 
             /*
-             * Parse the command line options.
+             * Execute the early command line options.
              */
             try {
-                CliParser.getInstance().parse(Platform.getCommandLineArgs());
-                if (CliParser.getInstance().handleEarlyOption()) {
+                CliCommandLine cmdLine = CliParserManager.getInstance().parse(Platform.getCommandLineArgs());
+                TracingRcpPlugin.getDefault().setCommandLine(cmdLine);
+                if (cmdLine != null && CliParserManager.applicationStartup(cmdLine)) {
                     return IApplication.EXIT_OK;
                 }
-            } catch(ParseException e) {
+            } catch (CliParserException e) {
                 TracingRcpPlugin.getDefault().logError("Error parsing command line arguments", e); //$NON-NLS-1$
                 return IApplication.EXIT_OK;
             }

@@ -162,4 +162,10 @@
             splashId="org.eclipse.tracecompass.rcp.ui.splashHandler">
       </splashHandlerProductBinding>
    </extension>
+   <extension
+         point="org.eclipse.tracecompass.tmf.cli.parser.extension">
+      <parser
+            class="org.eclipse.tracecompass.internal.tracing.rcp.ui.cli.RcpCliParser">
+      </parser>
+   </extension>
 </plugin>

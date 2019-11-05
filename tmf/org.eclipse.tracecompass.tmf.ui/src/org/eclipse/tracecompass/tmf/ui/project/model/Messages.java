@@ -23,9 +23,6 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.tmf.ui.project.model.messages"; //$NON-NLS-1$
-
-
-
     /**
      * The category of the analysis helper properties
      *
@@ -155,6 +152,9 @@ public class Messages extends NLS {
     public static String TmfOpenTraceHelper_InitError;
     /** Trace not found */
     public static String TmfOpenTraceHelper_TraceNotFound;
+    /** The trace element does not refer to a trace
+     * @since 5.2*/
+    public static String TmfOpenTraceHelper_NotATrace;
 
     /**
      * Error when experiment folder doesn't exists

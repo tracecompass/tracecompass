@@ -25,12 +25,17 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.internal.tracing.rcp.ui.cli.CliParser;
+import org.eclipse.tracecompass.internal.provisional.tmf.cli.core.parser.CliCommandLine;
+import org.eclipse.tracecompass.internal.provisional.tmf.cli.core.parser.CliParserManager;
 import org.eclipse.tracecompass.internal.tracing.rcp.ui.messages.Messages;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
@@ -65,6 +70,8 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     private static final String PATH_WIZBAN = ICONS_PATH + "wizban/"; //$NON-NLS-1$
 
     private static final String IMAGE_FILE_EXT = "png"; //$NON-NLS-1$
+
+    private @Nullable Job fCliParsingJob = null;
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
@@ -122,8 +129,59 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
     @Override
     public void postStartup() {
-        // Queue the option handling after all queued tasks in UI thread
-        Display.getDefault().asyncExec(() -> CliParser.getInstance().handleLateOptions());
+        CliCommandLine cmdLine = TracingRcpPlugin.getDefault().getCommandLine();
+        if (cmdLine != null) {
+            // Queue the option handling after all queued tasks in UI thread
+            Display.getDefault().asyncExec(() -> {
+                Job cliParsingJob = CliParserManager.getWorkspaceLoadingJob(cmdLine);
+                cliParsingJob.addJobChangeListener(new IJobChangeListener() {
+
+                    @Override
+                    public void aboutToRun(IJobChangeEvent event) {
+                        // Nothing to do
+                    }
+
+                    @Override
+                    public void awake(IJobChangeEvent event) {
+                        // Nothing to do
+                    }
+
+                    @Override
+                    public void done(IJobChangeEvent event) {
+                        fCliParsingJob = null;
+                    }
+
+                    @Override
+                    public void running(IJobChangeEvent event) {
+                        // Nothing to do
+                    }
+
+                    @Override
+                    public void scheduled(IJobChangeEvent event) {
+                        // Nothing to do
+                    }
+
+                    @Override
+                    public void sleeping(IJobChangeEvent event) {
+                        // Nothing to do
+                    }
+
+                });
+                fCliParsingJob = cliParsingJob;
+                cliParsingJob.schedule();
+            });
+        }
+    }
+
+
+
+    @Override
+    public boolean preShutdown() {
+        Job cliParsingJob = fCliParsingJob;
+        if (cliParsingJob != null) {
+            cliParsingJob.cancel();
+        }
+        return true;
     }
 
     // ------------------------------------------------------------------------

@@ -40,9 +40,12 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class HelpCliParserTest {
 
+    /**
+     * String to use in text files to be replaced by the complete help text
+     */
+    public static final String HELP_PLACEHOLDER = "%HELP%";
     private static final String TESTFILES = "testfiles/";
     private static final String HELP_FILE = "helpText.txt";
-    private static final String HELP_PLACEHOLDER = "%HELP%";
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
@@ -127,13 +130,25 @@ public class HelpCliParserTest {
 
     }
 
-    private static String replaceHelp(String outputString) throws IOException {
+    private String replaceHelp(String outputString) throws IOException {
         if (outputString.contains(HELP_PLACEHOLDER)) {
-            byte[] helpBytes = Files.readAllBytes(Paths.get(TESTFILES + HELP_FILE));
-            String helpString = new String(helpBytes);
+            String helpString = getHelpText();
             return outputString.replace(HELP_PLACEHOLDER, helpString);
         }
         return outputString;
+    }
+
+    /**
+     * Get the help text for this test case. The help text will replace the
+     * {@link #HELP_PLACEHOLDER} text in test files.
+     *
+     * @return The complete help text string
+     * @throws IOException
+     *             Exceptions thrown by reading files
+     */
+    protected String getHelpText() throws IOException {
+        byte[] helpBytes = Files.readAllBytes(Paths.get(TESTFILES + HELP_FILE));
+        return new String(helpBytes);
     }
 
 }
