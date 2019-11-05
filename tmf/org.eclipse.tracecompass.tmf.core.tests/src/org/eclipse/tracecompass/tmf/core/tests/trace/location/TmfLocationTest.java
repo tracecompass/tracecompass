@@ -20,6 +20,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfExperimentLocation;
 import org.eclipse.tracecompass.internal.tmf.core.trace.experiment.TmfLocationArray;
@@ -168,8 +169,8 @@ public class TmfLocationTest {
         assertTrue("equals", fLocation3.equals(fLocation3));
         assertTrue("equals", fExpLocation.equals(fExpLocation));
 
-        assertTrue("equals", !fLocation2.equals(fLocation3));
-        assertTrue("equals", !fLocation3.equals(fLocation2));
+        assertFalse("equals", Objects.equals(fLocation2, fLocation3));
+        assertFalse("equals", Objects.equals(fLocation3, fLocation2));
         TmfLocationArray locationArray1 = new TmfLocationArray(aLocationArray, 2, fLocation3, 5);
         TmfExperimentLocation expLocation1 = new TmfExperimentLocation(locationArray1);
         TmfLocationArray locationArray2 = new TmfLocationArray(aLocationArray, 2, fLocation2, 4);

@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.tmf.core.analysis;
 
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.internal.tmf.core.analysis.TmfAnalysisModuleSources;
 import org.eclipse.tracecompass.internal.tmf.core.analysis.TmfAnalysisParameterProviders;
@@ -203,15 +205,15 @@ public class TmfAnalysisManager {
             List<Class<? extends IAnalysisParameterProvider>> parameterProviders = checkNotNull(fParameterProviders.get(module.getId()));
             for (Class<? extends IAnalysisParameterProvider> providerClass : parameterProviders) {
                 try {
-                    IAnalysisParameterProvider provider = fParamProviderInstances.get(providerClass);
+                    @Nullable IAnalysisParameterProvider provider = fParamProviderInstances.get(providerClass);
                     if (provider == null) {
-                        provider = providerClass.newInstance();
+                        provider = providerClass.getConstructor().newInstance();
                         fParamProviderInstances.put(providerClass, provider);
                     }
                     if (provider.appliesToTrace(trace)) {
                         providerSet.add(provider);
                     }
-                } catch (IllegalArgumentException | SecurityException | InstantiationException | IllegalAccessException e) {
+                } catch (IllegalArgumentException | SecurityException | InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                     Activator.logError(Messages.TmfAnalysisManager_ErrorParameterProvider, e);
                 }
             }
