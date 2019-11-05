@@ -66,7 +66,7 @@ public interface ISegmentStoreProvider {
      *
      * @return The Segment start time, Segment end time, and Segment duration
      *         aspects
-     * @since 5.0
+     * @since 5.1
      */
     static Iterable<ISegmentAspect> getBaseSegmentAspects() {
         return ImmutableList.of(Objects.requireNonNull(SegmentStartTimeAspect.SEGMENT_START_TIME_ASPECT), Objects.requireNonNull(SegmentEndTimeAspect.SEGMENT_END_TIME_ASPECT), Objects.requireNonNull(SegmentDurationAspect.SEGMENT_DURATION_ASPECT));
