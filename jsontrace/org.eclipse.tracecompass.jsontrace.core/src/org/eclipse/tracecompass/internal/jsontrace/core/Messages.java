@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.internal.jsontrace.core;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.osgi.util.NLS;
 
 /**
@@ -22,22 +23,22 @@ public class Messages extends NLS {
     /**
      * Description
      */
-    public static String SortingJob_description;
+    public static @Nullable String SortingJob_description;
 
     /**
      * Merging phase
      */
-    public static String SortingJob_merging;
+    public static @Nullable String SortingJob_merging;
 
     /**
      * Sorting phase
      */
-    public static String SortingJob_sorting;
+    public static @Nullable String SortingJob_sorting;
 
     /**
      * Splitting phase
      */
-    public static String SortingJob_splitting;
+    public static @Nullable String SortingJob_splitting;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

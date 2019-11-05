@@ -360,7 +360,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         TmfVertex wupTarget = new TmfVertex(ts);
         TmfEdge hLink = graph.append(target, wupTarget);
         ITmfEventField content = context.getEvent().getContent();
-        Integer vec = content.getFieldValue(Integer.class, eventLayout.fieldVec());
+        Long vec = content.getFieldValue(Long.class, eventLayout.fieldVec());
         if (hLink != null) {
             // Try to resolve the type of the target edge to the softirq's source
             hLink.setType(resolveSoftirq(vec));
@@ -371,7 +371,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
          * Packet_Reception context replaces this if the right events are
          * enabled.
          */
-        if (vec == LinuxValues.SOFTIRQ_NET_RX || vec == LinuxValues.SOFTIRQ_NET_TX) {
+        if (vec != null && (vec == LinuxValues.SOFTIRQ_NET_RX || vec == LinuxValues.SOFTIRQ_NET_TX)) {
             // create edge if wake up is caused by incoming packet
             OsWorker k = getOrCreateKernelWorker(event, cpu);
             TmfVertex tail = graph.getTail(k);
@@ -434,12 +434,12 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         return ret;
     }
 
-    private static EdgeType resolveSoftirq(@Nullable Integer vec) {
+    private static EdgeType resolveSoftirq(@Nullable Long vec) {
         EdgeType ret = EdgeType.UNKNOWN;
         if (vec == null) {
             return ret;
         }
-        switch (vec) {
+        switch (vec.intValue()) {
         case LinuxValues.SOFTIRQ_HRTIMER:
         case LinuxValues.SOFTIRQ_TIMER:
             ret = EdgeType.TIMER;
@@ -527,7 +527,7 @@ public class TraceEventHandlerExecutionGraph extends BaseHandler {
         IKernelAnalysisEventLayout eventLayout = getProvider().getEventLayout(event.getTrace());
         TmfGraph graph = NonNullUtils.checkNotNull(getProvider().getAssignedGraph());
         Long vec = event.getContent().getFieldValue(Long.class, eventLayout.fieldVec());
-        if (vec == LinuxValues.SOFTIRQ_NET_RX || vec == LinuxValues.SOFTIRQ_NET_TX) {
+        if (vec != null && (vec == LinuxValues.SOFTIRQ_NET_RX || vec == LinuxValues.SOFTIRQ_NET_TX)) {
             Integer cpu = NonNullUtils.checkNotNull(TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event));
             OsWorker k = getOrCreateKernelWorker(event, cpu);
             graph.add(k, new TmfVertex(event.getTimestamp().getValue()));
