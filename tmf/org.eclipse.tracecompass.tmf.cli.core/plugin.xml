@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="org.eclipse.tracecompass.tmf.cli.parser.extension" name="%extensionpoint.cliparser.name" schema="schema/org.eclipse.tracecompass.tmf.cli.parser.extension.exsd"/>
+   <extension
+         point="org.eclipse.tracecompass.tmf.cli.parser.extension">
+      <parser
+            class="org.eclipse.tracecompass.internal.tmf.cli.core.parser.help.HelpCliParser">
+      </parser>
+   </extension>
+</plugin>

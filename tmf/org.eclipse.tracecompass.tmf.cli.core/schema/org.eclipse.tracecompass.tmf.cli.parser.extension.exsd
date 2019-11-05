@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.tracecompass.tmf.cli.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.tracecompass.tmf.cli.core" id="org.eclipse.tracecompass.tmf.cli.parser.extension" name="Cli Parser"/>
+      </appinfo>
+      <documentation>
+         This extension points describe actions that can be executed in a Trace Compass instance. Those actions can be executed directly from the command line, via parsing its arguments and calling the proper callback with those arguments.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="parser" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A fully qualified identifier of the target extension point.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  An optional identifier of the extension instance.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  An optional name of the extension instance.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="parser">
+      <annotation>
+         <documentation>
+            Describe a CLI parser that provides additional arguments and actions from the command line
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The class describing the parser
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.tracecompass.tmf.cli.core.action.ICliParser"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="priority" type="string">
+            <annotation>
+               <documentation>
+                  A positive number, typically between 1 and 10, that fixes a priority for the execution of this CLI parser, the lower the number, the highest its priority. default: 5
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         1.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;To add a CLI parser for a plugin, you need to define a class that implements the ICliParser interface, and link it in the plugin&apos;s plugin.xml file as follows:
+&lt;/p&gt;
+&lt;pre&gt;
+   &lt;extension
+         point=&quot;org.eclipse.tracecompass.tmf.cli.parser.extension&quot;&gt;
+      &lt;parser
+            class=&quot;org.eclipse.tracecompass.internal.tracing.rcp.ui.cli.RcpCliParser&quot;&gt;
+      &lt;/parser&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2019 École Polytechnique de Montréal
+
+All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at &amp;lt;a href=&amp;quot;http://www.eclipse.org/legal/epl-v10.html&amp;quot;&amp;gt;http://www.eclipse.org/legal/epl-v10.html&amp;lt;/a&amp;gt;
+      </documentation>
+   </annotation>
+
+</schema>
