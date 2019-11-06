@@ -88,7 +88,7 @@ public class AddProjectNatureTest {
     private static final String CUSTOMIZE_VIEW_DIALOG_TITLE_4_6 = "Available Customizations";
     private static final String CUSTOMIZE_VIEW_MENU_ITEM_4_7 = "Filters and Customization...";
     private static final String CUSTOMIZE_VIEW_DIALOG_TITLE_4_7 = "Filters and Customization";
-    private static final String CUSTOMIZE_VIEW_RESOUCES_FILTER = ".* resources";
+    private static final String CUSTOMIZE_VIEW_RESOURCES_FILTER = ".* resources";
     private static final String CUSTOMIZE_VIEW_SHADOW_FILTER = "Trace Compass Shadow Projects";
     private static final String OK_BUTTON = "OK";
 
@@ -204,7 +204,7 @@ public class AddProjectNatureTest {
     public void testViewerFilter() {
 
         /* Check that shadow project is visible */
-        toggleFilters();
+        toggleFilters(false);
         SWTBotTreeItem shadowProject = SWTBotUtils.selectProject(fBot, SOME_PROJECT_SHADOW_NAME);
         assertEquals(SOME_PROJECT_SHADOW_NAME, shadowProject.getText());
         SWTBotTreeItem tracesItem = SWTBotUtils.getTraceProjectItem(fBot, shadowProject, TRACES_FOLDER_NAME);
@@ -213,7 +213,7 @@ public class AddProjectNatureTest {
         SWTBotUtils.getTraceProjectItem(fBot, shadowProject, EXPERIMENTS_FOLDER_NAME);
 
         /* Check that shadow project is not visible */
-        toggleFilters();
+        toggleFilters(true);
 
         SWTBotView viewBot = fBot.viewByTitle(PROJECT_EXPLORER_TITLE);
         viewBot.setFocus();
@@ -226,7 +226,7 @@ public class AddProjectNatureTest {
         }
     }
 
-    private static void toggleFilters() {
+    private static void toggleFilters(boolean checked) {
         SWTBotView viewBot = fBot.viewByTitle(PROJECT_EXPLORER_TITLE);
         viewBot.setFocus();
 
@@ -243,12 +243,16 @@ public class AddProjectNatureTest {
         shell.bot().cTabItem(0).activate();
 
         SWTBotTable table = shell.bot().table();
-        SWTBotTableItem item = table.getTableItem(CUSTOMIZE_VIEW_RESOUCES_FILTER);
+        SWTBotTableItem item = table.getTableItem(CUSTOMIZE_VIEW_RESOURCES_FILTER);
         item.select();
-        item.toggleCheck();
+        if (checked != item.isChecked()) {
+            item.toggleCheck();
+        }
         item = table.getTableItem(CUSTOMIZE_VIEW_SHADOW_FILTER);
         item.select();
-        item.toggleCheck();
+        if (checked != item.isChecked()) {
+            item.toggleCheck();
+        }
 
         shell.bot().button(OK_BUTTON).click();
     }
