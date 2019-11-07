@@ -783,7 +783,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                 Object entryObject = sSel.toArray()[1];
                 if (entryObject instanceof TimeEvent) {
                     TimeEvent event = (TimeEvent) entryObject;
-                    IContributionItem contribItem = createOpenSourceCodeAction(getPresentationProvider().getEventHoverToolTipInfo(event));
+                    IContributionItem contribItem = createOpenSourceCodeAction(getPresentationProvider().getEventHoverToolTipInfo(event, getTimeGraphViewer().getSelectionBegin()));
                     if (contribItem != null) {
                         menuManager.add(contribItem);
                     }
