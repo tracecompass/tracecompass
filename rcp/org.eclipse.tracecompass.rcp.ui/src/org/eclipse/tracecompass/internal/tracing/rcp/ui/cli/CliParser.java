@@ -24,15 +24,19 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tracing.rcp.ui.TracingRcpPlugin;
 import org.eclipse.tracecompass.internal.tracing.rcp.ui.messages.Messages;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.core.project.model.TmfTraceType;
 import org.eclipse.tracecompass.tmf.core.project.model.TraceTypeHelper;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfCommonProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
 
@@ -186,23 +190,65 @@ public class CliParser {
     public void handleLateOptions() {
         if (fLineParser.hasOption(OPTION_COMMAND_LINE_OPEN_SHORT)) {
             IProject defaultProject = createDefaultProject();
-            openTraceIfNecessary(defaultProject, fLineParser.getOptionValue(OPTION_COMMAND_LINE_OPEN_SHORT));
+            Path tracePath = replaceHomeDir(fLineParser.getOptionValue(OPTION_COMMAND_LINE_OPEN_SHORT));
+            TmfCommonProjectElement existingTraceElement = findElement(tracePath);
+            openTraceIfNecessary(defaultProject, tracePath, existingTraceElement);
         }
 
     }
 
-    private static void openTraceIfNecessary(IProject project, String trace) {
-        String traceToOpen = trace;
+    /**
+     * Find in the workspace a trace element that corresponds to the trace to
+     * open.
+     *
+     * @param tracePath
+     *            The path of the trace to open
+     * @return The existing trace element or <code>null</code> if the trace does
+     *         not exist in the workspace
+     */
+    private static @Nullable TmfCommonProjectElement findElement(Path tracePath) {
+        IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects(0);
+
+        for (IProject project : projects) {
+            TmfProjectElement pElement = TmfProjectRegistry.getProject(project);
+            if (pElement != null) {
+                List<TmfCommonProjectElement> tElements = new ArrayList<>();
+                TmfTraceFolder tracesFolder = pElement.getTracesFolder();
+                if (tracesFolder != null) {
+                    tElements.addAll(tracesFolder.getTraces());
+                }
+
+                for (TmfCommonProjectElement tElement : tElements) {
+                    // If this element is for the same trace, return it
+                    if (new Path(tElement.getLocation().getPath()).equals(tracePath)) {
+                        return tElement;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private static Path replaceHomeDir(String tracePath) {
+        String traceToOpen = tracePath;
         String userHome = System.getProperty("user.home"); //$NON-NLS-1$
         // In case the application was not started on the shell, expand ~ to home directory
         if ((traceToOpen != null) && traceToOpen.startsWith("~/") && (userHome != null)) { //$NON-NLS-1$
             traceToOpen = traceToOpen.replaceFirst("^~", userHome); //$NON-NLS-1$
         }
+        return new Path(traceToOpen);
+    }
+
+    private static void openTraceIfNecessary(IProject project, Path traceToOpen, @Nullable TmfCommonProjectElement existingTrace) {
+        if (existingTrace != null) {
+            TmfOpenTraceHelper.openTraceFromElement(existingTrace);
+            return;
+        }
 
         if (traceToOpen != null) {
             try {
                 TmfTraceFolder destinationFolder = TmfProjectRegistry.getProject(project, true).getTracesFolder();
-                TmfOpenTraceHelper.openTraceFromPath(destinationFolder, traceToOpen, TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell());
+                TmfOpenTraceHelper.openTraceFromPath(destinationFolder, traceToOpen.toOSString(), TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell());
             } catch (CoreException e) {
                 TracingRcpPlugin.getDefault().logError(e.getMessage());
             }

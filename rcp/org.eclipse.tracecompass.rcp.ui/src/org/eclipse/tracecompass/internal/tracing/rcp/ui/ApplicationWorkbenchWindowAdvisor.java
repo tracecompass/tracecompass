@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.internal.tracing.rcp.ui;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.tracecompass.internal.tracing.rcp.ui.cli.CliParser;
 import org.eclipse.tracecompass.tmf.core.TmfCommonConstants;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -97,7 +96,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         super.postWindowOpen();
         TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(new PerspectiveListener());
         hideActionSets();
-        CliParser.getInstance().handleLateOptions();
     }
 
     // ------------------------------------------------------------------------

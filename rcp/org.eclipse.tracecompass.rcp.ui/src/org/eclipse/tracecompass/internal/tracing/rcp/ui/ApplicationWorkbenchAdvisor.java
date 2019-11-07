@@ -29,6 +29,8 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.internal.tracing.rcp.ui.cli.CliParser;
 import org.eclipse.tracecompass.internal.tracing.rcp.ui.messages.Messages;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
@@ -116,6 +118,12 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
             ErrorDialog.openError(null, Messages.Application_WorkspaceSavingError, null, status, IStatus.ERROR | IStatus.WARNING);
             TracingRcpPlugin.getDefault().getLog().log(status);
         }
+    }
+
+    @Override
+    public void postStartup() {
+        // Queue the option handling after all queued tasks in UI thread
+        Display.getDefault().asyncExec(() -> CliParser.getInstance().handleLateOptions());
     }
 
     // ------------------------------------------------------------------------
