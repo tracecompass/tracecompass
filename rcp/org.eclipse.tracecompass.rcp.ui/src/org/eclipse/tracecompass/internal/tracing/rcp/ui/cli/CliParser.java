@@ -13,6 +13,7 @@
 package org.eclipse.tracecompass.internal.tracing.rcp.ui.cli;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -86,7 +87,7 @@ public class CliParser {
         fOptions.addOption(OPTION_COMMAND_LINE_LIST_SHORT, OPTION_COMMAND_LINE_LIST_LONG, false, OPTION_COMMAND_LINE_LIST_DESCRIPTION);
 
         OptionBuilder.withArgName("path"); //$NON-NLS-1$
-        OptionBuilder.hasArg();
+        OptionBuilder.hasArgs();
         OptionBuilder.withLongOpt(OPTION_COMMAND_LINE_OPEN_LONG);
         OptionBuilder.withDescription(OPTION_COMMAND_LINE_OPEN_DESCRIPTION);
         Option openOpt = OptionBuilder.create(OPTION_COMMAND_LINE_OPEN_SHORT);
@@ -190,24 +191,25 @@ public class CliParser {
     public void handleLateOptions() {
         if (fLineParser.hasOption(OPTION_COMMAND_LINE_OPEN_SHORT)) {
             IProject defaultProject = createDefaultProject();
-            Path tracePath = replaceHomeDir(fLineParser.getOptionValue(OPTION_COMMAND_LINE_OPEN_SHORT));
-            TmfCommonProjectElement existingTraceElement = findElement(tracePath);
-            openTraceIfNecessary(defaultProject, tracePath, existingTraceElement);
+            List<Path> tracePaths = replaceHomeDir(fLineParser.getOptionValues(OPTION_COMMAND_LINE_OPEN_SHORT));
+            Collection<TmfCommonProjectElement> existingTraceElement = findElements(tracePaths);
+            openTraceIfNecessary(defaultProject, tracePaths, existingTraceElement);
         }
 
     }
 
     /**
-     * Find in the workspace a trace element that corresponds to the trace to
+     * Find in the workspace the trace elements that corresponds to the traces to
      * open.
      *
-     * @param tracePath
+     * @param tracePaths
      *            The path of the trace to open
-     * @return The existing trace element or <code>null</code> if the trace does
+     * @return The existing trace elements or <code>null</code> if the trace does
      *         not exist in the workspace
      */
-    private static @Nullable TmfCommonProjectElement findElement(Path tracePath) {
+    private static @Nullable Collection<TmfCommonProjectElement> findElements(List<Path> tracePaths) {
         IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects(0);
+        List<TmfCommonProjectElement> wanted = new ArrayList<>();
 
         for (IProject project : projects) {
             TmfProjectElement pElement = TmfProjectRegistry.getProject(project);
@@ -220,35 +222,46 @@ public class CliParser {
 
                 for (TmfCommonProjectElement tElement : tElements) {
                     // If this element is for the same trace, return it
-                    if (new Path(tElement.getLocation().getPath()).equals(tracePath)) {
-                        return tElement;
+                    Path elementPath = new Path(tElement.getLocation().getPath());
+                    if (tracePaths.contains(elementPath)) {
+                        wanted.add(tElement);
+                        tracePaths.remove(elementPath);
+
                     }
                 }
             }
         }
-        return null;
+        return wanted;
     }
 
-    private static Path replaceHomeDir(String tracePath) {
-        String traceToOpen = tracePath;
-        String userHome = System.getProperty("user.home"); //$NON-NLS-1$
-        // In case the application was not started on the shell, expand ~ to home directory
-        if ((traceToOpen != null) && traceToOpen.startsWith("~/") && (userHome != null)) { //$NON-NLS-1$
-            traceToOpen = traceToOpen.replaceFirst("^~", userHome); //$NON-NLS-1$
+    private static List<Path> replaceHomeDir(String[] tracePaths) {
+        List<Path> tracesToOpen = new ArrayList<>();
+        for (String tracePath : tracePaths) {
+            String traceToOpen = tracePath;
+            String userHome = System.getProperty("user.home"); //$NON-NLS-1$
+            // In case the application was not started on the shell, expand ~ to
+            // home directory
+            if ((traceToOpen != null) && traceToOpen.startsWith("~/") && (userHome != null)) { //$NON-NLS-1$
+                traceToOpen = traceToOpen.replaceFirst("^~", userHome); //$NON-NLS-1$
+            }
+            tracesToOpen.add(new Path(traceToOpen));
         }
-        return new Path(traceToOpen);
+        return tracesToOpen;
     }
 
-    private static void openTraceIfNecessary(IProject project, Path traceToOpen, @Nullable TmfCommonProjectElement existingTrace) {
-        if (existingTrace != null) {
+    private static void openTraceIfNecessary(IProject project, List<Path> tracePaths, Collection<TmfCommonProjectElement> existingTraces) {
+        for (TmfCommonProjectElement existingTrace : existingTraces) {
             TmfOpenTraceHelper.openTraceFromElement(existingTrace);
+        }
+
+        if (tracePaths.isEmpty()) {
             return;
         }
 
-        if (traceToOpen != null) {
+        TmfTraceFolder destinationFolder = TmfProjectRegistry.getProject(project, true).getTracesFolder();
+        for (Path tracePath : tracePaths) {
             try {
-                TmfTraceFolder destinationFolder = TmfProjectRegistry.getProject(project, true).getTracesFolder();
-                TmfOpenTraceHelper.openTraceFromPath(destinationFolder, traceToOpen.toOSString(), TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell());
+                TmfOpenTraceHelper.openTraceFromPath(destinationFolder, tracePath.toOSString(), TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell());
             } catch (CoreException e) {
                 TracingRcpPlugin.getDefault().logError(e.getMessage());
             }

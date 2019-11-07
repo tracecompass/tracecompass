@@ -76,6 +76,8 @@ public class CliParserTest {
                 // Open trace
                 { "--cli --open mytrace", false, null },
                 { "--cli -o mytrace", false, null },
+                { "--cli --open mytrace mytrace2 mytrace3", false, null },
+                { "--cli -o mytrace mytrace2 mytrace3", false, null },
                 { "--cli --open", true, "missingOpenArgument.txt" },
                 { "--cli -o", true, "missingOpenArgument.txt" },
                 // Errors
