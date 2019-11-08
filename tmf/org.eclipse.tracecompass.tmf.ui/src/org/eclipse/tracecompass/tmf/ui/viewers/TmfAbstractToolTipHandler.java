@@ -194,7 +194,7 @@ public abstract class TmfAbstractToolTipHandler {
     private static final int MAX_SHELL_HEIGHT = 700;
     private static final int MOUSE_DEADZONE = 5;
     private static final String TIME_HYPERLINK = "<a href=time://%d>%s</a>"; //$NON-NLS-1$
-    private static final String SOURCE_HYPERLINK = "<a href=" + TmfStrings.source() + "://%s\\\">%s</a>"; //$NON-NLS-1$//$NON-NLS-2$
+    private static final String SOURCE_HYPERLINK = "<a href=" + TmfStrings.source() + "://%s>%s</a>"; //$NON-NLS-1$//$NON-NLS-2$
     private static final Pattern TIME_PATTERN = Pattern.compile("\\s*time\\:\\/\\/(\\d+).*"); //$NON-NLS-1$
     private static final Pattern SOURCE_PATTERN = Pattern.compile(TmfStrings.source().toLowerCase() +"\\:\\/\\/(.*):(\\d+).*"); //$NON-NLS-1$
 
