@@ -9,7 +9,7 @@
 
 package org.eclipse.tracecompass.tmf.core.statesystem;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
@@ -85,7 +85,7 @@ public class TmfAttributePool {
         }
         switch (type) {
         case FIFO:
-            fAvailableQuarks = new LinkedList<>();
+            fAvailableQuarks = new ArrayDeque<>();
             break;
         case PRIORITY:
             fAvailableQuarks = new PriorityQueue<>();
