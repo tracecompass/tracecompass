@@ -69,4 +69,9 @@ public class TmfModelResponse<T> implements ITmfResponse {
     public String getStatusMessage() {
         return fStatusMessage;
     }
+
+    @Override
+    public String toString() {
+        return "Response: " + fStatus + ", " + fStatusMessage;  //$NON-NLS-1$//$NON-NLS-2$
+    }
 }

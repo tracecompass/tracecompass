@@ -38,4 +38,9 @@ public class TimeGraphModel {
     public List<ITimeGraphRowModel> getRows() {
         return fRows;
     }
+
+    @Override
+    public String toString() {
+        return "Model: rows -> " + fRows; //$NON-NLS-1$
+    }
 }

@@ -44,4 +44,9 @@ public class TimeGraphRowModel implements ITimeGraphRowModel {
         return fEntryID;
     }
 
+    @Override
+    public String toString() {
+        return "Row Model for entry " + fEntryID; //$NON-NLS-1$
+    }
+
 }

@@ -148,4 +148,9 @@ public class TimeGraphState extends OutputElement implements ITimeGraphState {
         }
         return toTest;
     }
+
+    @Override
+    public String toString() {
+        return "State: start: " + fStartTime + ", duration: " + fDuration + ", value: " + fValue + ", label: " + fLabel;  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    }
 }
