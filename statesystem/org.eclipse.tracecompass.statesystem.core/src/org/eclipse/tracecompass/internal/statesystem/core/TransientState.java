@@ -110,6 +110,20 @@ public class TransientState {
     }
 
     /**
+     * Retrieve all the ongoing state values.
+     *
+     * @return The list of state values
+     */
+    public List<@Nullable Object> getOngoingStateValues() {
+        fRWLock.readLock().lock();
+        try {
+            return new ArrayList<>(fOngoingStateInfo);
+        } finally {
+            fRWLock.readLock().unlock();
+        }
+    }
+
+    /**
      * Retrieve the start time of the state in which the given attribute is in.
      *
      * @param quark

@@ -12,6 +12,9 @@
 
 package org.eclipse.tracecompass.statesystem.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
@@ -340,4 +343,24 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      * @since 2.1
      */
     void removeFiles();
+
+    /**
+     * Returns the current state values we have (in the Transient State) for all the
+     * attributes.
+     * <p>
+     * This is useful even for a StateHistorySystem, as we are guaranteed it
+     * will only do a memory access and not go look on disk (and we don't even
+     * have to provide a timestamp!)
+     * </p>
+     *
+     * @return the list of transient state values
+     * @since 4.3
+     */
+    default List<@Nullable Object> queryOngoing() {
+        List<@Nullable Object> retVal = new ArrayList<>();
+        for (int attr = 0; attr < getNbAttributes(); attr++) {
+            retVal.add(queryOngoing(attr));
+        }
+        return retVal;
+    }
 }

@@ -509,6 +509,11 @@ public class StateSystem implements ITmfStateSystemBuilder {
     }
 
     @Override
+    public List<@Nullable Object> queryOngoing() {
+        return transState.getOngoingStateValues();
+    }
+
+    @Override
     public long getOngoingStartTime(int attribute) {
         return transState.getOngoingStartTime(attribute);
     }
