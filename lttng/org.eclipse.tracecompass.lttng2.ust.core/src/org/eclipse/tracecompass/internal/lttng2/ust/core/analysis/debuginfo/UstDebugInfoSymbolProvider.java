@@ -91,6 +91,6 @@ public class UstDebugInfoSymbolProvider extends DefaultSymbolProvider {
                 return symbol;
             }
         }
-        return null;
+        return new TmfLibrarySymbol(bc.getOffset(), bc.getBinaryFilePath());
     }
 }
