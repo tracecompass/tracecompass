@@ -175,18 +175,14 @@ public class StateSystemDataProvider extends AbstractTmfTraceDataProvider implem
                 ArrayList<?> actualList = (ArrayList<?>) actualTimeObj;
                 Long actualTime = (Long) actualList.get(0);
                 if (actualTime != null) {
-                    for (ITmfStateInterval fullstate : ss.queryFullState(actualTime)) {
-                        if (fullstate.getAttribute() == quark) {
-                            valueString = NonNullUtils.nullToEmptyString(fullstate.getValue());
-                            break;
-                        }
-                    }
+                    ITmfStateInterval interval = ss.querySingleState(actualTime, quark);
+                    valueString = String.valueOf(interval.getValue());
                 }
             }
         } catch (StateSystemDisposedException e) {
             // Return empty string
         }
-        return Objects.requireNonNull(valueString);
+        return NonNullUtils.nullToEmptyString(valueString);
     }
 
     private abstract static  class EntryModelBuilder {
