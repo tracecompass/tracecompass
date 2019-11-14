@@ -26,6 +26,7 @@ import org.eclipse.ui.PlatformUI;
 public final class HandlerUtils {
 
     private HandlerUtils() {
+        // Do nothing
     }
 
     /**
