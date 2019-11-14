@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -34,6 +34,7 @@ import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterOrNode;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.filter.parser.FilterParserParser;
 
 /**
@@ -237,21 +238,27 @@ public class FilterSimpleExpressionCu implements IFilterCu {
 
         private static BiFunction<Object, Object, Boolean> matchFunc() {
             return (i, j) -> {
-                try {
-                    Pattern filterPattern = Pattern.compile(String.valueOf(j));
-                    // j is the value entered by the user, it was converted to a
-                    // Number, we should not try to check numerical equality if
-                    // value entered is not a number
-                    if (j instanceof Number) {
-                        // For numbers, the equality check is better suited as
-                        // the format (hex, decimal) is considered. For strings,
-                        // the pattern matching will work better
-                        return equals(i, j) || filterPattern.matcher(String.valueOf(i)).find();
+                Pattern filterPattern = null;
+                Object value = j;
+                if (j instanceof Pair) {
+                    Pair<?, ?> pair = (Pair<?, ?>) j;
+                    if (pair.getFirst() instanceof Pattern) {
+                        filterPattern = (Pattern) pair.getFirst();
                     }
-                    return filterPattern.matcher(String.valueOf(i)).find();
-                } catch (PatternSyntaxException e) {
-                    return false;
+                    value = pair.getSecond();
                 }
+                /*
+                 * 'value' is the value entered by the user, if it has been
+                 * converted to a Number, the equality check is better suited as
+                 * the format (hex, decimal) is considered
+                 */
+                if (value instanceof Number && equals(i, value)) {
+                    return true;
+                }
+                if (filterPattern != null) {
+                    return filterPattern.matcher(String.valueOf(i)).find();
+                }
+                return false;
             };
         }
 
@@ -348,24 +355,40 @@ public class FilterSimpleExpressionCu implements IFilterCu {
         /**
          * Convert a human-readable string value to its machine representation.
          * For example, duration strings such as "200ms" can be converted to the
-         * long value of 200000000.
+         * long value of 200000000. For the MATCHES operator, return a pair that
+         * contains the compiled pattern and the parsed value.
          *
+         * @param operator
+         *            The operator for which the value is prepared
          * @param value
          *            The human-readable string value entered by the user
-         * @return The parsed value if available, or the string itself if no
-         *         formatter succeeded.
+         * @return The parsed value as a number if available, or the string
+         *         itself if no formatter succeeded, or a pair of the compiled
+         *         pattern and the parsed value.
          */
-        public static @Nullable Object prepareValue(@Nullable String value) {
+        public static @Nullable Object prepareValue(ConditionOperator operator, @Nullable String value) {
             if (value == null) {
                 return null;
             }
+            Object parsedValue = value;
             // Try to convert to a number
             Number number = toNumber(value);
             if (number != null) {
-                return number;
+                parsedValue = number;
             }
-
-            return value;
+            Pattern pattern = null;
+            if (operator == ConditionOperator.MATCHES) {
+                // Try to compile to a pattern
+                try {
+                    pattern = Pattern.compile(String.valueOf(value));
+                } catch (PatternSyntaxException e) {
+                    // Ignore
+                }
+                if (pattern != null) {
+                    return new Pair<>(pattern, parsedValue);
+                }
+            }
+            return parsedValue;
         }
     }
 

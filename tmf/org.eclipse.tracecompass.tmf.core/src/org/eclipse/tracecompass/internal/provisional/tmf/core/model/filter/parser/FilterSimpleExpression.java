@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (c) 2018 Ericsson
+* Copyright (c) 2018, 2019 Ericsson
 *
 * All rights reserved. This program and the accompanying materials are
 * made available under the terms of the Eclipse Public License v1.0 which
@@ -45,7 +45,7 @@ public class FilterSimpleExpression implements Predicate<Multimap<String, Object
         fField = field;
         fOperator = operator;
         fOriginalValue = value;
-        fValue = ConditionOperator.prepareValue(value);
+        fValue = ConditionOperator.prepareValue(operator, value);
     }
 
     @Override

@@ -105,6 +105,17 @@ public class ElementResolverFilterTest {
         assertNotNull(cu);
         predicate = cu.generate();
         assertFalse(predicate.test(ELEMENT.getMetadata()));
+
+        cu = FilterCu.compile(" \"key3\" == 10");
+        assertNotNull(cu);
+        predicate = cu.generate();
+        assertTrue(predicate.test(ELEMENT.getMetadata()));
+
+        // Match a number against an hex string
+        cu = FilterCu.compile(" \"key3\" == 0xa");
+        assertNotNull(cu);
+        predicate = cu.generate();
+        assertTrue(predicate.test(ELEMENT.getMetadata()));
     }
 
     @Test
@@ -178,6 +189,17 @@ public class ElementResolverFilterTest {
         assertFalse(predicate.test(ELEMENT.getMetadata()));
 
         cu = FilterCu.compile(" \"key 2\" matches value2");
+        assertNotNull(cu);
+        predicate = cu.generate();
+        assertTrue(predicate.test(ELEMENT.getMetadata()));
+
+        cu = FilterCu.compile(" \"key3\" matches 10");
+        assertNotNull(cu);
+        predicate = cu.generate();
+        assertTrue(predicate.test(ELEMENT.getMetadata()));
+
+        // Match a number against an hex string
+        cu = FilterCu.compile(" \"key3\" matches 0xa");
         assertNotNull(cu);
         predicate = cu.generate();
         assertTrue(predicate.test(ELEMENT.getMetadata()));
