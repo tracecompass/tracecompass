@@ -74,6 +74,18 @@ public class DataProviderParameterUtils {
      */
     public static final String REGEX_MAP_FILTERS_KEY = "regex_map_filters"; //$NON-NLS-1$
 
+    /**
+     * Key to indicate a full search. When set to {@link Boolean#TRUE}, the data
+     * provider is expected to perform a full search of elements that occur
+     * between the usual elements found at the requested times (e.g. in gaps).
+     * If any element matches the specified regex filter, at least one such
+     * matching element per gap should be returned. It is not expected to return
+     * all matching elements found in a single gap, for performance reasons.
+     *
+     * @since 5.2
+     */
+    public static final String FULL_SEARCH_KEY = "full_search"; //$NON-NLS-1$
+
     private DataProviderParameterUtils() {
         // Private constructor
     }

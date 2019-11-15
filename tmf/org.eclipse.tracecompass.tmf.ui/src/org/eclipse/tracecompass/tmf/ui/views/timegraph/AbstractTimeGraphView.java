@@ -613,8 +613,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         @Override
         public void doRun() {
             Sampling sampling = new Sampling(getZoomStartTime(), getZoomEndTime(), getResolution());
+            boolean isFilterActive = !getRegexes().values().isEmpty();
             try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStates")) { //$NON-NLS-1$
-                boolean isFilterActive = !getRegexes().values().isEmpty();
                 boolean isFilterCleared = !isFilterActive && getTimeGraphViewer().isTimeEventFilterActive();
                 getTimeGraphViewer().setTimeEventFilterApplied(isFilterActive);
 
@@ -656,6 +656,19 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     }
                 }
             }
+
+            if (isFilterActive && Thread.currentThread() == fZoomThread) {
+                /* Do a full filter search as a second pass */
+                try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStatesFullSearch")) { //$NON-NLS-1$
+                    for (TimeGraphEntry entry : fEntries) {
+                        if (getMonitor().isCanceled()) {
+                            return;
+                        }
+                        zoomEntries(Collections.singleton(entry), getZoomStartTime(), getZoomEndTime(), getResolution(), true, getMonitor());
+                        refresh();
+                    }
+                }
+            }
         }
 
     }
@@ -682,12 +695,45 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     protected void zoomEntries(@NonNull Iterable<@NonNull TimeGraphEntry> entries,
             long zoomStartTime, long zoomEndTime, long resolution, @NonNull IProgressMonitor monitor) {
+        zoomEntries(entries, zoomStartTime, zoomEndTime, resolution, false, monitor);
+    }
+
+    /**
+     * Add events from the queried time range to the queried entries.
+     * <p>
+     * Called from the ZoomThread for every entry to update the zoomed event
+     * list.
+     * <p>
+     * The implementation should call
+     * {@link TimeGraphEntry#setSampling(Sampling)} if the zoomed event list is
+     * successfully set.
+     * <p>
+     * When a full search is requested, the gaps in between samples of the
+     * queried time range should be searched and at least one event matching the
+     * regex filter should be included per gap, if any is found.
+     *
+     * @param entries
+     *            List of entries to zoom on.
+     * @param zoomStartTime
+     *            Start of the time range
+     * @param zoomEndTime
+     *            End of the time range
+     * @param resolution
+     *            The resolution
+     * @param fullSearch
+     *            True to perform a full search
+     * @param monitor
+     *            The progress monitor object
+     * @since 5.2
+     */
+    protected void zoomEntries(@NonNull Iterable<@NonNull TimeGraphEntry> entries,
+            long zoomStartTime, long zoomEndTime, long resolution, boolean fullSearch, @NonNull IProgressMonitor monitor) {
 
         try {
             Map<Integer, Predicate<Map<String, String>>> predicates = computeRegexPredicate();
 
             for (TimeGraphEntry entry : entries) {
-                List<ITimeEvent> zoomedEventList = getEventList(entry, zoomStartTime, zoomEndTime, resolution, monitor);
+                List<ITimeEvent> zoomedEventList = getEventList(entry, zoomStartTime, zoomEndTime, fullSearch ? 1L : resolution, monitor);
                 if (monitor.isCanceled()) {
                     return;
                 }

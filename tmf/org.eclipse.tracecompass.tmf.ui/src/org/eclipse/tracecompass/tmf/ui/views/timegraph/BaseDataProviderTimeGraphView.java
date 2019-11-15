@@ -383,7 +383,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
     }
 
     @Override
-    protected void zoomEntries(@NonNull Iterable<@NonNull TimeGraphEntry> entries, long zoomStartTime, long zoomEndTime, long resolution, @NonNull IProgressMonitor monitor) {
+    protected void zoomEntries(@NonNull Iterable<@NonNull TimeGraphEntry> entries, long zoomStartTime, long zoomEndTime, long resolution, boolean fullSearch, @NonNull IProgressMonitor monitor) {
         if (resolution < 0) {
             // StateSystemUtils.getTimes would throw an illegal argument exception.
             return;
@@ -391,14 +391,13 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
 
         long start = Long.min(zoomStartTime, zoomEndTime);
         long end = Long.max(zoomStartTime, zoomEndTime);
-        List<@NonNull Long> times = StateSystemUtils.getTimes(start, end, resolution);
         Sampling sampling = new Sampling(start, end, resolution);
         Multimap<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Long> providersToModelIds = filterGroupEntries(entries, zoomStartTime, zoomEndTime);
         SubMonitor subMonitor = SubMonitor.convert(monitor, getClass().getSimpleName() + "#zoomEntries", providersToModelIds.size()); //$NON-NLS-1$
 
         for (Entry<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Collection<Long>> entry : providersToModelIds.asMap().entrySet()) {
             ITimeGraphDataProvider<? extends TimeGraphEntryModel> dataProvider = entry.getKey();
-            Map<@NonNull String, @NonNull Object> parameters = getFetchRowModelParameters(times, entry.getValue());
+            Map<@NonNull String, @NonNull Object> parameters = getFetchRowModelParameters(start, end, resolution, fullSearch, entry.getValue());
             TmfModelResponse<TimeGraphModel> response = dataProvider.fetchRowModel(parameters, monitor);
 
             TimeGraphModel model = response.getModel();
@@ -626,20 +625,29 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
     /**
      * Get the fetch parameters to pass to a fetchRowModel call
      *
-     * @param times
-     *            Sorted list of times to query.
+     * @param start
+     *            Start time of query
+     * @param end
+     *            End time of query
+     * @param resolution
+     *            Resolution of query
+     * @param fullSearch
+     *            True to perform a full search
      * @param items
      *            The unique keys of the entries to query.
      * @return Map of parameters for fetchRowModel
      * @since 5.2
      */
-    protected @NonNull Map<@NonNull String, @NonNull Object> getFetchRowModelParameters(@NonNull List<Long> times, @NonNull Collection<Long> items) {
+    protected @NonNull Map<@NonNull String, @NonNull Object> getFetchRowModelParameters(long start, long end, long resolution, boolean fullSearch, @NonNull Collection<Long> items) {
         @NonNull Map<@NonNull String, @NonNull Object> parameters = new HashMap<>();
-        parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, times);
+        parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, StateSystemUtils.getTimes(start, end, resolution));
         parameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, items);
         Multimap<@NonNull Integer, @NonNull String> regexesMap = getRegexes();
         if (!regexesMap.isEmpty()) {
             parameters.put(DataProviderParameterUtils.REGEX_MAP_FILTERS_KEY, regexesMap.asMap());
+        }
+        if (fullSearch) {
+            parameters.put(DataProviderParameterUtils.FULL_SEARCH_KEY, Boolean.TRUE);
         }
         return parameters;
     }

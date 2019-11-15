@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -22,6 +22,7 @@ import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
 /**
@@ -86,13 +87,13 @@ public interface ITimeGraphStateFilter {
     }
 
     /**
-     * Filter the time graph state and add it to the state list
+     * Filter the time graph state and add it to the state list.
      *
      * @param stateList
      *            The timegraph state list
      * @param timeGraphState
      *            The current timegraph state
-     * @param key
+     * @param entryId
      *            The timegraph entry model id
      * @param predicates
      *            The predicates used to filter the timegraph state. It is a map
@@ -104,17 +105,71 @@ public interface ITimeGraphStateFilter {
      *            The progress monitor
      * @since 5.0
      */
-    default void applyFilterAndAddState(List<ITimeGraphState> stateList, ITimeGraphState timeGraphState, Long key, Map<Integer, Predicate<Multimap<String, Object>>> predicates, @Nullable IProgressMonitor monitor) {
+    default void applyFilterAndAddState(List<ITimeGraphState> stateList, ITimeGraphState timeGraphState, Long entryId, Map<Integer, Predicate<Multimap<String, Object>>> predicates, @Nullable IProgressMonitor monitor) {
+        applyFilterAndAddState(stateList, timeGraphState, entryId, predicates, null, monitor);
+    }
+
+    /**
+     * Filter the time graph state and add it to the state list.
+     * <p>
+     * If a list of times is specified, all states that intersect a time in the
+     * list are included. States that do not intersect any time (e.g. in gap)
+     * are only included if they are neither dimmed nor excluded, and a maximum
+     * of one state per gap is included. The method must be called in
+     * chronological order of states, otherwise the result is unspecified.
+     *
+     * @param stateList
+     *            The timegraph state list
+     * @param timeGraphState
+     *            The current timegraph state
+     * @param entryId
+     *            The timegraph entry model id
+     * @param predicates
+     *            The predicates used to filter the timegraph state. It is a map
+     *            of predicate by property. The value of the property is an
+     *            integer representing a bitmask associated to that property.
+     *            The status of each property will be set for the timegraph
+     *            state according to the associated predicate test result.
+     * @param times
+     *            The list of times that should be included in the state list.
+     *            If set to <code>null</code>, all matching states should be
+     *            included.
+     * @param monitor
+     *            The progress monitor
+     * @since 5.2
+     */
+    default void applyFilterAndAddState(List<ITimeGraphState> stateList, ITimeGraphState timeGraphState, Long entryId, Map<Integer, Predicate<Multimap<String, Object>>> predicates, @Nullable List<Long> times, @Nullable IProgressMonitor monitor) {
+
+        long startTime = timeGraphState.getStartTime();
+        long endTime = timeGraphState.getStartTime() + timeGraphState.getDuration();
+
+        // Discard all additional states in same gap after first match
+        if (times != null && !stateList.isEmpty()) {
+            ITimeGraphState lastState = Iterables.getLast(stateList);
+            long lastStart = lastState.getStartTime();
+            long lastEnd = lastStart + lastState.getDuration();
+            int index = Collections.binarySearch(times, lastStart);
+            if (index < 0) {
+                index = -index - 1;
+                if (index >= times.size()) {
+                    // Skip all after the last query time
+                    return;
+                }
+                if (lastEnd < times.get(index) && endTime <= times.get(index)) {
+                    // If last state was in gap, skip all others in same gap
+                    return;
+                }
+            }
+        }
 
         if (!predicates.isEmpty()) {
             // Get the filter external input data
-            long startTime = timeGraphState.getStartTime();
             Multimap<@NonNull String, @NonNull Object> input = HashMultimap.create();
-            input.putAll(getFilterData(key, startTime, monitor));
+            input.putAll(getFilterData(entryId, startTime, monitor));
             input.putAll(timeGraphState.getMetadata());
 
-            // Test each predicates and set the status of the property associated to the
-            // predicate
+            // Test each predicates and set the status of the property
+            // associated to the predicate
             for (Map.Entry<Integer, Predicate<Multimap<String, Object>>> mapEntry : predicates.entrySet()) {
                 Predicate<Multimap<String, Object>> value = Objects.requireNonNull(mapEntry.getValue());
                 boolean status = value.test(input);
@@ -127,7 +182,19 @@ public interface ITimeGraphStateFilter {
             }
         }
 
+        if (times != null && (timeGraphState.getActiveProperties() & (IFilterProperty.DIMMED | IFilterProperty.EXCLUDE)) != 0) {
+            // Do not include state in gap if it is dimmed or excluded
+            int index = Collections.binarySearch(times, startTime);
+            if (index < 0) {
+                index = -index - 1;
+                if (index >= times.size() || (endTime < times.get(index))) {
+                    return;
+                }
+            }
+        }
+
         if (timeGraphState.isPropertyActive(IFilterProperty.EXCLUDE)) {
+            // Replace excluded state with a null state
             TimeGraphState timeGraphState2 = new TimeGraphState(timeGraphState.getStartTime(), timeGraphState.getDuration(), Integer.MIN_VALUE);
             timeGraphState2.setActiveProperties(timeGraphState.getActiveProperties());
             stateList.add(timeGraphState2);

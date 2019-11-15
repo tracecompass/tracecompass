@@ -2843,7 +2843,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             fTimeGraphProvider.postDrawEvent(event, drawRect, gc);
         }
         gc.setAlpha(old);
-        return visible;
+        return visible && !event.isPropertyActive(IFilterProperty.DIMMED);
     }
 
     private StyleManager getStyleManager() {
