@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2019 Ericsson
+ * Copyright (c) 2013, 2019 Ericsson, Draeger, Auriga
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -18,8 +18,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.FocusEvent;
@@ -38,6 +40,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.xycharts.TmfXyUiUtils;
+import org.eclipse.tracecompass.internal.tmf.ui.views.LockRangeDialog;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
@@ -96,6 +99,9 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
 
     private List<IContextActivation> fActiveContexts = new ArrayList<>();
     private IContextService fContextService;
+
+    /** The clamp to the Y axis action */
+    private @Nullable IAction fClampAction = null;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -179,6 +185,12 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
     @Override
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
+        IMenuManager menuManager = getViewSite().getActionBars().getMenuManager();
+
+        fClampAction = createClampAction();
+        menuManager.add(new Separator());
+        menuManager.add(fClampAction);
+
         fSashForm = new SashForm(parent, SWT.NONE);
         fTmfViewer = createLeftChildViewer(fSashForm);
         fXYViewerContainer = new Composite(fSashForm, SWT.NONE);
@@ -395,6 +407,18 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
         if (fPinAction != null) {
             fPinAction.setPinnedTrace(trace);
         }
+    }
+
+    private IAction createClampAction() {
+        Action action = new Action(Messages.TmfChartView_LockYAxis, IAction.AS_PUSH_BUTTON) {
+            @Override
+            public void run() {
+                LockRangeDialog rangeDialog = new LockRangeDialog(getSite().getShell(), getChartViewer());
+                rangeDialog.open();
+            }
+        };
+        action.setChecked(false);
+        return action;
     }
 
     // ------------------------------------------------------------------------
