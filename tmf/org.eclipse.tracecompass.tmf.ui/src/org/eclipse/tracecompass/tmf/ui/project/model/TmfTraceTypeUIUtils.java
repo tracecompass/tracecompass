@@ -91,6 +91,12 @@ public final class TmfTraceTypeUIUtils {
     /** Extension point attribute 'class' (attribute of other elements) */
     public static final String CLASS_ATTR = "class"; //$NON-NLS-1$
 
+    /**
+     * Extension point attribute 'useTraceAspects'
+     * @since 5.2
+     */
+    public static final String USE_TRACE_ASPECTS_ATTR = "useTraceAspects"; //$NON-NLS-1$
+
     private TmfTraceTypeUIUtils() {
     }
 
@@ -323,17 +329,25 @@ public final class TmfTraceTypeUIUtils {
                     break;
                 }
                 final String eventsTableType = eventsTableTypeCE[0].getAttribute(TmfTraceTypeUIUtils.CLASS_ATTR);
-                if (eventsTableType.isEmpty()) {
+                final boolean useTraceAspects = Boolean.parseBoolean(eventsTableTypeCE[0].getAttribute(TmfTraceTypeUIUtils.USE_TRACE_ASPECTS_ATTR));
+
+                if ((eventsTableType == null) || eventsTableType.isEmpty()) {
                     break;
                 }
                 try {
                     final Bundle bundle = Platform.getBundle(ce.getContributor().getName());
                     final Class<?> c = bundle.loadClass(eventsTableType);
-                    final Class<?>[] constructorArgs = new Class[] { Composite.class, int.class };
+                    Class<?>[] constructorArgs = null;
+                    Object[] args = null;
+                    if (useTraceAspects) {
+                        args = new Object[] { parent, cacheSize, trace.getEventAspects() };
+                        constructorArgs = new Class[] { Composite.class, int.class, Iterable.class };
+                    } else {
+                        args = new Object[] { parent, cacheSize };
+                        constructorArgs = new Class[] { Composite.class, int.class };
+                    }
                     final Constructor<?> constructor = c.getConstructor(constructorArgs);
-                    final Object[] args = new Object[] { parent, cacheSize };
                     return (TmfEventsTable) constructor.newInstance(args);
-
                 } catch (NoSuchMethodException | ClassNotFoundException | InstantiationException |
                         IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                     return null;

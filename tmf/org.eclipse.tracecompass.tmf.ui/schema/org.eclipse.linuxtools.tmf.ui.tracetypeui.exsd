@@ -137,6 +137,13 @@ If empty, the default events table will be used.
                </appinfo>
             </annotation>
          </attribute>
+         <attribute name="useTraceAspects" type="boolean">
+            <annotation>
+               <documentation>
+                  Set this flag to true, if the aspects for the table columns are provided by the &lt;samp&gt;ITmfTrace&lt;/samp&gt;. If the aspects is supplied by the events table extension, set this flag to false. Default value is false.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
@@ -192,8 +199,10 @@ If empty, the current perspective will be used.
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
-         Example use of the extension point: the GDB trace type, which specifies a custom icon and a custom editor, also the generic experiment, which specifies a custom icon. The &apos;type/tracetype&apos; element has to point to an existing tmf.core.tracetype extension!
-
+         &lt;p&gt;
+Example use of the extension point: the GDB trace type, which specifies a custom icon and a custom editor, also the generic experiment, which specifies a custom icon. The &apos;type/tracetype&apos; element has to point to an existing tmf.core.tracetype extension!
+&lt;/p&gt;
+&lt;pre&gt;
 &lt;extension
       point=&quot;org.eclipse.linuxtools.tmf.ui.tracetypeui&quot;&gt;
    &lt;type
@@ -208,6 +217,22 @@ If empty, the current perspective will be used.
          icon=&quot;icons/elcl16/experiment.gif&quot;&gt;
    &lt;/experiment_type&gt;
 &lt;/extension&gt;
+
+public class GdbEventsTable extends TmfEventsTable {
+    /**
+     * Constructor
+     *
+     * @param parent
+     *            the parent
+     * @param cacheSize
+     *            the cache size
+     */
+    public GdbEventsTable(Composite parent, int cacheSize) {
+        super(parent, cacheSize, GdbEventAspects.getAspects());
+    }
+}
+&lt;/pre&gt;
+
       </documentation>
    </annotation>
 
@@ -216,7 +241,25 @@ If empty, the current perspective will be used.
          <meta.section type="apiinfo"/>
       </appinfo>
       <documentation>
-         The &apos;eventsTableType/class&apos; element has to extend TmfEventsTable. It is optional however ; if it is not specified, the default TmfEventsTable will be used.
+         &lt;p&gt;
+The &apos;eventsTableType/class&apos; element has to extend TmfEventsTable. It is optional however ; if it is not specified, the default TmfEventsTable will be used.
+&lt;/p&gt;
+&lt;p&gt;
+When providing the &apos;eventsTableType/class&apos; and the flag &apos;useTraceAspects&apos; is set to true, the following constructor has to be implemented:
+&lt;/p&gt;
+&lt;pre&gt;
+    public MyTraceEventsTable(Composite parent, int cacheSize, Iterable&lt;ITmfEventAspect&lt;?&gt;&gt; aspects) {
+          super(parent, cacheSize, aspects);
+    }
+&lt;/pre&gt;
+&lt;p&gt;
+If the flag &apos;useTraceAspects&apos; is set to false, the following constructor has to be implemented and the aspects have to provided in the constructor:
+&lt;/p&gt;
+&lt;pre&gt;
+    public MyTraceEventsTable(Composite parent, int cacheSize) {
+          super(parent, cacheSize, myAspects);
+    }
+&lt;/pre&gt;
       </documentation>
    </annotation>
 
