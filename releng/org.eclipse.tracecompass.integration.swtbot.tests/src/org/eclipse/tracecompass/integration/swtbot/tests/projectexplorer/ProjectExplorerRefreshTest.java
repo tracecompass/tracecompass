@@ -41,7 +41,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -51,7 +50,6 @@ import org.junit.runners.MethodSorters;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(SWTBotJunit4ClassRunner.class)
-@Ignore
 public class ProjectExplorerRefreshTest {
     private static final String TRACE_PROJECT_NAME = "test";
 
