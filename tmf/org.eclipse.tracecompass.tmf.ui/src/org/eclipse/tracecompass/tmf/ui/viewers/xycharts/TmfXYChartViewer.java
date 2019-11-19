@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2019 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2013, 2019 Ericsson, École Polytechnique de Montréal, Draeger
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -10,6 +10,7 @@
  *   Bernd Hufmann - Initial API and implementation
  *   Geneviève Bastien - Moved some methods to TmfTimeViewer
  *   Patrick Tasse - Fix setFocus
+ *   Ivan Grinenko - Add ability to set fixed range for Y axis.
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.ui.viewers.xycharts;
 
@@ -104,6 +105,8 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     private boolean fSendTimeAlignSignals = false;
 
     private final TmfXYChartTimeAdapter fDataProvider;
+
+    private AxisRange fFixedYRange = null;
 
     private IStatusLineManager fStatusLineManager;
     // ------------------------------------------------------------------------
@@ -519,6 +522,31 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
         updateTimeFormat();
         fSwtChart.getAxisSet().adjustRange();
         fSwtChart.redraw();
+    }
+
+    /**
+     * Sets new fixed range for the Y axis.
+     *
+     * @param yRange
+     *            new fixed range for the Y axis or {@code null} to
+     *            make float again. If not {@code null} then
+     *            {@link IAxis#adjustRange} is not called for the Y
+     *            axis on updates.
+     * @since 5.2
+     */
+    public void setFixedYRange(@Nullable AxisRange yRange) {
+        fFixedYRange = yRange;
+        updateContent();
+    }
+
+    /**
+     * Gets current fixed range for the Y axis.
+     *
+     * @return Current fixed range or {@code null} if the range is not fixed.
+     * @since 5.2
+     */
+    public @Nullable AxisRange getFixedYRange() {
+        return fFixedYRange;
     }
 
     // ------------------------------------------------------------------------

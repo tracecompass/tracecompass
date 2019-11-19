@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017 Ericsson, Draeger, Auriga
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -58,8 +58,10 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
+import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.AxisRange;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfChartTimeStampFormat;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
+import org.swtchart.IAxisSet;
 import org.swtchart.IAxisTick;
 import org.swtchart.IBarSeries;
 import org.swtchart.ILineSeries;
@@ -494,11 +496,18 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                             delta = 1;
                         }
 
-                        IAxisTick xTick = getSwtChart().getAxisSet().getXAxis(0).getTick();
+                        IAxisSet axisSet = getSwtChart().getAxisSet();
+                        IAxisTick xTick = axisSet.getXAxis(0).getTick();
                         xTick.setFormat(tmfChartTimeStampFormat);
                         final double start = 1.0;
-                        getSwtChart().getAxisSet().getXAxis(0).setRange(new Range(start, start + delta));
-                        getSwtChart().getAxisSet().getYAxis(0).adjustRange();
+                        axisSet.getXAxis(0).setRange(new Range(start, start + delta));
+                        AxisRange fixedYRange = getFixedYRange();
+                        if (fixedYRange == null) {
+                            axisSet.getYAxis(0).adjustRange();
+                        } else {
+                            axisSet.getYAxis(0).setRange(
+                                    new Range(fixedYRange.getLower(), fixedYRange.getUpper()));
+                        }
                         getSwtChart().redraw();
 
                         if (isSendTimeAlignSignals()) {
