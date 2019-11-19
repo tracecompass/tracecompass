@@ -401,6 +401,9 @@
                         <instanceof
                               value="org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisOutputElement">
                         </instanceof>
+                        <instanceof
+                              value="org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisElement">
+                        </instanceof>
                      </or>
                   </iterate>
                </with>
@@ -1406,6 +1409,23 @@
                      operator="and">
                   <instanceof
                         value="org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement">
+                  </instanceof>
+               </iterate>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tracecompass.internal.tmf.ui.project.handlers.OpenAnalysisHandler"
+            commandId="org.eclipse.ui.navigate.openResource">
+         <activeWhen>
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate
+                     operator="and">
+                  <instanceof
+                        value="org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisElement">
                   </instanceof>
                </iterate>
             </and>

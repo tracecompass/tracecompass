@@ -21,6 +21,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfAnalysisOutputElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfExperimentElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfOnDemandAnalysisElement;
@@ -61,7 +62,8 @@ public class OpenAction extends Action {
                     firstElement instanceof TmfExperimentElement ||
                     firstElement instanceof TmfOnDemandAnalysisElement ||
                     firstElement instanceof TmfAnalysisOutputElement ||
-                    firstElement instanceof TmfReportElement)) {
+                    firstElement instanceof TmfReportElement ||
+                    firstElement instanceof TmfAnalysisElement)) {
                 element = (TmfProjectModelElement) firstElement;
                 return true;
             }
@@ -77,7 +79,8 @@ public class OpenAction extends Action {
             boolean executeCommand = (element instanceof TmfTraceElement ||
                     element instanceof TmfOnDemandAnalysisElement ||
                     element instanceof TmfAnalysisOutputElement ||
-                    element instanceof TmfReportElement);
+                    element instanceof TmfReportElement ||
+                    element instanceof TmfAnalysisElement);
 
             if (!executeCommand && element instanceof TmfExperimentElement) {
                 TmfExperimentElement experiment = (TmfExperimentElement) element;

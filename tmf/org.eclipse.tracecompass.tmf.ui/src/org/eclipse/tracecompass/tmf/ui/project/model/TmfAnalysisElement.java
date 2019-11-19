@@ -23,10 +23,13 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisOutput;
@@ -115,6 +118,28 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
             path = ((IFolder) resource).getFullPath();
         }
 
+        IAnalysisModule module = getAnalysisModule();
+        if(module == null) {
+            return;
+        }
+
+        for (IAnalysisOutput output : module.getOutputs()) {
+            TmfAnalysisOutputElement outputElement = childrenMap.remove(output.getName());
+            if (outputElement == null) {
+                IFolder newresource = ResourcesPlugin.getWorkspace().getRoot().getFolder(path.append(output.getName()));
+                outputElement = new TmfAnalysisOutputElement(output.getName(), newresource, this, output);
+                addChild(outputElement);
+            }
+            outputElement.refreshChildren();
+        }
+
+        /* Remove outputs that are not children of this analysis anymore */
+        for (TmfAnalysisOutputElement output : childrenMap.values()) {
+            removeChild(output);
+        }
+    }
+
+    private IAnalysisModule getAnalysisModule() {
         /*
          * We can get a list of available outputs once the analysis is
          * instantiated when the trace is opened
@@ -135,7 +160,7 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
         }
         if (trace == null) {
             deleteOutputs();
-            return;
+            return null;
         }
 
         IAnalysisModule module = trace.getAnalysisModule(fAnalysisHelper.getId());
@@ -146,23 +171,9 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
              * apply
              */
             fCanExecute = false;
-            return;
+            return null;
         }
-
-        for (IAnalysisOutput output : module.getOutputs()) {
-            TmfAnalysisOutputElement outputElement = childrenMap.remove(output.getName());
-            if (outputElement == null) {
-                IFolder newresource = ResourcesPlugin.getWorkspace().getRoot().getFolder(path.append(output.getName()));
-                outputElement = new TmfAnalysisOutputElement(output.getName(), newresource, this, output);
-                addChild(outputElement);
-            }
-            outputElement.refreshChildren();
-        }
-
-        /* Remove outputs that are not children of this analysis anymore */
-        for (TmfAnalysisOutputElement output : childrenMap.values()) {
-            removeChild(output);
-        }
+        return module;
     }
 
     /**
@@ -299,6 +310,20 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
      */
     public boolean canExecute() {
         return fCanExecute;
+    }
+
+    /**
+     * Schedule an analysis
+     *
+     * @return the status of the analysis scheduling
+     * @since 5.2
+     */
+    public IStatus scheduleAnalysis() {
+        IAnalysisModule module = getAnalysisModule();
+        if (module == null) {
+            return new Status(IStatus.INFO, Activator.PLUGIN_ID, String.format("null analysis for %s", getAnalysisHelper().getName())); //$NON-NLS-1$
+        }
+        return module.schedule();
     }
 
     /**
