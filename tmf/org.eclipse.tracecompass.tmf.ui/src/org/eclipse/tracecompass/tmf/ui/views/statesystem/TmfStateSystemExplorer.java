@@ -221,18 +221,26 @@ public class TmfStateSystemExplorer extends BaseDataProviderTimeGraphView {
              * use set to wait for initialization in build entry list to avoid
              * deadlocks.
              */
-            if (Iterables.contains(allModules(getTrace()), module)) {
+            final ITmfTrace viewTrace = getTrace();
+            if (Iterables.contains(allModules(viewTrace), module)) {
                 /*
                  * Rebuild only if the started analysis module is from the
                  * active trace/experiment.
                  */
-                synchronized (fStartedAnalysis) {
-                    fStartedAnalysis.add((ITmfAnalysisModuleWithStateSystems) module);
-                    //Every children of ITmfAnalysisModuleWithStateSystems extends TmfAbstractAnalysisModule
-                    ITmfTrace moduleTrace = module instanceof TmfAbstractAnalysisModule ? ((TmfAbstractAnalysisModule) module).getTrace() : getTrace();
-                    getDataProvider(moduleTrace).startedAnalysisSignalHandler((ITmfAnalysisModuleWithStateSystems) module);
-                    rebuild();
-                }
+                new Thread(() -> {
+                    /*
+                     *  DataProviderManager#getDataProvider() (see getDataProvider() below) should never be called in a signal handler.
+                     */
+                    synchronized (fStartedAnalysis) {
+                        fStartedAnalysis.add((ITmfAnalysisModuleWithStateSystems) module);
+                        //Every children of ITmfAnalysisModuleWithStateSystems extends TmfAbstractAnalysisModule
+                        ITmfTrace moduleTrace = module instanceof TmfAbstractAnalysisModule ? ((TmfAbstractAnalysisModule) module).getTrace() : viewTrace;
+                        if (moduleTrace != null) {
+                            getDataProvider(moduleTrace).startedAnalysisSignalHandler((ITmfAnalysisModuleWithStateSystems) module);
+                            rebuild();
+                        }
+                    }
+                }).start();
             } else {
                 /*
                  * Reset the View for the relevant trace, ensuring that the
