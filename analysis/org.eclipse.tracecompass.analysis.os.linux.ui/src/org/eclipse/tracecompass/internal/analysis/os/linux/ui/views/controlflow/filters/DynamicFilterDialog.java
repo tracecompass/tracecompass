@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Range;
 
 /**
@@ -205,7 +206,7 @@ public class DynamicFilterDialog extends TitleAreaDialog {
             StringJoiner joiner = new StringJoiner(RANGES_DELIMITER);
             for (Range<Long> range : filter.getCpuRanges()) {
                 String rangeString = range.lowerEndpoint().toString();
-                if (range.lowerEndpoint() != range.upperEndpoint()) {
+                if (!Objects.equal(range.lowerEndpoint(), range.upperEndpoint())) {
                     rangeString = rangeString.concat(INTERNAL_RANGE_SEPARATOR + range.upperEndpoint());
                 }
                 joiner.add(rangeString);
