@@ -110,6 +110,7 @@ public class TmfVirtualTable extends Composite {
                 try {
                     Thread.sleep(POLLING_INTERVAL);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
             }
             Display.getDefault().asyncExec(() -> {

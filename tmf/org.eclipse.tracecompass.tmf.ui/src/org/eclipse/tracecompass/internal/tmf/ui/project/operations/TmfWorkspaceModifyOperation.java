@@ -66,6 +66,7 @@ public abstract class TmfWorkspaceModifyOperation implements IRunnableWithProgre
                         // Pass it outside the workspace runnable
                         iteHolder[0] = e;
                     } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
                         // Re-throw as OperationCanceledException, which will be
                         // caught and re-thrown as InterruptedException below.
                         throw new OperationCanceledException(e.getMessage());

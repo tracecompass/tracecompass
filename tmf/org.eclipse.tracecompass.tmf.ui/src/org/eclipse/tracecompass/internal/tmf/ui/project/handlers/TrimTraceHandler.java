@@ -517,10 +517,9 @@ public class TrimTraceHandler extends AbstractHandler {
         try {
             PlatformUI.getWorkbench().getProgressService().run(true, true, trimOperation);
         } catch (InterruptedException e) {
-            return null;
+            Thread.currentThread().interrupt();
         } catch (InvocationTargetException e) {
             TraceUtils.displayErrorMsg(Messages.TrimTraceHandler_failMsg, e.getMessage(), e);
-            return null;
         }
 
         return null;

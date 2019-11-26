@@ -389,6 +389,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                          * the data provider
                          **/
                         TraceCompassLogUtils.traceInstant(LOGGER, Level.INFO, e.getMessage());
+                        Thread.currentThread().interrupt();
                     }
                 }
             } while (!isComplete);

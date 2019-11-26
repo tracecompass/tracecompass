@@ -50,7 +50,7 @@ public class ConvertToTracingProjectHandler extends AbstractHandler {
                 } catch (InvocationTargetException e) {
                     Activator.getDefault().logError("Error adding tracing nature to project " + project.getName(), e); //$NON-NLS-1$
                 } catch (InterruptedException e) {
-                    // do nothing
+                    Thread.currentThread().interrupt();
                 }
             }
         }

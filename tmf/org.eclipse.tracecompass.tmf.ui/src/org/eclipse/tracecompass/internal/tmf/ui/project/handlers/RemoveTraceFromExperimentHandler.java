@@ -119,10 +119,9 @@ public class RemoveTraceFromExperimentHandler extends AbstractHandler {
         try {
             PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
         } catch (InterruptedException e) {
-            return null;
+            Thread.currentThread().interrupt();
         } catch (InvocationTargetException e) {
             TraceUtils.displayErrorMsg(Messages.RemoveTraceFromExperimentHandler_Error, e.getTargetException().toString(), e.getTargetException());
-            return null;
         }
         return null;
     }

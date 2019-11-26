@@ -133,6 +133,7 @@ public abstract class TmfGraphBuilderModule extends TmfAbstractAnalysisModule im
             request.waitForCompletion();
         } catch (InterruptedException e) {
             Activator.getInstance().logError("Request interrupted", e); //$NON-NLS-1$
+            Thread.currentThread().interrupt();
         }
     }
 

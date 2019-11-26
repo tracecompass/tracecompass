@@ -113,6 +113,7 @@ public class NewTmfViewAction extends Action {
                             try {
                                 Thread.sleep(100);
                             } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
                                 return;
                             }
                         }

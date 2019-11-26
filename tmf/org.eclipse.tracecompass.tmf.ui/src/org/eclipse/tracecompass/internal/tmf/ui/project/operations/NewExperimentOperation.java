@@ -108,6 +108,7 @@ public class NewExperimentOperation implements IRunnableWithProgress {
             setStatus(Status.OK_STATUS);
         } catch (InterruptedException e) {
             setStatus(Status.CANCEL_STATUS);
+            Thread.currentThread().interrupt();
         } catch (InvalidRegistryObjectException | CoreException e) {
             String msg = NLS.bind(Messages.NewExperimentOperation_CreationError, fExperimentName);
             Activator.getDefault().logError(msg, e);

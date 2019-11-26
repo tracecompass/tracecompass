@@ -126,6 +126,7 @@ public class OpenAsExperimentHandler extends AbstractHandler {
             try {
                 PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 return null;
             } catch (InvocationTargetException e) {
                 TraceUtils.displayErrorMsg(e.toString(), e.getTargetException().toString());
@@ -156,6 +157,7 @@ public class OpenAsExperimentHandler extends AbstractHandler {
             try {
                 PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 return null;
             } catch (InvocationTargetException e) {
                 TraceUtils.displayErrorMsg(e.toString(), e.getTargetException().toString());

@@ -337,6 +337,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
                                      * the data provider
                                      **/
                                     runScope.addData(FAILED_TO_SLEEP_PREFIX + getName(), e);
+                                    Thread.currentThread().interrupt();
                                     return new Status(IStatus.ERROR, Activator.PLUGIN_ID, FAILED_TO_SLEEP_PREFIX + getName());
                                 }
                             }

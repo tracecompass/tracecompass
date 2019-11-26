@@ -249,6 +249,7 @@ public class DsfGdbAdaptor {
                                 }
                             } catch (InterruptedException e) {
                                 GdbTraceCorePlugin.logError(INTERRUPTION_EXCEPTION, e);
+                                Thread.currentThread().interrupt();
                             } catch (ExecutionException e) {
                                 GdbTraceCorePlugin.logError(GDB_EXCEPTION, e);
                             } catch (RejectedExecutionException e) {
@@ -486,6 +487,7 @@ public class DsfGdbAdaptor {
             }
         } catch (InterruptedException e) {
             GdbTraceCorePlugin.logError(INTERRUPTION_EXCEPTION, e);
+            Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
             GdbTraceCorePlugin.logError(GDB_EXCEPTION, e);
         } catch (RejectedExecutionException e) {
@@ -554,6 +556,7 @@ public class DsfGdbAdaptor {
             frameNum = data.getNumberOfCollectedFrame();
         } catch (InterruptedException e) {
             GdbTraceCorePlugin.logError(INTERRUPTION_EXCEPTION, e);
+            Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
             GdbTraceCorePlugin.logError(GDB_EXCEPTION, e);
         } catch (RejectedExecutionException e) {
@@ -644,6 +647,7 @@ public class DsfGdbAdaptor {
         } catch (InterruptedException e) {
             status = false;
             GdbTraceCorePlugin.logError(INTERRUPTION_EXCEPTION, e);
+            Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
             status = false;
             GdbTraceCorePlugin.logError(GDB_EXCEPTION, e);
@@ -748,6 +752,7 @@ public class DsfGdbAdaptor {
             return ev;
 
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             return createExceptionEvent(rank, INTERRUPTION_EXCEPTION);
         } catch (java.util.concurrent.ExecutionException e) {
             return createExceptionEvent(rank, GDB_EXCEPTION);

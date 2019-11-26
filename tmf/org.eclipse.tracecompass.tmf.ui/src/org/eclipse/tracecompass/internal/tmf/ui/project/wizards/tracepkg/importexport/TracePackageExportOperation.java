@@ -150,6 +150,7 @@ public class TracePackageExportOperation extends AbstractTracePackageOperation {
 
         } catch (InterruptedException e) {
             setStatus(Status.CANCEL_STATUS);
+            Thread.currentThread().interrupt();
         } catch (Exception e) {
             setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation, e));
         }

@@ -156,10 +156,9 @@ public class DeleteTraceSupplementaryFilesHandler extends AbstractHandler {
         try {
             PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
         } catch (InterruptedException e) {
-            return null;
+            Thread.currentThread().interrupt();
         } catch (InvocationTargetException e) {
             TraceUtils.displayErrorMsg(e.toString(), e.getTargetException().toString());
-            return null;
         }
         return null;
     }

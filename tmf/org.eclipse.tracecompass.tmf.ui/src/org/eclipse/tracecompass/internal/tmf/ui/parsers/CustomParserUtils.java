@@ -87,6 +87,7 @@ public class CustomParserUtils {
         try {
             PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         } catch (InvocationTargetException e) {
             TraceUtils.displayErrorMsg(e.toString(), e.getTargetException().toString());
         }

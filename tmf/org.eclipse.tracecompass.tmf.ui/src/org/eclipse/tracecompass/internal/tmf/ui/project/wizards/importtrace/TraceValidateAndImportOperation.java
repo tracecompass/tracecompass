@@ -321,6 +321,7 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
             setStatus(Status.OK_STATUS);
         } catch (InterruptedException e) {
             setStatus(Status.CANCEL_STATUS);
+            Thread.currentThread().interrupt();
         } catch (Exception e) {
             String errorMessage = Messages.ImportTraceWizard_ImportProblem + ": " + //$NON-NLS-1$
                     (fCurrentPath != null ? fCurrentPath : ""); //$NON-NLS-1$

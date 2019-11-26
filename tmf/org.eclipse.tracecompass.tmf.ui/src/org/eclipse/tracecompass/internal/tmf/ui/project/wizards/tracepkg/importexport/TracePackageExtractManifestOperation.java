@@ -112,6 +112,7 @@ public class TracePackageExtractManifestOperation extends AbstractTracePackageOp
             archiveFile.close();
         } catch (InterruptedException e) {
             setStatus(Status.CANCEL_STATUS);
+            Thread.currentThread().interrupt();
         } catch (Exception e) {
             setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.TracePackageExtractManifestOperation_ErrorReadingManifest, e));
         }

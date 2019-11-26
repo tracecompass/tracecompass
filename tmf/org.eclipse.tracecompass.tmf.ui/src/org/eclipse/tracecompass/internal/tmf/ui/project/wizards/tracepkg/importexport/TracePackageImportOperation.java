@@ -234,6 +234,7 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
 
         } catch (InterruptedException e) {
             setStatus(Status.CANCEL_STATUS);
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -543,12 +544,11 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
         try {
             operation.run(SubMonitor.convert(monitor));
             archiveFile.close();
-        } catch (InvocationTargetException e) {
+        } catch (InvocationTargetException | IOException e) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation, e);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             return Status.CANCEL_STATUS;
-        } catch (IOException e) {
-            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation, e);
         }
 
         if (provider.getException() != null) {

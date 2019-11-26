@@ -257,7 +257,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
             try {
                 request.waitForCompletion();
             } catch (InterruptedException e) {
-                // ignore
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -1272,6 +1272,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                 fSearchRequest.waitForCompletion();
             } catch (InterruptedException e) {
                 Activator.getDefault().logError("Search request interrupted!", e); //$NON-NLS-1$
+                Thread.currentThread().interrupt();
             }
 
             IStatus status = Status.OK_STATUS;
@@ -1475,6 +1476,7 @@ public class TmfUml2SDSyncLoader extends TmfComponent implements IUml2SDLoader, 
                 try {
                     Thread.sleep(INDEXING_THREAD_SLEEP_VALUE);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     return Status.OK_STATUS;
                 }
             }

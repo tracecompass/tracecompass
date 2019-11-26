@@ -392,6 +392,7 @@ public class TmfOpenTraceHelper {
                     }
                 });
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 return new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getElementPath()) + ENDL + ENDL + e.getMessage(), e);
             } catch (InvocationTargetException e) {
                 Activator.getDefault().logError(NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getTypeName()) + ' ' + traceElement.getName());
@@ -579,6 +580,7 @@ public class TmfOpenTraceHelper {
                     }
                 });
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 return;
             } catch (final InvocationTargetException e) {
                 Activator.getDefault().logError(NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getTypeName()) + ' ' + traceElement.getName());

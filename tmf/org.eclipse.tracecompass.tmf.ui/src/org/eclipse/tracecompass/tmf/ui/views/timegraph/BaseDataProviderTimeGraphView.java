@@ -272,6 +272,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                     Thread.sleep(BUILD_UPDATE_TIMEOUT);
                 } catch (InterruptedException e) {
                     Activator.getDefault().logError("Failed to wait for data provider", e); //$NON-NLS-1$
+                    Thread.currentThread().interrupt();
                 }
             }
         }

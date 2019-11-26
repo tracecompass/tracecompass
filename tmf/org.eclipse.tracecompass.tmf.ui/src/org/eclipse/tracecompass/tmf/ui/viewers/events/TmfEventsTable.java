@@ -1130,7 +1130,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 } catch (InvocationTargetException e) {
                     Activator.getDefault().logError("Invocation target exception copying to clipboard ", e); //$NON-NLS-1$
                 } catch (InterruptedException e) {
-                    /* ignored */
+                    Thread.currentThread().interrupt();
                 }
             }
         };

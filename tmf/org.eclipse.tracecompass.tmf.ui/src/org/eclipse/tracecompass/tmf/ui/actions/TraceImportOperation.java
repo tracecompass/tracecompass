@@ -121,6 +121,7 @@ public class TraceImportOperation extends WorkspaceModifyOperation {
         } catch (InvocationTargetException e) {
             Activator.getDefault().logError("Error running trace import operation", e); //$NON-NLS-1$
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
         monitor.done();
     }

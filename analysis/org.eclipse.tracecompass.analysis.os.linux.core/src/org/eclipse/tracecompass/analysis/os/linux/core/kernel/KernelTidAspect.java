@@ -45,6 +45,7 @@ public final class KernelTidAspect extends LinuxTidAspect {
             return resolve(event, false, NULL_MONITOR);
         } catch (InterruptedException e) {
             /* Should not happen since there is nothing to interrupt */
+            Thread.currentThread().interrupt();
             return null;
         }
     }

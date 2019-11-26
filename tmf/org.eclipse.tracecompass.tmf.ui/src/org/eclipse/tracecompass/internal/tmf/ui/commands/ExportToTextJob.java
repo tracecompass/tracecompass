@@ -116,6 +116,7 @@ public class ExportToTextJob extends Job {
             try {
                 Thread.sleep(SLEEPING_INTERVAL);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
         if (request.isFailed()) {

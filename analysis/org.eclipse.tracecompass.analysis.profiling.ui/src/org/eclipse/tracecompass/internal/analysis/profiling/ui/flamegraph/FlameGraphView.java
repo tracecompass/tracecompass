@@ -243,6 +243,7 @@ public class FlameGraphView extends TmfView {
         } catch (InterruptedException e) {
             Activator.getDefault().logError(e.getMessage(), e);
             fLock.release();
+            Thread.currentThread().interrupt();
         }
         if (!callGraphProviders.iterator().hasNext()) {
             fTimeGraphViewer.setInput(null);

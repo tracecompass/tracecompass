@@ -69,6 +69,7 @@ public abstract class AbstractSegmentStoreAnalysisEventBasedModule extends Abstr
         try {
             req.waitForCompletion();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
 
         /* Do not process the results if the request was cancelled */

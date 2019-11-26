@@ -130,6 +130,7 @@ public class RenameTraceHandler extends AbstractHandler {
         try {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(operation);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             return null;
         } catch (InvocationTargetException e) {
             TraceUtils.displayErrorMsg(e.toString(), e.getTargetException().toString());
@@ -169,6 +170,7 @@ public class RenameTraceHandler extends AbstractHandler {
         try {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(operation);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         } catch (InvocationTargetException e) {
             TraceUtils.displayErrorMsg(e.toString(), e.getTargetException().toString());
         }

@@ -171,7 +171,7 @@ public class SymbolProviderConfigDialog extends TitleAreaDialog implements IPref
             setMessage(e.getMessage(), IMessageProvider.ERROR);
             cancel = true;
         } catch (InterruptedException e) {
-            // ignore
+            Thread.currentThread().interrupt();
         }
         if (!cancel) {
             super.okPressed();

@@ -455,7 +455,7 @@ public class ExportTracePackageWizardPage extends AbstractTracePackageWizardPage
         } catch (InvocationTargetException e) {
             handleError(org.eclipse.tracecompass.internal.tmf.ui.project.wizards.tracepkg.Messages.TracePackage_ErrorOperation, e);
         } catch (InterruptedException e) {
-            // Do nothing
+            Thread.currentThread().interrupt();
         }
 
         return exporter.getStatus().getSeverity() == IStatus.OK;

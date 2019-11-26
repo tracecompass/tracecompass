@@ -426,6 +426,7 @@ public class SelectTracesWizardPage extends WizardPage {
             status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.SelectTracesWizardPage_SelectionError, e);
         } catch (InterruptedException e) {
             status = Status.CANCEL_STATUS;
+            Thread.currentThread().interrupt();
         }
         if (!status.isOK()) {
             if (status.getSeverity() == IStatus.CANCEL) {

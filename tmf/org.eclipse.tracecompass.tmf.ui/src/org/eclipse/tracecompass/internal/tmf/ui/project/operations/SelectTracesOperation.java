@@ -204,6 +204,7 @@ public class SelectTracesOperation implements IRunnableWithProgress {
             setStatus(Status.OK_STATUS);
         } catch (InterruptedException e) {
             setStatus(Status.CANCEL_STATUS);
+            Thread.currentThread().interrupt();
         } catch (Exception e) {
             Activator.getDefault().logError(Messages.SelectTracesWizardPage_SelectionError, e);
             setStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.SelectTracesWizardPage_SelectionError, e));

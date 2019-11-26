@@ -186,6 +186,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
         } catch (InvocationTargetException e) {
             Activator.getDefault().logError("Error creating TMF project " + project.getName(), e); //$NON-NLS-1$
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
         return project;
     }
@@ -283,6 +284,7 @@ public class TmfProjectRegistry implements IResourceChangeListener {
         } catch (InvocationTargetException e) {
             Activator.getDefault().logError("Error adding tracing nature to project " + project.getName(), e); //$NON-NLS-1$
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 

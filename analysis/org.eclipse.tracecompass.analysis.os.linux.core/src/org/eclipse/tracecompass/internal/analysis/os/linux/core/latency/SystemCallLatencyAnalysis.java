@@ -134,6 +134,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
                 try {
                     tid = KernelTidAspect.INSTANCE.resolve(event, true, fMonitor);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     return;
                 }
                 if (tid == null) {
@@ -156,6 +157,7 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
                 try {
                     tid = KernelTidAspect.INSTANCE.resolve(event, true, fMonitor);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     return;
                 }
                 if (tid == null) {

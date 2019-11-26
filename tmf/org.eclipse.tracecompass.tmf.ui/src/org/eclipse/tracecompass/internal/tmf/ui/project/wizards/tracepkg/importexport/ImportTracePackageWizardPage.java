@@ -332,6 +332,7 @@ public class ImportTracePackageWizardPage extends AbstractTracePackageWizardPage
         } catch (InvocationTargetException e) {
             handleError(Messages.ImportTracePackageWizardPage_ErrorOperation, e);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
 
         return importOperation.getStatus().getSeverity() == IStatus.OK;

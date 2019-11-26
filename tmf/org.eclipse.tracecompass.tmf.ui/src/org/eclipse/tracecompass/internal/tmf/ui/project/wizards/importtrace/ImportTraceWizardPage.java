@@ -1314,6 +1314,7 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
             operationStatus[0] = new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.ImportTraceWizard_ImportProblem, e.getTargetException());
         } catch (InterruptedException e) {
             operationStatus[0] = Status.CANCEL_STATUS;
+            Thread.currentThread().interrupt();
         }
         if (!operationStatus[0].isOK()) {
             if (operationStatus[0].getSeverity() == IStatus.CANCEL) {
