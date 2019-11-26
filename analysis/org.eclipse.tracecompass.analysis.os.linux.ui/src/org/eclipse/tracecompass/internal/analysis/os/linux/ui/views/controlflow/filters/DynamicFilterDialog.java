@@ -247,7 +247,6 @@ public class DynamicFilterDialog extends TitleAreaDialog {
     private static List<Range<Long>> parseCpuRangesText(final String string) {
         List<Range<Long>> results = new ArrayList<>();
         if (validateCpuRange(string)) {
-            string.split(RANGES_DELIMITER);
             for (String range : string.split(RANGES_DELIMITER)) {
                 if (range.contains(INTERNAL_RANGE_SEPARATOR)) {
                     /* Parse as a range */
