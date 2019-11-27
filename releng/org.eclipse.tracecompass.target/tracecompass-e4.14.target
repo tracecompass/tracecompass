@@ -2,11 +2,11 @@
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.cdt.gnu.dsf.feature.group" version="0.0.0"/>
-<repository location="https://download.eclipse.org/tools/cdt/builds/9.10/cdt-9.10.0-simrel-2019-12-m2/"/>
+<repository location="https://download.eclipse.org/tools/cdt/builds/9.10/cdt-9.10.0-simrel-2019-12-m3/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.linuxtools.dataviewers.feature.feature.group" version="0.0.0"/>
-<repository location="https://download.eclipse.org/linuxtools/update-2019-12-m1/"/>
+<repository location="https://download.eclipse.org/linuxtools/update-2019-12-m3/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.swtbot.eclipse.feature.group" version="0.0.0"/>
@@ -26,7 +26,7 @@
 <repository location="https://download.eclipse.org/tm/updates/4.5.102-SNAPSHOT/repository/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-<repository location="https://download.eclipse.org/tools/cdt/launchbar/2.4/launchbar-2.4.0/"/>
+<repository location="https://download.eclipse.org/tools/cdt/launchbar/2.4/launchbar-2.4.1-simrel-2019-12-m3/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.antlr.runtime" version="3.2.0.v201101311130"/>
@@ -45,7 +45,7 @@
 <unit id="javax.xml.bind" version="0.0.0"/>
 <unit id="javax.activation" version="0.0.0"/>
 <unit id="javax.xml.stream" version="0.0.0"/>
-<repository location="https://download.eclipse.org/tools/orbit/downloads/drops/S20191025144108/repository/"/>
+<repository location="https://download.eclipse.org/tools/orbit/downloads/drops/S20191126223242/repository/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.license.feature.group" version="0.0.0"/>
@@ -65,7 +65,7 @@
 <unit id="org.eclipse.ui.trace" version="0.0.0"/>
 <unit id="org.eclipse.ui.views.log" version="0.0.0"/>
 <unit id="org.eclipse.jdt.junit4.runtime" version="0.0.0"/>
-<repository location="https://download.eclipse.org/eclipse/updates/4.14-I-builds/I20191101-0300/"/>
+<repository location="https://download.eclipse.org/eclipse/updates/4.14milestones/S-4.14M3-201911201800/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf" version="1.7.2"/>
@@ -75,11 +75,11 @@
 <unit id="org.eclipse.wst.xml.core" version="0.0.0"/>
 <unit id="org.eclipse.wst.xml.ui" version="0.0.0"/>
 <unit id="org.eclipse.wst.xsd.core" version="0.0.0"/>
-<repository location="https://download.eclipse.org/webtools/downloads/drops/R3.16.0/S-3.16.0.M2-20191022024703/repository/"/>
+<repository location="https://download.eclipse.org/webtools/downloads/drops/R3.16.0/S-3.16.0.M3-20191121172023/repository/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.xsd" version="0.0.0"/>
-<repository location="https://download.eclipse.org/modeling/emf/emf/builds/milestone/S201910290220/"/>
+<repository location="https://download.eclipse.org/modeling/emf/emf/builds/milestone/S201911170537/"/>
 </location>
 </locations>
 <targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
