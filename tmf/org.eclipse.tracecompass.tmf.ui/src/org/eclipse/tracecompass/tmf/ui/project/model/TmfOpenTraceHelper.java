@@ -156,8 +156,7 @@ public class TmfOpenTraceHelper {
 
         // No trace type was determined.
         if (traceTypeToSet == null) {
-            return new Status(IStatus.INFO, Activator.PLUGIN_ID,
-                    Messages.TmfOpenTraceHelper_NoTraceType);
+            return Status.OK_STATUS;
         }
 
         IStatus ret = TmfTraceTypeUIUtils.setTraceType(linkedTrace, traceTypeToSet);
