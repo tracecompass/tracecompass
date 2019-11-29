@@ -104,7 +104,10 @@ public class TmfOpenTraceHelper {
      *            the file to import
      * @param shell
      *            the shell to use for dialogs
-     * @return IStatus OK if successful
+     * @return IStatus OK if successful. In addition to the OK status, a code OK
+     *         means the trace will be opened correctly, otherwise, a code of
+     *         {@link IStatus#INFO} means the operation completely successfully,
+     *         but the path won't be opened as a trace.
      * @throws CoreException
      *             core exceptions if something is not well set up in the back end
      */
@@ -113,8 +116,8 @@ public class TmfOpenTraceHelper {
     }
 
     /**
-     * Opens a trace from a path while importing it to the destination folder. The
-     * trace is linked as a resource.
+     * Opens a trace from a path while importing it to the destination folder.
+     * The trace is linked as a resource.
      *
      * @param destinationFolder
      *            The destination trace folder
@@ -124,9 +127,13 @@ public class TmfOpenTraceHelper {
      *            the shell to use for dialogs
      * @param tracetypeHint
      *            The trace type id, can be null
-     * @return IStatus OK if successful
+     * @return IStatus OK if successful. In addition to the OK status, a code OK
+     *         means the trace will be opened correctly, otherwise, a code of
+     *         {@link IStatus#INFO} means the operation completely successfully,
+     *         but the path won't be opened as a trace.
      * @throws CoreException
-     *             core exceptions if something is not well set up in the back end
+     *             core exceptions if something is not well set up in the back
+     *             end
      */
     public static IStatus openTraceFromPath(TmfTraceFolder destinationFolder, String path, Shell shell, String tracetypeHint) throws CoreException {
         final String pathToUse = checkTracePath(path);
@@ -156,7 +163,8 @@ public class TmfOpenTraceHelper {
 
         // No trace type was determined.
         if (traceTypeToSet == null) {
-            return Status.OK_STATUS;
+            return new Status(IStatus.OK, Activator.PLUGIN_ID, IStatus.INFO,
+                                        Messages.TmfOpenTraceHelper_NoTraceType, null);
         }
 
         IStatus ret = TmfTraceTypeUIUtils.setTraceType(linkedTrace, traceTypeToSet);
@@ -364,9 +372,10 @@ public class TmfOpenTraceHelper {
      * @param traceElement
      *            the {@link TmfTraceElement} to open
      * @return The status of the opening. If the status is {@link IStatus#OK},
-     *         then the trace will eventually be opened. Any other status means
-     *         no trace will be opened as a result of this method, the severity
-     *         of the status will describe the exact issue.
+     *         then the element will be opened. In addition to the OK status, a
+     *         code OK means that a trace trace will be opened correctly,
+     *         otherwise, a code of {@link IStatus#INFO} means the operation
+     *         completely successfully, but the path won't be opened as a trace.
      * @since 5.2
      */
     public static IStatus openFromElement(final TmfCommonProjectElement traceElement) {
@@ -404,7 +413,7 @@ public class TmfOpenTraceHelper {
             if (editor != null) {
                 activePage.activate(editor);
                 return editor instanceof TmfEventsEditor ? Status.OK_STATUS :
-                    new Status(IStatus.INFO, Activator.PLUGIN_ID, NLS.bind(Messages.TmfOpenTraceHelper_NotATrace, traceElement.getElementPath()));
+                    new Status(IStatus.OK, Activator.PLUGIN_ID, IStatus.INFO, NLS.bind(Messages.TmfOpenTraceHelper_NotATrace, traceElement.getElementPath()), null);
             }
 
             // If a trace type is not set then delegate it to the eclipse platform
@@ -414,7 +423,7 @@ public class TmfOpenTraceHelper {
                     // only local open is supported
                     IEditorPart openedEditor = IDE.openEditor(activePage, file, activate);
                     return openedEditor instanceof TmfEventsEditor ? Status.OK_STATUS :
-                        new Status(IStatus.INFO, Activator.PLUGIN_ID, NLS.bind(Messages.TmfOpenTraceHelper_NotATrace, traceElement.getElementPath()));
+                        new Status(IStatus.OK, Activator.PLUGIN_ID, IStatus.INFO, NLS.bind(Messages.TmfOpenTraceHelper_NotATrace, traceElement.getElementPath()), null);
                 } catch (PartInitException e) {
                     TraceUtils.displayErrorMsg(NLS.bind(Messages.TmfOpenTraceHelper_OpenElement, traceElement.getTypeName()),
                             NLS.bind(Messages.TmfOpenTraceHelper_ErrorOpeningElement, traceElement.getElementPath()) + ENDL + ENDL + e.getMessage(), e);

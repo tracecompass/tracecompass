@@ -294,7 +294,7 @@ public class RcpCliParser implements ICliParser {
                     }
                     try {
                         IStatus status = TmfOpenTraceHelper.openFromElement(existingTrace);
-                        if (!status.isOK()) {
+                        if (!status.isOK() || (status.getCode() != IStatus.OK)) {
                             waitService.registerStatus(new Path(existingTrace.getLocation().getPath()), status);
                         }
                     } catch (Exception e) {
@@ -320,7 +320,7 @@ public class RcpCliParser implements ICliParser {
                     }
                     try {
                         IStatus status = TmfOpenTraceHelper.openTraceFromPath(destinationFolder, tracePath.toOSString(), TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell());
-                        if (!status.isOK()) {
+                        if (!status.isOK() || (status.getCode() != IStatus.OK)) {
                             waitService.registerStatus(tracePath, status);
                         }
                     } catch (CoreException e) {
