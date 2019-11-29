@@ -491,6 +491,16 @@ If there is a default perspective associated with the opened trace or experiment
 
 When opening a trace or experiment, all currently opened views which are relevant for the corresponding trace type will be updated.
 
+The '''Project Explorer''' tree for the opened trace will be updated and will show all the available analysis for and views for the corresponding trace type as in the following image.
+
+[[Image:images/ProjectExplorerOpenTrace.png]]
+
+If an analysis can't be executed (e.g. due to missing required events) then the analysis will be strike-through. Right-mouse clicking on the analysis tree element and selecting menu item '''Help''', will provide more details why the analysis can't be executed.
+
+Double-clicking the left mouse button on the a analysis, will execute the analysis. Alternatively, select an analysis in the in the '''Project Explorer''' view and click the right mouse button. Then select '''Open''' menu item of the context-sensitive menu. Opening a view tree element underneath the analysis will also trigger the execution of the corresponding analysis.
+
+Note, that some analysis are implemented for automatic execution, so that they are executed when opening the trace.
+
 If a trace resource is a file (and not a directory), then the '''Open With''' menu item is available in the context-sensitive menu and can be used to open the trace source file with any applicable internal or external editor. In that case the trace will not be processed by the tracing application.
 
 === Creating an Experiment ===
