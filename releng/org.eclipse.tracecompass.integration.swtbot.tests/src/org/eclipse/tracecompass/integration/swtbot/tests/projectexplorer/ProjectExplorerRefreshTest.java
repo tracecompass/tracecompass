@@ -254,8 +254,9 @@ public class ProjectExplorerRefreshTest {
         SWTBotImportWizardUtils.selectImportFromDirectory(fBot, fCProjectFolder.getAbsolutePath());
         SWTBotImportWizardUtils.selectFolder(fBot, true, C_PROJECT_NAME, TEST_FILE_KERNEL.getName());
         SWTBotImportWizardUtils.selectFolder(fBot, true, C_PROJECT_NAME, TEST_FILE_UST.getName());
-        fBot.button("Finish").click();
-        fBot.waitUntil(Conditions.shellCloses(fBot.shell("Trace Import")), DISK_ACCESS_TIMEOUT);
+        SWTBotShell shell = fBot.shell("Trace Import");
+        shell.bot().button("Finish").click();
+        fBot.waitUntil(Conditions.shellCloses(shell), DISK_ACCESS_TIMEOUT);
         WaitUtils.waitForJobs();
 
         // Be sure that the two traces are imported
