@@ -13,8 +13,13 @@
 package org.eclipse.tracecompass.ctf.core.tests;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.tracecompass.internal.ctf.core.Activator;
@@ -105,6 +110,30 @@ public class CtfCoreTestPlugin extends Plugin {
             }
         }
         return System.getProperty("java.io.tmpdir"); //$NON-NLS-1$
+    }
+
+    /**
+     * Return a path to a file relative to this plugin's base directory
+     *
+     * @param relativePath
+     *            The path relative to the plugin's root directory
+     * @return The path corresponding to the relative path in parameter
+     */
+    public static IPath getAbsoluteFilePath(String relativePath) {
+        CtfCoreTestPlugin plugin = CtfCoreTestPlugin.getDefault();
+        if (plugin == null) {
+            /*
+             * Shouldn't happen but at least throw something to get the test to
+             * fail early
+             */
+            throw new IllegalStateException();
+        }
+        URL location = FileLocator.find(plugin.getBundle(), new Path(relativePath), null);
+        try {
+            return new Path(FileLocator.toFileURL(location).getPath());
+        } catch (IOException e) {
+            throw new IllegalStateException();
+        }
     }
 
 }

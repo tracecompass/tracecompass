@@ -16,6 +16,7 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests.perf.views.UiResponseTest;
+import org.eclipse.tracecompass.ctf.core.tests.shared.CtfBenchmarkTrace;
 import org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.PerspectiveFactory;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
@@ -74,6 +75,21 @@ public class LttngUiResponseBenchmark extends UiResponseTest {
     @Test
     public void testWithManyThreads() throws SecurityException, IllegalArgumentException, IOException {
         runTestWithTrace(FileUtils.toFile(FileLocator.toFileURL(CtfTestTrace.MANY_THREADS.getTraceURL())).getAbsolutePath(), TRACE_TYPE, EnumSet.of(OsLinuxViews.CONTROL_FLOW, OsLinuxViews.RESOURCES, OsLinuxViews.CPU_USAGE, OsLinuxViews.DISK_IO_ACTIVITY));
+    }
+
+    /**
+     * Test with the os-events benchmark trace
+     *
+     * @throws SecurityException
+     *             If a security manager is present and any the wrong class is
+     *             loaded or the class loader is not the same as its ancestor's
+     *             loader.
+     * @throws IllegalArgumentException
+     *             the object is not the correct class type
+     */
+    @Test
+    public void testWithOsEvents() throws SecurityException, IllegalArgumentException {
+        runTestWithTrace(CtfBenchmarkTrace.ALL_OS_ANALYSES.getTracePath().toString(), TRACE_TYPE, EnumSet.of(OsLinuxViews.CONTROL_FLOW, OsLinuxViews.RESOURCES, OsLinuxViews.CPU_USAGE, OsLinuxViews.DISK_IO_ACTIVITY));
     }
 
 }
