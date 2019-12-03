@@ -150,11 +150,13 @@ public class XmlPatternAnalysis extends TmfAbstractAnalysisModule implements ITm
 
         if (!segmentStoreFile.exists()) {
             fStateSystemModule.cancel();
-            try {
-                Files.delete(stateSystemFile.toPath());
-            } catch (IOException e) {
-                // log it, failing to delete doesn't garantee failure
-                Activator.logWarning(e.getMessage(), e);
+            if (stateSystemFile.exists()) {
+                try {
+                    Files.delete(stateSystemFile.toPath());
+                } catch (IOException e) {
+                    // log it, failing to delete doesn't garantee failure
+                    Activator.logWarning(e.getMessage(), e);
+                }
             }
         }
 
