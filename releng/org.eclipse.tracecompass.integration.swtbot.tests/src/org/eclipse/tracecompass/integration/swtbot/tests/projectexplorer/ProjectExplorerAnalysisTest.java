@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.integration.swtbot.tests.projectexplorer;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -21,10 +22,17 @@ import java.util.StringJoiner;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
@@ -48,6 +56,10 @@ import com.google.common.collect.Sets.SetView;
 public class ProjectExplorerAnalysisTest {
 
     @NonNull private static final String EXPERIMENT_NAME = "TestExperiment";
+    @NonNull private static final String IRQ_XML_ANALYSIS_NAME = "IRQ Analysis";
+    @NonNull private static final String IRQ_XML_ANALYSIS_HT_FILE_NAME = "lttng.analysis.irq.ht";
+    @NonNull private static final String FUTEX_XML_ANALYSIS_NAME = "Futex Contention Analysis";
+    @NonNull private static final String FUTEX_XML_ANALYSIS_HT_FILE_NAME = "lttng.analysis.futex.ht";
 
     private static SWTWorkbenchBot fBot;
     private static String fUstTraceFile;
@@ -242,8 +254,47 @@ public class ProjectExplorerAnalysisTest {
             diff.forEach(elem -> System.err.println("New untested analysis : " + elem));
         }
     }
+    /**
+     * Test execution using double-click or context sensitive menu
+     */
+    @Test
+    public void testAnalysisRun() {
+        SWTBotTreeItem traceNode = getExpandedTraceNode(fBot, fKernelTraceFile, false);
+        SWTBotTreeItem viewNode = traceNode.getNode("Views");
+        viewNode.expand();
+
+        boolean supplExists = supplementaryFileExists(traceNode, IRQ_XML_ANALYSIS_HT_FILE_NAME);
+        assertFalse(supplExists);
+        SWTBotTreeItem irqAnalysisNode = viewNode.getNode(IRQ_XML_ANALYSIS_NAME);
+        irqAnalysisNode.contextMenu().menu("Open").click();
+        supplExists = supplementaryFileExists(traceNode, IRQ_XML_ANALYSIS_HT_FILE_NAME);
+        assertTrue(supplExists);
+
+        supplExists = supplementaryFileExists(traceNode, FUTEX_XML_ANALYSIS_HT_FILE_NAME);
+        assertFalse(supplExists);
+        SWTBotTreeItem futexAnalysisNode = viewNode.getNode(FUTEX_XML_ANALYSIS_NAME);
+        futexAnalysisNode.doubleClick();
+        supplExists = supplementaryFileExists(traceNode, FUTEX_XML_ANALYSIS_HT_FILE_NAME);
+        assertTrue(supplExists);
+    }
 
     private static Set<AnalysisNode> getAnalysisNodes(SWTWorkbenchBot bot, String name, boolean isExperiment) {
+        SWTBotTreeItem traceNode = getExpandedTraceNode(bot, name, isExperiment);
+        SWTBotTreeItem viewNode = traceNode.getNode("Views");
+        viewNode.expand();
+
+        SWTBotTreeItem[] analysisNodes = viewNode.getItems();
+        assertNotNull(analysisNodes);
+        int length = analysisNodes.length;
+        Set<AnalysisNode> actualNodes = new HashSet<>();
+        for (int i = 0; i < length; i++) {
+            SWTBotTreeItem analysisNode = analysisNodes[i];
+            actualNodes.add(new AnalysisNode(analysisNode.getText(), analysisNode.isEnabled(), analysisNode.isVisible()));
+        }
+        return actualNodes;
+    }
+
+    private static SWTBotTreeItem getExpandedTraceNode(SWTWorkbenchBot bot, String name, boolean isExperiment) {
         SWTBotTreeItem project = SWTBotUtils.selectProject(fBot, TRACE_PROJECT_NAME);
         SWTBotTreeItem traceNode;
         if (isExperiment) {
@@ -258,16 +309,38 @@ public class ProjectExplorerAnalysisTest {
         }
         traceNode.expand();
 
-        SWTBotTreeItem viewNode = traceNode.getNode("Views");
-        viewNode.expand();
-        SWTBotTreeItem[] analysisNodes = viewNode.getItems();
-        assertNotNull(analysisNodes);
-        int length = analysisNodes.length;
-        Set<AnalysisNode> actualNodes = new HashSet<>();
-        for (int i = 0; i < length; i++) {
-            SWTBotTreeItem analysisNode = analysisNodes[i];
-            actualNodes.add(new AnalysisNode(analysisNode.getText(), analysisNode.isEnabled(), analysisNode.isVisible()));
+        return traceNode;
+    }
+
+    private static boolean supplementaryFileExists(SWTBotTreeItem traceNode, String filename) {
+        // make sure that analysis are finished
+        WaitUtils.waitForJobs();
+        try {
+            ResourcesPlugin.getWorkspace().getRoot().getProject(TRACE_PROJECT_NAME).refreshLocal(IResource.DEPTH_INFINITE, null);
+        } catch (CoreException e) {
         }
-        return actualNodes;
+        // Make sure that all jobs are finished after refresh
+        WaitUtils.waitForJobs();
+
+        traceNode.contextMenu().menu("Delete Supplementary Files...").click();
+
+        SWTBotShell shell = fBot.shell("Delete Resources");
+        SWTBot bot = shell.bot();
+        SWTBotTree tree = bot.tree();
+        SWTBotTreeItem traceSupplNode = SWTBotUtils.getTreeItem(bot, tree, traceNode.getText());
+
+        SWTBotTreeItem[] supplFileNodes = traceSupplNode.getItems();
+
+        boolean supplFound = false;
+        for (SWTBotTreeItem swtBotTreeItem : supplFileNodes) {
+            if (swtBotTreeItem.getText().equals(filename)) {
+                supplFound = true;
+                break;
+            }
+        }
+
+        bot.button("Cancel").click();
+        fBot.waitUntil(Conditions.shellCloses(shell));
+        return supplFound;
     }
 }
