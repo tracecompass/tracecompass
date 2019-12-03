@@ -81,7 +81,7 @@ public class OpenAnalysisHandler extends AbstractHandler {
         }
 
         IStatus analysisStatus = fAnalysisElement.scheduleAnalysis();
-        if(analysisStatus.isOK()) {
+        if (!analysisStatus.isOK()) {
             Activator.getDefault().logInfo(analysisStatus.getMessage(), analysisStatus.getException());
         }
 
