@@ -60,7 +60,7 @@ public class CriticalPathParameterProvider extends TmfAbstractAnalysisParamProvi
             }
             /* Try to find the worker for the critical path */
             IAnalysisModule mod = getModule();
-            if ((mod != null) && (mod instanceof CriticalPathModule)) {
+            if (mod instanceof CriticalPathModule) {
                 OsWorker worker = new OsWorker(currentHostThread, "", 0); //$NON-NLS-1$
                 return worker;
             }
