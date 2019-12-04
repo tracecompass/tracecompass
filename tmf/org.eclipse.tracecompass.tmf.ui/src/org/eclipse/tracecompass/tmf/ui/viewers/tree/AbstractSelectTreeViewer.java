@@ -87,8 +87,10 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     private static final @NonNull String FILTER_STRING = ".FILTER_STRING"; //$NON-NLS-1$
     private static final @NonNull String UPDATE_CONTENT_JOB_NAME = "AbstractSelectTreeViewer#updateContent Job"; //$NON-NLS-1$
     private static final String FAILED_TO_SLEEP_PREFIX = "Failed to sleep the "; //$NON-NLS-1$
+    private static final String LOG_CATEGORY_SUFFIX = " Tree viewer"; //$NON-NLS-1$
 
     private final String fId;
+    private final @NonNull String fLogCategory;
 
     private static final ViewerComparator COMPARATOR = new ViewerComparator() {
         @Override
@@ -146,6 +148,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         fCheckboxTree = checkboxTree;
         fLegendIndex = legendIndex;
         fId = id;
+        fLogCategory = fId + LOG_CATEGORY_SUFFIX;
     }
 
     /**
@@ -283,7 +286,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     @Override
     protected void updateContent(long start, long end, boolean isSelection) {
         try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, UPDATE_CONTENT_JOB_NAME)
-                .setCategory("TreeViewer").build()) { //$NON-NLS-1$
+                .setCategory(fLogCategory).build()) {
             ITmfTrace trace = getTrace();
             if (trace == null) {
                 return;
@@ -353,29 +356,35 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     }
 
     private void updateTree(ITmfTrace trace, long start, long end, List<@NonNull ITmfTreeDataModel> model) {
-        final ITmfTreeViewerEntry rootEntry = modelToTree(start, end, model);
-        /* Set the input in main thread only if it didn't change */
-        if (rootEntry != null) {
-            Display.getDefault().asyncExec(() -> {
-                if (!trace.equals(getTrace())) {
-                    return;
-                }
-                TreeViewer treeViewer = getTreeViewer();
-                if (treeViewer.getControl().isDisposed()) {
-                    return;
-                }
-                Object input = treeViewer.getInput();
-                if (!(input instanceof ITmfTreeViewerEntry) || !treeEquals(rootEntry, (ITmfTreeViewerEntry) input)) {
-                    treeViewer.setInput(rootEntry);
-                    contentChanged(rootEntry);
-                } else {
-                    treeViewer.refresh();
-                }
-                // FIXME should add a bit of padding
-                for (TreeColumn column : treeViewer.getTree().getColumns()) {
-                    column.pack();
-                }
-            });
+        try (FlowScopeLog parentScope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "AbstractSelectTreeViewer:TreeUpdateRequested" ) //$NON-NLS-1$
+                .setCategory(fLogCategory).build()) {
+            final ITmfTreeViewerEntry rootEntry = modelToTree(start, end, model);
+            /* Set the input in main thread only if it didn't change */
+            if (rootEntry != null) {
+                Display.getDefault().asyncExec(() -> {
+                    try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "AbstractSelectTreeViewer:TreeUpdate").setParentScope(parentScope).build()) { //$NON-NLS-1$
+
+                        if (!trace.equals(getTrace())) {
+                            return;
+                        }
+                        TreeViewer treeViewer = getTreeViewer();
+                        if (treeViewer.getControl().isDisposed()) {
+                            return;
+                        }
+                        Object input = treeViewer.getInput();
+                        if (!(input instanceof ITmfTreeViewerEntry) || !treeEquals(rootEntry, (ITmfTreeViewerEntry) input)) {
+                            treeViewer.setInput(rootEntry);
+                            contentChanged(rootEntry);
+                        } else {
+                            treeViewer.refresh();
+                        }
+                        // FIXME should add a bit of padding
+                        for (TreeColumn column : treeViewer.getTree().getColumns()) {
+                            column.pack();
+                        }
+                    }
+                });
+            }
         }
     }
 
