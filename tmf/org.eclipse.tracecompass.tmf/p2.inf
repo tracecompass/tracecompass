@@ -1,6 +1,6 @@
 instructions.configure=\
 org.eclipse.equinox.p2.touchpoint.eclipse.addRepository(location:http${#58}//download.eclipse.org/tracecompass/master/repository,type:0,name:Trace Compass,enabled:false); \
 org.eclipse.equinox.p2.touchpoint.eclipse.addRepository(location:http${#58}//download.eclipse.org/tracecompass/master/repository,type:1,name:Trace Compass,enabled:false); \
-org.eclipse.equinox.p2.touchpoint.eclipse.addRepository(location:http${#58}//download.eclipse.org/tracecompass.incubator/master/repository,type:0,name:Trace Compass Incubator,enabled:false); \
-org.eclipse.equinox.p2.touchpoint.eclipse.addRepository(location:http${#58}//download.eclipse.org/tracecompass.incubator/master/repository,type:1,name:Trace Compass Incubator,enabled:false);
+org.eclipse.equinox.p2.touchpoint.eclipse.addRepository(location:http${#58}//download.eclipse.org/tracecompass.incubator/stable-5.2/repository,type:0,name:Trace Compass Incubator,enabled:false); \
+org.eclipse.equinox.p2.touchpoint.eclipse.addRepository(location:http${#58}//download.eclipse.org/tracecompass.incubator/stable-5.2/repository,type:1,name:Trace Compass Incubator,enabled:false);
 
