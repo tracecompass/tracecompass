@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Phaser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -33,8 +34,10 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.core.signal.TmfEndSynchSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfStartAnalysisSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfStartSynchSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.BaseDataProviderTimeGraphView;
@@ -81,6 +84,8 @@ public class CriticalPathView extends BaseDataProviderTimeGraphView {
     private static final String[] FILTER_COLUMN_NAMES = new String[] {
             COLUMN_PROCESS
     };
+
+    private Phaser fPhaser = new Phaser();
 
     private class CriticalPathTreeLabelProvider extends TreeLabelProvider {
 
@@ -195,11 +200,46 @@ public class CriticalPathView extends BaseDataProviderTimeGraphView {
         IAnalysisModule analysis = signal.getAnalysisModule();
         if (analysis instanceof CriticalPathModule) {
             CriticalPathModule criticalPath = (CriticalPathModule) analysis;
-            Collection<ITmfTrace> traces = TmfTraceManager.getTraceSetWithExperiment(getTrace());
-            if (traces.contains(criticalPath.getTrace())) {
-                rebuild();
-            }
+            /*
+             * We need to wait for CriticalPathDataProviderFactory to have
+             * received this signal. Create a new phaser and register, and wait
+             * for the end synch signal to arrive and advance in a new thread.
+             */
+            fPhaser = new Phaser();
+            fPhaser.register();
+            new Thread() {
+                @Override
+                public void run() {
+                    fPhaser.awaitAdvance(0);
+                    Collection<ITmfTrace> traces = TmfTraceManager.getTraceSetWithExperiment(getTrace());
+                    if (traces.contains(criticalPath.getTrace())) {
+                        rebuild();
+                    }
+                }
+            }.start();
         }
+    }
+
+    /**
+     * Handler for the start synch signal
+     *
+     * @param signal
+     *            Incoming signal
+     */
+    @TmfSignalHandler
+    public void startSynch(TmfStartSynchSignal signal) {
+        fPhaser.register();
+    }
+
+    /**
+     * Handler for the end synch signal
+     *
+     * @param signal
+     *            Incoming signal
+     */
+    @TmfSignalHandler
+    public void endSynch(TmfEndSynchSignal signal) {
+        fPhaser.arriveAndDeregister();
     }
 
     @Override
