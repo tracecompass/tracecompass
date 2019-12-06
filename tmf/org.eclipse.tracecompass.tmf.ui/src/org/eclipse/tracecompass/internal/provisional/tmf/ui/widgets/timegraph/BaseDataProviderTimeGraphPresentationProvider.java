@@ -55,6 +55,7 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
     private static final OutputElementStyle TRANSPARENT_STYLE = new OutputElementStyle(null, ImmutableMap.of());
 
     private final Map<ITimeGraphDataProvider<?>, BiFunction<ITimeEvent, Long, Map<String, String>>> fProviders = new LinkedHashMap<>();
+    private boolean fShowTooltipTimes = true;
     private Map<String, Integer> fKeyToIndex = new HashMap<>();
     private @Nullable Map<String, OutputElementStyle> fStylesMap = null;
     private @Nullable StateItem @Nullable[] fStateTable = null;
@@ -248,6 +249,21 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
         fStyleManager = new StyleManager(fetchStyles());
         super.refresh();
         updateStyles();
+    }
+
+    @Override
+    public boolean displayTimesInTooltip() {
+        return fShowTooltipTimes;
+    }
+
+    /**
+     * Set whether to show times (start, end, duration) in the tooltips
+     *
+     * @param showTimes
+     *            Whether to display start/end/duration times in the tooltips
+     */
+    public void setShowTimesInTooltip(boolean showTimes) {
+        fShowTooltipTimes = showTimes;
     }
 
     private void updateStyles() {
