@@ -34,11 +34,43 @@ public interface ISegmentAspect {
     String EMPTY_STRING = ""; //$NON-NLS-1$
 
     /**
+     * <p>
+     * An aspect resolves a segment to data using {@link ISegmentAspect#resolve(ISegment)}. The data can be
+     * {@link #CATEGORICAL} or {@link #CONTINUOUS}.
+     * </p>
+     * <p>
+     * Not all data resolved are numbers, if they are not, they are guaranteed
+     * to not be {@link #CONTINUOUS}.
+     * </p>
+     *
      * @since 5.2
      */
     enum SegmentType {
-            CATEGORICAL,
-            CONTINUOUS,
+        /**
+         * <p>
+         * A <strong>categorical</strong> aspect is one that will resolve
+         * characteristics that do not have mathematical meaning. An example
+         * would be return codes as it would make no sense to add them up
+         * however, testing equality is still valid as with all resolved data.
+         * </p>
+         */
+        CATEGORICAL,
+
+        /**
+         * <p>
+         * A <strong>continuous aspect</strong> is one that resolves data to
+         * measurements. Their possible values should not be counted and should
+         * be described using intervals on a real number line. Examples would be
+         * the start time, end time and duration. Testing equality and comparing
+         * results makes sense here, as well as performing mathematical
+         * operations.
+         * </p>
+         * <p>
+         * (e.g. the difference between start times can be measured to determine
+         * the period of a regular segment source)
+         * </p>
+         */
+        CONTINUOUS,
     }
 
     /**
@@ -77,7 +109,8 @@ public interface ISegmentAspect {
      */
     @Nullable Object resolve(ISegment segment);
 
-    /** Gets the type of the segment aspect, Categorical or Continuous
+    /**
+     * Gets the {@link SegmentType} of the segment aspect, Categorical or Continuous
      *
      * @return the type of the segment aspect
      * @since 5.2
