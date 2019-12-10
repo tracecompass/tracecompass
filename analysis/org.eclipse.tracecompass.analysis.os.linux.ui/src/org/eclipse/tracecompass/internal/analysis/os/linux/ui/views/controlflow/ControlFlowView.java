@@ -599,17 +599,16 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
             ITmfTreeDataModel entryModel = entry.getEntryModel();
             if (entryModel instanceof ThreadEntryModel) {
                 ThreadEntryModel model = (ThreadEntryModel) entryModel;
-
-                if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_tidColumn)) {
-                    return Integer.toString(model.getThreadId());
-                } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_ptidColumn)) {
-                    if (model.getParentThreadId() > 0) {
-                        return Integer.toString(model.getParentThreadId());
+                if (model.getThreadId() != Integer.MIN_VALUE) {
+                    if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_tidColumn)) {
+                        return Integer.toString(model.getThreadId());
+                    } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_ptidColumn)) {
+                        if (model.getParentThreadId() > 0) {
+                            return Integer.toString(model.getParentThreadId());
+                        }
+                    } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_birthTimeColumn)) {
+                        return FormatTimeUtils.formatTime(entry.getStartTime(), TimeFormat.CALENDAR, Resolution.NANOSEC);
                     }
-                } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_birthTimeColumn)) {
-                    return FormatTimeUtils.formatTime(entry.getStartTime(), TimeFormat.CALENDAR, Resolution.NANOSEC);
-                } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_traceColumn)) {
-                    return getTrace(entry).getName();
                 }
             }
             return ""; //$NON-NLS-1$
@@ -630,7 +629,10 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
             } else if (columnIndex == 1) {
                 ITmfTreeDataModel entryModel = entry.getEntryModel();
                 if (entryModel instanceof ThreadEntryModel) {
-                    return Integer.toString(((ThreadEntryModel) entryModel).getThreadId());
+                    int threadId = ((ThreadEntryModel) entryModel).getThreadId();
+                    if (threadId != Integer.MIN_VALUE) {
+                        return Integer.toString(threadId);
+                    }
                 }
             }
             return ""; //$NON-NLS-1$

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2019 Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,8 +24,6 @@ public class Messages extends NLS {
     public static String ControlFlowView_tidColumn;
     public static String ControlFlowView_ptidColumn;
     public static String ControlFlowView_processColumn;
-    public static String ControlFlowView_traceColumn;
-    public static String ControlFlowView_invisibleColumn;
 
     public static String ControlFlowView_stateTypeName;
     public static String ControlFlowView_multipleStates;
