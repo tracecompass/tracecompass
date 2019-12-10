@@ -77,6 +77,8 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
     /* Table of <scope, key> to id */
     private static final Table<String, Object, Long> fScopedIdTable = HashBasedTable.create();
 
+    private static final String DEFAULT_SCOPE = "DEFAULT"; //$NON-NLS-1$
+
     private final A fAnalysisModule;
     private final ReentrantReadWriteLock fLock = new ReentrantReadWriteLock(false);
     private final BiMap<Long, Integer> fIdToQuark = HashBiMap.create();
@@ -146,12 +148,14 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      * between data providers. The other entry ids not associated to any key are
      * unique within the scope. Within "scope2", the entry id associated with
      * key1 is independent from the one is "scope1".
+     * <p>
+     * A default global scope is provided if not overridden.
      *
      * @return the scope, or <code>null</code> if scope is unique to this data
      *         provider
      */
     protected @Nullable String getScope() {
-        return null;
+        return DEFAULT_SCOPE;
     }
 
     /**
