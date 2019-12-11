@@ -780,6 +780,7 @@ public class TimeGraphViewTest {
      * Test zoom to selection
      */
     @Test
+    @Ignore
     public void testZoomToSelection() {
         resetTimeRange();
         SWTBotTimeGraph timegraph = fTimeGraph;
