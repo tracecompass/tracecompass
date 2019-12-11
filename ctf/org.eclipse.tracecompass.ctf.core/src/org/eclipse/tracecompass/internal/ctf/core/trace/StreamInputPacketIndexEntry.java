@@ -176,8 +176,8 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
 
         // LTTng Specific
         Target target = lookupTarget(streamPacketContextDef);
-        fTarget = target.string;
-        fTargetID = target.number;
+        fTarget = target.getLabel();
+        fTargetID = target.getNumber();
         fLostEvents = computeLostEvents(lostSoFar);
     }
 
@@ -208,9 +208,6 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
         // LTTng Specific
         fTarget = entryToAdd.getTarget();
         fTargetID = entryToAdd.getTargetId();
-        Target target = new Target();
-        target.number = fTargetID;
-        target.string = fTarget;
         fLostEvents = entryToAdd.getLostEvents();
     }
 
@@ -295,38 +292,44 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
     }
 
     private static class Target {
-        public String string;
-        public long number;
+        private String fLabel;
+        private long fNumber;
 
-        public Target() {
-            string = null;
-            number = IPacketReader.UNKNOWN_CPU;
+        public Target(String target, long targetID) {
+            fLabel = target;
+            fNumber = targetID;
+        }
+
+        public String getLabel() {
+            return fLabel;
+        }
+
+        public long getNumber() {
+            return fNumber;
         }
     }
 
     private Target lookupTarget(StructDefinition streamPacketContextDef) {
-        Target ret = new Target();
+        Target ret = new Target(null, IPacketReader.UNKNOWN_CPU);
         boolean hasDevice = fAttributes.containsKey(CTFStrings.DEVICE);
         if (hasDevice) {
             IDefinition def = streamPacketContextDef.lookupDefinition(CTFStrings.DEVICE);
             if (def instanceof SimpleDatatypeDefinition) {
                 SimpleDatatypeDefinition simpleDefinition = (SimpleDatatypeDefinition) def;
-                ret.string = simpleDefinition.getStringValue();
-                ret.number = simpleDefinition.getIntegerValue();
+                ret = new Target(simpleDefinition.getStringValue(), simpleDefinition.getIntegerValue());
             } else if (def instanceof StringDefinition) {
                 StringDefinition stringDefinition = (StringDefinition) def;
-                ret.string = stringDefinition.getValue();
-                final Matcher matcher = NUMBER_PATTERN.matcher(ret.string);
+                ret = new Target(stringDefinition.getValue(), IPacketReader.UNKNOWN_CPU);
+                final Matcher matcher = NUMBER_PATTERN.matcher(ret.getLabel());
                 if (matcher.matches()) {
                     String number = matcher.group(1);
-                    ret.number = Integer.parseInt(number);
+                    ret = new Target(ret.getLabel(), Integer.parseInt(number));
                 }
             }
         } else {
             Long cpuId = (Long) fAttributes.get(CTFStrings.CPU_ID);
             if (cpuId != null) {
-                ret.string = ("CPU" + cpuId.toString()); //$NON-NLS-1$
-                ret.number = cpuId;
+                ret = new Target("CPU" + cpuId.toString(), cpuId); //$NON-NLS-1$
             }
         }
         return ret;
