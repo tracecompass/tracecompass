@@ -207,8 +207,10 @@ public class SegmentHistoryTree<E extends ISegment> extends AbstractOverlappingH
 
             @Override
             public @NonNull E next() {
-                hasNext();
-                return NonNullUtils.checkNotNull(intersecting.removeFirst());
+                if (hasNext()) {
+                    return NonNullUtils.checkNotNull(intersecting.removeFirst());
+                }
+                throw new NoSuchElementException();
             }
 
             @Override
