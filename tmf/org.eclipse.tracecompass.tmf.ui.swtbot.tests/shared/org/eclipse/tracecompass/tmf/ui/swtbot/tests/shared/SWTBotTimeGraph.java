@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -22,6 +22,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
@@ -125,6 +126,62 @@ public class SWTBotTimeGraph extends AbstractSWTBotControl<TimeGraphControl> {
         return new SWTBotTimeGraphEntry(widget, parent.get());
     }
 
+    /**
+     * Perform a drag operation on the canvas of the time graph
+     *
+     * @param pDown
+     *            Point for the mouse to press down on
+     * @param pUp
+     *            Point for the mouse to release on
+     * @param mouseMask
+     *            the SWT button mask to press
+     */
+    public void drag(Point pDown, Point pUp, int mouseMask) {
+        List<Integer> buttons = new ArrayList<>();
+        List<Integer> masks = new ArrayList<>();
+        masks.add(SWT.NONE);
+        if ((mouseMask & SWT.BUTTON1) != 0) {
+            buttons.add(1);
+            masks.add(masks.get(masks.size() - 1) | SWT.BUTTON1);
+        }
+        if ((mouseMask & SWT.BUTTON2) != 0) {
+            buttons.add(2);
+            masks.add(masks.get(masks.size() - 1) | SWT.BUTTON2);
+        }
+        if ((mouseMask & SWT.BUTTON3) != 0) {
+            buttons.add(3);
+            masks.add(masks.get(masks.size() - 1) | SWT.BUTTON3);
+        }
+        if ((mouseMask & SWT.BUTTON4) != 0) {
+            buttons.add(4);
+            masks.add(masks.get(masks.size() - 1) | SWT.BUTTON4);
+        }
+        if ((mouseMask & SWT.BUTTON5) != 0) {
+            buttons.add(5);
+            masks.add(masks.get(masks.size() - 1) | SWT.BUTTON5);
+        }
+        notify(SWT.MouseEnter);
+        notify(SWT.MouseMove, createMouseEvent(pDown.x, pDown.y, 0, SWT.NONE, 0));
+        notify(SWT.Activate);
+        notify(SWT.FocusIn);
+        for (int buttonIndex = 0; buttonIndex < buttons.size(); buttonIndex++) {
+            int button = buttons.get(buttonIndex);
+            int buttonMask = masks.get(buttonIndex);
+            notify(SWT.MouseDown, createMouseEvent(pDown.x, pDown.y, button, buttonMask, 1));
+        }
+        if (!Objects.equals(pUp, pDown)) {
+            notify(SWT.MouseMove, createMouseEvent(pUp.x, pUp.y, 0, mouseMask, 0));
+        }
+        for (int buttonIndex = buttons.size() - 1; buttonIndex >= 0; buttonIndex--) {
+            int button = buttons.get(buttonIndex);
+            int buttonMask = masks.get(buttonIndex + 1);
+            notify(SWT.MouseUp, createMouseEvent(pUp.x, pUp.y, button, buttonMask, 1));
+        }
+        notify(SWT.MouseMove, createMouseEvent(pUp.x, pUp.y, 0, SWT.NONE, 0));
+        notify(SWT.MouseExit);
+        notify(SWT.Deactivate);
+        notify(SWT.FocusOut);
+    }
 
     /**
      * Set the expand state of a time graph entry

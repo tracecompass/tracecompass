@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2019 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -153,7 +154,14 @@ public class SWTBotTimeGraphEntry extends AbstractSWTBotControl<TimeGraphControl
         doubleClickXY(p.x, p.y);
     }
 
-    private Point getPointForTime(long time) {
+    /**
+     * Get the coordinates of a point for a specified time
+     *
+     * @param time
+     *            the time to get the equivalent Point of.
+     * @return the point at the time
+     */
+    public Point getPointForTime(long time) {
         return UIThreadRunnable.syncExec((Result<Point>) () -> {
             ITimeDataProvider timeDataProvider = widget.getTimeDataProvider();
             if (timeDataProvider.getTime0() > time || timeDataProvider.getTime1() < time) {
@@ -163,6 +171,24 @@ public class SWTBotTimeGraphEntry extends AbstractSWTBotControl<TimeGraphControl
             Rectangle bounds = widget.getItemBounds(fEntry);
             int y = bounds.y + bounds.height / 2;
             return new Point(x, y);
+        });
+    }
+
+    /**
+     * Get the time in the entry for a given X point
+     *
+     * @param x
+     *            the x point
+     * @return the time or {@code null} or {@code -1} if it is out of bounds
+     */
+    public Long getTimeForPoint(int x) {
+        return UIThreadRunnable.syncExec((Result<@Nullable Long>) () -> {
+            Rectangle bounds = widget.getBounds();
+            Point p = new Point(x, bounds.y + bounds.height / 2);
+            if (!bounds.contains(p)) {
+                return null;
+            }
+            return widget.getTimeAtX(x);
         });
     }
 

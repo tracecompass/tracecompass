@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
-
 import org.apache.log4j.SimpleLayout;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.bindings.keys.KeyStroke;
@@ -77,6 +76,7 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITimeDataProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.ui.IWorkbenchPart;
 import org.junit.After;
@@ -419,6 +419,89 @@ public class TimeGraphViewTest {
         ImageHelper delta = highlighted.diff(reset);
         tg.expandAll();
         assertTrue("Some highlighting", delta.getHistogram().elementSet().size() > 1);
+    }
+
+    /**
+     * Test Mouse operations, drag, select and middle-drag
+     */
+    @Test
+    public void testDrag() {
+
+        String pg = "Plumber guy";
+        SWTBotTimeGraph timegraph = fTimeGraph;
+        resetTimeRange();
+
+        SWTBotTimeGraphEntry[] entries = timegraph.getEntries();
+        assertNotNull(entries);
+
+        SWTBotTimeGraphEntry entry1 = timegraph.getEntry(pg, "Hat2");
+        assertNotNull(entry1);
+        SWTBotTimeGraphEntry entry2 = timegraph.getEntry(pg, "Head3");
+        assertNotNull(entry2);
+        ITimeDataProvider timeprovider = timegraph.widget.getTimeDataProvider();
+
+        validateRanges(timeprovider, 0, 0, 20, 100);
+
+        // Change selection
+        Point down = entry1.getPointForTime(40);
+        Point up = entry2.getPointForTime(80);
+
+        fTimeGraph.drag(down, up, SWT.BUTTON1);
+
+        validateRanges(timeprovider, 40, 80, 20, 100);
+
+        // Zoom window
+        down = entry1.getPointForTime(70);
+        up = entry2.getPointForTime(30);
+
+        fTimeGraph.drag(down, up, SWT.BUTTON3);
+
+        validateRanges(timeprovider, 40, 80, 30, 70);
+
+        // Drag window
+        down = entry1.getPointForTime(65);
+        up = entry2.getPointForTime(35);
+
+        fTimeGraph.drag(down, up, SWT.BUTTON2);
+
+        validateRanges(timeprovider, 40, 80, 60, 100);
+
+        // Check for aliasing
+        up = entry1.getPointForTime(99);
+
+        for (int selectionDown = 61; selectionDown < 99; selectionDown++) {
+            down = entry1.getPointForTime(selectionDown);
+            fTimeGraph.drag(down, up, SWT.BUTTON1);
+            validateRanges(timeprovider, selectionDown, 99, 60, 100);
+        }
+        down = entry1.getPointForTime(61);
+
+        for (int selectionUp = 62; selectionUp < 100; selectionUp++) {
+            // drag the cursor by one ns per cycle
+            up = entry1.getPointForTime(selectionUp);
+            fTimeGraph.drag(down, up, SWT.BUTTON1);
+            down = up;
+            validateRanges(timeprovider, 61, selectionUp, 60, 100);
+        }
+
+        // drag cursor around
+        down = entry1.getPointForTime(65);
+        up = entry1.getPointForTime(85);
+
+        fTimeGraph.drag(down, up, SWT.BUTTON1);
+        validateRanges(timeprovider, 65, 85, 60, 100);
+        up = entry1.getPointForTime(70);
+        fTimeGraph.drag(down, up, SWT.BUTTON1);
+        validateRanges(timeprovider, 70, 85, 60, 100);
+    }
+
+    private static void validateRanges(ITimeDataProvider timeprovider,
+            long selectionBegin, long selectionEnd,
+            long time0, long time1) {
+        assertEquals("Selection Begin", selectionBegin, timeprovider.getSelectionBegin());
+        assertEquals("Selection End", selectionEnd, timeprovider.getSelectionEnd());
+        assertEquals("Window 0", time0, timeprovider.getTime0());
+        assertEquals("Window 1", time1, timeprovider.getTime1());
     }
 
     /**
