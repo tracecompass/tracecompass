@@ -503,6 +503,57 @@ public class TimeGraphViewTest {
         assertEquals("Window 0", time0, timeprovider.getTime0());
         assertEquals("Window 1", time1, timeprovider.getTime1());
     }
+    /**
+     * Test bookmark operations
+     */
+    @Test
+    public void testBookmark() {
+        String pg = "Plumber guy";
+        SWTBotTimeGraph timegraph = fTimeGraph;
+        resetTimeRange();
+        SWTBotTimeGraphEntry[] entries = null;
+        entries = timegraph.getEntries();
+        assertNotNull(entries);
+        SWTBotTimeGraphEntry entry1 = timegraph.getEntry(pg, "Hat2");
+        SWTBotTimeGraphEntry entry2 = timegraph.getEntry(pg, "Head3");
+        assertNotNull(entry1);
+        assertNotNull(entry2);
+        ITimeDataProvider timeprovider = timegraph.widget.getTimeDataProvider();
+
+        // initial settings
+        long unsetTime = 0;
+        long time0 = 20;
+        long time1 = 100;
+        // Bookmark Range
+        long bookmarkBegin = 40;
+        long bookmarkEnd = 80;
+        // Other marker
+        long previousMarker = 38;
+        long nextMarker = 44;
+
+        Point down = entry1.getPointForTime(bookmarkBegin);
+        Point up = entry2.getPointForTime(bookmarkEnd);
+
+        validateRanges(timeprovider, unsetTime, unsetTime, time0, time1);
+
+        fTimeGraph.drag(down, up, SWT.BUTTON1);
+        // Contiguous time?
+        validateRanges(timeprovider, bookmarkBegin, bookmarkEnd, time0, time1);
+        fViewBot.toolbarButton("Add Bookmark...").click();
+        SWTBotShell bookmarkShell = fBot.shell("Add Bookmark");
+        bookmarkShell.bot().text().setText("Bookmark");
+        bookmarkShell.bot().button(OK_BUTTON).click();
+        fViewBot.toolbarButton("Previous Marker").click();
+        validateRanges(timeprovider, previousMarker, previousMarker, time0, time1);
+        fViewBot.toolbarButton("Next Marker").click();
+        validateRanges(timeprovider, bookmarkBegin, bookmarkEnd, time0, time1);
+        fViewBot.toolbarButton("Remove Bookmark").click();
+        validateRanges(timeprovider, bookmarkBegin, bookmarkEnd, time0, time1);
+        fViewBot.toolbarButton("Previous Marker").click();
+        validateRanges(timeprovider, previousMarker, previousMarker, time0, time1);
+        fViewBot.toolbarButton("Next Marker").click();
+        validateRanges(timeprovider, nextMarker, nextMarker, time0, time1);
+    }
 
     /**
      * Test the legend operation. Change sliders and reset, do not change colors
