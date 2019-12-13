@@ -190,8 +190,8 @@ public final class TimestampTransformFactory {
         /* Save the timestamp transform to a file */
         File syncFile = getSyncFormulaFile(resource);
         if (syncFile != null) {
-            if (syncFile.exists()) {
-                syncFile.delete();
+            if (syncFile.exists() && !syncFile.delete()) {
+                Activator.logError("Error erasing syncfile " + syncFile); //$NON-NLS-1$
             }
             if (tt == null) {
                 return;
