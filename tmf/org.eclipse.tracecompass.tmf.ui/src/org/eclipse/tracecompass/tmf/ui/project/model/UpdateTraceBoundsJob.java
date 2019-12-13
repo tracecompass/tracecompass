@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -251,7 +252,9 @@ public class UpdateTraceBoundsJob extends Job {
                 traceElement.refreshViewer();
             } catch (IOException e) {
                 TraceCompassLogUtils.traceInstant(LOGGER, Level.CONFIG, "Failed to read time bounds", "trace", traceElement.getName(), "bounds file", boundsFile.getAbsoluteFile()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                boundsFile.delete();
+                if (!boundsFile.delete()) {
+                    Activator.getDefault().logError("Failed to delete " + boundsFile); //$NON-NLS-1$
+                }
             }
         }
     }
