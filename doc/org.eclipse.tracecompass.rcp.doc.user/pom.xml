@@ -102,13 +102,13 @@
                   </goals>
                   <configuration>
                   <target>
+                    <mkdir dir="${docDestination}/org.eclipse.tracecompass.rcp.doc.user"/>
                     <delete includeemptydirs="false">
                       <fileset
                         dir="${docDestination}/org.eclipse.tracecompass.rcp.doc.user">
                         <include name="**" />
                       </fileset>
                     </delete>
-
                     <copy includeemptydirs="false" todir="${docDestination}/org.eclipse.tracecompass.rcp.doc.user">
                       <fileset dir="doc" includes="*.html,images/**"/>
                     </copy>
