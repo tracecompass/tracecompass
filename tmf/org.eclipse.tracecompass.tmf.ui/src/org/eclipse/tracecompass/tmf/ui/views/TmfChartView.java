@@ -275,6 +275,8 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
     @Override
     public void setFocus() {
         fChartViewer.getControl().setFocus();
+        /* Force activation because focus gained event is not always received */
+        activateContextService();
     }
 
     /**

@@ -1543,6 +1543,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     @Override
     public void setFocus() {
         fTimeGraphViewer.setFocus();
+        /* Force activation because focus gained event is not always received */
+        activateContextService();
     }
 
     @Override
