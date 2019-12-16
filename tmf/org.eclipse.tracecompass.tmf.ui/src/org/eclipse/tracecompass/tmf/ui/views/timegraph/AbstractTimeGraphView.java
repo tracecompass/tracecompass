@@ -235,7 +235,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private ITmfTrace fTrace;
 
     /** The selected trace editor file */
-    private IFile fEditorFile;
+    private @Nullable IFile fEditorFile;
 
     /** The timegraph entry list */
     private List<TimeGraphEntry> fEntryList;
@@ -1362,7 +1362,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                         @Override
                         public void run(IProgressMonitor monitor) throws CoreException {
                             IMarkerEvent bookmark = event.getBookmark();
-                            IMarker marker = fEditorFile.createMarker(IMarker.BOOKMARK);
+                            IFile editorFile = fEditorFile;
+                            if (editorFile == null) {
+                                return;
+                            }
+                            IMarker marker = editorFile.createMarker(IMarker.BOOKMARK);
                             marker.setAttribute(IMarker.MESSAGE, bookmark.getLabel());
                             marker.setAttribute(ITmfMarker.MARKER_TIME, Long.toString(bookmark.getTime()));
                             if (bookmark.getDuration() > 0) {
@@ -1388,7 +1392,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             public void bookmarkRemoved(TimeGraphBookmarkEvent event) {
                 try {
                     IMarkerEvent bookmark = event.getBookmark();
-                    IMarker[] markers = fEditorFile.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO);
+                    IFile editorFile = fEditorFile;
+                    if (editorFile == null) {
+                        return;
+                    }
+                    IMarker[] markers = editorFile.findMarkers(IMarker.BOOKMARK, false, IResource.DEPTH_ZERO);
                     for (IMarker marker : markers) {
                         if (bookmark.getLabel().equals(marker.getAttribute(IMarker.MESSAGE)) &&
                                 Long.toString(bookmark.getTime()).equals(marker.getAttribute(ITmfMarker.MARKER_TIME, (String) null)) &&
