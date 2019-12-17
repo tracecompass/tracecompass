@@ -1760,9 +1760,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 // nanosecond of this pixel's time range
                 hitTime = time0 + (long) Math.ceil((time1 - time0) * ((double) x / timeWidth));
             } else {
-                // nanosecond greater than one pixel: use the nanosecond that
-                // covers this pixel start position
-                hitTime = time0 + (long) Math.floor((time1 - time0) * ((double) x / timeWidth));
+                // nanosecond greater than one pixel: use closest nanosecond to
+                // this pixel's start time
+                hitTime = time0 + Math.round((time1 - time0) * ((double) x / timeWidth));
             }
         }
         return hitTime;
