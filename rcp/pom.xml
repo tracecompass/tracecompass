@@ -39,7 +39,7 @@
       <id>run-rcp-tests</id>
       <activation>
         <property>
-          <name>!skip-tc-ui-tests</name>
+          <name>!skip-short-tc-ui-tests</name>
         </property>
       </activation>
       <modules>

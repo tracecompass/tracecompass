@@ -86,16 +86,22 @@ the build system. You can set them by using `-P[profile name]` and
   `-Dmaven.test.skip=true` or `-DskipTests=true` , which already skips
   all the tests.
 
-* `-Dskip-tc-ui-tests`
+* `-Dskip-short-tc-ui-tests`
 
-  Skips the automated UI integration tests. Not required when using
+  Skips the short UI integration tests. Not required when using
+  `-Dmaven.test.skip=true` or `-DskipTests=true`, which already skips
+  all the tests.
+
+* `-Dskip-long-tc-ui-tests`
+
+  Skips the long UI integration tests. Not required when using
   `-Dmaven.test.skip=true` or `-DskipTests=true`, which already skips
   all the tests.
 
 * `-Dskip-rcp`
 
   Skips building the RCP archives and related deployment targets. Only works in
-  conjunction with `-Dskip-tc-ui-tests`, due to a limitation in Maven.
+  conjunction with `-Dskip-tc-long-ui-tests`, due to a limitation in Maven.
 
 * `-Pctf-grammar`
 

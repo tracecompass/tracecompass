@@ -21,7 +21,7 @@
   <version>1.0.8-SNAPSHOT</version>
 
   <properties>
-    <skipTests>${skip-tc-ui-tests}</skipTests>
+    <skipTests>${skip-short-tc-ui-tests}</skipTests>
   </properties>
 
   <packaging>eclipse-test-plugin</packaging>

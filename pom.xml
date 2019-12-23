@@ -44,7 +44,8 @@
     <testArgLine></testArgLine>
 
     <skip-tc-core-tests>false</skip-tc-core-tests>
-    <skip-tc-ui-tests>false</skip-tc-ui-tests>
+    <skip-short-tc-ui-tests>false</skip-short-tc-ui-tests>
+    <skip-long-tc-ui-tests>false</skip-long-tc-ui-tests>
 
     <tycho-version>1.3.0</tycho-version>
     <tycho-extras-version>1.3.0</tycho-extras-version>
