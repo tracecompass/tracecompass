@@ -122,7 +122,6 @@ import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.internal.tmf.ui.commands.CopyToClipboardOperation;
 import org.eclipse.tracecompass.internal.tmf.ui.commands.ExportToTextCommandHandler;
 import org.eclipse.tracecompass.internal.tmf.ui.dialogs.AddBookmarkDialog;
-import org.eclipse.tracecompass.tmf.core.component.ITmfEventProvider;
 import org.eclipse.tracecompass.tmf.core.component.TmfComponent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
@@ -2179,7 +2178,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
      */
     protected class FilterThread extends Thread {
         private final ITmfFilterTreeNode filter;
-        private TmfCollapseFilter collapseFilter = null;
+        private TmfCollapseFilter fCollapseFilter = null;
         private TmfEventRequest request;
         private boolean refreshBusy = false;
         private boolean refreshPending = false;
@@ -2202,7 +2201,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 return;
             }
             if (fCollapseFilterEnabled) {
-                collapseFilter = new TmfCollapseFilter();
+                fCollapseFilter = new TmfCollapseFilter();
             }
             final int nbRequested = (int) (fTrace.getNbEvents() - fFilterCheckCount);
             if (nbRequested <= 0) {
@@ -2218,12 +2217,13 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     }
                     boolean refresh = false;
                     if (filter.matches(event)) {
+                        TmfCollapseFilter collapseFilter = fCollapseFilter;
                         if (collapseFilter == null || collapseFilter.matches(event)) {
                             final long rank = fFilterCheckCount;
                             final int index = (int) fFilterMatchCount;
                             fFilterMatchCount++;
                             fCache.storeEvent(event, rank, index);
-                        } else if (collapseFilter != null) {
+                        } else {
                             fCache.updateCollapsedEvent((int) fFilterMatchCount - 1);
                         }
                         refresh = true;
@@ -2235,10 +2235,11 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     fFilterCheckCount++;
                 }
             };
-            ((ITmfEventProvider) fTrace).sendRequest(request);
+            fTrace.sendRequest(request);
             try {
                 request.waitForCompletion();
             } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
             refreshTable();
             synchronized (fFilterSyncObj) {
@@ -2423,13 +2424,13 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             }
             final Display display = Display.getDefault();
             if (startIndex < 0) {
-                rank = (int) trace.getNbEvents() - 1;
+                rank = trace.getNbEvents() - 1L;
                 /*
                  * -1 for header row, -3 for header and top and bottom filter
                  * status rows
                  */
             } else if (startIndex >= (fTable.getItemCount() - (eventFilter == null ? 1 : 3))) {
-                rank = 0;
+                rank = 0L;
             } else {
                 int idx = startIndex;
                 while (foundRank == -1) {
@@ -2452,13 +2453,13 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 if (foundRank == -1) {
                     if (direction == Direction.FORWARD) {
                         rank++;
-                        if (rank > (trace.getNbEvents() - 1)) {
+                        if (rank > (trace.getNbEvents() - 1L)) {
                             rank = 0;
                         }
                     } else {
                         rank--;
                         if (rank < 0) {
-                            rank = (int) trace.getNbEvents() - 1;
+                            rank = trace.getNbEvents() - 1L;
                         }
                     }
                 }
@@ -2466,7 +2467,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
             final int startRank = (int) rank;
             boolean wrapped = false;
             while (!monitor.isCanceled() && (foundRank == -1)) {
-                int nbRequested = (direction == Direction.FORWARD ? Integer.MAX_VALUE : Math.min((int) rank + 1, trace.getCacheSize()));
+                int nbRequested = (int) (direction == Direction.FORWARD ? (long) Integer.MAX_VALUE : Math.min(rank + 1, trace.getCacheSize()));
                 if (direction == Direction.BACKWARD) {
                     rank = Math.max(0, rank - trace.getCacheSize() + 1);
                 }
@@ -2488,7 +2489,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                         currentRank++;
                     }
                 };
-                ((ITmfEventProvider) trace).sendRequest(request);
+                trace.sendRequest(request);
                 try {
                     request.waitForCompletion();
                     if (request.isCancelled()) {
@@ -2498,6 +2499,7 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                     synchronized (fSearchSyncObj) {
                         fSearchThread = null;
                     }
+                    Thread.currentThread().interrupt();
                     return Status.OK_STATUS;
                 }
                 if (foundRank == -1) {
@@ -2508,13 +2510,12 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                             }
                             return Status.OK_STATUS;
                         }
-                        nbRequested = (int) rank;
                         rank = 0;
                         wrapped = true;
                     } else {
                         rank--;
                         if (rank < 0) {
-                            rank = (int) trace.getNbEvents() - 1;
+                            rank = trace.getNbEvents() - 1L;
                             wrapped = true;
                         }
                         if ((rank <= startRank) && wrapped) {
