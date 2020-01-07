@@ -18,6 +18,10 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = Messages.class.getPackage().getName() + ".messages"; //$NON-NLS-1$
     /**
+     * The symbol to display
+     */
+    public static String FlameGraph_Symbol;
+    /**
      * The duration of a function
      */
     public static String FlameGraph_Duration;

@@ -83,8 +83,10 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
 
     @Override
     public Map<String, String> getEventHoverToolTipInfo(ITimeEvent event, long hoverTime) {
-        AggregatedCalledFunctionStatistics statistics = ((FlamegraphEvent) event).getStatistics();
+        FlamegraphEvent fgEvent = (FlamegraphEvent) event;
+        AggregatedCalledFunctionStatistics statistics = fgEvent.getStatistics();
         ImmutableMap.Builder<String, String> builder = new ImmutableMap.Builder<>();
+        builder.put(Messages.FlameGraph_Symbol, fgEvent.getLabel());
         builder.put(Messages.FlameGraph_NbCalls, NumberFormat.getIntegerInstance().format(statistics.getDurationStatistics().getNbElements())); // $NON-NLS-1$
         builder.put(String.valueOf(Messages.FlameGraph_Durations), ""); //$NON-NLS-1$
         builder.put("\t" + Messages.FlameGraph_Duration, FORMATTER.format(event.getDuration())); //$NON-NLS-1$
@@ -93,7 +95,7 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
         builder.put("\t" + Messages.FlameGraph_MinDuration, FORMATTER.format(statistics.getDurationStatistics().getMin())); // $NON-NLS-1$ //$NON-NLS-1$
         builder.put("\t" + Messages.FlameGraph_Deviation, FORMATTER.format(statistics.getDurationStatistics().getStdDev())); //$NON-NLS-1$
         builder.put(Messages.FlameGraph_SelfTimes, ""); //$NON-NLS-1$
-        builder.put("\t" + Messages.FlameGraph_SelfTime, FORMATTER.format(((FlamegraphEvent) event).getSelfTime())); //$NON-NLS-1$
+        builder.put("\t" + Messages.FlameGraph_SelfTime, FORMATTER.format(fgEvent.getSelfTime())); //$NON-NLS-1$
         builder.put("\t" + Messages.FlameGraph_AverageSelfTime, FORMATTER.format(statistics.getSelfTimeStatistics().getMean())); // $NON-NLS-1$ //$NON-NLS-1$
         builder.put("\t" + Messages.FlameGraph_MaxSelfTime, FORMATTER.format(statistics.getSelfTimeStatistics().getMax())); // $NON-NLS-1$ //$NON-NLS-1$
         builder.put("\t" + Messages.FlameGraph_MinSelfTime, FORMATTER.format(statistics.getSelfTimeStatistics().getMin())); // $NON-NLS-1$ //$NON-NLS-1$
