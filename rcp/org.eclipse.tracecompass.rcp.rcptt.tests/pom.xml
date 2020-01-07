@@ -26,6 +26,7 @@
     <dataPath>${project.build.directory}/dependency/tracecompass-test-traces-ctf-jar</dataPath>
     <!-- Overridden by profile on Windows -->
     <aut.extension>tar.gz</aut.extension>
+    <skipTests>${skip-short-tc-ui-tests}</skipTests>
   </properties>
 
   <dependencies>

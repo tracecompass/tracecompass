@@ -28,40 +28,31 @@
     <module>org.eclipse.tracecompass.analysis.counters.core</module>
     <module>org.eclipse.tracecompass.analysis.counters.core.tests</module>
     <module>org.eclipse.tracecompass.analysis.counters.ui</module>
+    <module>org.eclipse.tracecompass.analysis.counters.ui.swtbot.tests</module>
+
     <module>org.eclipse.tracecompass.analysis.graph.core</module>
     <module>org.eclipse.tracecompass.analysis.graph.core.tests</module>
+    <module>org.eclipse.tracecompass.analysis.graph.ui</module>
+
     <module>org.eclipse.tracecompass.analysis.lami.core</module>
     <module>org.eclipse.tracecompass.analysis.lami.core.tests</module>
     <module>org.eclipse.tracecompass.analysis.lami.ui</module>
-    <module>org.eclipse.tracecompass.analysis.graph.ui</module>
+    <module>org.eclipse.tracecompass.analysis.lami.ui.swtbot.tests</module>
+
     <module>org.eclipse.tracecompass.analysis.os.linux.core</module>
     <module>org.eclipse.tracecompass.analysis.os.linux.core.tests</module>
     <module>org.eclipse.tracecompass.analysis.os.linux.ui</module>
     <module>org.eclipse.tracecompass.analysis.os.linux.ui.tests</module>
+    <module>org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests</module>
+
     <module>org.eclipse.tracecompass.analysis.profiling.core</module>
     <module>org.eclipse.tracecompass.analysis.profiling.core.tests</module>
     <module>org.eclipse.tracecompass.analysis.profiling.ui</module>
+    <module>org.eclipse.tracecompass.analysis.profiling.ui.swtbot.tests</module>
+
     <module>org.eclipse.tracecompass.analysis.timing.core</module>
     <module>org.eclipse.tracecompass.analysis.timing.core.tests</module>
     <module>org.eclipse.tracecompass.analysis.timing.ui</module>
+    <module>org.eclipse.tracecompass.analysis.timing.ui.swtbot.tests</module>
   </modules>
-
-  <profiles>
-    <profile>
-      <id>automated-ui-tests</id>
-      <activation>
-        <property>
-          <name>!skip-automated-ui-tests</name>
-        </property>
-      </activation>
-      <modules>
-        <module>org.eclipse.tracecompass.analysis.counters.ui.swtbot.tests</module>
-        <module>org.eclipse.tracecompass.analysis.os.linux.ui.swtbot.tests</module>
-        <module>org.eclipse.tracecompass.analysis.profiling.ui.swtbot.tests</module>
-        <module>org.eclipse.tracecompass.analysis.timing.ui.swtbot.tests</module>
-        <module>org.eclipse.tracecompass.analysis.lami.ui.swtbot.tests</module>
-      </modules>
-    </profile>
-  </profiles>
-
 </project>

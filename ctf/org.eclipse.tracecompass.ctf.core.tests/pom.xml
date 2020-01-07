@@ -26,6 +26,7 @@
 
   <properties>
     <ctfTestSuiteCommit>0f8beba86ae551f42adeb81d1bfddd5645f31013</ctfTestSuiteCommit>
+    <skipTests>${skip-tc-core-tests}</skipTests>
   </properties>
 
   <!-- Do not download the test traces if "maven.test.skip" is set -->
@@ -34,7 +35,7 @@
       <id>download-traces</id>
       <activation>
         <property>
-          <name>!maven.test.skip</name>
+          <name>!skipTests</name>
         </property>
       </activation>
 
