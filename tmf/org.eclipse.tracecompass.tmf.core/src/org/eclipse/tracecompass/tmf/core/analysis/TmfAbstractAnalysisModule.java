@@ -357,6 +357,9 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
                     return;
                 }
                 fStarted = true;
+                // Reset cancellation and failure cause
+                fAnalysisCancelled = false;
+                fFailureCause = null;
             }
 
             /*

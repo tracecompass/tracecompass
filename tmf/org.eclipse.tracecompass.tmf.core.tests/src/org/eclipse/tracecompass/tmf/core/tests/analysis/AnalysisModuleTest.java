@@ -151,24 +151,25 @@ public class AnalysisModuleTest {
     @Test
     public void testWaitForCompletionCancelled() {
         TestAnalysis module = setUpAnalysis();
-
-        /* Set a stub trace for analysis */
-        ITmfTrace trace = TmfTestTrace.A_TEST_10K.getTrace();
         try {
-            assertTrue(module.setTrace(trace));
-        } catch (TmfAnalysisException e) {
-            fail(e.getMessage());
+            /* Set a stub trace for analysis */
+            ITmfTrace trace = TmfTestTrace.A_TEST_10K.getTrace();
+            try {
+                assertTrue(module.setTrace(trace));
+            } catch (TmfAnalysisException e) {
+                fail(e.getMessage());
+            }
+
+            module.setParameter(TestAnalysis.PARAM_TEST, 0);
+            IStatus status = module.schedule();
+            assertEquals(Status.OK_STATUS, status);
+            boolean completed = module.waitForCompletion();
+
+            assertFalse(completed);
+            assertEquals(0, module.getAnalysisOutput());
+        } finally {
+            module.dispose();
         }
-
-        module.setParameter(TestAnalysis.PARAM_TEST, 0);
-        IStatus status = module.schedule();
-        assertEquals(Status.OK_STATUS, status);
-        boolean completed = module.waitForCompletion();
-
-        assertFalse(completed);
-        assertEquals(0, module.getAnalysisOutput());
-
-        module.dispose();
     }
 
     /**
