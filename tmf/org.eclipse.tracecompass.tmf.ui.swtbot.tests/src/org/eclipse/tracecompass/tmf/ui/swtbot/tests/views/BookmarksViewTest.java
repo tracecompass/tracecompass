@@ -232,7 +232,7 @@ public class BookmarksViewTest {
         bookmark.select();
         bookmark.contextMenu("Delete").click();
         SWTBotShell deleteBookmarkShell = fBot.shell("Delete Selected Entries");
-        deleteBookmarkShell.bot().button("Delete").click();
+        SWTBotUtils.anyButtonOf(deleteBookmarkShell.bot(), "Delete", "Yes").click();
         fBot.waitUntil(Conditions.treeHasRows(bookmarkTree, 0));
         tableItem = editorBot.bot().table().getTableItem(7);
         assertNull("Bookmark not deleted from event table", getBookmarkImage(tableItem));
