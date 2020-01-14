@@ -75,6 +75,15 @@ public class OsWorker implements IGraphWorker {
         return Collections.singletonMap(OsStrings.tid(), String.valueOf(tid));
     }
 
+    @Override
+    public @NonNull Map<@NonNull String, @NonNull Object> getWorkerAspects() {
+        int tid = fHostTid.getTid();
+        if (tid == -1) {
+            return Collections.emptyMap();
+        }
+        return Collections.singletonMap(OsStrings.tid(), tid);
+    }
+
     @SuppressWarnings("null")
     @Override
     public @NonNull Map<@NonNull String, @NonNull String> getWorkerInformation(long t) {

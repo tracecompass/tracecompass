@@ -57,8 +57,9 @@ public class CriticalPathTest extends KernelTestBase {
     private static final String TID2 = String.valueOf(TID_NO2);
     private static final String PROCESS2 = "weston-desktop-";
     private static final @NonNull String CP_ID = "org.eclipse.linuxtools.tmf.analysis.graph.ui.criticalpath.view.criticalpathview";
+    private static final String KWORKER_PROCESS = "kworker/u16:0";
     private static final String CRIT_PATH_MAIN_ENTRY = "[" + PROCESS + "," + TID + "]";
-    private static final String CRIT_PATH_OTHER_ENTRY = "[kworker/u16:0,6]";
+    private static final String CRIT_PATH_OTHER_ENTRY = "[" + KWORKER_PROCESS + ",6]";
     private static final String CRIT_PATH_MAIN_ENTRY2 = "[" + PROCESS2 + "," + TID2 + "]";
 
     private static final String FOLLOW_FORWARD = "Follow critical path forward";
@@ -144,10 +145,14 @@ public class CriticalPathTest extends KernelTestBase {
         fViewBotCp.toolbarButton(FOLLOW_FORWARD).click();
         fBot.waitUntil(timeGraphIsReadyCondition);
         fBot.waitUntil(ConditionHelpers.timeGraphSelectionContains(timeGraphCp, 0, CRIT_PATH_OTHER_ENTRY));
+        // Make sure changing the selection changed the selection in CFV too
+        fBot.waitUntil(ConditionHelpers.timeGraphSelectionContains(timeGraphCfv, 0, KWORKER_PROCESS));
         // Follow it back up
         fViewBotCp.toolbarButton(FOLLOW_BACKWARD).click();
         fBot.waitUntil(timeGraphIsReadyCondition);
         fBot.waitUntil(ConditionHelpers.timeGraphSelectionContains(timeGraphCp, 0, CRIT_PATH_MAIN_ENTRY));
+        // Make sure changing the selection changed the selection in CFV too
+        fBot.waitUntil(ConditionHelpers.timeGraphSelectionContains(timeGraphCfv, 0, PROCESS));
 
         // Follow another process and make sure the critical path changes
         entry = timeGraphCfv.getEntry(trace.getName(), "systemd", "we", PROCESS, PROCESS2);

@@ -28,6 +28,7 @@ import com.google.common.collect.Multimap;
  */
 public class CriticalPathEntry extends TimeGraphEntryModel {
 
+    private static final String HOST_ID_STR = "hostId"; //$NON-NLS-1$
     private final Long fSum;
     private final Double fPercent;
     private final @NonNull Multimap<@NonNull String, @NonNull Object> fAspects = HashMultimap.create();
@@ -57,8 +58,8 @@ public class CriticalPathEntry extends TimeGraphEntryModel {
         super(id, parentId, Collections.singletonList(String.valueOf(worker)), startTime, endTime);
         fSum = sum;
         fPercent = percent;
-        fAspects.put("hostId", worker.getHostId());
-        for (Entry<String, String> entry : worker.getWorkerInformation().entrySet()) {
+        fAspects.put(HOST_ID_STR, worker.getHostId());
+        for (Entry<@NonNull String, @NonNull Object> entry : worker.getWorkerAspects().entrySet()) {
             fAspects.put(entry.getKey(), entry.getValue());
         }
     }
