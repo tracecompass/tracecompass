@@ -387,8 +387,8 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
                         String deviceType = analysis.resolveDeviceType(entry.getValue(), time);
                         tooltips.put(deviceType, deviceId);
                         ITmfTrace trace = getTrace();
-                        CallsiteAnalysis csa = TmfTraceUtils.getAnalysisModuleOfClass(trace, CallsiteAnalysis.class, CallsiteAnalysis.ID);
-                        if (csa != null) {
+                        Iterable<@NonNull CallsiteAnalysis> csas = TmfTraceUtils.getAnalysisModulesOfClass(trace, CallsiteAnalysis.class);
+                        for (CallsiteAnalysis csa : csas) {
                             List<@NonNull ITmfCallsite> res = csa.getCallsites(String.valueOf(trace.getUUID()), deviceType, deviceId, time);
                             if (!res.isEmpty()) {
                                 tooltips.put(TmfStrings.source(), String.valueOf(res.get(0)));
