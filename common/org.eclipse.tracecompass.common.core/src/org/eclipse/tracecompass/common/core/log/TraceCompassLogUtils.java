@@ -9,6 +9,8 @@
 
 package org.eclipse.tracecompass.common.core.log;
 
+import java.text.DecimalFormat;
+import java.text.Format;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -101,6 +103,8 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 public final class TraceCompassLogUtils {
 
+    private static final Format FORMAT = new DecimalFormat("#.###"); //$NON-NLS-1$
+
     /*
      * Field names
      */
@@ -109,6 +113,7 @@ public final class TraceCompassLogUtils {
     private static final String CATEGORY = "cat"; //$NON-NLS-1$
     private static final String ID = "id"; //$NON-NLS-1$
     private static final String TID = "tid"; //$NON-NLS-1$
+    private static final String PID = "pid"; //$NON-NLS-1$
     private static final String TIMESTAMP = "ts"; //$NON-NLS-1$
     private static final String PHASE = "ph"; //$NON-NLS-1$
 
@@ -228,6 +233,7 @@ public final class TraceCompassLogUtils {
         private int fId = Integer.MIN_VALUE;
         private @Nullable String fCategory = null;
         private @Nullable FlowScopeLog fParent = null;
+        private boolean fHasParent = false;
 
         /**
          * Flow scope log builder constructor
@@ -288,6 +294,9 @@ public final class TraceCompassLogUtils {
             }
             fCategory = category;
             fId = id;
+            // Id is already set, so assume this scope has a parent, even if the
+            // parent object is not available
+            fHasParent = true;
             return this;
         }
 
@@ -319,9 +328,10 @@ public final class TraceCompassLogUtils {
         public FlowScopeLog build() {
             FlowScopeLog parent = fParent;
             if (parent != null) {
-                return new FlowScopeLog(fLogger, fLevel, fLabel, parent.fCategory, parent.fId, fArgs);
+                // Has a parent scope, so step in flow
+                return new FlowScopeLog(fLogger, fLevel, fLabel, parent.fCategory, parent.fId, false, fArgs);
             }
-            return new FlowScopeLog(fLogger, fLevel, fLabel, String.valueOf(fCategory), (fId == Integer.MIN_VALUE ? ID_GENERATOR.incrementAndGet() : fId), fArgs);
+            return new FlowScopeLog(fLogger, fLevel, fLabel, String.valueOf(fCategory), (fId == Integer.MIN_VALUE ? ID_GENERATOR.incrementAndGet() : fId), !fHasParent, fArgs);
         }
 
     }
@@ -382,11 +392,14 @@ public final class TraceCompassLogUtils {
          *            the category of the flow events
          * @param id
          *            The id of the flow
+         * @param startFlow
+         *            Whether this flow scope object is the start of a flow, or
+         *            a step
          * @param args
          *            the messages to pass, should be in pairs key, value, key2,
          *            value2.... typically arguments
          */
-        private FlowScopeLog(Logger log, Level level, String label, String category, int id, Object... args) {
+        private FlowScopeLog(Logger log, Level level, String label, String category, int id, boolean startFlow, Object... args) {
             long time = System.nanoTime();
             fId = id;
             fLogger = log;
@@ -396,7 +409,17 @@ public final class TraceCompassLogUtils {
             fLogger.log(fLevel, (() -> {
                 StringBuilder sb = new StringBuilder();
                 sb.append('{');
-                appendCommon(sb, 's', time, fThreadId);
+                appendCommon(sb, 'B', time, fThreadId);
+                appendName(sb, label);
+                appendArgs(sb, args);
+                sb.append('}');
+                return sb.toString();
+            }));
+            // Add a flow event, either start or step in enclosing scope
+            fLogger.log(fLevel, (() -> {
+                StringBuilder sb = new StringBuilder();
+                sb.append('{');
+                appendCommon(sb, startFlow ? 's' : 't', time, fThreadId);
                 appendName(sb, label);
                 appendCategory(sb, category);
                 appendId(sb, fId);
@@ -407,8 +430,7 @@ public final class TraceCompassLogUtils {
         }
 
         /**
-         * Flow step, could be launching a new process or simply hit a
-         * checkpoint
+         * Flow step, it will add a stop point for an arrow
          *
          * @param label
          *            The label for this step
@@ -464,9 +486,7 @@ public final class TraceCompassLogUtils {
             fLogger.log(fLevel, (() -> {
                 StringBuilder sb = new StringBuilder();
                 sb.append('{');
-                appendCommon(sb, 'f', time, fThreadId);
-                appendCategory(sb, fCategory);
-                appendId(sb, fId);
+                appendCommon(sb, 'E', time, fThreadId);
                 appendArgs(sb, fData);
                 sb.append('}');
                 return sb.toString();
@@ -751,9 +771,10 @@ public final class TraceCompassLogUtils {
      * USE ME FIRST
      */
     private static StringBuilder appendCommon(StringBuilder appendTo, char phase, long time, long threadId) {
-        writeObject(appendTo, TIMESTAMP, time).append(','); // $NON-NLS-1$
+        writeObject(appendTo, TIMESTAMP, FORMAT.format((double) time / 1000)).append(','); // $NON-NLS-1$
         writeObject(appendTo, PHASE, phase).append(',');
-        return writeObject(appendTo, TID, threadId); // $NON-NLS-1$
+        writeObject(appendTo, TID, threadId).append(',');
+        return writeObject(appendTo, PID, threadId); // $NON-NLS-1$
     }
 
     private static StringBuilder appendName(StringBuilder sb, @Nullable String name) {

@@ -40,7 +40,7 @@ public class LoggerTest {
     private StreamHandler fStreamHandler;
 
     private static String eventWithNoTs(String event) {
-        return event.replaceFirst("\\\"ts\\\"\\:\\d+", "\"ts\":0");
+        return event.replaceFirst("\\\"ts\\\"\\:\\\"\\d*\\.\\d+\\\"", "\"ts\":0");
     }
 
     private static String eventUnifyId(String event) {
@@ -112,8 +112,8 @@ public class LoggerTest {
             new Object();
         }
         fStreamHandler.flush();
-        assertEquals("INFO: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"name\":\"world\"}", fLog.getMessages().get(0));
-        assertEquals("INFO: {\"ts\":0,\"ph\":\"E\",\"tid\":1}", fLog.getMessages().get(1));
+        assertEquals("INFO: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"world\"}", fLog.getMessages().get(0));
+        assertEquals("INFO: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(1));
     }
 
     /**
@@ -132,10 +132,10 @@ public class LoggerTest {
             }
         }
         fStreamHandler.flush();
-        assertEquals("INFO: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"name\":\"foo\"}", fLog.getMessages().get(0));
-        assertEquals("INFO: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"name\":\"bar\"}", fLog.getMessages().get(1));
-        assertEquals("INFO: {\"ts\":0,\"ph\":\"E\",\"tid\":1}", fLog.getMessages().get(2));
-        assertEquals("INFO: {\"ts\":0,\"ph\":\"E\",\"tid\":1}", fLog.getMessages().get(3));
+        assertEquals("INFO: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"foo\"}", fLog.getMessages().get(0));
+        assertEquals("INFO: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"bar\"}", fLog.getMessages().get(1));
+        assertEquals("INFO: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(2));
+        assertEquals("INFO: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(3));
     }
 
     /**
@@ -158,10 +158,10 @@ public class LoggerTest {
             }
         }
         fStreamHandler.flush();
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"name\":\"foo\"}", fLog.getMessages().get(0));
-        assertEquals("FINER: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"name\":\"bar\"}", fLog.getMessages().get(1));
-        assertEquals("FINER: {\"ts\":0,\"ph\":\"E\",\"tid\":1}", fLog.getMessages().get(2));
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"E\",\"tid\":1}", fLog.getMessages().get(3));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"foo\"}", fLog.getMessages().get(0));
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"bar\"}", fLog.getMessages().get(1));
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(2));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(3));
     }
 
     /**
@@ -178,11 +178,11 @@ public class LoggerTest {
             }
         }
         fStreamHandler.flush();
-        assertEquals("WARNING: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"name\":\"foo\"}",
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"foo\"}",
                 fLog.getMessages().get(0));
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"name\":\"bar\"}", fLog.getMessages().get(1));
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"E\",\"tid\":1}", fLog.getMessages().get(2));
-        assertEquals("WARNING: {\"ts\":0,\"ph\":\"E\",\"tid\":1}", fLog.getMessages().get(3));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"bar\"}", fLog.getMessages().get(1));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(2));
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(3));
     }
 
     /**
@@ -199,11 +199,11 @@ public class LoggerTest {
             }
         }
         fStreamHandler.flush();
-        assertEquals("WARNING: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"name\":\"foo\"}",
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"foo\"}",
                 fLog.getMessages().get(0));
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"name\":\"bar\"}", fLog.getMessages().get(1));
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"args\":{\"return\":\"false\"}}", fLog.getMessages().get(2));
-        assertEquals("WARNING: {\"ts\":0,\"ph\":\"E\",\"tid\":1}", fLog.getMessages().get(3));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"bar\"}", fLog.getMessages().get(1));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1,\"args\":{\"return\":\"false\"}}", fLog.getMessages().get(2));
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(3));
     }
 
     /**
@@ -226,10 +226,12 @@ public class LoggerTest {
             }
         }
         fStreamHandler.flush();
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"name\":\"foo\",\"cat\":\"mycat\",\"id\":\"0x1234\"}", fLog.getMessages().get(0));
-        assertEquals("FINER: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"name\":\"bar\",\"cat\":\"mycat\",\"id\":\"0x1234\",\"args\":{\"big\":\"ben\"}}", fLog.getMessages().get(1));
-        assertEquals("FINER: {\"ts\":0,\"ph\":\"f\",\"tid\":1,\"cat\":\"mycat\",\"id\":\"0x1234\"}", fLog.getMessages().get(2));
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"f\",\"tid\":1,\"cat\":\"mycat\",\"id\":\"0x1234\"}", fLog.getMessages().get(3));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"foo\"}", fLog.getMessages().get(0));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"pid\":1,\"name\":\"foo\",\"cat\":\"mycat\",\"id\":\"0x1234\"}", fLog.getMessages().get(1));
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"bar\",\"args\":{\"big\":\"ben\"}}", fLog.getMessages().get(2));
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"t\",\"tid\":1,\"pid\":1,\"name\":\"bar\",\"cat\":\"mycat\",\"id\":\"0x1234\",\"args\":{\"big\":\"ben\"}}", fLog.getMessages().get(3));
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(4));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(5));
     }
 
     /**
@@ -246,12 +248,42 @@ public class LoggerTest {
             }
         }
         fStreamHandler.flush();
-        assertEquals("WARNING: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"name\":\"foo\",\"cat\":\"mydog\",\"id\":\"0x1234\"}",
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"foo\"}",
                 fLog.getMessages().get(0));
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"name\":\"bar\",\"cat\":\"mydog\",\"id\":\"0x1234\"}", fLog.getMessages().get(1));
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"t\",\"tid\":1,\"name\":\"barked\",\"cat\":\"mydog\",\"id\":\"0x1234\"}", fLog.getMessages().get(2));
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"f\",\"tid\":1,\"cat\":\"mydog\",\"id\":\"0x1234\"}", fLog.getMessages().get(3));
-        assertEquals("WARNING: {\"ts\":0,\"ph\":\"f\",\"tid\":1,\"cat\":\"mydog\",\"id\":\"0x1234\"}", fLog.getMessages().get(4));
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"pid\":1,\"name\":\"foo\",\"cat\":\"mydog\",\"id\":\"0x1234\"}",
+                fLog.getMessages().get(1));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"bar\"}",
+                fLog.getMessages().get(2));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"t\",\"tid\":1,\"pid\":1,\"name\":\"bar\",\"cat\":\"mydog\",\"id\":\"0x1234\"}", fLog.getMessages().get(3));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"t\",\"tid\":1,\"pid\":1,\"name\":\"barked\",\"cat\":\"mydog\",\"id\":\"0x1234\"}", fLog.getMessages().get(4));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(5));
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(6));
+    }
+
+    /**
+     * Test flow where child flow sets category and id instead of parent
+     */
+    @Test
+    public void testFlowWithUnsetParent() {
+        Logger logger = fLogger;
+        assertNotNull(logger);
+        try (FlowScopeLog log = new FlowScopeLogBuilder(logger, Level.WARNING, "foo").setCategory("mydog").build()) {
+            try (FlowScopeLog log1 = new FlowScopeLogBuilder(logger, Level.FINE, "bar").setCategoryAndId("mydog", log.getId()).build()) {
+                log1.step("barked");
+                new Object();
+            }
+        }
+        fStreamHandler.flush();
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"foo\"}",
+                fLog.getMessages().get(0));
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"pid\":1,\"name\":\"foo\",\"cat\":\"mydog\",\"id\":\"0x1234\"}",
+                fLog.getMessages().get(1));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"bar\"}",
+                fLog.getMessages().get(2));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"t\",\"tid\":1,\"pid\":1,\"name\":\"bar\",\"cat\":\"mydog\",\"id\":\"0x1234\"}", fLog.getMessages().get(3));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"t\",\"tid\":1,\"pid\":1,\"name\":\"barked\",\"cat\":\"mydog\",\"id\":\"0x1234\"}", fLog.getMessages().get(4));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(5));
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(6));
     }
 
     /**
@@ -268,11 +300,15 @@ public class LoggerTest {
             }
         }
         fStreamHandler.flush();
-        assertEquals("WARNING: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"name\":\"foo\",\"cat\":\"myspider\",\"id\":\"0x1234\"}",
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"foo\"}",
                 fLog.getMessages().get(0));
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"name\":\"bar\",\"cat\":\"myspider\",\"id\":\"0x1234\"}", fLog.getMessages().get(1));
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"f\",\"tid\":1,\"cat\":\"myspider\",\"id\":\"0x1234\",\"args\":{\"return\":\"false\"}}", fLog.getMessages().get(2));
-        assertEquals("WARNING: {\"ts\":0,\"ph\":\"f\",\"tid\":1,\"cat\":\"myspider\",\"id\":\"0x1234\"}", fLog.getMessages().get(3));
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"pid\":1,\"name\":\"foo\",\"cat\":\"myspider\",\"id\":\"0x1234\"}",
+                fLog.getMessages().get(1));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"bar\"}",
+                fLog.getMessages().get(2));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"t\",\"tid\":1,\"pid\":1,\"name\":\"bar\",\"cat\":\"myspider\",\"id\":\"0x1234\"}", fLog.getMessages().get(3));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1,\"args\":{\"return\":\"false\"}}", fLog.getMessages().get(4));
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(5));
     }
 
     /**
@@ -288,9 +324,11 @@ public class LoggerTest {
             new Object();
         }
         fStreamHandler.flush();
-        assertEquals("WARNING: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"name\":\"foo\",\"cat\":\"null\",\"id\":\"0x1234\"}",
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"foo\"}",
                 fLog.getMessages().get(0));
-        assertEquals("WARNING: {\"ts\":0,\"ph\":\"f\",\"tid\":1,\"cat\":\"null\",\"id\":\"0x1234\"}", fLog.getMessages().get(1));
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"s\",\"tid\":1,\"pid\":1,\"name\":\"foo\",\"cat\":\"null\",\"id\":\"0x1234\"}",
+                fLog.getMessages().get(1));
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(2));
     }
 
     /**
@@ -347,17 +385,17 @@ public class LoggerTest {
             new Object();
         }
         fStreamHandler.flush();
-        assertEquals("WARNING: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"name\":\"foo\",\"args\":{\"Pen:Pineapple\":\"Apple:Pen\"}}",
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"foo\",\"args\":{\"Pen:Pineapple\":\"Apple:Pen\"}}",
                 fLog.getMessages().get(0));
-        assertEquals("WARNING: {\"ts\":0,\"ph\":\"E\",\"tid\":1}", fLog.getMessages().get(1));
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(1));
 
-        assertEquals("WARNING: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"name\":\"foo\",\"args\":{\"msg\":\"Pen:Pineapple:Apple:Pen\"}}",
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"foo\",\"args\":{\"msg\":\"Pen:Pineapple:Apple:Pen\"}}",
                 fLog.getMessages().get(2));
-        assertEquals("WARNING: {\"ts\":0,\"ph\":\"E\",\"tid\":1}", fLog.getMessages().get(3));
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(3));
 
-        assertEquals("WARNING: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"name\":\"foo\",\"args\":{\"pen\":\"pineapple\",\"apple\":\"pen\",\"number_of_badgers\":12}}",
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"foo\",\"args\":{\"pen\":\"pineapple\",\"apple\":\"pen\",\"number_of_badgers\":12}}",
                 fLog.getMessages().get(4));
-        assertEquals("WARNING: {\"ts\":0,\"ph\":\"E\",\"tid\":1}", fLog.getMessages().get(5));
+        assertEquals("WARNING: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(5));
     }
 
     /**
@@ -403,10 +441,10 @@ public class LoggerTest {
             assertEquals("test", e.getMessage());
         }
         fStreamHandler.flush();
-        assertEquals("INFO: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"name\":\"foo\"}", fLog.getMessages().get(0));
-        assertEquals("INFO: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"name\":\"bar\"}", fLog.getMessages().get(1));
-        assertEquals("INFO: {\"ts\":0,\"ph\":\"E\",\"tid\":1}", fLog.getMessages().get(2));
-        assertEquals("INFO: {\"ts\":0,\"ph\":\"E\",\"tid\":1}", fLog.getMessages().get(3));
+        assertEquals("INFO: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"foo\"}", fLog.getMessages().get(0));
+        assertEquals("INFO: {\"ts\":0,\"ph\":\"B\",\"tid\":1,\"pid\":1,\"name\":\"bar\"}", fLog.getMessages().get(1));
+        assertEquals("INFO: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(2));
+        assertEquals("INFO: {\"ts\":0,\"ph\":\"E\",\"tid\":1,\"pid\":1}", fLog.getMessages().get(3));
     }
 
     private static final class LivingObject {
@@ -448,10 +486,10 @@ public class LoggerTest {
         }
 
         fStreamHandler.flush();
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"N\",\"tid\":1,\"name\":\"LivingObject\",\"id\":\"0x1234\"}", fLog.getMessages().get(0));
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"N\",\"tid\":1,\"name\":\"LivingObject\",\"id\":\"0x1234\"}", fLog.getMessages().get(1));
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"D\",\"tid\":1,\"name\":\"LivingObject\",\"id\":\"0x1234\"}", fLog.getMessages().get(2));
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"D\",\"tid\":1,\"name\":\"LivingObject\",\"id\":\"0x1234\"}", fLog.getMessages().get(3));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"N\",\"tid\":1,\"pid\":1,\"name\":\"LivingObject\",\"id\":\"0x1234\"}", fLog.getMessages().get(0));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"N\",\"tid\":1,\"pid\":1,\"name\":\"LivingObject\",\"id\":\"0x1234\"}", fLog.getMessages().get(1));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"D\",\"tid\":1,\"pid\":1,\"name\":\"LivingObject\",\"id\":\"0x1234\"}", fLog.getMessages().get(2));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"D\",\"tid\":1,\"pid\":1,\"name\":\"LivingObject\",\"id\":\"0x1234\"}", fLog.getMessages().get(3));
     }
 
     /**
@@ -473,8 +511,8 @@ public class LoggerTest {
         }
 
         fStreamHandler.flush();
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"N\",\"tid\":1,\"name\":\"ArrayList\",\"id\":\"0x1234\"}", fLog.getMessages().get(0));
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"D\",\"tid\":1,\"name\":\"ArrayList\",\"id\":\"0x1234\"}", fLog.getMessages().get(1));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"N\",\"tid\":1,\"pid\":1,\"name\":\"ArrayList\",\"id\":\"0x1234\"}", fLog.getMessages().get(0));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"D\",\"tid\":1,\"pid\":1,\"name\":\"ArrayList\",\"id\":\"0x1234\"}", fLog.getMessages().get(1));
     }
 
     /**
@@ -486,7 +524,7 @@ public class LoggerTest {
         assertNotNull(logger);
         TraceCompassLogUtils.traceInstant(logger, Level.FINE, "hello", "foo", "bar");
         fStreamHandler.flush();
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"i\",\"tid\":1,\"name\":\"hello\",\"args\":{\"foo\":\"bar\"}}", fLog.getMessages().get(0));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"i\",\"tid\":1,\"pid\":1,\"name\":\"hello\",\"args\":{\"foo\":\"bar\"}}", fLog.getMessages().get(0));
     }
 
     /**
@@ -507,13 +545,13 @@ public class LoggerTest {
         TraceCompassLogUtils.traceAsyncEnd(logger, Level.FINE, "network connect", "net", 10, "OK");
 
         fStreamHandler.flush();
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"b\",\"tid\":1,\"name\":\"network connect\",\"cat\":\"net\",\"id\":\"0x1234\"}", fLog.getMessages().get(0));
-        assertEquals("FINER: {\"ts\":0,\"ph\":\"b\",\"tid\":1,\"name\":\"network lookup\",\"cat\":\"net\",\"id\":\"0x1234\"}", fLog.getMessages().get(1));
-        assertEquals("FINER: {\"ts\":0,\"ph\":\"n\",\"tid\":1,\"name\":\"network cache\",\"cat\":\"net\",\"id\":\"0x1234\"}", fLog.getMessages().get(2));
-        assertEquals("FINER: {\"ts\":0,\"ph\":\"b\",\"tid\":1,\"id\":\"0x1234\"}", fLog.getMessages().get(3));
-        assertEquals("FINER: {\"ts\":0,\"ph\":\"e\",\"tid\":1,\"id\":\"0x1234\"}", fLog.getMessages().get(4));
-        assertEquals("FINER: {\"ts\":0,\"ph\":\"e\",\"tid\":1,\"name\":\"network lookup\",\"cat\":\"net\",\"id\":\"0x1234\",\"args\":{\"msg\":\"OK\"}}", fLog.getMessages().get(5));
-        assertEquals("FINE: {\"ts\":0,\"ph\":\"e\",\"tid\":1,\"name\":\"network connect\",\"cat\":\"net\",\"id\":\"0x1234\",\"args\":{\"msg\":\"OK\"}}", fLog.getMessages().get(6));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"b\",\"tid\":1,\"pid\":1,\"name\":\"network connect\",\"cat\":\"net\",\"id\":\"0x1234\"}", fLog.getMessages().get(0));
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"b\",\"tid\":1,\"pid\":1,\"name\":\"network lookup\",\"cat\":\"net\",\"id\":\"0x1234\"}", fLog.getMessages().get(1));
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"n\",\"tid\":1,\"pid\":1,\"name\":\"network cache\",\"cat\":\"net\",\"id\":\"0x1234\"}", fLog.getMessages().get(2));
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"b\",\"tid\":1,\"pid\":1,\"id\":\"0x1234\"}", fLog.getMessages().get(3));
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"e\",\"tid\":1,\"pid\":1,\"id\":\"0x1234\"}", fLog.getMessages().get(4));
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"e\",\"tid\":1,\"pid\":1,\"name\":\"network lookup\",\"cat\":\"net\",\"id\":\"0x1234\",\"args\":{\"msg\":\"OK\"}}", fLog.getMessages().get(5));
+        assertEquals("FINE: {\"ts\":0,\"ph\":\"e\",\"tid\":1,\"pid\":1,\"name\":\"network connect\",\"cat\":\"net\",\"id\":\"0x1234\",\"args\":{\"msg\":\"OK\"}}", fLog.getMessages().get(6));
     }
 
     /**
@@ -527,8 +565,8 @@ public class LoggerTest {
         TraceCompassLogUtils.traceInstant(logger, Level.INFO, "test null key", null, "value");
 
         fStreamHandler.flush();
-        assertEquals("INFO: {\"ts\":0,\"ph\":\"i\",\"tid\":1,\"name\":\"test null value\",\"args\":{\"nullvalue\":\"null\"}}", fLog.getMessages().get(0));
-        assertEquals("INFO: {\"ts\":0,\"ph\":\"i\",\"tid\":1,\"name\":\"test null key\",\"args\":{\"null\":\"value\"}}", fLog.getMessages().get(1));
+        assertEquals("INFO: {\"ts\":0,\"ph\":\"i\",\"tid\":1,\"pid\":1,\"name\":\"test null value\",\"args\":{\"nullvalue\":\"null\"}}", fLog.getMessages().get(0));
+        assertEquals("INFO: {\"ts\":0,\"ph\":\"i\",\"tid\":1,\"pid\":1,\"name\":\"test null key\",\"args\":{\"null\":\"value\"}}", fLog.getMessages().get(1));
     }
 
     /**
@@ -544,9 +582,9 @@ public class LoggerTest {
         TraceCompassLogUtils.traceCounter(logger, Level.FINER, "counter", "cats", 0);
 
         fStreamHandler.flush();
-        assertEquals("FINER: {\"ts\":0,\"ph\":\"C\",\"tid\":1,\"name\":\"counter\",\"args\":{\"cats\":0}}", fLog.getMessages().get(0));
-        assertEquals("FINER: {\"ts\":0,\"ph\":\"C\",\"tid\":1,\"name\":\"counter\",\"args\":{\"cats\":10}}", fLog.getMessages().get(1));
-        assertEquals("FINER: {\"ts\":0,\"ph\":\"C\",\"tid\":1,\"name\":\"counter\",\"args\":{\"cats\":0}}", fLog.getMessages().get(2));
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"C\",\"tid\":1,\"pid\":1,\"name\":\"counter\",\"args\":{\"cats\":0}}", fLog.getMessages().get(0));
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"C\",\"tid\":1,\"pid\":1,\"name\":\"counter\",\"args\":{\"cats\":10}}", fLog.getMessages().get(1));
+        assertEquals("FINER: {\"ts\":0,\"ph\":\"C\",\"tid\":1,\"pid\":1,\"name\":\"counter\",\"args\":{\"cats\":0}}", fLog.getMessages().get(2));
     }
 
     /**
@@ -559,8 +597,8 @@ public class LoggerTest {
         TraceCompassLogUtils.traceMarker(logger, Level.CONFIG, "instant", 0);
         TraceCompassLogUtils.traceMarker(logger, Level.CONFIG, "colored", 15, "color", 0xaabccdd);
         fStreamHandler.flush();
-        assertEquals("CONFIG: {\"ts\":0,\"ph\":\"R\",\"tid\":1,\"name\":\"instant\",\"dur\":0}", fLog.getMessages().get(0));
-        assertEquals("CONFIG: {\"ts\":0,\"ph\":\"R\",\"tid\":1,\"name\":\"colored\",\"dur\":15,\"args\":{\"color\":179031261}}", fLog.getMessages().get(1));
+        assertEquals("CONFIG: {\"ts\":0,\"ph\":\"R\",\"tid\":1,\"pid\":1,\"name\":\"instant\",\"dur\":0}", fLog.getMessages().get(0));
+        assertEquals("CONFIG: {\"ts\":0,\"ph\":\"R\",\"tid\":1,\"pid\":1,\"name\":\"colored\",\"dur\":15,\"args\":{\"color\":179031261}}", fLog.getMessages().get(1));
     }
 
 }
