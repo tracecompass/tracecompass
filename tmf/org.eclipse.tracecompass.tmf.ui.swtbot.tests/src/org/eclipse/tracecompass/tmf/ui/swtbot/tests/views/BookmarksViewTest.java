@@ -217,8 +217,8 @@ public class BookmarksViewTest {
         editorBot = fBot.activeEditor();
         WaitUtils.waitUntil(SWTBotEditor::isActive, editorBot, "Waiting for the editor to open");
         assertEquals("Editor was open on wrong trace", editorName, editorBot.getTitle());
+        WaitUtils.waitUntil(eb -> eb.bot().table().selection().rowCount() > 0, editorBot, "Selection is still empty");
         tableBot = editorBot.bot().table();
-        WaitUtils.waitUntil(tb -> tb.selection().rowCount() > 0, tableBot, "Selection is still empty");
         WaitUtils.waitUntil(tb -> !Objects.equal(tb.selection().get(0).get(1), "<srch>"), tableBot, "Header is still selected");
         selection = tableBot.selection();
         row = selection.get(0);
