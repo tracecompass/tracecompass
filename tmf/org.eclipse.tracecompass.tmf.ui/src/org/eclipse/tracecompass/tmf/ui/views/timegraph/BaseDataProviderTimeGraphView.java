@@ -787,14 +787,13 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         ISelection selection = getSite().getSelectionProvider().getSelection();
         if (selection instanceof IStructuredSelection) {
             IStructuredSelection sSel = (IStructuredSelection) selection;
-            Object firstElement = sSel.getFirstElement();
-            if (firstElement instanceof TimeGraphEntry) {
-                Object entryObject = sSel.toArray()[1];
-                if (entryObject instanceof TimeEvent) {
-                    TimeEvent event = (TimeEvent) entryObject;
+            for (Object element : sSel.toArray()) {
+                if (element instanceof TimeEvent) {
+                    TimeEvent event = (TimeEvent) element;
                     IContributionItem contribItem = createOpenSourceCodeAction(getPresentationProvider().getEventHoverToolTipInfo(event, getTimeGraphViewer().getSelectionBegin()));
                     if (contribItem != null) {
                         menuManager.add(contribItem);
+                        break;
                     }
                 }
             }
