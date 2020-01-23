@@ -103,7 +103,7 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
      * FIXME when switching between traces, the current worker is set to null, do
      * this to remember the last arrows used.
      */
-    private List<ITimeGraphArrow> fLinks;
+    private List<@NonNull ITimeGraphArrow> fLinks;
 
     /** Cache for entry metadata */
     private final Map<Long, @NonNull Multimap<@NonNull String, @NonNull Object>> fEntryMetadata = new HashMap<>();
@@ -280,7 +280,7 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
         /**
          * Cache the links once the graph has been traversed.
          */
-        private @Nullable List<ITimeGraphArrow> fGraphLinks;
+        private @Nullable List<@NonNull ITimeGraphArrow> fGraphLinks;
 
         private CriticalPathVisitor(TmfGraph graph, IGraphWorker worker) {
             fGraph = graph;
@@ -367,7 +367,7 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
             return list;
         }
 
-        public synchronized List<ITimeGraphArrow> getGraphLinks() {
+        public synchronized List<@NonNull ITimeGraphArrow> getGraphLinks() {
             if (fGraphLinks == null) {
                 // the graph has not been traversed yet
                 fGraphLinks = new ArrayList<>();
@@ -383,7 +383,7 @@ public class CriticalPathDataProvider extends AbstractTmfTraceDataProvider imple
      */
     private @Nullable List<@NonNull ITimeGraphArrow> getLinkList(long startTime, long endTime) {
         IGraphWorker current = getCurrent();
-        List<ITimeGraphArrow> graphLinks = fLinks;
+        List<@NonNull ITimeGraphArrow> graphLinks = fLinks;
         if (current == null) {
             if (graphLinks != null) {
                 return graphLinks;
