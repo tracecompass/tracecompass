@@ -18,6 +18,7 @@ import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge.EdgeType;
+import org.eclipse.tracecompass.internal.analysis.graph.core.base.Messages;
 
 /**
  * Timed vertex for TmfGraph

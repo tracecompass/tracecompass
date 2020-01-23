@@ -18,7 +18,11 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * Packages external string files
+ *
+ * @deprecated This class has been internalized in package
+ *             {@link org.eclipse.tracecompass.internal.analysis.graph.core.base.Messages}
  */
+@Deprecated
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.analysis.graph.core.base.messages"; //$NON-NLS-1$

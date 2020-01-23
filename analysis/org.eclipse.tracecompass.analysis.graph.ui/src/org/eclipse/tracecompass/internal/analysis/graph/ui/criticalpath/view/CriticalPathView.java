@@ -26,6 +26,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.tracecompass.analysis.graph.core.criticalpath.CriticalPathModule;
 import org.eclipse.tracecompass.internal.analysis.graph.core.dataprovider.CriticalPathDataProvider;
 import org.eclipse.tracecompass.internal.analysis.graph.core.dataprovider.CriticalPathEntry;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.BaseDataProviderTimeGraphPresentationProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
@@ -127,12 +128,11 @@ public class CriticalPathView extends BaseDataProviderTimeGraphView {
      * Constructor
      */
     public CriticalPathView() {
-        super(ID, new CriticalPathPresentationProvider(), CriticalPathDataProvider.ID);
+        super(ID, new BaseDataProviderTimeGraphPresentationProvider(), CriticalPathDataProvider.ID);
         setTreeColumns(COLUMN_NAMES);
         setFilterColumns(FILTER_COLUMN_NAMES);
         setTreeLabelProvider(new CriticalPathTreeLabelProvider());
         setEntryComparator(new CriticalPathEntryComparator());
-        setLegendProvider((shell, presentationProvider) -> new CriticalPathLegend(shell, presentationProvider).open());
     }
 
     // ------------------------------------------------------------------------
