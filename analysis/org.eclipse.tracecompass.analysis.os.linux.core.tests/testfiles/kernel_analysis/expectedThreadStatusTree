@@ -1,4 +1,4 @@
-lttng_kernel_analysis.xml,1,80,-2147483648,-2147483648,-2147483648
+lttng_kernel_analysis.xml,1,80
 proc10,1,81,10,10,0
 tid11,5,81,11,10,10
 tid12,6,81,12,10,11

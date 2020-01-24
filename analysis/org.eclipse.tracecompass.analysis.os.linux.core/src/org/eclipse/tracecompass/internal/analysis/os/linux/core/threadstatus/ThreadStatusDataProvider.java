@@ -63,6 +63,7 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphStateFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphArrow;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
@@ -89,7 +90,7 @@ import com.google.common.collect.TreeMultimap;
  *
  * @author Simon Delisle
  */
-public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider implements ITimeGraphDataProvider<@NonNull ThreadEntryModel>, IOutputStyleProvider {
+public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider implements ITimeGraphDataProvider<@NonNull TimeGraphEntryModel>, IOutputStyleProvider {
 
     /**
      * Extension point ID.
@@ -156,6 +157,8 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
      */
     private long fLastEnd = Long.MIN_VALUE;
 
+    private @Nullable TimeGraphEntryModel fTraceEntry = null;
+
     /**
      * Cache threadID to a {@link ThreadEntryModel} for faster lookups
      * when building link list
@@ -182,9 +185,9 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
     }
 
     @Override
-    public @NonNull TmfModelResponse<@NonNull TmfTreeModel<@NonNull ThreadEntryModel>> fetchTree(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+    public @NonNull TmfModelResponse<@NonNull TmfTreeModel<@NonNull TimeGraphEntryModel>> fetchTree(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         if (fLastEnd == Long.MAX_VALUE) {
-            return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), filter(fTidToEntry, fetchParameters)), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+            return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), filter(Objects.requireNonNull(fTraceEntry), fTidToEntry, fetchParameters)), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
 
         fModule.waitForInitialization();
@@ -199,7 +202,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
          */
         synchronized (fBuildMap) {
             boolean complete = ss.waitUntilBuilt(0);
-            @NonNull List<@NonNull ThreadEntryModel> list = Collections.emptyList();
+            @NonNull List<@NonNull TimeGraphEntryModel> list = Collections.emptyList();
             /* Don't query empty state system */
             if (ss.getNbAttributes() > 0 && ss.getStartTime() != Long.MIN_VALUE) {
                 long end = ss.getCurrentEndTime();
@@ -226,8 +229,8 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
                 }
 
                 // update the trace Entry.
-                fTidToEntry.replaceValues(Integer.MIN_VALUE, Collections.singleton(new ThreadEntryModel.Builder(fTraceId, Collections.singletonList(getTrace().getName()),
-                        ss.getStartTime(), end, Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE)));
+                TimeGraphEntryModel traceEntry = new TimeGraphEntryModel(fTraceId, -1, getTrace().getName(), ss.getStartTime(), end);
+                fTraceEntry = traceEntry;
 
                 for (Integer threadQuark : ss.getQuarks(Attributes.THREADS, WILDCARD)) {
                     String threadAttributeName = ss.getAttributeName(threadQuark);
@@ -253,10 +256,10 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
 
                 fLastEnd = end;
 
-                list = filter(fTidToEntry, fetchParameters);
+                list = filter(traceEntry, fTidToEntry, fetchParameters);
             }
 
-            for (ThreadEntryModel model : list) {
+            for (TimeGraphEntryModel model : list) {
                 fEntryMetadata.put(model.getId(), model.getMetadata());
             }
 
@@ -327,6 +330,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
     /**
      * Filter the threads from a {@link TreeMultimap} according to if they are
      * active or not
+     * @param traceEntry
      *
      * @param tidToEntry
      *            Threads to filter
@@ -334,11 +338,12 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
      *            time range to query
      * @return a list of the active threads
      */
-    private @NonNull List<@NonNull ThreadEntryModel> filter(TreeMultimap<Integer, ThreadEntryModel.Builder> tidToEntry, @NonNull Map<@NonNull String, @NonNull Object> parameters) {
+    private @NonNull List<@NonNull TimeGraphEntryModel> filter(TimeGraphEntryModel traceEntry, TreeMultimap<Integer, ThreadEntryModel.Builder> tidToEntry, @NonNull Map<@NonNull String, @NonNull Object> parameters) {
         // avoid putting everything as a child of the swapper thread.
         Boolean isActiveFilter = DataProviderParameterUtils.extractBoolean(parameters, ACTIVE_THREAD_FILTER_KEY);
         if (!Boolean.TRUE.equals(isActiveFilter)) {
-            ImmutableList.Builder<ThreadEntryModel> builder = ImmutableList.builder();
+            ImmutableList.Builder<TimeGraphEntryModel> builder = ImmutableList.builder();
+            builder.add(traceEntry);
             for (ThreadEntryModel.Builder entryBuilder : tidToEntry.values()) {
                 builder.add(build(entryBuilder));
             }
@@ -363,7 +368,8 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
         if (selectedItems != null) {
             Set<Long> cpus = Sets.newHashSet(selectedItems);
             List<@NonNull Integer> quarks = ss.getQuarks(Attributes.THREADS, WILDCARD, Attributes.CURRENT_CPU_RQ);
-            Set<ThreadEntryModel> models = new HashSet<>();
+            Set<TimeGraphEntryModel> models = new HashSet<>();
+            models.add(traceEntry);
             Map<Integer, Integer> rqToPidCache = new HashMap<>();
             try {
                 for (ITmfStateInterval interval : ss.query2D(quarks, Long.max(ss.getStartTime(), start), end)) {
@@ -404,7 +410,8 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
             }
             return Lists.newArrayList(models);
         }
-        ImmutableList.Builder<ThreadEntryModel> builder = ImmutableList.builder();
+        ImmutableList.Builder<TimeGraphEntryModel> builder = ImmutableList.builder();
+        builder.add(traceEntry);
         for (ThreadEntryModel.Builder thread : tidToEntry.values()) {
             Integer statusQuark = fQuarkMap.get(thread.getId());
             if (statusQuark == null) {
@@ -762,11 +769,11 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
 
     @Deprecated
     @Override
-    public TmfModelResponse<List<ThreadEntryModel>> fetchTree(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
+    public TmfModelResponse<List<TimeGraphEntryModel>> fetchTree(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
-        TmfModelResponse<@NonNull TmfTreeModel<@NonNull ThreadEntryModel>> response = fetchTree(parameters, monitor);
-        TmfTreeModel<@NonNull ThreadEntryModel> model = response.getModel();
-        List<ThreadEntryModel> treeModel = null;
+        TmfModelResponse<@NonNull TmfTreeModel<@NonNull TimeGraphEntryModel>> response = fetchTree(parameters, monitor);
+        TmfTreeModel<@NonNull TimeGraphEntryModel> model = response.getModel();
+        List<TimeGraphEntryModel> treeModel = null;
         if (model != null) {
             treeModel = model.getEntries();
         }

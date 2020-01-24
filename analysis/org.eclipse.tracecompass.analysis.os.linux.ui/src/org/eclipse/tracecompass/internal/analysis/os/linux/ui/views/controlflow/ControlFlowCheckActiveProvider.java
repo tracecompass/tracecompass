@@ -99,14 +99,14 @@ public final class ControlFlowCheckActiveProvider implements ITimeGraphEntryActi
         TimeQueryFilter filter = new TimeQueryFilter(range.getStartTime().toNanos(), range.getEndTime().toNanos(), 2);
         Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
         parameters.put(ThreadStatusDataProvider.ACTIVE_THREAD_FILTER_KEY, true);
-        TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> response = ((ThreadStatusDataProvider) dataProvider).fetchTree(parameters, null);
-        TmfTreeModel<@NonNull ThreadEntryModel> model = response.getModel();
+        TmfModelResponse<TmfTreeModel<@NonNull TimeGraphEntryModel>> response = ((ThreadStatusDataProvider) dataProvider).fetchTree(parameters, null);
+        TmfTreeModel<@NonNull TimeGraphEntryModel> model = response.getModel();
         if (model == null) {
             // query must have failed, return empty and don't invalidate the cache.
             return Collections.emptySet();
         }
         fRange = range;
-        fActive = model.getEntries().stream().map(ThreadEntryModel::getId).collect(Collectors.toSet());
+        fActive = model.getEntries().stream().map(TimeGraphEntryModel::getId).collect(Collectors.toSet());
         return fActive;
 
     }

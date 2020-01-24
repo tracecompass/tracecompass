@@ -38,6 +38,7 @@ import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
@@ -90,29 +91,37 @@ public class ThreadStatusDataProviderTest {
     }
 
     private static Map<Long, String> assertAndGetTree(ThreadStatusDataProvider provider) throws IOException {
-        TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> treeResponse = provider.fetchTree(FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(0, Long.MAX_VALUE, 2)), null);
+        TmfModelResponse<TmfTreeModel<@NonNull TimeGraphEntryModel>> treeResponse = provider.fetchTree(FetchParametersUtils.timeQueryToMap(new TimeQueryFilter(0, Long.MAX_VALUE, 2)), null);
         assertNotNull(treeResponse);
         assertEquals(ITmfResponse.Status.COMPLETED, treeResponse.getStatus());
-        TmfTreeModel<@NonNull ThreadEntryModel> treeModel = treeResponse.getModel();
+        TmfTreeModel<@NonNull TimeGraphEntryModel> treeModel = treeResponse.getModel();
         assertNotNull(treeModel);
-        List<@NonNull ThreadEntryModel> treeEntries = treeModel.getEntries();
+        List<@NonNull TimeGraphEntryModel> treeEntries = treeModel.getEntries();
 
         List<String> expectedStrings = Files.readAllLines(Paths.get("testfiles/kernel_analysis/expectedThreadStatusTree"));
         assertEquals(expectedStrings.size(), treeEntries.size());
         for (int i = 0; i < expectedStrings.size(); i++) {
             String expectedString = expectedStrings.get(i);
             String[] split = expectedString.split(",");
-            ThreadEntryModel threadEntry = treeEntries.get(i);
+            TimeGraphEntryModel threadEntry = treeEntries.get(i);
 
+            // Assert common fields
             assertEquals(split[0], threadEntry.getName());
             assertEquals(Long.parseLong(split[1]), threadEntry.getStartTime());
             assertEquals(Long.parseLong(split[2]), threadEntry.getEndTime());
-            assertEquals(Integer.parseInt(split[3]), threadEntry.getThreadId());
-            assertEquals(Integer.parseInt(split[4]), threadEntry.getProcessId());
-            assertEquals(Integer.parseInt(split[5]), threadEntry.getParentThreadId());
+            if (threadEntry instanceof ThreadEntryModel) {
+                // Verify the thread entry fields
+                ThreadEntryModel threadEntryModel = (ThreadEntryModel) threadEntry;
+                assertEquals(Integer.parseInt(split[3]), threadEntryModel.getThreadId());
+                assertEquals(Integer.parseInt(split[4]), threadEntryModel.getProcessId());
+                assertEquals(Integer.parseInt(split[5]), threadEntryModel.getParentThreadId());
+            } else {
+                // Make sure there is no extra expected fields
+                assertEquals(3, split.length);
+            }
         }
         Map<Long, String> map = new HashMap<>();
-        for (ThreadEntryModel threadModel : treeEntries) {
+        for (TimeGraphEntryModel threadModel : treeEntries) {
             map.put(threadModel.getId(), threadModel.getName());
         }
         return map;

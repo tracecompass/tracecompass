@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersU
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -179,13 +180,13 @@ public class ActiveThreadsFilter extends ViewerFilter {
         SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(beginTS, endTS, 2, cpus);
         Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
         parameters.put(ThreadStatusDataProvider.ACTIVE_THREAD_FILTER_KEY, true);
-        TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> response = threadStatusProvider.fetchTree(parameters, null);
-        TmfTreeModel<@NonNull ThreadEntryModel> model = response.getModel();
+        TmfModelResponse<TmfTreeModel<@NonNull TimeGraphEntryModel>> response = threadStatusProvider.fetchTree(parameters, null);
+        TmfTreeModel<@NonNull TimeGraphEntryModel> model = response.getModel();
 
         if (model == null) {
             return Collections.emptySet();
         }
-        HashSet<Long> onCpuThreads = Sets.newHashSet(Iterables.transform(model.getEntries(), ThreadEntryModel::getId));
+        HashSet<Long> onCpuThreads = Sets.newHashSet(Iterables.transform(model.getEntries(), TimeGraphEntryModel::getId));
         return onCpuThreads == null ? Collections.emptySet() : onCpuThreads;
     }
 
@@ -204,13 +205,13 @@ public class ActiveThreadsFilter extends ViewerFilter {
         TimeQueryFilter filter = new TimeQueryFilter(beginTS, endTS, 2);
         Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
         parameters.put(ThreadStatusDataProvider.ACTIVE_THREAD_FILTER_KEY, true);
-        TmfModelResponse<TmfTreeModel<@NonNull ThreadEntryModel>> response = threadStatusProvider.fetchTree(parameters, null);
-        TmfTreeModel<@NonNull ThreadEntryModel> model = response.getModel();
+        TmfModelResponse<TmfTreeModel<@NonNull TimeGraphEntryModel>> response = threadStatusProvider.fetchTree(parameters, null);
+        TmfTreeModel<@NonNull TimeGraphEntryModel> model = response.getModel();
 
         if (model == null) {
             return Collections.emptySet();
         }
-        HashSet<Long> activeThreads = Sets.newHashSet(Iterables.transform(model.getEntries(), ThreadEntryModel::getId));
+        HashSet<Long> activeThreads = Sets.newHashSet(Iterables.transform(model.getEntries(), TimeGraphEntryModel::getId));
         return activeThreads == null ? Collections.emptySet() : activeThreads;
     }
 
