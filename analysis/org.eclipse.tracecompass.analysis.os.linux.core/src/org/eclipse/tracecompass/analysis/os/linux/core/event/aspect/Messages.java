@@ -29,6 +29,9 @@ public class Messages extends NLS {
     public static @Nullable String AspectHelpText_Pid;
 
     public static @Nullable String AspectName_Tid;
+    /** Label for the parent's thread ID
+     * @since 4.2*/
+    public static @Nullable String AspectName_Ptid;
 
     /**
      * String to identify the executable name

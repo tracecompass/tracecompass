@@ -50,6 +50,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelTidAspect;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadEntryModel;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.threadstatus.ThreadStatusDataProvider;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Activator;
@@ -109,8 +110,8 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
     private static final String OPTIMIZE_ICON = ICONS_PATH + "elcl16/Optimization.png"; //$NON-NLS-1$
 
     private static final String PROCESS_COLUMN = Messages.ControlFlowView_processColumn;
-    private static final String TID_COLUMN = Messages.ControlFlowView_tidColumn;
-    private static final String PTID_COLUMN = Messages.ControlFlowView_ptidColumn;
+    private static final String TID_COLUMN = OsStrings.tid();
+    private static final String PTID_COLUMN = OsStrings.ptid();
     private static final String BIRTH_TIME_COLUMN = Messages.ControlFlowView_birthTimeColumn;
     private Action fOptimizationAction;
 
@@ -600,9 +601,9 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
             if (entryModel instanceof ThreadEntryModel) {
                 ThreadEntryModel model = (ThreadEntryModel) entryModel;
 
-                if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_tidColumn)) {
+                if (COLUMN_NAMES[columnIndex].equals(OsStrings.tid())) {
                     return Integer.toString(model.getThreadId());
-                } else if (COLUMN_NAMES[columnIndex].equals(Messages.ControlFlowView_ptidColumn)) {
+                } else if (COLUMN_NAMES[columnIndex].equals(OsStrings.ptid())) {
                     if (model.getParentThreadId() > 0) {
                         return Integer.toString(model.getParentThreadId());
                     }

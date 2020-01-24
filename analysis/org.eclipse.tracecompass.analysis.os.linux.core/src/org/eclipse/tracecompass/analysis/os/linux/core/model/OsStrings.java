@@ -53,6 +53,16 @@ public final class OsStrings {
     }
 
     /**
+     * Get the string for the parent's thread ID
+     *
+     * @return The externalized label for parent's thread ID
+     * @since 4.2
+     */
+    public static String ptid() {
+        return Objects.requireNonNull(org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.Messages.AspectName_Ptid);
+    }
+
+    /**
      * Get the string for the cpu string
      *
      * @return The externalized label for CPU

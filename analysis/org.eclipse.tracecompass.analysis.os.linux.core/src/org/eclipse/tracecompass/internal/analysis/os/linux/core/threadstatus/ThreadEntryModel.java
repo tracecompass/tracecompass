@@ -52,7 +52,7 @@ public class ThreadEntryModel extends TimeGraphEntryModel {
          * @param pid
          *            the thread's PID
          * @param ppid
-         *            the thread's PPID
+         *            the thread's parent TID
          */
         public Builder(long id, @NonNull List<@NonNull String> labels, long start, long end, int pid, int ppid) {
             fId = id;
@@ -163,7 +163,7 @@ public class ThreadEntryModel extends TimeGraphEntryModel {
      * @param pid
      *            the thread's PID
      * @param ppid
-     *            the thread's PPID
+     *            the thread's parent thread ID
      */
     public ThreadEntryModel(long id, long parentId, @NonNull List<@NonNull String> labels, long start, long end, int pid, int ppid) {
         super(id, parentId, labels, start, end);
@@ -171,7 +171,7 @@ public class ThreadEntryModel extends TimeGraphEntryModel {
         fParentThreadId = ppid;
         fAspects = HashMultimap.create();
         fAspects.put(OsStrings.tid(), pid);
-        fAspects.put(OsStrings.pid(), ppid);
+        fAspects.put(OsStrings.ptid(), ppid);
         if (!labels.isEmpty()) {
             fAspects.put(OsStrings.execName(), String.valueOf(labels.get(0)));
         }
