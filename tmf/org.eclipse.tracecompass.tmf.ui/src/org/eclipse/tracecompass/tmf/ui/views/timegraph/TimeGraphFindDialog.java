@@ -580,7 +580,8 @@ class TimeGraphFindDialog extends Dialog {
     }
 
     private int findNext(int startIndex, String findString, BiMap<ITimeGraphEntry, Integer> items, SearchOptions options) {
-        if (fFindTarget != null) {
+        FindTarget findTarget = fFindTarget;
+        if (findTarget != null) {
             if (findString == null || findString.length() == 0) {
                 return -1;
             }
@@ -590,8 +591,14 @@ class TimeGraphFindDialog extends Dialog {
             BiMap<Integer, ITimeGraphEntry> entries = items.inverse();
             while (index >= 0 && index < entries.size()) {
                 final @Nullable ITimeGraphEntry entry = entries.get(index);
-                if (entry != null && entry.matches(pattern)) {
-                    return index;
+                if (entry != null) {
+                    String[] columnTexts = findTarget.getColumnTexts(entry);
+                    for (int i = 0; i < columnTexts.length; i++) {
+                        String columnText = columnTexts[i];
+                        if (columnText != null && !columnText.isEmpty() && pattern.matcher(columnTexts[i]).find()) {
+                            return index;
+                        }
+                    }
                 }
                 index = options.forwardSearch ? ++index : --index;
             }

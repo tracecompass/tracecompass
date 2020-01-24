@@ -28,6 +28,7 @@ import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
+import org.eclipse.swtbot.swt.finder.utils.TableCollection;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCanvas;
@@ -43,9 +44,9 @@ import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -81,6 +82,7 @@ public abstract class FindDialogTestBase {
     private static final String DIALOG_TITLE = "Find";
     private String fFindText;
     private SWTBotView fViewBot;
+    private SWTBotTimeGraph fTimeGraphBot;
 
     private int fSelectionIndex;
 
@@ -143,6 +145,7 @@ public abstract class FindDialogTestBase {
         String title = getViewTitle();
         fViewBot = fBot.viewByTitle(title);
         fViewBot.show();
+        fTimeGraphBot = new SWTBotTimeGraph(fViewBot.bot());
 
         TmfSignalManager.dispatchSignal(new TmfSelectionRangeUpdatedSignal(this, START_TIME));
         fBot.waitUntil(ConditionHelpers.timeGraphIsReadyCondition((AbstractTimeGraphView) fViewBot.getViewReference().getPart(false), new TmfTimeRange(START_TIME, START_TIME), START_TIME));
@@ -277,7 +280,8 @@ public abstract class FindDialogTestBase {
     private static void verifyStatusLabel(SWTBot bot, boolean shouldBeFound) {
         // Get the second label in the dialog
         SWTBotLabel statusLabel = bot.label(1);
-        assertTrue("status label", shouldBeFound == !statusLabel.getText().equals("Entry not found"));
+        String label = statusLabel.getText();
+        assertTrue("status label : \"" + label + '\"', shouldBeFound == !label.equals("Entry not found"));
     }
 
     /**
@@ -342,8 +346,8 @@ public abstract class FindDialogTestBase {
     }
 
     private void verifySelection(String name, SearchOptions options, SWTBotView view, boolean isWrapped) {
-        final String entryName = getTimegraphSelectionName(view);
-        assertTrue("entry name", entryName != null && entryName.contains(name));
+        final String entryName = getTimegraphSelectionText(view);
+        assertTrue("entry name : \"" + entryName + '\"', entryName != null && entryName.contains(name));
 
         final int selectionIndex = getSelectionIndex(view);
         if (!isWrapped) {
@@ -365,15 +369,15 @@ public abstract class FindDialogTestBase {
      *            The timegraph view bot
      * @return The selected entry
      */
-    private static String getTimegraphSelectionName(final SWTBotView view) {
-        final TimeGraphControl timegraph = view.bot().widget(WidgetOfType.widgetOfType(TimeGraphControl.class));
-        return UIThreadRunnable.syncExec(() -> {
-            ITimeGraphEntry entry = timegraph.getSelectedTrace();
-            if (entry != null) {
-                return entry.getName();
+    private String getTimegraphSelectionText(final SWTBotView view) {
+        String text = "";
+        TableCollection selection = fTimeGraphBot.selection();
+        if (selection.rowCount() > 0) {
+            for (int col = 0; col < selection.columnCount(); col++) {
+                text += ' ' + selection.get(0, col);
             }
-            return null;
-        });
+        }
+        return text;
     }
 
     /**

@@ -2871,6 +2871,20 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         public Shell getShell() {
             return getSite().getShell();
         }
+
+        public String[] getColumnTexts(@NonNull ITimeGraphEntry entry) {
+            String[] texts = null;
+            if (fColumns != null) {
+                texts = new String[fColumns.length];
+                for (int i = 0; i < fColumns.length; i++) {
+                    texts[i] = fLabelProvider.getColumnText(entry, i);
+                }
+            } else {
+                texts = new String[1];
+                texts[0] = entry.getName();
+            }
+            return texts;
+        }
     }
 
     class TimeGraphPartListener implements IPartListener {
