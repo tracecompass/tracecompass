@@ -129,7 +129,8 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
 
     private static final String[] FILTER_COLUMN_NAMES = new String[] {
             PROCESS_COLUMN,
-            TID_COLUMN
+            TID_COLUMN,
+            PID_COLUMN
     };
 
     private static final Comparator<ITimeGraphEntry>[] COLUMN_COMPARATORS;
@@ -637,6 +638,11 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
                 ITmfTreeDataModel entryModel = entry.getEntryModel();
                 if (entryModel instanceof ThreadEntryModel) {
                     return Integer.toString(((ThreadEntryModel) entryModel).getThreadId());
+                }
+            } else if (columnIndex == 2) {
+                ITmfTreeDataModel entryModel = entry.getEntryModel();
+                if (entryModel instanceof ThreadEntryModel) {
+                    return Integer.toString(((ThreadEntryModel) entryModel).getProcessId());
                 }
             }
             return ""; //$NON-NLS-1$
