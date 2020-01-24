@@ -647,6 +647,20 @@ public class ControlFlowView extends BaseDataProviderTimeGraphView {
             }
             return ""; //$NON-NLS-1$
         }
+
+        @Override
+        public String getText(Object element) {
+            if (!(element instanceof TimeGraphEntry)) {
+                return String.valueOf(element);
+            }
+            TimeGraphEntry entry = (TimeGraphEntry) element;
+            ITmfTreeDataModel entryModel = entry.getEntryModel();
+            if (entryModel instanceof ThreadEntryModel) {
+                return entry.getName() + ' ' + Integer.toString(((ThreadEntryModel) entryModel).getThreadId()) + ' ' + Integer.toString(((ThreadEntryModel) entryModel).getProcessId());
+            }
+            return entry.getName();
+        }
+
     }
 
     @TmfSignalHandler
