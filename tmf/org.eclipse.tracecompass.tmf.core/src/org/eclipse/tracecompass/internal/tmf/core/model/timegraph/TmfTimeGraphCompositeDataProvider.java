@@ -9,6 +9,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.model.timegraph;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,9 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.tree.TmfTreeCompositeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
+import org.eclipse.tracecompass.tmf.core.model.IOutputStyleProvider;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.OutputStyleModel;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
@@ -44,10 +48,9 @@ import com.google.common.collect.ImmutableList;
  *            The type of {@link ITimeGraphDataProvider} that this composite
  *            must encapsulate
  * @author Loic Prieur-Drevon
- * @since 4.0
  */
 public class TmfTimeGraphCompositeDataProvider<M extends ITimeGraphEntryModel, P extends ITimeGraphDataProvider<M>>
-extends TmfTreeCompositeDataProvider<M, P> implements ITimeGraphDataProvider<M> {
+extends TmfTreeCompositeDataProvider<M, P> implements ITimeGraphDataProvider<M>, IOutputStyleProvider {
 
     /**
      * Constructor
@@ -145,6 +148,24 @@ extends TmfTreeCompositeDataProvider<M, P> implements ITimeGraphDataProvider<M> 
     public TmfModelResponse<Map<String, String>> fetchTooltip(SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
         Map<String, Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
         return fetchTooltip(parameters, monitor);
+    }
+
+    @Override
+    public TmfModelResponse<OutputStyleModel> fetchStyle(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+        Map<String, OutputElementStyle> styles = new HashMap<>();
+        for (P dataProvider : getProviders()) {
+            if (dataProvider instanceof IOutputStyleProvider) {
+                TmfModelResponse<OutputStyleModel> response = ((IOutputStyleProvider) dataProvider).fetchStyle(fetchParameters, monitor);
+                OutputStyleModel model = response.getModel();
+                if (model != null) {
+                    styles.putAll(model.getStyles());
+                }
+            }
+        }
+        if (styles.isEmpty()) {
+            return new TmfModelResponse<>(null, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        }
+        return new TmfModelResponse<>(new OutputStyleModel(styles), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
 }
