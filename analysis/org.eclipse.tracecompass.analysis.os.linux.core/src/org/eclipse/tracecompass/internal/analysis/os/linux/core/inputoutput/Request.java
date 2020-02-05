@@ -162,4 +162,17 @@ public class Request {
         fNrSector = getNrSector() + request.getNrSector();
     }
 
+    /**
+     * Whether the current request fully includes the request in parameter
+     *
+     * @param request
+     *            Request that may be included
+     * @return <code>true</code> if the request in parameter is fully included
+     *         in the current request
+     */
+    public boolean includes(Request request) {
+        return (getType() == request.getType() &&
+                (getSector() <= request.getSector() && getSector() + getNrSector() >= request.getSector() + request.getNrSector()));
+    }
+
 }

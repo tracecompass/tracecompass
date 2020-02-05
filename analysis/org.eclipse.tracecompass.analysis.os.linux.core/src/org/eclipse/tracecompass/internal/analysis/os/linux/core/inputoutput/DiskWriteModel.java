@@ -11,8 +11,8 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.Attributes;
@@ -38,8 +38,8 @@ import org.eclipse.tracecompass.tmf.core.util.Pair;
  * @since 2.0
  */
 public class DiskWriteModel extends Disk {
-    private final Map<Long, Pair<Request, Integer>> fDriverQueue = new HashMap<>();
-    private final Map<Long, Pair<Request, Integer>> fWaitingQueue = new HashMap<>();
+    private final List<Pair<Request, Integer>> fDriverQueue = new ArrayList<>();
+    private final List<Pair<Request, Integer>> fWaitingQueue = new ArrayList<>();
     private final ITmfStateSystemBuilder fSs;
     private final TmfAttributePool fWaitingQueueAttrib;
     private final TmfAttributePool fDriverQueueAttrib;
@@ -86,11 +86,12 @@ public class DiskWriteModel extends Disk {
      *         available
      */
     public @Nullable Request getWaitingRequest(Long sector) {
-        Pair<Request, Integer> reqQuark = fWaitingQueue.get(sector);
-        if (reqQuark == null) {
-            return null;
+        for (Pair<Request, Integer> reqQuark : fWaitingQueue) {
+            if (reqQuark.getFirst().getSector().equals(sector)) {
+                return reqQuark.getFirst();
+            }
         }
-        return reqQuark.getFirst();
+        return null;
     }
 
     /**
@@ -100,18 +101,26 @@ public class DiskWriteModel extends Disk {
      *            The timestamp at which to add this request
      * @param sector
      *            The sector where the requests starts
+     * @param type The type of request
      * @return The quark of the request that was removed or
      *         {@link ITmfStateSystem.INVALID_ATTRIBUTE} if the request was not
      *         present
      */
-    private int removeWaitingRequest(long ts, Long sector) {
-        Pair<Request, Integer> reqQuark = fWaitingQueue.remove(sector);
+    private int removeWaitingRequest(long ts, Long sector, IoOperationType type) {
+        Pair<Request, Integer> reqQuark = null;
+        for (Pair<Request, Integer> waitingRequest : fWaitingQueue) {
+            Request request = waitingRequest.getFirst();
+            if (request.getSector().equals(sector) && request.getType() == type) {
+                reqQuark = waitingRequest;
+                break;
+            }
+        }
         if (reqQuark == null) {
             return ITmfStateSystem.INVALID_ATTRIBUTE;
         }
-        int slotQuark = reqQuark.getSecond();
-        fWaitingQueueAttrib.recycle(slotQuark, ts);
-        return slotQuark;
+        fWaitingQueue.remove(reqQuark);
+        fWaitingQueueAttrib.recycle(reqQuark.getSecond(), ts);
+        return reqQuark.getSecond();
     }
 
     /**
@@ -146,10 +155,13 @@ public class DiskWriteModel extends Disk {
 
             int mergedInQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.MERGED_IN);
             fSs.modifyAttribute(ts, (Object) null, mergedInQuark);
+
+            int requestTypeQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.TYPE);
+            fSs.modifyAttribute(ts, request.getType().ordinal(), requestTypeQuark);
         } catch (StateValueTypeException e) {
             Activator.getDefault().logError("Error inserting request", e); //$NON-NLS-1$
         }
-        fWaitingQueue.put(request.getSector(), new Pair<>(request, slotQuark));
+        fWaitingQueue.add(new Pair<>(request, slotQuark));
 
         return slotQuark;
     }
@@ -165,17 +177,17 @@ public class DiskWriteModel extends Disk {
      *            The timestamp at which to add this request
      * @param request
      *            The requests to put
-     * @param initialSector
-     *            The original base sector of this request.
      * @return The quark of the request that has been updated
      */
-    public int updateWaitingRequest(long ts, Request request, Long initialSector) {
-        Pair<Request, Integer> reqQuark = fWaitingQueue.get(initialSector);
+    public int updateWaitingRequest(long ts, Request request) {
+        Pair<Request, Integer> reqQuark = null;
+        for (Pair<Request, Integer> waiting : fWaitingQueue) {
+            if (waiting.getFirst().getSector().equals(request.getSector())) {
+                reqQuark = waiting;
+            }
+        }
         if (reqQuark == null) {
             return addWaitingRequest(ts, request);
-        } else if (!initialSector.equals(request.getSector())) {
-            fWaitingQueue.remove(initialSector);
-            fWaitingQueue.put(request.getSector(), reqQuark);
         }
 
         int slotQuark = reqQuark.getSecond();
@@ -219,11 +231,12 @@ public class DiskWriteModel extends Disk {
      *         available
      */
     public @Nullable Request getDriverRequest(Long sector) {
-        Pair<Request, Integer> reqQuark = fDriverQueue.get(sector);
-        if (reqQuark == null) {
-            return null;
+        for (Pair<Request, Integer> request : fDriverQueue) {
+            if (request.getFirst().getSector().equals(sector)) {
+                return request.getFirst();
+            }
         }
-        return reqQuark.getFirst();
+        return null;
     }
 
     /**
@@ -233,13 +246,22 @@ public class DiskWriteModel extends Disk {
      *            The timestamp at which to add this request
      * @param sector
      *            The sector where the requests starts
+     * @param type
+     *            The type of this request
      */
-    private void removeDriverRequest(long ts, Long sector) {
-        Pair<Request, Integer> reqQuark = fDriverQueue.remove(sector);
-        if (reqQuark == null) {
-            return;
+    private void removeDriverRequest(long ts, Long sector, IoOperationType type) {
+        Pair<Request, Integer> reqQuark = null;
+        for (Pair<Request, Integer> driverRequest : fDriverQueue) {
+            Request request = driverRequest.getFirst();
+            if (request.getSector().equals(sector) && request.getType() == type) {
+                reqQuark = driverRequest;
+                break;
+            }
         }
-        fDriverQueueAttrib.recycle(reqQuark.getSecond(), ts);
+        if (reqQuark != null) {
+            fDriverQueue.remove(reqQuark);
+            fDriverQueueAttrib.recycle(reqQuark.getSecond(), ts);
+        }
     }
 
     /**
@@ -255,10 +277,19 @@ public class DiskWriteModel extends Disk {
     public int issueRequest(long ts, Request request) {
         /* Remove from waiting queue */
         Object issuedFromValue = null;
-        int fromQuark = removeWaitingRequest(ts, request.getSector());
+        int fromQuark = removeWaitingRequest(ts, request.getSector(), request.getType());
         if (fromQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
             issuedFromValue = Integer.parseInt(fSs.getAttributeName(fromQuark));
+        } else {
+            // Maybe this request is already being processed, so this one is not added
+            for (Pair<Request, Integer> issued : fDriverQueue) {
+                Request first = issued.getFirst();
+                if (first.includes(request)) {
+                    return ITmfStateSystem.INVALID_ATTRIBUTE;
+                }
+            }
         }
+        removeDanglingRequests(ts, request);
 
         ITmfStateValue statusState = request.getType() == IoOperationType.READ ? StateValues.READING_REQUEST_VALUE : StateValues.WRITING_REQUEST_VALUE;
         int slotQuark = fDriverQueueAttrib.getAvailable();
@@ -279,9 +310,31 @@ public class DiskWriteModel extends Disk {
             Activator.getDefault().logError("Error issuing request", e); //$NON-NLS-1$
         }
 
-        fDriverQueue.put(request.getSector(), new Pair<>(request, slotQuark));
+        fDriverQueue.add(new Pair<>(request, slotQuark));
         updateQueuesLength(ts);
         return slotQuark;
+    }
+
+    private void removeDanglingRequests(long ts, Request request) {
+        // There are no events sometimes when merging requests, that should be
+        // fixed in kernel instrumentation, but in the meantime, verify if any
+        // other request is totally covered by this one, it means it was merged
+        // somehow
+        List<Pair<Request, Integer>> toRemove = new ArrayList<>();
+        for (Pair<Request, Integer> entry : fWaitingQueue) {
+            Request otherRequest = entry.getFirst();
+            if (request.includes(otherRequest)) {
+
+                toRemove.add(entry);
+            }
+        }
+        for (Pair<Request, Integer> sectorToRemove : toRemove) {
+            if (fWaitingQueue.remove(sectorToRemove)) {
+                int slotQuark = sectorToRemove.getSecond();
+                fWaitingQueueAttrib.recycle(slotQuark, ts);
+            }
+        }
+
     }
 
     /**
@@ -314,7 +367,7 @@ public class DiskWriteModel extends Disk {
         }
 
         /* Remove the request from driver queue */
-        removeDriverRequest(ts, request.getSector());
+        removeDriverRequest(ts, request.getSector(), request.getType());
         updateQueuesLength(ts);
     }
 
@@ -330,10 +383,9 @@ public class DiskWriteModel extends Disk {
      *            The merged request to be removed from the queue
      */
     public void mergeRequests(long ts, Request baseRequest, Request mergedRequest) {
-        int mergedQuark = removeWaitingRequest(ts, mergedRequest.getSector());
-        Long baseSector = baseRequest.getSector();
+        int mergedQuark = removeWaitingRequest(ts, mergedRequest.getSector(), mergedRequest.getType());
         baseRequest.mergeRequest(mergedRequest);
-        int baseQuark = updateWaitingRequest(ts, baseRequest, baseSector);
+        int baseQuark = updateWaitingRequest(ts, baseRequest);
         if (mergedQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
             /* Add the merge information */
             try {

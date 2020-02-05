@@ -62,6 +62,7 @@ public class BlockRqInsertHandler extends KernelEventHandler {
         }
         BlockIO bio = new BlockIO(sector, nrSector, disk, rwbs);
         Request request = new Request(bio);
+        request.setType(rwbs);
         disk.addWaitingRequest(ts, request);
     }
 

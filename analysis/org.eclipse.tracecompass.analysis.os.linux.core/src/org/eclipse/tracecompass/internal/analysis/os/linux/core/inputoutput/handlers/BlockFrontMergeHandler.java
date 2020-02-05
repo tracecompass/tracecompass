@@ -65,7 +65,7 @@ public class BlockFrontMergeHandler extends KernelEventHandler {
         BlockIO bio = new BlockIO(sector, nrSector, disk, rwbs);
         request.insertBio(bio);
 
-        disk.updateWaitingRequest(ts, request, rqSector);
+        disk.updateWaitingRequest(ts, request);
     }
 
 }

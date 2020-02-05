@@ -77,7 +77,7 @@ import com.google.common.collect.ImmutableMap;
  */
 public class InputOutputStateProvider extends AbstractTmfStateProvider {
 
-    private static final int VERSION = 1;
+    private static final int VERSION = 2;
 
     private final Map<Integer, DiskWriteModel> fDisks = new HashMap<>();
     private final Map<String, KernelEventHandler> fEventNames;

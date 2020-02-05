@@ -26,7 +26,6 @@ import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.InputOutputAn
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.xy.AbstractTreeCommonXDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.model.YModel;
@@ -163,7 +162,7 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
         String writeName = Objects.requireNonNull(Messages.DisksIODataProvider_write);
 
         for (Integer diskQuark : ss.getQuarks(Attributes.DISKS, "*")) { //$NON-NLS-1$
-            String diskName = getDiskName(ss, diskQuark);
+            String diskName = DiskUtils.getDiskName(ss, diskQuark);
             long diskId = getId(diskQuark);
             nodes.add(new TmfTreeDataModel(diskId, rootId, Collections.singletonList(diskName)));
 
@@ -178,15 +177,6 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
             }
         }
         return new TmfTreeModel<>(Collections.emptyList(), nodes);
-    }
-
-    private static String getDiskName(ITmfStateSystem ss, Integer diskQuark) {
-        ITmfStateInterval interval = StateSystemUtils.queryUntilNonNullValue(ss, diskQuark, ss.getStartTime(), ss.getCurrentEndTime());
-        if (interval != null) {
-            return String.valueOf(interval.getValue());
-        }
-        int devNum = Integer.parseInt(ss.getAttributeName(diskQuark));
-        return Disk.extractDeviceIdString(devNum);
     }
 
     @Override
@@ -242,10 +232,10 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
             int quark = entry.getValue();
 
             if (ss.getAttributeName(quark).equals(Attributes.SECTORS_READ)) {
-                String name = getTrace().getName() + '/' + getDiskName(ss, ss.getParentAttributeQuark(quark)) + "/read"; //$NON-NLS-1$
+                String name = getTrace().getName() + '/' + DiskUtils.getDiskName(ss, ss.getParentAttributeQuark(quark)) + "/read"; //$NON-NLS-1$
                 builders.add(new DiskBuilder(id, quark, name, length));
             } else if (ss.getAttributeName(quark).equals(Attributes.SECTORS_WRITTEN)) {
-                String name = getTrace().getName() + '/' + getDiskName(ss, ss.getParentAttributeQuark(quark)) + "/write"; //$NON-NLS-1$
+                String name = getTrace().getName() + '/' + DiskUtils.getDiskName(ss, ss.getParentAttributeQuark(quark)) + "/write"; //$NON-NLS-1$
                 builders.add(new DiskBuilder(id, quark, name, length));
             }
         }
