@@ -592,6 +592,6 @@ public class TracePackageImportOperation extends AbstractTracePackageOperation i
     @Override
     public String queryOverwrite(String pathString) {
         // We always overwrite once we reach this point
-        return null;
+        return IOverwriteQuery.ALL;
     }
 }
