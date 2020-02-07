@@ -30,9 +30,9 @@ import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -387,12 +387,8 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
                 @Override
                 protected @Nullable IStatus run(final @Nullable IProgressMonitor monitor) {
                     try (FlowScopeLog jobLog = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TmfAbstractAnalysis:executing").setParentScope(analysisLog).build()) { //$NON-NLS-1$
-                        IProgressMonitor mon = monitor;
-                        if (mon == null) {
-                            mon = new NullProgressMonitor();
-                        }
+                        IProgressMonitor mon = SubMonitor.convert(monitor);
                         try {
-                            mon.beginTask("", IProgressMonitor.UNKNOWN); //$NON-NLS-1$
                             broadcast(new TmfStartAnalysisSignal(TmfAbstractAnalysisModule.this, TmfAbstractAnalysisModule.this));
                             TmfCoreTracer.traceAnalysis(TmfAbstractAnalysisModule.this.getId(), TmfAbstractAnalysisModule.this.getTrace(), "started"); //$NON-NLS-1$
                             fAnalysisCancelled = !executeAnalysis(mon);
@@ -412,7 +408,6 @@ public abstract class TmfAbstractAnalysisModule extends TmfComponent
                             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, IStatus.OK, "Exception executing analysis", e); //$NON-NLS-1$
                         } finally {
                             synchronized (syncObj) {
-                                mon.done();
                                 setAnalysisCompleted();
                             }
                             TmfTraceManager.refreshSupplementaryFiles(trace);
