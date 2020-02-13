@@ -11,8 +11,10 @@
 
 package org.eclipse.tracecompass.tmf.ui.model;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Stack;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
@@ -64,15 +66,33 @@ public class StyleManager {
      */
     public @Nullable Object getStyle(OutputElementStyle elementStyle, String property) {
         OutputElementStyle style = elementStyle;
+        Stack<String> styleQueue = new Stack<>();
         while (style != null) {
             Map<String, Object> styleValues = style.getStyleValues();
             Object value = styleValues.get(property);
             if (value != null) {
                 return value;
             }
-            style = fStyleMap.get(style.getParentKey());
+
+            // Get the next style
+            style = popNextStyle(style, styleQueue);
         }
         return null;
+    }
+
+    private @Nullable OutputElementStyle popNextStyle(OutputElementStyle style, Stack<String> styleQueue) {
+        // Get the next style
+        OutputElementStyle nextStyle = null;
+        String parentKey = style.getParentKey();
+        if (parentKey != null) {
+            String[] split = parentKey.split(","); //$NON-NLS-1$
+            styleQueue.addAll(Arrays.asList(split));
+        }
+        while (nextStyle == null && !styleQueue.isEmpty()) {
+            nextStyle = fStyleMap.get(styleQueue.pop());
+        }
+
+        return nextStyle;
     }
 
     /**
@@ -91,6 +111,7 @@ public class StyleManager {
     public @Nullable Float getFactorStyle(OutputElementStyle elementStyle, String property) {
         Float factor = null;
         OutputElementStyle style = elementStyle;
+        Stack<String> styleQueue = new Stack<>();
         while (style != null) {
             Map<String, Object> styleValues = style.getStyleValues();
             if (factor == null) {
@@ -103,7 +124,9 @@ public class StyleManager {
             if (value instanceof Float) {
                 return (factor == null) ? (Float) value : factor * (Float) value;
             }
-            style = fStyleMap.get(style.getParentKey());
+
+            // Get the next style
+            style = popNextStyle(style, styleQueue);
         }
         return (factor == null) ? null : factor;
     }
@@ -126,6 +149,7 @@ public class StyleManager {
         Float opacity = null;
         RGBAColor blend = null;
         OutputElementStyle style = elementStyle;
+        Stack<String> styleQueue = new Stack<>();
         while (style != null) {
             Map<String, Object> styleValues = style.getStyleValues();
             if (blend == null) {
@@ -155,7 +179,9 @@ public class StyleManager {
                     }
                 }
             }
-            style = fStyleMap.get(style.getParentKey());
+
+            // Get the next style
+            style = popNextStyle(style, styleQueue);
         }
         int alpha = (opacity == null) ? 255 : (int) (opacity * 255);
         RGBAColor rgba = (color == null) ? (opacity == null ? null : new RGBAColor(0, 0, 0, alpha)) : RGBAColor.fromString(color, alpha);

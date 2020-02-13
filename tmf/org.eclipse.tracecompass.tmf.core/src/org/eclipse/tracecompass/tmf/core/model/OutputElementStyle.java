@@ -35,7 +35,8 @@ public class OutputElementStyle {
      * without overriding any properties.
      *
      * @param styleKey
-     *            Style key.
+     *            Style key. It can be a comma-separated list of parent keys for
+     *            multiple inheritance.
      */
     public OutputElementStyle(String styleKey) {
         fParentStyleKey = styleKey;
@@ -47,8 +48,9 @@ public class OutputElementStyle {
      *
      * @param parentStyleKey
      *            Parent style key or <code>null</code> if there is no parent.
-     *            The parent key should match another style key and is used for
-     *            style inheritance.
+     *            The parent key is a style key of comma-separated list of style
+     *            key that should each match another existing style key. It is
+     *            used for style inheritance.
      * @param values
      *            Style values or empty map if there is no values. Use to define
      *            different style properties. Properties to use can be found in
@@ -60,7 +62,10 @@ public class OutputElementStyle {
     }
 
     /**
-     * Get the parent style key.
+     * Get the parent style key. It can be a comma-separated list of parent
+     * style keys, where the right-most style has precedence over the left ones.
+     * For instance, if styles 'A' and 'B' are defined, then parent style 'A,B'
+     * means properties will be searched for first in B, then in A.
      *
      * @return Parent key or <code>null</code> if there is no parent
      */

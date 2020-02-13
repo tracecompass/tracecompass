@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.tmf.core.dataprovider.X11ColorUtils;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties.BorderStyle;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties.SymbolType;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties.TextDirection;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.ui.model.StyleManager;
@@ -50,6 +51,7 @@ public class StyleManagerTest {
     private static final String STYLE2 = "style2";
     private static final String RED_COLOR = Objects.requireNonNull(X11ColorUtils.toHexColor("red"));
     private static final String BLUE_COLOR = Objects.requireNonNull(X11ColorUtils.toHexColor("blue"));
+    private static final String BLACK_COLOR = Objects.requireNonNull(X11ColorUtils.toHexColor("black"));
 
     /**
      * @return The arrays of parameters
@@ -61,6 +63,7 @@ public class StyleManagerTest {
                 { "styles with map", STYLES_WITH_MAP },
                 { "style inheritance", STYLE_INHERITANCE },
                 { "default values", DEFAULT_VALUES },
+                { "multiple inheritance", MULTIPLE_INHERITANCE },
         });
     }
 
@@ -267,6 +270,67 @@ public class StyleManagerTest {
                     new StyleProperty(EMPTY_STYLE, StyleProperties.LINEAR_GRADIENT_COLOR_END, null),
                     new StyleProperty(EMPTY_STYLE, StyleProperties.BORDER_COLOR, null),
                     new StyleProperty(EMPTY_STYLE, StyleProperties.COLOR, null));
+        }
+    };
+
+    /**
+     * Test multiple style inheritance, where parent style is a comma-separated
+     * list of styles. Right-most style and its ancestors should have precedence
+     * over left most. The "A1" style also has a parent that is not present in
+     * the styles.
+     */
+    private static final OutputElementStyle A_THEN_B_STYLE = new OutputElementStyle("B2,A2");
+    private static final OutputElementStyle B_THEN_A_STYLE = new OutputElementStyle("A2,B2");
+    private static final OutputElementStyle B_THEN_A_STYLE_THEN_MAP = new OutputElementStyle("A2,B2",
+            ImmutableMap.of(
+                    StyleProperties.SYMBOL_TYPE, SymbolType.PLUS,
+                    StyleProperties.BORDER_RADIUS, 0.25f,
+                    StyleProperties.COLOR, BLACK_COLOR));
+    private static StyleTestCase MULTIPLE_INHERITANCE = new StyleTestCase(ImmutableMap.of(
+            "A1", new OutputElementStyle("A", ImmutableMap.of(
+                    StyleProperties.BACKGROUND_COLOR, RED_COLOR,
+                    StyleProperties.OPACITY, 0.5f,
+                    StyleProperties.SYMBOL_TYPE, SymbolType.CIRCLE)),
+            "A2", new OutputElementStyle("A1", ImmutableMap.of(
+                    StyleProperties.BACKGROUND_COLOR, BLUE_COLOR,
+                    StyleProperties.BORDER_RADIUS, 0.75f,
+                    StyleProperties.COLOR, RED_COLOR)),
+            "B1", new OutputElementStyle(null, ImmutableMap.of(
+                    StyleProperties.HEIGHT, 0.75f,
+                    StyleProperties.WIDTH, 0.75f,
+                    StyleProperties.SYMBOL_TYPE, SymbolType.DIAMOND,
+                    StyleProperties.COLOR, BLUE_COLOR)),
+            "B2", new OutputElementStyle("B1", ImmutableMap.of(
+                    StyleProperties.HEIGHT, 0.5f,
+                    StyleProperties.BORDER_RADIUS, 0.5f)))) {
+        @Override
+        public List<StyleProperty> getStylePropertiesToTest() {
+            return ImmutableList.of(
+                    new StyleProperty(A_THEN_B_STYLE, StyleProperties.SYMBOL_TYPE, SymbolType.CIRCLE),
+                    new StyleProperty(B_THEN_A_STYLE, StyleProperties.SYMBOL_TYPE, SymbolType.DIAMOND),
+                    new StyleProperty(B_THEN_A_STYLE_THEN_MAP, StyleProperties.SYMBOL_TYPE, SymbolType.PLUS));
+        }
+
+        @Override
+        public List<StyleProperty> getFactorStylePropertiesToTest() {
+            return ImmutableList.of(
+                    new StyleProperty(A_THEN_B_STYLE, StyleProperties.HEIGHT, 0.5f),
+                    new StyleProperty(B_THEN_A_STYLE, StyleProperties.HEIGHT, 0.5f),
+                    new StyleProperty(A_THEN_B_STYLE, StyleProperties.WIDTH, 0.75f),
+                    new StyleProperty(B_THEN_A_STYLE, StyleProperties.WIDTH, 0.75f),
+                    new StyleProperty(A_THEN_B_STYLE, StyleProperties.BORDER_RADIUS, 0.75f),
+                    new StyleProperty(B_THEN_A_STYLE, StyleProperties.BORDER_RADIUS, 0.5f),
+                    new StyleProperty(B_THEN_A_STYLE_THEN_MAP, StyleProperties.BORDER_RADIUS, 0.25f));
+        }
+
+        @Override
+        public List<StyleProperty> getColorStylePropertiesToTest() {
+            return ImmutableList.of(
+                    new StyleProperty(A_THEN_B_STYLE, StyleProperties.BACKGROUND_COLOR, RGBAColor.fromString(BLUE_COLOR, (int) (0.5 * 255))),
+                    new StyleProperty(B_THEN_A_STYLE, StyleProperties.BACKGROUND_COLOR, RGBAColor.fromString(BLUE_COLOR, (int) (0.5 * 255))),
+                    new StyleProperty(A_THEN_B_STYLE, StyleProperties.COLOR, RGBAColor.fromString(RED_COLOR, (int) (0.5 * 255))),
+                    new StyleProperty(B_THEN_A_STYLE, StyleProperties.COLOR, RGBAColor.fromString(BLUE_COLOR, (int) (0.5 * 255))),
+                    new StyleProperty(B_THEN_A_STYLE_THEN_MAP, StyleProperties.COLOR, RGBAColor.fromString(BLACK_COLOR, (int) (0.5 * 255))));
         }
     };
 
