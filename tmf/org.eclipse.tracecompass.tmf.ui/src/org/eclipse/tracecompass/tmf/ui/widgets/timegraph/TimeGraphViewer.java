@@ -206,6 +206,10 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
 
     private Composite fTimeAlignedComposite;
 
+    private Composite fFirstRowFiller;
+    private Composite fLastRowLeftFiller;
+    private Composite fLastRowRightFiller;
+
     private ITimeGraphLegendProvider fLegendProvider;
 
     private Action fHorizontalAction;
@@ -565,11 +569,11 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
             }
         });
 
-        // Fill the last row to match with the scroll bar position
+        // Fill the last column of the first row to match with the scroll bar position
         // Dummy composite to fill the space
-        Composite filler = new Composite(fTimeAlignedComposite, SWT.NONE);
-        filler.setLayoutData(new GridData(SWT.LEFT, SWT.BOTTOM, false, false));
-        filler.setLayout(new FillLayout());
+        fFirstRowFiller = new Composite(fTimeAlignedComposite, SWT.NONE);
+        fFirstRowFiller.setLayoutData(new GridData(SWT.LEFT, SWT.BOTTOM, false, false));
+        fFirstRowFiller.setLayout(new FillLayout());
 
         fTimeGraphCtrl = createTimeGraphControl(fTimeAlignedComposite, fColorScheme);
         fTimeGraphCtrl.setTimeProvider(this);
@@ -667,9 +671,9 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
             }
         });
 
-        Composite filler2 = new Composite(fTimeAlignedComposite, SWT.NONE);
-        filler2.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false, false));
-        filler2.setLayout(new FillLayout());
+        fLastRowLeftFiller = new Composite(fTimeAlignedComposite, SWT.NONE);
+        fLastRowLeftFiller.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false, false));
+        fLastRowLeftFiller.setLayout(new FillLayout());
 
         fHorizontalScrollBar = new Slider(fTimeAlignedComposite, SWT.HORIZONTAL | SWT.NO_FOCUS);
         GridData layoutData = new GridData(SWT.FILL, SWT.TOP, false, false);
@@ -702,9 +706,9 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
             setStartFinishTimeNotify(time0, time1);
         });
 
-        Composite filler3 = new Composite(fTimeAlignedComposite, SWT.NONE);
-        filler3.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-        filler3.setLayout(new FillLayout());
+        fLastRowRightFiller = new Composite(fTimeAlignedComposite, SWT.NONE);
+        fLastRowRightFiller.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
+        fLastRowRightFiller.setLayout(new FillLayout());
 
         fTimeGraphCtrl.addControlListener(new ControlAdapter() {
             @Override
@@ -991,6 +995,8 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
         if (fTree.getColumnCount() == 1) {
             fTree.getColumn(0).setWidth(fNameWidth);
         }
+        GridData gd1 = (GridData) fLastRowLeftFiller.getLayoutData();
+        gd1.widthHint = fNameWidth;
         fTimeAlignedComposite.layout();
         fTree.redraw();
         fTimeGraphCtrl.redraw();
@@ -1820,6 +1826,56 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
      */
     public TimeGraphScale getTimeGraphScale() {
         return fTimeScaleCtrl;
+    }
+
+    /**
+     * Sets if the time graph scale control is visible. This includes the header
+     * of the tree and the time graph scale itself.
+     *
+     * @param visible
+     *            {@code true} to make the controls visible or {@code false} to
+     *            hide them
+     * @since 5.2
+     */
+    public void setTimeGraphScaleVisible(boolean visible) {
+        setControlVisible(fTree, visible);
+        setControlVisible(fTimeScaleCtrl, visible);
+        setControlVisible(fFirstRowFiller, visible);
+        fTimeAlignedComposite.requestLayout();
+    }
+
+    /**
+     * Sets if the marker axis control is visible.
+     *
+     * @param visible
+     *            {@code true} to make the control visible or {@code false} to
+     *            hide it
+     * @since 5.2
+     */
+    public void setMarkerAxisControlVisible(boolean visible) {
+        setControlVisible(fMarkerAxisCtrl, visible);
+        fTimeAlignedComposite.requestLayout();
+    }
+
+    /**
+     * Sets if the horizontal scroll bar is visible.
+     *
+     * @param visible
+     *            {@code true} to make the control visible or {@code false} to
+     *            hide it
+     * @since 5.2
+     */
+    public void setHorizontalScrollBarVisible(boolean visible) {
+        setControlVisible(fLastRowLeftFiller, visible);
+        setControlVisible(fHorizontalScrollBar, visible);
+        setControlVisible(fLastRowRightFiller, visible);
+        fTimeAlignedComposite.requestLayout();
+    }
+
+    private static void setControlVisible(Control control, boolean visible) {
+        GridData gridData = (GridData) control.getLayoutData();
+        gridData.exclude = !visible;
+        control.setVisible(visible);
     }
 
     /**
