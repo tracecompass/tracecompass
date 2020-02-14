@@ -37,7 +37,9 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  *
  * @author Matthew Khouzam
  * @author Mikael Ferland
+ * @deprecated use {@link org.eclipse.tracecompass.analysis.counters.ui.views.CounterView}
  */
+@Deprecated
 public class CounterView extends TmfChartView {
 
     /** View ID. */
@@ -46,7 +48,7 @@ public class CounterView extends TmfChartView {
     /**
      * Title of the chart viewer
      */
-    public static final String VIEW_TITLE = "Counters"; //$NON-NLS-1$
+    public static final String VIEW_TITLE = "Counters (Legacy)"; //$NON-NLS-1$
 
     /**
      * Constructor

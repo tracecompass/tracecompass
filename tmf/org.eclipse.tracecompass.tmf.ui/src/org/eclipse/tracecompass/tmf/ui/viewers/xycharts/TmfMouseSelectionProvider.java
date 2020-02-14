@@ -27,7 +27,9 @@ import org.swtchart.IPlotArea;
  * notifies the viewer about a change of selection.
  *
  * @author Bernd Hufmann
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfMouseSelectionProvider}
  */
+@Deprecated
 public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseListener, MouseMoveListener, ICustomPaintListener {
 
     // ------------------------------------------------------------------------

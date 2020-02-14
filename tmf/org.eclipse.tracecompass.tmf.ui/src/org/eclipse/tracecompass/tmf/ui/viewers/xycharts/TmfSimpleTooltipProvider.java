@@ -29,7 +29,9 @@ import org.swtchart.IAxisSet;
  * current mouse position.
  *
  * @author Bernd Hufmann
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfSimpleTooltipProvider}
  */
+@Deprecated
 public class TmfSimpleTooltipProvider extends TmfBaseProvider implements MouseTrackListener {
 
     private final class XYToolTipHandler extends TmfAbstractToolTipHandler {

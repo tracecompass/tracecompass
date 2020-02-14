@@ -39,7 +39,9 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSet
  *
  * @author Yonni Chen
  * @since 2.1
+ * @deprecated use {@link org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterChartViewer2}
  */
+@Deprecated
 public class AbstractSegmentStoreScatterChartViewer extends TmfFilteredXYChartViewer {
 
     private static final Format FORMAT =SubSecondTimeWithUnitFormat.getInstance();

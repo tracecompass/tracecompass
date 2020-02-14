@@ -21,7 +21,9 @@ import org.swtchart.ISeries.SeriesType;
  * SWTBot class representing a SwtChart series
  *
  * @author Patrick Tasse
+ * @deprecated use {link {@link SWTBotEclipseSwtChartSeries}
  */
+@Deprecated
 public class SWTBotSwtChartSeries extends AbstractSWTBotControl<Chart> {
 
     private final ISeries fSeries;

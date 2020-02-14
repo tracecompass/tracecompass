@@ -68,12 +68,12 @@ import org.eclipse.tracecompass.tmf.ui.viewers.IImageSave;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
-import org.swtchart.Chart;
-import org.swtchart.IAxis;
-import org.swtchart.IAxisTick;
-import org.swtchart.ISeries;
-import org.swtchart.ISeriesSet;
-import org.swtchart.ITitle;
+import org.eclipse.swtchart.Chart;
+import org.eclipse.swtchart.IAxis;
+import org.eclipse.swtchart.IAxisTick;
+import org.eclipse.swtchart.ISeries;
+import org.eclipse.swtchart.ISeriesSet;
+import org.eclipse.swtchart.ITitle;
 
 import com.google.common.collect.Iterators;
 
@@ -647,7 +647,7 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
      */
     private void refreshDisplayTitles() {
         Rectangle chartRect = fChart.getClientArea();
-        Rectangle plotRect = fChart.getPlotArea().getClientArea();
+        Rectangle plotRect = ((Composite) fChart.getPlotArea()).getClientArea();
 
         ITitle chartTitle = checkNotNull(fChart.getTitle());
         refreshDisplayTitle(chartTitle, getTitle(), chartRect.width);

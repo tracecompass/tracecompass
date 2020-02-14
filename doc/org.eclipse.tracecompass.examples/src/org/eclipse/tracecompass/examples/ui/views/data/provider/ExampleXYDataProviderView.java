@@ -19,14 +19,14 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.examples.core.data.provider.ExampleXYDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
-import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer2;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
-import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.linechart.TmfFilteredXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.linechart.TmfXYChartSettings;
+import org.eclipse.tracecompass.tmf.ui.views.xychart.TmfChartView;
 
 import com.google.common.collect.ImmutableList;
 
@@ -56,7 +56,7 @@ public class ExampleXYDataProviderView extends TmfChartView {
         return new TmfFilteredXYChartViewer(parent, settings, ExampleXYDataProvider.ID);
     }
 
-    private static final class TreeXyViewer extends AbstractSelectTreeViewer {
+    private static final class TreeXyViewer extends AbstractSelectTreeViewer2 {
 
         public TreeXyViewer(Composite parent) {
             super(parent, 1, ExampleXYDataProvider.ID);

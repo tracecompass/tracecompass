@@ -87,7 +87,9 @@ import com.google.common.collect.Multimap;
  *
  * @author Yonni Chen
  * @since 3.2
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.viewers.xychart.linechart.TmfCommonXAxisChartViewer}
  */
+@Deprecated
 public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
 
     private static final String DIRTY_UNDERFLOW_ERROR = "Dirty underflow error"; //$NON-NLS-1$

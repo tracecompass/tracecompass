@@ -39,14 +39,16 @@ import org.swtchart.LineStyle;
  * SWTBot tests for Counters view.
  *
  * @author Mikael Ferland
+ * @deprecated replaced by {@link NewCounterViewTest}
  */
+@Deprecated
 public class CounterViewTest extends XYDataProviderBaseTest {
 
     private static final int NUMBER_OF_POINTS = 50;
     private static final RGB BLUE = new RGB(0, 0, 255);
     private static final @NonNull String TRACE_NAME = "kernel_vm";
     private static final @NonNull String COUNTER_NAME = "minor_faults";
-    private static final @NonNull String COUNTERS_VIEW_TITLE = "Counters View";
+    private static final @NonNull String COUNTERS_VIEW_TITLE = "Counters (Legacy)";
     private static final @NonNull String MAIN_SERIES_NAME = "kernel_vm/Ungrouped/minor_faults";
     private static final @NonNull String COUNTERS_VIEW_ID = "org.eclipse.tracecompass.analysis.counters.ui.view.counters";
 

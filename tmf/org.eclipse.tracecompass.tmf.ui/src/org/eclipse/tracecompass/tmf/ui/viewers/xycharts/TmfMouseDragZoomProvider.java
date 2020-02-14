@@ -27,7 +27,9 @@ import org.swtchart.IPlotArea;
  * It also notifies the viewer about a change of range.
  *
  * @author Bernd Hufmann
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfMouseDragZoomProvider}
  */
+@Deprecated
 public class TmfMouseDragZoomProvider extends TmfBaseProvider implements MouseListener, MouseMoveListener, ICustomPaintListener {
 
     // ------------------------------------------------------------------------

@@ -71,7 +71,9 @@ import com.google.gson.GsonBuilder;
  * SWTBot tests for viewers using XY data provider
  *
  * @author Yonni Chen
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.swtbot.tests.views.xychart.XYDataProviderBaseTest}
  */
+@Deprecated
 @RunWith(SWTBotJunit4ClassRunner.class)
 public abstract class XYDataProviderBaseTest {
 
@@ -185,6 +187,7 @@ public abstract class XYDataProviderBaseTest {
         String expected = FileUtils.read(getFullPath(expectedJson));
         TmfCommonXAxisModel model = extractModelFromChart(chart, otherSeries);
         String current = fGson.toJson(model);
+        current = current.replaceAll("\\(Legacy\\)", "View");
         return expected.equals(current);
     }
 

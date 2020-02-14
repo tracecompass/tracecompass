@@ -22,7 +22,7 @@ import org.eclipse.tracecompass.tmf.core.model.filters.FilterTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
-import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer2;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData;
@@ -38,7 +38,7 @@ import com.google.common.collect.ImmutableList;
  * @author Wassim Nasrallah
  * @author Najib Arbaoui
  */
-public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
+public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer2 {
 
     /** Provides label for the Kernel memory usage tree viewer cells */
     private class MemoryLabelProvider extends DataProviderTreeLabelProvider {

@@ -36,6 +36,12 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swtchart.IAxis;
+import org.eclipse.swtchart.IAxisTick;
+import org.eclipse.swtchart.IBarSeries;
+import org.eclipse.swtchart.ISeries;
+import org.eclipse.swtchart.ISeries.SeriesType;
+import org.eclipse.swtchart.ISeriesSet;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartData;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartModel;
@@ -52,12 +58,6 @@ import org.eclipse.tracecompass.internal.tmf.chart.ui.consumer.XYChartConsumer;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.consumer.XYSeriesConsumer;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRangeMap;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
-import org.swtchart.IAxis;
-import org.swtchart.IAxisTick;
-import org.swtchart.IBarSeries;
-import org.swtchart.ISeries;
-import org.swtchart.ISeries.SeriesType;
-import org.swtchart.ISeriesSet;
 
 import com.google.common.collect.Iterators;
 
@@ -104,10 +104,10 @@ public final class SwtBarChart extends SwtXYChartViewer {
         super(parent, data, model);
 
         /* Add the mouse click listener */
-        getChart().getPlotArea().addMouseListener(new MouseDownListener());
+        getChart().getPlotArea().getControl().addMouseListener(new MouseDownListener());
 
         /* Add the paint listener */
-        getChart().getPlotArea().addPaintListener(new BarPainterListener());
+        getChart().getPlotArea().getControl().addPaintListener(new BarPainterListener());
 
         populate();
     }

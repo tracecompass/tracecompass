@@ -16,9 +16,9 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.latency;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterChartViewer;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterChartViewer2;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.linechart.TmfXYChartSettings;
 
 /**
  * Displays the latency analysis data in a scatter graph
@@ -27,7 +27,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSet
  * @author Matthew Khouzam - reduced memory usage
  * @since 1.0
  */
-public class SystemCallLatencyScatterGraphViewer extends AbstractSegmentStoreScatterChartViewer {
+public class SystemCallLatencyScatterGraphViewer extends AbstractSegmentStoreScatterChartViewer2 {
 
     /**
      * Constructor

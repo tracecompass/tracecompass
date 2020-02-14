@@ -12,16 +12,16 @@ package org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterChartViewer;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterChartViewer2;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.linechart.TmfXYChartSettings;
 
 /**
  * Displays the latency analysis data in a scatter graph
  *
  * @author Jean-Christian Kouame
  */
-public class PatternScatterGraphViewer extends AbstractSegmentStoreScatterChartViewer {
+public class PatternScatterGraphViewer extends AbstractSegmentStoreScatterChartViewer2 {
 
     private @NonNull String fAnalysisId = ""; //$NON-NLS-1$
 

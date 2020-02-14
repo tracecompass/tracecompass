@@ -24,7 +24,9 @@ import org.swtchart.Range;
  * a change of range.
  *
  * @author Bernd Hufmann
+ * @deprecated use {@link org.eclipse.tracecompass.internal.tmf.ui.viewers.xychart.TmfXyUiUtils}
  */
+@Deprecated
 public class TmfXyUiUtils {
 
     // ------------------------------------------------------------------------

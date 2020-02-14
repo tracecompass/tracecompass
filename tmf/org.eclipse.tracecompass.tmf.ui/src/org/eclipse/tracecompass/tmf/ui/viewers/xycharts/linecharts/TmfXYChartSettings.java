@@ -17,7 +17,9 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
  *
  * @author Yonni Chen
  * @since 3.2
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.viewers.xychart.linechart.TmfXYChartSettings}
  */
+@Deprecated
 public class TmfXYChartSettings {
 
     private final String fTitle;

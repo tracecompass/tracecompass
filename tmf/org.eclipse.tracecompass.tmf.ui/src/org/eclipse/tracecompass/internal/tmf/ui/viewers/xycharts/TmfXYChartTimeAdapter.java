@@ -21,7 +21,9 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils.TimeForma
  * Tmf Chart data provider wrapper to comply with Time data provider API
  *
  * @author Matthew Khouzam
+ * @deprecated use {@link org.eclipse.tracecompass.internal.tmf.ui.viewers.xychart.TmfXYChartTimeAdapter}
  */
+@Deprecated
 public final class TmfXYChartTimeAdapter implements ITimeDataProvider {
 
     private final TmfXYChartViewer fTimeProvider;

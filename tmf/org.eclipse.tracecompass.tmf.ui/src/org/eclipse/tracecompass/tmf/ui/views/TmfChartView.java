@@ -76,7 +76,9 @@ import org.swtchart.Chart;
  *
  * @author Bernd Hufmann
  * @author Mikael Ferland
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.views.xychart.TmfChartView}
  */
+@Deprecated
 public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, ITimeReset, ITmfPinnable, ITmfAllowMultiple {
 
     private static final int[] DEFAULT_WEIGHTS = {1, 3};

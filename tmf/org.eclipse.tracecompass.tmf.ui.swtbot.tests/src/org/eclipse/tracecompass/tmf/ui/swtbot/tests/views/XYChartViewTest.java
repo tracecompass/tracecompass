@@ -55,7 +55,9 @@ import org.swtchart.ISeriesSet;
 
 /**
  * Test for XY Chart views in Trace Compass.
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.swtbot.tests.views.xychart.XYChartViewTest}
  */
+@Deprecated
 @RunWith(SWTBotJunit4ClassRunner.class)
 public class XYChartViewTest {
 

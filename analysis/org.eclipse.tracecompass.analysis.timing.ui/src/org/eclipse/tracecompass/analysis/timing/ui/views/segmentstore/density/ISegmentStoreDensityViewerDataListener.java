@@ -18,6 +18,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
  * A listener that gets notified when the viewer sees its data changed or its
  * data selection change.
  */
+@Deprecated
 public interface ISegmentStoreDensityViewerDataListener {
 
     /**

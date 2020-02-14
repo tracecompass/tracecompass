@@ -16,15 +16,14 @@ package org.eclipse.tracecompass.examples.ui.viewers.histogram;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swtchart.IAxisSet;
+import org.eclipse.swtchart.LineStyle;
 import org.eclipse.tracecompass.internal.tmf.core.histogram.HistogramDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
-import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.barcharts.TmfHistogramTooltipProvider;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
-import org.swtchart.IAxisSet;
-import org.swtchart.LineStyle;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.barchart.TmfHistogramTooltipProvider;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.linechart.TmfFilteredXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.linechart.TmfXYChartSettings;
 
 /**
  * Histogram Viewer implementation based on TmfBarChartViewer.
@@ -53,12 +52,6 @@ public class NewHistogramViewer extends TmfFilteredXYChartViewer {
         axisSet.getYAxis(0).getGrid().setStyle(LineStyle.NONE);
 
         setTooltipProvider(new TmfHistogramTooltipProvider(this));
-    }
-
-    @Deprecated
-    @Override
-    public IYAppearance getSeriesAppearance(@NonNull String seriesName) {
-        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.BAR, DEFAULT_SERIES_WIDTH);
     }
 
     @Override

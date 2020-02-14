@@ -85,6 +85,7 @@ import com.google.common.primitives.Longs;
  * @since 3.2
  * @author Loic Prieur-Drevon
  */
+@Deprecated
 public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
 
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(AbstractSelectTreeViewer.class);

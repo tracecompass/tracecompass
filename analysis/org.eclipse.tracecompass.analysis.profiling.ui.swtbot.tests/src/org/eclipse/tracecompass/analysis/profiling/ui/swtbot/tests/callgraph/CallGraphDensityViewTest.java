@@ -32,10 +32,11 @@ import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtchart.ISeries;
 import org.eclipse.tracecompass.analysis.profiling.core.tests.flamegraph.AggregationTreeTest;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityViewer;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.ISegmentStoreDensityViewerDataListener;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density2.AbstractSegmentStoreDensityViewer;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density2.ISegmentStoreDensityViewerDataListener;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
 import org.eclipse.tracecompass.internal.analysis.profiling.ui.callgraph.CallGraphDensityView;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
@@ -49,7 +50,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
-import org.swtchart.ISeries;
 
 /**
  * Test the call graph density view, known as the Function Density view. The
@@ -157,7 +157,7 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
         super.emptyStateSystemTest();
         loadData();
         assertEquals(0, fTableBot.rowCount());
-        ISeries series = getSeries();
+        ISeries<?> series = getSeries();
         assertNotNull(series);
     }
 
@@ -301,13 +301,13 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
         assertArrayEquals(expected, getSeries().getYSeries(), 0.1);
     }
 
-    private ISeries getSeries() {
+    private ISeries<?> getSeries() {
         AbstractSegmentStoreDensityViewer densityViewer = fDensityViewer;
         assertNotNull(densityViewer);
-        ISeries[] serieses = densityViewer.getControl().getSeriesSet().getSeries();
+        ISeries<?>[] serieses = densityViewer.getControl().getSeriesSet().getSeries();
         assertNotNull(serieses);
         assertTrue(serieses.length > 0);
-        ISeries series = serieses[0];
+        ISeries<?> series = serieses[0];
         assertNotNull(series);
         return series;
     }

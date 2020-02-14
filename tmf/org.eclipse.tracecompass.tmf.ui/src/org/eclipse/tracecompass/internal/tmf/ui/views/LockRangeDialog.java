@@ -34,8 +34,10 @@ import org.swtchart.Range;
  * {@link TmfChartView}.
  *
  * @author Ivan Grinenko
+ * @deprecated use {@link org.eclipse.tracecompass.internal.tmf.ui.views.xychart.LockRangeDialog}
  *
  */
+@Deprecated
 public class LockRangeDialog extends Dialog {
     /**
      * Checkbox to lock or unlock the axis.

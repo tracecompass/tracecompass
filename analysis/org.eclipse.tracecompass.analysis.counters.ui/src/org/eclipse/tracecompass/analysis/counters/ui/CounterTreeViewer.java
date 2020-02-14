@@ -42,7 +42,9 @@ import com.google.common.collect.Lists;
  *
  * @author Matthew Khouzam
  * @author Mikael Ferland
+ * @deprecated use {@link org.eclipse.tracecompass.analysis.counters.ui.views.CounterTreeViewer}
  */
+@Deprecated
 public class CounterTreeViewer extends AbstractSelectTreeViewer {
 
     private final class CounterTreeLabelProvider extends DataProviderTreeLabelProvider {

@@ -27,7 +27,7 @@ import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityView;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density2.AbstractSegmentStoreDensityView;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternDensityView;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
@@ -36,9 +36,9 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.swtchart.Chart;
-import org.swtchart.ISeries;
-import org.swtchart.ISeriesSet;
+import org.eclipse.swtchart.Chart;
+import org.eclipse.swtchart.ISeries;
+import org.eclipse.swtchart.ISeriesSet;
 
 /**
  * Test of the pattern density view
@@ -136,7 +136,7 @@ public class PatternDensityViewTest extends PatternLatencyViewTestBase {
 
         ISeriesSet seriesSet = fDensityChart.getSeriesSet();
         assertNotNull(seriesSet);
-        ISeries[] series = seriesSet.getSeries();
+        ISeries<?>[] series = seriesSet.getSeries();
         assertNotNull(series);
 
         // Verify that the chart has 1 series

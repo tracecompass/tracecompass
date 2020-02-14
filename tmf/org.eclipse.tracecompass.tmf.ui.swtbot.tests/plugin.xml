@@ -39,6 +39,12 @@
             name="XY Chart View Stub"
             restorable="true">
       </view>
+      <view
+            class="org.eclipse.tracecompass.tmf.ui.swtbot.tests.views.xychart.XYChartViewStub"
+            id="org.eclipse.tracecompass.tmf.ui.swtbot.tests.views.xychart.xystub"
+            name="XY Chart View Stub New"
+            restorable="true">
+      </view>
    </extension>
 
 </plugin>

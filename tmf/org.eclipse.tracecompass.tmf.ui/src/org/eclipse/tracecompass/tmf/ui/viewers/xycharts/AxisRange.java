@@ -15,8 +15,10 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xycharts;
  *
  * @author Ivan Grinenko
  * @since 5.2
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.viewers.xychart.AxisRange}
  *
  */
+@Deprecated
 public class AxisRange {
 
     private final double fLower;

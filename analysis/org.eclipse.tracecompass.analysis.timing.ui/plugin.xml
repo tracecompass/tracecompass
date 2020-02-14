@@ -52,6 +52,14 @@
             restorable="true">
       </view>
       <view
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.SegmentStoreScatterView2"
+            icon="icons/eview16/latency.png"
+            id="org.eclipse.tracecompass.analysis.timing.ui.segstore.scatter2"
+            name="%view.segstore.scatters"
+            restorable="true">
+      </view>
+      <view
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
             class="org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.SegmentStoreTableView"
             icon="icons/eview16/latency.png"

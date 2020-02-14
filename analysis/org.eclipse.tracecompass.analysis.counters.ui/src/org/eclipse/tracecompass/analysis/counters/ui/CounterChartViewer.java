@@ -26,7 +26,9 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSet
  *
  * @author Matthew Khouzam
  * @author Mikael Ferland
+ * @deprecated use {@link org.eclipse.tracecompass.analysis.counters.ui.views.CounterChartViewer}
  */
+@Deprecated
 public final class CounterChartViewer extends TmfFilteredXYChartViewer {
 
     private boolean fIsCumulative = false;

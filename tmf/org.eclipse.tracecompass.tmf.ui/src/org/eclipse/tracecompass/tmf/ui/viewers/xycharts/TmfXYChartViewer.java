@@ -74,7 +74,9 @@ import com.google.common.annotations.VisibleForTesting;
  * notified by any changes caused by selection and zoom.
  *
  * @author Bernd Hufmann
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfXYChartViewer}
  */
+@Deprecated
 public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChartTimeProvider, IImageSave, IAdaptable {
 
     // ------------------------------------------------------------------------

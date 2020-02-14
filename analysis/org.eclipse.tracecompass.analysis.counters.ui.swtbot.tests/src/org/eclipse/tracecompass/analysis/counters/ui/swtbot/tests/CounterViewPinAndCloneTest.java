@@ -44,12 +44,14 @@ import org.junit.Test;
  * SWTBot tests for pin & clone for xy-charts using Counters view example.
  *
  * @author Bernd Hufmann
+ * @deprecated replaced by {@link NewCounterViewPinAndCloneTest}
  */
+@Deprecated
 public class CounterViewPinAndCloneTest extends XYDataProviderBaseTest {
 
     private static final String TRACETYPE_ID = "org.eclipse.linuxtools.lttng2.kernel.tracetype";
     private static final String TRACE_NAME = "kernel_vm";
-    private static final @NonNull String COUNTERS_VIEW_TITLE = "Counters";
+    private static final @NonNull String COUNTERS_VIEW_TITLE = "Counters (Legacy)";
     private static final @NonNull String MAIN_SERIES_NAME = "kernel_vm/Ungrouped/minor_faults";
     private static final @NonNull String COUNTERS_VIEW_ID = "org.eclipse.tracecompass.analysis.counters.ui.view.counters";
     private static final String PINNED_TO_TRACE_COUNTERS_VIEW_TITLE = COUNTERS_VIEW_TITLE + " <" + TRACE_NAME + ">";

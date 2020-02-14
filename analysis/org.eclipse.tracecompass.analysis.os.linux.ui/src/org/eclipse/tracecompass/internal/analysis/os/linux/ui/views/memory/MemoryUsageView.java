@@ -33,7 +33,9 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  * @author Samuel Gagnon
  * @author Mahdi Zolnouri
  * @author Wassim Nasrallah
+ * @deprecated use @{link {@link MemoryUsageView2}
  */
+@Deprecated
 public class MemoryUsageView extends TmfChartView {
     private final String fProviderId;
     private final TmfXYChartSettings fSettings;

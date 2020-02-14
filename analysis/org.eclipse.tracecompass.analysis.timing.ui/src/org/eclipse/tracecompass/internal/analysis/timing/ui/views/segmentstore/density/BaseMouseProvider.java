@@ -20,6 +20,7 @@ import org.swtchart.Chart;
  * @author Bernd Hufmann
  * @author Marc-Andre Laperle
  */
+@Deprecated
 public abstract class BaseMouseProvider {
 
     private AbstractSegmentStoreDensityViewer fDensityViewer;

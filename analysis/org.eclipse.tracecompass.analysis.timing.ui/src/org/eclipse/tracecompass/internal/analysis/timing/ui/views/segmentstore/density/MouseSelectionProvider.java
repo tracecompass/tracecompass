@@ -32,6 +32,7 @@ import org.swtchart.Range;
  * @author Bernd Hufmann
  * @author Marc-Andre Laperle
  */
+@Deprecated
 public class MouseSelectionProvider extends BaseMouseProvider implements MouseListener, MouseMoveListener, ICustomPaintListener {
 
     /** Cached start coordinate */

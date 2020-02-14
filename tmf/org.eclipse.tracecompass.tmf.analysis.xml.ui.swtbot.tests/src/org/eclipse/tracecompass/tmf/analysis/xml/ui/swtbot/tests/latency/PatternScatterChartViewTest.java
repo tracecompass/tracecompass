@@ -25,13 +25,13 @@ import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.Patte
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfXYChartViewer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.swtchart.Chart;
-import org.swtchart.ISeries;
-import org.swtchart.ISeriesSet;
-import org.swtchart.Range;
+import org.eclipse.swtchart.Chart;
+import org.eclipse.swtchart.ISeries;
+import org.eclipse.swtchart.ISeriesSet;
+import org.eclipse.swtchart.Range;
 
 /**
  * Tests of the pattern scatter chart view
@@ -84,7 +84,7 @@ public class PatternScatterChartViewTest extends PatternLatencyViewTestBase {
         assertEquals(100000000, range.upper - range.lower, 0);
         ISeriesSet seriesSet = fScatterChart.getSeriesSet();
         assertNotNull(seriesSet);
-        ISeries[] series = seriesSet.getSeries();
+        ISeries<?>[] series = seriesSet.getSeries();
         assertNotNull(series);
 
         // Verify that the chart has more than 1 series

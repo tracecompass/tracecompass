@@ -21,7 +21,9 @@ import org.eclipse.tracecompass.tmf.ui.viewers.ITmfTimeProvider;
  * provider interface. Typically, the time will be shown on the x-axis.
  *
  * @author Bernd Hufmann
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.viewers.xychart.ITmfChartTimeProvider}
  */
+@Deprecated
 public interface ITmfChartTimeProvider extends ITmfTimeProvider {
 
     /**

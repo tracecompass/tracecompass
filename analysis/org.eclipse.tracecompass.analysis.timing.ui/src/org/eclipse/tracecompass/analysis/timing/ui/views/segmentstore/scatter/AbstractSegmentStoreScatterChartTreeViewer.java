@@ -44,7 +44,9 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Geneviève Bastien
  * @since 3.0
+ * @deprecated use {@link AbstractSegmentStoreScatterChartTreeViewer2} instead
  */
+@Deprecated
 public class AbstractSegmentStoreScatterChartTreeViewer extends AbstractSelectTreeViewer {
 
     private final String fAnalysisId;

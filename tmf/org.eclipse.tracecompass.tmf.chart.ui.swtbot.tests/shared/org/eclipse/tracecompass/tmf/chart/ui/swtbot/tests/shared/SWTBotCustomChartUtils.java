@@ -35,10 +35,10 @@ import org.eclipse.tracecompass.internal.tmf.chart.ui.format.ChartDecimalUnitFor
 import org.eclipse.tracecompass.internal.tmf.chart.ui.format.ChartTimeStampFormat;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.swtchart.Chart;
-import org.swtchart.IAxis;
-import org.swtchart.ISeries;
-import org.swtchart.ISeriesSet;
+import org.eclipse.swtchart.Chart;
+import org.eclipse.swtchart.IAxis;
+import org.eclipse.swtchart.ISeries;
+import org.eclipse.swtchart.ISeriesSet;
 
 /**
  * Class that provides utility methods to test custom charts with swtbot
@@ -302,7 +302,7 @@ public final class SWTBotCustomChartUtils {
     public static void assertSeriesTitle(Chart customChart, List<String> titles) {
         ISeriesSet seriesSet = customChart.getSeriesSet();
         assertNotNull(seriesSet);
-        ISeries[] series = seriesSet.getSeries();
+        ISeries<?>[] series = seriesSet.getSeries();
 
         assertEquals(titles.size(), series.length);
         for (int i = 0; i < series.length; i++) {

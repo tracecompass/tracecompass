@@ -52,7 +52,9 @@ import com.google.common.primitives.Longs;
  * XYChart View Stub
  *
  * @author Bernd Hufmann
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.swtbot.tests.views.xychart.XYChartViewStub}
  */
+@Deprecated
 @SuppressWarnings("restriction")
 public class XYChartViewStub extends TmfChartView {
 

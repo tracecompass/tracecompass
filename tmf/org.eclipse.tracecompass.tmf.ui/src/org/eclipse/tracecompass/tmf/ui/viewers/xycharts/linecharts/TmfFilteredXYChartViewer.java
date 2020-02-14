@@ -47,7 +47,9 @@ import com.google.common.collect.Sets;
  *
  * @author Loic Prieur-Drevon
  * @since 3.2
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.viewers.xychart.linechart.TmfFilteredXYChartViewer}
  */
+@Deprecated
 public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implements ICheckboxTreeViewerListener {
 
     private static final int DEFAULT_SERIES_WIDTH = 2;

@@ -24,7 +24,7 @@ import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer2;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData;
@@ -37,7 +37,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Loic Prieur-Drevon
  */
-public class XmlTreeViewer extends AbstractSelectTreeViewer {
+public class XmlTreeViewer extends AbstractSelectTreeViewer2 {
 
     private class XmlLabelProvider extends TreeLabelProvider {
 
@@ -49,7 +49,7 @@ public class XmlTreeViewer extends AbstractSelectTreeViewer {
                     // do not show the legend for the trace entries.
                     return null;
                 }
-                return getLegendImage(String.valueOf(model.getName()));
+                return getLegendImage(model.getId());
             }
             return null;
         }

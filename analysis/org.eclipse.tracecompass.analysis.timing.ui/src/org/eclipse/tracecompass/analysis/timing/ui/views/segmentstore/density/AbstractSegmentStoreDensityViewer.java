@@ -84,6 +84,7 @@ import com.google.common.annotations.VisibleForTesting;
  *
  * @since 2.0
  */
+@Deprecated
 public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implements IImageSave {
 
     private static final Format DENSITY_TIME_FORMATTER = SubSecondTimeWithUnitFormat.getInstance();

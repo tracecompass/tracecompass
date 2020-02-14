@@ -35,7 +35,9 @@ import org.swtchart.LineStyle;
  *
  * @author Yonni Chen
  * @since 3.2
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.viewers.xychart.XYChartLegendImageProvider}
  */
+@Deprecated
 public class XYChartLegendImageProvider implements ILegendImageProvider {
 
     private static final @NonNull RGBAColor DEFAULT_COLOR = new RGBAColor(255, 255, 255);

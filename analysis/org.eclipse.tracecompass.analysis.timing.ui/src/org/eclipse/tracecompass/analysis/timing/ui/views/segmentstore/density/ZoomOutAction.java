@@ -21,6 +21,7 @@ import org.swtchart.Range;
 /**
  * Zoom action for the density view
  */
+@Deprecated
 class ZoomOutAction extends Action {
 
     private final AbstractSegmentStoreDensityView fView;

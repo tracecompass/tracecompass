@@ -25,7 +25,9 @@ import org.swtchart.Range;
  * It also notifies the viewer about a change of range.
  *
  * @author Bernd Hufmann
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfMouseDragProvider}
  */
+@Deprecated
 public class TmfMouseDragProvider extends TmfBaseProvider implements MouseListener, MouseMoveListener {
 
     // ------------------------------------------------------------------------

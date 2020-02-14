@@ -30,6 +30,7 @@ import org.swtchart.Range;
  * @author Bernd Hufmann
  * @author Marc-Andre Laperle
  */
+@Deprecated
 public class MouseDragZoomProvider extends BaseMouseProvider implements MouseListener, MouseMoveListener, ICustomPaintListener {
 
     /** Cached start coordinate */

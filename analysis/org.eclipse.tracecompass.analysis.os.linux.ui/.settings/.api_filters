@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.eclipse.tracecompass.analysis.os.linux.ui" version="2">
+    <resource path="src/org/eclipse/tracecompass/internal/analysis/os/linux/ui/views/memory/MemoryUsageTreeViewer.java" type="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory.MemoryUsageTreeViewer">
+        <filter comment="Accidentally API" id="305365105">
+            <message_arguments>
+                <message_argument value="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory.MemoryUsageTreeViewer"/>
+                <message_argument value="org.eclipse.tracecompass.analysis.os.linux.ui_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/eclipse/tracecompass/internal/analysis/os/linux/ui/views/memory/MemoryUsageView.java" type="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory.MemoryUsageView">
+        <filter comment="Accidentally API" id="305365105">
+            <message_arguments>
+                <message_argument value="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory.MemoryUsageView"/>
+                <message_argument value="org.eclipse.tracecompass.analysis.os.linux.ui_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/eclipse/tracecompass/internal/analysis/os/linux/ui/views/memory/Messages.java" type="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory.Messages">
+        <filter comment="Accidentally API" id="305365105">
+            <message_arguments>
+                <message_argument value="org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory.Messages"/>
+                <message_argument value="org.eclipse.tracecompass.analysis.os.linux.ui_3.1.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>

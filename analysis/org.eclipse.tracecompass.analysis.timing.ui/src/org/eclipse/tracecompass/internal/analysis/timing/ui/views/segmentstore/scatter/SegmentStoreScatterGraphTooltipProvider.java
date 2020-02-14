@@ -35,6 +35,7 @@ import org.swtchart.ISeries;
  *
  * @author Bernd Hufmann
  */
+@Deprecated
 public class SegmentStoreScatterGraphTooltipProvider extends TmfClosestDataPointTooltipProvider{
 
     // ------------------------------------------------------------------------

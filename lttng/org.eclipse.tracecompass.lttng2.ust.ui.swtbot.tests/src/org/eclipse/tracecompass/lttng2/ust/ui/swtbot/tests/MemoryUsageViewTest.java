@@ -25,19 +25,19 @@ import org.eclipse.tracecompass.internal.lttng2.ust.ui.views.memusage.UstMemoryU
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
-import org.eclipse.tracecompass.tmf.ui.swtbot.tests.XYDataProviderBaseTest;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfCommonXAxisChartViewer;
+import org.eclipse.tracecompass.tmf.ui.swtbot.tests.views.xychart.XYDataProviderBaseTest;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.linechart.TmfCommonXAxisChartViewer;
 import org.eclipse.ui.IViewPart;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.swtchart.Chart;
-import org.swtchart.ILineSeries;
-import org.swtchart.ISeries;
-import org.swtchart.ISeriesSet;
-import org.swtchart.LineStyle;
+import org.eclipse.swtchart.Chart;
+import org.eclipse.swtchart.ILineSeries;
+import org.eclipse.swtchart.ISeries;
+import org.eclipse.swtchart.ISeriesSet;
+import org.eclipse.swtchart.LineStyle;
 
 /**
  * Test for the {@link UstMemoryUsageView} in trace compass
@@ -77,9 +77,9 @@ public class MemoryUsageViewTest extends XYDataProviderBaseTest {
         fBot.waitUntil(ConditionHelpers.numberOfSeries(chart, EXPECTED_NUM_SERIES));
 
         ISeriesSet seriesSet = chart.getSeriesSet();
-        ISeries[] series = seriesSet.getSeries();
+        ISeries<?>[] series = seriesSet.getSeries();
         // Verify that each series is a ILineSeries
-        for (ISeries serie : series) {
+        for (ISeries<?> serie : series) {
             assertTrue(serie instanceof ILineSeries);
         }
     }

@@ -41,7 +41,9 @@ import org.swtchart.ISeries;
  *
  * @author Bernd Hufmann
  * @since 2.0
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfClosestDataPointTooltipProvider}
  */
+@Deprecated
 public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implements MouseMoveListener, PaintListener {
 
     private static final @NonNull String OLD_TOOLTIP = ""; //$NON-NLS-1$

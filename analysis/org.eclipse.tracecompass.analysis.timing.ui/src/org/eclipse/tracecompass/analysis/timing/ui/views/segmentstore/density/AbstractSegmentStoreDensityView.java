@@ -36,7 +36,9 @@ import com.google.common.annotations.VisibleForTesting;
  *
  * @author Matthew Khouzam
  * @author Marc-Andre Laperle
+ * @deprecated use {@link org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density2.AbstractSegmentStoreDensityViewer}
  */
+@Deprecated
 public abstract class AbstractSegmentStoreDensityView extends TmfView {
 
     private static final int[] DEFAULT_WEIGHTS = new int[] { 4, 6 };

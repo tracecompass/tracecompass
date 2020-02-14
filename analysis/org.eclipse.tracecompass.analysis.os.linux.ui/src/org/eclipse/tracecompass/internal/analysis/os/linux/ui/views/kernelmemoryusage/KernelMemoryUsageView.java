@@ -12,8 +12,8 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.kernelmemor
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelmemoryusage.KernelMemoryUsageDataProvider;
-import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory.MemoryUsageView;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
+import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory.MemoryUsageView2;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.linechart.TmfXYChartSettings;
 
 /**
  * Memory usage view
@@ -22,7 +22,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSet
  * @author Mahdi Zolnouri
  * @author Wassim Nasrallah
  */
-public class KernelMemoryUsageView extends MemoryUsageView {
+public class KernelMemoryUsageView extends MemoryUsageView2 {
 
     /** ID string */
     public static final @NonNull String ID = "org.eclipse.tracecompass.analysis.os.linux.ui.kernelmemoryusageview"; //$NON-NLS-1$

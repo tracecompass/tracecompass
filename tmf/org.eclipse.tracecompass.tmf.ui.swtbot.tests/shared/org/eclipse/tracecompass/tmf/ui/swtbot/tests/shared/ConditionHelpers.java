@@ -53,7 +53,7 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.editors.TmfEventsEditor;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewReference;
@@ -62,7 +62,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.hamcrest.Matcher;
 import org.osgi.framework.Version;
-import org.swtchart.Chart;
+import org.eclipse.swtchart.Chart;
+
 
 /**
  * Is a tree node available
@@ -732,12 +733,38 @@ public final class ConditionHelpers {
         return new TimeGraphIsReadyCondition(view, selectionRange, visibleTime);
     }
 
-    private static class XYViewerIsReadyCondition extends DefaultCondition  {
+    @Deprecated
+    private static class XYViewerIsReadyConditionLegacy extends DefaultCondition  {
 
-        private TmfXYChartViewer fViewer;
+        private org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer fViewer;
         private String fFailureMessage;
 
-        private XYViewerIsReadyCondition(TmfXYChartViewer view) {
+        private XYViewerIsReadyConditionLegacy(org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer view) {
+            fViewer = view;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+
+            if (fViewer.isDirty()) {
+                fFailureMessage = "Time graph is dirty";
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return fFailureMessage;
+        }
+    }
+
+    private static class XYViewerIsReadyCondition extends DefaultCondition  {
+
+        private org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfXYChartViewer fViewer;
+        private String fFailureMessage;
+
+        private XYViewerIsReadyCondition(org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfXYChartViewer view) {
             fViewer = view;
         }
 
@@ -821,7 +848,22 @@ public final class ConditionHelpers {
      * @param viewer
      *            the XY chart viewer
      * @return ICondition for verification
+     * @deprecated @{link {@link ConditionHelpers#xyViewerIsReadyCondition(org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfXYChartViewer)}}
      */
+    @Deprecated
+    public static ICondition xyViewerIsReadyCondition(org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer viewer) {
+        return new XYViewerIsReadyConditionLegacy(viewer);
+    }
+
+    /**
+    *
+    * Wait until the XY chart viewer is ready. The XY chart viewer is
+    * considered ready when it is not updating.
+    *
+    * @param viewer
+    *            the XY chart viewer
+    * @return ICondition for verification
+    */
     public static ICondition xyViewerIsReadyCondition(TmfXYChartViewer viewer) {
         return new XYViewerIsReadyCondition(viewer);
     }
@@ -914,6 +956,33 @@ public final class ConditionHelpers {
         }
     }
 
+    private static class NumberOfSeriesLegacy extends DefaultCondition {
+        private String fFailureMessage;
+        private org.swtchart.Chart fChart;
+        private final int fNumberOfSeries;
+
+        public NumberOfSeriesLegacy(org.swtchart.Chart chart, int numberOfSeries) {
+            fChart = chart;
+            fNumberOfSeries = numberOfSeries;
+        }
+
+        @Override
+        public boolean test() throws Exception {
+            int length = fChart.getSeriesSet().getSeries().length;
+            if (length != fNumberOfSeries){
+                fFailureMessage = "Chart did not contain the expected number series. Actual " + length + ", expected " + fNumberOfSeries;
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public String getFailureMessage() {
+            return fFailureMessage;
+        }
+    }
+
     private static class NumberOfSeries extends DefaultCondition {
         private String fFailureMessage;
         private Chart fChart;
@@ -939,6 +1008,22 @@ public final class ConditionHelpers {
         public String getFailureMessage() {
             return fFailureMessage;
         }
+    }
+
+    /**
+     * Wait until the chart has the specified number of series.
+     *
+     * @param chart
+     *            the chart
+     * @param numberOfSeries
+     *            the number of expected series
+     *
+     * @return ICondition for verification
+     * @deprecated use {@link ConditionHelpers#numberOfSeries(Chart, int)}
+     */
+    @Deprecated
+    public static ICondition numberOfSeries(org.swtchart.Chart chart, int numberOfSeries) {
+        return new NumberOfSeriesLegacy(chart, numberOfSeries);
     }
 
     /**

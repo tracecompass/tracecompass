@@ -18,12 +18,12 @@ import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterChartTreeViewer;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterChartTreeViewer2;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.latency.SystemCallLatencyAnalysis;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
-import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.views.xychart.TmfChartView;
 
 /**
  * Shows the system call latencies in time
@@ -60,7 +60,7 @@ public class SystemCallLatencyScatterView extends TmfChartView {
 
     @Override
     protected @NonNull TmfViewer createLeftChildViewer(@Nullable Composite parent) {
-        return new AbstractSegmentStoreScatterChartTreeViewer(Objects.requireNonNull(parent), SystemCallLatencyAnalysis.ID);
+        return new AbstractSegmentStoreScatterChartTreeViewer2(Objects.requireNonNull(parent), SystemCallLatencyAnalysis.ID);
     }
 
 }

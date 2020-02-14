@@ -31,7 +31,9 @@ import org.eclipse.ui.views.IViewDescriptor;
  *
  * @author Geneviève Bastien
  * @since 3.0
+ * {@link org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.SegmentStoreScatterView2}
  */
+@Deprecated
 public class SegmentStoreScatterView extends TmfChartView {
     /**
      * ID of this view

@@ -14,7 +14,7 @@ package org.eclipse.tracecompass.internal.tmf.chart.ui.swtchart;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.swtchart.ISeries;
+import org.eclipse.swtchart.ISeries;
 
 /**
  * This class is used for storing informations about a point inside a SWT

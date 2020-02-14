@@ -18,12 +18,12 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterChartTreeViewer;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.AbstractSegmentStoreScatterChartTreeViewer2;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.XmlLatencyViewInfo;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
-import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
-import org.eclipse.tracecompass.tmf.ui.views.TmfChartView;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfXYChartViewer;
+import org.eclipse.tracecompass.tmf.ui.views.xychart.TmfChartView;
 
 /**
  * The scatter graph view for pattern latency
@@ -85,7 +85,7 @@ public class PatternScatterGraphView extends TmfChartView {
     @Override
     protected @NonNull TmfViewer createLeftChildViewer(@Nullable Composite parent) {
         String analysisId = fViewInfo.getViewAnalysisId();
-        return new AbstractSegmentStoreScatterChartTreeViewer(Objects.requireNonNull(parent), String.valueOf(analysisId)) {
+        return new AbstractSegmentStoreScatterChartTreeViewer2(Objects.requireNonNull(parent), String.valueOf(analysisId)) {
 
             @Override
             protected @NonNull String getAnalysisId() {

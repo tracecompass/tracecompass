@@ -65,15 +65,15 @@ import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRangeMap;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.dialog.Messages;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.format.LabelFormat;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
-import org.swtchart.Chart;
-import org.swtchart.IAxis;
-import org.swtchart.IAxisSet;
-import org.swtchart.IAxisTick;
-import org.swtchart.ILineSeries;
-import org.swtchart.ISeries;
-import org.swtchart.ISeries.SeriesType;
-import org.swtchart.ISeriesSet;
-import org.swtchart.LineStyle;
+import org.eclipse.swtchart.Chart;
+import org.eclipse.swtchart.IAxis;
+import org.eclipse.swtchart.IAxisSet;
+import org.eclipse.swtchart.IAxisTick;
+import org.eclipse.swtchart.ILineSeries;
+import org.eclipse.swtchart.ISeries;
+import org.eclipse.swtchart.ISeries.SeriesType;
+import org.eclipse.swtchart.ISeriesSet;
+import org.eclipse.swtchart.LineStyle;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -157,16 +157,16 @@ public final class SwtScatterChart extends SwtXYChartViewer {
         super(parent, data, model);
 
         /* Add the mouse hovering listener */
-        getChart().getPlotArea().addMouseMoveListener(new MouseHoveringListener());
+        getChart().getPlotArea().getControl().addMouseMoveListener(new MouseHoveringListener());
 
         /* Add the mouse exit listener */
-        getChart().getPlotArea().addListener(SWT.MouseExit, new MouseExitListener());
+        getChart().getPlotArea().getControl().addListener(SWT.MouseExit, new MouseExitListener());
 
         /* Add the mouse click listener */
-        getChart().getPlotArea().addMouseListener(new MouseDownListener());
+        getChart().getPlotArea().getControl().addMouseListener(new MouseDownListener());
 
         /* Add the paint listener */
-        getChart().getPlotArea().addPaintListener(new ScatterPainterListener());
+        getChart().getPlotArea().getControl().addPaintListener(new ScatterPainterListener());
 
         populate();
     }

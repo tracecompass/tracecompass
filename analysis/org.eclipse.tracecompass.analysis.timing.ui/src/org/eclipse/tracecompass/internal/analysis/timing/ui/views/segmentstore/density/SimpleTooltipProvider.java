@@ -34,6 +34,7 @@ import org.swtchart.ISeries;
  * @author Bernd Hufmann
  * @author Marc-Andre Laperle
  */
+@Deprecated
 public class SimpleTooltipProvider extends BaseMouseProvider {
 
     private static final Format FORMAT = SubSecondTimeWithUnitFormat.getInstance();

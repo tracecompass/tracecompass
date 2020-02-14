@@ -34,7 +34,7 @@ import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
-import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer2;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData;
@@ -50,7 +50,7 @@ import com.google.common.collect.Iterables;
  *
  * @author Geneviève Bastien
  */
-public class CpuUsageTreeViewer extends AbstractSelectTreeViewer {
+public class CpuUsageTreeViewer extends AbstractSelectTreeViewer2 {
 
     private static final Format TIME_FORMATTER = SubSecondTimeWithUnitFormat.getInstance();
 
@@ -112,7 +112,7 @@ public class CpuUsageTreeViewer extends AbstractSelectTreeViewer {
     }
 
     /**
-     * Expose the {@link AbstractSelectTreeViewer#updateContent} method to the
+     * Expose the {@link AbstractSelectTreeViewer2#updateContent} method to the
      * {@link CpuUsageView}.
      */
     @Override

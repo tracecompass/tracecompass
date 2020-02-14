@@ -21,7 +21,9 @@ import org.swtchart.IAxis;
  * Base class for any provider such as tool tip, zoom and selection providers.
  *
  * @author Bernd Hufmann
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfBaseProvider}
  */
+@Deprecated
 public abstract class TmfBaseProvider {
 
     // ------------------------------------------------------------------------

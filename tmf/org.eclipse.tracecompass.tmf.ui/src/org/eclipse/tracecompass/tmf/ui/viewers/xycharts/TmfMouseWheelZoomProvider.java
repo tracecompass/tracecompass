@@ -27,7 +27,9 @@ import org.swtchart.Chart;
  * notifies the viewer about a change of range.
  *
  * @author Bernd Hufmann
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfMouseWheelZoomProvider}
  */
+@Deprecated
 public class TmfMouseWheelZoomProvider extends TmfBaseProvider implements MouseWheelListener {
 
     // ------------------------------------------------------------------------

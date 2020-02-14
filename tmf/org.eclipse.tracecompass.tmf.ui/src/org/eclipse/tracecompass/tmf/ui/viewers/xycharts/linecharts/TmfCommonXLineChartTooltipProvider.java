@@ -45,7 +45,9 @@ import org.swtchart.ISeries;
  * accurate.
  *
  * @author Geneviève Bastien
+ * @deprecated use {@link org.eclipse.tracecompass.tmf.ui.viewers.xychart.linechart.TmfCommonXLineChartTooltipProvider}
  */
+@Deprecated
 public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implements MouseTrackListener {
 
     private final class XYToolTipHandler extends TmfAbstractToolTipHandler {
