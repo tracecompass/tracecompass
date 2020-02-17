@@ -200,7 +200,7 @@ public class BookmarksViewTest {
         SWTBotUtils.openTrace(PROJECT_NAME, FileLocator.toFileURL(TmfTraceStub.class.getResource("/testfiles/E-Test-10K")).getPath(), TRACE_TYPE);
         WaitUtils.waitForJobs();
         bookmark.doubleClick();
-        assertEquals("Editor was open on wrong trace", editorName, fBot.activeEditor().getTitle());
+        editorBot = SWTBotUtils.activeEventsEditor(fBot, editorName);
         WaitUtils.waitUntil(TABLE_NOT_EMPTY, tableBot, "Table is still empty");
         selection = tableBot.selection();
         row = selection.get(0);
@@ -214,9 +214,7 @@ public class BookmarksViewTest {
         editorBot.close();
         WaitUtils.waitUntil(eb -> !eb.isActive(), editorBot, "Waiting for the editor to close");
         bookmark.doubleClick();
-        editorBot = fBot.activeEditor();
-        WaitUtils.waitUntil(SWTBotEditor::isActive, editorBot, "Waiting for the editor to open");
-        assertEquals("Editor was open on wrong trace", editorName, editorBot.getTitle());
+        editorBot = SWTBotUtils.activeEventsEditor(fBot, editorName);
         WaitUtils.waitUntil(eb -> eb.bot().table().selection().rowCount() > 0, editorBot, "Selection is still empty");
         tableBot = editorBot.bot().table();
         WaitUtils.waitUntil(tb -> !Objects.equal(tb.selection().get(0).get(1), "<srch>"), tableBot, "Header is still selected");
