@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2019 Ericsson
+ * Copyright (c) 2014, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v1.0 which
@@ -448,6 +448,9 @@ public final class SWTBotUtils {
 
         // Switch to and reset Testing perspective
         switchToPerspective(TestingPerspectiveFactory.ID);
+
+        // Make sure Projects Presentation is Flat
+        bot.viewByTitle("Project Explorer").viewMenu("Projects Presentation").menu("Flat").click();
     }
 
     private static void printEnvironment() {
