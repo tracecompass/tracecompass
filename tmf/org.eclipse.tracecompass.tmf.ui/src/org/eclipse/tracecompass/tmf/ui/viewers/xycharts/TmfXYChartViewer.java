@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2019 Ericsson, École Polytechnique de Montréal, Draeger
+ * Copyright (c) 2013, 2020 Ericsson, École Polytechnique de Montréal, Draeger
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -82,6 +82,8 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     // ------------------------------------------------------------------------
     private static final int DEFAULT_SCALE_HEIGHT = 22;
 
+    /** The composite to house the chart and time graph scale */
+    private Composite fCommonComposite;
     /** The color scheme for the chart */
     private @NonNull TimeGraphColorScheme fColorScheme = new TimeGraphColorScheme();
     /** The SWT Chart reference */
@@ -128,19 +130,19 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      *            The label of the yAXIS
      */
     public TmfXYChartViewer(Composite parent, String title, String xLabel, String yLabel) {
-        Composite commonComposite = new Composite(parent, parent.getStyle()) {
+        fCommonComposite = new Composite(parent, parent.getStyle()) {
             @Override
             public void redraw() {
                 fSwtChart.redraw();
                 fTimeScaleCtrl.redraw();
             }
         };
-        commonComposite.addDisposeListener(e -> {
+        fCommonComposite.addDisposeListener(e -> {
             fColorScheme.dispose();
         });
-        commonComposite.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0).margins(0, 0).create());
-        commonComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
-        fSwtChart = new Chart(commonComposite, SWT.NONE) {
+        fCommonComposite.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0).margins(0, 0).create());
+        fCommonComposite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+        fSwtChart = new Chart(fCommonComposite, SWT.NONE) {
             @Override
             public void addFocusListener(FocusListener listener) {
                 fSwtChart.getPlotArea().addFocusListener(listener);
@@ -179,10 +181,10 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
             fTimeScaleCtrl.redraw();
         });
 
-        fTimeScaleCtrl = new TimeGraphScale(commonComposite, fColorScheme, SWT.BOTTOM);
+        fTimeScaleCtrl = new TimeGraphScale(fCommonComposite, fColorScheme, SWT.BOTTOM);
         Color backgroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_BACKGROUND);
         fSwtChart.setBackground(backgroundColor);
-        commonComposite.setBackground(backgroundColor);
+        fCommonComposite.setBackground(backgroundColor);
         backgroundColor = fColorScheme.getColor(TimeGraphColorScheme.BACKGROUND);
         fSwtChart.setBackgroundInPlotArea(backgroundColor);
         fSwtChart.setForeground(fColorScheme.getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
@@ -253,6 +255,21 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      */
     public Chart getSwtChart() {
         return fSwtChart;
+    }
+
+    /**
+     * Switches visibility of the time axis on and off.
+     *
+     * @param visible
+     *            {@code true} to make the time axis visible.
+     *            {@code false} to make it invisible
+     * @since 5.2
+     */
+    public void setTimeAxisVisible(boolean visible) {
+        GridData gridData = (GridData) fTimeScaleCtrl.getLayoutData();
+        gridData.exclude = !visible;
+        fTimeScaleCtrl.setVisible(visible);
+        fCommonComposite.requestLayout();
     }
 
     /**
