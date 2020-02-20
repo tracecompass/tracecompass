@@ -1463,12 +1463,13 @@ public class ProjectExplorerTracesFolderTest {
         assertEquals(NEW_FOLDER_NAME + "/" + LTTNG_KERNEL_TRACE.getTraceName(), expTrace.getText());
 
         // verify that workaround for bug 525833 deleted all lingering directories
+        SWTBotTreeItem exp = SWTBotUtils.getTraceProjectItem(fBot, project, "Experiments", EXP_NAME);
+        SWTBotTreeItem tracesItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
         IStatus status = UIThreadRunnable.syncExec(new Result<IStatus>() {
             @Override
             public IStatus run() {
                 final String PLUGIN_ID = "org.eclipse.tracecompass.integration.swtbot.tests";
                 // Check that no lingering directories in experiment folder
-                SWTBotTreeItem exp = SWTBotUtils.getTraceProjectItem(fBot, project, "Experiments", EXP_NAME);
                 Object expObj = exp.widget.getData();
                 if (expObj instanceof TmfExperimentElement) {
                     TmfExperimentElement tmfExp = (TmfExperimentElement) expObj;
@@ -1484,7 +1485,6 @@ public class ProjectExplorerTracesFolderTest {
                     }
                 }
                 // Check that no lingering directories in traces folder
-                SWTBotTreeItem tracesItem = SWTBotUtils.selectTracesFolder(fBot, TRACE_PROJECT_NAME);
                 Object tracesFolderObj = tracesItem.widget.getData();
                 if (tracesFolderObj instanceof TmfTracesFolder) {
                     TmfTracesFolder tmfTracesFolder = (TmfTracesFolder) tracesFolderObj;
