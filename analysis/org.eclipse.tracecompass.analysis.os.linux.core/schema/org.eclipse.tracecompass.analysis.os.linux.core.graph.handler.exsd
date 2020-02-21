@@ -128,7 +128,9 @@ The handlers will be registered to the graph provider by their priority if speci
       <documentation>
          Copyright (c) 2017 École Polytechnique de montréal
 
-All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at &amp;lt;a href=&amp;quot;http://www.eclipse.org/legal/epl-v10.html&amp;quot;&amp;gt;http://www.eclipse.org/legal/epl-v10.html&amp;lt;/a&amp;gt;
+All rights reserved. This program and the accompanying materials are made available under the terms of the Eclipse Public License 2.0 which accompanies this distribution, and is available at &amp;lt;a href=&amp;quot;https://www.eclipse.org/legal/epl-2.0/&amp;quot;&amp;gt;https://www.eclipse.org/legal/epl-2.0/&amp;lt;/a&amp;gt;
+
+SPDX-License-Identifier: EPL-2.0
       </documentation>
    </annotation>
 
