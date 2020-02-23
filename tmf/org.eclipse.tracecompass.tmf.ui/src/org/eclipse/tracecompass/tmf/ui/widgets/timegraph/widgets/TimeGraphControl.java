@@ -44,7 +44,6 @@ import java.util.logging.Logger;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.IStatusLineManager;
-import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
@@ -99,6 +98,16 @@ import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.IS
 import org.eclipse.tracecompass.internal.tmf.ui.util.LineClipper;
 import org.eclipse.tracecompass.internal.tmf.ui.util.StylePropertiesUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.util.SymbolHelper;
+import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.TimeGraphRender;
+import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.TimeGraphRender.DeferredEntry;
+import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.TimeGraphRender.DeferredItem;
+import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.TimeGraphRender.DeferredLine;
+import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.TimeGraphRender.DeferredSegment;
+import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.TimeGraphRender.DeferredState;
+import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.TimeGraphRender.DeferredTinyState;
+import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.TimeGraphRender.DeferredTransparentState;
+import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.TimeGraphRender.LongPoint;
+import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.TimeGraphRender.PostDrawEvent;
 import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.model.TimeGraphLineEntry;
 import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.model.TimeLineEvent;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
@@ -162,8 +171,11 @@ public class TimeGraphControl extends TimeGraphBaseControl
      */
     public static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
 
-    private static final @NonNull String HIGHLIGHTED_BOUND_COLOR = "#ff3300"; //$NON-NLS-1$
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(TimeGraphControl.class);
+
+    private static final @NonNull String HIGHLIGHTED_BOUND_COLOR = "#ff3300"; //$NON-NLS-1$
+    private static final @NonNull RGBAColor BLACK = new RGBAColor(0, 0, 0, 255);
+    private static final int OPAQUE = 255;
     private static final int HIGHLIGHTED_BOUND_WIDTH = 4;
     private static final int DRAG_MARGIN = 5;
 
@@ -199,13 +211,9 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private static final int PPI = 72;
     private static final int DPI = 96;
 
-    private static final int OPAQUE = 255;
-
     private static final int VERTICAL_ZOOM_DELAY = 400;
 
     private static final String PREFERRED_WIDTH = "width"; //$NON-NLS-1$
-
-    private static final ColorRegistry COLOR_REGISTRY = new ColorRegistry();
 
     /**
      * The alpha color component value for dimmed events
@@ -268,7 +276,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private final Set<@NonNull ViewerFilter> fFilters = new LinkedHashSet<>();
     private MenuDetectEvent fPendingMenuDetectEvent = null;
     private boolean fGridLinesVisible = true;
-    private Color fGridLineColor = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
+    private final Color fGray = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
+    private final @NonNull RGBAColor fGrayColor = new RGBAColor((RGBAUtil.fromRGBA(fGray.getRGBA())));
+    private final @NonNull RGBAColor fTransparentGrayColor = new RGBAColor(fGrayColor.getRed(), fGrayColor.getGreen(), fGrayColor.getBlue(), fGrayColor.getAlpha() / 4);
+    private Color fGridLineColor = fGray;
     private boolean fLabelsVisible = true;
     private boolean fMidLinesVisible = true;
     private boolean fHideArrows = false;
@@ -282,16 +293,28 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private boolean fFilterActive;
     private boolean fHasSavedFilters;
 
-    private final @NonNull String fPaintScopeLabel= getClass().getCanonicalName() + "#paint"; //$NON-NLS-1$
-    private final @NonNull String fBackgroundScopeLabel= getClass().getCanonicalName() + "#drawBackground"; //$NON-NLS-1$
-    private final @NonNull String fGridLinesScopeLabel= getClass().getCanonicalName() + "#drawGridlines"; //$NON-NLS-1$
-    private final @NonNull String fBgmScopeLabel= getClass().getCanonicalName() + "#drawBgMarkers"; //$NON-NLS-1$
-    private final @NonNull String fItemsScopeLabel= getClass().getCanonicalName() + "#drawItems"; //$NON-NLS-1$
+    private List<DeferredEntry> fPostDrawEntries = new ArrayList<>();
+
+    private List<PostDrawEvent> fPostDrawArrows = new ArrayList<>();
+
+    private List<DeferredSegment> fPoints = new ArrayList<>();
+
+    private List<DeferredLine> fLines = new ArrayList<>();
+
+    private List<Rectangle> fSelectedRectangles = new ArrayList<>();
+
+    private final @NonNull String fPaintScopeLabel = getClass().getCanonicalName() + "#paint"; //$NON-NLS-1$
+    private final @NonNull String fBackgroundScopeLabel = getClass().getCanonicalName() + "#drawBackground"; //$NON-NLS-1$
+    private final @NonNull String fGridLinesScopeLabel = getClass().getCanonicalName() + "#drawGridlines"; //$NON-NLS-1$
+    private final @NonNull String fBgmScopeLabel = getClass().getCanonicalName() + "#drawBgMarkers"; //$NON-NLS-1$
+    private final @NonNull String fItemsScopeLabel = getClass().getCanonicalName() + "#drawItems"; //$NON-NLS-1$
     private final @NonNull String fLinksScopeLabel = getClass().getCanonicalName() + "#drawLinks"; //$NON-NLS-1$
     private final @NonNull String fMarkersScopeLabel = getClass().getCanonicalName() + "#drawMarkers"; //$NON-NLS-1$
     private final @NonNull String fDrawItemsCountLabel = fItemsScopeLabel + "#count"; //$NON-NLS-1$
     private final @NonNull String fDrawMarkersCountLabel = fMarkersScopeLabel + "#count"; //$NON-NLS-1$
     private final @NonNull String fDrawLinksCountLabel = fLinksScopeLabel + "#count"; //$NON-NLS-1$
+
+    private DeferredEntry fCurrentDeferredEntry;
 
     /**
      * Standard constructor
@@ -333,8 +356,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
     public void setTimeGraphProvider(ITimeGraphPresentationProvider timeGraphProvider) {
         fTimeGraphProvider = timeGraphProvider;
 
-       timeGraphProvider.setDrawingHelper(this);
-       timeGraphProvider.addColorListener(this);
+        timeGraphProvider.setDrawingHelper(this);
+        timeGraphProvider.addColorListener(this);
 
         StateItem[] stateItems = fTimeGraphProvider.getStateTable();
         colorSettingsChanged(stateItems);
@@ -1968,8 +1991,12 @@ public class TimeGraphControl extends TimeGraphBaseControl
     @Override
     void paint(Rectangle bounds, PaintEvent e) {
         try (ScopeLog sl = new ScopeLog(LOGGER, Level.FINE, fPaintScopeLabel)) {
-
             GC gc = e.gc;
+            fPostDrawEntries.clear();
+            fPostDrawArrows.clear();
+            fLines.clear();
+            fPoints.clear();
+            fSelectedRectangles.clear();
 
             if (bounds.width < 2 || bounds.height < 2 || null == fTimeProvider) {
                 return;
@@ -2002,8 +2029,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 // draw the links (arrows)
                 drawLinks(bounds, fTimeProvider, fItemData.fLinks, nameSpace, gc);
             }
-
-            fTimeGraphProvider.postDrawControl(bounds, gc);
 
             gc.setAlpha(OPAQUE * 2 / 5);
 
@@ -2074,6 +2099,13 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
 
             gc.setAlpha(OPAQUE);
+            for (PostDrawEvent postDrawEvent : fPostDrawArrows) {
+                postDrawEvent.draw(fTimeGraphProvider, gc);
+            }
+            fPostDrawEntries.clear();
+            fPostDrawArrows.clear();
+
+            fTimeGraphProvider.postDrawControl(bounds, gc);
         }
     }
 
@@ -2181,7 +2213,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
         }
         gc.setClipping((Rectangle) null);
-        TraceCompassLogUtils.traceCounter(LOGGER, Level.FINER, fDrawMarkersCountLabel , size);
+        TraceCompassLogUtils.traceCounter(LOGGER, Level.FINER, fDrawMarkersCountLabel, size);
     }
 
     /**
@@ -2227,7 +2259,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
         RGBAColor rgba = styleManager.getColorStyle(elementStyle, StyleProperties.COLOR);
         int colorInt = (rgba != null) ? rgba.toInt() : RGBAUtil.fromRGBA(marker.getColor());
-        Color color = getColor(colorInt);
+        Color color = TimeGraphRender.getColor(colorInt);
         Object symbolType = styleManager.getStyle(elementStyle, StyleProperties.SYMBOL_TYPE);
         if (symbolType != null && symbolType != SymbolType.NONE) {
             gc.setAlpha(colorInt & 0xff);
@@ -2301,7 +2333,48 @@ public class TimeGraphControl extends TimeGraphBaseControl
             Item item = items[i];
             drawItem(item, bounds, timeProvider, i, nameSpace, gc);
         }
-        TraceCompassLogUtils.traceCounter(LOGGER, Level.FINER, fDrawItemsCountLabel , bottomIndex - topIndex);
+        TraceCompassLogUtils.traceCounter(LOGGER, Level.FINER, fDrawItemsCountLabel, bottomIndex - topIndex);
+
+        if (gc == null) {
+            return;
+        }
+
+        /*
+         * Draw entries, entries contain events
+         */
+        for (DeferredEntry entry : fPostDrawEntries) {
+            entry.draw(fTimeGraphProvider, gc);
+        }
+
+        // Defer line drawing
+        for (DeferredLine line : fLines) {
+            line.draw(fTimeGraphProvider, gc);
+        }
+
+        Color prev = gc.getForeground();
+        Color black = TimeGraphRender.getColor(BLACK.toInt());
+        gc.setForeground(black);
+        int prevAA = gc.getAntialias();
+        /*
+         * BUG: Doesn't work in certain distros of Linux the end result is
+         * anti-aliased points. They may actually look better but are not as
+         * accurate.
+         */
+        gc.setAntialias(SWT.OFF);
+        int prevLineWidth = gc.getLineWidth();
+        gc.setLineWidth(1);
+        // Deferred point drawing, they are aggregated into segments
+        for (DeferredSegment seg : fPoints) {
+            seg.draw(fTimeGraphProvider, gc);
+        }
+        gc.setLineWidth(prevLineWidth);
+        gc.setAntialias(prevAA);
+        // Draw selection at very end
+        for (Rectangle rectangle : fSelectedRectangles) {
+            int arc = Math.min(rectangle.height + 1, rectangle.width) / 2;
+            gc.drawRoundRectangle(rectangle.x - 1, rectangle.y - 1, rectangle.width, rectangle.height + 1, arc, arc);
+        }
+        gc.setForeground(prev);
     }
 
     /**
@@ -2325,18 +2398,18 @@ public class TimeGraphControl extends TimeGraphBaseControl
             return;
         }
         Rectangle itemRect = getItemRect(bounds, i);
-        if (itemRect.y >= bounds.y + bounds.height) {
+        if (itemRect.y >= bounds.y + bounds.height || item.fEntry == null) {
             return;
         }
-
-        ITimeGraphEntry entry = item.fEntry;
+        ITimeGraphEntry entry = Objects.requireNonNull(item.fEntry);
         long time0 = timeProvider.getTime0();
         long time1 = timeProvider.getTime1();
         long selectedTime = fTimeProvider.getSelectionEnd();
-
         Rectangle rect = new Rectangle(nameSpace, itemRect.y, itemRect.width - nameSpace, itemRect.height);
+        DeferredEntry deferredEntry = new DeferredEntry(entry, rect);
+        fCurrentDeferredEntry = deferredEntry;
         if (rect.isEmpty() || (time1 <= time0)) {
-            fTimeGraphProvider.postDrawEntry(entry, rect, gc);
+            fPostDrawEntries.add(deferredEntry);
             return;
         }
 
@@ -2357,10 +2430,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
             setFontForHeight(height, gc);
 
             long maxDuration = (timeProvider.getTimeSpace() == 0) ? Long.MAX_VALUE : 1 * (time1 - time0) / timeProvider.getTimeSpace();
-            Iterator<ITimeEvent> iterator = entry.getTimeEventsIterator(time0, time1, maxDuration);
+            Iterator<@NonNull ITimeEvent> iterator = entry.getTimeEventsIterator(time0, time1, maxDuration);
             switch (entry.getStyle()) {
             case LINE:
-                drawLineGraphEntry(gc, time0, rect, pixelsPerNanoSec, iterator);
+                drawLineGraphEntry(time0, rect, pixelsPerNanoSec, iterator);
                 break;
             case STATE:
                 drawTimeGraphEntry(gc, time0, selectedTime, rect, selected, pixelsPerNanoSec, stateRect, iterator);
@@ -2370,38 +2443,14 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
             gc.setClipping((Rectangle) null);
         }
-        fTimeGraphProvider.postDrawEntry(entry, rect, gc);
+        fPostDrawEntries.add(deferredEntry);
     }
 
-    private static class LongPoint {
-        final int x;
-        final long y;
-
-        public LongPoint(int x, long y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(x, y);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof LongPoint) {
-                LongPoint longPoint = (LongPoint) obj;
-                return longPoint.x == x && longPoint.y == y;
-            }
-            return false;
-        }
-    }
-
-    private void drawLineGraphEntry(GC gc, long time0, Rectangle rect, double pixelsPerNanoSec, Iterator<ITimeEvent> iterator) {
+    private void drawLineGraphEntry(long time0, @NonNull Rectangle rect, double pixelsPerNanoSec, Iterator<ITimeEvent> iterator) {
         // clamp 0 - max positive
         long max = Long.MIN_VALUE;
         long min = 0;
-        List<List<LongPoint>> seriesModel = new ArrayList<>();
+        List<@NonNull List<@NonNull LongPoint>> seriesModel = new ArrayList<>();
         TimeLineEvent lastValid = null;
         while (iterator.hasNext()) {
             ITimeEvent event = iterator.next();
@@ -2441,24 +2490,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
 
         RGBAColor rgba = styleManager.getColorStyle(elementStyle, StyleProperties.COLOR);
-        int colorInt = (rgba != null) ? rgba.toInt() : OPAQUE;
-        Color color = getColor(colorInt);
-        for (int i = 0; i < seriesModel.size(); i++) {
-            Color prev = gc.getForeground();
-            int prevAlpha = gc.getAlpha();
-            gc.setAlpha(colorInt & 0xff);
-            gc.setForeground(color);
-            List<LongPoint> series = seriesModel.get(i);
-            int[] points = new int[series.size() * 2];
-            for (int point = 0; point < series.size(); point++) {
-                LongPoint longPoint = series.get(point);
-                points[point * 2] = longPoint.x;
-                points[point * 2 + 1] = rect.height - (int) ((longPoint.y - min) * scale) + rect.y;
-            }
-            gc.drawPolyline(points);
-            gc.setForeground(prev);
-            gc.setAlpha(prevAlpha);
-        }
+        fLines.add(new DeferredLine(rect, min, seriesModel, rgba == null ? BLACK : rgba, scale));
     }
 
     private void drawTimeGraphEntry(GC gc, long time0, long selectedTime, Rectangle rect, boolean selected, double pixelsPerNanoSec, Rectangle stateRect, Iterator<ITimeEvent> iterator) {
@@ -2483,7 +2515,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
                     stateRect.width = 0;
                 }
             }
-            if (drawState(getColorScheme(), event, stateRect, gc, selected, selectedTime >= event.getTime() && selectedTime < event.getTime() + event.getDuration())) {
+            boolean timeSelected = selectedTime >= event.getTime() && selectedTime < event.getTime() + event.getDuration();
+            if (drawState(getColorScheme(), event, stateRect, gc, selected, timeSelected)) {
                 lastX = stateRect.x + stateRect.width;
             }
         }
@@ -2533,7 +2566,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *            Graphics context
      */
     protected void drawLink(ILinkEvent event, Rectangle bounds, ITimeDataProvider timeProvider, int nameSpace, GC gc) {
-        drawArrow(getColorScheme(), event, getArrowRectangle(bounds, event), gc);
+        drawArrow(getColorScheme(), Objects.requireNonNull(event), getArrowRectangle(bounds, event), gc);
     }
 
     private @Nullable Rectangle getArrowRectangle(Rectangle bounds, ILinkEvent event) {
@@ -2574,7 +2607,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      *            Graphics context
      * @return true if the arrow was drawn
      */
-    protected boolean drawArrow(TimeGraphColorScheme colors, ITimeEvent event,
+    protected boolean drawArrow(TimeGraphColorScheme colors, @NonNull ITimeEvent event,
             Rectangle rect, GC gc) {
 
         if (rect == null || ((rect.height == 0) && (rect.width == 0))) {
@@ -2587,9 +2620,10 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
 
         RGBAColor rgba = styleManager.getColorStyle(elementStyle, StyleProperties.COLOR);
-        int colorInt = (rgba != null) ? rgba.toInt() : OPAQUE;
-        Color color = getColor(colorInt);
-        int alpha = colorInt & 0xff;
+        rgba = (rgba != null) ? rgba : BLACK;
+        int colorInt = rgba.toInt();
+        Color color = TimeGraphRender.getColor(colorInt);
+        int alpha = rgba.getAlpha();
         int prevAlpha = gc.getAlpha();
         gc.setAlpha(alpha);
 
@@ -2605,7 +2639,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         gc.setLineWidth(old);
         gc.setAlpha(prevAlpha);
         if (!Boolean.TRUE.equals(styleManager.getStyle(elementStyle, ITimeEventStyleStrings.annotated()))) {
-            fTimeGraphProvider.postDrawEvent(event, rect, gc);
+            fPostDrawArrows.add(new PostDrawEvent(event, rect));
         }
         return true;
     }
@@ -2759,12 +2793,13 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * @param gc
      *            Graphics context
      * @param selected
-     *            Is this time event currently selected (so it appears highlighted)
+     *            Is this time event currently selected (so it appears
+     *            highlighted)
      * @param timeSelected
      *            Is the timestamp currently selected
      * @return true if the state was drawn
      */
-    protected boolean drawState(TimeGraphColorScheme colors, ITimeEvent event,
+    protected boolean drawState(TimeGraphColorScheme colors, @NonNull ITimeEvent event,
             Rectangle rect, GC gc, boolean selected, boolean timeSelected) {
 
         StyleManager styleManager = getStyleManager();
@@ -2775,7 +2810,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
         boolean transparent = elementStyle.getParentKey() == null && elementStyle.getStyleValues().isEmpty();
         boolean visible = rect.width <= 0 ? false : true;
         rect.width = Math.max(1, rect.width);
-        Color black = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
+        Color black = TimeGraphRender.getColor(BLACK.toInt());
         gc.setForeground(black);
         Float heightFactor = styleManager.getFactorStyle(elementStyle, StyleProperties.HEIGHT);
         heightFactor = (heightFactor != null) ? Math.max(0.0f, Math.min(1.0f, heightFactor)) : DEFAULT_STATE_WIDTH;
@@ -2785,108 +2820,133 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
         Rectangle drawRect = new Rectangle(rect.x, rect.y + ((rect.height - height) / 2), rect.width, height);
 
+        List<DeferredItem> states = fCurrentDeferredEntry.getItems();
         if (transparent) {
             if (visible) {
                 // Avoid overlapping transparent states
                 int x = Math.max(fLastTransparentX, drawRect.x);
-                int width = drawRect.x + drawRect.width - x;
-                if (width > 0) {
+                drawRect.width = drawRect.x + drawRect.width - x;
+                if (drawRect.width > 0) {
                     // Draw transparent background
-                    drawRect.x = x;
-                    drawRect.width = width;
-                    gc.setAlpha(OPAQUE / 4);
-                    gc.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_GRAY));
-                    gc.fillRectangle(drawRect);
+                    RGBAColor bgColor = fTransparentGrayColor;
+                    DeferredItem deferredItem = new DeferredTransparentState(drawRect, bgColor);
+                    if (states.isEmpty() || !states.get(states.size() - 1).getBounds().intersects(drawRect)) {
+                        states.add(deferredItem);
+                        deferredItem.add(new PostDrawEvent(event, rect));
+                    }
                     fLastTransparentX = Math.max(fLastTransparentX, drawRect.x + drawRect.width);
-                    gc.setAlpha(OPAQUE);
                 } else {
+                    // clamp it to 0, just in case
                     drawRect.width = 0;
                 }
                 if (drawRect.width <= 2) {
                     // Draw point over state
-                    gc.drawPoint(rect.x, rect.y - 2);
+                    addPoint(fPoints, rect.x, rect.y - 2);
                     if (drawRect.width == 2) {
-                        gc.drawPoint(rect.x + 1, rect.y - 2);
+                        addPoint(fPoints, rect.x + 1, rect.y - 2);
                     }
-                } else {
-                    // Draw the top and bottom borders
-                    gc.drawLine(drawRect.x, drawRect.y, drawRect.x + drawRect.width - 1, drawRect.y);
-                    gc.drawLine(drawRect.x, drawRect.y + drawRect.height - 1, drawRect.x + drawRect.width - 1, drawRect.y + drawRect.height - 1);
                 }
             } else {
-                gc.drawPoint(rect.x, rect.y - 2);
+                addPoint(fPoints, rect.x, rect.y - 2);
             }
-            fTimeGraphProvider.postDrawEvent(event, drawRect, gc);
+
             return false;
         }
 
         int arc = Math.min(drawRect.height + 1, drawRect.width) / 2;
         RGBAColor rgba = styleManager.getColorStyle(elementStyle, StyleProperties.BACKGROUND_COLOR);
-        int colorInt = (rgba != null) ? rgba.toInt() : OPAQUE;
-        Color color = getColor(colorInt);
-        int alpha = colorInt & 0xff;
+        @NonNull RGBAColor bgColor = (rgba != null) ? rgba : BLACK;
         boolean reallySelected = timeSelected && selected;
         // fill all rect area
-        gc.setBackground(color);
         boolean draw = visible || fBlendSubPixelEvents;
-        int old = gc.getAlpha();
+        DeferredItem last = null;
         if (draw) {
-            gc.setAlpha(visible ? alpha : alpha / 2);
-            if (arc >= 1) {
-                gc.fillRoundRectangle(drawRect.x, drawRect.y, drawRect.width, drawRect.height, arc, arc);
-            } else {
-                gc.fillRectangle(drawRect);
+            if (!states.isEmpty()) {
+                DeferredItem state = states.get(states.size() - 1);
+                while ((state instanceof DeferredTransparentState) && (state.getBounds().x == drawRect.x)) {
+                    states.remove(states.size() - 1);
+                    state = states.isEmpty() ? null : states.get(states.size() - 1);
+                }
             }
-        }
 
-        gc.setAlpha(OPAQUE);
+            RGBAColor borderColor = BLACK;
+            int lineWidth = DeferredItem.NO_BORDER;
+            Object borderStyle = styleManager.getStyle(elementStyle, StyleProperties.BORDER_STYLE);
+            boolean hasBorders = borderStyle != null && !BorderStyle.NONE.equals(borderStyle);
+            if (hasBorders) {
+                Object borderWidth = styleManager.getStyle(elementStyle, StyleProperties.BORDER_WIDTH);
+                lineWidth = 1;
+                if (borderWidth instanceof Integer) {
+                    lineWidth = (int) borderWidth;
+                }
+                borderColor = styleManager.getColorStyle(elementStyle, StyleProperties.BORDER_COLOR);
+                if (borderColor == null) {
+                    borderColor = BLACK;
+                }
+            }
 
-        //draw border line
-        Object borderStyle = styleManager.getStyle(elementStyle, StyleProperties.BORDER_STYLE);
-        if (borderStyle != null && !BorderStyle.NONE.equals(borderStyle)) {
-            rgba = styleManager.getColorStyle(elementStyle, StyleProperties.BORDER_COLOR);
-            int borderColorInt = (rgba != null) ? rgba.toInt() : OPAQUE;
-            int borderAlpha = borderColorInt & 0xff;
-            Color oldForeground = gc.getForeground();
-            int oldLineWidth = gc.getLineWidth();
-            int oldAlpha = gc.getAlpha();
-            Color borderColor = getColor(borderColorInt);
-            gc.setForeground(borderColor);
-            gc.setAlpha(borderAlpha);
-            Object borderWidth = styleManager.getStyle(elementStyle, StyleProperties.BORDER_WIDTH);
-            gc.setLineWidth((borderWidth instanceof Integer) ? (int) borderWidth : 1);
-            gc.drawRoundRectangle(drawRect.x, drawRect.y, drawRect.width, drawRect.height , arc, arc);
-            gc.setForeground(oldForeground);
-            gc.setLineWidth(oldLineWidth);
-            gc.setAlpha(oldAlpha);
+            /*
+             * This has been tested in Linux and Windows, results may vary. The
+             * rounded rectangle is not noticeable for adjacent states of the
+             * same color until width=6 (arc=3) with antialiasing, or width=8
+             * (arc=4) without antialiasing.
+             *
+             * In other words, only draw rounded rectangles if the arc is
+             * noticeable.
+             */
+            if (arc >= 2) {
+                last = new DeferredState(drawRect, bgColor, Objects.requireNonNull(borderColor), arc, lineWidth, fLabelsVisible ? event.getLabel() : null);
+                states.add(last);
+            } else {
+                DeferredTinyState tinyCandidate = new DeferredTinyState(drawRect, bgColor, Objects.requireNonNull(borderColor), lineWidth);
+                boolean skipState = false;
+                if (!states.isEmpty()) {
+                    DeferredItem prev = states.get(states.size() - 1);
+                    if (prev instanceof DeferredTinyState) {
+                        DeferredTinyState tinyState = (DeferredTinyState) prev;
+                        if (fBlendSubPixelEvents) {
+                            skipState = tinyState.squash(tinyCandidate);
+                        } else if (tinyState.extend(tinyCandidate)) {
+                            skipState = true;
+                        }
+                    }
+                }
+                if (!skipState) {
+                    states.add(tinyCandidate);
+                }
+                last = tinyCandidate;
+            }
         }
 
         if (reallySelected) {
-            gc.drawRoundRectangle(drawRect.x - 1, drawRect.y - 1, drawRect.width, drawRect.height + 1, arc, arc);
+            fSelectedRectangles.add(drawRect);
         }
         if (!visible) {
-            gc.drawPoint(rect.x, rect.y - 2);
+            addPoint(fPoints, rect.x, rect.y - 2);
         }
-        if (visible && !Boolean.TRUE.equals(styleManager.getStyle(elementStyle, ITimeEventStyleStrings.annotated()))) {
-            String label = event.getLabel();
-            if (fLabelsVisible && label != null && !label.isEmpty() && rect.width > rect.height) {
-                gc.setForeground(Utils.getDistinctColor(color.getRGB()));
-                Utils.drawText(gc, label, drawRect.x, drawRect.y, drawRect.width, drawRect.height, true, true);
-                gc.setForeground(black);
-            }
-            fTimeGraphProvider.postDrawEvent(event, drawRect, gc);
+        if (visible && !Boolean.TRUE.equals(styleManager.getStyle(elementStyle, ITimeEventStyleStrings.annotated())) && last != null) {
+            last.add(new PostDrawEvent(event, rect));
         }
-        gc.setAlpha(old);
         return visible && !event.isPropertyActive(IFilterProperty.DIMMED);
     }
 
-    private StyleManager getStyleManager() {
-        return (fTimeGraphProvider instanceof IStylePresentationProvider) ?
-                ((IStylePresentationProvider) fTimeGraphProvider).getStyleManager() :
-                    StyleManager.empty();
+    private static void addPoint(List<DeferredSegment> points, int x, int y) {
+        if (!points.isEmpty()) {
+            DeferredSegment point = points.get(points.size() - 1);
+
+            if (point.contains(x, y)) {
+                point.extend(x);
+                return;
+            }
+        }
+        points.add(new DeferredSegment(x, y));
     }
 
-    private @Nullable OutputElementStyle getElementStyle(ITimeEvent event) {
+    private StyleManager getStyleManager() {
+        return (fTimeGraphProvider instanceof IStylePresentationProvider) ? ((IStylePresentationProvider) fTimeGraphProvider).getStyleManager() : StyleManager.empty();
+    }
+
+    private @Nullable OutputElementStyle getElementStyle(@NonNull ITimeEvent event) {
         OutputElementStyle elementStyle;
         if (fTimeGraphProvider instanceof IStylePresentationProvider) {
             IStylePresentationProvider provider = (IStylePresentationProvider) fTimeGraphProvider;
@@ -2908,7 +2968,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 return new OutputElementStyle(null, new HashMap<>());
             }
         }
-        @NonNull Map<@NonNull String, @NonNull Object> styleMap = StylePropertiesUtils.updateEventStyleProperties(fTimeGraphProvider.getEventStyle(event));
+        Map<@NonNull String, @NonNull Object> styleMap = StylePropertiesUtils.updateEventStyleProperties(fTimeGraphProvider.getEventStyle(event));
         return new OutputElementStyle(null, applyEventStyleProperties(styleMap, event));
     }
 
@@ -2925,16 +2985,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
             styleMap.put(ITimeEventStyleStrings.annotated(), Boolean.FALSE);
         }
         return styleMap;
-    }
-
-    private static Color getColor(int colorInt) {
-        String hexRGB = Integer.toHexString(colorInt);
-        Color color = COLOR_REGISTRY.get(hexRGB);
-        if (color == null) {
-            COLOR_REGISTRY.put(hexRGB, RGBAUtil.fromInt(colorInt).rgb);
-            color = COLOR_REGISTRY.get(hexRGB);
-        }
-        return color;
     }
 
     /**
