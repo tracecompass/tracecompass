@@ -11,9 +11,17 @@
 
 package org.eclipse.tracecompass.tmf.ui.colors;
 
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.dataprovider.X11ColorUtils;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * Color utility to manipulate {@link RGB} and Hex string
@@ -25,6 +33,18 @@ public final class ColorUtils {
 
     private static final String HEX_COLOR_FORMAT = "#%02x%02x%02x"; //$NON-NLS-1$
     private static final String HEX_COLOR_REGEX = "#[A-Fa-f0-9]{6}"; //$NON-NLS-1$
+
+    private static final LoadingCache<RGB, String> HEX_COLOR_CACHE = CacheBuilder.newBuilder().maximumSize(1024).build(new CacheLoader<RGB, String>(){
+
+        @Override
+        public String load(RGB rgb) throws Exception {
+            int r = rgb.red;
+            int g = rgb.green;
+            int b = rgb.blue;
+            return String.format(HEX_COLOR_FORMAT, r, g, b);
+        }
+
+    });
 
     private ColorUtils() {
         // Do nothing
@@ -55,10 +75,15 @@ public final class ColorUtils {
      * @return The hexadecimal string in format #rrggbb
      */
     public static @NonNull String toHexColor(RGB rgb) {
-        int r = rgb.red;
-        int g = rgb.green;
-        int b = rgb.blue;
-        return String.format(HEX_COLOR_FORMAT, r, g, b);
+        try {
+            return Objects.requireNonNull(HEX_COLOR_CACHE.get(rgb));
+        } catch (ExecutionException e) {
+            Activator.getDefault().logError(e.getMessage(), e);
+            int r = rgb.red;
+            int g = rgb.green;
+            int b = rgb.blue;
+            return String.format(HEX_COLOR_FORMAT, r, g, b);
+        }
     }
 
     /**
@@ -73,7 +98,7 @@ public final class ColorUtils {
      * @return The hexadecimal string in format #rrggbb
      */
     public static @NonNull String toHexColor(int red, int green, int blue) {
-        return String.format(HEX_COLOR_FORMAT, Math.abs(red % 256), Math.abs(green % 256), Math.abs(blue % 256));
+        return toHexColor(new RGB( Math.abs(red % 256), Math.abs(green % 256), Math.abs(blue % 256)));
     }
 
     /**
