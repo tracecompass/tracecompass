@@ -15,6 +15,7 @@
 package org.eclipse.tracecompass.ctf.core.event.types;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.scope.IDefinitionScope;
 
 /**
@@ -33,9 +34,11 @@ public final class EnumDefinition extends SimpleDatatypeDefinition {
     // Attributes
     // ------------------------------------------------------------------------
 
+    private static final String UNKNOWN_ENUM = "<unknown> (%s)"; //$NON-NLS-1$
+
     private final IntegerDefinition fInteger;
 
-    private final String fValue;
+    private final @Nullable String fValue;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -72,7 +75,7 @@ public final class EnumDefinition extends SimpleDatatypeDefinition {
      * @return the value of the enum.
      */
     public String getValue() {
-        return fValue;
+        return fValue != null ? fValue : String.format(UNKNOWN_ENUM, getIntegerValue());
     }
 
     @Override

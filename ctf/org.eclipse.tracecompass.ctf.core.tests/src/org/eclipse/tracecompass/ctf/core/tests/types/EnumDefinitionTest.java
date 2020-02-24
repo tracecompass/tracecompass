@@ -1,5 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2020 Ericsson, École Polytechnique de Montréal
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -30,7 +31,7 @@ import org.junit.Test;
  * The class <code>EnumDefinitionTest</code> contains tests for the class
  * <code>{@link EnumDefinition}</code>.
  *
- * @author ematkho
+ * @author Matthew Khouzam
  * @version $Revision: 1.0 $
  */
 public class EnumDefinitionTest {
@@ -94,4 +95,25 @@ public class EnumDefinitionTest {
 
         assertEquals("{ value = b, container = 12 }", result);
     }
+
+    /**
+     * Test results of an unknown enumeration value
+     */
+    @Test
+    public void testUnknownEnum() {
+        IntegerDeclaration integerDeclaration = IntegerDeclaration.createDeclaration(1, false, 1, ByteOrder.BIG_ENDIAN,
+                Encoding.ASCII, "", 8);
+        EnumDeclaration declaration = new EnumDeclaration(
+                integerDeclaration);
+        declaration.add(0, 10, "a");
+        declaration.add(11, 20, "b");
+        String fieldName = "unknownValue";
+
+        // Test with a value of 0, where 0 is not part of the enumeration
+        EnumDefinition fixture = new EnumDefinition(declaration, null, fieldName, new IntegerDefinition(integerDeclaration, null, fieldName, 22));
+
+        assertEquals("<unknown> (22)", fixture.getValue());
+        assertEquals("{ value = <unknown> (22), container = 22 }", fixture.toString());
+    }
+
 }
