@@ -65,6 +65,9 @@ public final class HTInterval implements ITmfStateInterval {
     /**
      * Standard constructor
      *
+     * Note: Unknown object type of the state value will be serialized
+     * and deserialized as String.
+     *
      * @param intervalStart
      *            Start time of the interval
      * @param intervalEnd
@@ -116,27 +119,21 @@ public final class HTInterval implements ITmfStateInterval {
             return (minSize + Long.BYTES);
         } else if (stateValue instanceof Double) {
             return (minSize + Double.BYTES);
-        } else if (stateValue instanceof String) {
-            String str = (String) stateValue;
-            int strLength = str.getBytes(CHARSET).length;
-
-            if (strLength > Short.MAX_VALUE) {
-                throw new IllegalArgumentException("String is too long to be stored in state system: " + str); //$NON-NLS-1$
-            }
-
-            /*
-             * String's length + 3 (2 bytes for size, 1 byte for \0 at the end)
-             */
-            return (minSize + strLength + 3);
         } else if (stateValue instanceof CustomStateValue) {
             /* Length of serialized value (short) + state value */
             return (minSize + Short.BYTES + ((CustomStateValue) stateValue).getSerializedSize());
         }
+        String str = String.valueOf(stateValue);
+        int strLength = str.getBytes(CHARSET).length;
+
+        if (strLength > Short.MAX_VALUE) {
+            throw new IllegalArgumentException("String is too long to be stored in state system: " + str); //$NON-NLS-1$
+        }
+
         /*
-         * It's very important that we know how to write the state value in the
-         * file!!
+         * String's length + 3 (2 bytes for size, 1 byte for \0 at the end)
          */
-        throw new IllegalStateException();
+        return (minSize + strLength + 3);
     }
 
     /**
@@ -281,9 +278,15 @@ public final class HTInterval implements ITmfStateInterval {
             } else if (value instanceof Double) {
                 buffer.put(TYPE_DOUBLE);
                 buffer.putDouble((double) value);
-            } else if (value instanceof String) {
+            } else if (value instanceof CustomStateValue) {
+                buffer.put(TYPE_CUSTOM);
+                int size = ((CustomStateValue) value).getSerializedSize();
+                buffer.putShort((short) size);
+                ISafeByteBufferWriter safeBuffer = SafeByteBufferFactory.wrapWriter(buffer, size);
+                ((CustomStateValue) value).serialize(safeBuffer);
+            } else {
+                String string = String.valueOf(value);
                 buffer.put(TYPE_STRING);
-                String string = (String) value;
                 byte[] strArray = string.getBytes(CHARSET);
 
                 /*
@@ -293,14 +296,6 @@ public final class HTInterval implements ITmfStateInterval {
                 buffer.putShort((short) strArray.length);
                 buffer.put(strArray);
                 buffer.put((byte) 0);
-            } else if (value instanceof CustomStateValue) {
-                buffer.put(TYPE_CUSTOM);
-                int size = ((CustomStateValue) value).getSerializedSize();
-                buffer.putShort((short) size);
-                ISafeByteBufferWriter safeBuffer = SafeByteBufferFactory.wrapWriter(buffer, size);
-                ((CustomStateValue) value).serialize(safeBuffer);
-            } else {
-                throw new IllegalStateException("Type: " + value.getClass() + " is not implemented in the state system"); //$NON-NLS-1$ //$NON-NLS-2$
             }
         } else {
             buffer.put(TYPE_NULL);
