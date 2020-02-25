@@ -38,6 +38,8 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -89,6 +91,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
 import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.IStylePresentationProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.util.LineClipper;
@@ -158,6 +163,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     public static final int ALL_LEVELS = AbstractTreeViewer.ALL_LEVELS;
 
     private static final @NonNull String HIGHLIGHTED_BOUND_COLOR = "#ff3300"; //$NON-NLS-1$
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(TimeGraphControl.class);
     private static final int HIGHLIGHTED_BOUND_WIDTH = 4;
     private static final int DRAG_MARGIN = 5;
 
@@ -275,6 +281,17 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     private boolean fFilterActive;
     private boolean fHasSavedFilters;
+
+    private final @NonNull String fPaintScopeLabel= getClass().getCanonicalName() + "#paint"; //$NON-NLS-1$
+    private final @NonNull String fBackgroundScopeLabel= getClass().getCanonicalName() + "#drawBackground"; //$NON-NLS-1$
+    private final @NonNull String fGridLinesScopeLabel= getClass().getCanonicalName() + "#drawGridlines"; //$NON-NLS-1$
+    private final @NonNull String fBgmScopeLabel= getClass().getCanonicalName() + "#drawBgMarkers"; //$NON-NLS-1$
+    private final @NonNull String fItemsScopeLabel= getClass().getCanonicalName() + "#drawItems"; //$NON-NLS-1$
+    private final @NonNull String fLinksScopeLabel = getClass().getCanonicalName() + "#drawLinks"; //$NON-NLS-1$
+    private final @NonNull String fMarkersScopeLabel = getClass().getCanonicalName() + "#drawMarkers"; //$NON-NLS-1$
+    private final @NonNull String fDrawItemsCountLabel = fItemsScopeLabel + "#count"; //$NON-NLS-1$
+    private final @NonNull String fDrawMarkersCountLabel = fMarkersScopeLabel + "#count"; //$NON-NLS-1$
+    private final @NonNull String fDrawLinksCountLabel = fLinksScopeLabel + "#count"; //$NON-NLS-1$
 
     /**
      * Standard constructor
@@ -1950,104 +1967,114 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     @Override
     void paint(Rectangle bounds, PaintEvent e) {
-        GC gc = e.gc;
+        try (ScopeLog sl = new ScopeLog(LOGGER, Level.FINE, fPaintScopeLabel)) {
 
-        if (bounds.width < 2 || bounds.height < 2 || null == fTimeProvider) {
-            return;
-        }
+            GC gc = e.gc;
 
-        fIdealNameSpace = 0;
-        int nameSpace = fTimeProvider.getNameSpace();
-
-        // draw the background layer
-        drawBackground(bounds, nameSpace, gc);
-
-        // draw the grid lines
-        drawGridLines(bounds, gc);
-
-        // draw the background markers
-        drawMarkers(bounds, fTimeProvider, fMarkers, false, nameSpace, gc);
-
-        // draw the items
-        drawItems(bounds, fTimeProvider, fItemData.fExpandedItems, fTopIndex, nameSpace, gc);
-
-        // draw the foreground markers
-        drawMarkers(bounds, fTimeProvider, fMarkers, true, nameSpace, gc);
-
-        // draw the links (arrows)
-        drawLinks(bounds, fTimeProvider, fItemData.fLinks, nameSpace, gc);
-
-        fTimeGraphProvider.postDrawControl(bounds, gc);
-
-        gc.setAlpha(OPAQUE * 2 / 5);
-
-        long time0 = fTimeProvider.getTime0();
-        long time1 = fTimeProvider.getTime1();
-        long selectionBegin = fTimeProvider.getSelectionBegin();
-        long selectionEnd = fTimeProvider.getSelectionEnd();
-        double pixelsPerNanoSec = (bounds.width - nameSpace <= RIGHT_MARGIN) ? 0 : (double) (bounds.width - nameSpace - RIGHT_MARGIN) / (time1 - time0);
-        int x0 = SaturatedArithmetic.add(bounds.x + nameSpace, (int) ((selectionBegin - time0) * pixelsPerNanoSec));
-        int x1 = SaturatedArithmetic.add(bounds.x + nameSpace, (int) ((selectionEnd - time0) * pixelsPerNanoSec));
-
-        // draw selection lines
-        if (fDragState != DRAG_SELECTION) {
-            gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.SELECTED_TIME));
-            if (x0 >= nameSpace && x0 < bounds.x + bounds.width) {
-                gc.drawLine(x0, bounds.y, x0, bounds.y + bounds.height);
+            if (bounds.width < 2 || bounds.height < 2 || null == fTimeProvider) {
+                return;
             }
-            if (x1 != x0) {
-                if (x1 >= nameSpace && x1 < bounds.x + bounds.width) {
-                    gc.drawLine(x1, bounds.y, x1, bounds.y + bounds.height);
+
+            fIdealNameSpace = 0;
+            int nameSpace = fTimeProvider.getNameSpace();
+            try (ScopeLog bgScope = new ScopeLog(LOGGER, Level.FINEST, fBackgroundScopeLabel)) {
+                // draw the background layer
+                drawBackground(bounds, nameSpace, gc);
+            }
+            try (ScopeLog glScope = new ScopeLog(LOGGER, Level.FINEST, fGridLinesScopeLabel)) {
+                // draw the grid lines
+                drawGridLines(bounds, gc);
+            }
+            try (ScopeLog bgmScope = new ScopeLog(LOGGER, Level.FINEST, fBgmScopeLabel)) {
+                // draw the background markers
+                drawMarkers(bounds, fTimeProvider, fMarkers, false, nameSpace, gc);
+            }
+            try (ScopeLog itemsScope = new ScopeLog(LOGGER, Level.FINEST, fItemsScopeLabel)) {
+                // draw the items
+                drawItems(bounds, fTimeProvider, fItemData.fExpandedItems, fTopIndex, nameSpace, gc);
+            }
+            try (ScopeLog markerScope = new ScopeLog(LOGGER, Level.FINEST, fMarkersScopeLabel)) {
+                // draw the foreground markers
+                drawMarkers(bounds, fTimeProvider, fMarkers, true, nameSpace, gc);
+            }
+
+            try (ScopeLog linksScope = new ScopeLog(LOGGER, Level.FINEST, fLinksScopeLabel)) {
+                // draw the links (arrows)
+                drawLinks(bounds, fTimeProvider, fItemData.fLinks, nameSpace, gc);
+            }
+
+            fTimeGraphProvider.postDrawControl(bounds, gc);
+
+            gc.setAlpha(OPAQUE * 2 / 5);
+
+            long time0 = fTimeProvider.getTime0();
+            long time1 = fTimeProvider.getTime1();
+            long selectionBegin = fTimeProvider.getSelectionBegin();
+            long selectionEnd = fTimeProvider.getSelectionEnd();
+            double pixelsPerNanoSec = (bounds.width - nameSpace <= RIGHT_MARGIN) ? 0 : (double) (bounds.width - nameSpace - RIGHT_MARGIN) / (time1 - time0);
+            int x0 = SaturatedArithmetic.add(bounds.x + nameSpace, (int) ((selectionBegin - time0) * pixelsPerNanoSec));
+            int x1 = SaturatedArithmetic.add(bounds.x + nameSpace, (int) ((selectionEnd - time0) * pixelsPerNanoSec));
+
+            // draw selection lines
+            if (fDragState != DRAG_SELECTION) {
+                gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.SELECTED_TIME));
+                if (x0 >= nameSpace && x0 < bounds.x + bounds.width) {
+                    gc.drawLine(x0, bounds.y, x0, bounds.y + bounds.height);
+                }
+                if (x1 != x0) {
+                    if (x1 >= nameSpace && x1 < bounds.x + bounds.width) {
+                        gc.drawLine(x1, bounds.y, x1, bounds.y + bounds.height);
+                    }
                 }
             }
-        }
 
-        // draw selection background
-        if (selectionBegin != 0 && selectionEnd != 0 && fDragState != DRAG_SELECTION) {
-            x0 = Math.max(nameSpace, Math.min(bounds.x + bounds.width, x0));
-            x1 = Math.max(nameSpace, Math.min(bounds.x + bounds.width, x1));
-            gc.setBackground(getColorScheme().getBkColor(false, false, true));
-            if (x1 - x0 > 1) {
-                gc.fillRectangle(new Rectangle(x0 + 1, bounds.y, x1 - x0 - 1, bounds.height));
-            } else if (x0 - x1 > 1) {
-                gc.fillRectangle(new Rectangle(x1 + 1, bounds.y, x0 - x1 - 1, bounds.height));
+            // draw selection background
+            if (selectionBegin != 0 && selectionEnd != 0 && fDragState != DRAG_SELECTION) {
+                x0 = Math.max(nameSpace, Math.min(bounds.x + bounds.width, x0));
+                x1 = Math.max(nameSpace, Math.min(bounds.x + bounds.width, x1));
+                gc.setBackground(getColorScheme().getBkColor(false, false, true));
+                if (x1 - x0 > 1) {
+                    gc.fillRectangle(new Rectangle(x0 + 1, bounds.y, x1 - x0 - 1, bounds.height));
+                } else if (x0 - x1 > 1) {
+                    gc.fillRectangle(new Rectangle(x1 + 1, bounds.y, x0 - x1 - 1, bounds.height));
+                }
             }
-        }
 
-        // draw drag selection background
-        if (fDragState == DRAG_ZOOM || fDragState == DRAG_SELECTION) {
-            gc.setBackground(getColorScheme().getBkColor(false, false, true));
-            if (fDragX0 < fDragX) {
-                gc.fillRectangle(new Rectangle(fDragX0, bounds.y, fDragX - fDragX0, bounds.height));
-            } else if (fDragX0 > fDragX) {
-                gc.fillRectangle(new Rectangle(fDragX, bounds.y, fDragX0 - fDragX, bounds.height));
+            // draw drag selection background
+            if (fDragState == DRAG_ZOOM || fDragState == DRAG_SELECTION) {
+                gc.setBackground(getColorScheme().getBkColor(false, false, true));
+                if (fDragX0 < fDragX) {
+                    gc.fillRectangle(new Rectangle(fDragX0, bounds.y, fDragX - fDragX0, bounds.height));
+                } else if (fDragX0 > fDragX) {
+                    gc.fillRectangle(new Rectangle(fDragX, bounds.y, fDragX0 - fDragX, bounds.height));
+                }
             }
-        }
 
-        // draw split line
-        if (DRAG_SPLIT_LINE == fDragState ||
-                (DRAG_NONE == fDragState && fMouseOverSplitLine && fTimeProvider.getNameSpace() > 0)) {
-            gc.setBackground(getColorScheme().getColor(TimeGraphColorScheme.DARK_GRAY));
-        } else {
-            gc.setBackground(getColorScheme().getColor(TimeGraphColorScheme.GRAY));
-        }
-        gc.fillRectangle(bounds.x + nameSpace - SNAP_WIDTH, bounds.y, SNAP_WIDTH, bounds.height);
-
-        if (DRAG_ZOOM == fDragState && Math.max(fDragX, fDragX0) > nameSpace) {
-            gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
-            gc.drawLine(fDragX0, bounds.y, fDragX0, bounds.y + bounds.height - 1);
-            if (fDragX != fDragX0) {
-                gc.drawLine(fDragX, bounds.y, fDragX, bounds.y + bounds.height - 1);
+            // draw split line
+            if (DRAG_SPLIT_LINE == fDragState ||
+                    (DRAG_NONE == fDragState && fMouseOverSplitLine && fTimeProvider.getNameSpace() > 0)) {
+                gc.setBackground(getColorScheme().getColor(TimeGraphColorScheme.DARK_GRAY));
+            } else {
+                gc.setBackground(getColorScheme().getColor(TimeGraphColorScheme.GRAY));
             }
-        } else if (DRAG_SELECTION == fDragState && Math.max(fDragX, fDragX0) > nameSpace) {
-            gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.SELECTED_TIME));
-            gc.drawLine(fDragX0, bounds.y, fDragX0, bounds.y + bounds.height - 1);
-            if (fDragX != fDragX0) {
-                gc.drawLine(fDragX, bounds.y, fDragX, bounds.y + bounds.height - 1);
-            }
-        }
+            gc.fillRectangle(bounds.x + nameSpace - SNAP_WIDTH, bounds.y, SNAP_WIDTH, bounds.height);
 
-        gc.setAlpha(OPAQUE);
+            if (DRAG_ZOOM == fDragState && Math.max(fDragX, fDragX0) > nameSpace) {
+                gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.TOOL_FOREGROUND));
+                gc.drawLine(fDragX0, bounds.y, fDragX0, bounds.y + bounds.height - 1);
+                if (fDragX != fDragX0) {
+                    gc.drawLine(fDragX, bounds.y, fDragX, bounds.y + bounds.height - 1);
+                }
+            } else if (DRAG_SELECTION == fDragState && Math.max(fDragX, fDragX0) > nameSpace) {
+                gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.SELECTED_TIME));
+                gc.drawLine(fDragX0, bounds.y, fDragX0, bounds.y + bounds.height - 1);
+                if (fDragX != fDragX0) {
+                    gc.drawLine(fDragX, bounds.y, fDragX, bounds.y + bounds.height - 1);
+                }
+            }
+
+            gc.setAlpha(OPAQUE);
+        }
     }
 
     /**
@@ -2146,13 +2173,15 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
         gc.setClipping(new Rectangle(nameSpace, 0, bounds.width - nameSpace, bounds.height));
         /* the list can grow concurrently but cannot shrink */
-        for (int i = 0; i < markers.size(); i++) {
+        int size = markers.size();
+        for (int i = 0; i < size; i++) {
             IMarkerEvent marker = markers.get(i);
             if (marker.isForeground() == foreground) {
                 drawMarker(marker, bounds, timeProvider, nameSpace, gc);
             }
         }
         gc.setClipping((Rectangle) null);
+        TraceCompassLogUtils.traceCounter(LOGGER, Level.FINER, fDrawMarkersCountLabel , size);
     }
 
     /**
@@ -2272,6 +2301,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             Item item = items[i];
             drawItem(item, bounds, timeProvider, i, nameSpace, gc);
         }
+        TraceCompassLogUtils.traceCounter(LOGGER, Level.FINER, fDrawItemsCountLabel , bottomIndex - topIndex);
     }
 
     /**
@@ -2480,10 +2510,12 @@ public class TimeGraphControl extends TimeGraphBaseControl
         }
         gc.setClipping(new Rectangle(nameSpace, 0, bounds.width - nameSpace, bounds.height));
         /* the list can grow concurrently but cannot shrink */
-        for (int i = 0; i < links.size(); i++) {
+        int size = links.size();
+        for (int i = 0; i < size; i++) {
             drawLink(links.get(i), bounds, timeProvider, nameSpace, gc);
         }
         gc.setClipping((Rectangle) null);
+        TraceCompassLogUtils.traceCounter(LOGGER, Level.FINER, fDrawLinksCountLabel, size);
     }
 
     /**
