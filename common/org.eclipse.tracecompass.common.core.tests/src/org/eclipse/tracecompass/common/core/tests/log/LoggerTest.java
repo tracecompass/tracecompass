@@ -42,7 +42,8 @@ public class LoggerTest {
     private StreamHandler fStreamHandler;
 
     private static String eventWithNoTs(String event) {
-        return event.replaceFirst("\\\"ts\\\"\\:\\\"\\d*\\.\\d+\\\"", "\"ts\":0");
+        //"ts":["1530079243191"],"ph":"E","tid":1,"p...>
+        return event.replaceFirst("\\\"ts\\\"\\:\\\"\\d*\\.?\\d*\\\"", "\"ts\":0");
     }
 
     private static String eventUnifyId(String event) {
