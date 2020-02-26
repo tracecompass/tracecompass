@@ -50,6 +50,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -110,6 +111,7 @@ public class BookmarksViewTest {
      *             if an error occurs during the file URL -> path conversion
      */
     @Test
+    @Ignore
     public void testTrace() throws IOException {
         SWTBotUtils.openTrace(PROJECT_NAME, FileLocator.toFileURL(TmfTraceStub.class.getResource("/testfiles/A-Test-10K")).getPath(), TRACE_TYPE);
 
@@ -123,6 +125,7 @@ public class BookmarksViewTest {
      *             if an error occurs during the file URL -> path conversion
      */
     @Test
+    @Ignore
     public void testExperiment() throws IOException {
         /**
          * Create Experiment with 2 LTTng CTF Kernel traces in it and open

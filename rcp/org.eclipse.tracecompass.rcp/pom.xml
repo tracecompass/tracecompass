@@ -94,6 +94,8 @@
                 <plugin id="org.eclipse.remote.jsch.ui"/>
                 <plugin id="org.eclipse.remote.ui"/>
                 <plugin id="org.eclipse.remote.console"/>
+                <plugin id="org.eclipse.swtchart"/>
+                <plugin id="org.eclipse.swtchart.extensions"/>
                 <plugin id="org.eclipse.wst.common.core"/>
                 <plugin id="org.eclipse.wst.common.environment"/>
                 <plugin id="org.eclipse.wst.common.frameworks"/>
