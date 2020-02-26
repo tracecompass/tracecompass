@@ -17,7 +17,6 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xychart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swtchart.Chart;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.xychart.TmfXyUiUtils;
 
 /**
@@ -48,17 +47,6 @@ public class TmfMouseWheelZoomProvider extends TmfBaseProvider implements MouseW
     // ------------------------------------------------------------------------
     // TmfBaseProvider
     // ------------------------------------------------------------------------
-    @Override
-    public void register() {
-        getChart().getPlotArea().getControl().addMouseWheelListener(this);
-    }
-
-    @Override
-    public void deregister() {
-        if ((getChartViewer().getControl() != null) && !getChartViewer().getControl().isDisposed()) {
-            getChart().getPlotArea().getControl().removeMouseWheelListener(this);
-        }
-    }
 
     @Override
     public void refresh() {
@@ -81,17 +69,15 @@ public class TmfMouseWheelZoomProvider extends TmfBaseProvider implements MouseW
 
     private void scroll(final int count) {
         ITmfChartTimeProvider viewer = getChartViewer();
-        Chart chart = getChart();
-        if ((viewer != null) && (chart != null) && (count != 0)) {
-            TmfXyUiUtils.horizontalScroll(viewer, chart, count > 0);
+        if ((viewer != null) && (count != 0)) {
+            TmfXyUiUtils.horizontalScroll(viewer, getXAxis(), count > 0);
         }
     }
 
     private void zoom(final int count, final int x) {
         ITmfChartTimeProvider viewer = getChartViewer();
-        Chart chart = getChart();
-        if ((viewer != null) && (chart != null) && (count != 0)) {
-            TmfXyUiUtils.zoom(viewer, chart, count > 0, x);
+        if ((viewer != null) && (count != 0)) {
+            TmfXyUiUtils.zoom(viewer, getXAxis(), count > 0, x);
         }
     }
 }

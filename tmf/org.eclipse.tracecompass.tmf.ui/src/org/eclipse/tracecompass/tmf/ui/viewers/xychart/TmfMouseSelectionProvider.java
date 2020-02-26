@@ -18,7 +18,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swtchart.IAxis;
 import org.eclipse.swtchart.ICustomPaintListener;
 
 /**
@@ -59,25 +58,6 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
     }
 
     // ------------------------------------------------------------------------
-    // TmfBaseProvider
-    // ------------------------------------------------------------------------
-    @Override
-    public void register() {
-        getChart().getPlotArea().getControl().addMouseListener(this);
-        getChart().getPlotArea().getControl().addMouseMoveListener(this);
-        getChart().getPlotArea().addCustomPaintListener(this);
-    }
-
-    @Override
-    public void deregister() {
-        if ((getChartViewer().getControl() != null) && !getChartViewer().getControl().isDisposed()) {
-            getChart().getPlotArea().getControl().removeMouseListener(this);
-            getChart().getPlotArea().getControl().removeMouseMoveListener(this);
-            getChart().getPlotArea().removeCustomPaintListener(this);
-        }
-    }
-
-    // ------------------------------------------------------------------------
     // MouseListener
     // ------------------------------------------------------------------------
     @Override
@@ -92,14 +72,13 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
                 return;
             }
             fDragBeginMarker = false;
+            IAxis xAxis = getXAxis();
             if ((e.stateMask & SWT.SHIFT) != SWT.SHIFT) {
-                IAxis xAxis = getChart().getAxisSet().getXAxis(0);
                 fBeginTime = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
                 fEndTime = fBeginTime;
             } else {
                 long selectionBegin = fBeginTime;
                 long selectionEnd = fEndTime;
-                IAxis xAxis = getChart().getAxisSet().getXAxis(0);
                 long time = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
                 if (Math.abs(time - selectionBegin) < Math.abs(time - selectionEnd)) {
                     fDragBeginMarker = true;
@@ -126,7 +105,7 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
             }
 
             fIsInternalUpdate = false;
-            getChart().redraw();
+            redraw();
         }
     }
 
@@ -135,7 +114,7 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
     // ------------------------------------------------------------------------
     @Override
     public void mouseMove(MouseEvent e) {
-        IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+        IAxis xAxis = getXAxis();
         fCursorTime = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
 
         if (fIsInternalUpdate) {
@@ -144,7 +123,7 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
             } else {
                 fEndTime = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
             }
-            getChart().redraw();
+            redraw();
         }
 
         ITmfChartTimeProvider viewer = getChartViewer();
@@ -168,7 +147,7 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
         long windowStartTime = viewer.getWindowStartTime() - viewer.getTimeOffset();
         long windowEndTime = viewer.getWindowEndTime() - viewer.getTimeOffset();
 
-        IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+        IAxis xAxis = getXAxis();
         e.gc.setBackground(TmfXYChartViewer.getDisplay().getSystemColor(SWT.COLOR_BLUE));
         e.gc.setForeground(TmfXYChartViewer.getDisplay().getSystemColor(SWT.COLOR_BLUE));
         e.gc.setLineStyle(SWT.LINE_SOLID);

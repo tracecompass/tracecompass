@@ -17,8 +17,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swtchart.IAxis;
-import org.eclipse.swtchart.Range;
 
 /**
  * Class for updating time ranges based on middle mouse button drag.
@@ -58,19 +56,6 @@ public class TmfMouseDragProvider extends TmfBaseProvider implements MouseListen
     // ------------------------------------------------------------------------
     // TmfBaseProvider
     // ------------------------------------------------------------------------
-    @Override
-    public void register() {
-        getChart().getPlotArea().getControl().addMouseListener(this);
-        getChart().getPlotArea().getControl().addMouseMoveListener(this);
-    }
-
-    @Override
-    public void deregister() {
-        if ((getChartViewer().getControl() != null) && !getChartViewer().getControl().isDisposed()) {
-            getChart().getPlotArea().getControl().removeMouseListener(this);
-            getChart().getPlotArea().getControl().removeMouseMoveListener(this);
-        }
-    }
 
     @Override
     public void refresh() {
@@ -108,7 +93,7 @@ public class TmfMouseDragProvider extends TmfBaseProvider implements MouseListen
     @Override
     public void mouseMove(MouseEvent e) {
         if (fIsUpdate) {
-            IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+            IAxis xAxis = getXAxis();
 
             ITmfChartTimeProvider viewer = getChartViewer();
 
@@ -133,8 +118,8 @@ public class TmfMouseDragProvider extends TmfBaseProvider implements MouseListen
                 fEndTime = fEndTime - delta;
             }
 
-            xAxis.setRange(new Range(fStartTime - viewer.getTimeOffset(), fEndTime - viewer.getTimeOffset()));
-            getChart().redraw();
+            xAxis.setRange(new AxisRange(fStartTime - viewer.getTimeOffset(), fEndTime - viewer.getTimeOffset()));
+            redraw();
         }
     }
 }

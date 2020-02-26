@@ -16,11 +16,7 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xychart;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swtchart.Chart;
-import org.eclipse.swtchart.IAxis;
-import org.eclipse.swtchart.IAxisSet;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfAbstractToolTipHandler;
@@ -37,10 +33,8 @@ public class TmfSimpleTooltipProvider extends TmfBaseProvider implements MouseTr
     private final class XYToolTipHandler extends TmfAbstractToolTipHandler {
         @Override
         public void fill(Control control, MouseEvent event, Point pt) {
-            Chart chart = getChart();
-            IAxisSet axisSet = chart.getAxisSet();
-            IAxis xAxis = axisSet.getXAxis(0);
-            IAxis yAxis = axisSet.getYAxis(0);
+            IAxis xAxis = getXAxis();
+            IAxis yAxis = getYAxis();
 
             double xCoordinate = xAxis.getDataCoordinate(pt.x);
             double yCoordinate = yAxis.getDataCoordinate(pt.y);
@@ -73,16 +67,10 @@ public class TmfSimpleTooltipProvider extends TmfBaseProvider implements MouseTr
     // ------------------------------------------------------------------------
     // TmfBaseProvider
     // ------------------------------------------------------------------------
-    @Override
-    public void register() {
-        fTooltipHandler.activateHoverHelp((Composite) getChart().getPlotArea());
-    }
 
     @Override
-    public void deregister() {
-        if ((getChartViewer().getControl() != null) && !getChartViewer().getControl().isDisposed()) {
-            fTooltipHandler.deactivateHoverHelp(getChart().getPlotArea().getControl());
-        }
+    public TmfAbstractToolTipHandler getTooltipHandler() {
+        return fTooltipHandler;
     }
 
     @Override

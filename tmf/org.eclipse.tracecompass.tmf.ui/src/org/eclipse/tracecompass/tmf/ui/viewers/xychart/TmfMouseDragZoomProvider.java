@@ -18,7 +18,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swtchart.IAxis;
 import org.eclipse.swtchart.ICustomPaintListener;
 
 /**
@@ -58,22 +57,6 @@ public class TmfMouseDragZoomProvider extends TmfBaseProvider implements MouseLi
     // TmfBaseProvider
     // ------------------------------------------------------------------------
     @Override
-    public void register() {
-        getChart().getPlotArea().getControl().addMouseListener(this);
-        getChart().getPlotArea().getControl().addMouseMoveListener(this);
-        getChart().getPlotArea().addCustomPaintListener(this);
-    }
-
-    @Override
-    public void deregister() {
-        if ((getChartViewer().getControl() != null) && !getChartViewer().getControl().isDisposed()) {
-            getChart().getPlotArea().getControl().removeMouseListener(this);
-            getChart().getPlotArea().getControl().removeMouseMoveListener(this);
-            getChart().getPlotArea().removeCustomPaintListener(this);
-        }
-    }
-
-    @Override
     public void refresh() {
         // nothing to do
     }
@@ -89,7 +72,7 @@ public class TmfMouseDragZoomProvider extends TmfBaseProvider implements MouseLi
     @Override
     public void mouseDown(MouseEvent e) {
         if ((getChartViewer().getWindowDuration() != 0) && (e.button == 3)) {
-            IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+            IAxis xAxis = getXAxis();
             fStartTime = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
             fEndTime = fStartTime;
             fIsUpdate = true;
@@ -109,7 +92,7 @@ public class TmfMouseDragZoomProvider extends TmfBaseProvider implements MouseLi
         }
 
         if (fIsUpdate) {
-            getChart().redraw();
+            getChartViewer().getControl().redraw();
         }
         fIsUpdate = false;
     }
@@ -120,7 +103,7 @@ public class TmfMouseDragZoomProvider extends TmfBaseProvider implements MouseLi
     @Override
     public void mouseMove(MouseEvent e) {
         if (fIsUpdate) {
-            IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+            IAxis xAxis = getXAxis();
             fEndTime = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
 
             ITmfChartTimeProvider viewer = getChartViewer();
@@ -129,7 +112,7 @@ public class TmfMouseDragZoomProvider extends TmfBaseProvider implements MouseLi
                 xyChartViewer.updateStatusLine(fStartTime, fEndTime, limitXDataCoordinate(xAxis.getDataCoordinate(e.x)));
             }
 
-            getChart().redraw();
+            getChartViewer().getControl().redraw();
         }
     }
 
@@ -139,7 +122,7 @@ public class TmfMouseDragZoomProvider extends TmfBaseProvider implements MouseLi
     @Override
     public void paintControl(PaintEvent e) {
         if (fIsUpdate && (fStartTime != fEndTime)) {
-            IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+            IAxis xAxis = getXAxis();
             int startX = xAxis.getPixelCoordinate(fStartTime);
             int endX = xAxis.getPixelCoordinate(fEndTime);
 

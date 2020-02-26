@@ -45,6 +45,7 @@ import org.eclipse.swtchart.LineStyle;
 import org.eclipse.swtchart.Range;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.xychart.TmfXYChartTimeAdapter;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.xychart.TmfXyUiUtils;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.xychart.XYAxis;
 import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfTimeNavigationProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfTimeZoomProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfZoomToSelectionProvider;
@@ -737,6 +738,7 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
             if (chart == null) {
                 return;
             }
+            XYAxis xAxis = XYAxis.create(chart.getAxisSet().getXAxis(0));
             Point cursorDisplayLocation = getDisplay().getCursorLocation();
             Point cursorControlLocation = ((Composite) fSwtChart.getPlotArea()).toControl(cursorDisplayLocation);
             Point cursorParentLocation = ((Composite) fSwtChart.getPlotArea()).getParent().toControl(cursorDisplayLocation);
@@ -746,9 +748,9 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
                 return;
             }
             if (useMousePosition) {
-                TmfXyUiUtils.zoom(this, chart, zoomIn, cursorControlLocation.x);
+                TmfXyUiUtils.zoom(this, xAxis, zoomIn, cursorControlLocation.x);
             } else {
-                TmfXyUiUtils.zoom(this, chart, zoomIn);
+                TmfXyUiUtils.zoom(this, xAxis, zoomIn);
             }
         };
     }
@@ -757,7 +759,7 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
         return left -> {
             Chart chart = getSwtChart();
             if (chart != null) {
-                TmfXyUiUtils.horizontalScroll(this, chart, left);
+                TmfXyUiUtils.horizontalScroll(this, XYAxis.create(chart.getAxisSet().getXAxis(0)), left);
             }
         };
     }

@@ -17,10 +17,10 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swtchart.IAxis;
 import org.eclipse.swtchart.ICustomPaintListener;
-import org.eclipse.swtchart.Range;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density2.AbstractSegmentStoreDensityViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.AxisRange;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.IAxis;
 
 /**
  * Class for providing zooming based on mouse drag with right mouse button.
@@ -50,22 +50,6 @@ public class MouseDragZoomProvider extends BaseMouseProvider implements MouseLis
     }
 
     @Override
-    public final void register() {
-        getChart().getPlotArea().getControl().addMouseListener(this);
-        getChart().getPlotArea().getControl().addMouseMoveListener(this);
-       getChart().getPlotArea().addCustomPaintListener(this);
-    }
-
-    @Override
-    public final void deregister() {
-        if (!getChart().isDisposed()) {
-            getChart().getPlotArea().getControl().removeMouseListener(this);
-            getChart().getPlotArea().getControl().removeMouseMoveListener(this);
-            getChart().getPlotArea().removeCustomPaintListener(this);
-        }
-    }
-
-    @Override
     public void mouseDoubleClick(@Nullable MouseEvent e) {
         // Do nothing
     }
@@ -73,7 +57,7 @@ public class MouseDragZoomProvider extends BaseMouseProvider implements MouseLis
     @Override
     public void mouseDown(@Nullable MouseEvent e) {
         if (e != null && e.button == 3) {
-            IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+            IAxis xAxis = getXAxis();
             fStartCoordinate = xAxis.getDataCoordinate(e.x);
             fEndCoordinate = fStartCoordinate;
             fIsUpdate = true;
@@ -88,7 +72,8 @@ public class MouseDragZoomProvider extends BaseMouseProvider implements MouseLis
                 fStartCoordinate = fEndCoordinate;
                 fEndCoordinate = tmp;
             }
-            getDensityViewer().zoom(new Range(fStartCoordinate, fEndCoordinate));
+            AxisRange range = new AxisRange(fStartCoordinate, fEndCoordinate);
+            getDensityViewer().zoom(range);
         }
 
         if (fIsUpdate) {
@@ -100,7 +85,7 @@ public class MouseDragZoomProvider extends BaseMouseProvider implements MouseLis
     @Override
     public void mouseMove(@Nullable MouseEvent e) {
         if (e != null && fIsUpdate) {
-            IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+            IAxis xAxis = getXAxis();
             fEndCoordinate = xAxis.getDataCoordinate(e.x);
             getChart().redraw();
         }
@@ -109,11 +94,11 @@ public class MouseDragZoomProvider extends BaseMouseProvider implements MouseLis
     @Override
     public void paintControl(@Nullable PaintEvent e) {
         if (e != null && fIsUpdate && (fStartCoordinate != fEndCoordinate)) {
-            IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+            IAxis xAxis = getXAxis();
             int startX = xAxis.getPixelCoordinate(fStartCoordinate);
             int endX = xAxis.getPixelCoordinate(fEndCoordinate);
 
-            e.gc.setBackground(getChart().getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
+            e.gc.setBackground(e.gc.getDevice().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
             if (fStartCoordinate < fEndCoordinate) {
                 e.gc.fillRectangle(startX, 0, endX - startX, e.height);
             } else {

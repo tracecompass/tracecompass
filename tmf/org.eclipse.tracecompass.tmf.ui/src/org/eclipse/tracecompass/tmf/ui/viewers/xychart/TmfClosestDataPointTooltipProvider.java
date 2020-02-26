@@ -14,6 +14,7 @@
 package org.eclipse.tracecompass.tmf.ui.viewers.xychart;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -27,9 +28,6 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swtchart.Chart;
-import org.eclipse.swtchart.IAxis;
-import org.eclipse.swtchart.ISeries;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfAbstractToolTipHandler;
@@ -50,18 +48,17 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
         @Override
         public void fill(Control control, MouseEvent e, Point pt) {
             if ((getChartViewer().getWindowDuration() != 0) && (e != null)) {
-                Chart chart = getChart();
-                IAxis xAxis = chart.getAxisSet().getXAxis(0);
-                IAxis yAxis = chart.getAxisSet().getYAxis(0);
+                IAxis xAxis = getXAxis();
+                IAxis yAxis = getYAxis();
 
-                ISeries[] series = chart.getSeriesSet().getSeries();
+                List<IXYSeries> series = getSeries();
 
                 double smallestDistance = Double.MAX_VALUE;
                 Parameter param = null;
 
                 // go over all series
-                for (int k = 0; k < series.length; k++) {
-                    ISeries serie = series[k];
+                for (int k = 0; k < series.size(); k++) {
+                    IXYSeries serie = series.get(k);
                     double[] xS = serie.getXSeries();
                     double[] yS = serie.getYSeries();
 
@@ -98,7 +95,7 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
                         return;
                     }
                     fIsHighlight = true;
-                    chart.redraw();
+                    redraw();
                 }
                 if (tooltip == null) {
                     return;
@@ -162,27 +159,13 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
     // TmfBaseProvider
     // ------------------------------------------------------------------------
     @Override
-    public void register() {
-        Chart chart = getChart();
-        chart.getPlotArea().getControl().addMouseMoveListener(this);
-        chart.getPlotArea().getControl().addPaintListener(this);
-        fTooltipHandler.activateHoverHelp(chart.getPlotArea().getControl());
-    }
-
-    @Override
-    public void deregister() {
-
-        Chart chart = getChart();
-        if ((chart != null) && !chart.isDisposed()) {
-            chart.getPlotArea().getControl().removeMouseMoveListener(this);
-            chart.getPlotArea().getControl().removePaintListener(this);
-            fTooltipHandler.deactivateHoverHelp(chart.getPlotArea().getControl());
-        }
-    }
-
-    @Override
     public void refresh() {
         // nothing to do
+    }
+
+    @Override
+    public TmfAbstractToolTipHandler getTooltipHandler() {
+        return fTooltipHandler;
     }
 
     // ------------------------------------------------------------------------
@@ -192,7 +175,7 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
     public void mouseMove(@Nullable MouseEvent e) {
         if (fIsHighlight) {
             fIsHighlight = false;
-            getChart().redraw();
+            redraw();
         }
     }
 
@@ -222,11 +205,11 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
      * @since 5.0
      */
     protected @Nullable Map<@NonNull String, @NonNull Map<@NonNull String, @NonNull Object>> createToolTipMap(@NonNull Parameter param) {
-        ISeries[] series = getChart().getSeriesSet().getSeries();
+        List<IXYSeries> series = getSeries();
         int seriesIndex = param.getSeriesIndex();
         int dataIndex = param.getDataIndex();
-        if ((series != null) && (seriesIndex < series.length)) {
-            ISeries serie = series[seriesIndex];
+        if ((series != null) && (seriesIndex < series.size())) {
+            IXYSeries serie = series.get(seriesIndex);
             double[] xS = serie.getXSeries();
             double[] yS = serie.getYSeries();
             if ((xS != null) && (yS != null) && (dataIndex < xS.length) && (dataIndex < yS.length)) {

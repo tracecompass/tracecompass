@@ -17,17 +17,18 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.viewers.xychart.ITmfChartTimeProvider;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.IXYSeries;
 import org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfClosestDataPointTooltipProvider;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.Resolution;
 import org.eclipse.tracecompass.tmf.ui.views.FormatTimeUtils.TimeFormat;
-import org.eclipse.swtchart.ISeries;
 
 /**
  * Tooltip provider for durations scatter charts. It displays the y value of
@@ -55,12 +56,12 @@ public class SegmentStoreScatterGraphTooltipProvider extends TmfClosestDataPoint
     // ------------------------------------------------------------------------
     @Override
     protected @Nullable Map<String, Map<String, Object>> createToolTipMap(Parameter param) {
-        ISeries[] series = getChart().getSeriesSet().getSeries();
+        List<IXYSeries> series = getSeries();
         int seriesIndex = param.getSeriesIndex();
         int dataIndex = param.getDataIndex();
-        if ((series != null) && (seriesIndex < series.length)) {
+        if ((series != null) && (seriesIndex < series.size())) {
             Map<String, Object> segMap = new HashMap<>();
-            ISeries serie = series[seriesIndex];
+            IXYSeries serie = series.get(seriesIndex);
             double[] xS = serie.getXSeries();
             double[] yS = serie.getYSeries();
             if ((xS != null) && (yS != null) && (dataIndex < xS.length) && (dataIndex < yS.length)) {

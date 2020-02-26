@@ -43,6 +43,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.xychart.TmfXyUiUtils;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.xychart.XYAxis;
 import org.eclipse.tracecompass.internal.tmf.ui.views.xychart.LockRangeDialog;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -534,7 +535,7 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
                     if (chart == null) {
                         return;
                     }
-                    TmfXyUiUtils.zoom(viewer, chart, true);
+                    TmfXyUiUtils.zoom(viewer, XYAxis.create(chart.getAxisSet().getXAxis(0)), true);
                 }
             };
             zoomInAction.setText(Messages.TmfTimeGraphViewer_ZoomInActionNameText);
@@ -558,7 +559,7 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
                     if (chart == null) {
                         return;
                     }
-                    TmfXyUiUtils.zoom(viewer, chart, false);
+                    TmfXyUiUtils.zoom(viewer, XYAxis.create(chart.getAxisSet().getXAxis(0)), false);
                 }
             };
             zoomOutAction.setText(Messages.TmfTimeGraphViewer_ZoomOutActionNameText);

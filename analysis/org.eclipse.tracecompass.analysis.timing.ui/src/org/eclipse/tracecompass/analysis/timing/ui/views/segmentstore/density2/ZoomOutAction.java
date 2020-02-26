@@ -16,7 +16,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.AnalysisTimingImageConstants;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
-import org.eclipse.swtchart.Range;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.AxisRange;
 
 /**
  * Zoom action for the density view
@@ -39,7 +39,7 @@ class ZoomOutAction extends Action {
     public void run() {
         final AbstractSegmentStoreDensityViewer chart = fView.getDensityViewer();
         if (chart != null) {
-            chart.zoom(new Range(AbstractSegmentStoreDensityView.DEFAULT_RANGE.getFirst(), AbstractSegmentStoreDensityView.DEFAULT_RANGE.getSecond()));
+            chart.zoom(new AxisRange(AbstractSegmentStoreDensityView.DEFAULT_RANGE.getFirst(), AbstractSegmentStoreDensityView.DEFAULT_RANGE.getSecond()));
         }
     }
 

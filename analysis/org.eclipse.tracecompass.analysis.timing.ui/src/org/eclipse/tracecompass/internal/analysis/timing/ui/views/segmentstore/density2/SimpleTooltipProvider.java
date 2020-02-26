@@ -97,7 +97,17 @@ public class SimpleTooltipProvider extends BaseMouseProvider {
         }
     }
 
-    private DensityToolTipHandler fToolTipHandler = new DensityToolTipHandler();
+    private DensityToolTipHandler fToolTipHandler = null;
+
+    @Override
+    public TmfAbstractToolTipHandler getTooltipHandler() {
+        DensityToolTipHandler toolTipHandler = fToolTipHandler;
+        if(toolTipHandler == null) {
+            toolTipHandler = new DensityToolTipHandler();
+            fToolTipHandler = toolTipHandler;
+        }
+        return toolTipHandler;
+    }
 
     /**
      * Constructor for a tool tip provider.
@@ -107,18 +117,5 @@ public class SimpleTooltipProvider extends BaseMouseProvider {
      */
     public SimpleTooltipProvider(AbstractSegmentStoreDensityViewer densityViewer) {
         super(densityViewer);
-        register();
-    }
-
-    @Override
-    public void register() {
-        fToolTipHandler.activateHoverHelp(getChart().getPlotArea().getControl());
-    }
-
-    @Override
-    public void deregister() {
-        if (!getDensityViewer().getControl().isDisposed()) {
-            fToolTipHandler.deactivateHoverHelp(getChart().getPlotArea().getControl());
-        }
     }
 }

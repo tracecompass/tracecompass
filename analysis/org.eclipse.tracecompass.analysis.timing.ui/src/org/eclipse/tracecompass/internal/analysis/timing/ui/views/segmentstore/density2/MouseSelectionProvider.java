@@ -20,9 +20,9 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtchart.IAxis;
 import org.eclipse.swtchart.ICustomPaintListener;
-import org.eclipse.swtchart.Range;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density2.AbstractSegmentStoreDensityView;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density2.AbstractSegmentStoreDensityViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.AxisRange;
 
 /**
  * Class for providing selection with the left mouse button. It also notifies
@@ -51,22 +51,6 @@ public class MouseSelectionProvider extends BaseMouseProvider implements MouseLi
     public MouseSelectionProvider(AbstractSegmentStoreDensityViewer densityViewer) {
         super(densityViewer);
         register();
-    }
-
-    @Override
-    public final void register() {
-        getChart().getPlotArea().getControl().addMouseListener(this);
-        getChart().getPlotArea().getControl().addMouseMoveListener(this);
-        getChart().getPlotArea().addCustomPaintListener(this);
-    }
-
-    @Override
-    public final void deregister() {
-        if (!getChart().isDisposed()) {
-            getChart().getPlotArea().getControl().removeMouseListener(this);
-            getChart().getPlotArea().getControl().removeMouseMoveListener(this);
-            getChart().getPlotArea().removeCustomPaintListener(this);
-        }
     }
 
     @Override
@@ -109,9 +93,9 @@ public class MouseSelectionProvider extends BaseMouseProvider implements MouseLi
                 fEndCoordinate = tmp;
             }
             if (!isEmptySelection()) {
-                getDensityViewer().select(new Range(AbstractSegmentStoreDensityView.DEFAULT_RANGE.getFirst(), AbstractSegmentStoreDensityView.DEFAULT_RANGE.getSecond()));
+                getDensityViewer().select(new AxisRange(AbstractSegmentStoreDensityView.DEFAULT_RANGE.getFirst(), AbstractSegmentStoreDensityView.DEFAULT_RANGE.getSecond()));
             } else {
-                getDensityViewer().select(new Range(fStartCoordinate, fEndCoordinate));
+                getDensityViewer().select(new AxisRange(fStartCoordinate, fEndCoordinate));
             }
             fIsUpdate = false;
             getChart().redraw();

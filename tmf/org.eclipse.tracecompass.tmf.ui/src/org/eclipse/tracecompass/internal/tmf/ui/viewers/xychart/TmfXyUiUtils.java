@@ -12,10 +12,9 @@
 package org.eclipse.tracecompass.internal.tmf.ui.viewers.xychart;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.AxisRange;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.IAxis;
 import org.eclipse.tracecompass.tmf.ui.viewers.xychart.ITmfChartTimeProvider;
-import org.eclipse.swtchart.Chart;
-import org.eclipse.swtchart.IAxis;
-import org.eclipse.swtchart.Range;
 
 /**
  * Utility class providing XY charts utility methods, for example for zooming
@@ -45,14 +44,13 @@ public class TmfXyUiUtils {
      *
      * @param viewer
      *            the chart time provider to use for scrolling
-     * @param chart
-     *            the SwtChart reference to use the scrolling
+     * @param xAxis
+     *            the x axis reference to use the scrolling
      * @param left
      *            true to scroll left else scroll right
      *
      */
-    public static void horizontalScroll(ITmfChartTimeProvider viewer, Chart chart, boolean left) {
-        IAxis xAxis = chart.getAxisSet().getXAxis(0);
+    public static void horizontalScroll(ITmfChartTimeProvider viewer, IAxis xAxis, boolean left) {
         if (xAxis == null) {
             return;
         }
@@ -75,7 +73,7 @@ public class TmfXyUiUtils {
             windowStartTime = windowsEndTime - range;
         }
         viewer.updateWindow(windowStartTime, windowsEndTime);
-        xAxis.setRange(new Range(windowStartTime - viewer.getTimeOffset(), windowsEndTime - viewer.getTimeOffset()));
+        xAxis.setRange(new AxisRange(windowStartTime - viewer.getTimeOffset(), windowsEndTime - viewer.getTimeOffset()));
     }
 
     /**
@@ -83,15 +81,14 @@ public class TmfXyUiUtils {
      *
      * @param viewer
      *            the chart time provider to use for zooming
-     * @param chart
-     *            the SwtChart reference to use the zooming
+     * @param xAxis
+     *            the axis reference to use the zooming
      * @param zoomIn
      *            true to zoomIn else zoomOut
      * @param x
      *            x location to center the zoom
      */
-    public static void zoom(ITmfChartTimeProvider viewer, Chart chart, boolean zoomIn, final int x) {
-        IAxis xAxis = chart.getAxisSet().getXAxis(0);
+    public static void zoom(ITmfChartTimeProvider viewer, IAxis xAxis, boolean zoomIn, final int x) {
         if (xAxis == null) {
             return;
         }
@@ -118,7 +115,7 @@ public class TmfXyUiUtils {
         long newWindowEndTime = validateWindowEndTime(viewer, newWindowStartTime, newWindowStartTime + newDuration);
         newWindowStartTime = validateWindowStartTime(viewer, newWindowStartTime);
         viewer.updateWindow(newWindowStartTime, newWindowEndTime);
-        xAxis.setRange(new Range(newWindowStartTime - viewer.getTimeOffset(),
+        xAxis.setRange(new AxisRange(newWindowStartTime - viewer.getTimeOffset(),
                 newWindowEndTime - viewer.getTimeOffset()));
     }
 
@@ -130,16 +127,16 @@ public class TmfXyUiUtils {
      *
      * @param viewer
      *            the chart time provider to use for zooming
-     * @param chart
-     *            the SwtChart reference to use the zooming
+     * @param axis
+     *            the axis reference to use the zooming
      * @param zoomIn
      *            true to zoom-in else to zoom-out
      */
-    public static void zoom(ITmfChartTimeProvider viewer, Chart chart, boolean zoomIn) {
+    public static void zoom(ITmfChartTimeProvider viewer, IAxis axis, boolean zoomIn) {
         if (zoomIn) {
-            zoomIn(viewer, chart);
+            zoomIn(viewer, axis);
         } else {
-            zoomOut(viewer, chart);
+            zoomOut(viewer, axis);
         }
     }
 
@@ -173,8 +170,8 @@ public class TmfXyUiUtils {
     // ------------------------------------------------------------------------
     // Helper methods
     // ------------------------------------------------------------------------
-    private static void zoomIn(ITmfChartTimeProvider viewer, Chart chart) {
-        IAxis xAxis = chart.getAxisSet().getXAxis(0);
+    private static void zoomIn(ITmfChartTimeProvider viewer, IAxis chart) {
+        IAxis xAxis = chart;
         if (xAxis == null) {
             return;
         }
@@ -199,12 +196,11 @@ public class TmfXyUiUtils {
         time0 = validateWindowStartTime(viewer, time0);
         time1 = validateWindowEndTime(viewer, time0, time1);
         viewer.updateWindow(time0, time1);
-        xAxis.setRange(new Range(time0 - viewer.getTimeOffset(),
+        xAxis.setRange(new AxisRange(time0 - viewer.getTimeOffset(),
                 time1 - viewer.getTimeOffset()));
     }
 
-    private static void zoomOut(ITmfChartTimeProvider viewer, Chart chart) {
-        IAxis xAxis = chart.getAxisSet().getXAxis(0);
+    private static void zoomOut(ITmfChartTimeProvider viewer, IAxis xAxis) {
         if (xAxis == null) {
             return;
         }
@@ -228,7 +224,7 @@ public class TmfXyUiUtils {
         time0 = validateWindowStartTime(viewer, Math.max(MIN_WINDOW_SIZE, Math.min(time0, viewer.getEndTime() - newInterval)));
         long time1 = validateWindowEndTime(viewer, time0, time0 + newInterval);
         viewer.updateWindow(time0, time1);
-        xAxis.setRange(new Range(time0 - viewer.getTimeOffset(),
+        xAxis.setRange(new AxisRange(time0 - viewer.getTimeOffset(),
                 time1 - viewer.getTimeOffset()));
     }
 

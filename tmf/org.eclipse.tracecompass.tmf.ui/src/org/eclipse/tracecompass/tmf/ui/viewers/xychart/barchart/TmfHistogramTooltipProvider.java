@@ -13,6 +13,8 @@
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.ui.viewers.xychart.barchart;
 
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -21,10 +23,10 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.IAxis;
 import org.eclipse.tracecompass.tmf.ui.viewers.xychart.ITmfChartTimeProvider;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.IXYSeries;
 import org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfBaseProvider;
-import org.eclipse.swtchart.IAxis;
-import org.eclipse.swtchart.ISeries;
 
 /**
  * Tool tip provider for TMF bar chart viewer. It displays the y value of
@@ -57,28 +59,11 @@ public class TmfHistogramTooltipProvider extends TmfBaseProvider implements Mous
      */
     public TmfHistogramTooltipProvider(ITmfChartTimeProvider tmfChartViewer) {
         super(tmfChartViewer);
-        register();
     }
 
     // ------------------------------------------------------------------------
     // TmfBaseProvider
     // ------------------------------------------------------------------------
-    @Override
-    public void register() {
-        getChart().getPlotArea().getControl().addMouseTrackListener(this);
-        getChart().getPlotArea().getControl().addMouseMoveListener(this);
-        getChart().getPlotArea().getControl().addPaintListener(this);
-    }
-
-    @Override
-    public void deregister() {
-        if ((getChartViewer().getControl() != null) && !getChartViewer().getControl().isDisposed()) {
-            getChart().getPlotArea().getControl().removeMouseTrackListener(this);
-            getChart().getPlotArea().getControl().removeMouseMoveListener(this);
-            getChart().getPlotArea().getControl().removePaintListener(this);
-        }
-    }
-
     @Override
     public void refresh() {
         // nothing to do
@@ -100,14 +85,14 @@ public class TmfHistogramTooltipProvider extends TmfBaseProvider implements Mous
     @Override
     public void mouseHover(MouseEvent e) {
         if (getChartViewer().getWindowDuration() != 0) {
-            IAxis xAxis = getChart().getAxisSet().getXAxis(0);
-            IAxis yAxis = getChart().getAxisSet().getYAxis(0);
+            IAxis xAxis = getXAxis();
+            IAxis yAxis = getYAxis();
 
             double xCoordinate = xAxis.getDataCoordinate(e.x);
 
-            ISeries[] series = getChart().getSeriesSet().getSeries();
+            List<IXYSeries> series = getSeries();
 
-            if ((xCoordinate < 0) || (series.length == 0)) {
+            if ((xCoordinate < 0) || series.isEmpty()) {
                 return;
             }
 
@@ -116,8 +101,9 @@ public class TmfHistogramTooltipProvider extends TmfBaseProvider implements Mous
             double rangeEnd = 0.0;
 
             // Consider first series only
-            double[] xS = series[0].getXSeries();
-            double[] yS = series[0].getYSeries();
+            IXYSeries firstSeries = series.get(0);
+            double[] xS = firstSeries.getXSeries();
+            double[] yS = firstSeries.getYSeries();
 
             if ((xS == null) || (yS == null)) {
                 return;
@@ -139,20 +125,20 @@ public class TmfHistogramTooltipProvider extends TmfBaseProvider implements Mous
             ITmfChartTimeProvider viewer = getChartViewer();
 
             /* set tooltip of closest data point */
-            StringBuffer buffer = new StringBuffer();
-            buffer.append("Range=["); //$NON-NLS-1$
-            buffer.append(TmfTimestamp.fromNanos((long) rangeStart + viewer.getTimeOffset()).toString());
-            buffer.append(',');
-            buffer.append(TmfTimestamp.fromNanos((long) rangeEnd + viewer.getTimeOffset()).toString());
-            buffer.append("]\n"); //$NON-NLS-1$
-            buffer.append("y="); //$NON-NLS-1$
-            buffer.append((long) y);
-            getChart().getPlotArea().setToolTipText(buffer.toString());
+            StringBuilder builder = new StringBuilder();
+            builder.append("Range=["); //$NON-NLS-1$
+            builder.append(TmfTimestamp.fromNanos((long) rangeStart + viewer.getTimeOffset()).toString());
+            builder.append(',');
+            builder.append(TmfTimestamp.fromNanos((long) rangeEnd + viewer.getTimeOffset()).toString());
+            builder.append("]\n"); //$NON-NLS-1$
+            builder.append("y="); //$NON-NLS-1$
+            builder.append((long) y);
+            setToolTipText(builder.toString());
 
             fHighlightX = e.x;
             fHighlightY = yAxis.getPixelCoordinate(y);
             fIsHighlight = true;
-            getChart().redraw();
+            redraw();
         }
     }
 
@@ -162,7 +148,7 @@ public class TmfHistogramTooltipProvider extends TmfBaseProvider implements Mous
     @Override
     public void mouseMove(MouseEvent e) {
         fIsHighlight = false;
-        getChart().redraw();
+        redraw();
     }
 
     // ------------------------------------------------------------------------
