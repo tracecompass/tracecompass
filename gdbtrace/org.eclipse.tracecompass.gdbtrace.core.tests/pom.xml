@@ -16,11 +16,11 @@
   <parent>
     <groupId>org.eclipse.tracecompass</groupId>
     <artifactId>org.eclipse.tracecompass.gdbtrace-parent</artifactId>
-    <version>5.2.0-SNAPSHOT</version>
+    <version>5.3.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.eclipse.tracecompass.gdbtrace.core.tests</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.1-SNAPSHOT</version>
 
   <properties>
     <skipTests>${skip-tc-core-tests}</skipTests>

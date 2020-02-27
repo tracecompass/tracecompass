@@ -4,7 +4,7 @@ Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
 Bundle-SymbolicName: org.eclipse.tracecompass.tmf.cli.core.tests;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.tmf.cli.core.tests.ActivatorTest
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.1.qualifier
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy

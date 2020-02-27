@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
 Bundle-SymbolicName: org.eclipse.tracecompass.analysis.counters.ui;singleton:=true
-Bundle-Version: 0.0.5.qualifier
+Bundle-Version: 0.0.6.qualifier
 Bundle-Localization: plugin
 Bundle-Activator: org.eclipse.tracecompass.internal.analysis.counters.ui.Activator
 Bundle-ActivationPolicy: lazy
