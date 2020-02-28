@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.ctf.core.event.types.AbstractArrayDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.CompoundDeclaration;
 import org.eclipse.tracecompass.ctf.core.event.types.Definition;
@@ -413,6 +414,43 @@ final class CTFEnumField extends CtfTmfEventField {
     CTFEnumField(@NonNull String name, CtfEnumPair enumValue) {
         super(name, new CtfEnumPair(enumValue.getFirst(),
                 enumValue.getSecond()), null);
+    }
+
+    @Override
+    public <T> @Nullable T getFieldValue(Class<T> type) {
+        CtfEnumPair value = getValue();
+        if (type.isAssignableFrom(CtfEnumPair.class)) {
+            @SuppressWarnings("unchecked")
+            T ret = (T) value;
+            return ret;
+        }
+
+        // If the type is a known number type, use the long value
+        if (type.equals(Long.class)) {
+            @SuppressWarnings("unchecked")
+            T ret = (T) value.getLongValue();
+            return ret;
+        }
+        if (type.equals(Integer.class)) {
+            @SuppressWarnings("unchecked")
+            T ret = (T) ((Integer) value.getLongValue().intValue());
+            return ret;
+        }
+        if (type.equals(Double.class)) {
+            @SuppressWarnings("unchecked")
+            T ret = (T) ((Double) value.getLongValue().doubleValue());
+            return ret;
+        }
+
+        // If type is string, use the string value
+        if (type.equals(String.class)) {
+            @SuppressWarnings("unchecked")
+            T ret = (T) value.getStringValue();
+            return ret;
+        }
+
+        // Don't know what to do, return null
+        return null;
     }
 
     @Override

@@ -17,6 +17,7 @@ package org.eclipse.tracecompass.tmf.ctf.core.tests.event;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -37,6 +38,8 @@ import org.eclipse.tracecompass.ctf.core.event.types.StructDefinition;
 import org.eclipse.tracecompass.ctf.core.event.types.VariantDeclaration;
 import org.eclipse.tracecompass.internal.ctf.core.event.types.ArrayDeclaration;
 import org.eclipse.tracecompass.internal.ctf.core.event.types.SequenceDeclaration;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
+import org.eclipse.tracecompass.tmf.ctf.core.CtfEnumPair;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEventField;
 import org.junit.Before;
 import org.junit.Test;
@@ -286,12 +289,23 @@ public class CtfTmfEventFieldTest {
 
     /**
      * Run the CtfTmfEventField parseField(Definition,String) method test.
+     *
+     * Also test the {@link ITmfEventField#getFieldValue(Class)} for this
+     * field type
      */
     @Test
     public void testParseField_enum() {
         IDefinition fieldDef = fixture.lookupDefinition(ENUM);
         CtfTmfEventField result = CtfTmfEventField.parseField(fieldDef, NAME);
         assertEquals("test=float", result.toString());
+
+        // Test the value conversion
+        assertEquals(new CtfEnumPair(FLOAT, (long) TEST_NUMBER), result.getFieldValue(CtfEnumPair.class));
+        assertEquals(Long.valueOf(TEST_NUMBER), result.getFieldValue(Long.class));
+        assertEquals(Integer.valueOf(TEST_NUMBER), result.getFieldValue(Integer.class));
+        assertEquals(Double.valueOf(TEST_NUMBER), result.getFieldValue(Double.class));
+        assertEquals(FLOAT, result.getFieldValue(String.class));
+        assertNull(result.getFieldValue(IDefinition.class));
     }
 
     /**

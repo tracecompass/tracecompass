@@ -112,7 +112,26 @@ public interface ITmfEventField {
         if (field == null) {
             return null;
         }
-        Object value = field.getValue();
+        return field.getFieldValue(type);
+    }
+
+    /**
+     * Retrieve the value of the current field
+     *
+     * This is a utility method that will do the proper null and instanceof
+     * checks on the value and return the desired type directly. Fields types
+     * can implement this when their value type cannot be directly converted to
+     * some other common types
+     *
+     * @param type
+     *            The expected type of this field, to which the returned value
+     *            will then be cast to.
+     * @return The value if it can be cast/converted to the correct type, or
+     *         'null' otherwise
+     * @since 5.2
+     */
+    default <T> @Nullable T getFieldValue(@NonNull Class<T> type) {
+        Object value = getValue();
         if (value == null) {
             return null;
         }
