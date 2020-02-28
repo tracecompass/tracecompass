@@ -15,7 +15,9 @@
 package org.eclipse.tracecompass.ctf.core.event.types;
 
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -116,7 +118,7 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      * non overlapping interval tree. The get method will return any value who's key
      * overlaps the queried interval.
      */
-    private final @NonNull Map<Pair, String> fEnumTree = new TreeMap<>(OVERLAP_COMPARATOR);
+    private final @NonNull TreeMap<Pair, String> fEnumTree = new TreeMap<>(OVERLAP_COMPARATOR);
     private final IntegerDeclaration fContainerType;
     private Pair fLastAdded = new Pair(-1, -1);
 
@@ -253,7 +255,37 @@ public final class EnumDeclaration extends Declaration implements ISimpleDatatyp
      * @return the label of that value, can be null
      */
     public @Nullable String query(long value) {
-        return fEnumTree.get(new Pair(value, value));
+        String strValue = fEnumTree.get(new Pair(value, value));
+        if (strValue != null || value <= 0) {
+            return strValue;
+        }
+        /*
+         * Divide the positive value in bits and see if there is a value for all
+         * those bits
+         */
+        List<String> flagsSet = new ArrayList<>();
+        for (int i = 0; i < Long.SIZE; i++) {
+            Long bitValue = 1L << i;
+            if ((bitValue & value) != 0) {
+                /*
+                 * See if there is a value for this bit where lower == upper, no
+                 * range accepted here
+                 */
+                Pair bitPair = new Pair(bitValue, bitValue);
+                strValue = fEnumTree.get(bitPair);
+                if (strValue == null) {
+                    // No value for this bit, not an enum flag
+                    return null;
+                }
+                Pair floorKey = fEnumTree.floorKey(bitPair);
+                if (!bitPair.equals(floorKey)) {
+                    // This is a range, not an enum flag
+                    return null;
+                }
+                flagsSet.add(strValue);
+            }
+        }
+        return flagsSet.isEmpty() ? null : String.join(" | ", flagsSet); //$NON-NLS-1$
     }
 
     /**

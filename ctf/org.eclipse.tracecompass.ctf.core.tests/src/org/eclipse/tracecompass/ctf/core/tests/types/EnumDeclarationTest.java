@@ -1,5 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2020 Ericsson, École Polytechnique de Montréal
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -38,7 +39,7 @@ import org.junit.Test;
  * The class <code>EnumDeclarationTest</code> contains tests for the class
  * <code>{@link EnumDeclaration}</code>.
  *
- * @author ematkho
+ * @author Matthew Khouzam
  * @version $Revision: 1.0 $
  */
 public class EnumDeclarationTest {
@@ -188,6 +189,44 @@ public class EnumDeclarationTest {
         String result = fixture.query(value);
 
         assertNull(result);
+    }
+
+    /**
+     * Test that values that are not present in the enum but whose bits have a
+     * value are returned as ORed strings
+     */
+    @Test
+    public void testBitFlagEnum() {
+        assertTrue(fixture.add(1 << 0, 1 << 0, "flag1"));
+        assertTrue(fixture.add(1 << 1, 1 << 1, "flag2"));
+        assertTrue(fixture.add(1 << 2, 1 << 2, "flag3"));
+        assertTrue(fixture.add(1 << 3, 1 << 3, "flag4"));
+        assertTrue(fixture.add(1 << 4, 1 << 4, "flag5"));
+        assertTrue(fixture.add(1 << 5, 1 << 5, "flag6"));
+        assertTrue(fixture.add(1 << 6, (1 << 6) + 3, "range"));
+        // Test a value with bit flag set
+        assertEquals("flag1 | flag2 | flag3", fixture.query((1 << 0) + (1 << 1) + (1 << 2)));
+        // Test a value where one bit is a range
+        assertNull(fixture.query((1 << 1) + (1 << 4) + (1 << 6)));
+        // Test a normal value that is included in the range
+        assertEquals("range", fixture.query((1 << 6) + 1));
+        // Test a value with one bit not set anywhere
+        assertNull(fixture.query((1 << 1) + (1 << 4) + (1 << 8)));
+        // Test 0
+        assertNull(fixture.query(0));
+        // Test a negative value
+        assertNull(fixture.query(-1));
+
+        // Add the 0 to the fixtures, values are still flags
+        assertTrue(fixture.add(0, 0, "noflag"));
+        assertEquals("noflag", fixture.query(0));
+
+        // Add a negative range
+        assertTrue(fixture.add(-4, -1, "negativeRange"));
+        // Bit flag still works
+        assertEquals("flag1 | flag2 | flag3", fixture.query((1 << 0) + (1 << 1) + (1 << 2)));
+        // Negative range OK
+        assertEquals("negativeRange", fixture.query(-1));
     }
 
     /**
