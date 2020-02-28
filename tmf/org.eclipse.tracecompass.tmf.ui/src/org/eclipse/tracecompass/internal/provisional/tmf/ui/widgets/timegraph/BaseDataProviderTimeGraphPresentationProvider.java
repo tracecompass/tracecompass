@@ -268,6 +268,11 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
         fShowTooltipTimes = showTimes;
     }
 
+    /**
+     * This method updates the styles map returned by the data provider(s) to
+     * overwrite any style property value that was changed by the user in the
+     * legend dialog with the value from the state table (ie. legend value).
+     */
     private void updateStyles() {
         Map<String, OutputElementStyle> stylesMap = fStylesMap;
         StateItem[] stateTable = fStateTable;
@@ -285,7 +290,12 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
             RGB rgb = stateItem.getStateColor();
             Map<@NonNull String, @NonNull Object> styleValues = elementStyle.getStyleValues();
             RGBAColor rgba = getColorStyle(elementStyle, StyleProperties.BACKGROUND_COLOR);
-            if (rgba == null || !new RGB(rgba.getRed(), rgba.getGreen(), rgba.getBlue()).equals(rgb)) {
+            /*
+             * Update if there is a color and it does not match the legend, or
+             * if there is no color and the legend is not the default.
+             */
+            if ((rgba != null && !new RGB(rgba.getRed(), rgba.getGreen(), rgba.getBlue()).equals(rgb))
+                    || (rgba == null && !new RGB(0, 0, 0).equals(rgb))) {
                 String hexColor = ColorUtils.toHexColor(rgb);
                 styleValues.put(StyleProperties.BACKGROUND_COLOR, hexColor);
                 styleValues.put(StyleProperties.COLOR, hexColor);
@@ -294,14 +304,17 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
 
             float heightFactor = stateItem.getStateHeightFactor();
             Float prevHeightFactor = getFloatStyle(elementStyle, StyleProperties.HEIGHT);
+            if (prevHeightFactor == null) {
+                prevHeightFactor = 1.0f;
+            }
+            /*
+             * Update if the height with factor does not match the legend. In
+             * that case update the base height without factor.
+             */
             if (!Float.valueOf(heightFactor).equals(prevHeightFactor)) {
-                if (prevHeightFactor == null) {
-                    styleValues.put(StyleProperties.HEIGHT, heightFactor);
-                } else {
-                    Object height = elementStyle.getStyleValues().getOrDefault(StyleProperties.HEIGHT, 1.0f);
-                    height = height instanceof Float ? height : 1.0f;
-                    styleValues.put(StyleProperties.HEIGHT, (float) height * heightFactor / prevHeightFactor);
-                }
+                Object height = elementStyle.getStyleValues().getOrDefault(StyleProperties.HEIGHT, 1.0f);
+                height = height instanceof Float ? height : 1.0f;
+                styleValues.put(StyleProperties.HEIGHT, (float) height * heightFactor / prevHeightFactor);
             }
         }
     }

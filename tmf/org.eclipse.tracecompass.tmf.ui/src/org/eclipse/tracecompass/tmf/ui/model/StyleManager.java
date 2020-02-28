@@ -105,7 +105,7 @@ public class StyleManager {
             }
             style = fStyleMap.get(style.getParentKey());
         }
-        return null;
+        return (factor == null) ? null : factor;
     }
 
     /**
@@ -158,7 +158,7 @@ public class StyleManager {
             style = fStyleMap.get(style.getParentKey());
         }
         int alpha = (opacity == null) ? 255 : (int) (opacity * 255);
-        RGBAColor rgba = (color == null) ? new RGBAColor(0, 0, 0, alpha) : RGBAColor.fromString(color + String.format("%02X", alpha)); //$NON-NLS-1$
+        RGBAColor rgba = (color == null) ? (opacity == null ? null : new RGBAColor(0, 0, 0, alpha)) : RGBAColor.fromString(color + String.format("%02X", alpha)); //$NON-NLS-1$
         return (rgba == null) ? null : (blend == null) ? rgba : blend(rgba, blend);
     }
 
