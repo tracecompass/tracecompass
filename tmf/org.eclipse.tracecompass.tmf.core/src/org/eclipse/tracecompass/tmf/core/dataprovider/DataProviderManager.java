@@ -135,7 +135,7 @@ public class DataProviderManager {
                 return dataProviderClass.cast(dataProvider);
             }
         }
-        String[] ids = id.split(DataProviderConstants.ID_SEPARATOR);
+        String[] ids = id.split(DataProviderConstants.ID_SEPARATOR, 2);
         for (ITmfTrace opened : TmfTraceManager.getInstance().getOpenedTraces()) {
             if (TmfTraceManager.getTraceSetWithExperiment(opened).contains(trace)) {
                 /* if this trace or an experiment containing this trace is opened */
