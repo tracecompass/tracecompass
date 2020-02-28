@@ -318,4 +318,13 @@ public class XmlDataProviderManager {
             fTimeGraphProviders.row(trace).clear();
         }
     }
+
+    /**
+     * Refresh the data providers when a change occurred in the module. Next
+     * time a data provider is requested, it will be compiled again.
+     */
+    public void refreshDataProviderFactories() {
+        fTimeGraphFactories.clear();
+        fXYFactories.clear();
+    }
 }

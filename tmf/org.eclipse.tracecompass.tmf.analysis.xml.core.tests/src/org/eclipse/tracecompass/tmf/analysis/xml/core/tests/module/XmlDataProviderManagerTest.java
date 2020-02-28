@@ -11,7 +11,9 @@
 
 package org.eclipse.tracecompass.tmf.analysis.xml.core.tests.module;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -20,6 +22,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.fsm.module.DataDrivenAnalysisModule;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlAnalysisModuleSource;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.module.XmlUtils;
+import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.DataDrivenTimeGraphProviderFactory;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.core.output.XmlDataProviderManager;
 import org.eclipse.tracecompass.internal.tmf.core.model.timegraph.TmfTimeGraphCompositeDataProvider;
 import org.eclipse.tracecompass.tmf.analysis.xml.core.module.TmfXmlStrings;
@@ -235,6 +238,31 @@ public class XmlDataProviderManagerTest {
             }
         }
 
+    }
+
+    /**
+     * Test getting the data provider factory, with and without update to XML
+     * files
+     */
+    @Test
+    public void testFactoryUpdate() {
+        // Get the time graph factory
+        Element viewElement = TmfXmlUtils.getElementInFile(TmfXmlTestFiles.EXPERIMENT.getPath().toOSString(), TmfXmlStrings.TIME_GRAPH_VIEW, EXPERIMENT_VIEW_ID);
+        assertNotNull(viewElement);
+        DataDrivenTimeGraphProviderFactory originalFactory = XmlDataProviderManager.getInstance().getTimeGraphProviderFactory(viewElement);
+
+        // Get the factory again, it should be the same as the original factory
+        viewElement = TmfXmlUtils.getElementInFile(TmfXmlTestFiles.EXPERIMENT.getPath().toOSString(), TmfXmlStrings.TIME_GRAPH_VIEW, EXPERIMENT_VIEW_ID);
+        assertNotNull(viewElement);
+        DataDrivenTimeGraphProviderFactory newFactory = XmlDataProviderManager.getInstance().getTimeGraphProviderFactory(viewElement);
+        assertEquals(originalFactory, newFactory);
+
+        // Notify of changes to the xml files and get the factory again, make sure it is different
+        XmlAnalysisModuleSource.notifyModuleChange();
+        viewElement = TmfXmlUtils.getElementInFile(TmfXmlTestFiles.EXPERIMENT.getPath().toOSString(), TmfXmlStrings.TIME_GRAPH_VIEW, EXPERIMENT_VIEW_ID);
+        assertNotNull(viewElement);
+        newFactory = XmlDataProviderManager.getInstance().getTimeGraphProviderFactory(viewElement);
+        assertNotEquals(originalFactory, newFactory);
     }
 
 }
