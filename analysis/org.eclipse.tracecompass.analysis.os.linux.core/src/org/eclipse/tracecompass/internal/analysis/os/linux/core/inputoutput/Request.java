@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.IoOperationType;
 
 /**
  * Represents a request to a disk of the system

@@ -16,11 +16,11 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.Disk;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.InputOutputAnalysisModule;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.InputOutputInformationProvider;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.LinuxTestCase;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.inputoutput.IoTestFactory;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.Disk;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.InputOutputAnalysisModule;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.InputOutputInformationProvider;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestHelper;
 import org.junit.After;
 import org.junit.Test;

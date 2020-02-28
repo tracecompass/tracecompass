@@ -20,9 +20,6 @@ import java.util.Objects;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.Attributes;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.Disk;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.InputOutputAnalysisModule;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.xy.AbstractTreeCommonXDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;

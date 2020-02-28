@@ -16,8 +16,8 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 import java.util.regex.Pattern;
 
 import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.LinuxTidAspect;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.Attributes;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.InputOutputStateProvider;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.KernelEventHandler;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;

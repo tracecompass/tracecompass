@@ -9,7 +9,7 @@
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.os.linux.core.inputoutput;
+package org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput;
 
 import java.util.Collection;
 import java.util.Collections;

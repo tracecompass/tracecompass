@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.IoOperationType;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.LinuxTestCase;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.IoOperationType;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;

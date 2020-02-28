@@ -42,6 +42,9 @@ public class Messages extends NLS {
      */
     public static @Nullable String DisksIODataProviderFactory_descriptionText;
 
+    /** Help text for the IO analysis */
+    public static @Nullable String LttngInputOutputModule_Help;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

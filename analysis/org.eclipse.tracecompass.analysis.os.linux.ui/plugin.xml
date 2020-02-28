@@ -143,7 +143,7 @@
             class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
             id="org.eclipse.tracecompass.analysis.os.linux.views.diskioactivity">
          <analysisModuleClass
-               class="org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.InputOutputAnalysisModule">
+               class="org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.InputOutputAnalysisModule">
          </analysisModuleClass>
       </output>
    </extension>

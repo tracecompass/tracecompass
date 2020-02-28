@@ -17,13 +17,13 @@ import java.util.Arrays;
 import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.Disk;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.InputOutputAnalysisModule;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.InputOutputInformationProvider;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.IoOperationType;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.inputoutput.IoTestCase;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.inputoutput.IoTestCase.DiskInfo;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.inputoutput.IoTestCase.SectorCountInfo;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.Disk;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.InputOutputAnalysisModule;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.InputOutputInformationProvider;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.IoOperationType;
 import org.eclipse.tracecompass.analysis.os.linux.core.tests.stubs.inputoutput.IoTestFactory;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestHelper;
 import org.junit.After;

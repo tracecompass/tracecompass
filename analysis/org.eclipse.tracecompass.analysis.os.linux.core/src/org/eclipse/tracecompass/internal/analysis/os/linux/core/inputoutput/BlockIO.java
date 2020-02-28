@@ -11,8 +11,6 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput;
 
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.IoOperationType;
-
 /**
  * Class that represents a block IO structure of the os kernel
  *

@@ -15,10 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.Attributes;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.Disk;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.IoOperationType;
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.StateValues;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;

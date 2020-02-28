@@ -9,7 +9,6 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput;
 
-import org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.Disk;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
