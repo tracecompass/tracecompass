@@ -12,7 +12,6 @@
 package org.eclipse.tracecompass.analysis.os.linux.core.execution.graph;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,6 +28,9 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.execution.graph.Messages;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 
 /**
  * This class represents the worker unit from the execution graph
@@ -93,8 +95,8 @@ public class OsWorker implements IGraphWorker {
         if (tid == -1) {
             return Collections.emptyMap();
         }
-        Map<String, String> workerInfo = new HashMap<>();
-        workerInfo.put("tid", String.valueOf(tid)); //$NON-NLS-1$
+        ImmutableMap.Builder<String, String> workerInfo = new Builder<>();
+        workerInfo.put(OsStrings.tid(), String.valueOf(tid)); //$NON-NLS-1$
         Optional<@Nullable KernelAnalysisModule> kam = TmfTraceManager.getInstance().getActiveTraceSet()
                 .stream()
                 .filter(trace -> trace.getHostId().equals(getHostId()))
@@ -102,14 +104,19 @@ public class OsWorker implements IGraphWorker {
                 .filter(Objects::nonNull)
                 .findFirst();
         if (!kam.isPresent()) {
-            return Collections.emptyMap();
+            return workerInfo.build();
         }
 
-        int priority = KernelThreadInformationProvider.getThreadPriority(kam.get(), tid, t);
+        KernelAnalysisModule module = kam.get();
+        int priority = KernelThreadInformationProvider.getThreadPriority(module, tid, t);
         if (priority != -1) {
-            return Collections.singletonMap(NonNullUtils.nullToEmptyString(Messages.OsWorker_threadPriority), Integer.toString(priority));
+            workerInfo.put(NonNullUtils.nullToEmptyString(Messages.OsWorker_threadPriority), Integer.toString(priority));
         }
-        return Collections.emptyMap();
+        String execName = KernelThreadInformationProvider.getExecutableName(module, tid, t);
+        if (execName != null) {
+            workerInfo.put(OsStrings.execName(), execName);
+        }
+        return workerInfo.build();
     }
 
     /**
