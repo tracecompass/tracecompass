@@ -11,5 +11,17 @@
             restorable="true">
       </view>
    </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <module
+         id="example.state.system.module"
+         name="Example State System Module"
+         analysis_module="org.eclipse.tracecompass.examples.core.analysis.ExampleStateSystemAnalysisModule"
+         automatic="true">
+         <tracetype
+               class="org.eclipse.tracecompass.tmf.core.trace.TmfTrace">
+         </tracetype>
+      </module>
+   </extension>
 
 </plugin>

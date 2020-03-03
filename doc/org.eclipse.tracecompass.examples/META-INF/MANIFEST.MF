@@ -13,7 +13,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Export-Package: org.eclipse.tracecompass.examples.ui;x-internal:=true,
+Export-Package: org.eclipse.tracecompass.examples.core.analysis;x-internal:=true,
+ org.eclipse.tracecompass.examples.ui;x-internal:=true,
  org.eclipse.tracecompass.examples.ui.viewers.histogram;x-internal:=true,
  org.eclipse.tracecompass.examples.ui.views.histogram;x-internal:=true
 Bundle-Vendor: %Bundle-Vendor

@@ -1559,8 +1559,8 @@ in advance, the attributes will be created on-demand.
 ===== modifyAttribute() =====
 
 This is the main state-change-insertion method. As was explained before, a state
-change is defined by a timestamp, an attribute and a state value. Those three
-elements need to be passed to modifyAttribute as parameters.
+change is defined by a timestamp, an attribute and an object representing the value
+of this state. Those three elements need to be passed to modifyAttribute as parameters.
 
 Other state change insertion methods are available (increment-, push-, pop- and
 removeAttribute()), but those are simply convenience wrappers around
@@ -1783,230 +1783,107 @@ module will also contain code that can query the state system.
 === State Provider ===
 
 <pre>
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
+import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 /**
- * Example state system provider.
+ * An example of a simple state provider for a simple state system analysis
  *
  * @author Alexandre Montplaisir
+ * @author Geneviève Bastien
  */
-public class MyStateProvider extends AbstractTmfStateProvider {
+public class ExampleStateProvider extends AbstractTmfStateProvider {
 
-    /** State value representing the idle state */
-    public static ITmfStateValue IDLE = TmfStateValue.newValueInt(0);
-
-    /** State value representing the running state */
-    public static ITmfStateValue RUNNING = TmfStateValue.newValueInt(1);
+    private static final @NonNull String PROVIDER_ID = "example.state.provider.id"; //$NON-NLS-1$
+    private static final int VERSION = 0;
 
     /**
      * Constructor
      *
      * @param trace
-     *            The trace to which this state provider is associated
+     *            The trace for this state provider
      */
-    public MyStateProvider(@NonNull ITmfTrace trace) {
-        super(trace, "Example"); //$NON-NLS-1$
-        /*
-         * The second parameter here is not important, it's only used to name a
-         * thread internally.
-         */
+    public ExampleStateProvider(@NonNull ITmfTrace trace) {
+        super(trace, PROVIDER_ID);
     }
 
     @Override
     public int getVersion() {
-        /*
-         * If the version of an existing file doesn't match the version supplied
-         * in the provider, a rebuild of the history will be forced.
-         */
-        return 1;
+        return VERSION;
     }
 
     @Override
-    public MyStateProvider getNewInstance() {
-        return new MyStateProvider(getTrace());
+    public @NonNull ITmfStateProvider getNewInstance() {
+        return new ExampleStateProvider(getTrace());
     }
 
     @Override
-    protected void eventHandle(ITmfEvent ev) {
-        /*
-         * AbstractStateChangeInput should have already checked for the correct
-         * class type.
+    protected void eventHandle(ITmfEvent event) {
+
+        /**
+         * Do what needs to be done with this event, here is an example that
+         * updates the CPU state and TID after a sched_switch
          */
-        CtfTmfEvent event = (CtfTmfEvent) ev;
+        if (event.getName().equals("sched_switch")) { //$NON-NLS-1$
 
-        final long ts = event.getTimestamp().getValue();
-        Integer nextTid = ((Long) event.getContent().getField("next_tid").getValue()).intValue();
-
-        try {
-
-            if (event.getType().getName().equals("sched_switch")) {
-                ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
-                int quark = ss.getQuarkAbsoluteAndAdd("CPUs", String.valueOf(event.getCPU()), "Status");
-                ITmfStateValue value;
-                if (nextTid > 0) {
-                    value = RUNNING;
-                } else {
-                    value = IDLE;
-                }
-                ss.modifyAttribute(ts, value, quark);
+            final long ts = event.getTimestamp().getValue();
+            Long nextTid = event.getContent().getFieldValue(Long.class, "next_tid"); //$NON-NLS-1$
+            Integer cpu = TmfTraceUtils.resolveIntEventAspectOfClassForEvent(event.getTrace(), TmfCpuAspect.class, event);
+            if (cpu == null || nextTid == null) {
+                return;
             }
 
-        } catch (TimeRangeException e) {
-            /*
-             * This should not happen, since the timestamp comes from a trace
-             * event.
-             */
-            throw new IllegalStateException(e);
-        } catch (AttributeNotFoundException e) {
-            /*
-             * This should not happen either, since we're only accessing a quark
-             * we just created.
-             */
-            throw new IllegalStateException(e);
-        } catch (StateValueTypeException e) {
-            /*
-             * This wouldn't happen here, but could potentially happen if we try
-             * to insert mismatching state value types in the same attribute.
-             */
-            e.printStackTrace();
-        }
+            ITmfStateSystemBuilder ss = Objects.requireNonNull(getStateSystemBuilder());
+            int quark = ss.getQuarkAbsoluteAndAdd("CPUs", String.valueOf(cpu)); //$NON-NLS-1$
 
+            // The status attribute has an integer value
+            int statusQuark = ss.getQuarkRelativeAndAdd(quark, "Status"); //$NON-NLS-1$
+            Integer value = (nextTid > 0 ? 1 : 0);
+            ss.modifyAttribute(ts, value, statusQuark);
+
+            // The main quark contains the tid of the running thread
+            ss.modifyAttribute(ts, nextTid, quark);
+        }
     }
 
 }
+
 </pre>
 
 === Analysis module definition ===
 
 <pre>
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+import java.util.Objects;
 
-import java.util.List;
-
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
-import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
-import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
- * Class showing examples of a StateSystemAnalysisModule with state system queries.
+ * An example of a simple state system analysis module.
  *
- * @author Alexandre Montplaisir
+ * @author Geneviève Bastien
  */
-public class MyStateSystemAnalysisModule extends TmfStateSystemAnalysisModule {
+public class ExampleStateSystemAnalysisModule extends TmfStateSystemAnalysisModule {
 
-	@Override
-	protected ITmfStateProvider createStateProvider() {
-        ITmfTrace trace = checkNotNull(getTrace());
-		return new MyStateProvider(trace);
-	}
+    /**
+     * Module ID
+     */
+    public static final String ID = "example.state.system.module"; //$NON-NLS-1$
 
     @Override
-    protected StateSystemBackendType getBackendType() {
-        return StateSystemBackendType.FULL;
+    protected @NonNull ITmfStateProvider createStateProvider() {
+        return new ExampleStateProvider(Objects.requireNonNull(getTrace()));
     }
 
-    /**
-     * Example method of querying one attribute in the state system.
-     *
-     * We pass it a cpu and a timestamp, and it returns us if that cpu was
-     * executing a process (true/false) at that time.
-     *
-     * @param cpu
-     *            The CPU to check
-     * @param timestamp
-     *            The timestamp of the query
-     * @return True if the CPU was running, false otherwise
-     */
-    public boolean cpuIsRunning(int cpu, long timestamp) {
-        try {
-            int quark = getStateSystem().getQuarkAbsolute("CPUs", String.valueOf(cpu), "Status");
-            ITmfStateValue value = getStateSystem().querySingleState(timestamp, quark).getStateValue();
-
-            if (value.equals(MyStateProvider.RUNNING)) {
-                return true;
-            }
-
-        /*
-         * Since at this level we have no guarantee on the contents of the state
-         * system, it's important to handle these cases correctly.
-         */
-        } catch (AttributeNotFoundException e) {
-            /*
-             * Handle the case where the attribute does not exist in the state
-             * system (no CPU with this number, etc.)
-             */
-        } catch (TimeRangeException e) {
-            /*
-             * Handle the case where 'timestamp' is outside of the range of the
-             * history.
-             */
-        } catch (StateSystemDisposedException e) {
-            /*
-             * Handle the case where the state system is being disposed. If this
-             * happens, it's normally when shutting down, so the view can just
-             * return immediately and wait it out.
-             */
-        }
-        return false;
-    }
-
-
-    /**
-     * Example method of using a full query.
-     *
-     * We pass it a timestamp, and it returns us how many CPUs were executing a
-     * process at that moment.
-     *
-     * @param timestamp
-     *            The target timestamp
-     * @return The amount of CPUs that were running at that time
-     */
-    public int getNbRunningCpus(long timestamp) {
-        int count = 0;
-
-        try {
-            /* Get the list of the quarks we are interested in. */
-            List<Integer> quarks = getStateSystem().getQuarks("CPUs", "*", "Status");
-
-            /*
-             * Get the full state at our target timestamp (it's better than
-             * doing an arbitrary number of single queries).
-             */
-            List<ITmfStateInterval> state = getStateSystem().queryFullState(timestamp);
-
-            /* Look at the value of the state for each quark */
-            for (Integer quark : quarks) {
-                ITmfStateValue value = state.get(quark).getStateValue();
-                if (value.equals(MyStateProvider.RUNNING)) {
-                    count++;
-                }
-            }
-
-        } catch (TimeRangeException e) {
-            /*
-             * Handle the case where 'timestamp' is outside of the range of the
-             * history.
-             */
-        } catch (StateSystemDisposedException e) {
-            /* Handle the case where the state system is being disposed. */
-        }
-        return count;
-    }
 }
 </pre>
 
@@ -3416,7 +3293,7 @@ public class MyLttngKernelAnalysis extends TmfAbstractAnalysisModule {
 
 The following are available as base classes for analysis modules. They also extend the abstract '''TmfAbstractAnalysisModule'''
 
-* '''TmfStateSystemAnalysisModule''': A base analysis module that builds one state system. A module extending this class only needs to provide a state provider and the type of state system backend to use. All state systems should now use this base class as it also contains all the methods to actually create the state sytem with a given backend.
+* '''TmfStateSystemAnalysisModule''': A base analysis module that builds one state system. A module extending this class only needs to provide a state provider and the type of state system backend to use. All state systems should now use this base class as it also contains all the methods to actually create the state sytem with a given backend. An example of this kind of analysis module can be found in [[#Analysis module definition]].
 
 The following interfaces can optionally be implemented by analysis modules if they use their functionalities. For instance, some utility views, like the State System Explorer, may have access to the module's data through these interfaces.
 
@@ -3451,7 +3328,7 @@ The following code shows what the resulting plugin.xml file should look like.
          </parameter>
          <parameter
                default_value="3"
-               name="myotherparam">
+               name="myotherparam" />
          <tracetype
                class="org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace">
          </tracetype>
