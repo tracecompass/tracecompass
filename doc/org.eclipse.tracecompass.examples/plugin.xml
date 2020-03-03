@@ -10,11 +10,25 @@
             name="%tracing.examples.histogram.view.name"
             restorable="true">
       </view>
+      <view
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.tracecompass.examples.ui.views.data.provider.ExampleTimeGraphDataProviderView"
+            id="org.eclipse.tracecompass.examples.dataprovider.tgview"
+            name="%tracing.examples.dataprovider.timegraph.view.name"
+            restorable="true">
+      </view>
+      <view
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
+            class="org.eclipse.tracecompass.examples.ui.views.data.provider.ExampleXYDataProviderView"
+            id="org.eclipse.tracecompass.examples.dataprovider.xyview"
+            name="%tracing.examples.dataprovider.xy.view.name"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.core.analysis">
       <module
-         id="example.state.system.module"
+         id="org.eclipse.tracecompass.examples.state.system.module"
          name="Example State System Module"
          analysis_module="org.eclipse.tracecompass.examples.core.analysis.ExampleStateSystemAnalysisModule"
          automatic="true">
@@ -22,6 +36,30 @@
                class="org.eclipse.tracecompass.tmf.core.trace.TmfTrace">
          </tracetype>
       </module>
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.examples.dataprovider.tgview">
+         <analysisId
+               id="org.eclipse.tracecompass.examples.state.system.module">
+         </analysisId>
+      </output>
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.examples.dataprovider.xyview">
+         <analysisId
+               id="org.eclipse.tracecompass.examples.state.system.module">
+         </analysisId>
+      </output>
+   </extension>
+   <extension point="org.eclipse.tracecompass.tmf.core.dataprovider">
+      <dataProviderFactory
+         class="org.eclipse.tracecompass.examples.core.data.provider.ExampleTimeGraphProviderFactory"
+         id="org.eclipse.tracecompass.examples.timegraph.dataprovider">
+      </dataProviderFactory>
+      <dataProviderFactory
+         class="org.eclipse.tracecompass.examples.core.data.provider.ExampleXYDataProviderFactory"
+         id="org.eclipse.tracecompass.examples.xy.dataprovider">
+      </dataProviderFactory>
    </extension>
 
 </plugin>

@@ -30,7 +30,7 @@ public class ExampleStateSystemAnalysisModule extends TmfStateSystemAnalysisModu
     /**
      * Module ID
      */
-    public static final String ID = "example.state.system.module"; //$NON-NLS-1$
+    public static final String ID = "org.eclipse.tracecompass.examples.state.system.module"; //$NON-NLS-1$
 
     @Override
     protected @NonNull ITmfStateProvider createStateProvider() {

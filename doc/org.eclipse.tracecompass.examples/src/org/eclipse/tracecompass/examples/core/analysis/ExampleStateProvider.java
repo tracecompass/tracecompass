@@ -33,7 +33,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
  */
 public class ExampleStateProvider extends AbstractTmfStateProvider {
 
-    private static final @NonNull String PROVIDER_ID = "example.state.provider.id"; //$NON-NLS-1$
+    private static final @NonNull String PROVIDER_ID = "org.eclipse.tracecompass.examples.state.provider"; //$NON-NLS-1$
     private static final int VERSION = 0;
 
     /**
@@ -74,14 +74,13 @@ public class ExampleStateProvider extends AbstractTmfStateProvider {
 
             ITmfStateSystemBuilder ss = Objects.requireNonNull(getStateSystemBuilder());
             int quark = ss.getQuarkAbsoluteAndAdd("CPUs", String.valueOf(cpu)); //$NON-NLS-1$
+            // The main quark contains the tid of the running thread
+            ss.modifyAttribute(ts, nextTid, quark);
 
             // The status attribute has an integer value
             int statusQuark = ss.getQuarkRelativeAndAdd(quark, "Status"); //$NON-NLS-1$
             Integer value = (nextTid > 0 ? 1 : 0);
             ss.modifyAttribute(ts, value, statusQuark);
-
-            // The main quark contains the tid of the running thread
-            ss.modifyAttribute(ts, nextTid, quark);
         }
     }
 
