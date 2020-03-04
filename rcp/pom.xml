@@ -38,18 +38,6 @@
 
   <profiles>
     <profile>
-      <id>run-rcp-tests</id>
-      <activation>
-        <property>
-          <name>!skip-short-tc-ui-tests</name>
-        </property>
-      </activation>
-      <modules>
-        <module>org.eclipse.tracecompass.rcp.product</module>
-      </modules>
-    </profile>
-
-    <profile>
       <id>build-rcp</id>
       <activation>
         <property>
