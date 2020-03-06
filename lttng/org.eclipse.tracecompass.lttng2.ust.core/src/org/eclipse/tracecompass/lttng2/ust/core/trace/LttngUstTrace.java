@@ -29,6 +29,7 @@ import org.eclipse.tracecompass.internal.lttng2.common.core.trace.ILttngTrace;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.Activator;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.ContextVpidAspect;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.ContextVtidAspect;
+import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.UstTracefAspect;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.DefaultUstEventLayout;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst20EventLayout;
 import org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout.LttngUst27EventLayout;
@@ -135,6 +136,9 @@ public class LttngUstTrace extends CtfTmfTrace implements ILttngTrace{
         }
         if (checkFieldPresent(layout.contextVpid())) {
             builder.add(new ContextVpidAspect(layout));
+        }
+        if (getContainedEventTypes().stream().anyMatch(potentialEvent -> potentialEvent.getName().startsWith(layout.eventTracefPrefix()))) {
+            builder.add(UstTracefAspect.getInstance());
         }
         builder.addAll(createCounterAspects(this));
         fUstTraceAspects = builder.build();

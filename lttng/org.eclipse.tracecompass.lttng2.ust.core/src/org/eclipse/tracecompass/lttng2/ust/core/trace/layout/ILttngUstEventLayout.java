@@ -48,6 +48,15 @@ public interface ILttngUstEventLayout {
     String eventCygProfileFuncExit();
     String eventCygProfileFastFuncExit();
 
+    /* Tracef */
+    /**
+     * Get the tracef event name prefix
+     * @since 5.0
+     */
+    default String eventTracefPrefix() {
+        return "lttng_ust_tracef:"; //$NON-NLS-1$
+    }
+
     // ------------------------------------------------------------------------
     // Field names
     // ------------------------------------------------------------------------
