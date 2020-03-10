@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *****************************************************************************/
-@import url("platform:/plugin/org.eclipse.ui.themes/css/e4-dark.css");
+@import url("platform:/plugin/org.eclipse.ui.themes/css/e4-dark_linux.css");
 
 /*
 	All workbench colors from the platform (see e4-dark_basestyle.css) need to
