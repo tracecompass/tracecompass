@@ -53,7 +53,10 @@ public class BlockRqComplete extends KernelEventHandler {
         Long sector = NonNullUtils.checkNotNull((Long) content.getField(getLayout().fieldBlockSector()).getValue());
         int nrSector = ((Long) content.getField(getLayout().fieldBlockNrSector()).getValue()).intValue();
         int phydisk = ((Long) content.getField(getLayout().fieldBlockDeviceId()).getValue()).intValue();
-        int rwbs = ((Long) content.getField(getLayout().fieldBlockRwbs()).getValue()).intValue();
+        Integer rwbs = content.getFieldValue(Integer.class, getLayout().fieldBlockRwbs());
+        if (rwbs == null) {
+            return;
+        }
         DiskWriteModel disk = fStateProvider.getDisk(phydisk);
 
         Request request = disk.getDriverRequest(sector);

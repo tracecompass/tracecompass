@@ -54,7 +54,10 @@ public class BlockFrontMergeHandler extends KernelEventHandler {
         int nrSector = ((Long) content.getField(getLayout().fieldBlockNrSector()).getValue()).intValue();
         Long rqSector = sector + nrSector;
         int dev = ((Long) content.getField(getLayout().fieldBlockDeviceId()).getValue()).intValue();
-        int rwbs = ((Long) content.getField(getLayout().fieldBlockRwbs()).getValue()).intValue();
+        Integer rwbs = content.getFieldValue(Integer.class, getLayout().fieldBlockRwbs());
+        if (rwbs == null) {
+            return;
+        }
         DiskWriteModel disk = fStateProvider.getDisk(dev);
 
         Request request = disk.getWaitingRequest(rqSector);

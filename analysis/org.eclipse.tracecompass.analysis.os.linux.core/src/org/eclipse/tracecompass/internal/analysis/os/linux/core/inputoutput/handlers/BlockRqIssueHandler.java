@@ -54,8 +54,8 @@ public class BlockRqIssueHandler extends KernelEventHandler {
         Integer phydisk = ((Long) content.getField(getLayout().fieldBlockDeviceId()).getValue()).intValue();
         Long sector = NonNullUtils.checkNotNull((Long) content.getField(getLayout().fieldBlockSector()).getValue());
         Integer nrSector = ((Long) content.getField(getLayout().fieldBlockNrSector()).getValue()).intValue();
-        Integer rwbs = ((Long) content.getField(getLayout().fieldBlockRwbs()).getValue()).intValue();
-        if (nrSector == 0) {
+        Integer rwbs = content.getFieldValue(Integer.class, getLayout().fieldBlockRwbs());
+        if (rwbs == null || nrSector == 0) {
             return;
         }
 
