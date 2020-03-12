@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017, 2019 Ericsson
+ * Copyright (c) 2017, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -113,5 +113,10 @@ public class TimeGraphArrow extends OutputElement implements ITimeGraphArrow {
     @Override
     public int getValue() {
         return fValue;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Arrow: sourceId:%d, destinationId:%d, time: %d, duration: %d, value: %d, style: %s", fSourceId, fDestinationId, fStartTime, fDuration, fValue, getStyle()); //$NON-NLS-1$
     }
 }

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017, 2019 Ericsson
+ * Copyright (c) 2017, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -153,6 +153,6 @@ public class TimeGraphState extends OutputElement implements ITimeGraphState {
 
     @Override
     public String toString() {
-        return "State: start: " + fStartTime + ", duration: " + fDuration + ", value: " + fValue + ", label: " + fLabel;  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        return String.format("State: time: %d, duration: %d, value: %d, label: %s, style: %s", fStartTime, fDuration, fValue, fLabel, getStyle()); //$NON-NLS-1$
     }
 }

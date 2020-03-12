@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017, 2018 Ericsson
+ * Copyright (c) 2017, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -134,7 +134,6 @@ public class TimeGraphEntryModel extends TmfTreeDataModel implements ITimeGraphE
 
     @Override
     public String toString() {
-        return "<name=" + getLabels() + " id=" + getId() + " parentId=" + getParentId() //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                + " start=" + fStartTime + " end=" + fEndTime + " hasRowModel=" + hasRowModel() + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        return String.format("Entry Model: id:%d, parentId:%d, labels:%s, startTime:%d, endTime:%d, hasRowModel:%b", getId(), getParentId(), getLabels(), fStartTime, fEndTime, fHasRowModel); //$NON-NLS-1$
     }
 }

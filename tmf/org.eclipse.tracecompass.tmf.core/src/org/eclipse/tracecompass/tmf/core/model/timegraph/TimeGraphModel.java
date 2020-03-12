@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2019 Ericsson
+ * Copyright (c) 2019, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -43,6 +43,6 @@ public class TimeGraphModel {
 
     @Override
     public String toString() {
-        return "Model: rows -> " + fRows; //$NON-NLS-1$
+        return String.format("Model: rows size: %d", fRows.size()); //$NON-NLS-1$
     }
 }
