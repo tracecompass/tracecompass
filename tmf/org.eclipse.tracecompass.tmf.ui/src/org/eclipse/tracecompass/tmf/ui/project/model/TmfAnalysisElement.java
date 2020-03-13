@@ -299,7 +299,10 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
 
         if (parentTrace instanceof TmfTraceElement) {
             TmfTraceElement traceElement = (TmfTraceElement) parentTrace;
-            TmfOpenTraceHelper.openTraceFromElement(traceElement);
+            IStatus status = TmfOpenTraceHelper.openFromElement(traceElement);
+            if (!status.isOK()) {
+                Activator.getDefault().logError("Error activating parent trace: " + status.getMessage()); //$NON-NLS-1$
+            }
         }
     }
 

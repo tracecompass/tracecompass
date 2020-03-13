@@ -133,7 +133,7 @@ public class SelectTracesWizardPage extends WizardPage {
         container.setLayout(new GridLayout(2, false));
         setControl(container);
 
-        new FilteredTree(container, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, new PatternFilter(), true) {
+        new FilteredTree(container, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, new PatternFilter(), true, true) {
             @Override
             protected TreeViewer doCreateTreeViewer(Composite aparent, int style) {
                 return SelectTracesWizardPage.this.doCreateTreeViewer(aparent);

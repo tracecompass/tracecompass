@@ -301,7 +301,7 @@ public class ImportHandler extends BaseControlViewHandler {
            traceFolder.setPersistentProperty(CtfConstants.LIVE_SESSION_NAME, connectionInfo.getSessionName());
 
            final TmfTraceElement finalTrace = found;
-           Display.getDefault().syncExec(() -> TmfOpenTraceHelper.openTraceFromElement(finalTrace));
+           Display.getDefault().syncExec(() -> TmfOpenTraceHelper.openFromElement(finalTrace));
        }
    }
 }

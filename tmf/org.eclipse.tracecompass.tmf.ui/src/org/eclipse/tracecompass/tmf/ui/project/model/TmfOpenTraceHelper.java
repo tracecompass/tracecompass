@@ -271,8 +271,11 @@ public class TmfOpenTraceHelper {
         if (traceElement == null) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, NLS.bind(Messages.TmfOpenTraceHelper_TraceNotFound, traceName));
         }
-        openTraceFromElement(traceElement);
-        return Status.OK_STATUS;
+        IStatus status = openFromElement(traceElement);
+        if (!status.isOK()) {
+            Activator.getDefault().logError("Error opening trace from folder: " + status.getMessage()); //$NON-NLS-1$
+        }
+        return status;
     }
 
     private static ITmfTrace openTraceElement(final TmfTraceElement traceElement) {

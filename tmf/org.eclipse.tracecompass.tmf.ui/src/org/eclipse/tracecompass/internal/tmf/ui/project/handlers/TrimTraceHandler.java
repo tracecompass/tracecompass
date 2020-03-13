@@ -353,7 +353,10 @@ public class TrimTraceHandler extends AbstractHandler {
 
         public void open() {
             if (fDestElement instanceof TmfCommonProjectElement) {
-                TmfOpenTraceHelper.openTraceFromElement((TmfCommonProjectElement) fDestElement);
+                IStatus status = TmfOpenTraceHelper.openFromElement((TmfCommonProjectElement) fDestElement);
+                if (!status.isOK()) {
+                    Activator.getDefault().logError("Error trimming trace: " + status.getMessage()); //$NON-NLS-1$
+                }
             }
         }
 

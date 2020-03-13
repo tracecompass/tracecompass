@@ -78,7 +78,7 @@ public class SelectRootNodeWizardPage extends WizardPage {
         setTitle(Messages.SelectRootNodeWizardPage_WindowTitle);
         setDescription(Messages.SelectRootNodeWizardPage_Description);
 
-        new FilteredTree(container, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, new PatternFilter(), true) {
+        new FilteredTree(container, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, new PatternFilter(), true, true) {
             @Override
             protected TreeViewer doCreateTreeViewer(Composite aparent, int style) {
                 return SelectRootNodeWizardPage.this.doCreateTreeViewer(aparent);

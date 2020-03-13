@@ -312,7 +312,7 @@ public class OffsetDialog extends Dialog {
                     protected boolean isLeafMatch(Viewer viewer, Object element) {
                         return wordMatches(((TmfTraceElement) element).getElementPath());
                     }
-                }, true);
+                }, true, true);
 
         // Make lines and make header visible
         final Tree tree = fViewer.getViewer().getTree();
@@ -458,7 +458,7 @@ public class OffsetDialog extends Dialog {
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 TmfTraceElement traceElement = (TmfTraceElement) e.item.getData();
-                TmfOpenTraceHelper.openTraceFromElement(traceElement);
+                TmfOpenTraceHelper.openFromElement(traceElement);
             }
         });
 

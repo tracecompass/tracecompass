@@ -167,7 +167,10 @@ public class OpenAsExperimentHandler extends AbstractHandler {
             }
         }
 
-        TmfOpenTraceHelper.openTraceFromElement(experimentElement);
+        status = TmfOpenTraceHelper.openFromElement(experimentElement);
+        if (!status.isOK()) {
+            TraceUtils.displayErrorMsg(Messages.OpenAsExperimentHandler_ValidationErrorTitle, NLS.bind(Messages.OpenAsExperimentHandler_ValidationErrorMessage, status.getMessage()));
+        }
 
         return null;
     }

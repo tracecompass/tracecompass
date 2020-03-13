@@ -75,7 +75,7 @@ public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
      */
     public FilteredCheckboxTree(Composite parent, int treeStyle, PatternFilter filter,
             boolean useNewLook) {
-        super(parent, treeStyle, filter, useNewLook);
+        super(parent, treeStyle, filter, useNewLook, true);
     }
 
     @Override

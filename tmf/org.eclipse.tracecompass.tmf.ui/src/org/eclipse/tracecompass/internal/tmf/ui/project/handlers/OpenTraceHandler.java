@@ -17,9 +17,11 @@ package org.eclipse.tracecompass.internal.tmf.ui.project.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceElement;
 import org.eclipse.ui.IWorkbenchPage;
@@ -99,7 +101,10 @@ public class OpenTraceHandler extends AbstractHandler {
         }
 
         // If trace is under an experiment, use the original trace from the traces folder
-        TmfOpenTraceHelper.openTraceFromElement(fTrace.getElementUnderTraceFolder());
+        IStatus status = TmfOpenTraceHelper.openFromElement(fTrace.getElementUnderTraceFolder());
+        if (!status.isOK()) {
+            Activator.getDefault().logError("Error opening trace: " + status.getMessage()); //$NON-NLS-1$
+        }
         return null;
     }
 

@@ -17,7 +17,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.ui.properties.ReadOnlyTextPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 
@@ -133,7 +135,10 @@ public class TmfAggregateAnalysisElement extends TmfAnalysisElement {
      */
     @Override
     public void activateParentTrace() {
-        TmfOpenTraceHelper.openTraceFromElement(fExperimentParent);
+        IStatus status = TmfOpenTraceHelper.openFromElement(fExperimentParent);
+        if (!status.isOK()) {
+            Activator.getDefault().logError("Error activating parent trace: " + status.getMessage()); //$NON-NLS-1$
+        }
     }
 
     @Override

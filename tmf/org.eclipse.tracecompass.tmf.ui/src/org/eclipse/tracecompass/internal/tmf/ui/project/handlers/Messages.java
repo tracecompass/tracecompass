@@ -88,6 +88,8 @@ public class Messages extends NLS {
     public static String OpenAsExperimentHandler_DefaultExperimentName;
     public static String OpenAsExperimentHandler_ValidationErrorTitle;
     public static String OpenAsExperimentHandler_ValidationErrorMessage;
+    public static String OpenAsExperimentHandler_OpeningErrorTitle;
+    public static String OpenAsExperimentHandler_OpeningErrorMessage;
 
     static {
         // initialize resource bundle
