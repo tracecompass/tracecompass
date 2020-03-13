@@ -22,7 +22,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.CpuUsageDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.presentation.IXYPresentationProvider;
 import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.swtchart.ITitle;
@@ -36,8 +38,6 @@ import com.google.common.base.Joiner;
  * @author Geneviève Bastien
  */
 public class CpuUsageXYViewer extends TmfFilteredXYChartViewer {
-
-    private static final int DEFAULT_SERIES_WIDTH = 1;
 
     /**
      * Constructor
@@ -61,11 +61,8 @@ public class CpuUsageXYViewer extends TmfFilteredXYChartViewer {
     }
 
     @Override
-    public IYAppearance getSeriesAppearance(@NonNull String seriesName) {
-        if (seriesName.startsWith(CpuUsageDataProvider.TOTAL)) {
-            return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH);
-        }
-        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.AREA, DEFAULT_SERIES_WIDTH);
+    public IYAppearance getSeriesAppearance(@NonNull Long seriesId) {
+        return getPresentationProvider().getAppearance(seriesId);
     }
 
     /**
@@ -79,5 +76,11 @@ public class CpuUsageXYViewer extends TmfFilteredXYChartViewer {
         } else {
             title.setText(Messages.CpuUsageView_Title + ' ' + Joiner.on(", ").join(cpus)); //$NON-NLS-1$
         }
+    }
+
+    @Override
+    protected IXYPresentationProvider createPresentationProvider(ITmfTrace trace) {
+        CPUUsagePresentationProvider presProvider = CPUUsagePresentationProvider.getForTrace(trace);
+        return presProvider;
     }
 }

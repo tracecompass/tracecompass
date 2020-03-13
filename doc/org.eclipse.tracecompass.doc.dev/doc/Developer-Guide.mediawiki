@@ -5353,7 +5353,6 @@ import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.examples.core.data.provider.ExampleXYDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
@@ -5393,19 +5392,8 @@ public class ExampleXYDataProviderView extends TmfChartView {
 
     private static final class TreeXyViewer extends AbstractSelectTreeViewer {
 
-        private final class TreeXyLabelProvider extends AbstractSelectTreeViewer.TreeLabelProvider {
-            @Override
-            public @Nullable Image getColumnImage(@Nullable Object element, int columnIndex) {
-                if (columnIndex == 1 && element instanceof TmfTreeViewerEntry && isChecked(element)) {
-                    return getLegendImage(String.valueOf(((TmfTreeViewerEntry) element).getName()));
-                }
-                return null;
-            }
-        }
-
         public TreeXyViewer(Composite parent) {
             super(parent, 1, ExampleXYDataProvider.ID);
-            setLabelProvider(new TreeXyLabelProvider());
         }
 
         @Override

@@ -14,9 +14,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.tracecompass.analysis.os.linux.core.memory.MemoryUsageTreeModel;
 import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
+import org.eclipse.tracecompass.tmf.core.presentation.IXYPresentationProvider;
 import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
@@ -34,8 +35,8 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  * @author Wassim Nasrallah
  */
 public class MemoryUsageView extends TmfChartView {
-   private final String fProviderId;
-   private final TmfXYChartSettings fSettings;
+    private final String fProviderId;
+    private final TmfXYChartSettings fSettings;
 
     /**
      * Constructor
@@ -57,10 +58,15 @@ public class MemoryUsageView extends TmfChartView {
     protected TmfXYChartViewer createChartViewer(Composite parent) {
         TmfFilteredXYChartViewer viewer = new TmfFilteredXYChartViewer(parent, fSettings, fProviderId) {
             @Override
-            public @NonNull IYAppearance getSeriesAppearance(String seriesName) {
-                int width = seriesName.endsWith(MemoryUsageTreeModel.TOTAL_SUFFIX) ? 2 : 1;
-                return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.LINE, width);
+            public @NonNull IYAppearance getSeriesAppearance(Long seriesId) {
+                return getPresentationProvider().getAppearance(seriesId);
             }
+
+            @Override
+            protected IXYPresentationProvider createPresentationProvider(ITmfTrace trace) {
+                return MemoryPresentationProvider.getForTrace(trace);
+            }
+
         };
         viewer.getSwtChart().getAxisSet().getYAxis(0).getTick().setFormat(DataSizeWithUnitFormat.getInstance());
         return viewer;
@@ -101,4 +107,5 @@ public class MemoryUsageView extends TmfChartView {
         action.setChecked(true);
         return action;
     }
+
 }

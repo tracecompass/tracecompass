@@ -24,7 +24,7 @@ public interface IXYPresentationProvider {
     /**
      * Returns the {@link IYAppearance} to which the specified series name is
      * mapped. If no appearance is found, a new one will be created with given
-     * paramters and added to this presentation provider
+     * parameters and added to this presentation provider
      *
      * @param seriesName
      *            The name of the series
@@ -33,11 +33,49 @@ public interface IXYPresentationProvider {
      * @param width
      *            The series width
      * @return The {@link IYAppearance} instance of the Y series.
+     * @deprecated As of 6.0, use {@link #getAppearance(Long, String, int)} instead
      */
+    @Deprecated
     IYAppearance getAppearance(String seriesName, String type, int width);
+
+    /**
+     * Returns the {@link IYAppearance} to which the specified series ID is
+     * mapped. If no appearance is found, a new one will be created with given
+     * parameters and added to this presentation provider.
+     *
+     * @param seriesId
+     *            The name of the series
+     * @param type
+     *            The series type
+     * @param width
+     *            The series width
+     * @return The {@link IYAppearance} instance of the Y series.
+     * @since 6.0
+     */
+    default IYAppearance getAppearance(Long seriesId, String type, int width) {
+        return getAppearance(String.valueOf(seriesId), type, width);
+    }
+
+    /**
+     * Returns the {@link IYAppearance} to which the specified series ID is
+     * mapped. If no appearance is found, a new one will be created with given
+     * parameters and added to this presentation provider.
+     *
+     * TODO Support output element styles in XY too, so line types can be
+     * defined by data provider
+     *
+     * @param seriesId
+     *            The name of the series
+     * @return The {@link IYAppearance} instance of the Y series.
+     * @since 6.0
+     */
+    default IYAppearance getAppearance(Long seriesId) {
+        return getAppearance(String.valueOf(seriesId), IYAppearance.Type.LINE, 1);
+    }
 
     /**
      * Remove all {@link IYAppearance}
      */
     void clear();
+
 }

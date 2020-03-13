@@ -135,8 +135,8 @@ public class AbstractSegmentStoreScatterChartViewer extends TmfFilteredXYChartVi
     }
 
     @Override
-    public IYAppearance getSeriesAppearance(@NonNull String seriesName) {
-        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.SCATTER, DEFAULT_SERIES_WIDTH);
+    public IYAppearance getSeriesAppearance(@NonNull Long seriesId) {
+        return getPresentationProvider().getAppearance(seriesId, IYAppearance.Type.SCATTER, DEFAULT_SERIES_WIDTH);
     }
 
     /**

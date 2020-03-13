@@ -32,7 +32,7 @@ import com.google.common.collect.ImmutableList;
  */
 public class DiskIOActivityTreeViewer extends AbstractSelectTreeViewer {
 
-    private final class DiskTreeLabelProvider extends TreeLabelProvider {
+    private final class DiskTreeLabelProvider extends DataProviderTreeLabelProvider {
 
         @Override
         public @Nullable Image getColumnImage(@Nullable Object element, int columnIndex) {
@@ -40,7 +40,7 @@ public class DiskIOActivityTreeViewer extends AbstractSelectTreeViewer {
                 TmfGenericTreeEntry<TmfTreeDataModel> entry = (TmfGenericTreeEntry<TmfTreeDataModel>) element;
                 if (!entry.hasChildren()) {
                     // ensures that only leaf nodes return images
-                    return getLegendImage(getFullPath(entry));
+                    return getLegendImage(entry.getModel().getId());
                 }
             }
             return null;

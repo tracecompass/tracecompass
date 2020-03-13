@@ -45,7 +45,7 @@ import com.google.common.collect.Lists;
  */
 public class CounterTreeViewer extends AbstractSelectTreeViewer {
 
-    private final class CounterTreeLabelProvider extends TreeLabelProvider {
+    private final class CounterTreeLabelProvider extends DataProviderTreeLabelProvider {
 
         @Override
         public Image getColumnImage(Object element, int columnIndex) {
@@ -54,7 +54,7 @@ public class CounterTreeViewer extends AbstractSelectTreeViewer {
                 if (genericEntry.hasChildren()) {
                     return null;
                 }
-                return getLegendImage(getFullPath(genericEntry));
+                return getLegendImage(genericEntry.getModel().getId());
             }
             return null;
         }

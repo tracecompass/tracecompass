@@ -19,6 +19,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.memory.MemoryUsageTreeModel;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.FilterTimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
@@ -38,7 +41,7 @@ import com.google.common.collect.ImmutableList;
 public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
 
     /** Provides label for the Kernel memory usage tree viewer cells */
-    private class MemoryLabelProvider extends TreeLabelProvider {
+    private class MemoryLabelProvider extends DataProviderTreeLabelProvider {
 
         @Override
         public String getColumnText(Object element, int columnIndex) {
@@ -50,7 +53,9 @@ public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
                 return obj.getName();
             } else if (columnIndex == 1) {
                 int tid = obj.getModel().getTid();
-                if (tid < 0) {
+                if (obj.getModel().getParentId() == -1) {
+                    // FIXME: Series total have different style than others. This should come from the data provider
+                    fPresentationProvider.setTotalSeries(obj.getModel().getId());
                     return Messages.MemoryUsageTree_Total;
                 }
                 return Integer.toString(tid);
@@ -60,14 +65,13 @@ public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
 
         @Override
         public Image getColumnImage(Object element, int columnIndex) {
-            if (columnIndex == 2 && element instanceof TmfGenericTreeEntry) {
+            if (columnIndex != 2 || !(element instanceof TmfGenericTreeEntry)) {
+                return null;
+            }
+            TmfGenericTreeEntry<MemoryUsageTreeModel> obj = (TmfGenericTreeEntry<MemoryUsageTreeModel>) element;
+            if (isChecked(element) || obj.getModel().getParentId() == -1) {
                 TmfGenericTreeEntry<MemoryUsageTreeModel> entry = (TmfGenericTreeEntry<MemoryUsageTreeModel>) element;
-                int tid = entry.getModel().getTid();
-                if (entry.getParent() instanceof TmfGenericTreeEntry && isChecked(element)) {
-                    return getLegendImage(entry.getParent().getName() + ':' + tid);
-                } else if (tid < 0) {
-                    return getLegendImage(entry.getName() + MemoryUsageTreeModel.TOTAL_SUFFIX);
-                }
+                return getLegendImage(entry.getModel().getId());
             }
             return null;
         }
@@ -75,6 +79,7 @@ public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
 
     // view is filtered by default
     private boolean fFiltered = true;
+    private MemoryPresentationProvider fPresentationProvider;
 
     /**
      * Constructor
@@ -114,5 +119,19 @@ public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
     public void setFiltered(boolean isFiltered) {
         fFiltered = isFiltered;
         updateContent(getWindowStartTime(), getWindowEndTime(), false);
+    }
+
+    @Override
+    @TmfSignalHandler
+    public void traceSelected(TmfTraceSelectedSignal signal) {
+        super.traceSelected(signal);
+        fPresentationProvider = MemoryPresentationProvider.getForTrace(signal.getTrace());
+    }
+
+    @Override
+    @TmfSignalHandler
+    public void traceOpened(TmfTraceOpenedSignal signal) {
+        super.traceOpened(signal);
+        fPresentationProvider = MemoryPresentationProvider.getForTrace(signal.getTrace());
     }
 }

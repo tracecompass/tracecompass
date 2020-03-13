@@ -54,7 +54,7 @@ public class NewHistogramViewer extends TmfFilteredXYChartViewer {
     }
 
     @Override
-    public IYAppearance getSeriesAppearance(@NonNull String seriesName) {
-        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.BAR, DEFAULT_SERIES_WIDTH);
+    public IYAppearance getSeriesAppearance(@NonNull Long seriesId) {
+        return getPresentationProvider().getAppearance(seriesId, IYAppearance.Type.BAR, DEFAULT_SERIES_WIDTH);
     }
 }

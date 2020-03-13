@@ -239,9 +239,24 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      *                       The name of the series
      * @return An {@link IYAppearance} instance for the series
      * @since 4.0
+     * @deprecated As of 6.0, use {@link #getSeriesAppearance(Long)} instead
      */
+    @Deprecated
     public @NonNull IYAppearance getSeriesAppearance(@NonNull String seriesName) {
         return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH);
+    }
+
+    /**
+     * Gets the appearance of a given series. If appearance doesn't exist, a new one
+     * will be created by the presentation provider
+     *
+     * @param seriesId
+     *                       The unique ID of the series
+     * @return An {@link IYAppearance} instance for the series
+     * @since 6.0
+     */
+    public @NonNull IYAppearance getSeriesAppearance(@NonNull Long seriesId) {
+        return getPresentationProvider().getAppearance(seriesId, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH);
     }
 
     /**
@@ -549,7 +564,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             ISeriesSet seriesSet = getSwtChart().getSeriesSet();
 
             String seriesName = yModel.getName();
-            IYAppearance appearance = getSeriesAppearance(seriesName);
+            IYAppearance appearance = getSeriesAppearance(yModel.getId());
 
             String type = appearance.getType();
             RGBAColor rgb = appearance.getColor();
@@ -584,7 +599,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             ISeriesSet seriesSet = getSwtChart().getSeriesSet();
 
             String seriesName = yModel.getName() + DIMMED_SERIES_SUFFIX;
-            IYAppearance appearance = getSeriesAppearance(yModel.getName());
+            IYAppearance appearance = getSeriesAppearance(yModel.getId());
 
             String type = appearance.getType();
             float[] rgb = appearance.getColor().getHSBA();

@@ -53,7 +53,7 @@ public class HistogramTreeViewer extends AbstractSelectTreeViewer {
                      * the trace level entry should not have a legend, the Total and lost event
                      * entries should.
                      */
-                    return getLegendImage(getFullPath(genericEntry));
+                    return getLegendImage(genericEntry.getModel().getId());
                 }
             }
             return null;

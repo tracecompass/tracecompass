@@ -48,6 +48,35 @@ public class XYChartLegendImageProvider implements ILegendImageProvider {
     }
 
     @Override
+    public Image getLegendImage(int imageHeight, int imageWidth, @NonNull Long id) {
+        /*
+         * If series exists in chart, then image legend match that series. Image will
+         * make sense if series exists in chart. If it does not exists, an image will
+         * still be created.
+         */
+        IYAppearance appearance = fChartViewer.getSeriesAppearance(id);
+        RGBAColor rgb = appearance.getColor();
+        Color lineColor = new Color(Display.getDefault(), rgb.getRed(), rgb.getGreen(), rgb.getBlue());
+        Color background = Display.getDefault().getSystemColor(SWT.COLOR_WHITE);
+
+        PaletteData palette = new PaletteData(background.getRGB(), lineColor.getRGB());
+        ImageData imageData = new ImageData(imageWidth, imageHeight, 8, palette);
+        imageData.transparentPixel = 0;
+        Image image = new Image(Display.getDefault(), imageData);
+        GC gc = new GC(image);
+
+        gc.setBackground(background);
+        gc.fillRectangle(0, 0, imageWidth, imageHeight);
+        drawStyleLine(gc, lineColor, imageWidth, imageHeight, appearance);
+
+        drawStyledDot(gc, lineColor, imageWidth, imageHeight, appearance);
+
+        gc.dispose();
+        lineColor.dispose();
+        return image;
+    }
+
+    @Override
     public Image getLegendImage(int imageHeight, int imageWidth, @NonNull String name) {
         /*
          * If series exists in chart, then image legend match that series. Image will
@@ -126,4 +155,5 @@ public class XYChartLegendImageProvider implements ILegendImageProvider {
         gc.setForeground(prevFg);
         gc.setBackground(prevBg);
     }
+
 }

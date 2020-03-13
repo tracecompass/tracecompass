@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.presentation.YAppearance;
 
 import com.google.common.collect.ImmutableList;
@@ -56,6 +57,7 @@ public class XYPresentationProvider implements IXYPresentationProvider {
     /* This map a series name and an IYAppearance */
     private final Map<String, IYAppearance> fYAppearances = new HashMap<>();
 
+    @Deprecated
     @Override
     public synchronized IYAppearance getAppearance(String serieName, String seriesType, int width) {
         IYAppearance appearance = fYAppearances.get(serieName);
@@ -72,6 +74,33 @@ public class XYPresentationProvider implements IXYPresentationProvider {
         return appearance;
     }
 
+    @Override
+    public @NonNull IYAppearance getAppearance(@NonNull Long seriesId, @NonNull String seriesType, int width) {
+        IYAppearance appearance = fYAppearances.get(String.valueOf(seriesId));
+        if (appearance != null) {
+            return appearance;
+        }
+
+        if(!SUPPORTED_TYPES.contains(seriesType)) {
+            throw new UnsupportedOperationException("Series type: " + seriesType + " is not supported."); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+
+        appearance = YAppearance.Type.SCATTER.equals(seriesType) ? createScatter(String.valueOf(seriesId), seriesType, width) : createAppearance(String.valueOf(seriesId), seriesType, width);
+        fYAppearances.put(String.valueOf(seriesId), appearance);
+        return appearance;
+    }
+
+    @Override
+    public @NonNull IYAppearance getAppearance(@NonNull Long seriesId) {
+        IYAppearance appearance = fYAppearances.get(String.valueOf(seriesId));
+        if (appearance != null) {
+            return appearance;
+        }
+
+        appearance = createAppearance(String.valueOf(seriesId), YAppearance.Type.LINE, 1);
+        fYAppearances.put(String.valueOf(seriesId), appearance);
+        return appearance;
+    }
 
     @Override
     public void clear() {

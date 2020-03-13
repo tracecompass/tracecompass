@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
+import org.eclipse.tracecompass.tmf.core.model.IOutputStyleProvider;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXYDataProvider;
@@ -51,6 +52,7 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
     private @NonNull Collection<@NonNull Long> fSelectedIds = Collections.emptyList();
 
     private final String fId;
+    private boolean fUseDefaultStyleValues = true;
 
     /**
      * Constructor
@@ -131,8 +133,17 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
     }
 
     @Override
+    public @NonNull IYAppearance getSeriesAppearance(@NonNull Long seriesId) {
+        return fUseDefaultStyleValues ? getPresentationProvider().getAppearance(seriesId, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH) : getPresentationProvider().getAppearance(seriesId);
+    }
+
+    @Override
     protected ITmfXYDataProvider initializeDataProvider(ITmfTrace trace) {
-        return DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeXYDataProvider.class);
+        ITmfTreeXYDataProvider dataProvider = DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeXYDataProvider.class);
+        if (dataProvider instanceof IOutputStyleProvider) {
+            fUseDefaultStyleValues = false;
+        }
+        return dataProvider;
     }
 
 }

@@ -152,6 +152,26 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         }
     }
 
+    /**
+     * Base class to provide the labels for the tree viewer. Views extending
+     * this class typically need to override the getColumnText method if they
+     * have more than one column to display. It also allows to change the font
+     * and colors of the cells.
+     * @since 6.0
+     */
+    protected class DataProviderTreeLabelProvider extends TreeLabelProvider {
+
+        @Override
+        public Image getColumnImage(Object element, int columnIndex) {
+            if (columnIndex == 1 && element instanceof TmfGenericTreeEntry && isChecked(element)) {
+                TmfGenericTreeEntry<TmfTreeDataModel> genericEntry = (TmfGenericTreeEntry<TmfTreeDataModel>) element;
+                return getLegendImage(genericEntry.getModel().getId());
+            }
+            return null;
+        }
+
+    }
+
     private ILegendImageProvider fLegendImageProvider;
     private Set<ICheckboxTreeViewerListener> fTreeListeners = new HashSet<>();
     private TriStateFilteredCheckboxTree fCheckboxTree;
@@ -184,6 +204,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         fLegendIndex = legendIndex;
         fId = id;
         fLogCategory = fId + LOG_CATEGORY_SUFFIX;
+        setLabelProvider(new DataProviderTreeLabelProvider());
     }
 
     /**
@@ -534,6 +555,29 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         return null;
     }
 
+    /**
+     * Get the legend image for a entry's ID
+     *
+     * @param id
+     *            the entry's unique ID
+     * @return the correctly dimensioned image if there is a legend image provider
+     * @since 6.0
+     */
+    protected Image getLegendImage(@NonNull Long id) {
+        /* If the image height match the row height, row height will increment */
+        ILegendImageProvider legendImageProvider = fLegendImageProvider;
+        int legendColumnIndex = fLegendIndex;
+        if (legendImageProvider != null && legendColumnIndex >= 0) {
+            Tree tree = getTreeViewer().getTree();
+            int imageWidth = tree.getColumn(legendColumnIndex).getWidth();
+            int imageHeight = tree.getItemHeight() - 1;
+            if (imageHeight > 0 && imageWidth > 0) {
+                return legendImageProvider.getLegendImage(imageHeight, imageWidth, id);
+            }
+        }
+        return null;
+    }
+
     @Override
     protected ITmfTreeViewerEntry updateElements(ITmfTrace trace, long start, long end, boolean isSelection) {
         throw new UnsupportedOperationException("This method should not be called for AbstractSelectTreeViewers"); //$NON-NLS-1$
@@ -628,7 +672,10 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
      * @param entry
      *            entry whose legend needs to be resolved.
      * @return the relevant series name.
+     * @deprecated The ID should be used to query the presentation provider
+     *             instead of the full path
      */
+    @Deprecated
     protected static @NonNull String getFullPath(TmfGenericTreeEntry<TmfTreeDataModel> entry) {
         StringBuilder path = new StringBuilder(entry.getName());
         ITmfTreeViewerEntry parent = entry.getParent();

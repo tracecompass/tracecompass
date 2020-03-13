@@ -47,7 +47,7 @@ public class DisksIOActivityViewer extends TmfFilteredXYChartViewer {
     }
 
     @Override
-    public IYAppearance getSeriesAppearance(@NonNull String seriesName) {
-        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.AREA, DEFAULT_SERIES_WIDTH);
+    public IYAppearance getSeriesAppearance(@NonNull Long seriesId) {
+        return getPresentationProvider().getAppearance(seriesId, IYAppearance.Type.AREA, DEFAULT_SERIES_WIDTH);
     }
 }

@@ -31,6 +31,9 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.CpuUsag
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
@@ -52,7 +55,7 @@ public class CpuUsageTreeViewer extends AbstractSelectTreeViewer {
     private static final Format TIME_FORMATTER = SubSecondTimeWithUnitFormat.getInstance();
 
     /** Provides label for the CPU usage tree viewer cells */
-    protected class CpuLabelProvider extends TreeLabelProvider {
+    protected class CpuLabelProvider extends DataProviderTreeLabelProvider {
 
         @Override
         public String getColumnText(Object element, int columnIndex) {
@@ -82,16 +85,20 @@ public class CpuUsageTreeViewer extends AbstractSelectTreeViewer {
                 CpuUsageEntryModel model = cpuUsageEntry.getModel();
                 int tid = model.getTid();
                 if (tid < 0) {
-                    return getLegendImage(CpuUsageDataProvider.TOTAL + model.getName());
+                    // Total entry, assume it is checked
+                    // FIXME: Make it [un]checkable
+                    fPresentationProvider.setTotalSeries(model.getId());
+                    return getLegendImage(model.getId());
                 }
                 if (isChecked(element)) {
-                    CpuUsageEntry parent = (CpuUsageEntry) cpuUsageEntry.getParent();
-                    return getLegendImage(parent.getModel().getName() + ':' + model.getTid());
+                    return getLegendImage(model.getId());
                 }
             }
             return null;
         }
     }
+
+    private CPUUsagePresentationProvider fPresentationProvider;
 
     /**
      * Constructor
@@ -173,4 +180,19 @@ public class CpuUsageTreeViewer extends AbstractSelectTreeViewer {
             return columns.build();
         };
     }
+
+    @Override
+    @TmfSignalHandler
+    public void traceSelected(TmfTraceSelectedSignal signal) {
+        super.traceSelected(signal);
+        fPresentationProvider = CPUUsagePresentationProvider.getForTrace(signal.getTrace());
+    }
+
+    @Override
+    @TmfSignalHandler
+    public void traceOpened(TmfTraceOpenedSignal signal) {
+        super.traceOpened(signal);
+        fPresentationProvider = CPUUsagePresentationProvider.getForTrace(signal.getTrace());
+    }
+
 }
