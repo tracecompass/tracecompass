@@ -69,7 +69,6 @@ public class ExampleXYDataProvider extends AbstractTreeDataProvider<ExampleState
     private static final AtomicLong sfAtomicId = new AtomicLong();
 
     private final BiMap<Long, Integer> fIDToDisplayQuark = HashBiMap.create();
-    private final Map<Integer, String> fQuarkToString = new HashMap<>();
 
     /**
      * Constructor
@@ -115,7 +114,6 @@ public class ExampleXYDataProvider extends AbstractTreeDataProvider<ExampleState
             if (statusQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
                 Long id = fIDToDisplayQuark.inverse().computeIfAbsent(statusQuark, q -> sfAtomicId.getAndIncrement());
                 entryList.add(new TmfTreeDataModel(id, -1, ss.getAttributeName(quark)));
-                fQuarkToString.put(statusQuark, ss.getAttributeName(quark));
             }
         }
         return new TmfTreeModel<>(Collections.emptyList(), entryList);
@@ -168,9 +166,9 @@ public class ExampleXYDataProvider extends AbstractTreeDataProvider<ExampleState
         } catch (IndexOutOfBoundsException | TimeRangeException | StateSystemDisposedException e) {
             return new TmfModelResponse<>(null, Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
         }
-        Map<String, IYModel> models = new HashMap<>();
+        List<IYModel> models = new ArrayList<>();
         for (Entry<Integer, double[]> values : quarkToValues.entrySet()) {
-            models.put(String.valueOf(fQuarkToString.get(values.getKey())), new YModel(fIDToDisplayQuark.inverse().getOrDefault(values.getKey(), -1L), String.valueOf(fQuarkToString.get(values.getKey())), values.getValue()));
+            models.add(new YModel(fIDToDisplayQuark.inverse().getOrDefault(values.getKey(), -1L), values.getValue()));
         }
 
         return new TmfModelResponse<>(new TmfCommonXAxisModel("Example XY data provider", nativeTimes, models), Status.COMPLETED, CommonStatusMessage.COMPLETED); //$NON-NLS-1$

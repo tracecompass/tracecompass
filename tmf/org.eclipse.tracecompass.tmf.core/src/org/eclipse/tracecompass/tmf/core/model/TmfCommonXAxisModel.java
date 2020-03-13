@@ -11,7 +11,10 @@
 
 package org.eclipse.tracecompass.tmf.core.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -20,7 +23,7 @@ import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.gson.annotations.SerializedName;
 
@@ -40,9 +43,9 @@ public class TmfCommonXAxisModel implements ITmfCommonXAxisModel {
     private final long[] fXValues;
 
     @SerializedName("series")
-    private final Map<String, IYModel> fYSeries;
+    private final Collection<IYModel> fYSeries;
 
-    private final transient Map<String, ISeriesModel> fSeries;
+    private final transient Collection<ISeriesModel> fSeries;
 
     /**
      * Constructor
@@ -53,12 +56,42 @@ public class TmfCommonXAxisModel implements ITmfCommonXAxisModel {
      *            x values
      * @param ySeries
      *            A Map of YSeries
+     * @deprecated As of 6.0, use
+     *             {@link #TmfCommonXAxisModel(String, long[], Collection)}
+     *             instead
      */
+    @Deprecated
     public TmfCommonXAxisModel(String title, long[] xValues, Map<String, IYModel> ySeries) {
         fTitle = title;
         fXValues = Arrays.copyOf(xValues, xValues.length);
-        fYSeries = ImmutableMap.copyOf(ySeries);
-        fSeries = Maps.transformValues(fYSeries, model -> new SeriesModel(model.getId(), model.getName(), fXValues, model.getData()));
+        fYSeries = ImmutableList.copyOf(ySeries.values());
+        List<ISeriesModel> series = new ArrayList<>();
+        for (IYModel model : fYSeries) {
+            series.add(new SeriesModel(model.getId(), model.getName(), fXValues, model.getData()));
+        }
+        fSeries = ImmutableList.copyOf(series);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param title
+     *            Chart title
+     * @param xValues
+     *            x values
+     * @param ySeries
+     *            A Map of YSeries
+     * @since 6.0
+     */
+    public TmfCommonXAxisModel(String title, long[] xValues, Collection<IYModel> ySeries) {
+        fTitle = title;
+        fXValues = Arrays.copyOf(xValues, xValues.length);
+        fYSeries = ImmutableList.copyOf(ySeries);
+        List<ISeriesModel> series = new ArrayList<>();
+        for (IYModel model : fYSeries) {
+            series.add(new SeriesModel(model.getId(), model.getName(), fXValues, model.getData()));
+        }
+        fSeries = ImmutableList.copyOf(series);
     }
 
     @Override
@@ -72,17 +105,29 @@ public class TmfCommonXAxisModel implements ITmfCommonXAxisModel {
     }
 
     @Override
-    public @NonNull Map<String, IYModel> getYData() {
-        return fYSeries;
-    }
-
-    @Override
     public boolean hasCommonXAxis() {
         return true;
     }
 
     @Override
-    public Map<String, ISeriesModel> getData() {
+    public @NonNull Collection<@NonNull ISeriesModel> getSeriesData() {
         return fSeries;
+    }
+
+    @Override
+    public @NonNull Collection<@NonNull IYModel> getYSeriesData() {
+        return fYSeries;
+    }
+
+    @Deprecated
+    @Override
+    public @NonNull Map<String, IYModel> getYData() {
+        return Maps.uniqueIndex(fYSeries, series -> series.getName());
+    }
+
+    @Deprecated
+    @Override
+    public Map<String, ISeriesModel> getData() {
+        return Maps.uniqueIndex(fSeries, series -> series.getName());
     }
 }

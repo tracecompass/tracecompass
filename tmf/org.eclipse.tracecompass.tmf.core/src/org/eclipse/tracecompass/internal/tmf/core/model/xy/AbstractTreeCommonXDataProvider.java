@@ -11,6 +11,7 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.model.xy;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -34,6 +35,8 @@ import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Class to abstract {@link ITmfTreeXYDataProvider} methods and fields for data
@@ -88,16 +91,40 @@ public abstract class AbstractTreeCommonXDataProvider<A extends TmfStateSystemAn
 
         try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "AbstractTreeXyDataProvider#fetchXY") //$NON-NLS-1$
                 .setCategory(getClass().getSimpleName()).build()) {
-            Map<String, IYModel> yModels = getYModels(ss, fetchParameters, monitor);
+            Collection<IYModel> yModels = getYSeriesModels(ss, fetchParameters, monitor);
             if (yModels == null) {
                 // getModels returns null if the query was cancelled.
                 return TmfXyResponseFactory.createCancelledResponse(CommonStatusMessage.TASK_CANCELLED);
             }
-            return TmfXyResponseFactory.create(getTitle(), filter.getTimesRequested(), yModels, complete);
+            return TmfXyResponseFactory.create(getTitle(), filter.getTimesRequested(), ImmutableList.copyOf(yModels), complete);
         } catch (StateSystemDisposedException | TimeRangeException | IndexOutOfBoundsException e) {
             return TmfXyResponseFactory.createFailedResponse(String.valueOf(e.getMessage()));
         }
     }
+
+    /**
+     * Abstract method to be implemented by the providers to return trees. Lets
+     * the abstract class handle waiting for {@link ITmfStateSystem}
+     * initialization and progress, as well as error handling
+     *
+     * @param ss
+     *            the {@link TmfStateSystemAnalysisModule}'s
+     *            {@link ITmfStateSystem}
+     * @param fetchParameters
+     *            the query's filter
+     * @param monitor
+     *            progress monitor
+     * @return the map of models, null if the query was cancelled
+     * @throws StateSystemDisposedException
+     *             if the state system was closed during the query or could not
+     *             be queried.
+     * @deprecated As of 5.3, use
+     *             {@link #getYSeriesModels(ITmfStateSystem, Map, IProgressMonitor)}
+     */
+    @Deprecated
+    protected abstract @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss,
+            Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor)
+                    throws StateSystemDisposedException;
 
     /**
      * Abstract method to be implemented by the providers to return trees. Lets the
@@ -115,9 +142,12 @@ public abstract class AbstractTreeCommonXDataProvider<A extends TmfStateSystemAn
      *             if the state system was closed during the query or could not be
      *             queried.
      */
-    protected abstract @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss,
+    protected @Nullable Collection<IYModel> getYSeriesModels(ITmfStateSystem ss,
             Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor)
-                    throws StateSystemDisposedException;
+                    throws StateSystemDisposedException {
+        Map<String, IYModel> yModels = getYModels(ss, fetchParameters, monitor);
+        return yModels == null ? null : yModels.values();
+    }
 
     /**
      * Getter for the title of this provider

@@ -36,7 +36,7 @@ import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
 /**
@@ -153,11 +153,11 @@ public class TmfTreeXYCompositeDataProvider<M extends ITmfTreeDataModel, P exten
         // The query is considered complete if all providers are completed
         boolean isComplete = Iterables.all(responses, response -> response.getStatus() == ITmfResponse.Status.COMPLETED);
         if (allCommon) {
-            ImmutableMap.Builder<String, IYModel> series = ImmutableMap.builder();
+            ImmutableList.Builder<IYModel> series = ImmutableList.builder();
             responses.forEach(response -> {
                 ITmfCommonXAxisModel model = (ITmfCommonXAxisModel) response.getModel();
                 if (model != null) {
-                    series.putAll(model.getYData());
+                    series.addAll(model.getYSeriesData());
                 }
             });
             TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(fetchParameters);
@@ -166,11 +166,11 @@ public class TmfTreeXYCompositeDataProvider<M extends ITmfTreeDataModel, P exten
             }
             return TmfXyResponseFactory.create(fTitle, filter.getTimesRequested(), series.build(), isComplete);
         }
-        ImmutableMap.Builder<String, ISeriesModel> series = ImmutableMap.builder();
+        ImmutableList.Builder<ISeriesModel> series = ImmutableList.builder();
         responses.forEach(response -> {
             ITmfXyModel model = response.getModel();
             if (model != null) {
-                series.putAll(model.getData());
+                series.addAll(model.getSeriesData());
             }
         });
         return TmfXyResponseFactory.create(fTitle, series.build(), isComplete);

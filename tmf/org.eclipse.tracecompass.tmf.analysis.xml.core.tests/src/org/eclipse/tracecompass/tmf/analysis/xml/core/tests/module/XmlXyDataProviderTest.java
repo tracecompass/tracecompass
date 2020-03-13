@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +66,9 @@ import org.junit.Test;
 import org.w3c.dom.Element;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Test the XML XY data provider
@@ -245,16 +248,17 @@ public class XmlXyDataProviderTest {
         assertEquals(ITmfResponse.Status.COMPLETED, rowResponse.getStatus());
         ITmfXyModel rowModel = rowResponse.getModel();
         assertNotNull(rowModel);
-        Map<@NonNull String, @NonNull ISeriesModel> data = rowModel.getData();
+        Collection<@NonNull ISeriesModel> series = rowModel.getSeriesData();
+        ImmutableMap<Long, @NonNull ISeriesModel> data = Maps.uniqueIndex(series, ISeriesModel::getId);
 
         for (int i = 0; i < expectedStrings.size(); i++) {
             String expectedString = expectedStrings.get(i);
             String[] split = expectedString.split(":");
             String rowName = split[0];
-            String rowId = null;
+            Long rowId = null;
             for (Entry<Long, String> entry : tree.entrySet()) {
                 if (entry.getValue().equals(rowName)) {
-                    rowId = Long.toString(entry.getKey());
+                    rowId = entry.getKey();
                     break;
                 }
             }

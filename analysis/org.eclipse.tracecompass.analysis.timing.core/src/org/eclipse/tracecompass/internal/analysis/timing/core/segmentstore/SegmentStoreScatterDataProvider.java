@@ -350,7 +350,7 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         Map<String, Series> types = initTypes(prefix, filter);
         if (types.isEmpty()) {
             // this would return an empty map even if we did the queries.
-            return TmfXyResponseFactory.create(Objects.requireNonNull(Messages.SegmentStoreScatterGraphViewer_title), Collections.emptyMap(), true);
+            return TmfXyResponseFactory.create(Objects.requireNonNull(Messages.SegmentStoreScatterGraphViewer_title), Collections.emptyList(), true);
         }
         long pixelSize = Math.max(1, (end - start) / filter.getTimesRequested().length);
         final Iterable<ISegment> intersectingElements = Iterables.filter(segStore.getIntersectingElements(start, end, SegmentComparators.INTERVAL_START_COMPARATOR), (segment) -> {
@@ -379,10 +379,10 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
             addPoint(thisSeries, segment, predicates, monitor);
         }
 
-        Map<String, ISeriesModel> seriesModelMap = new HashMap<>();
+        List<ISeriesModel> seriesModelMap = new ArrayList<>();
         for (Entry<String, Series> entry : types.entrySet()) {
             SeriesModel seriesModel = entry.getValue().build();
-            seriesModelMap.put(Long.toString(seriesModel.getId()), seriesModel);
+            seriesModelMap.add(seriesModel);
         }
         return TmfXyResponseFactory.create(Objects.requireNonNull(Messages.SegmentStoreScatterGraphViewer_title),
                 seriesModelMap, complete);

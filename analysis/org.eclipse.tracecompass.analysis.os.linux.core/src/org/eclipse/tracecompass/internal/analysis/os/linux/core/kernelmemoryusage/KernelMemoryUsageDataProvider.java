@@ -43,7 +43,8 @@ import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 
 /**
  * This data provider will return a XY model based on a query filter. The model
@@ -103,11 +104,17 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
         fKernelModule = kernelModule;
     }
 
+    @Deprecated
+    @Override
+    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
+        return Maps.uniqueIndex(getYSeriesModels(ss, fetchParameters, monitor), IYModel::getName);
+    }
+
     /**
      * @since 2.5
      */
     @Override
-    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss,
+    protected @Nullable Collection<IYModel> getYSeriesModels(ITmfStateSystem ss,
             Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor)
             throws StateSystemDisposedException {
 
@@ -175,14 +182,11 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
             }
         }
 
-        ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
+        ImmutableList.Builder<IYModel> ySeries = ImmutableList.builder();
 
         String total = getTrace().getName() + MemoryUsageTreeModel.TOTAL_SUFFIX;
-        ySeries.put(total, new YModel(getId(ITmfStateSystem.ROOT_ATTRIBUTE), total, totalKernelMemoryValues));
-
-        for (IYModel entry : selectedSeries.values()) {
-            ySeries.put(entry.getName(), entry);
-        }
+        ySeries.add(new YModel(getId(ITmfStateSystem.ROOT_ATTRIBUTE), total, totalKernelMemoryValues));
+        ySeries.addAll(selectedSeries.values());
 
         return ySeries.build();
     }

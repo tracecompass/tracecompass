@@ -61,7 +61,6 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 
 /**
  * This data provider will return a XY model (wrapped in a response) based on a
@@ -245,7 +244,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         long[] xValues = filter.getTimesRequested();
         Map<Integer, IYModel> map = initSeries(fetchParameters);
         if (map.isEmpty()) {
-            return TmfXyResponseFactory.create(TITLE, xValues, Collections.emptyMap(), true);
+            return TmfXyResponseFactory.create(TITLE, xValues, Collections.emptyList(), true);
         }
 
         long currentEnd = ss.getCurrentEndTime();
@@ -280,7 +279,7 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         }
 
         boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
-        return TmfXyResponseFactory.create(TITLE, xValues, Maps.uniqueIndex(map.values(), yModel -> Long.toString(yModel.getId())), complete);
+        return TmfXyResponseFactory.create(TITLE, xValues, map.values(), complete);
     }
 
     private Map<Integer, IYModel> initSeries(Map<String, Object> parameters) {

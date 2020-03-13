@@ -40,7 +40,7 @@ import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.TreeMultimap;
 
@@ -137,21 +137,27 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
         }
     }
 
+    @Deprecated
+    @Override
+    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
+        return Maps.uniqueIndex(getYSeriesModels(ss, fetchParameters, monitor), IYModel::getName);
+    }
+
     /**
      * @since 1.2
      */
     @Override
-    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters,
+    protected @Nullable Collection<IYModel> getYSeriesModels(ITmfStateSystem ss, Map<String, Object> fetchParameters,
             @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
         // Check if the parameters contain timeRequested and selectedItems
         // isCumulative will be compute later
         if (FetchParametersUtils.createSelectionTimeQuery(fetchParameters) != null) {
             return internalFetch(ss, fetchParameters, monitor);
         }
-        return Collections.emptyMap();
+        return Collections.emptyList();
     }
 
-    private @Nullable Map<String, IYModel> internalFetch(ITmfStateSystem ss, Map<String, Object> fetchParameters,
+    private @Nullable Collection<IYModel> internalFetch(ITmfStateSystem ss, Map<String, Object> fetchParameters,
             @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
         SelectedCounterQueryFilter filter = createCounterQuery(fetchParameters);
         if (filter == null) {
@@ -173,7 +179,7 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
             countersIntervals.put(interval.getAttribute(), interval);
         }
 
-        ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
+        ImmutableList.Builder<IYModel> ySeries = ImmutableList.builder();
         for (Entry<Long, Integer> entry : entries.entrySet()) {
             if (monitor != null && monitor.isCanceled()) {
                 return null;
@@ -181,7 +187,7 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
             int quark = entry.getValue();
             double[] yValues = buildYValues(countersIntervals.get(quark), filter);
             String seriesName = getTrace().getName() + '/' + ss.getFullAttributePath(quark);
-            ySeries.put(seriesName, new YModel(entry.getKey(), seriesName, yValues));
+            ySeries.add(new YModel(entry.getKey(), seriesName, yValues));
         }
 
         return ySeries.build();
@@ -294,4 +300,5 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
     protected boolean isCacheable() {
         return true;
     }
+
 }

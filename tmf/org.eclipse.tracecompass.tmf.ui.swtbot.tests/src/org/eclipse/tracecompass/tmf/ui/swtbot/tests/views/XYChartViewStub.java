@@ -103,7 +103,7 @@ public class XYChartViewStub extends TmfChartView {
             }
             @NonNull
             IYModel series = new YModel(1, "Top", yValues);
-            Map<@NonNull String, @NonNull IYModel> yModels = Collections.singletonMap(Long.toString(series.getId()), series);
+            List<@NonNull IYModel> yModels = Collections.singletonList(series);
             return TmfXyResponseFactory.create("Top", Objects.requireNonNull(Longs.toArray(xValues)), yModels, true);
         }
 

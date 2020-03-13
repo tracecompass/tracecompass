@@ -11,8 +11,10 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +27,7 @@ import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 
 /**
  * This class creates instance of {@link TmfModelResponse}
@@ -58,8 +60,8 @@ public final class TmfXyResponseFactory {
      * @return A {@link TmfModelResponse} with either a running status or a
      *         completed status
      */
-    public static TmfModelResponse<ITmfXyModel> create(String title, long[] xValues, Map<String, IYModel> yModels, boolean isComplete) {
-        Map<String, ISeriesModel> series = Maps.transformValues(yModels, model -> new SeriesModel(model.getId(), model.getName(), xValues, model.getData()));
+    public static TmfModelResponse<ITmfXyModel> create(String title, long[] xValues, Collection<IYModel> yModels, boolean isComplete) {
+        List<ISeriesModel> series = Lists.transform(new ArrayList<>(yModels), model -> new SeriesModel(model.getId(), model.getName(), xValues, model.getData()));
         ITmfXyModel model = new TmfXyModel(title, series);
 
         if (isComplete) {
@@ -81,7 +83,7 @@ public final class TmfXyResponseFactory {
      * @return A {@link TmfModelResponse} with either a running status or a
      *         completed status
      */
-    public static TmfModelResponse<ITmfXyModel> create(String title, Map<String, ISeriesModel> yModels, boolean isComplete) {
+    public static TmfModelResponse<ITmfXyModel> create(String title, List<ISeriesModel> yModels, boolean isComplete) {
         ITmfXyModel model = new TmfXyModel(title, yModels);
 
         if (isComplete) {
@@ -122,7 +124,7 @@ public final class TmfXyResponseFactory {
      * @return A {@link TmfModelResponse} with a COMPLETED status and empty model
      */
     public static TmfModelResponse<ITmfXyModel> createEmptyResponse(String message) {
-        ITmfXyModel model = new TmfXyModel(StringUtils.EMPTY, Collections.emptyMap());
+        ITmfXyModel model = new TmfXyModel(StringUtils.EMPTY, Collections.emptyList());
 
         return new TmfModelResponse<>(model, ITmfResponse.Status.COMPLETED, message);
     }

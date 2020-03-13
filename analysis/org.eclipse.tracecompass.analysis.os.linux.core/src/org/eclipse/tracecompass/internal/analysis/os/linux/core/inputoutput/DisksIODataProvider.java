@@ -12,6 +12,7 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
@@ -176,8 +178,14 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
         return new TmfTreeModel<>(Collections.emptyList(), nodes);
     }
 
+    @Deprecated
     @Override
     protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
+        return Maps.uniqueIndex(getYSeriesModels(ss, fetchParameters, monitor), IYModel::getName);
+    }
+
+    @Override
+    protected @Nullable Collection<IYModel> getYSeriesModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
         SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
         if (filter == null) {
             return null;
@@ -186,7 +194,7 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
         List<DiskBuilder> builders = initBuilders(ss, filter);
         if (builders.isEmpty()) {
             // this would return an empty map even if we did the queries.
-            return Collections.emptyMap();
+            return Collections.emptyList();
         }
 
         long currentEnd = ss.getCurrentEndTime();
@@ -218,7 +226,7 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
             }
             prevTime = time;
         }
-        return Maps.uniqueIndex(Iterables.transform(builders, DiskBuilder::build), IYModel::getName);
+        return ImmutableList.copyOf(Iterables.transform(builders, DiskBuilder::build));
     }
 
     private List<DiskBuilder> initBuilders(ITmfStateSystem ss, SelectionTimeQueryFilter filter) {
@@ -248,4 +256,5 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
     protected String getTitle() {
         return PROVIDER_TITLE;
     }
+
 }

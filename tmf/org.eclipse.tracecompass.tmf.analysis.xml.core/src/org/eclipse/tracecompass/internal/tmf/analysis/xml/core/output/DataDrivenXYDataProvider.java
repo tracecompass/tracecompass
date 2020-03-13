@@ -49,7 +49,7 @@ import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 
 /**
@@ -141,12 +141,12 @@ public class DataDrivenXYDataProvider extends AbstractTmfTraceDataProvider
 
         filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
         if (filter == null) {
-            return TmfXyResponseFactory.create(TITLE, xValues, Collections.emptyMap(), true);
+            return TmfXyResponseFactory.create(TITLE, xValues, Collections.emptyList(), true);
         }
 
         Map<DisplayElement, IYModel> map = initSeries(filter);
         if (map.isEmpty()) {
-            return TmfXyResponseFactory.create(TITLE, xValues, Collections.emptyMap(), true);
+            return TmfXyResponseFactory.create(TITLE, xValues, Collections.emptyList(), true);
         }
 
         ITmfStateSystem ss = null;
@@ -154,7 +154,7 @@ public class DataDrivenXYDataProvider extends AbstractTmfTraceDataProvider
             ss = de.fStateSystem;
         }
         if (ss == null) {
-            return TmfXyResponseFactory.create(TITLE, xValues, Collections.emptyMap(), true);
+            return TmfXyResponseFactory.create(TITLE, xValues, Collections.emptyList(), true);
         }
 
         long currentEnd = ss.getCurrentEndTime();
@@ -189,7 +189,7 @@ public class DataDrivenXYDataProvider extends AbstractTmfTraceDataProvider
         }
 
         boolean complete = ss.waitUntilBuilt(0) || filter.getEnd() <= currentEnd;
-        return TmfXyResponseFactory.create(TITLE, xValues, Maps.uniqueIndex(map.values(), value -> Long.toString(value.getId())), complete);
+        return TmfXyResponseFactory.create(TITLE, xValues, ImmutableList.copyOf(map.values()), complete);
     }
 
     private static void getSeriesDelta(double[] data) {

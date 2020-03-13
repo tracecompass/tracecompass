@@ -115,9 +115,9 @@ public class InputOutputDataProviderTest extends AbstractTestInputOutput {
             assertEquals(ITmfResponse.Status.COMPLETED, yResponse.getStatus());
             ITmfXyModel yModel = yResponse.getModel();
             assertNotNull(yModel);
-            Map<@NonNull String, @NonNull ISeriesModel> data = yModel.getData();
+            Collection<@NonNull ISeriesModel> data = yModel.getSeriesData();
             assertEquals(1, data.size());
-            ISeriesModel ySeries = data.values().iterator().next();
+            ISeriesModel ySeries = data.iterator().next();
             double[] expected = test.getActivity();
             double[] actual = ySeries.getData();
             for (int i = 0; i < expected.length; i++) {

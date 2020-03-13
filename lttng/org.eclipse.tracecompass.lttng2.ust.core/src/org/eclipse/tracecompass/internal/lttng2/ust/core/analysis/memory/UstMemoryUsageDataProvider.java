@@ -12,6 +12,7 @@
 package org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -82,11 +83,17 @@ public class UstMemoryUsageDataProvider extends AbstractTreeCommonXDataProvider<
         super(trace, module);
     }
 
+    @Deprecated
+    @Override
+    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
+        return Maps.uniqueIndex(getYSeriesModels(ss, fetchParameters, monitor), IYModel::getName);
+    }
+
     /**
      * @since 3.3
      */
     @Override
-    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
+    protected @Nullable Collection<IYModel> getYSeriesModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
         SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
         if (filter == null) {
             return null;
@@ -114,7 +121,7 @@ public class UstMemoryUsageDataProvider extends AbstractTreeCommonXDataProvider<
             }
         }
 
-        return Maps.uniqueIndex(models.values(), IYModel::getName);
+        return models.values();
     }
 
     /**

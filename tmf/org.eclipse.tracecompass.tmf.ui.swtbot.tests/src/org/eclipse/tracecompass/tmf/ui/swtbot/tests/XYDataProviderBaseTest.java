@@ -238,7 +238,7 @@ public abstract class XYDataProviderBaseTest {
 
         long[] x = Longs.toArray(Doubles.asList(xMain));
         assertNotNull(x);
-        return new TmfCommonXAxisModel(getTitle(), x, yModels);
+        return new TmfCommonXAxisModel(getTitle(), x, yModels.values());
     }
 
     /**

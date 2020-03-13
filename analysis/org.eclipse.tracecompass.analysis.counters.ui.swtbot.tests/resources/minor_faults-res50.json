@@ -52,8 +52,8 @@
     97959185,
     100000001
   ],
-  "series": {
-    "kernel_vm/Ungrouped/minor_faults": {
+  "series": [
+    {
       "label": "kernel_vm/Ungrouped/minor_faults",
       "yValues": [
         0.0,
@@ -108,5 +108,5 @@
         0.0
       ]
     }
-  }
+  ]
 }

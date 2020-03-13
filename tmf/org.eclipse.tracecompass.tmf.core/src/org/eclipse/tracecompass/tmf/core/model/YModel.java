@@ -55,6 +55,21 @@ public class YModel implements IYModel {
         fYValues = yValues;
     }
 
+    /**
+     * Constructor
+     *
+     * @param id
+     *            the series' ID
+     * @param yValues
+     *            The y series values
+     * @since 6.0
+     */
+    public YModel(long id, double[] yValues) {
+        fId = id;
+        fName = String.valueOf(id);
+        fYValues = yValues;
+    }
+
     @Override
     public long getId() {
         return fId;

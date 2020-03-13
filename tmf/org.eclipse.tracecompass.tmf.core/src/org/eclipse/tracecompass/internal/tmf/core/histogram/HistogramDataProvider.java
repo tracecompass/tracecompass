@@ -49,7 +49,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 /**
@@ -115,13 +114,13 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
         SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
         long[] xValues = new long[0];
         if (filter == null) {
-            return TmfXyResponseFactory.create(TITLE, xValues, Collections.emptyMap(), true);
+            return TmfXyResponseFactory.create(TITLE, xValues, Collections.emptyList(), true);
         }
         xValues = filter.getTimesRequested();
 
         Collection<Long> selected = filter.getSelectedItems();
         int n = xValues.length;
-        ImmutableMap.Builder<String, IYModel> builder = ImmutableMap.builder();
+        ImmutableList.Builder<IYModel> builder = ImmutableList.builder();
 
         final ITmfStatistics stats = Objects.requireNonNull(fModule.getStatistics());
         if (selected.contains(fTotalId)) {
@@ -130,14 +129,14 @@ public class HistogramDataProvider extends AbstractTmfTraceDataProvider implemen
             double[] y = new double[n];
             Arrays.setAll(y, values::get);
             String totalName = getTrace().getName() + '/' + Messages.HistogramDataProvider_Total;
-            builder.put(Long.toString(fTotalId), new YModel(fTotalId, totalName, y));
+            builder.add(new YModel(fTotalId, totalName, y));
         }
 
         ITmfStateSystem eventsSs = fModule.getStateSystem(TmfStatisticsEventTypesModule.ID);
         if (selected.contains(fLostId) && eventsSs != null) {
             try {
                 YModel series = getLostEvents(eventsSs, xValues);
-                builder.put(Long.toString(series.getId()), series);
+                builder.add(series);
             } catch (StateSystemDisposedException e) {
                 return TmfXyResponseFactory.createFailedResponse(CommonStatusMessage.STATE_SYSTEM_FAILED);
             }

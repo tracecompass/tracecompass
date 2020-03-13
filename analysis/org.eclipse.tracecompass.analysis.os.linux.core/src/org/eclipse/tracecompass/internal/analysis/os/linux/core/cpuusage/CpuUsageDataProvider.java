@@ -42,7 +42,7 @@ import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 /**
@@ -114,11 +114,17 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
         fKernelAnalysisModule = kernelAnalysisModule;
     }
 
+    @Deprecated
+    @Override
+    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
+        return Maps.uniqueIndex(getYSeriesModels(ss, fetchParameters, monitor), IYModel::getName);
+    }
+
     /**
      * @since 2.5
      */
     @Override
-    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+    protected @Nullable Collection<IYModel> getYSeriesModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         Set<Integer> cpus = Collections.emptySet();
 
         SelectionTimeQueryFilter filter = createCpuQuery(fetchParameters);
@@ -177,11 +183,11 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
             }
         }
 
-        ImmutableMap.Builder<String, IYModel> ySeries = ImmutableMap.builder();
+        ImmutableList.Builder<IYModel> ySeries = ImmutableList.builder();
         String key = TOTAL + getTrace().getName();
-        ySeries.put(key, new YModel(getId(ITmfStateSystem.ROOT_ATTRIBUTE), key, totalValues));
+        ySeries.add(new YModel(getId(ITmfStateSystem.ROOT_ATTRIBUTE), key, totalValues));
         for (IYModel entry : selectedThreadValues.values()) {
-            ySeries.put(entry.getName(), entry);
+            ySeries.add(entry);
         }
 
         return ySeries.build();
