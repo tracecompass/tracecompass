@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+   Copyright (c) 2020 Ericsson
+
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License 2.0
+   which accompanies this distribution, and is available at
+   https://www.eclipse.org/legal/epl-2.0/
+
+   SPDX-License-Identifier: EPL-2.0
+-->
+
+<project name="org.eclipse.tracecompass.tmf" default="main" >
+
+<property name="defaultCss" value="e4-dark_linux.css" />
+
+<target name="main">
+  <antcall target="resetCSS" />
+  <antcall target="fixCSS" />
+</target>
+
+<target name="checkTargetPlatform">
+  <echo message="Verifying target platform: ${targetPlatform}"/>
+  <condition property="platformCss" value="e4-dark.css" else="e4-dark_linux.css">
+    <or>
+      <equals arg1="${targetPlatform}" arg2="tracecompass-e4.6" />
+      <equals arg1="${targetPlatform}" arg2="tracecompass-e4.7" />
+      <equals arg1="${targetPlatform}" arg2="tracecompass-e4.8" />
+      <equals arg1="${targetPlatform}" arg2="tracecompass-e4.9" />
+      <equals arg1="${targetPlatform}" arg2="tracecompass-e4.10" />
+      <equals arg1="${targetPlatform}" arg2="tracecompass-e4.11" />
+      <equals arg1="${targetPlatform}" arg2="tracecompass-e4.12" />
+      <equals arg1="${targetPlatform}" arg2="tracecompass-e4.13" />
+    </or>
+  </condition>
+</target>
+
+<target name="fixCSS" depends="checkTargetPlatform">
+  <echo message="Updating org.eclipse.tracecompass.tmf.ui.dark.css"/>
+  <replaceregexp file="css/org.eclipse.tracecompass.tmf.ui.dark.css"
+                 match="(@import\s+url\(&quot;platform\:\/plugin\/org\.eclipse\.ui\.themes\/css\/)(e4-dark.*)(&quot;\);)"
+                 replace="\1${platformCss}\3"
+                 byline="true"/>
+</target>
+
+<target name="resetCSS">
+  <echo message="Setting default in org.eclipse.tracecompass.tmf.ui.dark.css"/>
+  <replaceregexp file="css/org.eclipse.tracecompass.tmf.ui.dark.css"
+                 match="(@import\s+url\(&quot;platform\:\/plugin\/org\.eclipse\.ui\.themes\/css\/)(e4-dark.*)(&quot;\);)"
+                 replace="\1${defaultCss}\3"
+                 byline="true"/>
+</target>
+
+</project>
