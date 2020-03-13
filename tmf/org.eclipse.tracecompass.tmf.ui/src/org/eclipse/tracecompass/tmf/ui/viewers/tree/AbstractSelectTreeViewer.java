@@ -79,7 +79,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.primitives.Longs;
 
 /**
- * Abstract viewer for trees with checkboxes.
+ * Abstract viewer for trees with checkboxes. This viewer gets his data from a
+ * data provider.
  *
  * @since 3.2
  * @author Loic Prieur-Drevon
@@ -163,9 +164,12 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
 
         @Override
         public Image getColumnImage(Object element, int columnIndex) {
-            if (columnIndex == 1 && element instanceof TmfGenericTreeEntry && isChecked(element)) {
+            if (columnIndex == fLegendIndex && element instanceof TmfGenericTreeEntry && isChecked(element)) {
                 TmfGenericTreeEntry<TmfTreeDataModel> genericEntry = (TmfGenericTreeEntry<TmfTreeDataModel>) element;
-                return getLegendImage(genericEntry.getModel().getId());
+                TmfTreeDataModel model = genericEntry.getModel();
+                if (model.hasRowModel()) {
+                    return getLegendImage(String.valueOf(genericEntry.getModel().getId()));
+                }
             }
             return null;
         }

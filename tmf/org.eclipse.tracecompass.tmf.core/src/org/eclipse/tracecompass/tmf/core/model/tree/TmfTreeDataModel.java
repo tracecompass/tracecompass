@@ -28,6 +28,7 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
     private final long fId;
     private final long fParentId;
     private final List<String> fLabels;
+    private final boolean fHasRowModel;
 
     /**
      * Constructor
@@ -40,7 +41,7 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
      *            The name of this model
      */
     public TmfTreeDataModel(long id, long parentId, String name) {
-        this(id, parentId, Collections.singletonList(name));
+        this(id, parentId, Collections.singletonList(name), true);
     }
 
     /**
@@ -55,9 +56,28 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
      * @since 5.0
      */
     public TmfTreeDataModel(long id, long parentId, List<String> labels) {
+        this(id, parentId, labels, true);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param id
+     *            The id of the model
+     * @param parentId
+     *            The parent id of this model. If it has none, give
+     *            <code>-1</code>.
+     * @param labels
+     *            The labels of this model
+     * @param hasRowModel
+     *            Whether this entry has data or not
+     * @since 6.0
+     */
+    public TmfTreeDataModel(long id, long parentId, List<String> labels, boolean hasRowModel) {
         fId = id;
         fParentId = parentId;
         fLabels = labels;
+        fHasRowModel = hasRowModel;
     }
 
     @Override
@@ -78,6 +98,11 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
     @Override
     public List<String> getLabels() {
         return fLabels;
+    }
+
+    @Override
+    public boolean hasRowModel() {
+        return fHasRowModel;
     }
 
     @Override

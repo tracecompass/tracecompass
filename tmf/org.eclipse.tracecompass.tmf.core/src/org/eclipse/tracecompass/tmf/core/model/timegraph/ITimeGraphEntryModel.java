@@ -46,6 +46,7 @@ public interface ITimeGraphEntryModel extends ITmfTreeDataModel, IElementResolve
      *
      * @return true if the entry has a row model
      */
+    @Override
     default boolean hasRowModel() {
         return true;
     }

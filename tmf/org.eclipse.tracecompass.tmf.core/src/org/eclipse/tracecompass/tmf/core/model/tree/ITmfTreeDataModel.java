@@ -72,4 +72,15 @@ public interface ITmfTreeDataModel {
         return null;
     }
 
+    /**
+     * Returns true if the entry has a row model, or false if it is just an
+     * entry with no data associated with it
+     *
+     * @return true if the entry has a row model
+     * @since 6.0
+     */
+    default boolean hasRowModel() {
+        return true;
+    }
+
 }
