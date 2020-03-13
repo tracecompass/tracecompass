@@ -189,6 +189,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableMultimap.Builder;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 /**
@@ -739,7 +740,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             long zoomStartTime, long zoomEndTime, long resolution, boolean fullSearch, @NonNull IProgressMonitor monitor) {
 
         try {
-            Map<Integer, Predicate<Map<String, String>>> predicates = computeRegexPredicate();
+            Map<Integer, Predicate<Multimap<String, Object>>> predicates = generateRegexPredicate();
 
             for (TimeGraphEntry entry : entries) {
                 List<ITimeEvent> zoomedEventList = getEventList(entry, zoomStartTime, zoomEndTime, fullSearch ? 1L : resolution, monitor);
@@ -747,7 +748,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     return;
                 }
                 if (zoomedEventList != null) {
-                    doFilterEvents(entry, zoomedEventList, predicates);
+                    doFilterEventList(entry, zoomedEventList, predicates);
                     applyResults(() -> entry.setZoomedEventList(zoomedEventList));
                 }
             }
@@ -766,18 +767,21 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *            The event list at this zoom level
      * @param predicates
      *            The predicate for the filter dialog text box
-     * @since 4.0
+     * @since 5.3
      */
     @NonNullByDefault
-    protected void doFilterEvents(TimeGraphEntry entry, List<ITimeEvent> eventList, Map<Integer, Predicate<Map<String, String>>> predicates) {
+    protected void doFilterEventList(TimeGraphEntry entry, List<ITimeEvent> eventList, Map<Integer, Predicate<Multimap<String, Object>>> predicates) {
         if (!predicates.isEmpty()) {
             // For each event in the events list, test each predicates and set the
             // status of the property associated to the predicate
             eventList.forEach(te -> {
-                for (Map.Entry<Integer, Predicate<Map<String, String>>> mapEntry : predicates.entrySet()) {
-                    Predicate<Map<String, String>> value = Objects.requireNonNull(mapEntry.getValue());
-                    Map<String, String> toTest = new HashMap<>(getPresentationProvider().getFilterInput(te));
-                    toTest.putAll(te.computeData());
+                for (Map.Entry<Integer, Predicate<Multimap<String, Object>>> mapEntry : predicates.entrySet()) {
+                    Predicate<Multimap<String, Object>> value = Objects.requireNonNull(mapEntry.getValue());
+                    Multimap<String, Object> toTest = HashMultimap.create();
+                    for (Entry<String, String> filterEntry : getPresentationProvider().getFilterInput(te).entrySet()) {
+                        toTest.put(filterEntry.getKey(), filterEntry.getValue());
+                    }
+                    toTest.putAll(te.getMetadata());
 
                     boolean status = value.test(toTest);
                     Integer property = mapEntry.getKey();
@@ -788,6 +792,47 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     }
                 }
             });
+        }
+        fillWithNullEvents(entry, eventList);
+    }
+
+    private static class TransformedPredicate implements Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>> {
+
+        private final @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>> fOriginalPredicate;
+
+        public TransformedPredicate(@NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>> value) {
+            fOriginalPredicate = value;
+        }
+
+        @Override
+        public boolean test(@NonNull Multimap<@NonNull String, @NonNull Object> map) {
+            Map<@NonNull String, @NonNull String> simpleMap = new HashMap<>();
+            for (Entry<@NonNull String, Collection<@NonNull Object>> entry : map.asMap().entrySet()) {
+                simpleMap.put(entry.getKey(), String.valueOf(entry.getValue().iterator().next()));
+            }
+            return fOriginalPredicate.test(simpleMap);
+        }
+
+    }
+
+    /**
+     * Filter the given eventList using the predicates
+     *
+     * @param entry
+     *            The timegraph entry
+     * @param eventList
+     *            The event list at this zoom level
+     * @param predicates
+     *            The predicate for the filter dialog text box
+     * @since 4.0
+     * @deprecated As of 5.3, replaced with
+     *             {@link #doFilterEventList(TimeGraphEntry, List, Map)}
+     */
+    @Deprecated
+    @NonNullByDefault
+    protected void doFilterEvents(TimeGraphEntry entry, List<ITimeEvent> eventList, Map<Integer, Predicate<Map<String, String>>> predicates) {
+        if (!predicates.isEmpty()) {
+            doFilterEventList(entry, eventList, Maps.transformValues(predicates, p -> new TransformedPredicate(p)));
         }
         fillWithNullEvents(entry, eventList);
     }

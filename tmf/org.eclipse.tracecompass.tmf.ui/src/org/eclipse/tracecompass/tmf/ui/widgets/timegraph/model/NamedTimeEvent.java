@@ -15,8 +15,11 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IMetadataStrings;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphState;
+
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * {@link TimeEvent} with a label.
@@ -92,12 +95,27 @@ public class NamedTimeEvent extends TimeEvent {
 
     /**
      * @since 4.0
+     * @deprecated As of 5.3, use the {@link #getMetadata()} instead
      */
+    @Deprecated
     @Override
     public @NonNull Map<@NonNull String, @NonNull String> computeData() {
         Map<@NonNull String, @NonNull String> data = super.computeData();
-        data.put(IElementResolver.LABEL_KEY, getLabel());
+        data.put(IMetadataStrings.LABEL_KEY, getLabel());
         return data;
+    }
+
+    @Override
+    public @NonNull Multimap<@NonNull String, @NonNull Object> getMetadata() {
+        Multimap<@NonNull String, @NonNull Object> metadata = super.getMetadata();
+        String entryName = getEntry().getName();
+        if (entryName == null) {
+            return metadata;
+        }
+        com.google.common.collect.ImmutableMultimap.Builder<String, Object> builder = ImmutableMultimap.builder();
+        builder.putAll(super.getMetadata());
+        builder.put(IMetadataStrings.ENTRY_NAME_KEY, entryName);
+        return builder.build();
     }
 
     @Override

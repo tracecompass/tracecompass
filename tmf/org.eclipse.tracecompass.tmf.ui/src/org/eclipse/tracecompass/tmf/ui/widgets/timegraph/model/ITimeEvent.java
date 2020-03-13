@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IMetadataStrings;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IPropertyCollection;
 
 import com.google.common.collect.ImmutableMultimap;
@@ -93,13 +94,15 @@ public interface ITimeEvent extends IPropertyCollection, IElementResolver {
 
     /**
      * @since 4.0
+     * @deprecated As of 5.3, use the {@link #getMetadata()} instead
      */
+    @Deprecated
     @Override
     default @NonNull Map<@NonNull String, @NonNull String> computeData() {
         Map<@NonNull String, @NonNull String> data = new HashMap<>();
         String entryName = getEntry().getName();
         if (entryName != null) {
-            data.put(IElementResolver.ENTRY_NAME_KEY, entryName);
+            data.put(IMetadataStrings.ENTRY_NAME_KEY, entryName);
         }
 
         return data;
@@ -111,6 +114,6 @@ public interface ITimeEvent extends IPropertyCollection, IElementResolver {
     @Override
     default @NonNull Multimap<@NonNull String, @NonNull Object> getMetadata() {
         String entryName = getEntry().getName();
-        return (entryName != null) ? ImmutableMultimap.of(IElementResolver.ENTRY_NAME_KEY, entryName) : ImmutableMultimap.of();
+        return (entryName != null) ? ImmutableMultimap.of(IMetadataStrings.ENTRY_NAME_KEY, entryName) : ImmutableMultimap.of();
     }
 }

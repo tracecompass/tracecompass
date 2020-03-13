@@ -187,8 +187,8 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             if (fullRange) {
                 redraw();
             }
-            @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = computeRegexPredicate();
-            Sampling sampling = new Sampling(getZoomStartTime(), getZoomEndTime(), getResolution(), predicates);
+            @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>>> predicates = generateRegexPredicate();
+            Sampling sampling = new Sampling(getZoomStartTime(), getZoomEndTime(), predicates, getResolution());
             Iterable<@NonNull TimeGraphEntry> incorrectSample = Iterables.filter(fVisibleEntries, entry -> !sampling.equals(entry.getSampling()));
             /* Only keep entries that are a member or child of the ss entry list */
             Iterable<@NonNull TimeGraphEntry> entries = Iterables.filter(incorrectSample, entry -> isMember(entry, entryList));
@@ -202,7 +202,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
         }
 
         private void doZoom(final ITmfStateSystem ss, final List<ILinkEvent> links, final List<IMarkerEvent> markers, long resolution, final @NonNull IProgressMonitor monitor, final long start, final long end, Sampling sampling,
-                Iterable<@NonNull TimeGraphEntry> entries, Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates, Map<TimeGraphEntry, List<ITimeEvent>> gaps) {
+                Iterable<@NonNull TimeGraphEntry> entries, @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>>> predicates, Map<TimeGraphEntry, List<ITimeEvent>> gaps) {
             queryFullStates(ss, start, end, resolution, monitor, (@NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState) -> {
                 try (TraceCompassLogUtils.ScopeLog scope = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStates");) { //$NON-NLS-1$
 
@@ -230,7 +230,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                              * Merge contiguous null events due to split query
                              */
                             List<ITimeEvent> eventList = Lists.newArrayList(entry.getTimeEventsIterator(getZoomStartTime(), getZoomEndTime(), getResolution()));
-                            doFilterEvents(entry, eventList, predicates);
+                            doFilterEventList(entry, eventList, predicates);
                             entry.setZoomedEventList(eventList);
                         }
                         entry.setSampling(sampling);
@@ -241,7 +241,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
         }
 
         private void zoom(@NonNull TimeGraphEntry entry, ITmfStateSystem ss, @NonNull List<List<ITmfStateInterval>> fullStates, @Nullable List<ITmfStateInterval> prevFullState,
-                Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates, @NonNull IProgressMonitor monitor, Map<TimeGraphEntry, List<ITimeEvent>> gaps) {
+                @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>>> predicates, @NonNull IProgressMonitor monitor, Map<TimeGraphEntry, List<ITimeEvent>> gaps) {
             List<ITimeEvent> eventList = getEventList(entry, ss, fullStates, prevFullState, monitor);
 
             if (gaps != null) {
@@ -250,7 +250,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
             }
 
             if (eventList != null && !monitor.isCanceled()) {
-                doFilterEvents(entry, eventList, predicates);
+                doFilterEventList(entry, eventList, predicates);
                 applyResults(() -> {
                     for (ITimeEvent event : eventList) {
                             entry.addZoomedEvent(event);
@@ -260,7 +260,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
         }
 
         private void doBgSearch(ITmfStateSystem ss, int resolution, @NonNull IProgressMonitor monitor, Map<TimeGraphEntry, List<ITimeEvent>> gaps,
-                @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates) {
+                @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>>> predicates) {
             try (TraceCompassLogUtils.ScopeLog poc = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINE, "TimegraphBgSearch")) { //$NON-NLS-1$
 
                 TimeEventFilterDialog timeEventFilterDialog = getTimeEventFilterDialog();
@@ -295,7 +295,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                             List<ITimeEvent> eventList = getEventList(Objects.requireNonNull(entry), ss, fullStates, prevFullState, monitor);
 
                             if (eventList != null && !eventList.isEmpty() && !monitor.isCanceled()) {
-                                doFilterEvents(entry, eventList, predicates);
+                                doFilterEventList(entry, eventList, predicates);
                                 for (ITimeEvent event : eventList) {
                                     int pos = Collections.binarySearch(gapEvents, event, TimeGraphEntry.WITHIN_COMPARATOR);
                                     // If the event is within a gap
