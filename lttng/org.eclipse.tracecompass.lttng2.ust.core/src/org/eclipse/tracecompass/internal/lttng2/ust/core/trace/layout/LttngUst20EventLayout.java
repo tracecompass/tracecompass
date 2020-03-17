@@ -33,7 +33,7 @@ public class LttngUst20EventLayout implements ILttngUstEventLayout {
      *
      * @return The instance
      */
-    public static LttngUst20EventLayout getInstance() {
+    public static synchronized LttngUst20EventLayout getInstance() {
         return INSTANCE;
     }
 

@@ -31,7 +31,7 @@ public class LttngUst28EventLayout extends LttngUst27EventLayout {
      *
      * @return The instance
      */
-    public static LttngUst28EventLayout getInstance() {
+    public static synchronized LttngUst28EventLayout getInstance() {
         return INSTANCE;
     }
 

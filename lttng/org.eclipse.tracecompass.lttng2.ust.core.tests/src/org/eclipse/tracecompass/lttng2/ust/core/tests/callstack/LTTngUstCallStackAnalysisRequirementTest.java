@@ -12,6 +12,7 @@
 package org.eclipse.tracecompass.lttng2.ust.core.tests.callstack;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Collection;
 import java.util.Set;
@@ -127,7 +128,9 @@ public class LTTngUstCallStackAnalysisRequirementTest {
      */
     @Test
     public void testCallStackRequirements() {
-        LttngUstCallStackAnalysisRequirement req = new LttngUstCallStackAnalysisRequirement(ILttngUstEventLayout.DEFAULT_LAYOUT);
+        ILttngUstEventLayout defaultLayout = ILttngUstEventLayout.DEFAULT_LAYOUT;
+        assertNotNull(defaultLayout);
+        LttngUstCallStackAnalysisRequirement req = new LttngUstCallStackAnalysisRequirement(defaultLayout);
         for (TestData item: TestData.values()) {
             assertEquals(item.name(), item.isValid(), req.test(item.getTrace()));
         }
