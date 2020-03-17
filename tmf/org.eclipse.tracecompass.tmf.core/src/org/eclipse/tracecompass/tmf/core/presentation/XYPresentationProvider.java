@@ -14,11 +14,18 @@ package org.eclipse.tracecompass.tmf.core.presentation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.presentation.YAppearance;
+import org.eclipse.tracecompass.tmf.core.dataprovider.X11ColorUtils;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Iterables;
 
 /**
@@ -30,75 +37,65 @@ import com.google.common.collect.Iterables;
 public class XYPresentationProvider implements IXYPresentationProvider {
 
     private static final List<String> SUPPORTED_STYLES = ImmutableList.of(
-            YAppearance.Style.SOLID,
-            YAppearance.Style.DASH,
-            YAppearance.Style.DOT,
-            YAppearance.Style.DASHDOT,
-            YAppearance.Style.DASHDOTDOT);
+            StyleProperties.SeriesStyle.SOLID,
+            StyleProperties.SeriesStyle.DASH,
+            StyleProperties.SeriesStyle.DOT,
+            StyleProperties.SeriesStyle.DASHDOT,
+            StyleProperties.SeriesStyle.DASHDOTDOT);
 
     private static final List<String> SUPPORTED_TYPES = ImmutableList.of(
-            YAppearance.Type.AREA,
-            YAppearance.Type.BAR,
-            YAppearance.Type.LINE,
-            YAppearance.Type.SCATTER);
+            StyleProperties.SeriesType.AREA,
+            StyleProperties.SeriesType.BAR,
+            StyleProperties.SeriesType.LINE,
+            StyleProperties.SeriesType.SCATTER);
 
     private static final List<String> SUPPORTED_TICKS = ImmutableList.of(
-            YAppearance.SymbolStyle.DIAMOND,
-            YAppearance.SymbolStyle.CIRCLE,
-            YAppearance.SymbolStyle.SQUARE,
-            YAppearance.SymbolStyle.TRIANGLE,
-            YAppearance.SymbolStyle.INVERTED_TRIANGLE,
-            YAppearance.SymbolStyle.PLUS,
-            YAppearance.SymbolStyle.CROSS);
+            StyleProperties.SymbolType.DIAMOND,
+            StyleProperties.SymbolType.CIRCLE,
+            StyleProperties.SymbolType.SQUARE,
+            StyleProperties.SymbolType.TRIANGLE,
+            StyleProperties.SymbolType.INVERTED_TRIANGLE,
+            StyleProperties.SymbolType.PLUS,
+            StyleProperties.SymbolType.CROSS);
 
     /* Gets the default palette for available colors for XY series */
     private static final IPaletteProvider COLOR_PALETTE = DefaultColorPaletteProvider.INSTANCE;
 
     /* This map a series name and an IYAppearance */
-    private final Map<String, IYAppearance> fYAppearances = new HashMap<>();
+    private final Map<Long, OutputElementStyle> fYAppearances = new HashMap<>();
+    /* Temporary map of string to ID for backward-compatibility */
+    private final Map<String, Long> fStringToId = new HashMap<>();
+    private final AtomicLong fIdGenerator = new AtomicLong();
 
     @Deprecated
     @Override
     public synchronized IYAppearance getAppearance(String serieName, String seriesType, int width) {
-        IYAppearance appearance = fYAppearances.get(serieName);
-        if (appearance != null) {
-            return appearance;
-        }
+        OutputElementStyle seriesStyle = getSeriesStyle(fStringToId.computeIfAbsent(serieName, n -> fIdGenerator.getAndIncrement()), seriesType, width);
+        return typeToYAppearance(seriesStyle);
+    }
 
-        if(!SUPPORTED_TYPES.contains(seriesType)) {
-            throw new UnsupportedOperationException("Series type: " + seriesType + " is not supported."); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-
-        appearance = YAppearance.Type.SCATTER.equals(seriesType) ? createScatter(serieName, seriesType, width) : createAppearance(serieName, seriesType, width);
-        fYAppearances.put(serieName, appearance);
-        return appearance;
+    private IYAppearance typeToYAppearance(OutputElementStyle seriesStyle) {
+        Map<String, Object> styleValues = seriesStyle.getStyleValues();
+        return new YAppearance(String.valueOf(styleValues.getOrDefault(StyleProperties.STYLE_NAME, "style name")), //$NON-NLS-1$
+                String.valueOf(styleValues.getOrDefault(StyleProperties.SERIES_TYPE, StyleProperties.SeriesType.LINE)),
+                String.valueOf(styleValues.getOrDefault(StyleProperties.SERIES_STYLE, StyleProperties.SeriesStyle.SOLID)),
+                Objects.requireNonNull(RGBAColor.fromString((String) styleValues.getOrDefault(StyleProperties.COLOR, generateColor()))),
+                (int) styleValues.getOrDefault(StyleProperties.WIDTH, 1));
     }
 
     @Override
-    public @NonNull IYAppearance getAppearance(@NonNull Long seriesId, @NonNull String seriesType, int width) {
-        IYAppearance appearance = fYAppearances.get(String.valueOf(seriesId));
+    public @NonNull OutputElementStyle getSeriesStyle(Long seriesId, @NonNull String type, int width) {
+        OutputElementStyle appearance = fYAppearances.get(seriesId);
         if (appearance != null) {
             return appearance;
         }
 
-        if(!SUPPORTED_TYPES.contains(seriesType)) {
-            throw new UnsupportedOperationException("Series type: " + seriesType + " is not supported."); //$NON-NLS-1$ //$NON-NLS-2$
+        if(!SUPPORTED_TYPES.contains(type)) {
+            throw new UnsupportedOperationException("Series type: " + type + " is not supported."); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        appearance = YAppearance.Type.SCATTER.equals(seriesType) ? createScatter(String.valueOf(seriesId), seriesType, width) : createAppearance(String.valueOf(seriesId), seriesType, width);
-        fYAppearances.put(String.valueOf(seriesId), appearance);
-        return appearance;
-    }
-
-    @Override
-    public @NonNull IYAppearance getAppearance(@NonNull Long seriesId) {
-        IYAppearance appearance = fYAppearances.get(String.valueOf(seriesId));
-        if (appearance != null) {
-            return appearance;
-        }
-
-        appearance = createAppearance(String.valueOf(seriesId), YAppearance.Type.LINE, 1);
-        fYAppearances.put(String.valueOf(seriesId), appearance);
+        appearance = StyleProperties.SeriesType.SCATTER.equals(type) ? createScatter(seriesId, type, width) : createAppearance(seriesId, type, width);
+        fYAppearances.put(seriesId, appearance);
         return appearance;
     }
 
@@ -107,22 +104,27 @@ public class XYPresentationProvider implements IXYPresentationProvider {
         fYAppearances.clear();
     }
 
-    private IYAppearance createAppearance(String seriesName, String seriesType, int width) {
+    private OutputElementStyle createAppearance(Long seriesId, String seriesType, int width) {
         RGBAColor color = generateColor();
-        String style = generateStyle(seriesType);
-        return new YAppearance(seriesName, seriesType, style, color, width);
+        Builder<String, Object> builder = ImmutableMap.builder();
+        builder.put(StyleProperties.STYLE_NAME, seriesId);
+        builder.put(StyleProperties.SERIES_TYPE, seriesType);
+        builder.put(StyleProperties.SERIES_STYLE, generateStyle(seriesType));
+        builder.put(StyleProperties.COLOR, X11ColorUtils.toHexColor(color.getRed(), color.getGreen(), color.getBlue()));
+        builder.put(StyleProperties.WIDTH, width);
+        return new OutputElementStyle(null, builder.build());
     }
 
-    private IYAppearance createScatter(String seriesName, String seriesType, int width) {
+    private OutputElementStyle createScatter(Long seriesId, String seriesType, int width) {
         RGBAColor color = generateColor();
-        String style = generateTickStyle(seriesType);
-
-        return new YAppearance(seriesName, seriesType, IYAppearance.Style.NONE, color, width) {
-            @Override
-            public String getSymbolStyle() {
-                return style;
-            }
-        };
+        Builder<String, Object> builder = ImmutableMap.builder();
+        builder.put(StyleProperties.STYLE_NAME, seriesId);
+        builder.put(StyleProperties.SERIES_TYPE, seriesType);
+        builder.put(StyleProperties.SERIES_STYLE, StyleProperties.SeriesStyle.NONE);
+        builder.put(StyleProperties.COLOR, X11ColorUtils.toHexColor(color.getRed(), color.getGreen(), color.getBlue()));
+        builder.put(StyleProperties.WIDTH, width);
+        builder.put(StyleProperties.SYMBOL_TYPE, generateTickStyle(seriesType));
+        return new OutputElementStyle(null, builder.build());
     }
 
     /**
@@ -147,17 +149,30 @@ public class XYPresentationProvider implements IXYPresentationProvider {
      * @return A string defining the style. See {@link IYAppearance.Style}'s strings
      */
     private String generateStyle(String type) {
-        if (!IYAppearance.Type.SCATTER.equals(type)) {
+        if (!StyleProperties.SeriesType.SCATTER.equals(type)) {
             int nbColor = COLOR_PALETTE.get().size();
             return Iterables.get(SUPPORTED_STYLES, (fYAppearances.keySet().size() / nbColor) % SUPPORTED_STYLES.size());
         }
-        return IYAppearance.Style.NONE;
+        return StyleProperties.SeriesStyle.NONE;
     }
 
     private String generateTickStyle(String type) {
-        if (IYAppearance.Type.SCATTER.equals(type)) {
+        if (StyleProperties.SeriesType.SCATTER.equals(type)) {
             return Iterables.get(SUPPORTED_TICKS, (fYAppearances.keySet().size() / (COLOR_PALETTE.get().size())) % SUPPORTED_TICKS.size());
         }
-        return IYAppearance.Style.NONE;
+        return StyleProperties.SeriesStyle.NONE;
+    }
+
+    /**
+     * Associate a style with the ID of an element
+     *
+     * @param id
+     *            The ID of the element
+     * @param style
+     *            The style
+     * @since 6.0
+     */
+    public void setStyle(long id, OutputElementStyle style) {
+        fYAppearances.put(id, style);
     }
 }

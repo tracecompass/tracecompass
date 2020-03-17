@@ -16,8 +16,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.BaseXYPresentationProvider;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
-import org.eclipse.tracecompass.tmf.core.presentation.XYPresentationProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
@@ -29,7 +30,7 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
  *
  * @author Geneviève Bastien
  */
-public class MemoryPresentationProvider extends XYPresentationProvider {
+public class MemoryPresentationProvider extends BaseXYPresentationProvider {
 
     private static final int DEFAULT_SERIES_WIDTH = 1;
     private static final int THICK_SERIES = 2;
@@ -59,11 +60,11 @@ public class MemoryPresentationProvider extends XYPresentationProvider {
     }
 
     @Override
-    public @NonNull IYAppearance getAppearance(@NonNull Long seriesId) {
+    public @NonNull OutputElementStyle getSeriesStyle(@NonNull Long seriesId) {
         if (fTotalSeries.contains(seriesId)) {
-            return getAppearance(seriesId, IYAppearance.Type.LINE, THICK_SERIES);
+            return getSeriesStyle(seriesId, IYAppearance.Type.LINE, THICK_SERIES);
         }
-        return getAppearance(seriesId, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH);
+        return getSeriesStyle(seriesId, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH);
     }
 
 }

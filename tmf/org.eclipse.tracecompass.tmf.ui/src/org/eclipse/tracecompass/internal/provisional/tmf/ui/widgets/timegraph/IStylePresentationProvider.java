@@ -11,29 +11,17 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.ui.model.StyleManager;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 
 /**
  * Interface for time graph presentation providers that support styles.
  *
  * @author Patrick Tasse
  */
-@NonNullByDefault
 public interface IStylePresentationProvider {
-
-    /**
-     * Get the element style for the specified event.
-     *
-     * @param event
-     *            the event
-     * @return the element style, or null to ignore event
-     */
-    @Nullable OutputElementStyle getElementStyle(ITimeEvent event);
 
     /**
      * Get the style manager for this presentation provider.

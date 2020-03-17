@@ -17,6 +17,8 @@ package org.eclipse.tracecompass.examples.ui.viewers.histogram;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.tmf.core.histogram.HistogramDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.barcharts.TmfHistogramTooltipProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
@@ -53,8 +55,14 @@ public class NewHistogramViewer extends TmfFilteredXYChartViewer {
         setTooltipProvider(new TmfHistogramTooltipProvider(this));
     }
 
+    @Deprecated
     @Override
-    public IYAppearance getSeriesAppearance(@NonNull Long seriesId) {
-        return getPresentationProvider().getAppearance(seriesId, IYAppearance.Type.BAR, DEFAULT_SERIES_WIDTH);
+    public IYAppearance getSeriesAppearance(@NonNull String seriesName) {
+        return getPresentationProvider().getAppearance(seriesName, IYAppearance.Type.BAR, DEFAULT_SERIES_WIDTH);
+    }
+
+    @Override
+    public @NonNull OutputElementStyle getSeriesStyle(@NonNull Long seriesId) {
+        return getPresentationProvider().getSeriesStyle(seriesId, StyleProperties.SeriesType.BAR, DEFAULT_SERIES_WIDTH);
     }
 }

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 
 /**
  * Basic implementation of {@link ITmfTreeDataModel}.
@@ -29,6 +30,7 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
     private final long fParentId;
     private final List<String> fLabels;
     private final boolean fHasRowModel;
+    private final @Nullable OutputElementStyle fStyle;
 
     /**
      * Constructor
@@ -41,7 +43,7 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
      *            The name of this model
      */
     public TmfTreeDataModel(long id, long parentId, String name) {
-        this(id, parentId, Collections.singletonList(name), true);
+        this(id, parentId, Collections.singletonList(name), true, null);
     }
 
     /**
@@ -56,7 +58,7 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
      * @since 5.0
      */
     public TmfTreeDataModel(long id, long parentId, List<String> labels) {
-        this(id, parentId, labels, true);
+        this(id, parentId, labels, true, null);
     }
 
     /**
@@ -71,13 +73,16 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
      *            The labels of this model
      * @param hasRowModel
      *            Whether this entry has data or not
+     * @param style
+     *            The style of this entry
      * @since 6.0
      */
-    public TmfTreeDataModel(long id, long parentId, List<String> labels, boolean hasRowModel) {
+    public TmfTreeDataModel(long id, long parentId, List<String> labels, boolean hasRowModel, @Nullable OutputElementStyle style) {
         fId = id;
         fParentId = parentId;
         fLabels = labels;
         fHasRowModel = hasRowModel;
+        fStyle = style;
     }
 
     @Override
@@ -103,6 +108,11 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
     @Override
     public boolean hasRowModel() {
         return fHasRowModel;
+    }
+
+    @Override
+    public @Nullable OutputElementStyle getStyle() {
+        return fStyle;
     }
 
     @Override

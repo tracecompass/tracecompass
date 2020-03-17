@@ -19,5 +19,5 @@ public interface ICheckboxTreeViewerListener {
      * @param entries
      *            Entries which have been checked in the tree
      */
-    public void handleCheckStateChangedEvent(Collection<ITmfTreeViewerEntry> entries);
+    void handleCheckStateChangedEvent(Collection<ITmfTreeViewerEntry> entries);
 }

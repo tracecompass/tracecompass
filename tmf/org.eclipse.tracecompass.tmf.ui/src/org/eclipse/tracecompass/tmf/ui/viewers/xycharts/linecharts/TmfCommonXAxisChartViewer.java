@@ -37,9 +37,12 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLo
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.BaseXYPresentationProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
@@ -49,7 +52,6 @@ import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.presentation.IXYPresentationProvider;
 import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
-import org.eclipse.tracecompass.tmf.core.presentation.XYPresentationProvider;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -89,20 +91,21 @@ import com.google.common.collect.Multimap;
 public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
 
     private static final String DIRTY_UNDERFLOW_ERROR = "Dirty underflow error"; //$NON-NLS-1$
+    private static final @NonNull RGBAColor DEFAULT_COLOR = new RGBAColor(255, 255, 255);
 
     private static final Map<String, ILineSeries.PlotSymbolType> SYMBOL_MAP;
     private static final ColorRegistry COLOR_REGISTRY = new ColorRegistry();
 
     static {
         ImmutableMap.Builder<String, ILineSeries.PlotSymbolType> builder = new Builder<>();
-        builder.put(IYAppearance.SymbolStyle.NONE, ILineSeries.PlotSymbolType.NONE);
-        builder.put(IYAppearance.SymbolStyle.CIRCLE, ILineSeries.PlotSymbolType.CIRCLE);
-        builder.put(IYAppearance.SymbolStyle.CROSS, ILineSeries.PlotSymbolType.CROSS);
-        builder.put(IYAppearance.SymbolStyle.DIAMOND, ILineSeries.PlotSymbolType.DIAMOND);
-        builder.put(IYAppearance.SymbolStyle.INVERTED_TRIANGLE, ILineSeries.PlotSymbolType.INVERTED_TRIANGLE);
-        builder.put(IYAppearance.SymbolStyle.TRIANGLE, ILineSeries.PlotSymbolType.TRIANGLE);
-        builder.put(IYAppearance.SymbolStyle.PLUS, ILineSeries.PlotSymbolType.PLUS);
-        builder.put(IYAppearance.SymbolStyle.SQUARE, ILineSeries.PlotSymbolType.SQUARE);
+        builder.put(StyleProperties.SymbolType.NONE, ILineSeries.PlotSymbolType.NONE);
+        builder.put(StyleProperties.SymbolType.CIRCLE, ILineSeries.PlotSymbolType.CIRCLE);
+        builder.put(StyleProperties.SymbolType.CROSS, ILineSeries.PlotSymbolType.CROSS);
+        builder.put(StyleProperties.SymbolType.DIAMOND, ILineSeries.PlotSymbolType.DIAMOND);
+        builder.put(StyleProperties.SymbolType.INVERTED_TRIANGLE, ILineSeries.PlotSymbolType.INVERTED_TRIANGLE);
+        builder.put(StyleProperties.SymbolType.TRIANGLE, ILineSeries.PlotSymbolType.TRIANGLE);
+        builder.put(StyleProperties.SymbolType.PLUS, ILineSeries.PlotSymbolType.PLUS);
+        builder.put(StyleProperties.SymbolType.SQUARE, ILineSeries.PlotSymbolType.SQUARE);
         SYMBOL_MAP = builder.build();
     }
     private static final double DEFAULT_MAXY = Double.MIN_VALUE;
@@ -117,7 +120,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
 
     private final double fResolution;
     private final AtomicInteger fDirty = new AtomicInteger();
-    private final Map<ITmfTrace, IXYPresentationProvider> fXYPresentationProvider;
+    private final Map<ITmfTrace, BaseXYPresentationProvider> fXYPresentationProvider;
     private UpdateThread fUpdateThread;
 
     /** Used for testing **/
@@ -158,8 +161,8 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      * @return A new presentation provider
      * @since 6.0
      */
-    protected IXYPresentationProvider createPresentationProvider(ITmfTrace trace) {
-        return new XYPresentationProvider();
+    protected BaseXYPresentationProvider createPresentationProvider(ITmfTrace trace) {
+        return new BaseXYPresentationProvider();
     }
 
     @Override
@@ -209,6 +212,16 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
     }
 
     /**
+     * Gets the presentation provider
+     *
+     * @return The presentation provider
+     * @since 6.0
+     */
+    public BaseXYPresentationProvider getPresentationProvider2() {
+        return Objects.requireNonNull(fXYPresentationProvider.get(getTrace()));
+    }
+
+    /**
      * Create map of parameters that will be used by updateData method. If a
      * viewer need a more specialized map than just the time requested it's its
      * responsibility to override this method and provide the desired instance.
@@ -239,7 +252,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      *                       The name of the series
      * @return An {@link IYAppearance} instance for the series
      * @since 4.0
-     * @deprecated As of 6.0, use {@link #getSeriesAppearance(Long)} instead
+     * @deprecated As of 6.0, use {@link #getSeriesStyle(Long)} instead
      */
     @Deprecated
     public @NonNull IYAppearance getSeriesAppearance(@NonNull String seriesName) {
@@ -247,16 +260,16 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
     }
 
     /**
-     * Gets the appearance of a given series. If appearance doesn't exist, a new one
-     * will be created by the presentation provider
+     * Gets the style of a given series. If style doesn't exist, a new one will
+     * be created by the presentation provider
      *
      * @param seriesId
-     *                       The unique ID of the series
-     * @return An {@link IYAppearance} instance for the series
+     *            The unique ID of the series
+     * @return An {@link OutputElementStyle} instance for the series
      * @since 6.0
      */
-    public @NonNull IYAppearance getSeriesAppearance(@NonNull Long seriesId) {
-        return getPresentationProvider().getAppearance(seriesId, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH);
+    public @NonNull OutputElementStyle getSeriesStyle(@NonNull Long seriesId) {
+        return getPresentationProvider().getSeriesStyle(seriesId, StyleProperties.SeriesType.LINE, DEFAULT_SERIES_WIDTH);
     }
 
     /**
@@ -564,15 +577,16 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             ISeriesSet seriesSet = getSwtChart().getSeriesSet();
 
             String seriesName = yModel.getName();
-            IYAppearance appearance = getSeriesAppearance(yModel.getId());
+            OutputElementStyle appearance = getSeriesStyle(yModel.getId());
+            BaseXYPresentationProvider presProvider = getPresentationProvider2();
 
-            String type = appearance.getType();
-            RGBAColor rgb = appearance.getColor();
+            String type = (String) presProvider.getStyleOrDefault(appearance, StyleProperties.SERIES_TYPE, StyleProperties.SeriesType.LINE);
+            RGBAColor rgb = presProvider.getColorStyleOrDefault(appearance, StyleProperties.COLOR, DEFAULT_COLOR);
             COLOR_REGISTRY.put(rgb.toString(), RGBAUtil.fromRGBAColor(rgb).rgb);
             Color color = COLOR_REGISTRY.get(rgb.toString());
-            String symbolType = appearance.getSymbolStyle();
+            String symbolType = (String) presProvider.getStyle(appearance, StyleProperties.SYMBOL_TYPE);
 
-            if (type.equals(IYAppearance.Type.BAR)) {
+            if (type.equals(StyleProperties.SeriesType.BAR)) {
                 IBarSeries barSeries = (IBarSeries) seriesSet.createSeries(SeriesType.BAR, seriesName);
                 barSeries.enableStack(true);
                 barSeries.setBarColor(color);
@@ -585,13 +599,13 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
              * Default is line chart
              */
             ILineSeries lineSeries = (ILineSeries) seriesSet.createSeries(SeriesType.LINE, seriesName);
-            lineSeries.enableArea(IYAppearance.Type.AREA.equals(type));
-            lineSeries.setLineStyle(LineStyle.valueOf(appearance.getStyle()));
+            lineSeries.enableArea(StyleProperties.SeriesType.AREA.equals(type));
+            lineSeries.setLineStyle(LineStyle.valueOf((String) presProvider.getStyle(appearance, StyleProperties.SERIES_STYLE)));
             lineSeries.setSymbolType(SYMBOL_MAP.getOrDefault(symbolType, ILineSeries.PlotSymbolType.NONE));
             lineSeries.setLineColor(color);
             lineSeries.setSymbolColor(color);
             lineSeries.setVisible(true);
-            lineSeries.setLineWidth(appearance.getWidth());
+            lineSeries.setLineWidth(((Number) presProvider.getFloatStyleOrDefault(appearance, StyleProperties.WIDTH, 1.0f)).intValue());
             return lineSeries;
         }
 
@@ -599,15 +613,17 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             ISeriesSet seriesSet = getSwtChart().getSeriesSet();
 
             String seriesName = yModel.getName() + DIMMED_SERIES_SUFFIX;
-            IYAppearance appearance = getSeriesAppearance(yModel.getId());
+            OutputElementStyle appearance = getSeriesStyle(yModel.getId());
+            BaseXYPresentationProvider presProvider = getPresentationProvider2();
 
-            String type = appearance.getType();
-            float[] rgb = appearance.getColor().getHSBA();
+            String type = (String) presProvider.getStyleOrDefault(appearance, StyleProperties.SERIES_TYPE, StyleProperties.SeriesType.LINE);
+            RGBAColor rgbaColor = presProvider.getColorStyleOrDefault(appearance, StyleProperties.COLOR, DEFAULT_COLOR);
+            float[] rgb = rgbaColor.getHSBA();
             COLOR_REGISTRY.put(rgb.toString(), new RGBA(rgb[0], rgb[1] * 0.5f, rgb[2] * 0.5f, rgb[3]).rgb);
             Color color = COLOR_REGISTRY.get(rgb.toString());
-            String symbolType = appearance.getSymbolStyle();
+            String symbolType = (String) presProvider.getStyle(appearance, StyleProperties.SYMBOL_TYPE);
 
-            if (type.equals(IYAppearance.Type.BAR)) {
+            if (type.equals(StyleProperties.SeriesType.BAR)) {
                 IBarSeries barSeries = (IBarSeries) seriesSet.createSeries(SeriesType.BAR, seriesName);
                 barSeries.enableStack(true);
                 barSeries.setBarColor(color);
@@ -620,13 +636,13 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
              * Default is line chart
              */
             ILineSeries lineSeries = (ILineSeries) seriesSet.createSeries(SeriesType.LINE, seriesName);
-            lineSeries.enableArea(IYAppearance.Type.AREA.equals(type));
-            lineSeries.setLineStyle(LineStyle.valueOf(appearance.getStyle()));
+            lineSeries.enableArea(StyleProperties.SeriesType.AREA.equals(type));
+            lineSeries.setLineStyle(LineStyle.valueOf((String) presProvider.getStyle(appearance, StyleProperties.SERIES_STYLE)));
             lineSeries.setSymbolType(SYMBOL_MAP.getOrDefault(symbolType, ILineSeries.PlotSymbolType.NONE));
             lineSeries.setLineColor(color);
             lineSeries.setSymbolColor(color);
             lineSeries.setVisible(true);
-            lineSeries.setLineWidth(appearance.getWidth());
+            lineSeries.setLineWidth(((Number) presProvider.getFloatStyleOrDefault(appearance, StyleProperties.WIDTH, 1.0f)).intValue());
             return lineSeries;
         }
 

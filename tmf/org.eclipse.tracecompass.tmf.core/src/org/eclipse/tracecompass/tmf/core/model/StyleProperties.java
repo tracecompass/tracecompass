@@ -382,4 +382,80 @@ public final class StyleProperties {
      * Default: style id
      */
     public static final String STYLE_NAME = "style-name"; //$NON-NLS-1$
+
+    /**
+     * XY Series type. Possible values: {@link SeriesType}.
+     * <p>
+     * Default: @link {@link SeriesType#LINE}
+     * @since 6.0
+     */
+    public static final String SERIES_TYPE = "series-type"; //$NON-NLS-1$
+
+    /**
+     * This contains strings defining a series type. It could be for example bar,
+     * line, scatter, etc.
+     *
+     * @author Yonni Chen
+     * @since 6.0
+     */
+    public interface SeriesType {
+        /**
+         * None
+         */
+        String LINE = "line"; //$NON-NLS-1$
+        /**
+         * Diamond
+         */
+        String AREA = "area"; //$NON-NLS-1$
+        /**
+         * Circle
+         */
+        String SCATTER = "scatter"; //$NON-NLS-1$
+        /**
+         * Square
+         */
+        String BAR = "bar"; //$NON-NLS-1$
+    }
+
+    /**
+     * XY Series style. Possible values: {@link SeriesStyle}.
+     * <p>
+     * Default: @link {@link SeriesStyle#SOLID}
+     * @since 6.0
+     */
+    public static final String SERIES_STYLE = "series-style"; //$NON-NLS-1$
+
+    /**
+     * This contains strings defining a series line style. It could be for example
+     * solid, dash, dot, etc.
+     *
+     * @author Yonni Chen
+     * @since 6.0
+     */
+    public interface SeriesStyle {
+        /**
+         * No line
+         */
+        String NONE = "NONE"; //$NON-NLS-1$
+        /**
+         * Solid line
+         */
+        String SOLID = "SOLID"; //$NON-NLS-1$
+        /**
+         * Dotted line
+         */
+        String DOT = "DOT"; //$NON-NLS-1$
+        /**
+         * Dashed line
+         */
+        String DASH = "DASH"; //$NON-NLS-1$
+        /**
+         * Dashed Dot (-.-.-.-) line
+         */
+        String DASHDOT = "DASHDOT"; //$NON-NLS-1$
+        /**
+         * Dashed Dot Dot (-..-..-..) line
+         */
+        String DASHDOTDOT = "DASHDOTDOT"; //$NON-NLS-1$
+    }
 }

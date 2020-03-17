@@ -17,7 +17,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.common.core.format.DataSpeedWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.DisksIODataProvider;
-import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 import org.swtchart.Chart;
@@ -47,7 +48,8 @@ public class DisksIOActivityViewer extends TmfFilteredXYChartViewer {
     }
 
     @Override
-    public IYAppearance getSeriesAppearance(@NonNull Long seriesId) {
-        return getPresentationProvider().getAppearance(seriesId, IYAppearance.Type.AREA, DEFAULT_SERIES_WIDTH);
+    public OutputElementStyle getSeriesStyle(@NonNull Long seriesId) {
+        return getPresentationProvider().getSeriesStyle(seriesId, StyleProperties.SeriesType.AREA, DEFAULT_SERIES_WIDTH);
     }
+
 }

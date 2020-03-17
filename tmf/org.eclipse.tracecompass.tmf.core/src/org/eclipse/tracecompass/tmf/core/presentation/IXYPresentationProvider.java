@@ -11,6 +11,9 @@
 
 package org.eclipse.tracecompass.tmf.core.presentation;
 
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
+
 /**
  * This is an interface responsible to retrieve presentation information for XY
  * charts. XY Viewers must use this provider, in order to apply style and color
@@ -33,13 +36,13 @@ public interface IXYPresentationProvider {
      * @param width
      *            The series width
      * @return The {@link IYAppearance} instance of the Y series.
-     * @deprecated As of 6.0, use {@link #getAppearance(Long, String, int)} instead
+     * @deprecated As of 6.0, use {@link #getSeriesStyle(Long, String, int)} instead
      */
     @Deprecated
     IYAppearance getAppearance(String seriesName, String type, int width);
 
     /**
-     * Returns the {@link IYAppearance} to which the specified series ID is
+     * Returns the {@link OutputElementStyle} to which the specified series ID is
      * mapped. If no appearance is found, a new one will be created with given
      * parameters and added to this presentation provider.
      *
@@ -52,8 +55,9 @@ public interface IXYPresentationProvider {
      * @return The {@link IYAppearance} instance of the Y series.
      * @since 6.0
      */
-    default IYAppearance getAppearance(Long seriesId, String type, int width) {
-        return getAppearance(String.valueOf(seriesId), type, width);
+    default OutputElementStyle getSeriesStyle(Long seriesId, String type, int width) {
+        IYAppearance appearance = getAppearance(String.valueOf(seriesId), type, width);
+        return appearance.toOutputElementStyle();
     }
 
     /**
@@ -69,12 +73,12 @@ public interface IXYPresentationProvider {
      * @return The {@link IYAppearance} instance of the Y series.
      * @since 6.0
      */
-    default IYAppearance getAppearance(Long seriesId) {
-        return getAppearance(String.valueOf(seriesId), IYAppearance.Type.LINE, 1);
+    default OutputElementStyle getSeriesStyle(Long seriesId) {
+        return getSeriesStyle(seriesId, StyleProperties.SeriesType.LINE, 1);
     }
 
     /**
-     * Remove all {@link IYAppearance}
+     * Remove all {@link OutputElementStyle}
      */
     void clear();
 

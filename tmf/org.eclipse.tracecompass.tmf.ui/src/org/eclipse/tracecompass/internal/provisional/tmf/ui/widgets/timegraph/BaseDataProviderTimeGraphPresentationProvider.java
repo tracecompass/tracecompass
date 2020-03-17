@@ -52,7 +52,7 @@ import com.google.common.collect.Maps;
  *
  * @author Simon Delisle
  */
-public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPresentationProvider implements IStylePresentationProvider {
+public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPresentationProvider implements ITimeGraphStylePresentationProvider {
 
     private static final OutputElementStyle TRANSPARENT_STYLE = new OutputElementStyle(null, ImmutableMap.of());
 

@@ -11,11 +11,26 @@
 
 package org.eclipse.tracecompass.tmf.core.presentation;
 
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+
 /**
  * This represents the appearance of a Y series for a XY chart. It contains
  * information about the name, type (ex. Bar, Line, Scatter), the style (ex.
  * Dot, Dash, Solid) and the color of the Y Series. There is no information
  * about the data.
+ *
+ * NOTE: This interface is kept as an internal API, it is the equivalent of an
+ * {@link OutputElementStyle} instead, where name maps to
+ * {@link StyleProperties#STYLE_NAME}, type maps to
+ * {@link StyleProperties#SERIES_TYPE}, style maps to
+ * {@link StyleProperties#SERIES_STYLE}, color maps to
+ * {@link StyleProperties#COLOR}, width maps to {@link StyleProperties#WIDTH},
+ * symbolStyle maps to {@link StyleProperties#SYMBOL_TYPE}, symbolSize maps to
+ * {@link StyleProperties#HEIGHT}
  *
  * @author Yonni Chen
  * @since 4.0
@@ -23,8 +38,8 @@ package org.eclipse.tracecompass.tmf.core.presentation;
 public interface IYAppearance {
 
     /**
-     * This contains strings defining a series type. It could be for example bar,
-     * line, scatter, etc.
+     * This contains strings defining a series type. It could be for example
+     * bar, line, scatter, etc.
      *
      * @author Yonni Chen
      */
@@ -59,8 +74,8 @@ public interface IYAppearance {
     }
 
     /**
-     * This contains strings defining a series line style. It could be for example
-     * solid, dash, dot, etc.
+     * This contains strings defining a series line style. It could be for
+     * example solid, dash, dot, etc.
      *
      * @author Yonni Chen
      */
@@ -105,8 +120,8 @@ public interface IYAppearance {
     }
 
     /**
-     * Symbol styles, contains strings defining potential appearances of a dot in a
-     * chart.
+     * Symbol styles, contains strings defining potential appearances of a dot
+     * in a chart.
      *
      * @author Matthew Khouzam
      * @since 4.1
@@ -165,8 +180,8 @@ public interface IYAppearance {
     RGBAColor getColor();
 
     /**
-     * Gets Y serie type. Serie type define the type of chart : Bar, Line, Scatter,
-     * etc.
+     * Gets Y serie type. Serie type define the type of chart : Bar, Line,
+     * Scatter, etc.
      *
      * @return the type of the Y serie
      */
@@ -180,8 +195,8 @@ public interface IYAppearance {
     int getWidth();
 
     /**
-     * Symbol Style. Used for ticks. Styles type define the type of ticks for actual
-     * points. Ticks can be:
+     * Symbol Style. Used for ticks. Styles type define the type of ticks for
+     * actual points. Ticks can be:
      * <ul>
      * <li>{@link SymbolStyle#CIRCLE}</li>
      * <li>{@link SymbolStyle#CROSS}</li>
@@ -210,4 +225,23 @@ public interface IYAppearance {
     default int getSymbolSize() {
         return 3;
     }
+
+    /**
+     * Convert this IYAppearance to an OutputElementStyle
+     *
+     * @return The OutputElementStyle from this style
+     * @since 6.0
+     */
+    default OutputElementStyle toOutputElementStyle() {
+        Builder<String, Object> builder = ImmutableMap.builder();
+        builder.put(StyleProperties.STYLE_NAME, getName());
+        builder.put(StyleProperties.SERIES_TYPE, getType());
+        builder.put(StyleProperties.SERIES_STYLE, getStyle());
+        builder.put(StyleProperties.COLOR, getColor());
+        builder.put(StyleProperties.WIDTH, getWidth());
+        builder.put(StyleProperties.SYMBOL_TYPE, getSymbolStyle());
+        builder.put(StyleProperties.HEIGHT, getSymbolSize());
+        return new OutputElementStyle(null, builder.build());
+    }
+
 }

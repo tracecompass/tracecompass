@@ -18,11 +18,14 @@ import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.BaseXYPresentationProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.IOutputStyleProvider;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
@@ -88,6 +91,19 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
             clearContent();
         }
         fSelectedIds = selectedIds;
+        // Update the styles as well
+        BaseXYPresentationProvider presProvider = getPresentationProvider2();
+        for (ITmfTreeViewerEntry entry : entries) {
+            if (entry instanceof TmfGenericTreeEntry) {
+                TmfGenericTreeEntry<TmfTreeDataModel> genericEntry = (TmfGenericTreeEntry<TmfTreeDataModel>) entry;
+                TmfTreeDataModel model = genericEntry.getModel();
+                OutputElementStyle style = model.getStyle();
+                if (style != null) {
+                    presProvider.setStyle(model.getId(), style);
+                }
+            }
+        }
+
         updateContent();
     }
 
@@ -133,14 +149,15 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
     }
 
     @Override
-    public @NonNull IYAppearance getSeriesAppearance(@NonNull Long seriesId) {
-        return fUseDefaultStyleValues ? getPresentationProvider().getAppearance(seriesId, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH) : getPresentationProvider().getAppearance(seriesId);
+    public @NonNull OutputElementStyle getSeriesStyle(@NonNull Long seriesId) {
+        return fUseDefaultStyleValues ? getPresentationProvider2().getSeriesStyle(seriesId, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH) : getPresentationProvider2().getSeriesStyle(seriesId);
     }
 
     @Override
     protected ITmfXYDataProvider initializeDataProvider(ITmfTrace trace) {
         ITmfTreeXYDataProvider dataProvider = DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeXYDataProvider.class);
         if (dataProvider instanceof IOutputStyleProvider) {
+            getPresentationProvider2().addProvider(dataProvider);
             fUseDefaultStyleValues = false;
         }
         return dataProvider;

@@ -93,6 +93,7 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
 import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.IStylePresentationProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.ITimeGraphStylePresentationProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.util.LineClipper;
 import org.eclipse.tracecompass.internal.tmf.ui.util.StylePropertiesUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.util.SymbolHelper;
@@ -2936,8 +2937,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     private @Nullable OutputElementStyle getElementStyle(@NonNull ITimeEvent event) {
         OutputElementStyle elementStyle;
-        if (fTimeGraphProvider instanceof IStylePresentationProvider) {
-            IStylePresentationProvider provider = (IStylePresentationProvider) fTimeGraphProvider;
+        if (fTimeGraphProvider instanceof ITimeGraphStylePresentationProvider) {
+            ITimeGraphStylePresentationProvider provider = (ITimeGraphStylePresentationProvider) fTimeGraphProvider;
             elementStyle = provider.getElementStyle(event);
             if (elementStyle == null) {
                 return null;
