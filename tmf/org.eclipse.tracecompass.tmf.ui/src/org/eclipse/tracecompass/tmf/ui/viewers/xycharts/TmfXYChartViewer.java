@@ -263,7 +263,7 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      * @param visible
      *            {@code true} to make the time axis visible.
      *            {@code false} to make it invisible
-     * @since 5.2
+     * @since 5.3
      */
     public void setTimeAxisVisible(boolean visible) {
         GridData gridData = (GridData) fTimeScaleCtrl.getLayoutData();
