@@ -61,17 +61,6 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
     /** ID of the followed CPU in the map data in {@link TmfTraceContext} */
     public static final @NonNull String RESOURCES_FOLLOW_CPU = ID + ".FOLLOW_CPU"; //$NON-NLS-1$
 
-    /**
-     * ID of the followed Current Thread in the map data in
-     * {@link TmfTraceContext}
-     *
-     * @deprecated Selected thread should be matched with its host. Use
-     *             {@link HostThread#SELECTED_HOST_THREAD_KEY} instead, with a
-     *             value of type {@link HostThread}
-     */
-    @Deprecated
-    public static final @NonNull String RESOURCES_FOLLOW_CURRENT_THREAD = ID + ".FOLLOW_CURRENT_THREAD"; //$NON-NLS-1$
-
     private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
     private String fFollowedThread = EMPTY_STRING;
