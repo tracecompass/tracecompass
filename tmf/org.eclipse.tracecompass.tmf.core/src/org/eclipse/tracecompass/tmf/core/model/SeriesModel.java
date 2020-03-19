@@ -95,28 +95,6 @@ public class SeriesModel implements ISeriesModel {
     }
 
     /**
-     * Constructor
-     *
-     * @param id
-     *            The unique ID of the associated entry
-     * @param name
-     *            The name of the series
-     * @param xValues
-     *            The x values of this series
-     * @param yValues
-     *            The y values of this series
-     * @param properties
-     *            The properties values for this series. Some priority values
-     *            are available in {@link IFilterProperty}
-     * @since 4.2
-     * @deprecated Use {@link SeriesModelBuilder}
-     */
-    @Deprecated
-    public SeriesModel(long id, String name, long[] xValues, double[] yValues, int[] properties) {
-        this(id, name, xValues, yValues, new TmfXYAxisDescription(DEFAULT_XAXIS_NAME, DEFAULT_XAXIS_UNIT), new TmfXYAxisDescription(DEFAULT_YAXIS_NAME, DEFAULT_YAXIS_UNIT), DisplayType.LINE, properties);
-    }
-
-    /**
      * Constructor with axis description
      *
      * @param id
