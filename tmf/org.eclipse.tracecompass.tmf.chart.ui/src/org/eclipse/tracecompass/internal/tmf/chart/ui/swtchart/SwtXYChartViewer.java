@@ -588,19 +588,6 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
     }
 
     /**
-     * Returns the average character width, measured in pixels, of the font
-     * described by the receiver.
-     *
-     * @param gc
-     *            The graphic context
-     * @return the average character width of the font
-     */
-    @Deprecated
-    private static int getAverageCharWidth(GC gc) {
-        return gc.getFontMetrics().getAverageCharWidth();
-    }
-
-    /**
      * Set the ITitle object text to a substring of canonicalTitle that when
      * rendered in the chart will fit maxPixelLength.
      */
@@ -622,11 +609,11 @@ public abstract class SwtXYChartViewer extends TmfViewer implements IChartViewer
              * the average character width of the current font.
              */
             if (pixels.x > maxPixelLength) {
-                int charwidth = getAverageCharWidth(gc);
+                double charwidth = gc.getFontMetrics().getAverageCharacterWidth();
 
                 int minimum = 3;
 
-                int strLen = ((maxPixelLength / charwidth) - minimum);
+                int strLen = (int) ((maxPixelLength / charwidth) - minimum);
 
                 if (strLen > minimum) {
                     newTitle = canonicalTitle.substring(0, strLen) + ELLIPSIS;
