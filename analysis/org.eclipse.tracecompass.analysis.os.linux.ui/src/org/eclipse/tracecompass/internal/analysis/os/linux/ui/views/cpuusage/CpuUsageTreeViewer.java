@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageEntryModel;
@@ -30,9 +29,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
 import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.CpuUsageDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
-import org.eclipse.tracecompass.tmf.core.model.filters.SelectedCpuQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
-import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
@@ -119,18 +116,6 @@ public class CpuUsageTreeViewer extends AbstractSelectTreeViewer {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
-
-    @Deprecated
-    @Override
-    protected @Nullable TimeQueryFilter getFilter(long start, long end, boolean isSelection) {
-        long newStart = Long.max(start, getStartTime());
-        long newEnd = Long.min(end, getEndTime());
-
-        if (isSelection || newEnd < newStart) {
-            return null;
-        }
-        return new SelectedCpuQueryFilter(newStart, newEnd, 2, Collections.emptyList(), CpuUsageView.getCpus(getTrace()));
-    }
 
     @Override
     protected @NonNull Map<String, Object> getParameters(long start, long end, boolean isSelection) {

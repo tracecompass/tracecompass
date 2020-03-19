@@ -21,9 +21,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.CpuUsageDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
-import org.eclipse.tracecompass.tmf.core.model.filters.SelectedCpuQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
-import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
@@ -53,12 +51,6 @@ public class CpuUsageXYViewer extends TmfFilteredXYChartViewer {
         super(parent, settings, CpuUsageDataProvider.ID);
         getSwtChart().getTitle().setVisible(true);
         getSwtChart().getLegend().setVisible(false);
-    }
-
-    @Deprecated
-    @Override
-    protected TimeQueryFilter createQueryFilter(long start, long end, int nb) {
-        return new SelectedCpuQueryFilter(start, end, nb, getSelected(), CpuUsageView.getCpus(getTrace()));
     }
 
     @Override

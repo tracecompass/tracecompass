@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -495,24 +494,6 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     @Override
     protected void initializeDataSource(@NonNull ITmfTrace trace) {
         getProvider(trace);
-    }
-
-    /**
-     * Get the filter to query the {@link ITmfTreeDataProvider} for the queried parameters
-     *
-     * @param start
-     *            query start time
-     * @param end
-     *            query end time
-     * @param isSelection
-     *            if the query is a selection
-     * @return the resulting query filter
-     * @since 4.0
-     * @deprecated Use {@link #getParameters(long, long, boolean)} instead
-     */
-    @Deprecated
-    protected @Nullable TimeQueryFilter getFilter(long start, long end, boolean isSelection) {
-        return new TimeQueryFilter(Long.min(start, end), Long.max(start, end), 2);
     }
 
     /**

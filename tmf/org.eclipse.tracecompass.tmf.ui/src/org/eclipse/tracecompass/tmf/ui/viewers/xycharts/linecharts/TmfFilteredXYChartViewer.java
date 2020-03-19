@@ -19,11 +19,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
-import org.eclipse.tracecompass.internal.tmf.core.model.filters.SelectionTimeQueryRegexFilter;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
-import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfTreeXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
@@ -106,12 +104,6 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
             fSelectedIds.clear();
         }
         super.traceClosed(signal);
-    }
-
-    @Deprecated
-    @Override
-    protected TimeQueryFilter createQueryFilter(long start, long end, int nb) {
-        return new SelectionTimeQueryRegexFilter(start, end, nb, fSelectedIds, getRegexes());
     }
 
     @Override

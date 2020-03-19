@@ -17,9 +17,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.analysis.counters.core.CounterDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
-import org.eclipse.tracecompass.tmf.core.model.filters.SelectedCounterQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
-import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfFilteredXYChartViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts.TmfXYChartSettings;
 
@@ -53,12 +51,6 @@ public final class CounterChartViewer extends TmfFilteredXYChartViewer {
         cancelUpdate();
         fIsCumulative ^= true;
         updateContent();
-    }
-
-    @Deprecated
-    @Override
-    protected TimeQueryFilter createQueryFilter(long start, long end, int nb) {
-        return new SelectedCounterQueryFilter(start, end, nb, getSelected(), fIsCumulative);
     }
 
     @Override

@@ -38,7 +38,6 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLo
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
-import org.eclipse.tracecompass.internal.tmf.core.model.filters.TimeQueryRegexFilter;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
@@ -192,28 +191,6 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
      */
     protected IXYPresentationProvider getPresentationProvider() {
         return Objects.requireNonNull(fXYPresentationProvider.get(getTrace()));
-    }
-
-    /**
-     * Create an instance of {@link TimeQueryFilter} that will be used by updateData
-     * method. If a viewer need a more specialized instance of
-     * {@link TimeQueryFilter}, it's its responsibility to override this method and
-     * provide the desired instance.
-     *
-     * @param start
-     *                  The starting value
-     * @param end
-     *                  The ending value
-     * @param nb
-     *                  The number of entries
-     * @return An {@link TimeQueryFilter} instance that data provider will use to
-     *         extract a model
-     * @since 4.0
-     * @deprecated Use createQueryParameters instead
-     */
-    @Deprecated
-    protected @NonNull TimeQueryFilter createQueryFilter(long start, long end, int nb) {
-        return new TimeQueryRegexFilter(getWindowStartTime(), getWindowEndTime(), nb, getRegexes());
     }
 
     /**
