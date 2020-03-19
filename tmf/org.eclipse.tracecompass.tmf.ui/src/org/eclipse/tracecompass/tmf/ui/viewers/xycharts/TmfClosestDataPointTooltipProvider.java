@@ -22,7 +22,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
@@ -43,7 +42,7 @@ import org.swtchart.ISeries;
  * @author Bernd Hufmann
  * @since 2.0
  */
-public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implements MouseTrackListener, MouseMoveListener, PaintListener {
+public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implements MouseMoveListener, PaintListener {
 
     private static final @NonNull String OLD_TOOLTIP = ""; //$NON-NLS-1$
 
@@ -187,40 +186,6 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
     }
 
     // ------------------------------------------------------------------------
-    // MouseTrackListener
-    // ------------------------------------------------------------------------
-
-    /**
-     * @deprecated, do not extend, use {@link #createToolTipMap(Parameter)} to
-     * populate tooltips
-     */
-    @Deprecated
-    @Override
-    public void mouseEnter(MouseEvent e) {
-        // do nothing
-    }
-
-    /**
-     * @deprecated, do not extend, use {@link #createToolTipMap(Parameter)} to
-     * populate tooltips
-     */
-    @Deprecated
-    @Override
-    public void mouseExit(MouseEvent e) {
-        // do nothing
-    }
-
-    /**
-     * @deprecated, do not extend, use {@link #createToolTipMap(Parameter)} to
-     * populate tooltips
-     */
-    @Deprecated
-    @Override
-    public void mouseHover(MouseEvent e) {
-        // do nothing
-    }
-
-    // ------------------------------------------------------------------------
     // MouseMoveListener
     // ------------------------------------------------------------------------
     @Override
@@ -234,6 +199,7 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
     // ------------------------------------------------------------------------
     // PaintListener
     // ------------------------------------------------------------------------
+
     @Override
     public void paintControl(PaintEvent e) {
         if (fIsHighlight && e != null) {
@@ -251,12 +217,12 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
      *
      * @param param
      *            parameter to create the tooltip string
-     * @return the tooltip based on the given parameter.
-     * @deprecated use {@link #createToolTipMap(Parameter)} as it will
-     *             categorize data better
+     * @return the tooltip map based on the given parameter. The Map<String,
+     *         Map<String, Object>> can be seen as a table. The first element is
+     *         the category, the second is the key, third is the value.
+     * @since 5.0
      */
-    @Deprecated
-    protected String createToolTipText(@NonNull Parameter param) {
+    protected @Nullable Map<@NonNull String, @NonNull Map<@NonNull String, @NonNull Object>> createToolTipMap(@NonNull Parameter param) {
         ISeries[] series = getChart().getSeriesSet().getSeries();
         int seriesIndex = param.getSeriesIndex();
         int dataIndex = param.getDataIndex();
@@ -271,28 +237,10 @@ public class TmfClosestDataPointTooltipProvider extends TmfBaseProvider implemen
                 buffer.append('\n');
                 buffer.append("y="); //$NON-NLS-1$
                 buffer.append((long) yS[dataIndex]);
-                return buffer.toString();
+                return Collections.singletonMap(OLD_TOOLTIP, Collections.singletonMap(OLD_TOOLTIP, buffer.toString()));
             }
         }
         return null;
-    }
-
-    /**
-     * Creates the tooltip based on the given parameter.
-     *
-     * @param param
-     *            parameter to create the tooltip string
-     * @return the tooltip map based on the given parameter. The Map<String,
-     *         Map<String, Object>> can be seen as a table. The first element is
-     *         the category, the second is the key, third is the value.
-     * @since 5.0
-     */
-    protected @Nullable Map<@NonNull String, @NonNull Map<@NonNull String, @NonNull Object>> createToolTipMap(@NonNull Parameter param) {
-        String toolTipText = createToolTipText(param);
-        if (toolTipText == null) {
-            return null;
-        }
-        return Collections.singletonMap(OLD_TOOLTIP, Collections.singletonMap(OLD_TOOLTIP, toolTipText));
     }
 
     /**
