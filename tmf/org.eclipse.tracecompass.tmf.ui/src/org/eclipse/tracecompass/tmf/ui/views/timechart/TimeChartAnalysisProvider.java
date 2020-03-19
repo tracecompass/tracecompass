@@ -106,7 +106,7 @@ public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider imp
     public void colorSettingsChanged(ColorSetting[] settings) {
         StateItem[] stateItems = new StateItem[settings.length];
         for (int i = 0; i < settings.length; i++) {
-            stateItems[i] = new StateItem(settings[i].getTickColorRGB());
+            stateItems[i] = new StateItem(settings[i].getTickColorRGB(), StateItem.UNDEFINED_STATE_NAME);
         }
         fStateTable = stateItems;
     }

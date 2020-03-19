@@ -56,18 +56,6 @@ public class StateItem {
     // ------------------------------------------------------------------------
 
     /**
-     * Creates a state item with given color and unspecified name.
-     *
-     * @param stateColor
-     *            A state color
-     * @deprecated use {@link StateItem#StateItem(Map)}
-     */
-    @Deprecated
-    public StateItem(RGB stateColor) {
-        this(stateColor, stateColor.toString());
-    }
-
-    /**
      * Copy constructor, from a map
      *
      * @param style
