@@ -83,11 +83,6 @@ public abstract class CallStackStateProvider extends AbstractTmfStateProvider {
      */
     public static final String PROCESSES = "Processes"; //$NON-NLS-1$
 
-    /** CallStack stack-attribute
-     * @deprecated Use {@link CallStackAnalysis#CALL_STACK} instead */
-    @Deprecated
-    public static final String CALL_STACK = "CallStack"; //$NON-NLS-1$
-
     /**
      * Unknown process ID
      *

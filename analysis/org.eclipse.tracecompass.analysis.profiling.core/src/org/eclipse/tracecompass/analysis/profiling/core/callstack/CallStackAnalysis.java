@@ -56,8 +56,6 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
 
     private static final String[] DEFAULT_THREADS_PATTERN = new String[] { "*" }; //$NON-NLS-1$
 
-    private static final String[] DEFAULT_CALL_STACK_PATH = new String[] { CALL_STACK };
-
     private final CallGraphAnalysis fCallGraphAnalysis;
 
     private final ListenerList<IAnalysisProgressListener> fListeners = new ListenerList<>(ListenerList.IDENTITY);
@@ -167,23 +165,6 @@ public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule imp
      */
     public String[] getThreadsPattern() {
         return DEFAULT_THREADS_PATTERN;
-    }
-
-    /**
-     * Get the call stack attribute path, relative to an attribute found by the
-     * combination of {@link #getProcessesPattern()} and
-     * {@link #getThreadsPattern()}.
-     * <p>
-     * Override this method if the state system attributes do not match the default
-     * pattern defined by {@link CallStackStateProvider}.
-     *
-     * @return the relative path of the call stack attribute
-     * @deprecated Use the {@link #CALL_STACK} value instead for the last part of
-     *             the path
-     */
-    @Deprecated
-    public String[] getCallStackPath() {
-        return DEFAULT_CALL_STACK_PATH;
     }
 
     /**
