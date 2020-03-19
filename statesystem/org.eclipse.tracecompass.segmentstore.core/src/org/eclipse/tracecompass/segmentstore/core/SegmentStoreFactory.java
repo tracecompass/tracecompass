@@ -64,7 +64,7 @@ public final class SegmentStoreFactory<E> {
          * Segment store that doesn't have to reside entirely in memory, ideal
          * for very large stores, the performance are not as high as the other
          * segment stores. These kind of stores should be created using the
-         * {@link SegmentStoreFactory#createOnDiskSegmentStore(Path, IHTIntervalReader)}
+         * {@link SegmentStoreFactory#createOnDiskSegmentStore(Path, IHTIntervalReader, int)}
          * factory method
          *
          * @since 2.0
@@ -127,25 +127,6 @@ public final class SegmentStoreFactory<E> {
         }
         // default option is the fastest
         return new LazyArrayListStore<>(array);
-    }
-
-    /**
-     * SegmentStore factory method that creates a segment store on disk
-     *
-     * @param segmentFile
-     *            The file where to store the segments
-     * @param segmentReader
-     *            The factory to read the segments from a safe byte buffer
-     *
-     * @return an {@link ISegmentStore}
-     * @throws IOException
-     *             Exceptions when creating the segment store
-     * @since 2.0
-     * @deprecated Use the {@link #createOnDiskSegmentStore(Path, IHTIntervalReader, int)} instead
-     */
-    @Deprecated
-    public static <E extends ISegment> ISegmentStore<E> createOnDiskSegmentStore(Path segmentFile, IHTIntervalReader<E> segmentReader) throws IOException {
-        return createOnDiskSegmentStore(segmentFile, segmentReader, 1);
     }
 
     /**
