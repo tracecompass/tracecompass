@@ -48,7 +48,6 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
-import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
@@ -440,46 +439,6 @@ public class XmlTimeGraphDataProvider extends AbstractTmfTraceDataProvider imple
     @Override
     public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         return new TmfModelResponse<>(null, Status.COMPLETED, CommonStatusMessage.COMPLETED);
-    }
-
-    @Deprecated
-    @Override
-    public TmfModelResponse<List<XmlTimeGraphEntryModel>> fetchTree(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
-        TmfModelResponse<TmfTreeModel<@NonNull XmlTimeGraphEntryModel>> response = fetchTree(parameters, monitor);
-        TmfTreeModel<@NonNull XmlTimeGraphEntryModel> model = response.getModel();
-        List<XmlTimeGraphEntryModel> treeModel = null;
-        if (model != null) {
-            treeModel = model.getEntries();
-        }
-        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
-    }
-
-    @Deprecated
-    @Override
-    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphRowModel>> fetchRowModel(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
-        TmfModelResponse<@NonNull TimeGraphModel> response = fetchRowModel(parameters, monitor);
-        TimeGraphModel model = response.getModel();
-        List<@NonNull ITimeGraphRowModel> rows = null;
-        if (model != null) {
-            rows = model.getRows();
-        }
-        return new TmfModelResponse<>(rows, response.getStatus(), response.getStatusMessage());
-    }
-
-    @Deprecated
-    @Override
-    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphArrow>> fetchArrows(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
-        return fetchArrows(parameters, monitor);
-    }
-
-    @Deprecated
-    @Override
-    public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        Map<String, Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
-        return fetchTooltip(parameters, monitor);
     }
 
 }

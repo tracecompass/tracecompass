@@ -132,12 +132,6 @@ public class DataDrivenXYDataProvider extends AbstractTmfTraceDataProvider
     }
 
     @Override
-    @Deprecated
-    public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        return fetchXY(FetchParametersUtils.timeQueryToMap(filter), monitor);
-    }
-
-    @Override
     public TmfModelResponse<ITmfXyModel> fetchXY(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(fetchParameters);
         if (filter == null) {
@@ -236,19 +230,6 @@ public class DataDrivenXYDataProvider extends AbstractTmfTraceDataProvider
             return ((Number) val).doubleValue();
         }
         return 0;
-    }
-
-    @Override
-    @Deprecated
-    public TmfModelResponse<List<ITmfTreeDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
-        TmfModelResponse<TmfTreeModel<ITmfTreeDataModel>> response = fetchTree(parameters, monitor);
-        TmfTreeModel<ITmfTreeDataModel> model = response.getModel();
-        List<ITmfTreeDataModel> treeModel = null;
-        if (model != null) {
-            treeModel = model.getEntries();
-        }
-        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
     }
 
     @Override

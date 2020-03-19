@@ -500,24 +500,4 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
         return fId;
     }
 
-    @Deprecated
-    @Override
-    public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
-        return fetchXY(parameters, monitor);
-    }
-
-    @Deprecated
-    @Override
-    public TmfModelResponse<List<TmfTreeDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
-        TmfModelResponse<TmfTreeModel<TmfTreeDataModel>> response = fetchTree(parameters, monitor);
-        TmfTreeModel<@NonNull TmfTreeDataModel> model = response.getModel();
-        List<TmfTreeDataModel> treeModel = null;
-        if (model != null) {
-            treeModel = model.getEntries();
-        }
-        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
-    }
-
 }

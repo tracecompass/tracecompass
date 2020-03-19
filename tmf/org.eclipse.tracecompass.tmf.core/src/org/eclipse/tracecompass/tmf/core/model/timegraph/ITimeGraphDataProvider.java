@@ -11,18 +11,12 @@
 
 package org.eclipse.tracecompass.tmf.core.model.timegraph;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
-import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
-import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
-import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
-import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 
 /**
@@ -52,24 +46,6 @@ public interface ITimeGraphDataProvider<M extends ITimeGraphEntryModel> extends 
      * Computes a list of time graph row models, which associate an entry's ID
      * to sampled states.
      *
-     * @param filter
-     *            Time graph query filter, specifies which IDs to return and the
-     *            sampling rate.
-     * @param monitor
-     *            Progress monitor
-     *
-     * @return A {@link TmfModelResponse} that encapsulate a
-     *         {@link ITimeGraphRowModel}
-     *
-     * @deprecated Use fetchRowModel with a map of parameters
-     */
-    @Deprecated
-    TmfModelResponse<List<ITimeGraphRowModel>> fetchRowModel(SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor);
-
-    /**
-     * Computes a list of time graph row models, which associate an entry's ID
-     * to sampled states.
-     *
      * @param fetchParameters
      *            Time graph query parameters, specifies which IDs to return and
      *            the sampling rate.
@@ -80,34 +56,7 @@ public interface ITimeGraphDataProvider<M extends ITimeGraphEntryModel> extends 
      *         {@link TimeGraphModel}
      * @since 5.0
      */
-    default TmfModelResponse<TimeGraphModel> fetchRowModel(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
-        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
-        if (filter != null) {
-            TmfModelResponse<List<ITimeGraphRowModel>> response = fetchRowModel(filter, monitor);
-            List<ITimeGraphRowModel> rows = response.getModel();
-            if (rows != null) {
-                return new TmfModelResponse<>(new TimeGraphModel(rows), response.getStatus(), response.getStatusMessage());
-            }
-            return new TmfModelResponse<>(null, response.getStatus(), response.getStatusMessage());
-        }
-        return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
-    }
-
-    /**
-     * Computes a list of time graph arrows.
-     *
-     * @param filter
-     *            Time query filter, specifies the sampling rate.
-     * @param monitor
-     *            Progress monitor
-     *
-     * @return A {@link TmfModelResponse} that encapsulate a
-     *         {@link ITimeGraphArrow}
-     *
-     * @deprecated Use fetchArrows with a map of parameters
-     */
-    @Deprecated
-    TmfModelResponse<List<ITimeGraphArrow>> fetchArrows(TimeQueryFilter filter, @Nullable IProgressMonitor monitor);
+    TmfModelResponse<TimeGraphModel> fetchRowModel(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor);
 
     /**
      * Computes a list of time graph arrows.
@@ -121,30 +70,7 @@ public interface ITimeGraphDataProvider<M extends ITimeGraphEntryModel> extends 
      *         {@link ITimeGraphArrow}
      * @since 5.0
      */
-    default TmfModelResponse<List<ITimeGraphArrow>> fetchArrows(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
-        TimeQueryFilter filter = FetchParametersUtils.createTimeQuery(fetchParameters);
-        if (filter != null) {
-            return fetchArrows(filter, monitor);
-        }
-
-        return new TmfModelResponse<>(Collections.emptyList(), ITmfResponse.Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
-    }
-
-    /**
-     * Computes a tool tip for a time stamp and entry.
-     *
-     * @param filter
-     *            Time query filter, specifies the time stamp, and item on which
-     *            to give more information
-     * @param monitor
-     *            Progress monitor
-     *
-     * @return A {@link TmfModelResponse} that encapsulate a map of Tooltips
-     *
-     * @deprecated Use fetchTooltip with a map of parameters
-     */
-    @Deprecated
-    TmfModelResponse<Map<String, String>> fetchTooltip(SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor);
+    TmfModelResponse<List<ITimeGraphArrow>> fetchArrows(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor);
 
     /**
      * Computes a tool tip for a time stamp and entry.
@@ -158,12 +84,5 @@ public interface ITimeGraphDataProvider<M extends ITimeGraphEntryModel> extends 
      * @return A {@link TmfModelResponse} that encapsulate a map of Tooltips
      * @since 5.0
      */
-    default TmfModelResponse<Map<String, String>> fetchTooltip(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
-        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
-        if (filter != null) {
-            return fetchTooltip(filter, monitor);
-        }
-
-        return new TmfModelResponse<>(Collections.emptyMap(), ITmfResponse.Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
-    }
+    TmfModelResponse<Map<String, String>> fetchTooltip(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor);
 }

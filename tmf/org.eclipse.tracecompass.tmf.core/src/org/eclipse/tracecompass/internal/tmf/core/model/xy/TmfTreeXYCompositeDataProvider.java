@@ -124,13 +124,6 @@ public class TmfTreeXYCompositeDataProvider<M extends ITmfTreeDataModel, P exten
         return new TmfTreeXYCompositeDataProvider<>(providers, title, providerId);
     }
 
-    @Deprecated
-    @Override
-    public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
-        return fetchXY(parameters, monitor);
-    }
-
     @Override
     public TmfModelResponse<ITmfXyModel> fetchXY(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         /**

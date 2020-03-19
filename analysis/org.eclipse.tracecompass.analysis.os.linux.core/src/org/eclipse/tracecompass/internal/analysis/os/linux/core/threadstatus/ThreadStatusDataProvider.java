@@ -769,52 +769,13 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
         return new TmfModelResponse<>(null, status, statusMessage);
     }
 
-    @Deprecated
-    @Override
-    public TmfModelResponse<List<TimeGraphEntryModel>> fetchTree(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
-        TmfModelResponse<@NonNull TmfTreeModel<@NonNull TimeGraphEntryModel>> response = fetchTree(parameters, monitor);
-        TmfTreeModel<@NonNull TimeGraphEntryModel> model = response.getModel();
-        List<TimeGraphEntryModel> treeModel = null;
-        if (model != null) {
-            treeModel = model.getEntries();
-        }
-        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
-    }
-
-    @Deprecated
-    @Override
-    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphRowModel>> fetchRowModel(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
-        TmfModelResponse<@NonNull TimeGraphModel> response = fetchRowModel(parameters, monitor);
-        TimeGraphModel model = response.getModel();
-        List<@NonNull ITimeGraphRowModel> rows = null;
-        if (model != null) {
-            rows = model.getRows();
-        }
-        return new TmfModelResponse<>(rows, response.getStatus(), response.getStatusMessage());
-    }
-
-    @Deprecated
-    @Override
-    public @NonNull TmfModelResponse<@NonNull List<@NonNull ITimeGraphArrow>> fetchArrows(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
-        return fetchArrows(parameters, monitor);
-    }
-
-    @Deprecated
-    @Override
-    public @NonNull TmfModelResponse<@NonNull Map<@NonNull String, @NonNull String>> fetchTooltip(@NonNull SelectionTimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        @NonNull Map<@NonNull String, @NonNull Object> parameters = FetchParametersUtils.selectionTimeQueryToMap(filter);
-        return fetchTooltip(parameters, monitor);
-    }
-
     @Override
     public @NonNull Multimap<@NonNull String, @NonNull Object> getFilterData(long entryId, long time, @Nullable IProgressMonitor monitor) {
         Multimap<@NonNull String, @NonNull Object> data = ITimeGraphStateFilter.mergeMultimaps(ITimeGraphDataProvider.super.getFilterData(entryId, time, monitor),
                 fEntryMetadata.getOrDefault(entryId, ImmutableMultimap.of()));
-        SelectionTimeQueryFilter filter = new SelectionTimeQueryFilter(Collections.singletonList(time), Collections.singleton(Objects.requireNonNull(entryId)));
-        TmfModelResponse<Map<String, String>> response = fetchTooltip(filter, monitor);
+        Map<@NonNull String, @NonNull Object> parameters = ImmutableMap.of(DataProviderParameterUtils.REQUESTED_TIME_KEY, Collections.singletonList(time),
+                DataProviderParameterUtils.REQUESTED_ELEMENT_KEY, Collections.singleton(Objects.requireNonNull(entryId)));
+        TmfModelResponse<Map<String, String>> response = fetchTooltip(parameters, monitor);
         Map<@NonNull String, @NonNull String> model = response.getModel();
         if (model != null) {
             for (Entry<String, String> entry : model.entrySet()) {

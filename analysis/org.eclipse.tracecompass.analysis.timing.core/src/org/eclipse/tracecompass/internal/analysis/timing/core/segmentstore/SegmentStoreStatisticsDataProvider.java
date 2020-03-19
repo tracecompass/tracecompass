@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreStatisticsModel;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
@@ -103,19 +102,6 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         super(trace);
         fId = id;
         fProvider = provider;
-    }
-
-    @Deprecated
-    @Override
-    public TmfModelResponse<List<SegmentStoreStatisticsModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
-        TmfModelResponse<@NonNull TmfTreeModel<@NonNull SegmentStoreStatisticsModel>> response = fetchTree(parameters, monitor);
-        TmfTreeModel<@NonNull SegmentStoreStatisticsModel> model = response.getModel();
-        List<SegmentStoreStatisticsModel> treeModel = null;
-        if (model != null) {
-            treeModel = model.getEntries();
-        }
-        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
     }
 
     @Override

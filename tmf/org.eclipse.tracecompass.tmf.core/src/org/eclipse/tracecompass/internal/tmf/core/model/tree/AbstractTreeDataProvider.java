@@ -14,7 +14,6 @@ package org.eclipse.tracecompass.internal.tmf.core.model.tree;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -29,7 +28,6 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractStateSystemAnalysisDataProvider;
-import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
@@ -272,19 +270,6 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
             }
         }
         return times;
-    }
-
-    @Deprecated
-    @Override
-    public TmfModelResponse<List<M>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
-        TmfModelResponse<TmfTreeModel<M>> response = fetchTree(parameters, monitor);
-        TmfTreeModel<M> treeModel = response.getModel();
-        List<M> listModel = null;
-        if (treeModel != null) {
-            listModel = treeModel.getEntries();
-        }
-        return new TmfModelResponse<>(listModel, response.getStatus(), response.getStatusMessage());
     }
 
     @Override

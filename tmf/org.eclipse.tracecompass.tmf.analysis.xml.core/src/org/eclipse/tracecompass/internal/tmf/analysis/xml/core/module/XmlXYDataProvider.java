@@ -422,23 +422,4 @@ public class XmlXYDataProvider extends AbstractTmfTraceDataProvider
         return ID;
     }
 
-    @Deprecated
-    @Override
-    public TmfModelResponse<ITmfXyModel> fetchXY(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
-        return fetchXY(parameters, monitor);
-    }
-
-    @Deprecated
-    @Override
-    public TmfModelResponse<List<ITmfTreeDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
-        TmfModelResponse<@NonNull TmfTreeModel<@NonNull ITmfTreeDataModel>> response = fetchTree(parameters, monitor);
-        TmfTreeModel<@NonNull ITmfTreeDataModel> model = response.getModel();
-        List<ITmfTreeDataModel> treeModel = null;
-        if (model != null) {
-            treeModel = model.getEntries();
-        }
-        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
-    }
 }

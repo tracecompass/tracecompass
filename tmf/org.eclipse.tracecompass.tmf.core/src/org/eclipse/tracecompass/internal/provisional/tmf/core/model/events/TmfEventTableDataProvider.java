@@ -45,7 +45,6 @@ import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterRootNode;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
-import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
@@ -137,19 +136,6 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
     @Override
     public String getId() {
         return ID;
-    }
-
-    @Deprecated
-    @Override
-    public TmfModelResponse<List<TmfEventTableColumnDataModel>> fetchTree(TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-        Map<String, Object> parameters = FetchParametersUtils.timeQueryToMap(filter);
-        TmfModelResponse<TmfTreeModel<TmfEventTableColumnDataModel>> response = fetchTree(parameters, monitor);
-        TmfTreeModel<TmfEventTableColumnDataModel> model = response.getModel();
-        List<TmfEventTableColumnDataModel> treeModel = null;
-        if (model != null) {
-            treeModel = model.getEntries();
-        }
-        return new TmfModelResponse<>(treeModel, response.getStatus(), response.getStatusMessage());
     }
 
     @Override

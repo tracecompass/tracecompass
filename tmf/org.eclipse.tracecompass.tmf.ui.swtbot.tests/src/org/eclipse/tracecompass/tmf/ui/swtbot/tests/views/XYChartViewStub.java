@@ -21,11 +21,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.internal.tmf.core.model.TmfXyResponseFactory;
-import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.YModel;
-import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
@@ -122,25 +120,6 @@ public class XYChartViewStub extends TmfChartView {
             return PROVIDER_ID;
         }
 
-        @SuppressWarnings("null")
-        @Deprecated
-        @Override
-        public @NonNull TmfModelResponse<@NonNull ITmfXyModel> fetchXY(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-            @NonNull Map<@NonNull String, @NonNull Object> fetchParameters = FetchParametersUtils.timeQueryToMap(filter);
-            return fetchXY(fetchParameters, monitor);
-        }
-
-        @Deprecated
-        @Override
-        public @NonNull TmfModelResponse<@NonNull List<@NonNull ITmfTreeDataModel>> fetchTree(@NonNull TimeQueryFilter filter, @Nullable IProgressMonitor monitor) {
-            @NonNull Map<@NonNull String, @NonNull Object> fetchParameters = FetchParametersUtils.timeQueryToMap(filter);
-            TmfModelResponse<TmfTreeModel<@NonNull ITmfTreeDataModel>> response = fetchTree(fetchParameters, monitor);
-            TmfTreeModel<@NonNull ITmfTreeDataModel> tree = response.getModel();
-            if (tree == null) {
-                return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.STATE_SYSTEM_FAILED);
-            }
-            return new TmfModelResponse<>(tree.getEntries(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
-        }
     }
 
     private class MyAbsractSelectTreeViewer extends AbstractSelectTreeViewer {
