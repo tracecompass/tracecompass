@@ -12,7 +12,6 @@
 package org.eclipse.tracecompass.statesystem.core;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 
 /**
@@ -39,11 +38,9 @@ public final class StateSystemBuilderUtils {
      *            The value to increment. This value can be negative.
      * @throws StateValueTypeException
      *             If the attribute already exists but is not of type Long
-     * @throws AttributeNotFoundException
-     *             If the quark is invalid
      */
     public static void incrementAttributeLong(ITmfStateSystemBuilder ssb, long t, int attributeQuark, long increment)
-            throws StateValueTypeException, AttributeNotFoundException {
+            throws StateValueTypeException {
         @Nullable Object stateValue = ssb.queryOngoing(attributeQuark);
 
         /* if the attribute was previously null, start counting at 0 */
@@ -68,11 +65,9 @@ public final class StateSystemBuilderUtils {
      *            The value to increment. This value can be negative.
      * @throws StateValueTypeException
      *             If the attribute already exists but is not of type Integer
-     * @throws AttributeNotFoundException
-     *             If the quark is invalid
      */
     public static void incrementAttributeInt(ITmfStateSystemBuilder ssb, long t, int attributeQuark, int increment)
-            throws StateValueTypeException, AttributeNotFoundException {
+            throws StateValueTypeException {
         @Nullable Object stateValue = ssb.queryOngoing(attributeQuark);
 
         /* if the attribute was previously null, start counting at 0 */

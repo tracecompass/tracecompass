@@ -22,11 +22,9 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
-import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemBuilderUtils;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
@@ -115,37 +113,32 @@ public class KernelCpuUsageStateProvider extends AbstractTmfStateProvider {
 
             Long prevTid = (Long) content.getField(fLayout.fieldPrevTid()).getValue();
 
-            try {
-                final ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
+            final ITmfStateSystemBuilder ss = checkNotNull(getStateSystemBuilder());
 
-                Integer currentCPUNode = ss.getQuarkRelativeAndAdd(getNodeCPUs(ss), cpu.toString());
+            Integer currentCPUNode = ss.getQuarkRelativeAndAdd(getNodeCPUs(ss), cpu.toString());
 
-                /*
-                 * This quark contains the value of the cumulative time spent on
-                 * the source CPU by the currently running thread
-                 */
-                Integer cumulativeTimeQuark = ss.getQuarkRelativeAndAdd(currentCPUNode, prevTid.toString());
-                Long startTime = fLastStartTimes.get(cpu);
-                /*
-                 * If start time is null, we haven't seen the start of the
-                 * process, so we assume beginning of the trace
-                 */
-                if (startTime == null) {
-                    startTime = fTraceStart;
-                }
-
-                /*
-                 * Modify cumulative time for this CPU/TID combo: The total time
-                 * changes when the process is scheduled out. Nothing happens
-                 * when the process is scheduled in.
-                 */
-                StateSystemBuilderUtils.incrementAttributeLong(ss, ts, cumulativeTimeQuark, ts - startTime);
-
-                fLastStartTimes.put(cpu, ts);
-
-            } catch (AttributeNotFoundException e) {
-                Activator.getDefault().logError("Attribute not found in LttngKernelCpuStateProvider", e); //$NON-NLS-1$
+            /*
+             * This quark contains the value of the cumulative time spent on
+             * the source CPU by the currently running thread
+             */
+            Integer cumulativeTimeQuark = ss.getQuarkRelativeAndAdd(currentCPUNode, prevTid.toString());
+            Long startTime = fLastStartTimes.get(cpu);
+            /*
+             * If start time is null, we haven't seen the start of the
+             * process, so we assume beginning of the trace
+             */
+            if (startTime == null) {
+                startTime = fTraceStart;
             }
+
+            /*
+             * Modify cumulative time for this CPU/TID combo: The total time
+             * changes when the process is scheduled out. Nothing happens
+             * when the process is scheduled in.
+             */
+            StateSystemBuilderUtils.incrementAttributeLong(ss, ts, cumulativeTimeQuark, ts - startTime);
+
+            fLastStartTimes.put(cpu, ts);
 
         }
     }

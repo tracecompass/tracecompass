@@ -18,13 +18,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
-import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.analysis.counters.core.aspects.CounterAspect;
 import org.eclipse.tracecompass.analysis.counters.core.aspects.ITmfCounterAspect;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemBuilderUtils;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
@@ -180,7 +179,7 @@ public class CounterStateProvider extends AbstractTmfStateProvider {
             if (!aspect.isCumulative()) {
                 try {
                     StateSystemBuilderUtils.incrementAttributeLong(ss, event.getTimestamp().toNanos(), quark, eventContent);
-                } catch (StateValueTypeException | AttributeNotFoundException e) {
+                } catch (StateValueTypeException e) {
                     TraceCompassLogUtils.traceInstant(LOGGER, Level.WARNING, "HandleCounterAspect:Exception", e); //$NON-NLS-1$
                 }
             } else {

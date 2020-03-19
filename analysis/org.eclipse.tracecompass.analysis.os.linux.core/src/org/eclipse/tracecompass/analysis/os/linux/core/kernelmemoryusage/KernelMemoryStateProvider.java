@@ -19,7 +19,6 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEven
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemBuilderUtils;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
@@ -134,7 +133,7 @@ public class KernelMemoryStateProvider extends AbstractTmfStateProvider {
             if (previousLowest > currentMemoryValue) {
                 ss.modifyAttribute(ts, currentMemoryValue, lowestMemoryQuark);
             }
-        } catch (AttributeNotFoundException | InterruptedException e) {
+        } catch (InterruptedException e) {
             Activator.getDefault().logError(String.valueOf(e.getMessage()), e);
         }
     }

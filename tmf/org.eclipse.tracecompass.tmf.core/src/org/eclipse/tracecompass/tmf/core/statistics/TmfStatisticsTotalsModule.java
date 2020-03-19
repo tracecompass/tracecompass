@@ -17,10 +17,8 @@ package org.eclipse.tracecompass.tmf.core.statistics;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemBuilderUtils;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.ITmfLostEvent;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
@@ -122,14 +120,9 @@ public class TmfStatisticsTotalsModule extends TmfStateSystemAnalysisModule {
              * timestamp values to nanoseconds. */
             final long ts = event.getTimestamp().toNanos();
 
-            try {
-                /* Total number of events */
-                int quark = ss.getQuarkAbsoluteAndAdd(Attributes.TOTAL);
-                StateSystemBuilderUtils.incrementAttributeInt(ss, ts, quark, 1);
-
-            } catch (AttributeNotFoundException e) {
-                Activator.logError("Get attribute not found exception ", e);  //$NON-NLS-1$
-            }
+            /* Total number of events */
+            int quark = ss.getQuarkAbsoluteAndAdd(Attributes.TOTAL);
+            StateSystemBuilderUtils.incrementAttributeInt(ss, ts, quark, 1);
         }
     }
 

@@ -18,10 +18,8 @@ package org.eclipse.tracecompass.tmf.core.statistics;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.core.Activator;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemBuilderUtils;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
 import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -136,46 +134,33 @@ public class TmfStatisticsEventTypesModule extends TmfStateSystemAnalysisModule 
 
             final String eventName = event.getName();
 
-            try {
-                /* Special handling for lost events */
-                if (event instanceof ITmfLostEvent) {
-                    ITmfLostEvent le = (ITmfLostEvent) event;
-                    quark = ss.getQuarkAbsoluteAndAdd(Attributes.EVENT_TYPES, eventName);
+            /* Special handling for lost events */
+            if (event instanceof ITmfLostEvent) {
+                ITmfLostEvent le = (ITmfLostEvent) event;
+                quark = ss.getQuarkAbsoluteAndAdd(Attributes.EVENT_TYPES, eventName);
 
-                    int curVal = ss.queryOngoingState(quark).unboxInt();
-                    if (curVal == -1) {
-                        curVal = 0;
-                    }
-
-                    ss.modifyAttribute(ts, (int) (curVal + le.getNbLostEvents()), quark);
-
-                    long lostEventsStartTime = le.getTimeRange().getStartTime().toNanos();
-                    long lostEventsEndTime = le.getTimeRange().getEndTime().toNanos();
-                    int lostEventsQuark = ss.getQuarkAbsoluteAndAdd(Attributes.LOST_EVENTS);
-                    ITmfStateValue currentLostEventsEndTime = ss.queryOngoingState(lostEventsQuark);
-                    if (currentLostEventsEndTime.isNull() || currentLostEventsEndTime.unboxLong() < lostEventsStartTime) {
-                        ss.modifyAttribute(lostEventsStartTime, lostEventsEndTime, lostEventsQuark);
-                    } else if (currentLostEventsEndTime.unboxLong() < lostEventsEndTime) {
-                        ss.updateOngoingState(TmfStateValue.newValueLong(lostEventsEndTime), lostEventsQuark);
-                    }
-                    return;
+                int curVal = ss.queryOngoingState(quark).unboxInt();
+                if (curVal == -1) {
+                    curVal = 0;
                 }
 
-                /* Number of events of each type, globally */
-                quark = ss.getQuarkAbsoluteAndAdd(Attributes.EVENT_TYPES, eventName);
-                StateSystemBuilderUtils.incrementAttributeInt(ss, ts, quark, 1);
+                ss.modifyAttribute(ts, (int) (curVal + le.getNbLostEvents()), quark);
 
-//                /* Number of events per CPU */
-//                quark = ss.getQuarkRelativeAndAdd(currentCPUNode, Attributes.STATISTICS, Attributes.EVENT_TYPES, eventName);
-//                ss.incrementAttribute(ts, quark);
-    //
-//                /* Number of events per process */
-//                quark = ss.getQuarkRelativeAndAdd(currentThreadNode, Attributes.STATISTICS, Attributes.EVENT_TYPES, eventName);
-//                ss.incrementAttribute(ts, quark);
-
-            } catch (AttributeNotFoundException e) {
-                Activator.logError("Get attribute not found exception ", e);  //$NON-NLS-1$
+                long lostEventsStartTime = le.getTimeRange().getStartTime().toNanos();
+                long lostEventsEndTime = le.getTimeRange().getEndTime().toNanos();
+                int lostEventsQuark = ss.getQuarkAbsoluteAndAdd(Attributes.LOST_EVENTS);
+                ITmfStateValue currentLostEventsEndTime = ss.queryOngoingState(lostEventsQuark);
+                if (currentLostEventsEndTime.isNull() || currentLostEventsEndTime.unboxLong() < lostEventsStartTime) {
+                    ss.modifyAttribute(lostEventsStartTime, lostEventsEndTime, lostEventsQuark);
+                } else if (currentLostEventsEndTime.unboxLong() < lostEventsEndTime) {
+                    ss.updateOngoingState(TmfStateValue.newValueLong(lostEventsEndTime), lostEventsQuark);
+                }
+                return;
             }
+
+            /* Number of events of each type, globally */
+            quark = ss.getQuarkAbsoluteAndAdd(Attributes.EVENT_TYPES, eventName);
+            StateSystemBuilderUtils.incrementAttributeInt(ss, ts, quark, 1);
         }
     }
 }
