@@ -21,23 +21,15 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.profiling.core.callgraph.ICallGraphProvider;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
-import org.eclipse.tracecompass.analysis.profiling.core.callstack.IFlameChartProvider;
-import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
-import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
-import org.eclipse.tracecompass.internal.analysis.profiling.core.callstack.SymbolAspect;
-import org.eclipse.tracecompass.segmentstore.core.ISegment;
-import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
-import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -59,12 +51,9 @@ import com.google.common.collect.ImmutableList;
  *         ...        ...
  * </pre>
  *
- * FIXME: Remove the implemented ISegmentStoreProvider interface at next major
- * API break
- *
  * @author Sonia Farrah
  */
-public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISegmentStoreProvider, ICallGraphProvider {
+public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ICallGraphProvider {
 
     /**
      * ID
@@ -74,8 +63,6 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
-
-    private final ListenerList<IAnalysisProgressListener> fListeners = new ListenerList<>(ListenerList.IDENTITY);
 
     /**
      * The List of thread nodes. Each thread has a virtual node having the root
@@ -122,15 +109,6 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
          * analysis dependencies work better
          */
         return true;
-    }
-
-    /**
-     * @deprecated Use the {@link IFlameChartProvider}'s segment store instead
-     */
-    @Override
-    @Deprecated
-    public @NonNull Iterable<@NonNull ISegmentAspect> getSegmentAspects() {
-        return Collections.singletonList(SymbolAspect.SYMBOL_ASPECT);
     }
 
     @Override
@@ -575,36 +553,9 @@ public class CallGraphAnalysis extends TmfAbstractAnalysisModule implements ISeg
         return true;
     }
 
-    /**
-     * @deprecated Use the {@link IFlameChartProvider}'s segment store instead
-     */
-    @Override
-    @Deprecated
-    public void addListener(@NonNull IAnalysisProgressListener listener) {
-        fListeners.add(listener);
-    }
-
-    /**
-     * @deprecated Use the {@link IFlameChartProvider}'s segment store instead
-     */
-    @Override
-    @Deprecated
-    public void removeListener(@NonNull IAnalysisProgressListener listener) {
-        fListeners.remove(listener);
-    }
-
     @Override
     protected void canceling() {
         // Do nothing
-    }
-
-    /**
-     * @deprecated Use the {@link IFlameChartProvider}'s segment store instead
-     */
-    @Override
-    @Deprecated
-    public @Nullable ISegmentStore<@NonNull ISegment> getSegmentStore() {
-        return null;
     }
 
     /**

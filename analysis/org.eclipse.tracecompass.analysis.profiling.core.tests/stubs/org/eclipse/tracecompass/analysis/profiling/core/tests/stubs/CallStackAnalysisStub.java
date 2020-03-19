@@ -14,7 +14,9 @@ package org.eclipse.tracecompass.analysis.profiling.core.tests.stubs;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackAnalysis;
+import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
@@ -30,6 +32,24 @@ public class CallStackAnalysisStub extends CallStackAnalysis {
      */
     public static final @NonNull String ID = "org.eclipse.tracecompass.profiling.callstack.test";
 
+    private final @Nullable ITmfStateSystem fSs;
+
+    /**
+     * Default constructor
+     */
+    public CallStackAnalysisStub() {
+        fSs = null;
+    }
+
+    /**
+     * Constructor, with a pre-filled state system
+     *
+     * @param stateSystem The pre-filled state system
+     */
+    public CallStackAnalysisStub(ITmfStateSystem stateSystem) {
+        fSs = stateSystem;
+    }
+
     @Override
     protected @NonNull ITmfStateProvider createStateProvider() {
         ITmfTrace trace = getTrace();
@@ -42,6 +62,12 @@ public class CallStackAnalysisStub extends CallStackAnalysis {
     @Override
     public List<String[]> getPatterns() {
         return super.getPatterns();
+    }
+
+    @Override
+    public @Nullable ITmfStateSystem getStateSystem() {
+        ITmfStateSystem ss = fSs;
+        return ss == null ? super.getStateSystem() : ss;
     }
 
 }

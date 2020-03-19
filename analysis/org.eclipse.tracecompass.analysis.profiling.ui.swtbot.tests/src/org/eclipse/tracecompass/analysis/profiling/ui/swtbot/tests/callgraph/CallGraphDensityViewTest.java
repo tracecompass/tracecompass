@@ -148,7 +148,7 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
         CallGraphDensityView funcDensityView = fFuncDensityView;
         assertNotNull(funcDensityView);
         SWTBotUtils.maximize(funcDensityView);
-        setCga(null);
+        resetAnalyses();
 
     }
 
@@ -313,7 +313,7 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
     }
 
     private void loadData() {
-        final ISegmentStoreProvider cga = getCga();
+        final ISegmentStoreProvider cga = getCsa();
 
         UIThreadRunnable.syncExec(() -> {
             fTableViewer.setData(cga);
