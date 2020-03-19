@@ -10,10 +10,7 @@
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.core.model.timegraph;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -55,22 +52,6 @@ public interface IElementResolver {
      */
     @Deprecated
     static final String ENTRY_NAME_KEY = IMetadataStrings.ENTRY_NAME_KEY;
-
-    /**
-     * Get available information from an item and return it into a key-value map
-     *
-     * @return The map of data
-     * @deprecated Use the {@link #getMetadata()} instead
-     */
-    @Deprecated
-    default Map<@NonNull String, @NonNull String> computeData() {
-        Map<String, String> map = new HashMap<>();
-        Multimap<String, Object> metadata = getMetadata();
-        for (Entry<String, Object> entry : metadata.entries()) {
-            map.put(entry.getKey(), String.valueOf(entry.getValue()));
-        }
-        return map;
-    }
 
     /**
      * Get the metadata for this data model. The keys are the names of the

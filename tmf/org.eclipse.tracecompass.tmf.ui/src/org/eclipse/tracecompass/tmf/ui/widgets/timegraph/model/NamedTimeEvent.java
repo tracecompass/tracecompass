@@ -11,7 +11,6 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
-import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -91,18 +90,6 @@ public class NamedTimeEvent extends TimeEvent {
     @Override
     public @NonNull String getLabel() {
         return fLabel;
-    }
-
-    /**
-     * @since 4.0
-     * @deprecated As of 5.3, use the {@link #getMetadata()} instead
-     */
-    @Deprecated
-    @Override
-    public @NonNull Map<@NonNull String, @NonNull String> computeData() {
-        Map<@NonNull String, @NonNull String> data = super.computeData();
-        data.put(IMetadataStrings.LABEL_KEY, getLabel());
-        return data;
     }
 
     @Override

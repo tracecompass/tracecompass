@@ -1,8 +1,5 @@
 package org.eclipse.tracecompass.tmf.core.tests.filter.parser;
 
-import java.util.Collections;
-import java.util.Map;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 
@@ -30,12 +27,6 @@ public class ElementResolverStub implements IElementResolver {
     @Override
     public @NonNull Multimap<@NonNull String, @NonNull Object> getMetadata() {
         return fData;
-    }
-
-    @Deprecated
-    @Override
-    public @NonNull Map<@NonNull String, @NonNull String> computeData() {
-        return Collections.emptyMap();
     }
 
 }

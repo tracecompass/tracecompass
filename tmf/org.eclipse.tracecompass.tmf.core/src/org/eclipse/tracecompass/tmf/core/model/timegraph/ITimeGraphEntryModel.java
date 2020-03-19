@@ -11,8 +11,6 @@
 
 package org.eclipse.tracecompass.tmf.core.model.timegraph;
 
-import java.util.Map;
-
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 
 import com.google.common.collect.HashMultimap;
@@ -57,12 +55,4 @@ public interface ITimeGraphEntryModel extends ITmfTreeDataModel, IElementResolve
         return HashMultimap.create();
     }
 
-    /**
-     * @since 5.2
-     */
-    @Override
-    @Deprecated
-    default Map<String, String> computeData() {
-        return IElementResolver.super.computeData();
-    }
 }

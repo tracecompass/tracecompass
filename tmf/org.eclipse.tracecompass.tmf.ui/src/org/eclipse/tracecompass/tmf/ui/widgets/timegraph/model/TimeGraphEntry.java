@@ -135,7 +135,7 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
          *            the resolution of the zoom
          * @param predicates
          *            The active predicate applied to the view element
-         * @since 5.3
+         * @since 6.0
          */
         public Sampling(long zoomStart, long zoomEnd, @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>>> predicates, long resolution) {
             fZoomStart = zoomStart;
@@ -741,12 +741,4 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
         return false;
     }
 
-    @Deprecated
-    @Override
-    public @NonNull Map<@NonNull String, @NonNull String> computeData() {
-        if (fModel instanceof IElementResolver) {
-            return ((IElementResolver) fModel).computeData();
-        }
-        return Collections.emptyMap();
-    }
 }

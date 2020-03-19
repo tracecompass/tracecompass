@@ -15,9 +15,6 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IMetadataStrings;
@@ -91,22 +88,6 @@ public interface ITimeEvent extends IPropertyCollection, IElementResolver {
      * @return The part after the split time
      */
     ITimeEvent splitAfter(long splitTime);
-
-    /**
-     * @since 4.0
-     * @deprecated As of 5.3, use the {@link #getMetadata()} instead
-     */
-    @Deprecated
-    @Override
-    default @NonNull Map<@NonNull String, @NonNull String> computeData() {
-        Map<@NonNull String, @NonNull String> data = new HashMap<>();
-        String entryName = getEntry().getName();
-        if (entryName != null) {
-            data.put(IMetadataStrings.ENTRY_NAME_KEY, entryName);
-        }
-
-        return data;
-    }
 
     /**
      * @since 5.0

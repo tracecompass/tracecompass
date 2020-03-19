@@ -1835,7 +1835,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
      * @param visible
      *            {@code true} to make the controls visible or {@code false} to
      *            hide them
-     * @since 5.3
+     * @since 6.0
      */
     public void setTimeGraphScaleVisible(boolean visible) {
         setControlVisible(fTree, visible);
@@ -1850,7 +1850,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
      * @param visible
      *            {@code true} to make the control visible or {@code false} to
      *            hide it
-     * @since 5.3
+     * @since 6.0
      */
     public void setMarkerAxisControlVisible(boolean visible) {
         setControlVisible(fMarkerAxisCtrl, visible);
@@ -1863,7 +1863,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
      * @param visible
      *            {@code true} to make the control visible or {@code false} to
      *            hide it
-     * @since 5.3
+     * @since 6.0
      */
     public void setHorizontalScrollBarVisible(boolean visible) {
         setControlVisible(fLastRowLeftFiller, visible);

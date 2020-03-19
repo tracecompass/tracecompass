@@ -11,9 +11,6 @@
 
 package org.eclipse.tracecompass.tmf.core.model.timegraph;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.model.OutputElement;
@@ -138,17 +135,6 @@ public class TimeGraphState extends OutputElement implements ITimeGraphState {
         metadata.put(TmfStrings.endTime(), fStartTime + fDuration);
         metadata.put(TmfStrings.duration(), fDuration);
         return metadata;
-    }
-
-    @Deprecated
-    @Override
-    public Map<String, String> computeData() {
-        Map<String, String> toTest = new HashMap<>();
-        String label = getLabel();
-        if (label != null) {
-            toTest.put(IElementResolver.LABEL_KEY, label);
-        }
-        return toTest;
     }
 
     @Override

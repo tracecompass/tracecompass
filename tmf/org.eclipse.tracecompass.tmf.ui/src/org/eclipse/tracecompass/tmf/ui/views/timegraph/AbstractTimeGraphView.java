@@ -185,8 +185,6 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.ImmutableMultimap.Builder;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -767,7 +765,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *            The event list at this zoom level
      * @param predicates
      *            The predicate for the filter dialog text box
-     * @since 5.3
+     * @since 6.0
      */
     @NonNullByDefault
     protected void doFilterEventList(TimeGraphEntry entry, List<ITimeEvent> eventList, Map<Integer, Predicate<Multimap<String, Object>>> predicates) {
@@ -825,7 +823,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * @param predicates
      *            The predicate for the filter dialog text box
      * @since 4.0
-     * @deprecated As of 5.3, replaced with
+     * @deprecated As of 6.0, replaced with
      *             {@link #doFilterEventList(TimeGraphEntry, List, Map)}
      */
     @Deprecated
@@ -878,37 +876,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 eventList.add(nullTimeEvent);
             }
         }
-    }
-
-    /**
-     * Compute the predicate for every property regexes
-     *
-     * @return A map of time event filters predicate by property
-     * @since 4.0
-     * @deprecated Use {@link #generateRegexPredicate()}
-     */
-    @Deprecated
-    @NonNullByDefault
-    protected Map<Integer, Predicate<Map<String, String>>> computeRegexPredicate() {
-        Multimap<Integer, String> regexes = getRegexes();
-        Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates = new HashMap<>();
-        for (Entry<Integer, Collection<String>> entry : regexes.asMap().entrySet()) {
-            String regex = IFilterStrings.mergeFilters(entry.getValue());
-            FilterCu cu = FilterCu.compile(regex);
-            Predicate<@NonNull Map<@NonNull String, @NonNull String>> predicate = cu != null ? multiToMapPredicate(cu.generate()) : null;
-                if (predicate != null) {
-                    predicates.put(entry.getKey(), predicate);
-                }
-        }
-        return predicates;
-    }
-
-    private static Predicate<@NonNull Map<@NonNull String, @NonNull String>> multiToMapPredicate(@NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>> predicate) {
-        return map -> {
-            Builder<@NonNull String, @NonNull Object> builder = ImmutableMultimap.builder();
-            map.forEach((key, value) -> builder.put(key, value));
-            return predicate.test(Objects.requireNonNull(builder.build()));
-        };
     }
 
     /**
