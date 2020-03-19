@@ -26,10 +26,6 @@ public class TmfFilterAndNode extends TmfFilterTreeNode implements ITmfFilterWit
 
     /** and node name */
     public static final String NODE_NAME = "AND"; //$NON-NLS-1$
-    /** not attribute name
-     * @deprecated use {@link ITmfFilterWithNot#NOT_ATTRIBUTE} */
-    @Deprecated
-    public static final String NOT_ATTR = "not"; //$NON-NLS-1$
 
     private boolean fNot = false;
 

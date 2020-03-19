@@ -31,10 +31,6 @@ public class TmfFilterMatchesNode extends TmfFilterAspectNode {
 
     /** matches node name */
     public static final String NODE_NAME = "MATCHES"; //$NON-NLS-1$
-    /** not attribute name
-     * @deprecated use {@link ITmfFilterWithNot#NOT_ATTRIBUTE} */
-    @Deprecated
-    public static final String NOT_ATTR = "not"; //$NON-NLS-1$
     /** regex attribute name */
     public static final String REGEX_ATTR = "regex"; //$NON-NLS-1$
 

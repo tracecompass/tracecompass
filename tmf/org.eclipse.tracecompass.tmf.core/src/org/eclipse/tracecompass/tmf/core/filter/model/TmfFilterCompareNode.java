@@ -34,18 +34,10 @@ public class TmfFilterCompareNode extends TmfFilterAspectNode implements ITmfFil
 
     /** compare node name */
     public static final String NODE_NAME = "COMPARE"; //$NON-NLS-1$
-    /** not attribute name
-     * @deprecated use {@link ITmfFilterWithNot#NOT_ATTRIBUTE} */
-    @Deprecated
-    public static final String NOT_ATTR = "not"; //$NON-NLS-1$
     /** result attribute name */
     public static final String RESULT_ATTR = "result"; //$NON-NLS-1$
     /** type attribute name */
     public static final String TYPE_ATTR = "type"; //$NON-NLS-1$
-    /** value attribute name
-     * @deprecated use {@link ITmfFilterWithValue#VALUE_ATTRIBUTE} */
-    @Deprecated
-    public static final String VALUE_ATTR = "value"; //$NON-NLS-1$
 
     /**
      * Supported comparison types
