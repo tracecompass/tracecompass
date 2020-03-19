@@ -165,63 +165,10 @@ public interface ITmfStateSystemBuilder extends ITmfStateSystem {
      * @throws StateValueTypeException
      *             If the inserted state value's type does not match what is
      *             already assigned to this attribute.
-     */
-    @Deprecated
-    default void modifyAttribute(long t, @NonNull ITmfStateValue value, int attributeQuark)
-            throws StateValueTypeException {
-        modifyAttribute(t, value.unboxValue(), attributeQuark);
-    }
-
-    /**
-     * Basic attribute modification method, we simply specify a new value, for a
-     * given attribute, effective at the given timestamp.
-     *
-     * @param t
-     *            Timestamp of the state change
-     * @param value
-     *            The State Value we want to assign to the attribute
-     * @param attributeQuark
-     *            Integer value of the quark corresponding to the attribute we
-     *            want to modify
-     * @throws TimeRangeException
-     *             If the requested time is outside of the trace's range
-     * @throws IndexOutOfBoundsException
-     *             If the attribute quark is out of range
-     * @throws StateValueTypeException
-     *             If the inserted state value's type does not match what is
-     *             already assigned to this attribute.
      * @since 3.1
      */
     void modifyAttribute(long t, Object value, int attributeQuark)
             throws StateValueTypeException;
-
-    /**
-     * "Push" helper method. This uses the given integer attribute as a stack:
-     * The value of that attribute will represent the stack depth (always
-     * {@literal >=} 1). Sub-attributes will be created, their base-name will be
-     * the position in the stack (1, 2, etc.) and their value will be the state
-     * value 'value' that was pushed to this position.
-     *
-     * @param t
-     *            Timestamp of the state change
-     * @param value
-     *            State value to assign to this stack position.
-     * @param attributeQuark
-     *            The base attribute to use as a stack. If it does not exist if
-     *            will be created (with depth = 1)
-     * @throws TimeRangeException
-     *             If the requested timestamp is invalid
-     * @throws IndexOutOfBoundsException
-     *             If the attribute quark is out of range
-     * @throws StateValueTypeException
-     *             If the attribute 'attributeQuark' already exists, but is not
-     *             of integer type.
-     */
-    @Deprecated
-    default void pushAttribute(long t, @NonNull ITmfStateValue value, int attributeQuark)
-            throws StateValueTypeException {
-        pushAttribute(t, value.unboxValue(), attributeQuark);
-    }
 
     /**
      * "Push" helper method. This uses the given integer attribute as a stack:
