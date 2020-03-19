@@ -110,7 +110,7 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
          * @param predicates
          *            The active predicate applied to the view element
          * @since 4.3
-         * @deprecated As of 5.3, replaced by {@link #Sampling(long, long, Map, long)}
+         * @deprecated As of 6.0, replaced by {@link #Sampling(long, long, Map, long)}
          */
         @Deprecated
         public Sampling(long zoomStart, long zoomEnd, long resolution, @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates) {
@@ -311,22 +311,6 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
     @Override
     public String getName() {
         return getEntryModel().getName();
-    }
-
-    /**
-     * Update the entry name
-     *
-     * @param name
-     *            the updated entry name
-     * @Deprecated The name should not be set through this method
-     */
-    @Deprecated
-    public void setName(String name) {
-        /*
-         * Model is immutable, this is the only way to do this, consider not updating
-         * name in the future?
-         */
-        fModel = new TimeGraphEntryModel(fModel.getId(), fModel.getParentId(), Collections.singletonList(name), getStartTime(), getEndTime(), fModel instanceof ITimeGraphEntryModel ? ((TimeGraphEntryModel) fModel).hasRowModel() : true);
     }
 
     @Override
@@ -653,20 +637,6 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
      */
     public void setSampling(Sampling sampling) {
         fSampling = sampling;
-    }
-
-    /**
-     * Getter for the underlying time graph entry model
-     *
-     * @return The underlying time graph entry model
-     * @since 4.0
-     * @deprecated Use the {@link #getEntryModel()} instead
-     */
-    @Deprecated
-    public ITimeGraphEntryModel getModel() {
-        ITmfTreeDataModel model = fModel;
-        return model instanceof ITimeGraphEntryModel ? (ITimeGraphEntryModel) model :
-            new TimeGraphEntryModel(model.getId(), model.getParentId(), getName(), getStartTime(), getEndTime());
     }
 
     /**

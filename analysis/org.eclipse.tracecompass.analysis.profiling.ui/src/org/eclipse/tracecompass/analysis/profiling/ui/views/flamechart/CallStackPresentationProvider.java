@@ -27,8 +27,8 @@ import org.eclipse.tracecompass.internal.analysis.profiling.ui.views.flamechart.
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.presentation.IPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.presentation.RotatingPaletteProvider;
@@ -86,7 +86,7 @@ public class CallStackPresentationProvider extends TimeGraphPresentationProvider
     @Override
     public @Nullable String getStateTypeName(@Nullable ITimeGraphEntry entry) {
         if (entry instanceof TimeGraphEntry) {
-            ITimeGraphEntryModel model = ((TimeGraphEntry) entry).getModel();
+            ITmfTreeDataModel model = ((TimeGraphEntry) entry).getEntryModel();
             if (model instanceof CallStackEntryModel) {
                 int type = ((CallStackEntryModel) model).getStackLevel();
                 if (type >= 0) {
