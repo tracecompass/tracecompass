@@ -21,8 +21,6 @@ import java.nio.channels.ClosedChannelException;
 import org.eclipse.tracecompass.datastore.core.interval.HTInterval;
 import org.eclipse.tracecompass.datastore.core.interval.IHTInterval;
 import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.AbstractHistoryTree;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTNode;
 import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.IHTNode.NodeType;
 
 /**
