@@ -44,9 +44,8 @@ import com.google.common.collect.ImmutableList;
  * system.
  *
  * @author Matthew Khouzam
- * TODO: Have this class also implement ICallGraphProvider at the next API break
  */
-public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule implements IFlameChartProvider {
+public abstract class CallStackAnalysis extends TmfStateSystemAnalysisModule implements IFlameChartProvider, ICallGraphProvider {
 
     /** CallStack stack-attribute
      * @since 1.1*/
