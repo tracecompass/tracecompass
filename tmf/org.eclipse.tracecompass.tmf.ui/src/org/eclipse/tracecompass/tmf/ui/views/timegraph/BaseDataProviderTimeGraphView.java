@@ -438,6 +438,8 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                         }
                     }
                 }
+            } else {
+                entry.setZoomedEventList(Collections.emptyList());
             }
         }
         return providersToModelIds;

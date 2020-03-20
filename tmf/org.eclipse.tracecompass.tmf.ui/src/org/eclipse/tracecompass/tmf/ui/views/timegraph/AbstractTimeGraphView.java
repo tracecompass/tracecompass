@@ -108,6 +108,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.Trac
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerConfigXmlParser;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.ITmfImageConstants;
 import org.eclipse.tracecompass.internal.tmf.ui.markers.MarkerUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.util.TimeGraphStyleUtil;
 import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfTimeNavigationProvider;
@@ -275,6 +276,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     /** The previous resource action */
     private Action fPreviousResourceAction;
 
+    /** The hide rows action */
+    private HideEmptyRowsAction fHideEmptyRowsAction;
+
     /** A comparator class */
     private Comparator<ITimeGraphEntry> fEntryComparator = null;
 
@@ -374,6 +378,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
     /** The time graph event filter dialog */
     private TimeEventFilterDialog fTimeEventFilterDialog;
+
+    /** Row filter to add**/
+    private volatile boolean fIsHideRowsFilterActive;
 
     private TimeGraphPartListener2 fPartListener2;
 
@@ -617,11 +624,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             Sampling sampling = new Sampling(getZoomStartTime(), getZoomEndTime(), getResolution());
             boolean isFilterActive = !getRegexes().values().isEmpty();
             try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStates")) { //$NON-NLS-1$
-                boolean isFilterCleared = !isFilterActive && getTimeGraphViewer().isTimeEventFilterActive();
+                boolean isFilterCleared = (!isFilterActive && getTimeGraphViewer().isTimeEventFilterActive()) && fIsHideRowsFilterActive;
                 getTimeGraphViewer().setTimeEventFilterApplied(isFilterActive);
 
                 boolean hasSavedFilter = fTimeEventFilterDialog != null && fTimeEventFilterDialog.hasActiveSavedFilters();
-                getTimeGraphViewer().setSavedFilterStatus(hasSavedFilter);
+                getTimeGraphViewer().setSavedFilterStatus(hasSavedFilter || fIsHideRowsFilterActive);
 
                 Iterable<@NonNull TimeGraphEntry> incorrectSample = Iterables.filter(fEntries, entry -> isFilterActive || isFilterCleared || !sampling.equals(entry.getSampling()));
                 zoomEntries(incorrectSample, getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
@@ -2323,6 +2330,21 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     /**
+     * Returns an action for hiding / showing empty rows
+     *
+     * @return the hide empty rows action.
+     * @since 5.3
+     */
+    protected Action getHideEmptyRowsAction() {
+        HideEmptyRowsAction hideEmptyRowsAction = fHideEmptyRowsAction;
+        if (hideEmptyRowsAction == null) {
+            hideEmptyRowsAction = new HideEmptyRowsAction();
+            fHideEmptyRowsAction = hideEmptyRowsAction;
+        }
+        return hideEmptyRowsAction;
+    }
+
+    /**
      * Get the dialog settings for this view
      *
      * @param force
@@ -2337,6 +2359,22 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             section = settings.addNewSection(sectionName);
         }
         return section;
+    }
+
+    private class HideEmptyRowsAction extends Action {
+        public HideEmptyRowsAction() {
+            super(org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.Messages.AbstractTimeGraphView_HideEmptyRowsActionName, IAction.AS_CHECK_BOX);
+            setToolTipText(org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.Messages.AbstractTimeGraphView_HideEmptyRowsActionTooltip);
+            setImageDescriptor(Activator.getDefault().getImageDescripterFromPath(ITmfImageConstants.IMG_UI_HIDE_ROWS_BUTTON));
+            fIsHideRowsFilterActive = false;
+        }
+        @Override
+        public void run() {
+            boolean hasSavedFilter = fTimeEventFilterDialog != null && fTimeEventFilterDialog.hasActiveSavedFilters();
+            fIsHideRowsFilterActive = isChecked();
+            getTimeGraphViewer().setSavedFilterStatus(hasSavedFilter || fIsHideRowsFilterActive);
+            restartZoomThread();
+        }
     }
 
     private class MarkerSetAction extends Action {
@@ -2413,6 +2451,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *            the tool bar manager
      */
     protected void fillLocalToolBar(IToolBarManager manager) {
+        manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, getHideEmptyRowsAction());
         if (fFilterColumns != null && fFilterLabelProvider != null && fFilterColumns.length > 0) {
             manager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS, fTimeGraphViewer.getShowFilterDialogAction());
         }
@@ -2445,6 +2484,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         manager.add(getShowLabelsAction());
         manager.add(fTimeGraphViewer.getMarkersMenu());
         manager.add(getMarkerSetMenu());
+        manager.add(getHideEmptyRowsAction());
     }
 
     /**
@@ -2766,11 +2806,18 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         if (trace == null) {
             return regexes;
         }
+
+        if (fIsHideRowsFilterActive) {
+            getTimeGraphViewer().setSavedFilterStatus(true);
+            regexes.put(IFilterProperty.EXCLUDE, ""); //$NON-NLS-1$
+        }
+
         TraceCompassFilter globalFilter = TraceCompassFilter.getFilterForTrace(trace);
         if (globalFilter == null) {
             return regexes;
         }
         regexes.putAll(IFilterProperty.DIMMED, globalFilter.getRegexes());
+
 
         return regexes;
     }

@@ -3985,9 +3985,25 @@ public class TimeGraphControl extends TimeGraphBaseControl
             return (!entry.hasTimeEvents() || (entry instanceof TimeGraphEntry && ((TimeGraphEntry) entry).hasZoomedEvents()));
         }
 
+        private boolean hasMarkers(Item item) {
+            ITimeGraphEntry entry = item.fEntry;
+            List<IMarkerEvent> markers = fMarkers;
+
+            for (IMarkerEvent marker : markers) {
+                if (entry == marker.getEntry()) {
+                    long t0 = marker.getTime();
+                    long t1 = t0 + marker.getDuration();
+                    if (t0 < fTimeProvider.getTime1() && t1 > fTimeProvider.getTime0()) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         private void filterData(List<Item> expandedItemList) {
             for (Item item : expandedItemList) {
-                if (!hasEvents(item)) {
+                if (!hasEvents(item) && !hasMarkers(item)) {
                     item.fItemHeight = 0;
                 }
             }

@@ -115,7 +115,7 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
 
     @Override
     protected List<String> getToolbarTooltips() {
-        return Arrays.asList("Show View Filters", "Show Legend", SEPARATOR,
+        return Arrays.asList("Hide Empty Rows", "Show View Filters", "Show Legend", SEPARATOR,
                 "Reset the Time Scale to Default", "Select Previous State Change", "Select Next State Change", SEPARATOR,
                 "Add Bookmark...", "Previous Marker", "Next Marker", SEPARATOR,
                 "Select Previous Resource", "Select Next Resource", "Zoom In", "Zoom Out", SEPARATOR,

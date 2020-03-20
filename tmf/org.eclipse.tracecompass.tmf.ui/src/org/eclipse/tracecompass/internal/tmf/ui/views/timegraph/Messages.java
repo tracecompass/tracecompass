@@ -25,6 +25,11 @@ public class Messages extends NLS {
      * Open source message
      */
     public static @Nullable String BaseDataProviderTimeGraphView_OpenSourceActionName;
+    /** Hide Empty Rows Action Name */
+    public static @Nullable String AbstractTimeGraphView_HideEmptyRowsActionName;
+    /** Hide Empty Rows Action Tooltip */
+    public static @Nullable String AbstractTimeGraphView_HideEmptyRowsActionTooltip;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

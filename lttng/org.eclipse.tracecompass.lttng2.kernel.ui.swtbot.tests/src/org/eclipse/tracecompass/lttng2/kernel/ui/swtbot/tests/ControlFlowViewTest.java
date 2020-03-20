@@ -121,7 +121,7 @@ public class ControlFlowViewTest extends KernelTimeGraphViewTestBase {
     @Override
     protected List<String> getToolbarTooltips() {
         return Arrays.asList("Optimize", SEPARATOR,
-                "Show View Filters", "Show Legend", SEPARATOR,
+                "Hide Empty Rows", "Show View Filters", "Show Legend", SEPARATOR,
                 "Reset the Time Scale to Default", "Select Previous State Change", "Select Next State Change", SEPARATOR,
                 "Add Bookmark...", "Previous Marker", "Next Marker", SEPARATOR,
                 "Select Previous Process", "Select Next Process", "Zoom In", "Zoom Out", SEPARATOR,
