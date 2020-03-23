@@ -223,12 +223,16 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
         List<@NonNull ITimeEvent> ret = new ArrayList<>();
         if (references != null) {
             for (ITimeEvent ref : references) {
-                if (ref instanceof NullTimeEvent) {
-                    ret.add(new NullTimeEvent(ref.getEntry(), ref.getTime() + trace.getStartTime().toNanos(), ref.getDuration()));
-                } else if (ref instanceof TimeLineEvent) {
-                    ret.add(new TimeLineEvent(ref.getEntry(), ref.getTime() + trace.getStartTime().toNanos(), ((TimeLineEvent) ref).getValues()));
-                } if (ref instanceof TimeEvent) {
-                    ret.add(new TimeEvent(ref.getEntry(), ref.getTime() + trace.getStartTime().toNanos(), ref.getDuration(), ((TimeEvent) ref).getValue()));
+                long start = ref.getTime();
+                long end = start + ref.getDuration();
+                if (((start >= startTime) && (start <= endTime)) || (end >= startTime) && end <= endTime) {
+                    if (ref instanceof NullTimeEvent) {
+                        ret.add(new NullTimeEvent(ref.getEntry(), ref.getTime() + trace.getStartTime().toNanos(), ref.getDuration()));
+                    } else if (ref instanceof TimeLineEvent) {
+                        ret.add(new TimeLineEvent(ref.getEntry(), ref.getTime() + trace.getStartTime().toNanos(), ((TimeLineEvent) ref).getValues()));
+                    } else if (ref instanceof TimeEvent) {
+                        ret.add(new TimeEvent(ref.getEntry(), ref.getTime() + trace.getStartTime().toNanos(), ref.getDuration(), ((TimeEvent) ref).getValue()));
+                    }
                 }
             }
         }
@@ -265,7 +269,7 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
                 (IMarkerEvent) new MarkerEvent(fRow2, 32 + start, 0, MARKER_GROUP, new RGBA(22, 33, 44, 22), "", false, 2),
                 (IMarkerEvent) new MarkerEvent(fRow2, 38 + start, 0, MARKER_GROUP, new RGBA(22, 33, 44, 22), "", false, 3),
                 (IMarkerEvent) new MarkerEvent(fRow2, 44 + start, 0, MARKER_GROUP, new RGBA(22, 33, 44, 22), "", false, 4),
-                (IMarkerEvent) new MarkerEvent(fRow2, 50 + start, 0, MARKER_GROUP, new RGBA(22, 33, 44, 22), "", false, 5));
+                (IMarkerEvent) new MarkerEvent(fRow2, 50 + start, 0, MARKER_GROUP, new RGBA(22, 33, 44, 22), "", true, 5));
     }
 
     /**

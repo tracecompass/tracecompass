@@ -250,8 +250,21 @@ public class TimeGraphViewTest {
 
     private void resetTimeRange() {
         TmfTimeRange fullTimeRange = fTrace.getTimeRange();
-        TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, INITIAL_WINDOW_RANGE);
+        setTimeRange(INITIAL_WINDOW_RANGE);
+        TimeGraphViewStub view = getView();
+        // Re-run as much as you need.
+        fBot.waitUntil(new TgConditionHelper(t -> {
+            if (fullTimeRange.equals(view.getWindowRange())) {
+                return true;
+            }
+            fViewBot.toolbarButton("Reset the Time Scale to Default").click();
+            return false;
+        }));
+    }
 
+    private void setTimeRange (TmfTimeRange range) {
+        TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, range);
+        TmfSignalManager.dispatchSignal(signal);
         TimeGraphViewStub view = getView();
         // This is an oddity: the signals may be lost if a view is not
         // initialized, so
@@ -262,18 +275,10 @@ public class TimeGraphViewTest {
         // Workflow: it should always fail at first and then a signal is sent.
         // it will either time out or work.
         fBot.waitUntil(new TgConditionHelper(t -> {
-            if (INITIAL_WINDOW_RANGE.equals(view.getWindowRange())) {
+            if (range.equals(view.getWindowRange())) {
                 return true;
             }
             TmfSignalManager.dispatchSignal(signal);
-            return false;
-        }));
-        // same as above: re-run as much as you need.
-        fBot.waitUntil(new TgConditionHelper(t -> {
-            if (fullTimeRange.equals(view.getWindowRange())) {
-                return true;
-            }
-            fViewBot.toolbarButton("Reset the Time Scale to Default").click();
             return false;
         }));
     }
@@ -1146,6 +1151,78 @@ public class TimeGraphViewTest {
         int newCount = getVisibleItems(timegraph);
         assertTrue("Fewer entries should be visible here. Current value is " + newCount + " previous was " + count, newCount < count);
 
+    }
+
+    /**
+     * Integration test for the time event filtering dialog
+     */
+    @Test
+    public void testHideEmptyRows() {
+        SWTWorkbenchBot bot = fBot;
+        resetTimeRange();
+
+        SWTBotTimeGraph timegraph = fTimeGraph;
+        assertTrue("timegraph visible", timegraph.isVisible());
+        timegraph.setFocus();
+
+        /* set time range */
+        ITmfTimestamp startTime = TmfTimestamp.fromNanos(49L);
+        ITmfTimestamp endTime = TmfTimestamp.fromNanos(75L);
+        setTimeRange(new TmfTimeRange(startTime, endTime));
+
+        /* hide empty rows (includes a row with only 1 marker) */
+        int count = getVisibleItems(timegraph);
+        fViewBot.toolbarButton("Hide Empty Rows").click();
+        bot.waitWhile(fTimeGraphIsDirty);
+        int newCount = getVisibleItems(timegraph);
+        assertTrue("Fewer entries should be visible here. Current value is " + newCount + " previous was " + count, newCount < count);
+
+        /* change time range to exclude row with markers */
+        count = newCount;
+        startTime = TmfTimestamp.fromNanos(50L);
+        endTime = TmfTimestamp.fromNanos(75L);
+        setTimeRange(new TmfTimeRange(startTime, endTime));
+
+        bot.waitWhile(fTimeGraphIsDirty);
+        newCount = getVisibleItems(timegraph);
+        assertTrue("Fewer entries should be visible here. Current value is " + newCount + " previous was " + count, newCount < count);
+
+        /* add a time events filter */
+        timegraph.setFocus();
+        // Move mouse to middle of the timegraph
+        timegraph.moveMouseToWidget();
+        // Press '/' to open the filter dialog
+        timegraph.pressShortcut(KeyStroke.getInstance('/'));
+
+        count = newCount;
+        SWTBot viewBot = fViewBot.bot();
+        SWTBotShell dialogShell = viewBot.shell("Time Event Filter").activate();
+        SWTBot shellBot = dialogShell.bot();
+        SWTBotText text = shellBot.text();
+        text.setText("Head3");
+        text.setFocus();
+        SWTBotUtils.pressShortcut(text, Keystrokes.CR);
+        bot.waitWhile(fTimeGraphIsDirty);
+        newCount = getVisibleItems(timegraph);
+        assertTrue("Fewer entries should be visible here. Current value is " + newCount + " previous was " + count, newCount < count);
+
+        /* show also empty rows */
+        count = newCount;
+        fViewBot.toolbarButton("Hide Empty Rows").click();
+        bot.waitWhile(fTimeGraphIsDirty);
+        newCount = getVisibleItems(timegraph);
+        /* All rows will be filtered by time events filter */
+        assertTrue("Same number of entries should be visible here. Current value is " + newCount + " previous was " + count, newCount == count);
+
+        /* remove time events filter */
+        count = newCount;
+        dialogShell = viewBot.shell("Time Event Filter").activate();
+        shellBot = dialogShell.bot();
+        SWTBotButton button = shellBot.buttonWithTooltip("Close (Esc)");
+        button.click();
+        bot.waitWhile(fTimeGraphIsDirty);
+        newCount = getVisibleItems(timegraph);
+        assertTrue("more number of entries should be visible here. Current value is " + newCount + " previous was " + count, newCount > count);
     }
 
     private static int getVisibleItems(SWTBotTimeGraph timegraph) {
