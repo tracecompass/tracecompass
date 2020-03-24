@@ -10,28 +10,28 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 
-import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.controlflow.ControlFlowView;
+import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources.ResourcesView;
 
 /**
- * Test the expand state of time graph entries for the {@link ControlFlowView}
+ * Test the expand state of time graph entries for the {@link ResourcesView}
  *
  * @author Jean-Christian Kouame
  *
  */
-public class ControlFlowViewExpandStateTest extends TimegraphViewExpandStateTestBase {
+public class ResourcesViewUiContextTest extends TimeGraphViewUiContextTestBase {
 
     @Override
     protected String getViewId() {
-        return ControlFlowView.ID;
+        return ResourcesView.ID;
     }
 
     @Override
     protected String getViewTitle() {
-        return "Control Flow";
+        return "Resources";
     }
 
     @Override
     protected String[] getItemLabel() {
-        return new String[] {"systemd", "kthreadd"};
+        return new String[] {"CPU 0 States", "CPU 1 States"};
     }
 }

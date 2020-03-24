@@ -1799,13 +1799,14 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         if (fTrace != null) {
             /* save the filters of the previous trace */
             fFiltersMap.put(fTrace, fTimeGraphViewer.getFilters());
-            fViewContext.put(fTrace, new ViewContext(fCurrentSortColumn, fSortDirection, fTimeGraphViewer.getSelection(), fTimeGraphViewer.getAllCollapsedElements()));
+            fViewContext.put(fTrace, new ViewContext(fCurrentSortColumn, fSortDirection, fTimeGraphViewer.getSelection(), fTimeGraphViewer.getAllCollapsedElements(), fIsHideRowsFilterActive));
         }
         fTrace = trace;
 
         TraceCompassLogUtils.traceInstant(LOGGER, Level.FINE, "TimeGraphView:LoadingTrace", "trace", trace.getName(), "viewId", getViewId()); //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
 
         restoreViewContext();
+        applyHideEmptyRowsFilterContext();
         fEditorFile = TmfTraceManager.getInstance().getTraceEditorFile(trace);
         synchronized (fEntryListMap) {
             fEntryList = fEntryListMap.get(fTrace);
@@ -2650,6 +2651,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 setEntryComparator(comparator);
             }
         }
+        fIsHideRowsFilterActive = (viewContext == null) ? false : viewContext.isHideRowFilterActive();
     }
 
     private void applyViewContext() {
@@ -2674,17 +2676,25 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         }
     }
 
+    private void applyHideEmptyRowsFilterContext() {
+        if (fHideEmptyRowsAction != null) {
+            fHideEmptyRowsAction.setChecked(fIsHideRowsFilterActive);
+        }
+    }
+
     private static class ViewContext {
         private final int fSortColumnIndex;
         private final int fSortDirection;
         private final @Nullable ITimeGraphEntry fSelection;
         private final @NonNull Set<@NonNull ITimeGraphEntry> fCollapsedEntries;
+        private final boolean fHideRowsFilterState;
 
-        ViewContext(int sortColunm, int sortDirection, ITimeGraphEntry selection, @NonNull Set<@NonNull ITimeGraphEntry> collapsedEntries) {
+        ViewContext(int sortColunm, int sortDirection, ITimeGraphEntry selection, @NonNull Set<@NonNull ITimeGraphEntry> collapsedEntries, boolean hideRowsFilterState) {
             fSortColumnIndex = sortColunm;
             fSortDirection = sortDirection;
             fSelection = selection;
             fCollapsedEntries = ImmutableSet.copyOf(collapsedEntries);
+            fHideRowsFilterState = hideRowsFilterState;
         }
 
         /**
@@ -2715,6 +2725,15 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
          */
         public @NonNull Set<@NonNull ITimeGraphEntry> getCollapsedEntries() {
             return fCollapsedEntries;
+        }
+
+        /**
+         * Get the state of the hide rows filter
+         *
+         * @return the state of the hide rows file
+         */
+        public boolean isHideRowFilterActive() {
+            return fHideRowsFilterState;
         }
     }
 
