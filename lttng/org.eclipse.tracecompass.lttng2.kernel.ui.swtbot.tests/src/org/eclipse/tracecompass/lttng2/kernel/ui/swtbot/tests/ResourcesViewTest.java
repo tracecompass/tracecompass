@@ -25,12 +25,15 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
+import org.eclipse.swtbot.swt.finder.results.IntResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCanvas;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
@@ -48,6 +51,7 @@ import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
 import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphMarkerAxis;
 import org.eclipse.ui.IWorkbenchPart;
@@ -77,6 +81,7 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
     private static final String ADD_BOOKMARK = "Add Bookmark...";
     private static final String REMOVE_BOOKMARK = "Remove Bookmark";
     private static final String ADD_BOOKMARK_DIALOG = "Add Bookmark";
+    private static final String HIDE_EMPTY_ROWS = "Hide Empty Rows";
     private static final String LOST_EVENTS = "Lost Events";
     private static final String OK = "OK";
     private static final @NonNull ITmfTimestamp START_TIME = TmfTimestamp.fromNanos(1368000272650993664L);
@@ -91,6 +96,8 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
     private static final @NonNull ITmfTimestamp CPU0_TIME3 = TmfTimestamp.fromNanos(1368000272652067834L);
     private static final @NonNull ITmfTimestamp CPU0_TIME4 = TmfTimestamp.fromNanos(1368000272652282668L);
     private static final @NonNull ITmfTimestamp CPU0_TIME5 = TmfTimestamp.fromNanos(1368000272652497502L);
+    private static final @NonNull ITmfTimestamp START_FOR_EMPTY_ROWS_TEST = TmfTimestamp.fromNanos(1368000272651423332L);
+    private static final @NonNull ITmfTimestamp END_FOR_EMPTY_ROWS_TEST = TmfTimestamp.fromNanos(1368000272651836454L);
     private static final String CPU0_THREADS = "CPU 0 Threads";
     private static final int TOP_MARGIN = 1;
     private static final Point TOGGLE_SIZE = new Point(7, 8);
@@ -255,6 +262,36 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         /* check that "Next Marker" and "Previous Marker" are enabled */
         assertTrue(viewBot.toolbarButton(NEXT_MARKER).isEnabled());
         assertTrue(viewBot.toolbarButton(PREVIOUS_MARKER).isEnabled());
+    }
+
+    /**
+     * Test "Show Empty Rows" view menu
+     */
+    @Test
+    public void testShowRows() {
+        SWTBotView viewBot = getViewBot();
+        /* change window range to 10 ms */
+        TmfTimeRange range = new TmfTimeRange(START_FOR_EMPTY_ROWS_TEST, END_FOR_EMPTY_ROWS_TEST);
+        TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, range));
+        fBot.waitUntil(ConditionHelpers.windowRange(range));
+
+        SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(viewBot.bot());
+        timeGraph.setFocus();
+
+        int count = getVisibleItems(timeGraph);
+
+        viewBot.toolbarButton(HIDE_EMPTY_ROWS).click();
+
+        /* Verify that number active entries changed */
+        SWTBotUtils.waitUntil(graph -> getVisibleItems(graph) < count, timeGraph,
+                () -> "Fewer number of visible entries expected: (count: " + count + ", actual: " + getVisibleItems(timeGraph) + ")");
+
+        timeGraph.setFocus();
+        viewBot.toolbarButton(HIDE_EMPTY_ROWS).click();
+
+        /* Verify that number active entries changed */
+        SWTBotUtils.waitUntil(graph -> getVisibleItems(graph) == count, timeGraph,
+                () -> "More number of visible entries expected: (count: " + count + ", actual: " + getVisibleItems(timeGraph) + ")");
     }
 
     /**
@@ -526,6 +563,24 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
             @Override
             public Point run() {
                 return control.getSize();
+            }
+        });
+    }
+
+    private static int getVisibleItems(SWTBotTimeGraph timegraph) {
+        return UIThreadRunnable.syncExec(Display.getDefault(), new IntResult() {
+            @Override
+            public Integer run() {
+                int count = 0;
+                TimeGraphControl control = timegraph.widget;
+                ITimeGraphEntry[] expandedElements = control.getExpandedElements();
+                for (ITimeGraphEntry entry : expandedElements) {
+                    Rectangle itemBounds = control.getItemBounds(entry);
+                    if (itemBounds.height > 0) {
+                        count++;
+                    }
+                }
+                return count;
             }
         });
     }
