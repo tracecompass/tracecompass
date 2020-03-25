@@ -1267,7 +1267,7 @@ Various options are available in the ''' Options ''' group:
 
 The ''' Direction ''' group allows to select the search direction: ''' Forward ''' or ''' Backward '''.
 
-==== Filtering Time Events in Time Graph Views ====
+=== Filtering Time Events in Time Graph Views ===
 
 Filtering time events in a '''Time Graph view''', e.g. [[#Control_Flow_View | Control Flow View]] or [[#Resources_View | Resources View]], using the ''' Time Event Filter ''' dialog box. To do so:
 
@@ -1318,6 +1318,9 @@ The time event filtering uses its own ''' domain-specific language (DSL) '''. Va
 The DSL allows the possibility to realize complex filters, combining several ''' Filter expressions ''' and using parenthesis. Example: '' TID != 5755 && (System_call contains select) ''
 
 Note that ''' field ''' parameter with whitespace should be specified using quotes mark. Example: '' "SOFT IRQ" present ''
+
+=== Filtering of Empty Rows Time Graph Views ===
+Time Graph Views support filtering of empty rows using a dynamic filter. Empty rows are rows with no time events nor row markers in the current visible time range. To hide empty rows, check the [[Image:images/hide_empty_rows.png]] '''Hide Empty Rows''' toolbar button or view menu entry. Unchecking it will show empty rows again. When changing the current visible time range, the list of visible rows will be dynamically updated.
 
 == Configurable Marker Sets ==
 
@@ -2307,6 +2310,10 @@ A user can fine tune this filter by providing ranges of CPUs allowing the filter
 The Control Flow View '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
 
 {|
+| [[Image:images/hide_empty_rows.png]]
+| Hide Empty Rows
+| If button is checked, it hides rows that are empty, else they are shown. This setting will be preserved when switching between open traces.
+|-
 | [[Image:images/filter_items.gif]]
 | Show View Filter
 | Opens the process filter dialog. Filter settings will be preserved when switching between open traces.
@@ -2412,10 +2419,12 @@ View Menu
 | Marker Set
 | The user can select from one of the configured market sets, or choose '''None''' to use no marker set. The setting applies to all views that support marker sets. The marker set configuration can be edited by selecting the '''Edit...''' menu item (see [[#Marker Set Configuration XML Format]]). After saving the changes in the opened editor, the marker set should then be re-selected to update the view.
 |-
+| Hide Empty Rows
+| If button is checked, it hides rows that are empty, else they are shown. This setting will be preserved when switching between open traces.
+|-
 | Thread Presentation
 | Select the threads layout. Two layouts are available. '''Flat''' layout lists the threads in a flat list per trace. '''Hierarchical''' layout shows the threads in a parent-child tree per trace.
 |-
-|
 | Dynamic Filters
 | Select and configure the Dynamic Filters to be applied.
 |}
@@ -2489,6 +2498,10 @@ See Control Flow View's '''[[#Incomplete_regions | Incomplete regions]]'''.
 The Resources View '''toolbar''', located at the top right of the view, has shortcut buttons to perform common actions:
 
 {|
+| [[Image:images/hide_empty_rows.png]]
+| Hide Empty Rows
+| If button is checked, it hides rows that are empty, else they are shown. This setting will be preserved when switching between open traces.
+|-
 | [[Image:images/filter_items.gif]]
 | Show View Filter
 | Opens the resources filter dialog. Filter settings will be preserved when switching between open traces.
@@ -2569,6 +2582,9 @@ View Menu
 |-
 | Marker Set
 | The user can select from one of the configured market sets, or choose '''None''' to use no marker set. The setting applies to all views that support marker sets. The marker set configuration can be edited by selecting the '''Edit...''' menu item (see [[#Marker Set Configuration XML Format]]). After saving the changes in the opened editor, the marker set should then be re-selected to update the view.
+|-|
+| Hide Empty Rows
+| If button is checked, it hides rows that are empty, else they are shown. This setting will be preserved when switching between open traces.
 |}
 
 === Marker Axis ===
