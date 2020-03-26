@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.bindings.keys.KeyStroke;
@@ -47,6 +48,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotTimeGraph;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
@@ -273,6 +275,11 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
         /* change window range to 10 ms */
         TmfTimeRange range = new TmfTimeRange(START_FOR_EMPTY_ROWS_TEST, END_FOR_EMPTY_ROWS_TEST);
         TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, range));
+
+        IWorkbenchPart part = viewBot.getViewReference().getPart(false);
+        assertTrue(part instanceof AbstractTimeGraphView);
+        AbstractTimeGraphView abstractTimeGraphView = (AbstractTimeGraphView) part;
+        viewBot.bot().waitUntil(ConditionHelpers.timeGraphRangeCondition(abstractTimeGraphView, Objects.requireNonNull(TmfTraceManager.getInstance().getActiveTrace()), range));
         fBot.waitUntil(ConditionHelpers.windowRange(range));
 
         SWTBotTimeGraph timeGraph = new SWTBotTimeGraph(viewBot.bot());

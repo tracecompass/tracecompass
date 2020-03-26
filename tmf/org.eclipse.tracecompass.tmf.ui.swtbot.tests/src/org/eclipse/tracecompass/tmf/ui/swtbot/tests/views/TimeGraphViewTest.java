@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -226,6 +227,11 @@ public class TimeGraphViewTest {
             public TmfContext seekEvent(ITmfLocation location) {
                 return new TmfContext();
             }
+
+            @Override
+            public ITmfTimestamp getInitialRangeOffset() {
+                return TmfTimestamp.fromNanos(80);
+            }
         };
         fTrace.setStartTime(TmfTimestamp.fromNanos(0));
 
@@ -249,38 +255,15 @@ public class TimeGraphViewTest {
     }
 
     private void resetTimeRange() {
-        TmfTimeRange fullTimeRange = fTrace.getTimeRange();
-        setTimeRange(INITIAL_WINDOW_RANGE);
-        TimeGraphViewStub view = getView();
-        // Re-run as much as you need.
-        fBot.waitUntil(new TgConditionHelper(t -> {
-            if (fullTimeRange.equals(view.getWindowRange())) {
-                return true;
-            }
-            fViewBot.toolbarButton("Reset the Time Scale to Default").click();
-            return false;
-        }));
+        setWindowRange(INITIAL_WINDOW_RANGE.getStartTime().getValue(), INITIAL_WINDOW_RANGE.getEndTime().getValue());
     }
 
-    private void setTimeRange (TmfTimeRange range) {
-        TmfWindowRangeUpdatedSignal signal = new TmfWindowRangeUpdatedSignal(this, range);
-        TmfSignalManager.dispatchSignal(signal);
-        TimeGraphViewStub view = getView();
-        // This is an oddity: the signals may be lost if a view is not
-        // initialized, so
-        // they are send in the condition.
-        //
-        // NOTE: maybe use a shorter poll delay?
-        //
-        // Workflow: it should always fail at first and then a signal is sent.
-        // it will either time out or work.
-        fBot.waitUntil(new TgConditionHelper(t -> {
-            if (range.equals(view.getWindowRange())) {
-                return true;
-            }
-            TmfSignalManager.dispatchSignal(signal);
-            return false;
-        }));
+    private void setWindowRange(long start, long end) {
+        ITmfTimestamp startTime = TmfTimestamp.fromNanos(start);
+        ITmfTimestamp endTime = TmfTimestamp.fromNanos(end);
+        TmfTimeRange range = new TmfTimeRange(startTime, endTime);
+        UIThreadRunnable.syncExec(() -> TmfSignalManager.dispatchSignal(new TmfWindowRangeUpdatedSignal(this, range)));
+        fViewBot.bot().waitUntil(ConditionHelpers.timeGraphRangeCondition(getView(), Objects.requireNonNull(fTrace), range));
     }
 
     private Rectangle getBounds() {
@@ -1166,9 +1149,7 @@ public class TimeGraphViewTest {
         timegraph.setFocus();
 
         /* set time range */
-        ITmfTimestamp startTime = TmfTimestamp.fromNanos(49L);
-        ITmfTimestamp endTime = TmfTimestamp.fromNanos(75L);
-        setTimeRange(new TmfTimeRange(startTime, endTime));
+        setWindowRange(49L, 75L);
 
         /* hide empty rows (includes a row with only 1 marker) */
         int count = getVisibleItems(timegraph);
@@ -1179,9 +1160,8 @@ public class TimeGraphViewTest {
 
         /* change time range to exclude row with markers */
         count = newCount;
-        startTime = TmfTimestamp.fromNanos(50L);
-        endTime = TmfTimestamp.fromNanos(75L);
-        setTimeRange(new TmfTimeRange(startTime, endTime));
+
+        setWindowRange(50L, 75L);
 
         bot.waitWhile(fTimeGraphIsDirty);
         newCount = getVisibleItems(timegraph);
