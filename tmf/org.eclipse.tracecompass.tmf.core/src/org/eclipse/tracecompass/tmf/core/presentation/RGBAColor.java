@@ -102,17 +102,47 @@ public class RGBAColor {
     /**
      * String parser, parses the output of {@link RGBAColor#toString()}
      *
-     * @param toString
-     *            the color
+     * @param rgbaString
+     *            the color string
      * @return the RGBA or null if invalid
      * @since 4.1
      */
-    public static @Nullable RGBAColor fromString(String toString) {
-        try {
-            return new RGBAColor(Long.decode(toString).intValue());
-        } catch (NumberFormatException ne) {
+    public static @Nullable RGBAColor fromString(String rgbaString) {
+        if (rgbaString.length() != 9 || rgbaString.charAt(0) != '#') {
             return null;
         }
+        int r = toInt(rgbaString.charAt(1), rgbaString.charAt(2));
+        int g = toInt(rgbaString.charAt(3), rgbaString.charAt(4));
+        int b = toInt(rgbaString.charAt(5), rgbaString.charAt(6));
+        int a = toInt(rgbaString.charAt(7), rgbaString.charAt(8));
+        if (r == -1 || g == -1 || b == -1 || a == -1) {
+            return null;
+        }
+        return new RGBAColor(r, g, b, a);
+    }
+
+    /**
+     * String parser, parses the RGB value in format "#RRGGBB" with the
+     * specified alpha value
+     *
+     * @param rgbString
+     *            the color string
+     * @param alpha
+     *            the alpha
+     * @return the RGBA or null if invalid
+     * @since 6.0
+     */
+    public static @Nullable RGBAColor fromString(String rgbString, int alpha) {
+        if (rgbString.length() != 7 || rgbString.charAt(0) != '#') {
+            return null;
+        }
+        int r = toInt(rgbString.charAt(1), rgbString.charAt(2));
+        int g = toInt(rgbString.charAt(3), rgbString.charAt(4));
+        int b = toInt(rgbString.charAt(5), rgbString.charAt(6));
+        if (r == -1 || g == -1 || b == -1) {
+            return null;
+        }
+        return new RGBAColor(r, g, b, alpha);
     }
 
     /**
@@ -267,5 +297,30 @@ public class RGBAColor {
     @Override
     public String toString() {
         return String.format("#%08X", toInt()); //$NON-NLS-1$
+    }
+
+    private static int toInt(char h, char l) {
+        int high = fromDigit(h);
+        if (high == -1) {
+            return -1;
+        }
+        int low = fromDigit(l);
+        if (low == -1) {
+            return -1;
+        }
+        return 16 * high + low;
+    }
+
+    private static int fromDigit(char c) {
+        if (c >= '0' && c <= '9') {
+            return c - '0';
+        }
+        if (c >= 'A' && c <= 'F') {
+            return 10 + c - 'A';
+        }
+        if (c >= 'a' && c <= 'f') {
+            return 10 + c - 'a';
+        }
+        return -1;
     }
 }
