@@ -53,10 +53,31 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
      * @param useNewLook
      *            <code>true</code> if the new <code>FilteredTree</code> look should
      *            be used
+     * @deprecated use {@link #TriStateFilteredCheckboxTree(Composite, int, PatternFilter, boolean, boolean)}
      * @since 3.1
      */
+    @Deprecated
     public TriStateFilteredCheckboxTree(Composite parent, int treeStyle, PatternFilter filter, boolean useNewLook) {
-        super(parent, treeStyle, filter, useNewLook);
+        this(parent, treeStyle, filter, useNewLook, false);
+    }
+
+    /**
+     * Create a new instance of the receiver.
+     *
+     * @param parent
+     *            the parent <code>Composite</code>
+     * @param treeStyle
+     *            the style bits for the <code>Tree</code>
+     * @param filter
+     *            the filter to be used
+     * @param useNewLook
+     *            <code>true</code> if the new <code>FilteredTree</code> look should
+     *            be used
+     * @param useFastHashLookup true, if tree should use fast hash lookup, else false
+     * @since 5.3
+     */
+    public TriStateFilteredCheckboxTree(Composite parent, int treeStyle, PatternFilter filter, boolean useNewLook, boolean useFastHashLookup) {
+        super(parent, treeStyle, filter, useNewLook, useFastHashLookup);
     }
 
     @Override

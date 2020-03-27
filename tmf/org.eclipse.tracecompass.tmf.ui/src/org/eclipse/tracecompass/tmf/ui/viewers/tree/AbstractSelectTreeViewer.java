@@ -167,7 +167,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         // Create the tree viewer with a filtered checkbox
         this(parent, new TriStateFilteredCheckboxTree(parent,
                 SWT.MULTI | SWT.H_SCROLL | SWT.FULL_SELECTION,
-                new MultiTreePatternFilter(), true), legendIndex, id);
+                new MultiTreePatternFilter(), true, false), legendIndex, id);
     }
 
     /**

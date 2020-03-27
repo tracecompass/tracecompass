@@ -339,7 +339,7 @@ public class TimeGraphFilterDialog extends SelectionStatusDialog {
     protected CheckboxTreeViewer createTreeViewer(Composite parent) {
         PatternFilter filter = new TreePatternFilter();
         filter.setIncludeLeadingWildcard(true);
-        fTree = new FilteredCheckboxTree(parent, SWT.BORDER | SWT.MULTI, filter, true);
+        fTree = new FilteredCheckboxTree(parent, SWT.BORDER | SWT.MULTI, filter, true, false);
 
         Tree tree = fTree.getViewer().getTree();
         tree.setHeaderVisible(true);

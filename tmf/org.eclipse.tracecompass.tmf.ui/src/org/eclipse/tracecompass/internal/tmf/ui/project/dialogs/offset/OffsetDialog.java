@@ -33,6 +33,7 @@ import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.TreeViewerEditor;
 import org.eclipse.jface.viewers.TreeViewerFocusCellManager;
@@ -312,10 +313,13 @@ public class OffsetDialog extends Dialog {
                     protected boolean isLeafMatch(Viewer viewer, Object element) {
                         return wordMatches(((TmfTraceElement) element).getElementPath());
                     }
-                }, true, true);
+                }, true);
 
         // Make lines and make header visible
-        final Tree tree = fViewer.getViewer().getTree();
+        TreeViewer treeViewer = fViewer.getViewer();
+        treeViewer.setUseHashlookup(true);
+        final Tree tree = treeViewer.getTree();
+
         tree.setHeaderVisible(true);
         tree.setLinesVisible(true);
 

@@ -157,7 +157,7 @@ public class TraceTypePreferencePageViewer {
     protected CheckboxTreeViewer createTreeViewer(Composite parent) {
         PatternFilter filter = new TreePatternFilter();
         filter.setIncludeLeadingWildcard(true);
-        fTree = new FilteredCheckboxTree(parent, SWT.BORDER | SWT.MULTI, filter, true);
+        fTree = new FilteredCheckboxTree(parent, SWT.BORDER | SWT.MULTI, filter, true, false);
         fTree.setLayout(new GridLayout());
         fTree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         TreeViewer viewer = fTree.getViewer();

@@ -59,6 +59,26 @@ public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
      */
     private CheckboxTreeViewer fCheckboxTreeViewer;
 
+    /**
+     * Create a new instance of the receiver.
+     *
+     * @param parent
+     *            the parent <code>Composite</code>
+     * @param treeStyle
+     *            the style bits for the <code>Tree</code>
+     * @param filter
+     *            the filter to be used
+     * @param useNewLook
+     *            <code>true</code> if the new <code>FilteredTree</code> look
+     *            should be used
+     * @deprecated use {@link #FilteredCheckboxTree(Composite, int, PatternFilter, boolean, boolean)}
+     *             Will only be removed after Eclipse 2019-06 (4.12) support is dropped.
+     */
+    @Deprecated
+    public FilteredCheckboxTree(Composite parent, int treeStyle, PatternFilter filter,
+            boolean useNewLook) {
+        this(parent, treeStyle, filter, useNewLook, false);
+    }
 
     /**
      * Create a new instance of the receiver.
@@ -72,10 +92,20 @@ public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
      * @param useNewLook
      *            <code>true</code> if the new <code>FilteredTree</code> look
      *            should be used
+     * @param useFastHashLookup true, if tree should use fast hash lookup, else false
+     * @since 5.3
      */
     public FilteredCheckboxTree(Composite parent, int treeStyle, PatternFilter filter,
-            boolean useNewLook) {
-        super(parent, treeStyle, filter, useNewLook, true);
+            boolean useNewLook, boolean useFastHashLookup) {
+        /*
+         *  Keep call to deprecated super constructor until support
+         *  for Eclipse 2019-06 (4.12) is dropped.
+         */
+        super(parent, treeStyle, filter, useNewLook);
+        TreeViewer viewer = getViewer();
+        if (viewer != null) {
+            viewer.setUseHashlookup(useFastHashLookup);
+        }
     }
 
     @Override

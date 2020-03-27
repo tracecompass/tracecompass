@@ -78,7 +78,7 @@ public class SelectRootNodeWizardPage extends WizardPage {
         setTitle(Messages.SelectRootNodeWizardPage_WindowTitle);
         setDescription(Messages.SelectRootNodeWizardPage_Description);
 
-        new FilteredTree(container, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, new PatternFilter(), true, true) {
+        new FilteredTree(container, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, new PatternFilter(), true) {
             @Override
             protected TreeViewer doCreateTreeViewer(Composite aparent, int style) {
                 return SelectRootNodeWizardPage.this.doCreateTreeViewer(aparent);
@@ -153,6 +153,7 @@ public class SelectRootNodeWizardPage extends WizardPage {
         setPageComplete(true);
         // Checks the first element by default
         fCheckboxTreeViewer.getTree().getItem(0).setChecked(true);
+        fCheckboxTreeViewer.setUseHashlookup(true);
         return fCheckboxTreeViewer;
     }
 
