@@ -39,7 +39,7 @@ class ZoomOutAction extends Action {
     public void run() {
         final AbstractSegmentStoreDensityViewer chart = fView.getDensityViewer();
         if (chart != null) {
-            chart.zoom(new Range(0, Long.MAX_VALUE));
+            chart.zoom(new Range(AbstractSegmentStoreDensityView.DEFAULT_RANGE.getFirst(), AbstractSegmentStoreDensityView.DEFAULT_RANGE.getSecond()));
         }
     }
 

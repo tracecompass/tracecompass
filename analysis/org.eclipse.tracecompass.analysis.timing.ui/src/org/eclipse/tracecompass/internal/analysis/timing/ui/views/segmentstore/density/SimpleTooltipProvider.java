@@ -11,15 +11,20 @@
 package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density;
 
 import java.text.Format;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityViewer;
 import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
+import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfAbstractToolTipHandler;
 import org.swtchart.Chart;
+import org.swtchart.IAxis;
 import org.swtchart.ISeries;
 
 /**
@@ -32,37 +37,61 @@ import org.swtchart.ISeries;
 public class SimpleTooltipProvider extends BaseMouseProvider {
 
     private static final Format FORMAT = SubSecondTimeWithUnitFormat.getInstance();
+    private static final String HTML_COLOR_TOOLTIP = "<span style=\"color:%s;\">%s</span>"; //$NON-NLS-1$
 
     private final class DensityToolTipHandler extends TmfAbstractToolTipHandler {
 
         @Override
         public void fill(Control control, MouseEvent event, Point pt) {
             Chart chart = getChart();
-            if (chart.getSeriesSet().getSeries().length != 0) {
-                if (event == null || chart.getAxisSet().getXAxes().length == 0 || chart.getAxisSet().getYAxes().length == 0 || getDensityViewer().getControl().getSeriesSet().getSeries().length == 0) {
+            ISeries[] seriesSet = chart.getSeriesSet().getSeries();
+            if (seriesSet.length != 0) {
+
+                if (event == null || chart.getAxisSet().getXAxes().length == 0 || chart.getAxisSet().getYAxes().length == 0 || seriesSet.length == 0) {
                     return;
                 }
-                ISeries series = getDensityViewer().getControl().getSeriesSet().getSeries()[0];
                 chart.getPlotArea().setToolTipText(null);
-                double[] xValues = series.getXSeries();
-                if (xValues.length < 2) {
-                    return;
+                long x1 = -1;
+                long x2 = -1;
+                List<String> names = new ArrayList<>();
+                List<Long> yValues = new ArrayList<>();
+                List<RGB> colors = new ArrayList<>();
+                for (ISeries ySeriesProvider : seriesSet) {
+                    double[] xValues = ySeriesProvider.getXSeries();
+                    if (xValues.length < 2) {
+                        continue;
+                    }
+                    double delta = xValues[1] - xValues[0];
+                    IAxis xAxis = chart.getAxisSet().getXAxis(0);
+                    double coords = xAxis.getDataCoordinate(event.x);
+                    int index = Arrays.binarySearch(xValues, coords);
+                    if (index < 0) {
+                        index = -index - 2;
+                    }
+                    double[] ySeries = ySeriesProvider.getYSeries();
+                    long y = Math.round(ySeries[index]);
+                    if (y > 0) {
+                        x1 = (long) xValues[index];
+                        x2 = (long) (x1 + delta);
+                        String id = ySeriesProvider.getId();
+                        colors.add(getDensityViewer().getColorForItem(id));
+                        names.add(id);
+                        yValues.add(y);
+                    }
                 }
-                double delta = xValues[1] - xValues[0];
-                double coords = chart.getAxisSet().getXAxis(0).getDataCoordinate(event.x);
-                int index = Arrays.binarySearch(xValues, coords);
-                if (index < 0) {
-                    index = -index - 2;
-                }
-                if (index < 0) {
-                    return;
-                }
-                long x1 = (long) xValues[index];
-                long x2 = (long) (x1 + delta);
-                long y = Math.round(series.getYSeries()[index]);
-                if (y > 0) {
+                if (!names.isEmpty()) {
                     addItem(Messages.SimpleTooltipProvider_duration, FORMAT.format(x1) + '-' + FORMAT.format(x2));
-                    addItem(null, ToolTipString.fromString(Messages.SimpleTooltipProvider_count), ToolTipString.fromDecimal(y));
+                    if (seriesSet.length == 1) {
+                        // No Color if there's only one
+                        addItem(null, ToolTipString.fromString(String.valueOf(Messages.SimpleTooltipProvider_count)), ToolTipString.fromDecimal(yValues.get(0)));
+                    } else {
+                        for (int i = 0; i < names.size(); i++) {
+                            String id = names.get(i);
+                            RGB color = getDensityViewer().getColorForItem(id);
+                            addItem(null, ToolTipString.fromHtml(String.format(HTML_COLOR_TOOLTIP, new RGBAColor(color.red, color.green, color.blue).toString(), id)), ToolTipString.fromDecimal(yValues.get(i)));
+                        }
+                    }
+
                 }
             }
         }

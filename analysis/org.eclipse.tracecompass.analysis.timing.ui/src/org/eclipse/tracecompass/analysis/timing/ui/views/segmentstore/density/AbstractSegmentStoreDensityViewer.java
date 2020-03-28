@@ -16,11 +16,17 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyStrin
 import java.text.Format;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.swt.SWT;
@@ -42,6 +48,7 @@ import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance.Type;
+import org.eclipse.tracecompass.tmf.core.presentation.RotatingPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -51,12 +58,14 @@ import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceContext;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
 import org.eclipse.tracecompass.tmf.ui.viewers.IImageSave;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfViewer;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
 import org.swtchart.IBarSeries;
+import org.swtchart.ILegend;
 import org.swtchart.ILineSeries;
 import org.swtchart.ILineSeries.PlotSymbolType;
 import org.swtchart.ISeries;
@@ -80,6 +89,8 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
     private static final Format DENSITY_TIME_FORMATTER = SubSecondTimeWithUnitFormat.getInstance();
     private static final RGB BAR_COLOR = new RGB(0x42, 0x85, 0xf4);
     private static final ColorRegistry COLOR_REGISTRY = new ColorRegistry();
+    private static final RotatingPaletteProvider PALETTE = new RotatingPaletteProvider.Builder().setSaturation(0.73f).setBrightness(0.957f).setNbColors(60).build();
+
     /** The color scheme for the chart */
     private TimeGraphColorScheme fColorScheme = new TimeGraphColorScheme();
     private final Chart fChart;
@@ -88,13 +99,14 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
     private final SimpleTooltipProvider fTooltipProvider;
 
     private @Nullable ITmfTrace fTrace;
-    private @Nullable IAnalysisProgressListener fListener;
-    private @Nullable ISegmentStoreProvider fSegmentStoreProvider;
-    private Range fCurrentDurationRange = new Range(Double.MIN_VALUE, Double.MAX_VALUE);
+    private Map<@NonNull String, @NonNull IAnalysisProgressListener> fProgressListeners = new HashMap<>();
+    private final Map<@NonNull String, @NonNull ISegmentStoreProvider> fSegmentStoreProviders = new HashMap<>();
+    private Range fCurrentDurationRange = new Range(AbstractSegmentStoreDensityView.DEFAULT_RANGE.getFirst(), AbstractSegmentStoreDensityView.DEFAULT_RANGE.getSecond());
     private TmfTimeRange fCurrentTimeRange = TmfTimeRange.NULL_RANGE;
     private final List<ISegmentStoreDensityViewerDataListener> fListeners;
     private int fOverrideNbPoints;
     private String fSeriesType;
+    private final Set<@NonNull ITmfTrace> fTraces = new HashSet<>();
 
     /**
      * Constructs a new density viewer.
@@ -168,8 +180,8 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         }
     }
 
-    private void updateDisplay(SegmentStoreWithRange<ISegment> data) {
-        ISeries series = fSeriesType.equals(Type.BAR) ? createSeries() : createAreaSeries();
+    private synchronized void updateDisplay(String name, SegmentStoreWithRange<ISegment> data) {
+        ISeries series = fSeriesType.equals(Type.BAR) ? createSeries() : createAreaSeries(name);
         int barWidth = 4;
         int preWidth = fOverrideNbPoints == 0 ? fChart.getPlotArea().getBounds().width / barWidth : fOverrideNbPoints;
         if (!fSeriesType.equals(Type.BAR)) {
@@ -182,9 +194,16 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         Arrays.fill(yOrigSeries, Double.MIN_VALUE);
         data.setComparator(SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
         ISegment maxSegment = data.getElement(SegmentStoreWithRange.LAST);
-        long maxLength = Long.MAX_VALUE;
+        long maxLength = Long.MIN_VALUE;
         if (maxSegment != null) {
             maxLength = maxSegment.getLength();
+        } else {
+            for (ISegment segment : data) {
+                maxLength = Math.max(maxLength, segment.getLength());
+            }
+            if (maxLength == Long.MIN_VALUE) {
+                maxLength = 1;
+            }
         }
         double maxFactor = 1.0 / (maxLength + 1.0);
         long minX = Long.MAX_VALUE;
@@ -204,7 +223,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
                 xOrigSeries[i] += timeWidth / 2;
             }
         }
-        double maxY = Double.MIN_VALUE;
+        double maxY = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < width; i++) {
             maxY = Math.max(maxY, yOrigSeries[i]);
         }
@@ -219,17 +238,28 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
          * adjustrange appears to bring origin back since we pad the series with
          * 0s, not interesting.
          */
-        xAxis.adjustRange();
-        Range range = xAxis.getRange();
-        // fix for overly aggressive lower after an adjust range
-        range.lower = minX - range.upper + maxLength;
-        xAxis.setRange(range);
+        Range currentDurationRange = fCurrentDurationRange;
+        if (Double.isFinite(currentDurationRange.lower) && Double.isFinite(currentDurationRange.upper)) {
+            xAxis.setRange(currentDurationRange);
+        } else {
+            xAxis.adjustRange();
+        }
+
         xAxis.getTick().setFormat(DENSITY_TIME_FORMATTER);
+        ILegend legend = fChart.getLegend();
+        legend.setVisible(fSegmentStoreProviders.size() > 1);
+        legend.setPosition(SWT.BOTTOM);
         /*
-         * Set the range to slightly under 1 but above 0 so that log scales
-         * display properly.
+         * Clamp range lower to 0.9 to make it log, 0.1 would be scientifically
+         * accurate, but we cannot have partial counts.
          */
-        fChart.getAxisSet().getYAxis(0).setRange(new Range(0.9, maxY));
+        for (ISeries internalSeries : fChart.getSeriesSet().getSeries()) {
+            double[] ySeries = internalSeries.getYSeries();
+            for (int i = 0; i < ySeries.length; i++) {
+                maxY = Math.max(maxY, ySeries[i]);
+            }
+        }
+        fChart.getAxisSet().getYAxis(0).setRange(new Range(0.9, Math.max(1.0, maxY)));
         fChart.getAxisSet().getYAxis(0).enableLogScale(true);
         fChart.redraw();
         new Thread(() -> {
@@ -248,13 +278,15 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         return series;
     }
 
-    private ISeries createAreaSeries() {
-        ILineSeries series = (ILineSeries) fChart.getSeriesSet().createSeries(SeriesType.LINE, Messages.AbstractSegmentStoreDensityViewer_SeriesLabel);
+    private ISeries createAreaSeries(String name) {
+        ILineSeries series = (ILineSeries) fChart.getSeriesSet().createSeries(SeriesType.LINE, name);
         series.setVisible(true);
         series.enableStep(true);
         series.enableArea(true);
         series.setSymbolType(PlotSymbolType.NONE);
-        series.setLineColor(getColorForRGB(BAR_COLOR));
+        RGB rgb = getColorForItem(name);
+        Color color = getColorForRGB(rgb);
+        series.setLineColor(color);
         return series;
     }
 
@@ -266,6 +298,31 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
             color = Objects.requireNonNull(COLOR_REGISTRY.get(rgbString));
         }
         return color;
+    }
+
+    /**
+     * Get the color for a series
+     *
+     * @param name
+     *            the series name
+     * @return The color in RGB
+     * @since 4.1
+     */
+    public RGB getColorForItem(String name) {
+        if (fSegmentStoreProviders.size() == 1) {
+            return BAR_COLOR;
+        }
+        Set<String> keys = fSegmentStoreProviders.keySet();
+        int i = 0;
+        for (String key : keys) {
+            if (key.equals(name)) {
+                break;
+            }
+            i++;
+        }
+        float pos = (float) i / keys.size();
+        int index = Math.max((int) (PALETTE.getNbColors() * pos), 0) % PALETTE.getNbColors();
+        return Objects.requireNonNull(RGBAUtil.fromRGBAColor(PALETTE.get().get(index)).rgb);
     }
 
     @Override
@@ -286,7 +343,9 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
             synchronized (fListeners) {
                 if (fCurrentTimeRange.equals(timeRange) && fCurrentDurationRange.equals(durationRange)) {
                     for (ISegmentStoreDensityViewerDataListener listener : fListeners) {
-                        listener.selectedDataChanged(data);
+                        for (SegmentStoreWithRange<ISegment> value : data.values()) {
+                            listener.selectedDataChanged(value);
+                        }
                     }
                 }
             }
@@ -311,38 +370,45 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         });
     }
 
-    private CompletableFuture<@Nullable SegmentStoreWithRange<ISegment>> computeDataAsync(final TmfTimeRange timeRange, final Range durationRange) {
+    private CompletableFuture<Map<String, SegmentStoreWithRange<ISegment>>> computeDataAsync(final TmfTimeRange timeRange, final Range durationRange) {
         return CompletableFuture.supplyAsync(() -> computeData(timeRange, durationRange));
     }
 
-    private @Nullable SegmentStoreWithRange<ISegment> computeData(final TmfTimeRange timeRange, final Range durationRange) {
-        final ISegmentStoreProvider segmentProvider = fSegmentStoreProvider;
-        if (segmentProvider == null) {
-            return null;
-        }
-        final ISegmentStore<ISegment> segStore = segmentProvider.getSegmentStore();
-        if (segStore == null) {
-            return null;
-        }
+    private @Nullable Map<String, SegmentStoreWithRange<ISegment>> computeData(final TmfTimeRange timeRange, final Range durationRange) {
+        Map<String, SegmentStoreWithRange<ISegment>> retVal = new HashMap<>();
+        for (Entry<String, ISegmentStoreProvider> entry : fSegmentStoreProviders.entrySet()) {
+            final ISegmentStoreProvider segmentProvider = Objects.requireNonNull(entry.getValue());
+            final ISegmentStore<ISegment> segStore = segmentProvider.getSegmentStore();
+            if (segStore == null) {
+                continue;
+            }
 
-        // Filter on the segment duration if necessary
-        if (durationRange.lower > Double.MIN_VALUE || durationRange.upper < Double.MAX_VALUE) {
-            Predicate<ISegment> predicate = segment -> segment.getLength() >= durationRange.lower && segment.getLength() <= durationRange.upper;
-            return new SegmentStoreWithRange<>(segStore, timeRange, predicate);
+            // Filter on the segment duration if necessary
+            if (durationRange.lower > Double.MIN_VALUE || durationRange.upper < Double.MAX_VALUE) {
+                Predicate<ISegment> predicate = segment -> segment.getLength() >= durationRange.lower && segment.getLength() <= durationRange.upper;
+                retVal.put(entry.getKey(), new SegmentStoreWithRange<>(segStore, timeRange, predicate));
+            } else {
+                retVal.put(entry.getKey(), new SegmentStoreWithRange<>(segStore, timeRange));
+            }
         }
-
-        return new SegmentStoreWithRange<>(segStore, timeRange);
-
+        return retVal;
     }
 
-    private void applyData(final @Nullable SegmentStoreWithRange<ISegment> data) {
-        if (data != null) {
+    private void applyData(final Map<String, SegmentStoreWithRange<ISegment>> map) {
+        Set<Entry<String, SegmentStoreWithRange<ISegment>>> entrySet = map.entrySet();
+        entrySet.parallelStream().forEach(entry -> {
+            SegmentStoreWithRange<ISegment> data = Objects.requireNonNull(entry.getValue());
             data.setComparator(SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
-            Display.getDefault().asyncExec(() -> updateDisplay(data));
+            Display.getDefault().asyncExec(() -> updateDisplay(entry.getKey(), data));
+            if (fSegmentStoreProviders.size() > 1) {
+                setType(Type.AREA);
+            } else {
+                setType(Type.BAR);
+            }
             for (ISegmentStoreDensityViewerDataListener l : fListeners) {
                 l.viewDataChanged(data);
             }
-        }
+        });
     }
 
     /**
@@ -355,7 +421,10 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
      */
     @VisibleForTesting
     public void setSegmentProvider(@Nullable ISegmentStoreProvider ssp) {
-        fSegmentStoreProvider = ssp;
+        fSegmentStoreProviders.clear();
+        if (ssp != null) {
+            fSegmentStoreProviders.put("", ssp); //$NON-NLS-1$
+        }
     }
 
     /**
@@ -369,12 +438,12 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         if (signal == null) {
             return;
         }
-        ITmfTrace trace = getTrace();
-        if (trace == null) {
+        ITmfTrace parent = getTrace();
+        if (parent == null) {
             return;
         }
-        fSegmentStoreProvider = getSegmentStoreProvider(trace);
         fCurrentTimeRange = NonNullUtils.checkNotNull(signal.getCurrentRange());
+        updateWindowRange(fCurrentTimeRange, false);
         updateWithRange(fCurrentTimeRange);
     }
 
@@ -388,8 +457,8 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
     @VisibleForTesting
     public void updateWithRange(final TmfTimeRange timeRange) {
         fCurrentTimeRange = timeRange;
-        fCurrentDurationRange = new Range(Double.MIN_VALUE, Double.MAX_VALUE);
-        final Range durationRange = fCurrentDurationRange;
+        final Range durationRange = getDefaultRange();
+        fCurrentDurationRange = durationRange;
         computeDataAsync(timeRange, durationRange).thenAccept(data -> {
             synchronized (fListeners) {
                 if (fCurrentTimeRange.equals(timeRange) && fCurrentDurationRange.equals(durationRange)) {
@@ -412,9 +481,13 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
     }
 
     private void internalDispose() {
-        if (fSegmentStoreProvider != null && fListener != null) {
-            fSegmentStoreProvider.removeListener(fListener);
-        }
+        fSegmentStoreProviders.entrySet().forEach(entry -> {
+            IAnalysisProgressListener listener = fProgressListeners.get(entry.getKey());
+            if (listener != null) {
+                Objects.requireNonNull(entry.getValue()).removeListener(listener);
+            }
+        });
+        fProgressListeners.clear();
         fDragZoomProvider.deregister();
         fTooltipProvider.deregister();
         fDragProvider.deregister();
@@ -429,8 +502,10 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
      */
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
-        fTrace = signal.getTrace();
-        loadTrace(getTrace());
+        if (fTrace != signal.getTrace()) {
+            loadTrace(getTrace());
+            fTrace = signal.getTrace();
+        }
     }
 
     /**
@@ -442,8 +517,8 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
     @TmfSignalHandler
     public void traceSelected(TmfTraceSelectedSignal signal) {
         if (fTrace != signal.getTrace()) {
-            fTrace = signal.getTrace();
             loadTrace(getTrace());
+            fTrace = signal.getTrace();
         }
     }
 
@@ -472,24 +547,58 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
      */
     protected void loadTrace(@Nullable ITmfTrace trace) {
         clearContent();
-
-        fTrace = trace;
         TmfTraceContext ctx = TmfTraceManager.getInstance().getCurrentTraceContext();
         TmfTimeRange windowRange = ctx.getWindowRange();
+        innerLoadTrace(trace);
+        updateWindowRange(windowRange, true);
+        fTrace = trace;
         fCurrentTimeRange = windowRange;
+        zoom(getDefaultRange());
+    }
+
+    private void innerLoadTrace(@Nullable ITmfTrace trace) {
+        Set<ISegmentStoreProvider> sps = new HashSet<>();
 
         if (trace != null) {
-            fSegmentStoreProvider = getSegmentStoreProvider(trace);
-            final ISegmentStoreProvider provider = fSegmentStoreProvider;
-            if (provider != null) {
-                fListener = (segmentProvider, data) -> updateWithRange(windowRange);
-                provider.addListener(fListener);
-                if (provider instanceof IAnalysisModule) {
-                    ((IAnalysisModule) provider).schedule();
+            boolean newTrace = !Objects.equals(trace, fTrace) || fSegmentStoreProviders.isEmpty();
+            if (newTrace) {
+                fTraces.clear();
+                fSegmentStoreProviders.clear();
+                for (ITmfTrace child : TmfTraceManager.getTraceSet(trace)) {
+                    fTraces.add(child);
+                    ISegmentStoreProvider segmentStoreProvider = getSegmentStoreProvider(child);
+                    String name = child.getName();
+                    if (segmentStoreProvider != null && name != null) {
+                        fSegmentStoreProviders.put(name, segmentStoreProvider);
+                        sps.add(segmentStoreProvider);
+                    }
+                }
+                ISegmentStoreProvider segmentStoreProvider = getSegmentStoreProvider(trace);
+                String name = trace.getName();
+                if (segmentStoreProvider != null && name != null && !sps.contains(segmentStoreProvider)) {
+                    fSegmentStoreProviders.put(name, segmentStoreProvider);
                 }
             }
         }
-        zoom(new Range(0, Long.MAX_VALUE));
+    }
+
+    private void updateWindowRange(TmfTimeRange windowRange, boolean updateListeners) {
+
+        for (Entry<@NonNull String, @NonNull ISegmentStoreProvider> entry : fSegmentStoreProviders.entrySet()) {
+            ISegmentStoreProvider provider = Objects.requireNonNull(entry.getValue());
+            if (updateListeners) {
+                IAnalysisProgressListener listener = (segmentProvider, data) -> updateWithRange(windowRange);
+                provider.addListener(listener);
+                fProgressListeners.put(entry.getKey(), listener);
+            }
+            if (provider instanceof IAnalysisModule) {
+                ((IAnalysisModule) provider).schedule();
+            }
+        }
+    }
+
+    private static Range getDefaultRange() {
+        return new Range(AbstractSegmentStoreDensityView.DEFAULT_RANGE.getFirst(), AbstractSegmentStoreDensityView.DEFAULT_RANGE.getSecond());
     }
 
     /**

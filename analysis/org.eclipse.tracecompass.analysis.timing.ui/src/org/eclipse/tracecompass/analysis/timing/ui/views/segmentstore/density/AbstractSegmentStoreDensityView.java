@@ -24,6 +24,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ui.views.SaveImageUtil;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 
@@ -39,6 +40,12 @@ import com.google.common.annotations.VisibleForTesting;
 public abstract class AbstractSegmentStoreDensityView extends TmfView {
 
     private static final int[] DEFAULT_WEIGHTS = new int[] { 4, 6 };
+
+    /**
+     * Default zoom range
+     * @since 4.1
+     */
+    public static final Pair<Double, Double> DEFAULT_RANGE = new Pair<>(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY);
 
     private @Nullable AbstractSegmentStoreDensityViewer fDensityViewer;
     private @Nullable AbstractSegmentStoreTableViewer fTableViewer;

@@ -18,6 +18,7 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityView;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityViewer;
 import org.swtchart.IAxis;
 import org.swtchart.ICustomPaintListener;
@@ -109,7 +110,7 @@ public class MouseSelectionProvider extends BaseMouseProvider implements MouseLi
                 fEndCoordinate = tmp;
             }
             if (!isEmptySelection()) {
-                getDensityViewer().select(new Range(Double.MIN_VALUE, Double.MAX_VALUE));
+                getDensityViewer().select(new Range(AbstractSegmentStoreDensityView.DEFAULT_RANGE.getFirst(), AbstractSegmentStoreDensityView.DEFAULT_RANGE.getSecond()));
             } else {
                 getDensityViewer().select(new Range(fStartCoordinate, fEndCoordinate));
             }
