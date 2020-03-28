@@ -11,17 +11,15 @@
 package org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.density;
 
 import java.text.Format;
+import java.util.Arrays;
 
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.AbstractSegmentStoreDensityViewer;
 import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfAbstractToolTipHandler;
 import org.swtchart.Chart;
-import org.swtchart.IAxis;
-import org.swtchart.IBarSeries;
 import org.swtchart.ISeries;
 
 /**
@@ -46,34 +44,25 @@ public class SimpleTooltipProvider extends BaseMouseProvider {
                 }
                 ISeries series = getDensityViewer().getControl().getSeriesSet().getSeries()[0];
                 chart.getPlotArea().setToolTipText(null);
-                if (series instanceof IBarSeries) {
-                    IBarSeries barSeries = (IBarSeries) series;
-                    // Note: getBounds is broken in SWTChart 0.9.0
-                    Rectangle[] bounds = barSeries.getBounds();
-
-                    if (barSeries.getXSeries().length < 2) {
-                        return;
-                    }
-                    double delta = barSeries.getXSeries()[1] - barSeries.getXSeries()[0];
-                    for (int i = 0; i < bounds.length; i++) {
-                        Rectangle rec = bounds[i];
-                        if (rec == null) {
-                            continue;
-                        }
-                        int start = rec.x;
-                        int end = start + rec.width;
-                        if (event.x >= start && event.x <= end) {
-                            long x1 = (long) barSeries.getXSeries()[i];
-                            long x2 = (long) (x1 + delta);
-                            IAxis yAxis = chart.getAxisSet().getYAxes()[0];
-                            long y = Math.round(yAxis.getDataCoordinate(rec.y)) - 1;
-                            if (y > 0) {
-                                addItem(Messages.SimpleTooltipProvider_duration, FORMAT.format(x1) + '-' + FORMAT.format(x2));
-                                addItem(null, ToolTipString.fromString(Messages.SimpleTooltipProvider_count), ToolTipString.fromDecimal(y));
-                            }
-                            break;
-                        }
-                    }
+                double[] xValues = series.getXSeries();
+                if (xValues.length < 2) {
+                    return;
+                }
+                double delta = xValues[1] - xValues[0];
+                double coords = chart.getAxisSet().getXAxis(0).getDataCoordinate(event.x);
+                int index = Arrays.binarySearch(xValues, coords);
+                if (index < 0) {
+                    index = -index - 2;
+                }
+                if (index < 0) {
+                    return;
+                }
+                long x1 = (long) xValues[index];
+                long x2 = (long) (x1 + delta);
+                long y = Math.round(series.getYSeries()[index]);
+                if (y > 0) {
+                    addItem(Messages.SimpleTooltipProvider_duration, FORMAT.format(x1) + '-' + FORMAT.format(x2));
+                    addItem(null, ToolTipString.fromString(Messages.SimpleTooltipProvider_count), ToolTipString.fromDecimal(y));
                 }
             }
         }

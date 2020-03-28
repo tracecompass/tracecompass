@@ -38,6 +38,8 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
+import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance.Type;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
@@ -53,6 +55,8 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorS
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
 import org.swtchart.IBarSeries;
+import org.swtchart.ILineSeries;
+import org.swtchart.ILineSeries.PlotSymbolType;
 import org.swtchart.ISeries;
 import org.swtchart.ISeries.SeriesType;
 import org.swtchart.ISeriesSet;
@@ -87,6 +91,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
     private TmfTimeRange fCurrentTimeRange = TmfTimeRange.NULL_RANGE;
     private final List<ISegmentStoreDensityViewerDataListener> fListeners;
     private int fOverrideNbPoints;
+    private String fSeriesType;
 
     /**
      * Constructs a new density viewer.
@@ -116,6 +121,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         yAxis.getTick().setForeground(foregroundColor);
         xAxis.getGrid().setStyle(LineStyle.DOT);
         yAxis.getGrid().setStyle(LineStyle.DOT);
+        fSeriesType = IYAppearance.Type.BAR;
 
         fDragZoomProvider = new MouseDragZoomProvider(this);
         fDragZoomProvider.register();
@@ -141,14 +147,32 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         return TmfTraceManager.getInstance().getActiveTrace();
     }
 
-    private void updateDisplay(SegmentStoreWithRange<ISegment> data) {
-        IBarSeries series = (IBarSeries) fChart.getSeriesSet().createSeries(SeriesType.BAR, Messages.AbstractSegmentStoreDensityViewer_SeriesLabel);
-        series.setVisible(true);
-        series.setBarPadding(0);
+    /**
+     * Set the type of series you want
+     * @param type the type, bar or area
+     * @since 4.0
+     */
+    protected void setType(String type) {
+        switch (type) {
+        case Type.BAR:
+            fSeriesType = Type.BAR;
+            break;
+        case Type.AREA:
+            fSeriesType = Type.AREA;
+            break;
+        default:
+            break;
+        }
+    }
 
-        series.setBarColor(new Color(Display.getDefault(), BAR_COLOR));
+    private void updateDisplay(SegmentStoreWithRange<ISegment> data) {
+        ISeries series = fSeriesType.equals(Type.BAR) ? createSeries() : createAreaSeries();
         int barWidth = 4;
-        final int width = fOverrideNbPoints == 0 ? fChart.getPlotArea().getBounds().width / barWidth : fOverrideNbPoints;
+        int preWidth = fOverrideNbPoints == 0 ? fChart.getPlotArea().getBounds().width / barWidth : fOverrideNbPoints;
+        if (!fSeriesType.equals(Type.BAR)) {
+            preWidth += 2;
+        }
+        final int width = preWidth;
         double[] xOrigSeries = new double[width];
         double[] yOrigSeries = new double[width];
         // Set a positive value that is greater than 0 and less than 1.0
@@ -173,6 +197,9 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         double timeWidth = (double) maxLength / (double) width;
         for (int i = 0; i < width; i++) {
             xOrigSeries[i] = i * timeWidth;
+            if (!fSeriesType.equals(Type.BAR)) {
+                xOrigSeries[i] += timeWidth / 2;
+            }
         }
         double maxY = Double.MIN_VALUE;
         for (int i = 0; i < width; i++) {
@@ -208,6 +235,24 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
             }
         }).start();
 
+    }
+
+    private ISeries createSeries() {
+        IBarSeries series = (IBarSeries) fChart.getSeriesSet().createSeries(SeriesType.BAR, Messages.AbstractSegmentStoreDensityViewer_SeriesLabel);
+        series.setVisible(true);
+        series.setBarPadding(0);
+        series.setBarColor(new Color(Display.getDefault(), BAR_COLOR));
+        return series;
+    }
+
+    private ISeries createAreaSeries() {
+        ILineSeries series = (ILineSeries) fChart.getSeriesSet().createSeries(SeriesType.LINE, Messages.AbstractSegmentStoreDensityViewer_SeriesLabel);
+        series.setVisible(true);
+        series.enableStep(true);
+        series.enableArea(true);
+        series.setSymbolType(PlotSymbolType.NONE);
+        series.setLineColor(new Color(Display.getDefault(), BAR_COLOR));
+        return series;
     }
 
     @Override
