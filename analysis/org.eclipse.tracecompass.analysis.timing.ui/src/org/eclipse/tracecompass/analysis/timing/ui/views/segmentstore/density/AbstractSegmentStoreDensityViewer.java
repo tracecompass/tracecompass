@@ -151,7 +151,8 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         final int width = fOverrideNbPoints == 0 ? fChart.getPlotArea().getBounds().width / barWidth : fOverrideNbPoints;
         double[] xOrigSeries = new double[width];
         double[] yOrigSeries = new double[width];
-        Arrays.fill(yOrigSeries, 1.0);
+        // Set a positive value that is greater than 0 and less than 1.0
+        Arrays.fill(yOrigSeries, Double.MIN_VALUE);
         data.setComparator(SegmentComparators.INTERVAL_LENGTH_COMPARATOR);
         ISegment maxSegment = data.getElement(SegmentStoreWithRange.LAST);
         long maxLength = Long.MAX_VALUE;
@@ -162,7 +163,11 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         long minX = Long.MAX_VALUE;
         for (ISegment segment : data) {
             double xBox = segment.getLength() * maxFactor * width;
-            yOrigSeries[(int) xBox]++;
+            if (yOrigSeries[(int) xBox] < 1) {
+                yOrigSeries[(int) xBox] = 1;
+            } else {
+                yOrigSeries[(int) xBox]++;
+            }
             minX = Math.min(minX, segment.getLength());
         }
         double timeWidth = (double) maxLength / (double) width;
