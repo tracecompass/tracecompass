@@ -17,10 +17,12 @@ import java.text.Format;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -77,6 +79,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
 
     private static final Format DENSITY_TIME_FORMATTER = SubSecondTimeWithUnitFormat.getInstance();
     private static final RGB BAR_COLOR = new RGB(0x42, 0x85, 0xf4);
+    private static final ColorRegistry COLOR_REGISTRY = new ColorRegistry();
     /** The color scheme for the chart */
     private TimeGraphColorScheme fColorScheme = new TimeGraphColorScheme();
     private final Chart fChart;
@@ -241,7 +244,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         IBarSeries series = (IBarSeries) fChart.getSeriesSet().createSeries(SeriesType.BAR, Messages.AbstractSegmentStoreDensityViewer_SeriesLabel);
         series.setVisible(true);
         series.setBarPadding(0);
-        series.setBarColor(new Color(Display.getDefault(), BAR_COLOR));
+        series.setBarColor(getColorForRGB(BAR_COLOR));
         return series;
     }
 
@@ -251,8 +254,18 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         series.enableStep(true);
         series.enableArea(true);
         series.setSymbolType(PlotSymbolType.NONE);
-        series.setLineColor(new Color(Display.getDefault(), BAR_COLOR));
+        series.setLineColor(getColorForRGB(BAR_COLOR));
         return series;
+    }
+
+    private static Color getColorForRGB(RGB rgb) {
+        String rgbString = rgb.toString();
+        Color color = COLOR_REGISTRY.get(rgbString);
+        if (color == null) {
+            COLOR_REGISTRY.put(rgbString, rgb);
+            color = Objects.requireNonNull(COLOR_REGISTRY.get(rgbString));
+        }
+        return color;
     }
 
     @Override
