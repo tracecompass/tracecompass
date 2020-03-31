@@ -308,10 +308,10 @@ public class HistogramDataModel implements IHistogramDataModel {
      *            the histogram range end time
      */
     public void setTimeRange(long startTime, long endTime) {
-        fFirstBucketTime = fFirstEventTime = fEndTime = startTime;
+        fFirstBucketTime = fFirstEventTime = fEndTime = fTimeLimit = startTime;
         fBucketDuration = 1;
         updateEndTime();
-        while (endTime >= fTimeLimit) {
+        while (endTime >= fTimeLimit && fTimeLimit < Long.MAX_VALUE) {
             mergeBuckets();
         }
     }
@@ -497,7 +497,7 @@ public class HistogramDataModel implements IHistogramDataModel {
         if (timestamp >= fFirstBucketTime) {
 
             // Compact as needed
-            while (timestamp >= fTimeLimit) {
+            while (timestamp >= fTimeLimit && fTimeLimit < Long.MAX_VALUE) {
                 mergeBuckets();
             }
 
@@ -570,7 +570,7 @@ public class HistogramDataModel implements IHistogramDataModel {
         // Compact as needed
         if (fullRange) {
             fEndTime = Math.max(fEndTime, endTime);
-            while (endTime >= fTimeLimit) {
+            while (endTime >= fTimeLimit && fTimeLimit < Long.MAX_VALUE) {
                 mergeBuckets();
             }
         }
@@ -715,7 +715,9 @@ public class HistogramDataModel implements IHistogramDataModel {
     // ------------------------------------------------------------------------
 
     private void updateEndTime() {
-        fTimeLimit = fFirstBucketTime + (fNbBuckets * fBucketDuration);
+        long newLimit = fFirstBucketTime + (fNbBuckets * fBucketDuration);
+        // Make sure there is no overflow
+        fTimeLimit = fFirstBucketTime <= newLimit ? newLimit : Long.MAX_VALUE;
     }
 
     private void mergeBuckets() {

@@ -251,6 +251,30 @@ public class HistogramDataModelTest {
     }
 
     /**
+     * Test counting events when the timestamp limit would overflow because of
+     * large trace time range
+     */
+    @Test
+    public void testCountEventLimitOverflow() {
+        final int nbBuckets = 2;
+        final long beginTime = 4294967296000L;
+        final long endTime = Long.MAX_VALUE - 1;
+        final int maxHeight = 10;
+        // Bucket duration is a power of 2 and must include both begin and end time
+        long bucketDuration = (long) Math.pow(2, (int) (Math.log((endTime - beginTime) / nbBuckets) / Math.log(2)) + 1);
+
+        HistogramDataModel model = new HistogramDataModel(nbBuckets);
+        model.countEvent(0, beginTime, null);
+        model.countEvent(1, endTime, null);
+
+        HistogramScaledData result = model.scaleTo(nbBuckets, maxHeight, 1);
+
+        assertArrayEqualsInt(1, result.fData);
+
+        testModelConsistency(model, nbBuckets, nbBuckets, bucketDuration, beginTime, beginTime, endTime, Long.MAX_VALUE);
+    }
+
+    /**
      * Test method for {@link HistogramDataModel#scaleTo(int,int,int)}.
      */
     @Test
