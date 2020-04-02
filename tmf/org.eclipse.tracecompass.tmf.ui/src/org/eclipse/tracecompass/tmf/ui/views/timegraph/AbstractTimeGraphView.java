@@ -105,6 +105,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parse
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.IFilterStrings;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.ViewFilterDialog;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerConfigXmlParser;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
@@ -141,6 +142,7 @@ import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.TmfUiRefreshHandler;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfAllowMultiple;
+import org.eclipse.tracecompass.tmf.ui.views.ITmfFilterableControl;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfPinnable;
 import org.eclipse.tracecompass.tmf.ui.views.ITmfTimeAligned;
 import org.eclipse.tracecompass.tmf.ui.views.SaveImageUtil;
@@ -195,7 +197,7 @@ import com.google.common.collect.Multimap;
  *
  * This view contains a time graph viewer.
  */
-public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeAligned, ITmfAllowMultiple, ITmfPinnable, IResourceChangeListener{
+public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeAligned, ITmfAllowMultiple, ITmfPinnable, IResourceChangeListener, ITmfFilterableControl {
 
     private static final String TIMEGRAPH_UI_CONTEXT = "org.eclipse.tracecompass.tmf.ui.view.timegraph.context"; //$NON-NLS-1$
     private static final String TMF_VIEW_UI_CONTEXT = "org.eclipse.tracecompass.tmf.ui.view.context"; //$NON-NLS-1$
@@ -636,7 +638,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             try (TraceCompassLogUtils.ScopeLog linkLog = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingLinks")) { //$NON-NLS-1$
                 /* Refresh the arrows when zooming */
                 computedLinks = getLinkList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
-                TimeEventFilterDialog filterDialog = getTimeEventFilterDialog();
+                ViewFilterDialog filterDialog = getViewFilterDialog();
                 if (filterDialog != null && computedLinks != null) {
                     if (filterDialog.hasActiveSavedFilters()) {
                         computedLinks = Collections.emptyList();
@@ -845,8 +847,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      */
     private void fillWithNullEvents(TimeGraphEntry entry, List<ITimeEvent> eventList) {
         List<ITimeEvent> filtered = new ArrayList<>();
+        ViewFilterDialog viewFilterDialog = getViewFilterDialog();
         if (!eventList.isEmpty()
-                && getTimeEventFilterDialog() != null && getTimeEventFilterDialog().hasActiveSavedFilters()) {
+                && viewFilterDialog != null && viewFilterDialog.hasActiveSavedFilters()) {
 
             eventList.forEach(te -> {
                 // Keep only the events that do not have the 'exclude' property activated
@@ -2869,8 +2872,23 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *
      * @return The time event filter dialog. Could be null.
      * @since 4.0
+     * @deprecated As of 6.0, the {@link TimeEventFilterDialog} has been made to
+     *             support more types of views and copied to the
+     *             {@link ViewFilterDialog} class. Use
+     *             {@link #getViewFilterDialog} method instead
      */
+    @Deprecated
     protected TimeEventFilterDialog getTimeEventFilterDialog() {
+        return fTimeEventFilterDialog;
+    }
+
+    /**
+     * Get the view filter dialog
+     *
+     * @return The time event filter dialog. Could be null.
+     * @since 6.0
+     */
+    protected ViewFilterDialog getViewFilterDialog() {
         return fTimeEventFilterDialog;
     }
 
@@ -2928,9 +2946,23 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *
      * @return the timeEventFilterAction
      * @since 4.1
+     * @deprecated As of 6.0, this class implements {@link ITmfFilterableControl}
+     *             and this method is replaced by the one from the interface
+     *             {@link #getFilterAction()}
      */
+    @Deprecated
     public Action getTimeEventFilterAction() {
         return fTimeEventFilterAction;
+    }
+
+    @Override
+    public Action getFilterAction() {
+        return fTimeEventFilterAction;
+    }
+
+    @Override
+    public void filterUpdated(String regex, Set<@NonNull String> filterRegexes) {
+        restartZoomThread();
     }
 
     /*

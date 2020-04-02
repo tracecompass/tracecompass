@@ -9,19 +9,22 @@
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.tmf.ui.viewers.timegraph.handlers;
+package org.eclipse.tracecompass.internal.tmf.ui.views.handler;
 
-import org.eclipse.tracecompass.tmf.ui.views.timegraph.AbstractTimeGraphView;
+import org.eclipse.tracecompass.tmf.ui.views.ITmfFilterableControl;
+import org.eclipse.tracecompass.tmf.ui.views.TmfView;
 
 /**
  * Time graph filter handler, launches filtering
  *
  * @author Matthew Khouzam
  */
-public class TimeGraphFilterHandler extends TimeGraphBaseHandler {
+public class TmfViewFilterHandler extends TmfViewBaseHandler {
 
     @Override
-    public void execute(AbstractTimeGraphView view) {
-        view.getTimeEventFilterAction().run();
+    public void execute(TmfView view) {
+        if (view instanceof ITmfFilterableControl) {
+            ((ITmfFilterableControl) view).getFilterAction().run();
+        }
     }
 }

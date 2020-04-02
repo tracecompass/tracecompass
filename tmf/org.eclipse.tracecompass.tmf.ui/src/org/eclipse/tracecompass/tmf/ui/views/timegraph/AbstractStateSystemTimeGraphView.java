@@ -41,7 +41,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
-import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.TimeEventFilterDialog;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.ViewFilterDialog;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
@@ -177,7 +177,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                 return;
             }
 
-            TimeEventFilterDialog timeEventFilterDialog = getTimeEventFilterDialog();
+            ViewFilterDialog timeEventFilterDialog = getViewFilterDialog();
             boolean isFilterActive = timeEventFilterDialog != null && timeEventFilterDialog.isFilterActive();
             getTimeGraphViewer().setTimeEventFilterApplied(isFilterActive);
 
@@ -263,7 +263,7 @@ public abstract class AbstractStateSystemTimeGraphView extends AbstractTimeGraph
                 @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>>> predicates) {
             try (TraceCompassLogUtils.ScopeLog poc = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINE, "TimegraphBgSearch")) { //$NON-NLS-1$
 
-                TimeEventFilterDialog timeEventFilterDialog = getTimeEventFilterDialog();
+                ViewFilterDialog timeEventFilterDialog = getViewFilterDialog();
                 boolean hasActiveSavedFilters = timeEventFilterDialog.hasActiveSavedFilters();
 
                 //Regroup the gaps by overlapping gaps

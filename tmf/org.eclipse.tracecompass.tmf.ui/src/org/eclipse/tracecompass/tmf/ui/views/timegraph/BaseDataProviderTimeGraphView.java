@@ -41,6 +41,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IAnnotation.AnnotationType;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.ViewFilterDialog;
 import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.BaseDataProviderTimeGraphPresentationProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.Messages;
@@ -487,10 +488,11 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             ITimeEvent event = createTimeEvent(entry, state);
             if (prev != null) {
                 long prevEnd = prev.getTime() + prev.getDuration();
-                if (prevEnd < event.getTime() && (getTimeEventFilterDialog() == null || !getTimeEventFilterDialog().hasActiveSavedFilters())) {
+                ViewFilterDialog viewFilterDialog = getViewFilterDialog();
+                if (prevEnd < event.getTime() && (viewFilterDialog == null || !viewFilterDialog.hasActiveSavedFilters())) {
                     // fill in the gap.
                     TimeEvent timeEvent = new TimeEvent(entry, prevEnd, event.getTime() - prevEnd);
-                    if (getTimeEventFilterDialog() != null && getTimeEventFilterDialog().isFilterActive()) {
+                    if (viewFilterDialog != null && viewFilterDialog.isFilterActive()) {
                         timeEvent.setProperty(IFilterProperty.DIMMED, true);
                     }
                     events.add(timeEvent);
