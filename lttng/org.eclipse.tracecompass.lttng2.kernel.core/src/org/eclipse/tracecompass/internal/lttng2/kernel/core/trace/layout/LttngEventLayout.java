@@ -64,11 +64,12 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     private static final String COMPAT_SYSCALL_ENTRY_PREFIX = "compat_sys_";
     private static final String SYSCALL_EXIT_PREFIX = "exit_syscall";
 
-    private static final String BLOCK_RQ_INSERT= "block_rq_insert";
-    private static final String BLOCK_RQ_ISSUE= "block_rq_issue";
-    private static final String ELV_MERGE_REQUESTS= "addons_elv_merge_requests";
-    private static final String BLOCK_RQ_COMPLETE= "block_rq_complete";
-    private static final String LTTNG_STATEDUMP_BLOCK_DEVICE= "lttng_statedump_block_device";
+    private static final String BLOCK_RQ_INSERT = "block_rq_insert";
+    private static final String BLOCK_RQ_ISSUE = "block_rq_issue";
+    private static final String ELV_MERGE_REQUESTS = "addons_elv_merge_requests";
+    private static final String BLOCK_RQ_COMPLETE = "block_rq_complete";
+    private static final String LTTNG_STATEDUMP_BLOCK_DEVICE = "lttng_statedump_block_device";
+    private static final String LTTNG_STATEDUMP_FILE_DESCRIPTOR = "lttng_statedump_file_descriptor";
     private static final String BLOCK_BIO_FRONTMERGE = "block_bio_frontmerge";
     private static final String BLOCK_BIO_BACKMERGE = "block_bio_backmerge";
 
@@ -457,6 +458,11 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     @Override
     public @NonNull String eventStatedumpBlockDevice() {
         return LTTNG_STATEDUMP_BLOCK_DEVICE;
+    }
+
+    @Override
+    public @NonNull String eventStatedumpFileDescriptor() {
+        return LTTNG_STATEDUMP_FILE_DESCRIPTOR;
     }
 
     @Override

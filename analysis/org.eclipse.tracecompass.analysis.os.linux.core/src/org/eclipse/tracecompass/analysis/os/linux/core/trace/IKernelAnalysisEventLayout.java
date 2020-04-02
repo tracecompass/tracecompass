@@ -805,6 +805,17 @@ public interface IKernelAnalysisEventLayout {
     }
 
     /**
+     * Optional event used by some tracers to associate the file descriptors to
+     * the actual file name
+     *
+     * @return The name of the event
+     * @since 5.0
+     */
+    default @Nullable String eventStatedumpFileDescriptor() {
+        return null;
+    }
+
+    /**
      * The field with the IRQ number. This is used in IPI handlers (entry and
      * exit).
      *
