@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.latency;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
 import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWriter;
 import org.eclipse.tracecompass.datastore.core.serialization.SafeByteBufferFactory;
@@ -20,6 +21,10 @@ import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.segment.interfaces.INamedSegment;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * A linux kernel system call, represented as an {@link ISegment}.
@@ -27,7 +32,7 @@ import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
  * @author Alexandre Montplaisir
  * @since 2.0
  */
-public final class SystemCall implements INamedSegment, ITmfSourceLookup {
+public final class SystemCall implements INamedSegment, ITmfSourceLookup, IElementResolver {
 
     private static final long serialVersionUID = 1554494342105208730L;
 
@@ -167,6 +172,13 @@ public final class SystemCall implements INamedSegment, ITmfSourceLookup {
     @Override
     public @Nullable ITmfCallsite getCallsite() {
         return (ITmfCallsite) SystemCallLatencyAnalysis.SyscallCallsiteAspect.INSTANCE.resolve(this);
+    }
+
+    @Override
+    public Multimap<String, Object> getMetadata() {
+        Multimap<String, Object> map = HashMultimap.create();
+        map.put(OsStrings.tid(), fTid);
+        return map;
     }
 
 }
