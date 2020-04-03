@@ -18,10 +18,12 @@ package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -86,6 +88,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableMultimap.Builder;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 
 /**
@@ -171,6 +174,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     boolean fColumnsCreated = false;
 
     private @Nullable Job fFilteringJob = null;
+    private Set<String> fLocalRegexes = Collections.emptySet();
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -448,9 +452,9 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
             String regex = IFilterStrings.mergeFilters(entry.getValue());
             FilterCu cu = FilterCu.compile(regex);
             Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>> predicate = cu != null ? cu.generate() : null;
-                if (predicate != null) {
-                    predicates.put(entry.getKey(), predicate);
-                }
+            if (predicate != null) {
+                predicates.put(entry.getKey(), predicate);
+            }
         }
         return predicates;
     }
@@ -605,7 +609,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
      * Set or remove the global regex filter value
      *
      * @param signal
-     *                   the signal carrying the regex value
+     *            the signal carrying the regex value
      * @since 3.1
      */
     @TmfSignalHandler
@@ -614,8 +618,8 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     }
 
     /**
-     * This method build the multimap of regexes by property that will be used to
-     * filter the timegraph states
+     * This method build the multimap of regexes by property that will be used
+     * to filter the timegraph states
      *
      * Override this method to add other regexes with their properties. The data
      * provider should handle everything after.
@@ -629,6 +633,10 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         ITmfTrace trace = fTrace;
         if (trace == null) {
             return regexes;
+        }
+        Set<String> localRegexes = fLocalRegexes;
+        if (!localRegexes.isEmpty()) {
+            regexes.putAll(IFilterProperty.DIMMED, localRegexes);
         }
         TraceCompassFilter globalFilter = TraceCompassFilter.getFilterForTrace(trace);
         if (globalFilter == null) {
@@ -662,5 +670,19 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
                 }
             }
         });
+    }
+
+    /**
+     * Set the local filter regexes for this table
+     *
+     * @param filterRegexes
+     *            The set of regexes
+     * @since 4.1
+     */
+    public void setLocalRegexes(Set<String> filterRegexes) {
+        if (!filterRegexes.equals(fLocalRegexes)) {
+            fLocalRegexes = ImmutableSet.copyOf(filterRegexes);
+            setData(getSegmentProvider());
+        }
     }
 }

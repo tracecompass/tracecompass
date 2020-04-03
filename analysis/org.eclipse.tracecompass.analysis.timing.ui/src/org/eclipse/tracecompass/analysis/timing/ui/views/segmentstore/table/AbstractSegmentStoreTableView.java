@@ -16,21 +16,32 @@
 package org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table;
 
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.ViewFilterDialog;
 import org.eclipse.tracecompass.internal.tmf.ui.commands.ExportToTsvAction;
 import org.eclipse.tracecompass.internal.tmf.ui.commands.ExportToTsvUtils;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.ui.views.ITmfFilterableControl;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
+import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.contexts.IContextActivation;
+import org.eclipse.ui.contexts.IContextService;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -40,11 +51,13 @@ import com.google.common.annotations.VisibleForTesting;
  * @author France Lapointe Nguyen
  * @since 2.0
  */
-public abstract class AbstractSegmentStoreTableView extends TmfView {
+public abstract class AbstractSegmentStoreTableView extends TmfView implements ITmfFilterableControl {
 
     // ------------------------------------------------------------------------
     // Attributes
     // ------------------------------------------------------------------------
+
+    private static final String TMF_VIEW_UI_CONTEXT = "org.eclipse.tracecompass.tmf.ui.view.context"; //$NON-NLS-1$
 
     private final Action fExportAction = new ExportToTsvAction() {
         @Override
@@ -59,6 +72,12 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
     };
 
     private @Nullable AbstractSegmentStoreTableViewer fSegmentStoreViewer;
+    private @Nullable ViewFilterDialog fFilterDialog = null;
+
+    private List<IContextActivation> fActiveContexts = new ArrayList<>();
+    private @Nullable IContextService fContextService = null;
+
+    private @Nullable Action fFilterAction;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -80,7 +99,8 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
         super.createPartControl(parent);
         SashForm sf = new SashForm(parent, SWT.NONE);
         TableViewer tableViewer = new TableViewer(sf, SWT.FULL_SELECTION | SWT.VIRTUAL);
-        fSegmentStoreViewer = createSegmentStoreViewer(tableViewer);
+        AbstractSegmentStoreTableViewer segmentStoreViewer = createSegmentStoreViewer(tableViewer);
+        fSegmentStoreViewer = segmentStoreViewer;
         getViewSite().getActionBars().getMenuManager().add(fExportAction);
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
         if (trace != null) {
@@ -89,6 +109,38 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
                 fSegmentStoreViewer.traceSelected(signal);
             }
         }
+        // Add focus lost event
+        segmentStoreViewer.getControl().addFocusListener(new FocusListener() {
+            @Override
+            public void focusLost(@Nullable FocusEvent e) {
+                deactivateContextService();
+            }
+
+            @Override
+            public void focusGained(@Nullable FocusEvent e) {
+                activateContextService();
+            }
+        });
+
+        Action timeEventFilterAction = new Action() {
+
+            @Override
+            public void run() {
+                ViewFilterDialog dialog = fFilterDialog;
+                if (dialog != null) {
+                    fFilterDialog = null;
+                    dialog.close();
+                }
+                dialog = new ViewFilterDialog(segmentStoreViewer.getControl().getShell(), AbstractSegmentStoreTableView.this, segmentStoreViewer.getControl());
+                fFilterDialog = dialog;
+                dialog.open();
+            }
+        };
+
+        fFilterAction = timeEventFilterAction;
+
+        IWorkbenchPartSite site = getSite();
+        fContextService = site.getWorkbenchWindow().getService(IContextService.class);
     }
 
     // ------------------------------------------------------------------------
@@ -100,6 +152,7 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
         if (fSegmentStoreViewer != null) {
             fSegmentStoreViewer.getTableViewer().getControl().setFocus();
         }
+        activateContextService();
     }
 
     @Override
@@ -145,4 +198,33 @@ public abstract class AbstractSegmentStoreTableView extends TmfView {
         Table table = segmentStoreViewer.getTableViewer().getTable();
         ExportToTsvUtils.exportTableToTsv(table, stream);
     }
+
+    private void activateContextService() {
+        IContextService contextService = fContextService;
+        if (fActiveContexts.isEmpty() && contextService != null) {
+            fActiveContexts.add(Objects.requireNonNull(contextService.activateContext(TMF_VIEW_UI_CONTEXT)));
+        }
+    }
+
+    private void deactivateContextService() {
+        IContextService contextService = fContextService;
+        if (contextService != null) {
+            contextService.deactivateContexts(fActiveContexts);
+            fActiveContexts.clear();
+        }
+    }
+
+    @Override
+    public Action getFilterAction() {
+        return Objects.requireNonNull(fFilterAction);
+    }
+
+    @Override
+    public void filterUpdated(@Nullable String regex, Set<String> filterRegexes) {
+        AbstractSegmentStoreTableViewer segmentStoreViewer = fSegmentStoreViewer;
+        if (segmentStoreViewer != null) {
+            segmentStoreViewer.setLocalRegexes(filterRegexes);
+        }
+    }
+
 }
