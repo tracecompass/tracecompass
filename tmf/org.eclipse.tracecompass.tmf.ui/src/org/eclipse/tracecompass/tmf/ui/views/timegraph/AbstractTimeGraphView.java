@@ -625,13 +625,13 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             Sampling sampling = new Sampling(getZoomStartTime(), getZoomEndTime(), getResolution());
             boolean isFilterActive = !getRegexes().values().isEmpty();
             try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStates")) { //$NON-NLS-1$
-                boolean isFilterCleared = (!isFilterActive && getTimeGraphViewer().isTimeEventFilterActive()) && fIsHideRowsFilterActive;
                 getTimeGraphViewer().setTimeEventFilterApplied(isFilterActive);
 
                 boolean hasSavedFilter = fTimeEventFilterDialog != null && fTimeEventFilterDialog.hasActiveSavedFilters();
                 getTimeGraphViewer().setSavedFilterStatus(hasSavedFilter || fIsHideRowsFilterActive);
 
-                Iterable<@NonNull TimeGraphEntry> incorrectSample = Iterables.filter(fEntries, entry -> isFilterActive || isFilterCleared || !sampling.equals(entry.getSampling()));
+                // Sampling is cleared when calling restartZoomThread() so that during filtering the entries are refreshed
+                Iterable<@NonNull TimeGraphEntry> incorrectSample = Iterables.filter(fEntries, entry -> !sampling.equals(entry.getSampling()));
                 zoomEntries(incorrectSample, getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
             }
             List<ILinkEvent> computedLinks;
@@ -2931,6 +2931,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             fZoomThread = null;
         }
         Runnable runnable = () -> {
+            // Clear the sampling to make sure all entries are refreshed
+            clearSampling(getTrace());
             startZoomThread(getTimeGraphViewer().getTime0(), getTimeGraphViewer().getTime1());
         };
         Display display = PlatformUI.getWorkbench().getDisplay();
@@ -3204,6 +3206,18 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 }
             }
         };
+    }
+
+    private void clearSampling(ITmfTrace trace) {
+        /*
+         * Clear the sampling to make sure all entries are refreshed
+         */
+        List<@NonNull TimeGraphEntry> entryList = getEntryList(trace);
+        if (entryList != null) {
+            for (TimeGraphEntry entry : entryList) {
+                Utils.flatten(entry).forEach(e -> e.setSampling(null));
+            }
+        }
     }
 
 }
