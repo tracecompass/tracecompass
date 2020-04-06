@@ -33,6 +33,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -50,13 +53,16 @@ import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersU
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.core.signal.TmfDataModelSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -68,6 +74,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.dialogs.TriStateFiltere
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import com.google.common.primitives.Longs;
 
 /**
@@ -120,6 +127,28 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         }
     }
 
+    /**
+     * Listener to select a range in other viewers when a cell of the segment
+     * store table view is selected
+     */
+    private class TreeViewerSelectionListener implements ISelectionChangedListener {
+
+        @Override
+        public void selectionChanged(SelectionChangedEvent event) {
+            IStructuredSelection selection = event.getStructuredSelection();
+            Object entry = selection.getFirstElement();
+            if (entry instanceof TmfGenericTreeEntry) {
+                ITmfTreeDataModel model = ((TmfGenericTreeEntry<?>) entry).getModel();
+                if (model instanceof IElementResolver) {
+                    Multimap<@NonNull String, @NonNull Object> metadata = ((IElementResolver) model).getMetadata();
+                    if (!metadata.isEmpty()) {
+                        TmfSignalManager.dispatchSignal(new TmfDataModelSelectedSignal(AbstractSelectTreeViewer.this, metadata));
+                    }
+                }
+            }
+        }
+    }
+
     private ILegendImageProvider fLegendImageProvider;
     private ICheckboxTreeViewerListener fChartViewer;
     private TriStateFilteredCheckboxTree fCheckboxTree;
@@ -145,6 +174,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         if (treeViewer instanceof CheckboxTreeViewer) {
             ((CheckboxTreeViewer) treeViewer).addCheckStateListener(new CheckStateChangedListener());
         }
+        treeViewer.addSelectionChangedListener(new TreeViewerSelectionListener());
         checkboxTree.getFilterControl().addModifyListener(e -> saveViewContext());
         fCheckboxTree = checkboxTree;
         fLegendIndex = legendIndex;
