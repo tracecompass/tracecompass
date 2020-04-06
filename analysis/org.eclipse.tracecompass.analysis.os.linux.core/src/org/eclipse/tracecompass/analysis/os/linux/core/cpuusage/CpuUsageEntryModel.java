@@ -16,8 +16,13 @@ import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.CpuUsageDataProvider;
+import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * Entry Model to represent entries for the {@link CpuUsageDataProvider}.
@@ -25,9 +30,10 @@ import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
  * @author Loic Prieur-Drevon
  * @since 2.4
  */
-public class CpuUsageEntryModel extends TmfTreeDataModel {
+public class CpuUsageEntryModel extends TmfTreeDataModel implements IElementResolver {
     private final int fTid;
     private final long fTime;
+    private final Multimap<String, Object> fMetadata;
 
     /**
      * Constructor
@@ -66,6 +72,9 @@ public class CpuUsageEntryModel extends TmfTreeDataModel {
         super(id, parentId, labels);
         fTid = tid;
         fTime = time;
+        Multimap<String, Object> map = HashMultimap.create();
+        map.put(OsStrings.tid(), tid);
+        fMetadata = map;
     }
 
     /**
@@ -103,5 +112,10 @@ public class CpuUsageEntryModel extends TmfTreeDataModel {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), fTid, fTime);
+    }
+
+    @Override
+    public Multimap<String, Object> getMetadata() {
+        return fMetadata;
     }
 }
