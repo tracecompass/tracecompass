@@ -15,7 +15,15 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.tree;
 
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -25,6 +33,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableColorProvider;
@@ -60,6 +69,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
  */
 public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
 
+    private static final ISelection EMPTY_SELECTION = StructuredSelection.EMPTY;
     private final TreeViewer fTreeViewer;
 
     // ------------------------------------------------------------------------
@@ -425,17 +435,75 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
         Job thread = new Job("") { //$NON-NLS-1$
             @Override
             public IStatus run(IProgressMonitor monitor) {
-                final ITmfTreeViewerEntry rootEntry = updateElements(trace, start, end, isSelection);
-                /* Set the input in main thread only if it didn't change */
-                if (rootEntry != null) {
+                final ITmfTreeViewerEntry newRootEntry = updateElements(trace, start, end, isSelection);
+                /* Set the input in main thread only if it changed */
+                if (newRootEntry != null) {
                     Display.getDefault().asyncExec(() -> {
                         if (fTreeViewer.getControl().isDisposed()) {
                             return;
                         }
 
-                        if (rootEntry != fTreeViewer.getInput()) {
-                            fTreeViewer.setInput(rootEntry);
-                            contentChanged(rootEntry);
+                        Object input = fTreeViewer.getInput();
+                        if (newRootEntry != input) {
+
+                            /*
+                             * Find in the new entries the equivalent of the
+                             * selected one
+                             */
+                            ISelection selection = fTreeViewer.getSelection();
+                            if (!selection.isEmpty() && selection instanceof StructuredSelection) {
+                                StructuredSelection structuredSelection = (StructuredSelection) selection;
+                                Object selected = structuredSelection.getFirstElement();
+                                if (selected instanceof ITmfTreeViewerEntry) {
+                                    ITmfTreeViewerEntry newSelection = findEquivalent(newRootEntry, (ITmfTreeViewerEntry) selected);
+                                    selection = newSelection != null ? new StructuredSelection(newSelection) : EMPTY_SELECTION;
+                                }
+                            }
+
+                            /*
+                             * Get currently expanded nodes
+                             */
+                            Object[] expandedElements = fTreeViewer.getExpandedElements();
+                            Set<String> expandedPaths = new HashSet<>();
+                            for (Object element : expandedElements) {
+                                if (element instanceof ITmfTreeViewerEntry) {
+                                    expandedPaths.add(getPath((ITmfTreeViewerEntry) element).toString());
+                                }
+                            }
+                            Set<String> allPaths = new HashSet<>();
+                            if (input instanceof ITmfTreeViewerEntry) {
+                                for (ITmfTreeViewerEntry child : ((ITmfTreeViewerEntry) input).getChildren()) {
+                                    add(allPaths, child);
+                                }
+                            }
+                            /*
+                             * All the current nodes minus currently expanded
+                             * are collapsed, so if an entry is included in the
+                             * expanded list or it is NOT present in in the
+                             * previous list, expand it. Basically collapse all
+                             * that was previously collapsed.
+                             */
+                            Set<@NonNull ITmfTreeViewerEntry> newExpanded = new HashSet<>();
+                            addIf(newExpanded, newRootEntry, (ITmfTreeViewerEntry entry) -> {
+                                String key = getPath(entry).toString();
+                                return (expandedPaths.contains(key) || !allPaths.contains(key));
+                            });
+
+                            fTreeViewer.setInput(newRootEntry);
+                            contentChanged(newRootEntry);
+
+                            /*
+                             * Reset Selection
+                             */
+                            if (!selection.isEmpty()) {
+                                fTreeViewer.setSelection(selection, true);
+                            }
+
+                            /*
+                             * Reset Expanded
+                             */
+                            fTreeViewer.setExpandedElements(newExpanded.toArray());
+
                         } else {
                             fTreeViewer.refresh();
                         }
@@ -450,6 +518,58 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
         };
         thread.setSystem(true);
         thread.schedule();
+    }
+
+    private void addIf(Collection<@NonNull ITmfTreeViewerEntry> toAdd, @NonNull ITmfTreeViewerEntry parent, Predicate<@NonNull ITmfTreeViewerEntry> condition) {
+        if (condition.test(parent) && parent.hasChildren()) {
+            toAdd.add(parent);
+        }
+        for (ITmfTreeViewerEntry child : parent.getChildren()) {
+            if (child.hasChildren()) {
+                addIf(toAdd, child, condition);
+            }
+        }
+    }
+
+    private static Deque<String> getPath(@NonNull ITmfTreeViewerEntry entry) {
+        Deque<String> retVal = new ArrayDeque<>();
+        ITmfTreeViewerEntry current = entry;
+        while (current.getParent() != null) {
+            retVal.addFirst(current.getName());
+            current = current.getParent();
+        }
+        return retVal;
+    }
+
+    private static ITmfTreeViewerEntry findEquivalent(@NonNull ITmfTreeViewerEntry entriesToSearch, @NonNull ITmfTreeViewerEntry selectedItem) {
+        Deque<String> path = getPath(selectedItem);
+        Iterator<String> iter = path.iterator();
+        ITmfTreeViewerEntry currentEntry = entriesToSearch;
+        while (iter.hasNext()) {
+            String current = iter.next();
+            boolean found = false;
+            for (ITmfTreeViewerEntry child : currentEntry.getChildren()) {
+                if (Objects.equals(child.getName(), current)) {
+                    found = true;
+                    currentEntry = child;
+                    break;
+                }
+            }
+            if (!found) {
+                return null;
+            }
+
+        }
+        return currentEntry;
+    }
+
+    private void add(Collection<String> collection, @NonNull ITmfTreeViewerEntry entry) {
+        collection.add(getPath(entry).toString());
+        for (ITmfTreeViewerEntry child : entry.getChildren()) {
+            if (child.hasChildren()) {
+                add(collection, child);
+            }
+        }
     }
 
     /**
