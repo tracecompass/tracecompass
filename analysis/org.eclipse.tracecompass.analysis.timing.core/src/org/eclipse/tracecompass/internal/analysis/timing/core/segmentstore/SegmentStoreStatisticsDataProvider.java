@@ -159,7 +159,9 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
     }
 
     private long getUniqueId(String name) {
-        return fIdToType.computeIfAbsent(name, n -> ENTRY_ID.getAndIncrement());
+        synchronized (fIdToType) {
+            return fIdToType.computeIfAbsent(name, n -> ENTRY_ID.getAndIncrement());
+        }
     }
 
     @Override
@@ -169,7 +171,9 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
 
     @Override
     public void dispose() {
-        fIdToType.clear();
+        synchronized (fIdToType) {
+            fIdToType.clear();
+        }
         fProvider.dispose();
     }
 }
