@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2017 Ericsson
+ * Copyright (c) 2010, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -14,9 +14,13 @@
 
 package org.eclipse.tracecompass.tmf.ui.views.timechart;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tracecompass.tmf.ui.views.colors.ColorSetting;
@@ -38,6 +42,7 @@ public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider imp
     private static final Color BOOKMARK_INNER_COLOR = new Color(Display.getDefault(), 115, 165, 224);
     private static final Color BOOKMARK_OUTER_COLOR = new Color(Display.getDefault(), 2, 70, 140);
     private static final Color SEARCH_MATCH_COLOR = new Color(Display.getDefault(), 177, 118, 14);
+    private static final StateItem DEFAULT_STATE = new StateItem(new RGB(0, 0, 0), StateItem.UNDEFINED_STATE_NAME);
 
     private StateItem[] fStateTable;
 
@@ -61,6 +66,20 @@ public class TimeChartAnalysisProvider extends TimeGraphPresentationProvider imp
             return ITimeGraphPresentationProvider.INVISIBLE;
         }
         return ((TimeChartEvent) event).getColorSettingPriority();
+    }
+
+    @Override
+    public Map<String, Object> getEventStyle(ITimeEvent event) {
+        StateItem stateItem = null;
+        int index = getStateTableIndex(event);
+        if (index == ColorSettingsManager.PRIORITY_NONE) {
+            return DEFAULT_STATE.getStyleMap();
+        }
+        StateItem[] stateTable = getStateTable();
+        if (index >= 0 && index < stateTable.length) {
+            stateItem = stateTable[index];
+        }
+        return stateItem == null ? Collections.emptyMap() : stateItem.getStyleMap();
     }
 
     @Override
