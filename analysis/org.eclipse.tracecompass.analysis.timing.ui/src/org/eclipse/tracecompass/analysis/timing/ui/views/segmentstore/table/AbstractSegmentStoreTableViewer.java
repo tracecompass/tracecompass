@@ -40,6 +40,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -307,9 +308,17 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
             if (!tableViewer.getTable().isDisposed()) {
                 // Go to the top of the table
                 tableViewer.getTable().setTopIndex(0);
+                ISelection selection = tableViewer.getSelection();
+                ISegment selected = null;
+                if (!selection.isEmpty() && selection instanceof StructuredSelection) {
+                    Object firstElement = ((StructuredSelection) selection).getFirstElement();
+                    if (firstElement instanceof ISegment) {
+                        selected = (ISegment) firstElement;
+                    }
+                }
                 // Reset selected row
-                tableViewer.setSelection(StructuredSelection.EMPTY);
                 if (dataInput == null) {
+                    tableViewer.setSelection(StructuredSelection.EMPTY);
                     tableViewer.setInput(null);
                     tableViewer.setItemCount(0);
                     return;
@@ -318,8 +327,39 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
                 tableViewer.setInput(dataInput);
                 SegmentStoreContentProvider contentProvider = (SegmentStoreContentProvider) getTableViewer().getContentProvider();
                 tableViewer.setItemCount((int) Math.min(Integer.MAX_VALUE, contentProvider.getSegmentCount()));
+                boolean found = false;
+                if (selected != null && dataInput instanceof ISegmentStore<?>) {
+                    ISegmentStore<?> store = (ISegmentStore<?>) dataInput;
+                    for (ISegment segment : store.getIntersectingElements(selected.getEnd())) {
+                        if (isSameish(segment, selected)) {
+                            selection = new StructuredSelection(segment);
+                            tableViewer.setSelection(selection, true);
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if (!found) {
+                    tableViewer.setSelection(StructuredSelection.EMPTY);
+                }
             }
         });
+    }
+
+    private boolean isSameish(ISegment left, ISegment right) {
+        if (!(Objects.equals(left.getStart(), right.getStart()) && Objects.equals(left.getEnd(), right.getEnd()))) {
+            return false;
+        }
+        ISegmentStoreProvider segmentProvider = getSegmentProvider();
+        if (segmentProvider == null) {
+            return false;
+        }
+        for (ISegmentAspect aspect : segmentProvider.getSegmentAspects()) {
+            if (!Objects.equals(aspect.resolve(left), aspect.resolve(right))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -350,9 +390,10 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
             // Get the filter external input data
             Multimap<@NonNull String, @NonNull Object> input = ISegmentStoreProvider.getFilterInput(provider, segment);
 
-            // Test each predicates and set the status of the property
-            // associated to the
-            // predicate
+            /*
+             * Test each predicates and set the status of the property
+             * associated to the predicate
+             */
             boolean activateProperty = false;
             for (Map.Entry<Integer, Predicate<Multimap<String, Object>>> mapEntry : predicates.entrySet()) {
                 Integer property = Objects.requireNonNull(mapEntry.getKey());
