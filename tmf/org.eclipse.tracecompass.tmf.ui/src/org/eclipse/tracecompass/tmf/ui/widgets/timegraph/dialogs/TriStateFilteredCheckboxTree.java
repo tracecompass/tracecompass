@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -74,7 +74,7 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
      *            <code>true</code> if the new <code>FilteredTree</code> look should
      *            be used
      * @param useFastHashLookup true, if tree should use fast hash lookup, else false
-     * @since 5.3
+     * @since 6.0
      */
     public TriStateFilteredCheckboxTree(Composite parent, int treeStyle, PatternFilter filter, boolean useNewLook, boolean useFastHashLookup) {
         super(parent, treeStyle, filter, useNewLook, useFastHashLookup);

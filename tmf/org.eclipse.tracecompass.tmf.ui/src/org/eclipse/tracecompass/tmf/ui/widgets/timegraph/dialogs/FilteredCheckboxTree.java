@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Inria
+ * Copyright (c) 2014, 2020 Inria and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -93,7 +93,7 @@ public class FilteredCheckboxTree extends FilteredTree implements ICheckable {
      *            <code>true</code> if the new <code>FilteredTree</code> look
      *            should be used
      * @param useFastHashLookup true, if tree should use fast hash lookup, else false
-     * @since 5.3
+     * @since 6.0
      */
     public FilteredCheckboxTree(Composite parent, int treeStyle, PatternFilter filter,
             boolean useNewLook, boolean useFastHashLookup) {

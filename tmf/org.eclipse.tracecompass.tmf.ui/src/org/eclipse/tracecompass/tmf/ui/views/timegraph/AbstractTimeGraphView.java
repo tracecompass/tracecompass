@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2019 Ericsson, École Polytechnique de Montréal and others
+ * Copyright (c) 2012, 2020 Ericsson, École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -2346,7 +2346,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      * Returns an action for hiding / showing empty rows
      *
      * @return the hide empty rows action.
-     * @since 5.3
+     * @since 6.0
      */
     protected Action getHideEmptyRowsAction() {
         HideEmptyRowsAction hideEmptyRowsAction = fHideEmptyRowsAction;
