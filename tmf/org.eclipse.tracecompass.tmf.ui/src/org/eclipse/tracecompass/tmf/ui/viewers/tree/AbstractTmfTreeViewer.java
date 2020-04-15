@@ -15,15 +15,11 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.tree;
 
-import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -52,6 +48,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.tracecompass.internal.tmf.ui.viewers.tree.TreeUtil;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -69,7 +66,6 @@ import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
  */
 public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
 
-    private static final ISelection EMPTY_SELECTION = StructuredSelection.EMPTY;
     private final TreeViewer fTreeViewer;
 
     // ------------------------------------------------------------------------
@@ -206,7 +202,6 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
         super(parent);
         /* Build the tree viewer part of the view */
         fTreeViewer = treeViewer;
-        fTreeViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
         final Tree tree = fTreeViewer.getTree();
         tree.setHeaderVisible(true);
         tree.setLinesVisible(true);
@@ -443,67 +438,9 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
                             return;
                         }
 
-                        Object input = fTreeViewer.getInput();
-                        if (newRootEntry != input) {
-
-                            /*
-                             * Find in the new entries the equivalent of the
-                             * selected one
-                             */
-                            ISelection selection = fTreeViewer.getSelection();
-                            if (!selection.isEmpty() && selection instanceof StructuredSelection) {
-                                StructuredSelection structuredSelection = (StructuredSelection) selection;
-                                Object selected = structuredSelection.getFirstElement();
-                                if (selected instanceof ITmfTreeViewerEntry) {
-                                    ITmfTreeViewerEntry newSelection = findEquivalent(newRootEntry, (ITmfTreeViewerEntry) selected);
-                                    selection = newSelection != null ? new StructuredSelection(newSelection) : EMPTY_SELECTION;
-                                }
-                            }
-
-                            /*
-                             * Get currently expanded nodes
-                             */
-                            Object[] expandedElements = fTreeViewer.getExpandedElements();
-                            Set<String> expandedPaths = new HashSet<>();
-                            for (Object element : expandedElements) {
-                                if (element instanceof ITmfTreeViewerEntry) {
-                                    expandedPaths.add(getPath((ITmfTreeViewerEntry) element).toString());
-                                }
-                            }
-                            Set<String> allPaths = new HashSet<>();
-                            if (input instanceof ITmfTreeViewerEntry) {
-                                for (ITmfTreeViewerEntry child : ((ITmfTreeViewerEntry) input).getChildren()) {
-                                    add(allPaths, child);
-                                }
-                            }
-                            /*
-                             * All the current nodes minus currently expanded
-                             * are collapsed, so if an entry is included in the
-                             * expanded list or it is NOT present in in the
-                             * previous list, expand it. Basically collapse all
-                             * that was previously collapsed.
-                             */
-                            Set<@NonNull ITmfTreeViewerEntry> newExpanded = new HashSet<>();
-                            addIf(newExpanded, newRootEntry, (ITmfTreeViewerEntry entry) -> {
-                                String key = getPath(entry).toString();
-                                return (expandedPaths.contains(key) || !allPaths.contains(key));
-                            });
-
-                            fTreeViewer.setInput(newRootEntry);
-                            contentChanged(newRootEntry);
-
-                            /*
-                             * Reset Selection
-                             */
-                            if (!selection.isEmpty()) {
-                                fTreeViewer.setSelection(selection, true);
-                            }
-
-                            /*
-                             * Reset Expanded
-                             */
-                            fTreeViewer.setExpandedElements(newExpanded.toArray());
-
+                        Object currentRootEntry = fTreeViewer.getInput();
+                        if (newRootEntry != currentRootEntry) {
+                            updateTreeUI(fTreeViewer, newRootEntry);
                         } else {
                             fTreeViewer.refresh();
                         }
@@ -520,56 +457,77 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
         thread.schedule();
     }
 
-    private void addIf(Collection<@NonNull ITmfTreeViewerEntry> toAdd, @NonNull ITmfTreeViewerEntry parent, Predicate<@NonNull ITmfTreeViewerEntry> condition) {
-        if (condition.test(parent) && parent.hasChildren()) {
-            toAdd.add(parent);
+
+    /**
+     * Update tree UI, this preserves selection and expansion levels, needs to
+     * be called in UI thread
+     *
+     * @param treeViewer
+     *            the tree to update
+     * @param newInput
+     *            the entries to display
+     *
+     * @since 6.0
+     */
+    protected final void updateTreeUI(TreeViewer treeViewer, @NonNull ITmfTreeViewerEntry newInput) {
+        Object input = fTreeViewer.getInput();
+        if (newInput == input) {
+            return;
         }
-        for (ITmfTreeViewerEntry child : parent.getChildren()) {
-            if (child.hasChildren()) {
-                addIf(toAdd, child, condition);
+
+        /*
+         * Find in the new entries the equivalent of the selected one
+         */
+        ISelection selection = TreeUtil.getNewSelection(fTreeViewer.getSelection(), newInput);
+
+        /*
+         * Get currently expanded nodes
+         */
+        Object[] expandedElements = fTreeViewer.getExpandedElements();
+        Set<String> expandedPaths = new HashSet<>();
+        for (Object element : expandedElements) {
+            if (element instanceof ITmfTreeViewerEntry) {
+                expandedPaths.add(TreeUtil.getPath((ITmfTreeViewerEntry) element).toString());
             }
         }
-    }
-
-    private static Deque<String> getPath(@NonNull ITmfTreeViewerEntry entry) {
-        Deque<String> retVal = new ArrayDeque<>();
-        ITmfTreeViewerEntry current = entry;
-        while (current.getParent() != null) {
-            retVal.addFirst(current.getName());
-            current = current.getParent();
-        }
-        return retVal;
-    }
-
-    private static ITmfTreeViewerEntry findEquivalent(@NonNull ITmfTreeViewerEntry entriesToSearch, @NonNull ITmfTreeViewerEntry selectedItem) {
-        Deque<String> path = getPath(selectedItem);
-        Iterator<String> iter = path.iterator();
-        ITmfTreeViewerEntry currentEntry = entriesToSearch;
-        while (iter.hasNext()) {
-            String current = iter.next();
-            boolean found = false;
-            for (ITmfTreeViewerEntry child : currentEntry.getChildren()) {
-                if (Objects.equals(child.getName(), current)) {
-                    found = true;
-                    currentEntry = child;
-                    break;
-                }
-            }
-            if (!found) {
-                return null;
-            }
-
-        }
-        return currentEntry;
-    }
-
-    private void add(Collection<String> collection, @NonNull ITmfTreeViewerEntry entry) {
-        collection.add(getPath(entry).toString());
-        for (ITmfTreeViewerEntry child : entry.getChildren()) {
-            if (child.hasChildren()) {
-                add(collection, child);
+        // It's a salad
+        Set<@NonNull ITmfTreeViewerEntry> allLeafEntries = new HashSet<>();
+        Set<String> allPaths = new HashSet<>();
+        if (input instanceof ITmfTreeViewerEntry) {
+            TreeUtil.addIf(allLeafEntries, (ITmfTreeViewerEntry) input, entry -> !entry.hasChildren());
+            for (ITmfTreeViewerEntry child : ((ITmfTreeViewerEntry) input).getChildren()) {
+                TreeUtil.add(allPaths, child);
             }
         }
+        Set<String> allLeaves = allLeafEntries.stream().map(entry -> TreeUtil.getPath(entry)).map(Collection<String>::toString).collect(Collectors.toSet());
+        /*
+         * All the current nodes minus currently expanded are collapsed, so if
+         * an entry is included in the expanded list or it is NOT present in in
+         * the previous list, expand it. Basically collapse all that was
+         * previously collapsed.
+         *
+         * Also, make sure all new children are auto-expanded.
+         */
+        Set<@NonNull ITmfTreeViewerEntry> newExpanded = new HashSet<>();
+        TreeUtil.addIf(newExpanded, newInput, (ITmfTreeViewerEntry entry) -> {
+            String key = TreeUtil.getPath(entry).toString();
+            return (expandedPaths.contains(key) || !allPaths.contains(key)) || allLeaves.contains(key);
+        });
+
+        fTreeViewer.setInput(newInput);
+        contentChanged(newInput);
+
+        /*
+         * Reset Selection
+         */
+        if (!selection.isEmpty()) {
+            fTreeViewer.setSelection(selection, true);
+        }
+
+        /*
+         * Reset Expanded
+         */
+        fTreeViewer.setExpandedElements(newExpanded.toArray());
     }
 
     /**

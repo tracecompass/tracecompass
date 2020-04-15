@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -170,6 +171,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         super(parent, checkboxTree.getViewer());
 
         TreeViewer treeViewer = checkboxTree.getViewer();
+        treeViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
         treeViewer.setComparator(COMPARATOR);
         if (treeViewer instanceof CheckboxTreeViewer) {
             ((CheckboxTreeViewer) treeViewer).addCheckStateListener(new CheckStateChangedListener());
@@ -389,9 +391,9 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     private void updateTree(ITmfTrace trace, long start, long end, List<@NonNull ITmfTreeDataModel> model) {
         try (FlowScopeLog parentScope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "AbstractSelectTreeViewer:TreeUpdateRequested" ) //$NON-NLS-1$
                 .setCategory(fLogCategory).build()) {
-            final ITmfTreeViewerEntry rootEntry = modelToTree(start, end, model);
+            final ITmfTreeViewerEntry newRootEntry = modelToTree(start, end, model);
             /* Set the input in main thread only if it didn't change */
-            if (rootEntry != null) {
+            if (newRootEntry != null) {
                 Display.getDefault().asyncExec(() -> {
                     try (FlowScopeLog scope = new FlowScopeLogBuilder(LOGGER, Level.FINE, "AbstractSelectTreeViewer:TreeUpdate").setParentScope(parentScope).build()) { //$NON-NLS-1$
 
@@ -402,10 +404,10 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
                         if (treeViewer.getControl().isDisposed()) {
                             return;
                         }
-                        Object input = treeViewer.getInput();
-                        if (!(input instanceof ITmfTreeViewerEntry) || !treeEquals(rootEntry, (ITmfTreeViewerEntry) input)) {
-                            treeViewer.setInput(rootEntry);
-                            contentChanged(rootEntry);
+
+                        Object currentRootEntry = treeViewer.getInput();
+                        if (!(currentRootEntry instanceof ITmfTreeViewerEntry) || !treeEquals(newRootEntry, (ITmfTreeViewerEntry) currentRootEntry)) {
+                            updateTreeUI(treeViewer, newRootEntry);
                         } else {
                             treeViewer.refresh();
                         }
