@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2007, 2019 Intel Corporation and others
+ * Copyright (c) 2007, 2020 Intel Corporation and others
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
@@ -3279,8 +3279,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             int nameWidth = fTimeProvider.getNameSpace();
             if (e.x > nameWidth && size.x > nameWidth && fDragX != e.x) {
                 fDragX = e.x;
-                double pixelsPerNanoSec = (size.x - nameWidth <= RIGHT_MARGIN) ? 0 : (double) (size.x - nameWidth - RIGHT_MARGIN) / (fTime1bak - fTime0bak);
-                long timeDelta = (long) ((pixelsPerNanoSec == 0) ? 0 : ((fDragX - fDragX0) / pixelsPerNanoSec));
+                long timeDelta = getTimeAtX(fDragX) - getTimeAtX(fDragX0);
                 long time1 = fTime1bak - timeDelta;
                 long maxTime = fTimeProvider.getMaxTime();
                 if (time1 > maxTime) {
