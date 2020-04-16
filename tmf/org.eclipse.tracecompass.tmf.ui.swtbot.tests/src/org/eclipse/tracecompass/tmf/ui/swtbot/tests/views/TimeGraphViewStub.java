@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -203,12 +203,12 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
     /**
      * Set the presentation provider
      *
-     * @param presentaitonProvider
+     * @param presentationProvider
      *            the presentation provider
      */
-    public void setPresentationProvider(StubPresentationProvider presentaitonProvider) {
-        fPresentationProvider = presentaitonProvider;
-        getTimeGraphViewer().setTimeGraphProvider(presentaitonProvider);
+    public void setPresentationProvider(StubPresentationProvider presentationProvider) {
+        fPresentationProvider = presentationProvider;
+        getTimeGraphViewer().setTimeGraphProvider(presentationProvider);
         refresh();
     }
 
@@ -223,9 +223,9 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
         List<@NonNull ITimeEvent> ret = new ArrayList<>();
         if (references != null) {
             for (ITimeEvent ref : references) {
-                long start = ref.getTime();
+                long start = ref.getTime() + trace.getStartTime().toNanos();
                 long end = start + ref.getDuration();
-                if (((start >= startTime) && (start <= endTime)) || (end >= startTime) && end <= endTime) {
+                if (start <= endTime && end >= startTime) {
                     if (ref instanceof NullTimeEvent) {
                         ret.add(new NullTimeEvent(ref.getEntry(), ref.getTime() + trace.getStartTime().toNanos(), ref.getDuration()));
                     } else if (ref instanceof TimeLineEvent) {

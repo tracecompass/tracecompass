@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017, 2019 Ericsson
+ * Copyright (c) 2017, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -44,7 +45,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
-import org.eclipse.swtbot.swt.finder.results.IntResult;
+import org.eclipse.swtbot.swt.finder.results.ListResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
@@ -686,7 +687,7 @@ public class TimeGraphViewTest {
 
         resetTimeRange();
         SWTBotTimeGraph timegraph = fTimeGraph;
-        assertEquals(totalItems, getVisibleItems(timegraph));
+        assertEquals(totalItems, getVisibleItems(timegraph).size());
 
         SWTBotTimeGraphEntry[] entries = null;
         entries = timegraph.getEntries();
@@ -695,26 +696,26 @@ public class TimeGraphViewTest {
 
         timegraph.collapseAll();
         entries = timegraph.getEntries();
-        assertEquals(3, getVisibleItems(timegraph));
+        assertEquals(3, getVisibleItems(timegraph).size());
 
         timegraph.getEntry(pg).select();
         fireKey(timegraph, true, '+');
-        assertEquals(10, getVisibleItems(timegraph));
+        assertEquals(10, getVisibleItems(timegraph).size());
 
         timegraph.getEntry(pg).select();
         fireKey(timegraph, true, '-');
-        assertEquals(3, getVisibleItems(timegraph));
+        assertEquals(3, getVisibleItems(timegraph).size());
 
         timegraph.getEntry(hpc).select();
         fireKey(timegraph, true, '+');
-        assertEquals(10, getVisibleItems(timegraph));
+        assertEquals(10, getVisibleItems(timegraph).size());
         assertNotNull(timegraph.getEntry(hpc, element));
 
         timegraph.getEntry(pg).select();
         fireKey(timegraph, true, '*');
         timegraph.getEntry(hpc).select();
         fireKey(timegraph, true, '*');
-        assertEquals(totalItems, getVisibleItems(timegraph));
+        assertEquals(totalItems, getVisibleItems(timegraph).size());
         assertNotNull(timegraph.getEntry(hpc, element));
     }
 
@@ -857,23 +858,23 @@ public class TimeGraphViewTest {
         timegraph.getEntry(pg).select();
 
         assertEquals(1, timegraph.selection().columnCount());
-        assertEquals(17, getVisibleItems(timegraph));
+        assertEquals(17, getVisibleItems(timegraph).size());
 
         fireKey(timegraph, true, SWT.CR);
         assertEquals(1, timegraph.selection().columnCount());
         assertEquals('[' + pg + ']', timegraph.selection().get(0).toString());
-        assertEquals(10, getVisibleItems(timegraph));
+        assertEquals(10, getVisibleItems(timegraph).size());
 
         fireKey(timegraph, true, SWT.CR);
         assertEquals(1, timegraph.selection().columnCount());
         assertEquals('[' + pg + ']', timegraph.selection().get(0).toString());
-        assertEquals(17, getVisibleItems(timegraph));
+        assertEquals(17, getVisibleItems(timegraph).size());
 
         timegraph.getEntry(pg, "Hat1").select();
         fireKey(timegraph, true, SWT.CR);
         assertEquals(1, timegraph.selection().columnCount());
         assertEquals("[Hat1]", timegraph.selection().get(0).toString());
-        assertEquals(17, getVisibleItems(timegraph));
+        assertEquals(17, getVisibleItems(timegraph).size());
     }
 
     /**
@@ -1122,8 +1123,6 @@ public class TimeGraphViewTest {
         assertTrue("Count of \"HAT\" did not decrease to non-zero", filteredHatCount < refHatCount && filteredHatCount > 0);
         assertTrue("Count of \"HAIR\" did not decrease to zero", filteredHairCount < refHairCount && filteredHairCount == 0);
 
-        int count = getVisibleItems(timegraph);
-
         dialogShell = viewBot.shell("Time Event Filter").activate();
         shellBot = dialogShell.bot();
         text = shellBot.text();
@@ -1131,9 +1130,8 @@ public class TimeGraphViewTest {
         SWTBotUtils.pressShortcut(text, Keystrokes.CR);
 
         bot.waitWhile(fTimeGraphIsDirty);
-        int newCount = getVisibleItems(timegraph);
-        assertTrue("Fewer entries should be visible here. Current value is " + newCount + " previous was " + count, newCount < count);
-
+        List<String> visibleItems = getVisibleItems(timegraph);
+        assertEquals("Fewer entries should be visible here: " + visibleItems, 3, visibleItems.size());
     }
 
     /**
@@ -1150,22 +1148,20 @@ public class TimeGraphViewTest {
 
         /* set time range */
         setWindowRange(49L, 75L);
+        List<String> visibleItems = getVisibleItems(timegraph);
+        assertEquals("All entries should be visible here: " + visibleItems, 17, visibleItems.size());
 
         /* hide empty rows (includes a row with only 1 marker) */
-        int count = getVisibleItems(timegraph);
         fViewBot.toolbarButton("Hide Empty Rows").click();
         bot.waitWhile(fTimeGraphIsDirty);
-        int newCount = getVisibleItems(timegraph);
-        assertTrue("Fewer entries should be visible here. Current value is " + newCount + " previous was " + count, newCount < count);
+        visibleItems = getVisibleItems(timegraph);
+        assertEquals("Fewer entries should be visible here: " + visibleItems, 10, visibleItems.size());
 
         /* change time range to exclude row with markers */
-        count = newCount;
-
-        setWindowRange(50L, 75L);
-
+        setWindowRange(51L, 75L);
         bot.waitWhile(fTimeGraphIsDirty);
-        newCount = getVisibleItems(timegraph);
-        assertTrue("Fewer entries should be visible here. Current value is " + newCount + " previous was " + count, newCount < count);
+        visibleItems = getVisibleItems(timegraph);
+        assertEquals("Fewer entries should be visible here: " + visibleItems, 9, visibleItems.size());
 
         /* add a time events filter */
         timegraph.setFocus();
@@ -1174,7 +1170,6 @@ public class TimeGraphViewTest {
         // Press '/' to open the filter dialog
         timegraph.pressShortcut(KeyStroke.getInstance('/'));
 
-        count = newCount;
         SWTBot viewBot = fViewBot.bot();
         SWTBotShell dialogShell = viewBot.shell("Time Event Filter").activate();
         SWTBot shellBot = dialogShell.bot();
@@ -1183,42 +1178,40 @@ public class TimeGraphViewTest {
         text.setFocus();
         SWTBotUtils.pressShortcut(text, Keystrokes.CR);
         bot.waitWhile(fTimeGraphIsDirty);
-        newCount = getVisibleItems(timegraph);
-        assertTrue("Fewer entries should be visible here. Current value is " + newCount + " previous was " + count, newCount < count);
+        visibleItems = getVisibleItems(timegraph);
+        assertEquals("Fewer entries should be visible here: " + visibleItems, 2, visibleItems.size());
 
         /* show also empty rows */
-        count = newCount;
         fViewBot.toolbarButton("Hide Empty Rows").click();
         bot.waitWhile(fTimeGraphIsDirty);
-        newCount = getVisibleItems(timegraph);
         /* All rows will be filtered by time events filter */
-        assertTrue("Same number of entries should be visible here. Current value is " + newCount + " previous was " + count, newCount == count);
+        visibleItems = getVisibleItems(timegraph);
+        assertEquals("Same number of entries should be visible here: " + visibleItems, 2, visibleItems.size());
 
         /* remove time events filter */
-        count = newCount;
         dialogShell = viewBot.shell("Time Event Filter").activate();
         shellBot = dialogShell.bot();
         SWTBotButton button = shellBot.buttonWithTooltip("Close (Esc)");
         button.click();
         bot.waitWhile(fTimeGraphIsDirty);
-        newCount = getVisibleItems(timegraph);
-        assertTrue("more number of entries should be visible here. Current value is " + newCount + " previous was " + count, newCount > count);
+        visibleItems = getVisibleItems(timegraph);
+        assertEquals("All entries should be visible here: " + visibleItems, 17, visibleItems.size());
     }
 
-    private static int getVisibleItems(SWTBotTimeGraph timegraph) {
-        return UIThreadRunnable.syncExec(Display.getDefault(), new IntResult() {
+    private static List<String> getVisibleItems(SWTBotTimeGraph timegraph) {
+        return UIThreadRunnable.syncExec(Display.getDefault(), new ListResult<String>() {
             @Override
-            public Integer run() {
-                int count = 0;
+            public List<String> run() {
+                List<String> visibleItems = new ArrayList<>();
                 TimeGraphControl control = timegraph.widget;
                 ITimeGraphEntry[] expandedElements = control.getExpandedElements();
                 for (ITimeGraphEntry entry : expandedElements) {
                     Rectangle itemBounds = control.getItemBounds(entry);
                     if (itemBounds.height > 0) {
-                        count++;
+                        visibleItems.add(entry.getName());
                     }
                 }
-                return count;
+                return visibleItems;
             }
         });
     }
