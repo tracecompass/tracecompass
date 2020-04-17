@@ -24,6 +24,7 @@ import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry.DisplayStyle;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.MarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
@@ -95,6 +96,12 @@ class StubPresentationProvider extends TimeGraphPresentationProvider {
             return ((TimeEvent) event).getValue();
         }
         return -1;
+    }
+
+    @Override
+    public int getItemHeight(ITimeGraphEntry entry) {
+        int itemHeight = super.getItemHeight(entry);
+        return entry.getParent() == null ? itemHeight + 3 : itemHeight;
     }
 
     @Override
