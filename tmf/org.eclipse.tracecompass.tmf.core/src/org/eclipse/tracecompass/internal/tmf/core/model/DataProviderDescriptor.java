@@ -65,6 +65,21 @@ public class DataProviderDescriptor implements IDataProviderDescriptor {
         return fDescription;
     }
 
+    @Override
+    public boolean equals(@Nullable Object arg0) {
+        if (!(arg0 instanceof DataProviderDescriptor)) {
+            return false;
+        }
+        DataProviderDescriptor other = (DataProviderDescriptor) arg0;
+        return Objects.equals(fName, other.fName) && Objects.equals(fId, other.fId)
+                && Objects.equals(fType, other.fType) && Objects.equals(fDescription, other.fDescription);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fName, fId, fType, fDescription);
+    }
+
     /**
      * A builder class to build instances implementing interface {@link IDataProviderDescriptor}
      */
