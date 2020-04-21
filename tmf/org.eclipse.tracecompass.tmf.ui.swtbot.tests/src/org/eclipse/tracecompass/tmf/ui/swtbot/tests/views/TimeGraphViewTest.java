@@ -1139,7 +1139,6 @@ public class TimeGraphViewTest {
      */
     @Test
     public void testHideEmptyRows() {
-        SWTWorkbenchBot bot = fBot;
         resetTimeRange();
 
         SWTBotTimeGraph timegraph = fTimeGraph;
@@ -1148,20 +1147,15 @@ public class TimeGraphViewTest {
 
         /* set time range */
         setWindowRange(49L, 75L);
-        List<String> visibleItems = getVisibleItems(timegraph);
-        assertEquals("All entries should be visible here: " + visibleItems, 17, visibleItems.size());
+        SWTBotUtils.waitUntil(tg -> getVisibleItems(tg).size() == 17, timegraph, () -> "All entries should be visible here: " + getVisibleItems(timegraph));
 
         /* hide empty rows (includes a row with only 1 marker) */
         fViewBot.toolbarButton("Hide Empty Rows").click();
-        bot.waitWhile(fTimeGraphIsDirty);
-        visibleItems = getVisibleItems(timegraph);
-        assertEquals("Fewer entries should be visible here: " + visibleItems, 10, visibleItems.size());
+        SWTBotUtils.waitUntil(tg -> getVisibleItems(tg).size() == 10, timegraph, () -> "Fewer entries should be visible here: " + getVisibleItems(timegraph));
 
         /* change time range to exclude row with markers */
         setWindowRange(51L, 75L);
-        bot.waitWhile(fTimeGraphIsDirty);
-        visibleItems = getVisibleItems(timegraph);
-        assertEquals("Fewer entries should be visible here: " + visibleItems, 9, visibleItems.size());
+        SWTBotUtils.waitUntil(tg -> getVisibleItems(tg).size() == 9, timegraph, () -> "Fewer entries should be visible here: " + getVisibleItems(timegraph));
 
         /* add a time events filter */
         timegraph.setFocus();
@@ -1177,25 +1171,19 @@ public class TimeGraphViewTest {
         text.setText("Head3");
         text.setFocus();
         SWTBotUtils.pressShortcut(text, Keystrokes.CR);
-        bot.waitWhile(fTimeGraphIsDirty);
-        visibleItems = getVisibleItems(timegraph);
-        assertEquals("Fewer entries should be visible here: " + visibleItems, 2, visibleItems.size());
+        SWTBotUtils.waitUntil(tg -> getVisibleItems(tg).size() == 2, timegraph, () -> "Fewer entries should be visible here: " + getVisibleItems(timegraph));
 
         /* show also empty rows */
         fViewBot.toolbarButton("Hide Empty Rows").click();
-        bot.waitWhile(fTimeGraphIsDirty);
         /* All rows will be filtered by time events filter */
-        visibleItems = getVisibleItems(timegraph);
-        assertEquals("Same number of entries should be visible here: " + visibleItems, 2, visibleItems.size());
+        SWTBotUtils.waitUntil(tg -> getVisibleItems(tg).size() == 2, timegraph, () -> "Same number of entries should be visible here: " + getVisibleItems(timegraph));
 
         /* remove time events filter */
         dialogShell = viewBot.shell("Time Event Filter").activate();
         shellBot = dialogShell.bot();
         SWTBotButton button = shellBot.buttonWithTooltip("Close (Esc)");
         button.click();
-        bot.waitWhile(fTimeGraphIsDirty);
-        visibleItems = getVisibleItems(timegraph);
-        assertEquals("All entries should be visible here: " + visibleItems, 17, visibleItems.size());
+        SWTBotUtils.waitUntil(tg -> getVisibleItems(tg).size() == 17, timegraph, () -> "All entries should be visible here: " + getVisibleItems(timegraph));
     }
 
     private static List<String> getVisibleItems(SWTBotTimeGraph timegraph) {
