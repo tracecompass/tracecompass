@@ -11,6 +11,8 @@
 
 package org.eclipse.tracecompass.tmf.core.presentation;
 
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
@@ -323,4 +325,19 @@ public class RGBAColor {
         }
         return -1;
     }
+
+    @Override
+    public boolean equals(@Nullable Object arg0) {
+        if (!(arg0 instanceof RGBAColor)) {
+            return false;
+        }
+        RGBAColor other = (RGBAColor) arg0;
+        return fRed == other.fRed && fBlue == other.fBlue && fGreen == other.fGreen && fAlpha == other.fAlpha;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fRed, fGreen, fBlue, fAlpha);
+    }
+
 }
