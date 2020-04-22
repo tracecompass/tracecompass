@@ -724,30 +724,45 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
         // can be either in the data provider itself or before calling it. It
         // will avoid the creation of filters and the content of the map can be
         // use directly.
-        SelectionTimeQueryFilter filter = FetchParametersUtils.createSelectionTimeQuery(fetchParameters);
-        if (filter == null) {
+        List<@NonNull Long> selected = DataProviderParameterUtils.extractSelectedItems(fetchParameters);
+        List<@NonNull Long> times = DataProviderParameterUtils.extractTimeRequested(fetchParameters);
+        if (times == null || times.isEmpty() || selected == null || selected.isEmpty()) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
         }
-        Integer quark = fQuarkMap.get(filter.getSelectedItems().iterator().next());
+        Integer quark = fQuarkMap.get(selected.get(0));
         if (quark == null) {
             return new TmfModelResponse<>(null, status, statusMessage);
         }
-        long start = filter.getStart();
+        long start = times.get(0);
         try {
-            List<@NonNull ITmfStateInterval> states = ss.queryFullState(start);
             int currentCpuRqQuark = ss.optQuarkRelative(quark, Attributes.CURRENT_CPU_RQ);
             if (currentCpuRqQuark == ITmfStateSystem.INVALID_ATTRIBUTE || start < ss.getStartTime() || start > ss.getCurrentEndTime()) {
                 return new TmfModelResponse<>(null, status, statusMessage);
             }
+
+            ITmfStateInterval mainInterval = null;
+            ITmfStateInterval currentCpuInterval = null;
+            for (ITmfStateInterval interval : ss.query2D(ImmutableList.of(quark, currentCpuRqQuark), Collections.singleton(start))) {
+                if (interval.getAttribute() == quark) {
+                    mainInterval = interval;
+                    continue;
+                }
+                currentCpuInterval = interval;
+            }
+
+            if (mainInterval == null || currentCpuInterval == null) {
+                return new TmfModelResponse<>(null, status, statusMessage);
+            }
+
             ITmfCallsiteResolver csAnalysis = TmfTraceUtils.getAnalysisModuleOfClass(getTrace(), CallsiteAnalysis.class, CallsiteAnalysis.ID);
-            Object value = states.get(currentCpuRqQuark).getValue();
+            Object value = currentCpuInterval.getValue();
 
             if (value instanceof Integer) {
                 String cpuId = String.valueOf(value);
                 Map<String, String> returnValue = new LinkedHashMap<>();
                 returnValue.put(TmfStrings.cpu(), cpuId);
                 if (csAnalysis != null) {
-                    Object cpuThreadObj = states.get(quark).getValue();
+                    Object cpuThreadObj = mainInterval.getValue();
                     if (cpuThreadObj instanceof Integer && Objects.equals(ProcessStatus.RUN_SYTEMCALL.getStateValue().unboxInt(), cpuThreadObj)) {
                         ITmfTrace trace = getTrace();
                         for (ITmfEventAspect<?> aspect : trace.getEventAspects()) {
@@ -774,7 +789,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
         Multimap<@NonNull String, @NonNull Object> data = ITimeGraphStateFilter.mergeMultimaps(ITimeGraphDataProvider.super.getFilterData(entryId, time, monitor),
                 fEntryMetadata.getOrDefault(entryId, ImmutableMultimap.of()));
         Map<@NonNull String, @NonNull Object> parameters = ImmutableMap.of(DataProviderParameterUtils.REQUESTED_TIME_KEY, Collections.singletonList(time),
-                DataProviderParameterUtils.REQUESTED_ELEMENT_KEY, Collections.singleton(Objects.requireNonNull(entryId)));
+                DataProviderParameterUtils.REQUESTED_ITEMS_KEY, Collections.singleton(Objects.requireNonNull(entryId)));
         TmfModelResponse<Map<String, String>> response = fetchTooltip(parameters, monitor);
         Map<@NonNull String, @NonNull String> model = response.getModel();
         if (model != null) {
