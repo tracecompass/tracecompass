@@ -144,7 +144,22 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
     @Override
     public void loadTrace(ITmfTrace trace) {
         super.loadTrace(trace);
-        fXYPresentationProvider.putIfAbsent(trace, new XYPresentationProvider());
+        fXYPresentationProvider.putIfAbsent(trace, createPresentationProvider(trace));
+    }
+
+    /**
+     * Create a new presentation provider for this XY viewer. Sub-classes can
+     * overwrite this method to provide specific XY presentation provider
+     * instances.
+     *
+     * @param trace
+     *            The trace to get the provider for
+     *
+     * @return A new presentation provider
+     * @since 6.0
+     */
+    protected IXYPresentationProvider createPresentationProvider(ITmfTrace trace) {
+        return new XYPresentationProvider();
     }
 
     @Override
