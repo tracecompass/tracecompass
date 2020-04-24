@@ -296,6 +296,7 @@ public class SelectTracesWizardPage extends WizardPage {
         // Populate the list of traces to choose from
         Set<String> keys = fPreviousTraces.keySet();
         TmfTraceFolder traceFolder = fProject.getTracesFolder();
+        fCheckboxTreeViewer.setUseHashlookup(true);
         fCheckboxTreeViewer.setInput(traceFolder);
 
         // Set the checkbox for the traces already included
@@ -306,7 +307,6 @@ public class SelectTracesWizardPage extends WizardPage {
             setSubtreeChecked(element, event.getChecked());
             maintainCheckIntegrity(element);
         });
-        fCheckboxTreeViewer.setUseHashlookup(true);
         return fCheckboxTreeViewer;
     }
 
