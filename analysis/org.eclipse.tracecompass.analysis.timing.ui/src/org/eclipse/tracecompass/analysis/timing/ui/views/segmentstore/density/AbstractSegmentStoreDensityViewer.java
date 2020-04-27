@@ -153,7 +153,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
     /**
      * Set the type of series you want
      * @param type the type, bar or area
-     * @since 4.0
+     * @since 4.1
      */
     protected void setType(String type) {
         switch (type) {
