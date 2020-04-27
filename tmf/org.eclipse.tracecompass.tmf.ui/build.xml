@@ -23,7 +23,6 @@
   <echo message="Verifying target platform: ${targetPlatform}"/>
   <condition property="platformCss" value="e4-dark.css" else="e4-dark_linux.css">
     <or>
-      <equals arg1="${targetPlatform}" arg2="tracecompass-e4.6" />
       <equals arg1="${targetPlatform}" arg2="tracecompass-e4.7" />
       <equals arg1="${targetPlatform}" arg2="tracecompass-e4.8" />
       <equals arg1="${targetPlatform}" arg2="tracecompass-e4.9" />

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2015 Ericsson
+ * Copyright (c) 2011, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -32,7 +32,6 @@ import org.eclipse.cdt.dsf.concurrent.IDsfStatusConstants;
 import org.eclipse.cdt.dsf.concurrent.Query;
 import org.eclipse.cdt.dsf.datamodel.DMContexts;
 import org.eclipse.cdt.dsf.datamodel.IDMContext;
-import org.eclipse.cdt.dsf.debug.service.IBreakpoints;
 import org.eclipse.cdt.dsf.debug.service.IBreakpoints.IBreakpointsTargetDMContext;
 import org.eclipse.cdt.dsf.debug.service.IRunControl.IContainerDMContext;
 import org.eclipse.cdt.dsf.debug.service.command.ICommandControlService;
@@ -451,7 +450,7 @@ public class DsfGdbAdaptor {
                                 }
 
                                 CommandFactory cmdFactory = commandService.getCommandFactory();
-                                IBreakpoints bpService = tracker.getService(MIBreakpoints.class);
+                                MIBreakpoints bpService = tracker.getService(MIBreakpoints.class);
                                 if (cmdFactory == null || bpService == null) {
                                     drm.setStatus(new Status(IStatus.ERROR, GdbPlugin.PLUGIN_ID, IDsfStatusConstants.INTERNAL_ERROR, "Could not find necessary services", null)); //$NON-NLS-1$
                                     drm.done();
@@ -465,11 +464,10 @@ public class DsfGdbAdaptor {
                                     protected void handleSuccess() {
                                         MIBreakpoint[] breakpoints = getData().getMIBreakpoints();
                                         for (int i = 0; i < breakpoints.length; i++) {
-                                            // Use deprecated constructor for Neon backward compatibility
-                                            MIBreakpointDMData breakpoint = new MIBreakpointDMData(breakpoints[i]);
+                                            MIBreakpointDMData breakpoint = bpService.createMIBreakpointDMData(breakpoints[i]);
                                             String type = breakpoint.getBreakpointType();
                                             // Only save info if the current breakpoint is of type tracepoint
-                                            if(type.compareTo(MIBreakpoints.TRACEPOINT) == 0 ) {
+                                            if (type.compareTo(MIBreakpoints.TRACEPOINT) == 0 ) {
                                                 fTpInfo.put(Integer.valueOf(breakpoint.getReference()), breakpoint);
                                             }
                                         }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * Copyright (c) 2014, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -14,13 +14,12 @@
 
 package org.eclipse.tracecompass.tmf.ui.project.model;
 
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 
 /**
  * Viewer sorter for TMF project model elements
  */
-// Use deprecated base class for Neon backward compatibility
-public class TmfViewerSorter extends ViewerSorter {
+public class TmfViewerSorter extends ViewerComparator {
 
     private static int UNSET_PRIO = Integer.MAX_VALUE;
     private static int EXPERIMENT_FOLDER_PRIO = 0;

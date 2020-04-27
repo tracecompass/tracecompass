@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -13,11 +13,11 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.events;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -57,6 +57,8 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfContext;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -105,13 +107,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
      */
     private static final AtomicLong fAtomicLong = new AtomicLong();
 
-    /**
-     * Two lists are used in this case instead of a BiHashMap from Guava to
-     * accommodate the fact that the version of Guava used in Neon doesn't
-     * guaranteed a key insertion order for BiHashMap.
-     */
-    private static final Map<Long, ITmfEventAspect<?>> fIdToAspectMap = new LinkedHashMap<>();
-    private static final Map<ITmfEventAspect<?>, Long> fAspectToIdMap = new HashMap<>();
+    private static final BiMap<ITmfEventAspect<?>, Long> fAspectToIdMap = HashBiMap.create();
 
     /**
      * To optimize filtered request a map of index to rank is used to find the
@@ -145,7 +141,6 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         for (ITmfEventAspect<?> aspect : getTraceAspects(getTrace())) {
             synchronized (fAspectToIdMap) {
                 long id = fAspectToIdMap.computeIfAbsent(aspect, a -> fAtomicLong.getAndIncrement());
-                fIdToAspectMap.putIfAbsent(id, aspect);
                 model.add(new TmfEventTableColumnDataModel(id, -1, Collections.singletonList(aspect.getName()), aspect.getHelpText(), aspect.isHiddenByDefault()));
             }
         }
@@ -453,7 +448,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         Map<Long, ITmfEventAspect<?>> aspects = new LinkedHashMap<>();
         if (!desiredColumns.isEmpty()) {
             for (Long columnsId : desiredColumns) {
-                ITmfEventAspect<?> aspect = fIdToAspectMap.get(columnsId);
+                ITmfEventAspect<?> aspect = fAspectToIdMap.inverse().get(columnsId);
                 if (aspect != null) {
                     aspects.put(columnsId, aspect);
                 }
@@ -461,7 +456,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
             return aspects;
         }
 
-        return fIdToAspectMap;
+        return Objects.requireNonNull(fAspectToIdMap.inverse());
     }
 
     private static @Nullable ITmfFilter extractFilter(Map<String, Object> fetchParameters) {
@@ -479,7 +474,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
             if (filterMap != null && !filterMap.isEmpty()) {
                 for (Entry<Long, String> filterEntry : filterMap.entrySet()) {
                     TmfFilterMatchesNode filterNode = new TmfFilterMatchesNode(null);
-                    ITmfEventAspect<?> aspect = fIdToAspectMap.get(filterEntry.getKey());
+                    ITmfEventAspect<?> aspect = fAspectToIdMap.inverse().get(filterEntry.getKey());
                     if (aspect == null) {
                         return null;
                     }
@@ -518,7 +513,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
             TmfFilterRootNode rootFilter = new TmfFilterRootNode();
             for (Entry<Long, String> searchEntry : searchMap.entrySet()) {
                 TmfFilterMatchesNode searchNode = new TmfFilterMatchesNode(rootFilter);
-                ITmfEventAspect<?> aspect = fIdToAspectMap.get(searchEntry.getKey());
+                ITmfEventAspect<?> aspect = fAspectToIdMap.inverse().get(searchEntry.getKey());
                 if (aspect == null) {
                     return null;
                 }
