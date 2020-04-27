@@ -379,6 +379,15 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
 
         createProviderColumns();
 
+        /*
+         * If the listener is null then the table is updated from another viewer.
+         * Otherwise this class is responsible to load the trace.
+         */
+        SegmentStoreProviderProgressListener listener = fListener;
+        if (listener == null) {
+            return;
+        }
+
         ISegmentStore<ISegment> segStore = provider.getSegmentStore();
         // If results are not null, then the segment of the provider is ready
         // and model can be updated
@@ -449,10 +458,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         // If results are null, then add completion listener and if the provider
         // is an analysis, run the analysis
         updateModel(null);
-        SegmentStoreProviderProgressListener listener = fListener;
-        if (listener != null) {
-            provider.addListener(listener);
-        }
+        provider.addListener(listener);
         if (provider instanceof IAnalysisModule) {
             ((IAnalysisModule) provider).schedule();
         }
