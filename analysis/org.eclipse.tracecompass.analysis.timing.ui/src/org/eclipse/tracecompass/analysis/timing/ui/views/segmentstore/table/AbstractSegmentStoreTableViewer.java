@@ -56,7 +56,9 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgr
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
+import org.eclipse.tracecompass.internal.analysis.timing.ui.Activator;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.table.Messages;
 import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.table.SegmentStoreContentProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
@@ -102,6 +104,7 @@ import com.google.common.collect.Multimap;
  */
 public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableViewer {
 
+    private static final int MAX_ITEMS = 65535;
     private static final Format FORMATTER = new DecimalFormat("###,###.##"); //$NON-NLS-1$
     private static final Logger LOGGER = TraceCompassLog.getLogger(AbstractSegmentStoreTableViewer.class);
 
@@ -305,42 +308,52 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
     public void updateModel(final @Nullable Object dataInput) {
         final TableViewer tableViewer = getTableViewer();
         Display.getDefault().asyncExec(() -> {
-            if (!tableViewer.getTable().isDisposed()) {
-                // Go to the top of the table
-                tableViewer.getTable().setTopIndex(0);
-                ISelection selection = tableViewer.getSelection();
-                ISegment selected = null;
-                if (!selection.isEmpty() && selection instanceof StructuredSelection) {
-                    Object firstElement = ((StructuredSelection) selection).getFirstElement();
-                    if (firstElement instanceof ISegment) {
-                        selected = (ISegment) firstElement;
-                    }
-                }
-                // Reset selected row
-                if (dataInput == null) {
-                    tableViewer.setSelection(StructuredSelection.EMPTY);
-                    tableViewer.setInput(null);
-                    tableViewer.setItemCount(0);
-                    return;
-                }
-                addPackListener();
-                tableViewer.setInput(dataInput);
-                SegmentStoreContentProvider contentProvider = (SegmentStoreContentProvider) getTableViewer().getContentProvider();
-                tableViewer.setItemCount((int) Math.min(Integer.MAX_VALUE, contentProvider.getSegmentCount()));
-                boolean found = false;
-                if (selected != null && dataInput instanceof ISegmentStore<?>) {
-                    ISegmentStore<?> store = (ISegmentStore<?>) dataInput;
-                    for (ISegment segment : store.getIntersectingElements(selected.getEnd())) {
-                        if (isSameish(segment, selected)) {
-                            selection = new StructuredSelection(segment);
-                            tableViewer.setSelection(selection, true);
-                            found = true;
-                            break;
+            try (ScopeLog sl = new ScopeLog(LOGGER, Level.FINE, "updateModel")) { //$NON-NLS-1$
+                if (!tableViewer.getTable().isDisposed()) {
+                    // Go to the top of the table
+                    tableViewer.getTable().setTopIndex(0);
+                    ISelection selection = tableViewer.getSelection();
+                    ISegment selected = null;
+                    if (!selection.isEmpty() && selection instanceof StructuredSelection) {
+                        Object firstElement = ((StructuredSelection) selection).getFirstElement();
+                        if (firstElement instanceof ISegment) {
+                            selected = (ISegment) firstElement;
                         }
                     }
-                }
-                if (!found) {
-                    tableViewer.setSelection(StructuredSelection.EMPTY);
+                    // Reset selected row
+                    if (dataInput == null) {
+                        tableViewer.setSelection(StructuredSelection.EMPTY);
+                        tableViewer.setInput(null);
+                        tableViewer.setItemCount(0);
+                        return;
+                    }
+                    addPackListener();
+                    tableViewer.setInput(dataInput);
+                    SegmentStoreContentProvider contentProvider = (SegmentStoreContentProvider) getTableViewer().getContentProvider();
+                    long segmentCount = contentProvider.getSegmentCount();
+                    String contentProviderName = contentProvider.getClass().getSimpleName();
+                    TraceCompassLogUtils.traceCounter(LOGGER, Level.FINE, "SegmentStoreTableViewer#updateModel", contentProviderName, segmentCount); //$NON-NLS-1$
+                    if (segmentCount > MAX_ITEMS) {
+                        tableViewer.setItemCount(MAX_ITEMS);
+                        Activator.getDefault().logWarning("Too many items to display for " + contentProviderName + ". Cannot display " + segmentCount + " in a reasonable timeframe."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    } else {
+                        tableViewer.setItemCount((int) segmentCount);
+                    }
+                    boolean found = false;
+                    if (selected != null && dataInput instanceof ISegmentStore<?>) {
+                        ISegmentStore<?> store = (ISegmentStore<?>) dataInput;
+                        for (ISegment segment : store.getIntersectingElements(selected.getEnd())) {
+                            if (isSameish(segment, selected)) {
+                                selection = new StructuredSelection(segment);
+                                tableViewer.setSelection(selection, true);
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!found) {
+                        tableViewer.setSelection(StructuredSelection.EMPTY);
+                    }
                 }
             }
         });
