@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2018 École Polytechnique de Montréal
+ * Copyright (c) 2014, 2020 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -688,8 +688,8 @@ public final class StateSystemUtils {
      * @since 3.0
      */
     public static List<Long> getTimes(long from, long to, long resolution) {
-        if (to < from || resolution < 0) {
-            throw new IllegalArgumentException();
+        if (to < from || to - from < 0 || resolution < 0) {
+            throw new IllegalArgumentException(String.format("from:%d, to:%d, resolution:%d", from, to, resolution)); //$NON-NLS-1$
         }
         /*
          * If resolution is 0, adjust increment to return consecutive
@@ -697,7 +697,7 @@ public final class StateSystemUtils {
          */
         long increment = Math.max(resolution, 1L);
         List<Long> times = new ArrayList<>((int) ((to - from) / increment + 1));
-        for (long t = from; t < to; t += increment) {
+        for (long t = from; t < to && t >= from; t += increment) {
             times.add(t);
         }
         times.add(to);
