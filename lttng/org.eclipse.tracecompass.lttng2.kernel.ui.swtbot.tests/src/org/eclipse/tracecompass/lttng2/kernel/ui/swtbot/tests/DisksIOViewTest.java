@@ -50,14 +50,11 @@ import org.eclipse.swtchart.LineStyle;
  */
 public class DisksIOViewTest extends XYDataProviderBaseTest {
 
-    private static final RGB READ_COLOR;
     private static final RGB WRITE_COLOR;
     static {
         List<@NonNull Pair<@NonNull String, @NonNull String>> colors = IODataPalette.getColors();
         Pair<@NonNull String, @NonNull String> pair = colors.get(0);
-        RGBAColor readRgba = Objects.requireNonNull(RGBAColor.fromString(pair.getFirst(), 255));
         RGBAColor writeRgba = Objects.requireNonNull(RGBAColor.fromString(pair.getSecond(), 255));
-        READ_COLOR = new RGB(readRgba.getRed(), readRgba.getGreen(), readRgba.getBlue());
         WRITE_COLOR = new RGB(writeRgba.getRed(), writeRgba.getGreen(), writeRgba.getBlue());
     }
 
@@ -65,7 +62,6 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
     private static final int MORE_POINTS = 100;
 
     private static final @NonNull String TITLE = "Disk I/O View";
-    private static final @NonNull String READ_SERIES_NAME = "scp_dest/8,0/read";
     private static final @NonNull String WRITE_SERIES_NAME = "scp_dest/8,0/write";
 
     private static final @NonNull ITmfTimestamp ZOOM_START_TIME = TmfTimestamp.fromNanos(1361214078967381303L);
@@ -121,13 +117,12 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
     }
 
     private void verifyChartStyle() {
-        verifySeriesStyle(READ_SERIES_NAME, ISeries.SeriesType.LINE, READ_COLOR, LineStyle.SOLID, true);
         verifySeriesStyle(WRITE_SERIES_NAME, ISeries.SeriesType.LINE, WRITE_COLOR, LineStyle.SOLID, true);
     }
 
     @Override
     protected String getMainSeriesName() {
-        return READ_SERIES_NAME;
+        return WRITE_SERIES_NAME;
     }
 
     @Override

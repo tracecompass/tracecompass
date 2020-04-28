@@ -705,9 +705,6 @@ public final class IoTestFactory {
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.DRIVER_QUEUE_LENGTH));
 
             /* Bytes read and written */
-            intervals = ImmutableList.of(new StateIntervalStub(1, 20, NULL_STATE_VALUE));
-            info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.SECTORS_READ));
-
             intervals = ImmutableList.of(new StateIntervalStub(1, 19, NULL_STATE_VALUE),
                     new StateIntervalStub(20, 20, 8));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, DEVICE_ID, Attributes.SECTORS_WRITTEN));
@@ -728,9 +725,6 @@ public final class IoTestFactory {
             intervals = ImmutableList.of(new StateIntervalStub(1, 17, NULL_STATE_VALUE),
                     new StateIntervalStub(18, 20, 16));
             info.add(new IntervalInfo(intervals, Attributes.DISKS, SECOND_DEVICE_ID, Attributes.SECTORS_READ));
-
-            intervals = ImmutableList.of(new StateIntervalStub(1, 20, NULL_STATE_VALUE));
-            info.add(new IntervalInfo(intervals, Attributes.DISKS, SECOND_DEVICE_ID, Attributes.SECTORS_WRITTEN));
 
             return info;
         }

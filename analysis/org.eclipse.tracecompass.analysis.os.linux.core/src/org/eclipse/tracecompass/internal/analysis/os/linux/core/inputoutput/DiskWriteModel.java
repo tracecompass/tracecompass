@@ -52,8 +52,6 @@ public class DiskWriteModel extends Disk {
         fSs = ss;
         int diskQuark = getQuark();
         /* Initialize the state system for this disk */
-        fSs.getQuarkRelativeAndAdd(diskQuark, Attributes.SECTORS_WRITTEN);
-        fSs.getQuarkRelativeAndAdd(diskQuark, Attributes.SECTORS_READ);
         int wqQuark = fSs.getQuarkRelativeAndAdd(diskQuark, Attributes.WAITING_QUEUE);
         fWaitingQueueAttrib = new TmfAttributePool(fSs, wqQuark, QueueType.PRIORITY);
         fSs.getQuarkRelativeAndAdd(diskQuark, Attributes.WAITING_QUEUE_LENGTH);
