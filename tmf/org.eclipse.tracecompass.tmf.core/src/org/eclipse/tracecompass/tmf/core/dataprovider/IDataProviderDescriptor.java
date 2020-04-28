@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 Ericsson
+ * Copyright (c) 2019, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0 which
@@ -52,7 +52,12 @@ public interface IDataProviderDescriptor {
          * time, each entry has a series of states, arrows link from one series to
          * another
          */
-        TIME_GRAPH
+        TIME_GRAPH,
+        /**
+         * A provider for a data tree, which has entries (rows) and columns.
+         * @since 6.1
+         */
+        DATA_TREE
     }
 
     /**

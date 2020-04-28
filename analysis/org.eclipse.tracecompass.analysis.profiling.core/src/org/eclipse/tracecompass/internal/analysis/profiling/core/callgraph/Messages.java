@@ -36,6 +36,10 @@ public class Messages extends NLS {
      * Segment's start time exceeding its end time Error message
      */
     public static @Nullable String TimeError;
+
+    public static @Nullable String CallGraphStatistics_Title;
+    public static @Nullable String CallGraphStatistics_Description;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

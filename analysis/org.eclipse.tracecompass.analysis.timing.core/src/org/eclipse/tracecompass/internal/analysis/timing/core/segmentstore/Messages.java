@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017, 2018 Ericsson
+ * Copyright (c) 2017, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -75,6 +75,51 @@ public class Messages extends NLS {
      * Description of the data provider
      */
     public static @Nullable String SegmentStoreScatterGraphDataProvider_description;
+
+    /**
+     * Name of the label column
+     */
+    public static @Nullable String SegmentStoreStatistics_Label;
+    /**
+     * Name of the minimum column
+     */
+    public static @Nullable String SegmentStoreStatistics_MinLabel;
+    /**
+     * Name of the maximum column
+     */
+    public static @Nullable String SegmentStoreStatistics_MaxLabel;
+    /**
+     * Name of the average column
+     */
+    public static @Nullable String SegmentStoreStatistics_AverageLabel;
+    /**
+     * Name of the count column
+     */
+    public static @Nullable String SegmentStoreStatistics_CountLabel;
+    /**
+     * Name of the total column
+     */
+    public static @Nullable String SegmentStoreStatistics_TotalLabel;
+    /**
+     * Name of the standard deviation column
+     */
+    public static @Nullable String SegmentStoreStatistics_StandardDeviationLabel;
+    /**
+     * Name of the minimum start time column
+     */
+    public static @Nullable String SegmentStoreStatistics_MinStartLabel;
+    /**
+     * Name of the minimum end time column
+     */
+    public static @Nullable String SegmentStoreStatistics_MinEndLabel;
+    /**
+     * Name of the maximum start time column
+     */
+    public static @Nullable String SegmentStoreStatistics_MaxStartLabel;
+    /**
+     * Name of the maximum end time column
+     */
+    public static @Nullable String SegmentStoreStatistics_MaxEndLabel;
 
     static {
         // initialize resource bundle

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreSt
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
 import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
 import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatisticsAnalysis;
+import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
@@ -41,6 +42,8 @@ import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse.Status;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * This data provider will supply a statistics tree for an
@@ -128,16 +131,17 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         }
 
         List<SegmentStoreStatisticsModel> list = new ArrayList<>();
-        list.add(new SegmentStoreStatisticsModel(fTraceId, -1, Collections.singletonList(Objects.requireNonNull(getTrace().getName())), statsTotal));
+        list.add(new SegmentStoreStatisticsModel(fTraceId, -1, createLabels(NonNullUtils.nullToEmptyString(getTrace().getName()), statsTotal), statsTotal));
 
         /*
          * Add statistics for full duration.
          */
         long totalId = getUniqueId(TOTAL_PREFIX);
-        list.add(new SegmentStoreStatisticsModel(totalId, fTraceId, Collections.singletonList(Objects.requireNonNull(Messages.SegmentStoreStatisticsDataProvider_Total)), statsTotal));
+        list.add(new SegmentStoreStatisticsModel(totalId, fTraceId, createLabels(Objects.requireNonNull(Messages.SegmentStoreStatisticsDataProvider_Total), statsTotal), statsTotal));
         Map<String, IStatistics<ISegment>> totalStats = fProvider.getStatsPerType();
         for (Entry<String, IStatistics<ISegment>> entry : totalStats.entrySet()) {
-            list.add(new SegmentStoreStatisticsModel(getUniqueId(TOTAL_PREFIX + entry.getKey()), totalId, Collections.singletonList(entry.getKey()), entry.getValue()));
+            IStatistics<ISegment> statistics = entry.getValue();
+            list.add(new SegmentStoreStatisticsModel(getUniqueId(TOTAL_PREFIX + entry.getKey()), totalId, createLabels(entry.getKey(), statistics), statistics));
         }
 
         /*
@@ -159,11 +163,57 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
             list.add(new SegmentStoreStatisticsModel(selectionId, fTraceId, Collections.singletonList(Objects.requireNonNull(Messages.SegmentStoreStatisticsDataProvider_Selection)), statsForRange));
             Map<String, IStatistics<ISegment>> selectionStats = fProvider.getStatsPerTypeForRange(start, end, nonNullMonitor);
             for (Entry<String, IStatistics<ISegment>> entry : selectionStats.entrySet()) {
-                list.add(new SegmentStoreStatisticsModel(getUniqueId(SELECTION_PREFIX + entry.getKey()), selectionId, Collections.singletonList(entry.getKey()), entry.getValue()));
+                IStatistics<ISegment> statistics = entry.getValue();
+                list.add(new SegmentStoreStatisticsModel(getUniqueId(SELECTION_PREFIX + entry.getKey()), selectionId, createLabels(entry.getKey(), statistics), statistics));
             }
         }
-        return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), Collections.unmodifiableList(list)), Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        ImmutableList.Builder<String> headers = new ImmutableList.Builder<>();
+        headers.add(Objects.requireNonNull(Messages.SegmentStoreStatistics_Label))
+               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_MinLabel))
+               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_MaxLabel))
+               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_AverageLabel))
+               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_StandardDeviationLabel))
+               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_TotalLabel))
+               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_CountLabel))
+               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_MinStartLabel))
+               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_MinEndLabel))
+               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_MaxStartLabel))
+               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_MaxEndLabel));
+        return new TmfModelResponse<>(new TmfTreeModel<>(headers.build(), Collections.unmodifiableList(list)), Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
+
+    private static List<String> createLabels(String name, IStatistics<ISegment> statistics) {
+        ImmutableList.Builder<String> labels = new ImmutableList.Builder<>();
+
+        ISegment min = statistics.getMinObject();
+        long minStart = 0;
+        long minEnd = 0;
+        if (min != null) {
+            minStart = min.getStart();
+            minEnd = min.getEnd();
+        }
+        ISegment max = statistics.getMaxObject();
+        long maxStart = 0;
+        long maxEnd = 0;
+        if (max != null) {
+            maxStart = max.getStart();
+            maxEnd = max.getEnd();
+        }
+
+        labels.add(name)
+        .add(String.valueOf(statistics.getMin()))
+        .add(String.valueOf(statistics.getMax()))
+        .add(String.valueOf(statistics.getMean()))
+        .add(String.valueOf(statistics.getStdDev()))
+        .add(String.valueOf(statistics.getTotal()))
+        .add(String.valueOf(statistics.getNbElements()))
+        .add(String.valueOf(minStart))
+        .add(String.valueOf(minEnd))
+        .add(String.valueOf(maxStart))
+        .add(String.valueOf(maxEnd));
+        return labels.build();
+    }
+
 
     private long getUniqueId(String name) {
         synchronized (fIdToType) {
