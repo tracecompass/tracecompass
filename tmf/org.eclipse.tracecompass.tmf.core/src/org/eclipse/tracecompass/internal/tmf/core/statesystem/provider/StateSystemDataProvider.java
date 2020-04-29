@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 École Polytechnique de Montréal
+ * Copyright (c) 2019, 2020 École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -786,7 +786,7 @@ public class StateSystemDataProvider extends AbstractTmfTraceDataProvider implem
 
     private static TimeGraphState getStateFromInterval(ITmfStateInterval statusInterval, long currentEndTime) {
         long time = statusInterval.getStartTime();
-        long duration = Math.min(currentEndTime, statusInterval.getEndTime() + 1) - time;
+        long duration = Math.min(statusInterval.getEndTime(), currentEndTime - 1) + 1 - time;
         Object o = statusInterval.getValue();
         if (o instanceof Integer) {
             return new TimeGraphState(time, duration, ((Integer) o).intValue(), String.valueOf(o));
