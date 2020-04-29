@@ -484,7 +484,7 @@ public abstract class TmfChartView extends TmfView implements ITmfTimeAligned, I
         if (tree instanceof AbstractSelectTreeViewer && chart instanceof TmfFilteredXYChartViewer) {
             ILegendImageProvider legendImageProvider = new XYChartLegendImageProvider((TmfCommonXAxisChartViewer) chart);
             AbstractSelectTreeViewer selectTree = (AbstractSelectTreeViewer) tree;
-            selectTree.setTreeListener((TmfFilteredXYChartViewer) chart);
+            selectTree.addTreeListener((TmfFilteredXYChartViewer) chart);
             selectTree.setLegendImageProvider(legendImageProvider);
             TriStateFilteredCheckboxTree checkboxTree = selectTree.getTriStateFilteredCheckboxTree();
             checkboxTree.addPreCheckStateListener(new ManyEntriesSelectedDialogPreCheckedListener(checkboxTree));

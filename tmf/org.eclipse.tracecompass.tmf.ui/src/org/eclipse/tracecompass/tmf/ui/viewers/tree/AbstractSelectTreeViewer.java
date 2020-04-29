@@ -119,12 +119,14 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         @Override
         public void checkStateChanged(CheckStateChangedEvent event) {
             saveViewContext();
-            if (fChartViewer != null) {
-                fChartViewer.handleCheckStateChangedEvent(getCheckedViewerEntries());
-
-                // Legend image might have changed
+            if (!fTreeListeners.isEmpty()) {
+                Collection<ITmfTreeViewerEntry> entries = getCheckedViewerEntries();
+                for (ICheckboxTreeViewerListener listener : fTreeListeners) {
+                    listener.handleCheckStateChangedEvent(entries);
+                }
                 refresh();
             }
+
         }
     }
 
@@ -151,7 +153,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
     }
 
     private ILegendImageProvider fLegendImageProvider;
-    private ICheckboxTreeViewerListener fChartViewer;
+    private Set<ICheckboxTreeViewerListener> fTreeListeners = new HashSet<>();
     private TriStateFilteredCheckboxTree fCheckboxTree;
     private final int fLegendIndex;
 
@@ -206,9 +208,34 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
      *
      * @param listener
      *            Chart listening to changes in the tree's selected entries
+     * @deprecated As of 6.0, there can be more than one listener for the tree,
+     *             use {@link #addTreeListener(ICheckboxTreeViewerListener)}
      */
+    @Deprecated
     public void setTreeListener(ICheckboxTreeViewerListener listener) {
-        fChartViewer = listener;
+        addTreeListener(listener);
+    }
+
+    /**
+     * Add a listener to changes in the tree viewer
+     *
+     * @param listener
+     *            Listener for changes in the tree's selected entries
+     * @since 6.0
+     */
+    public void addTreeListener(ICheckboxTreeViewerListener listener) {
+        fTreeListeners.add(listener);
+    }
+
+    /**
+     * Remove a listener from this tree viewer
+     *
+     * @param listener
+     *            The listener to remove
+     * @since 6.0
+     */
+    public void removeTreeListener(ICheckboxTreeViewerListener listener) {
+        fTreeListeners.remove(listener);
     }
 
     /**
@@ -255,8 +282,8 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
             fCheckboxTree.setFilterText(""); //$NON-NLS-1$
         }
 
-        if (fChartViewer != null) {
-            fChartViewer.handleCheckStateChangedEvent(getCheckedViewerEntries());
+        for (ICheckboxTreeViewerListener listener : fTreeListeners) {
+            listener.handleCheckStateChangedEvent(getCheckedViewerEntries());
         }
         getTreeViewer().refresh();
     }
