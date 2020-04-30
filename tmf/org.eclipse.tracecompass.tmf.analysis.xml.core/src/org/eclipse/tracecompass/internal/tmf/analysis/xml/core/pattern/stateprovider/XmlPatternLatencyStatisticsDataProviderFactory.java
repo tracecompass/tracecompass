@@ -11,10 +11,19 @@
 
 package org.eclipse.tracecompass.internal.tmf.analysis.xml.core.pattern.stateprovider;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreStatisticsDataProvider;
+import org.eclipse.tracecompass.internal.tmf.core.model.DataProviderDescriptor;
 import org.eclipse.tracecompass.internal.tmf.core.model.tree.TmfTreeCompositeDataProvider;
+import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderDescriptor;
+import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderDescriptor.ProviderType;
 import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderFactory;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
@@ -67,4 +76,25 @@ public class XmlPatternLatencyStatisticsDataProviderFactory implements IDataProv
         return new SegmentStoreStatisticsDataProvider(trace, statisticsProvider, ID + ':' + secondaryId);
     }
 
+    @Override
+    public Collection<IDataProviderDescriptor> getDescriptors(ITmfTrace trace) {
+        Set<IDataProviderDescriptor> descriptors = new HashSet<>();
+        if (trace instanceof TmfExperiment) {
+            for (ITmfTrace child : TmfTraceManager.getTraceSet(trace)) {
+                descriptors.addAll(getDescriptors(child));
+            }
+            return descriptors;
+        }
+        // Single Trace
+        Iterable<XmlPatternAnalysis> modules = TmfTraceUtils.getAnalysisModulesOfClass(trace, XmlPatternAnalysis.class);
+        for (XmlPatternAnalysis module : modules) {
+            descriptors.add(new DataProviderDescriptor.Builder()
+                    .setId(ID + ':' + module.getId())
+                    .setName(Objects.requireNonNull(module.getName()))
+                    .setDescription(Objects.requireNonNull(module.getName()))
+                    .setProviderType(ProviderType.DATA_TREE)
+                    .build());
+        }
+        return new ArrayList<>(descriptors);
+    }
 }
