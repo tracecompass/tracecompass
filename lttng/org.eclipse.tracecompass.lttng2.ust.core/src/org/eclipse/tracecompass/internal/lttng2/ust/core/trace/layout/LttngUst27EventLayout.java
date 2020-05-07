@@ -11,6 +11,8 @@
 
 package org.eclipse.tracecompass.internal.lttng2.ust.core.trace.layout;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * Updated event definitions for LTTng-UST 2.7.
  *
@@ -24,7 +26,7 @@ public class LttngUst27EventLayout extends LttngUst20EventLayout {
      */
     protected LttngUst27EventLayout() {}
 
-    private static final LttngUst27EventLayout INSTANCE = new LttngUst27EventLayout();
+    private static @Nullable LttngUst27EventLayout INSTANCE = null;
 
     /**
      * Get a singleton instance.
@@ -32,7 +34,12 @@ public class LttngUst27EventLayout extends LttngUst20EventLayout {
      * @return The instance
      */
     public static synchronized LttngUst27EventLayout getInstance() {
-        return INSTANCE;
+        LttngUst27EventLayout instance = INSTANCE;
+        if (instance == null) {
+            instance = new LttngUst27EventLayout();
+            INSTANCE = instance;
+        }
+        return instance;
     }
 
     // ------------------------------------------------------------------------
