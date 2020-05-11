@@ -88,6 +88,7 @@ public class SelectRootNodeWizardPage extends WizardPage {
 
     private TreeViewer doCreateTreeViewer(Composite parent) {
         fCheckboxTreeViewer = new CheckboxTreeViewer(parent, SWT.BORDER);
+        fCheckboxTreeViewer.setUseHashlookup(true);
 
         fContentProvider = new TmfNavigatorContentProvider() {
 
@@ -153,7 +154,6 @@ public class SelectRootNodeWizardPage extends WizardPage {
         setPageComplete(true);
         // Checks the first element by default
         fCheckboxTreeViewer.getTree().getItem(0).setChecked(true);
-        fCheckboxTreeViewer.setUseHashlookup(true);
         return fCheckboxTreeViewer;
     }
 
