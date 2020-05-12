@@ -31,6 +31,7 @@ import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.SyscallLookup;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
+import org.eclipse.tracecompass.segmentstore.core.SegmentComparators;
 import org.eclipse.tracecompass.segmentstore.core.SegmentStoreFactory.SegmentStoreType;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
@@ -214,7 +215,19 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
 
         @Override
         public @Nullable Comparator<?> getComparator() {
-            return null;
+            return (ISegment segment1, ISegment segment2) -> {
+                if (segment1 == null) {
+                    return 1;
+                }
+                if (segment2 == null) {
+                    return -1;
+                }
+                if (segment1 instanceof SystemCall && segment2 instanceof SystemCall) {
+                    int res = ((SystemCall) segment1).getName().compareTo(((SystemCall) segment2).getName());
+                    return (res != 0 ? res : SegmentComparators.INTERVAL_START_COMPARATOR.thenComparing(SegmentComparators.INTERVAL_END_COMPARATOR).compare(segment1, segment2));
+                }
+                return 1;
+            };
         }
 
         @Override
@@ -245,7 +258,19 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
 
         @Override
         public @Nullable Comparator<?> getComparator() {
-            return null;
+            return (ISegment segment1, ISegment segment2) -> {
+                if (segment1 == null) {
+                    return 1;
+                }
+                if (segment2 == null) {
+                    return -1;
+                }
+                if (segment1 instanceof SystemCall && segment2 instanceof SystemCall) {
+                    int res = Integer.compare(((SystemCall) segment1).getTid(), ((SystemCall) segment2).getTid());
+                    return (res != 0 ? res : SegmentComparators.INTERVAL_START_COMPARATOR.thenComparing(SegmentComparators.INTERVAL_END_COMPARATOR).compare(segment1, segment2));
+                }
+                return 1;
+            };
         }
 
         @Override
@@ -276,7 +301,19 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
 
         @Override
         public @Nullable Comparator<?> getComparator() {
-            return null;
+            return (ISegment segment1, ISegment segment2) -> {
+                if (segment1 == null) {
+                    return 1;
+                }
+                if (segment2 == null) {
+                    return -1;
+                }
+                if (segment1 instanceof SystemCall && segment2 instanceof SystemCall) {
+                    int res = SyscallLookup.getInstance().getComponent(((SystemCall) segment1).getName()).compareTo(SyscallLookup.getInstance().getComponent(((SystemCall) segment2).getName()));
+                    return (res != 0 ? res : SegmentComparators.INTERVAL_START_COMPARATOR.thenComparing(SegmentComparators.INTERVAL_END_COMPARATOR).compare(segment1, segment2));
+                }
+                return 1;
+            };
         }
 
         @Override
@@ -315,7 +352,19 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
 
         @Override
         public @Nullable Comparator<?> getComparator() {
-            return null;
+            return (ISegment segment1, ISegment segment2) -> {
+                if (segment1 == null) {
+                    return 1;
+                }
+                if (segment2 == null) {
+                    return -1;
+                }
+                if (segment1 instanceof SystemCall && segment2 instanceof SystemCall) {
+                    int res = Integer.compare(((SystemCall) segment1).getReturnValue(), ((SystemCall) segment2).getReturnValue());
+                    return (res != 0 ? res : SegmentComparators.INTERVAL_START_COMPARATOR.thenComparing(SegmentComparators.INTERVAL_END_COMPARATOR).compare(segment1, segment2));
+                }
+                return 1;
+            };
         }
 
     }
@@ -339,7 +388,19 @@ public class SystemCallLatencyAnalysis extends AbstractSegmentStoreAnalysisEvent
 
         @Override
         public @Nullable Comparator<?> getComparator() {
-            return null;
+            return (ISegment segment1, ISegment segment2) -> {
+                if (segment1 == null) {
+                    return 1;
+                }
+                if (segment2 == null) {
+                    return -1;
+                }
+                if (segment1 instanceof SystemCall && segment2 instanceof SystemCall) {
+                    int res = SyscallLookup.getInstance().getFile(((SystemCall) segment1).getName()).compareTo(SyscallLookup.getInstance().getFile(((SystemCall) segment2).getName()));
+                    return (res != 0 ? res : SegmentComparators.INTERVAL_START_COMPARATOR.thenComparing(SegmentComparators.INTERVAL_END_COMPARATOR).compare(segment1, segment2));
+                }
+                return 1;
+            };
         }
 
         @Override
