@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -169,7 +169,7 @@ public class OpenAsExperimentHandler extends AbstractHandler {
 
         status = TmfOpenTraceHelper.openFromElement(experimentElement);
         if (!status.isOK()) {
-            TraceUtils.displayErrorMsg(Messages.OpenAsExperimentHandler_ValidationErrorTitle, NLS.bind(Messages.OpenAsExperimentHandler_ValidationErrorMessage, status.getMessage()));
+            TraceUtils.displayErrorMsg(Messages.OpenAsExperimentHandler_OpeningErrorTitle, NLS.bind(Messages.OpenAsExperimentHandler_OpeningErrorMessage, status.getMessage()));
         }
 
         return null;
