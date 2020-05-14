@@ -11,12 +11,19 @@
 
 package org.eclipse.tracecompass.tmf.core.model.tree;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TableColumnDescriptor;
+import org.eclipse.tracecompass.tmf.core.model.ITableColumnDescriptor;
 
 /**
  * Represent an entire tree model
+ *
+ * TODO: deprecate public constructors and fHeaders
  *
  * @author Simon Delisle
  * @param <T>
@@ -25,6 +32,7 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 public class TmfTreeModel<T extends ITmfTreeDataModel> {
     private List<String> fHeaders;
+    private List<ITableColumnDescriptor> fColumnDescriptors;
     private List<T> fEntries;
     private @Nullable String fScope;
 
@@ -37,8 +45,7 @@ public class TmfTreeModel<T extends ITmfTreeDataModel> {
      *            List of entries in the tree
      */
     public TmfTreeModel(List<String> headers, List<T> entries) {
-        fHeaders = headers;
-        fEntries = entries;
+        this(headers, entries, null);
     }
 
     /**
@@ -54,8 +61,33 @@ public class TmfTreeModel<T extends ITmfTreeDataModel> {
      */
     public TmfTreeModel(List<String> headers, List<T> entries, @Nullable String scope) {
         fHeaders = headers;
+        fColumnDescriptors = new ArrayList<>();
+        for (String header : headers) {
+            TableColumnDescriptor.Builder builder = new TableColumnDescriptor.Builder();
+            builder.setText(header);
+            fColumnDescriptors.add(builder.build());
+        }
         fEntries = entries;
         fScope = scope;
+    }
+
+    /**
+     * Headers for the model
+     *
+     * @return List of name of the header
+     * @since 6.1
+     */
+    public List<ITableColumnDescriptor> getColumnDescriptors() {
+        return fColumnDescriptors;
+    }
+
+    private TmfTreeModel(Builder<T> builder) {
+        fHeaders = builder.fColumnDescriptors.stream()
+                .map(ITableColumnDescriptor::getText)
+                .collect(Collectors.toList());
+        fColumnDescriptors = builder.fColumnDescriptors;
+        fEntries = builder.fEntries;
+        fScope = builder.fScope;
     }
 
     /**
@@ -84,5 +116,66 @@ public class TmfTreeModel<T extends ITmfTreeDataModel> {
      */
     public @Nullable String getScope() {
         return fScope;
+    }
+
+    /**
+     *
+     * A builder class to build instances implementing interface
+     * {@link TmfTreeModel}
+     *
+     * @param <T>
+     *            Tree data model extending {@link ITmfTreeDataModel}
+     * @since 6.1
+     */
+    public static class Builder<T extends ITmfTreeDataModel> {
+        private List<ITableColumnDescriptor> fColumnDescriptors = new ArrayList<>();
+        private List<T> fEntries;
+        private @Nullable String fScope;
+
+        /**
+         * Constructor
+         */
+        public Builder() {
+            fEntries = Collections.emptyList();
+        }
+
+        /**
+         * Sets the column descriptors
+         *
+         * @param columnDescriptors
+         *            the column descriptors to set
+         */
+        public void setColumnDescriptors(List<ITableColumnDescriptor> columnDescriptors) {
+            fColumnDescriptors = columnDescriptors;
+        }
+
+        /**
+         * Sets the entries of the model
+         *
+         * @param entries
+         *            the entries to set
+         */
+        public void setEntries(List<T> entries) {
+            fEntries = entries;
+        }
+
+        /**
+         * Sets the scope
+         *
+         * @param scope
+         *            the scope of all entry IDs in the model
+         */
+        public void setScope(String scope) {
+            fScope = scope;
+        }
+
+        /**
+         * The method to construct an instance of {@link TmfTreeModel}
+         *
+         * @return a {@link TmfTreeModel} instance
+         */
+        public TmfTreeModel<T> build() {
+            return new TmfTreeModel<>(this);
+        }
     }
 }

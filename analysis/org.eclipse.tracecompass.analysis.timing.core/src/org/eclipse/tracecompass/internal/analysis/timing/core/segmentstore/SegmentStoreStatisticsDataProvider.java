@@ -29,12 +29,14 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.Abs
 import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
 import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatisticsAnalysis;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TableColumnDescriptor;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
+import org.eclipse.tracecompass.tmf.core.model.ITableColumnDescriptor;
 import org.eclipse.tracecompass.tmf.core.model.filters.FilterTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
@@ -131,17 +133,17 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         }
 
         List<SegmentStoreStatisticsModel> list = new ArrayList<>();
-        list.add(new SegmentStoreStatisticsModel(fTraceId, -1, createLabels(NonNullUtils.nullToEmptyString(getTrace().getName()), statsTotal), statsTotal));
+        list.add(new SegmentStoreStatisticsModel(fTraceId, -1, getCellLabels(NonNullUtils.nullToEmptyString(getTrace().getName()), statsTotal), statsTotal));
 
         /*
          * Add statistics for full duration.
          */
         long totalId = getUniqueId(TOTAL_PREFIX);
-        list.add(new SegmentStoreStatisticsModel(totalId, fTraceId, createLabels(Objects.requireNonNull(Messages.SegmentStoreStatisticsDataProvider_Total), statsTotal), statsTotal));
+        list.add(new SegmentStoreStatisticsModel(totalId, fTraceId, getCellLabels(Objects.requireNonNull(Messages.SegmentStoreStatisticsDataProvider_Total), statsTotal), statsTotal));
         Map<String, IStatistics<ISegment>> totalStats = fProvider.getStatsPerType();
         for (Entry<String, IStatistics<ISegment>> entry : totalStats.entrySet()) {
             IStatistics<ISegment> statistics = entry.getValue();
-            list.add(new SegmentStoreStatisticsModel(getUniqueId(TOTAL_PREFIX + entry.getKey()), totalId, createLabels(entry.getKey(), statistics), statistics));
+            list.add(new SegmentStoreStatisticsModel(getUniqueId(TOTAL_PREFIX + entry.getKey()), totalId, getCellLabels(entry.getKey(), statistics), statistics));
         }
 
         /*
@@ -164,25 +166,64 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
             Map<String, IStatistics<ISegment>> selectionStats = fProvider.getStatsPerTypeForRange(start, end, nonNullMonitor);
             for (Entry<String, IStatistics<ISegment>> entry : selectionStats.entrySet()) {
                 IStatistics<ISegment> statistics = entry.getValue();
-                list.add(new SegmentStoreStatisticsModel(getUniqueId(SELECTION_PREFIX + entry.getKey()), selectionId, createLabels(entry.getKey(), statistics), statistics));
+                list.add(new SegmentStoreStatisticsModel(getUniqueId(SELECTION_PREFIX + entry.getKey()), selectionId, getCellLabels(entry.getKey(), statistics), statistics));
             }
         }
-        ImmutableList.Builder<String> headers = new ImmutableList.Builder<>();
-        headers.add(Objects.requireNonNull(Messages.SegmentStoreStatistics_Label))
-               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_MinLabel))
-               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_MaxLabel))
-               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_AverageLabel))
-               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_StandardDeviationLabel))
-               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_TotalLabel))
-               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_CountLabel))
-               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_MinStartLabel))
-               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_MinEndLabel))
-               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_MaxStartLabel))
-               .add(Objects.requireNonNull(Messages.SegmentStoreStatistics_MaxEndLabel));
-        return new TmfModelResponse<>(new TmfTreeModel<>(headers.build(), Collections.unmodifiableList(list)), Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        TmfTreeModel.Builder<SegmentStoreStatisticsModel> treeModelBuilder = new TmfTreeModel.Builder();
+        treeModelBuilder.setColumnDescriptors(getColumnDescriptors());
+        treeModelBuilder.setEntries(Collections.unmodifiableList(list));
+        return new TmfModelResponse<>(treeModelBuilder.build(), Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
-    private static List<String> createLabels(String name, IStatistics<ISegment> statistics) {
+    protected List<ITableColumnDescriptor> getColumnDescriptors() {
+        ImmutableList.Builder<ITableColumnDescriptor> headers = new ImmutableList.Builder<>();
+        TableColumnDescriptor.Builder builder = new TableColumnDescriptor.Builder();
+        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_Label));
+        headers.add(builder.build());
+
+        builder = new TableColumnDescriptor.Builder();
+        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_MinLabel));
+        headers.add(builder.build());
+
+        builder = new TableColumnDescriptor.Builder();
+        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_MaxLabel));
+        headers.add(builder.build());
+
+        builder = new TableColumnDescriptor.Builder();
+        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_AverageLabel));
+        headers.add(builder.build());
+
+        builder = new TableColumnDescriptor.Builder();
+        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_StandardDeviationLabel));
+        headers.add(builder.build());
+
+        builder = new TableColumnDescriptor.Builder();
+        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_CountLabel));
+        headers.add(builder.build());
+
+        builder = new TableColumnDescriptor.Builder();
+        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_TotalLabel));
+        headers.add(builder.build());
+
+        builder = new TableColumnDescriptor.Builder();
+        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_MinStartLabel));
+        headers.add(builder.build());
+
+        builder = new TableColumnDescriptor.Builder();
+        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_MinEndLabel));
+        headers.add(builder.build());
+
+        builder = new TableColumnDescriptor.Builder();
+        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_MaxStartLabel));
+        headers.add(builder.build());
+
+        builder = new TableColumnDescriptor.Builder();
+        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_MaxEndLabel));
+        headers.add(builder.build());
+        return headers.build();
+    }
+
+    private static List<String> getCellLabels(String name, IStatistics<ISegment> statistics) {
         ImmutableList.Builder<String> labels = new ImmutableList.Builder<>();
 
         ISegment min = statistics.getMinObject();
@@ -199,7 +240,6 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
             maxStart = max.getStart();
             maxEnd = max.getEnd();
         }
-
         labels.add(name)
         .add(String.valueOf(statistics.getMin()))
         .add(String.valueOf(statistics.getMax()))
@@ -213,7 +253,6 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         .add(String.valueOf(maxEnd));
         return labels.build();
     }
-
 
     private long getUniqueId(String name) {
         synchronized (fIdToType) {
