@@ -77,8 +77,6 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -207,10 +205,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     private static final int MAX_LABEL_LENGTH = 256;
 
-    /** points per inch */
-    private static final int PPI = 72;
-    private static final int DPI = 96;
-
     private static final int VERTICAL_ZOOM_DELAY = 400;
 
     private static final String PREFERRED_WIDTH = "width"; //$NON-NLS-1$
@@ -239,7 +233,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private int fGlobalItemHeight = CUSTOM_ITEM_HEIGHT;
     private int fHeightAdjustment = 0;
     private int fMaxItemHeight = 0;
-    private Map<Integer, Font> fFonts = new HashMap<>();
     private boolean fBlendSubPixelEvents = false;
     private int fMinimumItemWidth = 0;
     private int fTopIndex = 0;
@@ -341,9 +334,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
         addListener(SWT.MouseWheel, this);
         addDisposeListener((e) -> {
             fResourceManager.dispose();
-            for (Font font : fFonts.values()) {
-                font.dispose();
-            }
         });
     }
 
@@ -2421,13 +2411,11 @@ public class TimeGraphControl extends TimeGraphBaseControl
             gc.setClipping(new Rectangle(nameSpace, 0, bounds.width - nameSpace, bounds.height));
             fillSpace(rect, gc, selected);
 
-            int margins = getMarginForHeight(rect.height);
+            int margins = TimeGraphRender.getMarginForHeight(rect.height);
             int height = rect.height - margins;
             int topMargin = (margins + 1) / 2;
             Rectangle stateRect = new Rectangle(rect.x, rect.y + topMargin, rect.width, height);
 
-            /* Set the font for this item */
-            setFontForHeight(height, gc);
 
             long maxDuration = (timeProvider.getTimeSpace() == 0) ? Long.MAX_VALUE : 1 * (time1 - time0) / timeProvider.getTimeSpace();
             Iterator<@NonNull ITimeEvent> iterator = entry.getTimeEventsIterator(time0, time1, maxDuration);
@@ -2696,8 +2684,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
             gc.setClipping(bounds);
         }
 
-        int height = bounds.height - getMarginForHeight(bounds.height);
-        setFontForHeight(height, gc);
+        int height = bounds.height - TimeGraphRender.getMarginForHeight(bounds.height);
+        TimeGraphRender.setFontForHeight(height, Objects.requireNonNull(gc));
 
         String name = fLabelProvider == null ? item.fName : fLabelProvider.getColumnText(item.fEntry, 0);
         Rectangle rect = Utils.clone(bounds);
@@ -3013,31 +3001,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
         gc.setForeground(getColorScheme().getColor(TimeGraphColorScheme.MID_LINE));
         int midy = rect.y + rect.height / 2;
         gc.drawLine(rect.x, midy, rect.x + rect.width, midy);
-    }
-
-    private static int getMarginForHeight(int height) {
-        /*
-         * State rectangle is smaller than the item bounds when height is > 4. Don't use
-         * any margin if the height is below or equal that threshold. Use a maximum of 6
-         * pixels for both margins, otherwise try to use 13 pixels for the state height,
-         * but with a minimum margin of 1.
-         */
-        final int MARGIN_THRESHOLD = 4;
-        final int PREFERRED_HEIGHT = 13;
-        final int MIN_MARGIN = 1;
-        final int MAX_MARGIN = 6;
-        return height <= MARGIN_THRESHOLD ? 0 : Math.max(Math.min(height - PREFERRED_HEIGHT, MAX_MARGIN), MIN_MARGIN);
-    }
-
-    private void setFontForHeight(int pixels, GC gc) {
-        /* convert font height from pixels to points */
-        int height = Math.max(pixels * PPI / DPI, 1);
-        Font font = fFonts.computeIfAbsent(height, fontHeight -> {
-            FontData fontData = gc.getFont().getFontData()[0];
-            fontData.setHeight(fontHeight);
-            return new Font(gc.getDevice(), fontData);
-        });
-        gc.setFont(font);
     }
 
     @Override

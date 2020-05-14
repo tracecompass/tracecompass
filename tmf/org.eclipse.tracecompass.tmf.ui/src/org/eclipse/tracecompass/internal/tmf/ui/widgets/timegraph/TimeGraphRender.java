@@ -13,13 +13,17 @@ package org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
@@ -73,6 +77,11 @@ public final class TimeGraphRender {
 
         @Override
         public void draw(@Nullable ITimeGraphPresentationProvider provider, GC gc) {
+
+            /* Set the font for this item */
+            int height = fBounds.height;
+            setFontForHeight(height - getMarginForHeight(height), gc);
+
             for (DeferredItem item : getItems()) {
                 item.draw(provider, gc);
             }
@@ -679,7 +688,15 @@ public final class TimeGraphRender {
     }
 
     private static final RGBAColor BLACK = new RGBAColor(0, 0, 0, 255);
+
     private static final ColorRegistry COLOR_REGISTRY = new ColorRegistry();
+    private static final Map<Integer, Font> FONTS = new HashMap<>();
+
+    /** Dots per inch */
+    private static final int DPI = 96;
+
+    /** points per inch */
+    private static final int PPI = 72;
 
     /**
      * Get the color for a given color integer
@@ -687,15 +704,54 @@ public final class TimeGraphRender {
      * @param colorInt
      *            the color integer (0xRRGGBBAA)
      * @return the {@link Color}
-     * @since 6.0
      */
     public static Color getColor(int colorInt) {
         String hexRGB = Integer.toHexString(colorInt);
         Color color = COLOR_REGISTRY.get(hexRGB);
         if (color == null) {
             COLOR_REGISTRY.put(hexRGB, RGBAUtil.fromInt(colorInt).rgb);
-            color = COLOR_REGISTRY.get(hexRGB);
+            color = Objects.requireNonNull(COLOR_REGISTRY.get(hexRGB));
         }
         return color;
+    }
+
+    /**
+     * Sets the font height for a given height
+     *
+     * @param pixels
+     *            the height in pixels
+     * @param gc
+     *            the graphics context
+     */
+    public static void setFontForHeight(int pixels, GC gc) {
+        /* convert font height from pixels to points */
+        int height = Math.max(pixels * PPI / DPI, 1);
+        Font font = FONTS.computeIfAbsent(height, fontHeight -> {
+            FontData fontData = gc.getFont().getFontData()[0];
+            fontData.setHeight(fontHeight);
+            return new Font(gc.getDevice(), fontData);
+        });
+        gc.setFont(font);
+    }
+
+    /**
+     * Get the margin for a height
+     *
+     * @param height
+     *            the height
+     * @return the margin
+     */
+    public static int getMarginForHeight(int height) {
+        /*
+         * State rectangle is smaller than the item bounds when height is > 4.
+         * Don't use any margin if the height is below or equal that threshold.
+         * Use a maximum of 6 pixels for both margins, otherwise try to use 13
+         * pixels for the state height, but with a minimum margin of 1.
+         */
+        final int MARGIN_THRESHOLD = 4;
+        final int PREFERRED_HEIGHT = 13;
+        final int MIN_MARGIN = 1;
+        final int MAX_MARGIN = 6;
+        return height <= MARGIN_THRESHOLD ? 0 : Math.max(Math.min(height - PREFERRED_HEIGHT, MAX_MARGIN), MIN_MARGIN);
     }
 }
