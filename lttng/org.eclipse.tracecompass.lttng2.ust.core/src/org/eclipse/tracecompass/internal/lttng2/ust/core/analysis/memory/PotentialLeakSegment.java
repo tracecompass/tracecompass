@@ -12,6 +12,7 @@
 package org.eclipse.tracecompass.internal.lttng2.ust.core.analysis.memory;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.datastore.core.encoding.HTVarInt;
 import org.eclipse.tracecompass.datastore.core.interval.IHTIntervalReader;
 import org.eclipse.tracecompass.datastore.core.serialization.ISafeByteBufferWriter;
 import org.eclipse.tracecompass.segmentstore.core.BasicSegment;
@@ -31,7 +32,8 @@ public class PotentialLeakSegment extends BasicSegment implements INamedSegment 
      * The factory to read this segment from a buffer
      */
     public static final @NonNull IHTIntervalReader<@NonNull ISegment> MEMORY_SEGMENT_READ_FACTORY = buffer -> {
-        return new PotentialLeakSegment(buffer.getLong(), buffer.getLong(), buffer.getLong());
+        long start = buffer.getLong();
+        return new PotentialLeakSegment(start, start + HTVarInt.readLong(buffer), buffer.getLong());
     };
 
     /**
@@ -58,13 +60,13 @@ public class PotentialLeakSegment extends BasicSegment implements INamedSegment 
 
     @Override
     public int getSizeOnDisk() {
-        return Long.BYTES * 3;
+        return Long.BYTES * 2 + HTVarInt.getEncodedLengthLong(getEnd() - getStart());
     }
 
     @Override
     public void writeSegment(@NonNull ISafeByteBufferWriter buffer) {
         buffer.putLong(getStart());
-        buffer.putLong(getEnd());
+        HTVarInt.writeLong(buffer, getEnd() - getStart());
         buffer.putLong(fTid);
     }
 
