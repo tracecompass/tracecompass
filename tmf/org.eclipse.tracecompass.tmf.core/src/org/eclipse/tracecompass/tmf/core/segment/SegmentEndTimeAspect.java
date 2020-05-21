@@ -55,7 +55,7 @@ public final class SegmentEndTimeAspect implements ISegmentAspect {
 
     @Override
     public @Nullable Comparator<?> getComparator() {
-        return SegmentComparators.INTERVAL_END_COMPARATOR;
+        return SegmentComparators.INTERVAL_END_COMPARATOR.thenComparing(Comparator.comparingLong(ISegment::getLength));
     }
 
     @Override
