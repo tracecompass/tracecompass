@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 Ericsson
+ * Copyright (c) 2019, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -18,7 +18,6 @@ import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.analysis.callsite.ITmfCallsiteIterator;
 import org.eclipse.tracecompass.tmf.core.analysis.callsite.ITmfCallsiteResolver;
-import org.eclipse.tracecompass.tmf.core.analysis.callsite.TimeCallsite;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCallsiteAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfDeviceAspect;
@@ -64,11 +63,8 @@ public class CallsiteAnalysis extends TmfStateSystemAnalysisModule implements IT
     @Override
     public List<ITmfCallsite> getCallsites(String traceId, String deviceType, String deviceId, long time) {
         ITmfCallsiteIterator iterator = iterator(traceId, deviceType, deviceId, time);
-        if (iterator.hasNext()) {
-            TimeCallsite next = iterator.next();
-            if(next.getTime() <= time) {
-                return Collections.singletonList(next.getCallsite());
-            }
+        if (iterator.hasPrevious()) {
+            return Collections.singletonList(iterator.previous().getCallsite());
         }
         return Collections.emptyList();
     }

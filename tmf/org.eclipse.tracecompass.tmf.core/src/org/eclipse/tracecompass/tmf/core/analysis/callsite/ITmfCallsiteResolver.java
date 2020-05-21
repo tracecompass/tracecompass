@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 Ericsson
+ * Copyright (c) 2019, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -11,7 +11,6 @@
 
 package org.eclipse.tracecompass.tmf.core.analysis.callsite;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
@@ -52,6 +51,7 @@ public interface ITmfCallsiteResolver {
      *            initial time
      * @return the iterator that will traverse the callsites for the given
      *         parameters
+     * @since 6.0
      */
-    Iterator<TimeCallsite> iterator(String hostId, String deviceType, String deviceId, long initialTime);
+    ITmfCallsiteIterator iterator(String hostId, String deviceType, String deviceId, long initialTime);
 }

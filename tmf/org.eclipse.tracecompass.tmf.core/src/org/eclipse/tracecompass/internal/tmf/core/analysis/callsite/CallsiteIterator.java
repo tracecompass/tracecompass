@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 Ericsson
+ * Copyright (c) 2019, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -41,11 +41,10 @@ class CallsiteIterator implements ITmfCallsiteIterator {
     private int fSourceQuark = ITmfStateSystem.INVALID_ATTRIBUTE;
 
     private @Nullable TimeCallsite fPrevious = null;
-    private @Nullable TimeCallsite fCurrent = null;
     private @Nullable TimeCallsite fNext = null;
     private @Nullable ITmfStateInterval fFileInterval = null;
     private @Nullable ITmfStateInterval fLineInterval = null;
-
+    private final long fInitialTime;
 
     private final StateSystemStringInterner fInterner;
 
@@ -68,6 +67,7 @@ class CallsiteIterator implements ITmfCallsiteIterator {
     @VisibleForTesting
     public CallsiteIterator(@Nullable ITmfStateSystem ss, String traceId, String deviceType, String deviceId, long initialTime, StateSystemStringInterner interner) {
         fInterner = interner;
+        fInitialTime = initialTime;
         if (ss == null) {
             return;
         }
@@ -91,8 +91,12 @@ class CallsiteIterator implements ITmfCallsiteIterator {
         fSS = ss;
     }
 
-    private static boolean notMatch(@Nullable ITmfStateInterval interval, long time) {
-        return interval == null || time == Long.MIN_VALUE && interval.getValue() == null || time != Long.MIN_VALUE && !interval.intersects(time);
+    private static boolean notMatchNext(@Nullable ITmfStateInterval interval, long time) {
+        return interval == null || interval.getValue() == null || interval.getStartTime() < time;
+    }
+
+    private static boolean notMatchPrevious(@Nullable ITmfStateInterval interval, long time) {
+        return interval == null || interval.getValue() == null || interval.getStartTime() > time;
     }
 
     @Override
@@ -113,28 +117,38 @@ class CallsiteIterator implements ITmfCallsiteIterator {
         }
         if (fileInterval != null && lineInterval != null) {
             nextTime = Math.min(lineInterval.getEndTime() + 1, fileInterval.getEndTime() + 1);
+        } else {
+            nextTime = fInitialTime;
+        }
+        fPrevious = null;
+        if (fileInterval == null) {
+            fileInterval = fileIterator.next();
+        }
+        if (lineInterval == null) {
+            lineInterval = lineIterator.next();
         }
 
-        while (notMatch(fileInterval, nextTime)) {
-            if (fileIterator.hasNext()) {
-                fileInterval = fileIterator.next();
-            } else {
-                return false;
+        while (notMatchNext(fileInterval, nextTime) && notMatchNext(lineInterval, nextTime)) {
+            int compare = Long.compare(fileInterval.getEndTime(), lineInterval.getEndTime());
+            if (compare <= 0) {
+                if (fileIterator.hasNext()) {
+                    fileInterval = fileIterator.next();
+                } else {
+                    return false;
+                }
             }
-        }
-
-        while (notMatch(lineInterval, nextTime)) {
-            if (lineIterator.hasNext()) {
-                lineInterval = lineIterator.next();
-            } else {
-                return false;
+            if (compare >= 0) {
+                if (lineIterator.hasNext()) {
+                    lineInterval = lineIterator.next();
+                } else {
+                    return false;
+                }
             }
         }
 
         fFileInterval = fileInterval;
         fLineInterval = lineInterval;
         TimeCallsite next = getCallsite(fileInterval, lineInterval);
-
         fNext = next;
         return next != null;
     }
@@ -143,8 +157,6 @@ class CallsiteIterator implements ITmfCallsiteIterator {
     public TimeCallsite next() {
         if (hasNext()) {
             TimeCallsite next = Objects.requireNonNull(fNext, "Inconsistent state, should be non null if hasNext returned true"); //$NON-NLS-1$
-            fPrevious = fCurrent;
-            fCurrent = next;
             fNext = null;
             return next;
         }
@@ -175,24 +187,36 @@ class CallsiteIterator implements ITmfCallsiteIterator {
             return false;
         }
         if (fileInterval != null && lineInterval != null) {
-            prevTime = Math.min(lineInterval.getEndTime()+1, fileInterval.getEndTime()+1);
+            prevTime = Math.max(lineInterval.getStartTime() - 1, fileInterval.getStartTime() - 1);
+        } else {
+            prevTime = fInitialTime;
+        }
+        fNext = null;
+        if (fileInterval == null) {
+            fileInterval = fileIterator.previous();
+        }
+        if (lineInterval == null) {
+            lineInterval = lineIterator.previous();
         }
 
-        while (notMatch(fileInterval, prevTime)) {
-            if (fileIterator.hasPrevious()) {
-                fileInterval = fileIterator.previous();
-            } else {
-                return false;
+        while (notMatchPrevious(fileInterval, prevTime) || notMatchPrevious(lineInterval, prevTime)) {
+            int compare = Long.compare(fileInterval.getStartTime(), lineInterval.getStartTime());
+            if (compare >= 0) {
+                if (fileIterator.hasPrevious()) {
+                    fileInterval = fileIterator.previous();
+                } else {
+                    return false;
+                }
+            }
+            if (compare <= 0) {
+                if (lineIterator.hasPrevious()) {
+                    lineInterval = lineIterator.previous();
+                } else {
+                    return false;
+                }
             }
         }
 
-        while (notMatch(lineInterval, prevTime)) {
-            if (lineIterator.hasPrevious()) {
-                lineInterval = lineIterator.previous();
-            } else {
-                return false;
-            }
-        }
         fFileInterval = fileInterval;
         fLineInterval = lineInterval;
         TimeCallsite previous = getCallsite(fileInterval, lineInterval);
@@ -211,8 +235,6 @@ class CallsiteIterator implements ITmfCallsiteIterator {
     public TimeCallsite previous() {
         if (hasPrevious()) {
             TimeCallsite prev = Objects.requireNonNull(fPrevious, "Inconsistent state, should be non null if hasPrevious returned true"); //$NON-NLS-1$
-            fNext = fCurrent;
-            fCurrent = prev;
             fPrevious = null;
             return prev;
         }
@@ -234,7 +256,8 @@ class CallsiteIterator implements ITmfCallsiteIterator {
                     long line = (Integer) lineValue;
                     String fileName = fInterner.resolve(ss, fileId, fSourceQuark);
                     if (fileName != null) {
-                        return new TimeCallsite(new TmfCallsite(fileName, line == -1 ? null : line), fileInterval.getStartTime());
+                        long time = Math.max(fileInterval.getStartTime(), lineInterval.getStartTime());
+                        return new TimeCallsite(new TmfCallsite(fileName, line == -1 ? null : line), time);
                     }
                 }
             }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 Ericsson
+ * Copyright (c) 2019, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -48,7 +48,8 @@ import org.junit.Test;
 public class CallsiteTest {
 
     private static final String KERNEL_ANALYSIS = "testfiles/kernel_analysis/lttng_kernel_analysis.xml";
-    private static final List<@NonNull ITmfCallsite> EXPECTED = Arrays.asList(new TmfCallsite("fs/open.c", 0L));
+    private static final List<@NonNull ITmfCallsite> EXPECTED_40 = Arrays.asList(new TmfCallsite("fs/open.c", 0L));
+    private static final List<@NonNull ITmfCallsite> EXPECTED_71 = Arrays.asList(new TmfCallsite("fs/read_write.c", 0L));
     private TmfXmlKernelTraceStub fTrace;
 
     /**
@@ -86,13 +87,15 @@ public class CallsiteTest {
         assertTrue(module.waitForCompletion());
         String uuid = String.valueOf(fTrace.getUUID());
         String cpu = "cpu";
-        List<@NonNull ITmfCallsite> cs = module.getCallsites(uuid, cpu, "0", 42);
-        assertEquals(EXPECTED, cs);
+        assertEquals(Collections.emptyList(), module.getCallsites(uuid, cpu, "0", 39));
+        assertEquals(EXPECTED_40, module.getCallsites(uuid, cpu, "0", 40));
+        assertEquals(EXPECTED_40, module.getCallsites(uuid, cpu, "0", 41));
+        assertEquals(EXPECTED_40, module.getCallsites(uuid, cpu, "0", 70));
+        assertEquals(EXPECTED_71, module.getCallsites(uuid, cpu, "0", 71));
+        assertEquals(EXPECTED_71, module.getCallsites(uuid, cpu, "0", 72));
         assertEquals(Collections.emptyList(), module.getCallsites("Hello", cpu, "0", 42));
         assertEquals(Collections.emptyList(), module.getCallsites(uuid, cpu, "1", 42));
         assertEquals(Collections.emptyList(), module.getCallsites(uuid, cpu, "0", 12));
-        assertEquals(EXPECTED, module.getCallsites(uuid, cpu, "0", 55));
-        assertEquals(Collections.emptyList(), module.getCallsites(uuid, cpu, "..", 42));
         assertEquals(Collections.emptyList(), module.getCallsites(uuid, cpu, "..", 42));
     }
 
@@ -110,36 +113,67 @@ public class CallsiteTest {
         UUID uuid = trace.getUUID();
         assertNotNull(uuid);
         String cpu = "cpu";
-        ITmfCallsiteIterator iter = module.iterator(uuid.toString(), cpu, "0", 1);
-        evaluateIterator(iter, 40, new TmfCallsite("fs/open.c", 0L));
-        evaluateIterator(iter, 71, new TmfCallsite("fs/read_write.c", 0L));
 
-        for (int i = 0; i < 10; i++) {
-            evaluateEmptyIterator(iter);
-        }
+        ITmfCallsiteIterator iter = module.iterator(uuid.toString(), cpu, "0", 1);
+        evaluateNextIterator(iter, 40, new TmfCallsite("fs/open.c", 0L));
+        evaluateNextIterator(iter, 71, new TmfCallsite("fs/read_write.c", 0L));
+        evaluateEmptyNextIterator(iter);
+        evaluateEmptyNextIterator(iter);
+
+        iter = module.iterator(uuid.toString(), cpu, "0", 40);
+        evaluateNextIterator(iter, 40, new TmfCallsite("fs/open.c", 0L));
+        iter = module.iterator(uuid.toString(), cpu, "0", 71);
+        evaluateNextIterator(iter, 71, new TmfCallsite("fs/read_write.c", 0L));
+        iter = module.iterator(uuid.toString(), cpu, "0", 72);
+        evaluateEmptyNextIterator(iter);
+
+        iter = module.iterator(uuid.toString(), cpu, "0", 99);
+        evaluatePrevIterator(iter, 71, new TmfCallsite("fs/read_write.c", 0L));
+        evaluatePrevIterator(iter, 40, new TmfCallsite("fs/open.c", 0L));
+        evaluateEmptyPrevIterator(iter);
+        evaluateEmptyPrevIterator(iter);
+
+        iter = module.iterator(uuid.toString(), cpu, "0", 71);
+        evaluatePrevIterator(iter, 71, new TmfCallsite("fs/read_write.c", 0L));
+        iter = module.iterator(uuid.toString(), cpu, "0", 40);
+        evaluatePrevIterator(iter, 40, new TmfCallsite("fs/open.c", 0L));
+        iter = module.iterator(uuid.toString(), cpu, "0", 39);
+        evaluateEmptyPrevIterator(iter);
+
         iter = module.iterator(uuid.toString(), cpu, "0", 42);
-        evaluateIterator(iter, 40, new TmfCallsite("fs/open.c", 0L));
         for (int i = 0; i < 10; i++) {
-            evaluateIterator(iter, 71, new TmfCallsite("fs/read_write.c", 0L));
-            evaluateEmptyIterator(iter);
+            evaluateNextIterator(iter, 71, new TmfCallsite("fs/read_write.c", 0L));
+            evaluateEmptyNextIterator(iter);
             evaluatePrevIterator(iter, 40, new TmfCallsite("fs/open.c", 0L));
-            evaluateBackEmptyIterator(iter);
+            evaluateEmptyPrevIterator(iter);
         }
+
+        iter = module.iterator(uuid.toString(), cpu, "0", 42);
+        for (int i = 0; i < 10; i++) {
+            evaluatePrevIterator(iter, 40, new TmfCallsite("fs/open.c", 0L));
+            evaluateEmptyPrevIterator(iter);
+            evaluateNextIterator(iter, 71, new TmfCallsite("fs/read_write.c", 0L));
+            evaluateEmptyNextIterator(iter);
+        }
+
         iter = module.iterator("", cpu, "0", 42);
-        evaluateEmptyIterator(iter);
+        evaluateEmptyNextIterator(iter);
+        evaluateEmptyPrevIterator(iter);
+
         iter = module.iterator(uuid.toString(), cpu, "elephant", 42);
-        evaluateEmptyIterator(iter);
+        evaluateEmptyNextIterator(iter);
+        evaluateEmptyPrevIterator(iter);
     }
 
-    private static void evaluateEmptyIterator(Iterator<@NonNull TimeCallsite> iter) {
+    private static void evaluateEmptyNextIterator(Iterator<@NonNull TimeCallsite> iter) {
         assertFalse(iter.hasNext());
     }
 
-    private static void evaluateBackEmptyIterator(ITmfCallsiteIterator iter) {
+    private static void evaluateEmptyPrevIterator(ITmfCallsiteIterator iter) {
         assertFalse(iter.hasPrevious());
     }
 
-    private static void evaluateIterator(Iterator<@NonNull TimeCallsite> iter, long time, TmfCallsite callsite) {
+    private static void evaluateNextIterator(Iterator<@NonNull TimeCallsite> iter, long time, TmfCallsite callsite) {
         assertTrue(iter.hasNext());
         TimeCallsite next = iter.next();
         assertEquals(time, next.getTime());
@@ -148,9 +182,9 @@ public class CallsiteTest {
 
     private static void evaluatePrevIterator(ITmfCallsiteIterator iter, long time, TmfCallsite callsite) {
         assertTrue(iter.hasPrevious());
-        TimeCallsite next = iter.previous();
-        assertEquals(time, next.getTime());
-        assertEquals(callsite, next.getCallsite());
+        TimeCallsite previous = iter.previous();
+        assertEquals(time, previous.getTime());
+        assertEquals(callsite, previous.getCallsite());
     }
 
 }
