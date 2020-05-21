@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -105,7 +105,9 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
                         name = "0x" + Long.toUnsignedString(address, 16); //$NON-NLS-1$
                     }
                     if (address != null) {
-                        name = SymbolProviderUtils.getSymbolText(fProviders, pid, interval.getStartTime(), address);
+                        synchronized (fProviders) {
+                            name = SymbolProviderUtils.getSymbolText(fProviders, pid, interval.getStartTime(), address);
+                        }
                     }
                     return name;
                 }
