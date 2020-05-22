@@ -163,7 +163,13 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
             List<Integer> threadQuarks = ss.getQuarks(processQuark, getAnalysisModule().getThreadsPattern());
             for (int threadQuark : threadQuarks) {
                 int callStackQuark = ss.optQuarkRelative(threadQuark, CallStackAnalysis.CALL_STACK);
-                if (callStackQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
+                if (callStackQuark == ITmfStateSystem.INVALID_ATTRIBUTE ||
+                        callStackQuark >= fullStart.size() ||
+                        threadQuark >= fullStart.size()) {
+                    /*
+                     * Ignore if no call stack attribute or if attributes were
+                     * newly created after the full state queries.
+                     */
                     continue;
                 }
                 String threadName = ss.getAttributeName(threadQuark);
