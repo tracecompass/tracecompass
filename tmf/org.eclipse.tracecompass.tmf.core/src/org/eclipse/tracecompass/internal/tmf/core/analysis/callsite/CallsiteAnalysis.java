@@ -73,4 +73,13 @@ public class CallsiteAnalysis extends TmfStateSystemAnalysisModule implements IT
     public ITmfCallsiteIterator iterator(String traceId, String deviceType, String deviceId, long initialTime) {
         return new CallsiteIterator(getStateSystem(), traceId, deviceType, deviceId, initialTime, fSSInterner);
     }
+
+    /**
+     * Returns the state system string interner
+     *
+     * @return the state system string interner
+     */
+    protected StateSystemStringInterner getStringInterner() {
+        return fSSInterner;
+    }
 }

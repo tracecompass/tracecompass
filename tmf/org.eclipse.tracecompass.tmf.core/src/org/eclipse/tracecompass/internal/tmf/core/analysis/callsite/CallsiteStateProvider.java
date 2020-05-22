@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 Ericsson
+ * Copyright (c) 2019, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.internal.tmf.core.analysis.callsite;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
@@ -30,19 +31,18 @@ import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Iterables;
-
 /**
- * Callsite state provider, will write callsites with file names intened to a
+ * Callsite state provider, will write callsites with file names interned to a
  * tree as illustrated below.
  *
  * <pre>
  * +-Devices
- * | |- PATH
- * | |  |- File (top of callsite stack)
- * | |  \- Line (top of callsite stack)
- * | \- n
+ * | +-<trace UUID>
+ * | | +-<device type>
+ * | | | +-<device ID>
+ * | | | | +- Files(interned string Integer) (top of callsite stack)
+ * | | | | \- Lines(Integer)                 (top of callsite stack)
+ * | : : :
  * \-Sources(String) (time is the offset. This is used to intern strings)
  * </pre>
  *
@@ -87,10 +87,12 @@ public class CallsiteStateProvider extends AbstractTmfStateProvider {
      */
     public static final String STRING_POOL = "Sources"; //$NON-NLS-1$
 
-    private int fSourceQuark = ITmfStateSystem.INVALID_ATTRIBUTE;
-    private int fDevicesQuark = ITmfStateSystem.INVALID_ATTRIBUTE;
+    private int fSourceQuark;
+    private int fDevicesQuark;
 
     private final StateSystemStringInterner fInterner;
+
+    private Iterable<ITmfEventAspect<?>> fCsAspects;
 
     /**
      * Instantiate a new state provider.
@@ -105,6 +107,7 @@ public class CallsiteStateProvider extends AbstractTmfStateProvider {
     public CallsiteStateProvider(ITmfTrace trace, String id, StateSystemStringInterner interner) {
         super(trace, id);
         fInterner = interner;
+        fCsAspects = TmfTraceUtils.getEventAspects(trace, TmfCallsiteAspect.class);
     }
 
     @Override
@@ -113,72 +116,78 @@ public class CallsiteStateProvider extends AbstractTmfStateProvider {
     }
 
     @Override
+    public void assignTargetStateSystem(ITmfStateSystemBuilder ssb) {
+        super.assignTargetStateSystem(ssb);
+        fSourceQuark = ssb.getQuarkAbsoluteAndAdd(STRING_POOL);
+        fDevicesQuark = ssb.getQuarkAbsoluteAndAdd(DEVICES);
+    }
+
+    @Override
     protected void eventHandle(@NonNull ITmfEvent event) {
+        ITmfStateSystemBuilder ssb = Objects.requireNonNull(getStateSystemBuilder());
+        List<ITmfCallsite> callsites = null;
+        for (ITmfEventAspect<?> aspect : fCsAspects) {
+            Object result = aspect.resolve(event);
+            if (result instanceof List) {
+                callsites = (List<ITmfCallsite>) result;
+                break;
+            }
+        }
+        if (callsites == null || callsites.isEmpty()) {
+            return;
+        }
+        int root = getRootAttribute(event);
+        if (root == ITmfStateSystem.INVALID_ATTRIBUTE) {
+            return;
+        }
+        int filesQuark = ssb.getQuarkRelativeAndAdd(root, FILES);
+        int linesQuark = ssb.getQuarkRelativeAndAdd(root, LINES);
+        long time = event.getTimestamp().toNanos();
+        try {
+            Integer prevFile = (Integer) ssb.queryOngoing(filesQuark);
+            ssb.modifyAttribute(time, (int) (fInterner.intern(ssb, callsites.get(0).getFileName(), fSourceQuark) - ssb.getStartTime()), filesQuark);
+            Integer nextFile = (Integer) ssb.queryOngoing(filesQuark);
+            Long lineNo = callsites.get(0).getLineNo();
+            Integer prevLine = (Integer) ssb.queryOngoing(filesQuark);
+            Integer nextLine = lineNo == null ? null : Integer.valueOf(lineNo.intValue());
+            // have at least one change if a trace has two identical callsites.
+            if (Objects.equals(prevLine, nextLine) && Objects.equals(prevFile, nextFile)) {
+                ssb.modifyAttribute(time, (Object) null, linesQuark);
+            }
+            ssb.modifyAttribute(time, nextLine, linesQuark);
+        } catch (StateValueTypeException | IndexOutOfBoundsException | TimeRangeException e) {
+            Activator.logError(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get or create the root attribute for the specified event. This attribute
+     * is the parent of the {@value #FILES} and {@value #LINES} attributes.
+     *
+     * @param event
+     *            the event
+     * @return the root attribute or {@link ITmfStateSystem#INVALID_ATTRIBUTE}
+     */
+    protected int getRootAttribute(ITmfEvent event) {
+        String deviceId = null;
+        String deviceType = null;
         ITmfTrace trace = event.getTrace();
-        Iterable<ITmfEventAspect<?>> csAspects = TmfTraceUtils.getEventAspects(trace, TmfCallsiteAspect.class);
-        if (!Iterables.isEmpty(csAspects)) {
-            ITmfStateSystemBuilder ssb = getStateSystemBuilder();
-            if (ssb == null) {
-                return;
-            }
-            int sourceQuark = fSourceQuark;
-            if (sourceQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
-                sourceQuark = ssb.getQuarkAbsoluteAndAdd(STRING_POOL);
-                fSourceQuark = sourceQuark;
-            }
-            int devicesQuark = fDevicesQuark;
-            if (devicesQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
-                devicesQuark = ssb.getQuarkAbsoluteAndAdd(DEVICES);
-                fDevicesQuark = devicesQuark;
-            }
-            String deviceId = null;
-            String deviceType = null;
-            for (ITmfEventAspect<?> aspect : trace.getEventAspects()) {
-                if (aspect instanceof TmfDeviceAspect) {
-                    TmfDeviceAspect deviceAspect = (TmfDeviceAspect) aspect;
-                    Object result = deviceAspect.resolve(event);
-                    if (result != null) {
-                        deviceId = result.toString();
-                        deviceType = deviceAspect.getDeviceType();
-                        break;
-                    }
-                }
-            }
-            if (deviceId == null) {
-                return;
-            }
-            List<String> path = Arrays.asList(String.valueOf(trace.getUUID()), deviceType, deviceId);
-            List<ITmfCallsite> callsites = null;
-            for (ITmfEventAspect<?> aspect : csAspects) {
-                Object result = aspect.resolve(event);
-                if (result instanceof List) {
-                    callsites = (List<ITmfCallsite>) result;
+        for (ITmfEventAspect<?> aspect : trace.getEventAspects()) {
+            if (aspect instanceof TmfDeviceAspect) {
+                TmfDeviceAspect deviceAspect = (TmfDeviceAspect) aspect;
+                Object result = deviceAspect.resolve(event);
+                if (result != null) {
+                    deviceId = result.toString();
+                    deviceType = deviceAspect.getDeviceType();
                     break;
                 }
             }
-            if (callsites != null && !callsites.isEmpty()) {
-                int root = ssb.getQuarkRelativeAndAdd(devicesQuark, Iterables.toArray(path, String.class));
-                int filesQuark = ssb.getQuarkRelativeAndAdd(root, FILES);
-                int linesQuark = ssb.getQuarkRelativeAndAdd(root, LINES);
-                long time = event.getTimestamp().toNanos();
-                try {
-                    Integer prevFile = (Integer) ssb.queryOngoing(filesQuark);
-                    ssb.modifyAttribute(time, (int) (fInterner.intern(ssb, callsites.get(0).getFileName(), sourceQuark) - ssb.getStartTime()), filesQuark);
-                    Integer nextFile = (Integer) ssb.queryOngoing(filesQuark);
-                    Long lineNo = callsites.get(0).getLineNo();
-                    Integer prevLine = (Integer) ssb.queryOngoing(filesQuark);
-                    Integer nextLine = lineNo == null ? null : Integer.valueOf(lineNo.intValue());
-                    // have at lease one change if a trace has two identifcal callsites.
-                    if (Objects.equal(prevLine, nextLine) && Objects.equal(prevFile, nextFile)) {
-                        ssb.modifyAttribute(time, (Object) null, linesQuark);
-                    }
-                    ssb.modifyAttribute(time, nextLine, linesQuark);
-                } catch (StateValueTypeException | IndexOutOfBoundsException | TimeRangeException e) {
-                    Activator.logError(e.getMessage(), e);
-                }
-            }
         }
-
+        if (deviceId == null) {
+            return ITmfStateSystem.INVALID_ATTRIBUTE;
+        }
+        ITmfStateSystemBuilder ssb = Objects.requireNonNull(getStateSystemBuilder());
+        return ssb.getQuarkRelativeAndAdd(fDevicesQuark, String.valueOf(trace.getUUID()), deviceType, deviceId);
     }
 
     @Override
