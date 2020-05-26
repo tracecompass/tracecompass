@@ -43,6 +43,7 @@ public final class BtfEventTypeFactory {
         builder.put("ISR", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_ISRName), Messages.BtfTypeId_ISRDescr)); //$NON-NLS-1$
         builder.put("R", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_RName), Messages.BtfTypeId_RDescr)); //$NON-NLS-1$
         builder.put("IB", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_IBName), Messages.BtfTypeId_IBDescr)); //$NON-NLS-1$
+        builder.put("I", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_IName), Messages.BtfTypeId_IDescr)); //$NON-NLS-1$
         // Hardware
         builder.put("ECU", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_ECUName), Messages.BtfTypeId_ECUDescr)); //$NON-NLS-1$
         builder.put("P", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_PName), Messages.BtfTypeId_PDescr)); //$NON-NLS-1$
@@ -53,6 +54,7 @@ public final class BtfEventTypeFactory {
         builder.put("SEM", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_SEMName), Messages.BtfTypeId_SEMDescr)); //$NON-NLS-1$
         // Information
         builder.put("SIM", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_SIMName), Messages.BtfTypeId_SIMDescr)); //$NON-NLS-1$
+        builder.put("SYS", new BtfEventType(nullToEmptyString(Messages.BtfTypeId_SYSName), Messages.BtfTypeId_SYSDescr)); //$NON-NLS-1$
         TYPES = builder.build();
     }
 

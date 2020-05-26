@@ -28,6 +28,8 @@ public class Messages extends NLS {
     public static String BtfTypeId_CName;
     public static String BtfTypeId_ECUDescr;
     public static String BtfTypeId_ECUName;
+    public static String BtfTypeId_IDescr;
+    public static String BtfTypeId_IName;
     public static String BtfTypeId_IBDescr;
     public static String BtfTypeId_IBName;
     public static String BtfTypeId_ISRDescr;
@@ -46,6 +48,8 @@ public class Messages extends NLS {
     public static String BtfTypeId_SIMName;
     public static String BtfTypeId_STIDescr;
     public static String BtfTypeId_STIName;
+    public static String BtfTypeId_SYSDescr;
+    public static String BtfTypeId_SYSName;
     public static String BtfTypeId_TDescr;
     public static String BtfTypeId_TName;
     public static String BTFPayload_Activate;
