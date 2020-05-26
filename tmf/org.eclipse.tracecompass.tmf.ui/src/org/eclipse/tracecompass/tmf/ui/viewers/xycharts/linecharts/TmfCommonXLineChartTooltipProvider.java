@@ -17,12 +17,15 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
 import java.text.Format;
 import java.util.Arrays;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
-import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
+import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfAbstractToolTipHandler;
@@ -31,6 +34,8 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xycharts.TmfBaseProvider;
 import org.swtchart.Chart;
 import org.swtchart.IAxis;
 import org.swtchart.IAxisSet;
+import org.swtchart.IBarSeries;
+import org.swtchart.ILineSeries;
 import org.swtchart.ISeries;
 
 /**
@@ -96,9 +101,11 @@ public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implemen
                     /* Make sure the series values and the value at index exist */
                     if (isValid(index, serie)) {
                         String key = serie.getId();
-                        if (key != null && viewer != null) {
-                            IYAppearance appearance = viewer.getSeriesAppearance(key);
-                            key = String.format(HTML_COLOR_TOOLTIP, appearance.getColor(), key);
+                        Color color = getSeriesColor(serie);
+                        if (key != null && color != null) {
+                            RGBA rgba = color.getRGBA();
+                            RGBAColor rgbaColor = new RGBAColor(rgba.rgb.red, rgba.rgb.green, rgba.rgb.blue, rgba.alpha);
+                            key = String.format(HTML_COLOR_TOOLTIP, rgbaColor, key);
                         }
                         if (key == null) {
                             key = ""; //$NON-NLS-1$
@@ -112,6 +119,15 @@ public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implemen
                     }
                 }
             }
+        }
+
+        private @Nullable Color getSeriesColor(ISeries series) {
+            if (series instanceof IBarSeries) {
+                return ((IBarSeries) series).getBarColor();
+            } else if (series instanceof ILineSeries) {
+                return ((ILineSeries) series).getLineColor();
+            }
+            return null;
         }
     }
 
