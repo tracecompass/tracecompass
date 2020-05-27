@@ -19,6 +19,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
+import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatisticsAnalysis;
 import org.eclipse.tracecompass.analysis.timing.core.statistics.Statistics;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
@@ -36,7 +37,7 @@ import com.google.common.collect.ImmutableList;
  * @author Jean-Christian Kouame
  * @since 3.0
  */
-public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnalysisModule {
+public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnalysisModule implements IStatisticsAnalysis<ISegment> {
 
     private @Nullable ISegmentStoreProvider fSegmentStoreProviderModule;
 
@@ -102,6 +103,7 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
      *         the request is canceled
      * @since 1.3
      */
+    @Override
     public @Nullable IStatistics<ISegment> getStatsForRange(long start, long end, IProgressMonitor monitor) {
         ITmfTrace trace = getTrace();
         if (trace != null && (start == TmfTimeRange.ETERNITY.getStartTime().toNanos() && end == TmfTimeRange.ETERNITY.getEndTime().toNanos())) {
@@ -111,7 +113,7 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
         return getTotalStats(start, end, monitor);
     }
 
-    private Map<@NonNull String, org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics<ISegment>> getPerTypeStats(long start, long end, IProgressMonitor monitor) {
+    private Map<@NonNull String, IStatistics<@NonNull ISegment>> getPerTypeStats(long start, long end, IProgressMonitor monitor) {
         Iterable<@NonNull ISegment> store = getSegmentStore(start, end);
         if (monitor.isCanceled() || store == null) {
             return Collections.emptyMap();
@@ -135,7 +137,8 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
      *         valid or if the request is canceled
      * @since 1.3
      */
-    public Map<@NonNull String, org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics<ISegment>> getStatsPerTypeForRange(long start, long end, IProgressMonitor monitor) {
+    @Override
+    public Map<@NonNull String, IStatistics<@NonNull ISegment>> getStatsPerTypeForRange(long start, long end, IProgressMonitor monitor) {
         ITmfTrace trace = getTrace();
         if (trace != null && (start == TmfTimeRange.ETERNITY.getStartTime().toNanos() && end == TmfTimeRange.ETERNITY.getEndTime().toNanos())) {
             waitForCompletion();
@@ -175,7 +178,7 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
         return total;
     }
 
-    private Map<@NonNull String, org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics<ISegment>> calculateTotalPerType(Iterable<ISegment> segments, IProgressMonitor monitor) {
+    private Map<@NonNull String, IStatistics<@NonNull ISegment>> calculateTotalPerType(Iterable<ISegment> segments, IProgressMonitor monitor) {
         Map<String, IStatistics<ISegment>> perSegmentTypeStats = new HashMap<>();
 
         for (ISegment segment : segments) {
@@ -223,7 +226,8 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
      * @return The complete statistics
      * @since 1.3
      */
-    public @Nullable IStatistics<ISegment> getStatsTotal() {
+    @Override
+    public @Nullable IStatistics<@NonNull ISegment> getStatsTotal() {
         return fTotalStats;
     }
 
@@ -233,7 +237,8 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
      * @return the map of statistics per type
      * @since 1.3
      */
-    public Map<String, IStatistics<ISegment>> getStatsPerType() {
+    @Override
+    public Map<String, IStatistics<@NonNull ISegment>> getStatsPerType() {
         return fPerSegmentTypeStats;
     }
 

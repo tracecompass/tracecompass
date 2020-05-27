@@ -27,6 +27,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.SegmentStoreStatisticsModel;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
 import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
+import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatisticsAnalysis;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
@@ -61,14 +62,16 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
     private static final String STATISTICS_SUFFIX = ".statistics"; //$NON-NLS-1$
     private static final String TOTAL_PREFIX = "Total_"; //$NON-NLS-1$
     private static final String SELECTION_PREFIX = "Selection_"; //$NON-NLS-1$
-    private static final Map<AbstractSegmentStatisticsAnalysis, SegmentStoreStatisticsDataProvider> PROVIDER_MAP = new WeakHashMap<>();
+    private static final Map<IStatisticsAnalysis, SegmentStoreStatisticsDataProvider> PROVIDER_MAP = new WeakHashMap<>();
     private static final AtomicLong ENTRY_ID = new AtomicLong();
 
-    private final AbstractSegmentStatisticsAnalysis fProvider;
+    private final IStatisticsAnalysis fProvider;
     private final String fId;
 
     private final Map<String, Long> fIdToType = new HashMap<>();
     private final long fTraceId = ENTRY_ID.getAndIncrement();
+
+    private final @Nullable IAnalysisModule fModule;
 
     /**
      * Get an instance of {@link SegmentStoreStatisticsDataProvider} for a trace and
@@ -98,21 +101,25 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
      * @param id
      *            the extension point ID
      */
-    public SegmentStoreStatisticsDataProvider(ITmfTrace trace, AbstractSegmentStatisticsAnalysis provider, String id) {
+    public SegmentStoreStatisticsDataProvider(ITmfTrace trace, IStatisticsAnalysis provider, String id) {
         super(trace);
         fId = id;
         fProvider = provider;
+        fModule = provider instanceof IAnalysisModule ? (IAnalysisModule) provider : null;
     }
 
     @Override
     public TmfModelResponse<TmfTreeModel<SegmentStoreStatisticsModel>> fetchTree(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
-        if (monitor != null) {
-            fProvider.waitForCompletion(monitor);
-            if (monitor.isCanceled()) {
-                return new TmfModelResponse<>(null, Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
+        IAnalysisModule module = fModule;
+        if (module != null) {
+            if (monitor != null) {
+                module.waitForCompletion(monitor);
+                if (monitor.isCanceled()) {
+                    return new TmfModelResponse<>(null, Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
+                }
+            } else {
+                module.waitForCompletion();
             }
-        } else {
-            fProvider.waitForCompletion();
         }
 
         IStatistics<ISegment> statsTotal = fProvider.getStatsTotal();
@@ -174,6 +181,8 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         synchronized (fIdToType) {
             fIdToType.clear();
         }
-        fProvider.dispose();
+        if (fModule != null) {
+            fModule.dispose();
+        }
     }
 }
