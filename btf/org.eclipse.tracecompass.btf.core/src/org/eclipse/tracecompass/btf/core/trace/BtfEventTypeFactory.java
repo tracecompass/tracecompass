@@ -18,7 +18,7 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.nullToEmptyStrin
 
 import java.util.Map;
 
-import org.eclipse.tracecompass.btf.core.Messages;
+import org.eclipse.tracecompass.internal.btf.core.Messages;
 import org.eclipse.tracecompass.btf.core.event.BtfEventType;
 
 import com.google.common.collect.ImmutableMap;

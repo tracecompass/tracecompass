@@ -12,7 +12,7 @@
  *   Matthew Khouzam - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.btf.core;
+package org.eclipse.tracecompass.internal.btf.core;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -20,16 +20,16 @@ import org.eclipse.osgi.util.NLS;
  * BTF messages, taken from the spec
  *
  * @author Matthew Khouzam
- * @deprecated should be internal
  */
 @SuppressWarnings("javadoc")
-@Deprecated
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.btf.core.messages"; //$NON-NLS-1$
     public static String BtfTypeId_CDescr;
     public static String BtfTypeId_CName;
     public static String BtfTypeId_ECUDescr;
     public static String BtfTypeId_ECUName;
+    public static String BtfTypeId_IDescr;
+    public static String BtfTypeId_IName;
     public static String BtfTypeId_IBDescr;
     public static String BtfTypeId_IBName;
     public static String BtfTypeId_ISRDescr;
@@ -48,6 +48,8 @@ public class Messages extends NLS {
     public static String BtfTypeId_SIMName;
     public static String BtfTypeId_STIDescr;
     public static String BtfTypeId_STIName;
+    public static String BtfTypeId_SYSDescr;
+    public static String BtfTypeId_SYSName;
     public static String BtfTypeId_TDescr;
     public static String BtfTypeId_TName;
     public static String BTFPayload_Activate;

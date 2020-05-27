@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.btf.core.Messages;
+import org.eclipse.tracecompass.internal.btf.core.Messages;
 import org.eclipse.tracecompass.tmf.core.event.TmfEventField;
 
 import com.google.common.collect.ImmutableMap;
