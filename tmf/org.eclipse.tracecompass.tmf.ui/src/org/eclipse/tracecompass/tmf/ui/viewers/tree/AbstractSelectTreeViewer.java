@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2020 Ericsson, Draeger Auriga
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -90,10 +91,13 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
 
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(AbstractSelectTreeViewer.class);
 
+    private static final AtomicInteger INSTANCE_ID_SEQUENCE = new AtomicInteger(0);
+
     /** Timeout between updates in the updateData thread **/
     private static final long BUILD_UPDATE_TIMEOUT = 500;
 
     /** ID of the checked tree items in the map of data in {@link TmfTraceContext} */
+    private static final char SEP = ':';
     private static final @NonNull String CHECKED_ELEMENTS = ".CHECKED_ELEMENTS"; //$NON-NLS-1$
     private static final @NonNull String FILTER_STRING = ".FILTER_STRING"; //$NON-NLS-1$
     private static final @NonNull String UPDATE_CONTENT_JOB_NAME = "AbstractSelectTreeViewer#updateContent Job"; //$NON-NLS-1$
@@ -102,6 +106,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
 
     private final String fId;
     private final @NonNull String fLogCategory;
+    private final int fInstanceId;
 
     private static final ViewerComparator COMPARATOR = new ViewerComparator() {
         @Override
@@ -210,6 +215,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         fId = id;
         fLogCategory = fId + LOG_CATEGORY_SUFFIX;
         setLabelProvider(new DataProviderTreeLabelProvider());
+        fInstanceId = INSTANCE_ID_SEQUENCE.incrementAndGet();
     }
 
     /**
@@ -295,13 +301,13 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
             return;
         }
         TmfTraceContext ctx = TmfTraceManager.getInstance().getTraceContext(trace);
-        Set<Long> ids = (Set<Long>) ctx.getData(getClass() + CHECKED_ELEMENTS);
+        Set<Long> ids = (Set<Long>) ctx.getData(getDataContextId(CHECKED_ELEMENTS));
         if (ids != null && rootEntry != null) {
             List<ITmfTreeViewerEntry> checkedElements = new ArrayList<>();
             checkEntries(ids, rootEntry, checkedElements);
             internalSetCheckedElements(checkedElements.toArray());
         }
-        Object filterString = ctx.getData(getClass() + FILTER_STRING);
+        Object filterString = ctx.getData(getDataContextId(FILTER_STRING));
         if (filterString instanceof String) {
             fCheckboxTree.setFilterText((String) filterString);
         } else {
@@ -536,9 +542,13 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
             Text filterControl = fCheckboxTree.getFilterControl();
             String filterString = filterControl != null ? filterControl.getText() : null;
             TmfTraceManager.getInstance().updateTraceContext(previousTrace,
-                    builder -> builder.setData(getClass() + CHECKED_ELEMENTS, ids)
-                    .setData(getClass() + FILTER_STRING, filterString));
+                    builder -> builder.setData(getDataContextId(CHECKED_ELEMENTS), ids)
+                    .setData(getDataContextId(FILTER_STRING), filterString));
         }
+    }
+
+    private @NonNull String getDataContextId(String baseKey) {
+        return getClass().getName() + SEP + fInstanceId + baseKey;
     }
 
     private void restorePatternFilter(ITmfTrace trace) {
