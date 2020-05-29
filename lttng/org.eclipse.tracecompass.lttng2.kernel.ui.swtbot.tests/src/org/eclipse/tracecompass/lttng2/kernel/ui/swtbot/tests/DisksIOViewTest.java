@@ -14,17 +14,23 @@ package org.eclipse.tracecompass.lttng2.kernel.ui.swtbot.tests;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+import java.util.Objects;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.IODataPalette;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.io.diskioactivity.DiskIOActivityView;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
+import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.util.Pair;
 import org.eclipse.tracecompass.tmf.ctf.core.tests.shared.CtfTmfTestTraceUtils;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
@@ -44,8 +50,16 @@ import org.eclipse.swtchart.LineStyle;
  */
 public class DisksIOViewTest extends XYDataProviderBaseTest {
 
-    private static final RGB PURPLE = new RGB(255, 0, 255);
-    private static final RGB GREEN = new RGB(0, 255, 0);
+    private static final RGB READ_COLOR;
+    private static final RGB WRITE_COLOR;
+    static {
+        List<@NonNull Pair<@NonNull String, @NonNull String>> colors = IODataPalette.getColors();
+        Pair<@NonNull String, @NonNull String> pair = colors.get(0);
+        RGBAColor readRgba = Objects.requireNonNull(RGBAColor.fromString(pair.getFirst(), 255));
+        RGBAColor writeRgba = Objects.requireNonNull(RGBAColor.fromString(pair.getSecond(), 255));
+        READ_COLOR = new RGB(readRgba.getRed(), readRgba.getGreen(), readRgba.getBlue());
+        WRITE_COLOR = new RGB(writeRgba.getRed(), writeRgba.getGreen(), writeRgba.getBlue());
+    }
 
     private static final int NUMBER_OF_POINT = 50;
     private static final int MORE_POINTS = 100;
@@ -107,8 +121,8 @@ public class DisksIOViewTest extends XYDataProviderBaseTest {
     }
 
     private void verifyChartStyle() {
-        verifySeriesStyle(READ_SERIES_NAME, ISeries.SeriesType.LINE, GREEN, LineStyle.SOLID, true);
-        verifySeriesStyle(WRITE_SERIES_NAME, ISeries.SeriesType.LINE, PURPLE, LineStyle.SOLID, true);
+        verifySeriesStyle(READ_SERIES_NAME, ISeries.SeriesType.LINE, READ_COLOR, LineStyle.SOLID, true);
+        verifySeriesStyle(WRITE_SERIES_NAME, ISeries.SeriesType.LINE, WRITE_COLOR, LineStyle.SOLID, true);
     }
 
     @Override

@@ -20,21 +20,31 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.xy.AbstractTreeCommonXDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
+import org.eclipse.tracecompass.tmf.core.model.IOutputStyleProvider;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.OutputStyleModel;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.model.YModel;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
+import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+import org.eclipse.tracecompass.tmf.core.util.Pair;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
@@ -45,12 +55,8 @@ import com.google.common.collect.Maps;
  *
  * @author Yonni Chen
  */
-public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOutputAnalysisModule, TmfTreeDataModel> {
-
-    /**
-     * Title used to create XY models for the {@link DisksIODataProvider}.
-     */
-    protected static final String PROVIDER_TITLE = Objects.requireNonNull(Messages.DisksIODataProvider_title);
+public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOutputAnalysisModule, TmfTreeDataModel>
+        implements IOutputStyleProvider {
 
     /**
      * Extension point ID.
@@ -58,8 +64,30 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
     public static final String ID = "org.eclipse.tracecompass.analysis.os.linux.core.inputoutput.DisksIODataProvider"; //$NON-NLS-1$
 
     /**
-     * Inline class to encapsulate all the values required to build a series. Allows
-     * for reuse of full query results to be faster than {@link Disk}.
+     * Title used to create XY models for the {@link DisksIODataProvider}.
+     */
+    protected static final String PROVIDER_TITLE = Objects.requireNonNull(Messages.DisksIODataProvider_title);
+
+    private static final String BASE_STYLE = "base"; //$NON-NLS-1$
+    private static final Map<String, OutputElementStyle> STATE_MAP;
+    private static final List<Pair<String, String>> COLOR_LIST = IODataPalette.getColors();
+    private static final List<String> SUPPORTED_STYLES = ImmutableList.of(
+            StyleProperties.SeriesStyle.SOLID,
+            StyleProperties.SeriesStyle.DASH,
+            StyleProperties.SeriesStyle.DOT,
+            StyleProperties.SeriesStyle.DASHDOT,
+            StyleProperties.SeriesStyle.DASHDOTDOT);
+
+    static {
+        // Create the base style
+        ImmutableMap.Builder<@NonNull String, @NonNull OutputElementStyle> builder = new ImmutableMap.Builder<>();
+        builder.put(BASE_STYLE, new OutputElementStyle(null, ImmutableMap.of(StyleProperties.SERIES_TYPE, StyleProperties.SeriesType.AREA, StyleProperties.WIDTH, 1.0f)));
+        STATE_MAP = builder.build();
+    }
+
+    /**
+     * Inline class to encapsulate all the values required to build a series.
+     * Allows for reuse of full query results to be faster than {@link Disk}.
      */
     private static final class DiskBuilder {
 
@@ -96,8 +124,8 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
         }
 
         /**
-         * Update the value for the counter at the desired index. Use in increasing
-         * order of position
+         * Update the value for the counter at the desired index. Use in
+         * increasing order of position
          *
          * @param pos
          *            index to update
@@ -108,8 +136,8 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
          */
         private void updateValue(int pos, double newCount, long deltaT) {
             /**
-             * Linear interpolation to compute the disk throughput between time and the
-             * previous time, from the number of sectors at each time.
+             * Linear interpolation to compute the disk throughput between time
+             * and the previous time, from the number of sectors at each time.
              */
             fValues[pos] = (newCount - fPrevCount) * RATIO / deltaT;
             fPrevCount = newCount;
@@ -120,10 +148,9 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
         }
     }
 
-
     /**
-     * Create an instance of {@link DisksIODataProvider}. Returns a null instance if
-     * the analysis module is not found.
+     * Create an instance of {@link DisksIODataProvider}. Returns a null
+     * instance if the analysis module is not found.
      *
      * @param trace
      *            A trace on which we are interested to fetch a model
@@ -160,20 +187,34 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
         String readName = Objects.requireNonNull(Messages.DisksIODataProvider_read);
         String writeName = Objects.requireNonNull(Messages.DisksIODataProvider_write);
 
+        int i = 0;
         for (Integer diskQuark : ss.getQuarks(Attributes.DISKS, "*")) { //$NON-NLS-1$
             String diskName = DiskUtils.getDiskName(ss, diskQuark);
             long diskId = getId(diskQuark);
-            nodes.add(new TmfTreeDataModel(diskId, rootId, Collections.singletonList(diskName)));
+            nodes.add(new TmfTreeDataModel(diskId, rootId, Collections.singletonList(diskName), false, null));
+
+            // Get read and write color for this disk
+            Pair<String, String> pair = COLOR_LIST.get(i % COLOR_LIST.size());
+            String seriesStyle = SUPPORTED_STYLES.get((i / COLOR_LIST.size()) % SUPPORTED_STYLES.size());
 
             int readQuark = ss.optQuarkRelative(diskQuark, Attributes.SECTORS_READ);
             if (readQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
-                nodes.add(new TmfTreeDataModel(getId(readQuark), diskId, Collections.singletonList(readName)));
+                nodes.add(new TmfTreeDataModel(getId(readQuark), diskId, Collections.singletonList(readName), true,
+                        new OutputElementStyle(BASE_STYLE, ImmutableMap.of(
+                                StyleProperties.COLOR, pair.getFirst(),
+                                StyleProperties.SERIES_STYLE, seriesStyle,
+                                StyleProperties.STYLE_NAME, diskName + '/' + readName))));
             }
 
             int writeQuark = ss.optQuarkRelative(diskQuark, Attributes.SECTORS_WRITTEN);
             if (writeQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
-                nodes.add(new TmfTreeDataModel(getId(writeQuark), diskId, Collections.singletonList(writeName)));
+                nodes.add(new TmfTreeDataModel(getId(writeQuark), diskId, Collections.singletonList(writeName), true,
+                        new OutputElementStyle(BASE_STYLE, ImmutableMap.of(
+                        StyleProperties.COLOR, pair.getSecond(),
+                        StyleProperties.SERIES_STYLE, seriesStyle,
+                        StyleProperties.STYLE_NAME, diskName + '/' + writeName))));
             }
+            i++;
         }
         return new TmfTreeModel<>(Collections.emptyList(), nodes);
     }
@@ -257,4 +298,8 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
         return PROVIDER_TITLE;
     }
 
+    @Override
+    public TmfModelResponse<OutputStyleModel> fetchStyle(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+        return new TmfModelResponse<>(new OutputStyleModel(STATE_MAP), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+    }
 }
