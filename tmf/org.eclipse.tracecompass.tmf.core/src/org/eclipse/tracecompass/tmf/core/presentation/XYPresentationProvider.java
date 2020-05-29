@@ -76,10 +76,13 @@ public class XYPresentationProvider implements IXYPresentationProvider {
 
     private IYAppearance typeToYAppearance(OutputElementStyle seriesStyle) {
         Map<String, Object> styleValues = seriesStyle.getStyleValues();
+        String color = (String) styleValues.get(StyleProperties.COLOR);
+        int alpha = (int) ((Double) styleValues.getOrDefault(StyleProperties.OPACITY, 1.0) * 255);
+        RGBAColor rgba = (color == null ? generateColor() : Objects.requireNonNull(RGBAColor.fromString(color, alpha)));
         return new YAppearance(String.valueOf(styleValues.getOrDefault(StyleProperties.STYLE_NAME, "style name")), //$NON-NLS-1$
                 String.valueOf(styleValues.getOrDefault(StyleProperties.SERIES_TYPE, StyleProperties.SeriesType.LINE)),
                 String.valueOf(styleValues.getOrDefault(StyleProperties.SERIES_STYLE, StyleProperties.SeriesStyle.SOLID)),
-                Objects.requireNonNull(RGBAColor.fromString((String) styleValues.getOrDefault(StyleProperties.COLOR, generateColor()))),
+                rgba,
                 (int) styleValues.getOrDefault(StyleProperties.WIDTH, 1));
     }
 
