@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017-2020 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -11,6 +11,7 @@
 
 package org.eclipse.tracecompass.tmf.core.model.xy;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.viewmodel.IYSeries;
 
 /**
@@ -45,4 +46,15 @@ public interface IYModel {
      * @return An array of y values
      */
     double[] getData();
+
+    /**
+     * Get the Y axis description for this model
+     *
+     * @return The Y axis description, or <code>null</code> if the description
+     *         is not provided by the data provider
+     * @since 6.1
+     */
+    default @Nullable TmfXYAxisDescription getYAxisDescription() {
+        return null;
+    }
 }

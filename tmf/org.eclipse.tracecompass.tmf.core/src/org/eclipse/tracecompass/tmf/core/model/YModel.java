@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017-2020 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -16,6 +16,7 @@ import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.tmf.core.model.xy.TmfXYAxisDescription;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -39,6 +40,8 @@ public class YModel implements IYModel {
     @SerializedName("yValues")
     private final double[] fYValues;
 
+    private final @Nullable TmfXYAxisDescription fYAxis;
+
     /**
      * Constructor
      *
@@ -53,6 +56,7 @@ public class YModel implements IYModel {
         fId = id;
         fName = name;
         fYValues = yValues;
+        fYAxis = null;
     }
 
     /**
@@ -65,9 +69,27 @@ public class YModel implements IYModel {
      * @since 6.0
      */
     public YModel(long id, double[] yValues) {
+        this(id, String.valueOf(id), yValues, null);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param id
+     *            the series' ID
+     * @param name
+     *            The name of the series
+     * @param yValues
+     *            The y series values
+     * @param yAxis
+     *            The type of data in this model
+     * @since 6.1
+     */
+    public YModel(long id, String name, double[] yValues, @Nullable TmfXYAxisDescription yAxis) {
         fId = id;
-        fName = String.valueOf(id);
+        fName = name;
         fYValues = yValues;
+        fYAxis = yAxis;
     }
 
     @Override
@@ -78,6 +100,11 @@ public class YModel implements IYModel {
     @Override
     public String getName() {
         return fName;
+    }
+
+    @Override
+    public @Nullable TmfXYAxisDescription getYAxisDescription() {
+        return fYAxis;
     }
 
     @Override

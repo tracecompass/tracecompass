@@ -19,11 +19,12 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
-import org.eclipse.tracecompass.tmf.core.model.SeriesModel;
+import org.eclipse.tracecompass.tmf.core.model.SeriesModel.SeriesModelBuilder;
 import org.eclipse.tracecompass.tmf.core.model.TmfXyModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.tmf.core.model.xy.TmfXYAxisDescription;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 
@@ -61,7 +62,14 @@ public final class TmfXyResponseFactory {
      *         completed status
      */
     public static TmfModelResponse<ITmfXyModel> create(String title, long[] xValues, Collection<IYModel> yModels, boolean isComplete) {
-        List<ISeriesModel> series = Lists.transform(new ArrayList<>(yModels), model -> new SeriesModel(model.getId(), model.getName(), xValues, model.getData()));
+        List<ISeriesModel> series = Lists.transform(new ArrayList<>(yModels), model -> {
+            SeriesModelBuilder builder = new SeriesModelBuilder(model.getId(), model.getName(), xValues, model.getData());
+            TmfXYAxisDescription yAxis = model.getYAxisDescription();
+            if (yAxis != null) {
+                builder.yAxisDescription(yAxis);
+            }
+            return builder.build();
+        });
         ITmfXyModel model = new TmfXyModel(title, series);
 
         if (isComplete) {
