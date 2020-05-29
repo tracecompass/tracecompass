@@ -27,8 +27,6 @@ public class Messages extends NLS {
     public static @Nullable String DiskIOActivityViewer_Title;
     /** X axis caption */
     public static @Nullable String DiskIOActivityViewer_XAxis;
-    /** Y axis caption */
-    public static @Nullable String DiskIOActivityViewer_YAxis;
     /** Disk Name column */
     public static @Nullable String DiskIOActivityTreeViewer_DiskName;
     /** Legend Column*/

@@ -27,6 +27,7 @@ import org.eclipse.tracecompass.internal.tmf.core.model.xy.AbstractTreeCommonXDa
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataType;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.IOutputStyleProvider;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
@@ -37,6 +38,7 @@ import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.IYModel;
+import org.eclipse.tracecompass.tmf.core.model.xy.TmfXYAxisDescription;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -70,7 +72,9 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
 
     private static final String BASE_STYLE = "base"; //$NON-NLS-1$
     private static final Map<String, OutputElementStyle> STATE_MAP;
+    private static final String BINARY_SPEED_UNIT = "B/s"; //$NON-NLS-1$
     private static final List<Pair<String, String>> COLOR_LIST = IODataPalette.getColors();
+    private static final TmfXYAxisDescription Y_AXIS_DESCRIPTION = new TmfXYAxisDescription(Objects.requireNonNull(Messages.DiskIODataProvider_YAxis), BINARY_SPEED_UNIT, DataType.BINARY_NUMBER);
     private static final List<String> SUPPORTED_STYLES = ImmutableList.of(
             StyleProperties.SeriesStyle.SOLID,
             StyleProperties.SeriesStyle.DASH,
@@ -144,7 +148,7 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
         }
 
         private IYModel build() {
-            return new YModel(fId, fName, fValues);
+            return new YModel(fId, fName, fValues, Y_AXIS_DESCRIPTION);
         }
     }
 

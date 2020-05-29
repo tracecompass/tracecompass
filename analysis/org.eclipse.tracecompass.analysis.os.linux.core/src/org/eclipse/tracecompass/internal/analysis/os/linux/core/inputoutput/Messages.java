@@ -44,6 +44,8 @@ public class Messages extends NLS {
 
     /** Help text for the IO analysis */
     public static @Nullable String LttngInputOutputModule_Help;
+    /** Y axis caption */
+    public static @Nullable String DiskIODataProvider_YAxis;
 
     static {
         // initialize resource bundle
