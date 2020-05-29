@@ -174,7 +174,7 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
                 TmfGenericTreeEntry<TmfTreeDataModel> genericEntry = (TmfGenericTreeEntry<TmfTreeDataModel>) element;
                 TmfTreeDataModel model = genericEntry.getModel();
                 if (model.hasRowModel()) {
-                    return getLegendImage(String.valueOf(genericEntry.getModel().getId()));
+                    return getLegendImage(genericEntry.getModel().getId());
                 }
             }
             return null;
