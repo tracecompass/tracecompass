@@ -186,7 +186,7 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
     protected TmfTreeModel<TmfTreeDataModel> getTree(ITmfStateSystem ss, Map<String, Object> parameters, @Nullable IProgressMonitor monitor) {
         List<TmfTreeDataModel> nodes = new ArrayList<>();
         long rootId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
-        nodes.add(new TmfTreeDataModel(rootId, -1, Collections.singletonList(getTrace().getName())));
+        nodes.add(new TmfTreeDataModel(rootId, -1, Collections.singletonList(getTrace().getName()), false, null));
 
         String readName = Objects.requireNonNull(Messages.DisksIODataProvider_read);
         String writeName = Objects.requireNonNull(Messages.DisksIODataProvider_write);
