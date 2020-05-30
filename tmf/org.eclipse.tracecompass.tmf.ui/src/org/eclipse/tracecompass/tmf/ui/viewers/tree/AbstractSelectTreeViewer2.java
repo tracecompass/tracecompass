@@ -298,7 +298,7 @@ public abstract class AbstractSelectTreeViewer2 extends AbstractTmfTreeViewer {
         if (ids != null && rootEntry != null) {
             List<ITmfTreeViewerEntry> checkedElements = new ArrayList<>();
             checkEntries(ids, rootEntry, checkedElements);
-            fCheckboxTree.setCheckedElements(checkedElements.toArray());
+            internalSetCheckedElements(checkedElements.toArray());
         }
         Object filterString = ctx.getData(getClass() + FILTER_STRING);
         if (filterString instanceof String) {
@@ -306,11 +306,26 @@ public abstract class AbstractSelectTreeViewer2 extends AbstractTmfTreeViewer {
         } else {
             fCheckboxTree.setFilterText(""); //$NON-NLS-1$
         }
+        getTreeViewer().refresh();
+    }
 
+    /**
+     * Checks all the passed elements and unchecks all the other.
+     *
+     * @param checkedElements
+     *            the elements to check
+     */
+    protected void setCheckedElements(Object[] checkedElements) {
+        internalSetCheckedElements(checkedElements);
+        getTreeViewer().refresh();
+    }
+
+    private void internalSetCheckedElements(Object[] checkedElements) {
+        fCheckboxTree.setCheckedElements(checkedElements);
+        saveViewContext();
         for (ICheckboxTreeViewerListener listener : fTreeListeners) {
             listener.handleCheckStateChangedEvent(getCheckedViewerEntries());
         }
-        getTreeViewer().refresh();
     }
 
     private Collection<ITmfTreeViewerEntry> getCheckedViewerEntries() {
