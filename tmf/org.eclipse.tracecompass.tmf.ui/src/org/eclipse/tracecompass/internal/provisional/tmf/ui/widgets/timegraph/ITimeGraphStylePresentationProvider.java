@@ -12,6 +12,7 @@
 package org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.model.IStylePresentationProvider;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 

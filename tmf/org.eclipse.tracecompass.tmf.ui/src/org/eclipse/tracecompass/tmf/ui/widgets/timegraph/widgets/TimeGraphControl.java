@@ -92,7 +92,7 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
 import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
-import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.IStylePresentationProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.model.IStylePresentationProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.ITimeGraphStylePresentationProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.util.LineClipper;
 import org.eclipse.tracecompass.internal.tmf.ui.util.StylePropertiesUtils;

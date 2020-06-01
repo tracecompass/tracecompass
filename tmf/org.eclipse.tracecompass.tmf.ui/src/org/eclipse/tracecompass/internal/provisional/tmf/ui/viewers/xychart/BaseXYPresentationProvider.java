@@ -9,7 +9,7 @@
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph;
+package org.eclipse.tracecompass.internal.provisional.tmf.ui.viewers.xychart;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.model.IStylePresentationProvider;
 import org.eclipse.tracecompass.tmf.core.model.IOutputStyleProvider;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 import org.eclipse.tracecompass.tmf.core.model.OutputStyleModel;
