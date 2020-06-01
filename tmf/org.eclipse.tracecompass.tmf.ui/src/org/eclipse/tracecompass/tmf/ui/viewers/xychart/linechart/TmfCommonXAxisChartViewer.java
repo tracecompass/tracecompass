@@ -146,7 +146,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
     @Override
     public void loadTrace(ITmfTrace trace) {
         super.loadTrace(trace);
-        fXYPresentationProvider.putIfAbsent(trace, createPresentationProvider(trace));
+        fXYPresentationProvider.computeIfAbsent(trace, t -> createPresentationProvider(trace));
     }
 
     /**

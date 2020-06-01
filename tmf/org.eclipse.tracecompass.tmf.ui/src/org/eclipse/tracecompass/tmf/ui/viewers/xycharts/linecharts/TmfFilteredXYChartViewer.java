@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -57,7 +58,7 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
     private @NonNull Collection<@NonNull Long> fSelectedIds = Collections.emptyList();
 
     private final String fId;
-    private boolean fUseDefaultStyleValues = true;
+    private final Map<BaseXYPresentationProvider, Boolean> fUseDefaultStyleValues = new HashMap<>();
 
     /**
      * Constructor
@@ -123,6 +124,7 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
         if (signal != null && signal.getTrace().equals(getTrace())) {
             fSelectedIds.clear();
         }
+        fUseDefaultStyleValues.remove(getPresentationProvider2());
         super.traceClosed(signal);
     }
 
@@ -152,16 +154,21 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
 
     @Override
     public @NonNull OutputElementStyle getSeriesStyle(@NonNull Long seriesId) {
-        return fUseDefaultStyleValues ? getPresentationProvider2().getSeriesStyle(seriesId, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH) : getPresentationProvider2().getSeriesStyle(seriesId);
+        BaseXYPresentationProvider presentationProvider = getPresentationProvider2();
+        return fUseDefaultStyleValues.getOrDefault(presentationProvider, true) ? presentationProvider.getSeriesStyle(seriesId, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH) : presentationProvider.getSeriesStyle(seriesId);
     }
 
     @Override
     protected ITmfXYDataProvider initializeDataProvider(ITmfTrace trace) {
-        ITmfTreeXYDataProvider dataProvider = DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeXYDataProvider.class);
-        if (dataProvider instanceof IOutputStyleProvider) {
-            getPresentationProvider2().addProvider(dataProvider);
-            fUseDefaultStyleValues = false;
-        }
+        ITmfTreeXYDataProvider<?> dataProvider = DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeXYDataProvider.class);
+        BaseXYPresentationProvider presentationProvider = getPresentationProvider2();
+        fUseDefaultStyleValues.computeIfAbsent(presentationProvider, pp -> {
+            if (dataProvider instanceof IOutputStyleProvider) {
+                pp.addProvider(dataProvider);
+                return false;
+            }
+            return true;
+        });
         return dataProvider;
     }
 

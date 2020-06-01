@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.tmf.ui.viewers.xychart.linechart;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -55,7 +56,7 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
     private @NonNull Collection<@NonNull Long> fSelectedIds = Collections.emptyList();
 
     private final String fId;
-    private boolean fUseDefaultStyleValues = true;
+    private final Map<BaseXYPresentationProvider, Boolean> fUseDefaultStyleValues = new HashMap<>();
 
     /**
      * Constructor
@@ -121,6 +122,7 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
         if (signal != null && signal.getTrace().equals(getTrace())) {
             fSelectedIds.clear();
         }
+        fUseDefaultStyleValues.remove(getPresentationProvider());
         super.traceClosed(signal);
     }
 
@@ -145,16 +147,21 @@ public class TmfFilteredXYChartViewer extends TmfCommonXAxisChartViewer implemen
 
     @Override
     public @NonNull OutputElementStyle getSeriesStyle(@NonNull Long seriesId) {
-        return fUseDefaultStyleValues ? getPresentationProvider().getSeriesStyle(seriesId, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH) : getPresentationProvider().getSeriesStyle(seriesId);
+        BaseXYPresentationProvider presentationProvider = getPresentationProvider();
+        return fUseDefaultStyleValues.getOrDefault(presentationProvider, true) ? presentationProvider.getSeriesStyle(seriesId, IYAppearance.Type.LINE, DEFAULT_SERIES_WIDTH) : presentationProvider.getSeriesStyle(seriesId);
     }
 
     @Override
     protected ITmfXYDataProvider initializeDataProvider(ITmfTrace trace) {
-        ITmfTreeXYDataProvider dataProvider = DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeXYDataProvider.class);
-        if (dataProvider instanceof IOutputStyleProvider) {
-            getPresentationProvider().addProvider(dataProvider);
-            fUseDefaultStyleValues = false;
-        }
+        ITmfTreeXYDataProvider<?> dataProvider = DataProviderManager.getInstance().getDataProvider(trace, fId, ITmfTreeXYDataProvider.class);
+        BaseXYPresentationProvider presentationProvider = getPresentationProvider();
+        fUseDefaultStyleValues.computeIfAbsent(presentationProvider, pp -> {
+            if (dataProvider instanceof IOutputStyleProvider) {
+                pp.addProvider(dataProvider);
+                return false;
+            }
+            return true;
+        });
         return dataProvider;
     }
 
