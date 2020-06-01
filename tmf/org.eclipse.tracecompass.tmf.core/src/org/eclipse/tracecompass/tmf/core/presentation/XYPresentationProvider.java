@@ -114,7 +114,7 @@ public class XYPresentationProvider implements IXYPresentationProvider {
         builder.put(StyleProperties.SERIES_TYPE, seriesType);
         builder.put(StyleProperties.SERIES_STYLE, generateStyle(seriesType));
         builder.put(StyleProperties.COLOR, X11ColorUtils.toHexColor(color.getRed(), color.getGreen(), color.getBlue()));
-        builder.put(StyleProperties.WIDTH, width);
+        builder.put(StyleProperties.WIDTH, (float) width);
         return new OutputElementStyle(null, builder.build());
     }
 
@@ -125,7 +125,7 @@ public class XYPresentationProvider implements IXYPresentationProvider {
         builder.put(StyleProperties.SERIES_TYPE, seriesType);
         builder.put(StyleProperties.SERIES_STYLE, StyleProperties.SeriesStyle.NONE);
         builder.put(StyleProperties.COLOR, X11ColorUtils.toHexColor(color.getRed(), color.getGreen(), color.getBlue()));
-        builder.put(StyleProperties.WIDTH, width);
+        builder.put(StyleProperties.WIDTH, (float) width);
         builder.put(StyleProperties.SYMBOL_TYPE, generateTickStyle(seriesType));
         return new OutputElementStyle(null, builder.build());
     }
