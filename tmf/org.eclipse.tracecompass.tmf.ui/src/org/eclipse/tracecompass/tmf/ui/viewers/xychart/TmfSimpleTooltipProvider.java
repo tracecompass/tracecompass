@@ -61,7 +61,6 @@ public class TmfSimpleTooltipProvider extends TmfBaseProvider implements MouseTr
      */
     public TmfSimpleTooltipProvider(ITmfChartTimeProvider tmfChartViewer) {
         super(tmfChartViewer);
-        register();
     }
 
     // ------------------------------------------------------------------------

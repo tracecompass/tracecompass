@@ -18,11 +18,11 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swtchart.IAxis;
 import org.eclipse.swtchart.ICustomPaintListener;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density2.AbstractSegmentStoreDensityView;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density2.AbstractSegmentStoreDensityViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.xychart.AxisRange;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.IAxis;
 
 /**
  * Class for providing selection with the left mouse button. It also notifies
@@ -50,7 +50,6 @@ public class MouseSelectionProvider extends BaseMouseProvider implements MouseLi
      */
     public MouseSelectionProvider(AbstractSegmentStoreDensityViewer densityViewer) {
         super(densityViewer);
-        register();
     }
 
     @Override
@@ -63,13 +62,13 @@ public class MouseSelectionProvider extends BaseMouseProvider implements MouseLi
         if (e != null && (e.button == 1)) {
             fDragBeginMarker = false;
             if (((e.stateMask & SWT.SHIFT) != SWT.SHIFT) || (fEndCoordinate == fStartCoordinate)) {
-                IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+                IAxis xAxis = getXAxis();
                 fStartCoordinate = xAxis.getDataCoordinate(e.x);
                 fEndCoordinate = fStartCoordinate;
             } else {
                 double selectionBegin = fStartCoordinate;
                 double selectionEnd = fEndCoordinate;
-                IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+                IAxis xAxis = getXAxis();
                 double time = xAxis.getDataCoordinate(e.x);
                 if (Math.abs(time - selectionBegin) < Math.abs(time - selectionEnd)) {
                     fDragBeginMarker = true;
@@ -98,25 +97,25 @@ public class MouseSelectionProvider extends BaseMouseProvider implements MouseLi
                 getDensityViewer().select(new AxisRange(fStartCoordinate, fEndCoordinate));
             }
             fIsUpdate = false;
-            getChart().redraw();
+            redraw();
         }
     }
 
     @Override
     public void mouseMove(@Nullable MouseEvent e) {
         if (e != null && fIsUpdate) {
-            IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+            IAxis xAxis = getXAxis();
             if (fDragBeginMarker) {
                 fStartCoordinate = xAxis.getDataCoordinate(e.x);
             } else {
                 fEndCoordinate = xAxis.getDataCoordinate(e.x);
             }
-            getChart().redraw();
+            redraw();
         }
     }
 
     private boolean isEmptySelection() {
-        IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+        IAxis xAxis = getXAxis();
         int begin = xAxis.getPixelCoordinate(fStartCoordinate);
         int end = xAxis.getPixelCoordinate(fEndCoordinate);
 
@@ -129,9 +128,9 @@ public class MouseSelectionProvider extends BaseMouseProvider implements MouseLi
             return;
         }
 
-        Display display = getChart().getDisplay();
+        Display display = getControl().getDisplay();
 
-        IAxis xAxis = getChart().getAxisSet().getXAxis(0);
+        IAxis xAxis = getXAxis();
         e.gc.setBackground(display.getSystemColor(SWT.COLOR_BLUE));
         e.gc.setForeground(display.getSystemColor(SWT.COLOR_BLUE));
         e.gc.setLineStyle(SWT.LINE_SOLID);
@@ -141,7 +140,7 @@ public class MouseSelectionProvider extends BaseMouseProvider implements MouseLi
         int end = xAxis.getPixelCoordinate(fEndCoordinate);
         e.gc.drawLine(end, 0, end, e.height);
 
-        e.gc.setAlpha(150);
+        e.gc.setAlpha(64);
         if (Math.abs(fEndCoordinate - fStartCoordinate) > 1) {
             e.gc.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
             int beginX = xAxis.getPixelCoordinate(fStartCoordinate);

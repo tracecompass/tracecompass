@@ -46,7 +46,6 @@ public class MouseDragZoomProvider extends BaseMouseProvider implements MouseLis
      */
     public MouseDragZoomProvider(AbstractSegmentStoreDensityViewer densityViewer) {
         super(densityViewer);
-        register();
     }
 
     @Override
@@ -77,7 +76,7 @@ public class MouseDragZoomProvider extends BaseMouseProvider implements MouseLis
         }
 
         if (fIsUpdate) {
-            getChart().redraw();
+            redraw();
         }
         fIsUpdate = false;
     }
@@ -87,7 +86,7 @@ public class MouseDragZoomProvider extends BaseMouseProvider implements MouseLis
         if (e != null && fIsUpdate) {
             IAxis xAxis = getXAxis();
             fEndCoordinate = xAxis.getDataCoordinate(e.x);
-            getChart().redraw();
+            redraw();
         }
     }
 

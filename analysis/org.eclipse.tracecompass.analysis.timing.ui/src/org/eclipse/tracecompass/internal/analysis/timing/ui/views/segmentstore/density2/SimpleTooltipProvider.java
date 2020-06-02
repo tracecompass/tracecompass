@@ -19,13 +19,12 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swtchart.Chart;
-import org.eclipse.swtchart.IAxis;
-import org.eclipse.swtchart.ISeries;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density2.AbstractSegmentStoreDensityViewer;
 import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfAbstractToolTipHandler;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.IAxis;
+import org.eclipse.tracecompass.tmf.ui.viewers.xychart.IXYSeries;
 
 /**
  * Tool tip provider for density viewer. It displays the x and y value of the
@@ -43,26 +42,25 @@ public class SimpleTooltipProvider extends BaseMouseProvider {
 
         @Override
         public void fill(Control control, MouseEvent event, Point pt) {
-            Chart chart = getChart();
-            ISeries[] seriesSet = chart.getSeriesSet().getSeries();
-            if (seriesSet.length != 0) {
+            List<IXYSeries> seriesSet = getSeries();
+            if (!seriesSet.isEmpty()) {
 
-                if (event == null || chart.getAxisSet().getXAxes().length == 0 || chart.getAxisSet().getYAxes().length == 0 || seriesSet.length == 0) {
+                if (event == null || getXAxis() == null || seriesSet.isEmpty()) {
                     return;
                 }
-                chart.getPlotArea().setToolTipText(null);
+                setToolTipText(null);
                 long x1 = -1;
                 long x2 = -1;
                 List<String> names = new ArrayList<>();
                 List<Long> yValues = new ArrayList<>();
                 List<RGB> colors = new ArrayList<>();
-                for (ISeries ySeriesProvider : seriesSet) {
+                for (IXYSeries ySeriesProvider : seriesSet) {
                     double[] xValues = ySeriesProvider.getXSeries();
                     if (xValues.length < 2) {
                         continue;
                     }
                     double delta = xValues[1] - xValues[0];
-                    IAxis xAxis = chart.getAxisSet().getXAxis(0);
+                    IAxis xAxis = getXAxis();
                     double coords = xAxis.getDataCoordinate(event.x);
                     int index = Arrays.binarySearch(xValues, coords);
                     if (index < 0) {
@@ -81,7 +79,7 @@ public class SimpleTooltipProvider extends BaseMouseProvider {
                 }
                 if (!names.isEmpty()) {
                     addItem(Messages.SimpleTooltipProvider_duration, FORMAT.format(x1) + '-' + FORMAT.format(x2));
-                    if (seriesSet.length == 1) {
+                    if (seriesSet.size() == 1) {
                         // No Color if there's only one
                         addItem(null, ToolTipString.fromString(String.valueOf(Messages.SimpleTooltipProvider_count)), ToolTipString.fromDecimal(yValues.get(0)));
                     } else {

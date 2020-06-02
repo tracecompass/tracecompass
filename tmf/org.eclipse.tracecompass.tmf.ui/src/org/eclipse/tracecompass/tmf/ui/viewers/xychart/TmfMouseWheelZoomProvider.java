@@ -41,7 +41,6 @@ public class TmfMouseWheelZoomProvider extends TmfBaseProvider implements MouseW
      */
     public TmfMouseWheelZoomProvider(ITmfChartTimeProvider tmfChartViewer) {
         super(tmfChartViewer);
-        register();
     }
 
     // ------------------------------------------------------------------------

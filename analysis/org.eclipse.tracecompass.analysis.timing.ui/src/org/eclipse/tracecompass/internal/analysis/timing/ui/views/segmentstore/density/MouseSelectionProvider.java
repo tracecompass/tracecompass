@@ -159,7 +159,7 @@ public class MouseSelectionProvider extends BaseMouseProvider implements MouseLi
         int end = xAxis.getPixelCoordinate(fEndCoordinate);
         e.gc.drawLine(end, 0, end, e.height);
 
-        e.gc.setAlpha(150);
+        e.gc.setAlpha(64);
         if (Math.abs(fEndCoordinate - fStartCoordinate) > 1) {
             e.gc.setBackground(display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
             int beginX = xAxis.getPixelCoordinate(fStartCoordinate);

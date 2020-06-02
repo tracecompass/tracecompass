@@ -183,10 +183,9 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
             int endX = xAxis.getPixelCoordinate(fEndTime);
             e.gc.drawLine(endX, 0, endX, e.height);
         }
-        e.gc.setAlpha(150);
+        e.gc.setAlpha(64);
         if (Math.abs(fEndTime - fBeginTime) > 1) {
             e.gc.setBackground(TmfXYChartViewer.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-            e.gc.setAlpha(64);
             int beginX = xAxis.getPixelCoordinate(fBeginTime);
             int endX = xAxis.getPixelCoordinate(fEndTime);
             if (fEndTime > fBeginTime) {

@@ -70,8 +70,17 @@ public abstract class BaseMouseProvider {
      *
      * @return SWT chart reference.
      */
-    protected Chart getChart() {
+    private Chart getChart() {
         return fDensityViewer.getControl();
+    }
+
+    /**
+     * Returns the control reference (of the plot area)
+     *
+     * @return control reference
+     */
+    protected Control getControl() {
+        return fDensityViewer.getControl().getPlotArea().getControl();
     }
 
     /**

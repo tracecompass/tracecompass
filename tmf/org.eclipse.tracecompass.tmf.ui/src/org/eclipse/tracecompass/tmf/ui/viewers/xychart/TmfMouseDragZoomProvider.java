@@ -50,7 +50,6 @@ public class TmfMouseDragZoomProvider extends TmfBaseProvider implements MouseLi
      */
     public TmfMouseDragZoomProvider(ITmfChartTimeProvider tmfChartViewer) {
         super(tmfChartViewer);
-        register();
     }
 
     // ------------------------------------------------------------------------

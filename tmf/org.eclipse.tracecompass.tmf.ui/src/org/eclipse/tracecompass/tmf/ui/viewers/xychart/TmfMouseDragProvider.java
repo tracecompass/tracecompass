@@ -50,7 +50,6 @@ public class TmfMouseDragProvider extends TmfBaseProvider implements MouseListen
      */
     public TmfMouseDragProvider(ITmfChartTimeProvider tmfChartViewer) {
         super(tmfChartViewer);
-        register();
     }
 
     // ------------------------------------------------------------------------
