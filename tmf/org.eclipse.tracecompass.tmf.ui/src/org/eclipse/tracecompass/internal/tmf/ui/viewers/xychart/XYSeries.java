@@ -74,9 +74,9 @@ public class XYSeries implements IXYSeries {
 
     @Override
     public @Nullable Color getColor() {
-        if (this instanceof IBarSeries) {
+        if (fSeries instanceof IBarSeries) {
             return ((IBarSeries<?>) fSeries).getBarColor();
-        } else if (this instanceof ILineSeries) {
+        } else if (fSeries instanceof ILineSeries) {
             return ((ILineSeries<?>) fSeries).getLineColor();
         }
         return null;
