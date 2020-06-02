@@ -11,6 +11,7 @@
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.memory;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -19,11 +20,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.memory.MemoryUsageTreeModel;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.FilterTimeQueryFilter;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer2;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeColumnData;
 
@@ -55,7 +58,6 @@ public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer2 {
                 int tid = obj.getModel().getTid();
                 if (obj.getModel().getParentId() == -1) {
                     // FIXME: Series total have different style than others. This should come from the data provider
-                    fPresentationProvider.setTotalSeries(obj.getModel().getId());
                     return Messages.MemoryUsageTree_Total;
                 }
                 return Integer.toString(tid);
@@ -133,5 +135,20 @@ public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer2 {
     public void traceOpened(TmfTraceOpenedSignal signal) {
         super.traceOpened(signal);
         fPresentationProvider = MemoryPresentationProvider.getForTrace(signal.getTrace());
+    }
+
+    @Override
+    protected ITmfTreeViewerEntry modelToTree(long start, long end, List<ITmfTreeDataModel> model) {
+        // FIXME: Series total have different style than others. This should
+        // come from the data provider
+        for (ITmfTreeDataModel entryModel : model) {
+            if (entryModel.getParentId() == -1) {
+                // FIXME: Series total have different style than others. This
+                // should come from the data provider
+                fPresentationProvider.addTotalSeries(entryModel.getId());
+            }
+        }
+
+        return super.modelToTree(start, end, model);
     }
 }

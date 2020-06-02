@@ -87,7 +87,6 @@ public class CpuUsageTreeViewer extends AbstractSelectTreeViewer2 {
                 if (tid < 0) {
                     // Total entry, assume it is checked
                     // FIXME: Make it [un]checkable
-                    fPresentationProvider.setTotalSeries(model.getId());
                     return getLegendImage(model.getId());
                 }
                 if (isChecked(element)) {
@@ -147,6 +146,12 @@ public class CpuUsageTreeViewer extends AbstractSelectTreeViewer2 {
         map.put(-1L, root);
 
         for (CpuUsageEntryModel entryModel : Iterables.filter(model, CpuUsageEntryModel.class)) {
+            // Add a total series to the presentation provider if the tid is < 0
+            int tid = entryModel.getTid();
+            if (tid < 0) {
+                fPresentationProvider.addTotalSeries(entryModel.getId());
+            }
+
             CpuUsageEntry cpuUsageEntry = new CpuUsageEntry(entryModel, entryModel.getTime() / time);
             map.put(entryModel.getId(), cpuUsageEntry);
 

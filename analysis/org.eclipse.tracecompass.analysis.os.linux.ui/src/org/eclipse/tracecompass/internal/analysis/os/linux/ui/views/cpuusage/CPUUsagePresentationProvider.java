@@ -54,7 +54,7 @@ public class CPUUsagePresentationProvider extends BaseXYPresentationProvider {
      * @param id
      *            The ID of the series that is a total series
      */
-    public void setTotalSeries(long id) {
+    public void addTotalSeries(long id) {
         fTotalSeries.add(id);
     }
 
