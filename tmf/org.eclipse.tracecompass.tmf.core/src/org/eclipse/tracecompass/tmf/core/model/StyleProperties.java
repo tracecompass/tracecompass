@@ -338,7 +338,7 @@ public final class StyleProperties {
      * Width of an element in pixels. Not applicable to elements representing a
      * time duration.
      * <p>
-     * Default: 1.0
+     * Default: 1
      */
     public static final String WIDTH = "width"; //$NON-NLS-1$
 

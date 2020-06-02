@@ -297,7 +297,7 @@ public class StyleManagerTest {
                     StyleProperties.COLOR, RED_COLOR)),
             "B1", new OutputElementStyle(null, ImmutableMap.of(
                     StyleProperties.HEIGHT, 0.75f,
-                    StyleProperties.WIDTH, 0.75f,
+                    StyleProperties.WIDTH, 2,
                     StyleProperties.SYMBOL_TYPE, SymbolType.DIAMOND,
                     StyleProperties.COLOR, BLUE_COLOR)),
             "B2", new OutputElementStyle("B1", ImmutableMap.of(
@@ -316,8 +316,8 @@ public class StyleManagerTest {
             return ImmutableList.of(
                     new StyleProperty(A_THEN_B_STYLE, StyleProperties.HEIGHT, 0.5f),
                     new StyleProperty(B_THEN_A_STYLE, StyleProperties.HEIGHT, 0.5f),
-                    new StyleProperty(A_THEN_B_STYLE, StyleProperties.WIDTH, 0.75f),
-                    new StyleProperty(B_THEN_A_STYLE, StyleProperties.WIDTH, 0.75f),
+                    new StyleProperty(A_THEN_B_STYLE, StyleProperties.WIDTH, 2.0f),
+                    new StyleProperty(B_THEN_A_STYLE, StyleProperties.WIDTH, 2.0f),
                     new StyleProperty(A_THEN_B_STYLE, StyleProperties.BORDER_RADIUS, 0.75f),
                     new StyleProperty(B_THEN_A_STYLE, StyleProperties.BORDER_RADIUS, 0.5f),
                     new StyleProperty(B_THEN_A_STYLE_THEN_MAP, StyleProperties.BORDER_RADIUS, 0.25f));

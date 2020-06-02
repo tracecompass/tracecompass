@@ -97,7 +97,7 @@ public class StyleManager {
 
     /**
      * Get the style property factor value for the specified element style. The
-     * style hierarchy is traversed until a float value is found, and the
+     * style hierarchy is traversed until a number value is found, and the
      * returned float value will be multiplied by the first
      * {@link StyleProperties#FACTOR} suffixed modifier style that was found
      * along the way, if any.
@@ -121,8 +121,9 @@ public class StyleManager {
                 }
             }
             Object value = styleValues.get(property);
-            if (value instanceof Float) {
-                return (factor == null) ? (Float) value : factor * (Float) value;
+            if (value instanceof Number) {
+                float floatValue = ((Number) value).floatValue();
+                return (factor == null) ? floatValue : factor * floatValue;
             }
 
             // Get the next style
