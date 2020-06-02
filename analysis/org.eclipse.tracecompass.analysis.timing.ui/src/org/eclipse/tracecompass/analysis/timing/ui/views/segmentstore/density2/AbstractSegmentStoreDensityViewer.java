@@ -121,7 +121,8 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
         fChart = new Chart(parent, SWT.NONE);
         Color backgroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_BACKGROUND);
         fChart.setBackground(backgroundColor);
-        fChart.setBackgroundInPlotArea(backgroundColor);
+        backgroundColor = fColorScheme.getColor(TimeGraphColorScheme.BACKGROUND);
+        fChart.getPlotArea().setBackground(backgroundColor);
         parent.setBackground(backgroundColor);
         Color foregroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_FOREGROUND);
         fChart.setForeground(foregroundColor);
