@@ -230,11 +230,10 @@ public abstract class TmfBaseProvider {
         if (this instanceof MouseTrackListener) {
             control.addMouseTrackListener((MouseTrackListener) this);
         }
-        if (this instanceof PaintListener) {
-            control.addPaintListener((PaintListener) this);
-        }
         if (this instanceof ICustomPaintListener) {
             plotArea.addCustomPaintListener((ICustomPaintListener) this);
+        } else if (this instanceof PaintListener) {
+            control.addPaintListener((PaintListener) this);
         }
         TmfAbstractToolTipHandler tooltipHandler = getTooltipHandler();
         if(tooltipHandler != null) {
@@ -266,12 +265,12 @@ public abstract class TmfBaseProvider {
             if (this instanceof MouseTrackListener) {
                 control.removeMouseTrackListener((MouseTrackListener) this);
             }
-            if (this instanceof PaintListener) {
-                control.removePaintListener((PaintListener) this);
-            }
             if (this instanceof ICustomPaintListener) {
                 plotArea.removeCustomPaintListener((ICustomPaintListener) this);
+            } else if (this instanceof PaintListener) {
+                control.removePaintListener((PaintListener) this);
             }
+
             TmfAbstractToolTipHandler tooltipHandler = getTooltipHandler();
             if(tooltipHandler != null) {
                 tooltipHandler.deactivateHoverHelp(control);
