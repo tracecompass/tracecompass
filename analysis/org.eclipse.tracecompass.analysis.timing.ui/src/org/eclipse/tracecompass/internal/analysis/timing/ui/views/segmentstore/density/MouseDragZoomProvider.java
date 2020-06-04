@@ -114,13 +114,15 @@ public class MouseDragZoomProvider extends BaseMouseProvider implements MouseLis
             IAxis xAxis = getChart().getAxisSet().getXAxis(0);
             int startX = xAxis.getPixelCoordinate(fStartCoordinate);
             int endX = xAxis.getPixelCoordinate(fEndCoordinate);
-
-            e.gc.setBackground(getChart().getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
+            int prevAlpha = e.gc.getAlpha();
+            e.gc.setAlpha(64);
+            e.gc.setBackground(e.gc.getDevice().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
             if (fStartCoordinate < fEndCoordinate) {
                 e.gc.fillRectangle(startX, 0, endX - startX, e.height);
             } else {
                 e.gc.fillRectangle(endX, 0, startX - endX, e.height);
             }
+            e.gc.setAlpha(prevAlpha);
             e.gc.drawLine(startX, 0, startX, e.height);
             e.gc.drawLine(endX, 0, endX, e.height);
         }
@@ -128,6 +130,6 @@ public class MouseDragZoomProvider extends BaseMouseProvider implements MouseLis
 
     @Override
     public boolean drawBehindSeries() {
-        return true;
+        return false;
     }
 }
