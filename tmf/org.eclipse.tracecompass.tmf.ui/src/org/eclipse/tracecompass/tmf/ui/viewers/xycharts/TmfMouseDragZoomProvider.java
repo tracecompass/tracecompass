@@ -144,13 +144,15 @@ public class TmfMouseDragZoomProvider extends TmfBaseProvider implements MouseLi
             IAxis xAxis = getChart().getAxisSet().getXAxis(0);
             int startX = xAxis.getPixelCoordinate(fStartTime);
             int endX = xAxis.getPixelCoordinate(fEndTime);
-
-            e.gc.setBackground(TmfXYChartViewer.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND));
+            int prevAlpha = e.gc.getAlpha();
+            e.gc.setAlpha(64);
+            e.gc.setBackground(TmfXYChartViewer.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
             if (fStartTime < fEndTime) {
                 e.gc.fillRectangle(startX, 0, endX - startX, e.height);
             } else {
                 e.gc.fillRectangle(endX, 0, startX - endX, e.height);
             }
+            e.gc.setAlpha(prevAlpha);
             e.gc.drawLine(startX, 0, startX, e.height);
             e.gc.drawLine(endX, 0, endX, e.height);
         }
@@ -158,6 +160,6 @@ public class TmfMouseDragZoomProvider extends TmfBaseProvider implements MouseLi
 
     @Override
     public boolean drawBehindSeries() {
-        return true;
+        return false;
     }
 }
