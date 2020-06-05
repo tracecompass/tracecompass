@@ -22,10 +22,10 @@
 0000000000600df8 t __init_array_start
 0000000000400880 R _ZNSt13basic_filebufIcSt11char_traitsIcEED1Ev
                  w
-                 w insertValue__7AverageFd
-0000000000600e10 d getCount__7AverageFv
-0000000000600e10 d getTotal__7AverageFv
-                 w getAverage__7AverageFv
+                 w _ZN7Average10getAverageEv
+0000000000600e10 d _ZN7Average8getCountEv
+0000000000600e10 d _ZN7Average8getTotalEv
+                 w _ZN7Average10getAverageEv
 0000000000400870 T __libc_csu_fini
 0000000000400800 T __libc_csu_init
                  U __libc_start_main@@GLIBC_2.2.5
