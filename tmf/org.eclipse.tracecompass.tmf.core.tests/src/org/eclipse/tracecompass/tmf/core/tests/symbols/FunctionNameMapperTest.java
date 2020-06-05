@@ -70,7 +70,7 @@ public class FunctionNameMapperTest {
         assertSymbolString("__init_array_end", "600e08", results);
         assertSymbolString("__init_array_start", "600df8", results);
         assertSymbolString("std::basic_filebuf<char, std::char_traits<char> >::~basic_filebuf()", "400880", results);
-        assertSymbolString("Average::getTotal(void)", "600e10", results);
+        assertSymbolString("Average::getTotal()", "600e10", results);
         assertSymbolString("__libc_csu_fini", "400870", results);
         assertSymbolString("__libc_csu_init", "400800", results);
         assertSymbolString("main", "400756", results);
