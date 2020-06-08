@@ -28,9 +28,9 @@
       </view>
       <view
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.NewSegmentStoreScatterView"
+            class="org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.scatter.SegmentStoreScatterView2"
             icon="icons/eview16/memory-usage.png"
-            id="org.eclipse.tracecompass.analysis.timing.ui.segstore.newscatter:org.eclipse.linuxtools.lttng2.ust.analysis.memory"
+            id="org.eclipse.tracecompass.analysis.timing.ui.segstore.scatter2:org.eclipse.linuxtools.lttng2.ust.analysis.memory"
             name="%memoryusage.view.segmentscatter"
             restorable="true">
       </view>
@@ -53,7 +53,7 @@
       </output>
       <output
             class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
-            id="org.eclipse.tracecompass.analysis.timing.ui.segstore.newscatter:org.eclipse.linuxtools.lttng2.ust.analysis.memory">
+            id="org.eclipse.tracecompass.analysis.timing.ui.segstore.scatter2:org.eclipse.linuxtools.lttng2.ust.analysis.memory">
          <analysisId
                id="org.eclipse.linuxtools.lttng2.ust.analysis.memory">
          </analysisId>
