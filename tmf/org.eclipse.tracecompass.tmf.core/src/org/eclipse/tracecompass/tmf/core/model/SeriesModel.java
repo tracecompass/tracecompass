@@ -37,7 +37,7 @@ public class SeriesModel implements ISeriesModel {
     /**
      * Default unit type for X axis
      */
-    private static final String DEFAULT_XAXIS_UNIT = "time"; //$NON-NLS-1$
+    private static final String DEFAULT_XAXIS_UNIT = ""; //$NON-NLS-1$
 
     /**
      * Default name for Y axis
@@ -47,7 +47,7 @@ public class SeriesModel implements ISeriesModel {
     /**
      * Default unit type for y axis
      */
-    private static final String DEFAULT_YAXIS_UNIT = "time"; //$NON-NLS-1$
+    private static final String DEFAULT_YAXIS_UNIT = ""; //$NON-NLS-1$
 
     /**
      * transient to avoid serializing for tests, as IDs may not be the same from one

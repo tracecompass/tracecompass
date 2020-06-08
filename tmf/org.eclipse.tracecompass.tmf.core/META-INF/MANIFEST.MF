@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 6.0.0.qualifier
+Bundle-Version: 6.1.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.tmf.core;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.internal.tmf.core.Activator
@@ -83,6 +83,7 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.core.model.ann
  org.eclipse.tracecompass.internal.tmf.core.presentation;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.core.project.model;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.core.request;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
+ org.eclipse.tracecompass.internal.tmf.core.segment;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.core.statesystem.backends.partial;x-friends:="org.eclipse.tracecompass.statesystem.core.tests",
  org.eclipse.tracecompass.internal.tmf.core.statesystem.mipmap;x-friends:="org.eclipse.tracecompass.tmf.core.tests",
  org.eclipse.tracecompass.internal.tmf.core.statesystem.provider;x-friends:="org.eclipse.tracecompass.tmf.ui,org.eclipse.tracompass.tmf.core.tests",

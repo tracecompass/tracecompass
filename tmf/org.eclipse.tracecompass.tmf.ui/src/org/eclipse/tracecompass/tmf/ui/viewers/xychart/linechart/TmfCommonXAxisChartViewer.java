@@ -11,6 +11,7 @@
 
 package org.eclipse.tracecompass.tmf.ui.viewers.xychart.linechart;
 
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.eclipse.swtchart.ILineSeries;
 import org.eclipse.swtchart.ISeries;
 import org.eclipse.swtchart.ISeries.SeriesType;
 import org.eclipse.swtchart.ISeriesSet;
+import org.eclipse.swtchart.ITitle;
 import org.eclipse.swtchart.LineStyle;
 import org.eclipse.swtchart.Range;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
@@ -58,6 +60,7 @@ import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfCommonXAxisModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXYDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.xy.ITmfXyModel;
+import org.eclipse.tracecompass.tmf.core.model.xy.TmfXYAxisDescription;
 import org.eclipse.tracecompass.tmf.core.presentation.IYAppearance;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
@@ -67,6 +70,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
+import org.eclipse.tracecompass.tmf.ui.model.DataTypeUtils;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentInfo;
 import org.eclipse.tracecompass.tmf.ui.signal.TmfTimeViewAlignmentSignal;
 import org.eclipse.tracecompass.tmf.ui.viewers.xychart.AxisRange;
@@ -394,6 +398,8 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
 
                 Display.getDefault().asyncExec(() -> {
                     final TmfChartTimeStampFormat tmfChartTimeStampFormat = new TmfChartTimeStampFormat(getTimeOffset());
+                    TmfXYAxisDescription xAxisDescription = null;
+                    TmfXYAxisDescription yAxisDescription = null;
                     try (FlowScopeLog log = new FlowScopeLogBuilder(LOGGER, Level.FINE, "TmfCommonXAxisChart:UpdateDisplay").setParentScope(scope).build()) { //$NON-NLS-1$
                         if (!fTrace.equals(getTrace())) {
                             return;
@@ -448,6 +454,14 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                                     dimmedYArray[i] = dimmedY.get(i);
                                 }
 
+                                // Get the x and y data types
+                                if (xAxisDescription == null) {
+                                    xAxisDescription = entry.getXAxisDescription();
+                                }
+                                if (yAxisDescription == null) {
+                                    yAxisDescription = entry.getYAxisDescription();
+                                }
+
                                 // Create and fill the series
                                 ISeriesSet seriesSet = getSwtChart().getSeriesSet();
                                 ISeries<?> series = seriesSet.getSeries(entry.getName());
@@ -487,9 +501,24 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                             delta = 1;
                         }
 
+                        // Set the formatters for the axis
                         IAxisSet axisSet = getSwtChart().getAxisSet();
                         IAxisTick xTick = axisSet.getXAxis(0).getTick();
-                        xTick.setFormat(tmfChartTimeStampFormat);
+                        Format xFormatter = xAxisDescription != null ? DataTypeUtils.getFormat(xAxisDescription.getDataType(), xAxisDescription.getUnit()) : null;
+                        xTick.setFormat(xFormatter == null ? tmfChartTimeStampFormat : xFormatter);
+                        if (yAxisDescription != null) {
+                            Format format = axisSet.getYAxis(0).getTick().getFormat();
+                            if (format == null) {
+                                axisSet.getYAxis(0).getTick().setFormat(DataTypeUtils.getFormat(yAxisDescription.getDataType(), yAxisDescription.getUnit()));
+                            }
+                            ITitle title = axisSet.getYAxis(0).getTitle();
+                            // Set the Y title if it was not previously set (ie it is invisible)
+                            if (!title.isVisible()) {
+                                title.setText(yAxisDescription.getLabel());
+                                title.setVisible(true);
+                            }
+                        }
+
                         final double start = 1.0;
                         axisSet.getXAxis(0).setRange(new Range(start, start + delta));
                         AxisRange fixedYRange = getFixedYRange();
