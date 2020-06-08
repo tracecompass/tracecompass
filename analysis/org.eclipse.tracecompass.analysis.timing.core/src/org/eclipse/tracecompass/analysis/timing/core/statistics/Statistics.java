@@ -19,8 +19,8 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 
 /**
  * Class that calculates statistics on a certain type of object. If the object
- * is not a {@link Long}, a mapper function should be passed in the constructor
- * to retrieve the long value to make statistics on from an object.
+ * is not a {@link Number}, a mapper function should be passed in the constructor
+ * to retrieve the numerical value to make statistics on from an object.
  *
  * @author Bernd Hufmann
  * @author Geneviève Bastien
@@ -31,7 +31,7 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
  */
 public class Statistics<@NonNull E> implements IStatistics<E> {
 
-    private final Function<E, @NonNull Long> fMapper;
+    private final Function<E, @Nullable ? extends Number> fMapper;
 
     private @Nullable E fMin = null;
     private @Nullable E fMax = null;
@@ -62,7 +62,7 @@ public class Statistics<@NonNull E> implements IStatistics<E> {
      *            A mapper function that takes an object to computes statistics
      *            for and returns the value to use for the statistics
      */
-    public Statistics(Function<E, Long> mapper) {
+    public Statistics(Function<E, @Nullable ? extends @Nullable Number> mapper) {
         fNbElements = 0;
         fMean = 0.0;
         fVariance = 0.0;
@@ -72,22 +72,20 @@ public class Statistics<@NonNull E> implements IStatistics<E> {
 
     @Override
     public long getMin() {
-        @Nullable
-        E min = fMin;
+        @Nullable E min = fMin;
         if (min == null) {
             return Long.MAX_VALUE;
         }
-        return NonNullUtils.checkNotNull(fMapper.apply(min));
+        return NonNullUtils.checkNotNull(fMapper.apply(min)).longValue();
     }
 
     @Override
     public long getMax() {
-        @Nullable
-        E max = fMax;
+        @Nullable E max = fMax;
         if (max == null) {
             return Long.MIN_VALUE;
         }
-        return NonNullUtils.checkNotNull(fMapper.apply(max));
+        return NonNullUtils.checkNotNull(fMapper.apply(max)).longValue();
     }
 
     @Override
@@ -131,7 +129,12 @@ public class Statistics<@NonNull E> implements IStatistics<E> {
 
     @Override
     public void update(E object) {
-        Long value = NonNullUtils.checkNotNull(fMapper.apply(object));
+        Number number = fMapper.apply(object);
+        if (number == null) {
+            // TODO add null category?
+            return;
+        }
+        long value = number.longValue();
         /*
          * Min and max are trivial, as well as number of segments
          */
@@ -230,5 +233,4 @@ public class Statistics<@NonNull E> implements IStatistics<E> {
     public String toString() {
         return this.getClass() + ": Avg: " + getMean() + " on " + getNbElements() + " elements"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
-
 }

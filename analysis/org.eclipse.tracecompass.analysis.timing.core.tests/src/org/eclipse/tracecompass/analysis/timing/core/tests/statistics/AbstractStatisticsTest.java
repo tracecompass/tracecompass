@@ -117,7 +117,7 @@ public abstract class AbstractStatisticsTest<@NonNull E> {
      * Create a statistics object by calling the appropriate constructor whether the mapper function is null or not
      */
     private @NonNull Statistics<E> createStatistics() {
-        Function<@NonNull E, @NonNull Long> mapper = fMapper;
+        Function<@NonNull E, Long> mapper = fMapper;
         if (mapper == null) {
             return new Statistics<>();
         }

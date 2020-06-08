@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -44,6 +45,18 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
     private @Nullable IStatistics<ISegment> fTotalStats;
 
     private Map<String, IStatistics<ISegment>> fPerSegmentTypeStats = new HashMap<>();
+
+    /**
+     * Gets the segment mapper. This allows values to be resolved
+     *
+     * @return the resolver, the mapper that maps an {@link ISegment} to a
+     *         {@link Number}
+     *
+     * @since 5.2
+     */
+    protected Function<ISegment, @Nullable Number> getMapper() {
+        return ISegment::getLength;
+    }
 
     @Override
     protected Iterable<IAnalysisModule> getDependentAnalyses() {
@@ -163,12 +176,19 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
         long t0 = Long.min(start, end);
         long t1 = Long.max(start, end);
         ISegmentStore<@NonNull ISegment> segmentStore = segmentStoreProviderModule.getSegmentStore();
-        return segmentStore != null ? t0 != TmfTimeRange.ETERNITY.getStartTime().toNanos() || t1 != TmfTimeRange.ETERNITY.getEndTime().toNanos() ?
-                segmentStore.getIntersectingElements(t0, t1) : segmentStore : Collections.emptyList();
+        return segmentStore != null ?
+                isSaneRange(t0, t1) ?
+                        segmentStore.getIntersectingElements(t0, t1) :
+                        segmentStore :
+                Collections.emptyList();
     }
 
-    private static @Nullable IStatistics<ISegment> calculateTotalManual(Iterable<@NonNull ISegment> segments, IProgressMonitor monitor) {
-        IStatistics<ISegment> total = new Statistics<>(ISegment::getLength);
+    private static boolean isSaneRange(long t0, long t1) {
+        return t0 != TmfTimeRange.ETERNITY.getStartTime().toNanos() || t1 != TmfTimeRange.ETERNITY.getEndTime().toNanos();
+    }
+
+    private @Nullable IStatistics<ISegment> calculateTotalManual(Iterable<@NonNull ISegment> segments, IProgressMonitor monitor) {
+        IStatistics<ISegment> total = new Statistics<>(getMapper());
         for (ISegment segment : segments) {
             if (monitor.isCanceled()) {
                 return null;
@@ -187,8 +207,7 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
             }
             String segmentType = getSegmentType(segment);
             if (segmentType != null) {
-                // TODO should use computeIfAbsent but that would change the order in the tests.
-                IStatistics<ISegment> values = perSegmentTypeStats.getOrDefault(segmentType, new Statistics<>(ISegment::getLength));
+                IStatistics<ISegment> values = perSegmentTypeStats.getOrDefault(segmentType, new Statistics<>(getMapper()));
                 values.update(segment);
                 perSegmentTypeStats.put(segmentType, values);
             }
