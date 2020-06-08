@@ -785,7 +785,6 @@ public class TimeGraphViewTest {
     /**
      * Test horizontal zoom, we can see a rounding error
      */
-    @Ignore
     @Test
     public void testHorizontalZoom() {
         resetTimeRange();
@@ -1087,7 +1086,6 @@ public class TimeGraphViewTest {
     /**
      * Integration test for the time event filtering dialog
      */
-    @Ignore
     @Test
     public void testTimegraphEventFiltering() {
         SWTWorkbenchBot bot = fBot;
@@ -1139,7 +1137,6 @@ public class TimeGraphViewTest {
     /**
      * Integration test for the time event filtering dialog
      */
-    @Ignore
     @Test
     public void testHideEmptyRows() {
         resetTimeRange();

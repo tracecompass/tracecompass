@@ -50,7 +50,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -173,7 +172,6 @@ public class XYChartViewTest {
     /**
      * Test horizontal zoom, we can see a rounding error
      */
-    @Ignore
     @Test
     public void testHorizontalZoom() {
         fViewBot.setFocus();
