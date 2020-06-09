@@ -24,7 +24,7 @@ import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
-import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer;
+import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractSelectTreeViewer2;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfGenericTreeEntry;
@@ -40,11 +40,8 @@ import com.google.common.collect.ImmutableList;
  * @author Mahdi Zolnouri
  * @author Wassim Nasrallah
  * @author Najib Arbaoui
- *
- * @deprecated use {@link MemoryUsageTreeViewer2} instead
  */
-@Deprecated
-public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
+public class MemoryUsageTreeViewer2 extends AbstractSelectTreeViewer2 {
 
     /** Provides label for the Kernel memory usage tree viewer cells */
     private class MemoryLabelProvider extends DataProviderTreeLabelProvider {
@@ -94,7 +91,7 @@ public class MemoryUsageTreeViewer extends AbstractSelectTreeViewer {
      * @param id
      *            The memory usage data provider ID.
      */
-    public MemoryUsageTreeViewer(Composite parent, String id) {
+    public MemoryUsageTreeViewer2(Composite parent, String id) {
         super(parent, 2, id);
         setLabelProvider(new MemoryLabelProvider());
     }
