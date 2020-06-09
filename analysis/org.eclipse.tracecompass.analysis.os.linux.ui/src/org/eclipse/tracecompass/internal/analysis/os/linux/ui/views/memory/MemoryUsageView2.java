@@ -73,7 +73,7 @@ public class MemoryUsageView2 extends TmfChartView {
 
     @Override
     protected @NonNull TmfViewer createLeftChildViewer(Composite parent) {
-        return new MemoryUsageTreeViewer(parent, fProviderId);
+        return new MemoryUsageTreeViewer2(parent, fProviderId);
     }
 
     @Override
@@ -94,8 +94,8 @@ public class MemoryUsageView2 extends TmfChartView {
                 isFiltered ^= true;
                 setToolTipText(isFiltered ? Messages.MemoryView_FilterAction_FilteredTooltipText : Messages.MemoryView_FilterAction_UnfilteredTooltipText);
                 TmfViewer tree = getLeftChildViewer();
-                if (tree instanceof MemoryUsageTreeViewer) {
-                    MemoryUsageTreeViewer memoryUsageTreeViewer = (MemoryUsageTreeViewer) tree;
+                if (tree instanceof MemoryUsageTreeViewer2) {
+                    MemoryUsageTreeViewer2 memoryUsageTreeViewer = (MemoryUsageTreeViewer2) tree;
                     memoryUsageTreeViewer.setFiltered(isFiltered);
                 }
             }
