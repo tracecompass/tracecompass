@@ -157,6 +157,7 @@ mlock	mm	mm/mlock.c
 mlockall	mm	mm/mlock.c	
 mmap	arch	arch/x86/kernel	
 mmap2	arch	arch/x86/kernel	
+mmap_pgoff	mm	mm/mmap.c 
 modify_ldt	fs	fs/namespace.c	
 mount	fs	fs/namespace.c	
 move_pages	mm	mm/migrate.c	
