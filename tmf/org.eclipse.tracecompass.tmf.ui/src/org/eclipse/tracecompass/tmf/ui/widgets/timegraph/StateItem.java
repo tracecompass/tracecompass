@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2012, 2019 Ericsson
+ * Copyright (c) 2012, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -126,6 +126,20 @@ public class StateItem {
         float defaultStateWidth = ITimeEventStyleStrings.linkType().equals(itemType) ?
                 TimeGraphControl.DEFAULT_LINK_WIDTH : TimeGraphControl.DEFAULT_STATE_WIDTH;
         return (float) fStyleMap.getOrDefault(StyleProperties.HEIGHT, defaultStateWidth);
+    }
+
+    /**
+     * Returns the state width.
+     *
+     * @return Returns the state width.
+     * @since 6.1
+     */
+    public int getStateWidth() {
+        Object width = fStyleMap.get(StyleProperties.WIDTH);
+        if (width instanceof Integer) {
+            return (int) width;
+        }
+        return Math.round(TimeGraphControl.DEFAULT_STATE_WIDTH);
     }
 
     /**

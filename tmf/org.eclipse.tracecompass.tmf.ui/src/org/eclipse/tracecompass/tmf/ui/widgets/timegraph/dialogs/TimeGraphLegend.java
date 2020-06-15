@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2019 Ericsson.
+ * Copyright (c) 2009, 2020 Ericsson.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -339,6 +339,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
             super(parent, SWT.NONE);
             String fillColorKey = TimeGraphStyleUtil.getPreferenceName(fProvider, si, StyleProperties.BACKGROUND_COLOR);
             String heightFactorKey = TimeGraphStyleUtil.getPreferenceName(fProvider, si, StyleProperties.HEIGHT);
+            String widthKey = TimeGraphStyleUtil.getPreferenceName(fProvider, si, StyleProperties.WIDTH);
             IPreferenceStore store = TimeGraphStyleUtil.getStore();
             TimeGraphStyleUtil.loadValue(fProvider, si);
             String name = si.getStateString();
@@ -404,18 +405,30 @@ public class TimeGraphLegend extends TitleAreaDialog {
             label.setText(name);
             label.setLayoutData(GridDataFactory.fillDefaults().hint(160, SWT.DEFAULT).align(SWT.FILL, SWT.CENTER).grab(true, false).create());
             fScale = new Scale(this, SWT.NONE);
-            fScale.setMaximum(100);
-            fScale.setMinimum(1);
-            fScale.setSelection((int) (100 * si.getStateHeightFactor()));
+            if (si.getStyleMap().get(StyleProperties.WIDTH) instanceof Integer) {
+                fScale.setMinimum(1);
+                fScale.setMaximum(10);
+                fScale.setSelection(si.getStateWidth());
+            } else {
+                fScale.setMinimum(1);
+                fScale.setMaximum(100);
+                fScale.setSelection((int) (100 * si.getStateHeightFactor()));
+            }
             fScale.setToolTipText(Messages.TimeGraphLegend_widthTooltip);
             fScale.setData(LEGEND_ENTRY_KEY, name);
             fScale.addSelectionListener(new SelectionListener() {
 
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    float newWidth = fScale.getSelection() * 0.01f;
-                    store.setValue(heightFactorKey, newWidth);
-                    si.getStyleMap().put(StyleProperties.HEIGHT, newWidth);
+                    if (si.getStyleMap().get(StyleProperties.WIDTH) instanceof Integer) {
+                        int newWidth = fScale.getSelection();
+                        store.setValue(widthKey, newWidth);
+                        si.getStyleMap().put(StyleProperties.WIDTH, newWidth);
+                    } else {
+                        float newHeight = fScale.getSelection() * 0.01f;
+                        store.setValue(heightFactorKey, newHeight);
+                        si.getStyleMap().put(StyleProperties.HEIGHT, newHeight);
+                    }
                     fProvider.refresh();
                     fReset.setEnabled(true);
                 }
@@ -434,9 +447,14 @@ public class TimeGraphLegend extends TitleAreaDialog {
                 public void widgetSelected(SelectionEvent e) {
                     si.reset();
                     store.setToDefault(heightFactorKey);
+                    store.setToDefault(widthKey);
                     store.setToDefault(fillColorKey);
                     fBar.setColor(si.getStateColor());
-                    fScale.setSelection((int) (100 * si.getStateHeightFactor()));
+                    if (si.getStyleMap().get(StyleProperties.WIDTH) instanceof Integer) {
+                        fScale.setSelection(si.getStateWidth());
+                    } else {
+                        fScale.setSelection((int) (100 * si.getStateHeightFactor()));
+                    }
                     fProvider.refresh();
                     fReset.setEnabled(false);
                 }
@@ -450,7 +468,8 @@ public class TimeGraphLegend extends TitleAreaDialog {
             fReset.setImage(RESET_IMAGE.createImage());
             fReset.setLayoutData(GridDataFactory.swtDefaults().align(SWT.END, SWT.CENTER).create());
             if (store.getString(fillColorKey).equals(store.getDefaultString(fillColorKey)) &&
-                    store.getFloat(heightFactorKey) == store.getDefaultFloat(heightFactorKey)) {
+                    store.getFloat(heightFactorKey) == store.getDefaultFloat(heightFactorKey) &&
+                    store.getInt(widthKey) == store.getDefaultInt(widthKey)) {
                 fReset.setEnabled(false);
             }
         }

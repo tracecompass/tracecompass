@@ -2619,11 +2619,15 @@ public class TimeGraphControl extends TimeGraphBaseControl
         gc.setForeground(color);
         gc.setBackground(color);
         int old = gc.getLineWidth();
-        Float heightFactor = styleManager.getFactorStyle(elementStyle, StyleProperties.HEIGHT);
-        heightFactor = (heightFactor != null) ? Math.max(0.0f, Math.min(1.0f, heightFactor)) * 10.0f : 1.0f;
-        gc.setLineWidth(heightFactor.intValue());
+        Float widthFactor = styleManager.getFactorStyle(elementStyle, StyleProperties.WIDTH);
+        if (widthFactor == null) {
+            Float heightFactor = styleManager.getFactorStyle(elementStyle, StyleProperties.HEIGHT);
+            widthFactor = (heightFactor != null) ? heightFactor * 10.0f : 1.0f;
+        }
+        widthFactor = Math.max(1.0f, Math.min(10.0f, widthFactor));
+        gc.setLineWidth(widthFactor.intValue());
         /* Draw the arrow */
-        Point newEndpoint = drawArrowHead(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, heightFactor, gc);
+        Point newEndpoint = drawArrowHead(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, widthFactor, gc);
         gc.drawLine(rect.x, rect.y, newEndpoint.x, newEndpoint.y);
         gc.setLineWidth(old);
         gc.setAlpha(prevAlpha);

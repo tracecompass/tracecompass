@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2018, 2019 Ericsson
+ * Copyright (c) 2018, 2020 Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -54,6 +54,7 @@ public final class TimeGraphStyleUtil {
         String oldHeightFactorKey = getPreferenceName(presentationProvider, stateItem, ITimeEventStyleStrings.heightFactor());
         String fillColorKey = getPreferenceName(presentationProvider, stateItem, StyleProperties.BACKGROUND_COLOR);
         String heightFactorKey = getPreferenceName(presentationProvider, stateItem, StyleProperties.HEIGHT);
+        String widthKey = getPreferenceName(presentationProvider, stateItem, StyleProperties.WIDTH);
         Map<String, Object> styleMap = stateItem.getStyleMap();
 
         String prefRgbColor = store.getString(fillColorKey);
@@ -88,6 +89,11 @@ public final class TimeGraphStyleUtil {
             }
         }
 
+        store.setDefault(widthKey, -1);
+        int prefWidth = store.getInt(widthKey);
+        if (prefWidth != -1) {
+            styleMap.put(StyleProperties.WIDTH, prefWidth);
+        }
     }
 
     private static @Nullable Object getItemProperty(StateItem stateItem) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019 Ericsson
+ * Copyright (c) 2019, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -161,6 +161,10 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
                 if (height != null) {
                     styleMap.put(StyleProperties.HEIGHT, height);
                 }
+                Float width = getFloatStyle(elementStyle, StyleProperties.WIDTH);
+                if (width != null) {
+                    styleMap.put(StyleProperties.WIDTH, width.intValue());
+                }
                 Object symbolType = getStyle(elementStyle, StyleProperties.SYMBOL_TYPE);
                 if (symbolType instanceof String) {
                     styleMap.put(StyleProperties.SYMBOL_TYPE, symbolType);
@@ -302,19 +306,37 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
                 styleValues.put(StyleProperties.OPACITY, 1.0f);
             }
 
-            float heightFactor = stateItem.getStateHeightFactor();
-            Float prevHeightFactor = getFloatStyle(elementStyle, StyleProperties.HEIGHT);
-            if (prevHeightFactor == null) {
-                prevHeightFactor = 1.0f;
-            }
-            /*
-             * Update if the height with factor does not match the legend. In
-             * that case update the base height without factor.
-             */
-            if (!Float.valueOf(heightFactor).equals(prevHeightFactor)) {
-                Object height = elementStyle.getStyleValues().getOrDefault(StyleProperties.HEIGHT, 1.0f);
-                height = height instanceof Float ? height : 1.0f;
-                styleValues.put(StyleProperties.HEIGHT, (float) height * heightFactor / prevHeightFactor);
+            /* Use the WIDTH property if it is defined, use HEIGHT otherwise */
+            if (elementStyle.getStyleValues().containsKey(StyleProperties.WIDTH)) {
+                int widthFactor = stateItem.getStateWidth();
+                Float prevWidthFactor = getFloatStyle(elementStyle, StyleProperties.WIDTH);
+                if (prevWidthFactor == null) {
+                    prevWidthFactor = 1.0f;
+                }
+                /*
+                 * Update if the width with factor does not match the legend. In
+                 * that case update the base width without factor.
+                 */
+                if (!Float.valueOf(widthFactor).equals(prevWidthFactor)) {
+                    Object width = elementStyle.getStyleValues().get(StyleProperties.WIDTH);
+                    width = width instanceof Integer ? width : 1;
+                    styleValues.put(StyleProperties.WIDTH, Math.round((int) width * widthFactor / prevWidthFactor));
+                }
+            } else {
+                float heightFactor = stateItem.getStateHeightFactor();
+                Float prevHeightFactor = getFloatStyle(elementStyle, StyleProperties.HEIGHT);
+                if (prevHeightFactor == null) {
+                    prevHeightFactor = 1.0f;
+                }
+                /*
+                 * Update if the height with factor does not match the legend. In
+                 * that case update the base height without factor.
+                 */
+                if (!Float.valueOf(heightFactor).equals(prevHeightFactor)) {
+                    Object height = elementStyle.getStyleValues().get(StyleProperties.HEIGHT);
+                    height = height instanceof Float ? height : 1.0f;
+                    styleValues.put(StyleProperties.HEIGHT, (float) height * heightFactor / prevHeightFactor);
+                }
             }
         }
     }
