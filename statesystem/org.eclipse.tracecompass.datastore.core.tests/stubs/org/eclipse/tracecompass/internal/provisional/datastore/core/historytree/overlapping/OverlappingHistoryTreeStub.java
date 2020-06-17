@@ -15,8 +15,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.tracecompass.datastore.core.interval.HTInterval;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.overlapping.OverlappingHistoryTree;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.overlapping.OverlappingNode;
 
 /**
  * A stub for the overlapping history tree, specifying the object type to

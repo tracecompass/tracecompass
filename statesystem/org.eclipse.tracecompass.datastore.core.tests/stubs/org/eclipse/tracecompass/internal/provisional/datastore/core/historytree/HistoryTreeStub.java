@@ -16,8 +16,6 @@ import java.io.IOException;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.datastore.core.interval.HTInterval;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.AbstractHistoryTree;
-import org.eclipse.tracecompass.internal.provisional.datastore.core.historytree.HTNode;
 
 /**
  * A stub history tree for the base abstract history tree
