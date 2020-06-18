@@ -52,15 +52,15 @@ public final class TimeGraphStyleUtil {
         IPreferenceStore store = getStore();
         String oldFillColorKey = getPreferenceName(presentationProvider, stateItem, ITimeEventStyleStrings.fillColor());
         String oldHeightFactorKey = getPreferenceName(presentationProvider, stateItem, ITimeEventStyleStrings.heightFactor());
-        String fillColorKey = getPreferenceName(presentationProvider, stateItem, StyleProperties.BACKGROUND_COLOR);
+        String bgColorKey = getPreferenceName(presentationProvider, stateItem, StyleProperties.BACKGROUND_COLOR);
+        String colorKey = getPreferenceName(presentationProvider, stateItem, StyleProperties.COLOR);
         String heightFactorKey = getPreferenceName(presentationProvider, stateItem, StyleProperties.HEIGHT);
         String widthKey = getPreferenceName(presentationProvider, stateItem, StyleProperties.WIDTH);
         Map<String, Object> styleMap = stateItem.getStyleMap();
 
-        String prefRgbColor = store.getString(fillColorKey);
-        if (!prefRgbColor.isEmpty()) {
-            styleMap.put(StyleProperties.BACKGROUND_COLOR, prefRgbColor);
-            styleMap.put(StyleProperties.COLOR, prefRgbColor);
+        String prefBgColor = store.getString(bgColorKey);
+        if (!prefBgColor.isEmpty()) {
+            styleMap.put(StyleProperties.BACKGROUND_COLOR, prefBgColor);
         } else {
             // Update the new value with the old
             String oldPrefRgbColor = store.getString(oldFillColorKey);
@@ -69,10 +69,13 @@ public final class TimeGraphStyleUtil {
                 if (prefRgba != null) {
                     String hexColor = ColorUtils.toHexColor(prefRgba.getRed(), prefRgba.getGreen(), prefRgba.getBlue());
                     styleMap.put(StyleProperties.BACKGROUND_COLOR, hexColor);
-                    styleMap.put(StyleProperties.COLOR, hexColor);
-                    store.setValue(fillColorKey, hexColor);
+                    store.setValue(bgColorKey, hexColor);
                 }
             }
+        }
+        String prefColor = store.getString(colorKey);
+        if (!prefColor.isEmpty()) {
+            styleMap.put(StyleProperties.COLOR, prefColor);
         }
 
         store.setDefault(heightFactorKey, -1.0f);

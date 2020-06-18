@@ -148,9 +148,16 @@ public class BaseDataProviderTimeGraphPresentationProvider extends TimeGraphPres
                 fKeyToIndex.put(styleKey, tableIndex++);
                 OutputElementStyle elementStyle = styleEntry.getValue();
                 Map<String, Object> styleMap = new HashMap<>();
-                RGBAColor rgba = getColorStyle(elementStyle, StyleProperties.BACKGROUND_COLOR);
-                RGB rgb = (rgba != null) ?  new RGB(rgba.getRed(), rgba.getGreen(), rgba.getBlue()) : new RGB(0, 0, 0);
-                styleMap.put(StyleProperties.BACKGROUND_COLOR, ColorUtils.toHexColor(rgb));
+                RGBAColor bgColor = getColorStyle(elementStyle, StyleProperties.BACKGROUND_COLOR);
+                if (bgColor != null) {
+                    RGB rgb = new RGB(bgColor.getRed(), bgColor.getGreen(), bgColor.getBlue());
+                    styleMap.put(StyleProperties.BACKGROUND_COLOR, ColorUtils.toHexColor(rgb));
+                }
+                RGBAColor color = getColorStyle(elementStyle, StyleProperties.COLOR);
+                if (color != null) {
+                    RGB rgb = new RGB(color.getRed(), color.getGreen(), color.getBlue());
+                    styleMap.put(StyleProperties.COLOR, ColorUtils.toHexColor(rgb));
+                }
                 Object styleName = getStyle(elementStyle, StyleProperties.STYLE_NAME);
                 if (styleName instanceof String) {
                     styleMap.put(StyleProperties.STYLE_NAME, styleName);

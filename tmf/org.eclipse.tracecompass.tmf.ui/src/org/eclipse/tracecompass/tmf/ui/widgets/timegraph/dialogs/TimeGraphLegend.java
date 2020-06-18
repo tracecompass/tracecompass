@@ -337,7 +337,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
          */
         public LegendEntry(Composite parent, StateItem si) {
             super(parent, SWT.NONE);
-            String fillColorKey = TimeGraphStyleUtil.getPreferenceName(fProvider, si, StyleProperties.BACKGROUND_COLOR);
+            String bgColorKey = TimeGraphStyleUtil.getPreferenceName(fProvider, si, StyleProperties.BACKGROUND_COLOR);
             String heightFactorKey = TimeGraphStyleUtil.getPreferenceName(fProvider, si, StyleProperties.HEIGHT);
             String widthKey = TimeGraphStyleUtil.getPreferenceName(fProvider, si, StyleProperties.WIDTH);
             IPreferenceStore store = TimeGraphStyleUtil.getStore();
@@ -356,7 +356,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
                     cd.setRGB(fBar.fColor.getRGB());
                     RGB color = cd.open();
                     if (color != null) {
-                        store.setValue(fillColorKey, ColorUtils.toHexColor(color.red, color.green, color.blue));
+                        store.setValue(bgColorKey, ColorUtils.toHexColor(color.red, color.green, color.blue));
                         fBar.setColor(color);
                         si.setStateColor(color);
                         fProvider.refresh();
@@ -448,7 +448,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
                     si.reset();
                     store.setToDefault(heightFactorKey);
                     store.setToDefault(widthKey);
-                    store.setToDefault(fillColorKey);
+                    store.setToDefault(bgColorKey);
                     fBar.setColor(si.getStateColor());
                     if (si.getStyleMap().get(StyleProperties.WIDTH) instanceof Integer) {
                         fScale.setSelection(si.getStateWidth());
@@ -467,7 +467,7 @@ public class TimeGraphLegend extends TitleAreaDialog {
             fReset.setToolTipText(Messages.TimeGraphLegend_resetTooltip);
             fReset.setImage(RESET_IMAGE.createImage());
             fReset.setLayoutData(GridDataFactory.swtDefaults().align(SWT.END, SWT.CENTER).create());
-            if (store.getString(fillColorKey).equals(store.getDefaultString(fillColorKey)) &&
+            if (store.getString(bgColorKey).equals(store.getDefaultString(bgColorKey)) &&
                     store.getFloat(heightFactorKey) == store.getDefaultFloat(heightFactorKey) &&
                     store.getInt(widthKey) == store.getDefaultInt(widthKey)) {
                 fReset.setEnabled(false);
