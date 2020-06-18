@@ -184,7 +184,7 @@ In addition to these views, the '''Tracing and Monitoring Framework (TMF)''' fea
 * [[#Filters_View | Filters View]]
 * [[#Time_Chart_View  | Time Chart View]]
 * [[#State_System_Explorer_View | State System Explorer View]]
-* [[#Call_Stack_View | Call Stack View]]
+* [[#Flame Chart_View | Flame Chart View]]
 
 The framework also supports user creation of [[#Custom_Parsers  | Custom Parsers]].
 
@@ -2928,11 +2928,11 @@ The LTTng Kernel Events editor '''is''' the plain TMF [[#Events_Editor | Events 
 
 The Userspace traces are taken on an application level. With kernel traces, you know what events you will have as the domain is known and cloistered. Userspace traces can contain pretty much anything. Some analyses are offered if certain events are enabled.
 
-== Call Stack View ==
+== Flame Chart View ==
 
-The Call Stack view allows the user to visualize the call stack per thread over time, if the application and trace provide this information.
+The Flame Chart view allows the user to visualize the call stack per thread over time, if the application and trace provide this information.
 
-To open this view go in '''Window''' -> '''Show View''' -> '''Other...''' and select '''Tracing/Call Stack''' in the list. The view shows the call stack information for the currently selected trace. Conversely, you can select a trace and expand it in the '''Project Explorer''' then expand '''LTTng-UST CallStack Analysis''' (the trace must be loaded) and open '''Call Stack'''.
+To open this view go in '''Window''' -> '''Show View''', if in the eclipse plug-in then click '''Other...''' and select '''Tracing/Flame Chart''' in the list. The view shows the call stack information for the currently selected trace. Conversely, you can select a trace and expand it in the '''Project Explorer''' then expand '''LTTng-UST CallStack Analysis''' (the trace must be loaded) and open '''Flame Chart'''.
 
 The table on the left-hand side of the view shows the threads and call stack. The function name, depth, entry and exit time and duration are shown for the call stack at the selected time.
 
@@ -2950,7 +2950,7 @@ Clicking the '''Select Next State Change''' or '''Select Previous State Change''
 
 Clicking the '''Configure how addresses are mapped to function names''' ([[Image:images/binaries_obj.gif]]) icon will open the symbol providers dialog. Depending on the available symbol providers for the given trace, you can specify: 1) a text or binary file containing mappings from function addresses to function names or 2) the root location of the binaries of the trace target. If the call stack provider for the current trace type only provides function addresses, a mapping file will be required to get the function names in the view. See the following sections for an example with LTTng-UST traces.
 
-=== Using the Callstack View with LTTng-UST traces ===
+=== Using the Flame Chart View with LTTng-UST traces ===
 
 There is support in the LTTng-UST integration plugin to display the callstack
 of applications traced with the ''liblttng-ust-cyg-profile.so'' library (see
@@ -2964,7 +2964,7 @@ so, you need to:
 * Preload the ''liblttng-ust-cyg-profile'' library when running your program:
 ** <pre>LD_PRELOAD=/usr/lib/liblttng-ust-cyg-profile.so ./myprogram</pre>
 
-Once you load the resulting trace, the Callstack View should be populated with
+Once you load the resulting trace, the Flame Chart View should be populated with
 the relevant information.
 
 Note that for non-trivial applications, ''liblttng-ust-cyg-profile'' generates a
@@ -2972,7 +2972,7 @@ Note that for non-trivial applications, ''liblttng-ust-cyg-profile'' generates a
 avoid lost events. Refer to the
 [http://lttng.org/docs/#doc-fine-tuning-channels LTTng documentation].
 
-For traces taken with LTTng-UST 2.8 or later, the Callstack View should show the
+For traces taken with LTTng-UST 2.8 or later, the Flame Chart View should show the
 function names automatically, since it will make use of the debug information
 statedump events (which are enabled when using ''enable-event -u -a'').
 
@@ -2983,12 +2983,12 @@ the binary file or mapping manually:
 
 ''For LTTng-UST 2.8+, if it doesn't resolve symbols automatically, see the [[#Binary file location configuration | Source Lookup's Binary file location configuration]].''
 
-If you followed the steps in the previous section, you should have a Callstack
+If you followed the steps in the previous section, you should have a Flame Chart
 View populated with function entries and exits. However, the view will display
 the function addresses instead of names in the intervals, which are not very
 useful by themselves. To get the actual function names, you need to:
 
-* Click the '''Configure how addresses are mapped to function names''' ([[Image:images/binaries_obj.gif]]) button in the Callstack View.
+* Click the '''Configure how addresses are mapped to function names''' ([[Image:images/binaries_obj.gif]]) button in the Flame Chart View.
 
 Once again, multiple symbol providers can be available for a unique trace. Each symbol provider can be configured through its own tab. Thus, multiple sources can be used to map the function names to addresses. Below is an image of the basic symbol provider preference page which allows us to import binary or function name mapping files.
 
@@ -3016,7 +3016,7 @@ See Control Flow View's '''[[#Marker_Axis | Marker Axis]]'''.
 
 == Flame Graph View ==
 
-This is an aggregate view of the function calls from the '''Call Stack View'''. This shows a bird's eye view of what are the main
+This is an aggregate view of the function calls from the '''Flame Chart View'''. This shows a bird's eye view of what are the main
 time sinks in the traced applications. Each entry in the '''Flame Graph''' represents an aggregation of all the calls to a function
 in a certain depth of the call stack having the same caller. So, functions in the '''Flame Graph''' are aggregated by depth and
 caller. This enables the user to find the most executed code path easily.
@@ -3029,7 +3029,7 @@ caller. This enables the user to find the most executed code path easily.
 * Each thread traced makes its own flame graph.
 
 The function name is visible on each Flame graph event if the size permits. Each box in the '''Flame Graph'''
-has the same color as the box representing the same function in the '''Call Stack'''.
+has the same color as the box representing the same function in the '''Flame Chart'''.
 
 To open this view, select a trace, expand it in the '''Project Explorer''', then expand the
 '''Call Graph Analysis''' (the trace must be loaded) and open the '''Flame Graph'''.
@@ -3120,7 +3120,7 @@ The following keyboard shortcuts are available:
 
 === Importing a binary or function name mapping file (for LTTng-UST <2.8 traces) ===
 
-See Call Stack View's '''[[#Call Stack View | Importing a binary or function name mapping file (for LTTng-UST <2.8 traces) ]]'''.
+See Flame Chart View's '''[[#Flame Chart View | Importing a binary or function name mapping file (for LTTng-UST <2.8 traces) ]]'''.
 
 == Function Duration Density ==
 The '''Function Duration Density''' view shows the function duration of function displayed by duration for the current active time window range. This is useful to find global outliers.
@@ -3249,7 +3249,7 @@ the same machine that Trace Compass is running.
 It is possible to configure a ''root directory'' that will be used as a prefix
 for all file path resolutions. The button to open the configuration dialog is
 called '''Configure how addresses are mapped to function names''' and is
-currently located in the [[#Call Stack View]]. Note that the Call Stack View
+currently located in the [[#Flame Chart View]]. Note that the Call Stack View
 will also make use of this configuration to resolve its function names.
 
 [[Image:images/sourceLookup/symbol-mapping-config-ust28.png]]
