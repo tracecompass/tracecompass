@@ -2256,7 +2256,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             gc.setAlpha(colorInt & 0xff);
             Float heightFactor = styleManager.getFactorStyle(elementStyle, StyleProperties.HEIGHT);
             heightFactor = (heightFactor != null) ? Math.max(0.0f, Math.min(1.0f, heightFactor)) : 1.0f;
-            int symbolSize = (int) Math.ceil(rect.height * heightFactor);
+            int symbolSize = (int) Math.ceil(rect.height * heightFactor / 2);
             switch (String.valueOf(symbolType)) {
             case SymbolType.CROSS:
                 SymbolHelper.drawCross(gc, color, symbolSize, rect.x, rect.y + rect.height / 2);

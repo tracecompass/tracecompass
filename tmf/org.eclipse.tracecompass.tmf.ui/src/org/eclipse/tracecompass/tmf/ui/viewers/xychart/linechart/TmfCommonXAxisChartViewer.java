@@ -95,6 +95,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
 
     private static final String DIRTY_UNDERFLOW_ERROR = "Dirty underflow error"; //$NON-NLS-1$
     private static final @NonNull RGBAColor DEFAULT_COLOR = new RGBAColor(255, 255, 255);
+    private static final int DEFAULT_SYMBOL_SIZE = 4;
 
     private static final Map<String, ILineSeries.PlotSymbolType> SYMBOL_MAP;
     private static final ColorRegistry COLOR_REGISTRY = new ColorRegistry();
@@ -598,6 +599,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             lineSeries.enableArea(StyleProperties.SeriesType.AREA.equals(type));
             lineSeries.setLineStyle(LineStyle.valueOf((String) presProvider.getStyle(appearance, StyleProperties.SERIES_STYLE)));
             lineSeries.setSymbolType(SYMBOL_MAP.getOrDefault(symbolType, ILineSeries.PlotSymbolType.NONE));
+            lineSeries.setSymbolSize(Math.round(presProvider.getFloatStyleOrDefault(appearance, StyleProperties.HEIGHT, 1.0f).floatValue() * DEFAULT_SYMBOL_SIZE));
             lineSeries.setLineColor(color);
             lineSeries.setSymbolColor(color);
             lineSeries.setVisible(true);
@@ -634,6 +636,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             lineSeries.enableArea(StyleProperties.SeriesType.AREA.equals(type));
             lineSeries.setLineStyle(LineStyle.valueOf((String) presProvider.getStyle(appearance, StyleProperties.SERIES_STYLE)));
             lineSeries.setSymbolType(SYMBOL_MAP.getOrDefault(symbolType, ILineSeries.PlotSymbolType.NONE));
+            lineSeries.setSymbolSize(Math.round(presProvider.getFloatStyleOrDefault(appearance, StyleProperties.HEIGHT, 1.0f).floatValue() * DEFAULT_SYMBOL_SIZE));
             lineSeries.setLineColor(color);
             lineSeries.setSymbolColor(color);
             lineSeries.setVisible(true);

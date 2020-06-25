@@ -41,6 +41,7 @@ import org.swtchart.LineStyle;
 public class XYChartLegendImageProvider implements ILegendImageProvider {
 
     private static final @NonNull RGBAColor DEFAULT_COLOR = new RGBAColor(255, 255, 255);
+    private static final int DEFAULT_SYMBOL_SIZE = 4;
 
     private final TmfCommonXAxisChartViewer fChartViewer;
 
@@ -132,7 +133,7 @@ public class XYChartLegendImageProvider implements ILegendImageProvider {
     private void drawStyledDot(GC gc, Color lineColor, int imageWidth, int imageHeight, @NonNull OutputElementStyle appearance) {
         BaseXYPresentationProvider presProvider = fChartViewer.getPresentationProvider2();
         String symbolStyle = (String) presProvider.getStyleOrDefault(appearance, StyleProperties.SYMBOL_TYPE, StyleProperties.SymbolType.NONE);
-        int symbolSize = ((Number) presProvider.getFloatStyleOrDefault(appearance, StyleProperties.HEIGHT, 1.0f)).intValue();
+        int symbolSize = Math.round(presProvider.getFloatStyleOrDefault(appearance, StyleProperties.HEIGHT, 1.0f).floatValue() * DEFAULT_SYMBOL_SIZE);
         int centerX = imageWidth / 2;
         int centerY = imageHeight / 2;
         Color prevBg = gc.getBackground();

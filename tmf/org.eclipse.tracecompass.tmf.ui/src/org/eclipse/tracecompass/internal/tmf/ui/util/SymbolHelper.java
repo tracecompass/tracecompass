@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -33,7 +33,7 @@ public final class SymbolHelper {
      * @param color
      *            the color of the symbol
      * @param symbolSize
-     *            the size of the symbol (radius in pixels)
+     *            the size of the symbol (half of height in pixels)
      * @param centerX
      *            the center point x coordinate
      * @param centerY
@@ -63,7 +63,7 @@ public final class SymbolHelper {
      * @param color
      *            the color of the symbol
      * @param symbolSize
-     *            the size of the symbol (radius in pixels)
+     *            the size of the symbol (half of height in pixels)
      * @param centerX
      *            the center point x coordinate
      * @param centerY
@@ -74,11 +74,11 @@ public final class SymbolHelper {
         gc.setBackground(color);
         int[] pts = new int[6];
         pts[0] = centerX - symbolSize;
-        pts[1] = centerY + symbolSize / 3;
+        pts[1] = centerY + symbolSize;
         pts[2] = centerX;
         pts[3] = centerY - symbolSize;
         pts[4] = centerX + symbolSize;
-        pts[5] = centerY + symbolSize / 3;
+        pts[5] = centerY + symbolSize;
         gc.fillPolygon(pts);
         gc.setBackground(oldColor);
     }
@@ -91,7 +91,7 @@ public final class SymbolHelper {
      * @param color
      *            the color of the symbol
      * @param symbolSize
-     *            the size of the symbol (radius in pixels)
+     *            the size of the symbol (half of height in pixels)
      * @param centerX
      *            the center point x coordinate
      * @param centerY
@@ -102,11 +102,11 @@ public final class SymbolHelper {
         gc.setBackground(color);
         int[] pts = new int[6];
         pts[0] = centerX - symbolSize;
-        pts[1] = centerY - symbolSize / 3;
+        pts[1] = centerY - symbolSize;
         pts[2] = centerX;
         pts[3] = centerY + symbolSize;
         pts[4] = centerX + symbolSize;
-        pts[5] = centerY - symbolSize / 3;
+        pts[5] = centerY - symbolSize;
         gc.fillPolygon(pts);
         gc.setBackground(oldColor);
     }
@@ -119,7 +119,7 @@ public final class SymbolHelper {
      * @param color
      *            the color of the symbol
      * @param symbolSize
-     *            the size of the symbol (radius in pixels)
+     *            the size of the symbol (half of height in pixels)
      * @param centerX
      *            the center point x coordinate
      * @param centerY
@@ -146,7 +146,7 @@ public final class SymbolHelper {
      * @param color
      *            the color of the symbol
      * @param symbolSize
-     *            the size of the symbol (radius in pixels)
+     *            the size of the symbol (half of height in pixels)
      * @param centerX
      *            the center point x coordinate
      * @param centerY
@@ -173,7 +173,7 @@ public final class SymbolHelper {
      * @param color
      *            the color of the symbol
      * @param symbolSize
-     *            the size of the symbol (radius in pixels)
+     *            the size of the symbol (half of height in pixels)
      * @param centerX
      *            the center point x coordinate
      * @param centerY
@@ -203,7 +203,7 @@ public final class SymbolHelper {
      * @param color
      *            the color of the symbol
      * @param symbolSize
-     *            the size of the symbol (radius in pixels)
+     *            the size of the symbol (half of height in pixels)
      * @param centerX
      *            the center point x coordinate
      * @param centerY

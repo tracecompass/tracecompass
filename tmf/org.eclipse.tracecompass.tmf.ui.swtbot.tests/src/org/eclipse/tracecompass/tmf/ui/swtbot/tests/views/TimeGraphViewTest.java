@@ -1146,7 +1146,7 @@ public class TimeGraphViewTest {
         timegraph.setFocus();
 
         /* set time range */
-        setWindowRange(49L, 75L);
+        setWindowRange(50L, 75L);
         SWTBotUtils.waitUntil(tg -> getVisibleItems(tg).size() == 17, timegraph, () -> "All entries should be visible here: " + getVisibleItems(timegraph));
 
         /* hide empty rows (includes a row with only 1 marker) */
@@ -1154,7 +1154,7 @@ public class TimeGraphViewTest {
         SWTBotUtils.waitUntil(tg -> getVisibleItems(tg).size() == 10, timegraph, () -> "Fewer entries should be visible here: " + getVisibleItems(timegraph));
 
         /* change time range to exclude row with markers */
-        setWindowRange(51L, 75L);
+        setWindowRange(60L, 75L);
         SWTBotUtils.waitUntil(tg -> getVisibleItems(tg).size() == 9, timegraph, () -> "Fewer entries should be visible here: " + getVisibleItems(timegraph));
 
         /* add a time events filter */

@@ -12,7 +12,6 @@
 package org.eclipse.tracecompass.tmf.ui.swtbot.tests.views;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,12 +47,13 @@ class StubPresentationProvider extends TimeGraphPresentationProvider {
     }
 
     private static final List<StateItem> SYMBOLS = Arrays.asList(
-            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.CIRCLE, StyleProperties.BACKGROUND_COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY)),
-            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.SQUARE, StyleProperties.BACKGROUND_COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY)),
-            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.TRIANGLE, StyleProperties.BACKGROUND_COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY)),
-            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.INVERTED_TRIANGLE, StyleProperties.BACKGROUND_COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY)),
-            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.CROSS, StyleProperties.BACKGROUND_COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY)),
-            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.PLUS, StyleProperties.BACKGROUND_COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY)));
+            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.DIAMOND, StyleProperties.COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY, StyleProperties.HEIGHT, 1.0f)),
+            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.CIRCLE, StyleProperties.COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY, StyleProperties.HEIGHT, 1.0f)),
+            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.SQUARE, StyleProperties.COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY, StyleProperties.HEIGHT, 1.0f)),
+            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.TRIANGLE, StyleProperties.COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY, StyleProperties.HEIGHT, 1.0f)),
+            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.INVERTED_TRIANGLE, StyleProperties.COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY, StyleProperties.HEIGHT, 1.0f)),
+            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.CROSS, StyleProperties.COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY, StyleProperties.HEIGHT, 1.0f)),
+            new StateItem(ImmutableMap.of(StyleProperties.SYMBOL_TYPE, SymbolType.PLUS, StyleProperties.COLOR, MARKER_COLOR_HEX, StyleProperties.OPACITY, OPACITY, StyleProperties.HEIGHT, 1.0f)));
 
     private static final StateItem LASER = new StateItem(
             ImmutableMap.of(
@@ -109,10 +109,7 @@ class StubPresentationProvider extends TimeGraphPresentationProvider {
         if (event instanceof MarkerEvent && event.getDuration() == 0) {
             MarkerEvent markerEvent = (MarkerEvent) event;
             int value = markerEvent.getValue();
-            StateItem sym = SYMBOLS.get(value);
-            Map<String, Object> ret = new HashMap<>(super.getSpecificEventStyle(event));
-            ret.putAll(sym.getStyleMap());
-            return ret;
+            return SYMBOLS.get(value).getStyleMap();
         }
         return super.getSpecificEventStyle(event);
     }
