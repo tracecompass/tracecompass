@@ -10,34 +10,28 @@
  **********************************************************************/
 package org.eclipse.tracecompass.tmf.core.model;
 
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataType;
+
 /**
- * Interface to implement to describe a table column.
+ * Interface to implement to describe a table cell.
  *
  * @author Bernd Hufmann
  * @since 6.1
  *
  */
-public interface ITableColumnDescriptor {
+public interface ITableCellDescriptor {
 
     /**
-     * Gets the header text of the column.
+     * Gets the data type of the cell.
      *
-     * @return the text of the header
+     * @return the data type of the cell
      */
-    String getText();
+    DataType getDataType();
 
     /**
-     * Gets the header tooltip text of the column.
+     * Gets the unit of the cell.
      *
-     * @return the tooltip text of the column
+     * @return the unit of the cell
      */
-    String getTooltip();
-
-    /**
-     * Gets the default cell descriptor of the column.
-     *
-     * @return the default cell descriptor
-     */
-    ITableCellDescriptor getCellDescriptor();
-
+    String getUnit();
 }

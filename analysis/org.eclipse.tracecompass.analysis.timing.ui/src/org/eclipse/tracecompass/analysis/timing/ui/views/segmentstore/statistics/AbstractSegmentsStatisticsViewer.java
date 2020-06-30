@@ -41,6 +41,8 @@ import org.eclipse.tracecompass.internal.analysis.timing.ui.views.segmentstore.s
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataType;
+import org.eclipse.tracecompass.tmf.core.model.ITableCellDescriptor;
 import org.eclipse.tracecompass.tmf.core.model.filters.FilterTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
@@ -51,6 +53,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.ui.model.DataTypeUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.AbstractTmfTreeViewer;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeColumnDataProvider;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
@@ -117,25 +120,43 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
 
         @Override
         public String getColumnText(@Nullable Object element, int columnIndex) {
-            if (columnIndex == 0 && element instanceof TmfTreeViewerEntry) {
-                return String.valueOf(((TmfTreeViewerEntry) element).getName());
-            } else if (element instanceof TmfGenericTreeEntry) {
+            if (element instanceof TmfGenericTreeEntry) {
                 SegmentStoreStatisticsModel model = ((TmfGenericTreeEntry<@NonNull SegmentStoreStatisticsModel>) element).getModel();
+                // Avoid displaying statistics for trace level entries.
+                if (columnIndex == 0) {
+                    return model.getName();
+                } else if (model.getParentId() == -1) {
+                    return "";
+                }
+
                 if (model.getNbElements() == 0) {
                     return ""; //$NON-NLS-1$
                 }
+
+                List<ITableCellDescriptor> descriptors = model.getCellDescriptors();
+                ITmfTreeViewerEntry parent = ((TmfGenericTreeEntry<@NonNull SegmentStoreStatisticsModel>) element).getParent();
+                long id = model.getParentId();
+                while ((parent != null) && (id != -1) && descriptors.isEmpty()) {
+                    if (parent instanceof TmfGenericTreeEntry) {
+                        descriptors = ((TmfGenericTreeEntry) parent).getModel().getCellDescriptors();
+                        id = ((TmfGenericTreeEntry) parent).getModel().getParentId();
+                    }
+                    parent = parent.getParent();
+                }
+
+                ITableCellDescriptor descriptor = descriptors.size() > columnIndex ? descriptors.get(columnIndex) : null;
                 if (columnIndex == 1) {
-                    return toFormattedString(model.getMin());
+                    return toFormattedString(model.getMin(), descriptor);
                 } else if (columnIndex == 2) {
-                    return String.valueOf(toFormattedString(model.getMax()));
+                    return String.valueOf(toFormattedString(model.getMax(), descriptor));
                 } else if (columnIndex == 3) {
-                    return String.valueOf(toFormattedString(model.getMean()));
+                    return String.valueOf(toFormattedString(model.getMean(), descriptor));
                 } else if (columnIndex == 4) {
-                    return String.valueOf(toFormattedString(model.getStdDev()));
+                    return String.valueOf(toFormattedString(model.getStdDev(), descriptor));
                 } else if (columnIndex == 5) {
-                    return String.valueOf(model.getNbElements());
+                    return String.valueOf(toFormattedString(model.getNbElements(), descriptor));
                 } else if (columnIndex == 6) {
-                    return String.valueOf(toFormattedString(model.getTotal()));
+                    return String.valueOf(toFormattedString(model.getTotal(), descriptor));
                 }
             }
 
@@ -244,11 +265,29 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
      * @return formatted value
      */
     protected static String toFormattedString(double value) {
-        /*
-         * The cast to long is needed because the formatter cannot truncate the number.
-         */
-        return String.format("%s", FORMATTER.format(value)); //$NON-NLS-1$
+        return toFormattedString(value, null);
     }
+
+    /**
+     * Formats a Number value string
+     *
+     * @param value
+     *            a value to format
+     * @param descriptor
+     *            the column descriptor
+     * @return formatted value
+     * @since 4.2
+     */
+    protected static String toFormattedString(Number value, @Nullable ITableCellDescriptor descriptor) {
+        if (descriptor == null || descriptor.getDataType().equals(DataType.DURATION)) {
+            return String.format("%s", FORMATTER.format(value)); //$NON-NLS-1$
+        } else if (descriptor.getDataType().equals(DataType.NUMBER)) {
+            return String.valueOf(value) + (descriptor.getUnit().isEmpty() ? "" : descriptor.getUnit()); //$NON-NLS-1$
+        } else {
+            return String.format("%s", DataTypeUtils.getFormat(descriptor.getDataType(), descriptor.getUnit()).format(value)); //$NON-NLS-1$
+        }
+    }
+
 
     @Override
     protected @Nullable ITmfTreeViewerEntry updateElements(ITmfTrace trace, long start, long end, boolean isSelection) {
@@ -298,16 +337,7 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
         map.put(-1L, root);
 
         for (TmfTreeDataModel entry : model) {
-            TmfTreeViewerEntry viewerEntry;
-            if (entry.getParentId() != -1) {
-                viewerEntry = new TmfGenericTreeEntry<>(entry);
-            } else {
-                /*
-                 * create a regular TmfTreeViewerEntry to avoid displaying statistics for trace
-                 * level entries.
-                 */
-                viewerEntry = new TmfTreeViewerEntry(entry.getName());
-            }
+            TmfTreeViewerEntry viewerEntry = new TmfGenericTreeEntry<>(entry);
             map.put(entry.getId(), viewerEntry);
 
             TmfTreeViewerEntry parent = map.get(entry.getParentId());

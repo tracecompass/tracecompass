@@ -11,6 +11,8 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model;
 
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataType;
+import org.eclipse.tracecompass.tmf.core.model.ITableCellDescriptor;
 import org.eclipse.tracecompass.tmf.core.model.ITableColumnDescriptor;
 
 /**
@@ -22,6 +24,7 @@ public class TableColumnDescriptor implements ITableColumnDescriptor {
 
     private String fText = ""; //$NON-NLS-1$
     private String fTooltipText = ""; //$NON-NLS-1$
+    private ITableCellDescriptor fCellDescriptor;
 
     /**
      * Constructor
@@ -32,6 +35,7 @@ public class TableColumnDescriptor implements ITableColumnDescriptor {
     private TableColumnDescriptor(Builder builder) {
         fText = builder.fText;
         fTooltipText = builder.fTooltipText;
+        fCellDescriptor = builder.fCellDescriptor;
     }
 
     @Override
@@ -44,6 +48,11 @@ public class TableColumnDescriptor implements ITableColumnDescriptor {
         return fTooltipText;
     }
 
+    @Override
+    public ITableCellDescriptor getCellDescriptor() {
+        return fCellDescriptor;
+    }
+
     /**
      *
      * A builder class to build instances implementing interface {@link TableColumnDescriptor}
@@ -53,6 +62,7 @@ public class TableColumnDescriptor implements ITableColumnDescriptor {
     public static class Builder {
         private String fText = ""; //$NON-NLS-1$
         private String fTooltipText = ""; //$NON-NLS-1$
+        private ITableCellDescriptor fCellDescriptor = new TableCellDescriptor.Builder().setDataType(DataType.STRING).build();
 
         /**
          * Constructor
@@ -82,6 +92,18 @@ public class TableColumnDescriptor implements ITableColumnDescriptor {
          */
         public Builder setTooltip(String tooltip) {
             fTooltipText = tooltip;
+            return this;
+        }
+
+        /**
+         * Sets the default cell descriptor of the column
+         *
+         * @param cellDescriptor
+         *      the default cell descriptor to set
+         * @return this {@link Builder} object
+         */
+        public Builder setCellDescriptor(ITableCellDescriptor cellDescriptor) {
+            fCellDescriptor = cellDescriptor;
             return this;
         }
 
