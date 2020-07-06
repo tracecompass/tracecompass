@@ -84,7 +84,7 @@ public class OfflineStatisticsCalculator<@NonNull E> implements IStatistics<E> {
                 continue;
             }
             Long value = fMapper.apply(element);
-            if (value <= fMapper.apply(obj)) {
+            if (value < fMapper.apply(obj)) {
                 obj = element;
             }
         }
@@ -103,7 +103,7 @@ public class OfflineStatisticsCalculator<@NonNull E> implements IStatistics<E> {
                 continue;
             }
             Long value = fMapper.apply(element);
-            if (value >= fMapper.apply(obj)) {
+            if (value > fMapper.apply(obj)) {
                 obj = element;
             }
         }

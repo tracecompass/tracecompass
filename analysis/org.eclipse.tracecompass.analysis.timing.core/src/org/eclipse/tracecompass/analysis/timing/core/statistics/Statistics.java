@@ -16,6 +16,7 @@ import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.statistics.NumberComparator;
 
 /**
  * Class that calculates statistics on a certain type of object. If the object
@@ -31,12 +32,17 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
  */
 public class Statistics<@NonNull E> implements IStatistics<E> {
 
+    private static final NumberComparator COMPARATOR = new NumberComparator();
+
     private final Function<E, @Nullable ? extends Number> fMapper;
 
     private @Nullable E fMin = null;
     private @Nullable E fMax = null;
+    private Number fMinNum = Long.MAX_VALUE;
+    private Number fMaxNum = Long.MIN_VALUE;
     private long fNbElements;
     private double fMean;
+
     /**
      * reminder, this is the variance * nb elem, as per the online algorithm
      */
@@ -72,20 +78,12 @@ public class Statistics<@NonNull E> implements IStatistics<E> {
 
     @Override
     public long getMin() {
-        @Nullable E min = fMin;
-        if (min == null) {
-            return Long.MAX_VALUE;
-        }
-        return NonNullUtils.checkNotNull(fMapper.apply(min)).longValue();
+        return fMinNum.longValue();
     }
 
     @Override
     public long getMax() {
-        @Nullable E max = fMax;
-        if (max == null) {
-            return Long.MIN_VALUE;
-        }
-        return NonNullUtils.checkNotNull(fMapper.apply(max)).longValue();
+        return fMaxNum.longValue();
     }
 
     @Override
@@ -134,23 +132,41 @@ public class Statistics<@NonNull E> implements IStatistics<E> {
             // TODO add null category?
             return;
         }
-        long value = number.longValue();
-        /*
-         * Min and max are trivial, as well as number of segments
-         */
-        fMin = value <= getMin() ? object : fMin;
-        fMax = value >= getMax() ? object : fMax;
-
+        double doubleValue = number.doubleValue();
+        updateMin(object, number);
+        updateMax(object, number);
         fNbElements++;
         /*
          * The running mean is not trivial, see proof in javadoc.
          *
          * TODO: Check if saturated math would be required here
          */
-        double delta = value - fMean;
+        double delta = doubleValue - fMean;
         fMean += delta / fNbElements;
-        fVariance += delta * (value - fMean);
-        fTotal += value;
+        fVariance += delta * (doubleValue - fMean);
+        fTotal += doubleValue;
+    }
+
+    private void updateMax(@Nullable E object, Number number) {
+        if (object == null) {
+            return;
+        }
+        @Nullable E max = fMax;
+        if (max == null || COMPARATOR.compare(number, fMaxNum) > 0) {
+            fMax = object;
+            fMaxNum = number;
+        }
+    }
+
+    private void updateMin(@Nullable E object, Number number) {
+        if (object == null) {
+            return;
+        }
+        @Nullable E min = fMin;
+        if (min == null || COMPARATOR.compare(number, fMinNum) < 0) {
+            fMin = object;
+            fMinNum = number;
+        }
     }
 
     @Override
@@ -181,10 +197,8 @@ public class Statistics<@NonNull E> implements IStatistics<E> {
          *
          * Min and max are trivial, as well as number of segments
          */
-        long min = getMin();
-        long max = getMax();
-        fMin = other.getMin() <= min ? other.getMinObject() : fMin;
-        fMax = other.getMax() >= max ? other.getMaxObject() : fMax;
+        updateMin(other.getMinObject(), other.fMinNum);
+        updateMax(other.getMaxObject(), other.fMaxNum);
 
         long oldNbSeg = fNbElements;
         double oldAverage = fMean;
@@ -224,6 +238,8 @@ public class Statistics<@NonNull E> implements IStatistics<E> {
         fMean = copyOther.fMean;
         fMax = copyOther.fMax;
         fMin = copyOther.fMin;
+        fMinNum = copyOther.fMinNum;
+        fMaxNum = copyOther.fMaxNum;
         fNbElements = copyOther.fNbElements;
         fTotal = copyOther.fTotal;
         fVariance = copyOther.fVariance;
