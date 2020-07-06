@@ -28,6 +28,7 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.ImmutableList;
@@ -177,14 +178,14 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
         long t1 = Long.max(start, end);
         ISegmentStore<@NonNull ISegment> segmentStore = segmentStoreProviderModule.getSegmentStore();
         return segmentStore != null ?
-                isSaneRange(t0, t1) ?
-                        segmentStore.getIntersectingElements(t0, t1) :
+                isEternity(t0, t1) ?
                         segmentStore :
+                        segmentStore.getIntersectingElements(t0, t1) :
                 Collections.emptyList();
     }
 
-    private static boolean isSaneRange(long t0, long t1) {
-        return t0 != TmfTimeRange.ETERNITY.getStartTime().toNanos() || t1 != TmfTimeRange.ETERNITY.getEndTime().toNanos();
+    private static boolean isEternity(long t0, long t1) {
+        return TmfTimeRange.ETERNITY.equals(new TmfTimeRange(TmfTimestamp.fromNanos(t0), TmfTimestamp.fromNanos(t1)));
     }
 
     private @Nullable IStatistics<ISegment> calculateTotalManual(Iterable<@NonNull ISegment> segments, IProgressMonitor monitor) {
