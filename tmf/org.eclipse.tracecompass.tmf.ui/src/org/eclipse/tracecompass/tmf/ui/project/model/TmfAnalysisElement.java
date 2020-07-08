@@ -35,6 +35,7 @@ import org.eclipse.tracecompass.internal.tmf.ui.Activator;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisOutput;
+import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisOutputManager;
 import org.eclipse.tracecompass.tmf.core.project.model.ITmfPropertiesProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
@@ -125,14 +126,15 @@ public class TmfAnalysisElement extends TmfProjectModelElement implements ITmfSt
             return;
         }
 
+        TmfAnalysisOutputManager manager = TmfAnalysisOutputManager.getInstance();
         for (IAnalysisOutput output : module.getOutputs()) {
             TmfAnalysisOutputElement outputElement = childrenMap.remove(output.getName());
-            if (outputElement == null) {
+            if (outputElement == null && !manager.isHidden(getParent().getParent().getTraceType(), fAnalysisHelper.getId(), output.getId())) {
                 IFolder newresource = ResourcesPlugin.getWorkspace().getRoot().getFolder(path.append(output.getName()));
                 outputElement = new TmfAnalysisOutputElement(output.getName(), newresource, this, output);
                 addChild(outputElement);
+                outputElement.refreshChildren();
             }
-            outputElement.refreshChildren();
         }
 
         /* Remove outputs that are not children of this analysis anymore */

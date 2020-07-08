@@ -24,6 +24,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleSource;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisModuleHelperConfigElement;
+import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisOutputManager;
 
 /**
  * Utility class for accessing TMF analysis module extensions from the
@@ -72,6 +73,12 @@ public final class TmfAnalysisModuleSourceConfigElement implements IAnalysisModu
     /** Extension point attribute 'applies' */
     public static final String APPLIES_ATTR = "applies"; //$NON-NLS-1$
 
+    /** Extension point attribute to outputs (e.g. views) */
+    public static final String OUTPUT_ATTR = "output"; //$NON-NLS-1$
+
+    /** Extension point attribute to hide default outputs (e.g. views) */
+    public static final String HIDE_OUTPUT_ELEM = "hideOutput"; //$NON-NLS-1$
+
     /**
      * The mapping of available analysis ID to their corresponding helper
      */
@@ -111,6 +118,12 @@ public final class TmfAnalysisModuleSourceConfigElement implements IAnalysisModu
         if (fAnalysisHelpers.isEmpty()) {
             // Populate the analysis module list
             IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(TMF_ANALYSIS_TYPE_ID);
+            for (IConfigurationElement ce : config) {
+                String elementName = ce.getName();
+                if (elementName.equals(TmfAnalysisModuleSourceConfigElement.HIDE_OUTPUT_ELEM)) {
+                    TmfAnalysisOutputManager.getInstance().loadExclusion(ce);
+                }
+            }
             for (IConfigurationElement ce : config) {
                 String elementName = ce.getName();
                 if (elementName.equals(TmfAnalysisModuleSourceConfigElement.MODULE_ELEM)) {

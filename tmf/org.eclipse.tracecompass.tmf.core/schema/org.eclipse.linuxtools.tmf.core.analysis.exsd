@@ -24,6 +24,7 @@
             <element ref="parameterProvider"/>
             <element ref="listener"/>
             <element ref="tracetype"/>
+            <element ref="hideOutput"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -294,6 +295,39 @@
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.tracecompass.tmf.core.analysis.ITmfNewAnalysisModuleListener"/>
                </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="hideOutput">
+      <annotation>
+         <documentation>
+            Hide the output of an analysis for a given trace type. Does not handle inheritance by design.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="tracetype" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The trace type ID of the output to be hidden.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="analysis_module" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The analysis ID of the output to be hidden.
+
+Note: this is not consistent with camelCase as it is consistent with the module element.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="output" type="string" use="required">
+            <annotation>
+               <documentation>
+                  An ID for the output to be hidden. For example, for a view, it would be the view ID.
+               </documentation>
             </annotation>
          </attribute>
       </complexType>

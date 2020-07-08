@@ -52,4 +52,15 @@ public interface IAnalysisOutput {
      */
     void setOutputProperty(@NonNull String key, String value, boolean immediate);
 
+    /**
+     * Get the ID of the analysis output
+     * @return the ID
+     *
+     * @since 6.1
+     */
+    @NonNull
+    default String getId() {
+        return ""; //$NON-NLS-1$
+    }
+
 }

@@ -113,14 +113,17 @@ public class TmfAnalysisViewOutput implements IAnalysisOutput, IExecutableExtens
     protected IViewPart openView() throws PartInitException {
         final IWorkbench wb = PlatformUI.getWorkbench();
         final IWorkbenchPage activePage = wb.getActiveWorkbenchWindow().getActivePage();
+        return activePage.showView(getId());
+    }
 
+    @Override
+    public String getId() {
         String viewId = fViewId;
         String secondaryId = fSecondaryId;
         if (secondaryId != null) {
             viewId += ':' + secondaryId;
         }
-
-        return activePage.showView(viewId);
+        return String.valueOf(viewId);
     }
 
     @Override
