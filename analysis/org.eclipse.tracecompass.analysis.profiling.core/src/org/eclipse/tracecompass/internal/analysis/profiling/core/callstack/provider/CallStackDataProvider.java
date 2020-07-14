@@ -292,9 +292,13 @@ public class CallStackDataProvider extends AbstractTimeGraphDataProvider<@NonNul
         Integer pid = fQuarkToPid.get(interval.getAttribute());
         if (value != null && pid != null) {
             String name = fTimeEventNames.getUnchecked(new Pair<>(pid, interval));
-            return new TimeGraphState(startTime, duration, value.hashCode(), name);
+            return new TimeGraphState(startTime, duration, getColorValue(name, value), name);
         }
         return new TimeGraphState(startTime, duration, Integer.MIN_VALUE);
+    }
+
+    private static int getColorValue(String name, Object value) {
+        return 31 * (name != null ? name.hashCode() : value.hashCode());
     }
 
     @Override
