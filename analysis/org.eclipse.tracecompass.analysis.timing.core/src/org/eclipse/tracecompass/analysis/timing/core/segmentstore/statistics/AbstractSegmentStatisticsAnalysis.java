@@ -28,7 +28,6 @@ import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
-import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.ImmutableList;
@@ -120,7 +119,7 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
     @Override
     public @Nullable IStatistics<ISegment> getStatsForRange(long start, long end, IProgressMonitor monitor) {
         ITmfTrace trace = getTrace();
-        if (trace != null && (start == TmfTimeRange.ETERNITY.getStartTime().toNanos() && end == TmfTimeRange.ETERNITY.getEndTime().toNanos())) {
+        if (trace != null && isEternity(start, end)) {
             waitForCompletion();
             return getStatsTotal();
         }
@@ -154,11 +153,15 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
     @Override
     public Map<@NonNull String, IStatistics<@NonNull ISegment>> getStatsPerTypeForRange(long start, long end, IProgressMonitor monitor) {
         ITmfTrace trace = getTrace();
-        if (trace != null && (start == TmfTimeRange.ETERNITY.getStartTime().toNanos() && end == TmfTimeRange.ETERNITY.getEndTime().toNanos())) {
+        if (trace != null && isEternity(start, end)) {
             waitForCompletion();
             return getStatsPerType();
         }
         return getPerTypeStats(start, end, monitor);
+    }
+
+    private static boolean isEternity(long start, long end) {
+        return start == TmfTimeRange.ETERNITY.getStartTime().toNanos() && end == TmfTimeRange.ETERNITY.getEndTime().toNanos();
     }
 
     /**
@@ -182,10 +185,6 @@ public abstract class AbstractSegmentStatisticsAnalysis extends TmfAbstractAnaly
                         segmentStore :
                         segmentStore.getIntersectingElements(t0, t1) :
                 Collections.emptyList();
-    }
-
-    private static boolean isEternity(long t0, long t1) {
-        return TmfTimeRange.ETERNITY.equals(new TmfTimeRange(TmfTimestamp.fromNanos(t0), TmfTimestamp.fromNanos(t1)));
     }
 
     private @Nullable IStatistics<ISegment> calculateTotalManual(Iterable<@NonNull ISegment> segments, IProgressMonitor monitor) {
