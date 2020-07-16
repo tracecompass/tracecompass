@@ -26,6 +26,7 @@ import org.eclipse.tracecompass.analysis.profiling.core.base.IProfilingElement;
 import org.eclipse.tracecompass.analysis.profiling.core.base.IProfilingGroupDescriptor;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackHostUtils.IHostIdProvider;
 import org.eclipse.tracecompass.analysis.profiling.core.callstack.CallStackHostUtils.IHostIdResolver;
+import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.Activator;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.CalledFunctionFactory;
 import org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.ICalledFunction;
@@ -523,7 +524,7 @@ public class CallStackSeries implements ISegmentStore<ISegment> {
     @Override
     public Iterable<ISegment> getIntersectingElements(long start, long end) {
         ITmfStateSystem stateSystem = fRootGroup.getStateSystem();
-        long startTime = Math.max(start - 1, stateSystem.getStartTime());
+        long startTime = Math.max(SaturatedArithmetic.add(start, -1L), stateSystem.getStartTime());
         long endTime = Math.min(end, stateSystem.getCurrentEndTime());
         if (startTime > endTime) {
             return Collections.emptyList();
