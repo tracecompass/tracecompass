@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2019 Ericsson
+ * Copyright (c) 2015, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -17,6 +17,7 @@ package org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,6 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.linuxtools.dataviewers.piechart.PieChart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -33,7 +33,10 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swtchart.Chart;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.model.TmfPieChartStatisticsModel;
+import org.eclipse.tracecompass.internal.tmf.ui.widgets.piechart.PieSlice;
+import org.eclipse.tracecompass.internal.tmf.ui.widgets.piechart.TmfPieChart;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorScheme;
 
@@ -52,53 +55,46 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphColorS
 public class TmfPieChartViewer extends Composite {
 
     /**
-     * The pie chart containing global information about the trace
+     * Nested class used to handle and sort more easily the pair (Name, Number
+     * of occurrences)
+     *
+     * @author Alexis Cabana-Loriaux
      */
-    private PieChart fGlobalPC;
+    private static class EventOccurrenceObject {
 
-    /**
-     * The name of the piechart containing the statistics about the global trace
-     */
-    private String fGlobalPCname;
+        private final String fId;
 
-    /**
-     * The pie chart containing information about the current time-range
-     * selection
-     */
-    private PieChart fTimeRangePC;
+        private final String fName;
 
-    /**
-     * The name of the piechart containing the statistics about the current
-     * selection
-     */
-    private String fTimeRangePCname;
+        private final Long fNbOccurrences;
 
-    /**
-     * The listener for the mouse movement event.
-     */
-    private Listener fMouseMoveListener;
+        /**
+         * Constructor
+         * @param name name
+         * @param nbOccurences value
+         * @param id id
+         */
+        public EventOccurrenceObject(String name, Long nbOccurences, String id) {
+            this.fName = name;
+            this.fNbOccurrences = nbOccurences;
+            fId = id;
+        }
 
-    /**
-     * The listener for the mouse right click event.
-     */
-    private MouseListener fMouseClickListener;
+        public String getId() {
+            return fId;
+        }
 
-    /**
-     * The list of listener to notify when an event type is selected
-     */
-    private ListenerList<Listener> fEventTypeSelectedListeners = new ListenerList<>(ListenerList.IDENTITY);
+        public String getName() {
+            return fName;
+        }
 
-    /**
-     * The name of the slice containing the too little slices
-     */
-    private String fOthersSliceName;
+        public Long getNbOccurence() {
+            return fNbOccurrences;
+        }
 
-    /**
-     * Implementation of the State design pattern to reorder the layout
-     * depending on the selection. This variable holds the current state of the
-     * layout.
-     */
-    private IPieChartViewerState fCurrentState;
+    }
+
+    private static final Comparator<EventOccurrenceObject> COMPARATOR = Comparator.comparing(EventOccurrenceObject::getNbOccurence).reversed();
 
     /**
      * Represents the minimum percentage a slice of pie must have in order to be
@@ -113,12 +109,123 @@ public class TmfPieChartViewer extends Composite {
     private static final int NB_MAX_SLICES = 10;
 
     /**
+     * Function used to update or create the slices of a PieChart to match the
+     * content of a Map passed in parameter. It also provides a facade to use
+     * the PieChart API
+     */
+    private static void updatePieChartWithData(
+            final TmfPieChart chart,
+            final Map<String, Long> slices,
+            final float minimumSizeOfSlice,
+            final String nameOfOthers) {
+
+        List<EventOccurrenceObject> chartValues = new ArrayList<>();
+        Long eventTotal = 0L;
+        for (Entry<String, Long> entry : slices.entrySet()) {
+            eventTotal += entry.getValue();
+            chartValues.add(new EventOccurrenceObject(entry.getKey(), entry.getValue(), entry.getKey()));
+        }
+
+        // No events in the selection
+        if (eventTotal == 0) {
+            // clear the chart and show "NO DATA"
+
+            return;
+        }
+
+        /*
+         * filter out the event types taking too little space in the chart and
+         * label the whole group together. The remaining slices will be showing
+         */
+        List<EventOccurrenceObject> filteredChartValues = new ArrayList<>();
+        Long othersEntryCount = 0L;
+        int nbSlices = 0;
+        for (EventOccurrenceObject entry : chartValues) {
+            if (entry.getNbOccurence() / eventTotal.floatValue() > minimumSizeOfSlice && nbSlices <= NB_MAX_SLICES) {
+                filteredChartValues.add(entry);
+                nbSlices++;
+            } else {
+                othersEntryCount += entry.getNbOccurence();
+            }
+        }
+
+        Collections.sort(filteredChartValues, COMPARATOR);
+
+        // Add the "Others" slice in the pie if its not empty
+        if (othersEntryCount != 0) {
+            filteredChartValues.add(new EventOccurrenceObject(nameOfOthers, othersEntryCount, nameOfOthers));
+        }
+
+        // put the entries in the chart and add their percentage
+        chart.clear();
+        for (EventOccurrenceObject entry : filteredChartValues) {
+            chart.addPieSlice(entry.getName(), entry.getNbOccurence(), entry.getId());
+        }
+        chart.redraw();
+    }
+
+    /** The color scheme for the chart */
+    private @NonNull TimeGraphColorScheme fColorScheme = new TimeGraphColorScheme();
+
+    /**
+     * Implementation of the State design pattern to reorder the layout
+     * depending on the selection. This variable holds the current state of the
+     * layout.
+     */
+    private IPieChartViewerState fCurrentState;
+
+    /**
+     * The list of listener to notify when an event type is selected
+     */
+    private ListenerList<Listener> fEventTypeSelectedListeners = new ListenerList<>(ListenerList.IDENTITY);
+
+    /**
+     * The pie chart containing global information about the trace
+     */
+    private TmfPieChart fGlobalPC;
+
+    /**
+     * The name of the piechart containing the statistics about the global trace
+     */
+    private String fGlobalPCname;
+
+    /**
      * The data that has to be presented by the pie charts
      */
     private TmfPieChartStatisticsModel fModel = null;
 
-    /** The color scheme for the chart */
-    private @NonNull TimeGraphColorScheme fColorScheme = new TimeGraphColorScheme();
+    /**
+     * The listener for the mouse right click event.
+     */
+    private MouseListener fMouseClickListener;
+
+    /**
+     * The listener for the mouse movement event.
+     */
+    private Listener fMouseMoveListener;
+    /**
+     * The name of the slice containing the too little slices
+     */
+    private String fOthersSliceName;
+
+    // ------------------------------------------------------------------------
+    // Class methods
+    // ------------------------------------------------------------------------
+
+    private PieSlice fSelected = null;
+
+    /**
+     * The pie chart containing information about the current time-range
+     * selection
+     */
+    private TmfPieChart fTimeRangePC;
+
+    /**
+     * The name of the piechart containing the statistics about the current
+     * selection
+     */
+    private String fTimeRangePCname;
+
     /**
      * @param parent
      *            The parent composite that will hold the viewer
@@ -134,144 +241,40 @@ public class TmfPieChartViewer extends Composite {
         initContent();
     }
 
-    // ------------------------------------------------------------------------
-    // Class methods
-    // ------------------------------------------------------------------------
-
     /**
-     * Called by this class' constructor. Constructs the basic viewer containing
-     * the charts, as well as their listeners
+     * @param l
+     *            the listener to add
      */
-    private synchronized void initContent() {
-        setLayout(new FillLayout());
-
-        fGlobalPC = null;
-        fTimeRangePC = null;
-
-        // Setup listeners for the tooltips
-        fMouseMoveListener = event -> {
-            PieChart pc = (PieChart) event.widget;
-            switch (event.type) {
-            /* Get tooltip information on the slice */
-            case SWT.MouseMove:
-                int sliceIndex = pc.getSliceIndexFromPosition(0, event.x, event.y);
-                if (sliceIndex < 0) {
-                    // mouse is outside the chart
-                    pc.setToolTipText(null);
-                    break;
-                }
-                float percOfSlice = (float) pc.getSlicePercent(0, sliceIndex);
-                String percent = String.format("%.1f", percOfSlice); //$NON-NLS-1$
-                Long nbEvents = Long.valueOf((long) pc.getSeriesSet().getSeries()[sliceIndex].getXSeries()[0]);
-
-                String text = Messages.TmfStatisticsView_PieChartToolTipTextName + " = " + //$NON-NLS-1$
-                        pc.getSeriesSet().getSeries()[sliceIndex].getId() + "\n"; //$NON-NLS-1$
-
-                text += Messages.TmfStatisticsView_PieChartToolTipTextEventCount + " = "//$NON-NLS-1$
-                        + nbEvents.toString() + " (" + percent + "%)"; //$NON-NLS-1$ //$NON-NLS-2$
-                pc.setToolTipText(text);
-                return;
-            default:
-            }
-        };
-
-        fMouseClickListener = new MouseListener() {
-
-            @Override
-            public void mouseUp(MouseEvent e) {
-                // Do nothing
-            }
-
-            @Override
-            public void mouseDown(MouseEvent e) {
-                PieChart pc = (PieChart) e.widget;
-                int slicenb = pc.getSliceIndexFromPosition(0, e.x, e.y);
-                if (slicenb < 0 || slicenb >= pc.getSeriesSet().getSeries().length) {
-                    // mouse is outside the chart
-                    return;
-                }
-                Event selectionEvent = new Event();
-                selectionEvent.text = pc.getSeriesSet().getSeries()[slicenb].getId();
-                notifyEventTypeSelectionListener(selectionEvent);
-            }
-
-            @Override
-            public void mouseDoubleClick(MouseEvent e) {
-                // Do nothing
-            }
-        };
-
-        // at creation no content is selected
-        setCurrentState(new PieChartViewerStateNoContentSelected(this));
+    public void addEventTypeSelectionListener(Listener l) {
+        fEventTypeSelectedListeners.add(l);
     }
 
     /**
-     * Updates the data contained in the Global PieChart by using a Map.
-     * Normally, this method is only called by the state machine.
+     * @return the current state of the viewer
      */
-    synchronized void updateGlobalPieChart() {
-        if (getGlobalPC() == null) {
-            fGlobalPC = new PieChart(this, SWT.NONE);
-            Color backgroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_BACKGROUND);
-            Color foregroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_FOREGROUND);
-            getGlobalPC().getTitle().setText(fGlobalPCname);
-            getGlobalPC().getTitle().setForeground(foregroundColor);
-            getGlobalPC().setBackground(backgroundColor);
-            getGlobalPC().setForeground(foregroundColor);
-            getGlobalPC().getAxisSet().getXAxis(0).getTitle().setText(""); //Hide the title over the legend //$NON-NLS-1$
-            getGlobalPC().getAxisSet().getXAxis(0).getTitle().setForeground(foregroundColor);
-            getGlobalPC().getLegend().setVisible(true);
-            getGlobalPC().getLegend().setPosition(SWT.RIGHT);
-            getGlobalPC().getLegend().setBackground(backgroundColor);
-            getGlobalPC().getLegend().setForeground(foregroundColor);
-            getGlobalPC().addListener(SWT.MouseMove, fMouseMoveListener);
-            getGlobalPC().addMouseListener(fMouseClickListener);
-        } else if (getGlobalPC().isDisposed() || fModel == null || fModel.getPieChartGlobalModel() == null) {
-            return;
-        }
-
-        Map<String, Long> totalEventCountForChart = getTotalEventCountForChart(true);
-
-        if (totalEventCountForChart == null) {
-            return;
-        }
-
-        updatePieChartWithData(fGlobalPC, totalEventCountForChart, MIN_PRECENTAGE_TO_SHOW_SLICE, fOthersSliceName);
+    synchronized IPieChartViewerState getCurrentState() {
+        return fCurrentState;
     }
 
     /**
-     * Updates the data contained in the Time-Range PieChart by using a Map.
-     * Normally, this method is only called by the state machine.
+     * @return the global piechart
      */
-    synchronized void updateTimeRangeSelectionPieChart() {
-        if (getTimeRangePC() == null) {
-            Color backgroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_BACKGROUND);
-            Color foregroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_FOREGROUND);
-            fTimeRangePC = new PieChart(this, SWT.NONE);
-            fTimeRangePC.setBackground(backgroundColor);
-            fTimeRangePC.setForeground(foregroundColor);
-            getTimeRangePC().getTitle().setText(fTimeRangePCname);
-            getTimeRangePC().getTitle().setForeground(foregroundColor);
-            getTimeRangePC().getAxisSet().getXAxis(0).getTitle().setText(""); //Hide the title over the legend //$NON-NLS-1$
-            getTimeRangePC().getAxisSet().getXAxis(0).getTitle().setForeground(foregroundColor);
-            getTimeRangePC().getLegend().setPosition(SWT.BOTTOM);
-            getTimeRangePC().getLegend().setVisible(true);
-            getTimeRangePC().getLegend().setBackground(backgroundColor);
-            getTimeRangePC().getLegend().setForeground(foregroundColor);
-            getTimeRangePC().addListener(SWT.MouseMove, fMouseMoveListener);
-            getTimeRangePC().addMouseListener(fMouseClickListener);
-        }
-        else if (getTimeRangePC().isDisposed()) {
-            return;
-        }
+    synchronized Chart getGlobalPC() {
+        return fGlobalPC;
+    }
 
-        Map<String, Long> totalEventCountForChart = getTotalEventCountForChart(false);
+    /**
+     * @return the model
+     */
+    public TmfPieChartStatisticsModel getModel() {
+        return fModel;
+    }
 
-        if (totalEventCountForChart == null) {
-            return;
-        }
-
-        updatePieChartWithData(fTimeRangePC, totalEventCountForChart, MIN_PRECENTAGE_TO_SHOW_SLICE, fOthersSliceName);
+    /**
+     * @return the time-range selection piechart
+     */
+    synchronized Chart getTimeRangePC() {
+        return fTimeRangePC;
     }
 
     /* return the chart-friendly map given by the TmfPieChartStatisticsModel */
@@ -308,87 +311,86 @@ public class TmfPieChartViewer extends Composite {
         return totalEventCountForChart;
     }
 
-    /**
-     * Reinitializes the charts to their initial state, without any data
-     */
-    public synchronized void reinitializeCharts() {
-        if (isDisposed()) {
-            return;
-        }
+    // ------------------------------------------------------------------------
+    // Getters
+    // ------------------------------------------------------------------------
 
-        if (getGlobalPC() != null && !getGlobalPC().isDisposed()) {
-            getGlobalPC().dispose();
-        }
-        fGlobalPC = new PieChart(this, SWT.NONE);
-        getGlobalPC().getTitle().setText(fGlobalPCname);
-        getGlobalPC().getAxisSet().getXAxis(0).getTitle().setText(""); //Hide the title over the legend //$NON-NLS-1$
-        if (getTimeRangePC() != null && !getTimeRangePC().isDisposed()) {
-            getTimeRangePC().dispose();
-            fTimeRangePC = null;
-        }
-        layout();
+    /**
+     * Called by this class' constructor. Constructs the basic viewer containing
+     * the charts, as well as their listeners
+     */
+    private synchronized void initContent() {
+        setLayout(new FillLayout());
+
+        fGlobalPC = null;
+        fTimeRangePC = null;
+
+        // Setup listeners for the tooltips
+        fMouseMoveListener = event -> {
+            TmfPieChart pc = (TmfPieChart) event.widget;
+            switch (event.type) {
+            /* Get tooltip information on the slice */
+            case SWT.MouseMove:
+                PieSlice slice = pc.getSliceFromPosition(event.x, event.y);
+                if (slice == null) {
+                    // mouse is outside the chart
+                    pc.setToolTipText(null);
+                    break;
+                }
+                long nbEvents = (long) slice.getValue();
+                float percOfSlice = (float) (nbEvents / pc.getTotal() * 100.0);
+                String percent = String.format("%.1f", percOfSlice); //$NON-NLS-1$
+
+                String text = Messages.TmfStatisticsView_PieChartToolTipTextName + " = " + //$NON-NLS-1$
+                        slice.getLabel() + "\n"; //$NON-NLS-1$
+
+                text += Messages.TmfStatisticsView_PieChartToolTipTextEventCount + " = "//$NON-NLS-1$
+                        + nbEvents + " (" + percent + "%)"; //$NON-NLS-1$ //$NON-NLS-2$
+                pc.setToolTipText(text);
+                return;
+            default:
+            }
+        };
+
+        fMouseClickListener = new MouseListener() {
+
+
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+                // Do nothing
+            }
+
+            @Override
+            public void mouseDown(MouseEvent e) {
+                TmfPieChart pc = (TmfPieChart) e.widget;
+                PieSlice slice = pc.getSliceFromPosition(e.x, e.y);
+                fSelected = slice;
+                if (slice == null) {
+                    // mouse is outside the chart
+                    return;
+                }
+                String id = fSelected.getID();
+                select(id);
+                Event selectionEvent = new Event();
+                selectionEvent.text = slice.getLabel();
+                notifyEventTypeSelectionListener(selectionEvent);
+            }
+
+            @Override
+            public void mouseUp(MouseEvent e) {
+                // Do nothing
+            }
+        };
+
+        // at creation no content is selected
         setCurrentState(new PieChartViewerStateNoContentSelected(this));
     }
 
-    /**
-     * Function used to update or create the slices of a PieChart to match the
-     * content of a Map passed in parameter. It also provides a facade to use
-     * the PieChart API
-     */
-    private static void updatePieChartWithData(
-            final PieChart chart,
-            final Map<String, Long> slices,
-            final float minimumSizeOfSlice,
-            final String nameOfOthers) {
-
-        List<EventOccurrenceObject> chartValues = new ArrayList<>();
-        Long eventTotal = 0L;
-        for (Entry<String, Long> entry : slices.entrySet()) {
-            eventTotal += entry.getValue();
-            chartValues.add(new EventOccurrenceObject(entry.getKey(), entry.getValue()));
+    /* Notify all listeners that an event type has been selected */
+    private void notifyEventTypeSelectionListener(Event e) {
+        for (Object o : fEventTypeSelectedListeners.getListeners()) {
+            ((Listener) o).handleEvent(e);
         }
-
-        // No events in the selection
-        if (eventTotal == 0) {
-            // clear the chart and show "NO DATA"
-
-            return;
-        }
-
-        /*
-         * filter out the event types taking too little space in the chart and
-         * label the whole group together. The remaining slices will be showing
-         */
-        List<EventOccurrenceObject> filteredChartValues = new ArrayList<>();
-        Long othersEntryCount = 0L;
-        int nbSlices = 0;
-        for (EventOccurrenceObject entry : chartValues) {
-            if (entry.getNbOccurence() / eventTotal.floatValue() > minimumSizeOfSlice && nbSlices <= NB_MAX_SLICES) {
-                filteredChartValues.add(entry);
-                nbSlices++;
-            } else {
-                othersEntryCount += entry.getNbOccurence();
-            }
-        }
-
-        Collections.sort(filteredChartValues);
-
-        // Add the "Others" slice in the pie if its not empty
-        if (othersEntryCount != 0) {
-            filteredChartValues.add(new EventOccurrenceObject(nameOfOthers, othersEntryCount));
-        }
-
-        // put the entries in the chart and add their percentage
-        double[][] tempValues = new double[filteredChartValues.size()][1];
-        String[] tempNames = new String[filteredChartValues.size()];
-        int index = 0;
-        for (EventOccurrenceObject entry : filteredChartValues) {
-            tempValues[index][0] = entry.getNbOccurence();
-            tempNames[index] = entry.getName();
-            index++;
-        }
-
-        chart.addPieChartSeries(tempNames, tempValues);
     }
 
     /**
@@ -429,12 +431,30 @@ public class TmfPieChartViewer extends Composite {
         }
     }
 
+    // ------------------------------------------------------------------------
+    // Setters
+    // ------------------------------------------------------------------------
+
     /**
-     * @param l
-     *            the listener to add
+     * Reinitializes the charts to their initial state, without any data
      */
-    public void addEventTypeSelectionListener(Listener l) {
-        fEventTypeSelectedListeners.add(l);
+    public synchronized void reinitializeCharts() {
+        if (isDisposed()) {
+            return;
+        }
+
+        if (getGlobalPC() != null && !getGlobalPC().isDisposed()) {
+            getGlobalPC().dispose();
+        }
+        fGlobalPC = new TmfPieChart(this, SWT.NONE);
+        getGlobalPC().getTitle().setText(fGlobalPCname);
+        getGlobalPC().getAxisSet().getXAxis(0).getTitle().setText(""); //Hide the title over the legend //$NON-NLS-1$
+        if (getTimeRangePC() != null && !getTimeRangePC().isDisposed()) {
+            getTimeRangePC().dispose();
+            fTimeRangePC = null;
+        }
+        layout();
+        setCurrentState(new PieChartViewerStateNoContentSelected(this));
     }
 
     /**
@@ -445,47 +465,15 @@ public class TmfPieChartViewer extends Composite {
         fEventTypeSelectedListeners.remove(l);
     }
 
-    /* Notify all listeners that an event type has been selected */
-    private void notifyEventTypeSelectionListener(Event e) {
-        for (Object o : fEventTypeSelectedListeners.getListeners()) {
-            ((Listener) o).handleEvent(e);
-        }
-    }
-
-    // ------------------------------------------------------------------------
-    // Getters
-    // ------------------------------------------------------------------------
-
     /**
-     * @return the global piechart
+     * Setter method for the state.
+     *
+     * @param newState
+     *            The new state of the viewer Normally only called by classes
+     *            implementing the IPieChartViewerState interface.
      */
-    synchronized PieChart getGlobalPC() {
-        return fGlobalPC;
-    }
-
-    /**
-     * @return the time-range selection piechart
-     */
-    synchronized PieChart getTimeRangePC() {
-        return fTimeRangePC;
-    }
-
-    /**
-     * @return the current state of the viewer
-     */
-    synchronized IPieChartViewerState getCurrentState() {
-        return fCurrentState;
-    }
-
-    // ------------------------------------------------------------------------
-    // Setters
-    // ------------------------------------------------------------------------
-
-    /**
-     * @return the model
-     */
-    public TmfPieChartStatisticsModel getModel() {
-        return fModel;
+    public synchronized void setCurrentState(final IPieChartViewerState newState) {
+        fCurrentState = newState;
     }
 
     /**
@@ -502,50 +490,96 @@ public class TmfPieChartViewer extends Composite {
      * @param newChart
      *            the new PieChart
      */
-    public synchronized void setTimeRangePC(PieChart newChart) {
+    public synchronized void setTimeRangePC(TmfPieChart newChart) {
         fTimeRangePC = newChart;
     }
-
     /**
-     * Setter method for the state.
-     *
-     * @param newState
-     *            The new state of the viewer Normally only called by classes
-     *            implementing the IPieChartViewerState interface.
+     * Updates the data contained in the Global PieChart by using a Map.
+     * Normally, this method is only called by the state machine.
      */
-    public synchronized void setCurrentState(final IPieChartViewerState newState) {
-        fCurrentState = newState;
+    synchronized void updateGlobalPieChart() {
+        if (getGlobalPC() == null) {
+            fGlobalPC = new TmfPieChart(this, SWT.NONE);
+            Color backgroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_BACKGROUND);
+            Color foregroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_FOREGROUND);
+            getGlobalPC().getTitle().setText(fGlobalPCname);
+            getGlobalPC().getTitle().setForeground(foregroundColor);
+            getGlobalPC().setBackground(backgroundColor);
+            getGlobalPC().setForeground(foregroundColor);
+            getGlobalPC().getAxisSet().getXAxis(0).getTitle().setText(""); //Hide the title over the legend //$NON-NLS-1$
+            getGlobalPC().getAxisSet().getXAxis(0).getTitle().setForeground(foregroundColor);
+            getGlobalPC().getLegend().setVisible(true);
+            getGlobalPC().getLegend().setPosition(SWT.BOTTOM);
+            getGlobalPC().getLegend().setBackground(backgroundColor);
+            getGlobalPC().getLegend().setForeground(foregroundColor);
+            getGlobalPC().addListener(SWT.MouseMove, fMouseMoveListener);
+            getGlobalPC().addMouseListener(fMouseClickListener);
+        } else if (getGlobalPC().isDisposed() || fModel == null || fModel.getPieChartGlobalModel() == null) {
+            return;
+        }
+
+        Map<String, Long> totalEventCountForChart = getTotalEventCountForChart(true);
+
+        if (totalEventCountForChart == null) {
+            return;
+        }
+
+        updatePieChartWithData(fGlobalPC, totalEventCountForChart, MIN_PRECENTAGE_TO_SHOW_SLICE, fOthersSliceName);
+    }
+    /**
+     * Updates the data contained in the Time-Range PieChart by using a Map.
+     * Normally, this method is only called by the state machine.
+     */
+    synchronized void updateTimeRangeSelectionPieChart() {
+        if (getTimeRangePC() == null) {
+            Color backgroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_BACKGROUND);
+            Color foregroundColor = fColorScheme.getColor(TimeGraphColorScheme.TOOL_FOREGROUND);
+            fTimeRangePC = new TmfPieChart(this, SWT.NONE);
+            fTimeRangePC.setBackground(backgroundColor);
+            fTimeRangePC.setForeground(foregroundColor);
+            getTimeRangePC().getTitle().setText(fTimeRangePCname);
+            getTimeRangePC().getTitle().setForeground(foregroundColor);
+            getTimeRangePC().getAxisSet().getXAxis(0).getTitle().setText(""); //Hide the title over the legend //$NON-NLS-1$
+            getTimeRangePC().getAxisSet().getXAxis(0).getTitle().setForeground(foregroundColor);
+            getTimeRangePC().getLegend().setPosition(SWT.BOTTOM);
+            getTimeRangePC().getLegend().setVisible(true);
+            getTimeRangePC().getLegend().setBackground(backgroundColor);
+            getTimeRangePC().getLegend().setForeground(foregroundColor);
+            getTimeRangePC().addListener(SWT.MouseMove, fMouseMoveListener);
+            getTimeRangePC().addMouseListener(fMouseClickListener);
+        }
+        else if (getTimeRangePC().isDisposed()) {
+            return;
+        }
+
+        Map<String, Long> totalEventCountForChart = getTotalEventCountForChart(false);
+
+        if (totalEventCountForChart == null) {
+            return;
+        }
+
+        updatePieChartWithData(fTimeRangePC, totalEventCountForChart, MIN_PRECENTAGE_TO_SHOW_SLICE, fOthersSliceName);
     }
 
     /**
-     * Nested class used to handle and sort more easily the pair (Name, Number
-     * of occurrences)
+     * Select a slice of the pie
      *
-     * @author Alexis Cabana-Loriaux
+     * @param id
+     *            the id to select
      */
-    private static class EventOccurrenceObject implements Comparable<EventOccurrenceObject> {
-
-        private String fName;
-
-        private Long fNbOccurrences;
-
-        EventOccurrenceObject(String name, Long nbOccurences) {
-            this.fName = name;
-            this.fNbOccurrences = nbOccurences;
+    public void select(String id) {
+        if (id == null) {
+            return;
         }
-
-        @Override
-        public int compareTo(EventOccurrenceObject other) {
-            // descending order
-            return Long.compare(other.getNbOccurence(), this.getNbOccurence());
+        TmfPieChart pieChart = fGlobalPC;
+        if (pieChart != null) {
+            pieChart.select(id);
+            pieChart.redraw();
         }
-
-        public String getName() {
-            return fName;
-        }
-
-        public Long getNbOccurence() {
-            return fNbOccurrences;
+        pieChart = fTimeRangePC;
+        if (pieChart != null) {
+            pieChart.select(id);
+            pieChart.redraw();
         }
     }
 }

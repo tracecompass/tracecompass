@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -25,6 +25,12 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.tmf.ui.viewers.piecharts.messages"; //$NON-NLS-1$
+
+
+    /**
+     * Show no data in pie chart
+     */
+    public static String TmfPieChart_noData;
 
     /**
      * String shown on top of the time-range selection piechart

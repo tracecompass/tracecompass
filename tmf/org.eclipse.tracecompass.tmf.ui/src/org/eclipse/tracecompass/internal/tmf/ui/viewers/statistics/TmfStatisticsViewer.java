@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 Ericsson
+ * Copyright (c) 2012, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -26,7 +26,11 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -428,6 +432,19 @@ public class TmfStatisticsViewer extends TmfViewer {
             }
             /* Only select the first in the collection */
             fTreeViewer.setSelection(new StructuredSelection(nodes.get(0)), true);
+        });
+        fTreeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                ISelection selection = event.getSelection();
+                if (!selection.isEmpty() && selection instanceof TreeSelection) {
+                    TmfStatisticsTreeNode selectObject = (TmfStatisticsTreeNode) ((TreeSelection) selection).getFirstElement();
+                    String[] path = selectObject.getPath();
+                    fPieChartViewer.select(path[path.length - 1]);
+                }
+
+            }
         });
 
         /* Make sure the sash is split in 2 equal parts */
