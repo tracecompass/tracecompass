@@ -22,6 +22,15 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.messages"; //$NON-NLS-1$
 
+    /** I/O aspect name: disk */
+    public static @Nullable String IoAspect_DiskName;
+    /** I/O aspect help text: disk */
+    public static @Nullable String IoAspect_DiskHelpText;
+    /** I/O aspect help text: request type */
+    public static @Nullable String IoAspect_TypeHelpText;
+    /** I/O aspect name: request type */
+    public static @Nullable String IoAspect_TypeName;
+
     /**
      * Used for disk read series
      */
