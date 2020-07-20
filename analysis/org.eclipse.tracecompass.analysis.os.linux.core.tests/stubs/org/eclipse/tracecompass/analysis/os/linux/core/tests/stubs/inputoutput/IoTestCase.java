@@ -225,6 +225,8 @@ public class IoTestCase extends LinuxTestCase {
                             selectionId = oneModel.getId();
                         }
                         break;
+                    case FLUSH: // fall-through
+                    case OTHER: // fall-through
                     default:
                         throw new IllegalStateException("Unknown type");
                     }

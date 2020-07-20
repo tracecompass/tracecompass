@@ -35,11 +35,11 @@ public class BlockIO {
      * @param rwbs
      *            The rwbs value of a block operation
      */
-    public BlockIO(Long sector, int nr_sector, DiskWriteModel disk, int rwbs) {
+    public BlockIO(Long sector, int nr_sector, DiskWriteModel disk, IoOperationType rwbs) {
         fSector = sector;
         fNrSector = nr_sector;
         fDisk = disk;
-        fType = IoOperationType.getType(rwbs);
+        fType = rwbs;
     }
 
     /**

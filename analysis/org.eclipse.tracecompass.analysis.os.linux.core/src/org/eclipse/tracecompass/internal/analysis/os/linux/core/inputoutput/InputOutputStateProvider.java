@@ -34,6 +34,7 @@ import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundExc
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
+import org.eclipse.tracecompass.tmf.core.event.ITmfEventField;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
@@ -76,7 +77,7 @@ import com.google.common.collect.ImmutableMap;
  */
 public class InputOutputStateProvider extends AbstractTmfStateProvider {
 
-    private static final int VERSION = 3;
+    private static final int VERSION = 4;
 
     private final Map<Integer, DiskWriteModel> fDisks = new HashMap<>();
     private final Map<String, KernelEventHandler> fEventNames;
@@ -201,6 +202,21 @@ public class InputOutputStateProvider extends AbstractTmfStateProvider {
      */
     public static int getNodeSyscalls(ITmfStateSystemBuilder ssb) {
         return ssb.getQuarkAbsoluteAndAdd(Attributes.SYSTEM_CALLS_ROOT);
+    }
+
+    /**
+     * Get the rwbs flag of the block events
+     *
+     * @param eventField
+     *            The rwbs event field
+     * @return The int value
+     */
+    public static IoOperationType getRWBS(@Nullable ITmfEventField eventField) {
+        if (eventField == null) {
+            return IoOperationType.OTHER;
+        }
+        Integer fieldValue = eventField.getFieldValue(Integer.class);
+        return fieldValue == null ? IoOperationType.OTHER : IoOperationType.getType(fieldValue);
     }
 
 }

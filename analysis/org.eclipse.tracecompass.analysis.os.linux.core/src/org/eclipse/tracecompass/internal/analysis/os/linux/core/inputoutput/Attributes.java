@@ -41,8 +41,7 @@ public interface Attributes {
     String CURRENT_REQUEST = "Current_request";
     /** Size of a request */
     String REQUEST_SIZE = "Request_size";
-    /** Type of a request */
-    String TYPE = "Type";
+
     /**
      * Contains the request in the waiting queue to which this request was
      * merged

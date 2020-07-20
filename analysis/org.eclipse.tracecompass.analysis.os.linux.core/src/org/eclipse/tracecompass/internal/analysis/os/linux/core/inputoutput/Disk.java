@@ -180,7 +180,7 @@ public class Disk {
     public static double extractCount(int sectorQuark, ITmfStateSystem ss, List<ITmfStateInterval> states, long ts) {
         // Determine if we are handling read or write requests.
         String sectorName = ss.getAttributeName(sectorQuark);
-        int rw = sectorName.equals(Attributes.SECTORS_READ) ? StateValues.READING_REQUEST : StateValues.WRITING_REQUEST;
+        IoOperationType rw = sectorName.equals(Attributes.SECTORS_READ) ? IoOperationType.READ : IoOperationType.WRITE;
 
         // Get the initial value.
         Object stateValue = states.get(sectorQuark).getValue();
@@ -201,7 +201,7 @@ public class Disk {
             if (sizeQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
                 ITmfStateInterval interval = states.get(sizeQuark);
                 Object size = interval.getValue();
-                if (size instanceof Number && Objects.equals(rw, states.get(driverSlotQuark).getValue())) {
+                if (size instanceof Number && Objects.equals(rw.ordinal(), states.get(driverSlotQuark).getValue())) {
                     /*
                      * The request is fully completed (and included in the r/w sectors) at interval
                      * end time + 1, so at interval end time, we do not expect the size to be total

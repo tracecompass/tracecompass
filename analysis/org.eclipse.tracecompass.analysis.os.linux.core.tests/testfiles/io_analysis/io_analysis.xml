@@ -94,6 +94,24 @@
 <field name="tid" value="1" type="long" />
 <field name="rwbs" value="4" type="long" />
 </event>
+<event timestamp="41" name="block_rq_issue">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="0" type="long" />
+<field name="nr_sector" value="0" type="long" />
+<field name="bytes" value="0" type="long" />
+<field name="tid" value="1" type="long" />
+<field name="rwbs" value="1280" type="long" />
+</event>
+<event timestamp="48" name="block_rq_complete">
+<field name="cpu" value="0" type="int" />
+<field name="dev" value="8388624" type="long" />
+<field name="sector" value="-1" type="long" />
+<field name="nr_sector" value="0" type="long" />
+<field name="bytes" value="0" type="long" />
+<field name="tid" value="1" type="long" />
+<field name="rwbs" value="1280" type="long" />
+</event>
 <event timestamp="50" name="block_rq_issue">
 <field name="cpu" value="0" type="int" />
 <field name="dev" value="8388624" type="long" />

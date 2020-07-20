@@ -20,7 +20,6 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
 import org.eclipse.tracecompass.statesystem.core.StateSystemBuilderUtils;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateValueTypeException;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfAttributePool.QueueType;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
@@ -133,12 +132,11 @@ public class DiskWriteModel extends Disk {
     }
 
     private int insertInWaitingQueue(long ts, Request request) {
-        ITmfStateValue statusState = request.getType() == IoOperationType.READ ? StateValues.READING_REQUEST_VALUE : StateValues.WRITING_REQUEST_VALUE;
         int slotQuark = fWaitingQueueAttrib.getAvailable();
 
         /* Insertion in waiting queue */
         try {
-            fSs.modifyAttribute(ts, statusState.unboxValue(), slotQuark);
+            fSs.modifyAttribute(ts, request.getType().ordinal(), slotQuark);
 
             int currentRequestQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.CURRENT_REQUEST);
             fSs.modifyAttribute(ts, request.getSector(), currentRequestQuark);
@@ -148,9 +146,6 @@ public class DiskWriteModel extends Disk {
 
             int mergedInQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.MERGED_IN);
             fSs.modifyAttribute(ts, (Object) null, mergedInQuark);
-
-            int requestTypeQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.TYPE);
-            fSs.modifyAttribute(ts, request.getType().ordinal(), requestTypeQuark);
         } catch (StateValueTypeException e) {
             Activator.getDefault().logError("Error inserting request", e); //$NON-NLS-1$
         }
@@ -284,12 +279,11 @@ public class DiskWriteModel extends Disk {
         }
         removeDanglingRequests(ts, request);
 
-        ITmfStateValue statusState = request.getType() == IoOperationType.READ ? StateValues.READING_REQUEST_VALUE : StateValues.WRITING_REQUEST_VALUE;
         int slotQuark = fDriverQueueAttrib.getAvailable();
 
         /* Insertion in driver queue */
         try {
-            fSs.modifyAttribute(ts, statusState.unboxValue(), slotQuark);
+            fSs.modifyAttribute(ts, request.getType().ordinal(), slotQuark);
 
             int currentRequestQuark = fSs.getQuarkRelativeAndAdd(slotQuark, Attributes.CURRENT_REQUEST);
             fSs.modifyAttribute(ts, request.getSector(), currentRequestQuark);
@@ -351,6 +345,10 @@ public class DiskWriteModel extends Disk {
             case WRITE:
                 int writtenQuark = fSs.getQuarkRelativeAndAdd(getQuark(), Attributes.SECTORS_WRITTEN);
                 StateSystemBuilderUtils.incrementAttributeInt(fSs, ts, writtenQuark, request.getNrSector());
+                break;
+            case FLUSH:
+            case OTHER:
+                // No read/write to increment
                 break;
             default:
                 throw new IllegalStateException("Complete request: the request cannot be other than READ or WRITE:" + request.getType()); //$NON-NLS-1$

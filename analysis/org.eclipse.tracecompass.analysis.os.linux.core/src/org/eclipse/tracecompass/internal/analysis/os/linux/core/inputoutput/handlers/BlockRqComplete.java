@@ -16,6 +16,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEven
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.DiskWriteModel;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.InputOutputStateProvider;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.IoOperationType;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.Request;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.KernelEventHandler;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -53,11 +54,13 @@ public class BlockRqComplete extends KernelEventHandler {
         Long sector = NonNullUtils.checkNotNull((Long) content.getField(getLayout().fieldBlockSector()).getValue());
         int nrSector = ((Long) content.getField(getLayout().fieldBlockNrSector()).getValue()).intValue();
         int phydisk = ((Long) content.getField(getLayout().fieldBlockDeviceId()).getValue()).intValue();
-        Integer rwbs = content.getFieldValue(Integer.class, getLayout().fieldBlockRwbs());
-        if (rwbs == null) {
-            return;
-        }
+        IoOperationType rwbs = InputOutputStateProvider.getRWBS(content.getField(getLayout().fieldBlockRwbs()));
         DiskWriteModel disk = fStateProvider.getDisk(phydisk);
+
+        // For flush operations, -1 end sectors should match an issued 0 sector request
+        if (sector == -1L && rwbs == IoOperationType.FLUSH) {
+            sector = 0L;
+        }
 
         Request request = disk.getDriverRequest(sector);
         if (request == null) {

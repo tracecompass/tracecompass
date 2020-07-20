@@ -16,6 +16,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEven
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.DiskWriteModel;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.InputOutputStateProvider;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.IoOperationType;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.Request;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.KernelEventHandler;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -60,11 +61,11 @@ public class MergeRequestsHandler extends KernelEventHandler {
 
         Request baseRequest = disk.getWaitingRequest(baseRequestSector);
         if (baseRequest == null) {
-            baseRequest = new Request(disk, baseRequestSector, 0);
+            baseRequest = new Request(disk, baseRequestSector, IoOperationType.OTHER);
         }
         Request mergedRequest = disk.getWaitingRequest(mergedRequestSector);
         if (mergedRequest == null) {
-            mergedRequest = new Request(disk, mergedRequestSector, 0);
+            mergedRequest = new Request(disk, mergedRequestSector, IoOperationType.OTHER);
         }
         disk.mergeRequests(ts, baseRequest, mergedRequest);
     }

@@ -41,11 +41,11 @@ public class Request {
      * @param rwbs
      *            The read/write bits
      */
-    public Request(DiskWriteModel disk, Long sector, int rwbs) {
+    public Request(DiskWriteModel disk, Long sector, IoOperationType rwbs) {
         fSector = sector;
         fNrSector = 0;
         fDisk = disk;
-        fType = IoOperationType.getType(rwbs);
+        fType = rwbs;
     }
 
     /**
@@ -114,8 +114,8 @@ public class Request {
      * @param rwbs
      *            The read/write bits of the request
      */
-    public void setType(int rwbs) {
-        fType = IoOperationType.getType(rwbs);
+    public void setType(IoOperationType rwbs) {
+        fType = rwbs;
     }
 
     /**

@@ -17,6 +17,7 @@ import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.BlockIO;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.DiskWriteModel;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.InputOutputStateProvider;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.IoOperationType;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.inputoutput.Request;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers.KernelEventHandler;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
@@ -54,10 +55,7 @@ public class BlockRqIssueHandler extends KernelEventHandler {
         Integer phydisk = ((Long) content.getField(getLayout().fieldBlockDeviceId()).getValue()).intValue();
         Long sector = NonNullUtils.checkNotNull((Long) content.getField(getLayout().fieldBlockSector()).getValue());
         Integer nrSector = ((Long) content.getField(getLayout().fieldBlockNrSector()).getValue()).intValue();
-        Integer rwbs = content.getFieldValue(Integer.class, getLayout().fieldBlockRwbs());
-        if (rwbs == null || nrSector == 0) {
-            return;
-        }
+        IoOperationType rwbs = InputOutputStateProvider.getRWBS(content.getField(getLayout().fieldBlockRwbs()));
 
         DiskWriteModel disk = fStateProvider.getDisk(phydisk);
         Request request = disk.getWaitingRequest(sector);
