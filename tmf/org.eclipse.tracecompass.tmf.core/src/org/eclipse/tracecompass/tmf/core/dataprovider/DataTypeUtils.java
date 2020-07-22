@@ -8,7 +8,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
-package org.eclipse.tracecompass.tmf.ui.model;
+package org.eclipse.tracecompass.tmf.core.dataprovider;
 
 import java.text.FieldPosition;
 import java.text.Format;
@@ -20,7 +20,6 @@ import org.eclipse.tracecompass.common.core.format.DataSizeWithUnitFormat;
 import org.eclipse.tracecompass.common.core.format.DataSpeedWithUnitFormat;
 import org.eclipse.tracecompass.common.core.format.DecimalWithUnitPrefixFormat;
 import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
-import org.eclipse.tracecompass.tmf.core.dataprovider.DataType;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestampFormat;
 
 /**
