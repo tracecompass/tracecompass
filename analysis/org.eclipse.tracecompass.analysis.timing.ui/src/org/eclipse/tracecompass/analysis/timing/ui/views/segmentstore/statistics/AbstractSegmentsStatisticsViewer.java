@@ -117,29 +117,31 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
 
         @Override
         public String getColumnText(@Nullable Object element, int columnIndex) {
-            if (columnIndex == 0 && element instanceof TmfTreeViewerEntry) {
-                return String.valueOf(((TmfTreeViewerEntry) element).getName());
-            } else if (element instanceof TmfGenericTreeEntry) {
+            String label = ""; //$NON-NLS-1$
+            if (element instanceof TmfGenericTreeEntry) {
                 SegmentStoreStatisticsModel model = ((TmfGenericTreeEntry<@NonNull SegmentStoreStatisticsModel>) element).getModel();
-                if (model.getNbElements() == 0) {
-                    return ""; //$NON-NLS-1$
-                }
-                if (columnIndex == 1) {
-                    return toFormattedString(model.getMin());
-                } else if (columnIndex == 2) {
-                    return String.valueOf(toFormattedString(model.getMax()));
-                } else if (columnIndex == 3) {
-                    return String.valueOf(toFormattedString(model.getMean()));
-                } else if (columnIndex == 4) {
-                    return String.valueOf(toFormattedString(model.getStdDev()));
-                } else if (columnIndex == 5) {
-                    return String.valueOf(model.getNbElements());
-                } else if (columnIndex == 6) {
-                    return String.valueOf(toFormattedString(model.getTotal()));
+                // Avoid displaying statistics for trace level entries.
+                List<String> labels = model.getLabels();
+                if ((columnIndex < labels.size()) && (columnIndex <= 6) && (columnIndex == 0 || (model.getParentId() != -1)) && (model.getNbElements() != 0)) {
+                    label = labels.get(columnIndex);
+                } else if (columnIndex >= labels.size()) {
+                    // TODO Remove this else-if branch when toFormattedString() is removed
+                    if (columnIndex == 1) {
+                        return toFormattedString(model.getMin());
+                    } else if (columnIndex == 2) {
+                        return String.valueOf(toFormattedString(model.getMax()));
+                    } else if (columnIndex == 3) {
+                        return String.valueOf(toFormattedString(model.getMean()));
+                    } else if (columnIndex == 4) {
+                        return String.valueOf(toFormattedString(model.getStdDev()));
+                    } else if (columnIndex == 5) {
+                        return String.valueOf(model.getNbElements());
+                    } else if (columnIndex == 6) {
+                        return String.valueOf(toFormattedString(model.getTotal()));
+                    }
                 }
             }
-
-            return ""; //$NON-NLS-1$
+            return label;
         }
     }
 
@@ -242,7 +244,9 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
      * @param value
      *            a value to format
      * @return formatted value
+     * @deprecated use formatting in the segment store statistics provider
      */
+    @Deprecated
     protected static String toFormattedString(double value) {
         /*
          * The cast to long is needed because the formatter cannot truncate the number.
@@ -298,16 +302,7 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
         map.put(-1L, root);
 
         for (TmfTreeDataModel entry : model) {
-            TmfTreeViewerEntry viewerEntry;
-            if (entry.getParentId() != -1) {
-                viewerEntry = new TmfGenericTreeEntry<>(entry);
-            } else {
-                /*
-                 * create a regular TmfTreeViewerEntry to avoid displaying statistics for trace
-                 * level entries.
-                 */
-                viewerEntry = new TmfTreeViewerEntry(entry.getName());
-            }
+            TmfTreeViewerEntry viewerEntry = new TmfGenericTreeEntry<>(entry);
             map.put(entry.getId(), viewerEntry);
 
             TmfTreeViewerEntry parent = map.get(entry.getParentId());

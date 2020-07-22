@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -29,6 +30,7 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.Abs
 import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
 import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatisticsAnalysis;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
+import org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore.SegmentStoreStatisticsAspects.NamedStatistics;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TableColumnDescriptor;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
@@ -78,6 +80,8 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
 
     private final @Nullable IAnalysisModule fModule;
 
+    private SegmentStoreStatisticsAspects fAspects = new SegmentStoreStatisticsAspects();
+
     /**
      * Get an instance of {@link SegmentStoreStatisticsDataProvider} for a trace and
      * provider. Returns a null instance if the ISegmentStoreProvider is null. If
@@ -95,7 +99,6 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         // TODO experiment support.
         return PROVIDER_MAP.computeIfAbsent(module, p -> new SegmentStoreStatisticsDataProvider(trace, p, module.getId() + STATISTICS_SUFFIX));
     }
-
     /**
      * Constructor
      *
@@ -162,11 +165,13 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
             }
 
             long selectionId = getUniqueId(SELECTION_PREFIX);
-            list.add(new SegmentStoreStatisticsModel(selectionId, fTraceId, Collections.singletonList(Objects.requireNonNull(Messages.SegmentStoreStatisticsDataProvider_Selection)), statsForRange));
-            Map<String, IStatistics<ISegment>> selectionStats = fProvider.getStatsPerTypeForRange(start, end, nonNullMonitor);
-            for (Entry<String, IStatistics<ISegment>> entry : selectionStats.entrySet()) {
-                IStatistics<ISegment> statistics = entry.getValue();
-                list.add(new SegmentStoreStatisticsModel(getUniqueId(SELECTION_PREFIX + entry.getKey()), selectionId, getCellLabels(entry.getKey(), statistics), statistics));
+            if (statsForRange.getNbElements() > 0) {
+                list.add(new SegmentStoreStatisticsModel(selectionId, fTraceId, getCellLabels(Objects.requireNonNull(Messages.SegmentStoreStatisticsDataProvider_Selection), statsForRange), statsForRange));
+                Map<String, IStatistics<ISegment>> selectionStats = fProvider.getStatsPerTypeForRange(start, end, nonNullMonitor);
+                for (Entry<String, IStatistics<ISegment>> entry : selectionStats.entrySet()) {
+                    IStatistics<ISegment> statistics = entry.getValue();
+                    list.add(new SegmentStoreStatisticsModel(getUniqueId(SELECTION_PREFIX + entry.getKey()), selectionId, getCellLabels(entry.getKey(), statistics), statistics));
+                }
             }
         }
         TmfTreeModel.Builder<SegmentStoreStatisticsModel> treeModelBuilder = new TmfTreeModel.Builder();
@@ -175,82 +180,37 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         return new TmfModelResponse<>(treeModelBuilder.build(), Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
-    protected List<ITableColumnDescriptor> getColumnDescriptors() {
+    /**
+     * Gets the list of column descriptors.
+     *
+     * @return list of column descriptors
+     */
+    private List<ITableColumnDescriptor> getColumnDescriptors() {
         ImmutableList.Builder<ITableColumnDescriptor> headers = new ImmutableList.Builder<>();
-        TableColumnDescriptor.Builder builder = new TableColumnDescriptor.Builder();
-        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_Label));
-        headers.add(builder.build());
-
-        builder = new TableColumnDescriptor.Builder();
-        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_MinLabel));
-        headers.add(builder.build());
-
-        builder = new TableColumnDescriptor.Builder();
-        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_MaxLabel));
-        headers.add(builder.build());
-
-        builder = new TableColumnDescriptor.Builder();
-        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_AverageLabel));
-        headers.add(builder.build());
-
-        builder = new TableColumnDescriptor.Builder();
-        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_StandardDeviationLabel));
-        headers.add(builder.build());
-
-        builder = new TableColumnDescriptor.Builder();
-        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_CountLabel));
-        headers.add(builder.build());
-
-        builder = new TableColumnDescriptor.Builder();
-        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_TotalLabel));
-        headers.add(builder.build());
-
-        builder = new TableColumnDescriptor.Builder();
-        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_MinStartLabel));
-        headers.add(builder.build());
-
-        builder = new TableColumnDescriptor.Builder();
-        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_MinEndLabel));
-        headers.add(builder.build());
-
-        builder = new TableColumnDescriptor.Builder();
-        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_MaxStartLabel));
-        headers.add(builder.build());
-
-        builder = new TableColumnDescriptor.Builder();
-        builder.setText(Objects.requireNonNull(Messages.SegmentStoreStatistics_MaxEndLabel));
-        headers.add(builder.build());
+        for (IDataAspect<NamedStatistics> aspect : fAspects.getAspects()) {
+            TableColumnDescriptor.Builder builder = new TableColumnDescriptor.Builder();
+            builder.setText(Objects.requireNonNull(aspect.getName()));
+            builder.setTooltip(Objects.requireNonNull(aspect.getHelpText()));
+            headers.add(builder.build());
+        }
         return headers.build();
     }
 
-    private static List<String> getCellLabels(String name, IStatistics<ISegment> statistics) {
+    /**
+     * Returns a list of cell labels.
+     *
+     * @param name
+     *            the name value of the label column per row. Use as is.
+     * @param statistics
+     *            the {@link IStatistics} implementation to get the cell statistics labels from
+     * @return the list of cell label
+     */
+    private List<String> getCellLabels(String name, IStatistics<ISegment> statistics) {
+        NamedStatistics namedStatistics = new NamedStatistics(name, statistics);
         ImmutableList.Builder<String> labels = new ImmutableList.Builder<>();
-
-        ISegment min = statistics.getMinObject();
-        long minStart = 0;
-        long minEnd = 0;
-        if (min != null) {
-            minStart = min.getStart();
-            minEnd = min.getEnd();
+        for (IDataAspect<NamedStatistics> aspect : fAspects.getAspects()) {
+            labels.add(NonNullUtils.nullToEmptyString(aspect.apply(namedStatistics)));
         }
-        ISegment max = statistics.getMaxObject();
-        long maxStart = 0;
-        long maxEnd = 0;
-        if (max != null) {
-            maxStart = max.getStart();
-            maxEnd = max.getEnd();
-        }
-        labels.add(name)
-        .add(String.valueOf(statistics.getMin()))
-        .add(String.valueOf(statistics.getMax()))
-        .add(String.valueOf(statistics.getMean()))
-        .add(String.valueOf(statistics.getStdDev()))
-        .add(String.valueOf(statistics.getTotal()))
-        .add(String.valueOf(statistics.getNbElements()))
-        .add(String.valueOf(minStart))
-        .add(String.valueOf(minEnd))
-        .add(String.valueOf(maxStart))
-        .add(String.valueOf(maxEnd));
         return labels.build();
     }
 
@@ -274,4 +234,17 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
             fModule.dispose();
         }
     }
+
+    /**
+     * Set a mapper function to convert a statistics Number to String.
+     * Used for minimum, maximum, average, standard deviation and total.
+     *
+     * @param mapper
+     *              function to convert a Number to String
+     * @since 5.2
+     */
+    public void setMapper(Function<Number, String> mapper) {
+        fAspects.setMapper(mapper);
+    }
+
 }
