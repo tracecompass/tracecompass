@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.tmf.core.model.ITableCellDescriptor;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 
 /**
@@ -32,7 +31,6 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
     private final List<String> fLabels;
     private final boolean fHasRowModel;
     private final @Nullable OutputElementStyle fStyle;
-    private final List<ITableCellDescriptor> fCellDescriptors;
 
     /**
      * Constructor
@@ -73,25 +71,6 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
      *            <code>-1</code>.
      * @param labels
      *            The labels of this model
-     * @param cellDescriptors
-     *            Optional list of cell descriptors. If omitted, the cell
-     *            descriptors of the parent will be applied.
-     * @since 6.1
-     */
-    public TmfTreeDataModel(long id, long parentId, List<String> labels, List<ITableCellDescriptor> cellDescriptors) {
-        this(id, parentId, labels, true, null, cellDescriptors);
-    }
-
-    /**
-     * Constructor
-     *
-     * @param id
-     *            The id of the model
-     * @param parentId
-     *            The parent id of this model. If it has none, give
-     *            <code>-1</code>.
-     * @param labels
-     *            The labels of this model
      * @param hasRowModel
      *            Whether this entry has data or not
      * @param style
@@ -99,34 +78,11 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
      * @since 6.0
      */
     public TmfTreeDataModel(long id, long parentId, List<String> labels, boolean hasRowModel, @Nullable OutputElementStyle style) {
-        this(id, parentId, labels, hasRowModel, style, Collections.emptyList());
-    }
-
-    /**
-     * Constructor
-     *
-     * @param id
-     *            The id of the model
-     * @param parentId
-     *            The parent id of this model. If it has none, give
-     *            <code>-1</code>.
-     * @param labels
-     *            The labels of this model
-     * @param hasRowModel
-     *            Whether this entry has data or not
-     * @param style
-     *            The style of this entry
-     * @param cellDescriptors
-     *            Optional list of cell descriptors. If omitted, the cell descriptor of the parent will be applied.
-     * @since 6.1
-     */
-    public TmfTreeDataModel(long id, long parentId, List<String> labels, boolean hasRowModel, @Nullable OutputElementStyle style, List<ITableCellDescriptor> cellDescriptors) {
         fId = id;
         fParentId = parentId;
         fLabels = labels;
         fHasRowModel = hasRowModel;
         fStyle = style;
-        fCellDescriptors = cellDescriptors;
     }
 
     @Override
@@ -157,11 +113,6 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
     @Override
     public @Nullable OutputElementStyle getStyle() {
         return fStyle;
-    }
-
-    @Override
-    public List<ITableCellDescriptor> getCellDescriptors() {
-        return fCellDescriptors;
     }
 
     @Override

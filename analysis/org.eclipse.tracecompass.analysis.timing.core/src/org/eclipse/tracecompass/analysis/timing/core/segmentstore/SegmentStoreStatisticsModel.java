@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
-import org.eclipse.tracecompass.tmf.core.model.ITableCellDescriptor;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 
 /**
@@ -70,29 +69,7 @@ public class SegmentStoreStatisticsModel extends TmfTreeDataModel {
      * @since 5.0
      */
     public SegmentStoreStatisticsModel(long id, long parentId, List<String> labels, IStatistics<ISegment> statistics) {
-        this(id, parentId, labels, Collections.emptyList(), statistics);
-    }
-
-
-    /**
-     * Constructor
-     *
-     * @param id
-     *            The id of the model
-     * @param parentId
-     *            The parent id of this model. If it has none, give <code>-1</code>.
-     * @param labels
-     *            The labels of this model
-     * @param cellDescriptors
-     *            Optional list of cell descriptors. To omit, pass empty list.
-     *            If omitted, the parent cell descriptor will be applied.
-     * @param statistics
-     *            the {@link IStatistics} who's values will be copied into this
-     *            model.
-     * @since 5.2
-     */
-    public SegmentStoreStatisticsModel(long id, long parentId, List<String> labels, List<ITableCellDescriptor> cellDescriptors, IStatistics<ISegment> statistics) {
-        super(id, parentId, labels, cellDescriptors);
+        super(id, parentId, labels);
         fMin = statistics.getMin();
         fMax = statistics.getMax();
         fNbElements = statistics.getNbElements();

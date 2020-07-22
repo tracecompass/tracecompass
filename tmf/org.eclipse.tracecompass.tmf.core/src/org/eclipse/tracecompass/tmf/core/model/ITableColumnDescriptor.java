@@ -33,11 +33,4 @@ public interface ITableColumnDescriptor {
      */
     String getTooltip();
 
-    /**
-     * Gets the default cell descriptor of the column.
-     *
-     * @return the default cell descriptor
-     */
-    ITableCellDescriptor getCellDescriptor();
-
 }

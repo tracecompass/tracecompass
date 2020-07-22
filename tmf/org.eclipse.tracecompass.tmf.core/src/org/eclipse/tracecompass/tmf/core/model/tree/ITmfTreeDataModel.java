@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.tmf.core.model.ITableCellDescriptor;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 
 /**
@@ -61,17 +60,6 @@ public interface ITmfTreeDataModel {
      */
     default List<String> getLabels() {
         return Collections.singletonList(getName());
-    }
-
-    /**
-     * Return an optional list of cell descriptors for each column. If it's an empty
-     * list, then the cell descriptors of the parent model is assumed.
-     *
-     * @return optional list of cell descriptors
-     * @since 6.1
-     */
-    default List<ITableCellDescriptor> getCellDescriptors() {
-        return Collections.emptyList();
     }
 
     /**

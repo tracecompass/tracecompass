@@ -29,16 +29,13 @@ import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.Abs
 import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
 import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatisticsAnalysis;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TableCellDescriptor;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.TableColumnDescriptor;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.segmentstore.core.ISegment;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
-import org.eclipse.tracecompass.tmf.core.dataprovider.DataType;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
-import org.eclipse.tracecompass.tmf.core.model.ITableCellDescriptor;
 import org.eclipse.tracecompass.tmf.core.model.ITableColumnDescriptor;
 import org.eclipse.tracecompass.tmf.core.model.filters.FilterTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
@@ -136,7 +133,7 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         }
 
         List<SegmentStoreStatisticsModel> list = new ArrayList<>();
-        list.add(new SegmentStoreStatisticsModel(fTraceId, -1, getCellLabels(NonNullUtils.nullToEmptyString(getTrace().getName()), statsTotal), getCellDescriptors(), statsTotal));
+        list.add(new SegmentStoreStatisticsModel(fTraceId, -1, getCellLabels(NonNullUtils.nullToEmptyString(getTrace().getName()), statsTotal), statsTotal));
 
         /*
          * Add statistics for full duration.
@@ -172,24 +169,12 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
                 list.add(new SegmentStoreStatisticsModel(getUniqueId(SELECTION_PREFIX + entry.getKey()), selectionId, getCellLabels(entry.getKey(), statistics), statistics));
             }
         }
-        TmfTreeModel.Builder<SegmentStoreStatisticsModel> treeModelBuilder = new TmfTreeModel.Builder<>();
+        TmfTreeModel.Builder<SegmentStoreStatisticsModel> treeModelBuilder = new TmfTreeModel.Builder();
         treeModelBuilder.setColumnDescriptors(getColumnDescriptors());
         treeModelBuilder.setEntries(Collections.unmodifiableList(list));
         return new TmfModelResponse<>(treeModelBuilder.build(), Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
-    /**
-     * Gets the list of cell descriptors.
-     *
-     * Overriding this method allows to have different table column descriptors.
-     *
-     * Note that {@link SegmentStoreStatisticsDataProvider#getColumnDescriptors()},
-     * {@link SegmentStoreStatisticsDataProvider#getCellDescriptors()} and
-     * {@link SegmentStoreStatisticsDataProvider#getCellLabels(String, IStatistics)}
-     * have to be consistent and provide a list with the same length.
-     *
-     * @return list of cell descriptors
-     */
     protected List<ITableColumnDescriptor> getColumnDescriptors() {
         ImmutableList.Builder<ITableColumnDescriptor> headers = new ImmutableList.Builder<>();
         TableColumnDescriptor.Builder builder = new TableColumnDescriptor.Builder();
@@ -238,62 +223,7 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         return headers.build();
     }
 
-    /**
-     * Gets the list of cell descriptors.
-     *
-     * Overriding this method allows for providing custom cell descriptors.
-     *
-     * Note that {@link SegmentStoreStatisticsDataProvider#getColumnDescriptors()},
-     * {@link SegmentStoreStatisticsDataProvider#getCellDescriptors()} and
-     * {@link SegmentStoreStatisticsDataProvider#getCellLabels(String, IStatistics)}
-     * have to be consistent and provide a list with the same length.
-     *
-     * @return list of cell descriptors
-     */
-    protected List<ITableCellDescriptor> getCellDescriptors() {
-        ImmutableList.Builder<ITableCellDescriptor> headers = new ImmutableList.Builder<>();
-        // Header text
-        headers.add(new TableCellDescriptor.Builder().setDataType(DataType.STRING).build());
-        // Minimum duration
-        headers.add(new TableCellDescriptor.Builder().setDataType(DataType.DURATION).build());
-        // Maximum duration
-        headers.add(new TableCellDescriptor.Builder().setDataType(DataType.DURATION).build());
-        // Average duration
-        headers.add(new TableCellDescriptor.Builder().setDataType(DataType.DURATION).build());
-        // Standard Deviation
-        headers.add(new TableCellDescriptor.Builder().setDataType(DataType.DURATION).build());
-        // Number of elements (count)
-        headers.add(new TableCellDescriptor.Builder().setDataType(DataType.NUMBER).build());
-        // Total duration
-        headers.add(new TableCellDescriptor.Builder().setDataType(DataType.DURATION).build());
-        // Start time of minimum duration
-        headers.add(new TableCellDescriptor.Builder().setDataType(DataType.TIMESTAMP).build());
-        // End time of minimum duration
-        headers.add(new TableCellDescriptor.Builder().setDataType(DataType.TIMESTAMP).build());
-        // Start time of maximum duration
-        headers.add(new TableCellDescriptor.Builder().setDataType(DataType.TIMESTAMP).build());
-        // End time of maximum duration
-        headers.add(new TableCellDescriptor.Builder().setDataType(DataType.TIMESTAMP).build());
-        return headers.build();
-    }
-
-    /**
-     * Returns a list of cell labels.
-     *
-     * Overriding this method allows for providing custom cell labels.
-     *
-     * Note that {@link SegmentStoreStatisticsDataProvider#getColumnDescriptors()},
-     * {@link SegmentStoreStatisticsDataProvider#getCellDescriptors()} and
-     * {@link SegmentStoreStatisticsDataProvider#getCellLabels(String, IStatistics)}
-     * have to be consistent and provide a list with the same length.
-     *
-     * @param name
-     *            the name value of the label column per row. Use as is.
-     * @param statistics
-     *            the {@link IStatistics} implementation to get the cell statistics labels from
-     * @return the list of cell label
-     */
-    protected List<String> getCellLabels(String name, IStatistics<ISegment> statistics) {
+    private static List<String> getCellLabels(String name, IStatistics<ISegment> statistics) {
         ImmutableList.Builder<String> labels = new ImmutableList.Builder<>();
 
         ISegment min = statistics.getMinObject();
