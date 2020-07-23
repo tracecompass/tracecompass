@@ -21,6 +21,11 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.swtchart.Chart;
+import org.eclipse.swtchart.ISeries;
+import org.eclipse.swtchart.ISeriesSet;
+import org.eclipse.swtchart.Range;
+import org.eclipse.swtchart.model.IndexedSeriesModel;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternScatterGraphView;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.ConditionHelpers;
 import org.eclipse.tracecompass.tmf.ui.swtbot.tests.shared.SWTBotUtils;
@@ -28,10 +33,6 @@ import org.eclipse.tracecompass.tmf.ui.tests.shared.WaitUtils;
 import org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfXYChartViewer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.eclipse.swtchart.Chart;
-import org.eclipse.swtchart.ISeries;
-import org.eclipse.swtchart.ISeriesSet;
-import org.eclipse.swtchart.Range;
 
 /**
  * Tests of the pattern scatter chart view
@@ -91,7 +92,7 @@ public class PatternScatterChartViewTest extends PatternLatencyViewTestBase {
         assertTrue(series.length > 1);
         // Verify that each series has data
         for (int i = 0; i < series.length; i++) {
-            assertTrue("Verifying series " + i, series[i].getXSeries().length > 0);
+            assertTrue("Verifying series " + i, ((IndexedSeriesModel<?>) series[i].getDataModel()).size() > 0);
         }
     }
 

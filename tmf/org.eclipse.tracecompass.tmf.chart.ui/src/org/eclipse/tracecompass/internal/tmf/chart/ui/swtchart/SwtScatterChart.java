@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 École Polytechnique de Montréal
+ * Copyright (c) 2016, 2020 École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -43,6 +43,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swtchart.Chart;
+import org.eclipse.swtchart.IAxis;
+import org.eclipse.swtchart.IAxisSet;
+import org.eclipse.swtchart.IAxisTick;
+import org.eclipse.swtchart.ILineSeries;
+import org.eclipse.swtchart.ISeries;
+import org.eclipse.swtchart.ISeries.SeriesType;
+import org.eclipse.swtchart.ISeriesSet;
+import org.eclipse.swtchart.LineStyle;
+import org.eclipse.swtchart.model.DoubleArraySeriesModel;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartData;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartModel;
@@ -65,15 +75,6 @@ import org.eclipse.tracecompass.internal.tmf.chart.ui.data.ChartRangeMap;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.dialog.Messages;
 import org.eclipse.tracecompass.internal.tmf.chart.ui.format.LabelFormat;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
-import org.eclipse.swtchart.Chart;
-import org.eclipse.swtchart.IAxis;
-import org.eclipse.swtchart.IAxisSet;
-import org.eclipse.swtchart.IAxisTick;
-import org.eclipse.swtchart.ILineSeries;
-import org.eclipse.swtchart.ISeries;
-import org.eclipse.swtchart.ISeries.SeriesType;
-import org.eclipse.swtchart.ISeriesSet;
-import org.eclipse.swtchart.LineStyle;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -337,9 +338,8 @@ public final class SwtScatterChart extends SwtXYChartViewer {
             }
 
             /* Set the data for the SWT series */
-            ISeries series = checkNotNull(getSeriesMap().get(seriesConsumer.getSeries()));
-            series.setXSeries(xData);
-            series.setYSeries(yData);
+            ISeries<Integer> series = checkNotNull(getSeriesMap().get(seriesConsumer.getSeries()));
+            series.setDataModel(new DoubleArraySeriesModel(xData, yData));
 
             /* Create a series mapper */
             mapper.put(series, checkNotNull(object));
@@ -509,11 +509,11 @@ public final class SwtScatterChart extends SwtXYChartViewer {
             double closestDistance = -1.0;
 
             boolean found = false;
-            for (ISeries swtSeries : getChart().getSeriesSet().getSeries()) {
-                ILineSeries series = (ILineSeries) swtSeries;
-                double[] xSeries = series.getXSeries();
-
-                for (int i = 0; i < xSeries.length; i++) {
+            for (ISeries<Integer> swtSeries : getChart().getSeriesSet().getSeries()) {
+                ILineSeries<Integer> series = (ILineSeries<Integer>) swtSeries;
+                Iterator<Integer> iterator = series.getDataModel().iterator();
+                while (iterator.hasNext()) {
+                    int i = iterator.next();
                     Point dataPoint = series.getPixelCoordinates(i);
 
                     /*

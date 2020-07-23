@@ -12,11 +12,14 @@
 
 package org.eclipse.tracecompass.internal.tmf.ui.viewers.xychart;
 
+import java.util.stream.StreamSupport;
+
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swtchart.IBarSeries;
 import org.eclipse.swtchart.ILineSeries;
 import org.eclipse.swtchart.ISeries;
+import org.eclipse.swtchart.model.CartesianSeriesModel;
 import org.eclipse.tracecompass.tmf.ui.viewers.xychart.IXYSeries;
 
 /**
@@ -26,7 +29,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xychart.IXYSeries;
  */
 public class XYSeries implements IXYSeries {
 
-    private final ISeries<?> fSeries;
+    private final ISeries<Integer> fSeries;
 
     /**
      * Builder
@@ -37,7 +40,7 @@ public class XYSeries implements IXYSeries {
      */
     public static @Nullable XYSeries create(Object series) {
         if (series instanceof ISeries) {
-            return new XYSeries((ISeries<?>) series);
+            return new XYSeries((ISeries<Integer>) series);
         }
         return null;
     }
@@ -48,7 +51,7 @@ public class XYSeries implements IXYSeries {
      * @param series
      *            the series to wrap
      */
-    private XYSeries(ISeries<?> series) {
+    private XYSeries(ISeries<Integer> series) {
         fSeries = series;
     }
 
@@ -64,12 +67,20 @@ public class XYSeries implements IXYSeries {
 
     @Override
     public double[] getXSeries() {
-        return fSeries.getXSeries();
+        CartesianSeriesModel<Integer> dataModel = fSeries.getDataModel();
+        if (dataModel == null) {
+            return new double[0];
+        }
+        return StreamSupport.stream(dataModel.spliterator(), false).filter(t -> dataModel.getX(t) != null).mapToDouble(value -> dataModel.getX(value).doubleValue()).toArray();
     }
 
     @Override
     public double[] getYSeries() {
-        return fSeries.getYSeries();
+        CartesianSeriesModel<Integer> dataModel = fSeries.getDataModel();
+        if (dataModel == null) {
+            return new double[0];
+        }
+        return StreamSupport.stream(dataModel.spliterator(), false).filter(t -> dataModel.getY(t) != null).mapToDouble(value -> dataModel.getY(value).doubleValue()).toArray();
     }
 
     @Override

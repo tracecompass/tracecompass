@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -27,6 +27,10 @@ import org.eclipse.swtbot.swt.finder.matchers.WidgetOfType;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtchart.Chart;
+import org.eclipse.swtchart.ISeries;
+import org.eclipse.swtchart.ISeriesSet;
+import org.eclipse.swtchart.model.IndexedSeriesModel;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density2.AbstractSegmentStoreDensityView;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.table.AbstractSegmentStoreTableViewer;
 import org.eclipse.tracecompass.internal.tmf.analysis.xml.ui.views.latency.PatternDensityView;
@@ -36,9 +40,6 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.eclipse.swtchart.Chart;
-import org.eclipse.swtchart.ISeries;
-import org.eclipse.swtchart.ISeriesSet;
 
 /**
  * Test of the pattern density view
@@ -142,7 +143,7 @@ public class PatternDensityViewTest extends PatternLatencyViewTestBase {
         // Verify that the chart has 1 series
         assertEquals(1, series.length);
         // Verify that the series has data
-        assertTrue(series[0].getXSeries().length > 0);
+        assertTrue(((IndexedSeriesModel<?>) series[0].getDataModel()).size() > 0);
     }
 
     private static class SWTBotChart extends AbstractSWTBotControl<Chart> {

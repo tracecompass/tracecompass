@@ -15,6 +15,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.tracecompass.tmf.chart.core,
  org.eclipse.tracecompass.tmf.core,
  org.eclipse.tracecompass.tmf.ui,
+ org.eclipse.swtchart,
  org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.chart.ui.chart;x-friends:="org.eclipse.tracecompass.analysis.lami.ui,org.eclipse.tracecompass.tmf.chart.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.provisional.tmf.chart.ui.dialog;x-friends:="org.eclipse.tracecompass.analysis.lami.ui,org.eclipse.tracecompass.tmf.chart.ui.swtbot.tests",
@@ -28,6 +29,5 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.chart.ui.chart
  org.eclipse.tracecompass.internal.tmf.chart.ui.type;x-internal:=true
 Import-Package: com.google.common.annotations,
  com.google.common.collect,
- org.apache.commons.lang3,
- org.eclipse.swtchart
+ org.apache.commons.lang3
 Automatic-Module-Name: org.eclipse.tracecompass.tmf.chart.ui

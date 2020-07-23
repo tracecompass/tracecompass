@@ -42,6 +42,7 @@ import org.eclipse.swtchart.ISeriesSet;
 import org.eclipse.swtchart.ITitle;
 import org.eclipse.swtchart.LineStyle;
 import org.eclipse.swtchart.Range;
+import org.eclipse.swtchart.model.DoubleArraySeriesModel;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
@@ -465,8 +466,8 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
 
                                 // Create and fill the series
                                 ISeriesSet seriesSet = getSwtChart().getSeriesSet();
-                                ISeries<?> series = seriesSet.getSeries(entry.getName());
-                                ISeries<?> dimmedSeries = seriesSet.getSeries(entry.getName() + DIMMED_SERIES_SUFFIX);
+                                ISeries<Integer> series = seriesSet.getSeries(entry.getName());
+                                ISeries<Integer> dimmedSeries = seriesSet.getSeries(entry.getName() + DIMMED_SERIES_SUFFIX);
                                 if (brightX.isEmpty()) {
                                     // Remove the base series since there is
                                     // nothing to show
@@ -477,8 +478,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                                     if (series == null) {
                                         series = createSWTSeriesFromModel(entry);
                                     }
-                                    series.setXSeries(brightXArray);
-                                    series.setYSeries(brightYArray);
+                                    series.setDataModel(new DoubleArraySeriesModel(brightXArray, brightYArray));
                                     enableStack(series, true);
                                 }
                                 if (dimmedX.isEmpty()) {
@@ -491,8 +491,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                                     if (dimmedSeries == null) {
                                         dimmedSeries = createDimmedSeriesFromModel(entry);
                                     }
-                                    dimmedSeries.setXSeries(dimmedXArray);
-                                    dimmedSeries.setYSeries(dimmedYArray);
+                                    dimmedSeries.setDataModel(new DoubleArraySeriesModel(dimmedXArray, dimmedYArray));
                                     enableStack(dimmedSeries, true);
                                 }
                             }
@@ -571,7 +570,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             return xValuesToDisplay;
         }
 
-        private @NonNull ISeries<?> createSWTSeriesFromModel(ISeriesModel yModel) {
+        private @NonNull ISeries<Integer> createSWTSeriesFromModel(ISeriesModel yModel) {
             ISeriesSet seriesSet = getSwtChart().getSeriesSet();
 
             String seriesName = yModel.getName();
@@ -585,7 +584,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             String symbolType = (String) presProvider.getStyle(appearance, StyleProperties.SYMBOL_TYPE);
 
             if (type.equals(StyleProperties.SeriesType.BAR)) {
-                IBarSeries<?> barSeries = (IBarSeries<?>) seriesSet.createSeries(SeriesType.BAR, seriesName);
+                IBarSeries<Integer> barSeries = (IBarSeries<Integer>) seriesSet.createSeries(SeriesType.BAR, seriesName);
                 barSeries.setBarColor(color);
                 barSeries.setBarPadding(0);
                 barSeries.setVisible(true);
@@ -595,7 +594,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             /**
              * Default is line chart
              */
-            ILineSeries<?> lineSeries = (ILineSeries<?>) seriesSet.createSeries(SeriesType.LINE, seriesName);
+            ILineSeries<Integer> lineSeries = (ILineSeries<Integer>) seriesSet.createSeries(SeriesType.LINE, seriesName);
             lineSeries.enableArea(StyleProperties.SeriesType.AREA.equals(type));
             lineSeries.setLineStyle(LineStyle.valueOf((String) presProvider.getStyle(appearance, StyleProperties.SERIES_STYLE)));
             lineSeries.setSymbolType(SYMBOL_MAP.getOrDefault(symbolType, ILineSeries.PlotSymbolType.NONE));
@@ -607,7 +606,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             return lineSeries;
         }
 
-        private @NonNull ISeries<?> createDimmedSeriesFromModel(ISeriesModel yModel) {
+        private @NonNull ISeries<Integer> createDimmedSeriesFromModel(ISeriesModel yModel) {
             ISeriesSet seriesSet = getSwtChart().getSeriesSet();
 
             String seriesName = yModel.getName() + DIMMED_SERIES_SUFFIX;
@@ -622,7 +621,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             String symbolType = (String) presProvider.getStyle(appearance, StyleProperties.SYMBOL_TYPE);
 
             if (type.equals(IYAppearance.Type.BAR)) {
-                IBarSeries<?> barSeries = (IBarSeries<?>) seriesSet.createSeries(SeriesType.BAR, seriesName);
+                IBarSeries<Integer> barSeries = (IBarSeries<Integer>) seriesSet.createSeries(SeriesType.BAR, seriesName);
                 barSeries.setBarColor(color);
                 barSeries.setBarPadding(0);
                 barSeries.setVisible(true);
@@ -632,7 +631,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             /**
              * Default is line chart
              */
-            ILineSeries<?> lineSeries = (ILineSeries<?>) seriesSet.createSeries(SeriesType.LINE, seriesName);
+            ILineSeries<Integer> lineSeries = (ILineSeries<Integer>) seriesSet.createSeries(SeriesType.LINE, seriesName);
             lineSeries.enableArea(StyleProperties.SeriesType.AREA.equals(type));
             lineSeries.setLineStyle(LineStyle.valueOf((String) presProvider.getStyle(appearance, StyleProperties.SERIES_STYLE)));
             lineSeries.setSymbolType(SYMBOL_MAP.getOrDefault(symbolType, ILineSeries.PlotSymbolType.NONE));
@@ -664,7 +663,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
         if (getSwtChart().isDisposed()) {
             return;
         }
-        int numRequests = fOverrideNbPoints != 0 ? fOverrideNbPoints : (int) Math.min(getWindowEndTime() - getWindowStartTime() + 1, (long) (getSwtChart().getPlotArea().getBounds().width * fResolution));
+        int numRequests = fOverrideNbPoints != 0 ? fOverrideNbPoints : (int) Math.min(getWindowEndTime() - getWindowStartTime() + 1, (long) (getSwtChart().getPlotArea().getSize().x * fResolution));
         fUpdateThread = new UpdateThread(trace, numRequests, fScope);
         fUpdateThread.start();
     }

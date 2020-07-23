@@ -45,6 +45,7 @@ import org.eclipse.swtchart.ISeries.SeriesType;
 import org.eclipse.swtchart.ISeriesSet;
 import org.eclipse.swtchart.LineStyle;
 import org.eclipse.swtchart.Range;
+import org.eclipse.swtchart.model.DoubleArraySeriesModel;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.IAnalysisProgressListener;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
@@ -180,9 +181,9 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
     }
 
     private synchronized void updateDisplay(String name, SegmentStoreWithRange<ISegment> data) {
-        ISeries<?> series = fSeriesType.equals(Type.BAR) ? createSeries() : createAreaSeries(name);
+        ISeries<Integer> series = fSeriesType.equals(Type.BAR) ? createSeries() : createAreaSeries(name);
         int barWidth = 4;
-        int preWidth = fOverrideNbPoints == 0 ? fChart.getPlotArea().getBounds().width / barWidth : fOverrideNbPoints;
+        int preWidth = fOverrideNbPoints == 0 ? fChart.getPlotArea().getSize().x / barWidth : fOverrideNbPoints;
         if (!fSeriesType.equals(Type.BAR)) {
             preWidth += 2;
         }
@@ -230,8 +231,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
             maxLength++;
             minX--;
         }
-        series.setYSeries(yOrigSeries);
-        series.setXSeries(xOrigSeries);
+        series.setDataModel(new DoubleArraySeriesModel(xOrigSeries, yOrigSeries));
         final IAxis xAxis = fChart.getAxisSet().getXAxis(0);
         /*
          * adjustrange appears to bring origin back since we pad the series with
@@ -253,10 +253,7 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
          * accurate, but we cannot have partial counts.
          */
         for (ISeries<?> internalSeries : fChart.getSeriesSet().getSeries()) {
-            double[] ySeries = internalSeries.getYSeries();
-            for (int i = 0; i < ySeries.length; i++) {
-                maxY = Math.max(maxY, ySeries[i]);
-            }
+            maxY = Math.max(maxY, internalSeries.getDataModel().getMaxY().doubleValue());
         }
         fChart.getAxisSet().getYAxis(0).setRange(new Range(0.9, Math.max(1.0, maxY)));
         fChart.getAxisSet().getYAxis(0).enableLogScale(true);
@@ -269,16 +266,16 @@ public abstract class AbstractSegmentStoreDensityViewer extends TmfViewer implem
 
     }
 
-    private ISeries<?> createSeries() {
-        IBarSeries<?> series = (IBarSeries<?>) fChart.getSeriesSet().createSeries(SeriesType.BAR, Messages.AbstractSegmentStoreDensityViewer_SeriesLabel);
+    private ISeries<Integer> createSeries() {
+        IBarSeries<Integer> series = (IBarSeries<Integer>) fChart.getSeriesSet().createSeries(SeriesType.BAR, Messages.AbstractSegmentStoreDensityViewer_SeriesLabel);
         series.setVisible(true);
         series.setBarPadding(0);
         series.setBarColor(getColorForRGB(BAR_COLOR));
         return series;
     }
 
-    private ISeries<?> createAreaSeries(String name) {
-        ILineSeries<?> series = (ILineSeries<?>) fChart.getSeriesSet().createSeries(SeriesType.LINE, name);
+    private ISeries<Integer> createAreaSeries(String name) {
+        ILineSeries<Integer> series = (ILineSeries<Integer>) fChart.getSeriesSet().createSeries(SeriesType.LINE, name);
         series.setVisible(true);
         series.enableStep(true);
         series.enableArea(true);

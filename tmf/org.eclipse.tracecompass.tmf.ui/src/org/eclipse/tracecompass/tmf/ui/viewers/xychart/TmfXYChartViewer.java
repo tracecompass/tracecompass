@@ -174,7 +174,7 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
         });
 
         fSwtChart.addPaintListener(e -> {
-            Rectangle bounds = fSwtChart.getPlotArea().getBounds();
+            Rectangle bounds = fSwtChart.getPlotArea().getControl().getBounds();
             int y = fTimeScaleCtrl.getLocation().y;
             fTimeScaleCtrl.setBounds(bounds.x, y, bounds.width, DEFAULT_SCALE_HEIGHT);
             fTimeScaleCtrl.redraw();
@@ -448,13 +448,13 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      *            Graphics context
      */
     private void drawGridLines(GC gc) {
-        Rectangle bounds = fSwtChart.getPlotArea().getBounds();
+        Point size = fSwtChart.getPlotArea().getSize();
         Color foreground = fSwtChart.getAxisSet().getXAxis(0).getGrid().getForeground();
         gc.setForeground(foreground);
         gc.setAlpha(foreground.getAlpha());
         gc.setLineStyle(SWT.LINE_DOT);
         for (int x : fTimeScaleCtrl.getTickList()) {
-            gc.drawLine(x, 0, x,  bounds.height);
+            gc.drawLine(x, 0, x,  size.y);
         }
         gc.setAlpha(255);
     }
@@ -576,7 +576,7 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     protected void clearContent() {
         if (!fSwtChart.isDisposed()) {
             ISeriesSet set = fSwtChart.getSeriesSet();
-            ISeries[] series = set.getSeries();
+            ISeries<?>[] series = set.getSeries();
             for (int i = 0; i < series.length; i++) {
                 set.deleteSeries(series[i].getId());
             }
@@ -742,7 +742,7 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
             Point cursorDisplayLocation = getDisplay().getCursorLocation();
             Point cursorControlLocation = ((Composite) fSwtChart.getPlotArea()).toControl(cursorDisplayLocation);
             Point cursorParentLocation = ((Composite) fSwtChart.getPlotArea()).getParent().toControl(cursorDisplayLocation);
-            Rectangle controlBounds = getSwtChart().getPlotArea().getBounds();
+            Rectangle controlBounds = getSwtChart().getPlotArea().getControl().getBounds();
             // check the X axis only
             if (!controlBounds.contains(cursorParentLocation.x, controlBounds.y)) {
                 return;

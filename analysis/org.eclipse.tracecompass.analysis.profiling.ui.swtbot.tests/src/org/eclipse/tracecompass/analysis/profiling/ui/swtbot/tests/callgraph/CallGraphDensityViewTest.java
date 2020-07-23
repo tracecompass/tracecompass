@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Ericsson
+ * Copyright (c) 2016, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0 which
@@ -20,6 +20,7 @@ import static org.junit.Assert.fail;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.StreamSupport;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
@@ -33,6 +34,7 @@ import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtchart.ISeries;
+import org.eclipse.swtchart.model.CartesianSeriesModel;
 import org.eclipse.tracecompass.analysis.profiling.core.tests.flamegraph.AggregationTreeTest;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.ISegmentStoreProvider;
 import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density2.AbstractSegmentStoreDensityViewer;
@@ -178,7 +180,7 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
                 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
                 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 4.0 };
         waitForSeries(expected);
-        assertArrayEquals(expected, getSeries().getYSeries(), 0.1);
+        assertArrayEquals(expected, getYSeries(), 0.1);
     }
 
     @Override
@@ -198,7 +200,7 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
                 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
                 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0 };
         waitForSeries(expected);
-        assertArrayEquals(expected, getSeries().getYSeries(), 0.1);
+        assertArrayEquals(expected, getYSeries(), 0.1);
     }
 
     @Override
@@ -218,7 +220,7 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
                 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
                 1.0, 1.0, 1.0, 1.0, 1.0, 3.0, 1.0, 1.0, 1.0, 1.0 };
         waitForSeries(expected);
-        assertArrayEquals(expected, getSeries().getYSeries(), 0.1);
+        assertArrayEquals(expected, getYSeries(), 0.1);
     }
 
     @Override
@@ -238,7 +240,7 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
                 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
                 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0 };
         waitForSeries(expected);
-        assertArrayEquals(expected, getSeries().getYSeries(), 0.1);
+        assertArrayEquals(expected, getYSeries(), 0.1);
     }
 
     @Override
@@ -258,7 +260,7 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
                 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
                 1.0, 1.0, 1.0, 1.0, 1.0, 3.0, 1.0, 1.0, 1.0, 1.0 };
         waitForSeries(expected);
-        assertArrayEquals(expected, getSeries().getYSeries(), 0.1);
+        assertArrayEquals(expected, getYSeries(), 0.1);
     }
 
     @Override
@@ -278,7 +280,7 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
                 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
                 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0 };
         waitForSeries(expected);
-        assertArrayEquals(expected, getSeries().getYSeries(), 0.1);
+        assertArrayEquals(expected, getYSeries(), 0.1);
     }
 
     @Override
@@ -298,18 +300,26 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
                 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
                 1001.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
         waitForSeries(expected);
-        assertArrayEquals(expected, getSeries().getYSeries(), 0.1);
+        assertArrayEquals(expected, getYSeries(), 0.1);
     }
 
-    private ISeries<?> getSeries() {
+    private ISeries<Integer> getSeries() {
         AbstractSegmentStoreDensityViewer densityViewer = fDensityViewer;
         assertNotNull(densityViewer);
-        ISeries<?>[] serieses = densityViewer.getControl().getSeriesSet().getSeries();
+        ISeries<Integer>[] serieses = densityViewer.getControl().getSeriesSet().getSeries();
         assertNotNull(serieses);
         assertTrue(serieses.length > 0);
-        ISeries<?> series = serieses[0];
+        ISeries<Integer> series = serieses[0];
         assertNotNull(series);
         return series;
+    }
+
+    private double[] getYSeries() {
+        CartesianSeriesModel<Integer> dataModel = getSeries().getDataModel();
+        if (dataModel == null) {
+            return new double[0];
+        }
+        return StreamSupport.stream(dataModel.spliterator(), false).filter(t -> dataModel.getY(t) != null).mapToDouble(value -> dataModel.getY(value).doubleValue()).toArray();
     }
 
     private void loadData() {
@@ -341,7 +351,7 @@ public class CallGraphDensityViewTest extends AggregationTreeTest {
                 fDensityViewer.refresh();
                 fTableViewer.refresh();
             });
-            double[] ySeries = getSeries().getYSeries();
+            double[] ySeries = getYSeries();
             return Arrays.equals(expected, ySeries);
         }, null, "Unable to refresh viewer series");
     }

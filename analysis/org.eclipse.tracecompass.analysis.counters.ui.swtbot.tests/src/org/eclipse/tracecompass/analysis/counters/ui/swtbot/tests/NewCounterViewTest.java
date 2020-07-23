@@ -117,7 +117,7 @@ public class NewCounterViewTest extends XYDataProviderBaseTest {
         verifySeriesStyle(MAIN_SERIES_NAME, ISeries.SeriesType.LINE, BLUE, LineStyle.SOLID, false);
 
         // Ensure the data model is valid
-        WaitUtils.waitUntil(json -> isChartDataValid(chart, json, MAIN_SERIES_NAME),
+        WaitUtils.waitUntil(json -> isChartDataValid(chart, json),
                 "resources/minor_faults-res50.json", "The chart data is not valid.");
     }
 

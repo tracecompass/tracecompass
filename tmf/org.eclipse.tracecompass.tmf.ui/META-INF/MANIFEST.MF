@@ -21,6 +21,7 @@ Require-Bundle: org.eclipse.core.expressions,
  org.eclipse.ui.navigator.resources,
  org.eclipse.jface.text,
  org.eclipse.cdt.core,
+ org.eclipse.swtchart,
  org.swtchart,
  com.ibm.icu,
  org.eclipse.tracecompass.segmentstore.core,
@@ -150,6 +151,5 @@ Import-Package: com.google.common.annotations,
  com.google.gson.reflect,
  com.google.gson.stream,
  org.eclipse.emf.common.util,
- org.eclipse.emf.ecore,
- org.eclipse.swtchart
+ org.eclipse.emf.ecore
 Automatic-Module-Name: org.eclipse.tracecompass.tmf.ui

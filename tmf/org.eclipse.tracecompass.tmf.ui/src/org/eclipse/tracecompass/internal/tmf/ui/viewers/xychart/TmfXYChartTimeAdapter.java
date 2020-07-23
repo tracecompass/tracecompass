@@ -114,7 +114,7 @@ public final class TmfXYChartTimeAdapter implements ITimeDataProvider {
      * @return the width of the axis
      */
     public int getAxisWidth() {
-        return fTimeProvider.getSwtChart().getPlotArea().getBounds().width;
+        return fTimeProvider.getSwtChart().getPlotArea().getSize().x;
     }
 
     // -------------------------------------------------------------------------

@@ -42,6 +42,7 @@ import org.eclipse.swtchart.IBarSeries;
 import org.eclipse.swtchart.ISeries;
 import org.eclipse.swtchart.ISeries.SeriesType;
 import org.eclipse.swtchart.ISeriesSet;
+import org.eclipse.swtchart.model.DoubleArraySeriesModel;
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartData;
 import org.eclipse.tracecompass.internal.provisional.tmf.chart.core.chart.ChartModel;
@@ -213,15 +214,17 @@ public final class SwtBarChart extends SwtXYChartViewer {
 
             /* Generate numerical data for the Y axis */
             List<Number> data = yConsumer.getData();
+            double[] xData = new double[data.size()];
             double[] yData = new double[data.size()];
             for (int i = 0; i < yData.length; i++) {
                 Number number = checkNotNull(data.get(i));
+                xData[i] = i;
                 yData[i] = fYRanges.getInternalValue(number).doubleValue();
             }
 
             /* Set the data for the SWT series */
-            ISeries series = checkNotNull(getSeriesMap().get(seriesConsumer.getSeries()));
-            series.setYSeries(yData);
+            ISeries<Integer> series = checkNotNull(getSeriesMap().get(seriesConsumer.getSeries()));
+            series.setDataModel(new DoubleArraySeriesModel(xData, yData));
 
             /* Create a series mapper */
             mapper.put(series, checkNotNull(object));
