@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0 which
@@ -63,7 +63,7 @@ public class JsonTraceTest {
         testJsonTrace(path, nbEvents, startTime, endTime);
     }
 
-    private void testJsonTrace(String path, long expectedNbEvents, ITmfTimestamp startTime, ITmfTimestamp endTime)
+    private static void testJsonTrace(String path, long expectedNbEvents, ITmfTimestamp startTime, ITmfTimestamp endTime)
             throws TmfTraceException {
         ITmfTrace trace = new JsonStubTrace();
         try {

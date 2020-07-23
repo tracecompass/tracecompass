@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2019 Ericsson
+ * Copyright (c) 2018, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0 which
@@ -248,6 +248,9 @@ public abstract class SortingJob extends Job {
                 tempWriter.println('[');
                 while (!evs.isEmpty()) {
                     PartiallyParsedEvent sortedEvent = evs.poll();
+                    if (sortedEvent == null) {
+                        break;
+                    }
                     PartiallyParsedEvent parse = readNextEvent(parsers.get(sortedEvent.fPos), fTsKey, sortedEvent.fPos);
                     if (parse != null) {
                         tempWriter.println(sortedEvent.fLine.trim() + ',');

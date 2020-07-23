@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0 which
@@ -102,18 +102,16 @@ public class JsonStubTrace extends JsonTrace {
                 }
                 String nextJson = readNextEventString(() -> fFileInput.read());
                 while (nextJson != null) {
-                    if (nextJson != null) {
-                        JsonObject object = GSON.fromJson(nextJson, JsonObject.class);
-                        // Ignore events with no timestamp, they are there just to make sure the traces
-                        // parses in those cases
-                        JsonElement tsElement = object.get(TIMESTAMP_KEY);
-                        if (tsElement != null) {
-                            long timestamp = tsElement.getAsLong();
-                            return new TmfEvent(this, context.getRank(), TmfTimestamp.fromNanos(timestamp),
+                    JsonObject object = GSON.fromJson(nextJson, JsonObject.class);
+                    // Ignore events with no timestamp, they are there just to make sure the traces
+                    // parses in those cases
+                    JsonElement tsElement = object.get(TIMESTAMP_KEY);
+                    if (tsElement != null) {
+                        long timestamp = tsElement.getAsLong();
+                        return new TmfEvent(this, context.getRank(), TmfTimestamp.fromNanos(timestamp),
                                 new TmfEventType("JsonStubEvent", null), null); //$NON-NLS-1$
-                        }
-                        nextJson = readNextEventString(() -> fFileInput.read());
                     }
+                    nextJson = readNextEventString(() -> fFileInput.read());
                 }
             } catch (IOException e) {
                 // Nothing to do
