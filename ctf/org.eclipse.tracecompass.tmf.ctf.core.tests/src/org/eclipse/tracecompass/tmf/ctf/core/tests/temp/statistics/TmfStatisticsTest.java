@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Ericsson
+ * Copyright (c) 2012, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -256,7 +256,7 @@ public abstract class TmfStatisticsTest {
     public void testGetEventTypesInRangeWholeRange() {
         Map<String, Long> result = backend.getEventTypesInRange(tStart, tEnd);
         /* Number of events of that type in the whole trace */
-        assertEquals(new Long(464L), result.get(eventType));
+        assertEquals(Long.valueOf(464L), result.get(eventType));
 
         long count = sumOfEvents(result);
         assertEquals(totalNbEvents, count);
@@ -293,7 +293,7 @@ public abstract class TmfStatisticsTest {
     @Test
     public void testGetEventTypesInRangeNoEventsAtEdges() {
         Map<String, Long> result = backend.getEventTypesInRange(t1, t6);
-        assertEquals(new Long(2L), result.get(eventType));
+        assertEquals(Long.valueOf(2L), result.get(eventType));
 
         long count = sumOfEvents(result);
         assertEquals(2, count);
@@ -306,12 +306,12 @@ public abstract class TmfStatisticsTest {
     @Test
     public void testGetEventTypesInRangeEventAtStart() {
         Map<String, Long> result = backend.getEventTypesInRange(t2, t3);
-        assertEquals(new Long(1L), result.get(eventType));
+        assertEquals(Long.valueOf(1L), result.get(eventType));
         long count = sumOfEvents(result);
         assertEquals(1, count);
 
         result = backend.getEventTypesInRange(t2, t6);
-        assertEquals(new Long(2L), result.get(eventType));
+        assertEquals(Long.valueOf(2L), result.get(eventType));
         count = sumOfEvents(result);
         assertEquals(2, count);
     }
@@ -323,12 +323,12 @@ public abstract class TmfStatisticsTest {
     @Test
     public void testGetEventTypesInRangeEventAtEnd() {
         Map<String, Long> result = backend.getEventTypesInRange(t4, t5);
-        assertEquals(new Long(1L), result.get(eventType));
+        assertEquals(Long.valueOf(1L), result.get(eventType));
         long count = sumOfEvents(result);
         assertEquals(1, count);
 
         result = backend.getEventTypesInRange(t1, t5);
-        assertEquals(new Long(2L), result.get(eventType));
+        assertEquals(Long.valueOf(2L), result.get(eventType));
         count = sumOfEvents(result);
         assertEquals(2, count);
     }
@@ -341,7 +341,7 @@ public abstract class TmfStatisticsTest {
     @Test
     public void testGetEventTypesInRangeEventAtBoth() {
         Map<String, Long> result = backend.getEventTypesInRange(t2, t5);
-        assertEquals(new Long(2L), result.get(eventType));
+        assertEquals(Long.valueOf(2L), result.get(eventType));
         long count = sumOfEvents(result);
         assertEquals(2, count);
     }

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation, Ericsson
+ * Copyright (c) 2005, 2020 IBM Corporation, Ericsson
  * All rights reserved.   This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -107,7 +107,7 @@ public class DiagramToolTip {
         GC gc = new GC(fTextBox);
         FontMetrics fm = gc.getFontMetrics();
         gc.dispose();
-        int width = CHARACTERS_PER_COLUMN * fm.getAverageCharWidth();
+        int width = (int) (CHARACTERS_PER_COLUMN * fm.getAverageCharacterWidth());
         fTextBox.setSize(fTextBox.computeSize(width, fTextBox.getLineCount() * fTextBox.getLineHeight()));
         fToolTipShell.setLocation(hr.x, hr.y + cursorH);
         fToolTipShell.setSize(fTextBox.getSize());

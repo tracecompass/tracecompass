@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2014 Ericsson
+ * Copyright (c) 2013, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -53,6 +53,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfOpenTraceHelper;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectElement;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.tracecompass.tmf.ui.project.model.TmfTraceFolder;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Command line parser
@@ -321,7 +322,7 @@ public class RcpCliParser implements ICliParser {
                         return;
                     }
                     try {
-                        IStatus status = TmfOpenTraceHelper.openTraceFromPath(destinationFolder, tracePath.toOSString(), TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell());
+                        IStatus status = TmfOpenTraceHelper.openTraceFromPath(destinationFolder, tracePath.toOSString(), PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
                         if (!status.isOK() || (status.getCode() != IStatus.OK)) {
                             waitService.registerStatus(tracePath, status);
                         }

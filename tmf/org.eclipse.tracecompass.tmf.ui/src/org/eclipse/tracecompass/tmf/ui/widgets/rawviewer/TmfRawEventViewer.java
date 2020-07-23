@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 Ericsson
+ * Copyright (c) 2010, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -717,7 +717,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             }
             return;
         }
-        int offset = fStyledText.getOffsetAtLocation(new Point(0, fCursorYCoordinate));
+        int offset = fStyledText.getOffsetAtPoint(new Point(0, fCursorYCoordinate));
         int line = fStyledText.getLineAtOffset(offset);
         if (line < fLines.size() - fTopLineIndex) {
             LineData lineData = fLines.get(fTopLineIndex + line);
@@ -1127,7 +1127,7 @@ public class TmfRawEventViewer extends Composite implements ControlListener, Sel
             }
             return;
         }
-        int offset = fStyledText.getOffsetAtLocation(new Point(0, e.y));
+        int offset = fStyledText.getOffsetAtPoint(new Point(0, e.y));
         int line = fStyledText.getLineAtOffset(offset);
         if (line < fLines.size() - fTopLineIndex) {
             LineData lineData = fLines.get(fTopLineIndex + line);

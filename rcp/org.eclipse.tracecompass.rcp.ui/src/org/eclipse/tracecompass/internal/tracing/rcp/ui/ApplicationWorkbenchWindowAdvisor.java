@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -21,6 +21,7 @@ import org.eclipse.tracecompass.tmf.ui.project.model.TmfProjectRegistry;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
@@ -96,7 +97,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     @Override
     public void postWindowCreate() {
         super.postWindowOpen();
-        TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(new PerspectiveListener());
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(new PerspectiveListener());
         hideActionSets();
     }
 
@@ -109,7 +110,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
      */
     private static void hideActionSets() {
 
-        IWorkbenchPage page = TracingRcpPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
         for (int i = 0; i < UNWANTED_ACTION_SET.length; i++) {
             page.hideActionSet(UNWANTED_ACTION_SET[i]);

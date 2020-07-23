@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (c) 2016 Ericsson
+ * Copyright (c) 2016, 2020 Ericsson
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -289,7 +289,7 @@ class TimeGraphFindDialog extends Dialog {
                 fFindNextButton.notifyListeners(SWT.Selection, event1);
                 e.doit = false;
             } else if (e.detail == SWT.TRAVERSE_MNEMONIC) {
-                Character mnemonic = new Character(Character.toLowerCase(e.character));
+                Character mnemonic = Character.valueOf(Character.toLowerCase(e.character));
                 Button button = fMnemonicButtonMap.get(mnemonic);
                 if (button != null) {
                     if ((fFindField.isFocusControl() || (button.getStyle() & SWT.PUSH) != 0)
@@ -885,7 +885,7 @@ class TimeGraphFindDialog extends Dialog {
     private void storeButtonWithMnemonicInMap(Button button) {
         char mnemonic = LegacyActionTools.extractMnemonic(button.getText());
         if (mnemonic != LegacyActionTools.MNEMONIC_NONE) {
-            fMnemonicButtonMap.put(new Character(Character.toLowerCase(mnemonic)), button);
+            fMnemonicButtonMap.put(Character.valueOf(Character.toLowerCase(mnemonic)), button);
         }
     }
 

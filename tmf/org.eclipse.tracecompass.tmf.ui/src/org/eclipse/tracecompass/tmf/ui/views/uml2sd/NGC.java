@@ -844,7 +844,7 @@ public class NGC implements IGC {
         if ((font.getFont() != null) && (font.getFont() instanceof Font)) {
             Font toRestore = fContext.getFont();
             fContext.setFont((Font) font.getFont());
-            int width = fContext.getFontMetrics().getAverageCharWidth();
+            int width = (int) fContext.getFontMetrics().getAverageCharacterWidth();
             fContext.setFont(toRestore);
             return width;
         }
