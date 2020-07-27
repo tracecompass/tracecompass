@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 EfficiOS Inc., Michael Jeanson and others
+ * Copyright (c) 2016, 2020 EfficiOS Inc., Michael Jeanson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -11,8 +11,10 @@
 
 package org.eclipse.tracecompass.common.core.tests.format;
 
+import java.text.DecimalFormatSymbols;
 import java.text.Format;
 import java.util.Arrays;
+import java.util.Locale;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -30,7 +32,8 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class DecimalUnitFormatTest extends FormatTestBase {
 
-    private static final @NonNull Format FORMATTER = new DecimalUnitFormat();
+    private static final @NonNull Format FORMATTER = new DecimalUnitFormat(Locale.US);
+    private static final String NAN = DecimalFormatSymbols.getInstance(Locale.US).getNaN();
 
     /**
      * Constructor
@@ -95,7 +98,7 @@ public class DecimalUnitFormatTest extends FormatTestBase {
                 { Double.POSITIVE_INFINITY, "∞", Double.POSITIVE_INFINITY, -1 },
                 { Double.MIN_NORMAL, "0", 0L, -1 },
                 { Double.NEGATIVE_INFINITY, "-∞", Double.NEGATIVE_INFINITY, -1 },
-                { Double.NaN, "�", Double.NaN, -1 },
+                { Double.NaN, NAN, Double.NaN, -1 },
                 // Illegal argument
                 { null, "Toto", null, -1 },
                 // A unit that is not one of the expected ones, should parse the value, but not the whole string
@@ -105,7 +108,7 @@ public class DecimalUnitFormatTest extends FormatTestBase {
                 // Special double numbers with prefix
                 { null, "∞ k", Double.POSITIVE_INFINITY, -1 },
                 { null, "-∞ p", Double.NEGATIVE_INFINITY, -1 },
-                { null, "�M", Double.NaN, -1 },
+                { null, NAN + "M", Double.NaN, -1 },
                 // Trailing spaces
                 { null, "1.2 m  ", 0.0012, 5 },
         });

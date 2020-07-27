@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 Ericsson
+ * Copyright (c) 2014, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -89,6 +89,7 @@ public class AbstractCustomParserWizard {
         try (BufferedRandomAccessFile raf = new BufferedRandomAccessFile(xmlFile, "r");) {
             String s = raf.readLine();
             while (s != null) {
+                s = s.trim();
                 if (s.equals("<Definition category=\"" + category + "\" name=\"" + definitionName + "\">")) {
                     started = true;
                 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 EfficiOS Inc., Michael Jeanson and others
+ * Copyright (c), 2020 2016 EfficiOS Inc., Michael Jeanson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -13,10 +13,12 @@ package org.eclipse.tracecompass.common.core.format;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.FieldPosition;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -76,15 +78,17 @@ public class DecimalUnitFormat extends Format {
             .put(NANO_PREFIX, -9)
             .put(PICO_PREFIX, -12)
             .build();
-    private static final Format FORMAT = new DecimalFormat("#.#"); //$NON-NLS-1$
+
+    private static final String PATTERN = "#.#"; //$NON-NLS-1$
+    private final Locale fLocale;
+    private final Format fFormat;
     private final double fFactor;
 
     /**
      * Default constructor.
      */
     public DecimalUnitFormat() {
-        super();
-        fFactor = 1.0;
+        this(1.0, Locale.getDefault());
     }
 
     /**
@@ -94,7 +98,32 @@ public class DecimalUnitFormat extends Format {
      *            Multiplication factor to apply to the value
      */
     public DecimalUnitFormat(double factor) {
-        super();
+        this(factor, Locale.getDefault());
+    }
+
+    /**
+     * Constructor with locale.
+     *
+     * @param locale
+     *            Locale
+     * @since 4.3
+     */
+    public DecimalUnitFormat(Locale locale) {
+        this(1.0, locale);
+    }
+
+    /**
+     * Constructor with multiplication factor and locale.
+     *
+     * @param factor
+     *            Multiplication factor to apply to the value
+     * @param locale
+     *            Locale
+     * @since 4.3
+     */
+    public DecimalUnitFormat(double factor, Locale locale) {
+        fLocale = locale;
+        fFormat = new DecimalFormat(PATTERN, DecimalFormatSymbols.getInstance(locale));
         fFactor = factor;
     }
 
@@ -109,7 +138,7 @@ public class DecimalUnitFormat extends Format {
             double abs = Math.abs(value);
 
             if (Double.isInfinite(value) || Double.isNaN(value) || abs < PICO) {
-                return toAppendTo.append(FORMAT.format(value));
+                return toAppendTo.append(fFormat.format(value));
             }
 
             if (abs >= 1) {
@@ -117,35 +146,35 @@ public class DecimalUnitFormat extends Format {
                     return toAppendTo.append(num);
                 }
                 if (abs >= PETA) {
-                    return toAppendTo.append(FORMAT.format(value / PETA)).append(' ').append(PETA_PREFIX);
+                    return toAppendTo.append(fFormat.format(value / PETA)).append(' ').append(PETA_PREFIX);
                 }
                 if (abs >= TERA) {
-                    return toAppendTo.append(FORMAT.format(value / TERA)).append(' ').append(TERA_PREFIX);
+                    return toAppendTo.append(fFormat.format(value / TERA)).append(' ').append(TERA_PREFIX);
                 }
                 if (abs >= GIGA) {
-                    return toAppendTo.append(FORMAT.format(value / GIGA)).append(' ').append(GIGA_PREFIX);
+                    return toAppendTo.append(fFormat.format(value / GIGA)).append(' ').append(GIGA_PREFIX);
                 }
                 if (abs >= MEGA) {
-                    return toAppendTo.append(FORMAT.format(value / MEGA)).append(' ').append(MEGA_PREFIX);
+                    return toAppendTo.append(fFormat.format(value / MEGA)).append(' ').append(MEGA_PREFIX);
                 }
                 if (abs >= KILO) {
-                    return toAppendTo.append(FORMAT.format(value / KILO)).append(' ').append(KILO_PREFIX);
+                    return toAppendTo.append(fFormat.format(value / KILO)).append(' ').append(KILO_PREFIX);
                 }
 
-                return toAppendTo.append(FORMAT.format(value));
+                return toAppendTo.append(fFormat.format(value));
             }
 
             if (abs < NANO) {
-                return toAppendTo.append(FORMAT.format(value * TERA)).append(' ').append(PICO_PREFIX);
+                return toAppendTo.append(fFormat.format(value * TERA)).append(' ').append(PICO_PREFIX);
             }
             if (abs < MICRO) {
-                return toAppendTo.append(FORMAT.format(value * GIGA)).append(' ').append(NANO_PREFIX);
+                return toAppendTo.append(fFormat.format(value * GIGA)).append(' ').append(NANO_PREFIX);
             }
             if (abs < MILLI) {
-                return toAppendTo.append(FORMAT.format(value * MEGA)).append(' ').append(MICRO_PREFIX);
+                return toAppendTo.append(fFormat.format(value * MEGA)).append(' ').append(MICRO_PREFIX);
             }
 
-            return toAppendTo.append(FORMAT.format(value * KILO)).append(' ').append(MILLI_PREFIX);
+            return toAppendTo.append(fFormat.format(value * KILO)).append(' ').append(MILLI_PREFIX);
         }
 
         throw new IllegalArgumentException("Cannot format given Object as a Number: " + obj); //$NON-NLS-1$
@@ -156,7 +185,7 @@ public class DecimalUnitFormat extends Format {
      */
     @Override
     public Number parseObject(String source, ParsePosition pos) {
-        Number number = NumberFormat.getInstance().parse(source, pos);
+        Number number = NumberFormat.getInstance(fLocale).parse(source, pos);
         if (number == null) {
             return null;
         }

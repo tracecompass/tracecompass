@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Ericsson
+ * Copyright (c) 2013, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -40,9 +40,9 @@ public class TmfTimestampFormatTest {
     private static final @NonNull String TEST_PATTERN = "HH:mm:ss.SSS";
     private static final TimeZone TEST_TIME_ZONE = TimeZone.getTimeZone(TimeZone.getAvailableIDs(0)[0]);
     private static final TimeZone GMT = TimeZone.getTimeZone("GMT");
-    private static final Locale CA = Locale.CANADA;
+    private static final Locale US = Locale.US;
 
-    private static final TmfTimestampFormat tsf = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS", GMT, CA);
+    private static final TmfTimestampFormat tsf = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS", GMT, US);
     private static final TmfTimestampFormat tsf1 = new TmfTimestampFormat(TEST_PATTERN);
     private static final TmfTimestampFormat tsf2 = new TmfTimestampFormat(TEST_PATTERN, TEST_TIME_ZONE);
 
@@ -258,127 +258,127 @@ public class TmfTimestampFormatTest {
     public void testParseDateTime() throws ParseException {
         long time;
 
-        time = new TmfTimestampFormat("yyyy", GMT, CA).parseValue("2014");
+        time = new TmfTimestampFormat("yyyy", GMT, US).parseValue("2014");
         assertEquals("2014-01-01 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("YYYY", GMT, CA).parseValue("2014");
+        time = new TmfTimestampFormat("YYYY", GMT, US).parseValue("2014");
         assertEquals("2013-12-29 00:00:00.000000000", tsf.format(time)); // 1st day of week 1
 
-        time = new TmfTimestampFormat("MM", GMT, CA).parseValue("11");
+        time = new TmfTimestampFormat("MM", GMT, US).parseValue("11");
         assertEquals("1970-11-01 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("ww", GMT, CA).parseValue("01");
+        time = new TmfTimestampFormat("ww", GMT, US).parseValue("01");
         assertEquals("1969-12-28 00:00:00.000000000", tsf.format(time)); // Sunday of week 1
 
-        time = new TmfTimestampFormat("DDD", GMT, CA).parseValue("100");
+        time = new TmfTimestampFormat("DDD", GMT, US).parseValue("100");
         assertEquals("1970-04-10 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("F", GMT, CA).parseValue("2");
+        time = new TmfTimestampFormat("F", GMT, US).parseValue("2");
         assertEquals("1970-01-11 00:00:00.000000000", tsf.format(time)); // 2nd Sunday of month
 
-        time = new TmfTimestampFormat("EEE", GMT, CA).parseValue("Mon");
+        time = new TmfTimestampFormat("EEE", GMT, US).parseValue("Mon");
         assertEquals("1970-01-05 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("u", GMT, CA).parseValue("1");
+        time = new TmfTimestampFormat("u", GMT, US).parseValue("1");
         assertEquals("1970-01-05 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("dd", GMT, CA).parseValue("22");
+        time = new TmfTimestampFormat("dd", GMT, US).parseValue("22");
         assertEquals("1970-01-22 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("HH", GMT, CA).parseValue("12");
+        time = new TmfTimestampFormat("HH", GMT, US).parseValue("12");
         assertEquals("1970-01-01 12:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("kk", GMT, CA).parseValue("24");
+        time = new TmfTimestampFormat("kk", GMT, US).parseValue("24");
         assertEquals("1970-01-01 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("KK", GMT, CA).parseValue("12");
+        time = new TmfTimestampFormat("KK", GMT, US).parseValue("12");
         assertEquals("1970-01-01 12:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("hh", GMT, CA).parseValue("12");
+        time = new TmfTimestampFormat("hh", GMT, US).parseValue("12");
         assertEquals("1970-01-01 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("mm", GMT, CA).parseValue("34");
+        time = new TmfTimestampFormat("mm", GMT, US).parseValue("34");
         assertEquals("1970-01-01 00:34:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("ss", GMT, CA).parseValue("56");
+        time = new TmfTimestampFormat("ss", GMT, US).parseValue("56");
         assertEquals("1970-01-01 00:00:56.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy-MM", GMT, CA).parseValue("2014-11");
+        time = new TmfTimestampFormat("yyyy-MM", GMT, US).parseValue("2014-11");
         assertEquals("2014-11-01 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy-MM-dd", GMT, CA).parseValue("2014-11-22");
+        time = new TmfTimestampFormat("yyyy-MM-dd", GMT, US).parseValue("2014-11-22");
         assertEquals("2014-11-22 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy-MM-dd HH", GMT, CA).parseValue("2014-11-22 12");
+        time = new TmfTimestampFormat("yyyy-MM-dd HH", GMT, US).parseValue("2014-11-22 12");
         assertEquals("2014-11-22 12:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy-MM-dd HH:mm", GMT, CA).parseValue("2014-11-22 12:34");
+        time = new TmfTimestampFormat("yyyy-MM-dd HH:mm", GMT, US).parseValue("2014-11-22 12:34");
         assertEquals("2014-11-22 12:34:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss", GMT, CA).parseValue("2014-11-22 12:34:56");
+        time = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss", GMT, US).parseValue("2014-11-22 12:34:56");
         assertEquals("2014-11-22 12:34:56.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss.SSS", GMT, CA).parseValue("2014-11-22 12:34:56.123");
+        time = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss.SSS", GMT, US).parseValue("2014-11-22 12:34:56.123");
         assertEquals("2014-11-22 12:34:56.123000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy-ww", GMT, CA).parseValue("2014-01");
+        time = new TmfTimestampFormat("yyyy-ww", GMT, US).parseValue("2014-01");
         assertEquals("2013-12-29 00:00:00.000000000", tsf.format(time)); // Sunday of week 1
 
-        time = new TmfTimestampFormat("yyyy-DDD", GMT, CA).parseValue("2014-100");
+        time = new TmfTimestampFormat("yyyy-DDD", GMT, US).parseValue("2014-100");
         assertEquals("2014-04-10 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy-MM-F", GMT, CA).parseValue("2014-11-2");
+        time = new TmfTimestampFormat("yyyy-MM-F", GMT, US).parseValue("2014-11-2");
         assertEquals("2014-11-09 00:00:00.000000000", tsf.format(time)); // 2nd Sunday of month
 
-        time = new TmfTimestampFormat("yyyy-MM-EEE", GMT, CA).parseValue("2014-11-Mon");
+        time = new TmfTimestampFormat("yyyy-MM-EEE", GMT, US).parseValue("2014-11-Mon");
         assertEquals("2014-11-03 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy-MM-u", GMT, CA).parseValue("2014-11-1");
+        time = new TmfTimestampFormat("yyyy-MM-u", GMT, US).parseValue("2014-11-1");
         assertEquals("2014-11-03 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy MM dd HH mm ss SSS SSS SSS", GMT, CA).parseValue("2014 11 22 12 34 56 123 456 789");
+        time = new TmfTimestampFormat("yyyy MM dd HH mm ss SSS SSS SSS", GMT, US).parseValue("2014 11 22 12 34 56 123 456 789");
         assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy.MM.dd.HH.mm.ss.SSS.SSS.SSS", GMT, CA).parseValue("2014.11.22.12.34.56.123.456.789");
+        time = new TmfTimestampFormat("yyyy.MM.dd.HH.mm.ss.SSS.SSS.SSS", GMT, US).parseValue("2014.11.22.12.34.56.123.456.789");
         assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy,MM,dd,HH,mm,ss,SSS,SSS,SSS", GMT, CA).parseValue("2014,11,22,12,34,56,123,456,789");
+        time = new TmfTimestampFormat("yyyy,MM,dd,HH,mm,ss,SSS,SSS,SSS", GMT, US).parseValue("2014,11,22,12,34,56,123,456,789");
         assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy-MM-dd-HH-mm-ss-SSS-SSS-SSS", GMT, CA).parseValue("2014-11-22-12-34-56-123-456-789");
+        time = new TmfTimestampFormat("yyyy-MM-dd-HH-mm-ss-SSS-SSS-SSS", GMT, US).parseValue("2014-11-22-12-34-56-123-456-789");
         assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy_MM_dd_HH_mm_ss_SSS_SSS_SSS", GMT, CA).parseValue("2014_11_22_12_34_56_123_456_789");
+        time = new TmfTimestampFormat("yyyy_MM_dd_HH_mm_ss_SSS_SSS_SSS", GMT, US).parseValue("2014_11_22_12_34_56_123_456_789");
         assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy:MM:dd:HH:mm:ss:SSS:SSS:SSS", GMT, CA).parseValue("2014:11:22:12:34:56:123:456:789");
+        time = new TmfTimestampFormat("yyyy:MM:dd:HH:mm:ss:SSS:SSS:SSS", GMT, US).parseValue("2014:11:22:12:34:56:123:456:789");
         assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy;MM;dd;HH;mm;ss;SSS;SSS;SSS", GMT, CA).parseValue("2014;11;22;12;34;56;123;456;789");
+        time = new TmfTimestampFormat("yyyy;MM;dd;HH;mm;ss;SSS;SSS;SSS", GMT, US).parseValue("2014;11;22;12;34;56;123;456;789");
         assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy/MM/dd/HH/mm/ss/SSS/SSS/SSS", GMT, CA).parseValue("2014/11/22/12/34/56/123/456/789");
+        time = new TmfTimestampFormat("yyyy/MM/dd/HH/mm/ss/SSS/SSS/SSS", GMT, US).parseValue("2014/11/22/12/34/56/123/456/789");
         assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy''MM''dd''HH''mm''ss''SSS''SSS''SSS", GMT, CA).parseValue("2014'11'22'12'34'56'123'456'789");
+        time = new TmfTimestampFormat("yyyy''MM''dd''HH''mm''ss''SSS''SSS''SSS", GMT, US).parseValue("2014'11'22'12'34'56'123'456'789");
         assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy\"MM\"dd\"HH\"mm\"ss\"SSS\"SSS\"SSS", GMT, CA).parseValue("2014\"11\"22\"12\"34\"56\"123\"456\"789");
+        time = new TmfTimestampFormat("yyyy\"MM\"dd\"HH\"mm\"ss\"SSS\"SSS\"SSS", GMT, US).parseValue("2014\"11\"22\"12\"34\"56\"123\"456\"789");
         assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy MM dd HH mm ss SSS SSS SSS", GMT, CA).parseValue("2014  11  22  12  34  56  123 456 789");
+        time = new TmfTimestampFormat("yyyy MM dd HH mm ss SSS SSS SSS", GMT, US).parseValue("2014  11  22  12  34  56  123 456 789");
         assertEquals("2014-11-22 12:34:56.123456789", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy MM dd HH mm ss SSS SSS SSS", GMT, CA).parseValue("2014  1  2  3  4  5 123 456 789");
+        time = new TmfTimestampFormat("yyyy MM dd HH mm ss SSS SSS SSS", GMT, US).parseValue("2014  1  2  3  4  5 123 456 789");
         assertEquals("2014-01-02 03:04:05.123456789", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy MM dd HH mm ss SSS SSS SSS", GMT, CA).parseValue("2014 \t 1 \t 2 \t 3 \t 4 \t 5 \t 123 456 789");
+        time = new TmfTimestampFormat("yyyy MM dd HH mm ss SSS SSS SSS", GMT, US).parseValue("2014 \t 1 \t 2 \t 3 \t 4 \t 5 \t 123 456 789");
         assertEquals("2014-01-02 03:04:05.123456789", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss.SSS", GMT, CA).parseValue("1970-01-01 00:00:00.000");
+        time = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss.SSS", GMT, US).parseValue("1970-01-01 00:00:00.000");
         assertEquals("1970-01-01 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss.SSS", GMT, CA).parseValue("1969-12-31 23:59:59.123");
+        time = new TmfTimestampFormat("yyyy-MM-dd HH:mm:ss.SSS", GMT, US).parseValue("1969-12-31 23:59:59.123");
         assertEquals("1969-12-31 23:59:59.123000000", tsf.format(time));
 
     }
@@ -394,58 +394,58 @@ public class TmfTimestampFormatTest {
         long ref = tsf.parseValue("2014-11-22 12:34:56.123456789"); // Saturday
         long time;
 
-        time = new TmfTimestampFormat("yyyy", GMT, CA).parseValue("1970", ref);
+        time = new TmfTimestampFormat("yyyy", GMT, US).parseValue("1970", ref);
         assertEquals("1970-01-01 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("YYYY", GMT, CA).parseValue("1970", ref);
+        time = new TmfTimestampFormat("YYYY", GMT, US).parseValue("1970", ref);
         assertEquals("1969-12-28 00:00:00.000000000", tsf.format(time)); // 1st day of week 1
 
-        time = new TmfTimestampFormat("MM", GMT, CA).parseValue("01", ref);
+        time = new TmfTimestampFormat("MM", GMT, US).parseValue("01", ref);
         assertEquals("2014-01-01 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("ww", GMT, CA).parseValue("01", ref);
+        time = new TmfTimestampFormat("ww", GMT, US).parseValue("01", ref);
         assertEquals("2014-01-04 00:00:00.000000000", tsf.format(time)); // Saturday of week 1
 
-        time = new TmfTimestampFormat("DDD", GMT, CA).parseValue("1", ref);
+        time = new TmfTimestampFormat("DDD", GMT, US).parseValue("1", ref);
         assertEquals("2014-01-01 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("F", GMT, CA).parseValue("2", ref);
+        time = new TmfTimestampFormat("F", GMT, US).parseValue("2", ref);
         assertEquals("2014-11-08 00:00:00.000000000", tsf.format(time)); // 2nd Saturday of month
 
-        time = new TmfTimestampFormat("EEE", GMT, CA).parseValue("Mon", ref);
+        time = new TmfTimestampFormat("EEE", GMT, US).parseValue("Mon", ref);
         assertEquals("2014-11-17 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("u", GMT, CA).parseValue("1", ref);
+        time = new TmfTimestampFormat("u", GMT, US).parseValue("1", ref);
         assertEquals("2014-11-17 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("dd", GMT, CA).parseValue("01", ref);
+        time = new TmfTimestampFormat("dd", GMT, US).parseValue("01", ref);
         assertEquals("2014-11-01 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("HH", GMT, CA).parseValue("00", ref);
+        time = new TmfTimestampFormat("HH", GMT, US).parseValue("00", ref);
         assertEquals("2014-11-22 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("kk", GMT, CA).parseValue("24", ref);
+        time = new TmfTimestampFormat("kk", GMT, US).parseValue("24", ref);
         assertEquals("2014-11-22 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("KK", GMT, CA).parseValue("00", ref);
+        time = new TmfTimestampFormat("KK", GMT, US).parseValue("00", ref);
         assertEquals("2014-11-22 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("hh", GMT, CA).parseValue("12", ref);
+        time = new TmfTimestampFormat("hh", GMT, US).parseValue("12", ref);
         assertEquals("2014-11-22 00:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("mm", GMT, CA).parseValue("00", ref);
+        time = new TmfTimestampFormat("mm", GMT, US).parseValue("00", ref);
         assertEquals("2014-11-22 12:00:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("ss", GMT, CA).parseValue("00", ref);
+        time = new TmfTimestampFormat("ss", GMT, US).parseValue("00", ref);
         assertEquals("2014-11-22 12:34:00.000000000", tsf.format(time));
 
-        time = new TmfTimestampFormat(".S", GMT, CA).parseValue(".9", ref);
+        time = new TmfTimestampFormat(".S", GMT, US).parseValue(".9", ref);
         assertEquals("2014-11-22 12:34:56.900000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("T.S", GMT, CA).parseValue("8.9", ref);
+        time = new TmfTimestampFormat("T.S", GMT, US).parseValue("8.9", ref);
         assertEquals("1970-01-01 00:00:08.900000000", tsf.format(time));
 
-        time = new TmfTimestampFormat("T.S", GMT, CA).parseValue(".9", ref);
+        time = new TmfTimestampFormat("T.S", GMT, US).parseValue(".9", ref);
         assertEquals("1970-01-01 00:00:00.900000000", tsf.format(time));
     }
 }
