@@ -144,9 +144,11 @@ public class TmfTreeModel<T extends ITmfTreeDataModel> {
          *
          * @param columnDescriptors
          *            the column descriptors to set
+         * @return this {@link Builder} object
          */
-        public void setColumnDescriptors(List<ITableColumnDescriptor> columnDescriptors) {
+        public Builder<T> setColumnDescriptors(List<ITableColumnDescriptor> columnDescriptors) {
             fColumnDescriptors = columnDescriptors;
+            return this;
         }
 
         /**
@@ -154,9 +156,11 @@ public class TmfTreeModel<T extends ITmfTreeDataModel> {
          *
          * @param entries
          *            the entries to set
+         * @return this {@link Builder} object
          */
-        public void setEntries(List<T> entries) {
+        public Builder<T> setEntries(List<T> entries) {
             fEntries = entries;
+            return this;
         }
 
         /**
@@ -164,9 +168,11 @@ public class TmfTreeModel<T extends ITmfTreeDataModel> {
          *
          * @param scope
          *            the scope of all entry IDs in the model
+         * @return this {@link Builder} object
          */
-        public void setScope(String scope) {
+        public Builder<T> setScope(String scope) {
             fScope = scope;
+            return this;
         }
 
         /**
