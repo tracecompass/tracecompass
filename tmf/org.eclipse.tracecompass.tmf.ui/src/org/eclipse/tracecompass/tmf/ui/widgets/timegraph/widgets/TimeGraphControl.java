@@ -94,6 +94,8 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
 import org.eclipse.tracecompass.common.core.math.SaturatedArithmetic;
 import org.eclipse.tracecompass.internal.provisional.tmf.ui.model.IStylePresentationProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.ITimeGraphStylePresentationProvider;
+import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.ITmfUIPreferences;
 import org.eclipse.tracecompass.internal.tmf.ui.util.LineClipper;
 import org.eclipse.tracecompass.internal.tmf.ui.util.StylePropertiesUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.util.SymbolHelper;
@@ -286,6 +288,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
     private boolean fFilterActive;
     private boolean fHasSavedFilters;
+    private boolean fHideEmptyRowsFilterActive;
 
     private List<DeferredEntry> fPostDrawEntries = new ArrayList<>();
 
@@ -3989,7 +3992,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 refreshExpanded(expandedItemList, item);
             }
 
-            if (hasSavedFilters()) {
+            if (Activator.getDefault().getPreferenceStore().getBoolean(ITmfUIPreferences.FILTER_EMPTY_ROWS) ? hasSavedFilters() : isHideEmptyRowsFilterActive()) {
                 filterData(expandedItemList);
             }
 
@@ -4241,5 +4244,25 @@ public class TimeGraphControl extends TimeGraphBaseControl
      */
     public boolean hasSavedFilters() {
         return fHasSavedFilters;
+    }
+
+    /**
+     * Tells whether the HideEmptyRows action is active or not
+     *
+     * @return True when the HideEmptyRows action is active, false otherwise
+     * @since 6.1
+     */
+    public boolean isHideEmptyRowsFilterActive() {
+        return fHideEmptyRowsFilterActive;
+    }
+
+    /**
+     * Set whether the HideEmptyRows action is active or not
+     *
+     * @param hideEmptyRowsFilterActive
+     * @since 6.1
+     */
+    public void setHideEmptyRowsFilterActive(boolean hideEmptyRowsFilterActive) {
+        fHideEmptyRowsFilterActive = hideEmptyRowsFilterActive;
     }
 }

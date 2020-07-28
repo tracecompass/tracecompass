@@ -369,6 +369,7 @@ public class Messages extends NLS {
     public static String TmfTracingPreferencePage_AlwaysCloseOnResourceChange;
     public static String TmfTracingPreferencePage_HideManyEntriesSelectedWarning;
     public static String TmfTracingPreferencePage_UseBrowserTooltips;
+    public static String TmfTracingPreferencePage_filterEmptyRowsTooltips;
 
     public static String TmfSourceLookup_OpenSourceCodeActionText;
     public static String TmfSourceLookup_OpenSourceCodeNotFound;

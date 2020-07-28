@@ -58,4 +58,9 @@ public interface ITmfUIPreferences {
      * Preference to use HTML Tooltips
      */
     String USE_BROWSER_TOOLTIPS = "USE_HTML_TOOLTIPS"; //$NON-NLS-1$
+
+    /**
+     * Preference to filter out empty rows in searches by default
+     */
+    String FILTER_EMPTY_ROWS = "FILTER_EMPTY_ROWS"; //$NON-NLS-1$
 }

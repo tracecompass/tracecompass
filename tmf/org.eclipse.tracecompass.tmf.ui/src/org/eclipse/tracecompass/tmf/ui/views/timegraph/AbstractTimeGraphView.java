@@ -2388,6 +2388,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         public void run() {
             boolean hasSavedFilter = fTimeEventFilterDialog != null && fTimeEventFilterDialog.hasActiveSavedFilters();
             fIsHideRowsFilterActive = isChecked();
+            getTimeGraphViewer().setHideEmptyRowsFilterActive(fIsHideRowsFilterActive);
             getTimeGraphViewer().setSavedFilterStatus(hasSavedFilter || fIsHideRowsFilterActive);
             restartZoomThread();
         }

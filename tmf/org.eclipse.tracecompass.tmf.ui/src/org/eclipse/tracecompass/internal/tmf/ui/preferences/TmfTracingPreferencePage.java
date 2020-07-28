@@ -79,6 +79,10 @@ public class TmfTracingPreferencePage extends FieldEditorPreferencePage implemen
         BooleanFieldEditor useBrowserTooltips = new BooleanFieldEditor(ITmfUIPreferences.USE_BROWSER_TOOLTIPS,
                 Messages.TmfTracingPreferencePage_UseBrowserTooltips, getFieldEditorParent());
         addField(useBrowserTooltips);
+
+        BooleanFieldEditor hideEmptyRows = new BooleanFieldEditor(ITmfUIPreferences.FILTER_EMPTY_ROWS,
+                Messages.TmfTracingPreferencePage_filterEmptyRowsTooltips, getFieldEditorParent());
+        addField(hideEmptyRows);
     }
 
     @Override

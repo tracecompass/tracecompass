@@ -2993,4 +2993,14 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
     public boolean hasSavedFilters() {
         return getTimeGraphControl().hasSavedFilters();
     }
+
+    /**
+     * Set whether the NoEmptyRows action is active or not
+     * @param isHideEmptyRowsFilterActive
+     *              The HideEmptyRowsAction status
+     * @since 6.1
+     */
+    public void setHideEmptyRowsFilterActive(boolean isHideEmptyRowsFilterActive) {
+        getTimeGraphControl().setHideEmptyRowsFilterActive(isHideEmptyRowsFilterActive);
+    }
 }
