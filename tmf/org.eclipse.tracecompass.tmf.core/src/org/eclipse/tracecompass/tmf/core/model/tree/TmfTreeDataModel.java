@@ -127,18 +127,25 @@ public class TmfTreeDataModel implements ITmfTreeDataModel {
             return false;
         }
         TmfTreeDataModel other = (TmfTreeDataModel) obj;
+
+        if (!Objects.equals(fStyle, other.fStyle)) {
+            return false;
+        }
+
         return fId == other.fId
                 && fParentId == other.fParentId
-                && fLabels.equals(other.fLabels);
+                && fLabels.equals(other.fLabels)
+                && fHasRowModel == other.fHasRowModel;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fId, fParentId, fLabels);
+        return Objects.hash(fId, fParentId, fLabels, fStyle, fHasRowModel);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String toString() {
-        return "<name=" + fLabels + " id=" + fId + " parentId=" + fParentId + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        return "<name=" + fLabels + " id=" + fId + " parentId=" + fParentId + " style=" + fStyle + " hasRowModel=" + fHasRowModel +">";
     }
 }
