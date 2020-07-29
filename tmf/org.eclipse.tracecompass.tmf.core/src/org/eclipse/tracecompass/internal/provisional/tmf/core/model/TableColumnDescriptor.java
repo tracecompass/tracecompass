@@ -11,7 +11,10 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.model.ITableColumnDescriptor;
+
+import com.google.common.base.Objects;
 
 /**
  * Data table column descriptor implementation.
@@ -42,6 +45,36 @@ public class TableColumnDescriptor implements ITableColumnDescriptor {
     @Override
     public String getTooltip() {
         return fTooltipText;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof ITableColumnDescriptor)) {
+            return false;
+        }
+        ITableColumnDescriptor other = (ITableColumnDescriptor) obj;
+        return Objects.equal(fText, other.getText()) &&
+                Objects.equal(fTooltipText, other.getTooltip());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(fText, fTooltipText);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("[text=")
+               .append(fText)
+               .append(" tooltip=")
+               .append(fTooltipText)
+               .append("]");
+        return builder.toString();
     }
 
     /**
