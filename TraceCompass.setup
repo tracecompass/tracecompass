@@ -71,9 +71,6 @@
       storageURI="scope://Workspace"
       label="Target Platform">
     <choice
-        value="tracecompass-e4.7"
-        label="Trace Compass Eclipse Oxygen - 4.7"/>
-    <choice
         value="tracecompass-e4.8"
         label="Trace Compass Eclipse Photon - 4.8"/>
     <choice
