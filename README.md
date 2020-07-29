@@ -61,6 +61,21 @@ command from the top-level directory:
 
 The javadoc html files will be under `target/site/apidocs`.
 
+Tracing Trace Compass
+---------------------
+
+Trace Compass can be traced by doing the following in the launch configuration:
+
+* (java 8 only) -vmargs
+* -Djava.util.logging.config.file=%gitroot%/logging.properties (where %gitroot% is the directory tracecompass is checked out to)
+* -Dorg.eclipse.tracecompass.logging=true
+
+Additionally the folder the trace is being written to (default is `home/.tracecompass/logs`) needs to be created in advance. After running Trace Compass, a `trace_n.json` will be created in the tracing folder. It needs to be converted to true json, so use the `jsonify.sh` script in the root directory to convert it. Then it can be loaded into Trace Compass, if the **Trace Event format** is installed from the incubator, or from a web browser such as Chromium.
+
+The performance impact is low enough as long as the log level is greater than "*FINEST*".
+
+NOTE: thread 1 is always the UI thread for Trace Compass. Also, the thread numbers are the JVM threads and do not correspond necessarily to Process IDs.
+
 Maven profiles and properties
 -----------------------------
 
