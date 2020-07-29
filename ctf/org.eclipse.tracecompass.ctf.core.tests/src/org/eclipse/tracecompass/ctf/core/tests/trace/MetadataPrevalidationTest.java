@@ -32,7 +32,7 @@ import org.junit.Test;
 /**
  * There are so many it makes sense to move them to their own file
  */
-public class MetadataPrevalidationTests {
+public class MetadataPrevalidationTest {
 
     private static final String GOOD_TSDL = "/* CTF 1.8 */\ntrace {\n major = 1 ;\n minor = 8 ;\n byte_order = le ; \n};";
 

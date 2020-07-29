@@ -25,7 +25,7 @@ import org.junit.Test;
  * @author Geneviève Bastien
  */
 @NonNullByDefault
-public class DataProviderDescriptorTests {
+public class DataProviderDescriptorTest {
 
     private static final String DESCRIPTION = "Description";
     private static final String ID = "my.data.provider.id";

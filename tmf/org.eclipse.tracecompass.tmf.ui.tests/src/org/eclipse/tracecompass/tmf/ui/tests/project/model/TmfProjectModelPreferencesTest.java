@@ -28,7 +28,7 @@ import org.osgi.framework.Bundle;
  * @author Bernd Hufmann
  *
  */
-public class TmfProjectModelPreferencesTests {
+public class TmfProjectModelPreferencesTest {
 
     private static final String DEFAULT_ELEMENT_LABEL = "Trace Compass";
     private static final String DEFAULT_ICON_BUNDLE_SYMBOLIC_NAME = "org.eclipse.tracecompass.tmf.ui";
