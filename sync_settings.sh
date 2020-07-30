@@ -24,7 +24,7 @@ RUNTIME_FILES=$RUNTIME_REFERENCE/.settings/*.prefs
 TEST_FILES=$TEST_REFERENCE/.settings/*.prefs
 
 # Runtime plugins
-for DIR in */*.core */*.ui doc/org.eclipse.tracecompass.examples
+for DIR in */*.core */*.ui */*.branding doc/org.eclipse.tracecompass.examples
 do
   # Skip non-directories
   if [ ! -d $DIR ]; then
