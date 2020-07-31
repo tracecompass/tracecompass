@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2019 Ericsson
+ * Copyright (c) 2018, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -32,7 +32,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -105,29 +104,12 @@ public class ResourceUtilTest {
      * Create test parameter for the parameterized runner.
      *
      * @return The list of test parameters
-     * @throws CoreException
-     *             if core error occurs
      */
     @Parameters(name = "{index}: ({0})")
-    public static Iterable<Object[]> getTracePaths() throws CoreException {
-        IProgressMonitor progressMonitor = new NullProgressMonitor();
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-
-        // Create a project inside workspace location
-        fWorkspaceRoot = workspace.getRoot();
+    public static Iterable<Object[]> getTracePaths() {
+        fWorkspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
         fSomeProject = fWorkspaceRoot.getProject(SOME_PROJECT_NAME);
-        fSomeProject.create(progressMonitor);
-        fSomeProject.open(progressMonitor);
-
-        // Create an other project outside the workspace location
-        URI projectLocation = fProjectFolder.getRoot().toURI();
         fSomeOtherProject = fWorkspaceRoot.getProject(SOME_OTHER_PROJECT_NAME);
-        IProjectDescription description = workspace.newProjectDescription(fSomeOtherProject.getName());
-        if (projectLocation != null) {
-            description.setLocationURI(projectLocation);
-        }
-        fSomeOtherProject.create(description, progressMonitor);
-        fSomeOtherProject.open(progressMonitor);
         return Arrays.asList(new Object[][] { {fSomeProject}, {fSomeOtherProject} });
     }
 
@@ -136,11 +118,27 @@ public class ResourceUtilTest {
      *
      * @throws IOException
      *             if an IO error occurs
+     * @throws CoreException
+     *             if core error occurs
      */
     @BeforeClass
-    public static void beforeClass() throws IOException {
+    public static void beforeClass() throws IOException, CoreException {
         fTargetFile = fTemporaryFolder.newFile(LINK_TARGET_FILE).getCanonicalFile();
         fTargetFolder = fTemporaryFolder.newFolder(LINK_TARGET_FOLDER).getCanonicalFile();
+        IProgressMonitor progressMonitor = new NullProgressMonitor();
+
+        // Create a project inside workspace location
+        fSomeProject.create(progressMonitor);
+        fSomeProject.open(progressMonitor);
+
+        // Create another project outside the workspace location
+        URI projectLocation = fProjectFolder.getRoot().toURI();
+        IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(fSomeOtherProject.getName());
+        if (projectLocation != null) {
+            description.setLocationURI(projectLocation);
+        }
+        fSomeOtherProject.create(description, progressMonitor);
+        fSomeOtherProject.open(progressMonitor);
     }
 
     /**
