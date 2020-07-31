@@ -25,6 +25,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
@@ -116,6 +117,7 @@ import org.eclipse.tracecompass.tmf.ui.views.TracingPerspectiveFactory;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -409,6 +411,28 @@ public final class SWTBotUtils {
                 try {
                     PlatformUI.getWorkbench().showPerspective(id, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().resetPerspective();
+                    /*
+                     * Temporary fix for Bug 565725 until 2020-09 M3: Reset
+                     * perspective disposes the instantiated views' toolbars,
+                     * close the views and reopen them to restore their toolbar.
+                     * TODO: Remove when fixed in platform
+                     */
+                    IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+                    List<IViewReference> viewsToReset = new ArrayList<>();
+                    for (IViewReference viewReference : activePage.getViewReferences()) {
+                        IWorkbenchPart part = viewReference.getPart(false);
+                        if (part != null) {
+                            if (activePage.isPartVisible(part)) {
+                                viewsToReset.add(viewsToReset.size(), viewReference);
+                            } else {
+                                viewsToReset.add(0, viewReference);
+                            }
+                        }
+                    }
+                    for (IViewReference viewReference : viewsToReset) {
+                        activePage.hideView(viewReference);
+                        activePage.showView(viewReference.getId());
+                    }
                 } catch (WorkbenchException e) {
                     fail(e.getMessage());
                 }
