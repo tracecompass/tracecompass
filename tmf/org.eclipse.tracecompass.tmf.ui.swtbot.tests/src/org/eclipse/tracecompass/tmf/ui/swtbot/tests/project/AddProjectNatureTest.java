@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Locale;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
@@ -151,6 +152,7 @@ public class AddProjectNatureTest {
         IEclipsePreferences defaultPreferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
         defaultPreferences.put(ITmfTimePreferencesConstants.DATIME, "MMM d HH:mm:ss");
         defaultPreferences.put(ITmfTimePreferencesConstants.SUBSEC, ITmfTimePreferencesConstants.SUBSEC_NO_FMT);
+        defaultPreferences.put(ITmfTimePreferencesConstants.LOCALE, Locale.US.toLanguageTag());
         TmfTimestampFormat.updateDefaultFormats();
     }
 

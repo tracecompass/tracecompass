@@ -452,7 +452,9 @@ public final class SWTBotUtils {
         switchToPerspective(TestingPerspectiveFactory.ID);
 
         // Make sure Projects Presentation is Flat
-        bot.viewByTitle("Project Explorer").viewMenu("Projects Presentation").menu("Flat").click();
+        SWTBotView projectExplorerView = bot.viewByTitle("Project Explorer");
+        projectExplorerView.setFocus();
+        projectExplorerView.viewMenu("Projects Presentation").menu("Flat").click();
     }
 
     private static void printEnvironment() {
