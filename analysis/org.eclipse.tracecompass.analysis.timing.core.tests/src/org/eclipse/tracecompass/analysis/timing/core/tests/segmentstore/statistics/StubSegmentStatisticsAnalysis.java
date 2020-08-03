@@ -40,7 +40,7 @@ import com.google.common.collect.ImmutableList.Builder;
  * @author Matthew Khouzam
  *
  */
-class StubSegmentStatisticsAnalysis extends AbstractSegmentStatisticsAnalysis {
+public class StubSegmentStatisticsAnalysis extends AbstractSegmentStatisticsAnalysis {
 
     private final class StubProvider extends TestAnalysis implements ISegmentStoreProvider {
         private final ISegmentStore<@NonNull ISegment> ifFixture;
