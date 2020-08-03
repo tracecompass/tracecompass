@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -315,5 +316,17 @@ public class TmfPieChart extends Chart {
      */
     public void select(String id) {
         fSelectedId = id;
+    }
+
+    /**
+     * Set the color of a slice
+     *
+     * @param sliceId
+     *            the slice ID
+     * @param color
+     *            the color
+     */
+    public void addColor(String sliceId, @NonNull RGB color) {
+        REGISTRY.put(sliceId, color);
     }
 }
