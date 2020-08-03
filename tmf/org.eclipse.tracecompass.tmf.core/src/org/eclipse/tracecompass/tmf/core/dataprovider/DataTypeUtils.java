@@ -33,10 +33,6 @@ public final class DataTypeUtils {
     private static final Format DECIMAL_NO_UNIT_FORMAT = new DecimalWithUnitPrefixFormat(""); //$NON-NLS-1$
 
     private static final Format OTHER_FORMAT = new Format() {
-
-        /**
-         *
-         */
         private static final long serialVersionUID = -2824035517014261121L;
 
         @Override
@@ -51,7 +47,24 @@ public final class DataTypeUtils {
         public @Nullable Object parseObject(@Nullable String source, @Nullable ParsePosition pos) {
             return null;
         }
+    };
 
+    private static final Format BINARY_SPEED_FORMAT = new DataSpeedWithUnitFormat() {
+        private static final long serialVersionUID = 6571473479261285111L;
+
+        @Override
+        public Number parseObject(String source, ParsePosition pos) {
+            return null;
+        }
+    };
+
+    private static final Format BINARY_SIZE_FORMAT = new DataSizeWithUnitFormat() {
+        private static final long serialVersionUID = 391619032553653610L;
+
+        @Override
+        public Number parseObject(String source, ParsePosition pos) {
+            return null;
+        }
     };
 
     private DataTypeUtils() {
@@ -76,9 +89,9 @@ public final class DataTypeUtils {
         case BINARY_NUMBER:
             // Check if it's a speed
             if (units.endsWith("/s")) { //$NON-NLS-1$
-                return DataSpeedWithUnitFormat.getInstance();
+                return BINARY_SPEED_FORMAT;
             }
-            return DataSizeWithUnitFormat.getInstance();
+            return BINARY_SIZE_FORMAT;
         case DURATION:
             return SubSecondTimeWithUnitFormat.getInstance();
         case STRING:
