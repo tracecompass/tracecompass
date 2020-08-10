@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.function.UnaryOperator;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.profiling.core.callgraph.ICallGraphProvider;
@@ -28,6 +29,9 @@ import org.eclipse.tracecompass.tmf.core.dataprovider.IDataProviderFactory;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
+import org.eclipse.tracecompass.tmf.core.symbols.ISymbolProvider;
+import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
+import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderUtils;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
@@ -42,6 +46,25 @@ import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 public class CallGraphStatisticsDataProviderFactory implements IDataProviderFactory {
 
     private static final String ID = "org.eclipse.tracecompass.internal.analysis.profiling.core.callgraph.callgraphanalysis.statistics"; //$NON-NLS-1$
+
+    private static final class SymbolFormatter implements UnaryOperator<String> {
+
+        private final Collection< ISymbolProvider> fSymbolProviders;
+
+        public SymbolFormatter(@Nullable ITmfTrace trace) {
+            fSymbolProviders = trace != null ? SymbolProviderManager.getInstance().getSymbolProviders(trace) : Collections.emptySet();
+        }
+
+        @Override
+        public String apply(String original) {
+            try {
+                Long address = Long.decode(original);
+                return SymbolProviderUtils.getSymbolText(fSymbolProviders, address);
+            } catch (NumberFormatException e) {
+                return original;
+            }
+        }
+    }
 
     private static final IDataProviderDescriptor DESCRIPTOR = new DataProviderDescriptor.Builder()
             .setId(ID)
@@ -73,7 +96,10 @@ public class CallGraphStatisticsDataProviderFactory implements IDataProviderFact
             return null;
         }
         statisticsAnalysis.schedule();
-        return new SegmentStoreStatisticsDataProvider(trace, statisticsAnalysis, CallGraphStatisticsAnalysis.ID);
+        SegmentStoreStatisticsDataProvider dp = new SegmentStoreStatisticsDataProvider(trace, statisticsAnalysis, CallGraphStatisticsAnalysis.ID);
+        SymbolFormatter fe = new SymbolFormatter(trace);
+        dp.setLabelMapper(fe);
+        return dp;
     }
 
     @Override

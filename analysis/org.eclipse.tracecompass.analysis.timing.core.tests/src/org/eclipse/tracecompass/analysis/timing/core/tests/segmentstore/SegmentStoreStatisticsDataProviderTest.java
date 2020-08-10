@@ -67,18 +67,31 @@ public class SegmentStoreStatisticsDataProviderTest {
 
     private static final @NonNull List<@NonNull StatisticsHolder> EXPECTED_STATS_FULL = Arrays.asList(
             new StatisticsHolder("", 0, -1, 0, 65534, 32767.0, 18918.46, 65535, 2147385345.0, 0, 0, 65534, 131068),
-            new StatisticsHolder("Total", 1, 0, 0, 65534, 32767.0, 18918.46, 65535, 2147385345.0, 0, 0, 65534, 131068),
-            new StatisticsHolder("even", 2, 1, 0, 65534, 32767.0, 18918.90, 32768, 1073709056.0, 0, 0, 65534, 131068),
-            new StatisticsHolder("odd", 3, 1, 1, 65533, 32767.0, 18918.32, 32767, 1073676289.0, 1, 2, 65533, 131066));
+            new StatisticsHolder("Total", 2, 0, 0, 65534, 32767.0, 18918.46, 65535, 2147385345.0, 0, 0, 65534, 131068),
+            new StatisticsHolder("even", 3, 2, 0, 65534, 32767.0, 18918.90, 32768, 1073709056.0, 0, 0, 65534, 131068),
+            new StatisticsHolder("odd", 4, 2, 1, 65533, 32767.0, 18918.32, 32767, 1073676289.0, 1, 2, 65533, 131066));
 
     private static final @NonNull List<@NonNull StatisticsHolder> EXPECTED_STATS_SELECTION = Arrays.asList(
-            new StatisticsHolder("Selection", 4, 0, 512, 4096, 2304.0, 1035.04, 3585, 8259840.0, 512, 1024, 4096, 8192),
-            new StatisticsHolder("even", 5, 4, 512, 4096, 2304.0, 1035.48, 1793, 4131072.0, 512, 1024, 4096, 8192),
-            new StatisticsHolder("odd", 6, 4, 513, 4095, 2304.0, 1034.9, 1792, 4128768.0, 513, 1026, 4095, 8190));
+            new StatisticsHolder("Selection", 5, 0, 512, 4096, 2304.0, 1035.04, 3585, 8259840.0, 512, 1024, 4096, 8192),
+            new StatisticsHolder("even", 6, 5, 512, 4096, 2304.0, 1035.48, 1793, 4131072.0, 512, 1024, 4096, 8192),
+            new StatisticsHolder("odd", 7, 5, 513, 4095, 2304.0, 1034.9, 1792, 4128768.0, 513, 1026, 4095, 8190));
+
+    private static final List<@NonNull List<@NonNull String>> LIST_OF_EXPECTED_LABELS_WITH_MAPPER_FULL = Arrays.asList(
+            Arrays.asList("My", "0", "65534", "32767.0", "18918.46928268775", "65535", "2.147385345E9"),
+            Arrays.asList("MyTotal", "0", "65534", "32767.0", "18918.46928268775", "65535", "2.147385345E9"),
+            Arrays.asList("Myeven", "0", "65534", "32767.0", "18918.90229373787", "32768", "1.073709056E9"),
+            Arrays.asList("Myodd", "1", "65533", "32767.0", "18918.32494346861", "32767", "1.073676289E9"));
+
+    private static final @NonNull List<@NonNull StatisticsHolder> EXPECTED_STATS_WITH_MAPPER_FULL = Arrays.asList(
+            new StatisticsHolder("My", 1, -1, 0, 65534, 32767.0, 18918.46, 65535, 2147385345.0, 0, 0, 65534, 131068),
+            new StatisticsHolder("MyTotal", 8, 1, 0, 65534, 32767.0, 18918.46, 65535, 2147385345.0, 0, 0, 65534, 131068),
+            new StatisticsHolder("Myeven", 9, 8, 0, 65534, 32767.0, 18918.90, 32768, 1073709056.0, 0, 0, 65534, 131068),
+            new StatisticsHolder("Myodd", 10, 8, 1, 65533, 32767.0, 18918.32, 32767, 1073676289.0, 1, 2, 65533, 131066));
 
     private static List<ITableColumnDescriptor> fExpectedDescriptors;
 
     private static SegmentStoreStatisticsDataProvider fTestDataProvider;
+    private static SegmentStoreStatisticsDataProvider fTestDataProvider2;
 
     private static TmfXmlTraceStub fTrace;
 
@@ -104,8 +117,12 @@ public class SegmentStoreStatisticsDataProviderTest {
         fTrace = new TmfXmlTraceStubNs();
         @NonNull
         StubSegmentStatisticsAnalysis fixture = getValidSegmentStats(fTrace);
-        assertNotNull(fTrace);
-        fTestDataProvider = new SegmentStoreStatisticsDataProvider(fTrace, fixture, "org.eclipse.tracecompass.analysis.timing.core.tests.segmentstore");
+        ITmfTrace trace = fTrace;
+        assertNotNull(trace);
+        fTestDataProvider = new SegmentStoreStatisticsDataProvider(trace, fixture, "org.eclipse.tracecompass.analysis.timing.core.tests.segmentstore");
+        fTestDataProvider2 = new SegmentStoreStatisticsDataProvider(trace, fixture, "org.eclipse.tracecompass.analysis.timing.core.tests.segmentstore");
+        fTestDataProvider2.setLabelMapper(e -> "My" + e);
+        fTestDataProvider2.setMapper(String::valueOf);
     }
 
     /**
@@ -116,6 +133,11 @@ public class SegmentStoreStatisticsDataProviderTest {
         if (fTestDataProvider != null) {
             fTestDataProvider.dispose();
         }
+
+        if (fTestDataProvider != null) {
+            fTestDataProvider2.dispose();
+        }
+
         if (fTrace != null) {
             fTrace.dispose();
         }
@@ -199,6 +221,40 @@ public class SegmentStoreStatisticsDataProviderTest {
                 entries,
                 LIST_OF_EXPECTED_LABELS_FULL.size(),
                 EXPECTED_STATS_FULL.size() + EXPECTED_STATS_SELECTION.size());
+    }
+
+    /**
+     * Test to verify
+     * {@link SegmentStoreStatisticsDataProvider#fetchTree(Map, org.eclipse.core.runtime.IProgressMonitor)}
+     * for the full trace
+     */
+    @Test
+    public void testFetchTreeWithMapperFullRange() {
+        Map<@NonNull String, @NonNull Object> fetchParameters = new HashMap<>();
+        TmfModelResponse<@NonNull TmfTreeModel<@NonNull SegmentStoreStatisticsModel>> response = fTestDataProvider2.fetchTree(fetchParameters, new NullProgressMonitor());
+        assertNotNull(response);
+
+        TmfTreeModel<@NonNull SegmentStoreStatisticsModel> treeModel = response.getModel();
+        assertNotNull(treeModel);
+
+        assertEquals("Header list size", EXPECTED_HEADER_LIST.size(), treeModel.getHeaders().size());
+        assertEquals("Header list", EXPECTED_HEADER_LIST, treeModel.getHeaders());
+
+        List<@NonNull ITableColumnDescriptor> columnDescriptors = treeModel.getColumnDescriptors();
+        assertEquals("Header descriptor list size", EXPECTED_HEADER_LIST.size(), columnDescriptors.size());
+
+        assertEquals("Column descriptor list", fExpectedDescriptors, columnDescriptors);
+
+        assertNull("Scope", treeModel.getScope());
+
+        List<@NonNull SegmentStoreStatisticsModel> entries = treeModel.getEntries();
+        assertNotNull("Entries", entries);
+
+        verifyEntries(LIST_OF_EXPECTED_LABELS_WITH_MAPPER_FULL,
+                EXPECTED_STATS_WITH_MAPPER_FULL,
+                entries,
+                0,
+                EXPECTED_STATS_WITH_MAPPER_FULL.size());
     }
 
     // ------------------------------------------------------------------------

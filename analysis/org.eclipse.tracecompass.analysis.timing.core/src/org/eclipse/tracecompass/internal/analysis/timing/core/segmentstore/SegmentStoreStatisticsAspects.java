@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.internal.analysis.timing.core.segmentstore;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.analysis.timing.core.statistics.IStatistics;
@@ -30,10 +31,12 @@ import com.google.common.collect.ImmutableList;
 /* public */ final class SegmentStoreStatisticsAspects {
 
     private Function<Number, String> fMapper;
+    private Function<String, String> fLabelMapper;
     private List<IDataAspect<NamedStatistics>> fAspects;
 
     public SegmentStoreStatisticsAspects() {
         fMapper = e -> String.format("%s", DataTypeUtils.getFormat(DataType.DURATION, "").format(e)); //$NON-NLS-1$ //$NON-NLS-2$
+        fLabelMapper = e -> e;
         fAspects = createAspects();
     }
     /**
@@ -45,6 +48,18 @@ import com.google.common.collect.ImmutableList;
      */
     protected synchronized void setMapper(Function<Number, String> mapper) {
         fMapper = mapper;
+    }
+
+    /**
+     * Sets mapper function to format label string to an output string.
+     *
+     * @param mapper
+     *                function to map input string to output string. This can
+     *                be used, for example, to change a symbol address to a
+     *                symbol name.
+     */
+    protected synchronized void setLabelMapper(UnaryOperator<String> mapper) {
+        fLabelMapper = mapper;
     }
 
     /**
@@ -64,7 +79,7 @@ import com.google.common.collect.ImmutableList;
             }
             @Override
             public @Nullable Object apply(NamedStatistics input) {
-                return input.getName();
+                return fLabelMapper.apply(input.getName());
             }
         });
         aspectsBuilder.add(new IDataAspect<NamedStatistics>() {

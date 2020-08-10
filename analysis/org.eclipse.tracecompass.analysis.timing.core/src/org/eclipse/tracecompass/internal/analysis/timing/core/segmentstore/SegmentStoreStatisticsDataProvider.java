@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -247,4 +248,16 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         fAspects.setMapper(mapper);
     }
 
+    /**
+     * Sets mapper function to format label string to an output string.
+     *
+     * @param mapper
+     *                function to map input string to output string. This can
+     *                be used, for example, to change a symbol address to a
+     *                symbol name.
+     * @since 5.2
+     */
+    public void setLabelMapper(UnaryOperator<String> mapper) {
+        fAspects.setLabelMapper(mapper);
+    }
 }
