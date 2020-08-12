@@ -93,7 +93,7 @@ import com.google.common.collect.Multimap;
 public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
 
     private static final String DIRTY_UNDERFLOW_ERROR = "Dirty underflow error"; //$NON-NLS-1$
-    private static final @NonNull RGBAColor DEFAULT_COLOR = new RGBAColor(255, 255, 255);
+    private static final @NonNull RGBAColor DEFAULT_COLOR = new RGBAColor(0, 0, 0);
     private static final int DEFAULT_SYMBOL_SIZE = 4;
 
     private static final Map<String, ILineSeries.PlotSymbolType> SYMBOL_MAP;
