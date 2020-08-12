@@ -603,7 +603,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
              */
             ILineSeries lineSeries = (ILineSeries) seriesSet.createSeries(SeriesType.LINE, seriesName);
             lineSeries.enableArea(StyleProperties.SeriesType.AREA.equals(type));
-            lineSeries.setLineStyle(LineStyle.valueOf((String) presProvider.getStyle(appearance, StyleProperties.SERIES_STYLE)));
+            lineSeries.setLineStyle(LineStyle.valueOf((String) presProvider.getStyleOrDefault(appearance, StyleProperties.SERIES_STYLE, StyleProperties.SeriesStyle.SOLID)));
             lineSeries.setSymbolType(SYMBOL_MAP.getOrDefault(symbolType, ILineSeries.PlotSymbolType.NONE));
             lineSeries.setSymbolSize(Math.round(presProvider.getFloatStyleOrDefault(appearance, StyleProperties.HEIGHT, 1.0f).floatValue() * DEFAULT_SYMBOL_SIZE));
             lineSeries.setLineColor(color);
@@ -641,7 +641,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
              */
             ILineSeries lineSeries = (ILineSeries) seriesSet.createSeries(SeriesType.LINE, seriesName);
             lineSeries.enableArea(StyleProperties.SeriesType.AREA.equals(type));
-            lineSeries.setLineStyle(LineStyle.valueOf((String) presProvider.getStyle(appearance, StyleProperties.SERIES_STYLE)));
+            lineSeries.setLineStyle(LineStyle.valueOf((String) presProvider.getStyleOrDefault(appearance, StyleProperties.SERIES_STYLE, StyleProperties.SeriesStyle.SOLID)));
             lineSeries.setSymbolType(SYMBOL_MAP.getOrDefault(symbolType, ILineSeries.PlotSymbolType.NONE));
             lineSeries.setSymbolSize(Math.round(presProvider.getFloatStyleOrDefault(appearance, StyleProperties.HEIGHT, 1.0f).floatValue() * DEFAULT_SYMBOL_SIZE));
             lineSeries.setLineColor(color);
