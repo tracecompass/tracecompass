@@ -178,6 +178,11 @@ public class ImportTraceWizardPage extends WizardResourceImportPage {
      * Keep the extracted archive file to import using links.
      */
     public static final int OPTION_KEEP_EXTRACTED_ARCHIVE = 1 << 8;
+    /**
+     * Rename all traces with conflicting names. This flag is ignored, when
+     * {@link ImportTraceWizardPage#OPTION_OVERWRITE_EXISTING_RESOURCES} is set.
+     */
+    public static final int OPTION_RENAME_ALL = 1 << 9;
 
     // ------------------------------------------------------------------------
     // Attributes

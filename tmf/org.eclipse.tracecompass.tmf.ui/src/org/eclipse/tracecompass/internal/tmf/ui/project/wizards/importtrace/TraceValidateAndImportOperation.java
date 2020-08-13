@@ -128,8 +128,9 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
      *            {@link ImportTraceWizardPage#OPTION_PRESERVE_FOLDER_STRUCTURE} ,
      *            {@link ImportTraceWizardPage#OPTION_CREATE_LINKS_IN_WORKSPACE} ,
      *            {@link ImportTraceWizardPage#OPTION_IMPORT_UNRECOGNIZED_TRACES} ,
+     *            {@link ImportTraceWizardPage#OPTION_OVERWRITE_EXISTING_RESOURCES},
      *            and
-     *            {@link ImportTraceWizardPage#OPTION_OVERWRITE_EXISTING_RESOURCES}
+     *            {@link ImportTraceWizardPage#OPTION_RENAME_ALL}
      *            )
      * @param traceFolderElement
      *            the destination trace folder of the import operation.
@@ -160,7 +161,12 @@ public class TraceValidateAndImportOperation extends TmfWorkspaceModifyOperation
         if (overwriteExistingResources) {
             setConflictHandler(new ImportConflictHandler(fShell, fTraceFolderElement, ImportConfirmation.OVERWRITE_ALL));
         } else {
-            setConflictHandler(new ImportConflictHandler(fShell, fTraceFolderElement, ImportConfirmation.SKIP));
+            boolean renameAll = (importOptionFlags & ImportTraceWizardPage.OPTION_RENAME_ALL) != 0;
+            if (renameAll) {
+                setConflictHandler(new ImportConflictHandler(fShell, fTraceFolderElement, ImportConfirmation.RENAME_ALL));
+            } else {
+                setConflictHandler(new ImportConflictHandler(fShell, fTraceFolderElement, ImportConfirmation.SKIP));
+            }
         }
         fImportedResources = new ArrayList<>();
         fSelectedFileSystemElements = traceFileSystemElements;

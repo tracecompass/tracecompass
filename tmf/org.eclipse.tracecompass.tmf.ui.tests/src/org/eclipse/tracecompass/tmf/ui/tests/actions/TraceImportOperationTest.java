@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017, 2018 Ericsson
+ * Copyright (c) 2017, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -115,6 +115,29 @@ public class TraceImportOperationTest {
         PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
         WaitUtils.waitUntil(folder -> folder.getTraces().size() == EXPECTED_TRACE_COUNT, fDestFolder, () -> String.format("expected: %d but was: %d", EXPECTED_TRACE_COUNT, fDestFolder.getTraces().size()));
         validateImport(fSourcePath, fDestFolder, true);
+    }
+
+    /**
+     * Test the operation with rename option
+     *
+     * @throws Exception if an exception occurs
+     */
+    @Test
+    public void testRename() throws Exception {
+        WorkspaceModifyOperation operation = new TraceImportOperation(fSourcePath, fDestFolder);
+        PlatformUI.getWorkbench().getProgressService().run(true, true, operation);
+        WaitUtils.waitUntil(folder -> folder.getTraces().size() == EXPECTED_TRACE_COUNT, fDestFolder, () -> String.format("expected: %d but was: %d", EXPECTED_TRACE_COUNT, fDestFolder.getTraces().size()));
+        validateImport(fSourcePath, fDestFolder, true);
+
+        TraceImportOperation overwriteOperation = new TraceImportOperation(fSourcePath, fDestFolder);
+        overwriteOperation.renameConflictingTraces(false);
+        PlatformUI.getWorkbench().getProgressService().run(true, true, overwriteOperation);
+        WaitUtils.waitUntil(folder -> folder.getTraces().size() == EXPECTED_TRACE_COUNT, fDestFolder, () -> String.format("expected: %d but was: %d", EXPECTED_TRACE_COUNT, fDestFolder.getTraces().size()));
+
+        TraceImportOperation renameOperation = new TraceImportOperation(fSourcePath, fDestFolder);
+        renameOperation.renameConflictingTraces(true);
+        PlatformUI.getWorkbench().getProgressService().run(true, true, renameOperation);
+        WaitUtils.waitUntil(folder -> folder.getTraces().size() == 2 * EXPECTED_TRACE_COUNT, fDestFolder, () -> String.format("expected: %d but was: %d", 2 * EXPECTED_TRACE_COUNT, fDestFolder.getTraces().size()));
     }
 
     /**

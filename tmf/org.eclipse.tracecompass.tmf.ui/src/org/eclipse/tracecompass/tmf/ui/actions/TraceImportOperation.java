@@ -50,6 +50,7 @@ public class TraceImportOperation extends WorkspaceModifyOperation {
     private final TmfTraceFolder fDestFolder;
 
     private boolean fSkipArchiveExtraction = false;
+    private boolean fRenameConflictingTraces = false;
 
     private ITmfTimestamp fStartTimeRange = null;
     private ITmfTimestamp fEndTimeRange = null;
@@ -80,6 +81,17 @@ public class TraceImportOperation extends WorkspaceModifyOperation {
     }
 
     /**
+     * Sets the rename option.
+     *
+     * @param renameConflictingTraces
+     *            <code>true<code> to rename conflicting traces
+     * @since 6.1
+     */
+    public void renameConflictingTraces(boolean renameConflictingTraces) {
+        fRenameConflictingTraces = renameConflictingTraces;
+    }
+
+    /**
      * Sets the range for timestamps based filtering import.
      *
      * @param start
@@ -99,11 +111,16 @@ public class TraceImportOperation extends WorkspaceModifyOperation {
     protected void execute(IProgressMonitor monitor) throws CoreException, InvocationTargetException, InterruptedException {
         int importOptionFlags =
                 ImportTraceWizardPage.OPTION_CREATE_LINKS_IN_WORKSPACE |
-                ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES |
                 ImportTraceWizardPage.OPTION_PRESERVE_FOLDER_STRUCTURE;
         if (fSkipArchiveExtraction) {
             importOptionFlags |= ImportTraceWizardPage.OPTION_SKIP_ARCHIVE_EXTRACTION;
         }
+        if (fRenameConflictingTraces) {
+            importOptionFlags |= ImportTraceWizardPage.OPTION_RENAME_ALL;
+        } else {
+            importOptionFlags |= ImportTraceWizardPage.OPTION_OVERWRITE_EXISTING_RESOURCES;
+        }
+
         if(fStartTimeRange != null && fEndTimeRange != null) {
             importOptionFlags |= ImportTraceWizardPage.OPTION_FILTER_TIMERANGE;
         }
