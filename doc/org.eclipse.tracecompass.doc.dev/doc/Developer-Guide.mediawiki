@@ -3322,6 +3322,7 @@ The following code shows what the resulting plugin.xml file should look like.
          id="my.lttng.kernel.analysis.id"
          name="My LTTng Kernel Analysis"
          analysis_module="my.plugin.package.MyLttngKernelAnalysis"
+         applies_experiment="false"
          automatic="true">
          <parameter
                name="myparam">
@@ -3337,6 +3338,8 @@ The following code shows what the resulting plugin.xml file should look like.
 </pre>
 
 This defines an analysis module where the ''analysis_module'' attribute corresponds to the module class and must implement IAnalysisModule. This module has 2 parameters: ''myparam'' and ''myotherparam'' which has default value of 3. The ''tracetype'' element tells which tracetypes this analysis applies to. There can be many tracetypes. Also, the ''automatic'' attribute of the module indicates whether this analysis should be run when the trace is opened, or wait for the user's explicit request.
+
+Since experiments are traces too, it is possible to develop an analysis to work on experiment by setting the ''tracetype'' to the experiment's ID (the ID for the default experiment is ''org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment''). Setting the ''applies_experiment'' attribute to '''true''' creates a new instance of the analysis for an experiment that contains any trace of the correct type. This analysis runs on the whole experiment and will process all events. It is useful for analysis that are enhanced with data from multiple traces.
 
 Note that with these extension points, it is possible to use the same module class for more than one analysis (with different ids and names). That is a desirable behavior. For instance, a third party plugin may add a new tracetype different from the one the module is meant for, but on which the analysis can run. Also, different analyses could provide different results with the same module class but with different default values of parameters.
 
