@@ -612,18 +612,14 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
         fTimeGraphCtrl.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.keyCode == '.'
-                        // TODO: Remove when Bug 565818 is fixed
-                        || e.keyCode == '>') {
+                if (e.keyCode == '.') {
                     boolean extend = (e.stateMask & SWT.SHIFT) != 0;
                     if (extend) {
                         extendToNextMarker();
                     } else {
                         selectNextMarker();
                     }
-                } else if (e.keyCode == ','
-                        // TODO: Remove when Bug 565818 is fixed
-                        || e.keyCode == '<') {
+                } else if (e.keyCode == ',') {
                     boolean extend = (e.stateMask & SWT.SHIFT) != 0;
                     if (extend) {
                         extendToPrevMarker();
