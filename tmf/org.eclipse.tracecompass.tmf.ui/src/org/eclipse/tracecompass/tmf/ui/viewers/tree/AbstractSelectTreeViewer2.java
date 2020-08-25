@@ -179,6 +179,23 @@ public abstract class AbstractSelectTreeViewer2 extends AbstractTmfTreeViewer {
             return null;
         }
 
+        @Override
+        public String getColumnText(Object element, int columnIndex) {
+            if (element instanceof TmfGenericTreeEntry) {
+                if (columnIndex == fLegendIndex) {
+                    return ""; //$NON-NLS-1$
+                }
+                /* Model should not contain any label for the legend column */
+                int index = fLegendIndex < 0 || columnIndex < fLegendIndex ? columnIndex : columnIndex - 1;
+                TmfGenericTreeEntry<@NonNull ? extends ITmfTreeDataModel> genericEntry = (TmfGenericTreeEntry<@NonNull ? extends ITmfTreeDataModel>) element;
+                ITmfTreeDataModel model = genericEntry.getModel();
+                if (index < model.getLabels().size()) {
+                    return model.getLabels().get(index);
+                }
+                return ""; //$NON-NLS-1$
+            }
+            return super.getColumnText(element, columnIndex);
+        }
     }
 
     private ILegendImageProvider2 fLegendImageProvider;
