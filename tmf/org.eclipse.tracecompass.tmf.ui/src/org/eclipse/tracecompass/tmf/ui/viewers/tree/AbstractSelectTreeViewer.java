@@ -529,6 +529,13 @@ public abstract class AbstractSelectTreeViewer extends AbstractTmfTreeViewer {
         if (!Objects.equals(entry1.getName(), entry2.getName())) {
             return false;
         }
+        if (entry1 instanceof TmfGenericTreeEntry && entry2 instanceof TmfGenericTreeEntry) {
+            ITmfTreeDataModel model1 = ((TmfGenericTreeEntry<?>) entry1).getModel();
+            ITmfTreeDataModel model2 = ((TmfGenericTreeEntry<?>) entry2).getModel();
+            if (model1 != null && model2 != null && !model1.getLabels().equals(model2.getLabels())) {
+                return false;
+            }
+        }
         List<@NonNull ? extends ITmfTreeViewerEntry> children1 = entry1.getChildren();
         List<@NonNull ? extends ITmfTreeViewerEntry> children2 = entry2.getChildren();
         if (children1.size() != children2.size()) {
