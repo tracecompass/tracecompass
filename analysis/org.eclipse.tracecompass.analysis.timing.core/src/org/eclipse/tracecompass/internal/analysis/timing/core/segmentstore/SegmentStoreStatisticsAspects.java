@@ -89,7 +89,7 @@ import com.google.common.collect.ImmutableList;
             }
             @Override
             public @Nullable Object apply(NamedStatistics input) {
-                return fMapper.apply(input.getStatistics().getMin());
+                return fMapper.apply(input.getStatistics().getMinNumber());
             }
         });
 
@@ -100,7 +100,7 @@ import com.google.common.collect.ImmutableList;
             }
             @Override
             public @Nullable Object apply(NamedStatistics input) {
-                return fMapper.apply(input.getStatistics().getMax());
+                return fMapper.apply(input.getStatistics().getMaxNumber());
             }
         });
 

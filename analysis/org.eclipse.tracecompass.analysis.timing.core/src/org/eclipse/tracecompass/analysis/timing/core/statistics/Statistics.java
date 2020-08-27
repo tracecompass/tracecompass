@@ -54,10 +54,10 @@ public class Statistics<@NonNull E> implements IStatistics<E> {
      */
     public Statistics() {
         this(e -> {
-            if (!(e instanceof Long)) {
+            if (!(e instanceof Number)) {
                 throw new IllegalStateException("The object " + e + " is not a number"); //$NON-NLS-1$//$NON-NLS-2$
             }
-            return (Long) e;
+            return (Number) e; 
         });
     }
 
@@ -82,8 +82,18 @@ public class Statistics<@NonNull E> implements IStatistics<E> {
     }
 
     @Override
+    public Number getMaxNumber() {
+        return fMaxNum;
+    }
+
+    @Override
     public long getMax() {
         return fMaxNum.longValue();
+    }
+
+    @Override
+    public Number getMinNumber() {
+        return fMinNum;
     }
 
     @Override

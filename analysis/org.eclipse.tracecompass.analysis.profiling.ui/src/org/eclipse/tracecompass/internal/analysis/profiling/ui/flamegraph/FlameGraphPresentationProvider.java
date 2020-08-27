@@ -93,8 +93,8 @@ public class FlameGraphPresentationProvider extends TimeGraphPresentationProvide
         builder.put(String.valueOf(Messages.FlameGraph_Durations), ""); //$NON-NLS-1$
         builder.put("\t" + Messages.FlameGraph_Duration, FORMATTER.format(event.getDuration())); //$NON-NLS-1$
         builder.put("\t" + Messages.FlameGraph_AverageDuration, FORMATTER.format(statistics.getDurationStatistics().getMean())); // $NON-NLS-1$ //$NON-NLS-1$
-        builder.put("\t" + Messages.FlameGraph_MaxDuration, FORMATTER.format((statistics.getDurationStatistics().getMax()))); // $NON-NLS-1$ //$NON-NLS-1$
-        builder.put("\t" + Messages.FlameGraph_MinDuration, FORMATTER.format(statistics.getDurationStatistics().getMin())); // $NON-NLS-1$ //$NON-NLS-1$
+        builder.put("\t" + Messages.FlameGraph_MaxDuration, FORMATTER.format((statistics.getDurationStatistics().getMaxNumber()))); // $NON-NLS-1$ //$NON-NLS-1$
+        builder.put("\t" + Messages.FlameGraph_MinDuration, FORMATTER.format(statistics.getDurationStatistics().getMinNumber())); // $NON-NLS-1$ //$NON-NLS-1$
         builder.put("\t" + Messages.FlameGraph_Deviation, FORMATTER.format(statistics.getDurationStatistics().getStdDev())); //$NON-NLS-1$
         builder.put(Messages.FlameGraph_SelfTimes, ""); //$NON-NLS-1$
         builder.put("\t" + Messages.FlameGraph_SelfTime, FORMATTER.format(fgEvent.getSelfTime())); //$NON-NLS-1$

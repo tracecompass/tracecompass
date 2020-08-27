@@ -409,6 +409,8 @@ public class AggregatedCalledFunctionStatisticsTest {
         AggregatedCalledFunctionStatistics mainStatistics1 = main.getFunctionStatistics();
         assertEquals("Test main's maximum duration", 150, mainStatistics1.getDurationStatistics().getMax());
         assertEquals("Test main's minimum duration", 150, mainStatistics1.getDurationStatistics().getMin());
+        assertEquals("Test main's maximum duration", 150L, mainStatistics1.getDurationStatistics().getMaxNumber());
+        assertEquals("Test main's minimum duration", 150L, mainStatistics1.getDurationStatistics().getMinNumber());
         assertEquals("Test main's maximum self time", 40, mainStatistics1.getSelfTimeStatistics().getMax());
         assertEquals("Test main's minimum self time", 40, mainStatistics1.getSelfTimeStatistics().getMin());
         assertEquals("Test main's number of calls", 1, mainStatistics1.getDurationStatistics().getNbElements());

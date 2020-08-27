@@ -43,6 +43,26 @@ public interface IStatistics<@NonNull E> {
     long getMax();
 
     /**
+     * Get minimum number
+     *
+     * @return minimum number
+     * @since 5.2
+     */
+    default Number getMinNumber() {
+        return getMin();
+    }
+
+    /**
+     * Get maximum number
+     *
+     * @return maximum number
+     * @since 5.2
+     */
+    default Number getMaxNumber() {
+        return getMax();
+    }
+
+    /**
      * Get element with minimum value, or <code>null</code> if
      * {@link #getNbElements()} is 0.
      *
