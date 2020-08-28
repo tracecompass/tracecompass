@@ -267,11 +267,13 @@ public class TmfEventsTable extends TmfComponent implements IGotoMarker, IColorS
                 /* Don't update column width if resize due to packing */
                 return;
             }
-            if (column.getResizable() && !isExpanded(column)) {
+            if (!isExpanded(column)) {
                 int index = (int) column.getData(Key.INDEX);
                 fColumnSize[index] = column.getWidth();
-                /* Turns off AutoFit */
-                column.setData(Key.WIDTH, fColumnSize[index]);
+                if (column.getResizable()) {
+                    /* Turns off AutoFit */
+                    column.setData(Key.WIDTH, fColumnSize[index]);
+                }
             }
         }
     }
