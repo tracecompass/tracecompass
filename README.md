@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftracecompass%2Ftracecompass.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftracecompass%2Ftracecompass?ref=badge_shield)
+
 Eclipse Trace Compass
 =====================
 
@@ -139,3 +141,7 @@ the build system. You can set them by using `-P[profile name]` and
   Some directories may need to already exist at the destination (or Maven will
   throw related errors).
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftracecompass%2Ftracecompass.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftracecompass%2Ftracecompass?ref=badge_large)
