@@ -143,13 +143,14 @@ public final class TmfTimePreferences {
 
     private static Map<String, String> getPreferenceMap(boolean defaultValues) {
         Map<String, String> prefsMap = new HashMap<>();
-        IEclipsePreferences prefs = defaultValues ? DefaultScope.INSTANCE.getNode(Activator.PLUGIN_ID) : InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
-        prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.SUBSEC, SUBSEC_DEFAULT);
-        prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.TIME_DELIMITER, TIME_DELIMITER_DEFAULT);
-        prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.SSEC_DELIMITER, SSEC_DELIMITER_DEFAULT);
-        prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.DATIME, DATIME_DEFAULT);
-        prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.DATE_DELIMITER, DATE_DELIMITER_DEFAULT);
-        prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.TIME_ZONE, TIME_ZONE_DEFAULT);
+        IEclipsePreferences defaultPrefs = DefaultScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+        IEclipsePreferences prefs = defaultValues ? defaultPrefs : InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+        prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.SUBSEC, defaultPrefs.get(ITmfTimePreferencesConstants.SUBSEC, SUBSEC_DEFAULT));
+        prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.TIME_DELIMITER, defaultPrefs.get(ITmfTimePreferencesConstants.TIME_DELIMITER, TIME_DELIMITER_DEFAULT));
+        prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.SSEC_DELIMITER, defaultPrefs.get(ITmfTimePreferencesConstants.SSEC_DELIMITER, SSEC_DELIMITER_DEFAULT));
+        prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.DATIME, defaultPrefs.get(ITmfTimePreferencesConstants.DATIME, DATIME_DEFAULT));
+        prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.DATE_DELIMITER, defaultPrefs.get(ITmfTimePreferencesConstants.DATE_DELIMITER, DATE_DELIMITER_DEFAULT));
+        prefToMap(prefs, prefsMap, ITmfTimePreferencesConstants.TIME_ZONE, defaultPrefs.get(ITmfTimePreferencesConstants.TIME_ZONE, TIME_ZONE_DEFAULT));
         return prefsMap;
     }
 
