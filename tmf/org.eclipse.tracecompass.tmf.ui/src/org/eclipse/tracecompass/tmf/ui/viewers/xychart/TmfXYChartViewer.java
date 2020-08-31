@@ -83,6 +83,8 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
     // ------------------------------------------------------------------------
     private static final int DEFAULT_SCALE_HEIGHT = 22;
 
+    /** The composite to house the chart and time graph scale */
+    private Composite fCommonComposite;
     /** The color scheme for the chart */
     private @NonNull TimeGraphColorScheme fColorScheme = new TimeGraphColorScheme();
     /** The SWT Chart reference */
@@ -136,6 +138,7 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
                 fTimeScaleCtrl.redraw();
             }
         };
+        fCommonComposite = commonComposite;
         commonComposite.addDisposeListener(e -> {
             fColorScheme.dispose();
         });
@@ -253,6 +256,21 @@ public abstract class TmfXYChartViewer extends TmfTimeViewer implements ITmfChar
      */
     public Chart getSwtChart() {
         return fSwtChart;
+    }
+
+    /**
+     * Switches visibility of the time axis on and off.
+     *
+     * @param visible
+     *            {@code true} to make the time axis visible.
+     *            {@code false} to make it invisible
+     * @since 6.1
+     */
+    public void setTimeAxisVisible(boolean visible) {
+        GridData gridData = (GridData) fTimeScaleCtrl.getLayoutData();
+        gridData.exclude = !visible;
+        fTimeScaleCtrl.setVisible(visible);
+        fCommonComposite.requestLayout();
     }
 
     /**
