@@ -16,12 +16,12 @@
   <parent>
     <artifactId>org.eclipse.tracecompass.ctf-parent</artifactId>
     <groupId>org.eclipse.tracecompass</groupId>
-    <version>6.0.0-SNAPSHOT</version>
+    <version>6.1.0-SNAPSHOT</version>
   </parent>
 
   <name>Trace Compass CTF Parser Plug-in</name>
   <artifactId>org.eclipse.tracecompass.ctf.parser</artifactId>
-  <version>1.0.5-SNAPSHOT</version>
+  <version>1.0.6-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 
   <build>
