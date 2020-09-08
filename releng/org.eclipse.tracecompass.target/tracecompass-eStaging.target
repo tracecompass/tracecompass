@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><?pde version="3.8"?><target name="tracecompass-eStaging" sequenceNumber="149">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?pde version="3.8"?><target name="tracecompass-eStaging" sequenceNumber="150">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.cdt.gnu.dsf.feature.group" version="0.0.0"/>
 <unit id="org.eclipse.tm.terminal.control" version="0.0.0"/>
-<repository location="https://download.eclipse.org/tools/cdt/builds/10.0/cdt-10.0.0-rc1/"/>
+<repository location="https://download.eclipse.org/tools/cdt/builds/10.0/cdt-10.0.0-rc2/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.swtbot.eclipse.feature.group" version="0.0.0"/>
@@ -55,7 +55,7 @@
 <unit id="org.eclipse.ui.trace" version="0.0.0"/>
 <unit id="org.eclipse.ui.views.log" version="0.0.0"/>
 <unit id="org.eclipse.jdt.junit4.runtime" version="0.0.0"/>
-<repository location="https://download.eclipse.org/eclipse/updates/4.17milestones/S-4.17RC1-202008261800/"/>
+<repository location="https://download.eclipse.org/eclipse/updates/4.17milestones/S-4.17RC2-202009021800/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf" version="1.7.2"/>
