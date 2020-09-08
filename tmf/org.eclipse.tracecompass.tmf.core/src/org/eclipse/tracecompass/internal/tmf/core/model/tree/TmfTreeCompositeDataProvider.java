@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -50,7 +51,7 @@ import com.google.common.collect.ImmutableList;
  */
 public class TmfTreeCompositeDataProvider<M extends ITmfTreeDataModel, P extends ITmfTreeDataProvider<M>> implements ITmfTreeDataProvider<M> {
 
-    private final List<P> fProviders;
+    private final CopyOnWriteArrayList<P> fProviders = new CopyOnWriteArrayList<>();
     private final String fId;
 
     /**
@@ -90,7 +91,7 @@ public class TmfTreeCompositeDataProvider<M extends ITmfTreeDataModel, P extends
      *            the provider's ID
      */
     public TmfTreeCompositeDataProvider(List<P> providers, String id) {
-        fProviders = providers;
+        fProviders.addAll(providers);
         fId = id;
     }
 
@@ -143,4 +144,25 @@ public class TmfTreeCompositeDataProvider<M extends ITmfTreeDataModel, P extends
         return fProviders;
     }
 
+    /**
+     * Adds a new data provider to the list of providers
+     *
+     * @param dataProvider
+     *              a data provider to add
+     */
+    protected void addProvider(P dataProvider) {
+        fProviders.add(dataProvider);
+    }
+
+    /**
+     * Removes a give data provider from the list of providers.
+     * It will dispose the data provider.
+     *
+     * @param dataProvider
+     *            the data provider to remove
+     */
+    protected void removeProvider(P dataProvider) {
+        fProviders.remove(dataProvider);
+        dataProvider.dispose();
+    }
 }
