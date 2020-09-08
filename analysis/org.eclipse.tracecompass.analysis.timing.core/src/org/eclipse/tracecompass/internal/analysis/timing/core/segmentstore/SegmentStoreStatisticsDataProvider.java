@@ -75,6 +75,7 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
 
     private final IStatisticsAnalysis fProvider;
     private final String fId;
+    private @Nullable String fRootEntryName;
 
     private final Map<String, Long> fIdToType = new HashMap<>();
     private final long fTraceId = ENTRY_ID.getAndIncrement();
@@ -137,7 +138,11 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         }
 
         List<SegmentStoreStatisticsModel> list = new ArrayList<>();
-        list.add(new SegmentStoreStatisticsModel(fTraceId, -1, getCellLabels(NonNullUtils.nullToEmptyString(getTrace().getName()), statsTotal), statsTotal));
+        String rootName = getRootEntryName();
+        if (rootName == null) {
+            rootName = getTrace().getName();
+        }
+        list.add(new SegmentStoreStatisticsModel(fTraceId, -1, getCellLabels(NonNullUtils.nullToEmptyString(rootName), statsTotal), statsTotal));
 
         /*
          * Add statistics for full duration.
@@ -234,6 +239,26 @@ public class SegmentStoreStatisticsDataProvider extends AbstractTmfTraceDataProv
         if (fModule != null) {
             fModule.dispose();
         }
+    }
+
+    /**
+     * Sets the root entry name to apply. If null, then the trace name will be
+     * used (default).
+     *
+     * @param rootName
+     *            the root entry name to apply.
+     */
+    public void setRootEntryName(@Nullable String rootName) {
+        fRootEntryName = rootName;
+    }
+
+    /**
+     * Gets the root entry name to apply.
+     *
+     * @return the root entry name to apply.
+     */
+    public final @Nullable String getRootEntryName() {
+        return fRootEntryName;
     }
 
     /**
