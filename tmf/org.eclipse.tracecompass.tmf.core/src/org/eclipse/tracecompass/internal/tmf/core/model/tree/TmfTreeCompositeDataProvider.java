@@ -22,6 +22,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
+import org.eclipse.tracecompass.tmf.core.model.ITableColumnDescriptor;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
@@ -97,6 +98,7 @@ public class TmfTreeCompositeDataProvider<M extends ITmfTreeDataModel, P extends
     public TmfModelResponse<TmfTreeModel<M>> fetchTree(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         boolean isComplete = true;
         ImmutableList.Builder<M> series = ImmutableList.builder();
+        List<ITableColumnDescriptor> columnDescriptor = null;
 
         for (P dataProvider : fProviders) {
             TmfModelResponse<TmfTreeModel<M>> response = dataProvider.fetchTree(fetchParameters, monitor);
@@ -104,16 +106,27 @@ public class TmfTreeCompositeDataProvider<M extends ITmfTreeDataModel, P extends
             TmfTreeModel<M> model = response.getModel();
             if (model != null) {
                 series.addAll(model.getEntries());
+                // Use the column descriptor of the first model. All descriptors are supposed to be the same
+                if (columnDescriptor == null) {
+                    columnDescriptor = model.getColumnDescriptors();
+                }
             }
-
             if (monitor != null && monitor.isCanceled()) {
                 return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
             }
         }
-        if (isComplete) {
-            return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), series.build()), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+
+        TmfTreeModel.Builder<M> treeModelBuilder = new TmfTreeModel.Builder<>();
+        if (columnDescriptor == null) {
+            columnDescriptor = Collections.emptyList();
         }
-        return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), series.build()), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
+        treeModelBuilder.setColumnDescriptors(columnDescriptor)
+                        .setEntries(series.build());
+
+        if (isComplete) {
+            return new TmfModelResponse<>(treeModelBuilder.build(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        }
+        return new TmfModelResponse<>(treeModelBuilder.build(), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
     }
 
     @Override
