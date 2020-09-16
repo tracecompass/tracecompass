@@ -14,6 +14,8 @@ package org.eclipse.tracecompass.analysis.os.linux.core.tid;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
@@ -29,8 +31,6 @@ import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.statesystem.core.exceptions.TimeRangeException;
 import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue.Type;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
@@ -51,6 +51,8 @@ public class TidAnalysisModule extends TmfStateSystemAnalysisModule {
 
     /** The ID of this analysis module */
     public static final @NonNull String ID = "org.eclipse.tracecompass.analysis.os.linux.kernel.tid"; //$NON-NLS-1$
+
+    private final Map<Integer, ITmfStateInterval> fCache = new HashMap<>();
 
     /** The requirements as an immutable set */
     private static final @NonNull Set<@NonNull TmfAbstractAnalysisRequirement> REQUIREMENTS = Collections.emptySet();
@@ -104,9 +106,14 @@ public class TidAnalysisModule extends TmfStateSystemAnalysisModule {
             if (cpuQuark == ITmfStateSystem.INVALID_ATTRIBUTE) {
                 return null;
             }
-            ITmfStateValue value = stateSystem.querySingleState(queryTime, cpuQuark).getStateValue();
-            if (value.getType().equals(Type.INTEGER)) {
-                tid = value.unboxInt();
+            ITmfStateInterval state = fCache.get(cpuQuark);
+            if (state == null || !state.intersects(queryTime)) {
+                state = stateSystem.querySingleState(queryTime, cpuQuark);
+                fCache.put(cpuQuark, state);
+            }
+            Object value = state.getValue();
+            if (value instanceof Integer) {
+                tid = (Integer) value;
             }
         } catch (StateSystemDisposedException | TimeRangeException e) {
             Activator.getDefault().logError(NonNullUtils.nullToEmptyString(e.getMessage()), e);
