@@ -70,7 +70,7 @@ public class HT_IO {
 
         @Override
         public int hashCode() {
-            return Objects.hash(fStateHistory, fSeqNumber);
+            return Objects.hash(fStateHistory.fConfig.getStateFile().getAbsolutePath(), fSeqNumber);
         }
 
         @Override
