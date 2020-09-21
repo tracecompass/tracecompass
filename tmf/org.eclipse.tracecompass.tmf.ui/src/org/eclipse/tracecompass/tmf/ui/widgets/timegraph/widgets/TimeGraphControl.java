@@ -266,7 +266,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
     private final List<MenuDetectListener> fTimeGraphEntryMenuListeners = new ArrayList<>();
     private final List<MenuDetectListener> fTimeEventMenuListeners = new ArrayList<>();
     private final Cursor fDragCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_HAND);
-    private final Cursor fResizeCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_IBEAM);
+    private final Cursor fResizeCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_CROSS);
     private final Cursor fWaitCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_WAIT);
     private final Cursor fZoomCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_SIZEWE);
     private final Set<@NonNull ViewerFilter> fFilters = new LinkedHashSet<>();
