@@ -18,6 +18,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtchart.ICustomPaintListener;
 
 /**
@@ -38,6 +40,8 @@ public class TmfMouseDragZoomProvider extends TmfBaseProvider implements MouseLi
     private long fEndTime;
     /** Flag indicating that an update is ongoing */
     private boolean fIsUpdate;
+    /** Zoom cursor */
+    private final Cursor fZoomCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_SIZEWE);
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -75,6 +79,7 @@ public class TmfMouseDragZoomProvider extends TmfBaseProvider implements MouseLi
             fStartTime = limitXDataCoordinate(xAxis.getDataCoordinate(e.x));
             fEndTime = fStartTime;
             fIsUpdate = true;
+            getChartViewer().getControl().setCursor(fZoomCursor);
         }
     }
 
@@ -94,6 +99,7 @@ public class TmfMouseDragZoomProvider extends TmfBaseProvider implements MouseLi
             getChartViewer().getControl().redraw();
         }
         fIsUpdate = false;
+        getChartViewer().getControl().setCursor(null);
     }
 
     // ------------------------------------------------------------------------

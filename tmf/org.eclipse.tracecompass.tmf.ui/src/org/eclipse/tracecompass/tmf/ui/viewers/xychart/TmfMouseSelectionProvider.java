@@ -18,6 +18,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtchart.ICustomPaintListener;
 
 /**
@@ -42,6 +44,8 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
     private boolean fIsInternalUpdate;
     /** Flag indicating that the begin marker is dragged */
     private boolean fDragBeginMarker;
+    /** cursor for move */
+    private final Cursor fSelectCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_CROSS);
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -88,6 +92,7 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
                     fEndTime = time;
                 }
             }
+            getChartViewer().getControl().setCursor(fSelectCursor);
             fIsInternalUpdate = true;
         }
     }
@@ -106,6 +111,7 @@ public class TmfMouseSelectionProvider extends TmfBaseProvider implements MouseL
             fIsInternalUpdate = false;
             redraw();
         }
+        getChartViewer().getControl().setCursor(null);
     }
 
     // ------------------------------------------------------------------------

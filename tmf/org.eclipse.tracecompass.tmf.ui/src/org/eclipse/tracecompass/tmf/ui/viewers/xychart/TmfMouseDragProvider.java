@@ -17,6 +17,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Class for updating time ranges based on middle mouse button drag.
@@ -38,6 +40,8 @@ public class TmfMouseDragProvider extends TmfBaseProvider implements MouseListen
     private boolean fIsUpdate;
     /** Cached position when mouse button was pressed */
     private int fStartPosition;
+    /** cursor for move */
+    private final Cursor fMoveCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_HAND);
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -74,6 +78,7 @@ public class TmfMouseDragProvider extends TmfBaseProvider implements MouseListen
         if ((getChartViewer().getWindowDuration() != 0) && ((e.button == 2) || (e.button == 1 && (e.stateMask & SWT.CTRL) != 0))) {
             fStartPosition = e.x;
             fIsUpdate = true;
+            getChartViewer().getControl().setCursor(fMoveCursor);
         }
     }
 
@@ -84,6 +89,7 @@ public class TmfMouseDragProvider extends TmfBaseProvider implements MouseListen
             viewer.updateWindow(fStartTime, fEndTime);
         }
         fIsUpdate = false;
+        getChartViewer().getControl().setCursor(null);
     }
 
     // ------------------------------------------------------------------------
