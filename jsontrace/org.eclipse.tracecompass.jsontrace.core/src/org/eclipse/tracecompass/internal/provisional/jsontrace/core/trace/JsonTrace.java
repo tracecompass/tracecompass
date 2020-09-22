@@ -41,6 +41,8 @@ import org.eclipse.tracecompass.tmf.core.trace.location.TmfLongLocation;
 public abstract class JsonTrace extends TmfTrace
         implements ITmfPersistentlyIndexable, ITmfPropertiesProvider, ITmfTraceKnownSize {
 
+    // Arbitrary size that no event should be bigger than
+    private static final int MAX_SIZE = 50000000;
     private static final int CHECKPOINT_SIZE = 10000;
     private static final int ESTIMATED_EVENT_SIZE = 50;
     protected static final TmfLongLocation NULL_LOCATION = new TmfLongLocation(-1L);
@@ -205,6 +207,14 @@ public abstract class JsonTrace extends TmfTrace
                 sb.append((char) elem);
             }
             elem = parser.read();
+            /*
+             * Avoids reading too large events, as when validating, some trace
+             * type that are not opentracing would involve reading the whole
+             * trace
+             */
+            if (sb.length() > MAX_SIZE) {
+                return null;
+            }
         }
         return null;
     }
