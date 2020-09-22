@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2018 Ericsson, École Polytechnique de Montréal
+ * Copyright (c) 2015, 2020 Ericsson, École Polytechnique de Montréal
  *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0 which
@@ -72,6 +72,16 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
 
     private static final Format FORMATTER = SubSecondTimeWithUnitFormat.getInstance();
 
+    private static final int COL_LABEL = 0;
+    private static final int COL_MIN = 1;
+    private static final int COL_MAX = 2;
+    private static final int COL_AVG = 3;
+    private static final int COL_STDDEV = 4;
+    private static final int COL_COUNT = 5;
+    private static final int COL_TOTAL = 6;
+
+    private static final String BLANK = "---"; //$NON-NLS-1$
+
     private @Nullable TmfAbstractAnalysisModule fModule;
     private MenuManager fTablePopupMenuManager;
     private @Nullable String fProviderId;
@@ -122,21 +132,25 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
                 SegmentStoreStatisticsModel model = ((TmfGenericTreeEntry<@NonNull SegmentStoreStatisticsModel>) element).getModel();
                 // Avoid displaying statistics for trace level entries.
                 List<String> labels = model.getLabels();
-                if ((columnIndex < labels.size()) && (columnIndex <= 6) && (columnIndex == 0 || (model.getParentId() != -1)) && (model.getNbElements() != 0)) {
-                    label = labels.get(columnIndex);
+                if ((columnIndex < labels.size()) && (columnIndex <= COL_TOTAL) && (columnIndex == COL_LABEL || (model.getParentId() != -1))) {
+                    if (model.getNbElements() != 0 || columnIndex == COL_LABEL || columnIndex == COL_COUNT) {
+                        label = labels.get(columnIndex);
+                    } else {
+                        label = BLANK;
+                    }
                 } else if (columnIndex >= labels.size()) {
                     // TODO Remove this else-if branch when toFormattedString() is removed
-                    if (columnIndex == 1) {
+                    if (columnIndex == COL_MIN) {
                         return toFormattedString(model.getMin());
-                    } else if (columnIndex == 2) {
+                    } else if (columnIndex == COL_MAX) {
                         return String.valueOf(toFormattedString(model.getMax()));
-                    } else if (columnIndex == 3) {
+                    } else if (columnIndex == COL_AVG) {
                         return String.valueOf(toFormattedString(model.getMean()));
-                    } else if (columnIndex == 4) {
+                    } else if (columnIndex == COL_STDDEV) {
                         return String.valueOf(toFormattedString(model.getStdDev()));
-                    } else if (columnIndex == 5) {
+                    } else if (columnIndex == COL_COUNT) {
                         return String.valueOf(model.getNbElements());
-                    } else if (columnIndex == 6) {
+                    } else if (columnIndex == COL_TOTAL) {
                         return String.valueOf(toFormattedString(model.getTotal()));
                     }
                 }
@@ -155,6 +169,7 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
                 createTmfTreeColumnData(Messages.SegmentStoreStatisticsViewer_StandardDeviation, Comparator.comparing(keyExtractor(SegmentStoreStatisticsModel::getStdDev))),
                 createTmfTreeColumnData(Messages.SegmentStoreStatisticsViewer_Count, Comparator.comparing(keyExtractor(SegmentStoreStatisticsModel::getNbElements))),
                 createTmfTreeColumnData(Messages.SegmentStoreStatisticsViewer_Total, Comparator.comparing(keyExtractor(SegmentStoreStatisticsModel::getTotal))),
+                // A dummy column is added to prevent the Total column from taking all the remaining space
                 new TmfTreeColumnData("")); //$NON-NLS-1$
     }
 
