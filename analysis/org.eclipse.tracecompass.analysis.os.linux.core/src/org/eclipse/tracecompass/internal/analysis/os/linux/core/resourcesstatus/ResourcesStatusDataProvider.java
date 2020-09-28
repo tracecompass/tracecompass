@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus
 import java.text.FieldPosition;
 import java.text.Format;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,6 +27,7 @@ import java.util.Map.Entry;
 import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -112,6 +114,17 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     private final Map<Integer, Long> fSeparatorIds = new HashMap<>();
 
     /**
+     * CPU group entries (Current Thread, CPU, Frequency, separator) first, then IRQ, then SoftIRQ.
+     * Numerical order second, then CPU group entries in their correct order.
+     */
+    private static final @NonNull List<Type> CPU_GROUP_ORDER = Arrays.asList(Type.CURRENT_THREAD, Type.CPU, Type.FREQUENCY, Type.GROUP);
+
+    private static final Comparator<ResourcesEntryModel> COMPARATOR = Comparator
+            .comparing((Function<ResourcesEntryModel, Type>) entry -> CPU_GROUP_ORDER.contains(entry.getType()) ? Type.GROUP : entry.getType())
+            .thenComparing(ResourcesEntryModel::getResourceId)
+            .thenComparing(entry -> CPU_GROUP_ORDER.indexOf(entry.getType()));
+
+    /**
      * BiMap of IRQ/SoftIRQ twin model id to quark, the key is the model id of the
      * CPU entry under an aggregate IRQ/SoftIRQ entry, the value is the quark of its
      * twin IRQ/SoftIRQ entry under a CPU. These entries share the same states.
@@ -192,6 +205,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             List<Integer> softIrqQuarks = ss.getQuarks(cpuQuark, Attributes.SOFT_IRQS, WILDCARD);
             createInterrupt(ss, start, end, cpuEntry, softIrqQuarks, Type.SOFT_IRQ, builder);
         }
+        Collections.sort(builder, COMPARATOR);
 
         return new TmfTreeModel<>(Collections.emptyList(), ImmutableList.copyOf(builder));
     }

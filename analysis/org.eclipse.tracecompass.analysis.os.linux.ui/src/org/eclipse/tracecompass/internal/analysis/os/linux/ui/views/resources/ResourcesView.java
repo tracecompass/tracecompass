@@ -15,10 +15,7 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.resources;
 
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
-import java.util.function.Function;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.action.IMenuManager;
@@ -69,17 +66,6 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
             Messages.ResourcesView_stateTypeName
     };
 
-    /**
-     * CPU group entries (Current Thread, CPU, Frequency, separator) first, then IRQ, then SoftIRQ.
-     * Numerical order second, then CPU group entries in their correct order.
-     */
-    private static final @NonNull List<Type> CPU_GROUP_ORDER = Arrays.asList(Type.CURRENT_THREAD, Type.CPU, Type.FREQUENCY, Type.GROUP);
-
-    private static final Comparator<ResourcesEntryModel> COMPARATOR = Comparator
-            .comparing((Function<ResourcesEntryModel, Type>) entry -> CPU_GROUP_ORDER.contains(entry.getType()) ? Type.GROUP : entry.getType())
-            .thenComparing(ResourcesEntryModel::getResourceId)
-            .thenComparing(entry -> CPU_GROUP_ORDER.indexOf(entry.getType()));
-
     // ------------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------------
@@ -101,13 +87,6 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
             if (o1 instanceof TraceEntry && o2 instanceof TraceEntry) {
                 /* sort trace entries alphabetically */
                 return o1.getName().compareTo(o2.getName());
-            } else if (o1 instanceof TimeGraphEntry && o2 instanceof TimeGraphEntry) {
-                ITmfTreeDataModel model1 = ((TimeGraphEntry) o1).getEntryModel();
-                ITmfTreeDataModel model2 = ((TimeGraphEntry) o2).getEntryModel();
-                /* sort resource entries by their defined order */
-                if (model1 instanceof ResourcesEntryModel && model2 instanceof ResourcesEntryModel) {
-                    return COMPARATOR.compare((ResourcesEntryModel) model1, (ResourcesEntryModel) model2);
-                }
             }
             return 0;
         }
