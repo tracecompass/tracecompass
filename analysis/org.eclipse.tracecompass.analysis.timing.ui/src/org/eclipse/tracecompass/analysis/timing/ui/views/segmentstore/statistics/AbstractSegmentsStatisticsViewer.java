@@ -298,31 +298,36 @@ public abstract class AbstractSegmentsStatisticsViewer extends AbstractTmfTreeVi
             return null;
         }
 
-        return modelToTree(trace.getName(), model.getEntries());
+        return modelToTree(trace, model.getEntries());
     }
 
     /**
      * Algorithm to convert a model (List of {@link SegmentStoreStatisticsModel}) to
      * the tree.
      *
-     * @param traceName
-     *            trace / experiment name, we add it to help when debugging.
+     * @param trace
+     *            trace / experiment.
      * @param model
      *            model to convert
      * @return the resulting {@link TmfTreeViewerEntry}.
      */
-    private static @Nullable TmfTreeViewerEntry modelToTree(String traceName, List<SegmentStoreStatisticsModel> model) {
-        TmfTreeViewerEntry root = new TmfTreeViewerEntry(traceName);
-        Map<Long, TmfTreeViewerEntry> map = new HashMap<>();
-        map.put(-1L, root);
+    private @Nullable TmfTreeViewerEntry modelToTree(ITmfTrace trace, List<SegmentStoreStatisticsModel> model) {
+        TmfTreeViewerEntry root = getRoot(trace);
+        if (root == null) {
+            return null;
+        }
+        synchronized (root) {
+            root.getChildren().clear();
+            Map<Long, TmfTreeViewerEntry> map = new HashMap<>();
+            map.put(-1L, root);
+            for (TmfTreeDataModel entry : model) {
+                TmfTreeViewerEntry viewerEntry = new TmfGenericTreeEntry<>(entry);
+                map.put(entry.getId(), viewerEntry);
 
-        for (TmfTreeDataModel entry : model) {
-            TmfTreeViewerEntry viewerEntry = new TmfGenericTreeEntry<>(entry);
-            map.put(entry.getId(), viewerEntry);
-
-            TmfTreeViewerEntry parent = map.get(entry.getParentId());
-            if (parent != null && !parent.getChildren().contains(viewerEntry)) {
-                parent.addChild(viewerEntry);
+                TmfTreeViewerEntry parent = map.get(entry.getParentId());
+                if (parent != null && !parent.getChildren().contains(viewerEntry)) {
+                    parent.addChild(viewerEntry);
+                }
             }
         }
         return root;

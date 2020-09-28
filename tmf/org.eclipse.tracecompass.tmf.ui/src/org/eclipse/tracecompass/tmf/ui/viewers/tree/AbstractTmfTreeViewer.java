@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2017 École Polytechnique de Montréal and others.
+ * Copyright (c) 2014, 2020 École Polytechnique de Montréal and others.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -16,8 +16,12 @@
 package org.eclipse.tracecompass.tmf.ui.viewers.tree;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,8 +30,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
+import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -49,7 +55,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.tree.TreeUtil;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
@@ -67,6 +75,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
 public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
 
     private final TreeViewer fTreeViewer;
+    private final Map<ITmfTrace, TmfTreeViewerEntry> fRoots = Collections.synchronizedMap(new HashMap<>());
 
     // ------------------------------------------------------------------------
     // Internal classes
@@ -173,6 +182,37 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
 
     }
 
+    /**
+     * Element comparer that considers elements of class
+     * {@link TmfGenericTreeEntry} with the same model id to be equal.
+     *
+     * @since 6.2
+     */
+    protected static class ElementComparer implements IElementComparer {
+        @Override
+        public boolean equals(@Nullable Object a, @Nullable Object b) {
+            if (a instanceof TmfGenericTreeEntry && b instanceof TmfGenericTreeEntry) {
+                ITmfTreeDataModel aModel = ((TmfGenericTreeEntry<?>) a).getModel();
+                ITmfTreeDataModel bModel = ((TmfGenericTreeEntry<?>) b).getModel();
+                if (aModel != null && bModel != null) {
+                    return aModel.getId() == bModel.getId();
+                }
+            }
+            return Objects.equals(a, b);
+        }
+
+        @Override
+        public int hashCode(@Nullable Object element) {
+            if (element instanceof TmfGenericTreeEntry) {
+                ITmfTreeDataModel model = ((TmfGenericTreeEntry<?>) element).getModel();
+                if (model != null) {
+                    return Long.hashCode(model.getId());
+                }
+            }
+            return Objects.hashCode(element);
+        }
+    }
+
     // ------------------------------------------------------------------------
     // Constructors and initialization methods
     // ------------------------------------------------------------------------
@@ -207,6 +247,7 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
         tree.setLinesVisible(true);
         fTreeViewer.setContentProvider(new TreeContentProvider());
         fTreeViewer.setLabelProvider(new TreeLabelProvider());
+        fTreeViewer.setComparer(new ElementComparer());
         List<TmfTreeColumnData> columns = getColumnDataProvider().getColumnData();
         this.setTreeColumns(columns);
     }
@@ -317,6 +358,7 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
     @Override
     public void loadTrace(ITmfTrace trace) {
         super.loadTrace(trace);
+        fRoots.computeIfAbsent(trace, t -> new TmfTreeViewerEntry(t.getName()));
         if (trace == null) {
             return;
         }
@@ -339,6 +381,19 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
     // ------------------------------------------------------------------------
     // Operations
     // ------------------------------------------------------------------------
+
+    /**
+     * Gets the root element for the specified trace. Using a fixed root element
+     * helps the tree maintain its state when the model is updated or sorted.
+     *
+     * @param trace
+     *            the trace
+     * @return the root element, or null if the trace is closed
+     * @since 6.2
+     */
+    public @Nullable TmfTreeViewerEntry getRoot(ITmfTrace trace) {
+        return fRoots.get(trace);
+    }
 
     /**
      * Set the currently selected items in the treeviewer
@@ -439,14 +494,12 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
                         }
 
                         Object currentRootEntry = fTreeViewer.getInput();
+                        updateTreeUI(fTreeViewer, newRootEntry);
                         if (newRootEntry != currentRootEntry) {
-                            updateTreeUI(fTreeViewer, newRootEntry);
-                        } else {
-                            fTreeViewer.refresh();
-                        }
-                        // FIXME should add a bit of padding
-                        for (TreeColumn column : fTreeViewer.getTree().getColumns()) {
-                            column.pack();
+                            // FIXME should add a bit of padding
+                            for (TreeColumn column : fTreeViewer.getTree().getColumns()) {
+                                column.pack();
+                            }
                         }
                     });
                 }
@@ -471,9 +524,6 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
      */
     protected final void updateTreeUI(TreeViewer treeViewer, @NonNull ITmfTreeViewerEntry newInput) {
         Object input = fTreeViewer.getInput();
-        if (newInput == input) {
-            return;
-        }
 
         /*
          * Find in the new entries the equivalent of the selected one
@@ -514,8 +564,12 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
             return (expandedPaths.contains(key) || !allPaths.contains(key)) || allLeaves.contains(key);
         });
 
-        fTreeViewer.setInput(newInput);
-        contentChanged(newInput);
+        if (newInput != input) {
+            fTreeViewer.setInput(newInput);
+            contentChanged(newInput);
+        } else {
+            fTreeViewer.refresh();
+        }
 
         /*
          * Reset Selection
@@ -603,6 +657,17 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
     public void windowRangeUpdated(TmfWindowRangeUpdatedSignal signal) {
         super.windowRangeUpdated(signal);
         updateContent(this.getWindowStartTime(), this.getWindowEndTime(), false);
+    }
+
+    @Override
+    @TmfSignalHandler
+    public void traceClosed(@Nullable TmfTraceClosedSignal signal) {
+        if (signal != null) {
+            synchronized (fRoots) {
+                fRoots.remove(signal.getTrace());
+            }
+        }
+        super.traceClosed(signal);
     }
 
     @Override
