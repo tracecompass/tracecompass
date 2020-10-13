@@ -158,7 +158,7 @@ public class CpuUsageDataProviderTest {
         expected.put(3, 11L);
         expected.put(4, 13L);
         expected.put(-2, 48L);
-        compareModel(expected, model.getEntries());
+        compareModel(expected, model);
 
         /* Verify a range when a process runs at the start */
         filter = new SelectedCpuQueryFilter(22L, 25L, 2, Collections.emptyList(), Collections.emptySet());
@@ -173,7 +173,7 @@ public class CpuUsageDataProviderTest {
         expected.put(3, 3L);
         expected.put(4, 3L);
         expected.put(-2, 6L);
-        compareModel(expected, model.getEntries());
+        compareModel(expected, model);
 
         /* Verify a range when a process runs at the end */
         filter = new SelectedCpuQueryFilter(1L, 4L, 2, Collections.emptyList(), Collections.emptySet());
@@ -189,7 +189,7 @@ public class CpuUsageDataProviderTest {
         expected.put(3, 1L);
         expected.put(4, 2L);
         expected.put(-2, 6L);
-        compareModel(expected, model.getEntries());
+        compareModel(expected, model);
 
         /* Verify a range when a process runs at start and at the end */
         filter = new SelectedCpuQueryFilter(4L, 13L, 2, Collections.emptyList(), Collections.emptySet());
@@ -205,14 +205,20 @@ public class CpuUsageDataProviderTest {
         expected.put(3, 5L);
         expected.put(4, 4L);
         expected.put(-2, 18L);
-        compareModel(expected, model.getEntries());
+        compareModel(expected, model);
 
     }
 
-    private static void compareModel(Map<Integer, Long> expected, List<CpuUsageEntryModel> model) {
-        assertEquals("Size of model entries", expected.size(), model.size());
+    private static void compareModel(Map<Integer, Long> expected, TmfTreeModel<@NonNull CpuUsageEntryModel> model) {
+        List<@NonNull CpuUsageEntryModel> entries = model.getEntries();
+        // Compare the headers
+        assertEquals("Size of headers", 4, model.getHeaders().size());
+        assertEquals("Size of model entries", expected.size(), entries.size());
         Map<Integer, Long> actual = new HashMap<>();
-        model.forEach(entry -> actual.put(entry.getTid(), entry.getTime()));
+        for (CpuUsageEntryModel entry : entries) {
+            actual.put(entry.getTid(), entry.getTime());
+            assertEquals("Size of labels array", model.getHeaders().size(), entry.getLabels().size());
+        }
         assertEquals("model entries", expected, actual);
     }
 

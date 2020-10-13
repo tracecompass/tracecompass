@@ -11,6 +11,7 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage;
 
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,6 +29,8 @@ import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageEntryMod
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.KernelCpuUsageAnalysis;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelThreadInformationProvider;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
+import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.xy.AbstractTreeCommonXDataProvider;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -55,6 +58,7 @@ import com.google.common.collect.Maps;
  */
 public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<KernelCpuUsageAnalysis, CpuUsageEntryModel> {
 
+    private static final Format TIME_FORMATTER = SubSecondTimeWithUnitFormat.getInstance();
     /**
      * Prefix for the total series.
      * @since 2.4
@@ -221,10 +225,11 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
         List<CpuUsageEntryModel> entryList = new ArrayList<>();
         Set<Integer> cpus = extractCpuSet(parameters);
         Map<String, Long> cpuUsageMap = getAnalysisModule().getCpuUsageInRange(cpus, filter.getStart(), end);
+        double timeRange = end - filter.getStart();
 
         long totalTime = cpuUsageMap.getOrDefault(KernelCpuUsageAnalysis.TOTAL, 0l);
         long totalId = getId(ITmfStateSystem.ROOT_ATTRIBUTE);
-        entryList.add(new CpuUsageEntryModel(totalId, -1, Collections.singletonList(getTrace().getName()), TOTAL_SERIES_TID, totalTime));
+        entryList.add(new CpuUsageEntryModel(totalId, -1,ImmutableList.of(getTrace().getName(), String.valueOf(Messages.CpuUsageDataProvider_Total), String.format(Messages.CpuUsageDataProvider_TextPercent, timeRange > 0 ? 100 * totalTime / timeRange : (float) 0), TIME_FORMATTER.format(totalTime)), TOTAL_SERIES_TID, totalTime));
 
         for (Entry<String, Long> entry : cpuUsageMap.entrySet()) {
             /*
@@ -239,12 +244,13 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
 
             if (strings.length > 1) {
                 int tid = Integer.parseInt(strings[1]);
+                Long time = entry.getValue();
                 if (tid != 0) {
-                    entryList.add(new CpuUsageEntryModel(getId(tid), totalId, Collections.singletonList(getProcessName(tid, strings[1], end)), tid, entry.getValue()));
+                    entryList.add(new CpuUsageEntryModel(getId(tid), totalId, ImmutableList.of(getProcessName(tid, strings[1], end), String.valueOf(tid), String.format(Messages.CpuUsageDataProvider_TextPercent, timeRange > 0 ? 100 * time / timeRange : (float) 0), TIME_FORMATTER.format(time)), tid, time));
                 }
             }
         }
-        return new TmfTreeModel<>(Collections.emptyList(), entryList);
+        return new TmfTreeModel<>(ImmutableList.of(String.valueOf(Messages.CpuUsageDataProvider_ColumnProcess), OsStrings.tid(), String.valueOf(Messages.CpuUsageDataProvider_ColumnPercent), String.valueOf(Messages.CpuUsageDataProvider_ColumnTime)), entryList);
     }
 
     /*

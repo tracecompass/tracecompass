@@ -11,7 +11,6 @@
 
 package org.eclipse.tracecompass.analysis.os.linux.core.cpuusage;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,6 +21,7 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 
 /**
@@ -50,7 +50,7 @@ public class CpuUsageEntryModel extends TmfTreeDataModel implements IElementReso
      *            The total amount of time spent on CPU
      */
     public CpuUsageEntryModel(long id, long parentId, String processName, int tid, long time) {
-        this(id, parentId, Collections.singletonList(processName), tid, time);
+        this(id, parentId, ImmutableList.of(processName, String.valueOf(tid), String.valueOf(0L), String.valueOf(time)), tid, time);
     }
 
     /**
@@ -63,7 +63,8 @@ public class CpuUsageEntryModel extends TmfTreeDataModel implements IElementReso
      * @param tid
      *            The TID of the process
      * @param labels
-     *            The process's labels
+     *            The process's labels, in order, name, tid, percent usage and
+     *            formatted time
      * @param time
      *            The total amount of time spent on CPU
      * @since 4.0

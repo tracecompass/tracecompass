@@ -26,16 +26,11 @@ public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.cpuusage.messages"; //$NON-NLS-1$
 
-    public static String CpuUsageComposite_ColumnPercent;
-    public static String CpuUsageComposite_ColumnProcess;
-    public static String CpuUsageComposite_ColumnTime;
-    public static String CpuUsageComposite_TextPercent;
     public static String CpuUsageComposite_ColumnLegend;
     public static String CpuUsageView_Title;
     public static String CpuUsageXYViewer_CpuYAxis;
     public static String CpuUsageXYViewer_TimeXAxis;
     public static String CpuUsageXYViewer_Title;
-    public static String CpuUsageXYViewer_Total;
 
     static {
         // initialize resource bundle

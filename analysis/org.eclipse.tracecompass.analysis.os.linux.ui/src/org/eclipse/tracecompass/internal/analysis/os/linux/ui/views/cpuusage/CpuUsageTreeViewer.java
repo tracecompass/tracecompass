@@ -14,7 +14,6 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.ui.views.cpuusage;
 
-import java.text.Format;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -26,7 +25,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.os.linux.core.cpuusage.CpuUsageEntryModel;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
-import org.eclipse.tracecompass.common.core.format.SubSecondTimeWithUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.CpuUsageDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
@@ -52,31 +50,8 @@ import com.google.common.collect.Iterables;
  */
 public class CpuUsageTreeViewer extends AbstractSelectTreeViewer2 {
 
-    private static final Format TIME_FORMATTER = SubSecondTimeWithUnitFormat.getInstance();
-
     /** Provides label for the CPU usage tree viewer cells */
     protected class CpuLabelProvider extends DataProviderTreeLabelProvider {
-
-        @Override
-        public String getColumnText(Object element, int columnIndex) {
-            if (element instanceof CpuUsageEntry) {
-                CpuUsageEntry obj = (CpuUsageEntry) element;
-                if (columnIndex == 0) {
-                    return obj.getName();
-                } else if (columnIndex == 1) {
-                    int tid = obj.getModel().getTid();
-                    if (tid == CpuUsageDataProvider.TOTAL_SERIES_TID) {
-                        return Messages.CpuUsageXYViewer_Total;
-                    }
-                    return Integer.toString(tid);
-                } else if (columnIndex == 2) {
-                    return String.format(Messages.CpuUsageComposite_TextPercent, 100 * obj.getPercent());
-                } else if (columnIndex == 3) {
-                    return TIME_FORMATTER.format(obj.getModel().getTime());
-                }
-            }
-            return null;
-        }
 
         @Override
         public Image getColumnImage(Object element, int columnIndex) {
@@ -165,20 +140,23 @@ public class CpuUsageTreeViewer extends AbstractSelectTreeViewer2 {
 
     @Override
     protected ITmfTreeColumnDataProvider getColumnDataProvider() {
+        // FIXME: There is no way to retrieve the headers from the data provider
+        // without doing calling the fetchTree. This method is called in the
+        // constructor of the tree viewer, so the call has not been made yet.
         return () -> {
             ImmutableList.Builder<TmfTreeColumnData> columns = ImmutableList.builder();
 
-            columns.add(createColumn(Messages.CpuUsageComposite_ColumnProcess, Comparator.comparing(CpuUsageEntry::getName)));
+            columns.add(createColumn(org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.Messages.CpuUsageDataProvider_ColumnProcess, Comparator.comparing(CpuUsageEntry::getName)));
 
             Comparator<CpuUsageEntry> tidCompare = Comparator.comparingInt(c -> c.getModel().getTid());
             columns.add(createColumn(OsStrings.tid(), tidCompare));
 
-            TmfTreeColumnData percentColumn = createColumn(Messages.CpuUsageComposite_ColumnPercent, Comparator.comparingDouble(CpuUsageEntry::getPercent));
+            TmfTreeColumnData percentColumn = createColumn(org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.Messages.CpuUsageDataProvider_ColumnPercent, Comparator.comparingDouble(CpuUsageEntry::getPercent));
             percentColumn.setPercentageProvider(data -> ((CpuUsageEntry) data).getPercent());
             columns.add(percentColumn);
 
             Comparator<CpuUsageEntry> timeCompare = Comparator.comparingLong(c -> c.getModel().getTime());
-            columns.add(createColumn(Messages.CpuUsageComposite_ColumnTime, timeCompare));
+            columns.add(createColumn(org.eclipse.tracecompass.internal.analysis.os.linux.core.cpuusage.Messages.CpuUsageDataProvider_ColumnTime, timeCompare));
 
             columns.add(new TmfTreeColumnData(Messages.CpuUsageComposite_ColumnLegend));
 

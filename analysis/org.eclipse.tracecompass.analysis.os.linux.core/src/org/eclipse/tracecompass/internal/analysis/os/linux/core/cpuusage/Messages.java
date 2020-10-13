@@ -30,6 +30,26 @@ public class Messages extends NLS {
      * Data provider help text
      */
     public static @Nullable String CpuUsageProviderFactory_DescriptionText;
+    /**
+     * Percentage format string
+     */
+    public static @Nullable String CpuUsageDataProvider_TextPercent;
+    /**
+     * Total label
+     */
+    public static @Nullable String CpuUsageDataProvider_Total;
+    /**
+     * Percent column text header
+     */
+    public static @Nullable String CpuUsageDataProvider_ColumnPercent;
+    /**
+     * Process column text header
+     */
+    public static @Nullable String CpuUsageDataProvider_ColumnProcess;
+    /**
+     * Time column text header
+     */
+    public static @Nullable String CpuUsageDataProvider_ColumnTime;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
