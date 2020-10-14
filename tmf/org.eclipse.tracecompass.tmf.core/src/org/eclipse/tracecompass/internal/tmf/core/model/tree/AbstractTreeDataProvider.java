@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017, 2019 Ericsson
+ * Copyright (c) 2017, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -72,8 +72,8 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      */
     protected static final Logger LOGGER = TraceCompassLog.getLogger(AbstractTreeDataProvider.class);
 
-    /* Map of scope to unique id generator */
-    private static final Map<String, AtomicLong> fScopedIdGeneratorMap = new HashMap<>();
+    /* Global id generator */
+    private static final AtomicLong ID_GENERATOR = new AtomicLong();
     /* Table of <scope, key> to id */
     private static final Table<String, Object, Long> fScopedIdTable = HashBasedTable.create();
 
@@ -85,7 +85,6 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
     private @Nullable TmfModelResponse<TmfTreeModel<M>> fCached;
     private final Map<Long, Multimap<String, Object>> fEntryMetadata = new HashMap<>();
     private final @Nullable String fScope;
-    private final AtomicLong fIdGenerator;
     private final Map<Object, Long> fIdTable;
 
     /**
@@ -102,11 +101,9 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
         fScope = getScope();
         if (fScope != null) {
             synchronized (fScopedIdTable) {
-                fIdGenerator = fScopedIdGeneratorMap.computeIfAbsent(fScope, scope -> new AtomicLong());
                 fIdTable = fScopedIdTable.row(Objects.requireNonNull(fScope));
             }
         } else {
-            fIdGenerator = new AtomicLong();
             fIdTable = new HashMap<>();
         }
     }
@@ -116,7 +113,6 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
         ITmfTreeDataProvider.super.dispose();
         if (fScope != null) {
             synchronized (fScopedIdTable) {
-                fScopedIdGeneratorMap.remove(fScope);
                 fScopedIdTable.row(Objects.requireNonNull(fScope)).clear();
             }
         }
@@ -132,17 +128,18 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
     }
 
     /**
-     * Returns the scope of all entry ids used by the provider. The entry ids
-     * are unique to this scope. Override to provide a common scope if multiple
-     * providers need to share entry ids. In this case, shared entry ids should
-     * be obtained using a shared key that is unique to this scope.
+     * Returns the scope of all entry ids used by the provider. All entry ids
+     * but shared ids are unique across all providers. Override to provide a
+     * common scope if multiple providers need to share entry ids. In this case,
+     * shared entry ids should be obtained using a shared key that is unique to
+     * this scope.
      * <p>
      * Examples of data providers and their scope and entry ids:
      * <ul>
-     * <li>dp1 (scope=null): { 0, 1, 2, 3, ... }
-     * <li>dp2 (scope="scope1": { 0 (key1), 1, 4, 5 (key2), 7, ... }
-     * <li>dp3 (scope="scope1": { 0 (key1), 2, 3, 5 (key2), 6, ... }
-     * <li>dp4 (scope="scope2": { 0, 1, 2 (key1), 3, ... }
+     * <li>dp1 (scope=null): { 0, 1, 2, 3 }
+     * <li>dp2 (scope="scope1": { 4 (key1), 5, 8, 9 (key2), 11 }
+     * <li>dp3 (scope="scope1": { 4 (key1), 6, 7, 9 (key2), 10 }
+     * <li>dp4 (scope="scope2": { 12, 13, 14 (key1), 15 }
      * </ul>
      * Within "scope1", the entry id associated with key1 (or key2) is shared
      * between data providers. The other entry ids not associated to any key are
@@ -195,7 +192,7 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      * @return the unique id
      */
     protected long getEntryId() {
-        return fIdGenerator.getAndIncrement();
+        return ID_GENERATOR.getAndIncrement();
     }
 
     /**
@@ -210,7 +207,7 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      */
     protected long getEntryId(Object key) {
         synchronized (fScopedIdTable) {
-            return fIdTable.computeIfAbsent(key, k -> fIdGenerator.getAndIncrement());
+            return fIdTable.computeIfAbsent(key, k -> ID_GENERATOR.getAndIncrement());
         }
     }
 
