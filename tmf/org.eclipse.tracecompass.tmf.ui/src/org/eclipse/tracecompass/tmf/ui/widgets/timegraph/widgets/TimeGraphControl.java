@@ -4250,7 +4250,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Tells whether the HideEmptyRows action is active or not
      *
      * @return True when the HideEmptyRows action is active, false otherwise
-     * @since 6.1
+     * @since 6.2
      */
     public boolean isHideEmptyRowsFilterActive() {
         return fHideEmptyRowsFilterActive;
@@ -4260,7 +4260,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
      * Set whether the HideEmptyRows action is active or not
      *
      * @param hideEmptyRowsFilterActive
-     * @since 6.1
+     *            true to make the HideEmptyRows action active
+     * @since 6.2
      */
     public void setHideEmptyRowsFilterActive(boolean hideEmptyRowsFilterActive) {
         fHideEmptyRowsFilterActive = hideEmptyRowsFilterActive;
