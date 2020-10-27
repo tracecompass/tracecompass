@@ -566,10 +566,10 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
 
         if (newInput != input) {
             fTreeViewer.setInput(newInput);
-            contentChanged(newInput);
         } else {
             fTreeViewer.refresh();
         }
+        contentChanged(newInput);
 
         /*
          * Reset Selection
