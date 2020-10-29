@@ -2444,6 +2444,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
                     IFileStore fileStore = EFS.getLocalFileSystem().getStore(MarkerConfigXmlParser.MARKER_CONFIG_PATH);
                     try {
+                        // SWT doesn't send FocusOut from a popup menu
+                        getTimeGraphViewer().getTimeGraphControl().notifyListeners(SWT.FocusOut, null);
                         IDE.openEditorOnFileStore(page, fileStore);
                     } catch (PartInitException e) {
                         Activator.getDefault().logError("Error opening editor on " + MarkerConfigXmlParser.MARKER_CONFIG_PATH, e); //$NON-NLS-1$
