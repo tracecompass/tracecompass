@@ -2415,12 +2415,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
             gc.setClipping(new Rectangle(nameSpace, 0, bounds.width - nameSpace, bounds.height));
             fillSpace(rect, gc, selected);
 
-            int margins = TimeGraphRender.getMarginForHeight(rect.height);
-            int height = rect.height - margins;
-            int topMargin = (margins + 1) / 2;
-            Rectangle stateRect = new Rectangle(rect.x, rect.y + topMargin, rect.width, height);
-
-
             long maxDuration = (timeProvider.getTimeSpace() == 0) ? Long.MAX_VALUE : 1 * (time1 - time0) / timeProvider.getTimeSpace();
             Iterator<@NonNull ITimeEvent> iterator = entry.getTimeEventsIterator(time0, time1, maxDuration);
             switch (entry.getStyle()) {
@@ -2428,7 +2422,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 drawLineGraphEntry(time0, rect, pixelsPerNanoSec, iterator);
                 break;
             case STATE:
-                drawTimeGraphEntry(gc, time0, selectedTime, rect, selected, pixelsPerNanoSec, stateRect, iterator);
+                drawTimeGraphEntry(gc, time0, selectedTime, rect, selected, pixelsPerNanoSec, iterator);
                 break;
             default:
                 break;
@@ -2485,9 +2479,13 @@ public class TimeGraphControl extends TimeGraphBaseControl
         fLines.add(new DeferredLine(rect, min, seriesModel, rgba == null ? BLACK : rgba, scale));
     }
 
-    private void drawTimeGraphEntry(GC gc, long time0, long selectedTime, Rectangle rect, boolean selected, double pixelsPerNanoSec, Rectangle stateRect, Iterator<ITimeEvent> iterator) {
+    private void drawTimeGraphEntry(GC gc, long time0, long selectedTime, Rectangle rect, boolean selected, double pixelsPerNanoSec, Iterator<ITimeEvent> iterator) {
         int lastX = -1;
         fLastTransparentX = -1;
+        int margins = TimeGraphRender.getMarginForHeight(rect.height);
+        int height = rect.height - margins;
+        int topMargin = (margins + 1) / 2;
+        Rectangle stateRect = new Rectangle(rect.x, rect.y + topMargin, rect.width, height);
         while (iterator.hasNext()) {
             ITimeEvent event = iterator.next();
             int x = SaturatedArithmetic.add(rect.x, (int) ((event.getTime() - time0) * pixelsPerNanoSec));
@@ -2806,8 +2804,6 @@ public class TimeGraphControl extends TimeGraphBaseControl
         boolean transparent = elementStyle.getParentKey() == null && elementStyle.getStyleValues().isEmpty();
         boolean visible = rect.width <= 0 ? false : true;
         rect.width = Math.max(1, rect.width);
-        Color black = TimeGraphRender.getColor(BLACK.toInt());
-        gc.setForeground(black);
         Float heightFactor = styleManager.getFactorStyle(elementStyle, StyleProperties.HEIGHT);
         heightFactor = (heightFactor != null) ? Math.max(0.0f, Math.min(1.0f, heightFactor)) : DEFAULT_STATE_WIDTH;
         int height = 0;
@@ -2815,6 +2811,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
             height = Math.max(1, (int) (rect.height * heightFactor));
         }
         Rectangle drawRect = new Rectangle(rect.x, rect.y + ((rect.height - height) / 2), rect.width, height);
+        Color black = TimeGraphRender.getColor(BLACK.toInt());
+        gc.setForeground(black);
 
         List<DeferredItem> states = fCurrentDeferredEntry.getItems();
         if (transparent) {
@@ -2828,7 +2826,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
                     DeferredItem deferredItem = new DeferredTransparentState(drawRect, bgColor);
                     if (states.isEmpty() || !states.get(states.size() - 1).getBounds().intersects(drawRect)) {
                         states.add(deferredItem);
-                        deferredItem.add(new PostDrawEvent(event, rect));
+                        deferredItem.add(new PostDrawEvent(event, drawRect));
                     }
                     fLastTransparentX = Math.max(fLastTransparentX, drawRect.x + drawRect.width);
                 } else {
@@ -2921,7 +2919,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             addPoint(fPoints, rect.x, rect.y - 2);
         }
         if (visible && !Boolean.TRUE.equals(styleManager.getStyle(elementStyle, ITimeEventStyleStrings.annotated())) && last != null) {
-            last.add(new PostDrawEvent(event, rect));
+            last.add(new PostDrawEvent(event, drawRect));
         }
         return visible && !event.isPropertyActive(IFilterProperty.DIMMED);
     }
