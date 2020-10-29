@@ -34,6 +34,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceClosedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
+import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 import org.w3c.dom.Element;
 
 import com.google.common.collect.HashBasedTable;
@@ -178,12 +179,8 @@ public class XmlDataProviderManager {
         if (provider == null) {
             // Otherwise, see if it's an experiment and create a composite if
             // that's the case
-            Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
-            if (traces.size() > 1) {
-                // Try creating a composite only if there are many traces,
-                // otherwise, the previous call to create should have returned
-                // the data provider
-                provider = generateExperimentProviderXy(traces, providerId);
+            if (trace instanceof TmfExperiment) {
+                provider = generateExperimentProviderXy(TmfTraceManager.getTraceSet(trace), providerId);
             }
         }
         if (provider != null) {
@@ -270,13 +267,10 @@ public class XmlDataProviderManager {
                 provider = timeGraphFactory.create(trace);
 
                 if (provider == null) {
-                    // Otherwise, see if it's an experiment and create a composite if that's the
-                    // case
-                    Collection<ITmfTrace> traces = TmfTraceManager.getTraceSet(trace);
-                    if (traces.size() > 1) {
-                        // Try creating a composite only if there are many traces, otherwise, the
-                        // previous call to create should have returned the data provider
-                        provider = generateExperimentProviderTimeGraph(traces, viewElement);
+                    // Otherwise, see if it's an experiment and create a
+                    // composite if that's the case
+                    if (trace instanceof TmfExperiment) {
+                        provider = generateExperimentProviderTimeGraph(TmfTraceManager.getTraceSet(trace), viewElement);
                     }
                 }
                 if (provider != null) {
