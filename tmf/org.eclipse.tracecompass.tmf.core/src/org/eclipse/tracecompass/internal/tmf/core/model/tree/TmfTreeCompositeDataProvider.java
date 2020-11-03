@@ -165,4 +165,10 @@ public class TmfTreeCompositeDataProvider<M extends ITmfTreeDataModel, P extends
         fProviders.remove(dataProvider);
         dataProvider.dispose();
     }
+
+    @Override
+    public void dispose() {
+        fProviders.forEach(ITmfTreeDataProvider::dispose);
+        fProviders.clear();
+    }
 }
