@@ -311,24 +311,32 @@ public abstract class AbstractSelectTreeViewer2 extends AbstractTmfTreeViewer {
      */
     @Override
     protected void contentChanged(ITmfTreeViewerEntry rootEntry) {
-        ITmfTrace trace = getTrace();
-        if (trace == null) {
-            return;
+        try (FlowScopeLog refreshTree = new FlowScopeLogBuilder(LOGGER, Level.FINE, getClass().getSimpleName() + "#contentChanged()").setCategory("contentChanged").build()) { //$NON-NLS-1$ //$NON-NLS-2$
+            ITmfTrace trace = getTrace();
+            if (trace == null) {
+                return;
+            }
+            TmfTraceContext ctx = TmfTraceManager.getInstance().getTraceContext(trace);
+            Set<Long> ids = (Set<Long>) ctx.getData(getDataContextId(CHECKED_ELEMENTS));
+            if (ids != null && rootEntry != null) {
+                List<ITmfTreeViewerEntry> checkedElements = new ArrayList<>();
+                checkEntries(ids, rootEntry, checkedElements);
+                internalSetCheckedElements(checkedElements.toArray());
+            }
+            Object filterString = ctx.getData(getDataContextId(FILTER_STRING));
+            if (filterString instanceof String) {
+                fCheckboxTree.setFilterText((String) filterString);
+            } else {
+                fCheckboxTree.setFilterText(""); //$NON-NLS-1$
+            }
+            refreshTree(refreshTree);
         }
-        TmfTraceContext ctx = TmfTraceManager.getInstance().getTraceContext(trace);
-        Set<Long> ids = (Set<Long>) ctx.getData(getDataContextId(CHECKED_ELEMENTS));
-        if (ids != null && rootEntry != null) {
-            List<ITmfTreeViewerEntry> checkedElements = new ArrayList<>();
-            checkEntries(ids, rootEntry, checkedElements);
-            internalSetCheckedElements(checkedElements.toArray());
+    }
+
+    private void refreshTree(@NonNull FlowScopeLog parent) {
+        try (FlowScopeLog refresh = new FlowScopeLogBuilder(LOGGER, Level.FINE, getClass().getSimpleName() + "#treeRefresh()").setParentScope(parent).build()) {
+            getTreeViewer().refresh();
         }
-        Object filterString = ctx.getData(getDataContextId(FILTER_STRING));
-        if (filterString instanceof String) {
-            fCheckboxTree.setFilterText((String) filterString);
-        } else {
-            fCheckboxTree.setFilterText(""); //$NON-NLS-1$
-        }
-        getTreeViewer().refresh();
     }
 
     /**
@@ -338,8 +346,10 @@ public abstract class AbstractSelectTreeViewer2 extends AbstractTmfTreeViewer {
      *            the elements to check
      */
     protected void setCheckedElements(Object[] checkedElements) {
-        internalSetCheckedElements(checkedElements);
-        getTreeViewer().refresh();
+        try (FlowScopeLog checkedElementsFlow = new FlowScopeLogBuilder(LOGGER, Level.FINE, getClass().getSimpleName() + "#setCheckedElements()").setCategory("setChecked").build()) { //$NON-NLS-1$ //$NON-NLS-2$
+            internalSetCheckedElements(checkedElements);
+            refreshTree(checkedElementsFlow);
+        }
     }
 
     private void internalSetCheckedElements(Object[] checkedElements) {

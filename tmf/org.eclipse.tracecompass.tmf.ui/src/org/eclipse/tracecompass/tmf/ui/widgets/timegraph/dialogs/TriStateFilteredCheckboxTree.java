@@ -16,13 +16,20 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.progress.WorkbenchJob;
 
@@ -35,6 +42,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
  */
 public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
 
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(TriStateFilteredCheckboxTree.class);
     /**
      * Set containing only the tree items that are grayed
      */
@@ -83,7 +91,9 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
     @Override
     public void setCheckedElements(Object[] elements) {
         super.setCheckedElements(elements);
-        maintainAllCheckIntegrity();
+        try (ScopeLog sl = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#setCheckedElements")) { //$NON-NLS-1$
+            maintainAllCheckIntegrity();
+        }
     }
 
     @Override
@@ -117,37 +127,46 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
 
     @Override
     protected WorkbenchJob doCreateRefreshJob() {
-        WorkbenchJob job = super.doCreateRefreshJob();
-        job.addJobChangeListener(new JobChangeAdapter() {
-            @Override
-            public void done(IJobChangeEvent event) {
-                if (getCheckboxTreeViewer().getTree().isDisposed()) {
-                    return;
+        try (FlowScopeLog fsl = new FlowScopeLogBuilder(LOGGER, Level.FINE, getClass().getSimpleName() + "#doCreateRefreshJob").setCategory("refreshJob").build()) { //$NON-NLS-1$ //$NON-NLS-2$
+            WorkbenchJob job = super.doCreateRefreshJob();
+            job.addJobChangeListener(new JobChangeAdapter() {
+                @Override
+                public void done(IJobChangeEvent event) {
+                    try (FlowScopeLog fsl1 = new FlowScopeLogBuilder(LOGGER, Level.FINE, getClass().getSimpleName() + "#doCreateRefreshJob").setParentScope(fsl).build()) { //$NON-NLS-1$
+                        if (getCheckboxTreeViewer().getTree().isDisposed()) {
+                            return;
+                        }
+                        maintainAllCheckIntegrity();
+                    }
                 }
-                maintainAllCheckIntegrity();
-            }
-        });
-        return job;
+            });
+            return job;
+        }
     }
 
     @Override
     protected void checkSubtree(Object element, boolean state) {
-        CheckboxTreeViewer checkboxTreeViewer = getCheckboxTreeViewer();
-        if (checkboxTreeViewer.testFindItem(element) != null) {
-            if (state) {
-                fCheckedObjects.add(element);
-            } else {
-                fCheckedObjects.remove(element);
+        try (ScopeLog checkST = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#checkSubtree()")) { //$NON-NLS-1$
+            CheckboxTreeViewer checkboxTreeViewer = getCheckboxTreeViewer();
+            if (checkboxTreeViewer.testFindItem(element) != null) {
+                if (state) {
+                    fCheckedObjects.add(element);
+                } else {
+                    fCheckedObjects.remove(element);
+                }
             }
+            boolean expanded = checkboxTreeViewer.getExpandedState(element);
+            /*
+             * make sure element is expanded so that testFindItem will find the
+             * children
+             */
+            checkboxTreeViewer.setExpandedState(element, true);
+            for (Object o : ((ITreeContentProvider) checkboxTreeViewer.getContentProvider()).getChildren(element)) {
+                checkSubtree(o, state);
+            }
+            checkboxTreeViewer.setExpandedState(element, expanded);
+            maintainAllCheckIntegrity();
         }
-        boolean expanded = checkboxTreeViewer.getExpandedState(element);
-        /* make sure element is expanded so that testFindItem will find the children */
-        checkboxTreeViewer.setExpandedState(element, true);
-        for (Object o : ((ITreeContentProvider) checkboxTreeViewer.getContentProvider()).getChildren(element)) {
-            checkSubtree(o, state);
-        }
-        checkboxTreeViewer.setExpandedState(element, expanded);
-        maintainAllCheckIntegrity();
     }
 
     /**
@@ -179,40 +198,46 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
      *            Tree element from which the verification needs to be made
      */
     private void maintainCheckIntegrity(final Object element) {
-        CheckboxTreeViewer checkboxTreeViewer = getCheckboxTreeViewer();
-        ITreeContentProvider contentProvider = (ITreeContentProvider) checkboxTreeViewer.getContentProvider();
-        boolean allChecked = true;
-        boolean oneChecked = false;
-        boolean oneGrayed = false;
+        try (ScopeLog maintain = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#maintainChackIntegrity")) { //$NON-NLS-1$
+            CheckboxTreeViewer checkboxTreeViewer = getCheckboxTreeViewer();
+            ITreeContentProvider contentProvider = (ITreeContentProvider) checkboxTreeViewer.getContentProvider();
+            boolean allChecked = true;
+            boolean oneChecked = false;
+            boolean oneGrayed = false;
 
-        for (Object child : contentProvider.getChildren(element)) {
-            if (checkboxTreeViewer.testFindItem(child) == null) {
-                continue;
+            for (Object child : contentProvider.getChildren(element)) {
+                try (ScopeLog testFind = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#testFind")) { //$NON-NLS-1$
+                    if (checkboxTreeViewer.testFindItem(child) == null) {
+                        continue;
+                    }
+                }
+
+                boolean checked = getChecked(child);
+                oneChecked |= checked;
+                allChecked &= checked;
+                oneGrayed |= (checked && getGrayed(child));
+
+                if (oneGrayed || (oneChecked && !allChecked)) {
+                    setGrayed(element, true);
+                    setChecked(element, true);
+                } else {
+                    setGrayed(element, false);
+                    setChecked(element, allChecked);
+                }
             }
 
-            boolean checked = getChecked(child);
-            oneChecked |= checked;
-            allChecked &= checked;
-            oneGrayed |= (checked && getGrayed(child));
-
-            if (oneGrayed || (oneChecked && !allChecked)) {
-                setGrayed(element, true);
-                setChecked(element, true);
-            } else {
-                setGrayed(element, false);
-                setChecked(element, allChecked);
+            Object parentElement = contentProvider.getParent(element);
+            if (parentElement != null) {
+                maintainCheckIntegrity(parentElement);
             }
-        }
-
-        Object parentElement = contentProvider.getParent(element);
-        if (parentElement != null) {
-            maintainCheckIntegrity(parentElement);
         }
     }
 
     private void maintainAllCheckIntegrity() {
-        for (Object checkedElement : getCheckedElements()) {
-            maintainCheckIntegrity(checkedElement);
+        try (ScopeLog sl = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#maintainAllCheckIntegrity")) { //$NON-NLS-1$
+            for (Object checkedElement : getCheckedElements()) {
+                maintainCheckIntegrity(checkedElement);
+            }
         }
     }
 

@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -54,6 +56,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
+import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.ScopeLog;
 import org.eclipse.tracecompass.internal.tmf.ui.viewers.tree.TreeUtil;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -74,6 +78,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.TmfTimeViewer;
  */
 public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
 
+    private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(AbstractTmfTreeViewer.class);
     private final TreeViewer fTreeViewer;
     private final Map<ITmfTrace, TmfTreeViewerEntry> fRoots = Collections.synchronizedMap(new HashMap<>());
 
@@ -300,8 +305,8 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
                     Color oldForeground = event.gc.getForeground();
                     Color oldBackground = event.gc.getBackground();
                     /*
-                     * Draws a transparent gradient rectangle from the color
-                     * of foreground and background.
+                     * Draws a transparent gradient rectangle from the color of
+                     * foreground and background.
                      */
                     event.gc.setAlpha(64);
                     event.gc.setForeground(event.item.getDisplay().getSystemColor(SWT.COLOR_BLUE));
@@ -349,10 +354,12 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
 
     @Override
     public void refresh() {
-        Tree tree = fTreeViewer.getTree();
-        tree.setRedraw(false);
-        fTreeViewer.refresh();
-        tree.setRedraw(true);
+        try (ScopeLog refreshTree = new ScopeLog(LOGGER, Level.FINE, getClass().getCanonicalName() + "#refresh()")) {
+            Tree tree = fTreeViewer.getTree();
+            tree.setRedraw(false);
+            fTreeViewer.refresh();
+            tree.setRedraw(true);
+        }
     }
 
     @Override
@@ -434,8 +441,9 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
     }
 
     /**
-     * Method called when the trace is loaded, to initialize any data once the trace
-     * has been set, but before the first call to update the content of the viewer.
+     * Method called when the trace is loaded, to initialize any data once the
+     * trace has been set, but before the first call to update the content of
+     * the viewer.
      *
      * @param trace
      *            the trace being loaded
@@ -510,7 +518,6 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
         thread.schedule();
     }
 
-
     /**
      * Update tree UI, this preserves selection and expansion levels, needs to
      * be called in UI thread
@@ -523,78 +530,97 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
      * @since 6.0
      */
     protected final void updateTreeUI(TreeViewer treeViewer, @NonNull ITmfTreeViewerEntry newInput) {
-        Object input = fTreeViewer.getInput();
+        try (ScopeLog updateTreeUi = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#updateTreeUI")) { //$NON-NLS-1$
+            Set<String> expandedPaths = new HashSet<>();
+            Object input = fTreeViewer.getInput();
 
-        /*
-         * Find in the new entries the equivalent of the selected one
-         */
-        ISelection selection = TreeUtil.getNewSelection(fTreeViewer.getSelection(), newInput);
-
-        /*
-         * Get currently expanded nodes
-         */
-        Object[] expandedElements = fTreeViewer.getExpandedElements();
-        Set<String> expandedPaths = new HashSet<>();
-        for (Object element : expandedElements) {
-            if (element instanceof ITmfTreeViewerEntry) {
-                expandedPaths.add(TreeUtil.getPath((ITmfTreeViewerEntry) element).toString());
+            /*
+             * Find in the new entries the equivalent of the selected one
+             */
+            ISelection selection = null;
+            try (ScopeLog selection1 = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#getSelection")) { //$NON-NLS-1$
+                selection = TreeUtil.getNewSelection(fTreeViewer.getSelection(), newInput);
+            }
+            try (ScopeLog updatePaths = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#updatePaths")) { //$NON-NLS-1$
+                /*
+                 * Get currently expanded nodes
+                 */
+                Object[] expandedElements = fTreeViewer.getExpandedElements();
+                for (Object element : expandedElements) {
+                    if (element instanceof ITmfTreeViewerEntry) {
+                        expandedPaths.add(TreeUtil.getPath((ITmfTreeViewerEntry) element).toString());
+                    }
+                }
+            }
+            // It's a salad
+            Set<@NonNull ITmfTreeViewerEntry> allLeafEntries = new HashSet<>();
+            Set<String> allPaths = new HashSet<>();
+            Set<String> allChildren = Collections.emptySet();
+            try (ScopeLog updatePaths = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#fillAllLeaves")) { //$NON-NLS-1$
+                if (input instanceof ITmfTreeViewerEntry) {
+                    TreeUtil.addIf(allLeafEntries, (ITmfTreeViewerEntry) input, entry -> !entry.hasChildren());
+                    for (ITmfTreeViewerEntry child : ((ITmfTreeViewerEntry) input).getChildren()) {
+                        TreeUtil.add(allPaths, child);
+                    }
+                }
+                allChildren = allLeafEntries.stream().map(entry -> TreeUtil.getPath(entry)).map(Collection<String>::toString).collect(Collectors.toSet());
+            }
+            Set<String> allLeaves = allChildren;
+            Set<@NonNull ITmfTreeViewerEntry> newExpanded = new HashSet<>();
+            try (ScopeLog updatePaths = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#addAllNonCollapsed")) { //$NON-NLS-1$
+                /*
+                 * All the current nodes minus currently expanded are collapsed,
+                 * so if an entry is included in the expanded list or it is NOT
+                 * present in in the previous list, expand it. Basically
+                 * collapse all that was previously collapsed.
+                 *
+                 * Also, make sure all new children are auto-expanded.
+                 */
+                TreeUtil.addIf(newExpanded, newInput, (ITmfTreeViewerEntry entry) -> {
+                    String key = TreeUtil.getPath(entry).toString();
+                    return (expandedPaths.contains(key) || !allPaths.contains(key)) || allLeaves.contains(key);
+                });
+            }
+            try (ScopeLog updatePaths = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#updateInput")) { //$NON-NLS-1$
+                if (newInput != input) {
+                    fTreeViewer.setInput(newInput);
+                } else {
+                    fTreeViewer.refresh();
+                }
+            }
+            try (ScopeLog updatePaths = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#contentChanged")) { //$NON-NLS-1$
+                contentChanged(newInput);
+            }
+            try (ScopeLog updatePaths = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#resetSelection")) { //$NON-NLS-1$
+                /*
+                 * Reset Selection
+                 */
+                if (!selection.isEmpty()) {
+                    fTreeViewer.setSelection(selection, true);
+                }
+            }
+            try (ScopeLog updatePaths = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#expand")) { //$NON-NLS-1$
+                /*
+                 * Reset Expanded
+                 */
+                fTreeViewer.setExpandedElements(newExpanded.toArray());
             }
         }
-        // It's a salad
-        Set<@NonNull ITmfTreeViewerEntry> allLeafEntries = new HashSet<>();
-        Set<String> allPaths = new HashSet<>();
-        if (input instanceof ITmfTreeViewerEntry) {
-            TreeUtil.addIf(allLeafEntries, (ITmfTreeViewerEntry) input, entry -> !entry.hasChildren());
-            for (ITmfTreeViewerEntry child : ((ITmfTreeViewerEntry) input).getChildren()) {
-                TreeUtil.add(allPaths, child);
-            }
-        }
-        Set<String> allLeaves = allLeafEntries.stream().map(entry -> TreeUtil.getPath(entry)).map(Collection<String>::toString).collect(Collectors.toSet());
-        /*
-         * All the current nodes minus currently expanded are collapsed, so if
-         * an entry is included in the expanded list or it is NOT present in in
-         * the previous list, expand it. Basically collapse all that was
-         * previously collapsed.
-         *
-         * Also, make sure all new children are auto-expanded.
-         */
-        Set<@NonNull ITmfTreeViewerEntry> newExpanded = new HashSet<>();
-        TreeUtil.addIf(newExpanded, newInput, (ITmfTreeViewerEntry entry) -> {
-            String key = TreeUtil.getPath(entry).toString();
-            return (expandedPaths.contains(key) || !allPaths.contains(key)) || allLeaves.contains(key);
-        });
-
-        if (newInput != input) {
-            fTreeViewer.setInput(newInput);
-        } else {
-            fTreeViewer.refresh();
-        }
-        contentChanged(newInput);
-
-        /*
-         * Reset Selection
-         */
-        if (!selection.isEmpty()) {
-            fTreeViewer.setSelection(selection, true);
-        }
-
-        /*
-         * Reset Expanded
-         */
-        fTreeViewer.setExpandedElements(newExpanded.toArray());
     }
 
     /**
-     * Update the entries to the given start/end time. An extra parameter defines
-     * whether these times correspond to the selection or the visible range, as the
-     * viewer may update differently in those cases. This methods returns a root
-     * node that is not meant to be visible. The children of this 'fake' root node
-     * are the first level of entries that will appear in the tree. If no update is
-     * necessary, the method should return <code>null</code>. To empty the tree, a
-     * root node containing an empty list of children should be returned.
+     * Update the entries to the given start/end time. An extra parameter
+     * defines whether these times correspond to the selection or the visible
+     * range, as the viewer may update differently in those cases. This methods
+     * returns a root node that is not meant to be visible. The children of this
+     * 'fake' root node are the first level of entries that will appear in the
+     * tree. If no update is necessary, the method should return
+     * <code>null</code>. To empty the tree, a root node containing an empty
+     * list of children should be returned.
      *
      * This method is not called in the UI thread when using the default viewer
-     * content update. Resource-intensive calculations here should not block the UI.
+     * content update. Resource-intensive calculations here should not block the
+     * UI.
      *
      * @param trace
      *            The trace
@@ -605,8 +631,8 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
      * @param isSelection
      *            <code>true</code> if this time range is for a selection,
      *            <code>false</code> for the visible time range
-     * @return The root entry of the list of entries to display or <code>null</code>
-     *         if no update necessary
+     * @return The root entry of the list of entries to display or
+     *         <code>null</code> if no update necessary
      * @since 3.3
      */
     protected abstract ITmfTreeViewerEntry updateElements(@NonNull ITmfTrace trace, long start, long end, boolean isSelection);
@@ -621,18 +647,19 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
     }
 
     /**
-     * Sets the auto-expand level to be used for the input of the viewer. The value
-     * 0 means that there is no auto-expand; 1 means that top-level elements are
-     * expanded, but not their children; 2 means that top-level elements are
-     * expanded, and their children, but not grand-children; and so on.
+     * Sets the auto-expand level to be used for the input of the viewer. The
+     * value 0 means that there is no auto-expand; 1 means that top-level
+     * elements are expanded, but not their children; 2 means that top-level
+     * elements are expanded, and their children, but not grand-children; and so
+     * on.
      * <p>
      * The value {@link AbstractTreeViewer#ALL_LEVELS} means that all subtrees
      * should be expanded.
      * </p>
      *
      * @param level
-     *            non-negative level, or {@link AbstractTreeViewer#ALL_LEVELS} to
-     *            expand all levels of the tree
+     *            non-negative level, or {@link AbstractTreeViewer#ALL_LEVELS}
+     *            to expand all levels of the tree
      * @since 4.0
      */
     public void setAutoExpandLevel(int level) {
