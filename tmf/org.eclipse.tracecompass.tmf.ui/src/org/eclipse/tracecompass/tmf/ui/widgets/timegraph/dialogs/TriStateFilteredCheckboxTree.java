@@ -112,6 +112,7 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
             }
         }
         checkSubtree(element, state);
+        maintainCheckIntegrity(((ITreeContentProvider) treeViewer.getContentProvider()).getParent(element));
         return getCheckboxTreeViewer().setSubtreeChecked(element, state);
     }
 
@@ -165,7 +166,7 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
                 checkSubtree(o, state);
             }
             checkboxTreeViewer.setExpandedState(element, expanded);
-            maintainAllCheckIntegrity();
+
         }
     }
 
@@ -199,24 +200,30 @@ public class TriStateFilteredCheckboxTree extends FilteredCheckboxTree {
      */
     private void maintainCheckIntegrity(final Object element) {
         try (ScopeLog maintain = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#maintainChackIntegrity")) { //$NON-NLS-1$
+            if (element == null) {
+                return;
+            }
             CheckboxTreeViewer checkboxTreeViewer = getCheckboxTreeViewer();
             ITreeContentProvider contentProvider = (ITreeContentProvider) checkboxTreeViewer.getContentProvider();
             boolean allChecked = true;
             boolean oneChecked = false;
             boolean oneGrayed = false;
-
-            for (Object child : contentProvider.getChildren(element)) {
-                try (ScopeLog testFind = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#testFind")) { //$NON-NLS-1$
-                    if (checkboxTreeViewer.testFindItem(child) == null) {
-                        continue;
+            try (ScopeLog scanChildren = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#scanChildren")) { //$NON-NLS-1$
+                for (Object child : contentProvider.getChildren(element)) {
+                    if (!filterText.getText().isEmpty()) {
+                        try (ScopeLog testFind = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#testFind")) { //$NON-NLS-1$
+                            if (checkboxTreeViewer.testFindItem(child) == null) {
+                                continue;
+                            }
+                        }
                     }
+                    boolean checked = getChecked(child);
+                    oneChecked |= checked;
+                    allChecked &= checked;
+                    oneGrayed |= (checked && getGrayed(child));
                 }
-
-                boolean checked = getChecked(child);
-                oneChecked |= checked;
-                allChecked &= checked;
-                oneGrayed |= (checked && getGrayed(child));
-
+            }
+            try (ScopeLog updateParent = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#updateParent")) { //$NON-NLS-1$
                 if (oneGrayed || (oneChecked && !allChecked)) {
                     setGrayed(element, true);
                     setChecked(element, true);
