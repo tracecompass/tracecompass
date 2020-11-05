@@ -601,7 +601,9 @@ public abstract class AbstractTmfTreeViewer extends TmfTimeViewer {
             }
             try (ScopeLog updatePaths = new ScopeLog(LOGGER, Level.FINE, getClass().getSimpleName() + "#expand")) { //$NON-NLS-1$
                 /*
-                 * Reset Expanded
+                 * Reset Expanded. This may be a slow operation
+                 * TODO: only do if it is currently not expanded well
+                 * TODO: use expandall if possible
                  */
                 fTreeViewer.setExpandedElements(newExpanded.toArray());
             }
