@@ -84,8 +84,9 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
     private final BiMap<Long, Integer> fIdToQuark = HashBiMap.create();
     private @Nullable TmfModelResponse<TmfTreeModel<M>> fCached;
     private final Map<Long, Multimap<String, Object>> fEntryMetadata = new HashMap<>();
-    private final @Nullable String fScope;
-    private final Map<Object, Long> fIdTable;
+    private @Nullable String fScope;
+    private Map<Object, Long> fIdTable = new HashMap<>();
+    private volatile boolean fInitialized = false;
 
     /**
      * Constructor
@@ -98,14 +99,6 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
     public AbstractTreeDataProvider(ITmfTrace trace, A analysisModule) {
         super(trace);
         fAnalysisModule = analysisModule;
-        fScope = getScope();
-        if (fScope != null) {
-            synchronized (fScopedIdTable) {
-                fIdTable = fScopedIdTable.row(Objects.requireNonNull(fScope));
-            }
-        } else {
-            fIdTable = new HashMap<>();
-        }
     }
 
     @Override
@@ -207,6 +200,7 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      */
     protected long getEntryId(Object key) {
         synchronized (fScopedIdTable) {
+            checkScopeInitialized();
             return fIdTable.computeIfAbsent(key, k -> ID_GENERATOR.getAndIncrement());
         }
     }
@@ -361,4 +355,15 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
      */
     protected abstract TmfTreeModel<M> getTree(ITmfStateSystem ss, Map<String, Object> fetchParameters,
             @Nullable IProgressMonitor monitor) throws StateSystemDisposedException;
+
+    private void checkScopeInitialized() {
+        if (!fInitialized) {
+            fScope = getScope();
+            if (fScope != null) {
+                fIdTable = fScopedIdTable.row(Objects.requireNonNull(fScope));
+            }
+            fInitialized = true;
+        }
+    }
+
 }
