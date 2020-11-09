@@ -45,6 +45,12 @@
             name="XY Chart View Stub New"
             restorable="true">
       </view>
+      <view
+            class="org.eclipse.tracecompass.tmf.ui.swtbot.tests.views.TimeGraphViewWithTooManyMarkersStub"
+            id="org.eclipse.tracecompass.tmf.ui.swtbot.tests.views.timegraph.stub2"
+            name="Performance Killer timegraph"
+            restorable="true">
+      </view>
    </extension>
 
 </plugin>
