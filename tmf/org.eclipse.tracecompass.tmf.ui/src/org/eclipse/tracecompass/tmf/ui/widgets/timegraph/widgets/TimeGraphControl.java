@@ -1967,17 +1967,21 @@ public class TimeGraphControl extends TimeGraphBaseControl
     }
 
     Rectangle getItemRect(Rectangle bounds, int idx) {
-        int ySum = 0;
-        if (idx >= fTopIndex) {
-            for (int i = fTopIndex; i < idx; i++) {
-                ySum += fItemData.fExpandedItems[i].fItemHeight;
+        int[] ySums = fItemData.fYSums;
+        if (ySums[idx] == ItemData.UNSET_SUM) {
+            int ySum = 0;
+            if (idx >= fTopIndex) {
+                for (int i = fTopIndex; i < idx; i++) {
+                    ySum += fItemData.fExpandedItems[i].fItemHeight;
+                }
+            } else {
+                for (int i = fTopIndex - 1; i >= idx; i--) {
+                    ySum -= fItemData.fExpandedItems[i].fItemHeight;
+                }
             }
-        } else {
-            for (int i = fTopIndex - 1; i >= idx; i--) {
-                ySum -= fItemData.fExpandedItems[i].fItemHeight;
-            }
+            ySums[idx] = ySum;
         }
-        int y = bounds.y + ySum;
+        int y = bounds.y + ySums[idx];
         int height = fItemData.fExpandedItems[idx].fItemHeight;
         return new Rectangle(bounds.x, y, bounds.width, height);
     }
@@ -3910,6 +3914,8 @@ public class TimeGraphControl extends TimeGraphBaseControl
         private Item[] fItems = new Item[0];
         private ITimeGraphEntry fRootEntries[] = new ITimeGraphEntry[0];
         private List<ILinkEvent> fLinks = new ArrayList<>();
+        private int fYSums[] = new int[0];
+        public static final int UNSET_SUM = -1;
 
         public ItemData() {
             // Do nothing
@@ -3917,6 +3923,12 @@ public class TimeGraphControl extends TimeGraphBaseControl
 
         public Item findItem(ITimeGraphEntry entry) {
             return fItemMap.get(entry);
+        }
+
+        public void resetYSums() {
+            int[] ySums = new int[fItems.length];
+            Arrays.fill(ySums, UNSET_SUM);
+            fYSums = ySums;
         }
 
         public int findItemIndex(ITimeGraphEntry entry) {
@@ -3937,6 +3949,7 @@ public class TimeGraphControl extends TimeGraphBaseControl
             }
             fItemMap = itemMap;
             fItems = fItemMap.values().toArray(new Item[0]);
+            resetYSums();
             updateExpandedItems();
             if (selection != null) {
                 for (Item item : fExpandedItems) {
