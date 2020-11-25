@@ -255,7 +255,7 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
     }
 
     @Override
-    protected @NonNull List<IMarkerEvent> getViewMarkerList(long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor) {
+    protected @NonNull List<IMarkerEvent> getViewMarkerList(Iterable<@NonNull TimeGraphEntry> entries, long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor) {
         ITmfTrace trace = getTrace();
         if (trace == null) {
             return Collections.emptyList();

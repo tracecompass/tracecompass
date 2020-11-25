@@ -78,7 +78,6 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry.Sampling;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeLinkEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.TimeGraphControl;
-import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.Utils;
 import org.eclipse.ui.IWorkbenchActionConstants;
 
 import com.google.common.collect.HashBasedTable;
@@ -580,36 +579,34 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
     }
 
     @Override
-    protected @NonNull List<IMarkerEvent> getViewMarkerList(long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor) {
+    protected @NonNull List<IMarkerEvent> getViewMarkerList(Iterable<@NonNull TimeGraphEntry> entries, long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor) {
         List<IMarkerEvent> viewMarkerList = super.getViewMarkerList(startTime, endTime, resolution, monitor);
         List<@NonNull TimeGraphEntry> traceEntries = getEntryList(getTrace());
         if (traceEntries == null) {
             return viewMarkerList;
         }
         List<@NonNull Long> times = StateSystemUtils.getTimes(startTime, endTime, resolution);
-        for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
-            Multimap<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Long> providersToModelIds = filterGroupEntries(Utils.flatten(traceEntry), startTime, endTime);
-            for (ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider : providersToModelIds.keySet()) {
-                if (provider instanceof IOutputAnnotationProvider) {
-                    Map<@NonNull String, @NonNull Object> parameters = getFetchAnnotationsParameters(times, providersToModelIds.get(provider));
-                    TmfModelResponse<@NonNull AnnotationModel> response = ((IOutputAnnotationProvider) provider).fetchAnnotations(parameters, new NullProgressMonitor());
-                    AnnotationModel model = response.getModel();
-                    if (model != null) {
-                        for (Entry<String, Collection<Annotation>> entry : model.getAnnotations().entrySet()) {
-                            String category = entry.getKey();
-                            for (Annotation annotation : entry.getValue()) {
-                                if (annotation.getType() == AnnotationType.CHART) {
-                                    // If the annotation entry ID is -1 we want the
-                                    // marker to span across all entries
-                                    ITimeGraphEntry markerEntry = null;
-                                    if (annotation.getEntryId() != -1) {
-                                        synchronized (fEntries) {
-                                            markerEntry = fEntries.get(provider, annotation.getEntryId());
-                                        }
+        Multimap<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Long> providersToModelIds = filterGroupEntries(entries, startTime, endTime);
+        for (ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider : providersToModelIds.keySet()) {
+            if (provider instanceof IOutputAnnotationProvider) {
+                Map<@NonNull String, @NonNull Object> parameters = getFetchAnnotationsParameters(times, providersToModelIds.get(provider));
+                TmfModelResponse<@NonNull AnnotationModel> response = ((IOutputAnnotationProvider) provider).fetchAnnotations(parameters, new NullProgressMonitor());
+                AnnotationModel model = response.getModel();
+                if (model != null) {
+                    for (Entry<String, Collection<Annotation>> entry : model.getAnnotations().entrySet()) {
+                        String category = entry.getKey();
+                        for (Annotation annotation : entry.getValue()) {
+                            if (annotation.getType() == AnnotationType.CHART) {
+                                // If the annotation entry ID is -1 we want the
+                                // marker to span across all entries
+                                ITimeGraphEntry markerEntry = null;
+                                if (annotation.getEntryId() != -1) {
+                                    synchronized (fEntries) {
+                                        markerEntry = fEntries.get(provider, annotation.getEntryId());
                                     }
-                                    MarkerEvent markerEvent = new MarkerEvent(annotation, markerEntry, category, true);
-                                    viewMarkerList.add(markerEvent);
                                 }
+                                MarkerEvent markerEvent = new MarkerEvent(annotation, markerEntry, category, true);
+                                viewMarkerList.add(markerEvent);
                             }
                         }
                     }

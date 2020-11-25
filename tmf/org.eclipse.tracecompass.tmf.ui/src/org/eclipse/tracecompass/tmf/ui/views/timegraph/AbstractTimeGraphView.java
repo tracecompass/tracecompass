@@ -41,6 +41,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -189,6 +191,7 @@ import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
@@ -624,16 +627,15 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
         public void doRun() {
             Sampling sampling = new Sampling(getZoomStartTime(), getZoomEndTime(), getResolution());
             boolean isFilterActive = !getRegexes().values().isEmpty();
-            try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStates")) { //$NON-NLS-1$
-                getTimeGraphViewer().setTimeEventFilterApplied(isFilterActive);
+            /*
+             * Note: the zoomEntries function below will update the sampling, so
+             * the incorrect sample list needs to be set in advance because the
+             * filtered iterable could give different results.
+             */
+            List<@NonNull TimeGraphEntry> incorrectSample = Objects.requireNonNull(
+                    Lists.newArrayList(Iterables.filter(
+                            fEntries, entry -> !sampling.equals(entry.getSampling()))));
 
-                boolean hasSavedFilter = fTimeEventFilterDialog != null && fTimeEventFilterDialog.hasActiveSavedFilters();
-                getTimeGraphViewer().setSavedFilterStatus(hasSavedFilter || fIsHideRowsFilterActive);
-
-                // Sampling is cleared when calling restartZoomThread() so that during filtering the entries are refreshed
-                Iterable<@NonNull TimeGraphEntry> incorrectSample = Iterables.filter(fEntries, entry -> !sampling.equals(entry.getSampling()));
-                zoomEntries(incorrectSample, getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
-            }
             List<ILinkEvent> computedLinks;
             try (TraceCompassLogUtils.ScopeLog linkLog = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingLinks")) { //$NON-NLS-1$
                 /* Refresh the arrows when zooming */
@@ -650,23 +652,44 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             List<ILinkEvent> links = computedLinks;
             /* Refresh the view-specific markers when zooming */
             try (TraceCompassLogUtils.ScopeLog markerLoglog = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingMarkers")) { //$NON-NLS-1$
-                List<IMarkerEvent> markers = new ArrayList<>(getViewMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
+                List<IMarkerEvent> newMarkers = new ArrayList<>(getViewMarkerList(incorrectSample, getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
                 /* Refresh the trace-specific markers when zooming */
-                markers.addAll(getTraceMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
+                newMarkers.addAll(getTraceMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
                 applyResults(() -> {
                     if (links != null) {
                         fTimeGraphViewer.setLinks(links);
                     }
                     fTimeGraphViewer.setMarkerCategories(getMarkerCategories());
+                    Stream<IMarkerEvent> filteredMarkerStream = fTimeGraphViewer.getMarkers().parallelStream()
+                            .filter(event -> event.getEntry() != null)
+                            .filter(event -> event.getEntry() instanceof TimeGraphEntry)
+                            .filter(event -> {
+                                Object id = ((TimeGraphEntry) event.getEntry()).getEntryModel().getId();
+                                return fVisibleEntries.contains(id) || !incorrectSample.contains(id);
+                            });
+                    List<IMarkerEvent> markers = Stream.concat(filteredMarkerStream, newMarkers.parallelStream())
+                            .unordered() // enables faster distinct
+                            .distinct()  // avoid double adding in case the #getViewMarkerList does not follow the contract
+                            .collect(Collectors.toCollection(ArrayList::new));
                     fTimeGraphViewer.setMarkers(markers);
                 });
-                synchronized (fZoomThreadResultLock) {
-                    if (Thread.currentThread() == fZoomThread) {
-                        refresh();
-                    }
+
+            }
+            try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStates")) { //$NON-NLS-1$
+                getTimeGraphViewer().setTimeEventFilterApplied(isFilterActive);
+
+                boolean hasSavedFilter = fTimeEventFilterDialog != null && fTimeEventFilterDialog.hasActiveSavedFilters();
+                getTimeGraphViewer().setSavedFilterStatus(hasSavedFilter || fIsHideRowsFilterActive);
+
+                // Sampling is cleared when calling restartZoomThread() so that
+                // during filtering the entries are refreshed
+                zoomEntries(incorrectSample, getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
+            }
+            synchronized (fZoomThreadResultLock) {
+                if (Thread.currentThread() == fZoomThread) {
+                    refresh();
                 }
             }
-
             if (isFilterActive && Thread.currentThread() == fZoomThread) {
                 /* Do a full filter search as a second pass */
                 try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStatesFullSearch")) { //$NON-NLS-1$
@@ -2042,10 +2065,43 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
      *            The progress monitor object
      * @return The list of marker events
      * @since 2.0
+     * @deprecated use
+     *             {@link #getViewMarkerList(Iterable, long, long, long, IProgressMonitor)}
+     *             instead. To get all the entries of a view
+     *
+     *             <pre>
+     *             List<@NonNull TimeGraphEntry> traceEntries = getEntryList(getTrace());
+     *             for (TraceEntry traceEntry : Iterables.filter(traceEntries, TraceEntry.class)) {
+     *                 Multimap<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Long> providersToModelIds = filterGroupEntries(Utils.flatten(traceEntry), startTime, endTime);
+     *                 // Do stuff
+     *             }
+     *             </pre>
      */
+    @Deprecated
     protected @NonNull List<IMarkerEvent> getViewMarkerList(long startTime, long endTime,
             long resolution, @NonNull IProgressMonitor monitor) {
         return new ArrayList<>();
+    }
+
+    /**
+     * Gets the list of view-specific markers for a trace in a given time range.
+     * Default implementation returns an empty list.
+     * @param entries
+     *            A list of entries to query
+     * @param startTime
+     *            Start of the time range
+     * @param endTime
+     *            End of the time range
+     * @param resolution
+     *            The resolution
+     * @param monitor
+     *            The progress monitor object
+     * @return The list of marker events
+     * @since 6.2
+     */
+    protected @NonNull List<IMarkerEvent> getViewMarkerList(Iterable<@NonNull TimeGraphEntry> entries, long startTime, long endTime,
+            long resolution, @NonNull IProgressMonitor monitor) {
+        return getViewMarkerList(startTime, endTime, resolution, monitor);
     }
 
     /**

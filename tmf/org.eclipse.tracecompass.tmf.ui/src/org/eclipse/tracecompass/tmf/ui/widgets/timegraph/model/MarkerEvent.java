@@ -14,6 +14,8 @@
 
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
+import java.util.Objects;
+
 import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IAnnotation;
 
@@ -122,5 +124,31 @@ public class MarkerEvent extends TimeEvent implements IMarkerEvent {
     @Override
     public boolean isForeground() {
         return fForeground;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(getCategory(), getColor(), isForeground(), getLabel());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MarkerEvent other = (MarkerEvent) obj;
+        return Objects.equals(getCategory(), other.getCategory())
+                && Objects.equals(getColor(), other.getColor())
+                && isForeground() == other.isForeground()
+                && Objects.equals(getLabel(), other.getLabel());
     }
 }

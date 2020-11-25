@@ -33,7 +33,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 public class TimeGraphViewWithTooManyMarkersStub extends AbstractTimeGraphView {
 
     private static final int NB_MARKERS = 1000;
-    private static final int MARKER_STEP = 10;
+    private static final int MARKER_STEP = 30;
     private static final int NB_ENTRIES = 1000;
     /**
      * Id
@@ -55,9 +55,9 @@ public class TimeGraphViewWithTooManyMarkersStub extends AbstractTimeGraphView {
 
     @Override
     protected void buildEntryList(@NonNull ITmfTrace trace, @NonNull ITmfTrace parentTrace, @NonNull IProgressMonitor monitor) {
-        List<@NonNull TimeGraphEntry> entryList = getEntryList(trace);
+        List<@NonNull TimeGraphEntry> entryList = getEntryList(parentTrace);
         if (entryList == null || entryList.isEmpty()) {
-            addToEntryList(trace, fEntries);
+            addToEntryList(parentTrace, fEntries);
         }
         refresh();
     }
@@ -68,7 +68,7 @@ public class TimeGraphViewWithTooManyMarkersStub extends AbstractTimeGraphView {
     }
 
     @Override
-    protected @NonNull List<IMarkerEvent> getViewMarkerList(long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor) {
+    protected @NonNull List<IMarkerEvent> getViewMarkerList(Iterable<@NonNull TimeGraphEntry> entries, long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor) {
         ITmfTrace trace = getTrace();
         if (trace == null) {
             return Collections.emptyList();
@@ -76,11 +76,14 @@ public class TimeGraphViewWithTooManyMarkersStub extends AbstractTimeGraphView {
         RGBA fromInt = new RGBA(0, 0, 0, 255);
         long start = trace.getStartTime().toNanos();
         List<IMarkerEvent> markers = new ArrayList<>();
-        for (int rowId = 0; rowId < fEntries.size(); rowId++) {
-            TimeGraphEntry row = fEntries.get(rowId);
+        for (TimeGraphEntry row : entries) {
+            int rowId = fEntries.indexOf(row);
             int offset = (int) (MARKER_STEP / 2 * Math.sin(rowId * Math.PI / MARKER_STEP)) + MARKER_STEP / 2;
             for (long i = 0; i < NB_MARKERS; i += MARKER_STEP) {
-                markers.add(new MarkerEvent(row, start + i + offset, 0L, "", fromInt, "", true, (rowId / MARKER_STEP) % 7));
+                long time = start + i + offset;
+                if (time >= startTime && time <= endTime) {
+                    markers.add(new MarkerEvent(row, time, 0L, "", fromInt, "", true, (rowId / MARKER_STEP) % 7));
+                }
             }
         }
         return markers;
