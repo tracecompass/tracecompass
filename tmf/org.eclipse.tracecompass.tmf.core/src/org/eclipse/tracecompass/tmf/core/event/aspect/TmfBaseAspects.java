@@ -47,6 +47,25 @@ public final class TmfBaseAspects {
         }
     };
 
+    private static final ITmfEventAspect<Long> TIMESTAMP_NANOSECOND_ASPECT = new ITmfEventAspect<Long>() {
+        @Override
+        public String getName() {
+            return Messages.getMessage(Messages.AspectName_Timestamp_Nanoseconds);
+        }
+        @Override
+        public String getHelpText() {
+            return Messages.getMessage(Messages.AspectName_Timestamp_Nanoseconds_Help);
+        }
+        @Override
+        public @Nullable Long resolve(ITmfEvent event) {
+            return event.getTimestamp().toNanos();
+        }
+        @Override
+        public boolean isHiddenByDefault() {
+            return true;
+        }
+    };
+
     private static final ITmfEventAspect<String> EVENT_TYPE_ASPECT = new ITmfEventAspect<String>() {
         @Override
         public String getName() {
@@ -110,6 +129,17 @@ public final class TmfBaseAspects {
     public static ITmfEventAspect<ITmfTimestamp> getTimestampAspect() {
         return TIMESTAMP_ASPECT;
     }
+
+    /**
+     * Get the aspect for the event timestamp in nanoseconds
+     *
+     * @return The timestamp nanosecond aspect
+     * @since 6.1
+     */
+    public static ITmfEventAspect<Long> getTimestampNsAspect() {
+        return TIMESTAMP_NANOSECOND_ASPECT;
+    }
+
 
     /**
      * Get the aspect for the event type

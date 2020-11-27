@@ -137,14 +137,21 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
     @Override
     public TmfModelResponse<TmfTreeModel<TmfEventTableColumnDataModel>> fetchTree(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         List<TmfEventTableColumnDataModel> model = new ArrayList<>();
-
+        boolean hasTs = false;
         for (ITmfEventAspect<?> aspect : getTraceAspects(getTrace())) {
             synchronized (fAspectToIdMap) {
                 long id = fAspectToIdMap.computeIfAbsent(aspect, a -> fAtomicLong.getAndIncrement());
                 model.add(new TmfEventTableColumnDataModel(id, -1, Collections.singletonList(aspect.getName()), aspect.getHelpText(), aspect.isHiddenByDefault()));
+                hasTs |= (aspect == TmfBaseAspects.getTimestampAspect());
             }
         }
-
+        if (hasTs) {
+            synchronized (fAspectToIdMap) {
+                ITmfEventAspect<Long> aspect = TmfBaseAspects.getTimestampNsAspect();
+                long id = fAspectToIdMap.computeIfAbsent(aspect, a -> fAtomicLong.getAndIncrement());
+                model.add(new TmfEventTableColumnDataModel(id, -1, Collections.singletonList(aspect.getName()), aspect.getHelpText(), aspect.isHiddenByDefault()));
+            }
+        }
         return new TmfModelResponse<>(new TmfTreeModel<>(Collections.emptyList(), model), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 

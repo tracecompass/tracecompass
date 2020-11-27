@@ -33,6 +33,16 @@ public class Messages extends NLS {
     public static @Nullable String AspectHelpText_TraceName;
     public static @Nullable String AspectHelpText_CPU;
     public static @Nullable String AspectHelpText_Statesystem;
+    /**
+     * Nanosecond normalized timestamp
+     * @since 6.1
+     */
+    public static @Nullable String AspectName_Timestamp_Nanoseconds;
+    /**
+     * Explanation of why use a nanosecond normalized timestamp
+     * @since 6.1
+     */
+    public static @Nullable String AspectName_Timestamp_Nanoseconds_Help;
 
     static {
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
