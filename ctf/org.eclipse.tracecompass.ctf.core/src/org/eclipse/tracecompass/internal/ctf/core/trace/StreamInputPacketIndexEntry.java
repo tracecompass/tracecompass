@@ -217,17 +217,18 @@ public class StreamInputPacketIndexEntry implements ICTFPacketDescriptor {
         Builder<String, Object> attributeBuilder = ImmutableMap.<String, Object> builder();
         for (String field : streamPacketContextDef.getDeclaration().getFieldsList()) {
             IDefinition id = streamPacketContextDef.lookupDefinition(field);
+            String fieldName = field.startsWith("_") ? field.substring(1) : field; //$NON-NLS-1$
             if (id instanceof IntegerDefinition) {
-                attributeBuilder.put(field, ((IntegerDefinition) id).getValue());
+                attributeBuilder.put(fieldName, ((IntegerDefinition) id).getValue());
             } else if (id instanceof FloatDefinition) {
-                attributeBuilder.put(field, ((FloatDefinition) id).getValue());
+                attributeBuilder.put(fieldName, ((FloatDefinition) id).getValue());
             } else if (id instanceof EnumDefinition) {
                 final EnumDefinition enumDec = (EnumDefinition) id;
-                attributeBuilder.put(field, new AbstractMap.SimpleImmutableEntry<>(
+                attributeBuilder.put(fieldName, new AbstractMap.SimpleImmutableEntry<>(
                         NonNullUtils.checkNotNull(enumDec.getStringValue()),
                         NonNullUtils.checkNotNull(enumDec.getIntegerValue())));
             } else if (id instanceof StringDefinition) {
-                attributeBuilder.put(field, ((StringDefinition) id).getValue());
+                attributeBuilder.put(fieldName, ((StringDefinition) id).getValue());
             }
         }
         return attributeBuilder.build();
