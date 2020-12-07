@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2019 Ericsson
+ * Copyright (c) 2019, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -457,5 +457,34 @@ public final class StyleProperties {
          * Dashed Dot Dot (-..-..-..) line
          */
         String DASHDOTDOT = "DASHDOTDOT"; //$NON-NLS-1$
+    }
+
+    /**
+     * Vertical alignment as a string. Possible values: {@link VerticalAlign}.
+     * <p>
+     * Default: {@link VerticalAlign#MIDDLE}
+     * @since 6.2
+     */
+    public static final String VERTICAL_ALIGN = "vertical-align"; //$NON-NLS-1$
+
+    /**
+     * Vertical alignment values.
+     *
+     * @noimplement This interface is not intended to be implemented by clients.
+     * @since 6.2
+     */
+    public interface VerticalAlign {
+        /**
+         * Middle
+         */
+        String MIDDLE = "middle"; //$NON-NLS-1$
+        /**
+         * Top
+         */
+        String TOP = "top"; //$NON-NLS-1$
+        /**
+         * Bottom
+         */
+        String BOTTOM = "bottom"; //$NON-NLS-1$
     }
 }

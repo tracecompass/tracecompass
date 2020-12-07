@@ -115,6 +115,7 @@ import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties.BorderStyle;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties.SymbolType;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties.VerticalAlign;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -2264,27 +2265,34 @@ public class TimeGraphControl extends TimeGraphBaseControl
             Float heightFactor = styleManager.getFactorStyle(elementStyle, StyleProperties.HEIGHT);
             heightFactor = (heightFactor != null) ? Math.max(0.0f, Math.min(1.0f, heightFactor)) : 1.0f;
             int symbolSize = (int) Math.ceil(rect.height * heightFactor / 2);
+            Object verticalAlign = styleManager.getStyle(elementStyle, StyleProperties.VERTICAL_ALIGN);
+            int y = rect.y + rect.height / 2;
+            if (VerticalAlign.BOTTOM.equals(verticalAlign)) {
+                y += Math.max(0, rect.height / 2 - symbolSize);
+            } else if (VerticalAlign.TOP.equals(verticalAlign)) {
+                y -= Math.max(0, rect.height / 2 - symbolSize);
+            }
             switch (String.valueOf(symbolType)) {
             case SymbolType.CROSS:
-                SymbolHelper.drawCross(gc, color, symbolSize, rect.x, rect.y + rect.height / 2);
+                SymbolHelper.drawCross(gc, color, symbolSize, rect.x, y);
                 break;
             case SymbolType.PLUS:
-                SymbolHelper.drawPlus(gc, color, symbolSize, rect.x, rect.y + rect.height / 2);
+                SymbolHelper.drawPlus(gc, color, symbolSize, rect.x, y);
                 break;
             case SymbolType.SQUARE:
-                SymbolHelper.drawSquare(gc, color, symbolSize, rect.x, rect.y + rect.height / 2);
+                SymbolHelper.drawSquare(gc, color, symbolSize, rect.x, y);
                 break;
             case SymbolType.TRIANGLE:
-                SymbolHelper.drawTriangle(gc, color, symbolSize, rect.x, rect.y + rect.height / 2);
+                SymbolHelper.drawTriangle(gc, color, symbolSize, rect.x, y);
                 break;
             case SymbolType.INVERTED_TRIANGLE:
-                SymbolHelper.drawInvertedTriangle(gc, color, symbolSize, rect.x, rect.y + rect.height / 2);
+                SymbolHelper.drawInvertedTriangle(gc, color, symbolSize, rect.x, y);
                 break;
             case SymbolType.CIRCLE:
-                SymbolHelper.drawCircle(gc, color, symbolSize, rect.x, rect.y + rect.height / 2);
+                SymbolHelper.drawCircle(gc, color, symbolSize, rect.x, y);
                 break;
             default:
-                SymbolHelper.drawDiamond(gc, color, symbolSize, rect.x, rect.y + rect.height / 2);
+                SymbolHelper.drawDiamond(gc, color, symbolSize, rect.x, y);
             }
             gc.setAlpha(OPAQUE);
             if (marker.getDuration() == 0) {
