@@ -37,9 +37,14 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel.Type;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationCategoriesModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationEventHandler;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
 import org.eclipse.tracecompass.internal.tmf.core.analysis.callsite.CallsiteAnalysis;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.timegraph.AbstractTimeGraphDataProvider;
@@ -81,7 +86,7 @@ import com.google.common.primitives.Ints;
  *
  * @author Loic Prieur-Drevon
  */
-public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@NonNull KernelAnalysisModule, @NonNull ResourcesEntryModel> {
+public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@NonNull KernelAnalysisModule, @NonNull ResourcesEntryModel> implements IOutputAnnotationProvider {
 
     /**
      * Extension point ID.
@@ -143,6 +148,8 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     /** Map of thread id to Exec_name intervals */
     private final TreeMultimap<Integer, ITmfStateInterval> fExecNamesCache = TreeMultimap.create(Integer::compare, CACHE_COMPARATOR);
 
+    /** Annotation provider that reads UST traces */
+    private final IOutputAnnotationProvider fEventAnnotatonProvider;
     /**
      * Constructor
      *
@@ -154,6 +161,9 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
      */
     protected ResourcesStatusDataProvider(@NonNull ITmfTrace trace, @NonNull KernelAnalysisModule module) {
         super(trace, module);
+        Predicate<@NonNull ResourcesEntryModel> additional = model -> ResourcesEntryModel.Type.CURRENT_THREAD.equals(model.getType());
+        fEventAnnotatonProvider = new AnnotationEventHandler<>(TmfStrings.cpu(), additional,
+                (candidate) -> !(candidate instanceof IKernelTrace) && trace != candidate, TmfCpuAspect.class, trace, (fetchParameters, monitor) -> fetchTree(fetchParameters, monitor));
     }
 
     @Override
@@ -732,5 +742,15 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             }
         }
         return data;
+    }
+
+    @Override
+    public @NonNull TmfModelResponse<@NonNull AnnotationCategoriesModel> fetchAnnotationCategories(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+        return fEventAnnotatonProvider.fetchAnnotationCategories(fetchParameters, monitor);
+    }
+
+    @Override
+    public @NonNull TmfModelResponse<@NonNull AnnotationModel> fetchAnnotations(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+        return fEventAnnotatonProvider.fetchAnnotations(fetchParameters, monitor);
     }
 }

@@ -31,13 +31,20 @@ import java.util.function.Predicate;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.LinuxTidAspect;
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.KernelAnalysisModule;
+import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
+import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.Activator;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.StateValues;
-import org.eclipse.tracecompass.internal.tmf.core.analysis.callsite.CallsiteAnalysis;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.registry.LinuxStyle;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationCategoriesModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationEventHandler;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
+import org.eclipse.tracecompass.internal.tmf.core.analysis.callsite.CallsiteAnalysis;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
@@ -92,7 +99,7 @@ import com.google.common.collect.TreeMultimap;
  *
  * @author Simon Delisle
  */
-public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider implements ITimeGraphDataProvider<@NonNull TimeGraphEntryModel>, IOutputStyleProvider {
+public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider implements ITimeGraphDataProvider<@NonNull TimeGraphEntryModel>, IOutputStyleProvider, IOutputAnnotationProvider {
 
     /**
      * Extension point ID.
@@ -171,6 +178,8 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
     /** Cache for entry metadata */
     private final Map<Long, @NonNull Multimap<@NonNull String, @NonNull Object>> fEntryMetadata = new HashMap<>();
 
+    private IOutputAnnotationProvider fEventAnnotationProvider;
+
     /**
      * Constructor
      *
@@ -184,6 +193,8 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
     public ThreadStatusDataProvider(@NonNull ITmfTrace trace, KernelAnalysisModule module) {
         super(trace);
         fModule = module;
+        fEventAnnotationProvider = new AnnotationEventHandler<>(OsStrings.tid(), (unused -> true), (candidate) -> !(candidate instanceof IKernelTrace) && trace != candidate, LinuxTidAspect.class, trace,
+                (fetchParameters, monitor) -> fetchTree(fetchParameters, monitor));
     }
 
     @Override
@@ -805,4 +816,13 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
         return new TmfModelResponse<>(new OutputStyleModel(STATE_MAP), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
+    @Override
+    public @NonNull TmfModelResponse<@NonNull AnnotationCategoriesModel> fetchAnnotationCategories(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+        return fEventAnnotationProvider.fetchAnnotationCategories(fetchParameters, monitor);
+    }
+
+    @Override
+    public @NonNull TmfModelResponse<@NonNull AnnotationModel> fetchAnnotations(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+        return fEventAnnotationProvider.fetchAnnotations(fetchParameters, monitor);
+    }
 }

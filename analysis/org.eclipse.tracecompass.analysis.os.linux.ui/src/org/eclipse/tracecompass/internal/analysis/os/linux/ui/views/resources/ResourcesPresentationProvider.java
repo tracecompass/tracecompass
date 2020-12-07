@@ -24,6 +24,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.Messages;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.timegraph.ITimeGraphEntryModelWeighted;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphDataProvider;
@@ -38,6 +39,7 @@ import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.StateItem;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.MarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.NullTimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
@@ -208,11 +210,18 @@ public class ResourcesPresentationProvider extends TimeGraphPresentationProvider
     public Map<String, Object> getSpecificEventStyle(ITimeEvent event) {
         Map<String, Object> map = new HashMap<>(super.getSpecificEventStyle(event));
         if (isType(event.getEntry(), Type.CURRENT_THREAD) && event instanceof TimeEvent) {
-            int threadEventValue = ((TimeEvent) event).getValue();
-            RGBAColor color = PALETTE.get(Math.floorMod(threadEventValue + COLOR_DIFFERENCIATION_FACTOR, NUM_COLORS));
-            map.put(StyleProperties.BACKGROUND_COLOR, ColorUtils.toHexColor(color.getRed(), color.getGreen(), color.getBlue()));
-            map.put(StyleProperties.STYLE_NAME, String.valueOf(threadEventValue));
-
+            if(event instanceof MarkerEvent) {
+                TimeEvent timeEvent = (TimeEvent) event;
+                OutputElementStyle style = timeEvent.getModel().getStyle();
+                if (style != null) {
+                    return style.getStyleValues();
+                }
+            } else {
+                int threadEventValue = ((TimeEvent) event).getValue();
+                RGBAColor color = PALETTE.get(Math.floorMod(threadEventValue + COLOR_DIFFERENCIATION_FACTOR, NUM_COLORS));
+                map.put(StyleProperties.BACKGROUND_COLOR, ColorUtils.toHexColor(color.getRed(), color.getGreen(), color.getBlue()));
+                map.put(StyleProperties.STYLE_NAME, String.valueOf(threadEventValue));
+            }
         } else if (event.getEntry() instanceof TimeGraphEntry &&
                 ((TimeGraphEntry) event.getEntry()).getEntryModel() instanceof ITimeGraphEntryModelWeighted) {
             ITimeGraphEntryModelWeighted model = (ITimeGraphEntryModelWeighted) ((TimeGraphEntry) event.getEntry()).getEntryModel();
