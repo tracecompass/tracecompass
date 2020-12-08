@@ -134,7 +134,7 @@ public final class TmfBaseAspects {
      * Get the aspect for the event timestamp in nanoseconds
      *
      * @return The timestamp nanosecond aspect
-     * @since 6.1
+     * @since 6.2
      */
     public static ITmfEventAspect<Long> getTimestampNsAspect() {
         return TIMESTAMP_NANOSECOND_ASPECT;
