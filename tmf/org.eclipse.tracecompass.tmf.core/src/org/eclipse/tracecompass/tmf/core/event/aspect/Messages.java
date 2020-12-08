@@ -35,12 +35,12 @@ public class Messages extends NLS {
     public static @Nullable String AspectHelpText_Statesystem;
     /**
      * Nanosecond normalized timestamp
-     * @since 6.1
+     * @since 6.2
      */
     public static @Nullable String AspectName_Timestamp_Nanoseconds;
     /**
      * Explanation of why use a nanosecond normalized timestamp
-     * @since 6.1
+     * @since 6.2
      */
     public static @Nullable String AspectName_Timestamp_Nanoseconds_Help;
 
