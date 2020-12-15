@@ -62,6 +62,14 @@ class Messages extends NLS {
     public static String ResourcesStatusDataProviderFactory_title;
     /** Data Provider factory help text */
     public static String ResourcesStatusDataProviderFactory_descriptionText;
+    /** Style group for CPU states */
+    public static String ResourcesStatusDataProvider_styleGroupCpu;
+    /** Style group for other states */
+    public static String ResourcesStatusDataProvider_styleGroupOther;
+    /** Style name for the thread style */
+    public static String ResourcesStatusDataProvider_styleNameThread;
+    /** Style name for the frequency style */
+    public static String ResourcesStatusDataProvider_styleNameFrequency;
 
     static {
         // initialize resource bundle

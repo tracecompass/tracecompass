@@ -32,6 +32,7 @@ import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.FollowCpuA
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.FollowThreadAction;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.UnfollowCpuAction;
 import org.eclipse.tracecompass.internal.analysis.os.linux.ui.actions.UnfollowThreadAction;
+import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.BaseDataProviderTimeGraphPresentationProvider;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
@@ -74,7 +75,15 @@ public class ResourcesView extends BaseDataProviderTimeGraphView {
      * Default constructor
      */
     public ResourcesView() {
-        super(ID, new ResourcesPresentationProvider(), ResourcesStatusDataProvider.ID);
+        super(ID, new BaseDataProviderTimeGraphPresentationProvider() {
+            @Override
+            public int getItemHeight(ITimeGraphEntry entry) {
+                if (!entry.hasTimeEvents() && entry.getParent() != null) {
+                    return 4;
+                }
+                return super.getItemHeight(entry);
+            }
+        }, ResourcesStatusDataProvider.ID);
         setFilterColumns(FILTER_COLUMN_NAMES);
         setFilterLabelProvider(new ResourcesFilterLabelProvider());
         setEntryComparator(new ResourcesEntryComparator());

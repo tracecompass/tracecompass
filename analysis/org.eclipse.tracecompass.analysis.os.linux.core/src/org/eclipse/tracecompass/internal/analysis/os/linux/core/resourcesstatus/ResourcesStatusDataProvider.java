@@ -40,6 +40,7 @@ import org.eclipse.tracecompass.analysis.os.linux.core.model.OsStrings;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelTrace;
 import org.eclipse.tracecompass.common.core.format.DecimalUnitFormat;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.Attributes;
+import org.eclipse.tracecompass.internal.analysis.os.linux.core.registry.LinuxStyle;
 import org.eclipse.tracecompass.internal.analysis.os.linux.core.resourcesstatus.ResourcesEntryModel.Type;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationCategoriesModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationEventHandler;
@@ -54,11 +55,16 @@ import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
 import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.analysis.callsite.ITmfCallsiteResolver;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
+import org.eclipse.tracecompass.tmf.core.dataprovider.X11ColorUtils;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfCpuAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfDeviceAspect;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfCallsite;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
+import org.eclipse.tracecompass.tmf.core.model.IOutputStyleProvider;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.OutputStyleModel;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphArrow;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
@@ -67,15 +73,19 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphState;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
+import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
+import org.eclipse.tracecompass.tmf.core.presentation.RotatingPaletteProvider;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+import org.eclipse.tracecompass.tmf.core.util.Pair;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
@@ -86,7 +96,7 @@ import com.google.common.primitives.Ints;
  *
  * @author Loic Prieur-Drevon
  */
-public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@NonNull KernelAnalysisModule, @NonNull ResourcesEntryModel> implements IOutputAnnotationProvider {
+public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@NonNull KernelAnalysisModule, @NonNull ResourcesEntryModel> implements IOutputAnnotationProvider, IOutputStyleProvider {
 
     /**
      * Extension point ID.
@@ -99,7 +109,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     private static final @NonNull Format FREQUENCY_FORMATTER = new DecimalUnitFormat() {
 
         /**
-         *
+         * Serial version ID
          */
         private static final long serialVersionUID = 2101980732073309988L;
 
@@ -111,6 +121,50 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
 
     };
     private static final long FREQUENCY_MULTIPLIER = 1000;
+
+    private static final @NonNull Map<@NonNull String, @NonNull OutputElementStyle> STATE_MAP;
+
+    private static final @NonNull Map<@NonNull String, @NonNull OutputElementStyle> STYLE_MAP = Collections.synchronizedMap(new HashMap<>());
+
+    // Palette for process styles
+    private static final int NUM_COLORS = 25;
+    private static final float BRIGHTNESS = 0.8f;
+    private static final float SATURATION = 0.8f;
+    private static final int COLOR_DIFFERENCIATION_FACTOR = NUM_COLORS / 2 + 2;
+    private static final List<@NonNull RGBAColor> PALETTE =  new RotatingPaletteProvider.Builder()
+            .setNbColors(NUM_COLORS)
+            .setBrightness(BRIGHTNESS)
+            .setSaturation(SATURATION)
+            .build().get();
+    private static final String BASE_FREQUENCY_STYLE = "frequency"; //$NON-NLS-1$
+    private static final String BASE_THREAD_STYLE = "thread"; //$NON-NLS-1$
+
+    private static @NonNull Map<@NonNull String, @NonNull Object> toGroup(Map<@NonNull String, @NonNull Object> originalMap, @NonNull String group, @Nullable String styleName) {
+        Map<@NonNull String, @NonNull Object> builder = new HashMap<>(originalMap);
+        builder.put(StyleProperties.STYLE_GROUP, group);
+        if (styleName != null) {
+            builder.put(StyleProperties.STYLE_NAME, styleName);
+        }
+        return ImmutableMap.copyOf(builder);
+    }
+
+    static {
+        ImmutableMap.Builder<@NonNull String, @NonNull OutputElementStyle> builder = new ImmutableMap.Builder<>();
+        /*
+         * ADD STATE MAPPING HERE
+         */
+        builder.put(LinuxStyle.IDLE.getLabel(), new OutputElementStyle(null, toGroup(LinuxStyle.IDLE.toMap(), Messages.ResourcesStatusDataProvider_styleGroupCpu, null)));
+        builder.put(LinuxStyle.USERMODE.getLabel(), new OutputElementStyle(null, toGroup(LinuxStyle.USERMODE.toMap(), Messages.ResourcesStatusDataProvider_styleGroupCpu, null)));
+        builder.put(LinuxStyle.SYSCALL.getLabel(), new OutputElementStyle(null, toGroup(LinuxStyle.SYSCALL.toMap(), Messages.ResourcesStatusDataProvider_styleGroupCpu, null)));
+        builder.put(LinuxStyle.INTERRUPTED.getLabel(), new OutputElementStyle(null, toGroup(LinuxStyle.INTERRUPTED.toMap(), Messages.ResourcesStatusDataProvider_styleGroupCpu, null)));
+        builder.put(LinuxStyle.SOFT_IRQ.getLabel(), new OutputElementStyle(null, toGroup(LinuxStyle.SOFT_IRQ.toMap(), Messages.ResourcesStatusDataProvider_styleGroupCpu, null)));
+        builder.put(LinuxStyle.SOFT_IRQ_RAISED.getLabel(), new OutputElementStyle(null, toGroup(LinuxStyle.SOFT_IRQ_RAISED.toMap(), Messages.ResourcesStatusDataProvider_styleGroupCpu, null)));
+        builder.put(BASE_FREQUENCY_STYLE, new OutputElementStyle(null, toGroup(LinuxStyle.USERMODE.toMap(),
+                Messages.ResourcesStatusDataProvider_styleGroupOther, Messages.ResourcesStatusDataProvider_styleNameThread)));
+        builder.put(BASE_THREAD_STYLE, new OutputElementStyle(null, toGroup(LinuxStyle.USERMODE.toMap(), Messages.ResourcesStatusDataProvider_styleGroupOther,
+                Messages.ResourcesStatusDataProvider_styleNameFrequency)));
+        STATE_MAP = builder.build();
+    }
 
     /** Map of attribute quark to its ResourcesEntryModel type */
     private final HashMap<Integer, Type> fEntryModelTypes = new HashMap<>();
@@ -150,6 +204,9 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
 
     /** Annotation provider that reads UST traces */
     private final IOutputAnnotationProvider fEventAnnotatonProvider;
+
+    private @NonNull Map<@NonNull Integer, @NonNull Pair<Long, Long>> fFreqMap = new HashMap<>();
+
     /**
      * Constructor
      *
@@ -203,6 +260,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                 ResourcesEntryModel currentFreqEntry = new ResourcesEntryModelWeighted(getId(currentFreqQuark), traceId, computeEntryName(Type.FREQUENCY, cpu), start, end, cpu, Type.FREQUENCY, minFrequency, maxFrequency);
                 builder.add(currentFreqEntry);
                 fEntryModelTypes.put(currentFreqQuark, Type.FREQUENCY);
+                fFreqMap.put(currentFreqQuark, new Pair<>(minFrequency, maxFrequency));
             }
 
             // Add a separator entry after each CPU entry
@@ -387,20 +445,21 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                                 }
                             }
                         }
-                        TimeGraphState timeGraphState = new TimeGraphState(startTime, duration, s, execName != null ? execName + ' ' + '(' + String.valueOf(s) + ')' : String.valueOf(s));
+                        TimeGraphState timeGraphState = new TimeGraphState(startTime, duration, execName != null ? execName + ' ' + '(' + String.valueOf(s) + ')' : String.valueOf(s), getSpecificStyleForTid(s));
                         applyFilterAndAddState(eventList, timeGraphState, key, predicates, monitor);
                     } else if (type == Type.CURRENT_THREAD) {
                         // add null state when current thread is 0
                         ITimeGraphState timeGraphState = new TimeGraphState(startTime, duration, Integer.MIN_VALUE);
                         applyFilterAndAddState(eventList, timeGraphState, key, predicates, monitor);
                     } else {
-                        TimeGraphState timeGraphState = new TimeGraphState(startTime, duration, s);
+                        TimeGraphState timeGraphState = new TimeGraphState(startTime, duration, null, getElementStyle(type, s));
                         applyFilterAndAddState(eventList, timeGraphState, key, predicates, monitor);
                     }
                 } else if ((status instanceof Long) && (type == Type.FREQUENCY)) {
                     long s = (long) status;
                     // The value needs to fit in an integer
-                    TimeGraphState timeGraphState = new TimeGraphState(startTime, duration, (int) (s / FREQUENCY_MULTIPLIER), String.valueOf(FREQUENCY_FORMATTER.format(s)));
+                    Pair<Long, Long> freqPair = fFreqMap.get(interval.getAttribute());
+                    TimeGraphState timeGraphState = new TimeGraphState(startTime, duration, String.valueOf(FREQUENCY_FORMATTER.format(s)), getSpecificStyleForFrequency((int) (s / FREQUENCY_MULTIPLIER), key, freqPair));
                     applyFilterAndAddState(eventList, timeGraphState, key, predicates, monitor);
                 } else {
                     ITimeGraphState timeGraphState = new TimeGraphState(startTime, duration, Integer.MIN_VALUE);
@@ -413,6 +472,49 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
             fExecNamesCache.clear();
         }
         return new TimeGraphModel(rows);
+    }
+
+    private static @NonNull OutputElementStyle getElementStyle(Type type, int stateValue) {
+        String styleFor = getStyleFor(type, stateValue);
+        return STYLE_MAP.computeIfAbsent(styleFor, style -> new OutputElementStyle(style));
+    }
+
+    private static @NonNull String getStyleFor(Type type, int stateValue) {
+        if (type == Type.IRQ) {
+            return LinuxStyle.INTERRUPTED.getLabel();
+        }
+        switch (stateValue) {
+        case StateValues.CPU_STATUS_IDLE:
+            return LinuxStyle.IDLE.getLabel();
+        case StateValues.CPU_STATUS_RUN_USERMODE:
+            return LinuxStyle.USERMODE.getLabel();
+        case StateValues.CPU_STATUS_RUN_SYSCALL:
+            return LinuxStyle.SYSCALL.getLabel();
+        case StateValues.CPU_STATUS_IRQ:
+            return LinuxStyle.INTERRUPTED.getLabel();
+        case StateValues.CPU_STATUS_SOFTIRQ:
+            return LinuxStyle.SOFT_IRQ.getLabel();
+        case StateValues.CPU_STATUS_SOFT_IRQ_RAISED:
+            return LinuxStyle.SOFT_IRQ_RAISED.getLabel();
+        default:
+            return LinuxStyle.UNKNOWN.getLabel();
+        }
+    }
+
+    private static OutputElementStyle getSpecificStyleForTid(int s) {
+        return STYLE_MAP.computeIfAbsent(String.valueOf(s), pidStr -> {
+            RGBAColor color = PALETTE.get(Math.floorMod(s + COLOR_DIFFERENCIATION_FACTOR, NUM_COLORS));
+            return new OutputElementStyle(BASE_THREAD_STYLE,
+                    ImmutableMap.of(StyleProperties.BACKGROUND_COLOR, X11ColorUtils.toHexColor(color.getRed(), color.getGreen(), color.getBlue()),
+                    StyleProperties.STYLE_NAME, String.valueOf(s)));
+        });
+    }
+
+    private static OutputElementStyle getSpecificStyleForFrequency(int frequency, Long entryId, @Nullable Pair<Long, Long> freqPair) {
+        return STYLE_MAP.computeIfAbsent(String.valueOf(entryId) + '_' + String.valueOf(frequency), freqStr -> {
+            return new OutputElementStyle(BASE_FREQUENCY_STYLE,
+                    ImmutableMap.of(StyleProperties.HEIGHT, freqPair == null ? 1.0f : (float) (frequency - freqPair.getFirst()) / (freqPair.getSecond() - freqPair.getFirst())));
+        });
     }
 
     /**
@@ -482,12 +584,12 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                     if (execNameQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
                         Object currentThreadName = ss.querySingleState(currentThread.getEndTime(), execNameQuark).getValue();
                         if (currentThreadName instanceof String) {
-                            list.add(new TimeGraphState(start, duration, StateValues.CPU_STATUS_RUN_USERMODE, (String) currentThreadName));
+                            list.add(new TimeGraphState(start, duration, (String) currentThreadName, STYLE_MAP.computeIfAbsent(LinuxStyle.USERMODE.getLabel(), style -> new OutputElementStyle(style))));
                             continue;
                         }
                     }
                 }
-                list.add(new TimeGraphState(start, duration, StateValues.CPU_STATUS_RUN_USERMODE));
+                list.add(new TimeGraphState(start, duration, null, STYLE_MAP.computeIfAbsent(LinuxStyle.USERMODE.getLabel(), style -> new OutputElementStyle(style))));
             }
         }
         return list;
@@ -521,12 +623,12 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                     if (syscallQuark != ITmfStateSystem.INVALID_ATTRIBUTE) {
                         Object syscallName = ss.querySingleState(start, syscallQuark).getValue();
                         if (syscallName instanceof String) {
-                            list.add(new TimeGraphState(start, duration, StateValues.CPU_STATUS_RUN_SYSCALL, String.valueOf(syscallName)));
+                            list.add(new TimeGraphState(start, duration, String.valueOf(syscallName), STYLE_MAP.computeIfAbsent(LinuxStyle.SYSCALL.getLabel(), style -> new OutputElementStyle(style))));
                             continue;
                         }
                     }
                 }
-                list.add(new TimeGraphState(start, duration, StateValues.CPU_STATUS_RUN_SYSCALL));
+                list.add(new TimeGraphState(start, duration, null, STYLE_MAP.computeIfAbsent(LinuxStyle.SYSCALL.getLabel(), style -> new OutputElementStyle(style))));
             }
         }
         return list;
@@ -752,5 +854,10 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     @Override
     public @NonNull TmfModelResponse<@NonNull AnnotationModel> fetchAnnotations(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         return fEventAnnotatonProvider.fetchAnnotations(fetchParameters, monitor);
+    }
+
+    @Override
+    public @NonNull TmfModelResponse<@NonNull OutputStyleModel> fetchStyle(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+        return new TmfModelResponse<>(new OutputStyleModel(STATE_MAP), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 }
