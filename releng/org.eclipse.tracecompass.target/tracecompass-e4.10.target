@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="tracecompass-e4.10" sequenceNumber="13">
+<?pde version="3.8"?><target name="tracecompass-e4.10" sequenceNumber="14">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.cdt.gnu.dsf.feature.group" version="0.0.0"/>
@@ -46,7 +46,7 @@
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="jakarta.xml.bind" version="2.3.3.v20201118-1818"/>
-<repository location="https://download.eclipse.org/tools/orbit/downloads/drops/S20201124213957/repository/"/>
+<repository location="https://download.eclipse.org/tools/orbit/downloads/drops/R20201130205003/repository/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.license.feature.group" version="0.0.0"/>
