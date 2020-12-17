@@ -324,7 +324,7 @@
         <inherited>true</inherited>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.4.1</version>
+        <version>3.0.0-M3</version>
         <executions>
           <execution>
             <id>enforce-maven-version</id>
@@ -616,7 +616,7 @@
         <plugin>
           <groupId>org.jboss.tools.tycho-plugins</groupId>
           <artifactId>repository-utils</artifactId>
-          <version>1.0.0</version>
+          <version>1.7.0</version>
         </plugin>
 
         <plugin>
