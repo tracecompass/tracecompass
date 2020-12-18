@@ -23,6 +23,8 @@ ThemesExtension { color-definition:
 	'#org-eclipse-tracecompass-tmf-ui-FOREGROUND_SEL_NOFOCUS',
 	'#org-eclipse-tracecompass-tmf-ui-TOOL_BACKGROUND',
 	'#org-eclipse-tracecompass-tmf-ui-TOOL_FOREGROUND',
+	'#org-eclipse-ui-workbench-DARK_BACKGROUND',
+	'#org-eclipse-ui-workbench-DARK_FOREGROUND',
 	'#org-eclipse-ui-workbench-INACTIVE_UNSELECTED_TABS_COLOR_START',
 	'#org-eclipse-ui-workbench-INACTIVE_UNSELECTED_TABS_COLOR_END',
 	'#org-eclipse-ui-workbench-INACTIVE_TAB_BG_START',
