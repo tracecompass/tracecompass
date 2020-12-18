@@ -60,14 +60,14 @@
   </setupTask>
   <setupTask
       xsi:type="jdt:JRETask"
-      version="JavaSE-1.8"
-      location="${jre.location-1.8}">
+      version="JavaSE-11"
+      location="${jre.location-11}">
     <description>Define the JRE needed to compile and run the Java projects of ${scope.project.label}</description>
   </setupTask>
   <setupTask
       xsi:type="setup:VariableTask"
       name="eclipse.target.platform"
-      defaultValue="tracecompass-e4.17"
+      defaultValue="tracecompass-e4.18"
       storageURI="scope://Workspace"
       label="Target Platform">
     <choice
@@ -97,6 +97,9 @@
     <choice
         value="tracecompass-e4.17"
         label="Trace Compass Eclipse 2020-09 - 4.17"/>
+    <choice
+        value="tracecompass-e4.18"
+        label="Trace Compass Eclipse 2020-12 - 4.18"/>
     <choice
         value="tracecompass-eStaging"
         label="Trace Compass Eclipse Latest"/>
@@ -134,15 +137,15 @@
     <setupTask
         xsi:type="pde:TargetPlatformTask"
         id="tracecompass-baseline-resolve"
-        name="tracecompass-baseline-6.1.0"
+        name="tracecompass-baseline-6.2.0"
         activate="false">
       <description>Trace Compass Baseline</description>
     </setupTask>
     <setupTask
         xsi:type="pde:APIBaselineFromTargetTask"
-        id="tracecompass-baseline-6.1.0"
+        id="tracecompass-baseline-6.2.0"
         name="Trace Compass Baseline"
-        targetName="tracecompass-baseline-6.1.0">
+        targetName="tracecompass-baseline-6.2.0">
       <description>Trace Compass Baseline</description>
     </setupTask>
     <setupTask
