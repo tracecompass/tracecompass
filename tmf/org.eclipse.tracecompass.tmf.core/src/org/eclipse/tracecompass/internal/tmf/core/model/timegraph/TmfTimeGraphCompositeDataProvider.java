@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2020 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -11,13 +11,17 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.model.timegraph;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.model.tree.TmfTreeCompositeDataProvider;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
 import org.eclipse.tracecompass.tmf.core.model.IOutputStyleProvider;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
@@ -29,6 +33,7 @@ import org.eclipse.tracecompass.tmf.core.model.timegraph.ITimeGraphRowModel;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphModel;
 import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.ImmutableList;
 
@@ -61,6 +66,51 @@ extends TmfTreeCompositeDataProvider<M, P> implements ITimeGraphDataProvider<M>,
      */
     public TmfTimeGraphCompositeDataProvider(List<P> providers, String id) {
         super(providers, id);
+    }
+
+    /**
+     * Return a composite {@link ITimeGraphDataProvider} from a list of traces.
+     *
+     * @param traces
+     *            A list of traces from which to generate a provider.
+     * @param id
+     *            the provider's ID
+     * @return null if the non of the traces returns a provider, the provider if the
+     *         lists only return one, else a {@link TmfTimeGraphCompositeDataProvider}
+     *         encapsulating the providers
+     */
+    public static @Nullable ITimeGraphDataProvider<ITimeGraphEntryModel> create(Collection<ITmfTrace> traces, String id) {
+        return create(traces, id, null);
+    }
+
+    /**
+     * Return a composite {@link ITimeGraphDataProvider} from a list of traces.
+     *
+     * @param traces
+     *            A list of traces from which to generate a provider.
+     * @param id
+     *            the provider's ID
+     * @param secondaryId
+     *            The provider's secondaryId
+     * @return null if the non of the traces returns a provider, the provider if the
+     *         lists only return one, else a {@link TmfTimeGraphCompositeDataProvider}
+     *         encapsulating the providers
+     */
+    public static @Nullable ITimeGraphDataProvider<ITimeGraphEntryModel> create(Collection<ITmfTrace> traces, String id, @Nullable String secondaryId) {
+        String providerId = secondaryId == null ? id : id + ':' + secondaryId;
+        List<@NonNull ITimeGraphDataProvider<ITimeGraphEntryModel>> providers = new ArrayList<>();
+        for (ITmfTrace child : traces) {
+            ITimeGraphDataProvider<ITimeGraphEntryModel> provider = DataProviderManager.getInstance().getDataProvider(child, providerId, ITimeGraphDataProvider.class);
+            if (provider != null) {
+                providers.add(provider);
+            }
+        }
+        if (providers.isEmpty()) {
+            return null;
+        } else if (providers.size() == 1) {
+            return providers.get(0);
+        }
+        return new TmfTimeGraphCompositeDataProvider<>(providers, providerId);
     }
 
     @Override
