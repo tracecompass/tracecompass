@@ -57,6 +57,7 @@ import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfWindowRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.timestamp.ITmfTimestamp;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
+import org.eclipse.tracecompass.tmf.core.trace.experiment.TmfExperiment;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableSet;
@@ -278,6 +279,8 @@ public final class TmfTraceManager {
         if (!traces.isEmpty()) {
             Iterable<ITmfTrace> iterable = checkNotNull(Iterables.concat(Iterables.transform(traces, TmfTraceManager::getTraceSet)));
             return ImmutableSet.copyOf(iterable);
+        } else if (trace instanceof TmfExperiment) {
+            return ImmutableSet.of();
         }
         return ImmutableSet.of(trace);
     }
