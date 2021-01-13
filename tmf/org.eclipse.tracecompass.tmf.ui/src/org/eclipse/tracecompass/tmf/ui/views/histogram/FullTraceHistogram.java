@@ -119,6 +119,7 @@ public class FullTraceHistogram extends Histogram {
                 int center = (int) (((fRangeStartTime + fRangeDuration / 2) - fScaledData.fFirstBucketTime) / fScaledData.fBucketDuration);
                 fStartDelta = center - event.x;
                 fMouseMoved = false;
+                fCanvas.setCursor(fMoveCursor);
                 return;
             } else if (event.button == 3) {
                 fDragState = DRAG_ZOOM;
@@ -132,6 +133,7 @@ public class FullTraceHistogram extends Histogram {
                     fRangeStartTime = time;
                 }
                 fRangeDuration = time - fRangeStartTime;
+                fCanvas.setCursor(fZoomCursor);
                 fCanvas.redraw();
                 return;
             }
@@ -150,6 +152,7 @@ public class FullTraceHistogram extends Histogram {
                 fRangeStartTime = Math.max(getStartTime(), Math.min(getEndTime() - fRangeDuration, startTime));
             }
             ((HistogramView) fParentView).updateTimeRange(fRangeStartTime, fRangeStartTime + fRangeDuration);
+            fCanvas.setCursor(null);
             return;
         } else if (fDragState == DRAG_ZOOM && event.button == fDragButton) {
             fDragState = DRAG_NONE;
@@ -165,6 +168,7 @@ public class FullTraceHistogram extends Histogram {
                 fRangeDuration = fZoom.getDuration();
                 fCanvas.redraw();
             }
+            fCanvas.setCursor(null);
             return;
         }
         super.mouseUp(event);

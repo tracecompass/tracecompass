@@ -152,12 +152,14 @@ public class TimeRangeHistogram extends Histogram {
                 long minOffset = (long) ((endTime - fFullRangeEndTime) / fScaledData.fBucketDuration);
                 fMaxOffset = (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, maxOffset));
                 fMinOffset = (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, minOffset));
+                fCanvas.setCursor(fMoveCursor);
                 return;
             } else if (event.button == 3) {
                 fDragState = DRAG_ZOOM;
                 fDragButton = event.button;
                 fRangeStartTime = getTimestamp(event.x);
                 fRangeDuration = 0;
+                fCanvas.setCursor(fZoomCursor);
                 fCanvas.redraw();
                 return;
             }
@@ -178,6 +180,7 @@ public class TimeRangeHistogram extends Histogram {
                 ((HistogramView) fParentView).updateTimeRange(fRangeStartTime, fRangeStartTime + fRangeDuration);
                 setOffset(0);
             }
+            fCanvas.setCursor(null);
             return;
         } else if (fDragState == DRAG_ZOOM && event.button == fDragButton) {
             fDragState = DRAG_NONE;
@@ -193,6 +196,7 @@ public class TimeRangeHistogram extends Histogram {
                 fRangeDuration = fZoom.getDuration();
                 fCanvas.redraw();
             }
+            fCanvas.setCursor(null);
             return;
         }
         super.mouseUp(event);

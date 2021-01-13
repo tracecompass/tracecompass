@@ -36,6 +36,7 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
@@ -143,6 +144,23 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
     };
     private final Color fTimeRangeColor = new Color(Display.getCurrent(), 255, 128, 0);
     private final Color fLostEventColor = new Color(Display.getCurrent(), 208, 62, 120);
+
+    /**
+     * Movement cursor
+     * @since 6.2
+     */
+    protected final Cursor fMoveCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_HAND);
+    /**
+     * Zoom cursor
+     * @since 6.2
+     */
+    protected final Cursor fZoomCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_SIZEWE);
+
+    /**
+     * Select cursor
+     * @since 6.2
+     */
+    protected final Cursor fSelectCursor = Display.getDefault().getSystemCursor(SWT.CURSOR_CROSS);
 
     // Drag states
     /**
@@ -959,6 +977,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
         if (fScaledData != null && event.button == 1 && fDragState == DRAG_NONE &&
                 (fDataModel.getNbEvents() != 0 || fDataModel.getStartTime() < fDataModel.getEndTime())) {
             fDragState = DRAG_SELECTION;
+            fCanvas.setCursor(fZoomCursor);
             fDragButton = event.button;
             if ((event.stateMask & SWT.MODIFIER_MASK) == SWT.SHIFT) {
                 if (Math.abs(event.x - fScaledData.fSelectionBeginBucket) < Math.abs(event.x - fScaledData.fSelectionEndBucket)) {
@@ -967,11 +986,13 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
                 }
                 fSelectionEnd = getTimestamp(event.x);
                 fScaledData.fSelectionEndBucket = event.x;
+                fCanvas.setCursor(fSelectCursor);
             } else {
                 fSelectionBegin = Math.min(getTimestamp(event.x), getEndTime());
                 fScaledData.fSelectionBeginBucket = event.x;
                 fSelectionEnd = fSelectionBegin;
                 fScaledData.fSelectionEndBucket = fScaledData.fSelectionBeginBucket;
+                fCanvas.setCursor(fSelectCursor);
             }
             updateStatusLine(fSelectionBegin, fSelectionEnd, getTimestamp(event.x));
             fCanvas.redraw();
@@ -986,6 +1007,7 @@ public abstract class Histogram implements ControlListener, PaintListener, KeyLi
             fDragButton = 0;
             updateSelectionTime();
         }
+        fCanvas.setCursor(null);
         updateStatusLine(fSelectionBegin, fSelectionEnd, getTimestamp(event.x));
     }
 
