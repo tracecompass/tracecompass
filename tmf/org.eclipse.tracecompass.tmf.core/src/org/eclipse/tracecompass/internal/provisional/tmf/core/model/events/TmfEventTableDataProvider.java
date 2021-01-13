@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2018, 2020 Ericsson
+ * Copyright (c) 2018, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -35,6 +35,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.Virtua
 import org.eclipse.tracecompass.internal.tmf.core.filter.TmfCollapseFilter;
 import org.eclipse.tracecompass.internal.tmf.core.model.AbstractTmfTraceDataProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.event.aspect.ITmfEventAspect;
 import org.eclipse.tracecompass.tmf.core.event.aspect.TmfBaseAspects;
@@ -157,6 +158,13 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
 
     @Override
     public TmfModelResponse<ITmfVirtualTableModel<EventTableLine>> fetchLines(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+        if (!fetchParameters.containsKey(DataProviderParameterUtils.REQUESTED_TABLE_INDEX_KEY) &&
+                fetchParameters.containsKey(DataProviderParameterUtils.REQUESTED_TIME_KEY)) {
+            fetchParameters.put(DataProviderParameterUtils.REQUESTED_TABLE_INDEX_KEY, getTableIndex(fetchParameters));
+        }
+        if (!fetchParameters.containsKey(DataProviderParameterUtils.REQUESTED_COLUMN_IDS_KEY)) {
+            fetchParameters.put(DataProviderParameterUtils.REQUESTED_COLUMN_IDS_KEY, Collections.emptyList());
+        }
         VirtualTableQueryFilter queryFilter = FetchParametersUtils.createVirtualTableQueryFilter(fetchParameters);
         if (queryFilter == null) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
@@ -194,6 +202,19 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         List<Long> columnsIds = new ArrayList<>(aspects.keySet());
         TmfVirtualTableModel<EventTableLine> model = new TmfVirtualTableModel<>(columnsIds, request.getEventLines(), queryFilter.getIndex(), request.getCurrentCount());
         return new TmfModelResponse<>(model, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+    }
+
+    private long getTableIndex(Map<String, Object> fetchParameters) {
+        List<Long> timeRequested = DataProviderParameterUtils.extractTimeRequested(fetchParameters);
+        long index = 0;
+        if (timeRequested != null && !timeRequested.isEmpty()) {
+            ITmfTrace trace = getTrace();
+            ITmfContext context = trace.seekEvent(TmfTimestamp.fromNanos(timeRequested.get(0)));
+            long rank = context.getRank();
+            index = (rank == ITmfContext.UNKNOWN_RANK) ? trace.getNbEvents() - 1 : rank;
+            context.dispose();
+        }
+        return index;
     }
 
     /**
