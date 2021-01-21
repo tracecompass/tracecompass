@@ -78,7 +78,7 @@ public class TmfEventTableDataProviderTest {
     @BeforeClass
     public static void beforeClass() throws TmfTraceException {
         fTrace.dispose();
-        fTrace = new TmfTraceStub(TEST_TRACE.getFullPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, false, null);
+        fTrace = new TmfTraceStub(TEST_TRACE.getFullPath(), ITmfTrace.DEFAULT_TRACE_CACHE_SIZE, true, null);
         fProvider = new TmfEventTableDataProvider(fTrace);
         // Make sure the columns are computed before the test
         fColumns = fetchColumnId();

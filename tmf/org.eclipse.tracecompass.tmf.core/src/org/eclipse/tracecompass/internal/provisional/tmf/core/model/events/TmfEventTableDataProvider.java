@@ -177,6 +177,10 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         if (aspects.isEmpty()) {
             return new TmfModelResponse<>(new TmfVirtualTableModel<EventTableLine>(Collections.emptyList(), Collections.emptyList(), queryFilter.getIndex(), 0), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
+        List<Long> columnsIds = new ArrayList<>(aspects.keySet());
+        if (getTrace().getNbEvents() == 0) {
+            return new TmfModelResponse<>(new TmfVirtualTableModel<>(columnsIds, Collections.emptyList(), queryFilter.getIndex(), 0), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        }
 
         boolean forwardSearch = queryFilter.getCount() >= 0;
 
@@ -199,7 +203,6 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
             return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
         }
 
-        List<Long> columnsIds = new ArrayList<>(aspects.keySet());
         TmfVirtualTableModel<EventTableLine> model = new TmfVirtualTableModel<>(columnsIds, request.getEventLines(), queryFilter.getIndex(), request.getCurrentCount());
         return new TmfModelResponse<>(model, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
