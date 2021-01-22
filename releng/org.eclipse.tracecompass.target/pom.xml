@@ -93,6 +93,16 @@
                     <classifier>tracecompass-e4.17</classifier>
                   </artifact>
                   <artifact>
+                    <file>tracecompass-e4.18.target</file>
+                    <type>target</type>
+                    <classifier>tracecompass-e4.18</classifier>
+                  </artifact>
+                  <artifact>
+                    <file>tracecompass-e4.19.target</file>
+                    <type>target</type>
+                    <classifier>tracecompass-e4.19</classifier>
+                  </artifact>
+                  <artifact>
                     <file>tracecompass-eStaging.target</file>
                     <type>target</type>
                     <classifier>tracecompass-eStaging</classifier>
