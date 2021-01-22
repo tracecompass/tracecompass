@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2019, 2020 Ericsson
+ * Copyright (c) 2019, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -463,7 +463,7 @@ public final class StyleProperties {
      * Vertical alignment as a string. Possible values: {@link VerticalAlign}.
      * <p>
      * Default: {@link VerticalAlign#MIDDLE}
-     * @since 6.2
+     * @since 6.3
      */
     public static final String VERTICAL_ALIGN = "vertical-align"; //$NON-NLS-1$
 
@@ -471,7 +471,7 @@ public final class StyleProperties {
      * Vertical alignment values.
      *
      * @noimplement This interface is not intended to be implemented by clients.
-     * @since 6.2
+     * @since 6.3
      */
     public interface VerticalAlign {
         /**
