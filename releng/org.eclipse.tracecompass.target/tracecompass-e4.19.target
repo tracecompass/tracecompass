@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><?pde version="3.8"?><target name="tracecompass-e4.19" sequenceNumber="1">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?pde version="3.8"?><target name="tracecompass-e4.19" sequenceNumber="2">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.cdt.gnu.dsf.feature.group" version="0.0.0"/>
 <unit id="org.eclipse.tm.terminal.control" version="0.0.0"/>
-<repository location="https://download.eclipse.org/tools/cdt/builds/10.2/cdt-10.2.0-m1/"/>
+<repository location="https://download.eclipse.org/tools/cdt/builds/10.2/cdt-10.2.0-m2/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.swtbot.eclipse.feature.group" version="0.0.0"/>
@@ -26,6 +26,7 @@
 <unit id="org.apache.commons.io" version="0.0.0"/>
 <unit id="org.apache.commons.lang" version="0.0.0"/>
 <unit id="org.apache.commons.lang3" version="0.0.0"/>
+<unit id="org.apache.xml.serializer" version="0.0.0"/>
 <unit id="org.swtchart" version="0.10.0.v201605200358"/>
 <unit id="org.swtchart.source" version="0.10.0.v201605200358"/>
 <unit id="com.google.guava" version="27.1.0.v20190517-1946"/>
@@ -36,7 +37,7 @@
 <unit id="javax.xml.bind" version="0.0.0"/>
 <unit id="javax.activation" version="1.1.0.v201211130549"/>
 <unit id="javax.xml.stream" version="0.0.0"/>
-<repository location="https://download.eclipse.org/tools/orbit/downloads/drops/S20210105214148/repository/"/>
+<repository location="https://download.eclipse.org/tools/orbit/downloads/drops/S20210129010711/repository/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.license.feature.group" version="0.0.0"/>
@@ -56,7 +57,7 @@
 <unit id="org.eclipse.ui.trace" version="0.0.0"/>
 <unit id="org.eclipse.ui.views.log" version="0.0.0"/>
 <unit id="org.eclipse.jdt.junit4.runtime" version="0.0.0"/>
-<repository location="https://download.eclipse.org/eclipse/updates/4.19milestones/S-4.19M1-202101061800/"/>
+<repository location="https://download.eclipse.org/eclipse/updates/4.19-I-builds/I20210129-1800/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf" version="1.7.2"/>
@@ -66,11 +67,11 @@
 <unit id="org.eclipse.wst.xml.core" version="0.0.0"/>
 <unit id="org.eclipse.wst.xml.ui" version="0.0.0"/>
 <unit id="org.eclipse.wst.xsd.core" version="0.0.0"/>
-<repository location="https://download.eclipse.org/webtools/downloads/drops/R3.21.0/S-3.21.0.M1a-20210112222634/repository/"/>
+<repository location="https://download.eclipse.org/webtools/downloads/drops/R3.21.0/S-3.21.0.M2-20210128163350/repository/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.xsd" version="0.0.0"/>
-<repository location="https://download.eclipse.org/modeling/emf/emf/builds/milestone/S202101040220/"/>
+<repository location="https://download.eclipse.org/modeling/emf/emf/builds/milestone/S202101260740/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.swtchart.feature.feature.group" version="0.0.0"/>
