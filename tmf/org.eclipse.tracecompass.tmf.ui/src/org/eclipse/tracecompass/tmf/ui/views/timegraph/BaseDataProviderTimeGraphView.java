@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -205,6 +206,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                      * families at the end
                      */
                     List<TimeGraphEntry> orphaned = new ArrayList<>();
+                    Map<Long, AtomicInteger> indexMap = new HashMap<>();
                     for (TimeGraphEntryModel entry : model.getEntries()) {
                         TimeGraphEntry uiEntry = fScopedEntries.get(scope, entry.getId());
                         if (entry.getParentId() != -1) {
@@ -213,12 +215,14 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                                 TimeGraphEntry parent = fScopedEntries.get(scope, entry.getParentId());
                                 if (parent != null) {
                                     // TODO: the order of children from different data providers is undefined
-                                    parent.addChild(uiEntry);
+                                    int index = indexMap.computeIfAbsent(entry.getParentId(), l -> new AtomicInteger()).getAndIncrement();
+                                    parent.addChild(index, uiEntry);
                                 } else {
                                     orphaned.add(uiEntry);
                                 }
                                 fScopedEntries.put(scope, entry.getId(), uiEntry);
                             } else {
+                                indexMap.computeIfAbsent(entry.getParentId(), l -> new AtomicInteger()).getAndIncrement();
                                 uiEntry.updateModel(entry);
                             }
                         } else {
@@ -241,10 +245,13 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                         fEntryIds.put(uiEntry, dataProvider, entry.getId());
                     }
                     // Find missing parents
+                    // Orphans should be inserted before non-orphans
+                    indexMap.clear();
                     for (TimeGraphEntry orphanedEntry : orphaned) {
                         TimeGraphEntry parent = fScopedEntries.get(scope, orphanedEntry.getEntryModel().getParentId());
                         if (parent != null) {
-                            parent.addChild(orphanedEntry);
+                            int index = indexMap.computeIfAbsent(parent.getEntryModel().getId(), l -> new AtomicInteger()).getAndIncrement();
+                            parent.addChild(index, orphanedEntry);
                         }
                     }
                 }
