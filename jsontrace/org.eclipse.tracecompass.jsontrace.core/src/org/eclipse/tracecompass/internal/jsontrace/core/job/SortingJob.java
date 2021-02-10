@@ -216,8 +216,8 @@ public abstract class SortingJob extends Job {
                  * This resource is added to a priority queue and then removed at the very end.
                  */
                 BufferedInputStream createParser = new BufferedInputStream(new FileInputStream(traceling));
-                while (data != '{') {
-                    data = parser.read();
+                while (data != '[') {
+                    data = createParser.read();
                     if (data == -1) {
                         break;
                     }
@@ -236,7 +236,7 @@ public abstract class SortingJob extends Job {
                 return Status.CANCEL_STATUS;
             }
 
-            processMetadata(trace, dir);
+            processMetadata(trace, dir, parser);
 
             File file = new File(dir + File.separator + new File(trace.getPath()).getName());
             boolean success = file.createNewFile();
@@ -289,14 +289,32 @@ public abstract class SortingJob extends Job {
     }
 
     /**
-     * Process whatever metadata that can be found after the event list in the trace
-     * file file
+     * Process whatever metadata that can be found after the event list in the
+     * trace file file
+     *
+     * @param trace
+     *            the trace to be sort
+     * @param dir
+     *            the path to the trace file
+     * @param parser
+     *            The file parser, position at the end of the events
+     * @throws IOException
+     *             Exceptions thrown by reading file
+     */
+    protected void processMetadata(ITmfTrace trace, String dir, BufferedInputStream parser) throws IOException {
+        this.processMetadata(trace, dir);
+    }
+
+    /**
+     * Process whatever metadata that can be found after the event list in the
+     * trace file file
      *
      * @param trace
      *            the trace to be sort
      * @param dir
      *            the path to the trace file
      * @throws IOException
+     *             Exceptions thrown by reading file
      */
     protected abstract void processMetadata(ITmfTrace trace, String dir) throws IOException;
 
