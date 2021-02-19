@@ -14,7 +14,11 @@
 
 package org.eclipse.tracecompass.tmf.ctf.core.tests.temp.headless;
 
-import java.util.Vector;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.StringJoiner;
 
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.ctf.core.context.CtfTmfContext;
@@ -31,19 +35,25 @@ public class Benchmark {
     /**
      * Run the benchmark.
      *
-     * @param args The command-line arguments
+     * @param args
+     *            The command-line arguments
      */
     public static void main(final String[] args) {
         final String TRACE_PATH = "testfiles/kernel";
         final int NUM_LOOPS = 100;
 
         // Change this to enable text output
-        final boolean USE_TEXT = true;
+        final boolean USE_TEXT = false;
 
         // Work variables
         long nbEvent = 0L;
-        final Vector<Double> benchs = new Vector<>();
+        final List<Double> benchs = new ArrayList<>();
         long start, stop;
+        File f = new File(TRACE_PATH);
+        if (!f.isDirectory() || f.list() == null) {
+            System.err.println(String.format("Trace\n%s\nnot found", f.getAbsoluteFile()));
+            return;
+        }
         for (int loops = 0; loops < NUM_LOOPS; loops++) {
             nbEvent = 0L;
             CtfTmfTrace trace = new CtfTmfTrace();
@@ -89,11 +99,18 @@ public class Benchmark {
             avg += val;
         }
         avg /= benchs.size();
-        System.out.println("Time to read = " + avg + " events/ns");
+        double fileSize = Arrays.asList(f.listFiles()).stream().mapToLong(file -> file.length()).sum() / 1024. / 1024;
+        System.out.println(String.format("Trace size = %.2f MB, Number of events = %d, Average event size %.2f B/event", fileSize, nbEvent, fileSize * 1024. * 1024 / nbEvent));
+        System.out.println(String.format("Throughput = %.2f MB/s (%.2f ns/event)", fileSize * 1e9 / avg / nbEvent, avg));
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nRaw Results (ns/event) : ");
+        StringJoiner sj = new StringJoiner(", ");
+
         for (final Double val : benchs) {
-            System.out.print(val);
-            System.out.print(", ");
+            sj.add((String.format("%.2f", val)));
         }
+        sb.append(sj.toString());
+        System.out.println(sb);
 
     }
 
