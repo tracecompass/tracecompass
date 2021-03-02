@@ -21,7 +21,7 @@
 
   <groupId>org.eclipse.tracecompass</groupId>
   <artifactId>org.eclipse.tracecompass</artifactId>
-  <version>6.2.1-SNAPSHOT</version>
+  <version>6.3.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Trace Compass Parent</name>
 
@@ -373,7 +373,7 @@
               <groupId>org.eclipse.tracecompass</groupId>
               <artifactId>org.eclipse.tracecompass.target</artifactId>
               <classifier>${target-platform}</classifier>
-              <version>6.2.1-SNAPSHOT</version>
+              <version>6.3.0-SNAPSHOT</version>
             </artifact>
           </target>
         </configuration>
