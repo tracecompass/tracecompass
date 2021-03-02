@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2018, 2020 Ericsson
+ * Copyright (c) 2018, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.internal.tmf.core.model.timegraph;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -161,14 +162,15 @@ extends TmfTreeCompositeDataProvider<M, P> implements ITimeGraphDataProvider<M>,
 
     @Override
     public TmfModelResponse<Map<String, String>> fetchTooltip(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+        Map<String, String> model = new LinkedHashMap<>();
         for (P dataProvider : getProviders()) {
             TmfModelResponse<Map<String, String>> response = dataProvider.fetchTooltip(fetchParameters, monitor);
             Map<String, String> tooltip = response.getModel();
             if (tooltip != null) {
-                return response;
+                model.putAll(tooltip);
             }
         }
-        return new TmfModelResponse<>(null, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        return new TmfModelResponse<>(model, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
     @Override
