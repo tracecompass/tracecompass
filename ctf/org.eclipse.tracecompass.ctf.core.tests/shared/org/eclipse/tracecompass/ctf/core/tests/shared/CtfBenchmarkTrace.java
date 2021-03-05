@@ -11,11 +11,10 @@
 
 package org.eclipse.tracecompass.ctf.core.tests.shared;
 
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.ctf.core.tests.CtfCoreTestPlugin;
 import org.eclipse.tracecompass.testtraces.ctf.CtfTestTrace;
 
 /**
@@ -82,7 +81,7 @@ public enum CtfBenchmarkTrace {
      * @return The path for this trace
      */
     public Path getTracePath() {
-        return Paths.get(CtfCoreTestPlugin.getAbsoluteFilePath(TRACE_PATH + '/' + fTraceName).toOSString());
+        return FileSystems.getDefault().getPath("..", "..", "ctf", "org.eclipse.tracecompass.ctf.core.tests", TRACE_PATH, fTraceName).toAbsolutePath();
     }
 
 }
