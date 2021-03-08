@@ -79,7 +79,6 @@ import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
-import org.eclipse.tracecompass.tmf.core.util.Pair;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -205,7 +204,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
     /** Annotation provider that reads UST traces */
     private final IOutputAnnotationProvider fEventAnnotatonProvider;
 
-    private @NonNull Map<@NonNull Integer, @NonNull Pair<Long, Long>> fFreqMap = new HashMap<>();
+    private @NonNull Map<@NonNull Integer, @NonNull Long> fFreqMap = new HashMap<>();
 
     /**
      * Constructor
@@ -260,7 +259,7 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                 ResourcesEntryModel currentFreqEntry = new ResourcesEntryModelWeighted(getId(currentFreqQuark), traceId, computeEntryName(Type.FREQUENCY, cpu), start, end, cpu, Type.FREQUENCY, minFrequency, maxFrequency);
                 builder.add(currentFreqEntry);
                 fEntryModelTypes.put(currentFreqQuark, Type.FREQUENCY);
-                fFreqMap.put(currentFreqQuark, new Pair<>(minFrequency, maxFrequency));
+                fFreqMap.put(currentFreqQuark, maxFrequency);
             }
 
             // Add a separator entry after each CPU entry
@@ -457,9 +456,9 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
                     }
                 } else if ((status instanceof Long) && (type == Type.FREQUENCY)) {
                     long s = (long) status;
-                    // The value needs to fit in an integer
-                    Pair<Long, Long> freqPair = fFreqMap.get(interval.getAttribute());
-                    TimeGraphState timeGraphState = new TimeGraphState(startTime, duration, String.valueOf(FREQUENCY_FORMATTER.format(s)), getSpecificStyleForFrequency((int) (s / FREQUENCY_MULTIPLIER), key, freqPair));
+                    // The value needs to fit in an integer (relative to max frequency)
+                    Long maxFrequency = fFreqMap.get(interval.getAttribute());
+                    TimeGraphState timeGraphState = new TimeGraphState(startTime, duration, String.valueOf(FREQUENCY_FORMATTER.format(s)), getSpecificStyleForFrequency((int) (s / FREQUENCY_MULTIPLIER), key, maxFrequency));
                     applyFilterAndAddState(eventList, timeGraphState, key, predicates, monitor);
                 } else {
                     ITimeGraphState timeGraphState = new TimeGraphState(startTime, duration, Integer.MIN_VALUE);
@@ -510,10 +509,10 @@ public class ResourcesStatusDataProvider extends AbstractTimeGraphDataProvider<@
         });
     }
 
-    private static OutputElementStyle getSpecificStyleForFrequency(int frequency, Long entryId, @Nullable Pair<Long, Long> freqPair) {
+    private static OutputElementStyle getSpecificStyleForFrequency(int frequency, Long entryId, @Nullable Long maxFrequency) {
         return STYLE_MAP.computeIfAbsent(String.valueOf(entryId) + '_' + String.valueOf(frequency), freqStr -> {
             return new OutputElementStyle(BASE_FREQUENCY_STYLE,
-                    ImmutableMap.of(StyleProperties.HEIGHT, freqPair == null ? 1.0f : (float) (frequency - freqPair.getFirst()) / (freqPair.getSecond() - freqPair.getFirst())));
+                    ImmutableMap.of(StyleProperties.HEIGHT, maxFrequency == null ? 1.0f : (float) (frequency) / (maxFrequency)));
         });
     }
 
