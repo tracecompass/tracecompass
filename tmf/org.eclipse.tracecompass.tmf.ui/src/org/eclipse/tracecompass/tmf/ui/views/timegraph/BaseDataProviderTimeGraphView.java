@@ -195,7 +195,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                 return;
             }
             complete = response.getStatus() == ITmfResponse.Status.COMPLETED;
-
+            double factor = 1.0;
             TmfTreeModel<@NonNull TimeGraphEntryModel> model = response.getModel();
             if (model != null) {
                 synchronized (fEntries) {
@@ -280,7 +280,8 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
 
             if (!complete && !monitor.isCanceled()) {
                 try {
-                    Thread.sleep(BUILD_UPDATE_TIMEOUT);
+                    Thread.sleep((long) (BUILD_UPDATE_TIMEOUT * factor));
+                    factor = Math.min(20, factor + 1);
                 } catch (InterruptedException e) {
                     Activator.getDefault().logError("Failed to wait for data provider", e); //$NON-NLS-1$
                     Thread.currentThread().interrupt();

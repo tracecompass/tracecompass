@@ -427,6 +427,7 @@ public abstract class AbstractSelectTreeViewer2 extends AbstractTmfTreeViewer {
                         }
 
                         boolean isComplete = false;
+                        double factor = 1.0;
                         do {
                             TmfModelResponse<@NonNull TmfTreeModel<@NonNull ITmfTreeDataModel>> response;
                             try (FlowScopeLog iterScope = new FlowScopeLogBuilder(LOGGER, Level.FINE, UPDATE_CONTENT_JOB_NAME + " query") //$NON-NLS-1$
@@ -452,7 +453,8 @@ public abstract class AbstractSelectTreeViewer2 extends AbstractTmfTreeViewer {
                                  * provider again
                                  **/
                                 try {
-                                    Thread.sleep(BUILD_UPDATE_TIMEOUT);
+                                    Thread.sleep((long) (BUILD_UPDATE_TIMEOUT * factor));
+                                    factor = Math.min(20, factor + 1);
                                 } catch (InterruptedException e) {
                                     /**
                                      * InterruptedException is throw by Thread.Sleep and we should retry querying
