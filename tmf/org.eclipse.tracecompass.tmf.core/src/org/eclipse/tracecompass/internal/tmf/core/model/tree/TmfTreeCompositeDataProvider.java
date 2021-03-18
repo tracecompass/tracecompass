@@ -15,8 +15,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -38,7 +40,6 @@ import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Represents a base implementation of {@link ITmfTreeDataProvider} that
@@ -200,7 +201,7 @@ public class TmfTreeCompositeDataProvider<M extends ITmfTreeDataModel, P extends
     @Override
     public TmfModelResponse<AnnotationModel> fetchAnnotations(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         boolean isComplete = true;
-        ImmutableMap.Builder<String, Collection<Annotation>> annotationsBuilder = ImmutableMap.builder();
+        Map<String, Collection<Annotation>> annotations = new LinkedHashMap<>();
 
         for (P dataProvider : getProviders()) {
             if (dataProvider instanceof IOutputAnnotationProvider) {
@@ -208,7 +209,10 @@ public class TmfTreeCompositeDataProvider<M extends ITmfTreeDataModel, P extends
                 isComplete &= response.getStatus() == ITmfResponse.Status.COMPLETED;
                 AnnotationModel model = response.getModel();
                 if (model != null) {
-                    annotationsBuilder.putAll(model.getAnnotations());
+                    for (Entry<String, Collection<Annotation>> annotation:  model.getAnnotations().entrySet()) {
+                        Collection<Annotation> elements = annotations.computeIfAbsent(annotation.getKey(), unused -> new ArrayList<>());
+                        elements.addAll(annotation.getValue());
+                    }
                 }
 
                 if (monitor != null && monitor.isCanceled()) {
@@ -217,9 +221,9 @@ public class TmfTreeCompositeDataProvider<M extends ITmfTreeDataModel, P extends
             }
         }
         if (isComplete) {
-            return new TmfModelResponse<>(new AnnotationModel(annotationsBuilder.build()), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+            return new TmfModelResponse<>(new AnnotationModel(annotations), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
-        return new TmfModelResponse<>(new AnnotationModel(annotationsBuilder.build()), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
+        return new TmfModelResponse<>(new AnnotationModel(annotations), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
     }
 }
 

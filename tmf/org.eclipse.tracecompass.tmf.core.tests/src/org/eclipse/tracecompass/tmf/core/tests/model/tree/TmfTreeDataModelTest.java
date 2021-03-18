@@ -12,14 +12,35 @@ package org.eclipse.tracecompass.tmf.core.tests.model.tree;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.Annotation;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationCategoriesModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IAnnotation.AnnotationType;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
+import org.eclipse.tracecompass.internal.tmf.core.model.tree.TmfTreeCompositeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
+import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
+import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
+import org.eclipse.tracecompass.tmf.core.response.ITmfResponse.Status;
+import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -185,6 +206,37 @@ public class TmfTreeDataModelTest {
         assertEquals(TO_STRING, "<name=[Name] id=0 parentId=-1 style=null hasRowModel=true>", model2.toString());
     }
 
+    /**
+     * Test {@link TmfTreeCompositeDataProvider}
+     */
+    @Test
+    public void testCompositeTree() {
+        List<DummyDataProvider> ddps = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            ddps.add(new DummyDataProvider(i));
+        }
+        TmfTreeCompositeDataProvider<@NonNull TmfTreeDataModel, @NonNull DummyDataProvider> composite = new TmfTreeCompositeDataProvider<>(ddps, "composite-dummy");
+        assertNotNull(composite);
+        NullProgressMonitor monitor = new NullProgressMonitor();
+        TmfModelResponse<@NonNull TmfTreeModel<@NonNull TmfTreeDataModel>> tree = composite.fetchTree(Collections.emptyMap(), monitor);
+        TmfTreeModel<@NonNull TmfTreeDataModel> model = tree.getModel();
+        assertNotNull(model);
+        assertEquals(Arrays.asList("header"), model.getHeaders());
+        assertEquals(2, model.getEntries().size());
+        // AnnotationCategories
+        TmfModelResponse<@NonNull AnnotationCategoriesModel> returnVal = composite.fetchAnnotationCategories(Collections.emptyMap(), monitor);
+        AnnotationCategoriesModel categoryModel = returnVal.getModel();
+        assertNotNull(categoryModel);
+        assertEquals(Arrays.asList("0","1","common"), categoryModel.getAnnotationCategories());
+        // Annotations
+        TmfModelResponse<@NonNull AnnotationModel> annotations = composite.fetchAnnotations(Collections.emptyMap(), monitor);
+        AnnotationModel annotationsModel = annotations.getModel();
+        assertNotNull(annotationsModel);
+        Collection<@NonNull Annotation> collection = annotationsModel.getAnnotations().get("test");
+        assertNotNull(collection);
+        assertEquals(4, collection.size());
+    }
+
     // ------------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------------
@@ -199,6 +251,42 @@ public class TmfTreeDataModelTest {
             return new TmfTreeDataModel(ID2, PARENT_ID2, NAME);
         default:
             return new TmfTreeDataModel(ID0, PARENT_ID0, LABELS0);
+        }
+    }
+
+    @NonNullByDefault
+    private static class DummyDataProvider implements ITmfTreeDataProvider<@NonNull TmfTreeDataModel>, IOutputAnnotationProvider {
+        private final int fModelNo;
+
+        public DummyDataProvider(int modelNo) {
+            fModelNo = modelNo;
+        }
+
+        @Override
+        public TmfModelResponse<TmfTreeModel<TmfTreeDataModel>> fetchTree(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+            TmfTreeDataModel createModel = createModel(fModelNo);
+            TmfModelResponse<TmfTreeModel<TmfTreeDataModel>> response = new TmfModelResponse<>(new TmfTreeModel<>(Arrays.asList("header"), Arrays.asList(createModel)), ITmfResponse.Status.COMPLETED, "");
+            return response;
+        }
+
+        @Override
+        public @NonNull String getId() {
+            return "dummy";
+        }
+
+        @Override
+        public TmfModelResponse<AnnotationCategoriesModel> fetchAnnotationCategories(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+            AnnotationCategoriesModel model = new AnnotationCategoriesModel(Arrays.asList("common", Integer.toString(fModelNo)));
+            return new TmfModelResponse<AnnotationCategoriesModel>(model, Status.COMPLETED, "");
+        }
+
+        @Override
+        public TmfModelResponse<AnnotationModel> fetchAnnotations(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
+            Map<String, Collection<Annotation>> annotations = new HashMap<>();
+            annotations.put("test", Arrays.asList(new Annotation(0, 1, 2, AnnotationType.CHART, "Hi" + fModelNo, new OutputElementStyle("black")), new Annotation(0, 1, 2, AnnotationType.CHART, "Hello", new OutputElementStyle("pink"))));
+            annotations.put("test" + fModelNo, Arrays.asList(new Annotation(0, 1, 2, AnnotationType.CHART, "bye", new OutputElementStyle("white"))));
+            AnnotationModel model = new AnnotationModel(annotations);
+            return new TmfModelResponse<AnnotationModel>(model, Status.COMPLETED, "");
         }
     }
 }
