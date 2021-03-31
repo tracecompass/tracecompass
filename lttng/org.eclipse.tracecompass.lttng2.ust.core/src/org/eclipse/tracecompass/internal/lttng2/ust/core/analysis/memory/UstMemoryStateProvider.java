@@ -198,10 +198,10 @@ public class UstMemoryStateProvider extends AbstractTmfStateProvider {
             if (ZERO.equals(ptr)) {
                 return;
             }
-            Long newPtr = (Long) event.getContent().getField(fLayout.fieldInPtr()).getValue();
+            Long inPtr = (Long) event.getContent().getField(fLayout.fieldInPtr()).getValue();
             Long size = (Long) event.getContent().getField(fLayout.fieldSize()).getValue();
-            setMem(event, ptr, ZERO);
-            setMem(event, newPtr, size);
+            setMem(event, inPtr, ZERO);
+            setMem(event, ptr, size);
         }
             break;
         case MEMALIGN_INDEX: {
