@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2017 Ericsson
+ * Copyright (c) 2017, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -11,12 +11,16 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.model.tree;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -34,7 +38,9 @@ import org.eclipse.tracecompass.tmf.core.response.ITmfResponse;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Table;
 
 /**
  * Represents a base implementation of {@link ITmfTreeDataProvider} that
@@ -101,15 +107,53 @@ public class TmfTreeCompositeDataProvider<M extends ITmfTreeDataModel, P extends
     @Override
     public TmfModelResponse<TmfTreeModel<M>> fetchTree(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         boolean isComplete = true;
-        ImmutableList.Builder<M> series = ImmutableList.builder();
+        List<Entry<M, Object>> entries = new ArrayList<>();
         List<ITableColumnDescriptor> columnDescriptor = null;
 
+        Table<Object, Long, @NonNull M> scopedEntries = HashBasedTable.create();
         for (P dataProvider : fProviders) {
+            Map<Long, AtomicInteger> indexMap = new HashMap<>();
             TmfModelResponse<TmfTreeModel<M>> response = dataProvider.fetchTree(fetchParameters, monitor);
             isComplete &= response.getStatus() == ITmfResponse.Status.COMPLETED;
             TmfTreeModel<M> model = response.getModel();
             if (model != null) {
-                series.addAll(model.getEntries());
+                Object scope = (model.getScope() == null) ? dataProvider : model.getScope();
+                Map<Long, @NonNull M> row = scopedEntries.row(scope);
+                for (M entry : model.getEntries()) {
+                    M previous = row.putIfAbsent(entry.getId(), entry);
+                    // Ignore duplicate entries from different data providers
+                    if (previous == null) {
+                        if (entry.getParentId() == -1) {
+                            entries.add(new SimpleEntry(entry, scope));
+                        } else {
+                            /*
+                             * Insert new entries from subsequent data providers
+                             * at the correct position in the entries list. New
+                             * entries are inserted before sibling entries from
+                             * previous data providers.
+                             */
+                            int index = indexMap.computeIfAbsent(entry.getParentId(), l -> new AtomicInteger()).getAndIncrement();
+                            int pos = 0;
+                            while (pos < entries.size()) {
+                                Entry<M, Object> added = entries.get(pos);
+                                if (added.getValue().equals(scope) && added.getKey().getParentId() == entry.getParentId()) {
+                                    if (index == 0) {
+                                        break;
+                                    }
+                                    index--;
+                                }
+                                pos++;
+                            }
+                            if (pos < entries.size()) {
+                                entries.add(pos, new SimpleEntry(entry, scope));
+                            } else {
+                                entries.add(new SimpleEntry(entry, scope));
+                            }
+                        }
+                    } else {
+                        indexMap.computeIfAbsent(entry.getParentId(), l -> new AtomicInteger()).getAndIncrement();
+                    }
+                }
                 // Use the column descriptor of the first model. All descriptors are supposed to be the same
                 if (columnDescriptor == null) {
                     columnDescriptor = model.getColumnDescriptors();
@@ -125,7 +169,7 @@ public class TmfTreeCompositeDataProvider<M extends ITmfTreeDataModel, P extends
             columnDescriptor = Collections.emptyList();
         }
         treeModelBuilder.setColumnDescriptors(columnDescriptor)
-                        .setEntries(series.build());
+                        .setEntries(Lists.transform(entries, e -> e.getKey()));
 
         if (isComplete) {
             return new TmfModelResponse<>(treeModelBuilder.build(), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2020 Ericsson
+ * Copyright (c) 2020, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -59,16 +59,19 @@ public class TmfTreeDataModelTest {
     private static final long ID0 = 0L;
     private static final long PARENT_ID0 = -1L;
     private static final OutputElementStyle STYLE0 = null;
+
     private static final @NonNull List<@NonNull String> LABELS1 = Arrays.asList("label4, label5, label6", "label7");
     private static final long ID1 = 1L;
     private static final long PARENT_ID1 = 0L;
     private static final boolean HAS_MODEL1 = false;
     private static final @NonNull OutputElementStyle STYLE1 = new OutputElementStyle("1");
 
-    private static final long ID2 = 0L;
+    private static final long ID2 = 2L;
     private static final long PARENT_ID2 = -1L;
     private static final OutputElementStyle STYLE3 = null;
     private static final String NAME = "Name";
+
+    private static final String SCOPE = "scope";
 
     private TmfTreeDataModel fModel0 = null;
     private TmfTreeDataModel fModel1 = null;
@@ -203,7 +206,7 @@ public class TmfTreeDataModelTest {
         assertEquals(TO_STRING, "<name=[label1, label2, label3] id=0 parentId=-1 style=null hasRowModel=true>", fModel0.toString());
         assertEquals(TO_STRING, "<name=[label4, label5, label6, label7] id=1 parentId=0 style=Style [1, {}] hasRowModel=false>", fModel1.toString());
         TmfTreeDataModel model2 = createModel(2);
-        assertEquals(TO_STRING, "<name=[Name] id=0 parentId=-1 style=null hasRowModel=true>", model2.toString());
+        assertEquals(TO_STRING, "<name=[Name] id=2 parentId=-1 style=null hasRowModel=true>", model2.toString());
     }
 
     /**
@@ -212,7 +215,7 @@ public class TmfTreeDataModelTest {
     @Test
     public void testCompositeTree() {
         List<DummyDataProvider> ddps = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             ddps.add(new DummyDataProvider(i));
         }
         TmfTreeCompositeDataProvider<@NonNull TmfTreeDataModel, @NonNull DummyDataProvider> composite = new TmfTreeCompositeDataProvider<>(ddps, "composite-dummy");
@@ -222,26 +225,26 @@ public class TmfTreeDataModelTest {
         TmfTreeModel<@NonNull TmfTreeDataModel> model = tree.getModel();
         assertNotNull(model);
         assertEquals(Arrays.asList("header"), model.getHeaders());
-        assertEquals(2, model.getEntries().size());
+        assertEquals(3, model.getEntries().size());
         // AnnotationCategories
         TmfModelResponse<@NonNull AnnotationCategoriesModel> returnVal = composite.fetchAnnotationCategories(Collections.emptyMap(), monitor);
         AnnotationCategoriesModel categoryModel = returnVal.getModel();
         assertNotNull(categoryModel);
-        assertEquals(Arrays.asList("0","1","common"), categoryModel.getAnnotationCategories());
+        assertEquals(Arrays.asList("0", "1", "2", "common"), categoryModel.getAnnotationCategories());
         // Annotations
         TmfModelResponse<@NonNull AnnotationModel> annotations = composite.fetchAnnotations(Collections.emptyMap(), monitor);
         AnnotationModel annotationsModel = annotations.getModel();
         assertNotNull(annotationsModel);
         Collection<@NonNull Annotation> collection = annotationsModel.getAnnotations().get("test");
         assertNotNull(collection);
-        assertEquals(4, collection.size());
+        assertEquals(6, collection.size());
     }
 
     // ------------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------------
 
-    private static TmfTreeDataModel createModel(int i) {
+    private static @NonNull TmfTreeDataModel createModel(int i) {
         switch (i) {
         case 0:
             return new TmfTreeDataModel(ID0, PARENT_ID0, LABELS0);
@@ -264,8 +267,16 @@ public class TmfTreeDataModelTest {
 
         @Override
         public TmfModelResponse<TmfTreeModel<TmfTreeDataModel>> fetchTree(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
-            TmfTreeDataModel createModel = createModel(fModelNo);
-            TmfModelResponse<TmfTreeModel<TmfTreeDataModel>> response = new TmfModelResponse<>(new TmfTreeModel<>(Arrays.asList("header"), Arrays.asList(createModel)), ITmfResponse.Status.COMPLETED, "");
+            List<TmfTreeDataModel> modelList = new ArrayList<>();
+            TmfTreeDataModel model = createModel(fModelNo);
+            modelList.add(model);
+            long parentId = model.getParentId();
+            while (parentId != -1) {
+                TmfTreeDataModel parent = createModel((int) parentId);
+                modelList.add(0, parent);
+                parentId = parent.getParentId();
+            }
+            TmfModelResponse<TmfTreeModel<TmfTreeDataModel>> response = new TmfModelResponse<>(new TmfTreeModel<>(Arrays.asList("header"), modelList, SCOPE), ITmfResponse.Status.COMPLETED, "");
             return response;
         }
 
