@@ -11,7 +11,11 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Data provider annotation categories model
@@ -37,5 +41,23 @@ public class AnnotationCategoriesModel {
      */
     public List<String> getAnnotationCategories() {
         return fAnnotationCategories;
+    }
+
+    /**
+     * Creates a new aggregated {@link AnnotationCategoriesModel} from an array of
+     * {@link AnnotationCategoriesModel}.
+     *
+     * @param models
+     *            array of {@link AnnotationCategoriesModel}
+     * @return a new aggregated {@link AnnotationCategoriesModel}
+     */
+    public static AnnotationCategoriesModel of(AnnotationCategoriesModel... models) {
+        Set<String> categories = new HashSet<>();
+        for (AnnotationCategoriesModel categoryModel : models) {
+            if (categoryModel != null) {
+                categories.addAll(categoryModel.getAnnotationCategories());
+            }
+        }
+        return new AnnotationCategoriesModel(ImmutableList.copyOf(categories));
     }
 }

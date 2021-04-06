@@ -14,18 +14,13 @@ package org.eclipse.tracecompass.internal.tmf.core.model.tree;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.Annotation;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationCategoriesModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
@@ -182,48 +177,37 @@ public class TmfTreeCompositeDataProvider<M extends ITmfTreeDataModel, P extends
 
     @Override
     public TmfModelResponse<AnnotationCategoriesModel> fetchAnnotationCategories(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
-        Set<String> categories = new HashSet<>();
+        AnnotationCategoriesModel model = new AnnotationCategoriesModel(Collections.emptyList());
         for (P dataProvider : getProviders()) {
             if (dataProvider instanceof IOutputAnnotationProvider) {
                 TmfModelResponse<AnnotationCategoriesModel> response = ((IOutputAnnotationProvider) dataProvider).fetchAnnotationCategories(fetchParameters, monitor);
-                AnnotationCategoriesModel model = response.getModel();
-                if (model != null) {
-                    categories.addAll(model.getAnnotationCategories());
-                }
+                model = AnnotationCategoriesModel.of(model, response.getModel());
             }
         }
-        if (categories.isEmpty()) {
+        if (model.getAnnotationCategories().isEmpty()) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
-        return new TmfModelResponse<>(new AnnotationCategoriesModel(ImmutableList.copyOf(categories)), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+        return new TmfModelResponse<>(model, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
     }
 
     @Override
     public TmfModelResponse<AnnotationModel> fetchAnnotations(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         boolean isComplete = true;
-        Map<String, Collection<Annotation>> annotations = new LinkedHashMap<>();
-
+        AnnotationModel model = new AnnotationModel(Collections.emptyMap());
         for (P dataProvider : getProviders()) {
             if (dataProvider instanceof IOutputAnnotationProvider) {
                 TmfModelResponse<AnnotationModel> response = ((IOutputAnnotationProvider) dataProvider).fetchAnnotations(fetchParameters, monitor);
                 isComplete &= response.getStatus() == ITmfResponse.Status.COMPLETED;
-                AnnotationModel model = response.getModel();
-                if (model != null) {
-                    for (Entry<String, Collection<Annotation>> annotation:  model.getAnnotations().entrySet()) {
-                        Collection<Annotation> elements = annotations.computeIfAbsent(annotation.getKey(), unused -> new ArrayList<>());
-                        elements.addAll(annotation.getValue());
-                    }
-                }
-
+                model = AnnotationModel.of(model, response.getModel());
                 if (monitor != null && monitor.isCanceled()) {
                     return new TmfModelResponse<>(null, ITmfResponse.Status.CANCELLED, CommonStatusMessage.TASK_CANCELLED);
                 }
             }
         }
         if (isComplete) {
-            return new TmfModelResponse<>(new AnnotationModel(annotations), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
+            return new TmfModelResponse<>(model, ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
         }
-        return new TmfModelResponse<>(new AnnotationModel(annotations), ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
+        return new TmfModelResponse<>(model, ITmfResponse.Status.RUNNING, CommonStatusMessage.RUNNING);
     }
 }
 
