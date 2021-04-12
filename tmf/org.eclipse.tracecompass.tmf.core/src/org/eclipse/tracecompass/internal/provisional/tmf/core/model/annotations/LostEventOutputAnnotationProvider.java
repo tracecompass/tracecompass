@@ -14,9 +14,11 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -121,7 +123,8 @@ public class LostEventOutputAnnotationProvider implements IOutputAnnotationProvi
                 timeRequested.set(0, start);
                 timeRequested.set(timeRequested.size() - 1, end);
 
-                for (ITmfStateInterval interval : ss.query2D(ImmutableList.of(lostEventsQuark), timeRequested)) {
+                Collection<Long> times = getTimes(ss, timeRequested);
+                for (ITmfStateInterval interval : ss.query2D(ImmutableList.of(lostEventsQuark), times)) {
                     if (progressMonitor.isCanceled()) {
                         fLastRequest = Collections.emptyList();
                         fLastAnnotationModel = new AnnotationModel(Collections.emptyMap());
@@ -164,6 +167,19 @@ public class LostEventOutputAnnotationProvider implements IOutputAnnotationProvi
         } catch (AttributeNotFoundException e) {
             return -1;
         }
+    }
+
+    private static Collection<@NonNull Long> getTimes(ITmfStateSystem ss, List<Long> timeRequested) {
+        long start = ss.getStartTime();
+        long end = ss.getCurrentEndTime();
+        // use a LinkedHashSet to deduplicate time stamps
+        Collection<@NonNull Long> times = new LinkedHashSet<>();
+        for (long t : timeRequested) {
+            if (t >= start && t <= end) {
+                times.add(t);
+            }
+        }
+        return times;
     }
 
 }
