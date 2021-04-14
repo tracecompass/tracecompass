@@ -18,14 +18,29 @@ import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-import org.apache.commons.lang3.math.Fraction;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.RGBA;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.Annotation;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.PeriodicAnnotationSource;
+import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
+import org.eclipse.tracecompass.tmf.core.markers.ITimeReference;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
+import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
+import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
+import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
+import org.eclipse.tracecompass.tmf.ui.model.StyleManager;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEventSource;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.MarkerEvent;
@@ -41,7 +56,7 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
     /**
      * Reference marker time and index
      */
-    public static class Reference {
+    public static class Reference implements ITimeReference {
 
         /** Reference marker index 0 at time 0 */
         public static final Reference ZERO = new Reference(0L, 0);
@@ -76,22 +91,12 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
             this.index = index;
         }
 
-        /**
-         * Gets the reference marker time.
-         *
-         * @return the reference marker time
-         * @since 3.0
-         */
+        @Override
         public long getTime() {
             return time;
         }
 
-        /**
-         * Gets the reference marker index.
-         *
-         * @return the reference marker index
-         * @since 3.0
-         */
+        @Override
         public long getIndex() {
             return index;
         }
@@ -103,14 +108,8 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
     }
 
     private final String fCategory;
-    private final Reference fReference;
-    private final double fPeriod;
-    private final long fPeriodInteger;
-    private @Nullable Fraction fPeriodFraction;
-    private final long fRollover;
-    private final RGBA fColor1;
-    private final @Nullable RGBA fColor2;
     private final boolean fForeground;
+    private final PeriodicAnnotationSource fSource;
 
     /**
      * Constructs a periodic marker event source with line markers at period
@@ -144,8 +143,8 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
      * The markers will have the given category. Periods will be shaded with the
      * first and second colors alternatively. The reference defines the marker
      * with the given index to be at the specified time. The reference will be
-     * shaded with the first color if its index is even, or the second color
-     * if it is odd.
+     * shaded with the first color if its index is even, or the second color if
+     * it is odd.
      *
      * @param category
      *            the marker category
@@ -167,7 +166,10 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
         this(category, reference, period, rollover, foreground, color1, color2);
     }
 
-    /* Private constructor. The order of parameters is changed to make it unique. */
+    /*
+     * Private constructor. The order of parameters is changed to make it
+     * unique.
+     */
     private PeriodicMarkerEventSource(String category, Reference reference, double period, long rollover, boolean foreground, RGBA color1, @Nullable RGBA color2) {
         if (period <= 0) {
             throw new IllegalArgumentException("period cannot be less than or equal to zero"); //$NON-NLS-1$
@@ -175,20 +177,16 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
         if (rollover < 0) {
             throw new IllegalArgumentException("rollover cannot be less than zero"); //$NON-NLS-1$
         }
+        fSource = new PeriodicAnnotationSource(category, reference.getIndex(), reference.getTime(), period, rollover, Objects.requireNonNull(wrap(color1)), wrap(color2));
         fCategory = category;
-        fReference = reference;
-        fPeriod = period;
-        fPeriodInteger = (long) period;
-        try {
-            fPeriodFraction = Fraction.getFraction(fPeriod - fPeriodInteger);
-        } catch (ArithmeticException e) {
-            /* can't convert to fraction, use floating-point arithmetic */
-            fPeriodFraction = null;
-        }
-        fRollover = rollover;
-        fColor1 = color1;
-        fColor2 = color2;
         fForeground = foreground;
+    }
+
+    private static @Nullable RGBAColor wrap(@Nullable RGBA rgba) {
+        if (rgba == null) {
+            return null;
+        }
+        return new RGBAColor(rgba.rgb.red, rgba.rgb.green, rgba.rgb.blue, rgba.alpha);
     }
 
     @Override
@@ -201,69 +199,43 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
         if (startTime > endTime) {
             return Collections.emptyList();
         }
+        StyleManager sm = StyleManager.empty();
         List<IMarkerEvent> markers = new ArrayList<>();
-        /* Subtract 1.5 periods to ensure previous marker is included */
-        long time = startTime - Math.max(Math.round(1.5 * fPeriod), resolution);
-        Reference reference = adjustReference(fReference, time);
-        IMarkerEvent markerEvent = null;
-        while (true) {
-            long index = Math.round((time - reference.time) / fPeriod) + reference.index;
-            long markerTime = Math.round((index - reference.index) * fPeriod) + reference.time;
-            long duration = (fColor2 == null) ? 0 : Math.round((index + 1 - reference.index) * fPeriod) + reference.time - markerTime;
-            long labelIndex = index;
-            if (fRollover != 0) {
-                labelIndex %= fRollover;
-                if (labelIndex < 0) {
-                    labelIndex += fRollover;
+        if (resolution >= Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Cannot query " + resolution + " times"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        List<Long> times = StateSystemUtils.getTimes(startTime, endTime, resolution);
+        Map<String, Object> query = new HashMap<>();
+        query.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, times);
+        query.put(DataProviderParameterUtils.REQUESTED_MARKER_CATEGORIES_KEY, Collections.singleton(category));
+        TmfModelResponse<AnnotationModel> annotations = fSource.fetchAnnotations(query, monitor);
+        AnnotationModel model = annotations.getModel();
+        if (model == null) {
+            return markers;
+        }
+        Map<String, Collection<Annotation>> annotationsMap = model.getAnnotations();
+
+        Collection<Annotation> collection = annotationsMap.get(category);
+        if (collection != null) {
+            for (Annotation annotation : collection) {
+                OutputElementStyle style = annotation.getStyle();
+                if (style != null) {
+                    String indexStr = annotation.getLabel();
+                    long index = Long.parseLong(indexStr);
+                    if (isApplicable(index)) {
+                        String label = getMarkerLabel(index);
+                        annotation = new Annotation(annotation.getTime(), annotation.getDuration(), annotation.getEntryId(), label, style);
+                        RGBAColor rgbaColor = sm.getColorStyle(style, StyleProperties.COLOR);
+                        if (rgbaColor != null) {
+                            RGBA color = RGBAUtil.fromRGBAColor(rgbaColor);
+                            MarkerEvent marker = new MarkerEvent(null, annotation.getTime(), annotation.getDuration(), category, color, label, fForeground);
+                            markers.add(marker);
+                        }
+                    }
                 }
             }
-            /* Add previous marker if current is visible */
-            if ((markerTime >= startTime || markerTime + duration > startTime) && markerEvent != null) {
-                markers.add(markerEvent);
-            }
-            if (isApplicable(labelIndex)) {
-                RGBA color = (fColor2 == null) ? fColor1 : (index % 2 == 0) ? fColor1 : fColor2;
-                markerEvent = new MarkerEvent(null, markerTime, duration, fCategory, color, getMarkerLabel(labelIndex), fForeground);
-            } else {
-                markerEvent = null;
-            }
-            if (markerTime > endTime) {
-                if (markerEvent != null) {
-                    /* The next marker out of range is included */
-                    markers.add(markerEvent);
-                }
-                break;
-            }
-            time += Math.max(Math.round(fPeriod), resolution);
         }
         return markers;
-    }
-
-    /*
-     * Adjust to a reference that is closer to the start time, to avoid rounding
-     * errors in floating point calculations with large numbers.
-     */
-    private Reference adjustReference(Reference baseReference, long time) {
-        long offsetIndex = (long) ((time - baseReference.time) / fPeriod);
-        long offsetTime = 0;
-        Fraction fraction = fPeriodFraction;
-        if (fraction != null) {
-            /*
-             * If period = int num/den, find an offset index that is an exact
-             * multiple of den and calculate index * period = (index * int) +
-             * (index / den * num), all exact calculations.
-             */
-            offsetIndex = offsetIndex - offsetIndex % fraction.getDenominator();
-            offsetTime = offsetIndex * fPeriodInteger + offsetIndex / fraction.getDenominator() * fraction.getNumerator();
-        } else {
-            /*
-             * Couldn't compute fractional part as fraction, use simple
-             * multiplication but with possible rounding error.
-             */
-            offsetTime = Math.round(offsetIndex * fPeriod);
-        }
-        Reference reference = new Reference(baseReference.time + offsetTime, baseReference.index + offsetIndex);
-        return reference;
     }
 
     /**
@@ -284,6 +256,9 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
      * <p>
      * This method can be overridden by clients. Returning false will
      * essentially filter-out the marker.
+     *
+     * @apiNote not used as far as we know, this API is not good for moving
+     *          logic to core.
      *
      * @param index
      *            the marker index

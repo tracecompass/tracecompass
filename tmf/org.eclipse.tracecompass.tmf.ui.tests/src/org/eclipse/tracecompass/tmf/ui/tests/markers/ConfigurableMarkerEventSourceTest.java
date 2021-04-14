@@ -31,13 +31,13 @@ import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker.SplitMarker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker.WeightedMarker;
 import org.eclipse.tracecompass.internal.tmf.ui.markers.ConfigurableMarkerEventSource;
+import org.eclipse.tracecompass.tmf.core.markers.ITimeReferenceProvider;
 import org.eclipse.tracecompass.tmf.core.tests.shared.TmfTestTrace;
 import org.eclipse.tracecompass.tmf.core.trace.AbstractTmfTraceAdapterFactory;
 import org.eclipse.tracecompass.tmf.core.trace.ICyclesConverter;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceAdapterManager;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.TmfTraceStub;
-import org.eclipse.tracecompass.tmf.ui.markers.IMarkerReferenceProvider;
 import org.eclipse.tracecompass.tmf.ui.markers.PeriodicMarkerEventSource.Reference;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.junit.After;
@@ -71,10 +71,10 @@ public class ConfigurableMarkerEventSourceTest {
                 };
                 return adapterType.cast(adapter);
             }
-            if (IMarkerReferenceProvider.class.equals(adapterType)) {
-                IMarkerReferenceProvider adapter = new IMarkerReferenceProvider() {
+            if (ITimeReferenceProvider.class.equals(adapterType)) {
+                ITimeReferenceProvider adapter = new ITimeReferenceProvider() {
                     @Override
-                    public Reference getReference(String referenceId) {
+                    public Reference apply(String referenceId) {
                         if ("ref.c".equals(referenceId)) {
                             return new Reference(1000L, 0);
                         }
@@ -90,7 +90,7 @@ public class ConfigurableMarkerEventSourceTest {
         public Class<?>[] getAdapterList() {
             return new Class[] {
                     ICyclesConverter.class,
-                    IMarkerReferenceProvider.class
+                    ITimeReferenceProvider.class
             };
         }
     }

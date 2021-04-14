@@ -14,6 +14,11 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.markers;
 
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.trace.ICyclesConverter;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+
 /**
  * Marker constants
  *
@@ -65,4 +70,42 @@ public interface IMarkerConstants {
     String NS = "ns"; //$NON-NLS-1$
     /** Cycles unit */
     String CYCLES = "cycles"; //$NON-NLS-1$
+
+    /** Nanoseconds to milliseconds */
+    long NANO_PER_MILLI = 1000000L;
+    /** Nanoseconds to microseconds */
+    long NANO_PER_MICRO = 1000L;
+
+    /**
+     * Converter for a number with unit to
+     *
+     * @param number
+     *            the value of the time to be converted, for 314 us it would be
+     *            314.
+     * @param unit
+     *            the unit, {@link IMarkerConstants#MS},
+     *            {@link IMarkerConstants#US},{@link IMarkerConstants#NS} or
+     *            {@link IMarkerConstants#CYCLES}
+     * @param trace
+     *            needed for cycle conversion, can be {@code null}
+     * @return a double of nanoseconds. Note, will lose precision for UTC times,
+     *         but it is needed to not accumulate errors. This makes sense in
+     *         the context of "periodic markers"
+     */
+    static double convertToNanos(double number, String unit, @Nullable ITmfTrace trace) {
+        if (unit.equalsIgnoreCase(MS)) {
+            return number * NANO_PER_MILLI;
+        } else if (unit.equalsIgnoreCase(US)) {
+            return number * NANO_PER_MICRO;
+        } else if (unit.equalsIgnoreCase(NS)) {
+            return number;
+        } else if (unit.equalsIgnoreCase(CYCLES) &&
+                trace instanceof IAdaptable) {
+            ICyclesConverter adapter = ((IAdaptable) trace).getAdapter(ICyclesConverter.class);
+            if (adapter != null) {
+                return adapter.cyclesToNanos((long) number);
+            }
+        }
+        return number;
+    }
 }

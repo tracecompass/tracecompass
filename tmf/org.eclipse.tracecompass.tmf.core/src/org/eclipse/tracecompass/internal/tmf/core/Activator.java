@@ -19,10 +19,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.internal.tmf.core.annotations.CustomDefinedOutputAnnotationProviderFactory;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.symbols.SymbolProviderManager;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTraceAdapterManager;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.osgi.framework.BundleContext;
 
@@ -48,6 +51,7 @@ public class Activator extends Plugin {
      * The shared instance
      */
     private static Activator fPlugin;
+    private static final CustomDefinedOutputAnnotationProviderFactory CUSTOM_DEFINED_OUTPUT_ANNOTATION_PROVIDER_FACTORY = new CustomDefinedOutputAnnotationProviderFactory();
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -95,10 +99,13 @@ public class Activator extends Plugin {
         SymbolProviderManager.getInstance();
         /* Initialize the data provider manager */
         DataProviderManager.getInstance();
+        TmfTraceAdapterManager.registerFactory(CUSTOM_DEFINED_OUTPUT_ANNOTATION_PROVIDER_FACTORY, ITmfTrace.class);
     }
 
     @Override
     public void stop(BundleContext context) throws Exception {
+        TmfTraceAdapterManager.unregisterFactory(CUSTOM_DEFINED_OUTPUT_ANNOTATION_PROVIDER_FACTORY);
+        CUSTOM_DEFINED_OUTPUT_ANNOTATION_PROVIDER_FACTORY.dispose();
         TmfCoreTracer.stop();
         TmfTraceManager.getInstance().dispose();
         TmfAnalysisManager.dispose();

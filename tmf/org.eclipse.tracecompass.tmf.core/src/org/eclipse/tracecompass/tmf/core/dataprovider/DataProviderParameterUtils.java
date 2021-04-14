@@ -67,6 +67,26 @@ public class DataProviderParameterUtils {
     public static final String REQUESTED_ELEMENT_KEY = "requested_element"; //$NON-NLS-1$
 
     /**
+     * Requested marker set key
+     * @since 7.0
+     */
+    public static final String REQUESTED_MARKER_SET_KEY = "requested_marker_set"; //$NON-NLS-1$
+
+    /**
+     * Requested marker categories key
+     * @since 7.0
+     */
+    public static final String REQUESTED_MARKER_CATEGORIES_KEY = "requested_marker_categories"; //$NON-NLS-1$
+
+    /**
+     * Requested trace key, uses the hostID, as the time is the same for every
+     * trace with the same host id.
+     *
+     * @since 7.0
+     */
+    public static final String REQUESTED_TRACE_KEY = "requested_trace"; //$NON-NLS-1$
+
+    /**
      * Key to extract isFiltered from parameters map
      */
     public static final String FILTERED_KEY = "isFiltered"; //$NON-NLS-1$
@@ -193,9 +213,9 @@ public class DataProviderParameterUtils {
     @SuppressWarnings("unchecked")
     private static @Nullable List<Long> transformToLongList(Collection<?> collectionToTransform) {
         if (!collectionToTransform.isEmpty()) {
-            if (collectionToTransform instanceof List<?> && collectionToTransform.stream().allMatch(e -> e instanceof Long)) {
+            if (collectionToTransform instanceof List<?> && collectionToTransform.stream().allMatch(Long.class::isInstance)) {
                 return (List<Long>) collectionToTransform;
-            } else if (collectionToTransform.stream().allMatch(e -> e instanceof Integer)) {
+            } else if (collectionToTransform.stream().allMatch(Integer.class::isInstance)) {
                 List<Long> list = new ArrayList<>();
                 for (Integer element : (List<Integer>) collectionToTransform) {
                     list.add(element.longValue());

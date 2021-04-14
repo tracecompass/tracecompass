@@ -103,6 +103,11 @@ import org.eclipse.tracecompass.common.core.log.TraceCompassLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLog;
 import org.eclipse.tracecompass.common.core.log.TraceCompassLogUtils.FlowScopeLogBuilder;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.Annotation;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationCategoriesModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IAnnotation.AnnotationType;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.IFilterStrings;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
@@ -118,9 +123,12 @@ import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfTimeNavigationProvider
 import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfTimeZoomProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfZoomToSelectionProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.TimeEventFilterDialog;
+import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.CoreFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
+import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfDataModelSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfMarkerEventSourceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
@@ -218,6 +226,61 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     private static final int DEFAULT_BUFFER_SIZE = 3;
 
     private static final String HIDE_LABELS_KEY = "hide.labels"; //$NON-NLS-1$
+
+    private final class AnnotationMarkerEventSource implements IMarkerEventSource {
+        IOutputAnnotationProvider fProvider;
+
+        private AnnotationMarkerEventSource(IOutputAnnotationProvider ap) {
+            fProvider = ap;
+        }
+
+        @Override
+        public @NonNull List<@NonNull IMarkerEvent> getMarkerList(@NonNull String category, long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor) {
+
+            Map<@NonNull String, @NonNull Object> parameters = new HashMap<>();
+            MarkerSet defaultMarkerSet = MarkerUtils.getDefaultMarkerSet();
+            if (defaultMarkerSet != null) {
+                parameters.put(DataProviderParameterUtils.REQUESTED_MARKER_SET_KEY, defaultMarkerSet.getId());
+            }
+            parameters.put(DataProviderParameterUtils.REQUESTED_TRACE_KEY, fTrace.getHostId());
+            parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, StateSystemUtils.getTimes(startTime, endTime, resolution));
+            TmfModelResponse<@NonNull AnnotationModel> response = fProvider.fetchAnnotations(parameters, new NullProgressMonitor());
+            AnnotationModel model = response.getModel();
+            List<@NonNull IMarkerEvent> traceMarkerList = new ArrayList<>();
+            if (model != null) {
+                for (Entry<String, Collection<Annotation>> entry : model.getAnnotations().entrySet()) {
+                    for (Annotation annotation : entry.getValue()) {
+                        if (annotation.getType() == AnnotationType.CHART) {
+                            if (annotation.getEntryId() != -1) {
+                                Activator.getDefault().logWarning("Requesting an annotation with a bound entry. request : " + parameters + ", provider : " + fProvider.getClass().getName() + " annotation: " + annotation); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                            }
+                            // If the annotation entry ID is -1 we want the
+                            // marker to span across all entries
+                            MarkerEvent markerEvent = new MarkerEvent(annotation, null, entry.getKey(), true);
+                            traceMarkerList.add(markerEvent);
+                        }
+                    }
+                }
+            }
+            return traceMarkerList;
+        }
+
+        @Override
+        public @NonNull List<@NonNull String> getMarkerCategories() {
+            Map<@NonNull String, @NonNull Object> parameters = new HashMap<>();
+            MarkerSet defaultMarkerSet = MarkerUtils.getDefaultMarkerSet();
+            if (defaultMarkerSet != null) {
+                parameters.put(DataProviderParameterUtils.REQUESTED_MARKER_SET_KEY, defaultMarkerSet.getId());
+            }
+            parameters.put(DataProviderParameterUtils.REQUESTED_TRACE_KEY, fTrace.getHostId());
+            TmfModelResponse<@NonNull AnnotationCategoriesModel> cats = fProvider.fetchAnnotationCategories(parameters, new NullProgressMonitor());
+            AnnotationCategoriesModel model = cats.getModel();
+            if (model != null) {
+                return model.getAnnotationCategories();
+            }
+            return Collections.emptyList();
+        }
+    }
 
     /**
      * Redraw state enum
@@ -1854,7 +1917,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                         break;
                     }
                     List<@NonNull IMarkerEventSource> adapters = TmfTraceAdapterManager.getAdapters(trace, IMarkerEventSource.class);
+                    List<@NonNull IOutputAnnotationProvider> providers = TmfTraceAdapterManager.getAdapters(trace, IOutputAnnotationProvider.class);
                     markerEventSources.addAll(adapters);
+                    for (IOutputAnnotationProvider ap : providers) {
+                        markerEventSources.add(new AnnotationMarkerEventSource(ap));
+                    }
 
                     Job buildJob = new Job(getTitle() + Messages.AbstractTimeGraphView_BuildJob) {
                         @Override

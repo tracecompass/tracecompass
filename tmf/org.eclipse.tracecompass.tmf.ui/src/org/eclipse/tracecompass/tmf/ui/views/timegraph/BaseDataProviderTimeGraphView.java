@@ -44,7 +44,9 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.ViewFilterDialog;
 import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.BaseDataProviderTimeGraphPresentationProvider;
+import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.markers.MarkerUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.Messages;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.tmf.core.TmfStrings;
@@ -437,7 +439,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
             if (zoomStartTime <= entry.getEndTime() && zoomEndTime >= entry.getStartTime() && entry.hasTimeEvents()) {
                 synchronized (fEntries) {
                     if (!fEntryIds.isEmpty()) {
-                        fEntryIds.row(entry).forEach((provider, modelId) -> providersToModelIds.put(provider, modelId));
+                        fEntryIds.row(entry).forEach(providersToModelIds::put);
                     } else {
                         ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider = getProvider(entry);
                         if (provider != null) {
@@ -706,7 +708,20 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      * @since 5.2
      */
     protected @NonNull Map<@NonNull String, @NonNull Object> getFetchAnnotationCategoriesParameters() {
-        return new HashMap<>();
+        HashMap<@NonNull String, @NonNull Object> categoriesParameters = new HashMap<>();
+        putMarkerSetParameters(categoriesParameters, getTrace());
+        return categoriesParameters;
+    }
+
+    private static void putMarkerSetParameters(Map<@NonNull String, @NonNull Object> parameters, ITmfTrace trace) {
+        MarkerSet markerSet = MarkerUtils.getDefaultMarkerSet();
+        if (markerSet != null) {
+            String markerSetID = markerSet.getId();
+            if (markerSetID != null) {
+                parameters.put(DataProviderParameterUtils.REQUESTED_MARKER_SET_KEY, markerSetID);
+                parameters.put(DataProviderParameterUtils.REQUESTED_TRACE_KEY, trace.getHostId());
+            }
+        }
     }
 
     /**
@@ -720,9 +735,10 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      * @since 5.2
      */
     protected @NonNull Map<@NonNull String, @NonNull Object> getFetchAnnotationsParameters(@NonNull List<Long> times, @NonNull Collection<Long> items) {
-        @NonNull Map<@NonNull String, @NonNull Object> parameters = new HashMap<>();
+        Map<@NonNull String, @NonNull Object> parameters = new HashMap<>();
         parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, times);
         parameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, items);
+        putMarkerSetParameters(parameters, getTrace());
         return parameters;
     }
 
