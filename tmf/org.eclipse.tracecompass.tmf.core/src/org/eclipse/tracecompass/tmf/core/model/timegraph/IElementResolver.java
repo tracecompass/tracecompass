@@ -38,22 +38,6 @@ import com.google.common.collect.Multimap;
 public interface IElementResolver {
 
     /**
-     * The key for the label field
-     *
-     * @deprecated Use {@link IMetadataStrings#LABEL_KEY} instead.
-     */
-    @Deprecated
-    static final String LABEL_KEY = IMetadataStrings.LABEL_KEY;
-
-    /**
-     * The key for the entry name field
-     *
-     * @deprecated Use {@link IMetadataStrings#ENTRY_NAME_KEY} instead.
-     */
-    @Deprecated
-    static final String ENTRY_NAME_KEY = IMetadataStrings.ENTRY_NAME_KEY;
-
-    /**
      * Get the metadata for this data model. The keys are the names of the
      * metadata field or aspect. A field may have multiple values associated
      * with it.
