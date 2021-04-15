@@ -655,19 +655,6 @@ public class AggregationTreeTest {
     }
 
     /**
-     * Set the call graph analysis
-     *
-     * @param cga
-     *            The call graph analysis
-     * @deprecated Use {@link #setCga(CGAnalysis, ITmfStateSystem)} instead
-     */
-    @Deprecated
-    protected void setCga(CGAnalysis cga) {
-        fCsa = new CallStackAnalysisStub();
-        fCga = cga;
-    }
-
-    /**
      * Set the analyses to null
      */
     protected void resetAnalyses() {
