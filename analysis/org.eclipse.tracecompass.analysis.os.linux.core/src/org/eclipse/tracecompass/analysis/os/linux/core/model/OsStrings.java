@@ -13,8 +13,6 @@ package org.eclipse.tracecompass.analysis.os.linux.core.model;
 
 import java.util.Objects;
 
-import org.eclipse.tracecompass.tmf.core.TmfStrings;
-
 /**
  * Get externalized strings to identify various operating system concepts. These
  * strings can be used in views and analyses to have a common term to identify
@@ -62,17 +60,6 @@ public final class OsStrings {
      */
     public static String ptid() {
         return Objects.requireNonNull(org.eclipse.tracecompass.analysis.os.linux.core.event.aspect.Messages.AspectName_Ptid);
-    }
-
-    /**
-     * Get the string for the cpu string
-     *
-     * @return The externalized label for CPU
-     * @deprecated use {@link TmfStrings#cpu}
-     */
-    @Deprecated
-    public static String cpu() {
-        return TmfStrings.cpu();
     }
 
     /**
