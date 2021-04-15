@@ -22,7 +22,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.text.MessageFormat;
-import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.internal.tmf.core.Activator;
@@ -444,17 +443,6 @@ public abstract class AbstractFileCheckpointCollection implements ICheckpointCol
      */
     protected RandomAccessFile getRandomAccessFile() {
         return fRandomAccessFile;
-    }
-
-    /**
-     * Get the file channel currently used for the index
-     *
-     * @return the file channel
-     * @deprecated potential resource leak, use {@link #getRandomAccessFile()} instead
-     */
-    @Deprecated
-    protected FileChannel getFileChannel() {
-        return Objects.requireNonNull(fRandomAccessFile).getChannel();
     }
 
     /**
