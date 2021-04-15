@@ -85,7 +85,6 @@
                 <plugin id="org.json"/>
                 <plugin id="org.sat4j.core"/>
                 <plugin id="org.sat4j.pb"/>
-                <plugin id="org.swtchart"/>
                 <plugin id="com.google.gson"/>
                 <plugin id="com.google.guava"/>
                 <plugin id="org.apache.commons.io"/>

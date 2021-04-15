@@ -20,23 +20,10 @@ import org.eclipse.swt.graphics.Image;
  *
  * @author Yonni Chen
  * @since 3.2
+ * @deprecated use {@link ILegendImageProvider2} instead
  */
+@Deprecated
 public interface ILegendImageProvider {
-
-    /**
-     * Returns an image that represents the legend.
-     *
-     * @param imageHeight
-     *            Desired image height
-     * @param imageWidth
-     *            Desired image width
-     * @param name
-     *            Name associated with a legend image
-     * @return A legend image
-     * @deprecated As of 6.0, use {@link #getLegendImage(int, int, Long)} instead
-     */
-    @Deprecated
-    Image getLegendImage(int imageHeight, int imageWidth, @NonNull String name);
 
     /**
      * Returns an image that represents the legend.
@@ -50,7 +37,5 @@ public interface ILegendImageProvider {
      * @return A legend image
      * @since 6.0
      */
-    default Image getLegendImage(int imageHeight, int imageWidth, @NonNull Long id) {
-        return getLegendImage(imageHeight, imageWidth, String.valueOf(id));
-    }
+    Image getLegendImage(int imageHeight, int imageWidth, @NonNull Long id);
 }

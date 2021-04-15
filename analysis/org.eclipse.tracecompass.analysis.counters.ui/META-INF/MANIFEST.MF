@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
 Bundle-SymbolicName: org.eclipse.tracecompass.analysis.counters.ui;singleton:=true
-Bundle-Version: 1.0.1.qualifier
+Bundle-Version: 2.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-Activator: org.eclipse.tracecompass.internal.analysis.counters.ui.Activator
 Bundle-ActivationPolicy: lazy
@@ -19,10 +19,8 @@ Require-Bundle: org.eclipse.ui,
 Import-Package: com.google.common.base,
  com.google.common.collect,
  com.google.common.primitives,
- org.apache.commons.lang3,
- org.swtchart
-Export-Package: org.eclipse.tracecompass.analysis.counters.ui,
- org.eclipse.tracecompass.analysis.counters.ui.views,
+ org.apache.commons.lang3
+Export-Package: org.eclipse.tracecompass.analysis.counters.ui.views,
  org.eclipse.tracecompass.internal.analysis.counters.ui;x-internal:=true
 Automatic-Module-Name: org.eclipse.tracecompass.analysis.counters.ui
 

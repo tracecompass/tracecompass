@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGBA;
@@ -42,7 +41,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xychart.TmfBaseProvider;
  *
  * @since 6.0
  */
-public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implements MouseTrackListener {
+public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider {
 
     private final class XYToolTipHandler extends TmfAbstractToolTipHandler {
         private static final String HTML_COLOR_TOOLTIP = "<span style=\"color:%s;\">%s</span>"; //$NON-NLS-1$
@@ -142,36 +141,5 @@ public class TmfCommonXLineChartTooltipProvider extends TmfBaseProvider implemen
     @Override
     public void refresh() {
         // nothing to do
-    }
-
-    // ------------------------------------------------------------------------
-    // MouseTrackListener
-    // ------------------------------------------------------------------------
-
-    /**
-     * @deprecated, do not extend, use as-is
-     */
-    @Deprecated
-    @Override
-    public void mouseEnter(MouseEvent e) {
-        // do nothing
-    }
-
-    /**
-     * @deprecated, do not extend, use as-is
-     */
-    @Deprecated
-    @Override
-    public void mouseExit(MouseEvent e) {
-        // do nothing
-    }
-
-    /**
-     * @deprecated, do not extend, use as-is
-     */
-    @Deprecated
-    @Override
-    public void mouseHover(MouseEvent e) {
-        // do nothing
     }
 }

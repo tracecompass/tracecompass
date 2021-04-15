@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 6.2.2.qualifier
+Bundle-Version: 7.0.0.qualifier
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tracecompass.tmf.ui;singleton:=true
 Bundle-Activator: org.eclipse.tracecompass.internal.tmf.ui.Activator
@@ -22,7 +22,6 @@ Require-Bundle: org.eclipse.core.expressions,
  org.eclipse.jface.text,
  org.eclipse.cdt.core,
  org.eclipse.swtchart,
- org.swtchart,
  com.ibm.icu,
  org.eclipse.tracecompass.segmentstore.core,
  org.apache.commons.compress,
@@ -72,7 +71,6 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.ui.model;x-int
  org.eclipse.tracecompass.internal.tmf.ui.viewers.timegraph.handlers;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.viewers.tree;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.viewers.xychart;x-internal:=true,
- org.eclipse.tracecompass.internal.tmf.ui.viewers.xycharts;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.views;x-friends:="org.eclipse.tracecompass.tmf.ui.swtbot.tests",
  org.eclipse.tracecompass.internal.tmf.ui.views.handler;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.ui.views.histogram;x-internal:=true,
@@ -110,9 +108,6 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.ui.model;x-int
  org.eclipse.tracecompass.tmf.ui.viewers.xychart,
  org.eclipse.tracecompass.tmf.ui.viewers.xychart.barchart,
  org.eclipse.tracecompass.tmf.ui.viewers.xychart.linechart,
- org.eclipse.tracecompass.tmf.ui.viewers.xycharts,
- org.eclipse.tracecompass.tmf.ui.viewers.xycharts.barcharts,
- org.eclipse.tracecompass.tmf.ui.viewers.xycharts.linecharts,
  org.eclipse.tracecompass.tmf.ui.views,
  org.eclipse.tracecompass.tmf.ui.views.colors,
  org.eclipse.tracecompass.tmf.ui.views.distribution.model,

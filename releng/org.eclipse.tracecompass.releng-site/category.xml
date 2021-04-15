@@ -41,7 +41,7 @@
    <bundle id="org.apache.commons.compress"/>
    <bundle id="org.apache.commons.lang3"/>
    <bundle id="org.apache.commons.io"/>
-   <bundle id="org.swtchart"/>
+   <bundle id="org.eclipse.swtchart"/>
    <bundle id="com.google.guava"/>
    <bundle id="org.json"/>
    <category-def name="Trace Compass" label="Trace Compass Main Features"/>

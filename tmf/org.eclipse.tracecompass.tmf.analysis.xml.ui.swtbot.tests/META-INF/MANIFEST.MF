@@ -39,6 +39,5 @@ Require-Bundle: org.apache.log4j,
  org.eclipse.tracecompass.tmf.ui.tests,
  org.eclipse.jdt.annotation;bundle-version="[2.0.0,3.0.0)";resolution:=optional
 Import-Package: org.apache.commons.io,
- org.eclipse.tracecompass.testtraces.ctf,
- org.swtchart
+ org.eclipse.tracecompass.testtraces.ctf
 Automatic-Module-Name: org.eclipse.tracecompass.tmf.analysis.xml.ui.swtbot.tests

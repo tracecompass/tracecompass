@@ -251,19 +251,6 @@ public abstract class AbstractSelectTreeViewer2 extends AbstractTmfTreeViewer {
     }
 
     /**
-     * Tell the chart viewer to listen to changes in the tree viewer
-     *
-     * @param listener
-     *            Chart listening to changes in the tree's selected entries
-     * @deprecated As of 6.0, there can be more than one listener for the tree,
-     *             use {@link #addTreeListener(ICheckboxTreeViewerListener)}
-     */
-    @Deprecated
-    public void setTreeListener(ICheckboxTreeViewerListener listener) {
-        addTreeListener(listener);
-    }
-
-    /**
      * Add a listener to changes in the tree viewer
      *
      * @param listener
@@ -674,27 +661,6 @@ public abstract class AbstractSelectTreeViewer2 extends AbstractTmfTreeViewer {
             }
         });
         return column;
-    }
-
-    /**
-     * Get the full path of the entry, from the trace to itself, to query the
-     * presentation provider.
-     *
-     * @param entry
-     *            entry whose legend needs to be resolved.
-     * @return the relevant series name.
-     * @deprecated The ID should be used to query the presentation provider
-     *             instead of the full path
-     */
-    @Deprecated
-    protected static @NonNull String getFullPath(TmfGenericTreeEntry<TmfTreeDataModel> entry) {
-        StringBuilder path = new StringBuilder(entry.getName());
-        ITmfTreeViewerEntry parent = entry.getParent();
-        while (parent instanceof TmfGenericTreeEntry) {
-            path.insert(0, parent.getName() + '/');
-            parent = parent.getParent();
-        }
-        return path.toString();
     }
 
     /**

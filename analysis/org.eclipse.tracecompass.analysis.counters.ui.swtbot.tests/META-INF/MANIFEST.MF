@@ -29,7 +29,6 @@ Require-Bundle: org.eclipse.core.resources,
 Import-Package: org.apache.commons.io,
  org.eclipse.swt.graphics,
  org.eclipse.swtchart,
- org.eclipse.tracecompass.analysis.counters.core,
- org.swtchart
+ org.eclipse.tracecompass.analysis.counters.core
 Automatic-Module-Name: org.eclipse.tracecompass.analysis.counters.ui.swtbot.tests
 Export-Package: org.eclipse.tracecompass.analysis.counters.ui.swtbot.tests;x-internal:=true

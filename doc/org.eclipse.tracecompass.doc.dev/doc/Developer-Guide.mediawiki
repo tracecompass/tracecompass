@@ -364,7 +364,7 @@ To open the plug-in manifest, double-click on the MANIFEST.MF file. <br>
 [[Image:images/SelectManifest.png]]<br>
 
 Change to the Dependencies tab and select '''Add...''' of the ''Required Plug-ins'' section. A new dialog box will open. Next find plug-in ''org.eclipse.tracecompass.tmf.core'' and press '''OK'''<br>
-Following the same steps, add ''org.eclipse.tracecompass.tmf.ui'' and ''org.swtchart''.<br>
+Following the same steps, add ''org.eclipse.tracecompass.tmf.ui'' and ''org.exlipse.swtchart''.<br>
 [[Image:images/AddDependencyTmfUi.png]]<br>
 
 Change to the Extensions tab and select '''Add...''' of the ''All Extension'' section. A new dialog box will open. Find the view extension ''org.eclipse.ui.views'' and press '''Finish'''.<br>
