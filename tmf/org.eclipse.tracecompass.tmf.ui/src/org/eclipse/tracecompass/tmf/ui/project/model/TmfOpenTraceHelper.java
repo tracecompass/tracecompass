@@ -358,19 +358,6 @@ public class TmfOpenTraceHelper {
     }
 
     /**
-     * Open a trace (or experiment) from a project element. If the trace is already
-     * opened, its editor is activated and brought to top.
-     *
-     * @param traceElement
-     *            the {@link TmfTraceElement} to open
-     * @deprecated Use {@link #openFromElement(TmfCommonProjectElement)} instead
-     */
-    @Deprecated
-    public static void openTraceFromElement(final TmfCommonProjectElement traceElement) {
-        openFromElement(traceElement);
-    }
-
-    /**
      * Open a trace (or experiment) from a project element. If the trace is
      * already opened, its editor is activated and brought to top.
      *
