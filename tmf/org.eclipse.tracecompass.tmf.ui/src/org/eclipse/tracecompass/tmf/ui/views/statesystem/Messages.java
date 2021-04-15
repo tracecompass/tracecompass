@@ -15,7 +15,6 @@
 package org.eclipse.tracecompass.tmf.ui.views.statesystem;
 
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.tracecompass.tmf.core.TmfStrings;
 
 /**
  * Localizable strings in the State System Visualizer.
@@ -49,14 +48,6 @@ public class Messages extends NLS {
 
     /** Label for the "type" column */
     public static String TypeColumnLabel;
-
-    /** Label for the "start time" column
-     * @Deprecated Use {@link TmfStrings#startTime()} instead */
-    public static String StartTimeColumLabel;
-
-    /** Label for the "end time" column
-     * @Deprecated Use {@link TmfStrings#endTime()} instead*/
-    public static String EndTimeColumLabel;
 
     /** Label for the "attribute path" column */
     public static String AttributePathColumnLabel;
