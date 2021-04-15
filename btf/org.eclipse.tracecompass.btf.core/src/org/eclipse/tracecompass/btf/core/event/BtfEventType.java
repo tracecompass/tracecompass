@@ -59,17 +59,6 @@ public class BtfEventType extends TmfEventType {
     }
 
     /**
-     * does the event have an eighth column
-     *
-     * @return if the name is "sem" or "sig" true
-     * @deprecated - notes column is always there, while the content is optional
-     */
-    @Deprecated
-    public boolean hasNotes() {
-        return true;
-    }
-
-    /**
      * @return the name
      */
     @Override
