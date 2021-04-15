@@ -192,7 +192,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 /**
@@ -815,47 +814,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     }
                 }
             });
-        }
-        fillWithNullEvents(entry, eventList);
-    }
-
-    private static class TransformedPredicate implements Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>> {
-
-        private final @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>> fOriginalPredicate;
-
-        public TransformedPredicate(@NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>> value) {
-            fOriginalPredicate = value;
-        }
-
-        @Override
-        public boolean test(@NonNull Multimap<@NonNull String, @NonNull Object> map) {
-            Map<@NonNull String, @NonNull String> simpleMap = new HashMap<>();
-            for (Entry<@NonNull String, Collection<@NonNull Object>> entry : map.asMap().entrySet()) {
-                simpleMap.put(entry.getKey(), String.valueOf(entry.getValue().iterator().next()));
-            }
-            return fOriginalPredicate.test(simpleMap);
-        }
-
-    }
-
-    /**
-     * Filter the given eventList using the predicates
-     *
-     * @param entry
-     *            The timegraph entry
-     * @param eventList
-     *            The event list at this zoom level
-     * @param predicates
-     *            The predicate for the filter dialog text box
-     * @since 4.0
-     * @deprecated As of 6.0, replaced with
-     *             {@link #doFilterEventList(TimeGraphEntry, List, Map)}
-     */
-    @Deprecated
-    @NonNullByDefault
-    protected void doFilterEvents(TimeGraphEntry entry, List<ITimeEvent> eventList, Map<Integer, Predicate<Map<String, String>>> predicates) {
-        if (!predicates.isEmpty()) {
-            doFilterEventList(entry, eventList, Maps.transformValues(predicates, p -> new TransformedPredicate(p)));
         }
         fillWithNullEvents(entry, eventList);
     }
@@ -2927,21 +2885,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     }
 
     /**
-     * get the time event filter dialog
-     *
-     * @return The time event filter dialog. Could be null.
-     * @since 4.0
-     * @deprecated As of 6.0, the {@link TimeEventFilterDialog} has been made to
-     *             support more types of views and copied to the
-     *             {@link ViewFilterDialog} class. Use
-     *             {@link #getViewFilterDialog} method instead
-     */
-    @Deprecated
-    protected TimeEventFilterDialog getTimeEventFilterDialog() {
-        return fTimeEventFilterDialog;
-    }
-
-    /**
      * Get the view filter dialog
      *
      * @return The time event filter dialog. Could be null.
@@ -2998,20 +2941,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
     public void addPaintListener(PaintListener listener) {
         Control tgControl = getTimeGraphViewer().getTimeGraphControl();
         tgControl.addPaintListener(listener);
-    }
-
-    /**
-     * Gets the time event filter action
-     *
-     * @return the timeEventFilterAction
-     * @since 4.1
-     * @deprecated As of 6.0, this class implements {@link ITmfFilterableControl}
-     *             and this method is replaced by the one from the interface
-     *             {@link #getFilterAction()}
-     */
-    @Deprecated
-    public Action getTimeEventFilterAction() {
-        return fTimeEventFilterAction;
     }
 
     @Override

@@ -16,14 +16,11 @@
 package org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
@@ -48,25 +45,6 @@ import com.google.common.collect.Multimap;
  * An entry for use in the time graph views
  */
 public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
-
-    private static class TransformedPredicate implements Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>> {
-
-        private final @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>> fOriginalPredicate;
-
-        public TransformedPredicate(@NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>> value) {
-            fOriginalPredicate = value;
-        }
-
-        @Override
-        public boolean test(@NonNull Multimap<@NonNull String, @NonNull Object> map) {
-            Map<@NonNull String, @NonNull String> simpleMap = new HashMap<>();
-            for (Entry<@NonNull String, Collection<@NonNull Object>> entry : map.asMap().entrySet()) {
-                simpleMap.put(entry.getKey(), String.valueOf(entry.getValue().iterator().next()));
-            }
-            return fOriginalPredicate.test(simpleMap);
-        }
-
-    }
 
     /**
      * Class to describe on which time range and resolution the zoomed entry list is
@@ -96,32 +74,6 @@ public class TimeGraphEntry implements ITimeGraphEntry, IElementResolver {
             fZoomEnd = zoomEnd;
             fResolution = resolution;
             fPredicates = Collections.emptyMap();
-        }
-
-        /**
-         * Constructor for a zoom sampling object
-         *
-         * @param zoomStart
-         *            the start time of the zoom
-         * @param zoomEnd
-         *            the end time of the zoom
-         * @param resolution
-         *            the resolution of the zoom
-         * @param predicates
-         *            The active predicate applied to the view element
-         * @since 4.3
-         * @deprecated As of 6.0, replaced by {@link #Sampling(long, long, Map, long)}
-         */
-        @Deprecated
-        public Sampling(long zoomStart, long zoomEnd, long resolution, @NonNull Map<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> predicates) {
-            fZoomStart = zoomStart;
-            fZoomEnd = zoomEnd;
-            fResolution = resolution;
-            Map<@NonNull Integer, @NonNull Predicate<@NonNull Multimap<@NonNull String, @NonNull Object>>> newPredicates = new HashMap<>();
-            for (Entry<@NonNull Integer, @NonNull Predicate<@NonNull Map<@NonNull String, @NonNull String>>> entry : predicates.entrySet() ) {
-                newPredicates.put(entry.getKey(), new TransformedPredicate(entry.getValue()));
-            }
-            fPredicates = newPredicates;
         }
 
         /**
