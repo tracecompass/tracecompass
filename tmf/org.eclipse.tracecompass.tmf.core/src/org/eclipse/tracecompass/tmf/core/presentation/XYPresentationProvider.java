@@ -14,11 +14,8 @@ package org.eclipse.tracecompass.tmf.core.presentation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.core.presentation.YAppearance;
 import org.eclipse.tracecompass.tmf.core.dataprovider.X11ColorUtils;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
@@ -63,28 +60,6 @@ public class XYPresentationProvider implements IXYPresentationProvider {
 
     /* This map a series name and an IYAppearance */
     private final Map<Long, OutputElementStyle> fYAppearances = new HashMap<>();
-    /* Temporary map of string to ID for backward-compatibility */
-    private final Map<String, Long> fStringToId = new HashMap<>();
-    private final AtomicLong fIdGenerator = new AtomicLong();
-
-    @Deprecated
-    @Override
-    public synchronized IYAppearance getAppearance(String serieName, String seriesType, int width) {
-        OutputElementStyle seriesStyle = getSeriesStyle(fStringToId.computeIfAbsent(serieName, n -> fIdGenerator.getAndIncrement()), seriesType, width);
-        return typeToYAppearance(seriesStyle);
-    }
-
-    private IYAppearance typeToYAppearance(OutputElementStyle seriesStyle) {
-        Map<String, Object> styleValues = seriesStyle.getStyleValues();
-        String color = (String) styleValues.get(StyleProperties.COLOR);
-        int alpha = (int) ((Double) styleValues.getOrDefault(StyleProperties.OPACITY, 1.0) * 255);
-        RGBAColor rgba = (color == null ? generateColor() : Objects.requireNonNull(RGBAColor.fromString(color, alpha)));
-        return new YAppearance(String.valueOf(styleValues.getOrDefault(StyleProperties.STYLE_NAME, "style name")), //$NON-NLS-1$
-                String.valueOf(styleValues.getOrDefault(StyleProperties.SERIES_TYPE, StyleProperties.SeriesType.LINE)),
-                String.valueOf(styleValues.getOrDefault(StyleProperties.SERIES_STYLE, StyleProperties.SeriesStyle.SOLID)),
-                rgba,
-                (int) styleValues.getOrDefault(StyleProperties.WIDTH, 1));
-    }
 
     @Override
     public @NonNull OutputElementStyle getSeriesStyle(Long seriesId, @NonNull String type, int width) {

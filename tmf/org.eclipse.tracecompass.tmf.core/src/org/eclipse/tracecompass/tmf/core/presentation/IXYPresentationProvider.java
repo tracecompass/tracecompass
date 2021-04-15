@@ -25,23 +25,6 @@ import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
 public interface IXYPresentationProvider {
 
     /**
-     * Returns the {@link IYAppearance} to which the specified series name is
-     * mapped. If no appearance is found, a new one will be created with given
-     * parameters and added to this presentation provider
-     *
-     * @param seriesName
-     *            The name of the series
-     * @param type
-     *            The series type
-     * @param width
-     *            The series width
-     * @return The {@link IYAppearance} instance of the Y series.
-     * @deprecated As of 6.0, use {@link #getSeriesStyle(Long, String, int)} instead
-     */
-    @Deprecated
-    IYAppearance getAppearance(String seriesName, String type, int width);
-
-    /**
      * Returns the {@link OutputElementStyle} to which the specified series ID is
      * mapped. If no appearance is found, a new one will be created with given
      * parameters and added to this presentation provider.
@@ -55,10 +38,7 @@ public interface IXYPresentationProvider {
      * @return The {@link IYAppearance} instance of the Y series.
      * @since 6.0
      */
-    default OutputElementStyle getSeriesStyle(Long seriesId, String type, int width) {
-        IYAppearance appearance = getAppearance(String.valueOf(seriesId), type, width);
-        return appearance.toOutputElementStyle();
-    }
+    OutputElementStyle getSeriesStyle(Long seriesId, String type, int width);
 
     /**
      * Returns the {@link IYAppearance} to which the specified series ID is
