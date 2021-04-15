@@ -137,12 +137,6 @@ public class CounterDataProvider extends AbstractTreeCommonXDataProvider<Counter
         }
     }
 
-    @Deprecated
-    @Override
-    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
-        return Maps.uniqueIndex(getYSeriesModels(ss, fetchParameters, monitor), IYModel::getName);
-    }
-
     /**
      * @since 1.2
      */

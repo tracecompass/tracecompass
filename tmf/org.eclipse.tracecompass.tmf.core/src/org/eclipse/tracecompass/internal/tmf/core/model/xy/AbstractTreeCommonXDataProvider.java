@@ -103,30 +103,6 @@ public abstract class AbstractTreeCommonXDataProvider<A extends TmfStateSystemAn
     }
 
     /**
-     * Abstract method to be implemented by the providers to return trees. Lets
-     * the abstract class handle waiting for {@link ITmfStateSystem}
-     * initialization and progress, as well as error handling
-     *
-     * @param ss
-     *            the {@link TmfStateSystemAnalysisModule}'s
-     *            {@link ITmfStateSystem}
-     * @param fetchParameters
-     *            the query's filter
-     * @param monitor
-     *            progress monitor
-     * @return the map of models, null if the query was cancelled
-     * @throws StateSystemDisposedException
-     *             if the state system was closed during the query or could not
-     *             be queried.
-     * @deprecated As of 5.3, use
-     *             {@link #getYSeriesModels(ITmfStateSystem, Map, IProgressMonitor)}
-     */
-    @Deprecated
-    protected abstract @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss,
-            Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor)
-                    throws StateSystemDisposedException;
-
-    /**
      * Abstract method to be implemented by the providers to return trees. Lets the
      * abstract class handle waiting for {@link ITmfStateSystem} initialization and
      * progress, as well as error handling
@@ -142,12 +118,9 @@ public abstract class AbstractTreeCommonXDataProvider<A extends TmfStateSystemAn
      *             if the state system was closed during the query or could not be
      *             queried.
      */
-    protected @Nullable Collection<IYModel> getYSeriesModels(ITmfStateSystem ss,
+    protected abstract @Nullable Collection<IYModel> getYSeriesModels(ITmfStateSystem ss,
             Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor)
-                    throws StateSystemDisposedException {
-        Map<String, IYModel> yModels = getYModels(ss, fetchParameters, monitor);
-        return yModels == null ? null : yModels.values();
-    }
+                    throws StateSystemDisposedException;
 
     /**
      * Getter for the title of this provider

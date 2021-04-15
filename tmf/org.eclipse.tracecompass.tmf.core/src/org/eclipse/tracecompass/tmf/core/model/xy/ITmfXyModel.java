@@ -12,7 +12,6 @@
 package org.eclipse.tracecompass.tmf.core.model.xy;
 
 import java.util.Collection;
-import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -52,20 +51,8 @@ public interface ITmfXyModel {
     /**
      * Get the collection of {@link ISeriesModel}
      *
-     * @return Map of series data where the key is the unique id of the
-     *         associated series
-     * @deprecated Since 5.3, use {@link #getSeriesData()}
-     */
-    @Deprecated
-    Map<String, ISeriesModel> getData();
-
-    /**
-     * Get the collection of {@link ISeriesModel}
-     *
      * @return The collection of {@link ISeriesModel} to display
      * @since 6.0
      */
-    default Collection<ISeriesModel> getSeriesData() {
-        return getData().values();
-    }
+    Collection<ISeriesModel> getSeriesData();
 }

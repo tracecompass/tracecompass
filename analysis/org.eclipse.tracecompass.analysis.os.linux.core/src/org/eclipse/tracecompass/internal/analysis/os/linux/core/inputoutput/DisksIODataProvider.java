@@ -48,7 +48,6 @@ import org.eclipse.tracecompass.tmf.core.util.Pair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 
 /**
  * This data provider will return a XY model (model is wrapped in a response)
@@ -226,12 +225,6 @@ public class DisksIODataProvider extends AbstractTreeCommonXDataProvider<InputOu
             i++;
         }
         return new TmfTreeModel<>(Collections.emptyList(), nodes);
-    }
-
-    @Deprecated
-    @Override
-    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
-        return Maps.uniqueIndex(getYSeriesModels(ss, fetchParameters, monitor), IYModel::getName);
     }
 
     @Override

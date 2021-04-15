@@ -44,7 +44,6 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 
 /**
  * This data provider will return a XY model based on a query filter. The model
@@ -102,12 +101,6 @@ public class KernelMemoryUsageDataProvider extends AbstractTreeCommonXDataProvid
             KernelMemoryAnalysisModule module, KernelAnalysisModule kernelModule) {
         super(trace, module);
         fKernelModule = kernelModule;
-    }
-
-    @Deprecated
-    @Override
-    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
-        return Maps.uniqueIndex(getYSeriesModels(ss, fetchParameters, monitor), IYModel::getName);
     }
 
     /**

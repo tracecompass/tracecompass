@@ -118,12 +118,6 @@ public class CpuUsageDataProvider extends AbstractTreeCommonXDataProvider<Kernel
         fKernelAnalysisModule = kernelAnalysisModule;
     }
 
-    @Deprecated
-    @Override
-    protected @Nullable Map<String, IYModel> getYModels(ITmfStateSystem ss, Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) throws StateSystemDisposedException {
-        return Maps.uniqueIndex(getYSeriesModels(ss, fetchParameters, monitor), IYModel::getName);
-    }
-
     /**
      * @since 2.5
      */
