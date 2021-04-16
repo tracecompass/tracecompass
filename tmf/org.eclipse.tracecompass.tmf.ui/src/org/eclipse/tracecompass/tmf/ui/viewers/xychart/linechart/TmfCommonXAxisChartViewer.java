@@ -576,7 +576,6 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             String seriesName = yModel.getName();
             OutputElementStyle appearance = getSeriesStyle(yModel.getId());
             BaseXYPresentationProvider presProvider = getPresentationProvider();
-
             String type = (String) presProvider.getStyleOrDefault(appearance, StyleProperties.SERIES_TYPE, StyleProperties.SeriesType.LINE);
             RGBAColor rgb = presProvider.getColorStyleOrDefault(appearance, StyleProperties.COLOR, DEFAULT_COLOR);
             COLOR_REGISTRY.put(rgb.toString(), RGBAUtil.fromRGBAColor(rgb).rgb);
@@ -664,6 +663,11 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             return;
         }
         int numRequests = fOverrideNbPoints != 0 ? fOverrideNbPoints : (int) Math.min(getWindowEndTime() - getWindowStartTime() + 1, (long) (getSwtChart().getPlotArea().getSize().x * fResolution));
+
+        UpdateThread oldUpdateThread = fUpdateThread;
+        if (oldUpdateThread != null) {
+            oldUpdateThread.cancel();
+        }
         fUpdateThread = new UpdateThread(trace, numRequests, fScope);
         fUpdateThread.start();
     }
