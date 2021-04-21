@@ -151,7 +151,7 @@ public abstract class TmfStateValue implements ITmfStateValue {
         for (char c : strValue.toCharArray()) {
             if (Character.isISOControl(c)) {
                 Activator.getDefault().logError("Trying to use invalid string: " + strValue); //$NON-NLS-1$
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Trying to use invalid string: " + strValue);
             }
         }
         StringStateValue newValue = new StringStateValue(strValue);
