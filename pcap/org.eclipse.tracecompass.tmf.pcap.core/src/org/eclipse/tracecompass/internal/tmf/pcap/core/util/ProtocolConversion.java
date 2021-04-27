@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Ericsson
+ * 
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -10,6 +10,7 @@
  *
  * Contributors:
  *   Vincent Perot - Initial API and implementation
+ *   Prasanna Vadanan - SOMEIP Dissection and Implementation
  *******************************************************************************/
 
 package org.eclipse.tracecompass.internal.tmf.pcap.core.util;
@@ -48,6 +49,10 @@ public final class ProtocolConversion {
             return TmfPcapProtocol.UDP;
         case UNKNOWN:
             return TmfPcapProtocol.UNKNOWN;
+        case SOMEIP:
+            return TmfPcapProtocol.SOMEIP;
+        case SD:
+            return TmfPcapProtocol.SD;
         default:
             throw new IllegalArgumentException();
         }
@@ -74,6 +79,10 @@ public final class ProtocolConversion {
             return PcapProtocol.UDP;
         case UNKNOWN:
             return PcapProtocol.UNKNOWN;
+        case SOMEIP:
+            return PcapProtocol.SOMEIP;
+        case SD:
+            return PcapProtocol.SD;
         default:
             throw new IllegalArgumentException();
         }
