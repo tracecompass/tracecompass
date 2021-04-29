@@ -208,8 +208,8 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
         IMarkerEvent markerEvent = null;
         while (true) {
             long index = Math.round((time - reference.time) / fPeriod) + reference.index;
-            time = Math.round((index - reference.index) * fPeriod) + reference.time;
-            long duration = (fColor2 == null) ? 0 : Math.round((index + 1 - reference.index) * fPeriod) + reference.time - time;
+            long markerTime = Math.round((index - reference.index) * fPeriod) + reference.time;
+            long duration = (fColor2 == null) ? 0 : Math.round((index + 1 - reference.index) * fPeriod) + reference.time - markerTime;
             long labelIndex = index;
             if (fRollover != 0) {
                 labelIndex %= fRollover;
@@ -218,16 +218,16 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
                 }
             }
             /* Add previous marker if current is visible */
-            if ((time >= startTime || time + duration > startTime) && markerEvent != null) {
+            if ((markerTime >= startTime || markerTime + duration > startTime) && markerEvent != null) {
                 markers.add(markerEvent);
             }
             if (isApplicable(labelIndex)) {
                 RGBA color = (fColor2 == null) ? fColor1 : (index % 2 == 0) ? fColor1 : fColor2;
-                markerEvent = new MarkerEvent(null, time, duration, fCategory, color, getMarkerLabel(labelIndex), fForeground);
+                markerEvent = new MarkerEvent(null, markerTime, duration, fCategory, color, getMarkerLabel(labelIndex), fForeground);
             } else {
                 markerEvent = null;
             }
-            if (time > endTime) {
+            if (markerTime > endTime) {
                 if (markerEvent != null) {
                     /* The next marker out of range is included */
                     markers.add(markerEvent);

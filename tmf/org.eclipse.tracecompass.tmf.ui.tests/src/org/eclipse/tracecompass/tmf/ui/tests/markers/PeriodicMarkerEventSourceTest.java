@@ -174,9 +174,10 @@ public class PeriodicMarkerEventSourceTest {
         assertEquals(Arrays.asList(CATEGORY), source.getMarkerCategories());
         List<IMarkerEvent> expected = Arrays.asList(
                 new MarkerEvent(null, -20L, 10L, CATEGORY, EVEN_COLOR, "-2", false),
-                new MarkerEvent(null, 10L, 10L, CATEGORY, ODD_COLOR, "1", false),
-                new MarkerEvent(null, 40L, 10L, CATEGORY, EVEN_COLOR, "4", false),
-                new MarkerEvent(null, 70L, 10L, CATEGORY, ODD_COLOR, "7", false),
+                new MarkerEvent(null, 0L, 10L, CATEGORY, EVEN_COLOR, "0", false),
+                new MarkerEvent(null, 30L, 10L, CATEGORY, ODD_COLOR, "3", false),
+                new MarkerEvent(null, 50L, 10L, CATEGORY, ODD_COLOR, "5", false),
+                new MarkerEvent(null, 80L, 10L, CATEGORY, EVEN_COLOR, "8", false),
                 new MarkerEvent(null, 100L, 10L, CATEGORY, EVEN_COLOR, "10", false),
                 new MarkerEvent(null, 130L, 10L, CATEGORY, ODD_COLOR, "13", false));
         assertMarkerListEquals(expected, source.getMarkerList(CATEGORY, 0L, 100L, 25, new NullProgressMonitor()));
