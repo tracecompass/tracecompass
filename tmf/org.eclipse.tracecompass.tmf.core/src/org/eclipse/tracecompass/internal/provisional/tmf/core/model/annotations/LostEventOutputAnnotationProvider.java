@@ -69,6 +69,7 @@ public class LostEventOutputAnnotationProvider implements IOutputAnnotationProvi
     }
 
     private static final String COLOR = "#FF0032"; //$NON-NLS-1$
+    private static final float OPACITY =  50.0f / 255;
 
     @Override
     public TmfModelResponse<AnnotationCategoriesModel> fetchAnnotationCategories(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
@@ -143,6 +144,7 @@ public class LostEventOutputAnnotationProvider implements IOutputAnnotationProvi
                     long duration = lostEventsEndTime - lostEventsStartTime;
                     Map<String, Object> style = new HashMap<>();
                     style.put(StyleProperties.COLOR, COLOR);
+                    style.put(StyleProperties.OPACITY, OPACITY);
                     markers.put(LOST_EVENTS, new Annotation(lostEventsStartTime, duration, -1, AnnotationType.CHART, null, new OutputElementStyle(LOST_EVENTS, style)));
                 }
             }
