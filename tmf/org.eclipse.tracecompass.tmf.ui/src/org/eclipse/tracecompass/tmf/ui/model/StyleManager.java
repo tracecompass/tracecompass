@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2019 Ericsson
+ * Copyright (c) 2019, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -116,8 +116,8 @@ public class StyleManager {
             Map<String, Object> styleValues = style.getStyleValues();
             if (factor == null) {
                 Object value = styleValues.get(property + StyleProperties.FACTOR);
-                if (value instanceof Float) {
-                    factor = (Float) value;
+                if (value instanceof Number) {
+                    factor = ((Number) value).floatValue();
                 }
             }
             Object value = styleValues.get(property);
@@ -164,8 +164,8 @@ public class StyleManager {
             }
             if (opacity == null) {
                 Object value = styleValues.get(StyleProperties.OPACITY);
-                if (value instanceof Float) {
-                    opacity = (Float) value;
+                if (value instanceof Number) {
+                    opacity = ((Number) value).floatValue();
                     if (color != null) {
                         break;
                     }
