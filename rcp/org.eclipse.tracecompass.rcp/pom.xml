@@ -110,6 +110,7 @@
                 <plugin id="org.eclipse.wst.xml.ui"/>
                 <plugin id="org.eclipse.wst.xsd.core"/>
                 <plugin id="org.eclipse.xsd"/>
+                <plugin id="slf4j.api"/>
               </excludes>
             </configuration>
           </execution>

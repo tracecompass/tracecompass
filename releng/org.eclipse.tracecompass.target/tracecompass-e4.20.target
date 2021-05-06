@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="tracecompass-e4.10" sequenceNumber="16">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?pde version="3.8"?><target name="tracecompass-e4.20" sequenceNumber="1">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.cdt.gnu.dsf.feature.group" version="0.0.0"/>
-<repository location="https://download.eclipse.org/tools/cdt/releases/9.6/cdt-9.6.0/"/>
+<unit id="org.eclipse.tm.terminal.control" version="0.0.0"/>
+<repository location="https://download.eclipse.org/tools/cdt/builds/10.3/cdt-10.3.0-m2/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.swtbot.eclipse.feature.group" version="0.0.0"/>
@@ -16,35 +16,26 @@
 <unit id="org.eclipse.remote.ui" version="0.0.0"/>
 <unit id="org.eclipse.remote.jsch.core" version="0.0.0"/>
 <unit id="org.eclipse.remote.jsch.ui" version="0.0.0"/>
-<repository location="https://download.eclipse.org/releases/2018-12/"/>
-</location>
-<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.tm.terminal.control" version="0.0.0"/>
-<repository location="https://download.eclipse.org/tm/updates/4.5.1-SNAPSHOT/repository/"/>
-</location>
-<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-<repository location="https://download.eclipse.org/tools/cdt/launchbar/2.2/launchbar-2.2.2/"/>
+<repository location="https://download.eclipse.org/tools/ptp/remote/releases/3.0/remote-3.0.1/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.antlr.runtime" version="3.2.0.v201101311130"/>
 <unit id="org.antlr.runtime.source" version="3.2.0.v201101311130"/>
-<unit id="org.apache.commons.cli" version="0.0.0"/>
+<unit id="org.apache.commons.cli" version="1.2.0.v201404270220"/>
 <unit id="org.apache.commons.compress" version="0.0.0"/>
 <unit id="org.apache.commons.io" version="0.0.0"/>
 <unit id="org.apache.commons.lang" version="0.0.0"/>
 <unit id="org.apache.commons.lang3" version="0.0.0"/>
-<unit id="com.google.guava" version="21.0.0.v20170206-1425"/>
+<unit id="org.apache.xml.serializer" version="0.0.0"/>
+<unit id="com.google.guava" version="27.1.0.v20190517-1946"/>
 <unit id="org.json" version="0.0.0"/>
 <unit id="org.apache.derby" version="0.0.0"/>
 <unit id="org.hamcrest" version="0.0.0"/>
-<unit id="javax.xml.bind" version="0.0.0"/>
-<unit id="javax.activation" version="0.0.0"/>
-<unit id="javax.xml.stream" version="0.0.0"/>
-<repository location="https://download.eclipse.org/tools/orbit/downloads/drops/R20181128170323/repository/"/>
-</location>
-<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="jakarta.xml.bind" version="2.3.3.v20201118-1818"/>
-<repository location="https://download.eclipse.org/tools/orbit/downloads/drops/R20201130205003/repository/"/>
+<unit id="javax.xml.bind" version="0.0.0"/>
+<unit id="javax.activation" version="1.1.0.v201211130549"/>
+<unit id="javax.xml.stream" version="0.0.0"/>
+<repository location="https://download.eclipse.org/tools/orbit/downloads/drops/S20210427185022/repository/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.license.feature.group" version="0.0.0"/>
@@ -64,9 +55,6 @@
 <unit id="org.eclipse.ui.trace" version="0.0.0"/>
 <unit id="org.eclipse.ui.views.log" version="0.0.0"/>
 <unit id="org.eclipse.jdt.junit4.runtime" version="0.0.0"/>
-<repository location="https://download.eclipse.org/eclipse/updates/4.10/R-4.10-201812060815/"/>
-</location>
-<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="slf4j.api" version="0.0.0"/>
 <repository location="https://download.eclipse.org/eclipse/updates/4.20-I-builds/I20210429-1800/"/>
 </location>
@@ -78,11 +66,11 @@
 <unit id="org.eclipse.wst.xml.core" version="0.0.0"/>
 <unit id="org.eclipse.wst.xml.ui" version="0.0.0"/>
 <unit id="org.eclipse.wst.xsd.core" version="0.0.0"/>
-<repository location="https://download.eclipse.org/webtools/downloads/drops/R3.12.0/R-3.12.0-20181130055351/repository/"/>
+<repository location="https://download.eclipse.org/webtools/downloads/drops/R3.22.0/S-3.22.0.M2a-20210505164204/repository/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.xsd" version="0.0.0"/>
-<repository location="https://download.eclipse.org/modeling/emf/emf/builds/release/2.16/"/>
+<repository location="https://download.eclipse.org/modeling/emf/emf/builds/milestone/S202104270336/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.swtchart.feature.feature.group" version="0.0.0"/>
