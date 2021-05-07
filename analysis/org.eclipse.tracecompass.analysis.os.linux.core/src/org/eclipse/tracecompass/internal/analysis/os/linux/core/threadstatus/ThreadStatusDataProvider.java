@@ -443,7 +443,7 @@ public class ThreadStatusDataProvider extends AbstractTmfTraceDataProvider imple
         if (entryBuilder.getId() == fTraceId) {
             return entryBuilder.build(-1);
         }
-        long parentId = entryBuilder.getPpid() > 0 ? findEntry(entryBuilder.getPpid(), entryBuilder.getEndTime()) : fTraceId;
+        long parentId = entryBuilder.getPpid() > 0 ? findEntry(entryBuilder.getPpid(), entryBuilder.getStartTime()) : fTraceId;
         return entryBuilder.build(parentId);
     }
 
