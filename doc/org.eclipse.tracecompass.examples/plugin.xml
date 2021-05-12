@@ -24,7 +24,7 @@
          id="org.eclipse.tracecompass.examples.state.system.module"
          name="Example State System Module"
          analysis_module="org.eclipse.tracecompass.examples.core.analysis.ExampleStateSystemAnalysisModule"
-         automatic="true">
+         automatic="false">
          <tracetype
                class="org.eclipse.tracecompass.tmf.core.trace.TmfTrace">
          </tracetype>
