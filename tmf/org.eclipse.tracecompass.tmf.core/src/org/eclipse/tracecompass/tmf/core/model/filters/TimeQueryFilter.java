@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.tmf.core.Activator;
 
 import com.google.common.collect.Ordering;
 import com.google.common.primitives.Longs;
@@ -118,6 +119,10 @@ public class TimeQueryFilter {
                 return result;
             }
             throw new IllegalArgumentException("Number of entries requested is 1, but start and end are different. Impossible to create array."); //$NON-NLS-1$
+        }
+
+        if (n > 65536) {
+            Activator.logWarning(String.format("Number of entries is very large, it is likely a bug and will result in slower queries. start time = %d, end time = %d, number of elements = %d", start, end, n)); //$NON-NLS-1$
         }
 
         double stepSize = Math.abs(end - start) / ((double) n - 1);
