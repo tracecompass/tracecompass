@@ -13,7 +13,6 @@ package org.eclipse.tracecompass.tmf.core.model.filters;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -147,6 +146,6 @@ public class TimeQueryFilter {
 
     @Override
     public int hashCode() {
-        return Objects.hash(fTimesRequested);
+        return Arrays.hashCode(fTimesRequested);
     }
 }
