@@ -206,16 +206,16 @@ public class PeriodicMarkerEventSourceTest {
     }
 
     private static void assertMarkerListEquals(@NonNull List<IMarkerEvent> expectedList, @NonNull List<@NonNull IMarkerEvent> markerList) {
-        assertEquals(expectedList.size(), markerList.size());
+        assertEquals(markerList.toString(), expectedList.size(), markerList.size());
         for (int i = 0; i < expectedList.size(); i++) {
             IMarkerEvent expected = expectedList.get(i);
             IMarkerEvent marker = markerList.get(i);
-            assertEquals(marker.toString(), expected.getEntry(), marker.getEntry());
-            assertEquals(marker.toString(), expected.getTime(), marker.getTime());
-            assertEquals(marker.toString(), expected.getDuration(), marker.getDuration());
-            assertEquals(marker.toString(), expected.getCategory(), marker.getCategory());
-            assertEquals(marker.toString(), expected.getLabel(), marker.getLabel());
-            assertEquals(marker.toString(), expected.getColor(), marker.getColor());
+            assertEquals("Entry comparison for index " + i + " " + marker.toString(), expected.getEntry(), marker.getEntry());
+            assertEquals("Time comparison for index " + i + " " + marker.toString(), expected.getTime(), marker.getTime());
+            assertEquals("Duration comparison for index " + i + " " + marker.toString(), expected.getDuration(), marker.getDuration());
+            assertEquals("Category comparison for index " + i + " " + marker.toString(), expected.getCategory(), marker.getCategory());
+            assertEquals("Label comparison for index " + i + " " + marker.toString(), expected.getLabel(), marker.getLabel());
+            assertEquals("Color comparison for index " + i + " " + marker.toString(), expected.getColor(), marker.getColor());
         }
     }
 }
