@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="tracecompass-e4.8" sequenceNumber="18">
+<?pde version="3.8"?><target name="tracecompass-e4.8" sequenceNumber="19">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.cdt.gnu.dsf.feature.group" version="0.0.0"/>
@@ -66,10 +66,6 @@
 <unit id="a.jre.javase" version="10.0.0"/>
 <unit id="config.a.jre.javase" version="10.0.0"/>
 <repository location="https://download.eclipse.org/eclipse/updates/4.8/R-4.8-201806110500/"/>
-</location>
-<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="slf4j.api" version="0.0.0"/>
-<repository location="https://download.eclipse.org/eclipse/updates/4.20-I-builds/I20210429-1800/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.tracecompass.testtraces.tracecompass-test-traces-ctf" version="1.7.2"/>
