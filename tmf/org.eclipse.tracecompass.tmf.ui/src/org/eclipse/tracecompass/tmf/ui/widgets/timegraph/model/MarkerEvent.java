@@ -18,6 +18,10 @@ import java.util.Objects;
 
 import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IAnnotation;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
+import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
+import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
+import org.eclipse.tracecompass.tmf.ui.model.StyleManager;
 
 /**
  * TimeEvent implementation for marker events
@@ -26,6 +30,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.
  */
 public class MarkerEvent extends TimeEvent implements IMarkerEvent {
 
+    private static final RGBAColor BLACK = new RGBAColor(0,0,0);
     private final String fCategory;
     private final RGBA fColor;
     private final String fLabel;
@@ -102,7 +107,16 @@ public class MarkerEvent extends TimeEvent implements IMarkerEvent {
         super(entry, annotation);
         fCategory = category;
         fLabel = annotation.getLabel();
-        fColor = new RGBA(0, 0, 0, 255);
+        OutputElementStyle style = annotation.getStyle();
+        RGBAColor color = null;
+        if (style != null) {
+            StyleManager styleManager = StyleManager.empty();
+            color = styleManager.getColorStyle(style, StyleProperties.COLOR);
+        }
+        if (color == null) {
+            color = BLACK;
+        }
+        fColor = new RGBA(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
         fForeground = foreground;
     }
 

@@ -2299,13 +2299,14 @@ public class TimeGraphControl extends TimeGraphBaseControl
                 return;
             }
         }
-        oldDrawMarker(marker, gc, rect);
+        oldDrawMarker(marker, gc, rect, rgba);
     }
 
-    private void oldDrawMarker(IMarkerEvent marker, GC gc, Rectangle rect) {
-        Color color = getColorScheme().getColor(marker.getColor());
+    private void oldDrawMarker(IMarkerEvent marker, GC gc, Rectangle rect, @Nullable RGBAColor rgba) {
+        int colorInt = (rgba != null) ? rgba.toInt() : RGBAUtil.fromRGBA(marker.getColor());
+        Color color = TimeGraphRender.getColor(colorInt);
         gc.setBackground(color);
-        gc.setAlpha(color.getAlpha());
+        gc.setAlpha(rgba != null ? rgba.getAlpha() : color.getAlpha());
         gc.fillRectangle(rect);
         gc.setAlpha(OPAQUE);
         String label = marker.getLabel();
