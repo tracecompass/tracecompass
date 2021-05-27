@@ -14,8 +14,6 @@
 
 package org.eclipse.tracecompass.internal.analysis.os.linux.core.kernel.handlers;
 
-import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
-
 import org.eclipse.tracecompass.analysis.os.linux.core.kernel.StateValues;
 import org.eclipse.tracecompass.analysis.os.linux.core.model.ProcessStatus;
 import org.eclipse.tracecompass.analysis.os.linux.core.trace.IKernelAnalysisEventLayout;
@@ -50,7 +48,7 @@ public class SchedSwitchHandler extends KernelEventHandler {
         }
 
         ITmfEventField content = event.getContent();
-        String prevProcessName = checkNotNull((String) content.getField(getLayout().fieldPrevComm()).getValue());
+        String prevProcessName = content.getFieldValue(String.class, getLayout().fieldPrevComm());
         Integer prevTid = content.getFieldValue(Integer.class, getLayout().fieldPrevTid());
         Long prevState = content.getFieldValue(Long.class, getLayout().fieldPrevState());
         Integer prevPrio = content.getFieldValue(Integer.class, getLayout().fieldPrevPrio());
@@ -88,7 +86,9 @@ public class SchedSwitchHandler extends KernelEventHandler {
         ss.modifyAttribute(timestamp, cpu, quark);
 
         /* Set the exec name of the former process */
-        setProcessExecName(ss, prevProcessName, formerThreadNode, timestamp);
+        if (prevProcessName != null) {
+            setProcessExecName(ss, prevProcessName, formerThreadNode, timestamp);
+        }
 
         /* Set the exec name of the new process */
         if (nextProcessName != null) {
