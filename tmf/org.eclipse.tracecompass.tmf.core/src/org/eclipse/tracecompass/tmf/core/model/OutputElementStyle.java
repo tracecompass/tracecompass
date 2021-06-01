@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2019 Ericsson
+ * Copyright (c) 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.tmf.core.model;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -86,5 +87,25 @@ public class OutputElementStyle {
     @Override
     public String toString() {
         return String.format("Style [%s, %s]", fParentStyleKey, fValues); //$NON-NLS-1$
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fParentStyleKey, fValues);
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        OutputElementStyle other = (OutputElementStyle) obj;
+        return Objects.equals(fParentStyleKey, other.fParentStyleKey) && Objects.equals(fValues, other.fValues);
     }
 }

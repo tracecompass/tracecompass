@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2019 Ericsson
+ * Copyright (c) 2012, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -177,7 +177,7 @@ public class TimeEvent implements ITimeEvent {
 
     @Override
     public int hashCode() {
-        return Objects.hash(fEntry, fTime, fDuration, getValue(), getActiveProperties());
+        return Objects.hash(fEntry, fTime, fDuration, getValue(), getActiveProperties(), fModel.getStyle());
     }
 
     @Override
@@ -196,7 +196,8 @@ public class TimeEvent implements ITimeEvent {
                 Objects.equals(fTime, other.getTime()) &&
                 Objects.equals(fDuration, other.getDuration()) &&
                 Objects.equals(getValue(), other.getValue()) &&
-                Objects.equals(getActiveProperties(), other.getActiveProperties());
+                Objects.equals(getActiveProperties(), other.getActiveProperties()) &&
+                Objects.equals(fModel.getStyle(), other.getModel().getStyle());
     }
 
     @Override
