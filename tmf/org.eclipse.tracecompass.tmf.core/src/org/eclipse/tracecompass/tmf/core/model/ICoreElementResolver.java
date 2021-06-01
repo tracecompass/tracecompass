@@ -8,12 +8,12 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
-package org.eclipse.tracecompass.tmf.core.model.timegraph;
+package org.eclipse.tracecompass.tmf.core.model;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.tracecompass.tmf.core.model.ICoreElementResolver;
+import org.eclipse.jdt.annotation.NonNull;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
@@ -33,11 +33,20 @@ import com.google.common.collect.Multimap;
  * </ul>
  *
  * @author Jean-Christian Kouame
- * @since 4.0
- * @deprecated use {@link ICoreElementResolver instead}
+ * @author Bernd Hufmann
+ * @since 7.0
  */
-@Deprecated
-public interface IElementResolver extends ICoreElementResolver {
+public interface ICoreElementResolver {
+
+    /**
+     * Get the metadata for this data model. The keys are the names of the
+     * metadata field or aspect. A field may have multiple values associated
+     * with it.
+     *
+     * @return A map of field names to values
+     * @since 5.0
+     */
+    Multimap<@NonNull String, @NonNull Object> getMetadata();
 
     /**
      * Compare 2 sets of metadata to see if the second intersects the first. 2

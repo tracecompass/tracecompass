@@ -13,6 +13,7 @@ package org.eclipse.tracecompass.tmf.core.model.timegraph;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.TmfStrings;
+import org.eclipse.tracecompass.tmf.core.model.CoreMetadataStrings;
 import org.eclipse.tracecompass.tmf.core.model.OutputElement;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 
@@ -129,7 +130,7 @@ public class TimeGraphState extends OutputElement implements ITimeGraphState {
         Multimap<String, Object> metadata = super.getMetadata();
         String label = getLabel();
         if (label != null) {
-            metadata.put(IMetadataStrings.LABEL_KEY, label);
+            metadata.put(CoreMetadataStrings.LABEL_KEY, label);
         }
         metadata.put(TmfStrings.startTime(), fStartTime);
         metadata.put(TmfStrings.endTime(), fStartTime + fDuration);

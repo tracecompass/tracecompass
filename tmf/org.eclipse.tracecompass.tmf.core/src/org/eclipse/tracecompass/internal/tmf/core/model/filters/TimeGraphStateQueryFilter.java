@@ -14,8 +14,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.tracecompass.tmf.core.model.CoreFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 
 import com.google.common.collect.Multimap;
 
@@ -42,7 +42,7 @@ public class TimeGraphStateQueryFilter extends SelectionTimeQueryFilter implemen
      *            The regexes use to filter the queried data. It is a multimap of
      *            filter strings by property. The data provider will use the filter
      *            strings to determine whether the property should be activated or
-     *            not. See {@link IFilterProperty} for supported properties.
+     *            not. See {@link CoreFilterProperty} for supported properties.
      */
     public TimeGraphStateQueryFilter(List<Long> times, Collection<Long> items, Multimap<@NonNull Integer, @NonNull String> regexes) {
         super(times, items);

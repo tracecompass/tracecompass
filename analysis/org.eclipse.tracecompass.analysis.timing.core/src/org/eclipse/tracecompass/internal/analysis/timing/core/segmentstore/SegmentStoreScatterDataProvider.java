@@ -41,11 +41,11 @@ import org.eclipse.tracecompass.segmentstore.core.segment.interfaces.INamedSegme
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
+import org.eclipse.tracecompass.tmf.core.model.CoreFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.SeriesModel;
 import org.eclipse.tracecompass.tmf.core.model.SeriesModel.SeriesModelBuilder;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeDataModel;
@@ -424,12 +424,12 @@ public class SegmentStoreScatterDataProvider extends AbstractTmfTraceDataProvide
                 Predicate<Multimap<String, Object>> value = Objects.requireNonNull(mapEntry.getValue());
                 boolean status = value.test(input);
                 Integer property = Objects.requireNonNull(mapEntry.getKey());
-                if (status && property != IFilterProperty.DIMMED) {
+                if (status && property != CoreFilterProperty.DIMMED) {
                     mask |= property;
-                } else if (!status && property == IFilterProperty.DIMMED) {
-                    mask |= IFilterProperty.DIMMED;
-                } else if (!status && property == IFilterProperty.EXCLUDE) {
-                    mask |= IFilterProperty.EXCLUDE;
+                } else if (!status && property == CoreFilterProperty.DIMMED) {
+                    mask |= CoreFilterProperty.DIMMED;
+                } else if (!status && property == CoreFilterProperty.EXCLUDE) {
+                    mask |= CoreFilterProperty.EXCLUDE;
                 }
             }
             series.addPoint(segment.getStart(), segment.getLength(), mask);

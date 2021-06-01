@@ -13,7 +13,7 @@ package org.eclipse.tracecompass.tmf.core.model.xy;
 
 import org.eclipse.tracecompass.common.core.NonNullUtils;
 import org.eclipse.tracecompass.internal.tmf.core.model.xy.Messages;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
+import org.eclipse.tracecompass.tmf.core.model.CoreFilterProperty;
 
 /**
  * This represents a model for a series in a XY chart. I should be used to
@@ -108,7 +108,7 @@ public interface ISeriesModel {
     /**
      * Get the array of properties for each data point in the series. There
      * should be the same number of points in the properties as in the series.
-     * See {@link IFilterProperty} for some values that the properties can take.
+     * See {@link CoreFilterProperty} for some values that the properties can take.
      *
      * @return The values of the properties for each data point
      * @since 4.2

@@ -118,8 +118,8 @@ import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfTimeNavigationProvider
 import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfTimeZoomProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.views.ITmfZoomToSelectionProvider;
 import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.TimeEventFilterDialog;
+import org.eclipse.tracecompass.tmf.core.model.CoreFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.resources.ITmfMarker;
 import org.eclipse.tracecompass.tmf.core.signal.TmfDataModelSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfMarkerEventSourceUpdatedSignal;
@@ -648,7 +648,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                     if (filterDialog.hasActiveSavedFilters()) {
                         computedLinks = Collections.emptyList();
                     } else {
-                        computedLinks.forEach(link -> link.setProperty(IFilterProperty.DIMMED, filterDialog.isFilterActive()));
+                        computedLinks.forEach(link -> link.setProperty(CoreFilterProperty.DIMMED, filterDialog.isFilterActive()));
                     }
                 }
             }
@@ -813,7 +813,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
                     boolean status = value.test(toTest);
                     Integer property = mapEntry.getKey();
-                    if (property == IFilterProperty.DIMMED || property == IFilterProperty.EXCLUDE) {
+                    if (property == CoreFilterProperty.DIMMED || property == CoreFilterProperty.EXCLUDE) {
                         te.setProperty(property, !status);
                     } else {
                         te.setProperty(property, status);
@@ -840,7 +840,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
             eventList.forEach(te -> {
                 // Keep only the events that do not have the 'exclude' property activated
-                if (!te.isPropertyActive(IFilterProperty.EXCLUDE)) {
+                if (!te.isPropertyActive(CoreFilterProperty.EXCLUDE)) {
                     filtered.add(te);
                 }
             });
@@ -852,8 +852,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             for (ITimeEvent event : filtered) {
                 if (prevTime < event.getTime()) {
                     NullTimeEvent nullTimeEvent = new NullTimeEvent(entry, prevTime, event.getTime() - prevTime);
-                    nullTimeEvent.setProperty(IFilterProperty.DIMMED, true);
-                    nullTimeEvent.setProperty(IFilterProperty.EXCLUDE, true);
+                    nullTimeEvent.setProperty(CoreFilterProperty.DIMMED, true);
+                    nullTimeEvent.setProperty(CoreFilterProperty.EXCLUDE, true);
                     eventList.add(nullTimeEvent);
                 }
                 eventList.add(event);
@@ -861,8 +861,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             }
             if (prevTime < endTime) {
                 NullTimeEvent nullTimeEvent = new NullTimeEvent(entry, prevTime, endTime - prevTime);
-                nullTimeEvent.setProperty(IFilterProperty.DIMMED, true);
-                nullTimeEvent.setProperty(IFilterProperty.EXCLUDE, true);
+                nullTimeEvent.setProperty(CoreFilterProperty.DIMMED, true);
+                nullTimeEvent.setProperty(CoreFilterProperty.EXCLUDE, true);
                 eventList.add(nullTimeEvent);
             }
         }
@@ -2850,13 +2850,13 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         @NonNull String dialogRegex = fTimeEventFilterDialog != null ? fTimeEventFilterDialog.getTextBoxRegex() : ""; //$NON-NLS-1$
         if (!dialogRegex.isEmpty()) {
-            regexes.put(IFilterProperty.DIMMED, dialogRegex);
+            regexes.put(CoreFilterProperty.DIMMED, dialogRegex);
         }
 
         Set<@NonNull String> savedFilters = fTimeEventFilterDialog != null ? fTimeEventFilterDialog.getSavedFilters() : Collections.emptySet();
         for (String savedFilter : savedFilters) {
-            regexes.put(IFilterProperty.EXCLUDE, savedFilter);
-            regexes.put(IFilterProperty.DIMMED, savedFilter);
+            regexes.put(CoreFilterProperty.EXCLUDE, savedFilter);
+            regexes.put(CoreFilterProperty.DIMMED, savedFilter);
         }
 
         ITmfTrace trace = getTrace();
@@ -2866,14 +2866,14 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         if (fIsHideRowsFilterActive) {
             getTimeGraphViewer().setSavedFilterStatus(true);
-            regexes.put(IFilterProperty.EXCLUDE, ""); //$NON-NLS-1$
+            regexes.put(CoreFilterProperty.EXCLUDE, ""); //$NON-NLS-1$
         }
 
         TraceCompassFilter globalFilter = TraceCompassFilter.getFilterForTrace(trace);
         if (globalFilter == null) {
             return regexes;
         }
-        regexes.putAll(IFilterProperty.DIMMED, globalFilter.getRegexes());
+        regexes.putAll(CoreFilterProperty.DIMMED, globalFilter.getRegexes());
 
 
         return regexes;

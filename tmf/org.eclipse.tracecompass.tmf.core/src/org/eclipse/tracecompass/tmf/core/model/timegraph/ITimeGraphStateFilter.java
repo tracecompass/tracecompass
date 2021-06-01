@@ -19,6 +19,7 @@ import java.util.function.Predicate;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.model.CoreFilterProperty;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
@@ -122,7 +123,7 @@ public interface ITimeGraphStateFilter {
                 Predicate<Multimap<String, Object>> value = Objects.requireNonNull(mapEntry.getValue());
                 boolean status = value.test(input);
                 Integer property = Objects.requireNonNull(mapEntry.getKey());
-                if (property == IFilterProperty.DIMMED || property == IFilterProperty.EXCLUDE) {
+                if (property == CoreFilterProperty.DIMMED || property == CoreFilterProperty.EXCLUDE) {
                     timeGraphState.setProperty(property, !status);
                 } else {
                     timeGraphState.setProperty(property, status);
@@ -130,7 +131,7 @@ public interface ITimeGraphStateFilter {
             }
         }
 
-        if (times != null && (timeGraphState.getActiveProperties() & (IFilterProperty.DIMMED | IFilterProperty.EXCLUDE)) != 0) {
+        if (times != null && (timeGraphState.getActiveProperties() & (CoreFilterProperty.DIMMED | CoreFilterProperty.EXCLUDE)) != 0) {
             // Do not include state in gap if it is dimmed or excluded
             int index = Collections.binarySearch(times, startTime);
             if (index < 0) {
@@ -141,7 +142,7 @@ public interface ITimeGraphStateFilter {
             }
         }
 
-        if (timeGraphState.isPropertyActive(IFilterProperty.EXCLUDE)) {
+        if (timeGraphState.isPropertyActive(CoreFilterProperty.EXCLUDE)) {
             // Replace excluded state with a null state
             TimeGraphState timeGraphState2 = new TimeGraphState(timeGraphState.getStartTime(), timeGraphState.getDuration(), Integer.MIN_VALUE);
             timeGraphState2.setActiveProperties(timeGraphState.getActiveProperties());

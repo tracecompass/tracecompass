@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.xy.ISeriesModel;
 import org.eclipse.tracecompass.tmf.core.model.xy.TmfXYAxisDescription;
 
@@ -113,7 +112,7 @@ public class SeriesModel implements ISeriesModel {
      *            Display type
      * @param properties
      *            The properties values for this series. Some priority values
-     *            are available in {@link IFilterProperty}
+     *            are available in {@link CoreFilterProperty}
      */
     private SeriesModel(long id, String name, long[] xValues, double[] yValues, TmfXYAxisDescription xAxis, TmfXYAxisDescription yAxis, DisplayType displayType, int[] properties) {
         fId = id;

@@ -69,8 +69,8 @@ import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.tmf.core.TmfStrings;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.event.lookup.ITmfSourceLookup;
+import org.eclipse.tracecompass.tmf.core.model.CoreFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.signal.TmfDataModelSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
@@ -407,7 +407,7 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
             for (Map.Entry<Integer, Predicate<Multimap<String, Object>>> mapEntry : predicates.entrySet()) {
                 Integer property = Objects.requireNonNull(mapEntry.getKey());
                 Predicate<Multimap<String, Object>> value = Objects.requireNonNull(mapEntry.getValue());
-                if (property == IFilterProperty.DIMMED || property == IFilterProperty.EXCLUDE) {
+                if (property == CoreFilterProperty.DIMMED || property == CoreFilterProperty.EXCLUDE) {
                     boolean status = value.test(input);
                     activateProperty |= status;
                 }
@@ -691,13 +691,13 @@ public abstract class AbstractSegmentStoreTableViewer extends TmfSimpleTableView
         }
         Set<String> localRegexes = fLocalRegexes;
         if (!localRegexes.isEmpty()) {
-            regexes.putAll(IFilterProperty.DIMMED, localRegexes);
+            regexes.putAll(CoreFilterProperty.DIMMED, localRegexes);
         }
         TraceCompassFilter globalFilter = TraceCompassFilter.getFilterForTrace(trace);
         if (globalFilter == null) {
             return regexes;
         }
-        regexes.putAll(IFilterProperty.DIMMED, globalFilter.getRegexes());
+        regexes.putAll(CoreFilterProperty.DIMMED, globalFilter.getRegexes());
 
         return regexes;
     }

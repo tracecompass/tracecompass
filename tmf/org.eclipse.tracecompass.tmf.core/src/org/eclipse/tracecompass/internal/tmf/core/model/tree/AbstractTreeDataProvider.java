@@ -31,9 +31,9 @@ import org.eclipse.tracecompass.internal.tmf.core.model.AbstractStateSystemAnaly
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
 import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
+import org.eclipse.tracecompass.tmf.core.model.ICoreElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.filters.SelectionTimeQueryFilter;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.IElementResolver;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataModel;
 import org.eclipse.tracecompass.tmf.core.model.tree.ITmfTreeDataProvider;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
@@ -294,8 +294,8 @@ public abstract class AbstractTreeDataProvider<A extends TmfStateSystemAnalysisM
             if (ss.getNbAttributes() > 0 && ss.getStartTime() != Long.MIN_VALUE) {
                 tree = getTree(ss, fetchParameters, monitor);
                 for (M model : tree.getEntries()) {
-                    if (model instanceof IElementResolver) {
-                        fEntryMetadata.put(model.getId(), ((IElementResolver) model).getMetadata());
+                    if (model instanceof ICoreElementResolver) {
+                        fEntryMetadata.put(model.getId(), ((ICoreElementResolver) model).getMetadata());
                     }
                 }
             }

@@ -23,7 +23,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.tracecompass.internal.tmf.ui.widgets.timegraph.model.TimeLineEvent;
-import org.eclipse.tracecompass.tmf.core.model.timegraph.IFilterProperty;
+import org.eclipse.tracecompass.tmf.core.model.CoreFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.timegraph.TimeGraphEntryModel;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimeRange;
 import org.eclipse.tracecompass.tmf.core.timestamp.TmfTimestamp;
@@ -166,11 +166,11 @@ public class TimeGraphViewStub extends AbstractTimeGraphView {
     @Override
     protected @NonNull Multimap<@NonNull Integer, @NonNull String> getRegexes() {
         Multimap<@NonNull Integer, @NonNull String> regexes = super.getRegexes();
-        if (regexes.containsKey(IFilterProperty.BOUND) && (fFilterRegex == null || fFilterRegex.isEmpty())) {
-            regexes.removeAll(IFilterProperty.BOUND);
+        if (regexes.containsKey(CoreFilterProperty.BOUND) && (fFilterRegex == null || fFilterRegex.isEmpty())) {
+            regexes.removeAll(CoreFilterProperty.BOUND);
         }
-        if (!regexes.containsKey(IFilterProperty.BOUND) && fFilterRegex != null && !fFilterRegex.isEmpty()) {
-            regexes.put(IFilterProperty.BOUND, fFilterRegex);
+        if (!regexes.containsKey(CoreFilterProperty.BOUND) && fFilterRegex != null && !fFilterRegex.isEmpty()) {
+            regexes.put(CoreFilterProperty.BOUND, fFilterRegex);
         }
         return regexes;
     }

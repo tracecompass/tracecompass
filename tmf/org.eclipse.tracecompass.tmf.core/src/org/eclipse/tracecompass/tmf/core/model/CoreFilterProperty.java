@@ -8,32 +8,36 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  **********************************************************************/
-package org.eclipse.tracecompass.tmf.core.model.timegraph;
-
-import org.eclipse.tracecompass.tmf.core.model.CoreFilterProperty;
+package org.eclipse.tracecompass.tmf.core.model;
 
 /**
- * Interface that contains the list of possible properties for a timegraph item.
+ * Class with constants that contains the list of possible properties for a model item,
+ * for example timegraph item.
  *
  * @author Jean-Christian Kouame
- * @since 4.0
- * @deprecated use {@link CoreFilterProperty} instead
+ * @author Bernd Hufmann
+ * @since 7.0
+ *
  */
-@Deprecated
-public interface IFilterProperty {
+public final class CoreFilterProperty {
+
+    private CoreFilterProperty () {
+        // Empty private constructor
+    }
 
     /**
      * The dimmed property mask
      */
-    public static final int DIMMED = CoreFilterProperty.DIMMED;
+    public static final int DIMMED = 1 << 0;
 
     /**
      * The draw bound property mask
      */
-    public static final int BOUND = CoreFilterProperty.BOUND;
+    public static final int BOUND = 1 << 1;
 
     /**
      * The exclude property mask
      */
-    public static final int EXCLUDE = CoreFilterProperty.EXCLUDE;
+    public static final int EXCLUDE = 1 << 2;
+
 }
