@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2020 Ericsson, École Polytechnique de Montréal and others
+ * Copyright (c) 2012, 2021 Ericsson, École Polytechnique de Montréal and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -663,8 +663,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                             .filter(event -> event.getEntry() != null)
                             .filter(event -> event.getEntry() instanceof TimeGraphEntry)
                             .filter(event -> {
-                                Object id = ((TimeGraphEntry) event.getEntry()).getEntryModel().getId();
-                                return fVisibleEntries.contains(id) || !incorrectSample.contains(id);
+                                TimeGraphEntry entry = (TimeGraphEntry) event.getEntry();
+                                return fVisibleEntries.contains(entry)
+                                        ? !incorrectSample.contains(entry)
+                                        : sampling.equals(entry.getSampling());
                             });
                     List<IMarkerEvent> markers = Stream.concat(filteredMarkerStream, newMarkers.parallelStream())
                             .unordered() // enables faster distinct
