@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2018 Ericsson
+ * Copyright (c) 2018, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -26,6 +26,7 @@ public class VirtualTableLine implements IVirtualTableLine {
 
     private List<VirtualTableCell> fCells;
     private long findex;
+    private int fActiveProperties = 0;
 
     /**
      * Constructor.
@@ -64,11 +65,21 @@ public class VirtualTableLine implements IVirtualTableLine {
         }
         VirtualTableLine other = (VirtualTableLine) obj;
         return fCells.equals(other.getCells()) &&
-                findex == other.getIndex();
+                findex == other.getIndex() && fActiveProperties == other.getActiveProperties();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fCells, findex);
+        return Objects.hash(fCells, findex, fActiveProperties);
+    }
+
+    @Override
+    public int getActiveProperties() {
+        return fActiveProperties;
+    }
+
+    @Override
+    public void setActiveProperties(int activeProperties) {
+        fActiveProperties = activeProperties;
     }
 }

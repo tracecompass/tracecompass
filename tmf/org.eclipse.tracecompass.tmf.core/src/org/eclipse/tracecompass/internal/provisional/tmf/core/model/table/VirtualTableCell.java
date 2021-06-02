@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2019 Ericsson
+ * Copyright (c) 2019, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -14,15 +14,16 @@ package org.eclipse.tracecompass.internal.provisional.tmf.core.model.table;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.tmf.core.model.ICorePropertyCollection;
 
 /**
  * Represent a cell in a virtual table
  *
  * @author Simon Delisle
  */
-public class VirtualTableCell {
+public class VirtualTableCell implements ICorePropertyCollection {
     private String fContent;
-    private int fTags;
+    private int fActiveProperties;
 
     /**
      * Constructor
@@ -32,7 +33,7 @@ public class VirtualTableCell {
      */
     public VirtualTableCell(String content) {
         this.fContent = content;
-        this.fTags = 0;
+        this.fActiveProperties = 0;
     }
 
     /**
@@ -45,7 +46,7 @@ public class VirtualTableCell {
      */
     public VirtualTableCell(String content, int tags) {
         this.fContent = content;
-        this.fTags = tags;
+        this.fActiveProperties = tags;
     }
 
     /**
@@ -55,15 +56,6 @@ public class VirtualTableCell {
      */
     public String getContent() {
         return fContent;
-    }
-
-    /**
-     * Get tags
-     *
-     * @return Tags encode as int
-     */
-    public int getTags() {
-        return fTags;
     }
 
     @Override
@@ -79,11 +71,21 @@ public class VirtualTableCell {
         }
         VirtualTableCell other = (VirtualTableCell) obj;
         return fContent.equals(other.getContent()) &&
-                fTags == other.getTags();
+                fActiveProperties == other.getActiveProperties();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fContent, fTags);
+        return Objects.hash(fContent, fActiveProperties);
+    }
+
+    @Override
+    public int getActiveProperties() {
+        return fActiveProperties;
+    }
+
+    @Override
+    public void setActiveProperties(int activeProperties) {
+        fActiveProperties = activeProperties;
     }
 }

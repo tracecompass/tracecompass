@@ -83,7 +83,8 @@ public class EventTableLine extends VirtualTableLine {
                 ", Line: " + getCells() + //$NON-NLS-1$
                 ", Timestamp: " + fTimestamp + //$NON-NLS-1$
                 ", Rank: " + fRank + //$NON-NLS-1$
-                ", RepeatCount: " + fRepeatCount; //$NON-NLS-1$
+                ", RepeatCount: " + fRepeatCount + //$NON-NLS-1$
+                ", ActiveProperties: " + getActiveProperties(); //$NON-NLS-1$
     }
 
     @Override

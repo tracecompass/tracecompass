@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.VirtualTableQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.EventTableLine;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfFilterModel;
@@ -46,6 +47,7 @@ import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterMatchesNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterNode;
 import org.eclipse.tracecompass.tmf.core.filter.model.TmfFilterRootNode;
 import org.eclipse.tracecompass.tmf.core.model.CommonStatusMessage;
+import org.eclipse.tracecompass.tmf.core.model.CoreFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.tree.TmfTreeModel;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest;
 import org.eclipse.tracecompass.tmf.core.request.ITmfEventRequest.ExecutionType;
@@ -75,6 +77,10 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
      * Key for table search
      */
     public static final String TABLE_SEARCH_KEY = "table_search"; //$NON-NLS-1$
+    /**
+     * Key for table search
+     */
+    public static final String TABLE_SEARCH_INDEX_KEY = "table_search_index"; //$NON-NLS-1$
 
     /**
      * Key for table filters
@@ -169,10 +175,17 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         if (queryFilter == null) {
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
         }
+
         @Nullable ITmfFilter filter = extractFilter(fetchParameters);
         @Nullable ITmfFilter searchFilter = extractSearchFilter(fetchParameters);
         @Nullable TmfCollapseFilter collapseFilter = extractCollapseFilter(fetchParameters);
         Map<Long, ITmfEventAspect<?>> aspects = getAspectsFromColumnsId(queryFilter.getColumnsId());
+
+        Object isIndexRequestObj = fetchParameters.get(TABLE_SEARCH_INDEX_KEY);
+        boolean isIndexRequest = false;
+        if (isIndexRequestObj instanceof Boolean) {
+            isIndexRequest = (Boolean) isIndexRequestObj;
+        }
 
         if (aspects.isEmpty()) {
             return new TmfModelResponse<>(new TmfVirtualTableModel<EventTableLine>(Collections.emptyList(), Collections.emptyList(), queryFilter.getIndex(), 0), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);
@@ -188,7 +201,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         if (filter != null) {
             request = filteredTableRequest(Math.abs(queryFilter.getCount()), queryFilter.getIndex(), aspects, filter, searchFilter, forwardSearch, collapseFilter, monitor);
         } else {
-            request = tableRequest(Math.abs(queryFilter.getCount()), queryFilter.getIndex(), aspects, searchFilter, forwardSearch, collapseFilter, monitor);
+            request = tableRequest(Math.abs(queryFilter.getCount()), queryFilter.getIndex(), aspects, searchFilter, forwardSearch, collapseFilter, isIndexRequest,  monitor);
             request.setEventCount(getTrace().getNbEvents());
         }
 
@@ -347,7 +360,8 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
                 if (filter.matches(event) && (collapseFilter == null || collapseFilter.matches(event))) {
                     if (searchFilter == null || searchFilter.matches(event)) {
                         if (events.size() < queryCount && queryIndex <= currentIndex) {
-                            events.add(buildEventTableLine(aspects, event, currentIndex, rank));
+                            // FIXME: searching while filtering
+                            events.add(buildEventTableLine(aspects, event, currentIndex, rank, false));
                         }
                         if (currentIndex % INDEX_STORING_INTERVAL == 0) {
                             fIndexToRankMap.put(currentIndex, rank);
@@ -389,6 +403,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
             @Nullable ITmfFilter searchFilter,
             boolean forwardSearch,
             @Nullable ITmfFilter collapseFilter,
+            boolean isIndexRequest,
             @Nullable IProgressMonitor monitor) {
 
         return new TableEventRequest(queryIndex) {
@@ -403,9 +418,10 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
                 }
 
                 List<EventTableLine> events = getEventLines();
-                if ((searchFilter == null || searchFilter.matches(event)) && (collapseFilter == null || collapseFilter.matches(event))) {
+                boolean matches = searchFilter == null ? false : searchFilter.matches(event);
+                if ((!isIndexRequest || matches) && (collapseFilter == null || collapseFilter.matches(event))) {
                     if (events.size() < queryCount) {
-                        events.add(buildEventTableLine(aspects, event, rank, rank));
+                        events.add(buildEventTableLine(aspects, event, rank, rank, matches));
                     }
                 } else if (collapseFilter != null && !events.isEmpty()) {
                     // If a collapse filter is present, we need to update the last event we have in
@@ -438,14 +454,16 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
      *            rank in the trace
      * @return A new event table line
      */
-    private static EventTableLine buildEventTableLine(Map<Long, ITmfEventAspect<?>> aspects, ITmfEvent event, long lineIndex, long lineRank) {
+    private static EventTableLine buildEventTableLine(Map<Long, ITmfEventAspect<?>> aspects, ITmfEvent event, long lineIndex, long lineRank, boolean matches) {
         List<VirtualTableCell> entry = new ArrayList<>(aspects.size());
         for (Entry<Long, ITmfEventAspect<?>> aspectEntry : aspects.entrySet()) {
             Object aspectResolved = aspectEntry.getValue().resolve(event);
             String cellContent = aspectResolved == null ? StringUtils.EMPTY : String.valueOf(aspectResolved);
             entry.add(new VirtualTableCell(cellContent));
         }
-        return new EventTableLine(entry, lineIndex, event.getTimestamp(), lineRank, 0);
+        EventTableLine tableLine = new EventTableLine(entry, lineIndex, event.getTimestamp(), lineRank, 0);
+        tableLine.setActiveProperties(matches ? CoreFilterProperty.HIGHLIGHT : 0);
+        return tableLine;
     }
 
     /**
@@ -533,25 +551,19 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         return null;
     }
 
-    private static @Nullable ITmfFilter extractSearchFilter(Map<String, Object> fetchParameters) {
+    private @Nullable ITmfFilter extractSearchFilter(Map<String, Object> fetchParameters) {
         Object searchFilterObject = fetchParameters.get(TABLE_SEARCH_KEY);
-        if (searchFilterObject instanceof Map<?, ?>) {
-            Map<Long, String> searchMap = (Map<Long, String>) searchFilterObject;
-            if (searchMap.isEmpty()) {
+        if (searchFilterObject instanceof List<?>) {
+            List<String> searchExpressions = (List<String>) searchFilterObject;
+            if (searchExpressions.isEmpty()) {
                 return null;
             }
-
-            TmfFilterRootNode rootFilter = new TmfFilterRootNode();
-            for (Entry<Long, String> searchEntry : searchMap.entrySet()) {
-                TmfFilterMatchesNode searchNode = new TmfFilterMatchesNode(rootFilter);
-                ITmfEventAspect<?> aspect = fAspectToIdMap.inverse().get(searchEntry.getKey());
-                if (aspect == null) {
-                    return null;
-                }
-                searchNode.setEventAspect(aspect);
-                searchNode.setRegex(searchEntry.getValue());
+            List<String> filters = new ArrayList<>();
+            for (String searchEntry : searchExpressions) {
+                filters.add(searchEntry);
             }
-            return rootFilter;
+            TraceCompassFilter filter = TraceCompassFilter.fromRegex(filters, getTrace());
+            return filter.getEventFilter();
         }
         return null;
     }

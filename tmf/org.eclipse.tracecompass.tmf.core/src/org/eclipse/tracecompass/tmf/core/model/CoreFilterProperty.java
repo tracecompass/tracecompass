@@ -40,4 +40,9 @@ public final class CoreFilterProperty {
      */
     public static final int EXCLUDE = 1 << 2;
 
+    /**
+     * The highlight property mask
+     */
+    public static final int HIGHLIGHT = 1 << 3;
+
 }
