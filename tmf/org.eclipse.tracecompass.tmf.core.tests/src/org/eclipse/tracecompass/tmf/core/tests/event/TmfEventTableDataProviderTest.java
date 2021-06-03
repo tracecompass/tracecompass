@@ -321,10 +321,10 @@ public class TmfEventTableDataProviderTest {
 
     /**
      * Given a start index, count and a list of desired columns, we check model
-     * returned by the data provider. We also apply a filter on a column
+     * returned by the data provider. We also apply a search filter on a single column.
      */
     @Test
-    public void testDataProviderWithSimpleSearch() {
+    public void testDataProviderWithSimpleSingleColumnsSearch() {
         Long eventTypeColumnId = fColumns.get(EVENT_TYPE_COLUMN_NAME);
         Long timestampColumnId = fColumns.get(TIMESTAMP_COLUMN_NAME);
 
@@ -335,10 +335,10 @@ public class TmfEventTableDataProviderTest {
         VirtualTableQueryFilter queryFilter = new EventTableQueryFilter(Arrays.asList(eventTypeColumnId, timestampColumnId), 0, 1, null);
         Map<String, Object> parameters = FetchParametersUtils.virtualTableQueryToMap(queryFilter);
 
-        List<String> searchExpressions = new ArrayList<>();
-        searchExpressions.add("\""+EVENT_TYPE_COLUMN_NAME+"\"" + " matches " + "Type-2");
+        Map<Long, String> searchExpressions = new HashMap<>();
+        searchExpressions.put(eventTypeColumnId, "Type-2");
 
-        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_KEY, searchExpressions);
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_EXPRESSION_KEY, searchExpressions);
         parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_INDEX_KEY, true);
 
         List<Long> expectedColumnsId = Arrays.asList(eventTypeColumnId, timestampColumnId);
@@ -357,7 +357,7 @@ public class TmfEventTableDataProviderTest {
         int nbEventsRequested = 5;
         queryFilter = new EventTableQueryFilter(Arrays.asList(eventTypeColumnId, timestampColumnId), 0, nbEventsRequested, null);
         parameters = FetchParametersUtils.virtualTableQueryToMap(queryFilter);
-        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_KEY, searchExpressions);
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_EXPRESSION_KEY, searchExpressions);
 
         response = fProvider.fetchLines(parameters, null);
         currentModel = response.getModel();
@@ -376,19 +376,25 @@ public class TmfEventTableDataProviderTest {
 
     /**
      * Given a start index, count and a list of desired columns, we check model
-     * returned by the data provider. We also apply a filter on a column
+     * returned by the data provider. We also apply a search filter on multiple columns
      */
     @Test
-    public void testDataProviderWithComplexSearch() {
+    public void testDataProviderWithSimpleMultiColumnsSearch() {
+        Long eventTypeColumnId = fColumns.get(EVENT_TYPE_COLUMN_NAME);
+        Long timestampColumnId = fColumns.get(TIMESTAMP_COLUMN_NAME);
+
+        assertNotNull(timestampColumnId);
+        assertNotNull(eventTypeColumnId);
+
         // Query for the index for the first matching event
         VirtualTableQueryFilter queryFilter = new EventTableQueryFilter(new ArrayList<>(fColumns.values()), 0, 1, null);
         Map<String, Object> parameters = FetchParametersUtils.virtualTableQueryToMap(queryFilter);
 
-        List<String> searchExpressions = new ArrayList<>();
-        searchExpressions.add("\""+EVENT_TYPE_COLUMN_NAME+"\"" + " == " + "Type-3");
-        searchExpressions.add("\""+TIMESTAMP_COLUMN_NAME+"\"" + " contains " + "4");
+        Map<Long, String> searchExpressions = new HashMap<>();
+        searchExpressions.put(eventTypeColumnId, "T.*3");
+        searchExpressions.put(timestampColumnId, "\\d*4\\d*s*");
 
-        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_KEY, searchExpressions);
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_EXPRESSION_KEY, searchExpressions);
         parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_INDEX_KEY, true);
 
         List<Long> expectedColumnsId = new ArrayList<>(fColumns.values());
@@ -407,7 +413,118 @@ public class TmfEventTableDataProviderTest {
         int nbEventsRequested = 5;
         queryFilter = new EventTableQueryFilter(new ArrayList<>(fColumns.values()), 0, nbEventsRequested, null);
         parameters = FetchParametersUtils.virtualTableQueryToMap(queryFilter);
-        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_KEY, searchExpressions);
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_EXPRESSION_KEY, searchExpressions);
+
+        response = fProvider.fetchLines(parameters, null);
+        currentModel = response.getModel();
+        assertNotNull(currentModel);
+        assertEquals(nbEventsRequested, currentModel.getLines().size());
+        expectedData = Arrays.asList(
+                new EventTableLine(Arrays.asList(new VirtualTableCell(lineTimestamp(1)), new VirtualTableCell("Type-0"), new VirtualTableCell(""), new VirtualTableCell(lineNsTimestamp(1))), 0, TmfTimestamp.fromMillis(1), 0, 0),
+                new EventTableLine(Arrays.asList(new VirtualTableCell(lineTimestamp(2)), new VirtualTableCell("Type-1"), new VirtualTableCell(""), new VirtualTableCell(lineNsTimestamp(2))), 1, TmfTimestamp.fromMillis(2), 1, 0),
+                new EventTableLine(Arrays.asList(new VirtualTableCell(lineTimestamp(3)), new VirtualTableCell("Type-2"), new VirtualTableCell(""), new VirtualTableCell(lineNsTimestamp(3))), 2, TmfTimestamp.fromMillis(3), 2, 0),
+                new EventTableLine(Arrays.asList(new VirtualTableCell(lineTimestamp(4)), new VirtualTableCell("Type-3"), new VirtualTableCell(""), new VirtualTableCell(lineNsTimestamp(4))), 3, TmfTimestamp.fromMillis(4), 3, 0),
+                new EventTableLine(Arrays.asList(new VirtualTableCell(lineTimestamp(5)), new VirtualTableCell("Type-4"), new VirtualTableCell(""), new VirtualTableCell(lineNsTimestamp(5))), 4, TmfTimestamp.fromMillis(5), 4, 0));
+        expectedData.get(3).setActiveProperties(CoreFilterProperty.HIGHLIGHT);
+        expectedModel = new TmfVirtualTableModel<>(expectedColumnsId, expectedData, 0, 10000);
+        assertEquals(expectedModel, currentModel);
+    }
+
+    /**
+     * Given a start index, count and a list of desired columns, we check model
+     * returned by the data provider. We also apply a search filter on a single column.
+     */
+    @Test
+    public void testDataProviderWithComplexSingleColumnsSearch() {
+        Long eventTypeColumnId = fColumns.get(EVENT_TYPE_COLUMN_NAME);
+        Long timestampColumnId = fColumns.get(TIMESTAMP_COLUMN_NAME);
+
+        assertNotNull(timestampColumnId);
+        assertNotNull(eventTypeColumnId);
+
+        // Query for the index for the first matching event
+        VirtualTableQueryFilter queryFilter = new EventTableQueryFilter(Arrays.asList(eventTypeColumnId, timestampColumnId), 0, 1, null);
+        Map<String, Object> parameters = FetchParametersUtils.virtualTableQueryToMap(queryFilter);
+
+        Map<Long, String> searchExpressions = new HashMap<>();
+        searchExpressions.put(eventTypeColumnId, "\""+EVENT_TYPE_COLUMN_NAME+"\"" + " matches " + "Type-2");
+
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_COMPLEX_EXPRESSION_KEY, searchExpressions);
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_INDEX_KEY, true);
+
+        List<Long> expectedColumnsId = Arrays.asList(eventTypeColumnId, timestampColumnId);
+        TmfTimestampFormat.getDefaulTimeFormat().format(TmfTimestamp.fromMillis(2).toNanos());
+        List<EventTableLine> expectedData = Arrays.asList(
+                new EventTableLine(Arrays.asList(new VirtualTableCell("Type-2"), new VirtualTableCell(lineTimestamp(3))), 2, TmfTimestamp.fromMillis(3), 2, 0));
+        expectedData.get(0).setActiveProperties(CoreFilterProperty.HIGHLIGHT);
+
+        TmfModelResponse<ITmfVirtualTableModel<EventTableLine>> response = fProvider.fetchLines(parameters, null);
+        ITmfVirtualTableModel<EventTableLine> currentModel = response.getModel();
+
+        TmfVirtualTableModel<@NonNull EventTableLine> expectedModel = new TmfVirtualTableModel<>(expectedColumnsId, expectedData, 0, 10000);
+        assertEquals(expectedModel, currentModel);
+
+        // Query for events with search filter active. Matching lines will be tagged for highlighting
+        int nbEventsRequested = 5;
+        queryFilter = new EventTableQueryFilter(Arrays.asList(eventTypeColumnId, timestampColumnId), 0, nbEventsRequested, null);
+        parameters = FetchParametersUtils.virtualTableQueryToMap(queryFilter);
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_COMPLEX_EXPRESSION_KEY, searchExpressions);
+
+        response = fProvider.fetchLines(parameters, null);
+        currentModel = response.getModel();
+        assertNotNull(currentModel);
+        assertEquals(nbEventsRequested, currentModel.getLines().size());
+        expectedData = Arrays.asList(
+                new EventTableLine(Arrays.asList(new VirtualTableCell("Type-0"), new VirtualTableCell(lineTimestamp(1))), 0, TmfTimestamp.fromMillis(1), 0, 0),
+                new EventTableLine(Arrays.asList(new VirtualTableCell("Type-1"), new VirtualTableCell(lineTimestamp(2))), 1, TmfTimestamp.fromMillis(2), 1, 0),
+                new EventTableLine(Arrays.asList(new VirtualTableCell("Type-2"), new VirtualTableCell(lineTimestamp(3))), 2, TmfTimestamp.fromMillis(3), 2, 0),
+                new EventTableLine(Arrays.asList(new VirtualTableCell("Type-3"), new VirtualTableCell(lineTimestamp(4))), 3, TmfTimestamp.fromMillis(4), 3, 0),
+                new EventTableLine(Arrays.asList(new VirtualTableCell("Type-4"), new VirtualTableCell(lineTimestamp(5))), 4, TmfTimestamp.fromMillis(5), 4, 0));
+        expectedData.get(2).setActiveProperties(CoreFilterProperty.HIGHLIGHT);
+        expectedModel = new TmfVirtualTableModel<>(expectedColumnsId, expectedData, 0, 10000);
+        assertEquals(expectedModel, currentModel);
+    }
+
+    /**
+     * Given a start index, count and a list of desired columns, we check model
+     * returned by the data provider. We also apply a search filter on multiple columns
+     */
+    @Test
+    public void testDataProviderWithComplexMultiColumnsSearch() {
+        Long eventTypeColumnId = fColumns.get(EVENT_TYPE_COLUMN_NAME);
+        Long timestampColumnId = fColumns.get(TIMESTAMP_COLUMN_NAME);
+
+        assertNotNull(timestampColumnId);
+        assertNotNull(eventTypeColumnId);
+
+        // Query for the index for the first matching event
+        VirtualTableQueryFilter queryFilter = new EventTableQueryFilter(new ArrayList<>(fColumns.values()), 0, 1, null);
+        Map<String, Object> parameters = FetchParametersUtils.virtualTableQueryToMap(queryFilter);
+
+        Map<Long, String> searchExpressions = new HashMap<>();
+        searchExpressions.put(eventTypeColumnId, "\""+EVENT_TYPE_COLUMN_NAME+"\"" + " == " + "Type-3");
+        searchExpressions.put(timestampColumnId, "\""+TIMESTAMP_COLUMN_NAME+"\"" + " contains " + "4");
+
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_COMPLEX_EXPRESSION_KEY, searchExpressions);
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_INDEX_KEY, true);
+
+        List<Long> expectedColumnsId = new ArrayList<>(fColumns.values());
+        TmfTimestampFormat.getDefaulTimeFormat().format(TmfTimestamp.fromMillis(2).toNanos());
+        List<EventTableLine> expectedData = Arrays.asList(
+                new EventTableLine(Arrays.asList(new VirtualTableCell(lineTimestamp(4)), new VirtualTableCell("Type-3"), new VirtualTableCell(""), new VirtualTableCell(lineNsTimestamp(4))), 3, TmfTimestamp.fromMillis(4), 3, 0));
+        expectedData.get(0).setActiveProperties(CoreFilterProperty.HIGHLIGHT);
+
+        TmfModelResponse<ITmfVirtualTableModel<EventTableLine>> response = fProvider.fetchLines(parameters, null);
+        ITmfVirtualTableModel<EventTableLine> currentModel = response.getModel();
+
+        TmfVirtualTableModel<@NonNull EventTableLine> expectedModel = new TmfVirtualTableModel<>(expectedColumnsId, expectedData, 0, 10000);
+        assertEquals(expectedModel, currentModel);
+
+        // Query for events with search filter active. Matching lines will be tagged for highlighting
+        int nbEventsRequested = 5;
+        queryFilter = new EventTableQueryFilter(new ArrayList<>(fColumns.values()), 0, nbEventsRequested, null);
+        parameters = FetchParametersUtils.virtualTableQueryToMap(queryFilter);
+        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_COMPLEX_EXPRESSION_KEY, searchExpressions);
 
         response = fProvider.fetchLines(parameters, null);
         currentModel = response.getModel();

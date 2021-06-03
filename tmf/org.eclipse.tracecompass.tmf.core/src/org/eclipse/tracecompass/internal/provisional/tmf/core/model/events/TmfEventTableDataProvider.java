@@ -74,11 +74,15 @@ import com.google.common.collect.ImmutableSet;
 public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider implements ITmfVirtualTableDataProvider<TmfEventTableColumnDataModel, EventTableLine> {
 
     /**
-     * Key for table search
+     * Key for table search complex filter expressions
      */
-    public static final String TABLE_SEARCH_KEY = "table_search"; //$NON-NLS-1$
+    public static final String TABLE_SEARCH_COMPLEX_EXPRESSION_KEY = "table_search_complex_expressions"; //$NON-NLS-1$
     /**
-     * Key for table search
+     * Key for table search simple filter expressions (regex only)
+     */
+    public static final String TABLE_SEARCH_EXPRESSION_KEY = "table_search_simple_expressions"; //$NON-NLS-1$
+    /**
+     * Key for table search to get index of search
      */
     public static final String TABLE_SEARCH_INDEX_KEY = "table_search_index"; //$NON-NLS-1$
 
@@ -173,6 +177,11 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         }
         VirtualTableQueryFilter queryFilter = FetchParametersUtils.createVirtualTableQueryFilter(fetchParameters);
         if (queryFilter == null) {
+            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
+        }
+
+        if (fetchParameters.containsKey(TABLE_SEARCH_COMPLEX_EXPRESSION_KEY) && fetchParameters.containsKey(TABLE_SEARCH_EXPRESSION_KEY)) {
+            // only allow one way of defining filters
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
         }
 
@@ -418,7 +427,7 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
                 }
 
                 List<EventTableLine> events = getEventLines();
-                boolean matches = searchFilter == null ? false : searchFilter.matches(event);
+                boolean matches = searchFilter != null && searchFilter.matches(event);
                 if ((!isIndexRequest || matches) && (collapseFilter == null || collapseFilter.matches(event))) {
                     if (events.size() < queryCount) {
                         events.add(buildEventTableLine(aspects, event, rank, rank, matches));
@@ -551,24 +560,69 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     private @Nullable ITmfFilter extractSearchFilter(Map<String, Object> fetchParameters) {
-        Object searchFilterObject = fetchParameters.get(TABLE_SEARCH_KEY);
-        if (searchFilterObject instanceof List<?>) {
-            List<String> searchExpressions = (List<String>) searchFilterObject;
-            if (searchExpressions.isEmpty()) {
-                return null;
-            }
-            List<String> filters = new ArrayList<>();
-            for (String searchEntry : searchExpressions) {
-                filters.add(searchEntry);
-            }
-            TraceCompassFilter filter = TraceCompassFilter.fromRegex(filters, getTrace());
-            return filter.getEventFilter();
+        Object searchFilterObject = fetchParameters.get(TABLE_SEARCH_EXPRESSION_KEY);
+        if (searchFilterObject instanceof Map<?, ?>) {
+            return extractSimpleSearchFilter((Map<?, String>) searchFilterObject);
+        }
+        searchFilterObject = fetchParameters.get(TABLE_SEARCH_COMPLEX_EXPRESSION_KEY);
+        if (searchFilterObject instanceof Map<?, ?>) {
+            return extractComplexSearchFilter((Map<?, String>) searchFilterObject);
         }
         return null;
     }
 
-    private static @Nullable TmfCollapseFilter extractCollapseFilter(Map<String, Object> fetchParameters) {
+    private @Nullable ITmfFilter extractComplexSearchFilter (Map<?, String> searchMap) {
+        if (searchMap.isEmpty()) {
+            return null;
+        }
+        List<String> filters = new ArrayList<>();
+        for (String searchEntry : searchMap.values()) {
+            filters.add(searchEntry);
+        }
+        TraceCompassFilter filter = TraceCompassFilter.fromRegex(filters, getTrace());
+        return filter.getEventFilter();
+    }
+
+    private @Nullable static ITmfFilter extractSimpleSearchFilter (Map<?, String> searchMap) {
+        if (searchMap.isEmpty()) {
+            return null;
+        }
+        TmfFilterRootNode rootFilter = new TmfFilterRootNode();
+        for (Entry<?, String> searchEntry : searchMap.entrySet()) {
+            TmfFilterMatchesNode searchNode = new TmfFilterMatchesNode(rootFilter);
+            Long key = extractColumnId(searchEntry.getKey());
+            if (key != null) {
+                ITmfEventAspect<?> aspect = fAspectToIdMap.inverse().get(key);
+                if (aspect != null) {
+                    searchNode.setEventAspect(aspect);
+                    searchNode.setRegex(searchEntry.getValue());
+                    return rootFilter;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static @Nullable Long extractColumnId(@Nullable Object key) {
+        try {
+            if (key instanceof String) {
+                return Long.valueOf((String) key);
+            }
+            if (key instanceof Long) {
+                return (Long) key;
+            }
+            if (key instanceof Integer) {
+                return Long.valueOf((Integer) key);
+            }
+        } catch (NumberFormatException e) {
+            // fall through
+        }
+        return null;
+    }
+
+    private static @Nullable TmfCollapseFilter extractCollapseFilter(Map<?, Object> fetchParameters) {
         Object filtersObject = fetchParameters.get(TABLE_FILTERS_KEY);
         if (filtersObject instanceof ITmfFilterModel) {
             ITmfFilterModel filters = (ITmfFilterModel) filtersObject;
