@@ -706,7 +706,7 @@ public final class TimeGraphRender {
      * @return the {@link Color}
      */
     public static Color getColor(int colorInt) {
-        String hexRGB = Integer.toHexString(colorInt);
+        String hexRGB = Integer.toHexString((colorInt >> 8) & 0xffffff);
         Color color = COLOR_REGISTRY.get(hexRGB);
         if (color == null) {
             COLOR_REGISTRY.put(hexRGB, RGBAUtil.fromInt(colorInt).rgb);
