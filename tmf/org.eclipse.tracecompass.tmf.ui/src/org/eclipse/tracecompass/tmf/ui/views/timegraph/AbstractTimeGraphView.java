@@ -624,7 +624,11 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         @Override
         public void doRun() {
-            Sampling sampling = new Sampling(getZoomStartTime(), getZoomEndTime(), getResolution());
+            long zoomStartTime = getZoomStartTime();
+            long zoomEndTime = getZoomEndTime();
+            long resolution = getResolution();
+            IProgressMonitor monitor = getMonitor();
+            Sampling sampling = new Sampling(zoomStartTime, zoomEndTime, resolution);
             boolean isFilterActive = !getRegexes().values().isEmpty();
             /*
              * Note: the zoomEntries function below will update the sampling, so
@@ -638,7 +642,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             List<ILinkEvent> computedLinks;
             try (TraceCompassLogUtils.ScopeLog linkLog = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingLinks")) { //$NON-NLS-1$
                 /* Refresh the arrows when zooming */
-                computedLinks = getLinkList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
+                computedLinks = getLinkList(zoomStartTime, zoomEndTime, resolution, monitor);
                 ViewFilterDialog filterDialog = getViewFilterDialog();
                 if (filterDialog != null && computedLinks != null) {
                     if (filterDialog.hasActiveSavedFilters()) {
@@ -651,9 +655,9 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             List<ILinkEvent> links = computedLinks;
             /* Refresh the view-specific markers when zooming */
             try (TraceCompassLogUtils.ScopeLog markerLoglog = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingMarkers")) { //$NON-NLS-1$
-                List<IMarkerEvent> newMarkers = new ArrayList<>(getViewMarkerList(incorrectSample, getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
+                List<IMarkerEvent> newMarkers = new ArrayList<>(getViewMarkerList(incorrectSample, zoomStartTime, zoomEndTime, resolution, monitor));
                 /* Refresh the trace-specific markers when zooming */
-                newMarkers.addAll(getTraceMarkerList(getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor()));
+                newMarkers.addAll(getTraceMarkerList(zoomStartTime, zoomEndTime, resolution, monitor));
                 applyResults(() -> {
                     if (links != null) {
                         fTimeGraphViewer.setLinks(links);
@@ -684,7 +688,7 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
                 // Sampling is cleared when calling restartZoomThread() so that
                 // during filtering the entries are refreshed
-                zoomEntries(incorrectSample, getZoomStartTime(), getZoomEndTime(), getResolution(), getMonitor());
+                zoomEntries(incorrectSample, zoomStartTime, zoomEndTime, resolution, monitor);
             }
             synchronized (fZoomThreadResultLock) {
                 if (Thread.currentThread() == fZoomThread) {
@@ -695,10 +699,10 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 /* Do a full filter search as a second pass */
                 try (TraceCompassLogUtils.ScopeLog log = new TraceCompassLogUtils.ScopeLog(LOGGER, Level.FINER, "ZoomThread:GettingStatesFullSearch")) { //$NON-NLS-1$
                     for (TimeGraphEntry entry : fEntries) {
-                        if (getMonitor().isCanceled()) {
+                        if (monitor.isCanceled()) {
                             return;
                         }
-                        zoomEntries(Collections.singleton(entry), getZoomStartTime(), getZoomEndTime(), getResolution(), true, getMonitor());
+                        zoomEntries(Collections.singleton(entry), zoomStartTime, zoomEndTime, resolution, true, monitor);
                         refresh();
                     }
                 }
