@@ -4371,7 +4371,7 @@ Alice kills the program, and immediately the server speeds up. She then goes to 
 
 = Trace Compass Incubator =
 
-To install features from the Trace Compass incubator, use the following update site URL: http://download.eclipse.org/tracecompass.incubator/master/repository/.
+To install features from the Trace Compass incubator, use the following update site URL: http://download.eclipse.org/tracecompass.incubator/stable-7.0/repository/.
 
 If you're using the Trace Compass RCP, there's an easy method to install incubator features. See the [http://archive.eclipse.org/tracecompass/doc/stable/org.eclipse.tracecompass.rcp.doc.user/Trace-Compass-Incubator.html Trace Compass RCP documentation]
 

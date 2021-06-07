@@ -80,7 +80,7 @@ Then click '''Finish'''. It will open Eclipse's main installation wizard. Follow
 
 === From an update site ===
 
-Optionally, one can also install the incubator features using the following update site URL: http://download.eclipse.org/tracecompass.incubator/master/repository/.
+Optionally, one can also install the incubator features using the following update site URL: http://download.eclipse.org/tracecompass.incubator/stable-7.0/repository/.
 
 == Update incubator features ==
 
