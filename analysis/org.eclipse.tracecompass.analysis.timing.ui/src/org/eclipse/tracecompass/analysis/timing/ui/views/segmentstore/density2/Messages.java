@@ -20,7 +20,7 @@ import org.eclipse.osgi.util.NLS;
  */
 @NonNullByDefault({})
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.density2.messages"; //$NON-NLS-1$
 
     /**
      * Label for the count axis of the density chart.
