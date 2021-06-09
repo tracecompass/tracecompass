@@ -5,14 +5,6 @@
          point="org.eclipse.ui.views">
       <view
             category="org.eclipse.linuxtools.lttng2.ui.views.category"
-            class="org.eclipse.tracecompass.analysis.counters.ui.CounterView"
-            icon="icons/counter.png"
-            id="org.eclipse.tracecompass.analysis.counters.ui.view.counters"
-            name="%view.counters"
-            restorable="true">
-      </view>
-      <view
-            category="org.eclipse.linuxtools.lttng2.ui.views.category"
             class="org.eclipse.tracecompass.analysis.counters.ui.views.CounterView"
             icon="icons/counter.png"
             id="org.eclipse.tracecompass.analysis.counters.ui.views.countersview"
