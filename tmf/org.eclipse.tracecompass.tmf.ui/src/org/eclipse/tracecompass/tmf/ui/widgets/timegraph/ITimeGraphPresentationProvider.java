@@ -23,9 +23,11 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.tracecompass.internal.tmf.ui.Messages;
+import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeEventStyleStrings;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.ITimeGraphEntry;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.widgets.ITmfTimeGraphDrawingHelper;
 
 /**
@@ -202,6 +204,16 @@ public interface ITimeGraphPresentationProvider {
      * @since 3.0
      */
     default Map<String, Object> getEventStyle(ITimeEvent event) {
+        if (event instanceof TimeEvent) {
+            TimeEvent timeEvent = (TimeEvent) event;
+            OutputElementStyle style = timeEvent.getModel().getStyle();
+            if (style!= null) {
+                Map<@NonNull String, @NonNull Object> styleValues = style.getStyleValues();
+                if (!styleValues.isEmpty()) {
+                    return styleValues;
+                }
+            }
+        }
         StateItem stateItem = null;
         int index = getStateTableIndex(event);
         StateItem[] stateTable = getStateTable();
