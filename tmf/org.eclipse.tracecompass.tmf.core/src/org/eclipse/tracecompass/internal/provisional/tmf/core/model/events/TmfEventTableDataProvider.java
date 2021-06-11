@@ -25,7 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TraceCompassFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.VirtualTableQueryFilter;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.EventTableLine;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfFilterModel;
@@ -74,13 +73,13 @@ import com.google.common.collect.ImmutableSet;
 public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider implements ITmfVirtualTableDataProvider<TmfEventTableColumnDataModel, EventTableLine> {
 
     /**
-     * Key for table search complex filter expressions
+     * Key for table search regex filter expressions (regex only)
      */
-    public static final String TABLE_SEARCH_COMPLEX_EXPRESSION_KEY = "table_search_complex_expressions"; //$NON-NLS-1$
+    public static final String TABLE_SEARCH_EXPRESSION_KEY = "table_search_expressions"; //$NON-NLS-1$
     /**
-     * Key for table search simple filter expressions (regex only)
+     * Key for table search to get index of search
      */
-    public static final String TABLE_SEARCH_EXPRESSION_KEY = "table_search_simple_expressions"; //$NON-NLS-1$
+    public static final String TABLE_SEARCH_INDEX_KEY = "table_search_index"; //$NON-NLS-1$
 
     /**
      * Key for table filters
@@ -173,11 +172,6 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         }
         VirtualTableQueryFilter queryFilter = FetchParametersUtils.createVirtualTableQueryFilter(fetchParameters);
         if (queryFilter == null) {
-            return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
-        }
-
-        if (fetchParameters.containsKey(TABLE_SEARCH_COMPLEX_EXPRESSION_KEY) && fetchParameters.containsKey(TABLE_SEARCH_EXPRESSION_KEY)) {
-            // only allow one way of defining filters
             return new TmfModelResponse<>(null, ITmfResponse.Status.FAILED, CommonStatusMessage.INCORRECT_QUERY_PARAMETERS);
         }
 
@@ -554,28 +548,12 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
     }
 
     @SuppressWarnings("unchecked")
-    private @Nullable ITmfFilter extractSearchFilter(Map<String, Object> fetchParameters) {
+    private @Nullable static ITmfFilter extractSearchFilter(Map<String, Object> fetchParameters) {
         Object searchFilterObject = fetchParameters.get(TABLE_SEARCH_EXPRESSION_KEY);
         if (searchFilterObject instanceof Map<?, ?>) {
             return extractSimpleSearchFilter((Map<?, String>) searchFilterObject);
         }
-        searchFilterObject = fetchParameters.get(TABLE_SEARCH_COMPLEX_EXPRESSION_KEY);
-        if (searchFilterObject instanceof Map<?, ?>) {
-            return extractComplexSearchFilter((Map<?, String>) searchFilterObject);
-        }
         return null;
-    }
-
-    private @Nullable ITmfFilter extractComplexSearchFilter (Map<?, String> searchMap) {
-        if (searchMap.isEmpty()) {
-            return null;
-        }
-        List<String> filters = new ArrayList<>();
-        for (String searchEntry : searchMap.values()) {
-            filters.add(searchEntry);
-        }
-        TraceCompassFilter filter = TraceCompassFilter.fromRegex(filters, getTrace());
-        return filter.getEventFilter();
     }
 
     private @Nullable static ITmfFilter extractSimpleSearchFilter (Map<?, String> searchMap) {
