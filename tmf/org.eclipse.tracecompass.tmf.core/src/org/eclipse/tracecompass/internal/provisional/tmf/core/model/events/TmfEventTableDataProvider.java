@@ -81,10 +81,6 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
      * Key for table search simple filter expressions (regex only)
      */
     public static final String TABLE_SEARCH_EXPRESSION_KEY = "table_search_simple_expressions"; //$NON-NLS-1$
-    /**
-     * Key for table search to get index of search
-     */
-    public static final String TABLE_SEARCH_INDEX_KEY = "table_search_index"; //$NON-NLS-1$
 
     /**
      * Key for table filters
@@ -190,11 +186,8 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
         @Nullable TmfCollapseFilter collapseFilter = extractCollapseFilter(fetchParameters);
         Map<Long, ITmfEventAspect<?>> aspects = getAspectsFromColumnsId(queryFilter.getColumnsId());
 
-        Object isIndexRequestObj = fetchParameters.get(TABLE_SEARCH_INDEX_KEY);
-        boolean isIndexRequest = false;
-        if (isIndexRequestObj instanceof Boolean) {
-            isIndexRequest = (Boolean) isIndexRequestObj;
-        }
+        Boolean isFiltered = DataProviderParameterUtils.extractIsFiltered(fetchParameters);
+        boolean isIndexRequest = isFiltered != null && isFiltered;
 
         if (aspects.isEmpty()) {
             return new TmfModelResponse<>(new TmfVirtualTableModel<EventTableLine>(Collections.emptyList(), Collections.emptyList(), queryFilter.getIndex(), 0), ITmfResponse.Status.COMPLETED, CommonStatusMessage.COMPLETED);

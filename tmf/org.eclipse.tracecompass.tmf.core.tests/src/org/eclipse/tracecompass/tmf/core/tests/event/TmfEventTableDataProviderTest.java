@@ -36,6 +36,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.ITmfVi
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.TmfVirtualTableModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.table.VirtualTableCell;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
+import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.model.CoreFilterProperty;
 import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
@@ -339,7 +340,7 @@ public class TmfEventTableDataProviderTest {
         searchExpressions.put(eventTypeColumnId, "Type-2");
 
         parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_EXPRESSION_KEY, searchExpressions);
-        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_INDEX_KEY, true);
+        parameters.put(DataProviderParameterUtils.FILTERED_KEY, true);
 
         List<Long> expectedColumnsId = Arrays.asList(eventTypeColumnId, timestampColumnId);
         TmfTimestampFormat.getDefaulTimeFormat().format(TmfTimestamp.fromMillis(2).toNanos());
@@ -395,7 +396,7 @@ public class TmfEventTableDataProviderTest {
         searchExpressions.put(timestampColumnId, "\\d*4\\d*s*");
 
         parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_EXPRESSION_KEY, searchExpressions);
-        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_INDEX_KEY, true);
+        parameters.put(DataProviderParameterUtils.FILTERED_KEY, true);
 
         List<Long> expectedColumnsId = new ArrayList<>(fColumns.values());
         TmfTimestampFormat.getDefaulTimeFormat().format(TmfTimestamp.fromMillis(2).toNanos());
@@ -450,7 +451,7 @@ public class TmfEventTableDataProviderTest {
         searchExpressions.put(eventTypeColumnId, "\""+EVENT_TYPE_COLUMN_NAME+"\"" + " matches " + "Type-2");
 
         parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_COMPLEX_EXPRESSION_KEY, searchExpressions);
-        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_INDEX_KEY, true);
+        parameters.put(DataProviderParameterUtils.FILTERED_KEY, true);
 
         List<Long> expectedColumnsId = Arrays.asList(eventTypeColumnId, timestampColumnId);
         TmfTimestampFormat.getDefaulTimeFormat().format(TmfTimestamp.fromMillis(2).toNanos());
@@ -506,7 +507,7 @@ public class TmfEventTableDataProviderTest {
         searchExpressions.put(timestampColumnId, "\""+TIMESTAMP_COLUMN_NAME+"\"" + " contains " + "4");
 
         parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_COMPLEX_EXPRESSION_KEY, searchExpressions);
-        parameters.put(TmfEventTableDataProvider.TABLE_SEARCH_INDEX_KEY, true);
+        parameters.put(DataProviderParameterUtils.FILTERED_KEY, true);
 
         List<Long> expectedColumnsId = new ArrayList<>(fColumns.values());
         TmfTimestampFormat.getDefaulTimeFormat().format(TmfTimestamp.fromMillis(2).toNanos());
