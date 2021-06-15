@@ -115,16 +115,17 @@ public class LostEventOutputAnnotationProvider implements IOutputAnnotationProvi
             long start = Math.max(timeRequested.get(0), ss.getStartTime());
             long end = Math.min(timeRequested.get(timeRequested.size() - 1), ss.getCurrentEndTime());
             if (start <= end) {
+                List<Long> times = new ArrayList<>(getTimes(ss, timeRequested));
+
                 /* Update start to ensure that the previous marker is included. */
                 start = Math.max(start - 1, ss.getStartTime());
                 /* Update end to ensure that the next marker is included. */
                 long nextStartTime = ss.querySingleState(end, lostEventsQuark).getEndTime() + 1;
                 end = Math.min(nextStartTime, ss.getCurrentEndTime());
 
-                timeRequested.set(0, start);
-                timeRequested.set(timeRequested.size() - 1, end);
+                times.set(0, start);
+                times.set(times.size() - 1, end);
 
-                Collection<Long> times = getTimes(ss, timeRequested);
                 for (ITmfStateInterval interval : ss.query2D(ImmutableList.of(lostEventsQuark), times)) {
                     if (progressMonitor.isCanceled()) {
                         fLastRequest = Collections.emptyList();
