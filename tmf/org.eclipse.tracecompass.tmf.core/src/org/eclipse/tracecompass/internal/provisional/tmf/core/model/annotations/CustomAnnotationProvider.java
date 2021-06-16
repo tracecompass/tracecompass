@@ -245,7 +245,6 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
         if (timeRequested == null || timeRequested.size() < 2) {
             return Collections.emptyMap();
         }
-        Set<@NonNull String> categoriesRequested = getCategories(fetchParams);
         Long[] times = timeRequested.toArray(new Long[0]);
         long starttime = timeRequested.get(0);
         long endtime = timeRequested.get(timeRequested.size() - 1);
@@ -263,9 +262,6 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
                         List<Annotation> markerList = new ArrayList<>();
                         for (Entry<@NonNull String, @NonNull Collection<@NonNull Annotation>> entryAnnotation : annotations.entrySet()) {
                             String category = Objects.requireNonNull(entryAnnotation.getKey());
-                            if (!categoriesRequested.isEmpty() && !categoriesRequested.contains(category)) {
-                                continue;
-                            }
                             for (Annotation annotation : Objects.requireNonNull(entryAnnotation.getValue())) {
                                 markerList.add(annotation);
                                 for (SubMarker subMarker : periodicAnnotationSource.getMarker().getSubMarkers()) {
@@ -279,21 +275,14 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
                 }
             }
         }
+
+        @Nullable Set<@NonNull String> categoriesRequested = DataProviderParameterUtils.extractSelectedCategories(fetchParams);
+        markerMap.keySet().removeIf(cat -> categoriesRequested != null && !categoriesRequested.contains(cat));
+
         return markerMap;
     }
 
-    private static Set<String> getCategories(Map<String, Object> fetchParams) {
-        Set<String> categories = new HashSet<>();
-        Object fetched = fetchParams.getOrDefault(DataProviderParameterUtils.REQUESTED_MARKER_CATEGORIES_KEY, Collections.emptyList());
-        if (fetched instanceof Iterable<?>) {
-            for (Object key : (Iterable<?>) fetched) {
-                if (key != null) {
-                    categories.add(String.valueOf(key));
-                }
-            }
-        }
-        return categories;
-    }
+
 
     private static OutputElementStyle getOutputStyle(Marker marker, RGBAColor color) {
         Map<@NonNull String, @NonNull Object> style = new HashMap<>();

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -99,7 +100,8 @@ public class LostEventOutputAnnotationProvider implements IOutputAnnotationProvi
 
         List<Long> timeRequested = DataProviderParameterUtils.extractTimeRequested(fetchParameters);
         List<@NonNull Long> entries = DataProviderParameterUtils.extractSelectedItems(fetchParameters);
-        if (timeRequested == null || timeRequested.size() < 2|| entries == null) {
+        @Nullable Set<@NonNull String> categories = DataProviderParameterUtils.extractSelectedCategories(fetchParameters);
+        if (timeRequested == null || timeRequested.size() < 2|| entries == null || (categories != null && !categories.contains(LOST_EVENTS))) {
             return NO_DATA;
         }
 

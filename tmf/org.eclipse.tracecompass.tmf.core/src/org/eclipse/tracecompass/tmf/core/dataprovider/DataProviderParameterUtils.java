@@ -14,8 +14,10 @@ package org.eclipse.tracecompass.tmf.core.dataprovider;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -201,6 +203,28 @@ public class DataProviderParameterUtils {
         }
 
         return regexes;
+    }
+
+    /**
+     * Extract selected marker categories from fetch parameters. If parameter is not in the map
+     * then return null.
+     *
+     * @param fetchParams
+     *            Map of parameters
+     * @return set of selected categories or null if parameter is not in parameter map
+     */
+    public static @Nullable Set<String> extractSelectedCategories(Map<String, Object> fetchParams) {
+        Set<String> categories = null;
+        Object fetched = fetchParams.get(DataProviderParameterUtils.REQUESTED_MARKER_CATEGORIES_KEY);
+        if (fetched instanceof Iterable<?>) {
+            categories = new HashSet<>();
+            for (Object key : (Iterable<?>) fetched) {
+                if (key != null) {
+                    categories.add(String.valueOf(key));
+                }
+            }
+        }
+        return categories;
     }
 
     /**

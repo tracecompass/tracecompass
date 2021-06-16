@@ -113,6 +113,8 @@ public class AnnotationEventHandler<@NonNull M extends TimeGraphEntryModel> impl
     public TmfModelResponse<@NonNull AnnotationModel> fetchAnnotations(Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         List<Long> timeRequested = DataProviderParameterUtils.extractTimeRequested(fetchParameters);
         List<@NonNull Long> entries = DataProviderParameterUtils.extractSelectedItems(fetchParameters);
+        @Nullable Set<@NonNull String> categories = DataProviderParameterUtils.extractSelectedCategories(fetchParameters);
+
         if (timeRequested == null || entries == null) {
             return NO_DATA;
         }
@@ -144,6 +146,11 @@ public class AnnotationEventHandler<@NonNull M extends TimeGraphEntryModel> impl
                 }
             }
             for (ITmfTrace source : fMarkerTraces) {
+                if (categories != null && !categories.contains(source.getName())) {
+                    // marker category is filtered out
+                    continue;
+                }
+
                 TmfEventRequest req = new TmfEventRequest(ITmfEvent.class, tr, 0, Integer.MAX_VALUE, ExecutionType.FOREGROUND) {
                     private int timesliceIndex = 0;
                     private Set<Object> values = new HashSet<>();
