@@ -34,7 +34,7 @@ import com.google.common.collect.Multimap;
  *
  * @author Jean-Christian Kouame
  * @author Bernd Hufmann
- * @since 7.0
+ * @since 7.1
  */
 public interface ICoreElementResolver {
 

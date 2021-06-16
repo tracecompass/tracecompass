@@ -17,7 +17,7 @@ package org.eclipse.tracecompass.tmf.core.markers;
  * views.
  *
  * @author Matthew Khouzam
- * @since 7.0
+ * @since 7.1
  */
 public interface ITimeReference {
 

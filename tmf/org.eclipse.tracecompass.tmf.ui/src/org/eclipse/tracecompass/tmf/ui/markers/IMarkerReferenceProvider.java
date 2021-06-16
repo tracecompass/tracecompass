@@ -37,7 +37,7 @@ public interface IMarkerReferenceProvider extends org.eclipse.tracecompass.tmf.c
     Reference getReference(String referenceId);
 
     /**
-     * @since 7.0
+     * @since 7.1
      */
     @Override
     default ITimeReference apply(String referenceId) {

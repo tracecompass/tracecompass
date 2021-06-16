@@ -14,7 +14,7 @@ package org.eclipse.tracecompass.tmf.core.model;
 /**
  * String constants to be used for the metadata of {@link ICoreElementResolver}.
  *
- * @since 7.0
+ * @since 7.1
  */
 public final class CoreMetadataStrings {
 

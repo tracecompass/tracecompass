@@ -70,13 +70,13 @@ public class DataProviderParameterUtils {
 
     /**
      * Requested marker set key
-     * @since 7.0
+     * @since 7.1
      */
     public static final String REQUESTED_MARKER_SET_KEY = "requested_marker_set"; //$NON-NLS-1$
 
     /**
      * Requested marker categories key
-     * @since 7.0
+     * @since 7.1
      */
     public static final String REQUESTED_MARKER_CATEGORIES_KEY = "requested_marker_categories"; //$NON-NLS-1$
 
@@ -84,7 +84,7 @@ public class DataProviderParameterUtils {
      * Requested trace key, uses the hostID, as the time is the same for every
      * trace with the same host id.
      *
-     * @since 7.0
+     * @since 7.1
      */
     public static final String REQUESTED_TRACE_KEY = "requested_trace"; //$NON-NLS-1$
 
@@ -212,6 +212,7 @@ public class DataProviderParameterUtils {
      * @param fetchParams
      *            Map of parameters
      * @return set of selected categories or null if parameter is not in parameter map
+     * @since 7.1
      */
     public static @Nullable Set<String> extractSelectedCategories(Map<String, Object> fetchParams) {
         Set<String> categories = null;

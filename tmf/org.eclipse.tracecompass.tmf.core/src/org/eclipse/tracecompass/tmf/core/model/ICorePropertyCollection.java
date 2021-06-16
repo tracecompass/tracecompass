@@ -20,7 +20,7 @@ package org.eclipse.tracecompass.tmf.core.model;
  *
  * @author Jean-Christian Kouame
  * @author Bernd Hufmann
- * @since 7.0
+ * @since 7.1
  *
  */
 public interface ICorePropertyCollection {

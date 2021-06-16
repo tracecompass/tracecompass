@@ -18,7 +18,7 @@ import java.util.function.Function;
  * a given id string
  *
  * @author Matthew Khouzam
- * @since 7.0
+ * @since 7.1
  */
 public interface ITimeReferenceProvider extends Function<String, ITimeReference> {
 

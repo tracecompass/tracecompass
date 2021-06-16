@@ -16,7 +16,7 @@ package org.eclipse.tracecompass.tmf.core.markers;
  * {@link ITimeReference} implementation.
  *
  * @author Matthew Khouzam
- * @since 7.0
+ * @since 7.1
  */
 public class TimeReference implements ITimeReference {
 
