@@ -566,14 +566,14 @@ public class TmfEventTableDataProvider extends AbstractTmfTraceDataProvider impl
             Long key = extractColumnId(searchEntry.getKey());
             if (key != null) {
                 ITmfEventAspect<?> aspect = fAspectToIdMap.inverse().get(key);
-                if (aspect != null) {
-                    searchNode.setEventAspect(aspect);
-                    searchNode.setRegex(searchEntry.getValue());
-                    return rootFilter;
+                if (aspect == null) {
+                    return null;
                 }
+                searchNode.setEventAspect(aspect);
+                searchNode.setRegex(searchEntry.getValue());
             }
         }
-        return null;
+        return rootFilter;
     }
 
     private static @Nullable Long extractColumnId(@Nullable Object key) {
