@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2017 Ericsson
+ * Copyright (c) 2013, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -12,7 +12,7 @@
  *   Alexandre Montplaisir - Initial API and implementation
  *   Bernd Hufmann - Updated to new TMF chart framework
  *******************************************************************************/
-package org.eclipse.tracecompass.examples.ui.viewers.histogram;
+package org.eclipse.tracecompass.internal.tmf.ui.viewers.eventdensity;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.swt.widgets.Composite;
@@ -31,7 +31,7 @@ import org.eclipse.tracecompass.tmf.ui.viewers.xychart.linechart.TmfXYChartSetti
  * @author Alexandre Montplaisir
  * @author Bernd Hufmann
  */
-public class NewHistogramViewer extends TmfFilteredXYChartViewer {
+public class EventDensityViewer extends TmfFilteredXYChartViewer {
 
     private static final int DEFAULT_SERIES_WIDTH = 1;
 
@@ -43,7 +43,7 @@ public class NewHistogramViewer extends TmfFilteredXYChartViewer {
      * @param settings
      *            See {@link TmfXYChartSettings} to know what it contains
      */
-    public NewHistogramViewer(Composite parent, TmfXYChartSettings settings) {
+    public EventDensityViewer(Composite parent, TmfXYChartSettings settings) {
         super(parent, settings, HistogramDataProvider.ID);
 
         /* Hide the grid */

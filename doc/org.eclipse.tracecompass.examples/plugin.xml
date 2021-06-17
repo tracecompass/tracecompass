@@ -3,13 +3,6 @@
 <plugin>
    <extension
          point="org.eclipse.ui.views">
-            <view
-            category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="org.eclipse.tracecompass.examples.ui.views.histogram.NewHistogramView"
-            id="org.eclipse.tracecompass.examples.ui.views.NewHistogramView"
-            name="%tracing.examples.histogram.view.name"
-            restorable="true">
-      </view>
       <view
             category="org.eclipse.linuxtools.tmf.ui.views.category"
             class="org.eclipse.tracecompass.examples.ui.views.data.provider.ExampleTimeGraphDataProviderView"

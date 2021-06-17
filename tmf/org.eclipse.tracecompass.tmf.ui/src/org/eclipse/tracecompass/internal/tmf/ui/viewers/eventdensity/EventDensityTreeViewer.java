@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017, 2018 Ericsson
+ * Copyright (c) 2017, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -9,7 +9,7 @@
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
 
-package org.eclipse.tracecompass.examples.ui.viewers.histogram;
+package org.eclipse.tracecompass.internal.tmf.ui.viewers.eventdensity;
 
 import java.util.Comparator;
 
@@ -31,7 +31,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @author Loic Prieur-Drevon
  */
-public class HistogramTreeViewer extends AbstractSelectTreeViewer2 {
+public class EventDensityTreeViewer extends AbstractSelectTreeViewer2 {
 
     private class HistogramLabelProvider extends TreeLabelProvider {
 
@@ -66,7 +66,7 @@ public class HistogramTreeViewer extends AbstractSelectTreeViewer2 {
      * @param parent
      *            the parent {@link Composite}
      */
-    public HistogramTreeViewer(Composite parent) {
+    public EventDensityTreeViewer(Composite parent) {
         super(parent, 1, HistogramDataProvider.ID);
         setLabelProvider(new HistogramLabelProvider());
     }
