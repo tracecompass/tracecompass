@@ -36,9 +36,9 @@ import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.Annotation;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationCategoriesModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.CustomAnnotationProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.PeriodicAnnotationSource;
+import org.eclipse.tracecompass.internal.tmf.core.annotations.CustomAnnotationProvider;
+import org.eclipse.tracecompass.internal.tmf.core.annotations.PeriodicAnnotationProvider;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSegment;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker;
@@ -157,8 +157,8 @@ public class ConfigurableMarkerEventSource implements IMarkerEventSource, IDispo
                         }
                         boolean isApplicable = true;
                         String label = indexStr;
-                        if (fAnnotationProvider instanceof PeriodicAnnotationSource) {
-                            PeriodicAnnotationSource source = (PeriodicAnnotationSource) fAnnotationProvider;
+                        if (fAnnotationProvider instanceof PeriodicAnnotationProvider) {
+                            PeriodicAnnotationProvider source = (PeriodicAnnotationProvider) fAnnotationProvider;
                             isApplicable = source.isApplicable(index);
                             if (!fHasError) {
                                 try {
@@ -202,8 +202,8 @@ public class ConfigurableMarkerEventSource implements IMarkerEventSource, IDispo
 
         @Override
         public List<SubMarker> getSubMarkers() {
-            if (fAnnotationProvider instanceof PeriodicAnnotationSource) {
-                return ((PeriodicAnnotationSource) fAnnotationProvider).getMarker().getSubMarkers();
+            if (fAnnotationProvider instanceof PeriodicAnnotationProvider) {
+                return ((PeriodicAnnotationProvider) fAnnotationProvider).getMarker().getSubMarkers();
             }
             return Collections.emptyList();
         }

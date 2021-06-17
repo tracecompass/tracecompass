@@ -9,7 +9,7 @@
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations;
+package org.eclipse.tracecompass.internal.tmf.core.annotations;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,6 +27,10 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.Annotation;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationCategoriesModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
 import org.eclipse.tracecompass.internal.tmf.core.markers.IMarkerConstants;
 import org.eclipse.tracecompass.internal.tmf.core.markers.Marker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.Marker.PeriodicMarker;
@@ -121,7 +125,7 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
                 baseReference = ITimeReference.ZERO;
             }
             ITimeReference reference = new TimeReference(baseReference.getTime() + Math.round(IMarkerConstants.convertToNanos(periodicMarker.getOffset(), periodicMarker.getUnit(), trace)), baseReference.getIndex());
-            return new PeriodicAnnotationSource(marker, reference.getIndex(), reference.getTime(), period, rollover, evenColor, oddColor);
+            return new PeriodicAnnotationProvider(marker, reference.getIndex(), reference.getTime(), period, rollover, evenColor, oddColor);
         }
         throw new IllegalArgumentException("Marker must be of type PeriodicMarker or SubMarker"); //$NON-NLS-1$
 
@@ -252,8 +256,8 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
         Map<@NonNull String, @NonNull Collection<@NonNull Annotation>> markerMap = new LinkedHashMap<>();
         for (IOutputAnnotationProvider source : fMarkerEventSources) {
             long minDuration = resolution * MIN_PERIOD;
-            if (source instanceof PeriodicAnnotationSource) {
-                PeriodicAnnotationSource periodicAnnotationSource = (PeriodicAnnotationSource) source;
+            if (source instanceof PeriodicAnnotationProvider) {
+                PeriodicAnnotationProvider periodicAnnotationSource = (PeriodicAnnotationProvider) source;
                 long maxDuration = (long) periodicAnnotationSource.getPeriod();
                 if (maxDuration > minDuration) {
                     AnnotationModel model = periodicAnnotationSource.fetchAnnotations(fetchParams, monitor).getModel();
@@ -322,8 +326,8 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
     public double getMaxDuration() {
         double duration = 0;
         for (IOutputAnnotationProvider es : fMarkerEventSources) {
-            if (es instanceof PeriodicAnnotationSource) {
-                duration = Math.max(duration, ((PeriodicAnnotationSource) es).getPeriod());
+            if (es instanceof PeriodicAnnotationProvider) {
+                duration = Math.max(duration, ((PeriodicAnnotationProvider) es).getPeriod());
             }
         }
         return duration;

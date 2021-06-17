@@ -44,7 +44,6 @@ Export-Package: org.eclipse.tracecompass.internal.provisional.tmf.core.model,
    org.eclipse.tracecompass.analysis.counters.core,
    org.eclipse.tracecompass.analysis.profiling.core,
    org.eclipse.tracecompass.tmf.core.tests",
- org.eclipse.tracecompass.internal.tmf.core.model.annontations;x-internal:=true,
  org.eclipse.tracecompass.internal.tmf.core.model.filters;
   x-friends:="org.eclipse.tracecompass.analysis.counters.ui,
    org.eclipse.tracecompass.analysis.graph.core,

@@ -1,5 +1,5 @@
 /**********************************************************************
- * Copyright (c) 2020 Ericsson
+ * Copyright (c) 2020, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -63,7 +63,7 @@ import com.google.common.collect.Iterables;
  * @param <M>
  *            the model type to pass
  */
-public class AnnotationEventHandler<@NonNull M extends TimeGraphEntryModel> implements IOutputAnnotationProvider {
+public class EventAnnotationProvider<@NonNull M extends TimeGraphEntryModel> implements IOutputAnnotationProvider {
     private static final TmfModelResponse<AnnotationModel> NO_DATA = new TmfModelResponse<>(new AnnotationModel(Collections.emptyMap()), Status.COMPLETED, ""); //$NON-NLS-1$
     private final String fMetadataKey;
     private final Map<String, String> fMarkerColorCache = new HashMap<>();
@@ -95,7 +95,7 @@ public class AnnotationEventHandler<@NonNull M extends TimeGraphEntryModel> impl
      * @param treeResolver
      *            the tree resolver, to get the node to place the annotations at
      */
-    public AnnotationEventHandler(String metadataKey, Predicate<M> additional, Predicate<ITmfTrace> tracefilter, Class<? extends ITmfEventAspect<?>> aspect, ITmfTrace trace,
+    public EventAnnotationProvider(String metadataKey, Predicate<M> additional, Predicate<ITmfTrace> tracefilter, Class<? extends ITmfEventAspect<?>> aspect, ITmfTrace trace,
             BiFunction<@NonNull Map<@NonNull String, @NonNull Object>, @Nullable IProgressMonitor, TmfModelResponse<TmfTreeModel<M>>> treeResolver) {
         fAspect = aspect;
         fMetadataKey = metadataKey;
@@ -137,7 +137,7 @@ public class AnnotationEventHandler<@NonNull M extends TimeGraphEntryModel> impl
         entries2.stream().filter(predicate).filter(fAdditionalPredicate).forEach(element -> rowMap.put(keyMapper.apply(element), element));
         Map<String, Collection<Annotation>> markers = new LinkedHashMap<>();
         TmfTimeRange tr = new TmfTimeRange(TmfTimestamp.fromNanos(timeRequested.get(0)), TmfTimestamp.fromNanos(timeRequested.get(timeRequested.size() - 1)));
-        AnnotationEventHandler<@NonNull M> lock = this;
+        EventAnnotationProvider<@NonNull M> lock = this;
         synchronized (lock) {
             for (ITmfTrace source : fMarkerTraces) {
                 TmfEventRequest old = fRunningRequests.remove(source);

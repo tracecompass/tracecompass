@@ -9,7 +9,7 @@
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
 
-package org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations;
+package org.eclipse.tracecompass.internal.tmf.core.annotations;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +24,10 @@ import org.apache.commons.lang3.math.Fraction;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.Annotation;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationCategoriesModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
 import org.eclipse.tracecompass.internal.tmf.core.markers.Marker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.Marker.PeriodicMarker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker;
@@ -45,7 +49,7 @@ import com.google.common.collect.RangeSet;
  * @author Matthew Khouzam
  * @since 6.3
  */
-public class PeriodicAnnotationSource implements IOutputAnnotationProvider {
+public class PeriodicAnnotationProvider implements IOutputAnnotationProvider {
     private static final TmfModelResponse<AnnotationModel> EMPTY_MODEL_RESPONSE = new TmfModelResponse<>(new AnnotationModel(Collections.emptyMap()), Status.COMPLETED, ""); //$NON-NLS-1$
     private final String fCategory;
     private final double fPeriod;
@@ -80,7 +84,7 @@ public class PeriodicAnnotationSource implements IOutputAnnotationProvider {
      * @param color2
      *            the odd color
      */
-    public PeriodicAnnotationSource(Marker category, long index, long time, double period, long rollover, RGBAColor color1, @Nullable RGBAColor color2) {
+    public PeriodicAnnotationProvider(Marker category, long index, long time, double period, long rollover, RGBAColor color1, @Nullable RGBAColor color2) {
         fCategory = String.valueOf(category.getName());
         fMarker = category;
         fReference = new TimeReference(time, index);
@@ -117,7 +121,7 @@ public class PeriodicAnnotationSource implements IOutputAnnotationProvider {
      * @param color2
      *            the odd color
      */
-    public PeriodicAnnotationSource(String category, long index, long time, double period, long rollover, RGBAColor color1, @Nullable RGBAColor color2) {
+    public PeriodicAnnotationProvider(String category, long index, long time, double period, long rollover, RGBAColor color1, @Nullable RGBAColor color2) {
         this(new Marker(category, "black") {}, index, time, period, rollover, color1, color2); //$NON-NLS-1$
     }
 

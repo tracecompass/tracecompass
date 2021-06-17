@@ -31,7 +31,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.Annotation;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.PeriodicAnnotationSource;
+import org.eclipse.tracecompass.internal.tmf.core.annotations.PeriodicAnnotationProvider;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.markers.ITimeReference;
@@ -109,7 +109,7 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
 
     private final String fCategory;
     private final boolean fForeground;
-    private final PeriodicAnnotationSource fSource;
+    private final PeriodicAnnotationProvider fSource;
 
     /**
      * Constructs a periodic marker event source with line markers at period
@@ -177,7 +177,7 @@ public class PeriodicMarkerEventSource implements IMarkerEventSource {
         if (rollover < 0) {
             throw new IllegalArgumentException("rollover cannot be less than zero"); //$NON-NLS-1$
         }
-        fSource = new PeriodicAnnotationSource(category, reference.getIndex(), reference.getTime(), period, rollover, Objects.requireNonNull(wrap(color1)), wrap(color2));
+        fSource = new PeriodicAnnotationProvider(category, reference.getIndex(), reference.getTime(), period, rollover, Objects.requireNonNull(wrap(color1)), wrap(color2));
         fCategory = category;
         fForeground = foreground;
     }
