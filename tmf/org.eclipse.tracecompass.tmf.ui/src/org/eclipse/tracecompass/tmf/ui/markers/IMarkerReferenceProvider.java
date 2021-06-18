@@ -14,7 +14,6 @@
 
 package org.eclipse.tracecompass.tmf.ui.markers;
 
-import org.eclipse.tracecompass.tmf.core.markers.ITimeReference;
 import org.eclipse.tracecompass.tmf.ui.markers.PeriodicMarkerEventSource.Reference;
 
 /**
@@ -22,10 +21,8 @@ import org.eclipse.tracecompass.tmf.ui.markers.PeriodicMarkerEventSource.Referen
  * reference for periodic markers.
  *
  * @since 3.0
- * @deprecated, use {@link org.eclipse.tracecompass.tmf.core.markers.ITimeReferenceProvider} instead
  */
-@Deprecated
-public interface IMarkerReferenceProvider extends org.eclipse.tracecompass.tmf.core.markers.ITimeReferenceProvider {
+public interface IMarkerReferenceProvider {
 
     /**
      * Get the reference for the specified reference id
@@ -35,12 +32,4 @@ public interface IMarkerReferenceProvider extends org.eclipse.tracecompass.tmf.c
      * @return a reference
      */
     Reference getReference(String referenceId);
-
-    /**
-     * @since 7.1
-     */
-    @Override
-    default ITimeReference apply(String referenceId) {
-        return getReference(referenceId);
-    }
 }

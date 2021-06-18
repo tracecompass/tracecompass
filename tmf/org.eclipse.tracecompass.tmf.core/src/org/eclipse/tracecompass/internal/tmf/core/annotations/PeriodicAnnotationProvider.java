@@ -11,6 +11,8 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.annotations;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.math.Fraction;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,9 +29,6 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationCategoriesModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
-import org.eclipse.tracecompass.internal.tmf.core.markers.Marker;
-import org.eclipse.tracecompass.internal.tmf.core.markers.Marker.PeriodicMarker;
-import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.markers.ITimeReference;
 import org.eclipse.tracecompass.tmf.core.markers.TimeReference;
@@ -41,10 +39,9 @@ import org.eclipse.tracecompass.tmf.core.response.ITmfResponse.Status;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.RangeSet;
 
 /**
- * Data provider for Periodic Markers (frames)
+ * Annotation provider for periodic markers (frames)
  *
  * @author Matthew Khouzam
  * @since 6.3
@@ -59,21 +56,15 @@ public class PeriodicAnnotationProvider implements IOutputAnnotationProvider {
     private final RGBAColor fColor1;
     private final @Nullable RGBAColor fColor2;
     private ITimeReference fReference;
-    /**
-     * TODO: remove later
-     */
-    private final Marker fMarker;
 
     /**
      * Creates a data provider for periodic markers. They alternate in color and
      * can have sub markers.
      *
      * @param category
-     *            the category marker, to reference submarkers and such
-     * @param index
-     *            the index (number) of the reference frame
-     * @param time
-     *            the time of the reference frame frame - the time of the frame refered by index.
+     *            the category name
+     * @param reference
+     *            the reference frame time and index
      * @param period
      *            the period of the markers, in ns
      * @param rollover
@@ -84,10 +75,15 @@ public class PeriodicAnnotationProvider implements IOutputAnnotationProvider {
      * @param color2
      *            the odd color
      */
-    public PeriodicAnnotationProvider(Marker category, long index, long time, double period, long rollover, RGBAColor color1, @Nullable RGBAColor color2) {
-        fCategory = String.valueOf(category.getName());
-        fMarker = category;
-        fReference = new TimeReference(time, index);
+    public PeriodicAnnotationProvider(String category, ITimeReference reference, double period, long rollover, RGBAColor color1, @Nullable RGBAColor color2) {
+        if (period <= 0) {
+            throw new IllegalArgumentException("period cannot be less than or equal to zero"); //$NON-NLS-1$
+        }
+        if (rollover < 0) {
+            throw new IllegalArgumentException("rollover cannot be less than zero"); //$NON-NLS-1$
+        }
+        fCategory = category;
+        fReference = reference;
         fColor1 = color1;
         fColor2 = color2;
         fPeriod = period;
@@ -99,30 +95,6 @@ public class PeriodicAnnotationProvider implements IOutputAnnotationProvider {
             fPeriodFraction = null;
         }
         fRollover = rollover;
-    }
-
-    /**
-     * Creates a data provider for periodic markers. They alternate in color and
-     * can have sub markers.
-     *
-     * @param category
-     *            the category Name
-     * @param index
-     *            the index (number) of the starting frame
-     * @param time
-     *            the time of the starting frame
-     * @param period
-     *            the period of the markers, in ns
-     * @param rollover
-     *            the rollover for the index. If it is 100, the indexes will
-     *            increment 98->99->0-> ...
-     * @param color1
-     *            the even color
-     * @param color2
-     *            the odd color
-     */
-    public PeriodicAnnotationProvider(String category, long index, long time, double period, long rollover, RGBAColor color1, @Nullable RGBAColor color2) {
-        this(new Marker(category, "black") {}, index, time, period, rollover, color1, color2); //$NON-NLS-1$
     }
 
     /*
@@ -153,23 +125,8 @@ public class PeriodicAnnotationProvider implements IOutputAnnotationProvider {
 
     @Override
     public @NonNull TmfModelResponse<@NonNull AnnotationCategoriesModel> fetchAnnotationCategories(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
-        List<@NonNull String> categories = new ArrayList<>();
-        categories.add(fCategory);
-        getCategories(categories, getMarker());
-        /*
-         * We can have different sub-markers of the same category, we need them
-         * to be distinct
-         */
-        categories = categories.stream().distinct().collect(Collectors.toList());
         return new TmfModelResponse<>(
-                new AnnotationCategoriesModel(categories), Status.COMPLETED, ""); //$NON-NLS-1$
-    }
-
-    private void getCategories(List<@NonNull String> categories, Marker marker) {
-        for (SubMarker sm : marker.getSubMarkers()) {
-            categories.add(String.valueOf(sm.getName()));
-            getCategories(categories, sm);
-        }
+                new AnnotationCategoriesModel(Collections.singletonList(fCategory)), Status.COMPLETED, ""); //$NON-NLS-1$
     }
 
     @Override
@@ -214,7 +171,7 @@ public class PeriodicAnnotationProvider implements IOutputAnnotationProvider {
             }
             if (isApplicable(labelIndex)) {
                 OutputElementStyle style = Objects.requireNonNull((index % 2) == 0 ? styles[0] : styles[1]);
-                annotation = new Annotation(markerTime, duration, -1, String.valueOf(labelIndex), style);
+                annotation = new Annotation(markerTime, duration, -1, getAnnotationLabel(labelIndex), style);
             } else {
                 annotation = null;
             }
@@ -251,25 +208,16 @@ public class PeriodicAnnotationProvider implements IOutputAnnotationProvider {
     }
 
     /**
-     * Get the marker model
+     * Get the annotation label for the given marker index.
+     * <p>
+     * This method can be overridden by clients.
      *
-     * @return the marker that this annotation provider is modeled on
+     * @param index
+     *            the marker index
+     * @return the annotation label
      */
-    public Marker getMarker() {
-        return fMarker;
-    }
-
-    /**
-     * Get the base index (starting index) for a marker
-     *
-     * @return the base index
-     */
-    public long getBaseIndex() {
-        Marker marker = getMarker();
-        if (marker instanceof PeriodicMarker) {
-            return ((PeriodicMarker) marker).getOffset();
-        }
-        return 0;
+    public String getAnnotationLabel(long index) {
+        return checkNotNull(Long.toString(index));
     }
 
     /**
@@ -280,14 +228,6 @@ public class PeriodicAnnotationProvider implements IOutputAnnotationProvider {
      * @return true if it applies
      */
     public boolean isApplicable(long index) {
-        Marker marker = getMarker();
-        if (marker instanceof PeriodicMarker) {
-            PeriodicMarker periodicMarker = (PeriodicMarker) marker;
-            RangeSet<@Nullable Long> indexRange = periodicMarker.getIndexRange();
-            if (indexRange != null) {
-                return indexRange.contains(periodicMarker.getOffset() + index);
-            }
-        }
         return true;
     }
 }

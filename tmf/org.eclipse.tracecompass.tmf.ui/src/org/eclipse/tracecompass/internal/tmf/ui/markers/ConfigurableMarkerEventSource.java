@@ -17,64 +17,59 @@ package org.eclipse.tracecompass.internal.tmf.ui.markers;
 import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.IllegalFormatException;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.RGBA;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.Annotation;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationCategoriesModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
-import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
-import org.eclipse.tracecompass.internal.tmf.core.annotations.CustomAnnotationProvider;
-import org.eclipse.tracecompass.internal.tmf.core.annotations.PeriodicAnnotationProvider;
+import org.eclipse.tracecompass.internal.tmf.core.markers.IMarkerConstants;
+import org.eclipse.tracecompass.internal.tmf.core.markers.Marker;
+import org.eclipse.tracecompass.internal.tmf.core.markers.Marker.PeriodicMarker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSegment;
 import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker;
+import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker.SplitMarker;
 import org.eclipse.tracecompass.internal.tmf.core.markers.SubMarker.WeightedMarker;
-import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
-import org.eclipse.tracecompass.internal.tmf.ui.Activator;
-import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
-import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
-import org.eclipse.tracecompass.tmf.core.model.StyleProperties;
-import org.eclipse.tracecompass.tmf.core.model.filters.TimeQueryFilter;
-import org.eclipse.tracecompass.tmf.core.presentation.RGBAColor;
-import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.signal.TmfMarkerEventSourceUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
 import org.eclipse.tracecompass.tmf.core.trace.AbstractTmfTraceAdapterFactory.IDisposableAdapter;
+import org.eclipse.tracecompass.tmf.core.trace.ICyclesConverter;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
-import org.eclipse.tracecompass.tmf.ui.colors.RGBAUtil;
-import org.eclipse.tracecompass.tmf.ui.model.StyleManager;
+import org.eclipse.tracecompass.tmf.ui.colors.ColorUtils;
+import org.eclipse.tracecompass.tmf.ui.markers.IMarkerReferenceProvider;
+import org.eclipse.tracecompass.tmf.ui.markers.PeriodicMarkerEventSource;
+import org.eclipse.tracecompass.tmf.ui.markers.PeriodicMarkerEventSource.Reference;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEvent;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.IMarkerEventSource;
 import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.MarkerEvent;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.RangeSet;
 
 /**
  * Configurable marker event source.
  */
 public class ConfigurableMarkerEventSource implements IMarkerEventSource, IDisposableAdapter {
 
+    private static final long NANO_PER_MILLI = 1000000L;
+    private static final long NANO_PER_MICRO = 1000L;
     private static final int MIN_PERIOD = 5; // in units of resolution intervals
-    private static final Pattern INDEX_EXTRACTOR = Pattern.compile("(%d+).*"); //$NON-NLS-1$
+    private static final int ALPHA = 10;
+    private static final String COLOR_REGEX = "#[A-Fa-f0-9]{6}"; //$NON-NLS-1$
 
-    private final ITmfTrace fTrace;
     private List<IConfigurableMarkerEventSource> fMarkerEventSources;
-    private CustomAnnotationProvider fProvider;
+    private Map<Marker, RGBA> fColors = new HashMap<>();
+    private final ITmfTrace fTrace;
 
     /**
      * Constructor
@@ -83,8 +78,8 @@ public class ConfigurableMarkerEventSource implements IMarkerEventSource, IDispo
      *            the trace
      */
     public ConfigurableMarkerEventSource(ITmfTrace trace) {
+        fMarkerEventSources = new ArrayList<>();
         fTrace = trace;
-        updateMarkerSet();
         TmfSignalManager.register(this);
     }
 
@@ -98,115 +93,81 @@ public class ConfigurableMarkerEventSource implements IMarkerEventSource, IDispo
      *
      * @param markerSet
      *            the marker set, or null to clear the configuration
-     * @return The list of marker sources
      */
-    public List<IConfigurableMarkerEventSource> configure(MarkerSet markerSet) {
-        fProvider.configure(markerSet);
-        List<@NonNull IConfigurableMarkerEventSource> singletonList = Objects.requireNonNull(Collections.singletonList(new ConfigurableMarkerSource(fProvider)));
-        fMarkerEventSources = singletonList;
-        return singletonList;
+    public void configure(MarkerSet markerSet) {
+        fMarkerEventSources.clear();
+        if (markerSet != null) {
+            for (Marker marker : markerSet.getMarkers()) {
+                configure(marker);
+            }
+        }
     }
 
-    private class ConfigurableMarkerSource implements IConfigurableMarkerEventSource {
-
-        private final IOutputAnnotationProvider fAnnotationProvider;
-        private boolean fHasError = false;
-
-        public ConfigurableMarkerSource(IOutputAnnotationProvider provider) {
-            fAnnotationProvider = provider;
-        }
-
-        @Override
-        public @NonNull List<@NonNull String> getMarkerCategories() {
-            TimeQueryFilter timeQueryFilter = new TimeQueryFilter(0, Long.MAX_VALUE, 2);
-            List<@NonNull String> categories = new ArrayList<>();
-            Map<@NonNull String, @NonNull Object> fetchParameters = FetchParametersUtils.timeQueryToMap(timeQueryFilter);
-            TmfModelResponse<@NonNull AnnotationCategoriesModel> response = fAnnotationProvider.fetchAnnotationCategories(fetchParameters, new NullProgressMonitor());
-            AnnotationCategoriesModel model = response.getModel();
-            if (model != null) {
-                categories.addAll(model.getAnnotationCategories());
-            }
-            return categories;
-        }
-
-        @SuppressWarnings({"restriction"})
-        @Override
-        public @NonNull List<@NonNull IMarkerEvent> getMarkerList(@NonNull String category, long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor) {
-            if (startTime >= endTime) {
-                return Collections.emptyList();
-            }
-            TimeQueryFilter filter = new TimeQueryFilter(StateSystemUtils.getTimes(startTime, endTime, resolution));
-            TmfModelResponse<@NonNull AnnotationModel> response = fAnnotationProvider.fetchAnnotations(FetchParametersUtils.timeQueryToMap(filter), monitor);
-            AnnotationModel model = response.getModel();
-            if (model == null) {
-                return Collections.emptyList();
-            }
-            Map<@NonNull String, @NonNull Collection<@NonNull Annotation>> annotationsMap = model.getAnnotations();
-            List<@NonNull IMarkerEvent> markers = new ArrayList<>();
-            Collection<Annotation> collection = annotationsMap.get(category);
-            if (collection != null) {
-                StyleManager sm = StyleManager.empty();
-                for (Annotation annotation : collection) {
-                    OutputElementStyle style = annotation.getStyle();
-                    if (style != null) {
-                        String indexStr = annotation.getLabel();
-                        Matcher matcher = INDEX_EXTRACTOR.matcher(indexStr);
-                        long index = annotation.getStartTime();
-                        if (matcher.matches()) {
-                            index = Long.parseLong(matcher.group(1));
-                        }
-                        boolean isApplicable = true;
-                        String label = indexStr;
-                        if (fAnnotationProvider instanceof PeriodicAnnotationProvider) {
-                            PeriodicAnnotationProvider source = (PeriodicAnnotationProvider) fAnnotationProvider;
-                            isApplicable = source.isApplicable(index);
-                            if (!fHasError) {
-                                try {
-                                    label = String.format(indexStr, source.getBaseIndex() + index);
-                                } catch (IllegalFormatException e) {
-                                    Activator.getDefault().logError("Cannot format label for periodic marker ", e); //$NON-NLS-1$
-                                    fHasError = true;
-                                }
-                            }
-                        }
-                        if (fAnnotationProvider instanceof CustomAnnotationProvider) {
-                            CustomAnnotationProvider customAnnotationProvider = (CustomAnnotationProvider) fAnnotationProvider;
-                            Map<String, String> formatters = customAnnotationProvider.getLabel();
-                            String format = formatters.get(category);
-                            if (!fHasError && format != null) {
-                                try {
-                                    long val = Long.decode(indexStr);
-                                    label = String.format(format, val);
-                                } catch (NumberFormatException | IllegalFormatException e) {
-                                    Activator.getDefault().logError("Cannot format label for custom marker ", e); //$NON-NLS-1$
-                                    fHasError = true;
-                                }
-                            }
-                        }
-                        if (isApplicable) {
-                            annotation = new Annotation(annotation.getTime(), annotation.getDuration(), annotation.getEntryId(), label, style);
-                            RGBAColor rgbaColor = sm.getColorStyle(style, StyleProperties.COLOR);
-                            if (rgbaColor != null) {
-                                RGBA color = RGBAUtil.fromRGBAColor(rgbaColor);
-                                // set to false for now
-                                MarkerEvent marker = new MarkerEvent(null, annotation.getTime(), annotation.getDuration(), category, color, label, false);
-                                markers.add(marker);
-                            }
-                        }
-                    }
+    private void configure(Marker marker) {
+        if (marker instanceof PeriodicMarker) {
+            PeriodicMarker periodicMarker = (PeriodicMarker) marker;
+            String referenceId = periodicMarker.getReferenceId();
+            Reference baseReference = null;
+            if (fTrace instanceof IAdaptable && !referenceId.isEmpty()) {
+                @Nullable IMarkerReferenceProvider adapter = ((IAdaptable) fTrace).getAdapter(IMarkerReferenceProvider.class);
+                if (adapter != null) {
+                    baseReference = adapter.getReference(referenceId);
                 }
             }
-
-            return markers;
-        }
-
-        @Override
-        public List<SubMarker> getSubMarkers() {
-            if (fAnnotationProvider instanceof PeriodicAnnotationProvider) {
-                return ((PeriodicAnnotationProvider) fAnnotationProvider).getMarker().getSubMarkers();
+            if (baseReference == null) {
+                baseReference = Reference.ZERO;
             }
-            return Collections.emptyList();
+            long rollover = periodicMarker.getRange().hasUpperBound() ? (periodicMarker.getRange().upperEndpoint() - periodicMarker.getRange().lowerEndpoint() + 1) : 0;
+            RGBA evenColor = getColor(periodicMarker);
+            RGBA oddColor = getOddColor(evenColor);
+            double period = convertToNanos(periodicMarker.getPeriod(), periodicMarker.getUnit());
+            Reference reference = new Reference(baseReference.getTime() + Math.round(convertToNanos(periodicMarker.getOffset(), periodicMarker.getUnit())), baseReference.getIndex());
+            ConfigurablePeriodicMarkerEventSource markerEventSource = new ConfigurablePeriodicMarkerEventSource(marker, checkNotNull(periodicMarker.getName()), reference, period, rollover, evenColor, oddColor, false, periodicMarker.getRange().lowerEndpoint(), checkNotNull(periodicMarker.getLabel()), periodicMarker.getIndexRange());
+            fMarkerEventSources.add(markerEventSource);
         }
+    }
+
+    private double convertToNanos(double number, String unit) {
+        if (unit.equalsIgnoreCase(IMarkerConstants.MS)) {
+            return number * NANO_PER_MILLI;
+        } else if (unit.equalsIgnoreCase(IMarkerConstants.US)) {
+            return number * NANO_PER_MICRO;
+        } else if (unit.equalsIgnoreCase(IMarkerConstants.NS)) {
+            return number;
+        } else if (unit.equalsIgnoreCase(IMarkerConstants.CYCLES) &&
+                fTrace instanceof IAdaptable) {
+            ICyclesConverter adapter = ((IAdaptable) fTrace).getAdapter(ICyclesConverter.class);
+            if (adapter != null) {
+                return adapter.cyclesToNanos((long) number);
+            }
+        }
+        return number;
+    }
+
+    private @NonNull RGBA getColor(Marker marker) {
+        RGBA color = fColors.get(marker);
+        if (color == null) {
+            color = parseColor(marker.getColor());
+            fColors.put(marker, color);
+        }
+        return color;
+    }
+
+    private static @NonNull RGBA getOddColor(RGBA color) {
+        return new RGBA(color.rgb.red, color.rgb.green, color.rgb.blue, 0);
+    }
+
+    private static @NonNull RGBA parseColor(String color) {
+        RGB rgb = null;
+        if (color.matches(COLOR_REGEX)) {
+            rgb = ColorUtils.fromHexColor(color);
+        } else {
+            rgb = ColorUtils.fromX11Color(color);
+            if (rgb == null) {
+                rgb = new RGB(0, 0, 0);
+            }
+        }
+        return new RGBA(rgb.red, rgb.green, rgb.blue, ALPHA);
     }
 
     @Override
@@ -233,38 +194,139 @@ public class ConfigurableMarkerEventSource implements IMarkerEventSource, IDispo
 
     @Override
     public List<IMarkerEvent> getMarkerList(String category, long startTime, long endTime, long resolution, IProgressMonitor monitor) {
-        List<@NonNull IMarkerEvent> markerList = new ArrayList<>();
-        for (IConfigurableMarkerEventSource source : fMarkerEventSources) {
-            long minDuration = resolution * MIN_PERIOD;
-            List<@NonNull IMarkerEvent> list = source.getMarkerList(category, startTime, endTime, resolution, monitor);
-            for (IMarkerEvent markerEvent : list) {
-                if (markerEvent.getDuration() > minDuration) {
-                    markerList.add(markerEvent);
-                }
-            }
-        }
-        markerList.sort(Comparator.comparingLong(IMarkerEvent::getTime));
-        return markerList;
+        return getMarkerList(startTime, endTime, resolution, monitor).stream()
+                .filter((marker) -> marker.getCategory().equals(category))
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<IMarkerEvent> getMarkerList(long startTime, long endTime, long resolution, IProgressMonitor monitor) {
-        List<@NonNull IMarkerEvent> markerList = new ArrayList<>();
+        @NonNull List<@NonNull IMarkerEvent> markerList = new ArrayList<>();
         for (IConfigurableMarkerEventSource source : fMarkerEventSources) {
             long minDuration = resolution * MIN_PERIOD;
-            List<@NonNull IMarkerEvent> list = source.getMarkerList(startTime, endTime, resolution, monitor);
-            for (IMarkerEvent markerEvent : list) {
-                if (markerEvent.getDuration() > minDuration) {
+            if (source.getMaxDuration() > minDuration) {
+                @NonNull List<@NonNull IMarkerEvent> list = source.getMarkerList(startTime, endTime, resolution, monitor);
+                for (IMarkerEvent markerEvent : list) {
+                    for (SubMarker subMarker : source.getSubMarkers()) {
+                        getSubMarkerList(subMarker, markerEvent, markerList, startTime, endTime, minDuration);
+                    }
                     markerList.add(markerEvent);
                 }
             }
         }
-        markerList.sort(Comparator.comparingLong(IMarkerEvent::getTime));
+        markerList.sort(Comparator.comparingLong(marker -> marker.getTime()));
         return markerList;
     }
 
+    private void getSubMarkerList(SubMarker subMarker, IMarkerEvent markerEvent, @NonNull List<@NonNull IMarkerEvent> markerList, long startTime, long endTime, long minDuration) {
+        if (subMarker instanceof SplitMarker) {
+            getSubMarkerList((SplitMarker) subMarker, markerEvent, markerList, startTime, endTime, minDuration);
+        } else if (subMarker instanceof WeightedMarker) {
+            getSubMarkerList((WeightedMarker) subMarker, markerEvent, markerList, startTime, endTime, minDuration);
+        }
+    }
+
+    private void getSubMarkerList(SplitMarker splitMarker, IMarkerEvent markerEvent, @NonNull List<@NonNull IMarkerEvent> markerList, long startTime, long endTime, long minDuration) {
+        if (markerEvent.getTime() > endTime || markerEvent.getTime() + markerEvent.getDuration() < startTime) {
+            return;
+        }
+        long lower = splitMarker.getRange().lowerEndpoint();
+        long upper = splitMarker.getRange().upperEndpoint();
+        long segments = upper - lower + 1;
+        long start = markerEvent.getTime();
+        for (int i = 0; i < segments; i++) {
+            long end = markerEvent.getTime() + Math.round((double) (i + 1) / segments * markerEvent.getDuration());
+            long duration = end - start;
+            long labelIndex = lower + i;
+            if (end >= startTime && duration > minDuration && splitMarker.getIndexRange().contains(labelIndex)) {
+                RGBA color = (labelIndex & 1) == 0 ? getColor(splitMarker) : getOddColor(getColor(splitMarker));
+                IMarkerEvent subMarkerEvent = new MarkerEvent(null, start, end - start, splitMarker.getName(), color, String.format(splitMarker.getLabel(), labelIndex), false);
+                for (SubMarker subMarker : splitMarker.getSubMarkers()) {
+                    getSubMarkerList(subMarker, subMarkerEvent, markerList, startTime, endTime, minDuration);
+                }
+                markerList.add(subMarkerEvent);
+            }
+            if (start >= endTime) {
+                break;
+            }
+            start = end;
+        }
+    }
+
+    private void getSubMarkerList(WeightedMarker weightedMarker, IMarkerEvent markerEvent, @NonNull List<@NonNull IMarkerEvent> markerList, long startTime, long endTime, long minDuration) {
+        if (markerEvent.getTime() > endTime || markerEvent.getTime() + markerEvent.getDuration() < startTime) {
+            return;
+        }
+        long start = markerEvent.getTime();
+        long length = 0;
+        for (int i = 0; i < weightedMarker.getSegments().size(); i++) {
+            MarkerSegment segment = weightedMarker.getSegments().get(i);
+            length += segment.getLength();
+            long end = markerEvent.getTime() + Math.round((length / (double) weightedMarker.getTotalLength()) * markerEvent.getDuration());
+            long duration = end - start;
+            if (end >= startTime && duration > minDuration && !segment.getColor().isEmpty()) {
+                RGBA color = getColor(segment);
+                IMarkerEvent subMarkerEvent = new MarkerEvent(null, start, end - start, weightedMarker.getName(), color, String.format(segment.getLabel(), i), false);
+                for (SubMarker subMarker : segment.getSubMarkers()) {
+                    getSubMarkerList(subMarker, subMarkerEvent, markerList, startTime, endTime, minDuration);
+                }
+                for (SubMarker subMarker : weightedMarker.getSubMarkers()) {
+                    getSubMarkerList(subMarker, subMarkerEvent, markerList, startTime, endTime, minDuration);
+                }
+                markerList.add(subMarkerEvent);
+            }
+            if (start >= endTime) {
+                break;
+            }
+            start = end;
+        }
+    }
+
     private static interface IConfigurableMarkerEventSource extends IMarkerEventSource {
+        double getMaxDuration();
+
         public List<SubMarker> getSubMarkers();
+    }
+
+    private class ConfigurablePeriodicMarkerEventSource extends PeriodicMarkerEventSource implements IConfigurableMarkerEventSource {
+
+        private final Marker fMarker;
+        private final long fStartIndex;
+        private final String fLabel;
+        private final RangeSet<Long> fIndexRange;
+        private final double fMaxDuration;
+
+        public ConfigurablePeriodicMarkerEventSource(Marker marker, @NonNull String category, @NonNull Reference reference, double period, long rollover, @NonNull RGBA evenColor, @NonNull RGBA oddColor, boolean foreground, long startIndex, @NonNull String label, RangeSet<Long> indexRange) {
+            super(category, reference, period, rollover, evenColor, oddColor, foreground);
+            fMarker = marker;
+            fStartIndex = startIndex;
+            fLabel = label;
+            fIndexRange = indexRange;
+            fMaxDuration = period;
+        }
+
+        @Override
+        public @NonNull String getMarkerLabel(long index) {
+            return checkNotNull(String.format(fLabel, fStartIndex + index));
+        }
+
+        @Override
+        public boolean isApplicable(long index) {
+            if (fIndexRange != null) {
+                return fIndexRange.contains(fStartIndex + index);
+            }
+            return true;
+        }
+
+        @Override
+        public double getMaxDuration() {
+            return fMaxDuration;
+        }
+
+        @Override
+        public List<SubMarker> getSubMarkers() {
+            return fMarker.getSubMarkers();
+        }
     }
 
     /**
@@ -275,12 +337,6 @@ public class ConfigurableMarkerEventSource implements IMarkerEventSource, IDispo
      */
     @TmfSignalHandler
     public void markerEventSourceUpdated(final TmfMarkerEventSourceUpdatedSignal signal) {
-        updateMarkerSet();
-    }
-
-    private final void updateMarkerSet() {
-        MarkerSet defaultMarkerSet = MarkerUtils.getDefaultMarkerSet();
-        fProvider = new CustomAnnotationProvider(Objects.requireNonNull(fTrace), defaultMarkerSet);
-        fMarkerEventSources = configure(defaultMarkerSet);
+        configure(MarkerUtils.getDefaultMarkerSet());
     }
 }

@@ -11,12 +11,14 @@
 
 package org.eclipse.tracecompass.internal.tmf.core.annotations;
 
+import static org.eclipse.tracecompass.common.core.NonNullUtils.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -51,6 +53,8 @@ import org.eclipse.tracecompass.tmf.core.response.ITmfResponse.Status;
 import org.eclipse.tracecompass.tmf.core.response.TmfModelResponse;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
+import com.google.common.collect.RangeSet;
+
 /**
  * Custom Annotation Provider
  *
@@ -64,7 +68,7 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
     private static final int ALPHA = 10;
     private static final String COLOR_REGEX = "#[A-Fa-f0-9]{6}"; //$NON-NLS-1$
 
-    private List<IOutputAnnotationProvider> fMarkerEventSources = new ArrayList<>();
+    private List<CustomPeriodicAnnotationProvider> fAnnotationProviders = new ArrayList<>();
     private Map<Marker, RGBAColor> fColors = new HashMap<>();
     private final @Nullable ITmfTrace fTrace;
     private @Nullable MarkerSet fMarkerSet;
@@ -82,7 +86,7 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
     public CustomAnnotationProvider(@Nullable ITmfTrace trace, @Nullable MarkerSet markerSet) {
         fTrace = trace;
         fMarkerSet = markerSet;
-        fMarkerEventSources = configure(markerSet);
+        fAnnotationProviders = configure(markerSet);
     }
 
     /**
@@ -93,19 +97,19 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
      * @return the list of {@link IOutputAnnotationProvider}s for this marker
      *         set
      */
-    public List<IOutputAnnotationProvider> configure(@Nullable MarkerSet markerSet) {
-        List<IOutputAnnotationProvider> markerEventSources = new ArrayList<>();
+    public List<CustomPeriodicAnnotationProvider> configure(@Nullable MarkerSet markerSet) {
+        List<CustomPeriodicAnnotationProvider> annotationProviders = new ArrayList<>();
         if (markerSet != null) {
             for (Marker marker : markerSet.getMarkers()) {
-                markerEventSources.add(configure(Objects.requireNonNull(marker)));
+                annotationProviders.add(configure(Objects.requireNonNull(marker)));
             }
         }
-        fMarkerEventSources = markerEventSources;
+        fAnnotationProviders = annotationProviders;
         fMarkerSet = markerSet;
-        return markerEventSources;
+        return annotationProviders;
     }
 
-    private IOutputAnnotationProvider configure(Marker marker) {
+    private CustomPeriodicAnnotationProvider configure(Marker marker) {
         if (marker instanceof PeriodicMarker) {
             PeriodicMarker periodicMarker = (PeriodicMarker) marker;
             long rollover = periodicMarker.getRange().hasUpperBound() ? (periodicMarker.getRange().upperEndpoint() - periodicMarker.getRange().lowerEndpoint() + 1) : 0;
@@ -125,7 +129,7 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
                 baseReference = ITimeReference.ZERO;
             }
             ITimeReference reference = new TimeReference(baseReference.getTime() + Math.round(IMarkerConstants.convertToNanos(periodicMarker.getOffset(), periodicMarker.getUnit(), trace)), baseReference.getIndex());
-            return new PeriodicAnnotationProvider(marker, reference.getIndex(), reference.getTime(), period, rollover, evenColor, oddColor);
+            return new CustomPeriodicAnnotationProvider(periodicMarker, reference, period, rollover, evenColor, oddColor);
         }
         throw new IllegalArgumentException("Marker must be of type PeriodicMarker or SubMarker"); //$NON-NLS-1$
 
@@ -154,7 +158,7 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
             long labelIndex = lower + i;
             if (end >= startTime && duration > minDuration && splitMarker.getIndexRange().contains(labelIndex)) {
                 RGBAColor color = (labelIndex & 1) == 0 ? getColor(splitMarker) : getOddColor(getColor(splitMarker));
-                OutputElementStyle outputStyle = getOutputStyle(splitMarker, color);
+                OutputElementStyle outputStyle = getOutputStyle(color);
                 Annotation subAnnotation = new Annotation(start, end - start, -1, String.format(splitMarker.getLabel(), labelIndex), outputStyle);
                 for (SubMarker subMarker : splitMarker.getSubMarkers()) {
                     getSubMarkerList(Objects.requireNonNull(subMarker), subAnnotation, annotationMap, startTime, endTime, minDuration, times);
@@ -183,7 +187,7 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
             long duration = end - start;
             if (end >= startTime && duration > minDuration && !segment.getColor().isEmpty()) {
                 RGBAColor color = getColor(segment);
-                Annotation subAnnotation = new Annotation(start, end - start, -1, String.format(segment.getLabel(), i), getOutputStyle(segment, color));
+                Annotation subAnnotation = new Annotation(start, end - start, -1, String.format(segment.getLabel(), i), getOutputStyle(color));
                 for (SubMarker subMarker : segment.getSubMarkers()) {
                     getSubMarkerList(Objects.requireNonNull(subMarker), subAnnotation, annotationMap, startTime, endTime, minDuration, times);
                 }
@@ -203,10 +207,7 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
     private static void populateMap(Map<String, Collection<@NonNull Annotation>> annotationMap, List<@NonNull Annotation> annotationsList, String name) {
         Collection<@NonNull Annotation> annotations = annotationMap.get(name);
         if (annotations != null) {
-            Set<@NonNull Annotation> annotationSet = new HashSet<>();
-            annotationSet.addAll(annotationsList);
-            annotationSet.addAll(annotations);
-            annotationMap.put(name, annotationSet);
+            annotations.addAll(annotationsList);
         } else {
             annotationMap.put(name, annotationsList);
         }
@@ -254,27 +255,24 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
         long endtime = timeRequested.get(timeRequested.size() - 1);
         int resolution = (int) Math.min(Integer.MAX_VALUE, timeRequested.get(1) - timeRequested.get(0));
         Map<@NonNull String, @NonNull Collection<@NonNull Annotation>> markerMap = new LinkedHashMap<>();
-        for (IOutputAnnotationProvider source : fMarkerEventSources) {
+        for (CustomPeriodicAnnotationProvider periodicAnnotationProvider : fAnnotationProviders) {
             long minDuration = resolution * MIN_PERIOD;
-            if (source instanceof PeriodicAnnotationProvider) {
-                PeriodicAnnotationProvider periodicAnnotationSource = (PeriodicAnnotationProvider) source;
-                long maxDuration = (long) periodicAnnotationSource.getPeriod();
-                if (maxDuration > minDuration) {
-                    AnnotationModel model = periodicAnnotationSource.fetchAnnotations(fetchParams, monitor).getModel();
-                    if (model != null) {
-                        Map<@NonNull String, @NonNull Collection<@NonNull Annotation>> annotations = model.getAnnotations();
-                        List<Annotation> markerList = new ArrayList<>();
-                        for (Entry<@NonNull String, @NonNull Collection<@NonNull Annotation>> entryAnnotation : annotations.entrySet()) {
-                            String category = Objects.requireNonNull(entryAnnotation.getKey());
-                            for (Annotation annotation : Objects.requireNonNull(entryAnnotation.getValue())) {
-                                markerList.add(annotation);
-                                for (SubMarker subMarker : periodicAnnotationSource.getMarker().getSubMarkers()) {
-                                    getSubMarkerList(Objects.requireNonNull(subMarker), annotation, markerMap, starttime, endtime, minDuration, times);
+            long maxDuration = (long) periodicAnnotationProvider.getPeriod();
+            if (maxDuration > minDuration) {
+                AnnotationModel model = periodicAnnotationProvider.fetchAnnotations(fetchParams, monitor).getModel();
+                if (model != null) {
+                    Map<@NonNull String, @NonNull Collection<@NonNull Annotation>> annotations = model.getAnnotations();
+                    List<Annotation> markerList = new ArrayList<>();
+                    for (Entry<@NonNull String, @NonNull Collection<@NonNull Annotation>> entryAnnotation : annotations.entrySet()) {
+                        String category = Objects.requireNonNull(entryAnnotation.getKey());
+                        for (Annotation annotation : Objects.requireNonNull(entryAnnotation.getValue())) {
+                            markerList.add(annotation);
+                            for (SubMarker subMarker : periodicAnnotationProvider.getSubMarkers()) {
+                                getSubMarkerList(Objects.requireNonNull(subMarker), annotation, markerMap, starttime, endtime, minDuration, times);
 
-                                }
                             }
-                            markerMap.put(category, markerList);
                         }
+                        markerMap.put(category, markerList);
                     }
                 }
             }
@@ -286,30 +284,39 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
         return markerMap;
     }
 
-
-
-    private static OutputElementStyle getOutputStyle(Marker marker, RGBAColor color) {
+    private static OutputElementStyle getOutputStyle(RGBAColor color) {
         Map<@NonNull String, @NonNull Object> style = new HashMap<>();
-        String name = marker.getName();
-        if (name != null) {
-            style.put(StyleProperties.STYLE_NAME, name);
-        }
-        style.put(StyleProperties.COLOR, color.toString().substring(0, 7));
+        String colorString = color.toString().substring(0, 7);
+        style.put(StyleProperties.STYLE_NAME, colorString);
+        style.put(StyleProperties.COLOR, colorString);
         style.put(StyleProperties.OPACITY, (float) (color.getAlpha() / 255.0));
         return new OutputElementStyle(null, style);
     }
 
     @Override
     public @NonNull TmfModelResponse<@NonNull AnnotationCategoriesModel> fetchAnnotationCategories(@NonNull Map<@NonNull String, @NonNull Object> fetchParameters, @Nullable IProgressMonitor monitor) {
-        List<@NonNull String> categories = new ArrayList<>();
-        for (IOutputAnnotationProvider source : fMarkerEventSources) {
-            TmfModelResponse<@NonNull AnnotationCategoriesModel> response = source.fetchAnnotationCategories(fetchParameters, monitor);
+        Set<@NonNull String> categories = new LinkedHashSet<>();
+        for (CustomPeriodicAnnotationProvider annotationProvider : fAnnotationProviders) {
+            TmfModelResponse<@NonNull AnnotationCategoriesModel> response = annotationProvider.fetchAnnotationCategories(fetchParameters, monitor);
             AnnotationCategoriesModel model = response.getModel();
             if (model != null) {
                 categories.addAll(model.getAnnotationCategories());
+                getSubMarkerCategories(categories, annotationProvider.getSubMarkers());
             }
         }
-        return new TmfModelResponse<>(new AnnotationCategoriesModel(categories), Status.COMPLETED, ""); //$NON-NLS-1$
+        return new TmfModelResponse<>(new AnnotationCategoriesModel(new ArrayList<>(categories)), Status.COMPLETED, ""); //$NON-NLS-1$
+    }
+
+    private void getSubMarkerCategories(Set<String> categories, List<SubMarker> subMarkers) {
+        for (SubMarker subMarker : subMarkers) {
+            categories.add(subMarker.getName());
+            getSubMarkerCategories(categories, subMarker.getSubMarkers());
+            if (subMarker instanceof WeightedMarker) {
+                for (MarkerSegment segment : ((WeightedMarker) subMarker).getSegments()) {
+                    getSubMarkerCategories(categories, segment.getSubMarkers());
+                }
+            }
+        }
     }
 
     @Override
@@ -325,7 +332,7 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
      */
     public double getMaxDuration() {
         double duration = 0;
-        for (IOutputAnnotationProvider es : fMarkerEventSources) {
+        for (IOutputAnnotationProvider es : fAnnotationProviders) {
             if (es instanceof PeriodicAnnotationProvider) {
                 duration = Math.max(duration, ((PeriodicAnnotationProvider) es).getPeriod());
             }
@@ -349,5 +356,37 @@ public class CustomAnnotationProvider implements IOutputAnnotationProvider {
             }
         }
         return labels;
+    }
+
+    private class CustomPeriodicAnnotationProvider extends PeriodicAnnotationProvider {
+        private final long fStartIndex;
+        private final String fLabel;
+        private final RangeSet<Long> fIndexRange;
+        private List<SubMarker> fSubMarkers;
+
+        public CustomPeriodicAnnotationProvider(PeriodicMarker periodicMarker, ITimeReference reference, double period, long rollover, RGBAColor evenColor, RGBAColor oddColor) {
+            super(periodicMarker.getName(), reference, period, rollover, evenColor, oddColor);
+            fStartIndex = periodicMarker.getRange().lowerEndpoint();
+            fLabel = periodicMarker.getLabel();
+            fIndexRange = periodicMarker.getIndexRange();
+            fSubMarkers = periodicMarker.getSubMarkers();
+        }
+
+        @Override
+        public String getAnnotationLabel(long index) {
+            return checkNotNull(String.format(fLabel, fStartIndex + index));
+        }
+
+        @Override
+        public boolean isApplicable(long index) {
+            if (fIndexRange != null) {
+                return fIndexRange.contains(fStartIndex + index);
+            }
+            return true;
+        }
+
+        public List<SubMarker> getSubMarkers() {
+            return fSubMarkers;
+        }
     }
 }
