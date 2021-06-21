@@ -21,6 +21,7 @@ import org.antlr.runtime.tree.CommonTree;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.tracecompass.ctf.core.event.types.EnumDeclaration;
+import org.eclipse.tracecompass.ctf.core.event.types.IntegerDeclaration;
 import org.eclipse.tracecompass.ctf.parser.CTFParser;
 import org.eclipse.tracecompass.internal.ctf.core.Activator;
 import org.eclipse.tracecompass.internal.ctf.core.event.metadata.ICommonTreeParser;
@@ -90,7 +91,8 @@ public final class EnumeratorParser implements ICommonTreeParser {
 
         List<CommonTree> children = enumerator.getChildren();
 
-        long low = 0, high = 0;
+        long low = 0;
+        long high = 0;
         boolean valueSpecified = false;
         String label = null;
 
@@ -122,10 +124,10 @@ public final class EnumeratorParser implements ICommonTreeParser {
         } else if (!valueSpecified && !enumDeclaration.add(label)) {
             throw new ParseException("enum cannot add element " + label); //$NON-NLS-1$
         }
-
-        if (valueSpecified && (BigInteger.valueOf(low).compareTo(enumDeclaration.getContainerType().getMinValue()) < 0 ||
-                BigInteger.valueOf(high).compareTo(enumDeclaration.getContainerType().getMaxValue()) > 0)) {
-            throw new ParseException("enum value is not in range"); //$NON-NLS-1$
+        IntegerDeclaration enumContainerType = enumDeclaration.getContainerType();
+        if (valueSpecified && (BigInteger.valueOf(low).compareTo(enumContainerType.getMinValue()) < 0 ||
+                BigInteger.valueOf(high).compareTo(enumContainerType.getMaxValue()) > 0)) {
+            throw new ParseException(String.format("enum value ( %d - %d ) is not in range ( %d - %d )", low, high, enumContainerType.getMinValue(), enumContainerType.getMinValue())); //$NON-NLS-1$
         }
 
         return high;
