@@ -53,9 +53,9 @@ import com.google.common.collect.TreeMultimap;
 /**
  * Trace Annotation provider for providing lost events annotations.
  */
-public class LostEventOutputAnnotationProvider implements IOutputAnnotationProvider {
+public class LostEventsOutputAnnotationProvider implements IOutputAnnotationProvider {
 
-    private static final String LOST_EVENTS = checkNotNull(Messages.LostEventOutputAnnotationProvider_LostEventsCategory);
+    private static final String LOST_EVENTS = checkNotNull(Messages.LostEventsOutputAnnotationProvider_LostEventsCategory);
     private static final TmfModelResponse<AnnotationModel> NO_DATA = new TmfModelResponse<>(new AnnotationModel(Collections.emptyMap()), Status.COMPLETED, ""); //$NON-NLS-1$
 
     private final ITmfTrace fTrace;
@@ -68,7 +68,7 @@ public class LostEventOutputAnnotationProvider implements IOutputAnnotationProvi
      * @param trace
      *            the trace to provide lost events annotations.
      */
-    public LostEventOutputAnnotationProvider(ITmfTrace trace) {
+    public LostEventsOutputAnnotationProvider(ITmfTrace trace) {
         fTrace = trace;
     }
 
@@ -102,9 +102,8 @@ public class LostEventOutputAnnotationProvider implements IOutputAnnotationProvi
         }
 
         List<Long> timeRequested = DataProviderParameterUtils.extractTimeRequested(fetchParameters);
-        List<@NonNull Long> entries = DataProviderParameterUtils.extractSelectedItems(fetchParameters);
         @Nullable Set<@NonNull String> categories = DataProviderParameterUtils.extractSelectedCategories(fetchParameters);
-        if (timeRequested == null || timeRequested.size() < 2|| entries == null || (categories != null && !categories.contains(LOST_EVENTS))) {
+        if (timeRequested == null || timeRequested.size() < 2 || (categories != null && !categories.contains(LOST_EVENTS))) {
             return NO_DATA;
         }
 

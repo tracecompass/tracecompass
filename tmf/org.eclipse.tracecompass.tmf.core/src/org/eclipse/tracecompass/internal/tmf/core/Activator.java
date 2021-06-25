@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 Ericsson
+ * Copyright (c) 2009, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.internal.tmf.core.annotations.CustomDefinedOutputAnnotationProviderFactory;
+import org.eclipse.tracecompass.internal.tmf.core.annotations.LostEventsOutputAnnotationProviderFactory;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalManager;
@@ -51,6 +52,7 @@ public class Activator extends Plugin {
      * The shared instance
      */
     private static Activator fPlugin;
+    private static final LostEventsOutputAnnotationProviderFactory LOST_EVENTS_ANNOTATION_PROVIDER_FACTORY = new LostEventsOutputAnnotationProviderFactory();
     private static final CustomDefinedOutputAnnotationProviderFactory CUSTOM_DEFINED_OUTPUT_ANNOTATION_PROVIDER_FACTORY = new CustomDefinedOutputAnnotationProviderFactory();
 
     // ------------------------------------------------------------------------
@@ -99,12 +101,15 @@ public class Activator extends Plugin {
         SymbolProviderManager.getInstance();
         /* Initialize the data provider manager */
         DataProviderManager.getInstance();
+        TmfTraceAdapterManager.registerFactory(LOST_EVENTS_ANNOTATION_PROVIDER_FACTORY, ITmfTrace.class);
         TmfTraceAdapterManager.registerFactory(CUSTOM_DEFINED_OUTPUT_ANNOTATION_PROVIDER_FACTORY, ITmfTrace.class);
     }
 
     @Override
     public void stop(BundleContext context) throws Exception {
+        TmfTraceAdapterManager.unregisterFactory(LOST_EVENTS_ANNOTATION_PROVIDER_FACTORY);
         TmfTraceAdapterManager.unregisterFactory(CUSTOM_DEFINED_OUTPUT_ANNOTATION_PROVIDER_FACTORY);
+        LOST_EVENTS_ANNOTATION_PROVIDER_FACTORY.dispose();
         CUSTOM_DEFINED_OUTPUT_ANNOTATION_PROVIDER_FACTORY.dispose();
         TmfCoreTracer.stop();
         TmfTraceManager.getInstance().dispose();

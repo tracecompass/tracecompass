@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 @SuppressWarnings("javadoc")
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "org.eclipse.tracecompass.internal.tmf.core.annotations.messages"; //$NON-NLS-1$
-    public static @Nullable String LostEventOutputAnnotationProvider_LostEventsCategory;
+    public static @Nullable String LostEventsOutputAnnotationProvider_LostEventsCategory;
 
     static {
         // initialize resource bundle

@@ -24,7 +24,7 @@ public class LostEventsOutputAnnotationProviderFactory extends AbstractTmfTraceA
     @Override
     protected <T> @Nullable T getTraceAdapter(ITmfTrace trace, @Nullable Class<T> adapterType) {
         if (null != adapterType && IOutputAnnotationProvider.class.equals(adapterType)) {
-            IOutputAnnotationProvider adapter = new LostEventOutputAnnotationProvider(trace);
+            IOutputAnnotationProvider adapter = new LostEventsOutputAnnotationProvider(trace);
             return adapterType.cast(adapter);
         }
         return null;
