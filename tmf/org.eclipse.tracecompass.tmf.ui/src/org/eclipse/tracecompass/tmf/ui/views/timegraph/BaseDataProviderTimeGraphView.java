@@ -129,9 +129,11 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
     protected final Table<Object, Long, @NonNull TimeGraphEntry> fScopedEntries = HashBasedTable.create();
 
     /** Map of parent trace to providers */
-    private Multimap<ITmfTrace, ITimeGraphDataProvider<? extends @NonNull TimeGraphEntryModel>> fProviders = HashMultimap.create();
+    private final Multimap<ITmfTrace, ITimeGraphDataProvider<? extends @NonNull TimeGraphEntryModel>> fProviders = HashMultimap.create();
     /** Map of parent trace to scopes, for cleanup */
-    private Multimap<ITmfTrace, Object> fScopes = HashMultimap.create();
+    private final Multimap<ITmfTrace, Object> fScopes = HashMultimap.create();
+    /** Map of provider to marker categories */
+    private final Map<ITimeGraphDataProvider<? extends @NonNull TimeGraphEntryModel>, List<String>> fMarkerCategories = new HashMap<>();
 
     private final String fProviderId;
 
@@ -580,7 +582,9 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                 TmfModelResponse<@NonNull AnnotationCategoriesModel> response = ((IOutputAnnotationProvider) provider).fetchAnnotationCategories(parameters, new NullProgressMonitor());
                 AnnotationCategoriesModel model = response.getModel();
                 if (model != null) {
-                    viewMarkerCategories.addAll(model.getAnnotationCategories());
+                    List<@NonNull String> categories = model.getAnnotationCategories();
+                    viewMarkerCategories.addAll(categories);
+                    fMarkerCategories.put(provider, categories);
                 }
             }
         }
@@ -598,7 +602,13 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         Multimap<ITimeGraphDataProvider<? extends TimeGraphEntryModel>, Long> providersToModelIds = filterGroupEntries(entries, startTime, endTime);
         for (ITimeGraphDataProvider<? extends TimeGraphEntryModel> provider : providersToModelIds.keySet()) {
             if (provider instanceof IOutputAnnotationProvider) {
+                List<String> categories = new ArrayList<>(fMarkerCategories.get(provider));
+                categories.removeIf(category -> !getTimeGraphViewer().isMarkerCategoryVisible(category));
+                if (categories.isEmpty()) {
+                    continue;
+                }
                 Map<@NonNull String, @NonNull Object> parameters = getFetchAnnotationsParameters(times, providersToModelIds.get(provider));
+                parameters.put(DataProviderParameterUtils.REQUESTED_MARKER_CATEGORIES_KEY, categories);
                 TmfModelResponse<@NonNull AnnotationModel> response = ((IOutputAnnotationProvider) provider).fetchAnnotations(parameters, new NullProgressMonitor());
                 AnnotationModel model = response.getModel();
                 if (model != null) {
@@ -773,6 +783,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
                     fProviders.removeAll(viewTrace).forEach(provider -> {
                         fEntries.row(provider).clear();
                         fEntryIds.column(provider).clear();
+                        fMarkerCategories.remove(provider);
                     });
                 } else {
                     for (TimeGraphEntry entry : entryList) {

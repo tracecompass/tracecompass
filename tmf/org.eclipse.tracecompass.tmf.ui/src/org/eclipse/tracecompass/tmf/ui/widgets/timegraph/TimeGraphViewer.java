@@ -160,6 +160,7 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
     private List<ITimeGraphTimeListener> fTimeListeners = new ArrayList<>();
     private List<ITimeGraphRangeListener> fRangeListeners = new ArrayList<>();
     private List<ITimeGraphBookmarkListener> fBookmarkListeners = new ArrayList<>();
+    private List<ITimeGraphMarkerListener> fMarkerListeners = new ArrayList<>();
 
     // Time format, using Epoch reference, Relative time format(default),
     // Number, or Cycles
@@ -1508,7 +1509,20 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
             updateMarkerList();
             updateMarkerActions();
             getControl().redraw();
+            fireMarkerCategoriesChanged();
         }
+    }
+
+    /**
+     * Returns true if the specified marker category is visible
+     *
+     * @param category
+     *            the marker category
+     * @return true if the specified marker category is visible
+     * @since 7.1
+     */
+    public boolean isMarkerCategoryVisible(String category) {
+        return !fHiddenMarkerCategories.contains(category);
     }
 
     /**
@@ -1535,6 +1549,34 @@ public class TimeGraphViewer extends Viewer implements ITimeDataProvider, IMarke
      */
     public List<IMarkerEvent> getMarkers() {
         return Collections.unmodifiableList(fMarkers);
+    }
+
+    /**
+     * Add a marker listener
+     *
+     * @param listener
+     *            The listener to add
+     * @since 7.1
+     */
+    public void addMarkerListener(ITimeGraphMarkerListener listener) {
+        fMarkerListeners.add(listener);
+    }
+
+    /**
+     * Remove a marker listener
+     *
+     * @param listener
+     *            The listener to remove
+     * @since 7.1
+     */
+    public void removeMarkerListener(ITimeGraphMarkerListener listener) {
+        fMarkerListeners.remove(listener);
+    }
+
+    private void fireMarkerCategoriesChanged() {
+        for (ITimeGraphMarkerListener listener : fMarkerListeners) {
+            listener.markerCategoriesChanged();
+        }
     }
 
     /**

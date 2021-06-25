@@ -236,12 +236,16 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
 
         @Override
         public @NonNull List<@NonNull IMarkerEvent> getMarkerList(@NonNull String category, long startTime, long endTime, long resolution, @NonNull IProgressMonitor monitor) {
+            if (!getTimeGraphViewer().isMarkerCategoryVisible(category)) {
+                return Collections.emptyList();
+            }
 
             Map<@NonNull String, @NonNull Object> parameters = new HashMap<>();
             MarkerSet defaultMarkerSet = MarkerUtils.getDefaultMarkerSet();
             if (defaultMarkerSet != null) {
                 parameters.put(DataProviderParameterUtils.REQUESTED_MARKER_SET_KEY, defaultMarkerSet.getId());
             }
+            parameters.put(DataProviderParameterUtils.REQUESTED_MARKER_CATEGORIES_KEY, Collections.singletonList(category));
             parameters.put(DataProviderParameterUtils.REQUESTED_TRACE_KEY, fTrace.getHostId());
             parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, StateSystemUtils.getTimes(startTime, endTime, resolution));
             TmfModelResponse<@NonNull AnnotationModel> response = fProvider.fetchAnnotations(parameters, new NullProgressMonitor());
@@ -1485,6 +1489,8 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 }
             }
         });
+
+        fTimeGraphViewer.addMarkerListener(() -> restartZoomThread());
 
         timeGraphControl.addPaintListener(new PaintListener() {
 

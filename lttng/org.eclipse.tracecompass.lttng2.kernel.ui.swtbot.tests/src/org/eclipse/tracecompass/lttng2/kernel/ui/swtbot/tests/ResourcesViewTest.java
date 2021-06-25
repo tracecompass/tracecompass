@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2018 Ericsson and others
+ * Copyright (c) 2015, 2021 Ericsson and others
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -480,7 +480,7 @@ public class ResourcesViewTest extends KernelTimeGraphViewTestBase {
 
         /* show Lost Events markers */
         viewBot.viewMenu(LOST_EVENTS).click();
-        assertEquals(size1, getSize(markerAxis));
+        SWTBotUtils.waitUntil(ma -> size1.equals(getSize(ma)), markerAxis, "Lost Events did not reappear");
     }
 
     /**
