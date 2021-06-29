@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Ericsson
+ * Copyright (c) 2015, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -110,8 +110,10 @@ public abstract class AbstractTmfTraceAdapterFactory implements IAdapterFactory 
      */
     @TmfSignalHandler
     public synchronized void traceClosed(TmfTraceClosedSignal signal) {
-        Map<Class<?>, Object> row = fAdapters.row(signal.getTrace());
-        disposeAdapters(row.values());
-        row.clear();
+        for (ITmfTrace trace : TmfTraceManager.getTraceSetWithExperiment(signal.getTrace())) {
+            Map<Class<?>, Object> row = fAdapters.row(trace);
+            disposeAdapters(row.values());
+            row.clear();
+        }
     }
 }
