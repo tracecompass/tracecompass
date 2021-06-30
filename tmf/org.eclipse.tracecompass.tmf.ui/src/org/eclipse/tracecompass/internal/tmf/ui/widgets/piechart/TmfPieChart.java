@@ -162,7 +162,7 @@ public class TmfPieChart extends Chart {
                 Font font = new Font(Display.getDefault(), FONT, 15, SWT.BOLD);
                 gc.setForeground(BLACK);
                 gc.setFont(font);
-                String text = Messages.TmfPieChart_noData;
+                String text = org.eclipse.tracecompass.internal.tmf.ui.Messages.TmfChartViewer_NoData;
                 Point textSize = e.gc.textExtent(text);
                 gc.drawText(text, (bounds.width - textSize.x) / 2, (bounds.height - textSize.y) / 2);
                 gc.setFont(oldFont);

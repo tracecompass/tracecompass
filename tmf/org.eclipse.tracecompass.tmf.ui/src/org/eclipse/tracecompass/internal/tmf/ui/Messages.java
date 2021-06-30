@@ -45,6 +45,7 @@ public class Messages extends NLS {
     public static String MarkerEvent_Bookmarks;
 
     public static String TmfChartView_LockYAxis;
+    public static String TmfChartViewer_NoData;
     public static String TmfCommonXLineChartTooltipProvider_time;
 
     public static String TmfEventsTable_AddAsFilterText;

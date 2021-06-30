@@ -28,14 +28,19 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGBA;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtchart.IAxisSet;
 import org.eclipse.swtchart.IAxisTick;
 import org.eclipse.swtchart.IBarSeries;
+import org.eclipse.swtchart.ICustomPaintListener;
 import org.eclipse.swtchart.ILineSeries;
+import org.eclipse.swtchart.IPlotArea;
 import org.eclipse.swtchart.ISeries;
 import org.eclipse.swtchart.ISeries.SeriesType;
 import org.eclipse.swtchart.ISeriesSet;
@@ -52,6 +57,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.Trac
 import org.eclipse.tracecompass.internal.provisional.tmf.ui.viewers.xychart.BaseXYPresentationProvider;
 import org.eclipse.tracecompass.internal.tmf.core.model.filters.FetchParametersUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
+import org.eclipse.tracecompass.internal.tmf.ui.Messages;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderParameterUtils;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataTypeUtils;
 import org.eclipse.tracecompass.tmf.core.model.OutputElementStyle;
@@ -122,6 +128,26 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
     private static final @NonNull Logger LOGGER = TraceCompassLog.getLogger(TmfCommonXAxisChartViewer.class);
     private static final int DEFAULT_SERIES_WIDTH = 1;
     private static final String DIMMED_SERIES_SUFFIX = ".dimmed"; //$NON-NLS-1$
+    private static final ICustomPaintListener NO_DATA = e -> {
+        GC gc = e.gc;
+        Rectangle bounds = gc.getClipping();
+        Font oldFont = gc.getFont();
+        int height = 28;
+        Font font = new Font(Display.getDefault(), "Arial", height, SWT.BOLD); //$NON-NLS-1$
+        IPlotArea chart = (IPlotArea) e.widget;
+        Color oldFg = gc.getForeground();
+        gc.setForeground(chart.getChart().getForeground());
+        gc.setFont(font);
+        String text = Messages.TmfChartViewer_NoData;
+        Point textSize = e.gc.textExtent(text);
+        Color bg = gc.getBackground();
+        gc.setBackground(chart.getBackground());
+        gc.drawText(text, (bounds.width - textSize.x) / 2, (bounds.height - textSize.y) / 2);
+        gc.setBackground(bg);
+        gc.setForeground(oldFg);
+        gc.setFont(oldFont);
+        font.dispose();
+    };
 
     private final double fResolution;
     private final AtomicInteger fDirty = new AtomicInteger();
@@ -389,6 +415,7 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
             } while (!isComplete);
         }
 
+
         /**
          * Update the chart's values before refreshing the viewer
          */
@@ -500,7 +527,10 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                             clearContent();
                             delta = 1;
                         }
-
+                        getSwtChart().getPlotArea().removeCustomPaintListener(NO_DATA);
+                        if(seriesValues.getSeriesData().isEmpty()) {
+                            getSwtChart().getPlotArea().addCustomPaintListener(NO_DATA);
+                        }
                         // Set the formatters for the axis
                         IAxisSet axisSet = getSwtChart().getAxisSet();
                         IAxisTick xTick = axisSet.getXAxis(0).getTick();
@@ -529,7 +559,6 @@ public abstract class TmfCommonXAxisChartViewer extends TmfXYChartViewer {
                                     new Range(fixedYRange.getLower(), fixedYRange.getUpper()));
                         }
                         getSwtChart().redraw();
-
                         if (isSendTimeAlignSignals()) {
                             /*
                              * The width of the chart might have changed and its time axis might be
