@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2019 Ericsson
+ * Copyright (c) 2018, 2021 Ericsson
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License 2.0 which
@@ -44,9 +44,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.ViewFilterDialog;
 import org.eclipse.tracecompass.internal.provisional.tmf.ui.widgets.timegraph.BaseDataProviderTimeGraphPresentationProvider;
-import org.eclipse.tracecompass.internal.tmf.core.markers.MarkerSet;
 import org.eclipse.tracecompass.internal.tmf.ui.Activator;
-import org.eclipse.tracecompass.internal.tmf.ui.markers.MarkerUtils;
 import org.eclipse.tracecompass.internal.tmf.ui.views.timegraph.Messages;
 import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
 import org.eclipse.tracecompass.tmf.core.TmfStrings;
@@ -719,19 +717,7 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
      */
     protected @NonNull Map<@NonNull String, @NonNull Object> getFetchAnnotationCategoriesParameters() {
         HashMap<@NonNull String, @NonNull Object> categoriesParameters = new HashMap<>();
-        putMarkerSetParameters(categoriesParameters, getTrace());
         return categoriesParameters;
-    }
-
-    private static void putMarkerSetParameters(Map<@NonNull String, @NonNull Object> parameters, ITmfTrace trace) {
-        MarkerSet markerSet = MarkerUtils.getDefaultMarkerSet();
-        if (markerSet != null) {
-            String markerSetID = markerSet.getId();
-            if (markerSetID != null) {
-                parameters.put(DataProviderParameterUtils.REQUESTED_MARKER_SET_KEY, markerSetID);
-                parameters.put(DataProviderParameterUtils.REQUESTED_TRACE_KEY, trace.getHostId());
-            }
-        }
     }
 
     /**
@@ -748,7 +734,6 @@ public class BaseDataProviderTimeGraphView extends AbstractTimeGraphView {
         Map<@NonNull String, @NonNull Object> parameters = new HashMap<>();
         parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, times);
         parameters.put(DataProviderParameterUtils.REQUESTED_ITEMS_KEY, items);
-        putMarkerSetParameters(parameters, getTrace());
         return parameters;
     }
 

@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.tracecompass.internal.tmf.core.annotations.CustomDefinedOutputAnnotationProviderFactory;
+import org.eclipse.tracecompass.internal.tmf.core.annotations.CustomOutputAnnotationProviderFactory;
 import org.eclipse.tracecompass.internal.tmf.core.annotations.LostEventsOutputAnnotationProviderFactory;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.dataprovider.DataProviderManager;
@@ -53,7 +53,7 @@ public class Activator extends Plugin {
      */
     private static Activator fPlugin;
     private static final LostEventsOutputAnnotationProviderFactory LOST_EVENTS_ANNOTATION_PROVIDER_FACTORY = new LostEventsOutputAnnotationProviderFactory();
-    private static final CustomDefinedOutputAnnotationProviderFactory CUSTOM_DEFINED_OUTPUT_ANNOTATION_PROVIDER_FACTORY = new CustomDefinedOutputAnnotationProviderFactory();
+    private static final CustomOutputAnnotationProviderFactory CUSTOM_DEFINED_OUTPUT_ANNOTATION_PROVIDER_FACTORY = new CustomOutputAnnotationProviderFactory();
 
     // ------------------------------------------------------------------------
     // Constructors

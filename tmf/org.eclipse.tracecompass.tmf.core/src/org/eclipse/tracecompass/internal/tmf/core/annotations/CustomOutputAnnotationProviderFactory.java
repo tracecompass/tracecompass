@@ -17,14 +17,15 @@ import org.eclipse.tracecompass.tmf.core.trace.AbstractTmfTraceAdapterFactory;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 /**
- * Output annotation provider factory for trace level annotations for custom annotations (frames).
+ * Output annotation provider factory for trace level annotations for custom
+ * annotations (frames).
  */
-public class CustomDefinedOutputAnnotationProviderFactory extends AbstractTmfTraceAdapterFactory {
+public class CustomOutputAnnotationProviderFactory extends AbstractTmfTraceAdapterFactory {
 
     @Override
     protected @Nullable <T> T getTraceAdapter(ITmfTrace trace, @Nullable Class<T> adapterType) {
         if (null != adapterType && IOutputAnnotationProvider.class.equals(adapterType)) {
-            return adapterType.cast(new CustomDefinedOutputAnnotationProvider());
+            return adapterType.cast(new CustomOutputAnnotationProvider(trace));
         }
         return null;
     }

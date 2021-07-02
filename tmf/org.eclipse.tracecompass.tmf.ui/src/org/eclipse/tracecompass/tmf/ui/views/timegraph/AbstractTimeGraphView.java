@@ -247,7 +247,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 parameters.put(DataProviderParameterUtils.REQUESTED_MARKER_SET_KEY, defaultMarkerSet.getId());
             }
             parameters.put(DataProviderParameterUtils.REQUESTED_MARKER_CATEGORIES_KEY, Collections.singletonList(category));
-            parameters.put(DataProviderParameterUtils.REQUESTED_TRACE_KEY, fTrace.getHostId());
             parameters.put(DataProviderParameterUtils.REQUESTED_TIME_KEY, StateSystemUtils.getTimes(startTime, endTime, resolution));
             TmfModelResponse<@NonNull AnnotationModel> response = fProvider.fetchAnnotations(parameters, new NullProgressMonitor());
             AnnotationModel model = response.getModel();
@@ -277,7 +276,6 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
             if (defaultMarkerSet != null) {
                 parameters.put(DataProviderParameterUtils.REQUESTED_MARKER_SET_KEY, defaultMarkerSet.getId());
             }
-            parameters.put(DataProviderParameterUtils.REQUESTED_TRACE_KEY, fTrace.getHostId());
             TmfModelResponse<@NonNull AnnotationCategoriesModel> cats = fProvider.fetchAnnotationCategories(parameters, new NullProgressMonitor());
             AnnotationCategoriesModel model = cats.getModel();
             if (model != null) {

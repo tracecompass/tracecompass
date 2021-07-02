@@ -31,56 +31,69 @@ import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 
 /**
- * Trace Annotation provider for providing custom (frame) annotations. This one
- * is a singleton for all of trace compass, it encapsulates the individual
- * annotation providers per trace.
+ * Trace Annotation provider for providing custom (frame) annotations. It
+ * encapsulates the individual annotation providers per marker set.
  */
-public class CustomDefinedOutputAnnotationProvider implements IOutputAnnotationProvider {
+public class CustomOutputAnnotationProvider implements IOutputAnnotationProvider {
 
     private static final String INVALID_MARKER_ID = "Invalid marker ID %s"; //$NON-NLS-1$
     private static final String NO_MARKER_ID = "no markerID"; //$NON-NLS-1$
-    private final Map<String, Map<String, CustomAnnotationProvider>> fTraceMarkers = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String, CustomAnnotationProvider> fProviders = Collections.synchronizedMap(new HashMap<>());
+    private final ITmfTrace fTrace;
+
+    static {
+        MarkerConfigXmlParser.initMarkerSets();
+    }
 
     /**
      * Constructor
      */
-    public CustomDefinedOutputAnnotationProvider() {
-        MarkerConfigXmlParser.initMarkerSets();
+    public CustomOutputAnnotationProvider(ITmfTrace trace) {
+        fTrace = trace;
     }
 
     @Override
     public TmfModelResponse<AnnotationCategoriesModel> fetchAnnotationCategories(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         Object markerID = fetchParameters.get(DataProviderParameterUtils.REQUESTED_MARKER_SET_KEY);
-        Object hostID = fetchParameters.get(DataProviderParameterUtils.REQUESTED_TRACE_KEY);
-        Optional<ITmfTrace> activeTrace = getTrace(hostID);
+        /* Ignore if trace is not the first element of its trace set. */
+        if (!isFirstTrace()) {
+            return new TmfModelResponse<>(null, Status.COMPLETED, ""); //$NON-NLS-1$
+        }
         if (markerID == null) {
             return new TmfModelResponse<>(null, Status.FAILED, NO_MARKER_ID);
         }
         MarkerSet ms = getMarkerSet(markerID);
-        if (ms != null) {
-            return getAnnotationProvider(String.valueOf(hostID), activeTrace.get(), ms).fetchAnnotationCategories(fetchParameters, monitor);
+        if (ms == null) {
+            return new TmfModelResponse<>(null, Status.FAILED, formatError(markerID));
         }
-        return new TmfModelResponse<>(null, Status.FAILED, formatError(markerID));
+        return getAnnotationProvider(null, ms).fetchAnnotationCategories(fetchParameters, monitor);
     }
 
     @Override
     public TmfModelResponse<AnnotationModel> fetchAnnotations(Map<String, Object> fetchParameters, @Nullable IProgressMonitor monitor) {
         Object markerID = fetchParameters.get(DataProviderParameterUtils.REQUESTED_MARKER_SET_KEY);
         Object hostID = fetchParameters.get(DataProviderParameterUtils.REQUESTED_TRACE_KEY);
-        Optional<ITmfTrace> activeTrace = getTrace(hostID);
+        Optional<ITmfTrace> requestedTrace = getTrace(hostID);
+        /*
+         * Ignore if trace is not the requested trace, or if no requested trace,
+         * if the trace is not the first element of its trace set.
+         */
+        if ((requestedTrace.isPresent() && !requestedTrace.get().equals(fTrace)) ||
+                (requestedTrace.isEmpty() && !isFirstTrace())) {
+            return new TmfModelResponse<>(null, Status.COMPLETED, ""); //$NON-NLS-1$
+        }
         if (markerID == null) {
             return new TmfModelResponse<>(null, Status.FAILED, NO_MARKER_ID);
         }
         MarkerSet ms = getMarkerSet(markerID);
-        if (ms != null) {
-            return getAnnotationProvider(String.valueOf(hostID), activeTrace.isPresent() ? activeTrace.get() : null, ms).fetchAnnotations(fetchParameters, monitor);
+        if (ms == null) {
+            return new TmfModelResponse<>(null, Status.FAILED, formatError(markerID));
         }
-        return new TmfModelResponse<>(null, Status.FAILED, formatError(markerID));
+        return getAnnotationProvider(requestedTrace.isPresent() ? requestedTrace.get() : null, ms).fetchAnnotations(fetchParameters, monitor);
     }
 
-    private CustomAnnotationProvider getAnnotationProvider(String hostID, @Nullable ITmfTrace activeTrace, MarkerSet ms) {
-        Map<String, CustomAnnotationProvider> capMap = fTraceMarkers.computeIfAbsent(hostID, e -> Collections.synchronizedMap(new HashMap<>()));
-        return capMap.computeIfAbsent(ms.getId(), a -> new CustomAnnotationProvider(activeTrace, ms));
+    private CustomAnnotationProvider getAnnotationProvider(@Nullable ITmfTrace trace, MarkerSet ms) {
+        return fProviders.computeIfAbsent(ms.getId(), msId -> new CustomAnnotationProvider(trace, ms));
     }
 
     private static @Nullable MarkerSet getMarkerSet(Object markerID) {
@@ -95,6 +108,15 @@ public class CustomDefinedOutputAnnotationProvider implements IOutputAnnotationP
 
     private static Optional<ITmfTrace> getTrace(Object hostID) {
         return TmfTraceManager.getInstance().getOpenedTraces().stream().flatMap(trace -> TmfTraceManager.getTraceSetWithExperiment(trace).stream()).filter(t -> Objects.equals(t.getHostId(), hostID)).findAny();
+    }
+
+    /*
+     * Returns true if, for any opened trace, this provider's trace is the first
+     * element in the opened trace's trace set.
+     */
+    private boolean isFirstTrace() {
+        return TmfTraceManager.getInstance().getOpenedTraces().stream()
+                .anyMatch(t -> TmfTraceManager.getTraceSet(t).stream().findFirst().get().equals(fTrace));
     }
 
     private static String formatError(Object markerID) {
