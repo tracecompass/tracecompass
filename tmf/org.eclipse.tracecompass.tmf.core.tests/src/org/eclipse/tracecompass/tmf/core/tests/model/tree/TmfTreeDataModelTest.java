@@ -230,7 +230,7 @@ public class TmfTreeDataModelTest {
         TmfModelResponse<@NonNull AnnotationCategoriesModel> returnVal = composite.fetchAnnotationCategories(Collections.emptyMap(), monitor);
         AnnotationCategoriesModel categoryModel = returnVal.getModel();
         assertNotNull(categoryModel);
-        assertEquals(Arrays.asList("0", "1", "2", "common"), categoryModel.getAnnotationCategories());
+        assertEquals(Arrays.asList("common", "0", "1", "2"), categoryModel.getAnnotationCategories());
         // Annotations
         TmfModelResponse<@NonNull AnnotationModel> annotations = composite.fetchAnnotations(Collections.emptyMap(), monitor);
         AnnotationModel annotationsModel = annotations.getModel();

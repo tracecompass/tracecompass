@@ -11,7 +11,7 @@
 
 package org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -52,7 +52,7 @@ public class AnnotationCategoriesModel {
      * @return a new aggregated {@link AnnotationCategoriesModel}
      */
     public static AnnotationCategoriesModel of(AnnotationCategoriesModel... models) {
-        Set<String> categories = new HashSet<>();
+        Set<String> categories = new LinkedHashSet<>();
         for (AnnotationCategoriesModel categoryModel : models) {
             if (categoryModel != null) {
                 categories.addAll(categoryModel.getAnnotationCategories());
