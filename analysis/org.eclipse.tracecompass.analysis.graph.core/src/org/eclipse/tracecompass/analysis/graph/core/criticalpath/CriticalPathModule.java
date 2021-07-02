@@ -27,6 +27,8 @@ import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * Class to implement the critical path analysis
  *
@@ -46,6 +48,7 @@ public class CriticalPathModule extends TmfAbstractAnalysisModule implements ICr
     private final TmfGraphBuilderModule fGraphModule;
 
     private volatile @Nullable TmfGraph fCriticalPath;
+    private volatile boolean fScheduleOnParameterChange = true;
 
     /**
      * Default constructor
@@ -60,6 +63,26 @@ public class CriticalPathModule extends TmfAbstractAnalysisModule implements ICr
         addParameter(PARAM_WORKER);
         setId(ANALYSIS_ID);
         fGraphModule = graph;
+    }
+
+    /**
+     * Constructor with the parameter. Can be used by benchmarks, to avoid that
+     * setting the parameter causes the module to be schedule and run in a job
+     * which keeps it in memory forever (and thus can cause OOME)
+     *
+     * @param graph
+     *            The graph module that will be used to calculate the critical
+     *            path on
+     * @param worker
+     *            The worker parameter to set
+     * @since 3.1
+     */
+    @VisibleForTesting
+    public CriticalPathModule(TmfGraphBuilderModule graph, IGraphWorker worker) {
+        this(graph);
+        fScheduleOnParameterChange = false;
+        setParameter(PARAM_WORKER, worker);
+
     }
 
     @Override
@@ -115,7 +138,9 @@ public class CriticalPathModule extends TmfAbstractAnalysisModule implements ICr
         fCriticalPath = null;
         cancel();
         resetAnalysis();
-        schedule();
+        if (fScheduleOnParameterChange) {
+            schedule();
+        }
     }
 
     private static ICriticalPathAlgorithm getAlgorithm(TmfGraph graph) {
