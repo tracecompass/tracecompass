@@ -14,6 +14,7 @@ package org.eclipse.tracecompass.segmentstore.core.tests.htStore;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -153,17 +154,27 @@ public class HTStoreTest extends AbstractTestSegmentStore {
             // Get the segment store, it should be in build mode and fill it with some data
             HistoryTreeSegmentStoreStub<TestSegment> segmentStore = new HistoryTreeSegmentStoreStub<>(filePath, 1, TestSegment.DESERIALISER, version);
             segmentStore.add(new TestSegment(1, 3, "abc"));
+            segmentStore.add(new TestSegment(2, 2, "no duration"));
             segmentStore.finishedBuilding(4);
             segmentStore.dispose();
 
             // Open the segment store, it should be filled with the segment
             segmentStore = new HistoryTreeSegmentStoreStub<>(filePath, 1, TestSegment.DESERIALISER, version);
-            assertEquals(1, segmentStore.size());
+            assertEquals(2, segmentStore.size());
             segmentStore.dispose();
 
             // Re-open the segment store, it should be filled with the segment
             segmentStore = new HistoryTreeSegmentStoreStub<>(filePath, 1, TestSegment.DESERIALISER, version);
-            assertEquals(1, segmentStore.size());
+            assertEquals(2, segmentStore.size());
+            for (TestSegment segment : segmentStore) {
+                if (segment.getStart() == 1) {
+                    assertEquals(3, segment.getEnd());
+                } else if (segment.getStart() == 2) {
+                    assertEquals(2, segment.getEnd());
+                } else {
+                    fail("Unexpected segment " + segment);
+                }
+            }
             segmentStore.dispose();
         } finally {
             Files.delete(filePath);
