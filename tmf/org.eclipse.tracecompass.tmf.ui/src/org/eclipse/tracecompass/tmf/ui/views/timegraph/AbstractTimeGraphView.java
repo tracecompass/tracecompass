@@ -108,6 +108,7 @@ import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.AnnotationModel;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IAnnotation.AnnotationType;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.IOutputAnnotationProvider;
+import org.eclipse.tracecompass.internal.provisional.tmf.core.model.annotations.TraceAnnotationProvider;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.FilterCu;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filter.parser.IFilterStrings;
 import org.eclipse.tracecompass.internal.provisional.tmf.core.model.filters.TmfFilterAppliedSignal;
@@ -1918,16 +1919,13 @@ public abstract class AbstractTimeGraphView extends TmfView implements ITmfTimeA
                 if (site != null) {
                     service = site.getService(IWorkbenchSiteProgressService.class);
                 }
+                markerEventSources.add(new AnnotationMarkerEventSource(new TraceAnnotationProvider(viewTrace)));
                 for (ITmfTrace trace : getTracesToBuild(viewTrace)) {
                     if (trace == null) {
                         break;
                     }
                     List<@NonNull IMarkerEventSource> adapters = TmfTraceAdapterManager.getAdapters(trace, IMarkerEventSource.class);
-                    List<@NonNull IOutputAnnotationProvider> providers = TmfTraceAdapterManager.getAdapters(trace, IOutputAnnotationProvider.class);
                     markerEventSources.addAll(adapters);
-                    for (IOutputAnnotationProvider ap : providers) {
-                        markerEventSources.add(new AnnotationMarkerEventSource(ap));
-                    }
 
                     Job buildJob = new Job(getTitle() + Messages.AbstractTimeGraphView_BuildJob) {
                         @Override
