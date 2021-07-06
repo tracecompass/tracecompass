@@ -160,7 +160,8 @@ public class TmfPieChart extends Chart {
                 bounds = gc.getClipping();
                 Font oldFont = gc.getFont();
                 Font font = new Font(Display.getDefault(), FONT, 15, SWT.BOLD);
-                gc.setForeground(BLACK);
+                gc.setForeground(chart.getForeground());
+                gc.setFont(font);
                 gc.setFont(font);
                 String text = org.eclipse.tracecompass.internal.tmf.ui.Messages.TmfChartViewer_NoData;
                 Point textSize = e.gc.textExtent(text);
@@ -175,9 +176,11 @@ public class TmfPieChart extends Chart {
 
             if (chart.getLegend().isVisible()) {
                 Rectangle legendBounds = ((Control) chart.getLegend()).getBounds();
+                chart.getLegend().setBackground(chart.getBackground());
+                chart.getLegend().setForeground(chart.getForeground());
                 Font oldFont = gc.getFont();
                 Font font = new Font(Display.getDefault(), FONT, 10, SWT.BOLD);
-                gc.setForeground(BLACK);
+                gc.setForeground(chart.getForeground());
                 gc.setFont(font);
                 String text = chart.getAxisSet().getXAxis(0).getTitle().getText();
                 Point textSize = e.gc.textExtent(text);
